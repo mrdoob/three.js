@@ -18,7 +18,7 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-//
+// Polyfills
 
 if ( Number.EPSILON === undefined ) {
 
@@ -40,7 +40,7 @@ if ( Math.sign === undefined ) {
 
 }
 
-if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
+if ( Function.prototype.name === undefined ) {
 
 	// Missing in IE9-11.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
@@ -59,43 +59,36 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 if ( Object.assign === undefined ) {
 
+	// Missing in IE.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-	Object.defineProperty( Object, 'assign', {
+	( function () {
 
-		writable: true,
-		configurable: true,
-
-		value: function ( target ) {
+		Object.assign = function ( target ) {
 
 			'use strict';
 
 			if ( target === undefined || target === null ) {
 
-				throw new TypeError( "Cannot convert first argument to object" );
+				throw new TypeError( 'Cannot convert undefined or null to object' );
 
 			}
 
-			var to = Object( target );
+			var output = Object( target );
 
-			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
+			for ( var index = 1; index < arguments.length; index ++ ) {
 
-				var nextSource = arguments[ i ];
+				var source = arguments[ index ];
 
-				if ( nextSource === undefined || nextSource === null ) continue;
+				if ( source !== undefined && source !== null ) {
 
-				nextSource = Object( nextSource );
+					for ( var nextKey in source ) {
 
-				var keysArray = Object.keys( nextSource );
+						if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
+							output[ nextKey ] = source[ nextKey ];
 
-					var nextKey = keysArray[ nextIndex ];
-					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
-
-					if ( desc !== undefined && desc.enumerable ) {
-
-						to[ nextKey ] = nextSource[ nextKey ];
+						}
 
 					}
 
@@ -103,240 +96,245 @@ if ( Object.assign === undefined ) {
 
 			}
 
-			return to;
+			return output;
 
-		}
+		};
 
-	} );
+	} )();
 
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+//
 
-THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
+Object.assign( THREE, {
 
-// GL STATE CONSTANTS
+	// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
-THREE.CullFaceNone = 0;
-THREE.CullFaceBack = 1;
-THREE.CullFaceFront = 2;
-THREE.CullFaceFrontBack = 3;
+	MOUSE: { LEFT: 0, MIDDLE: 1, RIGHT: 2 },
 
-THREE.FrontFaceDirectionCW = 0;
-THREE.FrontFaceDirectionCCW = 1;
+	// GL STATE CONSTANTS
 
-// SHADOWING TYPES
+	CullFaceNone: 0,
+	CullFaceBack: 1,
+	CullFaceFront: 2,
+	CullFaceFrontBack: 3,
 
-THREE.BasicShadowMap = 0;
-THREE.PCFShadowMap = 1;
-THREE.PCFSoftShadowMap = 2;
+	FrontFaceDirectionCW: 0,
+	FrontFaceDirectionCCW: 1,
 
-// MATERIAL CONSTANTS
+	// SHADOWING TYPES
 
-// side
+	BasicShadowMap: 0,
+	PCFShadowMap: 1,
+	PCFSoftShadowMap: 2,
 
-THREE.FrontSide = 0;
-THREE.BackSide = 1;
-THREE.DoubleSide = 2;
+	// MATERIAL CONSTANTS
 
-// shading
+	// side
 
-THREE.FlatShading = 1;
-THREE.SmoothShading = 2;
+	FrontSide: 0,
+	BackSide: 1,
+	DoubleSide: 2,
 
-// colors
+	// shading
 
-THREE.NoColors = 0;
-THREE.FaceColors = 1;
-THREE.VertexColors = 2;
+	FlatShading: 1,
+	SmoothShading: 2,
 
-// blending modes
+	// colors
 
-THREE.NoBlending = 0;
-THREE.NormalBlending = 1;
-THREE.AdditiveBlending = 2;
-THREE.SubtractiveBlending = 3;
-THREE.MultiplyBlending = 4;
-THREE.CustomBlending = 5;
+	NoColors: 0,
+	FaceColors: 1,
+	VertexColors: 2,
 
-// custom blending equations
-// (numbers start from 100 not to clash with other
-// mappings to OpenGL constants defined in Texture.js)
+	// blending modes
 
-THREE.AddEquation = 100;
-THREE.SubtractEquation = 101;
-THREE.ReverseSubtractEquation = 102;
-THREE.MinEquation = 103;
-THREE.MaxEquation = 104;
+	NoBlending: 0,
+	NormalBlending: 1,
+	AdditiveBlending: 2,
+	SubtractiveBlending: 3,
+	MultiplyBlending: 4,
+	CustomBlending: 5,
 
-// custom blending destination factors
+	// custom blending equations
+	// (numbers start from 100 not to clash with other
+	// mappings to OpenGL constants defined in Texture.js)
 
-THREE.ZeroFactor = 200;
-THREE.OneFactor = 201;
-THREE.SrcColorFactor = 202;
-THREE.OneMinusSrcColorFactor = 203;
-THREE.SrcAlphaFactor = 204;
-THREE.OneMinusSrcAlphaFactor = 205;
-THREE.DstAlphaFactor = 206;
-THREE.OneMinusDstAlphaFactor = 207;
+	AddEquation: 100,
+	SubtractEquation: 101,
+	ReverseSubtractEquation: 102,
+	MinEquation: 103,
+	MaxEquation: 104,
 
-// custom blending source factors
+	// custom blending destination factors
 
-//THREE.ZeroFactor = 200;
-//THREE.OneFactor = 201;
-//THREE.SrcAlphaFactor = 204;
-//THREE.OneMinusSrcAlphaFactor = 205;
-//THREE.DstAlphaFactor = 206;
-//THREE.OneMinusDstAlphaFactor = 207;
-THREE.DstColorFactor = 208;
-THREE.OneMinusDstColorFactor = 209;
-THREE.SrcAlphaSaturateFactor = 210;
+	ZeroFactor: 200,
+	OneFactor: 201,
+	SrcColorFactor: 202,
+	OneMinusSrcColorFactor: 203,
+	SrcAlphaFactor: 204,
+	OneMinusSrcAlphaFactor: 205,
+	DstAlphaFactor: 206,
+	OneMinusDstAlphaFactor: 207,
 
-// depth modes
+	// custom blending source factors
 
-THREE.NeverDepth = 0;
-THREE.AlwaysDepth = 1;
-THREE.LessDepth = 2;
-THREE.LessEqualDepth = 3;
-THREE.EqualDepth = 4;
-THREE.GreaterEqualDepth = 5;
-THREE.GreaterDepth = 6;
-THREE.NotEqualDepth = 7;
+	//ZeroFactor: 200,
+	//OneFactor: 201,
+	//SrcAlphaFactor: 204,
+	//OneMinusSrcAlphaFactor: 205,
+	//DstAlphaFactor: 206,
+	//OneMinusDstAlphaFactor: 207,
+	DstColorFactor: 208,
+	OneMinusDstColorFactor: 209,
+	SrcAlphaSaturateFactor: 210,
 
+	// depth modes
 
-// TEXTURE CONSTANTS
-
-THREE.MultiplyOperation = 0;
-THREE.MixOperation = 1;
-THREE.AddOperation = 2;
-
-// Tone Mapping modes
-
-THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (required for special purpose passes.)
-THREE.LinearToneMapping = 1; // only apply exposure.
-THREE.ReinhardToneMapping = 2;
-THREE.Uncharted2ToneMapping = 3; // John Hable
-THREE.CineonToneMapping = 4;  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
-
-// Mapping modes
-
-THREE.UVMapping = 300;
-
-THREE.CubeReflectionMapping = 301;
-THREE.CubeRefractionMapping = 302;
-
-THREE.EquirectangularReflectionMapping = 303;
-THREE.EquirectangularRefractionMapping = 304;
-
-THREE.SphericalReflectionMapping = 305;
-THREE.CubeUVReflectionMapping = 306;
-THREE.CubeUVRefractionMapping = 307;
-
-// Wrapping modes
-
-THREE.RepeatWrapping = 1000;
-THREE.ClampToEdgeWrapping = 1001;
-THREE.MirroredRepeatWrapping = 1002;
-
-// Filters
-
-THREE.NearestFilter = 1003;
-THREE.NearestMipMapNearestFilter = 1004;
-THREE.NearestMipMapLinearFilter = 1005;
-THREE.LinearFilter = 1006;
-THREE.LinearMipMapNearestFilter = 1007;
-THREE.LinearMipMapLinearFilter = 1008;
-
-// Data types
-
-THREE.UnsignedByteType = 1009;
-THREE.ByteType = 1010;
-THREE.ShortType = 1011;
-THREE.UnsignedShortType = 1012;
-THREE.IntType = 1013;
-THREE.UnsignedIntType = 1014;
-THREE.FloatType = 1015;
-THREE.HalfFloatType = 1025;
-
-// Pixel types
-
-//THREE.UnsignedByteType = 1009;
-THREE.UnsignedShort4444Type = 1016;
-THREE.UnsignedShort5551Type = 1017;
-THREE.UnsignedShort565Type = 1018;
-
-// Pixel formats
-
-THREE.AlphaFormat = 1019;
-THREE.RGBFormat = 1020;
-THREE.RGBAFormat = 1021;
-THREE.LuminanceFormat = 1022;
-THREE.LuminanceAlphaFormat = 1023;
-// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-THREE.RGBEFormat = THREE.RGBAFormat; //1024;
-THREE.DepthFormat = 1026;
-
-// DDS / ST3C Compressed texture formats
-
-THREE.RGB_S3TC_DXT1_Format = 2001;
-THREE.RGBA_S3TC_DXT1_Format = 2002;
-THREE.RGBA_S3TC_DXT3_Format = 2003;
-THREE.RGBA_S3TC_DXT5_Format = 2004;
+	NeverDepth: 0,
+	AlwaysDepth: 1,
+	LessDepth: 2,
+	LessEqualDepth: 3,
+	EqualDepth: 4,
+	GreaterEqualDepth: 5,
+	GreaterDepth: 6,
+	NotEqualDepth: 7,
 
 
-// PVRTC compressed texture formats
+	// TEXTURE CONSTANTS
 
-THREE.RGB_PVRTC_4BPPV1_Format = 2100;
-THREE.RGB_PVRTC_2BPPV1_Format = 2101;
-THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
-THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
+	MultiplyOperation: 0,
+	MixOperation: 1,
+	AddOperation: 2,
 
-// ETC compressed texture formats
+	// Tone Mapping modes
 
-THREE.RGB_ETC1_Format = 2151;
+	NoToneMapping: 0, // do not do any tone mapping, not even exposure (required for special purpose passes.)
+	LinearToneMapping: 1, // only apply exposure.
+	ReinhardToneMapping: 2,
+	Uncharted2ToneMapping: 3, // John Hable
+	CineonToneMapping: 4, // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 
-// Loop styles for AnimationAction
+	// Mapping modes
 
-THREE.LoopOnce = 2200;
-THREE.LoopRepeat = 2201;
-THREE.LoopPingPong = 2202;
+	UVMapping: 300,
 
-// Interpolation
+	CubeReflectionMapping: 301,
+	CubeRefractionMapping: 302,
 
-THREE.InterpolateDiscrete = 2300;
-THREE.InterpolateLinear = 2301;
-THREE.InterpolateSmooth = 2302;
+	EquirectangularReflectionMapping: 303,
+	EquirectangularRefractionMapping: 304,
 
-// Interpolant ending modes
+	SphericalReflectionMapping: 305,
+	CubeUVReflectionMapping: 306,
+	CubeUVRefractionMapping: 307,
 
-THREE.ZeroCurvatureEnding = 2400;
-THREE.ZeroSlopeEnding = 2401;
-THREE.WrapAroundEnding = 2402;
+	// Wrapping modes
 
-// Triangle Draw modes
+	RepeatWrapping: 1000,
+	ClampToEdgeWrapping: 1001,
+	MirroredRepeatWrapping: 1002,
 
-THREE.TrianglesDrawMode = 0;
-THREE.TriangleStripDrawMode = 1;
-THREE.TriangleFanDrawMode = 2;
+	// Filters
 
-// Texture Encodings
+	NearestFilter: 1003,
+	NearestMipMapNearestFilter: 1004,
+	NearestMipMapLinearFilter: 1005,
+	LinearFilter: 1006,
+	LinearMipMapNearestFilter: 1007,
+	LinearMipMapLinearFilter: 1008,
 
-THREE.LinearEncoding = 3000; // No encoding at all.
-THREE.sRGBEncoding = 3001;
-THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+	// Data types
 
-// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
-// These encodings should not specified as output encodings except in rare situations.
-THREE.RGBEEncoding = 3002; // AKA Radiance.
-THREE.LogLuvEncoding = 3003;
-THREE.RGBM7Encoding = 3004;
-THREE.RGBM16Encoding = 3005;
-THREE.RGBDEncoding = 3006; // MaxRange is 256.
+	UnsignedByteType: 1009,
+	ByteType: 1010,
+	ShortType: 1011,
+	UnsignedShortType: 1012,
+	IntType: 1013,
+	UnsignedIntType: 1014,
+	FloatType: 1015,
+	HalfFloatType: 1025,
 
-// Depth packing strategies
+	// Pixel types
 
-THREE.BasicDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
-THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.
+	//UnsignedByteType: 1009,
+	UnsignedShort4444Type: 1016,
+	UnsignedShort5551Type: 1017,
+	UnsignedShort565Type: 1018,
+
+	// Pixel formats
+
+	AlphaFormat: 1019,
+	RGBFormat: 1020,
+	RGBAFormat: 1021,
+	LuminanceFormat: 1022,
+	LuminanceAlphaFormat: 1023,
+	// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
+	RGBEFormat: THREE.RGBAFormat, //1024;
+	DepthFormat: 1026,
+
+	// DDS / ST3C Compressed texture formats
+
+	RGB_S3TC_DXT1_Format: 2001,
+	RGBA_S3TC_DXT1_Format: 2002,
+	RGBA_S3TC_DXT3_Format: 2003,
+	RGBA_S3TC_DXT5_Format: 2004,
+
+	// PVRTC compressed texture formats
+
+	RGB_PVRTC_4BPPV1_Format: 2100,
+	RGB_PVRTC_2BPPV1_Format: 2101,
+	RGBA_PVRTC_4BPPV1_Format: 2102,
+	RGBA_PVRTC_2BPPV1_Format: 2103,
+
+	// ETC compressed texture formats
+
+	RGB_ETC1_Format: 2151,
+
+	// Loop styles for AnimationAction
+
+	LoopOnce: 2200,
+	LoopRepeat: 2201,
+	LoopPingPong: 2202,
+
+	// Interpolation
+
+	InterpolateDiscrete: 2300,
+	InterpolateLinear: 2301,
+	InterpolateSmooth: 2302,
+
+	// Interpolant ending modes
+
+	ZeroCurvatureEnding: 2400,
+	ZeroSlopeEnding: 2401,
+	WrapAroundEnding: 2402,
+
+	// Triangle Draw modes
+
+	TrianglesDrawMode: 0,
+	TriangleStripDrawMode: 1,
+	TriangleFanDrawMode: 2,
+
+	// Texture Encodings
+
+	LinearEncoding: 3000, // No encoding at all.
+	sRGBEncoding: 3001,
+	GammaEncoding: 3007, // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+
+	// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
+	// These encodings should not specified as output encodings except in rare situations.
+	RGBEEncoding: 3002, // AKA Radiance.
+	LogLuvEncoding: 3003,
+	RGBM7Encoding: 3004,
+	RGBM16Encoding: 3005,
+	RGBDEncoding: 3006, // MaxRange is 256.
+
+	// Depth packing strategies
+
+	BasicDepthPacking: 3200, // for writing to float textures for high precision or for visualizing results in RGB buffers
+	RGBADepthPacking: 3201 // for packing into RGBA buffers.
+
+} );
 
 // File:src/math/Color.js
 
@@ -16364,221 +16362,224 @@ THREE.Audio = function ( listener ) {
 
 };
 
-THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Audio.prototype.constructor = THREE.Audio;
+THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-THREE.Audio.prototype.getOutput = function () {
+	constructor: THREE.Audio,
 
-	return this.gain;
+	getOutput: function () {
 
-};
+		return this.gain;
 
-THREE.Audio.prototype.setNodeSource = function ( audioNode ) {
+	},
 
-	this.hasPlaybackControl = false;
-	this.sourceType = 'audioNode';
-	this.source = audioNode;
-	this.connect();
+	setNodeSource: function ( audioNode ) {
 
-	return this;
-
-};
-
-THREE.Audio.prototype.setBuffer = function ( audioBuffer ) {
-
-	var scope = this;
-
-	scope.source.buffer = audioBuffer;
-	scope.sourceType = 'buffer';
-	if ( scope.autoplay ) scope.play();
-
-	return this;
-
-};
-
-THREE.Audio.prototype.play = function () {
-
-	if ( this.isPlaying === true ) {
-
-		console.warn( 'THREE.Audio: Audio is already playing.' );
-		return;
-
-	}
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return;
-
-	}
-
-	var source = this.context.createBufferSource();
-
-	source.buffer = this.source.buffer;
-	source.loop = this.source.loop;
-	source.onended = this.source.onended;
-	source.start( 0, this.startTime );
-	source.playbackRate.value = this.playbackRate;
-
-	this.isPlaying = true;
-
-	this.source = source;
-
-	this.connect();
-
-};
-
-THREE.Audio.prototype.pause = function () {
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return;
-
-	}
-
-	this.source.stop();
-	this.startTime = this.context.currentTime;
-
-};
-
-THREE.Audio.prototype.stop = function () {
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return;
-
-	}
-
-	this.source.stop();
-	this.startTime = 0;
-
-};
-
-THREE.Audio.prototype.connect = function () {
-
-	if ( this.filter !== null ) {
-
-		this.source.connect( this.filter );
-		this.filter.connect( this.getOutput() );
-
-	} else {
-
-		this.source.connect( this.getOutput() );
-
-	}
-
-};
-
-THREE.Audio.prototype.disconnect = function () {
-
-	if ( this.filter !== null ) {
-
-		this.source.disconnect( this.filter );
-		this.filter.disconnect( this.getOutput() );
-
-	} else {
-
-		this.source.disconnect( this.getOutput() );
-
-	}
-
-};
-
-THREE.Audio.prototype.getFilter = function () {
-
-	return this.filter;
-
-};
-
-THREE.Audio.prototype.setFilter = function ( value ) {
-
-	if ( value === undefined ) value = null;
-
-	if ( this.isPlaying === true ) {
-
-		this.disconnect();
-		this.filter = value;
+		this.hasPlaybackControl = false;
+		this.sourceType = 'audioNode';
+		this.source = audioNode;
 		this.connect();
 
-	} else {
+		return this;
 
-		this.filter = value;
+	},
+
+	setBuffer: function ( audioBuffer ) {
+
+		var scope = this;
+
+		scope.source.buffer = audioBuffer;
+		scope.sourceType = 'buffer';
+		if ( scope.autoplay ) scope.play();
+
+		return this;
+
+	},
+
+	play: function () {
+
+		if ( this.isPlaying === true ) {
+
+			console.warn( 'THREE.Audio: Audio is already playing.' );
+			return;
+
+		}
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return;
+
+		}
+
+		var source = this.context.createBufferSource();
+
+		source.buffer = this.source.buffer;
+		source.loop = this.source.loop;
+		source.onended = this.source.onended;
+		source.start( 0, this.startTime );
+		source.playbackRate.value = this.playbackRate;
+
+		this.isPlaying = true;
+
+		this.source = source;
+
+		this.connect();
+
+	},
+
+	pause: function () {
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return;
+
+		}
+
+		this.source.stop();
+		this.startTime = this.context.currentTime;
+
+	},
+
+	stop: function () {
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return;
+
+		}
+
+		this.source.stop();
+		this.startTime = 0;
+
+	},
+
+	connect: function () {
+
+		if ( this.filter !== null ) {
+
+			this.source.connect( this.filter );
+			this.filter.connect( this.getOutput() );
+
+		} else {
+
+			this.source.connect( this.getOutput() );
+
+		}
+
+	},
+
+	disconnect: function () {
+
+		if ( this.filter !== null ) {
+
+			this.source.disconnect( this.filter );
+			this.filter.disconnect( this.getOutput() );
+
+		} else {
+
+			this.source.disconnect( this.getOutput() );
+
+		}
+
+	},
+
+	getFilter: function () {
+
+		return this.filter;
+
+	},
+
+	setFilter: function ( value ) {
+
+		if ( value === undefined ) value = null;
+
+		if ( this.isPlaying === true ) {
+
+			this.disconnect();
+			this.filter = value;
+			this.connect();
+
+		} else {
+
+			this.filter = value;
+
+		}
+
+	},
+
+	setPlaybackRate: function ( value ) {
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return;
+
+		}
+
+		this.playbackRate = value;
+
+		if ( this.isPlaying === true ) {
+
+			this.source.playbackRate.value = this.playbackRate;
+
+		}
+
+	},
+
+	getPlaybackRate: function () {
+
+		return this.playbackRate;
+
+	},
+
+	onEnded: function () {
+
+		this.isPlaying = false;
+
+	},
+
+	getLoop: function () {
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return false;
+
+		}
+
+		return this.source.loop;
+
+	},
+
+	setLoop: function ( value ) {
+
+		if ( this.hasPlaybackControl === false ) {
+
+			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			return;
+
+		}
+
+		this.source.loop = value;
+
+	},
+
+	getVolume: function () {
+
+		return this.gain.gain.value;
+
+	},
+
+
+	setVolume: function ( value ) {
+
+		this.gain.gain.value = value;
 
 	}
 
-};
-
-THREE.Audio.prototype.setPlaybackRate = function ( value ) {
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return;
-
-	}
-
-	this.playbackRate = value;
-
-	if ( this.isPlaying === true ) {
-
-		this.source.playbackRate.value = this.playbackRate;
-
-	}
-
-};
-
-THREE.Audio.prototype.getPlaybackRate = function () {
-
-	return this.playbackRate;
-
-};
-
-THREE.Audio.prototype.onEnded = function () {
-
-	this.isPlaying = false;
-
-};
-
-THREE.Audio.prototype.setLoop = function ( value ) {
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return;
-
-	}
-
-	this.source.loop = value;
-
-};
-
-THREE.Audio.prototype.getLoop = function () {
-
-	if ( this.hasPlaybackControl === false ) {
-
-		console.warn( 'THREE.Audio: this Audio has no playback control.' );
-		return false;
-
-	}
-
-	return this.source.loop;
-
-};
-
-
-THREE.Audio.prototype.setVolume = function ( value ) {
-
-	this.gain.gain.value = value;
-
-};
-
-THREE.Audio.prototype.getVolume = function () {
-
-	return this.gain.gain.value;
-
-};
+} );
 
 // File:src/audio/AudioAnalyser.js
 
@@ -16597,9 +16598,7 @@ THREE.AudioAnalyser = function ( audio, fftSize ) {
 
 };
 
-THREE.AudioAnalyser.prototype = {
-
-	constructor: THREE.AudioAnalyser,
+Object.assign( THREE.AudioAnalyser.prototype, {
 
 	getData: function () {
 
@@ -16608,7 +16607,7 @@ THREE.AudioAnalyser.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/audio/AudioContext.js
 
@@ -16653,78 +16652,82 @@ THREE.PositionalAudio = function ( listener ) {
 
 };
 
-THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
-THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
+THREE.PositionalAudio.prototype = Object.assign( Object.create( THREE.Audio.prototype ), {
 
-THREE.PositionalAudio.prototype.getOutput = function () {
+	constructor: THREE.PositionalAudio,
 
-	return this.panner;
+	getOutput: function () {
 
-};
+		return this.panner;
 
-THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
+	},
 
-	this.panner.refDistance = value;
+	getRefDistance: function () {
 
-};
+		return this.panner.refDistance;
 
-THREE.PositionalAudio.prototype.getRefDistance = function () {
+	},
 
-	return this.panner.refDistance;
+	setRefDistance: function ( value ) {
 
-};
+		this.panner.refDistance = value;
 
-THREE.PositionalAudio.prototype.setRolloffFactor = function ( value ) {
+	},
 
-	this.panner.rolloffFactor = value;
+	getRolloffFactor: function () {
 
-};
+		return this.panner.rolloffFactor;
 
-THREE.PositionalAudio.prototype.getRolloffFactor = function () {
+	},
 
-	return this.panner.rolloffFactor;
+	setRolloffFactor: function ( value ) {
 
-};
+		this.panner.rolloffFactor = value;
 
-THREE.PositionalAudio.prototype.setDistanceModel = function ( value ) {
+	},
 
-	this.panner.distanceModel = value;
+	getDistanceModel: function () {
 
-};
+		return this.panner.distanceModel;
 
-THREE.PositionalAudio.prototype.getDistanceModel = function () {
+	},
 
-	return this.panner.distanceModel;
+	setDistanceModel: function ( value ) {
 
-};
+		this.panner.distanceModel = value;
 
-THREE.PositionalAudio.prototype.setMaxDistance = function ( value ) {
+	},
 
-	this.panner.maxDistance = value;
+	getMaxDistance: function () {
 
-};
+		return this.panner.maxDistance;
 
-THREE.PositionalAudio.prototype.getMaxDistance = function () {
+	},
 
-	return this.panner.maxDistance;
+	setMaxDistance: function ( value ) {
 
-};
+		this.panner.maxDistance = value;
 
-THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
+	},
 
-	var position = new THREE.Vector3();
+	updateMatrixWorld: ( function () {
 
-	return function updateMatrixWorld( force ) {
+		var position = new THREE.Vector3();
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		return function updateMatrixWorld( force ) {
 
-		position.setFromMatrixPosition( this.matrixWorld );
+			THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		this.panner.setPosition( position.x, position.y, position.z );
+			position.setFromMatrixPosition( this.matrixWorld );
 
-	};
+			this.panner.setPosition( position.x, position.y, position.z );
 
-} )();
+		};
+
+	} )()
+
+
+} );
 
 // File:src/audio/AudioListener.js
 
@@ -16747,91 +16750,93 @@ THREE.AudioListener = function () {
 
 };
 
-THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
-THREE.AudioListener.prototype.constructor = THREE.AudioListener;
+THREE.AudioListener.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-THREE.AudioListener.prototype.getInput = function () {
+	constructor: THREE.AudioListener,
 
-	return this.gain;
+	getInput: function () {
 
-};
+		return this.gain;
 
-THREE.AudioListener.prototype.removeFilter = function ( ) {
+	},
 
-	if ( this.filter !== null ) {
+	removeFilter: function ( ) {
 
-		this.gain.disconnect( this.filter );
-		this.filter.disconnect( this.context.destination );
-		this.gain.connect( this.context.destination );
-		this.filter = null;
+		if ( this.filter !== null ) {
 
-	}
+			this.gain.disconnect( this.filter );
+			this.filter.disconnect( this.context.destination );
+			this.gain.connect( this.context.destination );
+			this.filter = null;
 
-};
+		}
 
-THREE.AudioListener.prototype.setFilter = function ( value ) {
+	},
 
-	if ( this.filter !== null ) {
+	getFilter: function () {
 
-		this.gain.disconnect( this.filter );
-		this.filter.disconnect( this.context.destination );
+		return this.filter;
 
-	} else {
+	},
 
-		this.gain.disconnect( this.context.destination );
+	setFilter: function ( value ) {
 
-	}
+		if ( this.filter !== null ) {
 
-	this.filter = value;
-	this.gain.connect( this.filter );
-	this.filter.connect( this.context.destination );
+			this.gain.disconnect( this.filter );
+			this.filter.disconnect( this.context.destination );
 
-};
+		} else {
 
-THREE.AudioListener.prototype.getFilter = function () {
+			this.gain.disconnect( this.context.destination );
 
-	return this.filter;
+		}
 
-};
+		this.filter = value;
+		this.gain.connect( this.filter );
+		this.filter.connect( this.context.destination );
 
-THREE.AudioListener.prototype.setMasterVolume = function ( value ) {
+	},
 
-	this.gain.gain.value = value;
+	getMasterVolume: function () {
 
-};
+		return this.gain.gain.value;
 
-THREE.AudioListener.prototype.getMasterVolume = function () {
+	},
 
-	return this.gain.gain.value;
+	setMasterVolume: function ( value ) {
 
-};
+		this.gain.gain.value = value;
 
+	},
 
-THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
+	updateMatrixWorld: ( function () {
 
-	var position = new THREE.Vector3();
-	var quaternion = new THREE.Quaternion();
-	var scale = new THREE.Vector3();
+		var position = new THREE.Vector3();
+		var quaternion = new THREE.Quaternion();
+		var scale = new THREE.Vector3();
 
-	var orientation = new THREE.Vector3();
+		var orientation = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+		return function updateMatrixWorld( force ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+			THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		var listener = this.context.listener;
-		var up = this.up;
+			var listener = this.context.listener;
+			var up = this.up;
 
-		this.matrixWorld.decompose( position, quaternion, scale );
+			this.matrixWorld.decompose( position, quaternion, scale );
 
-		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-		listener.setPosition( position.x, position.y, position.z );
-		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
+			listener.setPosition( position.x, position.y, position.z );
+			listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
 
-	};
+		};
 
-} )();
+	} )()
+
+} );
 
 // File:src/cameras/Camera.js
 
@@ -17019,52 +17024,55 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 };
 
-THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
-THREE.OrthographicCamera.prototype.constructor = THREE.OrthographicCamera;
+THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.prototype ), {
 
-THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
+	constructor: THREE.OrthographicCamera,
 
-	var dx = ( this.right - this.left ) / ( 2 * this.zoom );
-	var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
-	var cx = ( this.right + this.left ) / 2;
-	var cy = ( this.top + this.bottom ) / 2;
+	copy: function ( source ) {
 
-	this.projectionMatrix.makeOrthographic( cx - dx, cx + dx, cy + dy, cy - dy, this.near, this.far );
+		THREE.Camera.prototype.copy.call( this, source );
 
-};
+		this.left = source.left;
+		this.right = source.right;
+		this.top = source.top;
+		this.bottom = source.bottom;
+		this.near = source.near;
+		this.far = source.far;
 
-THREE.OrthographicCamera.prototype.copy = function ( source ) {
+		this.zoom = source.zoom;
 
-	THREE.Camera.prototype.copy.call( this, source );
+		return this;
 
-	this.left = source.left;
-	this.right = source.right;
-	this.top = source.top;
-	this.bottom = source.bottom;
-	this.near = source.near;
-	this.far = source.far;
+	},
 
-	this.zoom = source.zoom;
+	updateProjectionMatrix: function () {
 
-	return this;
+		var dx = ( this.right - this.left ) / ( 2 * this.zoom );
+		var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+		var cx = ( this.right + this.left ) / 2;
+		var cy = ( this.top + this.bottom ) / 2;
 
-};
+		this.projectionMatrix.makeOrthographic( cx - dx, cx + dx, cy + dy, cy - dy, this.near, this.far );
 
-THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
+	},
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	toJSON: function ( meta ) {
 
-	data.object.zoom = this.zoom;
-	data.object.left = this.left;
-	data.object.right = this.right;
-	data.object.top = this.top;
-	data.object.bottom = this.bottom;
-	data.object.near = this.near;
-	data.object.far = this.far;
+		var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
-	return data;
+		data.object.zoom = this.zoom;
+		data.object.left = this.left;
+		data.object.right = this.right;
+		data.object.top = this.top;
+		data.object.bottom = this.bottom;
+		data.object.near = this.near;
+		data.object.far = this.far;
 
-};
+		return data;
+
+	}
+
+} );
 
 // File:src/cameras/PerspectiveCamera.js
 
@@ -17098,202 +17106,201 @@ THREE.PerspectiveCamera = function( fov, aspect, near, far ) {
 
 };
 
-THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
-THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
+THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.prototype ), {
 
+	constructor: THREE.PerspectiveCamera,
 
-/**
- * Sets the FOV by focal length (DEPRECATED).
- *
- * Optionally also sets .filmGauge, otherwise uses it. See .setFocalLength.
- */
-THREE.PerspectiveCamera.prototype.setLens = function( focalLength, filmGauge ) {
+	copy: function ( source ) {
 
-	console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
-			"Use .setFocalLength and .filmGauge for a photographic setup." );
+		THREE.Camera.prototype.copy.call( this, source );
 
-	if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
-	this.setFocalLength( focalLength );
+		this.fov = source.fov;
+		this.zoom = source.zoom;
 
-};
+		this.near = source.near;
+		this.far = source.far;
+		this.focus = source.focus;
 
-/**
- * Sets the FOV by focal length in respect to the current .filmGauge.
- *
- * The default film gauge is 35, so that the focal length can be specified for
- * a 35mm (full frame) camera.
- *
- * Values for focal length and film gauge must have the same unit.
- */
-THREE.PerspectiveCamera.prototype.setFocalLength = function( focalLength ) {
+		this.aspect = source.aspect;
+		this.view = source.view === null ? null : Object.assign( {}, source.view );
 
-	// see http://www.bobatkins.com/photography/technical/field_of_view.html
-	var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
+		this.filmGauge = source.filmGauge;
+		this.filmOffset = source.filmOffset;
 
-	this.fov = THREE.Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
-	this.updateProjectionMatrix();
+		return this;
 
-};
+	},
 
+	/**
+	 * Sets the FOV by focal length (DEPRECATED).
+	 *
+	 * Optionally also sets .filmGauge, otherwise uses it. See .setFocalLength.
+	 */
+	setLens: function ( focalLength, filmGauge ) {
 
-/**
- * Calculates the focal length from the current .fov and .filmGauge.
- */
-THREE.PerspectiveCamera.prototype.getFocalLength = function() {
+		console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
+				"Use .setFocalLength and .filmGauge for a photographic setup." );
 
-	var vExtentSlope = Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov );
+		if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
+		this.setFocalLength( focalLength );
 
-	return 0.5 * this.getFilmHeight() / vExtentSlope;
+	},
 
-};
+	/**
+	 * Sets the FOV by focal length in respect to the current .filmGauge.
+	 *
+	 * The default film gauge is 35, so that the focal length can be specified for
+	 * a 35mm (full frame) camera.
+	 *
+	 * Values for focal length and film gauge must have the same unit.
+	 */
+	setFocalLength: function ( focalLength ) {
 
-THREE.PerspectiveCamera.prototype.getEffectiveFOV = function() {
+		// see http://www.bobatkins.com/photography/technical/field_of_view.html
+		var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
-	return THREE.Math.RAD2DEG * 2 * Math.atan(
-			Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+		this.fov = THREE.Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
+		this.updateProjectionMatrix();
 
-};
+	},
 
-THREE.PerspectiveCamera.prototype.getFilmWidth = function() {
+	/**
+	 * Calculates the focal length from the current .fov and .filmGauge.
+	 */
+	getFocalLength: function () {
 
-	// film not completely covered in portrait format (aspect < 1)
-	return this.filmGauge * Math.min( this.aspect, 1 );
+		var vExtentSlope = Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov );
 
-};
+		return 0.5 * this.getFilmHeight() / vExtentSlope;
 
-THREE.PerspectiveCamera.prototype.getFilmHeight = function() {
+	},
 
-	// film not completely covered in landscape format (aspect > 1)
-	return this.filmGauge / Math.max( this.aspect, 1 );
+	getEffectiveFOV: function () {
 
-};
+		return THREE.Math.RAD2DEG * 2 * Math.atan(
+				Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
+	},
 
+	getFilmWidth: function () {
 
-/**
- * Sets an offset in a larger frustum. This is useful for multi-window or
- * multi-monitor/multi-machine setups.
- *
- * For example, if you have 3x2 monitors and each monitor is 1920x1080 and
- * the monitors are in grid like this
- *
- *   +---+---+---+
- *   | A | B | C |
- *   +---+---+---+
- *   | D | E | F |
- *   +---+---+---+
- *
- * then for each monitor you would call it like this
- *
- *   var w = 1920;
- *   var h = 1080;
- *   var fullWidth = w * 3;
- *   var fullHeight = h * 2;
- *
- *   --A--
- *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
- *   --B--
- *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
- *   --C--
- *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
- *   --D--
- *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
- *   --E--
- *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
- *   --F--
- *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
- *
- *   Note there is no reason monitors have to be the same size or in a grid.
- */
-THREE.PerspectiveCamera.prototype.setViewOffset = function( fullWidth, fullHeight, x, y, width, height ) {
+		// film not completely covered in portrait format (aspect < 1)
+		return this.filmGauge * Math.min( this.aspect, 1 );
 
-	this.aspect = fullWidth / fullHeight;
+	},
 
-	this.view = {
-		fullWidth: fullWidth,
-		fullHeight: fullHeight,
-		offsetX: x,
-		offsetY: y,
-		width: width,
-		height: height
-	};
+	getFilmHeight: function () {
 
-	this.updateProjectionMatrix();
+		// film not completely covered in landscape format (aspect > 1)
+		return this.filmGauge / Math.max( this.aspect, 1 );
 
-};
+	},
 
-THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function() {
+	/**
+	 * Sets an offset in a larger frustum. This is useful for multi-window or
+	 * multi-monitor/multi-machine setups.
+	 *
+	 * For example, if you have 3x2 monitors and each monitor is 1920x1080 and
+	 * the monitors are in grid like this
+	 *
+	 *   +---+---+---+
+	 *   | A | B | C |
+	 *   +---+---+---+
+	 *   | D | E | F |
+	 *   +---+---+---+
+	 *
+	 * then for each monitor you would call it like this
+	 *
+	 *   var w = 1920;
+	 *   var h = 1080;
+	 *   var fullWidth = w * 3;
+	 *   var fullHeight = h * 2;
+	 *
+	 *   --A--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+	 *   --B--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+	 *   --C--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+	 *   --D--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+	 *   --E--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+	 *   --F--
+	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+	 *
+	 *   Note there is no reason monitors have to be the same size or in a grid.
+	 */
+	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
 
-	var near = this.near,
-		top = near * Math.tan(
-				THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
-		height = 2 * top,
-		width = this.aspect * height,
-		left = - 0.5 * width,
-		view = this.view;
+		this.aspect = fullWidth / fullHeight;
 
-	if ( view !== null ) {
+		this.view = {
+			fullWidth: fullWidth,
+			fullHeight: fullHeight,
+			offsetX: x,
+			offsetY: y,
+			width: width,
+			height: height
+		};
 
-		var fullWidth = view.fullWidth,
-			fullHeight = view.fullHeight;
+		this.updateProjectionMatrix();
 
-		left += view.offsetX * width / fullWidth;
-		top -= view.offsetY * height / fullHeight;
-		width *= view.width / fullWidth;
-		height *= view.height / fullHeight;
+	},
+
+	updateProjectionMatrix: function () {
+
+		var near = this.near,
+			top = near * Math.tan(
+					THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			height = 2 * top,
+			width = this.aspect * height,
+			left = - 0.5 * width,
+			view = this.view;
+
+		if ( view !== null ) {
+
+			var fullWidth = view.fullWidth,
+				fullHeight = view.fullHeight;
+
+			left += view.offsetX * width / fullWidth;
+			top -= view.offsetY * height / fullHeight;
+			width *= view.width / fullWidth;
+			height *= view.height / fullHeight;
+
+		}
+
+		var skew = this.filmOffset;
+		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
+
+		this.projectionMatrix.makeFrustum(
+				left, left + width, top - height, top, near, this.far );
+
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+		data.object.fov = this.fov;
+		data.object.zoom = this.zoom;
+
+		data.object.near = this.near;
+		data.object.far = this.far;
+		data.object.focus = this.focus;
+
+		data.object.aspect = this.aspect;
+
+		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+
+		data.object.filmGauge = this.filmGauge;
+		data.object.filmOffset = this.filmOffset;
+
+		return data;
 
 	}
 
-	var skew = this.filmOffset;
-	if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
-
-	this.projectionMatrix.makeFrustum(
-			left, left + width, top - height, top, near, this.far );
-
-};
-
-THREE.PerspectiveCamera.prototype.copy = function( source ) {
-
-	THREE.Camera.prototype.copy.call( this, source );
-
-	this.fov = source.fov;
-	this.zoom = source.zoom;
-
-	this.near = source.near;
-	this.far = source.far;
-	this.focus = source.focus;
-
-	this.aspect = source.aspect;
-	this.view = source.view === null ? null : Object.assign( {}, source.view );
-
-	this.filmGauge = source.filmGauge;
-	this.filmOffset = source.filmOffset;
-
-	return this;
-
-};
-
-THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
-
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.fov = this.fov;
-	data.object.zoom = this.zoom;
-
-	data.object.near = this.near;
-	data.object.far = this.far;
-	data.object.focus = this.focus;
-
-	data.object.aspect = this.aspect;
-
-	if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
-
-	data.object.filmGauge = this.filmGauge;
-	data.object.filmOffset = this.filmOffset;
-
-	return data;
-
-};
+} );
 
 // File:src/cameras/StereoCamera.js
 
@@ -17317,9 +17324,7 @@ THREE.StereoCamera = function () {
 
 };
 
-THREE.StereoCamera.prototype = {
-
-	constructor: THREE.StereoCamera,
+Object.assign( THREE.StereoCamera.prototype, {
 
 	update: ( function () {
 
@@ -17385,7 +17390,7 @@ THREE.StereoCamera.prototype = {
 
 	} )()
 
-};
+} );
 
 // File:src/lights/Light.js
 
@@ -19425,6 +19430,21 @@ THREE.ObjectLoader.prototype = {
 						geometry = new THREE[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
+							data.height,
+							data.radialSegments,
+							data.heightSegments,
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
+					case 'ConeGeometry':
+					case 'ConeBufferGeometry':
+
+						geometry = new THREE [ data.type ](
+							data.radius,
 							data.height,
 							data.radialSegments,
 							data.heightSegments,
@@ -34614,164 +34634,152 @@ THREE.CurvePath = function () {
 
 };
 
-THREE.CurvePath.prototype = Object.create( THREE.Curve.prototype );
-THREE.CurvePath.prototype.constructor = THREE.CurvePath;
+THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype ), {
 
-THREE.CurvePath.prototype.add = function ( curve ) {
+	constructor: THREE.CurvePath,
 
-	this.curves.push( curve );
+	add: function ( curve ) {
 
-};
+		this.curves.push( curve );
 
-/*
-THREE.CurvePath.prototype.checkConnection = function() {
-	// TODO
-	// If the ending of curve is not connected to the starting
-	// or the next curve, then, this is not a real path
-};
-*/
+	},
 
-THREE.CurvePath.prototype.closePath = function() {
+	closePath: function () {
 
-	// TODO Test
-	// and verify for vector3 (needs to implement equals)
-	// Add a line curve if start and end of lines are not connected
-	var startPoint = this.curves[ 0 ].getPoint( 0 );
-	var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
+		// TODO Test
+		// and verify for vector3 (needs to implement equals)
+		// Add a line curve if start and end of lines are not connected
+		var startPoint = this.curves[ 0 ].getPoint( 0 );
+		var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
 
-	if ( ! startPoint.equals( endPoint ) ) {
+		if ( ! startPoint.equals( endPoint ) ) {
 
-		this.curves.push( new THREE.LineCurve( endPoint, startPoint ) );
-
-	}
-
-};
-
-// To get accurate point with reference to
-// entire path distance at time t,
-// following has to be done:
-
-// 1. Length of each sub path have to be known
-// 2. Locate and identify type of curve
-// 3. Get t for the curve
-// 4. Return curve.getPointAt(t')
-
-THREE.CurvePath.prototype.getPoint = function( t ) {
-
-	var d = t * this.getLength();
-	var curveLengths = this.getCurveLengths();
-	var i = 0;
-
-	// To think about boundaries points.
-
-	while ( i < curveLengths.length ) {
-
-		if ( curveLengths[ i ] >= d ) {
-
-			var diff = curveLengths[ i ] - d;
-			var curve = this.curves[ i ];
-
-			var u = 1 - diff / curve.getLength();
-
-			return curve.getPointAt( u );
+			this.curves.push( new THREE.LineCurve( endPoint, startPoint ) );
 
 		}
 
-		i ++;
+	},
+
+	// To get accurate point with reference to
+	// entire path distance at time t,
+	// following has to be done:
+
+	// 1. Length of each sub path have to be known
+	// 2. Locate and identify type of curve
+	// 3. Get t for the curve
+	// 4. Return curve.getPointAt(t')
+
+	getPoint: function ( t ) {
+
+		var d = t * this.getLength();
+		var curveLengths = this.getCurveLengths();
+		var i = 0;
+
+		// To think about boundaries points.
+
+		while ( i < curveLengths.length ) {
+
+			if ( curveLengths[ i ] >= d ) {
+
+				var diff = curveLengths[ i ] - d;
+				var curve = this.curves[ i ];
+
+				var u = 1 - diff / curve.getLength();
+
+				return curve.getPointAt( u );
+
+			}
+
+			i ++;
+
+		}
+
+		return null;
+
+		// loop where sum != 0, sum > d , sum+1 <d
+
+	},
+
+	// We cannot use the default THREE.Curve getPoint() with getLength() because in
+	// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
+	// getPoint() depends on getLength
+
+	getLength: function () {
+
+		var lens = this.getCurveLengths();
+		return lens[ lens.length - 1 ];
+
+	},
+
+	// Compute lengths and cache them
+	// We cannot overwrite getLengths() because UtoT mapping uses it.
+
+	getCurveLengths: function () {
+
+		// We use cache values if curves and cache array are same length
+
+		if ( this.cacheLengths && this.cacheLengths.length === this.curves.length ) {
+
+			return this.cacheLengths;
+
+		}
+
+		// Get length of sub-curve
+		// Push sums into cached array
+
+		var lengths = [], sums = 0;
+
+		for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
+
+			sums += this.curves[ i ].getLength();
+			lengths.push( sums );
+
+		}
+
+		this.cacheLengths = lengths;
+
+		return lengths;
+
+	},
+
+	/**************************************************************
+	 *	Create Geometries Helpers
+	 **************************************************************/
+
+	/// Generate geometry from path points (for Line or Points objects)
+
+	createPointsGeometry: function ( divisions ) {
+
+		var pts = this.getPoints( divisions );
+		return this.createGeometry( pts );
+
+	},
+
+	// Generate geometry from equidistant sampling along the path
+
+	createSpacedPointsGeometry: function ( divisions ) {
+
+		var pts = this.getSpacedPoints( divisions );
+		return this.createGeometry( pts );
+
+	},
+
+	createGeometry: function ( points ) {
+
+		var geometry = new THREE.Geometry();
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
+
+		}
+
+		return geometry;
 
 	}
 
-	return null;
-
-	// loop where sum != 0, sum > d , sum+1 <d
-
-};
-
-/*
-THREE.CurvePath.prototype.getTangent = function( t ) {
-};
-*/
-
-// We cannot use the default THREE.Curve getPoint() with getLength() because in
-// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
-// getPoint() depends on getLength
-
-THREE.CurvePath.prototype.getLength = function() {
-
-	var lens = this.getCurveLengths();
-	return lens[ lens.length - 1 ];
-
-};
-
-// Compute lengths and cache them
-// We cannot overwrite getLengths() because UtoT mapping uses it.
-
-THREE.CurvePath.prototype.getCurveLengths = function() {
-
-	// We use cache values if curves and cache array are same length
-
-	if ( this.cacheLengths && this.cacheLengths.length === this.curves.length ) {
-
-		return this.cacheLengths;
-
-	}
-
-	// Get length of sub-curve
-	// Push sums into cached array
-
-	var lengths = [], sums = 0;
-
-	for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
-
-		sums += this.curves[ i ].getLength();
-		lengths.push( sums );
-
-	}
-
-	this.cacheLengths = lengths;
-
-	return lengths;
-
-};
-
-
-
-/**************************************************************
- *	Create Geometries Helpers
- **************************************************************/
-
-/// Generate geometry from path points (for Line or Points objects)
-
-THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
-
-	var pts = this.getPoints( divisions );
-	return this.createGeometry( pts );
-
-};
-
-// Generate geometry from equidistant sampling along the path
-
-THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
-
-	var pts = this.getSpacedPoints( divisions );
-	return this.createGeometry( pts );
-
-};
-
-THREE.CurvePath.prototype.createGeometry = function( points ) {
-
-	var geometry = new THREE.Geometry();
-
-	for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-		var point = points[ i ];
-		geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
-
-	}
-
-	return geometry;
-
-};
+} );
 
 // File:src/extras/core/Font.js
 
@@ -34786,9 +34794,7 @@ THREE.Font = function ( data ) {
 
 };
 
-THREE.Font.prototype = {
-
-	constructor: THREE.Font,
+Object.assign( THREE.Font.prototype, {
 
 	generateShapes: function ( text, size, divisions ) {
 
@@ -34940,7 +34946,7 @@ THREE.Font.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/extras/core/Path.js
 
@@ -34964,495 +34970,685 @@ THREE.Path = function ( points ) {
 
 };
 
-THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
-THREE.Path.prototype.constructor = THREE.Path;
+THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype ), {
 
-// TODO Clean up PATH API
+	constructor: THREE.Path,
 
-// Create path using straight lines to connect all points
-// - vectors: array of Vector2
+	// TODO Clean up PATH API
 
-THREE.Path.prototype.fromPoints = function ( vectors ) {
+	// Create path using straight lines to connect all points
+	// - vectors: array of Vector2
 
-	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
+	fromPoints: function ( vectors ) {
 
-	for ( var i = 1, l = vectors.length; i < l; i ++ ) {
+		this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
-		this.lineTo( vectors[ i ].x, vectors[ i ].y );
+		for ( var i = 1, l = vectors.length; i < l; i ++ ) {
 
-	}
+			this.lineTo( vectors[ i ].x, vectors[ i ].y );
 
-};
+		}
 
-// startPath() endPath()?
+	},
 
-THREE.Path.prototype.moveTo = function ( x, y ) {
+	moveTo: function ( x, y ) {
 
-	this.actions.push( { action: 'moveTo', args: [ x, y ] } );
+		this.actions.push( { action: 'moveTo', args: [ x, y ] } );
 
-};
+	},
 
-THREE.Path.prototype.lineTo = function ( x, y ) {
+	lineTo: function ( x, y ) {
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
 
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
-	this.curves.push( curve );
+		var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
+		this.curves.push( curve );
 
-	this.actions.push( { action: 'lineTo', args: [ x, y ] } );
+		this.actions.push( { action: 'lineTo', args: [ x, y ] } );
 
-};
+	},
 
-THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
+	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
 
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.QuadraticBezierCurve(
-		new THREE.Vector2( x0, y0 ),
-		new THREE.Vector2( aCPx, aCPy ),
-		new THREE.Vector2( aX, aY )
-	);
+		var curve = new THREE.QuadraticBezierCurve(
+			new THREE.Vector2( x0, y0 ),
+			new THREE.Vector2( aCPx, aCPy ),
+			new THREE.Vector2( aX, aY )
+		);
 
-	this.curves.push( curve );
+		this.curves.push( curve );
 
-	this.actions.push( { action: 'quadraticCurveTo', args: [ aCPx, aCPy, aX, aY ] } );
+		this.actions.push( { action: 'quadraticCurveTo', args: [ aCPx, aCPy, aX, aY ] } );
 
-};
+	},
 
-THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
 
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.CubicBezierCurve(
-		new THREE.Vector2( x0, y0 ),
-		new THREE.Vector2( aCP1x, aCP1y ),
-		new THREE.Vector2( aCP2x, aCP2y ),
-		new THREE.Vector2( aX, aY )
-	);
+		var curve = new THREE.CubicBezierCurve(
+			new THREE.Vector2( x0, y0 ),
+			new THREE.Vector2( aCP1x, aCP1y ),
+			new THREE.Vector2( aCP2x, aCP2y ),
+			new THREE.Vector2( aX, aY )
+		);
 
-	this.curves.push( curve );
+		this.curves.push( curve );
 
-	this.actions.push( { action: 'bezierCurveTo', args: [ aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ] } );
+		this.actions.push( { action: 'bezierCurveTo', args: [ aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ] } );
 
-};
+	},
 
-THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
+	splineThru: function ( pts /*Array of Vector*/ ) {
 
-	var args = Array.prototype.slice.call( arguments );
+		var args = Array.prototype.slice.call( arguments );
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
 
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var npts = [ new THREE.Vector2( x0, y0 ) ];
-	Array.prototype.push.apply( npts, pts );
+		var npts = [ new THREE.Vector2( x0, y0 ) ];
+		Array.prototype.push.apply( npts, pts );
 
-	var curve = new THREE.SplineCurve( npts );
-	this.curves.push( curve );
+		var curve = new THREE.SplineCurve( npts );
+		this.curves.push( curve );
 
-	this.actions.push( { action: 'splineThru', args: args } );
+		this.actions.push( { action: 'splineThru', args: args } );
 
-};
+	},
 
-// FUTURE: Change the API or follow canvas API?
+	arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-THREE.Path.prototype.arc = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		this.absarc( aX + x0, aY + y0, aRadius,
+			aStartAngle, aEndAngle, aClockwise );
 
-	this.absarc( aX + x0, aY + y0, aRadius,
-		aStartAngle, aEndAngle, aClockwise );
+	},
 
- };
+	absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
- THREE.Path.prototype.absarc = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+		this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
-	this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+	},
 
- };
+	ellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+		var lastargs = this.actions[ this.actions.length - 1 ].args;
+		var x0 = lastargs[ lastargs.length - 2 ];
+		var y0 = lastargs[ lastargs.length - 1 ];
 
-	var lastargs = this.actions[ this.actions.length - 1 ].args;
-	var x0 = lastargs[ lastargs.length - 2 ];
-	var y0 = lastargs[ lastargs.length - 1 ];
+		this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
 
-	this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+	},
 
- };
+	absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
+		var args = [
+			aX, aY,
+			xRadius, yRadius,
+			aStartAngle, aEndAngle,
+			aClockwise,
+			aRotation || 0 // aRotation is optional.
+		];
 
-THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+		var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+		this.curves.push( curve );
 
-	var args = [
-		aX, aY,
-		xRadius, yRadius,
-		aStartAngle, aEndAngle,
-		aClockwise,
-		aRotation || 0 // aRotation is optional.
-	];
+		var lastPoint = curve.getPoint( 1 );
+		args.push( lastPoint.x );
+		args.push( lastPoint.y );
 
-	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
-	this.curves.push( curve );
+		this.actions.push( { action: 'ellipse', args: args } );
 
-	var lastPoint = curve.getPoint( 1 );
-	args.push( lastPoint.x );
-	args.push( lastPoint.y );
+	},
 
-	this.actions.push( { action: 'ellipse', args: args } );
+	getSpacedPoints: function ( divisions ) {
 
- };
+		if ( ! divisions ) divisions = 40;
 
-THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
+		var points = [];
 
-	if ( ! divisions ) divisions = 40;
+		for ( var i = 0; i < divisions; i ++ ) {
 
-	var points = [];
+			points.push( this.getPoint( i / divisions ) );
 
-	for ( var i = 0; i < divisions; i ++ ) {
+			//if ( !this.getPoint( i / divisions ) ) throw "DIE";
 
-		points.push( this.getPoint( i / divisions ) );
+		}
 
-		//if ( !this.getPoint( i / divisions ) ) throw "DIE";
+		if ( this.autoClose ) {
 
-	}
+			points.push( points[ 0 ] );
 
-	if ( this.autoClose ) {
+		}
 
-		points.push( points[ 0 ] );
+		return points;
 
-	}
+	},
 
-	return points;
+	getPoints: function ( divisions ) {
 
-};
+		divisions = divisions || 12;
 
-/* Return an array of vectors based on contour of the path */
+		var b2 = THREE.ShapeUtils.b2;
+		var b3 = THREE.ShapeUtils.b3;
 
-THREE.Path.prototype.getPoints = function( divisions ) {
+		var points = [];
 
-	divisions = divisions || 12;
+		var cpx, cpy, cpx2, cpy2, cpx1, cpy1, cpx0, cpy0,
+			laste, tx, ty;
 
-	var b2 = THREE.ShapeUtils.b2;
-	var b3 = THREE.ShapeUtils.b3;
+		for ( var i = 0, l = this.actions.length; i < l; i ++ ) {
 
-	var points = [];
+			var item = this.actions[ i ];
 
-	var cpx, cpy, cpx2, cpy2, cpx1, cpy1, cpx0, cpy0,
-		laste, tx, ty;
+			var action = item.action;
+			var args = item.args;
 
-	for ( var i = 0, l = this.actions.length; i < l; i ++ ) {
+			switch ( action ) {
 
-		var item = this.actions[ i ];
+			case 'moveTo':
 
-		var action = item.action;
-		var args = item.args;
+				points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
-		switch ( action ) {
+				break;
 
-		case 'moveTo':
+			case 'lineTo':
 
-			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
+				points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
-			break;
+				break;
 
-		case 'lineTo':
+			case 'quadraticCurveTo':
 
-			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
+				cpx  = args[ 2 ];
+				cpy  = args[ 3 ];
 
-			break;
+				cpx1 = args[ 0 ];
+				cpy1 = args[ 1 ];
 
-		case 'quadraticCurveTo':
+				if ( points.length > 0 ) {
 
-			cpx  = args[ 2 ];
-			cpy  = args[ 3 ];
+					laste = points[ points.length - 1 ];
 
-			cpx1 = args[ 0 ];
-			cpy1 = args[ 1 ];
+					cpx0 = laste.x;
+					cpy0 = laste.y;
 
-			if ( points.length > 0 ) {
+				} else {
 
-				laste = points[ points.length - 1 ];
+					laste = this.actions[ i - 1 ].args;
 
-				cpx0 = laste.x;
-				cpy0 = laste.y;
-
-			} else {
-
-				laste = this.actions[ i - 1 ].args;
-
-				cpx0 = laste[ laste.length - 2 ];
-				cpy0 = laste[ laste.length - 1 ];
-
-			}
-
-			for ( var j = 1; j <= divisions; j ++ ) {
-
-				var t = j / divisions;
-
-				tx = b2( t, cpx0, cpx1, cpx );
-				ty = b2( t, cpy0, cpy1, cpy );
-
-				points.push( new THREE.Vector2( tx, ty ) );
-
-			}
-
-			break;
-
-		case 'bezierCurveTo':
-
-			cpx  = args[ 4 ];
-			cpy  = args[ 5 ];
-
-			cpx1 = args[ 0 ];
-			cpy1 = args[ 1 ];
-
-			cpx2 = args[ 2 ];
-			cpy2 = args[ 3 ];
-
-			if ( points.length > 0 ) {
-
-				laste = points[ points.length - 1 ];
-
-				cpx0 = laste.x;
-				cpy0 = laste.y;
-
-			} else {
-
-				laste = this.actions[ i - 1 ].args;
-
-				cpx0 = laste[ laste.length - 2 ];
-				cpy0 = laste[ laste.length - 1 ];
-
-			}
-
-
-			for ( var j = 1; j <= divisions; j ++ ) {
-
-				var t = j / divisions;
-
-				tx = b3( t, cpx0, cpx1, cpx2, cpx );
-				ty = b3( t, cpy0, cpy1, cpy2, cpy );
-
-				points.push( new THREE.Vector2( tx, ty ) );
-
-			}
-
-			break;
-
-		case 'splineThru':
-
-			laste = this.actions[ i - 1 ].args;
-
-			var last = new THREE.Vector2( laste[ laste.length - 2 ], laste[ laste.length - 1 ] );
-			var spts = [ last ];
-
-			var n = divisions * args[ 0 ].length;
-
-			spts = spts.concat( args[ 0 ] );
-
-			var spline = new THREE.SplineCurve( spts );
-
-			for ( var j = 1; j <= n; j ++ ) {
-
-				points.push( spline.getPointAt( j / n ) );
-
-			}
-
-			break;
-
-		case 'arc':
-
-			var aX = args[ 0 ], aY = args[ 1 ],
-				aRadius = args[ 2 ],
-				aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
-				aClockwise = !! args[ 5 ];
-
-			var deltaAngle = aEndAngle - aStartAngle;
-			var angle;
-			var tdivisions = divisions * 2;
-
-			for ( var j = 1; j <= tdivisions; j ++ ) {
-
-				var t = j / tdivisions;
-
-				if ( ! aClockwise ) {
-
-					t = 1 - t;
+					cpx0 = laste[ laste.length - 2 ];
+					cpy0 = laste[ laste.length - 1 ];
 
 				}
 
-				angle = aStartAngle + t * deltaAngle;
+				for ( var j = 1; j <= divisions; j ++ ) {
 
-				tx = aX + aRadius * Math.cos( angle );
-				ty = aY + aRadius * Math.sin( angle );
+					var t = j / divisions;
 
-				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+					tx = b2( t, cpx0, cpx1, cpx );
+					ty = b2( t, cpy0, cpy1, cpy );
 
-				points.push( new THREE.Vector2( tx, ty ) );
-
-			}
-
-			//console.log(points);
-
-			break;
-
-		case 'ellipse':
-
-			var aX = args[ 0 ], aY = args[ 1 ],
-				xRadius = args[ 2 ],
-				yRadius = args[ 3 ],
-				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
-				aClockwise = !! args[ 6 ],
-				aRotation = args[ 7 ];
-
-
-			var deltaAngle = aEndAngle - aStartAngle;
-			var angle;
-			var tdivisions = divisions * 2;
-
-			var cos, sin;
-			if ( aRotation !== 0 ) {
-
-				cos = Math.cos( aRotation );
-				sin = Math.sin( aRotation );
-
-			}
-
-			for ( var j = 1; j <= tdivisions; j ++ ) {
-
-				var t = j / tdivisions;
-
-				if ( ! aClockwise ) {
-
-					t = 1 - t;
+					points.push( new THREE.Vector2( tx, ty ) );
 
 				}
 
-				angle = aStartAngle + t * deltaAngle;
+				break;
 
-				tx = aX + xRadius * Math.cos( angle );
-				ty = aY + yRadius * Math.sin( angle );
+			case 'bezierCurveTo':
 
+				cpx  = args[ 4 ];
+				cpy  = args[ 5 ];
+
+				cpx1 = args[ 0 ];
+				cpy1 = args[ 1 ];
+
+				cpx2 = args[ 2 ];
+				cpy2 = args[ 3 ];
+
+				if ( points.length > 0 ) {
+
+					laste = points[ points.length - 1 ];
+
+					cpx0 = laste.x;
+					cpy0 = laste.y;
+
+				} else {
+
+					laste = this.actions[ i - 1 ].args;
+
+					cpx0 = laste[ laste.length - 2 ];
+					cpy0 = laste[ laste.length - 1 ];
+
+				}
+
+
+				for ( var j = 1; j <= divisions; j ++ ) {
+
+					var t = j / divisions;
+
+					tx = b3( t, cpx0, cpx1, cpx2, cpx );
+					ty = b3( t, cpy0, cpy1, cpy2, cpy );
+
+					points.push( new THREE.Vector2( tx, ty ) );
+
+				}
+
+				break;
+
+			case 'splineThru':
+
+				laste = this.actions[ i - 1 ].args;
+
+				var last = new THREE.Vector2( laste[ laste.length - 2 ], laste[ laste.length - 1 ] );
+				var spts = [ last ];
+
+				var n = divisions * args[ 0 ].length;
+
+				spts = spts.concat( args[ 0 ] );
+
+				var spline = new THREE.SplineCurve( spts );
+
+				for ( var j = 1; j <= n; j ++ ) {
+
+					points.push( spline.getPointAt( j / n ) );
+
+				}
+
+				break;
+
+			case 'arc':
+
+				var aX = args[ 0 ], aY = args[ 1 ],
+					aRadius = args[ 2 ],
+					aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
+					aClockwise = !! args[ 5 ];
+
+				var deltaAngle = aEndAngle - aStartAngle;
+				var angle;
+				var tdivisions = divisions * 2;
+
+				for ( var j = 1; j <= tdivisions; j ++ ) {
+
+					var t = j / tdivisions;
+
+					if ( ! aClockwise ) {
+
+						t = 1 - t;
+
+					}
+
+					angle = aStartAngle + t * deltaAngle;
+
+					tx = aX + aRadius * Math.cos( angle );
+					ty = aY + aRadius * Math.sin( angle );
+
+					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+
+					points.push( new THREE.Vector2( tx, ty ) );
+
+				}
+
+				//console.log(points);
+
+				break;
+
+			case 'ellipse':
+
+				var aX = args[ 0 ], aY = args[ 1 ],
+					xRadius = args[ 2 ],
+					yRadius = args[ 3 ],
+					aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
+					aClockwise = !! args[ 6 ],
+					aRotation = args[ 7 ];
+
+
+				var deltaAngle = aEndAngle - aStartAngle;
+				var angle;
+				var tdivisions = divisions * 2;
+
+				var cos, sin;
 				if ( aRotation !== 0 ) {
 
-					var x = tx, y = ty;
-
-					// Rotate the point about the center of the ellipse.
-					tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
-					ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
+					cos = Math.cos( aRotation );
+					sin = Math.sin( aRotation );
 
 				}
 
-				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+				for ( var j = 1; j <= tdivisions; j ++ ) {
 
-				points.push( new THREE.Vector2( tx, ty ) );
+					var t = j / tdivisions;
+
+					if ( ! aClockwise ) {
+
+						t = 1 - t;
+
+					}
+
+					angle = aStartAngle + t * deltaAngle;
+
+					tx = aX + xRadius * Math.cos( angle );
+					ty = aY + yRadius * Math.sin( angle );
+
+					if ( aRotation !== 0 ) {
+
+						var x = tx, y = ty;
+
+						// Rotate the point about the center of the ellipse.
+						tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
+						ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
+
+					}
+
+					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+
+					points.push( new THREE.Vector2( tx, ty ) );
+
+				}
+
+				//console.log(points);
+
+				break;
+
+			} // end switch
+
+		}
+
+
+
+		// Normalize to remove the closing point by default.
+		var lastPoint = points[ points.length - 1 ];
+		if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
+				 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
+			points.splice( points.length - 1, 1 );
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	toShapes: function ( isCCW, noHoles ) {
+
+		function extractSubpaths( inActions ) {
+
+			var subPaths = [], lastPath = new THREE.Path();
+
+			for ( var i = 0, l = inActions.length; i < l; i ++ ) {
+
+				var item = inActions[ i ];
+
+				var args = item.args;
+				var action = item.action;
+
+				if ( action === 'moveTo' ) {
+
+					if ( lastPath.actions.length !== 0 ) {
+
+						subPaths.push( lastPath );
+						lastPath = new THREE.Path();
+
+					}
+
+				}
+
+				lastPath[ action ].apply( lastPath, args );
 
 			}
 
-			//console.log(points);
+			if ( lastPath.actions.length !== 0 ) {
 
-			break;
+				subPaths.push( lastPath );
 
-		} // end switch
+			}
 
-	}
+			// console.log(subPaths);
 
+			return	subPaths;
 
+		}
 
-	// Normalize to remove the closing point by default.
-	var lastPoint = points[ points.length - 1 ];
-	if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
-			 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
-		points.splice( points.length - 1, 1 );
+		function toShapesNoHoles( inSubpaths ) {
 
-	if ( this.autoClose ) {
+			var shapes = [];
 
-		points.push( points[ 0 ] );
+			for ( var i = 0, l = inSubpaths.length; i < l; i ++ ) {
 
-	}
+				var tmpPath = inSubpaths[ i ];
 
-	return points;
+				var tmpShape = new THREE.Shape();
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
 
-};
+				shapes.push( tmpShape );
 
-//
-// Breaks path into shapes
-//
-//	Assumptions (if parameter isCCW==true the opposite holds):
-//	- solid shapes are defined clockwise (CW)
-//	- holes are defined counterclockwise (CCW)
-//
-//	If parameter noHoles==true:
-//  - all subPaths are regarded as solid shapes
-//  - definition order CW/CCW has no relevance
-//
+			}
 
-THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
+			//console.log("shape", shapes);
 
-	function extractSubpaths( inActions ) {
+			return shapes;
 
-		var subPaths = [], lastPath = new THREE.Path();
+		}
 
-		for ( var i = 0, l = inActions.length; i < l; i ++ ) {
+		function isPointInsidePolygon( inPt, inPolygon ) {
 
-			var item = inActions[ i ];
+			var polyLen = inPolygon.length;
 
-			var args = item.args;
-			var action = item.action;
+			// inPt on polygon contour => immediate success    or
+			// toggling of inside/outside at every single! intersection point of an edge
+			//  with the horizontal line through inPt, left of inPt
+			//  not counting lowerY endpoints of edges and whole edges on that line
+			var inside = false;
+			for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 
-			if ( action === 'moveTo' ) {
+				var edgeLowPt  = inPolygon[ p ];
+				var edgeHighPt = inPolygon[ q ];
 
-				if ( lastPath.actions.length !== 0 ) {
+				var edgeDx = edgeHighPt.x - edgeLowPt.x;
+				var edgeDy = edgeHighPt.y - edgeLowPt.y;
 
-					subPaths.push( lastPath );
-					lastPath = new THREE.Path();
+				if ( Math.abs( edgeDy ) > Number.EPSILON ) {
+
+					// not parallel
+					if ( edgeDy < 0 ) {
+
+						edgeLowPt  = inPolygon[ q ]; edgeDx = - edgeDx;
+						edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
+
+					}
+					if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
+
+					if ( inPt.y === edgeLowPt.y ) {
+
+						if ( inPt.x === edgeLowPt.x )		return	true;		// inPt is on contour ?
+						// continue;				// no intersection or edgeLowPt => doesn't count !!!
+
+					} else {
+
+						var perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
+						if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
+						if ( perpEdge < 0 ) 				continue;
+						inside = ! inside;		// true intersection left of inPt
+
+					}
+
+				} else {
+
+					// parallel or collinear
+					if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
+					// edge lies on the same horizontal line as inPt
+					if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
+						 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
+					// continue;
 
 				}
 
 			}
 
-			lastPath[ action ].apply( lastPath, args );
+			return	inside;
 
 		}
 
-		if ( lastPath.actions.length !== 0 ) {
+		var isClockWise = THREE.ShapeUtils.isClockWise;
 
-			subPaths.push( lastPath );
+		var subPaths = extractSubpaths( this.actions );
+		if ( subPaths.length === 0 ) return [];
 
-		}
+		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
-		// console.log(subPaths);
 
-		return	subPaths;
+		var solid, tmpPath, tmpShape, shapes = [];
 
-	}
+		if ( subPaths.length === 1 ) {
 
-	function toShapesNoHoles( inSubpaths ) {
-
-		var shapes = [];
-
-		for ( var i = 0, l = inSubpaths.length; i < l; i ++ ) {
-
-			var tmpPath = inSubpaths[ i ];
-
-			var tmpShape = new THREE.Shape();
+			tmpPath = subPaths[ 0 ];
+			tmpShape = new THREE.Shape();
 			tmpShape.actions = tmpPath.actions;
 			tmpShape.curves = tmpPath.curves;
-
 			shapes.push( tmpShape );
+			return shapes;
+
+		}
+
+		var holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
+		holesFirst = isCCW ? ! holesFirst : holesFirst;
+
+		// console.log("Holes first", holesFirst);
+
+		var betterShapeHoles = [];
+		var newShapes = [];
+		var newShapeHoles = [];
+		var mainIdx = 0;
+		var tmpPoints;
+
+		newShapes[ mainIdx ] = undefined;
+		newShapeHoles[ mainIdx ] = [];
+
+		for ( var i = 0, l = subPaths.length; i < l; i ++ ) {
+
+			tmpPath = subPaths[ i ];
+			tmpPoints = tmpPath.getPoints();
+			solid = isClockWise( tmpPoints );
+			solid = isCCW ? ! solid : solid;
+
+			if ( solid ) {
+
+				if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
+
+				newShapes[ mainIdx ] = { s: new THREE.Shape(), p: tmpPoints };
+				newShapes[ mainIdx ].s.actions = tmpPath.actions;
+				newShapes[ mainIdx ].s.curves = tmpPath.curves;
+
+				if ( holesFirst )	mainIdx ++;
+				newShapeHoles[ mainIdx ] = [];
+
+				//console.log('cw', i);
+
+			} else {
+
+				newShapeHoles[ mainIdx ].push( { h: tmpPath, p: tmpPoints[ 0 ] } );
+
+				//console.log('ccw', i);
+
+			}
+
+		}
+
+		// only Holes? -> probably all Shapes with wrong orientation
+		if ( ! newShapes[ 0 ] )	return	toShapesNoHoles( subPaths );
+
+
+		if ( newShapes.length > 1 ) {
+
+			var ambiguous = false;
+			var toChange = [];
+
+			for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+
+				betterShapeHoles[ sIdx ] = [];
+
+			}
+
+			for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+
+				var sho = newShapeHoles[ sIdx ];
+
+				for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
+
+					var ho = sho[ hIdx ];
+					var hole_unassigned = true;
+
+					for ( var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
+
+						if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
+
+							if ( sIdx !== s2Idx )	toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
+							if ( hole_unassigned ) {
+
+								hole_unassigned = false;
+								betterShapeHoles[ s2Idx ].push( ho );
+
+							} else {
+
+								ambiguous = true;
+
+							}
+
+						}
+
+					}
+					if ( hole_unassigned ) {
+
+						betterShapeHoles[ sIdx ].push( ho );
+
+					}
+
+				}
+
+			}
+			// console.log("ambiguous: ", ambiguous);
+			if ( toChange.length > 0 ) {
+
+				// console.log("to change: ", toChange);
+				if ( ! ambiguous )	newShapeHoles = betterShapeHoles;
+
+			}
+
+		}
+
+		var tmpHoles;
+
+		for ( var i = 0, il = newShapes.length; i < il; i ++ ) {
+
+			tmpShape = newShapes[ i ].s;
+			shapes.push( tmpShape );
+			tmpHoles = newShapeHoles[ i ];
+
+			for ( var j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
+
+				tmpShape.holes.push( tmpHoles[ j ].h );
+
+			}
 
 		}
 
@@ -35462,213 +35658,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	}
 
-	function isPointInsidePolygon( inPt, inPolygon ) {
-
-		var polyLen = inPolygon.length;
-
-		// inPt on polygon contour => immediate success    or
-		// toggling of inside/outside at every single! intersection point of an edge
-		//  with the horizontal line through inPt, left of inPt
-		//  not counting lowerY endpoints of edges and whole edges on that line
-		var inside = false;
-		for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
-
-			var edgeLowPt  = inPolygon[ p ];
-			var edgeHighPt = inPolygon[ q ];
-
-			var edgeDx = edgeHighPt.x - edgeLowPt.x;
-			var edgeDy = edgeHighPt.y - edgeLowPt.y;
-
-			if ( Math.abs( edgeDy ) > Number.EPSILON ) {
-
-				// not parallel
-				if ( edgeDy < 0 ) {
-
-					edgeLowPt  = inPolygon[ q ]; edgeDx = - edgeDx;
-					edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
-
-				}
-				if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
-
-				if ( inPt.y === edgeLowPt.y ) {
-
-					if ( inPt.x === edgeLowPt.x )		return	true;		// inPt is on contour ?
-					// continue;				// no intersection or edgeLowPt => doesn't count !!!
-
-				} else {
-
-					var perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
-					if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
-					if ( perpEdge < 0 ) 				continue;
-					inside = ! inside;		// true intersection left of inPt
-
-				}
-
-			} else {
-
-				// parallel or collinear
-				if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
-				// edge lies on the same horizontal line as inPt
-				if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
-					 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
-				// continue;
-
-			}
-
-		}
-
-		return	inside;
-
-	}
-
-	var isClockWise = THREE.ShapeUtils.isClockWise;
-
-	var subPaths = extractSubpaths( this.actions );
-	if ( subPaths.length === 0 ) return [];
-
-	if ( noHoles === true )	return	toShapesNoHoles( subPaths );
-
-
-	var solid, tmpPath, tmpShape, shapes = [];
-
-	if ( subPaths.length === 1 ) {
-
-		tmpPath = subPaths[ 0 ];
-		tmpShape = new THREE.Shape();
-		tmpShape.actions = tmpPath.actions;
-		tmpShape.curves = tmpPath.curves;
-		shapes.push( tmpShape );
-		return shapes;
-
-	}
-
-	var holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
-	holesFirst = isCCW ? ! holesFirst : holesFirst;
-
-	// console.log("Holes first", holesFirst);
-
-	var betterShapeHoles = [];
-	var newShapes = [];
-	var newShapeHoles = [];
-	var mainIdx = 0;
-	var tmpPoints;
-
-	newShapes[ mainIdx ] = undefined;
-	newShapeHoles[ mainIdx ] = [];
-
-	for ( var i = 0, l = subPaths.length; i < l; i ++ ) {
-
-		tmpPath = subPaths[ i ];
-		tmpPoints = tmpPath.getPoints();
-		solid = isClockWise( tmpPoints );
-		solid = isCCW ? ! solid : solid;
-
-		if ( solid ) {
-
-			if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
-
-			newShapes[ mainIdx ] = { s: new THREE.Shape(), p: tmpPoints };
-			newShapes[ mainIdx ].s.actions = tmpPath.actions;
-			newShapes[ mainIdx ].s.curves = tmpPath.curves;
-
-			if ( holesFirst )	mainIdx ++;
-			newShapeHoles[ mainIdx ] = [];
-
-			//console.log('cw', i);
-
-		} else {
-
-			newShapeHoles[ mainIdx ].push( { h: tmpPath, p: tmpPoints[ 0 ] } );
-
-			//console.log('ccw', i);
-
-		}
-
-	}
-
-	// only Holes? -> probably all Shapes with wrong orientation
-	if ( ! newShapes[ 0 ] )	return	toShapesNoHoles( subPaths );
-
-
-	if ( newShapes.length > 1 ) {
-
-		var ambiguous = false;
-		var toChange = [];
-
-		for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-
-			betterShapeHoles[ sIdx ] = [];
-
-		}
-
-		for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-
-			var sho = newShapeHoles[ sIdx ];
-
-			for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
-
-				var ho = sho[ hIdx ];
-				var hole_unassigned = true;
-
-				for ( var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
-
-					if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
-
-						if ( sIdx !== s2Idx )	toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
-						if ( hole_unassigned ) {
-
-							hole_unassigned = false;
-							betterShapeHoles[ s2Idx ].push( ho );
-
-						} else {
-
-							ambiguous = true;
-
-						}
-
-					}
-
-				}
-				if ( hole_unassigned ) {
-
-					betterShapeHoles[ sIdx ].push( ho );
-
-				}
-
-			}
-
-		}
-		// console.log("ambiguous: ", ambiguous);
-		if ( toChange.length > 0 ) {
-
-			// console.log("to change: ", toChange);
-			if ( ! ambiguous )	newShapeHoles = betterShapeHoles;
-
-		}
-
-	}
-
-	var tmpHoles;
-
-	for ( var i = 0, il = newShapes.length; i < il; i ++ ) {
-
-		tmpShape = newShapes[ i ].s;
-		shapes.push( tmpShape );
-		tmpHoles = newShapeHoles[ i ];
-
-		for ( var j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
-
-			tmpShape.holes.push( tmpHoles[ j ].h );
-
-		}
-
-	}
-
-	//console.log("shape", shapes);
-
-	return shapes;
-
-};
+} );
 
 // File:src/extras/core/Shape.js
 
@@ -35691,60 +35681,60 @@ THREE.Shape = function () {
 
 };
 
-THREE.Shape.prototype = Object.create( THREE.Path.prototype );
-THREE.Shape.prototype.constructor = THREE.Shape;
+THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
 
-// Convenience method to return ExtrudeGeometry
+	constructor: THREE.Shape,
 
-THREE.Shape.prototype.extrude = function ( options ) {
+	// Convenience method to return ExtrudeGeometry
 
-	return new THREE.ExtrudeGeometry( this, options );
+	extrude: function ( options ) {
 
-};
+		return new THREE.ExtrudeGeometry( this, options );
 
-// Convenience method to return ShapeGeometry
+	},
 
-THREE.Shape.prototype.makeGeometry = function ( options ) {
+	// Convenience method to return ShapeGeometry
 
-	return new THREE.ShapeGeometry( this, options );
+	makeGeometry: function ( options ) {
 
-};
+		return new THREE.ShapeGeometry( this, options );
 
-// Get points of holes
+	},
 
-THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
+	getPointsHoles: function ( divisions ) {
 
-	var holesPts = [];
+		var holesPts = [];
 
-	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+
+		}
+
+		return holesPts;
+
+	},
+
+	// Get points of shape and holes (keypoints based on segments parameter)
+
+	extractAllPoints: function ( divisions ) {
+
+		return {
+
+			shape: this.getPoints( divisions ),
+			holes: this.getPointsHoles( divisions )
+
+		};
+
+	},
+
+	extractPoints: function ( divisions ) {
+
+		return this.extractAllPoints( divisions );
 
 	}
 
-	return holesPts;
-
-};
-
-
-// Get points of shape and holes (keypoints based on segments parameter)
-
-THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getPoints( divisions ),
-		holes: this.getPointsHoles( divisions )
-
-	};
-
-};
-
-THREE.Shape.prototype.extractPoints = function ( divisions ) {
-
-	return this.extractAllPoints( divisions );
-
-};
+} );
 
 // File:src/extras/curves/LineCurve.js
 
@@ -36670,6 +36660,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	};
 
 	var scope = this;
+	var twoPi = 2.0 * Math.PI;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
@@ -36679,16 +36670,17 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
+	thetaLength = thetaLength !== undefined ? thetaLength : twoPi;
 
 	// used to calculate buffer length
-	
+
 	var nbCap = 0;
+
 	if ( openEnded === false ) {
 
-		if ( radiusTop > 0 ) nbCap++;
-		if ( radiusBottom > 0 ) nbCap++;
+		if ( radiusTop > 0 ) nbCap ++;
+		if ( radiusBottom > 0 ) nbCap ++;
 
 	}
 
@@ -36704,7 +36696,10 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	// helper variables
 
-	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
+	var index = 0,
+	    indexOffset = 0,
+	    indexArray = [],
+	    halfHeight = height / 2;
 
 	// group variables
 	var groupStart = 0;
@@ -36793,6 +36788,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 				normal.copy( vertex );
 
 				// handle special case if radiusTop/radiusBottom is zero
+
 				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
 
 					normal.x = Math.sin( u * thetaLength + thetaStart );
@@ -36858,7 +36854,9 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 	function generateCap( top ) {
 
-		var x, centerIndexStart, centerIndexEnd;
+		var x,
+		    centerIndexStart,
+		    centerIndexEnd;
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
 
@@ -36883,17 +36881,8 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			if ( top === true ) {
-
-				uv.x = x / radialSegments;
-				uv.y = 0;
-
-			} else {
-
-				uv.x = ( x - 1 ) / radialSegments;
-				uv.y = 1;
-
-			}
+			uv.x = 0.5;
+			uv.y = 0.5;
 
 			uvs.setXY( index, uv.x, uv.y );
 
@@ -36910,18 +36899,24 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 		for ( x = 0; x <= radialSegments; x ++ ) {
 
 			var u = x / radialSegments;
+			var theta = u * thetaLength + thetaStart;
+
+			var cosTheta = Math.cos( theta );
+			var sinTheta = Math.sin( theta );
 
 			// vertex
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.x = radius * sinTheta;
 			vertex.y = halfHeight * sign;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertex.z = radius * cosTheta;
 			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+			uv.x = ( cosTheta * 0.5 ) + 0.5;
+			uv.y = ( sinTheta * 0.5 ) + 0.5;
+			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
 			index ++;
@@ -36999,6 +36994,71 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
+
+// File:src/extras/geometries/ConeBufferGeometry.js
+
+/*
+ * @author: abelnation / http://github.com/abelnation
+ */
+
+THREE.ConeBufferGeometry = function (
+	radius, height,
+	radialSegments, heightSegments,
+	openEnded, thetaStart, thetaLength ) {
+
+	THREE.CylinderBufferGeometry.call( this,
+		0, radius, height,
+		radialSegments, heightSegments,
+		openEnded, thetaStart, thetaLength );
+
+	this.type = 'ConeBufferGeometry';
+
+	this.parameters = {
+		radius: radius,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+};
+
+THREE.ConeBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.ConeBufferGeometry.prototype.constructor = THREE.ConeBufferGeometry;
+
+// File:src/extras/geometries/ConeGeometry.js
+
+/**
+ * @author abelnation / http://github.com/abelnation
+ */
+
+THREE.ConeGeometry = function (
+	radius, height,
+	radialSegments, heightSegments,
+	openEnded, thetaStart, thetaLength ) {
+
+	THREE.CylinderGeometry.call( this,
+		0, radius, height,
+		radialSegments, heightSegments,
+		openEnded, thetaStart, thetaLength );
+
+	this.type = 'ConeGeometry';
+
+	this.parameters = {
+		radius: radius,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+};
+
+THREE.ConeGeometry.prototype = Object.create( THREE.CylinderGeometry.prototype );
+THREE.ConeGeometry.prototype.constructor = THREE.ConeGeometry;
 
 // File:src/extras/geometries/EdgesGeometry.js
 
