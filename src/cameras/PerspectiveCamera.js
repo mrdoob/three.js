@@ -224,3 +224,45 @@ THREE.PerspectiveCamera.prototype.toJSON = function( meta ) {
 	return data;
 
 };
+
+THREE.PerspectiveCamera.prototype.zoomTo = function( node, factor ){
+
+	if ( !node.geometry ) {
+	
+		return;
+	
+	}
+	
+	if ( node.geometry.boundingSphere === null ) { 
+	
+		node.geometry.computeBoundingSphere();
+	
+	}
+	
+	if ( !node.geometry.boundingSphere ) {
+	
+		return;
+		
+	}
+	
+	node.updateMatrixWorld();
+
+	var _factor = factor || 1;
+	
+	var radius = node.geometry.boundingSphere.radius;
+	var fovr = this.fov * Math.PI / 180;
+	
+	if( this.aspect < 1 ){
+	
+		fovr = fovr * this.aspect;
+		
+	}
+	
+	var distanceFactor = Math.abs( radius / Math.sin( fovr / 2 ) ) * _factor ;
+	
+	var dir = new THREE.Vector3( 0, 0, -1 ).applyQuaternion( this.quaternion );
+	var offset = dir.multiplyScalar( -distanceFactor );
+	this.position.copy(node.position.clone().add( offset ));
+	
+};
+
