@@ -661,8 +661,8 @@
 				mouseX = 10000;
 				mouseY = 10000;
 
-				birdUniforms.texturePosition.value = simulator.currentPosition;
-				birdUniforms.textureVelocity.value = simulator.currentVelocity;
+				birdUniforms.texturePosition.value = simulator.currentPosition.texture;
+				birdUniforms.textureVelocity.value = simulator.currentVelocity.texture;
 
 				renderer.render( scene, camera );
 
