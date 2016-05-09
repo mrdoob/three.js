@@ -1,0 +1,16 @@
+#colorjack_square {
+	border: 1px solid #404040;
+	border-radius: 6px;
+	background: #191919;
+	box-shadow: 3px 3px 3px rgba(0,0,0,0.35);
+	-webkit-box-shadow: 3px 3px 3px rgba(0,0,0,0.35);
+	-moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.35);
+	cursor: default;
+	display: block;
+	font-family: arial, helvetica, sans-serif;
+	font-size: 11px;
+	position: relative;
+	width: 215px;
+	height: 10px;
+	z-index:1;
+}
