@@ -37,7 +37,7 @@ THREE.LinearlyTransformedSphericalDistribution.prototype.valueAtNormalizedPosVec
 
 	}
 
-	var angleScalarValue = ( this.transformInverseDet / ( Math.pow( transformedPosMag, 3 ) ) );
+	var angleScalarValue = ( this.transformInverseDet / Math.pow( transformedPosMag, 3 ) );
 	var result = distFnValue * angleScalarValue;
 
 	return result;
@@ -54,16 +54,12 @@ THREE.LinearlyTransformedSphericalDistribution.prototype.updateTransform = funct
 
 THREE.LinearlyTransformedSphericalDistribution.prototype.scale = function ( x, y, z ) {
 
-	this.transformMat4.scale( new THREE.Vector3( x, y, z ) );
+	var scale = new THREE.Matrix4().makeScale( x, y, z );
+	this.transformMat4.multiply( scale );
 	this.updateTransform();
 
 	return this;
 
-}
-
-THREE.LinearlyTransformedSphericalDistribution.prototype.skew = function ( x, y, z ) {
-	// TODO: implement
-	return this;
 }
 
 THREE.LinearlyTransformedSphericalDistribution.prototype.rotate = function ( rx, ry, rz ) {
@@ -76,7 +72,17 @@ THREE.LinearlyTransformedSphericalDistribution.prototype.rotate = function ( rx,
 
 }
 
-THREE.LinearlyTransformedSphericalDistribution.prototype.transformMat3 = function ( mat4 ) {
+THREE.LinearlyTransformedSphericalDistribution.prototype.shear = function ( x, y, z ) {
+
+	var shear = new THREE.Matrix4().makeShear( x, y, z );
+	this.transformMat4.multiply( shear );
+	this.updateTransform();
+
+	return this;
+
+}
+
+THREE.LinearlyTransformedSphericalDistribution.prototype.transformMat4 = function ( mat4 ) {
 
 	this.transformMat4 = mat4.clone();
 	this.updateTransform();
