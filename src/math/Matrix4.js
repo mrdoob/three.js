@@ -316,9 +316,13 @@ THREE.Matrix4.prototype = {
 
 		return function ( eye, target, up ) {
 
-			if ( x === undefined ) x = new THREE.Vector3();
-			if ( y === undefined ) y = new THREE.Vector3();
-			if ( z === undefined ) z = new THREE.Vector3();
+			if ( x === undefined ) {
+
+				x = new THREE.Vector3();
+				y = new THREE.Vector3();
+				z = new THREE.Vector3();
+
+			}
 
 			var te = this.elements;
 
@@ -334,7 +338,7 @@ THREE.Matrix4.prototype = {
 
 			if ( x.lengthSq() === 0 ) {
 
-				z.x += 0.0001;
+				z.z += 0.0001;
 				x.crossVectors( up, z ).normalize();
 
 			}
@@ -800,8 +804,12 @@ THREE.Matrix4.prototype = {
 
 		return function ( position, quaternion, scale ) {
 
-			if ( vector === undefined ) vector = new THREE.Vector3();
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( vector === undefined ) {
+
+				vector = new THREE.Vector3();
+				matrix = new THREE.Matrix4();
+
+			}
 
 			var te = this.elements;
 
