@@ -29,6 +29,11 @@ for f in $(${DIR}/filesChangedBetweenBranches.sh); do
 done
 
 echo ""
+echo "============"
+echo "| ALL DONE |"
+echo "============"
+echo ""
+
 read -p "Commit formatting changes to current branch [yn]?" -n 1 -r
 echo    # (optional) move to a new line
 
