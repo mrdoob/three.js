@@ -1,6 +1,5 @@
 {
     "preset": "mdcs",
-    "disallowSpaceAfterPrefixUnaryOperators": ["+", "-"],
     "disallowNewlineBeforeBlockStatements": true,
     "requireSpaceAfterBinaryOperators": [",", "="],
     "disallowKeywordsOnNewLine": ["else"],
