@@ -10,23 +10,15 @@ THREE.Spline = function ( points ) {
 
 	this.points = points;
 
-	var c = [],
-		v3 = { x: 0, y: 0, z: 0 },
-		point,
-		intPoint,
-		weight,
-		w2,
-		w3,
-		pa,
-		pb,
-		pc,
-		pd;
+	var c = [], v3 = { x: 0, y: 0, z: 0 },
+	point, intPoint, weight, w2, w3,
+	pa, pb, pc, pd;
 
 	this.initFromArray = function ( a ) {
 
 		this.points = [];
 
-		for ( var i = 0; i < a.length; i++ ) {
+		for ( var i = 0; i < a.length; i ++ ) {
 
 			this.points[ i ] = { x: a[ i ][ 0 ], y: a[ i ][ 1 ], z: a[ i ][ 2 ] };
 
@@ -42,8 +34,8 @@ THREE.Spline = function ( points ) {
 
 		c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
 		c[ 1 ] = intPoint;
-		c[ 2 ] = intPoint > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
-		c[ 3 ] = intPoint > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
+		c[ 2 ] = intPoint  > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
+		c[ 3 ] = intPoint  > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
 
 		pa = this.points[ c[ 0 ] ];
 		pb = this.points[ c[ 1 ] ];
@@ -63,12 +55,10 @@ THREE.Spline = function ( points ) {
 
 	this.getControlPointsArray = function () {
 
-		var i,
-			p,
-			l = this.points.length,
+		var i, p, l = this.points.length,
 			coords = [];
 
-		for ( i = 0; i < l; i++ ) {
+		for ( i = 0; i < l; i ++ ) {
 
 			p = this.points[ i ];
 			coords[ i ] = [ p.x, p.y, p.z ];
@@ -83,13 +73,8 @@ THREE.Spline = function ( points ) {
 
 	this.getLength = function ( nSubDivisions ) {
 
-		var i,
-			index,
-			nSamples,
-			position,
-			point = 0,
-			intPoint = 0,
-			oldIntPoint = 0,
+		var i, index, nSamples, position,
+			point = 0, intPoint = 0, oldIntPoint = 0,
 			oldPosition = new THREE.Vector3(),
 			tmpVec = new THREE.Vector3(),
 			chunkLengths = [],
@@ -99,14 +84,13 @@ THREE.Spline = function ( points ) {
 
 		chunkLengths[ 0 ] = 0;
 
-		if ( ! nSubDivisions )
-			nSubDivisions = 100;
+		if ( ! nSubDivisions ) nSubDivisions = 100;
 
 		nSamples = this.points.length * nSubDivisions;
 
 		oldPosition.copy( this.points[ 0 ] );
 
-		for ( i = 1; i < nSamples; i++ ) {
+		for ( i = 1; i < nSamples; i ++ ) {
 
 			index = i / nSamples;
 
@@ -139,24 +123,20 @@ THREE.Spline = function ( points ) {
 
 	this.reparametrizeByArcLength = function ( samplingCoef ) {
 
-		var i,
-			j,
-			index,
-			indexCurrent,
-			indexNext,
+		var i, j,
+			index, indexCurrent, indexNext,
 			realDistance,
-			sampling,
-			position,
+			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
 			sl = this.getLength();
 
 		newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
 
-		for ( i = 1; i < this.points.length; i++ ) {
+		for ( i = 1; i < this.points.length; i ++ ) {
 
-			// tmpVec.copy( this.points[ i - 1 ] );
-			// linearDistance = tmpVec.distanceTo( this.points[ i ] );
+			//tmpVec.copy( this.points[ i - 1 ] );
+			//linearDistance = tmpVec.distanceTo( this.points[ i ] );
 
 			realDistance = sl.chunks[ i ] - sl.chunks[ i - 1 ];
 
@@ -165,7 +145,7 @@ THREE.Spline = function ( points ) {
 			indexCurrent = ( i - 1 ) / ( this.points.length - 1 );
 			indexNext = i / ( this.points.length - 1 );
 
-			for ( j = 1; j < sampling - 1; j++ ) {
+			for ( j = 1; j < sampling - 1; j ++ ) {
 
 				index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
 

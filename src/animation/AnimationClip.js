@@ -10,7 +10,7 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 
 	this.name = name || THREE.Math.generateUUID();
 	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : - 1;
+	this.duration = ( duration !== undefined ) ? duration : -1;
 
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
@@ -27,19 +27,20 @@ THREE.AnimationClip = function ( name, duration, tracks ) {
 };
 
 THREE.AnimationClip.prototype = {
+
 	constructor: THREE.AnimationClip,
 
-	resetDuration: function () {
+	resetDuration: function() {
 
 		var tracks = this.tracks,
 			duration = 0;
 
-		for ( var i = 0, n = tracks.length; i !== n; ++i ) {
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
 
 			var track = this.tracks[ i ];
 
 			duration = Math.max(
-				duration, track.times[ track.times.length - 1 ] );
+					duration, track.times[ track.times.length - 1 ] );
 
 		}
 
@@ -47,9 +48,9 @@ THREE.AnimationClip.prototype = {
 
 	},
 
-	trim: function () {
+	trim: function() {
 
-		for ( var i = 0; i < this.tracks.length; i++ ) {
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].trim( 0, this.duration );
 
@@ -59,9 +60,9 @@ THREE.AnimationClip.prototype = {
 
 	},
 
-	optimize: function () {
+	optimize: function() {
 
-		for ( var i = 0; i < this.tracks.length; i++ ) {
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].optimize();
 
@@ -70,18 +71,20 @@ THREE.AnimationClip.prototype = {
 		return this;
 
 	}
+
 };
 
 // Static methods:
 
 Object.assign( THREE.AnimationClip, {
-	parse: function ( json ) {
+
+	parse: function( json ) {
 
 		var tracks = [],
 			jsonTracks = json.tracks,
 			frameTime = 1.0 / ( json.fps || 1.0 );
 
-		for ( var i = 0, n = jsonTracks.length; i !== n; ++i ) {
+		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
 			tracks.push( THREE.KeyframeTrack.parse( jsonTracks[ i ] ).scale( frameTime ) );
 
@@ -91,18 +94,21 @@ Object.assign( THREE.AnimationClip, {
 
 	},
 
-	toJSON: function ( clip ) {
+
+	toJSON: function( clip ) {
 
 		var tracks = [],
 			clipTracks = clip.tracks;
 
 		var json = {
+
 			'name': clip.name,
 			'duration': clip.duration,
 			'tracks': tracks
+
 		};
 
-		for ( var i = 0, n = clipTracks.length; i !== n; ++i ) {
+		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
 
 			tracks.push( THREE.KeyframeTrack.toJSON( clipTracks[ i ] ) );
 
@@ -112,20 +118,21 @@ Object.assign( THREE.AnimationClip, {
 
 	},
 
-	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
+
+	CreateFromMorphTargetSequence: function( name, morphTargetSequence, fps, noLoop ) {
 
 		var numMorphTargets = morphTargetSequence.length;
 		var tracks = [];
 
-		for ( var i = 0; i < numMorphTargets; i++ ) {
+		for ( var i = 0; i < numMorphTargets; i ++ ) {
 
 			var times = [];
 			var values = [];
 
 			times.push(
-				( i + numMorphTargets - 1 ) % numMorphTargets,
-				i,
-				( i + 1 ) % numMorphTargets );
+					( i + numMorphTargets - 1 ) % numMorphTargets,
+					i,
+					( i + 1 ) % numMorphTargets );
 
 			values.push( 0, 1, 0 );
 
@@ -143,19 +150,19 @@ Object.assign( THREE.AnimationClip, {
 			}
 
 			tracks.push(
-				new THREE.NumberKeyframeTrack(
-					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
-					times, values
-				).scale( 1.0 / fps ) );
+					new THREE.NumberKeyframeTrack(
+						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+						times, values
+					).scale( 1.0 / fps ) );
 		}
 
-		return new THREE.AnimationClip( name, - 1, tracks );
+		return new THREE.AnimationClip( name, -1, tracks );
 
 	},
 
-	findByName: function ( clipArray, name ) {
+	findByName: function( clipArray, name ) {
 
-		for ( var i = 0; i < clipArray.length; i++ ) {
+		for ( var i = 0; i < clipArray.length; i ++ ) {
 
 			if ( clipArray[ i ].name === name ) {
 
@@ -168,7 +175,7 @@ Object.assign( THREE.AnimationClip, {
 
 	},
 
-	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
+	CreateClipsFromMorphTargetSequences: function( morphTargets, fps, noLoop ) {
 
 		var animationToMorphTargets = {};
 
@@ -178,7 +185,7 @@ Object.assign( THREE.AnimationClip, {
 
 		// sort morph target names into animation groups based
 		// patterns like Walk_001, Walk_002, Run_001, Run_002
-		for ( var i = 0, il = morphTargets.length; i < il; i++ ) {
+		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
 
 			var morphTarget = morphTargets[ i ];
 			var parts = morphTarget.name.match( pattern );
@@ -213,7 +220,7 @@ Object.assign( THREE.AnimationClip, {
 	},
 
 	// parse the animation.hierarchy format
-	parseAnimation: function ( animation, bones, nodeName ) {
+	parseAnimation: function( animation, bones, nodeName ) {
 
 		if ( ! animation ) {
 
@@ -222,8 +229,8 @@ Object.assign( THREE.AnimationClip, {
 
 		}
 
-		var addNonemptyTrack = function (
-			trackType, trackName, animationKeys, propertyName, destTracks ) {
+		var addNonemptyTrack = function(
+				trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
 			if ( animationKeys.length !== 0 ) {
@@ -232,7 +239,7 @@ Object.assign( THREE.AnimationClip, {
 				var values = [];
 
 				THREE.AnimationUtils.flattenJSON(
-					animationKeys, times, values, propertyName );
+						animationKeys, times, values, propertyName );
 
 				// empty keys are filtered out, so check again
 				if ( times.length !== 0 ) {
@@ -249,12 +256,12 @@ Object.assign( THREE.AnimationClip, {
 
 		var clipName = animation.name || 'default';
 		// automatic length determination in AnimationClip.
-		var duration = animation.length || - 1;
+		var duration = animation.length || -1;
 		var fps = animation.fps || 30;
 
 		var hierarchyTracks = animation.hierarchy || [];
 
-		for ( var h = 0; h < hierarchyTracks.length; h++ ) {
+		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
 
 			var animationKeys = hierarchyTracks[ h ].keys;
 
@@ -263,17 +270,17 @@ Object.assign( THREE.AnimationClip, {
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
-			if ( animationKeys[ 0 ].morphTargets ) {
+			if ( animationKeys[0].morphTargets ) {
 
 				// figure out all morph targets used in this track
 				var morphTargetNames = {};
-				for ( var k = 0; k < animationKeys.length; k++ ) {
+				for ( var k = 0; k < animationKeys.length; k ++ ) {
 
-					if ( animationKeys[ k ].morphTargets ) {
+					if ( animationKeys[k].morphTargets ) {
 
-						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m++ ) {
+						for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
 
-							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+							morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
 						}
 
 					}
@@ -289,9 +296,9 @@ Object.assign( THREE.AnimationClip, {
 					var values = [];
 
 					for ( var m = 0;
-						m !== animationKeys[ k ].morphTargets.length; ++m ) {
+							m !== animationKeys[k].morphTargets.length; ++ m ) {
 
-						var animationKey = animationKeys[ k ];
+						var animationKey = animationKeys[k];
 
 						times.push( animationKey.time );
 						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
@@ -299,7 +306,7 @@ Object.assign( THREE.AnimationClip, {
 					}
 
 					tracks.push( new THREE.NumberKeyframeTrack(
-						'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+							'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 				}
 
@@ -311,16 +318,16 @@ Object.assign( THREE.AnimationClip, {
 				var boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
-					THREE.VectorKeyframeTrack, boneName + '.position',
-					animationKeys, 'pos', tracks );
+						THREE.VectorKeyframeTrack, boneName + '.position',
+						animationKeys, 'pos', tracks );
 
 				addNonemptyTrack(
-					THREE.QuaternionKeyframeTrack, boneName + '.quaternion',
-					animationKeys, 'rot', tracks );
+						THREE.QuaternionKeyframeTrack, boneName + '.quaternion',
+						animationKeys, 'rot', tracks );
 
 				addNonemptyTrack(
-					THREE.VectorKeyframeTrack, boneName + '.scale',
-					animationKeys, 'scl', tracks );
+						THREE.VectorKeyframeTrack, boneName + '.scale',
+						animationKeys, 'scl', tracks );
 
 			}
 
@@ -337,4 +344,5 @@ Object.assign( THREE.AnimationClip, {
 		return clip;
 
 	}
+
 } );

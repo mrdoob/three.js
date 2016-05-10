@@ -10,6 +10,7 @@ THREE.MaterialLoader = function ( manager ) {
 };
 
 THREE.MaterialLoader.prototype = {
+
 	constructor: THREE.MaterialLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -49,60 +50,37 @@ THREE.MaterialLoader.prototype = {
 
 		var material = new THREE[ json.type ];
 
-		if ( json.uuid !== undefined )
-			material.uuid = json.uuid;
-		if ( json.name !== undefined )
-			material.name = json.name;
+		if ( json.uuid !== undefined ) material.uuid = json.uuid;
+		if ( json.name !== undefined ) material.name = json.name;
 		if ( json.color !== undefined ) material.color.setHex( json.color );
-		if ( json.roughness !== undefined )
-			material.roughness = json.roughness;
-		if ( json.metalness !== undefined )
-			material.metalness = json.metalness;
+		if ( json.roughness !== undefined ) material.roughness = json.roughness;
+		if ( json.metalness !== undefined ) material.metalness = json.metalness;
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
-		if ( json.shininess !== undefined )
-			material.shininess = json.shininess;
-		if ( json.uniforms !== undefined )
-			material.uniforms = json.uniforms;
-		if ( json.vertexShader !== undefined )
-			material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined )
-			material.fragmentShader = json.fragmentShader;
-		if ( json.vertexColors !== undefined )
-			material.vertexColors = json.vertexColors;
-		if ( json.shading !== undefined )
-			material.shading = json.shading;
-		if ( json.blending !== undefined )
-			material.blending = json.blending;
-		if ( json.side !== undefined )
-			material.side = json.side;
-		if ( json.opacity !== undefined )
-			material.opacity = json.opacity;
-		if ( json.transparent !== undefined )
-			material.transparent = json.transparent;
-		if ( json.alphaTest !== undefined )
-			material.alphaTest = json.alphaTest;
-		if ( json.depthTest !== undefined )
-			material.depthTest = json.depthTest;
-		if ( json.depthWrite !== undefined )
-			material.depthWrite = json.depthWrite;
-		if ( json.colorWrite !== undefined )
-			material.colorWrite = json.colorWrite;
-		if ( json.wireframe !== undefined )
-			material.wireframe = json.wireframe;
-		if ( json.wireframeLinewidth !== undefined )
-			material.wireframeLinewidth = json.wireframeLinewidth;
+		if ( json.shininess !== undefined ) material.shininess = json.shininess;
+		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
+		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
+		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+		if ( json.shading !== undefined ) material.shading = json.shading;
+		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.side !== undefined ) material.side = json.side;
+		if ( json.opacity !== undefined ) material.opacity = json.opacity;
+		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
+		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
+		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
+		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
+		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
 		// for PointsMaterial
-		if ( json.size !== undefined )
-			material.size = json.size;
-		if ( json.sizeAttenuation !== undefined )
-			material.sizeAttenuation = json.sizeAttenuation;
+		if ( json.size !== undefined ) material.size = json.size;
+		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 
 		// maps
 
-		if ( json.map !== undefined )
-			material.map = this.getTexture( json.map );
+		if ( json.map !== undefined ) material.map = this.getTexture( json.map );
 
 		if ( json.alphaMap !== undefined ) {
 
@@ -111,13 +89,10 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
-		if ( json.bumpMap !== undefined )
-			material.bumpMap = this.getTexture( json.bumpMap );
-		if ( json.bumpScale !== undefined )
-			material.bumpScale = json.bumpScale;
+		if ( json.bumpMap !== undefined ) material.bumpMap = this.getTexture( json.bumpMap );
+		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
-		if ( json.normalMap !== undefined )
-			material.normalMap = this.getTexture( json.normalMap );
+		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
 		if ( json.normalScale !== undefined ) {
 
 			var normalScale = json.normalScale;
@@ -134,25 +109,17 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
-		if ( json.displacementMap !== undefined )
-			material.displacementMap = this.getTexture( json.displacementMap );
-		if ( json.displacementScale !== undefined )
-			material.displacementScale = json.displacementScale;
-		if ( json.displacementBias !== undefined )
-			material.displacementBias = json.displacementBias;
+		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
+		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
+		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
 
-		if ( json.roughnessMap !== undefined )
-			material.roughnessMap = this.getTexture( json.roughnessMap );
-		if ( json.metalnessMap !== undefined )
-			material.metalnessMap = this.getTexture( json.metalnessMap );
+		if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
+		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
 
-		if ( json.emissiveMap !== undefined )
-			material.emissiveMap = this.getTexture( json.emissiveMap );
-		if ( json.emissiveIntensity !== undefined )
-			material.emissiveIntensity = json.emissiveIntensity;
+		if ( json.emissiveMap !== undefined ) material.emissiveMap = this.getTexture( json.emissiveMap );
+		if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;
 
-		if ( json.specularMap !== undefined )
-			material.specularMap = this.getTexture( json.specularMap );
+		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 
 		if ( json.envMap !== undefined ) {
 
@@ -161,24 +128,19 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
-		if ( json.reflectivity )
-			material.reflectivity = json.reflectivity;
+		if ( json.reflectivity ) material.reflectivity = json.reflectivity;
 
-		if ( json.lightMap !== undefined )
-			material.lightMap = this.getTexture( json.lightMap );
-		if ( json.lightMapIntensity !== undefined )
-			material.lightMapIntensity = json.lightMapIntensity;
+		if ( json.lightMap !== undefined ) material.lightMap = this.getTexture( json.lightMap );
+		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
 
-		if ( json.aoMap !== undefined )
-			material.aoMap = this.getTexture( json.aoMap );
-		if ( json.aoMapIntensity !== undefined )
-			material.aoMapIntensity = json.aoMapIntensity;
+		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
+		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
 		// MultiMaterial
 
 		if ( json.materials !== undefined ) {
 
-			for ( var i = 0, l = json.materials.length; i < l; i++ ) {
+			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
 				material.materials.push( this.parse( json.materials[ i ] ) );
 
@@ -189,4 +151,5 @@ THREE.MaterialLoader.prototype = {
 		return material;
 
 	}
+
 };

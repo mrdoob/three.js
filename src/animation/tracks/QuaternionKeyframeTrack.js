@@ -13,7 +13,9 @@ THREE.QuaternionKeyframeTrack = function ( name, times, values, interpolation ) 
 
 };
 
-THREE.QuaternionKeyframeTrack.prototype = Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+THREE.QuaternionKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
 	constructor: THREE.QuaternionKeyframeTrack,
 
 	ValueTypeName: 'quaternion',
@@ -22,10 +24,10 @@ THREE.QuaternionKeyframeTrack.prototype = Object.assign( Object.create( THREE.Ke
 
 	DefaultInterpolation: THREE.InterpolateLinear,
 
-	InterpolantFactoryMethodLinear: function ( result ) {
+	InterpolantFactoryMethodLinear: function( result ) {
 
 		return new THREE.QuaternionLinearInterpolant(
-			this.times, this.values, this.getValueSize(), result );
+				this.times, this.values, this.getValueSize(), result );
 
 	},
 

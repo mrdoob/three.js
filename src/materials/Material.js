@@ -5,7 +5,7 @@
 
 THREE.Material = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount++ } );
+	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -57,6 +57,7 @@ THREE.Material = function () {
 };
 
 THREE.Material.prototype = {
+
 	constructor: THREE.Material,
 
 	get needsUpdate() {
@@ -144,30 +145,20 @@ THREE.Material.prototype = {
 		data.uuid = this.uuid;
 		data.type = this.type;
 
-		if ( this.name !== '' )
-			data.name = this.name;
+		if ( this.name !== '' ) data.name = this.name;
 
-		if ( this.color instanceof THREE.Color )
-			data.color = this.color.getHex();
+		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
 
-		if ( this.roughness !== 0.5 )
-			data.roughness = this.roughness;
-		if ( this.metalness !== 0.5 )
-			data.metalness = this.metalness;
+		if ( this.roughness !== 0.5 ) data.roughness = this.roughness;
+		if ( this.metalness !== 0.5 ) data.metalness = this.metalness;
 
-		if ( this.emissive instanceof THREE.Color )
-			data.emissive = this.emissive.getHex();
-		if ( this.specular instanceof THREE.Color )
-			data.specular = this.specular.getHex();
-		if ( this.shininess !== undefined )
-			data.shininess = this.shininess;
+		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
+		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
+		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 
-		if ( this.map instanceof THREE.Texture )
-			data.map = this.map.toJSON( meta ).uuid;
-		if ( this.alphaMap instanceof THREE.Texture )
-			data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
-		if ( this.lightMap instanceof THREE.Texture )
-			data.lightMap = this.lightMap.toJSON( meta ).uuid;
+		if ( this.map instanceof THREE.Texture ) data.map = this.map.toJSON( meta ).uuid;
+		if ( this.alphaMap instanceof THREE.Texture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+		if ( this.lightMap instanceof THREE.Texture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
 		if ( this.bumpMap instanceof THREE.Texture ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
@@ -187,15 +178,11 @@ THREE.Material.prototype = {
 			data.displacementBias = this.displacementBias;
 
 		}
-		if ( this.roughnessMap instanceof THREE.Texture )
-			data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
-		if ( this.metalnessMap instanceof THREE.Texture )
-			data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+		if ( this.roughnessMap instanceof THREE.Texture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap instanceof THREE.Texture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
-		if ( this.emissiveMap instanceof THREE.Texture )
-			data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
-		if ( this.specularMap instanceof THREE.Texture )
-			data.specularMap = this.specularMap.toJSON( meta ).uuid;
+		if ( this.emissiveMap instanceof THREE.Texture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
+		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
 
 		if ( this.envMap instanceof THREE.Texture ) {
 
@@ -204,36 +191,24 @@ THREE.Material.prototype = {
 
 		}
 
-		if ( this.size !== undefined )
-			data.size = this.size;
-		if ( this.sizeAttenuation !== undefined )
-			data.sizeAttenuation = this.sizeAttenuation;
+		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
-		if ( this.blending !== THREE.NormalBlending )
-			data.blending = this.blending;
-		if ( this.shading !== THREE.SmoothShading )
-			data.shading = this.shading;
-		if ( this.side !== THREE.FrontSide )
-			data.side = this.side;
-		if ( this.vertexColors !== THREE.NoColors )
-			data.vertexColors = this.vertexColors;
+		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.shading !== THREE.SmoothShading ) data.shading = this.shading;
+		if ( this.side !== THREE.FrontSide ) data.side = this.side;
+		if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
 
-		if ( this.opacity < 1 )
-			data.opacity = this.opacity;
-		if ( this.transparent === true )
-			data.transparent = this.transparent;
-		if ( this.alphaTest > 0 )
-			data.alphaTest = this.alphaTest;
-		if ( this.premultipliedAlpha === true )
-			data.premultipliedAlpha = this.premultipliedAlpha;
-		if ( this.wireframe === true )
-			data.wireframe = this.wireframe;
-		if ( this.wireframeLinewidth > 1 )
-			data.wireframeLinewidth = this.wireframeLinewidth;
+		if ( this.opacity < 1 ) data.opacity = this.opacity;
+		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
+		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
 		// TODO: Copied from Object3D.toJSON
 
-		function extractFromCache( cache ) {
+		function extractFromCache ( cache ) {
 
 			var values = [];
 
@@ -254,10 +229,8 @@ THREE.Material.prototype = {
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
 
-			if ( textures.length > 0 )
-				data.textures = textures;
-			if ( images.length > 0 )
-				data.images = images;
+			if ( textures.length > 0 ) data.textures = textures;
+			if ( images.length > 0 ) data.images = images;
 
 		}
 
@@ -321,7 +294,7 @@ THREE.Material.prototype = {
 			var n = srcPlanes.length;
 			dstPlanes = new Array( n );
 
-			for ( var i = 0; i !== n; ++i )
+			for ( var i = 0; i !== n; ++ i )
 				dstPlanes[ i ] = srcPlanes[ i ].clone();
 
 		}
@@ -343,6 +316,7 @@ THREE.Material.prototype = {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
+
 };
 
 Object.assign( THREE.Material.prototype, THREE.EventDispatcher.prototype );

@@ -4,18 +4,20 @@
  * @author tschw
  */
 
-THREE.QuaternionLinearInterpolant = function (
-	parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+THREE.QuaternionLinearInterpolant = function(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	THREE.Interpolant.call(
-		this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 };
 
-THREE.QuaternionLinearInterpolant.prototype = Object.assign( Object.create( THREE.Interpolant.prototype ), {
+THREE.QuaternionLinearInterpolant.prototype =
+		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+
 	constructor: THREE.QuaternionLinearInterpolant,
 
-	interpolate_: function ( i1, t0, t, t1 ) {
+	interpolate_: function( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,
 			values = this.sampleValues,
@@ -28,11 +30,12 @@ THREE.QuaternionLinearInterpolant.prototype = Object.assign( Object.create( THRE
 		for ( var end = offset + stride; offset !== end; offset += 4 ) {
 
 			THREE.Quaternion.slerpFlat( result, 0,
-				values, offset - stride, values, offset, alpha );
+					values, offset - stride, values, offset, alpha );
 
 		}
 
 		return result;
 
 	}
+
 } );

@@ -17,15 +17,16 @@ THREE.InterleavedBuffer = function ( array, stride ) {
 };
 
 THREE.InterleavedBuffer.prototype = {
+
 	constructor: THREE.InterleavedBuffer,
 
-	get length() {
+	get length () {
 
 		return this.array.length;
 
 	},
 
-	get count() {
+	get count () {
 
 		return this.array.length / this.stride;
 
@@ -33,7 +34,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version++;
+		if ( value === true ) this.version ++;
 
 	},
 
@@ -60,7 +61,7 @@ THREE.InterleavedBuffer.prototype = {
 		index1 *= this.stride;
 		index2 *= attribute.stride;
 
-		for ( var i = 0, l = this.stride; i < l; i++ ) {
+		for ( var i = 0, l = this.stride; i < l; i ++ ) {
 
 			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 
@@ -72,8 +73,7 @@ THREE.InterleavedBuffer.prototype = {
 
 	set: function ( value, offset ) {
 
-		if ( offset === undefined )
-			offset = 0;
+		if ( offset === undefined ) offset = 0;
 
 		this.array.set( value, offset );
 
@@ -86,4 +86,5 @@ THREE.InterleavedBuffer.prototype = {
 		return new this.constructor().copy( this );
 
 	}
+
 };

@@ -437,7 +437,7 @@ Object.defineProperties( THREE, {
 			return new THREE.PointsMaterial( parameters );
 		}
 	},
-	ParticleSystemMaterial: {
+	ParticleSystemMaterial:{
 		value: function ( parameters ) {
 			console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointsMaterial.' );
 			return new THREE.PointsMaterial( parameters );
@@ -469,6 +469,25 @@ Object.defineProperties( THREE.ShaderMaterial.prototype, {
 		}
 	}
 } );
+
+//
+
+THREE.EventDispatcher.prototype = Object.assign( Object.create( {
+
+    // Note: Extra base ensures these properties are not 'assign'ed.
+
+	constructor: THREE.EventDispatcher,
+
+	apply: function( target ) {
+
+		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
+				"just inherit or Object.assign the prototype to mix-in." );
+
+		Object.assign( target, this );
+
+	}
+
+} ), THREE.EventDispatcher.prototype );
 
 //
 
@@ -577,13 +596,12 @@ Object.defineProperties( THREE.WebGLRenderer.prototype, {
 
 Object.defineProperty( THREE.WebGLShadowMap.prototype, 'cullFace', {
 	set: function( cullFace ) {
-		var flipSided = ( cullFace !== THREE.CullFaceBack );
-		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. " +
-				" Set .shadowMap.flipSidedFaces to " + flipSided + "." );
-		this.flipSidedFaces = flipSided;
+		var value = ( cullFace !== THREE.CullFaceBack );
+		console.warn( "WebGLRenderer: .shadowMap.cullFace is deprecated. Set .shadowMap.renderReverseSided to " + value + "." );
+		this.renderReverseSided = value;
 	},
 	get: function() {
-		return this.flipSidedFaces ? THREE.CullFaceFront : THREE.CullFaceBack;
+		return this.renderReverseSided ? THREE.CullFaceFront : THREE.CullFaceBack;
 	}
 } );
 
@@ -719,6 +737,7 @@ Object.defineProperties( THREE.Audio.prototype, {
 //
 
 THREE.GeometryUtils = {
+
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
 		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
@@ -744,9 +763,11 @@ THREE.GeometryUtils = {
 		return geometry.center();
 
 	}
+
 };
 
 THREE.ImageUtils = {
+
 	crossOrigin: undefined,
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
@@ -758,8 +779,7 @@ THREE.ImageUtils = {
 
 		var texture = loader.load( url, onLoad, undefined, onError );
 
-		if ( mapping )
-			texture.mapping = mapping;
+		if ( mapping ) texture.mapping = mapping;
 
 		return texture;
 
@@ -774,8 +794,7 @@ THREE.ImageUtils = {
 
 		var texture = loader.load( urls, onLoad, undefined, onError );
 
-		if ( mapping )
-			texture.mapping = mapping;
+		if ( mapping ) texture.mapping = mapping;
 
 		return texture;
 
@@ -792,6 +811,7 @@ THREE.ImageUtils = {
 		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 	}
+
 };
 
 //

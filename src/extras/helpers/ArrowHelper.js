@@ -14,7 +14,7 @@
  *  headWidth - Number
  */
 
-THREE.ArrowHelper = (function () {
+THREE.ArrowHelper = ( function () {
 
 	var lineGeometry = new THREE.BufferGeometry();
 	lineGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
@@ -28,14 +28,10 @@ THREE.ArrowHelper = (function () {
 
 		THREE.Object3D.call( this );
 
-		if ( color === undefined )
-			color = 0xffff00;
-		if ( length === undefined )
-			length = 1;
-		if ( headLength === undefined )
-			headLength = 0.2 * length;
-		if ( headWidth === undefined )
-			headWidth = 0.2 * headLength;
+		if ( color === undefined ) color = 0xffff00;
+		if ( length === undefined ) length = 1;
+		if ( headLength === undefined ) headLength = 0.2 * length;
+		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		this.position.copy( origin );
 
@@ -52,12 +48,12 @@ THREE.ArrowHelper = (function () {
 
 	};
 
-}());
+}() );
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
 
-THREE.ArrowHelper.prototype.setDirection = (function () {
+THREE.ArrowHelper.prototype.setDirection = ( function () {
 
 	var axis = new THREE.Vector3();
 	var radians;
@@ -86,14 +82,12 @@ THREE.ArrowHelper.prototype.setDirection = (function () {
 
 	};
 
-}());
+}() );
 
 THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
-	if ( headLength === undefined )
-		headLength = 0.2 * length;
-	if ( headWidth === undefined )
-		headWidth = 0.2 * headLength;
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
 	this.line.updateMatrix();

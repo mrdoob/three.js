@@ -16,7 +16,7 @@ THREE.Points = function ( geometry, material ) {
 THREE.Points.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Points.prototype.constructor = THREE.Points;
 
-THREE.Points.prototype.raycast = (function () {
+THREE.Points.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
@@ -61,12 +61,14 @@ THREE.Points.prototype.raycast = (function () {
 				if ( distance < raycaster.near || distance > raycaster.far ) return;
 
 				intersects.push( {
+
 					distance: distance,
 					distanceToRay: Math.sqrt( rayPointDistanceSq ),
 					point: intersectPoint.clone(),
 					index: index,
 					face: null,
 					object: object
+
 				} );
 
 			}
@@ -83,7 +85,7 @@ THREE.Points.prototype.raycast = (function () {
 
 				var indices = index.array;
 
-				for ( var i = 0, il = indices.length; i < il; i++ ) {
+				for ( var i = 0, il = indices.length; i < il; i ++ ) {
 
 					var a = indices[ i ];
 
@@ -95,7 +97,7 @@ THREE.Points.prototype.raycast = (function () {
 
 			} else {
 
-				for ( var i = 0, l = positions.length / 3; i < l; i++ ) {
+				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
 					position.fromArray( positions, i * 3 );
 
@@ -109,7 +111,7 @@ THREE.Points.prototype.raycast = (function () {
 
 			var vertices = geometry.vertices;
 
-			for ( var i = 0, l = vertices.length; i < l; i++ ) {
+			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
 				testPoint( vertices[ i ], i );
 
@@ -119,7 +121,7 @@ THREE.Points.prototype.raycast = (function () {
 
 	};
 
-}());
+}() );
 
 THREE.Points.prototype.clone = function () {
 

@@ -9,12 +9,12 @@ THREE.XHRLoader = function ( manager ) {
 };
 
 THREE.XHRLoader.prototype = {
+
 	constructor: THREE.XHRLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.path !== undefined )
-			url = this.path + url;
+		if ( this.path !== undefined ) url = this.path + url;
 
 		var scope = this;
 
@@ -91,10 +91,8 @@ THREE.XHRLoader.prototype = {
 
 		}, false );
 
-		if ( this.responseType !== undefined )
-			request.responseType = this.responseType;
-		if ( this.withCredentials !== undefined )
-			request.withCredentials = this.withCredentials;
+		if ( this.responseType !== undefined ) request.responseType = this.responseType;
+		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
 		request.send( null );
 
@@ -121,4 +119,5 @@ THREE.XHRLoader.prototype = {
 		this.withCredentials = value;
 
 	}
+
 };

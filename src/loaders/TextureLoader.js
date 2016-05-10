@@ -9,6 +9,7 @@ THREE.TextureLoader = function ( manager ) {
 };
 
 THREE.TextureLoader.prototype = {
+
 	constructor: THREE.TextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -46,4 +47,5 @@ THREE.TextureLoader.prototype = {
 		this.path = value;
 
 	}
+
 };

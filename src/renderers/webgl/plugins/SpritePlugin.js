@@ -8,11 +8,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	var gl = renderer.context;
 	var state = renderer.state;
 
-	var vertexBuffer,
-		elementBuffer;
-	var program,
-		attributes,
-		uniforms;
+	var vertexBuffer, elementBuffer;
+	var program, attributes, uniforms;
 
 	var texture;
 
@@ -25,10 +22,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	function init() {
 
 		var vertices = new Float32Array( [
-			- 0.5, - 0.5, 0, 0,
-			0.5, - 0.5, 1, 0,
-			0.5, 0.5, 1, 1,
-			- 0.5, 0.5, 0, 1
+			- 0.5, - 0.5,  0, 0,
+			  0.5, - 0.5,  1, 0,
+			  0.5,   0.5,  1, 1,
+			- 0.5,   0.5,  0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -36,7 +33,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			0, 2, 3
 		] );
 
-		vertexBuffer = gl.createBuffer();
+		vertexBuffer  = gl.createBuffer();
 		elementBuffer = gl.createBuffer();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
@@ -48,31 +45,31 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		program = createProgram();
 
 		attributes = {
-			position: gl.getAttribLocation( program, 'position' ),
-			uv: gl.getAttribLocation( program, 'uv' )
+			position:			gl.getAttribLocation ( program, 'position' ),
+			uv:					gl.getAttribLocation ( program, 'uv' )
 		};
 
 		uniforms = {
-			uvOffset: gl.getUniformLocation( program, 'uvOffset' ),
-			uvScale: gl.getUniformLocation( program, 'uvScale' ),
+			uvOffset:			gl.getUniformLocation( program, 'uvOffset' ),
+			uvScale:			gl.getUniformLocation( program, 'uvScale' ),
 
-			rotation: gl.getUniformLocation( program, 'rotation' ),
-			scale: gl.getUniformLocation( program, 'scale' ),
+			rotation:			gl.getUniformLocation( program, 'rotation' ),
+			scale:				gl.getUniformLocation( program, 'scale' ),
 
-			color: gl.getUniformLocation( program, 'color' ),
-			map: gl.getUniformLocation( program, 'map' ),
-			opacity: gl.getUniformLocation( program, 'opacity' ),
+			color:				gl.getUniformLocation( program, 'color' ),
+			map:				gl.getUniformLocation( program, 'map' ),
+			opacity:			gl.getUniformLocation( program, 'opacity' ),
 
-			modelViewMatrix: gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix: gl.getUniformLocation( program, 'projectionMatrix' ),
+			modelViewMatrix: 	gl.getUniformLocation( program, 'modelViewMatrix' ),
+			projectionMatrix:	gl.getUniformLocation( program, 'projectionMatrix' ),
 
-			fogType: gl.getUniformLocation( program, 'fogType' ),
-			fogDensity: gl.getUniformLocation( program, 'fogDensity' ),
-			fogNear: gl.getUniformLocation( program, 'fogNear' ),
-			fogFar: gl.getUniformLocation( program, 'fogFar' ),
-			fogColor: gl.getUniformLocation( program, 'fogColor' ),
+			fogType:			gl.getUniformLocation( program, 'fogType' ),
+			fogDensity:			gl.getUniformLocation( program, 'fogDensity' ),
+			fogNear:			gl.getUniformLocation( program, 'fogNear' ),
+			fogFar:				gl.getUniformLocation( program, 'fogFar' ),
+			fogColor:			gl.getUniformLocation( program, 'fogColor' ),
 
-			alphaTest: gl.getUniformLocation( program, 'alphaTest' )
+			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
 		};
 
 		var canvas = document.createElement( 'canvas' );
@@ -156,9 +153,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		}
 
+
 		// update positions and sort
 
-		for ( var i = 0, l = sprites.length; i < l; i++ ) {
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
 			var sprite = sprites[ i ];
 
@@ -173,7 +171,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		var scale = [];
 
-		for ( var i = 0, l = sprites.length; i < l; i++ ) {
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
 			var sprite = sprites[ i ];
 			var material = sprite.material;
@@ -245,14 +243,14 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	};
 
-	function createProgram() {
+	function createProgram () {
 
 		var program = gl.createProgram();
 
 		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
 		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
 
-		gl.shaderSource( vertexShader,[
+		gl.shaderSource( vertexShader, [
 
 			'precision ' + renderer.getPrecision() + ' float;',
 
@@ -270,27 +268,27 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			'void main() {',
 
-			'vUV = uvOffset + uv * uvScale;',
+				'vUV = uvOffset + uv * uvScale;',
 
-			'vec2 alignedPosition = position * scale;',
+				'vec2 alignedPosition = position * scale;',
 
-			'vec2 rotatedPosition;',
-			'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
-			'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
+				'vec2 rotatedPosition;',
+				'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
+				'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
 
-			'vec4 finalPosition;',
+				'vec4 finalPosition;',
 
-			'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
-			'finalPosition.xy += rotatedPosition;',
-			'finalPosition = projectionMatrix * finalPosition;',
+				'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
+				'finalPosition.xy += rotatedPosition;',
+				'finalPosition = projectionMatrix * finalPosition;',
 
-			'gl_Position = finalPosition;',
+				'gl_Position = finalPosition;',
 
 			'}'
 
 		].join( '\n' ) );
 
-		gl.shaderSource( fragmentShader,[
+		gl.shaderSource( fragmentShader, [
 
 			'precision ' + renderer.getPrecision() + ' float;',
 
@@ -309,32 +307,32 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			'void main() {',
 
-			'vec4 texture = texture2D( map, vUV );',
+				'vec4 texture = texture2D( map, vUV );',
 
-			'if ( texture.a < alphaTest ) discard;',
+				'if ( texture.a < alphaTest ) discard;',
 
-			'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
+				'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
 
-			'if ( fogType > 0 ) {',
+				'if ( fogType > 0 ) {',
 
-			'float depth = gl_FragCoord.z / gl_FragCoord.w;',
-			'float fogFactor = 0.0;',
+					'float depth = gl_FragCoord.z / gl_FragCoord.w;',
+					'float fogFactor = 0.0;',
 
-			'if ( fogType == 1 ) {',
+					'if ( fogType == 1 ) {',
 
-			'fogFactor = smoothstep( fogNear, fogFar, depth );',
+						'fogFactor = smoothstep( fogNear, fogFar, depth );',
 
-			'} else {',
+					'} else {',
 
-			'const float LOG2 = 1.442695;',
-			'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
-			'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
+						'const float LOG2 = 1.442695;',
+						'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
+						'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
 
-			'}',
+					'}',
 
-			'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
+					'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
 
-			'}',
+				'}',
 
 			'}'
 
@@ -352,8 +350,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	}
 
-	function painterSortStable( a, b ) {
-
+	function painterSortStable ( a, b ) {
+		
 		if ( a.renderOrder !== b.renderOrder ) {
 
 			return a.renderOrder - b.renderOrder;

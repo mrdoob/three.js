@@ -18,25 +18,20 @@ THREE.StereoCamera = function () {
 
 };
 
-THREE.StereoCamera.prototype = {
-	constructor: THREE.StereoCamera,
+Object.assign( THREE.StereoCamera.prototype, {
 
-	update: (function () {
+	update: ( function () {
 
-		var focus,
-			fov,
-			aspect,
-			near,
-			far;
+		var focus, fov, aspect, near, far;
 
 		var eyeRight = new THREE.Matrix4();
 		var eyeLeft = new THREE.Matrix4();
 
-		return function update( camera ) {
+		return function update ( camera ) {
 
 			var needsUpdate = focus !== camera.focus || fov !== camera.fov ||
-				aspect !== camera.aspect * this.aspect || near !== camera.near ||
-				far !== camera.far;
+												aspect !== camera.aspect * this.aspect || near !== camera.near ||
+												far !== camera.far;
 
 			if ( needsUpdate ) {
 
@@ -53,8 +48,7 @@ THREE.StereoCamera.prototype = {
 				var eyeSep = 0.064 / 2;
 				var eyeSepOnProjection = eyeSep * near / focus;
 				var ymax = near * Math.tan( THREE.Math.DEG2RAD * fov * 0.5 );
-				var xmin,
-					xmax;
+				var xmin, xmax;
 
 				// translate xOffset
 
@@ -88,5 +82,6 @@ THREE.StereoCamera.prototype = {
 
 		};
 
-	})()
-};
+	} )()
+
+} );

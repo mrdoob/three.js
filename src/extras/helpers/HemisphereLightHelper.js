@@ -18,7 +18,7 @@ THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
 	geometry.rotateX( - Math.PI / 2 );
 
-	for ( var i = 0, il = 8; i < il; i++ ) {
+	for ( var i = 0, il = 8; i < il; i ++ ) {
 
 		geometry.faces[ i ].color = this.colors[ i < 4 ? 0 : 1 ];
 

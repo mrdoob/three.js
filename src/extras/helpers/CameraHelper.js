@@ -110,8 +110,7 @@ THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
 THREE.CameraHelper.prototype.update = function () {
 
-	var geometry,
-		pointMap;
+	var geometry, pointMap;
 
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
@@ -124,7 +123,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 		if ( points !== undefined ) {
 
-			for ( var i = 0, il = points.length; i < il; i++ ) {
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
 				geometry.vertices[ points[ i ] ].copy( vector );
 
@@ -139,11 +138,10 @@ THREE.CameraHelper.prototype.update = function () {
 		geometry = this.geometry;
 		pointMap = this.pointMap;
 
-		var w = 1,
-			h = 1;
+		var w = 1, h = 1;
 
 		// we need just camera projection matrix
-			// world matrix must be identity
+		// world matrix must be identity
 
 		camera.projectionMatrix.copy( this.camera.projectionMatrix );
 
@@ -168,9 +166,9 @@ THREE.CameraHelper.prototype.update = function () {
 
 		// up
 
-		setPoint( "u1", w * 0.7, h * 1.1, - 1 );
+		setPoint( "u1",   w * 0.7, h * 1.1, - 1 );
 		setPoint( "u2", - w * 0.7, h * 1.1, - 1 );
-		setPoint( "u3",         0, h * 2, - 1 );
+		setPoint( "u3",         0, h * 2,   - 1 );
 
 		// cross
 

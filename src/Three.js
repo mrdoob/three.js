@@ -16,7 +16,7 @@ if ( typeof define === 'function' && define.amd ) {
 
 }
 
-//
+// Polyfills
 
 if ( Number.EPSILON === undefined ) {
 
@@ -38,59 +38,55 @@ if ( Math.sign === undefined ) {
 
 }
 
-if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
+if ( Function.prototype.name === undefined ) {
 
 	// Missing in IE9-11.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 
 	Object.defineProperty( Function.prototype, 'name', {
+
 		get: function () {
 
 			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
 
 		}
+
 	} );
 
 }
 
 if ( Object.assign === undefined ) {
 
+	// Missing in IE.
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-	Object.defineProperty( Object, 'assign', {
-		writable: true,
-		configurable: true,
+	( function () {
 
-		value: function ( target ) {
+		Object.assign = function ( target ) {
 
 			'use strict';
 
 			if ( target === undefined || target === null ) {
 
-				throw new TypeError( "Cannot convert first argument to object" );
+				throw new TypeError( 'Cannot convert undefined or null to object' );
 
 			}
 
-			var to = Object( target );
+			var output = Object( target );
 
-			for ( var i = 1, n = arguments.length; i !== n; ++i ) {
+			for ( var index = 1; index < arguments.length; index ++ ) {
 
-				var nextSource = arguments[ i ];
+				var source = arguments[ index ];
 
-				if ( nextSource === undefined || nextSource === null ) continue;
+				if ( source !== undefined && source !== null ) {
 
-				nextSource = Object( nextSource );
+					for ( var nextKey in source ) {
 
-				var keysArray = Object.keys( nextSource );
+						if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++nextIndex ) {
+							output[ nextKey ] = source[ nextKey ];
 
-					var nextKey = keysArray[ nextIndex ];
-					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
-
-					if ( desc !== undefined && desc.enumerable ) {
-
-						to[ nextKey ] = nextSource[ nextKey ];
+						}
 
 					}
 
@@ -98,234 +94,242 @@ if ( Object.assign === undefined ) {
 
 			}
 
-			return to;
+			return output;
 
-		}
-	} );
+		};
+
+	} )();
 
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+//
 
-THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
+Object.assign( THREE, {
 
-// GL STATE CONSTANTS
+	// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
-THREE.CullFaceNone = 0;
-THREE.CullFaceBack = 1;
-THREE.CullFaceFront = 2;
-THREE.CullFaceFrontBack = 3;
+	MOUSE: { LEFT: 0, MIDDLE: 1, RIGHT: 2 },
 
-THREE.FrontFaceDirectionCW = 0;
-THREE.FrontFaceDirectionCCW = 1;
+	// GL STATE CONSTANTS
 
-// SHADOWING TYPES
+	CullFaceNone: 0,
+	CullFaceBack: 1,
+	CullFaceFront: 2,
+	CullFaceFrontBack: 3,
 
-THREE.BasicShadowMap = 0;
-THREE.PCFShadowMap = 1;
-THREE.PCFSoftShadowMap = 2;
+	FrontFaceDirectionCW: 0,
+	FrontFaceDirectionCCW: 1,
 
-// MATERIAL CONSTANTS
+	// SHADOWING TYPES
 
-// side
+	BasicShadowMap: 0,
+	PCFShadowMap: 1,
+	PCFSoftShadowMap: 2,
 
-THREE.FrontSide = 0;
-THREE.BackSide = 1;
-THREE.DoubleSide = 2;
+	// MATERIAL CONSTANTS
 
-// shading
+	// side
 
-THREE.FlatShading = 1;
-THREE.SmoothShading = 2;
+	FrontSide: 0,
+	BackSide: 1,
+	DoubleSide: 2,
 
-// colors
+	// shading
 
-THREE.NoColors = 0;
-THREE.FaceColors = 1;
-THREE.VertexColors = 2;
+	FlatShading: 1,
+	SmoothShading: 2,
 
-// blending modes
+	// colors
 
-THREE.NoBlending = 0;
-THREE.NormalBlending = 1;
-THREE.AdditiveBlending = 2;
-THREE.SubtractiveBlending = 3;
-THREE.MultiplyBlending = 4;
-THREE.CustomBlending = 5;
+	NoColors: 0,
+	FaceColors: 1,
+	VertexColors: 2,
 
-// custom blending equations
-// (numbers start from 100 not to clash with other
-// mappings to OpenGL constants defined in Texture.js)
+	// blending modes
 
-THREE.AddEquation = 100;
-THREE.SubtractEquation = 101;
-THREE.ReverseSubtractEquation = 102;
-THREE.MinEquation = 103;
-THREE.MaxEquation = 104;
+	NoBlending: 0,
+	NormalBlending: 1,
+	AdditiveBlending: 2,
+	SubtractiveBlending: 3,
+	MultiplyBlending: 4,
+	CustomBlending: 5,
 
-// custom blending destination factors
+	// custom blending equations
+	// (numbers start from 100 not to clash with other
+	// mappings to OpenGL constants defined in Texture.js)
 
-THREE.ZeroFactor = 200;
-THREE.OneFactor = 201;
-THREE.SrcColorFactor = 202;
-THREE.OneMinusSrcColorFactor = 203;
-THREE.SrcAlphaFactor = 204;
-THREE.OneMinusSrcAlphaFactor = 205;
-THREE.DstAlphaFactor = 206;
-THREE.OneMinusDstAlphaFactor = 207;
+	AddEquation: 100,
+	SubtractEquation: 101,
+	ReverseSubtractEquation: 102,
+	MinEquation: 103,
+	MaxEquation: 104,
 
-// custom blending source factors
+	// custom blending destination factors
 
-// THREE.ZeroFactor = 200;
-// THREE.OneFactor = 201;
-// THREE.SrcAlphaFactor = 204;
-// THREE.OneMinusSrcAlphaFactor = 205;
-// THREE.DstAlphaFactor = 206;
-// THREE.OneMinusDstAlphaFactor = 207;
-THREE.DstColorFactor = 208;
-THREE.OneMinusDstColorFactor = 209;
-THREE.SrcAlphaSaturateFactor = 210;
+	ZeroFactor: 200,
+	OneFactor: 201,
+	SrcColorFactor: 202,
+	OneMinusSrcColorFactor: 203,
+	SrcAlphaFactor: 204,
+	OneMinusSrcAlphaFactor: 205,
+	DstAlphaFactor: 206,
+	OneMinusDstAlphaFactor: 207,
 
-// depth modes
+	// custom blending source factors
 
-THREE.NeverDepth = 0;
-THREE.AlwaysDepth = 1;
-THREE.LessDepth = 2;
-THREE.LessEqualDepth = 3;
-THREE.EqualDepth = 4;
-THREE.GreaterEqualDepth = 5;
-THREE.GreaterDepth = 6;
-THREE.NotEqualDepth = 7;
+	//ZeroFactor: 200,
+	//OneFactor: 201,
+	//SrcAlphaFactor: 204,
+	//OneMinusSrcAlphaFactor: 205,
+	//DstAlphaFactor: 206,
+	//OneMinusDstAlphaFactor: 207,
+	DstColorFactor: 208,
+	OneMinusDstColorFactor: 209,
+	SrcAlphaSaturateFactor: 210,
 
-// TEXTURE CONSTANTS
+	// depth modes
 
-THREE.MultiplyOperation = 0;
-THREE.MixOperation = 1;
-THREE.AddOperation = 2;
+	NeverDepth: 0,
+	AlwaysDepth: 1,
+	LessDepth: 2,
+	LessEqualDepth: 3,
+	EqualDepth: 4,
+	GreaterEqualDepth: 5,
+	GreaterDepth: 6,
+	NotEqualDepth: 7,
 
-// Tone Mapping modes
 
-THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (required for special purpose passes.)
-THREE.LinearToneMapping = 1; // only apply exposure.
-THREE.ReinhardToneMapping = 2;
-THREE.Uncharted2ToneMapping = 3; // John Hable
-THREE.CineonToneMapping = 4; // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+	// TEXTURE CONSTANTS
 
-// Mapping modes
+	MultiplyOperation: 0,
+	MixOperation: 1,
+	AddOperation: 2,
 
-THREE.UVMapping = 300;
+	// Tone Mapping modes
 
-THREE.CubeReflectionMapping = 301;
-THREE.CubeRefractionMapping = 302;
+	NoToneMapping: 0, // do not do any tone mapping, not even exposure (required for special purpose passes.)
+	LinearToneMapping: 1, // only apply exposure.
+	ReinhardToneMapping: 2,
+	Uncharted2ToneMapping: 3, // John Hable
+	CineonToneMapping: 4, // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 
-THREE.EquirectangularReflectionMapping = 303;
-THREE.EquirectangularRefractionMapping = 304;
+	// Mapping modes
 
-THREE.SphericalReflectionMapping = 305;
-THREE.CubeUVReflectionMapping = 306;
-THREE.CubeUVRefractionMapping = 307;
+	UVMapping: 300,
 
-// Wrapping modes
+	CubeReflectionMapping: 301,
+	CubeRefractionMapping: 302,
 
-THREE.RepeatWrapping = 1000;
-THREE.ClampToEdgeWrapping = 1001;
-THREE.MirroredRepeatWrapping = 1002;
+	EquirectangularReflectionMapping: 303,
+	EquirectangularRefractionMapping: 304,
 
-// Filters
+	SphericalReflectionMapping: 305,
+	CubeUVReflectionMapping: 306,
+	CubeUVRefractionMapping: 307,
 
-THREE.NearestFilter = 1003;
-THREE.NearestMipMapNearestFilter = 1004;
-THREE.NearestMipMapLinearFilter = 1005;
-THREE.LinearFilter = 1006;
-THREE.LinearMipMapNearestFilter = 1007;
-THREE.LinearMipMapLinearFilter = 1008;
+	// Wrapping modes
 
-// Data types
+	RepeatWrapping: 1000,
+	ClampToEdgeWrapping: 1001,
+	MirroredRepeatWrapping: 1002,
 
-THREE.UnsignedByteType = 1009;
-THREE.ByteType = 1010;
-THREE.ShortType = 1011;
-THREE.UnsignedShortType = 1012;
-THREE.IntType = 1013;
-THREE.UnsignedIntType = 1014;
-THREE.FloatType = 1015;
-THREE.HalfFloatType = 1025;
+	// Filters
 
-// Pixel types
+	NearestFilter: 1003,
+	NearestMipMapNearestFilter: 1004,
+	NearestMipMapLinearFilter: 1005,
+	LinearFilter: 1006,
+	LinearMipMapNearestFilter: 1007,
+	LinearMipMapLinearFilter: 1008,
 
-// THREE.UnsignedByteType = 1009;
-THREE.UnsignedShort4444Type = 1016;
-THREE.UnsignedShort5551Type = 1017;
-THREE.UnsignedShort565Type = 1018;
+	// Data types
 
-// Pixel formats
+	UnsignedByteType: 1009,
+	ByteType: 1010,
+	ShortType: 1011,
+	UnsignedShortType: 1012,
+	IntType: 1013,
+	UnsignedIntType: 1014,
+	FloatType: 1015,
+	HalfFloatType: 1025,
 
-THREE.AlphaFormat = 1019;
-THREE.RGBFormat = 1020;
-THREE.RGBAFormat = 1021;
-THREE.LuminanceFormat = 1022;
-THREE.LuminanceAlphaFormat = 1023;
-// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-THREE.RGBEFormat = THREE.RGBAFormat; // 1024;
-THREE.DepthFormat = 1026;
+	// Pixel types
 
-// DDS / ST3C Compressed texture formats
+	//UnsignedByteType: 1009,
+	UnsignedShort4444Type: 1016,
+	UnsignedShort5551Type: 1017,
+	UnsignedShort565Type: 1018,
 
-THREE.RGB_S3TC_DXT1_Format = 2001;
-THREE.RGBA_S3TC_DXT1_Format = 2002;
-THREE.RGBA_S3TC_DXT3_Format = 2003;
-THREE.RGBA_S3TC_DXT5_Format = 2004;
+	// Pixel formats
 
-// PVRTC compressed texture formats
+	AlphaFormat: 1019,
+	RGBFormat: 1020,
+	RGBAFormat: 1021,
+	LuminanceFormat: 1022,
+	LuminanceAlphaFormat: 1023,
+	// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
+	RGBEFormat: THREE.RGBAFormat, //1024;
+	DepthFormat: 1026,
 
-THREE.RGB_PVRTC_4BPPV1_Format = 2100;
-THREE.RGB_PVRTC_2BPPV1_Format = 2101;
-THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
-THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
+	// DDS / ST3C Compressed texture formats
 
-// ETC compressed texture formats
+	RGB_S3TC_DXT1_Format: 2001,
+	RGBA_S3TC_DXT1_Format: 2002,
+	RGBA_S3TC_DXT3_Format: 2003,
+	RGBA_S3TC_DXT5_Format: 2004,
 
-THREE.RGB_ETC1_Format = 2151;
+	// PVRTC compressed texture formats
 
-// Loop styles for AnimationAction
+	RGB_PVRTC_4BPPV1_Format: 2100,
+	RGB_PVRTC_2BPPV1_Format: 2101,
+	RGBA_PVRTC_4BPPV1_Format: 2102,
+	RGBA_PVRTC_2BPPV1_Format: 2103,
 
-THREE.LoopOnce = 2200;
-THREE.LoopRepeat = 2201;
-THREE.LoopPingPong = 2202;
+	// ETC compressed texture formats
 
-// Interpolation
+	RGB_ETC1_Format: 2151,
 
-THREE.InterpolateDiscrete = 2300;
-THREE.InterpolateLinear = 2301;
-THREE.InterpolateSmooth = 2302;
+	// Loop styles for AnimationAction
 
-// Interpolant ending modes
+	LoopOnce: 2200,
+	LoopRepeat: 2201,
+	LoopPingPong: 2202,
 
-THREE.ZeroCurvatureEnding = 2400;
-THREE.ZeroSlopeEnding = 2401;
-THREE.WrapAroundEnding = 2402;
+	// Interpolation
 
-// Triangle Draw modes
+	InterpolateDiscrete: 2300,
+	InterpolateLinear: 2301,
+	InterpolateSmooth: 2302,
 
-THREE.TrianglesDrawMode = 0;
-THREE.TriangleStripDrawMode = 1;
-THREE.TriangleFanDrawMode = 2;
+	// Interpolant ending modes
 
-// Texture Encodings
+	ZeroCurvatureEnding: 2400,
+	ZeroSlopeEnding: 2401,
+	WrapAroundEnding: 2402,
 
-THREE.LinearEncoding = 3000; // No encoding at all.
-THREE.sRGBEncoding = 3001;
-THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+	// Triangle Draw modes
 
-// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
-// These encodings should not specified as output encodings except in rare situations.
-THREE.RGBEEncoding = 3002; // AKA Radiance.
-THREE.LogLuvEncoding = 3003;
-THREE.RGBM7Encoding = 3004;
-THREE.RGBM16Encoding = 3005;
-THREE.RGBDEncoding = 3006; // MaxRange is 256.
+	TrianglesDrawMode: 0,
+	TriangleStripDrawMode: 1,
+	TriangleFanDrawMode: 2,
 
-// Depth packing strategies
+	// Texture Encodings
 
-THREE.BasicDepthPacking = 3200; // for writing to float textures for high precision or for visualizing results in RGB buffers
-THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.
+	LinearEncoding: 3000, // No encoding at all.
+	sRGBEncoding: 3001,
+	GammaEncoding: 3007, // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
+
+	// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
+	// These encodings should not specified as output encodings except in rare situations.
+	RGBEEncoding: 3002, // AKA Radiance.
+	LogLuvEncoding: 3003,
+	RGBM7Encoding: 3004,
+	RGBM16Encoding: 3005,
+	RGBDEncoding: 3006, // MaxRange is 256.
+
+	// Depth packing strategies
+
+	BasicDepthPacking: 3200, // for writing to float textures for high precision or for visualizing results in RGB buffers
+	RGBADepthPacking: 3201 // for packing into RGBA buffers.
+
+} );

@@ -4,6 +4,7 @@
  */
 
 THREE.Math = {
+
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
 
@@ -13,12 +14,11 @@ THREE.Math = {
 
 		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
 		var uuid = new Array( 36 );
-		var rnd = 0,
-			r;
+		var rnd = 0, r;
 
 		return function () {
 
-			for ( var i = 0; i < 36; i++ ) {
+			for ( var i = 0; i < 36; i ++ ) {
 
 				if ( i === 8 || i === 13 || i === 18 || i === 23 ) {
 
@@ -30,8 +30,7 @@ THREE.Math = {
 
 				} else {
 
-					if ( rnd <= 0x02 )
-						rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
+					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
 					uuid[ i ] = chars[ ( i === 19 ) ? ( r & 0x3 ) | 0x8 : r ];
@@ -150,15 +149,16 @@ THREE.Math = {
 
 	nextPowerOfTwo: function ( value ) {
 
-		value--;
+		value --;
 		value |= value >> 1;
 		value |= value >> 2;
 		value |= value >> 4;
 		value |= value >> 8;
 		value |= value >> 16;
-		value++;
+		value ++;
 
 		return value;
 
 	}
+
 };

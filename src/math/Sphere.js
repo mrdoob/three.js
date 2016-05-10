@@ -11,6 +11,7 @@ THREE.Sphere = function ( center, radius ) {
 };
 
 THREE.Sphere.prototype = {
+
 	constructor: THREE.Sphere,
 
 	set: function ( center, radius ) {
@@ -42,7 +43,7 @@ THREE.Sphere.prototype = {
 
 			var maxRadiusSq = 0;
 
-			for ( var i = 0, il = points.length; i < il; i++ ) {
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
 				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
@@ -169,4 +170,5 @@ THREE.Sphere.prototype = {
 		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
 
 	}
+
 };

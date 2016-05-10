@@ -15,54 +15,55 @@ THREE.Quaternion = function ( x, y, z, w ) {
 };
 
 THREE.Quaternion.prototype = {
+
 	constructor: THREE.Quaternion,
 
-	get x() {
+	get x () {
 
 		return this._x;
 
 	},
 
-	set x( value ) {
+	set x ( value ) {
 
 		this._x = value;
 		this.onChangeCallback();
 
 	},
 
-	get y() {
+	get y () {
 
 		return this._y;
 
 	},
 
-	set y( value ) {
+	set y ( value ) {
 
 		this._y = value;
 		this.onChangeCallback();
 
 	},
 
-	get z() {
+	get z () {
 
 		return this._z;
 
 	},
 
-	set z( value ) {
+	set z ( value ) {
 
 		this._z = value;
 		this.onChangeCallback();
 
 	},
 
-	get w() {
+	get w () {
 
 		return this._w;
 
 	},
 
-	set w( value ) {
+	set w ( value ) {
 
 		this._w = value;
 		this.onChangeCallback();
@@ -178,8 +179,7 @@ THREE.Quaternion.prototype = {
 
 		// assumes axis is normalized
 
-		var halfAngle = angle / 2,
-			s = Math.sin( halfAngle );
+		var halfAngle = angle / 2, s = Math.sin( halfAngle );
 
 		this._x = axis.x * s;
 		this._y = axis.y * s;
@@ -200,15 +200,9 @@ THREE.Quaternion.prototype = {
 
 		var te = m.elements,
 
-			m11 = te[ 0 ],
-			m12 = te[ 4 ],
-			m13 = te[ 8 ],
-			m21 = te[ 1 ],
-			m22 = te[ 5 ],
-			m23 = te[ 9 ],
-			m31 = te[ 2 ],
-			m32 = te[ 6 ],
-			m33 = te[ 10 ],
+			m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
+			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
+			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
 
 			trace = m11 + m22 + m33,
 			s;
@@ -263,15 +257,13 @@ THREE.Quaternion.prototype = {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1,
-			r;
+		var v1, r;
 
 		var EPS = 0.000001;
 
 		return function ( vFrom, vTo ) {
 
-			if ( v1 === undefined )
-				v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
 			r = vFrom.dot( vTo ) + 1;
 
@@ -383,18 +375,18 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	premultiply: function ( q ) {
+
+		return this.multiplyQuaternions( q, this );
+
+	},
+
 	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
-		var qax = a._x,
-			qay = a._y,
-			qaz = a._z,
-			qaw = a._w;
-		var qbx = b._x,
-			qby = b._y,
-			qbz = b._z,
-			qbw = b._w;
+		var qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
+		var qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
 
 		this._x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
 		this._y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
@@ -412,10 +404,7 @@ THREE.Quaternion.prototype = {
 		if ( t === 0 ) return this;
 		if ( t === 1 ) return this.copy( qb );
 
-		var x = this._x,
-			y = this._y,
-			z = this._z,
-			w = this._w;
+		var x = this._x, y = this._y, z = this._z, w = this._w;
 
 		// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
 
@@ -462,7 +451,7 @@ THREE.Quaternion.prototype = {
 
 		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 		this._w = ( w * ratioA + this._w * ratioB );
 		this._x = ( x * ratioA + this._x * ratioB );
@@ -483,8 +472,7 @@ THREE.Quaternion.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined )
-			offset = 0;
+		if ( offset === undefined ) offset = 0;
 
 		this._x = array[ offset ];
 		this._y = array[ offset + 1 ];
@@ -499,10 +487,8 @@ THREE.Quaternion.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined )
-			array = [];
-		if ( offset === undefined )
-			offset = 0;
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
@@ -522,17 +508,19 @@ THREE.Quaternion.prototype = {
 	},
 
 	onChangeCallback: function () {}
+
 };
 
 Object.assign( THREE.Quaternion, {
-	slerp: function ( qa, qb, qm, t ) {
+
+	slerp: function( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
 
 	},
 
-	slerpFlat: function (
-		dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+	slerpFlat: function(
+			dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
 
@@ -593,4 +581,5 @@ Object.assign( THREE.Quaternion, {
 		dst[ dstOffset + 3 ] = w0;
 
 	}
+
 } );

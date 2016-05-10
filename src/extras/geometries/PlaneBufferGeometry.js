@@ -35,11 +35,11 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 	var offset = 0;
 	var offset2 = 0;
 
-	for ( var iy = 0; iy < gridY1; iy++ ) {
+	for ( var iy = 0; iy < gridY1; iy ++ ) {
 
 		var y = iy * segment_height - height_half;
 
-		for ( var ix = 0; ix < gridX1; ix++ ) {
+		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
 
@@ -60,11 +60,11 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	offset = 0;
 
-	var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array) ( gridX * gridY * 6 );
+	var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
 
-	for ( var iy = 0; iy < gridY; iy++ ) {
+	for ( var iy = 0; iy < gridY; iy ++ ) {
 
-		for ( var ix = 0; ix < gridX; ix++ ) {
+		for ( var ix = 0; ix < gridX; ix ++ ) {
 
 			var a = ix + gridX1 * iy;
 			var b = ix + gridX1 * ( iy + 1 );

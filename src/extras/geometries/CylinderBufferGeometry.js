@@ -2,7 +2,7 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -29,16 +29,17 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 	heightSegments = Math.floor( heightSegments ) || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
 
 	// used to calculate buffer length
-	
+
 	var nbCap = 0;
+
 	if ( openEnded === false ) {
 
-		if ( radiusTop > 0 ) nbCap++;
-		if ( radiusBottom > 0 ) nbCap++;
+		if ( radiusTop > 0 ) nbCap ++;
+		if ( radiusBottom > 0 ) nbCap ++;
 
 	}
 
@@ -47,7 +48,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	// buffers
 
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array) ( indexCount ), 1 );
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
 	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
@@ -55,9 +56,9 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 	// helper variables
 
 	var index = 0,
-		indexOffset = 0,
-		indexArray = [],
-		halfHeight = height / 2;
+	    indexOffset = 0,
+	    indexArray = [],
+	    halfHeight = height / 2;
 
 	// group variables
 	var groupStart = 0;
@@ -112,8 +113,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	function generateTorso() {
 
-		var x,
-			y;
+		var x, y;
 		var normal = new THREE.Vector3();
 		var vertex = new THREE.Vector3();
 
@@ -124,7 +124,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 		// generate vertices, normals and uvs
 
-		for ( y = 0; y <= heightSegments; y++ ) {
+		for ( y = 0; y <= heightSegments; y ++ ) {
 
 			var indexRow = [];
 
@@ -133,7 +133,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			// calculate the radius of the current row
 			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-			for ( x = 0; x <= radialSegments; x++ ) {
+			for ( x = 0; x <= radialSegments; x ++ ) {
 
 				var u = x / radialSegments;
 
@@ -147,6 +147,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 				normal.copy( vertex );
 
 				// handle special case if radiusTop/radiusBottom is zero
+
 				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
 
 					normal.x = Math.sin( u * thetaLength + thetaStart );
@@ -164,7 +165,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 				indexRow.push( index );
 
 				// increase index
-				index++;
+				index ++;
 
 			}
 
@@ -175,9 +176,9 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
-			for ( y = 0; y < heightSegments; y++ ) {
+			for ( y = 0; y < heightSegments; y ++ ) {
 
 				// we use the index array to access the correct indices
 				var i1 = indexArray[ y ][ x ];
@@ -186,14 +187,14 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 				var i4 = indexArray[ y ][ x + 1 ];
 
 				// face one
-				indices.setX( indexOffset, i1 ); indexOffset++;
-				indices.setX( indexOffset, i2 ); indexOffset++;
-				indices.setX( indexOffset, i4 ); indexOffset++;
+				indices.setX( indexOffset, i1 ); indexOffset ++;
+				indices.setX( indexOffset, i2 ); indexOffset ++;
+				indices.setX( indexOffset, i4 ); indexOffset ++;
 
 				// face two
-				indices.setX( indexOffset, i2 ); indexOffset++;
-				indices.setX( indexOffset, i3 ); indexOffset++;
-				indices.setX( indexOffset, i4 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset ++;
+				indices.setX( indexOffset, i3 ); indexOffset ++;
+				indices.setX( indexOffset, i4 ); indexOffset ++;
 
 				// update counters
 				groupCount += 6;
@@ -212,9 +213,8 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 	function generateCap( top ) {
 
-		var x,
-			centerIndexStart,
-			centerIndexEnd;
+		var x, centerIndexStart, centerIndexEnd;
+
 		var uv = new THREE.Vector2();
 		var vertex = new THREE.Vector3();
 
@@ -230,7 +230,7 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 		// because the geometry needs one set of uvs per face,
 		// we must generate a center vertex per face/segment
 
-		for ( x = 1; x <= radialSegments; x++ ) {
+		for ( x = 1; x <= radialSegments; x ++ ) {
 
 			// vertex
 			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
@@ -239,22 +239,13 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			if ( top === true ) {
-
-				uv.x = x / radialSegments;
-				uv.y = 0;
-
-			} else {
-
-				uv.x = ( x - 1 ) / radialSegments;
-				uv.y = 1;
-
-			}
+			uv.x = 0.5;
+			uv.y = 0.5;
 
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
-			index++;
+			index ++;
 
 		}
 
@@ -263,30 +254,36 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 
 		// now we generate the surrounding vertices, normals and uvs
 
-		for ( x = 0; x <= radialSegments; x++ ) {
+		for ( x = 0; x <= radialSegments; x ++ ) {
 
 			var u = x / radialSegments;
+			var theta = u * thetaLength + thetaStart;
+
+			var cosTheta = Math.cos( theta );
+			var sinTheta = Math.sin( theta );
 
 			// vertex
-			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.x = radius * sinTheta;
 			vertex.y = halfHeight * sign;
-			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertex.z = radius * cosTheta;
 			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 			// normal
 			normals.setXYZ( index, 0, sign, 0 );
 
 			// uv
-			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+			uv.x = ( cosTheta * 0.5 ) + 0.5;
+			uv.y = ( sinTheta * 0.5 ) + 0.5;
+			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
-			index++;
+			index ++;
 
 		}
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
 			var c = centerIndexStart + x;
 			var i = centerIndexEnd + x;
@@ -294,16 +291,16 @@ THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radia
 			if ( top === true ) {
 
 				// face top
-				indices.setX( indexOffset, i ); indexOffset++;
-				indices.setX( indexOffset, i + 1 ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset ++;
+				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
 
 			} else {
 
 				// face bottom
-				indices.setX( indexOffset, i + 1 ); indexOffset++;
-				indices.setX( indexOffset, i ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+				indices.setX( indexOffset, i ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
 
 			}
 

@@ -15,6 +15,7 @@ THREE.Clock = function ( autoStart ) {
 };
 
 THREE.Clock.prototype = {
+
 	constructor: THREE.Clock,
 
 	start: function () {
@@ -64,4 +65,5 @@ THREE.Clock.prototype = {
 		return diff;
 
 	}
+
 };

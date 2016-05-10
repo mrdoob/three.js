@@ -9,16 +9,28 @@ THREE.FontLoader = function ( manager ) {
 };
 
 THREE.FontLoader.prototype = {
+
 	constructor: THREE.FontLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
+
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( new THREE.Font( JSON.parse( text.substring( 65, text.length - 2 ) ) ) );
+			var font = scope.parse( JSON.parse( text.substring( 65, text.length - 2 ) ) );
+
+			if ( onLoad ) onLoad( font );
 
 		}, onProgress, onError );
 
+	},
+
+	parse: function ( json ) {
+
+		return new THREE.Font( json );
+
 	}
+
 };

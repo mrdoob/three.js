@@ -13,7 +13,9 @@ THREE.NumberKeyframeTrack = function ( name, times, values, interpolation ) {
 
 };
 
-THREE.NumberKeyframeTrack.prototype = Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+THREE.NumberKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
 	constructor: THREE.NumberKeyframeTrack,
 
 	ValueTypeName: 'number',

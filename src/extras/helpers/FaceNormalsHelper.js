@@ -51,7 +51,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 THREE.FaceNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.FaceNormalsHelper.prototype.constructor = THREE.FaceNormalsHelper;
 
-THREE.FaceNormalsHelper.prototype.update = (function () {
+THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
@@ -77,7 +77,7 @@ THREE.FaceNormalsHelper.prototype.update = (function () {
 
 		var idx = 0;
 
-		for ( var i = 0, l = faces.length; i < l; i++ ) {
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -107,4 +107,4 @@ THREE.FaceNormalsHelper.prototype.update = (function () {
 
 	};
 
-}());
+}() );

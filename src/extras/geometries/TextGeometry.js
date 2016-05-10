@@ -38,12 +38,9 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 	// defaults
 
-	if ( parameters.bevelThickness === undefined )
-		parameters.bevelThickness = 10;
-	if ( parameters.bevelSize === undefined )
-		parameters.bevelSize = 8;
-	if ( parameters.bevelEnabled === undefined )
-		parameters.bevelEnabled = false;
+	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
 	THREE.ExtrudeGeometry.call( this, shapes, parameters );
 

@@ -19,6 +19,7 @@ THREE.Spherical = function ( radius, phi, theta ) {
 };
 
 THREE.Spherical.prototype = {
+
 	constructor: THREE.Spherical,
 
 	set: function ( radius, phi, theta ) {
@@ -48,7 +49,7 @@ THREE.Spherical.prototype = {
 	},
 
 	// restrict phi to be betwee EPS and PI-EPS
-	makeSafe: function () {
+	makeSafe: function() {
 
 		var EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
@@ -57,7 +58,7 @@ THREE.Spherical.prototype = {
 
 	},
 
-	setFromVector3: function ( vec3 ) {
+	setFromVector3: function( vec3 ) {
 
 		this.radius = vec3.length();
 
@@ -76,4 +77,5 @@ THREE.Spherical.prototype = {
 		return this;
 
 	},
+
 };

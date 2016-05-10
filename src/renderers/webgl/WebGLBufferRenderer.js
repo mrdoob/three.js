@@ -16,10 +16,9 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		_gl.drawArrays( mode, start, count );
 
-		_infoRender.calls++;
+		_infoRender.calls ++;
 		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES )
-			_infoRender.faces += count / 3;
+		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
 
 	}
 
@@ -52,10 +51,9 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		}
 
-		_infoRender.calls++;
+		_infoRender.calls ++;
 		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES )
-			_infoRender.faces += geometry.maxInstancedCount * count / 3;
+		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
 
 	}
 

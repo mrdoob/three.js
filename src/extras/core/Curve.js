@@ -33,9 +33,12 @@
  *	Abstract Curve base class
  **************************************************************/
 
-THREE.Curve = function () {};
+THREE.Curve = function () {
+
+};
 
 THREE.Curve.prototype = {
+
 	constructor: THREE.Curve,
 
 	// Virtual base class method to overwrite and implement in subclasses
@@ -62,13 +65,11 @@ THREE.Curve.prototype = {
 
 	getPoints: function ( divisions ) {
 
-		if ( ! divisions )
-			divisions = 5;
+		if ( ! divisions ) divisions = 5;
 
-		var d,
-			pts = [];
+		var d, pts = [];
 
-		for ( d = 0; d <= divisions; d++ ) {
+		for ( d = 0; d <= divisions; d ++ ) {
 
 			pts.push( this.getPoint( d / divisions ) );
 
@@ -82,13 +83,11 @@ THREE.Curve.prototype = {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( ! divisions )
-			divisions = 5;
+		if ( ! divisions ) divisions = 5;
 
-		var d,
-			pts = [];
+		var d, pts = [];
 
-		for ( d = 0; d <= divisions; d++ ) {
+		for ( d = 0; d <= divisions; d ++ ) {
 
 			pts.push( this.getPointAt( d / divisions ) );
 
@@ -111,14 +110,13 @@ THREE.Curve.prototype = {
 
 	getLengths: function ( divisions ) {
 
-		if ( ! divisions )
-			divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( ! divisions ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 		if ( this.cacheArcLengths
 			&& ( this.cacheArcLengths.length === divisions + 1 )
 			&& ! this.needsUpdate ) {
 
-			// console.log( "cached", this.cacheArcLengths );
+			//console.log( "cached", this.cacheArcLengths );
 			return this.cacheArcLengths;
 
 		}
@@ -126,16 +124,14 @@ THREE.Curve.prototype = {
 		this.needsUpdate = false;
 
 		var cache = [];
-		var current,
-			last = this.getPoint( 0 );
-		var p,
-			sum = 0;
+		var current, last = this.getPoint( 0 );
+		var p, sum = 0;
 
 		cache.push( 0 );
 
-		for ( p = 1; p <= divisions; p++ ) {
+		for ( p = 1; p <= divisions; p ++ ) {
 
-			current = this.getPoint( p / divisions );
+			current = this.getPoint ( p / divisions );
 			sum += current.distanceTo( last );
 			cache.push( sum );
 			last = current;
@@ -148,7 +144,7 @@ THREE.Curve.prototype = {
 
 	},
 
-	updateArcLengths: function () {
+	updateArcLengths: function() {
 
 		this.needsUpdate = true;
 		this.getLengths();
@@ -161,8 +157,7 @@ THREE.Curve.prototype = {
 
 		var arcLengths = this.getLengths();
 
-		var i = 0,
-			il = arcLengths.length;
+		var i = 0, il = arcLengths.length;
 
 		var targetArcLength; // The targeted u distance value to get
 
@@ -176,13 +171,11 @@ THREE.Curve.prototype = {
 
 		}
 
-		// var time = Date.now();
+		//var time = Date.now();
 
 		// binary search for the index with largest value smaller than target u distance
 
-		var low = 0,
-			high = il - 1,
-			comparison;
+		var low = 0, high = il - 1, comparison;
 
 		while ( low <= high ) {
 
@@ -211,7 +204,7 @@ THREE.Curve.prototype = {
 
 		i = high;
 
-		// console.log('b' , i, low, high, Date.now()- time);
+		//console.log('b' , i, low, high, Date.now()- time);
 
 		if ( arcLengths[ i ] === targetArcLength ) {
 
@@ -244,7 +237,7 @@ THREE.Curve.prototype = {
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function ( t ) {
+	getTangent: function( t ) {
 
 		var delta = 0.0001;
 		var t1 = t - delta;
@@ -252,10 +245,8 @@ THREE.Curve.prototype = {
 
 		// Capping in case of danger
 
-		if ( t1 < 0 )
-			t1 = 0;
-		if ( t2 > 1 )
-			t2 = 1;
+		if ( t1 < 0 ) t1 = 0;
+		if ( t2 > 1 ) t2 = 1;
 
 		var pt1 = this.getPoint( t1 );
 		var pt2 = this.getPoint( t2 );
@@ -271,6 +262,7 @@ THREE.Curve.prototype = {
 		return this.getTangent( t );
 
 	}
+
 };
 
 // TODO: Transformation for Curves?

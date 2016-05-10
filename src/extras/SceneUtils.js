@@ -3,11 +3,12 @@
  */
 
 THREE.SceneUtils = {
+
 	createMultiMaterialObject: function ( geometry, materials ) {
 
 		var group = new THREE.Group();
 
-		for ( var i = 0, l = materials.length; i < l; i++ ) {
+		for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
 			group.add( new THREE.Mesh( geometry, materials[ i ] ) );
 
@@ -35,4 +36,5 @@ THREE.SceneUtils = {
 		parent.add( child );
 
 	}
+
 };

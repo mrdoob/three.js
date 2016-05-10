@@ -18,6 +18,7 @@ THREE.Uniform = function ( value ) {
 };
 
 THREE.Uniform.prototype = {
+
 	constructor: THREE.Uniform,
 
 	onUpdate: function ( callback ) {
@@ -28,4 +29,5 @@ THREE.Uniform.prototype = {
 		return this;
 
 	}
+
 };

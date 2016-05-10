@@ -10,8 +10,7 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	var thresholdDot = Math.cos( THREE.Math.DEG2RAD * thresholdAngle );
 
-	var edge = [ 0, 0 ],
-		hash = {};
+	var edge = [ 0, 0 ], hash = {};
 
 	function sortFunction( a, b ) {
 
@@ -40,11 +39,11 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 	var vertices = geometry2.vertices;
 	var faces = geometry2.faces;
 
-	for ( var i = 0, l = faces.length; i < l; i++ ) {
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 		var face = faces[ i ];
 
-		for ( var j = 0; j < 3; j++ ) {
+		for ( var j = 0; j < 3; j ++ ) {
 
 			edge[ 0 ] = face[ keys[ j ] ];
 			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];

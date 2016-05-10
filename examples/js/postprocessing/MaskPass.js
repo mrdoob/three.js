@@ -25,11 +25,12 @@ THREE.MaskPass.prototype = {
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		var context = renderer.context;
+		var state = renderer.state;
 
 		// don't update color or depth
 
-		context.colorMask( false, false, false, false );
-		context.depthMask( false );
+		state.setColorWrite( false );
+		state.setDepthWrite( false );
 
 		// set up stencil
 
@@ -47,10 +48,10 @@ THREE.MaskPass.prototype = {
 
 		}
 
-		context.enable( context.STENCIL_TEST );
-		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
-		context.clearStencil( clearValue );
+		state.setStencilTest( true );
+		state.setStencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
+		state.setStencilFunc( context.ALWAYS, writeValue, 0xffffffff );
+		state.clearStencil( clearValue );
 
 		// draw into the stencil buffer
 
@@ -59,13 +60,13 @@ THREE.MaskPass.prototype = {
 
 		// re-enable update of color and depth
 
-		context.colorMask( true, true, true, true );
-		context.depthMask( true );
+		state.setColorWrite( true );
+		state.setDepthWrite( true );
 
 		// only render where stencil is set to 1
 
-		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
+		state.setStencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
+		state.setStencilOp( context.KEEP, context.KEEP, context.KEEP );
 
 	}
 
@@ -88,9 +89,7 @@ THREE.ClearMaskPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		var context = renderer.context;
-
-		context.disable( context.STENCIL_TEST );
+		renderer.state.setStencilTest( false );
 
 	}
 

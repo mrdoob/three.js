@@ -9,12 +9,12 @@ THREE.ImageLoader = function ( manager ) {
 };
 
 THREE.ImageLoader.prototype = {
+
 	constructor: THREE.ImageLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.path !== undefined )
-			url = this.path + url;
+		if ( this.path !== undefined ) url = this.path + url;
 
 		var scope = this;
 
@@ -74,8 +74,7 @@ THREE.ImageLoader.prototype = {
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined )
-			image.crossOrigin = this.crossOrigin;
+		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
 		scope.manager.itemStart( url );
 
@@ -96,4 +95,5 @@ THREE.ImageLoader.prototype = {
 		this.path = value;
 
 	}
+
 };

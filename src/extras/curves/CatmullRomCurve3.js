@@ -9,9 +9,10 @@
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-THREE.CatmullRomCurve3 = (function () {
+THREE.CatmullRomCurve3 = ( function() {
 
-	var tmp = new THREE.Vector3(),
+	var
+		tmp = new THREE.Vector3(),
 		px = new CubicPoly(),
 		py = new CubicPoly(),
 		pz = new CubicPoly();
@@ -38,7 +39,7 @@ THREE.CatmullRomCurve3 = (function () {
 	 *  and
 	 *   p'(0) = t0, p'(1) = t1.
 	 */
-	CubicPoly.prototype.init = function ( x0, x1, t0, t1 ) {
+	CubicPoly.prototype.init = function( x0, x1, t0, t1 ) {
 
 		this.c0 = x0;
 		this.c1 = t0;
@@ -47,7 +48,7 @@ THREE.CatmullRomCurve3 = (function () {
 
 	};
 
-	CubicPoly.prototype.initNonuniformCatmullRom = function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
+	CubicPoly.prototype.initNonuniformCatmullRom = function( x0, x1, x2, x3, dt0, dt1, dt2 ) {
 
 		// compute tangents when parameterized in [t1,t2]
 		var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
@@ -63,13 +64,13 @@ THREE.CatmullRomCurve3 = (function () {
 	};
 
 	// standard Catmull-Rom spline: interpolate between x1 and x2 with previous/following points x1/x4
-	CubicPoly.prototype.initCatmullRom = function ( x0, x1, x2, x3, tension ) {
+	CubicPoly.prototype.initCatmullRom = function( x0, x1, x2, x3, tension ) {
 
 		this.init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
 
 	};
 
-	CubicPoly.prototype.calc = function ( t ) {
+	CubicPoly.prototype.calc = function( t ) {
 
 		var t2 = t * t;
 		var t3 = t2 * t;
@@ -90,10 +91,7 @@ THREE.CatmullRomCurve3 = (function () {
 		function ( t ) {
 
 			var points = this.points,
-				point,
-				intPoint,
-				weight,
-				l;
+				point, intPoint, weight, l;
 
 			l = points.length;
 
@@ -114,10 +112,7 @@ THREE.CatmullRomCurve3 = (function () {
 
 			}
 
-			var p0,
-				p1,
-				p2,
-				p3; // 4 points
+			var p0, p1, p2, p3; // 4 points
 
 			if ( this.closed || intPoint > 0 ) {
 
@@ -155,12 +150,9 @@ THREE.CatmullRomCurve3 = (function () {
 				var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
 
 				// safety check for repeated points
-				if ( dt1 < 1e-4 )
-					dt1 = 1.0;
-				if ( dt0 < 1e-4 )
-					dt0 = dt1;
-				if ( dt2 < 1e-4 )
-					dt2 = dt1;
+				if ( dt1 < 1e-4 ) dt1 = 1.0;
+				if ( dt0 < 1e-4 ) dt0 = dt1;
+				if ( dt2 < 1e-4 ) dt2 = dt1;
 
 				px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
 				py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
@@ -187,4 +179,4 @@ THREE.CatmullRomCurve3 = (function () {
 
 	);
 
-})();
+} )();

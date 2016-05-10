@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 
-# get dir of this script file
+# Get absolute path to script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASE=${DIR}/../..
 
-# allow passing custom paths
-DEFAULT_PATHS="${DIR}/../../src/**/*.js"
-PATHS="${1:-${DEFAULT_PATHS}}"
+# Allow formatting specific file paths
+# default to all files
+FILES=${@:-${BASE}/}
 
-${DIR}/../../node_modules/.bin/esformatter \
-    --config ${DIR}/esformatter.config.json \
-    -i \
-    ${PATHS}
+${BASE}/node_modules/.bin/esformatter \
+   --config ${DIR}/esformatter.json \
+   -i \
+   "${@}"
+
+# apply rules that jscs can auto-fix
+${BASE}/node_modules/.bin/jscs \
+    --fix \
+    --config=${DIR}/config.json \
+    "${@}"
 

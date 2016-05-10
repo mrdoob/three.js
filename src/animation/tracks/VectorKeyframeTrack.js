@@ -14,7 +14,9 @@ THREE.VectorKeyframeTrack = function ( name, times, values, interpolation ) {
 
 };
 
-THREE.VectorKeyframeTrack.prototype = Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+THREE.VectorKeyframeTrack.prototype =
+		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+
 	constructor: THREE.VectorKeyframeTrack,
 
 	ValueTypeName: 'vector'

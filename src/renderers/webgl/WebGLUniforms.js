@@ -53,34 +53,34 @@
  *
  */
 
-THREE.WebGLUniforms = (function () { // scope
+THREE.WebGLUniforms = ( function() { // scope
 
 	// --- Base for inner nodes (including the root) ---
 
-	var UniformContainer = function () {
+	var UniformContainer = function() {
 
 			this.seq = [];
 			this.map = {};
 
 		},
 
-		// --- Utilities ---
+	// --- Utilities ---
 
-		// Array Caches (provide typed arrays for temporary by size)
+	// Array Caches (provide typed arrays for temporary by size)
 
 		arrayCacheF32 = [],
 		arrayCacheI32 = [],
 
-		uncacheTemporaryArrays = function () {
+		uncacheTemporaryArrays = function() {
 
 			arrayCacheF32.length = 0;
 			arrayCacheI32.length = 0;
 
 		},
 
-		// Flattening for arrays of vectors and matrices
+	// Flattening for arrays of vectors and matrices
 
-		flatten = function ( array, nBlocks, blockSize ) {
+		flatten = function( array, nBlocks, blockSize ) {
 
 			var firstElem = array[ 0 ];
 
@@ -102,7 +102,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 				firstElem.toArray( r, 0 );
 
-				for ( var i = 1, offset = 0; i !== nBlocks; ++i ) {
+				for ( var i = 1, offset = 0; i !== nBlocks; ++ i ) {
 
 					offset += blockSize;
 					array[ i ].toArray( r, offset );
@@ -115,9 +115,9 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		// Texture unit allocation
+	// Texture unit allocation
 
-		allocTexUnits = function ( renderer, n ) {
+		allocTexUnits = function( renderer, n ) {
 
 			var r = arrayCacheI32[ n ];
 
@@ -128,47 +128,44 @@ THREE.WebGLUniforms = (function () { // scope
 
 			}
 
-			for ( var i = 0; i !== n; ++i )
+			for ( var i = 0; i !== n; ++ i )
 				r[ i ] = renderer.allocTextureUnit();
 
 			return r;
 
 		},
 
-		// --- Setters ---
+	// --- Setters ---
 
-		// Note: Defining these methods externally, because they come in a bunch
-		// and this way their names minify.
+	// Note: Defining these methods externally, because they come in a bunch
+	// and this way their names minify.
 
 		// Single scalar
 
-		setValue1f = function ( gl, v ) {
-			gl.uniform1f( this.addr, v );
-		},
-		setValue1i = function ( gl, v ) {
-			gl.uniform1i( this.addr, v );
-		},
+		setValue1f = function( gl, v ) { gl.uniform1f( this.addr, v ); },
+		setValue1i = function( gl, v ) { gl.uniform1i( this.addr, v ); },
 
 		// Single float vector (from flat array or THREE.VectorN)
 
-		setValue2fv = function ( gl, v ) {
+		setValue2fv = function( gl, v ) {
 
 			if ( v.x === undefined ) gl.uniform2fv( this.addr, v );
 			else gl.uniform2f( this.addr, v.x, v.y );
 
 		},
 
-		setValue3fv = function ( gl, v ) {
+		setValue3fv = function( gl, v ) {
 
 			if ( v.x !== undefined )
-				gl.uniform3f( this.addr, v.x, v.y, v.z );else if ( v.r !== undefined )
+				gl.uniform3f( this.addr, v.x, v.y, v.z );
+			else if ( v.r !== undefined )
 				gl.uniform3f( this.addr, v.r, v.g, v.b );
 			else
 				gl.uniform3fv( this.addr, v );
 
 		},
 
-		setValue4fv = function ( gl, v ) {
+		setValue4fv = function( gl, v ) {
 
 			if ( v.x === undefined ) gl.uniform4fv( this.addr, v );
 			else gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
@@ -177,19 +174,19 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Single matrix (from flat array or MatrixN)
 
-		setValue2fm = function ( gl, v ) {
+		setValue2fm = function( gl, v ) {
 
 			gl.uniformMatrix2fv( this.addr, false, v.elements || v );
 
 		},
 
-		setValue3fm = function ( gl, v ) {
+		setValue3fm = function( gl, v ) {
 
 			gl.uniformMatrix3fv( this.addr, false, v.elements || v );
 
 		},
 
-		setValue4fm = function ( gl, v ) {
+		setValue4fm = function( gl, v ) {
 
 			gl.uniformMatrix4fv( this.addr, false, v.elements || v );
 
@@ -197,7 +194,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Single texture (2D / Cube)
 
-		setValueT1 = function ( gl, v, renderer ) {
+		setValueT1 = function( gl, v, renderer ) {
 
 			var unit = renderer.allocTextureUnit();
 			gl.uniform1i( this.addr, unit );
@@ -205,7 +202,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		setValueT6 = function ( gl, v, renderer ) {
+		setValueT6 = function( gl, v, renderer ) {
 
 			var unit = renderer.allocTextureUnit();
 			gl.uniform1i( this.addr, unit );
@@ -215,55 +212,32 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Integer / Boolean vectors or arrays thereof (always flat arrays)
 
-		setValue2iv = function ( gl, v ) {
-			gl.uniform2iv( this.addr, v );
-		},
-		setValue3iv = function ( gl, v ) {
-			gl.uniform3iv( this.addr, v );
-		},
-		setValue4iv = function ( gl, v ) {
-			gl.uniform4iv( this.addr, v );
-		},
+		setValue2iv = function( gl, v ) { gl.uniform2iv( this.addr, v ); },
+		setValue3iv = function( gl, v ) { gl.uniform3iv( this.addr, v ); },
+		setValue4iv = function( gl, v ) { gl.uniform4iv( this.addr, v ); },
 
 		// Helper to pick the right setter for the singular case
 
-		getSingularSetter = function ( type ) {
+		getSingularSetter = function( type ) {
 
 			switch ( type ) {
 
-				case 0x1406:
-					return setValue1f; // FLOAT
-				case 0x8b50:
-					return setValue2fv; // _VEC2
-				case 0x8b51:
-					return setValue3fv; // _VEC3
-				case 0x8b52:
-					return setValue4fv; // _VEC4
+				case 0x1406: return setValue1f; // FLOAT
+				case 0x8b50: return setValue2fv; // _VEC2
+				case 0x8b51: return setValue3fv; // _VEC3
+				case 0x8b52: return setValue4fv; // _VEC4
 
-				case 0x8b5a:
-					return setValue2fm; // _MAT2
-				case 0x8b5b:
-					return setValue3fm; // _MAT3
-				case 0x8b5c:
-					return setValue4fm; // _MAT4
+				case 0x8b5a: return setValue2fm; // _MAT2
+				case 0x8b5b: return setValue3fm; // _MAT3
+				case 0x8b5c: return setValue4fm; // _MAT4
 
-				case 0x8b5e:
-					return setValueT1; // SAMPLER_2D
-				case 0x8b60:
-					return setValueT6; // SAMPLER_CUBE
+				case 0x8b5e: return setValueT1; // SAMPLER_2D
+				case 0x8b60: return setValueT6; // SAMPLER_CUBE
 
-				case 0x1404:
-				case 0x8b56:
-					return setValue1i; // INT, BOOL
-				case 0x8b53:
-				case 0x8b57:
-					return setValue2iv; // _VEC2
-				case 0x8b54:
-				case 0x8b58:
-					return setValue3iv; // _VEC3
-				case 0x8b55:
-				case 0x8b59:
-					return setValue4iv; // _VEC4
+				case 0x1404: case 0x8b56: return setValue1i; // INT, BOOL
+				case 0x8b53: case 0x8b57: return setValue2iv; // _VEC2
+				case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
+				case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
 
 			}
 
@@ -271,28 +245,24 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Array of scalars
 
-		setValue1fv = function ( gl, v ) {
-			gl.uniform1fv( this.addr, v );
-		},
-		setValue1iv = function ( gl, v ) {
-			gl.uniform1iv( this.addr, v );
-		},
+		setValue1fv = function( gl, v ) { gl.uniform1fv( this.addr, v ); },
+		setValue1iv = function( gl, v ) { gl.uniform1iv( this.addr, v ); },
 
 		// Array of vectors (flat or from THREE classes)
 
-		setValueV2a = function ( gl, v ) {
+		setValueV2a = function( gl, v ) {
 
 			gl.uniform2fv( this.addr, flatten( v, this.size, 2 ) );
 
 		},
 
-		setValueV3a = function ( gl, v ) {
+		setValueV3a = function( gl, v ) {
 
 			gl.uniform3fv( this.addr, flatten( v, this.size, 3 ) );
 
 		},
 
-		setValueV4a = function ( gl, v ) {
+		setValueV4a = function( gl, v ) {
 
 			gl.uniform4fv( this.addr, flatten( v, this.size, 4 ) );
 
@@ -300,19 +270,19 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Array of matrices (flat or from THREE clases)
 
-		setValueM2a = function ( gl, v ) {
+		setValueM2a = function( gl, v ) {
 
 			gl.uniformMatrix2fv( this.addr, false, flatten( v, this.size, 4 ) );
 
 		},
 
-		setValueM3a = function ( gl, v ) {
+		setValueM3a = function( gl, v ) {
 
 			gl.uniformMatrix3fv( this.addr, false, flatten( v, this.size, 9 ) );
 
 		},
 
-		setValueM4a = function ( gl, v ) {
+		setValueM4a = function( gl, v ) {
 
 			gl.uniformMatrix4fv( this.addr, false, flatten( v, this.size, 16 ) );
 
@@ -320,14 +290,14 @@ THREE.WebGLUniforms = (function () { // scope
 
 		// Array of textures (2D / Cube)
 
-		setValueT1a = function ( gl, v, renderer ) {
+		setValueT1a = function( gl, v, renderer ) {
 
 			var n = v.length,
 				units = allocTexUnits( renderer, n );
 
 			gl.uniform1iv( this.addr, units );
 
-			for ( var i = 0; i !== n; ++i ) {
+			for ( var i = 0; i !== n; ++ i ) {
 
 				var tex = v[ i ];
 				if ( tex ) renderer.setTexture2D( tex, units[ i ] );
@@ -336,14 +306,14 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		setValueT6a = function ( gl, v, renderer ) {
+		setValueT6a = function( gl, v, renderer ) {
 
 			var n = v.length,
 				units = allocTexUnits( renderer, n );
 
 			gl.uniform1iv( this.addr, units );
 
-			for ( var i = 0; i !== n; ++i ) {
+			for ( var i = 0; i !== n; ++ i ) {
 
 				var tex = v[ i ];
 				if ( tex ) renderer.setTextureCube( tex, units[ i ] );
@@ -352,51 +322,35 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
+
 		// Helper to pick the right setter for a pure (bottom-level) array
 
-		getPureArraySetter = function ( type ) {
+		getPureArraySetter = function( type ) {
 
 			switch ( type ) {
 
-				case 0x1406:
-					return setValue1fv; // FLOAT
-				case 0x8b50:
-					return setValueV2a; // _VEC2
-				case 0x8b51:
-					return setValueV3a; // _VEC3
-				case 0x8b52:
-					return setValueV4a; // _VEC4
+				case 0x1406: return setValue1fv; // FLOAT
+				case 0x8b50: return setValueV2a; // _VEC2
+				case 0x8b51: return setValueV3a; // _VEC3
+				case 0x8b52: return setValueV4a; // _VEC4
 
-				case 0x8b5a:
-					return setValueM2a; // _MAT2
-				case 0x8b5b:
-					return setValueM3a; // _MAT3
-				case 0x8b5c:
-					return setValueM4a; // _MAT4
+				case 0x8b5a: return setValueM2a; // _MAT2
+				case 0x8b5b: return setValueM3a; // _MAT3
+				case 0x8b5c: return setValueM4a; // _MAT4
 
-				case 0x8b5e:
-					return setValueT1a; // SAMPLER_2D
-				case 0x8b60:
-					return setValueT6a; // SAMPLER_CUBE
+				case 0x8b5e: return setValueT1a; // SAMPLER_2D
+				case 0x8b60: return setValueT6a; // SAMPLER_CUBE
 
-				case 0x1404:
-				case 0x8b56:
-					return setValue1iv; // INT, BOOL
-				case 0x8b53:
-				case 0x8b57:
-					return setValue2iv; // _VEC2
-				case 0x8b54:
-				case 0x8b58:
-					return setValue3iv; // _VEC3
-				case 0x8b55:
-				case 0x8b59:
-					return setValue4iv; // _VEC4
+				case 0x1404: case 0x8b56: return setValue1iv; // INT, BOOL
+				case 0x8b53: case 0x8b57: return setValue2iv; // _VEC2
+				case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
+				case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
 
 			}
 
 		},
 
-		// --- Uniform Classes ---
+	// --- Uniform Classes ---
 
 		SingleUniform = function SingleUniform( id, activeInfo, addr ) {
 
@@ -408,7 +362,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		PureArrayUniform = function ( id, activeInfo, addr ) {
+		PureArrayUniform = function( id, activeInfo, addr ) {
 
 			this.id = id;
 			this.addr = addr;
@@ -419,7 +373,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		StructuredUniform = function ( id ) {
+		StructuredUniform = function( id ) {
 
 			this.id = id;
 
@@ -427,14 +381,14 @@ THREE.WebGLUniforms = (function () { // scope
 
 		};
 
-	StructuredUniform.prototype.setValue = function ( gl, value ) {
+	StructuredUniform.prototype.setValue = function( gl, value ) {
 
 		// Note: Don't need an extra 'renderer' parameter, since samplers
 		// are not allowed in structured uniforms.
 
 		var seq = this.seq;
 
-		for ( var i = 0, n = seq.length; i !== n; ++i ) {
+		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var u = seq[ i ];
 			u.setValue( gl, value[ u.id ] );
@@ -448,23 +402,23 @@ THREE.WebGLUniforms = (function () { // scope
 	// Parser - builds up the property tree from the path strings
 
 	var RePathPart = /([\w\d_]+)(\])?(\[|\.)?/g,
-	// extracts
-	// 	- the identifier (member name or array index)
-	//  - followed by an optional right bracket (found when array index)
-	//  - followed by an optional left bracket or dot (type of subscript)
-	//
-	// Note: These portions can be read in a non-overlapping fashion and
-	// allow straightforward parsing of the hierarchy that WebGL encodes
-	// in the uniform names.
+		// extracts
+		// 	- the identifier (member name or array index)
+		//  - followed by an optional right bracket (found when array index)
+		//  - followed by an optional left bracket or dot (type of subscript)
+		//
+		// Note: These portions can be read in a non-overlapping fashion and
+		// allow straightforward parsing of the hierarchy that WebGL encodes
+		// in the uniform names.
 
-		addUniform = function ( container, uniformObject ) {
+		addUniform = function( container, uniformObject ) {
 
 			container.seq.push( uniformObject );
 			container.map[ uniformObject.id ] = uniformObject;
 
 		},
 
-		parseUniform = function ( activeInfo, addr, container ) {
+		parseUniform = function( activeInfo, addr, container ) {
 
 			var path = activeInfo.name,
 				pathLength = path.length;
@@ -472,7 +426,7 @@ THREE.WebGLUniforms = (function () { // scope
 			// reset RegExp object, because of the early exit of a previous run
 			RePathPart.lastIndex = 0;
 
-			for ( ;; ) {
+			for (; ;) {
 
 				var match = RePathPart.exec( path ),
 					matchEnd = RePathPart.lastIndex,
@@ -481,16 +435,15 @@ THREE.WebGLUniforms = (function () { // scope
 					idIsIndex = match[ 2 ] === ']',
 					subscript = match[ 3 ];
 
-				if ( idIsIndex )
-					id = id | 0; // convert to integer
+				if ( idIsIndex ) id = id | 0; // convert to integer
 
 				if ( subscript === undefined ||
-					subscript === '[' && matchEnd + 2 === pathLength ) {
+						subscript === '[' && matchEnd + 2 === pathLength ) {
 					// bare name or "pure" bottom-level array "[0]" suffix
 
 					addUniform( container, subscript === undefined ?
-						new SingleUniform( id, activeInfo, addr ) :
-						new PureArrayUniform( id, activeInfo, addr ) );
+							new SingleUniform( id, activeInfo, addr ) :
+							new PureArrayUniform( id, activeInfo, addr ) );
 
 					break;
 
@@ -515,7 +468,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 		},
 
-		// Root Container
+	// Root Container
 
 		WebGLUniforms = function WebGLUniforms( gl, program, renderer ) {
 
@@ -525,7 +478,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 			var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-			for ( var i = 0; i !== n; ++i ) {
+			for ( var i = 0; i !== n; ++ i ) {
 
 				var info = gl.getActiveUniform( program, i ),
 					path = info.name,
@@ -537,7 +490,8 @@ THREE.WebGLUniforms = (function () { // scope
 
 		};
 
-	WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
+
+	WebGLUniforms.prototype.setValue = function( gl, name, value ) {
 
 		var u = this.map[ name ];
 
@@ -545,7 +499,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 	};
 
-	WebGLUniforms.prototype.set = function ( gl, object, name ) {
+	WebGLUniforms.prototype.set = function( gl, object, name ) {
 
 		var u = this.map[ name ];
 
@@ -553,7 +507,7 @@ THREE.WebGLUniforms = (function () { // scope
 
 	};
 
-	WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
+	WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
 
 		var v = object[ name ];
 
@@ -561,11 +515,12 @@ THREE.WebGLUniforms = (function () { // scope
 
 	};
 
+
 	// Static interface
 
-	WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
+	WebGLUniforms.upload = function( gl, seq, values, renderer ) {
 
-		for ( var i = 0, n = seq.length; i !== n; ++i ) {
+		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var u = seq[ i ],
 				v = values[ u.id ];
@@ -581,11 +536,11 @@ THREE.WebGLUniforms = (function () { // scope
 
 	};
 
-	WebGLUniforms.seqWithValue = function ( seq, values ) {
+	WebGLUniforms.seqWithValue = function( seq, values ) {
 
 		var r = [];
 
-		for ( var i = 0, n = seq.length; i !== n; ++i ) {
+		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var u = seq[ i ];
 			if ( u.id in values ) r.push( u );
@@ -596,44 +551,41 @@ THREE.WebGLUniforms = (function () { // scope
 
 	};
 
-	WebGLUniforms.splitDynamic = function ( seq, values ) {
+	WebGLUniforms.splitDynamic = function( seq, values ) {
 
 		var r = null,
 			n = seq.length,
 			w = 0;
 
-		for ( var i = 0; i !== n; ++i ) {
+		for ( var i = 0; i !== n; ++ i ) {
 
 			var u = seq[ i ],
 				v = values[ u.id ];
 
 			if ( v && v.dynamic === true ) {
 
-				if ( r === null )
-					r = [];
+				if ( r === null ) r = [];
 				r.push( u );
 
 			} else {
 
 				// in-place compact 'seq', removing the matches
-				if ( w < i )
-					seq[ w ] = u;
-				++w;
+				if ( w < i ) seq[ w ] = u;
+				++ w;
 
 			}
 
 		}
 
-		if ( w < n )
-			seq.length = w;
+		if ( w < n ) seq.length = w;
 
 		return r;
 
 	};
 
-	WebGLUniforms.evalDynamic = function ( seq, values, object, camera ) {
+	WebGLUniforms.evalDynamic = function( seq, values, object, camera ) {
 
-		for ( var i = 0, n = seq.length; i !== n; ++i ) {
+		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var v = values[ seq[ i ].id ],
 				f = v.onUpdateCallback;
@@ -646,5 +598,5 @@ THREE.WebGLUniforms = (function () { // scope
 
 	return WebGLUniforms;
 
-})();
+} )();
 

@@ -3,7 +3,8 @@
  */
 
 Object.defineProperty( THREE, 'AudioContext', {
-	get: (function () {
+
+	get: ( function () {
 
 		var context;
 
@@ -11,8 +12,7 @@ Object.defineProperty( THREE, 'AudioContext', {
 
 			if ( context === undefined ) {
 
-				var AudioContextImpl = ( window.AudioContext || window.webkitAudioContext );
-				context = new AudioContextImpl();
+				context = new ( window.AudioContext || window.webkitAudioContext )();
 
 			}
 
@@ -20,5 +20,6 @@ Object.defineProperty( THREE, 'AudioContext', {
 
 		};
 
-	})()
+	} )()
+
 } );

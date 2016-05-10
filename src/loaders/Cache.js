@@ -3,6 +3,7 @@
  */
 
 THREE.Cache = {
+
 	enabled: false,
 
 	files: {},
@@ -38,4 +39,5 @@ THREE.Cache = {
 		this.files = {};
 
 	}
+
 };

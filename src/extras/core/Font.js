@@ -9,8 +9,7 @@ THREE.Font = function ( data ) {
 
 };
 
-THREE.Font.prototype = {
-	constructor: THREE.Font,
+Object.assign( THREE.Font.prototype, {
 
 	generateShapes: function ( text, size, divisions ) {
 
@@ -22,7 +21,7 @@ THREE.Font.prototype = {
 
 			var paths = [];
 
-			for ( var i = 0; i < chars.length; i++ ) {
+			for ( var i = 0; i < chars.length; i ++ ) {
 
 				var ret = createPath( chars[ i ], scale, offset );
 				offset += ret.offset;
@@ -43,20 +42,8 @@ THREE.Font.prototype = {
 
 			var path = new THREE.Path();
 
-			var pts = [],
-				b2 = THREE.ShapeUtils.b2,
-				b3 = THREE.ShapeUtils.b3;
-			var x,
-				y,
-				cpx,
-				cpy,
-				cpx0,
-				cpy0,
-				cpx1,
-				cpy1,
-				cpx2,
-				cpy2,
-				laste;
+			var pts = [], b2 = THREE.ShapeUtils.b2, b3 = THREE.ShapeUtils.b3;
+			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
 
 			if ( glyph.o ) {
 
@@ -64,14 +51,14 @@ THREE.Font.prototype = {
 
 				for ( var i = 0, l = outline.length; i < l; ) {
 
-					var action = outline[ i++ ];
+					var action = outline[ i ++ ];
 
 					switch ( action ) {
 
 						case 'm': // moveTo
 
-							x = outline[ i++ ] * scale + offset;
-							y = outline[ i++ ] * scale;
+							x = outline[ i ++ ] * scale + offset;
+							y = outline[ i ++ ] * scale;
 
 							path.moveTo( x, y );
 
@@ -79,8 +66,8 @@ THREE.Font.prototype = {
 
 						case 'l': // lineTo
 
-							x = outline[ i++ ] * scale + offset;
-							y = outline[ i++ ] * scale;
+							x = outline[ i ++ ] * scale + offset;
+							y = outline[ i ++ ] * scale;
 
 							path.lineTo( x, y );
 
@@ -88,10 +75,10 @@ THREE.Font.prototype = {
 
 						case 'q': // quadraticCurveTo
 
-							cpx = outline[ i++ ] * scale + offset;
-							cpy = outline[ i++ ] * scale;
-							cpx1 = outline[ i++ ] * scale + offset;
-							cpy1 = outline[ i++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offset;
+							cpy  = outline[ i ++ ] * scale;
+							cpx1 = outline[ i ++ ] * scale + offset;
+							cpy1 = outline[ i ++ ] * scale;
 
 							path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
@@ -102,7 +89,7 @@ THREE.Font.prototype = {
 								cpx0 = laste.x;
 								cpy0 = laste.y;
 
-								for ( var i2 = 1; i2 <= divisions; i2++ ) {
+								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
 									b2( t, cpx0, cpx1, cpx );
@@ -116,12 +103,12 @@ THREE.Font.prototype = {
 
 						case 'b': // bezierCurveTo
 
-							cpx = outline[ i++ ] * scale + offset;
-							cpy = outline[ i++ ] * scale;
-							cpx1 = outline[ i++ ] * scale + offset;
-							cpy1 = outline[ i++ ] * scale;
-							cpx2 = outline[ i++ ] * scale + offset;
-							cpy2 = outline[ i++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offset;
+							cpy  = outline[ i ++ ] * scale;
+							cpx1 = outline[ i ++ ] * scale + offset;
+							cpy1 = outline[ i ++ ] * scale;
+							cpx2 = outline[ i ++ ] * scale + offset;
+							cpy2 = outline[ i ++ ] * scale;
 
 							path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
@@ -132,7 +119,7 @@ THREE.Font.prototype = {
 								cpx0 = laste.x;
 								cpy0 = laste.y;
 
-								for ( var i2 = 1; i2 <= divisions; i2++ ) {
+								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
 									b3( t, cpx0, cpx1, cpx2, cpx );
@@ -156,17 +143,15 @@ THREE.Font.prototype = {
 
 		//
 
-		if ( size === undefined )
-			size = 100;
-		if ( divisions === undefined )
-			divisions = 4;
+		if ( size === undefined ) size = 100;
+		if ( divisions === undefined ) divisions = 4;
 
 		var data = this.data;
 
 		var paths = createPaths( text );
 		var shapes = [];
 
-		for ( var p = 0, pl = paths.length; p < pl; p++ ) {
+		for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
 			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
 
@@ -175,4 +160,5 @@ THREE.Font.prototype = {
 		return shapes;
 
 	}
-};
+
+} );

@@ -3,7 +3,8 @@
         "plugins": [
             "esformatter-semicolons",
             "esformatter-limit-linebreaks",
-            "esformatter-eol-last"
+            "esformatter-eol-last",
+            "esformatter-spaced-lined-comment"
         ],
 
         "LimitLineBreaks": 2,
@@ -341,7 +342,7 @@
                 "ParameterList" : 1,
                 "SwitchDiscriminantOpening" : 1,
                 "SwitchDiscriminantClosing" : 1,
-                "SwitchCaseColon": 0,
+                "SwitchCaseColon": 1,
                 "ThrowKeyword": 1,
                 "TryKeyword": -1,
                 "TryOpeningBrace" : 1,
@@ -361,7 +362,7 @@
                 "AssignmentPattern" : 1,
                 "ArrayExpressionOpening" : 1,
                 "ArrayExpressionClosing" : 0,
-                "ArrayExpressionComma" : 1,
+                "ArrayExpressionComma" : -1,
                 "ArrayPatternOpening": 1,
                 "ArrayPatternClosing": 1,
                 "ArrayPatternComma": 1,

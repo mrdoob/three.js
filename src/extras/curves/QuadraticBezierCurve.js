@@ -2,6 +2,7 @@
  *	Quadratic Bezier curve
  **************************************************************/
 
+
 THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
 
 	this.v0 = v0;
@@ -12,6 +13,7 @@ THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
 
 THREE.QuadraticBezierCurve.prototype = Object.create( THREE.Curve.prototype );
 THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
+
 
 THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
@@ -24,7 +26,8 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 };
 
-THREE.QuadraticBezierCurve.prototype.getTangent = function ( t ) {
+
+THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
 	var tangentQuadraticBezier = THREE.CurveUtils.tangentQuadraticBezier;
 

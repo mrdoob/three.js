@@ -24,21 +24,16 @@ THREE.Matrix3 = function () {
 };
 
 THREE.Matrix3.prototype = {
+
 	constructor: THREE.Matrix3,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		var te = this.elements;
 
-		te[ 0 ] = n11;
-		te[ 1 ] = n21;
-		te[ 2 ] = n31;
-		te[ 3 ] = n12;
-		te[ 4 ] = n22;
-		te[ 5 ] = n32;
-		te[ 6 ] = n13;
-		te[ 7 ] = n23;
-		te[ 8 ] = n33;
+		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
+		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
+		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
 
 		return this;
 
@@ -73,21 +68,23 @@ THREE.Matrix3.prototype = {
 			me[ 0 ], me[ 3 ], me[ 6 ],
 			me[ 1 ], me[ 4 ], me[ 7 ],
 			me[ 2 ], me[ 5 ], me[ 8 ]
+
 		);
 
 		return this;
 
 	},
 
-	setFromMatrix4: function ( m ) {
+	setFromMatrix4: function( m ) {
 
 		var me = m.elements;
 
 		this.set(
 
-			me[ 0 ], me[ 4 ], me[ 8 ],
-			me[ 1 ], me[ 5 ], me[ 9 ],
+			me[ 0 ], me[ 4 ], me[  8 ],
+			me[ 1 ], me[ 5 ], me[  9 ],
 			me[ 2 ], me[ 6 ], me[ 10 ]
+
 		);
 
 		return this;
@@ -100,12 +97,9 @@ THREE.Matrix3.prototype = {
 
 		return function ( array, offset, length ) {
 
-			if ( v1 === undefined )
-				v1 = new THREE.Vector3();
-			if ( offset === undefined )
-				offset = 0;
-			if ( length === undefined )
-				length = array.length;
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = array.length;
 
 			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
@@ -127,14 +121,11 @@ THREE.Matrix3.prototype = {
 
 		return function applyToBuffer( buffer, offset, length ) {
 
-			if ( v1 === undefined )
-				v1 = new THREE.Vector3();
-			if ( offset === undefined )
-				offset = 0;
-			if ( length === undefined )
-				length = buffer.length / buffer.itemSize;
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
-			for ( var i = 0, j = offset; i < length; i++, j++ ) {
+			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
 
 				v1.x = buffer.getX( j );
 				v1.y = buffer.getY( j );
@@ -156,15 +147,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[ 0 ] *= s;
-		te[ 3 ] *= s;
-		te[ 6 ] *= s;
-		te[ 1 ] *= s;
-		te[ 4 ] *= s;
-		te[ 7 ] *= s;
-		te[ 2 ] *= s;
-		te[ 5 ] *= s;
-		te[ 8 ] *= s;
+		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
+		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
+		te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
 
 		return this;
 
@@ -174,15 +159,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		var a = te[ 0 ],
-			b = te[ 1 ],
-			c = te[ 2 ],
-			d = te[ 3 ],
-			e = te[ 4 ],
-			f = te[ 5 ],
-			g = te[ 6 ],
-			h = te[ 7 ],
-			i = te[ 8 ];
+		var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
+			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
 
 		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
@@ -199,15 +178,9 @@ THREE.Matrix3.prototype = {
 		var me = matrix.elements,
 			te = this.elements,
 
-			n11 = me[ 0 ],
-			n21 = me[ 1 ],
-			n31 = me[ 2 ],
-			n12 = me[ 3 ],
-			n22 = me[ 4 ],
-			n32 = me[ 5 ],
-			n13 = me[ 6 ],
-			n23 = me[ 7 ],
-			n33 = me[ 8 ],
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
+			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
+			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
 
 			t11 = n33 * n22 - n32 * n23,
 			t12 = n32 * n13 - n33 * n12,
@@ -250,18 +223,11 @@ THREE.Matrix3.prototype = {
 
 	transpose: function () {
 
-		var tmp,
-			m = this.elements;
+		var tmp, m = this.elements;
 
-		tmp = m[ 1 ];
-		m[ 1 ] = m[ 3 ];
-		m[ 3 ] = tmp;
-		tmp = m[ 2 ];
-		m[ 2 ] = m[ 6 ];
-		m[ 6 ] = tmp;
-		tmp = m[ 5 ];
-		m[ 5 ] = m[ 7 ];
-		m[ 7 ] = tmp;
+		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
+		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
+		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
 
 		return this;
 
@@ -270,7 +236,7 @@ THREE.Matrix3.prototype = {
 	flattenToArrayOffset: function ( array, offset ) {
 
 		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
-			"- just use .toArray instead." );
+				"- just use .toArray instead." );
 
 		return this.toArray( array, offset );
 
@@ -310,10 +276,8 @@ THREE.Matrix3.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined )
-			array = [];
-		if ( offset === undefined )
-			offset = 0;
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
 		var te = this.elements;
 
@@ -327,9 +291,10 @@ THREE.Matrix3.prototype = {
 
 		array[ offset + 6 ] = te[ 6 ];
 		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ] = te[ 8 ];
+		array[ offset + 8 ]  = te[ 8 ];
 
 		return array;
 
 	}
+
 };

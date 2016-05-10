@@ -4,7 +4,7 @@
 
 THREE.DirectGeometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount++ } );
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -41,6 +41,7 @@ THREE.DirectGeometry = function () {
 };
 
 Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, {
+
 	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
 	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
 
@@ -64,7 +65,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		var faces = geometry.faces;
 
-		for ( var i = 0; i < faces.length; i++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -121,7 +122,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			morphTargetsPosition = [];
 
-			for ( var i = 0; i < morphTargetsLength; i++ ) {
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
 				morphTargetsPosition[ i ] = [];
 
@@ -140,7 +141,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			morphTargetsNormal = [];
 
-			for ( var i = 0; i < morphNormalsLength; i++ ) {
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
 				morphTargetsNormal[ i ] = [];
 
@@ -160,7 +161,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		//
 
-		for ( var i = 0; i < faces.length; i++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -232,7 +233,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			// morphs
 
-			for ( var j = 0; j < morphTargetsLength; j++ ) {
+			for ( var j = 0; j < morphTargetsLength; j ++ ) {
 
 				var morphTarget = morphTargets[ j ].vertices;
 
@@ -240,7 +241,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			}
 
-			for ( var j = 0; j < morphNormalsLength; j++ ) {
+			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
 				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
@@ -281,4 +282,5 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
+
 } );

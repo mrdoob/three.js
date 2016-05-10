@@ -1,0 +1,33 @@
+{
+    "preset": "mdcs",
+    "disallowSpaceAfterPrefixUnaryOperators": ["+", "-"],
+    "disallowNewlineBeforeBlockStatements": true,
+    "requireSpaceAfterBinaryOperators": [",", "="],
+    "disallowKeywordsOnNewLine": ["else"],
+    "disallowMixedSpacesAndTabs": "smart",
+    "disallowQuotedKeysInObjects": true,
+    "disallowSpaceBeforeComma": {"allExcept": ["sparseArrays"]},
+    "disallowSpacesInAnonymousFunctionExpression": {
+      "beforeOpeningRoundBrace": true
+    },
+    "disallowSpacesInNamedFunctionExpression": {
+      "beforeOpeningRoundBrace": true
+    },
+    "requireCamelCaseOrUpperCaseIdentifiers": {"ignoreProperties": true, "strict": true},
+    "requireSpaceAfterLineComment": true,
+    "requireSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
+    "requireSpaceBeforeBinaryOperators": [
+      "=",
+      ",",
+      "+",
+      "-",
+      "/",
+      "*",
+      "==",
+      "===",
+      "!=",
+      "!=="
+    ],
+    "requireSpaceBeforePostfixUnaryOperators": ["++", "--"],
+    "validateIndentation": false
+}

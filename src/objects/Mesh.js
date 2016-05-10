@@ -37,7 +37,7 @@ THREE.Mesh.prototype.updateMorphTargets = function () {
 		this.morphTargetInfluences = [];
 		this.morphTargetDictionary = {};
 
-		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m++ ) {
+		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
 
 			this.morphTargetInfluences.push( 0 );
 			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
@@ -62,7 +62,8 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
-THREE.Mesh.prototype.raycast = (function () {
+
+THREE.Mesh.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
@@ -190,14 +191,11 @@ THREE.Mesh.prototype.raycast = (function () {
 
 		}
 
-		var uvs,
-			intersection;
+		var uvs, intersection;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			var a,
-				b,
-				c;
+			var a, b, c;
 			var index = geometry.index;
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
@@ -231,6 +229,7 @@ THREE.Mesh.prototype.raycast = (function () {
 
 			} else {
 
+
 				for ( var i = 0, l = positions.length; i < l; i += 9 ) {
 
 					a = i / 3;
@@ -252,19 +251,16 @@ THREE.Mesh.prototype.raycast = (function () {
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
-			var fvA,
-				fvB,
-				fvC;
+			var fvA, fvB, fvC;
 			var isFaceMaterial = material instanceof THREE.MultiMaterial;
 			var materials = isFaceMaterial === true ? material.materials : null;
 
 			var vertices = geometry.vertices;
 			var faces = geometry.faces;
 			var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-			if ( faceVertexUvs.length > 0 )
-				uvs = faceVertexUvs;
+			if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
 
-			for ( var f = 0, fl = faces.length; f < fl; f++ ) {
+			for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 				var face = faces[ f ];
 				var faceMaterial = isFaceMaterial === true ? materials[ face.materialIndex ] : material;
@@ -284,7 +280,7 @@ THREE.Mesh.prototype.raycast = (function () {
 					vB.set( 0, 0, 0 );
 					vC.set( 0, 0, 0 );
 
-					for ( var t = 0, tl = morphTargets.length; t < tl; t++ ) {
+					for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
 
 						var influence = morphInfluences[ t ];
 
@@ -335,7 +331,7 @@ THREE.Mesh.prototype.raycast = (function () {
 
 	};
 
-}());
+}() );
 
 THREE.Mesh.prototype.clone = function () {
 

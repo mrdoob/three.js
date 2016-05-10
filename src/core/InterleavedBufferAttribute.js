@@ -12,7 +12,9 @@ THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offse
 
 };
 
+
 THREE.InterleavedBufferAttribute.prototype = {
+
 	constructor: THREE.InterleavedBufferAttribute,
 
 	get length() {
@@ -119,4 +121,5 @@ THREE.InterleavedBufferAttribute.prototype = {
 		return this;
 
 	}
+
 };

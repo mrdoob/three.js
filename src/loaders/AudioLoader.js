@@ -9,6 +9,7 @@ THREE.AudioLoader = function ( manager ) {
 };
 
 THREE.AudioLoader.prototype = {
+
 	constructor: THREE.AudioLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
@@ -28,4 +29,5 @@ THREE.AudioLoader.prototype = {
 		}, onProgress, onError );
 
 	}
+
 };

@@ -2,6 +2,7 @@
  *	Spline 3D curve
  **************************************************************/
 
+
 THREE.SplineCurve3 = THREE.Curve.create(
 
 	function ( points /* array of Vector3 */ ) {

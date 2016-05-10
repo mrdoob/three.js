@@ -43,26 +43,14 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		numpoints = segments + 1,
 
-		u,
-		v,
-		r,
+		u, v, r,
 
-		cx,
-		cy,
-		pos,
-		pos2 = new THREE.Vector3(),
-		i,
-		j,
-		ip,
-		jp,
-		a,
-		b,
-		c,
-		d,
-		uva,
-		uvb,
-		uvc,
-		uvd;
+		cx, cy,
+		pos, pos2 = new THREE.Vector3(),
+		i, j,
+		ip, jp,
+		a, b, c, d,
+		uva, uvb, uvc, uvd;
 
 	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
 		tangents = frames.tangents,
@@ -82,7 +70,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 	// construct the grid
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		grid[ i ] = [];
 
@@ -96,7 +84,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		r = radius * taper( u );
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			v = j / radialSegments * 2 * Math.PI;
 
@@ -114,16 +102,17 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 	}
 
+
 	// construct the mesh
 
-	for ( i = 0; i < segments; i++ ) {
+	for ( i = 0; i < segments; i ++ ) {
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			ip = ( closed ) ? ( i + 1 ) % segments : i + 1;
 			jp = ( j + 1 ) % radialSegments;
 
-			a = grid[ i ][ j ]; // *** NOT NECESSARILY PLANAR ! ***
+			a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
 			b = grid[ ip ][ j ];
 			c = grid[ ip ][ jp ];
 			d = grid[ i ][ jp ];
@@ -166,7 +155,7 @@ THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var normal = new THREE.Vector3(),
+	var	normal = new THREE.Vector3(),
 
 		tangents = [],
 		normals = [],
@@ -179,11 +168,9 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		theta,
 		smallest,
 
-		tx,
-		ty,
-		tz,
-		i,
-		u;
+		tx, ty, tz,
+		i, u;
+
 
 	// expose internals
 	this.tangents = tangents;
@@ -192,7 +179,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// compute the tangent vectors for each segment on the path
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		u = i / ( numpoints - 1 );
 
@@ -266,9 +253,10 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	}
 
+
 	// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-	for ( i = 1; i < numpoints; i++ ) {
+	for ( i = 1; i < numpoints; i ++ ) {
 
 		normals[ i ] = normals[ i - 1 ].clone();
 
@@ -290,6 +278,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	}
 
+
 	// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
 
 	if ( closed ) {
@@ -303,7 +292,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 		}
 
-		for ( i = 1; i < numpoints; i++ ) {
+		for ( i = 1; i < numpoints; i ++ ) {
 
 			// twist a little...
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );

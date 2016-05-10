@@ -18,6 +18,7 @@ THREE.BufferAttribute = function ( array, itemSize, normalized ) {
 };
 
 THREE.BufferAttribute.prototype = {
+
 	constructor: THREE.BufferAttribute,
 
 	get count() {
@@ -28,7 +29,7 @@ THREE.BufferAttribute.prototype = {
 
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version++;
+		if ( value === true ) this.version ++;
 
 	},
 
@@ -56,7 +57,7 @@ THREE.BufferAttribute.prototype = {
 		index1 *= this.itemSize;
 		index2 *= attribute.itemSize;
 
-		for ( var i = 0, l = this.itemSize; i < l; i++ ) {
+		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
 
 			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 
@@ -76,10 +77,9 @@ THREE.BufferAttribute.prototype = {
 
 	copyColorsArray: function ( colors ) {
 
-		var array = this.array,
-			offset = 0;
+		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = colors.length; i < l; i++ ) {
+		for ( var i = 0, l = colors.length; i < l; i ++ ) {
 
 			var color = colors[ i ];
 
@@ -90,9 +90,9 @@ THREE.BufferAttribute.prototype = {
 
 			}
 
-			array[ offset++ ] = color.r;
-			array[ offset++ ] = color.g;
-			array[ offset++ ] = color.b;
+			array[ offset ++ ] = color.r;
+			array[ offset ++ ] = color.g;
+			array[ offset ++ ] = color.b;
 
 		}
 
@@ -102,16 +102,15 @@ THREE.BufferAttribute.prototype = {
 
 	copyIndicesArray: function ( indices ) {
 
-		var array = this.array,
-			offset = 0;
+		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = indices.length; i < l; i++ ) {
+		for ( var i = 0, l = indices.length; i < l; i ++ ) {
 
 			var index = indices[ i ];
 
-			array[ offset++ ] = index.a;
-			array[ offset++ ] = index.b;
-			array[ offset++ ] = index.c;
+			array[ offset ++ ] = index.a;
+			array[ offset ++ ] = index.b;
+			array[ offset ++ ] = index.c;
 
 		}
 
@@ -121,10 +120,9 @@ THREE.BufferAttribute.prototype = {
 
 	copyVector2sArray: function ( vectors ) {
 
-		var array = this.array,
-			offset = 0;
+		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i++ ) {
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
 			var vector = vectors[ i ];
 
@@ -135,8 +133,8 @@ THREE.BufferAttribute.prototype = {
 
 			}
 
-			array[ offset++ ] = vector.x;
-			array[ offset++ ] = vector.y;
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
 
 		}
 
@@ -146,10 +144,9 @@ THREE.BufferAttribute.prototype = {
 
 	copyVector3sArray: function ( vectors ) {
 
-		var array = this.array,
-			offset = 0;
+		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i++ ) {
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
 			var vector = vectors[ i ];
 
@@ -160,9 +157,9 @@ THREE.BufferAttribute.prototype = {
 
 			}
 
-			array[ offset++ ] = vector.x;
-			array[ offset++ ] = vector.y;
-			array[ offset++ ] = vector.z;
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
+			array[ offset ++ ] = vector.z;
 
 		}
 
@@ -172,10 +169,9 @@ THREE.BufferAttribute.prototype = {
 
 	copyVector4sArray: function ( vectors ) {
 
-		var array = this.array,
-			offset = 0;
+		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i++ ) {
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
 			var vector = vectors[ i ];
 
@@ -186,10 +182,10 @@ THREE.BufferAttribute.prototype = {
 
 			}
 
-			array[ offset++ ] = vector.x;
-			array[ offset++ ] = vector.y;
-			array[ offset++ ] = vector.z;
-			array[ offset++ ] = vector.w;
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
+			array[ offset ++ ] = vector.z;
+			array[ offset ++ ] = vector.w;
 
 		}
 
@@ -199,8 +195,7 @@ THREE.BufferAttribute.prototype = {
 
 	set: function ( value, offset ) {
 
-		if ( offset === undefined )
-			offset = 0;
+		if ( offset === undefined ) offset = 0;
 
 		this.array.set( value, offset );
 
@@ -305,6 +300,7 @@ THREE.BufferAttribute.prototype = {
 		return new this.constructor().copy( this );
 
 	}
+
 };
 
 //
@@ -362,6 +358,7 @@ THREE.Float64Attribute = function ( array, itemSize ) {
 	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
 
 };
+
 
 // Deprecated
 
