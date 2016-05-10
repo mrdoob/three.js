@@ -54,21 +54,6 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 	},
 
 	/**
-	 * Sets the FOV by focal length (DEPRECATED).
-	 *
-	 * Optionally also sets .filmGauge, otherwise uses it. See .setFocalLength.
-	 */
-	setLens: function ( focalLength, filmGauge ) {
-
-		console.warn( "THREE.PerspectiveCamera.setLens is deprecated. " +
-				"Use .setFocalLength and .filmGauge for a photographic setup." );
-
-		if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
-		this.setFocalLength( focalLength );
-
-	},
-
-	/**
 	 * Sets the FOV by focal length in respect to the current .filmGauge.
 	 *
 	 * The default film gauge is 35, so that the focal length can be specified for
