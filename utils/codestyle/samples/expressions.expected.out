@@ -38,6 +38,11 @@ a ? b : c;
 // unary sign operators should have space after them
 - a + b + ( - c );
 
+// no space between name and paren
+foo( a, b, c );
+// spacing between args
+foo( a, b, c );
+
 obj[ 'key' ];
 obj[ 'key' ];
 obj[ 'key' ];
