@@ -30,7 +30,12 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "argparse": "^1.0.3",
-    "jscs": "^1.13.1",
+    "esformatter": "^0.9.3",
+    "esformatter-limit-linebreaks": "0.0.3",
+    "esformatter-semicolons": "^1.1.2",
+    "esformatter-spaced-lined-comment": "^2.0.1",
+    "js-beautify": "^1.6.2",
+    "jscs": "3.0.1",
     "uglify-js": "^2.6.0"
   }
 }
