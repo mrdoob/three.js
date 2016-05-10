@@ -17,6 +17,12 @@ for f in $(${DIR}/filesChangedBetweenBranches.sh); do
     # format file
     ${DIR}/codestyle.sh ${BASE}/${f}
 
+    echo ""
+    echo "============================="
+    echo "| Accept formatting changes |"
+    echo "============================="
+    echo ""
+
     # enter git patch mode to approve all formatting changes
     git add --patch ${BASE}/${f}
 
