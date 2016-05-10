@@ -273,7 +273,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 			// uv
 			uv.x = ( cosTheta * 0.5 ) + 0.5;
-			uv.y = ( sinTheta * 0.5 ) + 0.5;
+			uv.y = ( sinTheta * 0.5 * sign ) + 0.5;
 			uvs.setXY( index, uv.x, uv.y );
 
 			// increase index
