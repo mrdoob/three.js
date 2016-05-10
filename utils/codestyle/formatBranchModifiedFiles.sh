@@ -6,7 +6,7 @@ BASE=${DIR}/../..
 
 # ensure all changes are committed
 # ignore files not in the repo
-if [[ -z $(git status -s | grep -E "^[^?]{2}") ]]; then
+if [[ -n $(git status -s | grep -E "^[^?]{2}") ]]; then
     echo "You have committed changes"
     exit 1
 fi
