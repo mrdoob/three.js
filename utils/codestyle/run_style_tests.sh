@@ -29,23 +29,28 @@ for f in ${FILES}; do
     FIX="${FDIR}/${NAME}.actual.out"
     FIX_ERRS="${FDIR}/${NAME}.actual.err"
 
-    echo "cp ${ORIG} ${FIX}"
+    # echo "cp ${ORIG} ${FIX}"
     cp ${ORIG} ${FIX}
 
-    echo "${DIR}/codestyle.sh ${FIX} > ${FIX_ERRS}"
+    # echo "${DIR}/codestyle.sh ${FIX} > ${FIX_ERRS}"
     ${DIR}/codestyle.sh ${FIX} > ${FIX_ERRS}
 
     FIX_DIFF=$(colordiff -r ${FIX} ${EXPE})
     ERR_DIFF=$(colordiff -r ${FIX_ERRS} ${ERRS})
 
-    echo ""
-    echo "code diff"
-    echo "---------"
-    colordiff -r ${EXPE} ${FIX}
-    echo ""
+    if [[ -z "${FIX_DIFF}" && -z "${ERR_DIFF}" ]]; then
+        echo ""
+        echo "PASS"
+    else
+        echo ""
+        echo "code diff"
+        echo "---------"
+        colordiff -r ${EXPE} ${FIX}
+        echo ""
 
-    echo "errors diff"
-    echo "-----------"
-    colordiff -r ${ERRS} ${FIX_ERRS}
+        echo "errors diff"
+        echo "-----------"
+        colordiff -r ${ERRS} ${FIX_ERRS}
+    fi
 
-done
+    done
