@@ -15,10 +15,10 @@ fi
 for f in $(${DIR}/filesChangedBetweenBranches.sh); do
 
     # format file
-    ${DIR}/codestyle.sh ${f}
+    ${DIR}/codestyle.sh ${BASE}/${f}
 
     # enter git patch mode to approve all formatting changes
-    git add --patch ${f}
+    git add --patch ${BASE}/${f}
 
 done
 
