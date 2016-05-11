@@ -327,6 +327,10 @@ FeatureFormatter.prototype = {
 							.on( 'file', function( filePath ) {
 
 								curFileHeader = [];
+								if (filteredDiff[filteredDiff.length - 1] !== '\n') {
+									// ensure newline between every file in diff output
+									filteredDiff.push('\n');
+								}
 								hasAddedHeader = false;
 
 								if ( filePath in changes ) {
