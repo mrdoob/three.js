@@ -205,7 +205,7 @@
                 "ForStatementClosingBrace" : ">=1",
                 "FunctionExpression" : 2,
                 "FunctionExpressionOpeningBrace" : 2,
-                "FunctionExpressionClosingBrace" : 2,
+                "FunctionExpressionClosingBrace" : "<=2",
                 "FunctionDeclaration" : ">=1",
                 "FunctionDeclarationOpeningBrace" : 2,
                 "FunctionDeclarationClosingBrace" : 2,
