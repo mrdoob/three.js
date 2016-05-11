@@ -94,7 +94,7 @@ DiffReader.prototype.read = function() {
 
 				var chunk = {
 					start: parseInt( lineNums[ 0 ], 10 ),
-					len: parseInt( lineNums[ 1 ], 10 ) };
+				len: parseInt( lineNums[ 1 ], 10 ) };
 
 				self.emit( 'chunk', chunk );
 
@@ -327,9 +327,11 @@ FeatureFormatter.prototype = {
 							.on( 'file', function( filePath ) {
 
 								curFileHeader = [];
-								if (filteredDiff[filteredDiff.length - 1] !== '\n') {
+								if ( filteredDiff[ filteredDiff.length - 1 ] !== '' ) {
+
 									// ensure newline between every file in diff output
-									filteredDiff.push('\n');
+									filteredDiff.push( '' );
+
 								}
 								hasAddedHeader = false;
 
