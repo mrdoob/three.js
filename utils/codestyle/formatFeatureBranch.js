@@ -141,6 +141,12 @@ FeatureFormatter.prototype = {
 
 				console.log("modified files/lines");
 				console.log(JSON.stringify(result, null, 2));
+				for ( var file in result ) {
+					console.log( file );
+					result[ file ].forEach( function ( chunk ) {
+						console.log( chunk.start + ',' + chunk.end );
+					} )
+				}
 
 				return done( null, result )
 		});
