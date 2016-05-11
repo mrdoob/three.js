@@ -29,8 +29,8 @@ function chunksOverlap( a, b ) {
 
 	console.log('    overlap? ' + [a.start, a.len].join(',') + ' ' + [b.start, b.len].join(','));
 
-	if ( ( a.start > b.start && a.start < bEnd ) ||
-		 ( aEnd > b.start && aEnd < bEnd ) ||
+	if ( ( a.start >= b.start && a.start <= bEnd ) ||
+		 ( aEnd >= b.start && aEnd <= bEnd ) ||
 	     ( a.start < b.start && aEnd > bEnd ) ) {
 
 		return true;
