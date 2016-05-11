@@ -83,6 +83,7 @@ FeatureFormatter.prototype = {
 
 		console.log( 'Determining files and lines modified by feature branch...' );
 
+		var self = this;
 		exec(
 			'git --no-pager diff dev..' + this.featureBranchName,
 			{ cwd: BASE_DIR },
@@ -148,18 +149,46 @@ FeatureFormatter.prototype = {
 					} )
 				}
 
+				self.featuredModifiedLines = result;
 				return done( null, result )
-		});
+			}
+		);
 
 	},
 
 	runFormatter: function( done ) {
 
 		console.log( 'Executing formatter script on feature-modified files...' );
-		var files = Object.keys( featureChanges );
 
-		// TODO: stub
-		return done();
+		var files = Object.keys( this.featuredModifiedLines );
+		async.each( files, function( file, cb ) {
+
+			exec(
+				'./utils/codestyle/codestyle.sh ' + file,
+				{ cwd: BASE_DIR },
+				function( err, stdout, stderr ) {
+
+					if ( err || stdout.trim() ) {
+
+						return cb( err || stdout.trim() );
+
+					}
+
+					return cb();
+
+				}
+			);
+
+		}, function( err ) {
+
+			if ( err ) {
+
+				return done ( err );
+
+			}
+			done();
+
+		} );
 
 	},
 
@@ -185,7 +214,7 @@ FeatureFormatter.prototype = {
 			this.confirmNoUncomittedChanges.bind( this ),
 			this.determineCurrentBranch.bind( this ),
 			this.determineFeatureModifiedFilesAndLines.bind( this ),
-			// this.runFormatter.bind( this ),
+			this.runFormatter.bind( this ),
 			// this.generateFilteredPatch.bind( this ),
 			// this.resetChanges.bind( this ),
 			// this.applyPatch.bind( this )
