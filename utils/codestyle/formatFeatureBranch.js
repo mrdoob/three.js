@@ -22,44 +22,6 @@ function FeatureFormatter(args) {
 FeatureFormatter.prototype = {
 	constructor: FeatureFormatter,
 
-	generateFilteredPatch: function( done ) {
-
-		console.log( 'Generating patch of selected formatting changes...' );
-
-	},
-
-	runFormatter: function( done ) {
-
-		console.log( 'Executing formatter script on feature-modified files...' );
-		var files = Object.keys( featureChanges );
-
-		// TODO: stub
-		return done();
-
-	},
-
-	// generates object representing changed files and line numbers
-	// keys are changed files, relative to base dir
-	// values are arrays of line range objects
-	determineFeatureModifiedFilesAndLines: function( done ) {
-
-		console.log( 'Determining files and lines modified by feature branch...' );
-		// TODO: stub
-		return done( null, {
-			'src/examples/Box2.js': [
-				{ start: 2,  end: 8 },
-				{ start: 12, end: 18 }
-			]
-		});
-
-	},
-
-	resetChanges: function ( done ) {
-
-		console.log( 'Reverting changes made by formatter...' );
-
-	},
-
 	confirmNoUncomittedChanges: function ( done ) {
 
 		console.log( 'Confirming you have no uncommitted changes...' );
@@ -92,6 +54,107 @@ FeatureFormatter.prototype = {
 
 	},
 
+	determineCurrentBranch: function ( done ) {
+
+		console.log( 'Getting current branch name...' );
+
+		var self = this;
+		exec(
+			'git rev-parse --abbrev-ref HEAD',
+			{ cwd: BASE_DIR },
+			function( err, stdout, stderr ) {
+				if ( err || stderr.trim() ) {
+
+					return done( err || stderr.trim() )
+				}
+
+				self.featureBranchName = stdout.trim()
+				console.log( 'Current branch: ' + self.featureBranchName );
+
+				return done( null, self.featureBranchName );
+			}
+		)
+	},
+
+	// generates object representing changed files and line numbers
+	// keys are changed files, relative to base dir
+	// values are arrays of line range objects
+	determineFeatureModifiedFilesAndLines: function( done ) {
+
+		console.log( 'Determining files and lines modified by feature branch...' );
+
+		exec(
+			'git --no-pager diff dev..' + this.featureBranchName,
+			{ cwd: BASE_DIR },
+			function( err, stdout, stderr ) {
+
+				if ( err || stderr.trim() ) {
+
+					return done( err || stderr.trim() );
+
+				}
+
+				var result = {};
+				var curFile = null;
+
+				stdout.split('\n').filter( function( line ) {
+
+					return /^(diff|index|---|\+\+\+|@@)/.test(line);
+
+				} ).forEach( function( line ) {
+
+					if ( /^\+\+\+.*\.js$/.test( line ) ) {
+
+						curFile = line.split(' ')[1];
+						if ( ! ( curFile in result ) ) {
+
+							result[ curFile ] = {}
+
+						}
+
+					} else if ( /^@@.*@@$/.test( line ) ) {
+
+						var tokens = line.split( ' ' );
+						var newChunk = tokens[ 2 ];
+
+						var lineNums = newChunk.split(',')
+
+						result[ curFile ].push( { start: lineNums[ 0 ], end: lineNums[ 1 ] } );
+
+					}
+
+				} );
+
+				console.log("modified files/lines");
+				console.log(JSON.stringify(result, null, 2));
+
+				return done( null, result )
+		});
+
+	},
+
+	runFormatter: function( done ) {
+
+		console.log( 'Executing formatter script on feature-modified files...' );
+		var files = Object.keys( featureChanges );
+
+		// TODO: stub
+		return done();
+
+	},
+
+	generateFilteredPatch: function( done ) {
+
+		console.log( 'Generating patch of selected formatting changes...' );
+
+	},
+
+	resetChanges: function ( done ) {
+
+		console.log( 'Reverting changes made by formatter...' );
+
+	},
+
 	applyPatch: function( done ) {
 
 	},
@@ -99,8 +162,9 @@ FeatureFormatter.prototype = {
 	formatFeatureBranch: function( done ) {
 
 		async.series( [
-			this.confirmNoUncomittedChanges.bind(this),
-			// this.determineFeatureModifiedFilesAndLines.bind( this ),
+			this.confirmNoUncomittedChanges.bind( this ),
+			this.determineCurrentBranch.bind( this ),
+			this.determineFeatureModifiedFilesAndLines.bind( this ),
 			// this.runFormatter.bind( this ),
 			// this.generateFilteredPatch.bind( this ),
 			// this.resetChanges.bind( this ),
