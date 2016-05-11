@@ -83,6 +83,12 @@ DiffReader.prototype.read = function() {
 				// remove leading '+' from line num pair
 				var newChunk = tokens[ 2 ].substring( 1 );
 				var lineNums = newChunk.split( ',' );
+
+				// single line chunks don't have length value
+				if (lineNums.length === 1) {
+					lineNums[1] = 1;
+				}
+
 				var chunk = { start: lineNums[ 0 ], len: lineNums[ 1 ] };
 
 				self.emit( 'chunk', chunk );
