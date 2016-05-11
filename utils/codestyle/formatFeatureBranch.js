@@ -103,6 +103,8 @@ FeatureFormatter.prototype = {
 
 				} ).forEach( function( line ) {
 
+					console.log( "l:  " + line );
+
 					if ( /^\+\+\+.*\.js$/.test( line ) ) {
 
 						curFile = line.split(' ')[1];
