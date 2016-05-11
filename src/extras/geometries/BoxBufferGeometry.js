@@ -59,11 +59,6 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 	// helper functions
 
-	function myNewMethod(a,b,c) {
-		console.log('it does all the things')
-		return a+(b++)+c;
-	}
-
 	function calculateVertexCount ( w, h, d ) {
 
 		var vertices = 0;
