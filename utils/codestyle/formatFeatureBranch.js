@@ -22,21 +22,28 @@ var DIFF_FILENAME = 'formatting.diff';
 var execOptions = { cwd: BASE_DIR, shell: '/bin/bash' };
 
 // call chunks overlapping if either endpoint of one lies within the other
-function chunksOverlap(a, b) {
+function chunksOverlap( a, b ) {
+
 	if ( ( a.start > b.start && a.start < b.end ) ||
-	     ( a.end > b.start && a.end < b.end ) ) {
+		( a.end > b.start && a.end < b.end ) ) {
+
 		return true;
+
 	}
 	return false;
+
 }
 
 function DiffReader( diffOutput, options ) {
+
 	EventEmitter.call( this );
-	this.lines = diffOutput.split('\n');
+	this.lines = diffOutput.split( '\n' );
 
 	this.options = options || {};
+
 }
-util.inherits(DiffReader, EventEmitter);
+
+util.inherits( DiffReader, EventEmitter );
 
 DiffReader.prototype.read = function() {
 
@@ -69,14 +76,15 @@ DiffReader.prototype.read = function() {
 			}
 
 			// After emitting parse state events, emit line to be processed
-			self.emit('line', line)
+			self.emit( 'line', line );
 
 		} );
 
-		self.emit('end');
+		self.emit( 'end' );
 
 	} );
-}
+
+};
 
 // Use a class so we can store intermediate data in `this`
 function FeatureFormatter( args ) {
@@ -114,9 +122,7 @@ FeatureFormatter.prototype = {
 
 				done();
 
-			}
-
-		);
+			} );
 
 	},
 
@@ -141,9 +147,7 @@ FeatureFormatter.prototype = {
 
 				return done( null, self.featureBranchName );
 
-			}
-
-		);
+			} );
 
 	},
 
@@ -172,11 +176,11 @@ FeatureFormatter.prototype = {
 				var diffReader = new DiffReader( stdout )
 					.on( 'file', function( filePath ) {
 
-						if ( /\.js$/.test(filePath) ) {
+						if ( /\.js$/.test( filePath ) ) {
 
-							console.log('file: ' + filePath);
+							console.log( 'file: ' + filePath );
 							curFile = filePath;
-							result[curFile] = [];
+							result[ curFile ] = [];
 
 						} else {
 
@@ -189,7 +193,7 @@ FeatureFormatter.prototype = {
 
 						if ( curFile ) {
 
-							console.log('  ' + chunk.start + ',' + chunk.end );
+							console.log( '  ' + chunk.start + ',' + chunk.end );
 							result[ curFile ].push( chunk );
 
 						}
@@ -213,7 +217,7 @@ FeatureFormatter.prototype = {
 						self.featuredModifiedLines = result;
 						return done( null, result );
 
-					})
+					} )
 					.on( 'error', done )
 					.read();
 
@@ -252,9 +256,7 @@ FeatureFormatter.prototype = {
 
 			);
 
-		}
-
-			, function( err ) {
+		}, function( err ) {
 
 				if ( err ) {
 
@@ -263,9 +265,7 @@ FeatureFormatter.prototype = {
 				}
 				done();
 
-			}
-
-		);
+			} );
 
 	},
 
@@ -277,7 +277,7 @@ FeatureFormatter.prototype = {
 		var changes = this.featuredModifiedLines;
 
 		async.seq(
-			function(_, cb) {
+			function( _, cb ) {
 
 				// run git diff
 				// filter diff output to only include chunks modified by feature
@@ -294,7 +294,7 @@ FeatureFormatter.prototype = {
 
 						var diffReader = new DiffReader( stdout );
 						diffReader
-							.on('file', function( filePath ) {
+							.on( 'file', function( filePath ) {
 
 								if ( filePath in changes ) {
 
@@ -309,24 +309,36 @@ FeatureFormatter.prototype = {
 
 							} )
 							.on( 'chunk', function( chunk ) {
+
 								if ( curFile ) {
+
 									for ( var i = 0; i < curFileChunks.length; i ++ ) {
-										if (chunksOverlap( chunk, curFileChunks[i] )) {
+
+										if ( chunksOverlap( chunk, curFileChunks[ i ] ) ) {
+
 											includeChunk = true;
 											return;
+
 										}
+
 									}
 									includeChunk = false;
+
 								} else {
+
 									includeChunk = false;
+
 								}
+
 							} )
 							.on( 'line', function( line ) {
 
 								// ensure header lines for files are always kept
-								if ( /^(diff|index|---|\+\+\+)/.test(line) ) {
+								if ( /^(diff|index|---|\+\+\+)/.test( line ) ) {
+
 									filteredDiff.push( line );
-								} else if (curFile && includeChunk) {
+
+								} else if ( curFile && includeChunk ) {
 
 									filteredDiff.push( line );
 
@@ -335,21 +347,25 @@ FeatureFormatter.prototype = {
 							} )
 							.on( 'error', done )
 							.on( 'end', function() {
-								cb( null, filteredDiff.join('\n') );
+
+								cb( null, filteredDiff.join( '\n' ) );
+
 							} )
 							.read();
+
 					}
 				);
+
 			},
-			function(filteredDiff, cb) {
+			function( filteredDiff, cb ) {
 
 				// save to file
 				fs.writeFile(
-					path.resolve(BASE_DIR, DIFF_FILENAME),
+					path.resolve( BASE_DIR, DIFF_FILENAME ),
 					filteredDiff, { encoding: 'utf8' }, cb );
 
 			}
-		)(null, done);
+		)( null, done );
 
 	},
 
@@ -361,30 +377,36 @@ FeatureFormatter.prototype = {
 			'git checkout -- .',
 			execOptions,
 			function( err, stdout, stderr ) {
+
 				if ( err || stderr.trim() ) {
-					return done ( err || stderr.trim() );
+
+					return done( err || stderr.trim() );
+
 				}
 				done();
-			}
-		);
+
+			} );
 
 	},
 
 	applyPatch: function( done ) {
 
-		console.log('Applying filtered patch to format only modified lines...');
+		console.log( 'Applying filtered patch to format only modified lines...' );
 
 		exec(
 			'git apply ' + DIFF_FILENAME,
 			execOptions,
 			function( err, stdout, stderr ) {
+
 				if ( err || stderr.trim() ) {
+
 					return done( err || stderr.trim() );
+
 				}
 
-				fs.unlink(path.resolve(BASE_DIR, DIFF_FILENAME), done);
-			}
-		);
+				fs.unlink( path.resolve( BASE_DIR, DIFF_FILENAME ), done );
+
+			} );
 
 	},
 
@@ -421,9 +443,7 @@ if ( require.main === module ) {
 
 		}
 
-	}
-
-	);
+	} );
 
 }
 
