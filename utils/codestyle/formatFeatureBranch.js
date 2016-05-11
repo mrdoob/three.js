@@ -103,8 +103,6 @@ FeatureFormatter.prototype = {
 
 				} ).forEach( function( line ) {
 
-					console.log( "l:  " + line );
-
 					if ( /^\+\+\+/.test( line ) ) {
 
 						if ( /\.js$/.test( line ) ) {
@@ -127,7 +125,9 @@ FeatureFormatter.prototype = {
 						if ( curFile ) {
 
 							var tokens = line.split( ' ' );
-							var newChunk = tokens[ 2 ];
+
+							// remove leading '+' from line num pair
+							var newChunk = tokens[ 2 ].substring(1);
 
 							var lineNums = newChunk.split(',')
 
