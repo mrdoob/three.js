@@ -27,11 +27,11 @@ function chunksOverlap( a, b ) {
 	var aEnd = a.start + a.len;
 	var bEnd = b.start + b.len;
 
-	console.log('    overlap? ' + [a.start, a.len].join(',') + ' ' + [b.start, b.len].join(','));
+	console.log( '    overlap? ' + [ a.start, a.len ].join( ',' ) + ' ' + [ b.start, b.len ].join( ',' ) );
 
 	if ( ( a.start >= b.start && a.start <= bEnd ) ||
-		 ( aEnd >= b.start && aEnd <= bEnd ) ||
-	     ( a.start < b.start && aEnd > bEnd ) ) {
+		( aEnd >= b.start && aEnd <= bEnd ) ||
+		( a.start < b.start && aEnd > bEnd ) ) {
 
 		return true;
 
@@ -57,6 +57,7 @@ function DiffReader( diffOutput, options ) {
 	this.options = options || {};
 
 }
+
 util.inherits( DiffReader, EventEmitter );
 
 DiffReader.prototype.read = function() {
@@ -74,7 +75,7 @@ DiffReader.prototype.read = function() {
 
 				var fileName = line.split( ' ' )[ 3 ];
 				fileName = fileName.replace( /^[ab]\//, '' );
-				self.emit( 'file', fileName ) ;
+				self.emit( 'file', fileName );
 
 			} else if ( /^@@.*@@/.test( line ) ) {
 
@@ -85,8 +86,10 @@ DiffReader.prototype.read = function() {
 				var lineNums = newChunk.split( ',' );
 
 				// single line chunks don't have length value
-				if (lineNums.length === 1) {
-					lineNums[1] = 0;
+				if ( lineNums.length === 1 ) {
+
+					lineNums[ 1 ] = 0;
+
 				}
 
 				var chunk = { start: lineNums[ 0 ], len: lineNums[ 1 ] };
@@ -305,7 +308,7 @@ FeatureFormatter.prototype = {
 				// run git diff
 				// filter diff output to only include chunks modified by feature
 				exec(
-					'git --no-pager diff --unified=0',
+					'git --no-pager diff --unified=1',
 					execOptions,
 					function( err, stdout, stderr ) {
 
@@ -328,7 +331,7 @@ FeatureFormatter.prototype = {
 
 									curFile = filePath;
 									curFileChunks = changes[ curFile ];
-									console.log('Considering: ' + curFile);
+									console.log( 'Considering: ' + curFile );
 
 								} else {
 
@@ -347,18 +350,18 @@ FeatureFormatter.prototype = {
 										if ( chunksOverlap( chunk, curFileChunks[ i ] ) ) {
 
 											includeChunk = true;
-											console.log('  including: ' + chunk.start + ',' + chunk.len);
+											console.log( '  including: ' + chunk.start + ',' + chunk.len );
 											return;
 
 										}
 
 									}
-									console.log('  discarding: ' + chunk.start + ',' + chunk.len);
+									console.log( '  discarding: ' + chunk.start + ',' + chunk.len );
 									includeChunk = false;
 
 								} else {
 
-									console.log('  discarding: ' + chunk.start + ',' + chunk.len);
+									console.log( '  discarding: ' + chunk.start + ',' + chunk.len );
 									includeChunk = false;
 
 								}
@@ -369,17 +372,21 @@ FeatureFormatter.prototype = {
 								// ensure header lines for files are always kept
 								if ( /^(diff|index|---|\+\+\+)/.test( line ) ) {
 
-									curFileHeader.push(line);
+									curFileHeader.push( line );
 
 								} else if ( curFile && includeChunk ) {
 
 									// we only add the header for a file when we know
 									// we will be including chunks from that file
-									if ( !hasAddedHeader ) {
-										curFileHeader.forEach(function ( headerLine ) {
-											filteredDiff.push(headerLine);
-										})
+									if ( ! hasAddedHeader ) {
+
+										curFileHeader.forEach( function( headerLine ) {
+
+											filteredDiff.push( headerLine );
+
+										} );
 										hasAddedHeader = true;
+
 									}
 									filteredDiff.push( line );
 
@@ -461,8 +468,8 @@ FeatureFormatter.prototype = {
 			this.determineFeatureModifiedFilesAndLines.bind( this ),
 			this.runFormatter.bind( this ),
 			this.generateFilteredPatch.bind( this ),
-			//this.resetChanges.bind( this ),
-			//this.applyPatch.bind( this )
+		// this.resetChanges.bind( this ),
+		// this.applyPatch.bind( this )
 		], done );
 
 	}
