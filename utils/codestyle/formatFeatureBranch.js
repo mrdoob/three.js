@@ -429,7 +429,7 @@ FeatureFormatter.prototype = {
 			function( err, stdout, stderr ) {
 
 				if ( err || stderr.trim() ) {
-
+0
 					return done( err || stderr.trim() );
 
 				}
@@ -454,9 +454,7 @@ FeatureFormatter.prototype = {
 
 				}
 
-				// TODO: cleanup file
-				done();
-				// fs.unlink( path.resolve( BASE_DIR, DIFF_FILENAME ), done );
+				fs.unlink( path.resolve( BASE_DIR, DIFF_FILENAME ), done );
 
 			} );
 
