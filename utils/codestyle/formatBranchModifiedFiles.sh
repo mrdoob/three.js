@@ -40,3 +40,11 @@ echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     git commit -m "formatBranchModifiedFiles script run on modified files"
 fi
+
+echo ""
+echo "View staged changes with:"
+echo "  ~$ git diff --cached"
+echo "View unstaged changes with:"
+echo "  ~$ git diff"
+echo ""
+
