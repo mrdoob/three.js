@@ -4,6 +4,9 @@
 var exec = require( 'child_process' ).exec;
 var async = require( 'async' );
 var path = require( 'path' );
+var fs = require( 'fs' );
+var util = require( 'util' );
+var EventEmitter = require( 'events' );
 
 var ArgumentParser = require( 'argparse' ).ArgumentParser;
 var cli = new ArgumentParser( {
@@ -16,6 +19,63 @@ var SCRIPT_DIR = __dirname;
 var BASE_DIR = path.resolve( SCRIPT_DIR, '../../' );
 
 var execOptions = { cwd: BASE_DIR, shell: '/bin/bash' };
+
+// call chunks overlapping if either endpoint of one lies within the other
+function chunksOverlap(a, b) {
+	if ( ( a.start > b.start && a.start < b.end ) ||
+	     ( a.end > b.start && a.end < b.end ) ) {
+		return true;
+	}
+	return false;
+}
+
+function DiffReader( diffOutput, options ) {
+	EventEmitter.call( this );
+	this.lines = diffOutput.split('\n');
+
+	this.options = options || {};
+}
+util.inherits(DiffReader, EventEmitter);
+
+DiffReader.prototype.read = function() {
+
+	var self = this;
+
+	// ensure read method returns immediately
+	process.nextTick( function() {
+
+		var curFile = null;
+
+		self.lines.forEach( function( line ) {
+
+			if ( /^diff/.test( line ) ) {
+
+				var fileName = line.split( ' ' )[ 3 ];
+				fileName = fileName.replace( /^[ab]\//, '' );
+				self.emit( 'file', fileName ) ;
+
+			} else if ( /^@@.*@@/.test( line ) ) {
+
+				var tokens = line.split( ' ' );
+
+				// remove leading '+' from line num pair
+				var newChunk = tokens[ 2 ].substring( 1 );
+				var lineNums = newChunk.split( ',' );
+				var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
+
+				self.emit( 'chunk', chunk );
+
+			}
+
+			// After emitting parse state events, emit line to be processed
+			self.emit('line', line)
+
+		} );
+
+		self.emit('end');
+
+	} );
+}
 
 // Use a class so we can store intermediate data in `this`
 function FeatureFormatter( args ) {
@@ -108,72 +168,53 @@ FeatureFormatter.prototype = {
 				var result = {};
 				var curFile = null;
 
-				stdout.split( '\n' ).filter( function( line ) {
+				var diffReader = new DiffReader( stdout )
+					.on( 'file', function( filePath ) {
 
-					return /^(diff|index|---|\+\+\+|@@)/.test( line );
+						if ( /\.js$/.test(filePath) ) {
 
-				}
-
-				).forEach( function( line ) {
-
-					if ( /^\+\+\+/.test( line ) ) {
-
-						if ( /\.js$/.test( line ) ) {
-
-							curFile = line.split( ' ' )[ 1 ];
-							if ( ! ( curFile in result ) ) {
-
-								console.log( '  file diff: ' + curFile );
-								result[ curFile ] = [];
-
-							}
+							console.log('file: ' + filePath);
+							curFile = filePath;
+							result[curFile] = [];
 
 						} else {
 
-							// skip this file
 							curFile = null;
 
 						}
 
-					} else if ( /^@@.*@@$/.test( line ) ) {
+					} )
+					.on( 'chunk', function( chunk ) {
 
 						if ( curFile ) {
 
-							var tokens = line.split( ' ' );
-
-							// remove leading '+' from line num pair
-							var newChunk = tokens[ 2 ].substring( 1 );
-
-							var lineNums = newChunk.split( ',' );
-
-							var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
+							console.log('  ' + chunk.start + ',' + chunk.end );
 							result[ curFile ].push( chunk );
 
 						}
 
-					}
+					} )
+					.on( 'end', function() {
 
-				}
+						console.log( "modified files/lines" );
 
-				);
+						for ( var file in result ) {
 
-				console.log( "modified files/lines" );
-				console.log( JSON.stringify( result, null, 2 ) );
-				for ( var file in result ) {
+							console.log( file );
+							result[ file ].forEach( function( chunk ) {
 
-					console.log( file );
-					result[ file ].forEach( function( chunk ) {
+								console.log( '  ' + chunk.start + ',' + chunk.end );
 
-						console.log( '  ' + chunk.start + ',' + chunk.end );
+							} );
 
-					}
+						}
 
-					);
+						self.featuredModifiedLines = result;
+						return done( null, result );
 
-				}
-
-				self.featuredModifiedLines = result;
-				return done( null, result );
+					})
+					.on( 'error', done )
+					.read();
 
 			}
 
@@ -231,11 +272,97 @@ FeatureFormatter.prototype = {
 
 		console.log( 'Generating patch of selected formatting changes...' );
 
+		var self = this;
+		var changes = this.featuredModifiedLines;
+
+		async.seq(
+			function(_, cb) {
+
+				// run git diff
+				// filter diff output to only include chunks modified by feature
+				exec(
+					'git --no-pager diff',
+					execOptions,
+					function( err, stdout, stderr ) {
+
+						var curFile,
+							curFileChunks = [],
+							includeChunk = false;
+
+						var filteredDiff = [];
+
+						var diffReader = new DiffReader( stdout );
+						diffReader
+							.on('file', function( filePath ) {
+
+								if ( filePath in changes ) {
+
+									curFile = filePath;
+									curFileChunks = changes[ curFile ];
+
+								} else {
+
+									curFile = null;
+
+								}
+
+							} )
+							.on( 'chunk', function( chunk ) {
+								if ( curFile ) {
+									for ( var i = 0; i < curFileChunks.length; i ++ ) {
+										if (chunksOverlap( chunk, curFileChunks[i] )) {
+											includeChunk = true;
+											return;
+										}
+									}
+									includeChunk = false;
+								} else {
+									includeChunk = false;
+								}
+							} )
+							.on( 'line', function( line ) {
+
+								if (curFile && includeChunk) {
+
+									filteredDiff.push( line );
+
+								}
+
+							} )
+							.on( 'error', done )
+							.on( 'end', function() {
+								cb( null, filteredDiff.join('\n') );
+							} )
+							.read();
+					}
+				);
+			},
+			function(filteredDiff, cb) {
+
+				// save to file
+				fs.writeFile(
+					path.resolve(BASE_DIR, 'formatting.diff'),
+					filteredDiff, { encoding: 'utf8' }, cb );
+
+			}
+		)(null, done);
+
 	},
 
 	resetChanges: function( done ) {
 
 		console.log( 'Reverting changes made by formatter...' );
+
+		exec(
+			'git checkout -- .',
+			execOptions,
+			function( err, stdout, stderr ) {
+				if ( err || stderr.trim() ) {
+					return done ( err || stderr.trim() );
+				}
+				done();
+			}
+		);
 
 	},
 
@@ -248,8 +375,8 @@ FeatureFormatter.prototype = {
 			this.determineCurrentBranch.bind( this ),
 			this.determineFeatureModifiedFilesAndLines.bind( this ),
 			this.runFormatter.bind( this ),
-		// this.generateFilteredPatch.bind( this ),
-		// this.resetChanges.bind( this ),
+			this.generateFilteredPatch.bind( this ),
+			this.resetChanges.bind( this ),
 		// this.applyPatch.bind( this )
 		], done );
 
