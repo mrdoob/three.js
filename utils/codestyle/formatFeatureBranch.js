@@ -252,9 +252,11 @@ FeatureFormatter.prototype = {
 			// strip leading 'a/' or 'b/' inserted by git from file path
 			file = file.replace( /^[ab]\//, '' );
 
-			console.log( '  ' + file );
+			var cmd = './utils/codestyle/codestyle.sh ' + file;
+			console.log( '  ' + cmd );
+
 			exec(
-				'./utils/codestyle/codestyle.sh ' + file,
+				cmd,
 				execOptions,
 				function( err, stdout, stderr ) {
 
