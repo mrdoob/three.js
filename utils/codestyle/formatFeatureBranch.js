@@ -378,7 +378,7 @@ FeatureFormatter.prototype = {
 							.on( 'line', function( line ) {
 
 								// ensure header lines for files are always kept
-								if ( /^(diff|index|---|\+\+\+)/.test( line ) ) {
+								if ( /^(diff|index|--- [ab]\/|\+\+\+ [ab]\/)/.test( line ) ) {
 
 									curFileHeader.push( line );
 
