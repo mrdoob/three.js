@@ -199,7 +199,8 @@ FeatureFormatter.prototype = {
 
 					if ( err || stderr.trim() ) {
 
-						console.log(stderr.trim())
+						console.log( stdout.trim() );
+						console.log( stderr.trim() );
 
 					}
 
