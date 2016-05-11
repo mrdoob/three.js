@@ -430,7 +430,9 @@ FeatureFormatter.prototype = {
 
 				}
 
-				fs.unlink( path.resolve( BASE_DIR, DIFF_FILENAME ), done );
+				// TODO: cleanup file
+				done();
+				// fs.unlink( path.resolve( BASE_DIR, DIFF_FILENAME ), done );
 
 			} );
 
