@@ -108,7 +108,8 @@ FeatureFormatter.prototype = {
 						curFile = line.split(' ')[1];
 						if ( ! ( curFile in result ) ) {
 
-							result[ curFile ] = {}
+							console.log('  file diff: ' + curFile);
+							result[ curFile ] = [];
 
 						}
 
@@ -119,7 +120,8 @@ FeatureFormatter.prototype = {
 
 						var lineNums = newChunk.split(',')
 
-						result[ curFile ].push( { start: lineNums[ 0 ], end: lineNums[ 1 ] } );
+						var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
+						result[ curFile ].push( chunk );
 
 					}
 
