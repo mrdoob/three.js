@@ -461,8 +461,8 @@ FeatureFormatter.prototype = {
 			this.determineFeatureModifiedFilesAndLines.bind( this ),
 			this.runFormatter.bind( this ),
 			this.generateFilteredPatch.bind( this ),
-			this.resetChanges.bind( this ),
-			this.applyPatch.bind( this )
+			//this.resetChanges.bind( this ),
+			//this.applyPatch.bind( this )
 		], done );
 
 	}
