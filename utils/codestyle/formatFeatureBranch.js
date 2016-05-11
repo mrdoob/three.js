@@ -5,24 +5,27 @@ var exec = require( 'child_process' ).exec;
 var async = require( 'async' );
 var path = require( 'path' );
 
-var ArgumentParser = require('argparse').ArgumentParser;
-var cli = new ArgumentParser({
+var ArgumentParser = require( 'argparse' ).ArgumentParser;
+var cli = new ArgumentParser( {
 	version: '0.0.1',
 	addHelp: true,
 	description: 'Run auto-formatter on lines that have changed between dev and the current branch'
-})
+} );
 
 var SCRIPT_DIR = __dirname;
-var BASE_DIR = path.resolve(SCRIPT_DIR, '../../');
+var BASE_DIR = path.resolve( SCRIPT_DIR, '../../' );
 
 // Use a class so we can store intermediate data in `this`
-function FeatureFormatter(args) {
-	this.args = args
+function FeatureFormatter( args ) {
+
+	this.args = args;
+
 }
+
 FeatureFormatter.prototype = {
 	constructor: FeatureFormatter,
 
-	confirmNoUncomittedChanges: function ( done ) {
+	confirmNoUncomittedChanges: function( done ) {
 
 		console.log( 'Confirming you have no uncommitted changes...' );
 
@@ -30,8 +33,6 @@ FeatureFormatter.prototype = {
 			'git status -s | grep --no-messages -E "^[^?]{2}" --color=never',
 			{ cwd: BASE_DIR },
 			function( err, stdout, stderr ) {
-
-				console.log(stdout)
 
 				if ( err ) {
 
@@ -50,11 +51,13 @@ FeatureFormatter.prototype = {
 
 				done();
 
-			} );
+			}
+
+		);
 
 	},
 
-	determineCurrentBranch: function ( done ) {
+	determineCurrentBranch: function( done ) {
 
 		console.log( 'Getting current branch name...' );
 
@@ -63,17 +66,22 @@ FeatureFormatter.prototype = {
 			'git rev-parse --abbrev-ref HEAD',
 			{ cwd: BASE_DIR },
 			function( err, stdout, stderr ) {
+
 				if ( err || stderr.trim() ) {
 
-					return done( err || stderr.trim() )
+					return done( err || stderr.trim() );
+
 				}
 
-				self.featureBranchName = stdout.trim()
+				self.featureBranchName = stdout.trim();
 				console.log( 'Current branch: ' + self.featureBranchName );
 
 				return done( null, self.featureBranchName );
+
 			}
-		)
+
+		);
+
 	},
 
 	// generates object representing changed files and line numbers
@@ -86,7 +94,7 @@ FeatureFormatter.prototype = {
 		var self = this;
 		exec(
 			'git --no-pager diff dev..' + this.featureBranchName,
-			{ cwd: BASE_DIR },
+			{ cwd: BASE_DIR, shell: '/bin/bash' },
 			function( err, stdout, stderr ) {
 
 				if ( err || stderr.trim() ) {
@@ -98,27 +106,31 @@ FeatureFormatter.prototype = {
 				var result = {};
 				var curFile = null;
 
-				stdout.split('\n').filter( function( line ) {
+				stdout.split( '\n' ).filter( function( line ) {
 
-					return /^(diff|index|---|\+\+\+|@@)/.test(line);
+					return /^(diff|index|---|\+\+\+|@@)/.test( line );
 
-				} ).forEach( function( line ) {
+				}
+
+				).forEach( function( line ) {
 
 					if ( /^\+\+\+/.test( line ) ) {
 
 						if ( /\.js$/.test( line ) ) {
 
-							curFile = line.split(' ')[1];
+							curFile = line.split( ' ' )[ 1 ];
 							if ( ! ( curFile in result ) ) {
 
-								console.log('  file diff: ' + curFile);
+								console.log( '  file diff: ' + curFile );
 								result[ curFile ] = [];
 
 							}
 
 						} else {
+
 							// skip this file
 							curFile = null;
+
 						}
 
 					} else if ( /^@@.*@@$/.test( line ) ) {
@@ -128,30 +140,41 @@ FeatureFormatter.prototype = {
 							var tokens = line.split( ' ' );
 
 							// remove leading '+' from line num pair
-							var newChunk = tokens[ 2 ].substring(1);
+							var newChunk = tokens[ 2 ].substring( 1 );
 
-							var lineNums = newChunk.split(',')
+							var lineNums = newChunk.split( ',' );
 
 							var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
 							result[ curFile ].push( chunk );
 
 						}
+
 					}
 
-				} );
+				}
 
-				console.log("modified files/lines");
-				console.log(JSON.stringify(result, null, 2));
+				);
+
+				console.log( "modified files/lines" );
+				console.log( JSON.stringify( result, null, 2 ) );
 				for ( var file in result ) {
+
 					console.log( file );
-					result[ file ].forEach( function ( chunk ) {
+					result[ file ].forEach( function( chunk ) {
+
 						console.log( '  ' + chunk.start + ',' + chunk.end );
-					} )
+
+					}
+
+					);
+
 				}
 
 				self.featuredModifiedLines = result;
-				return done( null, result )
+				return done( null, result );
+
 			}
+
 		);
 
 	},
@@ -163,36 +186,39 @@ FeatureFormatter.prototype = {
 		var files = Object.keys( this.featuredModifiedLines );
 		async.each( files, function( file, cb ) {
 
-			// strip leading 'a/' or 'b/' inserted by git from file path
-			file = file.replace(/^[ab]\//, '');
+				// strip leading 'a/' or 'b/' inserted by git from file path
+				file = file.replace( /^[ab]\//, '' );
 
-			console.log( '  ' + file );
-			exec(
-				'./utils/codestyle/codestyle.sh ' + file,
-				{ cwd: BASE_DIR },
-				function( err, stdout, stderr ) {
+				console.log( '  ' + file );
+				exec(
+					'./utils/codestyle/codestyle.sh ' + file,
+					{ cwd: BASE_DIR },
+					function( err, stdout, stderr ) {
 
-					if ( err || stdout.trim() ) {
+						if ( err || stdout.trim() ) {
 
-						return cb( err || stdout.trim() );
+							return cb( err || stdout.trim() );
+
+						}
+
+						return cb();
 
 					}
 
-					return cb();
+				);
+
+			}, function( err ) {
+
+				if ( err ) {
+
+					return done( err );
 
 				}
-			);
-
-		}, function( err ) {
-
-			if ( err ) {
-
-				return done ( err );
+				done();
 
 			}
-			done();
 
-		} );
+		);
 
 	},
 
@@ -202,15 +228,13 @@ FeatureFormatter.prototype = {
 
 	},
 
-	resetChanges: function ( done ) {
+	resetChanges: function( done ) {
 
 		console.log( 'Reverting changes made by formatter...' );
 
 	},
 
-	applyPatch: function( done ) {
-
-	},
+	applyPatch: function( done ) {},
 
 	formatFeatureBranch: function( done ) {
 
@@ -219,14 +243,13 @@ FeatureFormatter.prototype = {
 			this.determineCurrentBranch.bind( this ),
 			this.determineFeatureModifiedFilesAndLines.bind( this ),
 			this.runFormatter.bind( this ),
-			// this.generateFilteredPatch.bind( this ),
-			// this.resetChanges.bind( this ),
-			// this.applyPatch.bind( this )
+		// this.generateFilteredPatch.bind( this ),
+		// this.resetChanges.bind( this ),
+		// this.applyPatch.bind( this )
 		], done );
 
 	}
-
-}
+};
 
 if ( require.main === module ) {
 
@@ -234,6 +257,7 @@ if ( require.main === module ) {
 	var formatter = new FeatureFormatter( args );
 
 	formatter.formatFeatureBranch( function( err, result ) {
+
 		if ( err ) {
 
 			console.log( 'ERROR' );
@@ -244,6 +268,7 @@ if ( require.main === module ) {
 			console.log( '\nDone' );
 
 		}
+
 	} );
 
 }
