@@ -65,7 +65,7 @@ FeatureFormatter.prototype = {
 		console.log( 'Confirming you have no uncommitted changes...' );
 
 		exec(
-			'git status -s | grep -E "^[^?]{2}" --color=never',
+			'git status -s | grep --no-messages -E "^[^?]{2}" --color=never',
 			{ cwd: BASE_DIR },
 			function( err, stdout, stderr ) {
 
