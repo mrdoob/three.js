@@ -86,7 +86,7 @@ DiffReader.prototype.read = function() {
 
 				// single line chunks don't have length value
 				if (lineNums.length === 1) {
-					lineNums[1] = 1;
+					lineNums[1] = 0;
 				}
 
 				var chunk = { start: lineNums[ 0 ], len: lineNums[ 1 ] };
