@@ -299,7 +299,7 @@ FeatureFormatter.prototype = {
 				// run git diff
 				// filter diff output to only include chunks modified by feature
 				exec(
-					'git --no-pager diff',
+					'git --no-pager diff --unified=0',
 					execOptions,
 					function( err, stdout, stderr ) {
 
