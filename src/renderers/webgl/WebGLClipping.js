@@ -90,62 +90,63 @@ THREE.WebGLClipping = function() {
 
 	};
 
-	var resetGlobalState = function() {
+	function resetGlobalState() {
 
-			if ( uniform.value !== globalState ) {
+		if ( uniform.value !== globalState ) {
 
-				uniform.value = globalState;
-				uniform.needsUpdate = numGlobalPlanes > 0;
+			uniform.value = globalState;
+			uniform.needsUpdate = numGlobalPlanes > 0;
 
-			}
+		}
 
-			scope.numPlanes = numGlobalPlanes;
+		scope.numPlanes = numGlobalPlanes;
 
-		},
+	}
 
-		projectPlanes = function( planes, camera, dstOffset, skipTransform ) {
+	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
-			var nPlanes = planes !== null ? planes.length : 0,
-				dstArray = null;
+		var nPlanes = planes !== null ? planes.length : 0,
+			dstArray = null;
 
-			if ( nPlanes !== 0 ) {
+		if ( nPlanes !== 0 ) {
 
-				dstArray = uniform.value;
+			dstArray = uniform.value;
 
-				if ( skipTransform !== true || dstArray === null ) {
+			if ( skipTransform !== true || dstArray === null ) {
 
-					var flatSize = dstOffset + nPlanes * 4,
-						viewMatrix = camera.matrixWorldInverse;
+				var flatSize = dstOffset + nPlanes * 4,
+					viewMatrix = camera.matrixWorldInverse;
 
-					viewNormalMatrix.getNormalMatrix( viewMatrix );
+				viewNormalMatrix.getNormalMatrix( viewMatrix );
 
-					if ( dstArray === null || dstArray.length < flatSize ) {
+				if ( dstArray === null || dstArray.length < flatSize ) {
 
-						dstArray = new Float32Array( flatSize );
-
-					}
-
-					for ( var i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
-
-						plane.copy( planes[ i ] ).
-								applyMatrix4( viewMatrix, viewNormalMatrix );
-
-						plane.normal.toArray( dstArray, i4 );
-						dstArray[ i4 + 3 ] = plane.constant;
-
-					}
+					dstArray = new Float32Array( flatSize );
 
 				}
 
-				uniform.value = dstArray;
-				uniform.needsUpdate = true;
+				for ( var i = 0, i4 = dstOffset;
+									i !== nPlanes; ++ i, i4 += 4 ) {
+
+					plane.copy( planes[ i ] ).
+							applyMatrix4( viewMatrix, viewNormalMatrix );
+
+					plane.normal.toArray( dstArray, i4 );
+					dstArray[ i4 + 3 ] = plane.constant;
+
+				}
 
 			}
 
-			scope.numPlanes = nPlanes;
-			return dstArray;
+			uniform.value = dstArray;
+			uniform.needsUpdate = true;
 
-		};
+		}
+
+		scope.numPlanes = nPlanes;
+		return dstArray;
+
+	}
 
 };
 
