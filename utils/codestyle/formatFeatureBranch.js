@@ -105,26 +105,36 @@ FeatureFormatter.prototype = {
 
 					console.log( "l:  " + line );
 
-					if ( /^\+\+\+.*\.js$/.test( line ) ) {
+					if ( /^\+\+\+/.test( line ) ) {
 
-						curFile = line.split(' ')[1];
-						if ( ! ( curFile in result ) ) {
+						if ( /\.js$/.test( line ) ) {
 
-							console.log('  file diff: ' + curFile);
-							result[ curFile ] = [];
+							curFile = line.split(' ')[1];
+							if ( ! ( curFile in result ) ) {
 
+								console.log('  file diff: ' + curFile);
+								result[ curFile ] = [];
+
+							}
+
+						} else {
+							// skip this file
+							curFile = null;
 						}
 
 					} else if ( /^@@.*@@$/.test( line ) ) {
 
-						var tokens = line.split( ' ' );
-						var newChunk = tokens[ 2 ];
+						if ( curFile ) {
 
-						var lineNums = newChunk.split(',')
+							var tokens = line.split( ' ' );
+							var newChunk = tokens[ 2 ];
 
-						var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
-						result[ curFile ].push( chunk );
+							var lineNums = newChunk.split(',')
 
+							var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
+							result[ curFile ].push( chunk );
+
+						}
 					}
 
 				} );
