@@ -163,6 +163,10 @@ FeatureFormatter.prototype = {
 		var files = Object.keys( this.featuredModifiedLines );
 		async.each( files, function( file, cb ) {
 
+			// strip leading 'a/' or 'b/' inserted by git from file path
+			file = file.replace(/^[ab]\//, '');
+
+			console.log( '  ' + file );
 			exec(
 				'./utils/codestyle/codestyle.sh ' + file,
 				{ cwd: BASE_DIR },
