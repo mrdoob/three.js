@@ -322,7 +322,10 @@ FeatureFormatter.prototype = {
 							} )
 							.on( 'line', function( line ) {
 
-								if (curFile && includeChunk) {
+								// ensure header lines for files are always kept
+								if ( /^(diff|index|---|\+\+\+)/.test(line) ) {
+									filteredDiff.push( line );
+								} else if (curFile && includeChunk) {
 
 									filteredDiff.push( line );
 
