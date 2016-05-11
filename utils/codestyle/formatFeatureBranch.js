@@ -28,7 +28,7 @@ function chunksOverlap( a, b ) {
 	var bEnd = b.start + b.len;
 
 	if ( ( a.start > b.start && a.start < bEnd ) ||
-		( aEnd > b.start && a.end < bEnd ) ) {
+		( aEnd > b.start && aEnd < bEnd ) ) {
 
 		return true;
 
@@ -220,7 +220,7 @@ FeatureFormatter.prototype = {
 							console.log( file );
 							result[ file ].forEach( function( chunk ) {
 
-								console.log( '  ' + chunk.start + ',' + chunk.end );
+								console.log( '  ' + chunk.start + ',' + chunk.len );
 
 							} );
 
