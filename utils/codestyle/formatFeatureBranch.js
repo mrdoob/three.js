@@ -99,9 +99,10 @@ FeatureFormatter.prototype = {
 			execOptions,
 			function( err, stdout, stderr ) {
 
+				// formatter will complain if some style errors are not addressed
 				if ( err || stderr.trim() ) {
 
-					return done( err || stderr.trim() );
+					console.log( stderr.trim() );
 
 				}
 
@@ -209,7 +210,9 @@ FeatureFormatter.prototype = {
 
 			);
 
-		}, function( err ) {
+		}
+
+			, function( err ) {
 
 				if ( err ) {
 
@@ -271,7 +274,9 @@ if ( require.main === module ) {
 
 		}
 
-	});
+	}
+
+	);
 
 }
 
