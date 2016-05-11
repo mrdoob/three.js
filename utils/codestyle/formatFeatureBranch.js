@@ -144,7 +144,7 @@ FeatureFormatter.prototype = {
 				for ( var file in result ) {
 					console.log( file );
 					result[ file ].forEach( function ( chunk ) {
-						console.log( chunk.start + ',' + chunk.end );
+						console.log( '  ' + chunk.start + ',' + chunk.end );
 					} )
 				}
 
