@@ -330,7 +330,7 @@ FeatureFormatter.prototype = {
 								if ( filteredDiff[ filteredDiff.length - 1 ] !== '' ) {
 
 									// ensure newline between every file in diff output
-									filteredDiff.push( '' );
+									curFileHeader.push( '' );
 
 								}
 								hasAddedHeader = false;
