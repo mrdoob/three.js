@@ -31,6 +31,7 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "argparse": "^1.0.3",
+    "async": "^1.5.2",
     "esformatter": "^0.9.3",
     "esformatter-eol-last": "^1.0.0",
     "esformatter-limit-linebreaks": "0.0.3",
