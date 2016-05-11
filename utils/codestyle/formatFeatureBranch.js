@@ -73,7 +73,8 @@ FeatureFormatter.prototype = {
 
 				if ( err ) {
 
-					return done( new Error( 'error with git status: ' + err ) );
+					// grep returns error code if no matches found
+					return done();
 
 				} else if ( stderr.trim() ) {
 
@@ -84,7 +85,9 @@ FeatureFormatter.prototype = {
 					return done( new Error( 'you have uncommitted changes\n' + stdout.trim() ) );
 
 				}
+
 				done();
+
 			} );
 
 	},
