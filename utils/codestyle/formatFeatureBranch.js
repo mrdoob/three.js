@@ -17,6 +17,7 @@ var cli = new ArgumentParser( {
 
 var SCRIPT_DIR = __dirname;
 var BASE_DIR = path.resolve( SCRIPT_DIR, '../../' );
+var DIFF_FILENAME = 'formatting.diff';
 
 var execOptions = { cwd: BASE_DIR, shell: '/bin/bash' };
 
@@ -344,7 +345,7 @@ FeatureFormatter.prototype = {
 
 				// save to file
 				fs.writeFile(
-					path.resolve(BASE_DIR, 'formatting.diff'),
+					path.resolve(BASE_DIR, DIFF_FILENAME),
 					filteredDiff, { encoding: 'utf8' }, cb );
 
 			}
@@ -369,7 +370,21 @@ FeatureFormatter.prototype = {
 
 	},
 
-	applyPatch: function( done ) {},
+	applyPatch: function( done ) {
+
+		exec(
+			'git apply ' + DIFF_FILENAME,
+			execOptions,
+			function( err, stdout, stderr ) {
+				if ( err || stderr.trim() ) {
+					return done( err || stderr.trim() );
+				}
+
+				fs.unlink(path.resolve(BASE_DIR, DIFF_FILENAME), done);
+			}
+		);
+
+	},
 
 	formatFeatureBranch: function( done ) {
 
@@ -380,7 +395,7 @@ FeatureFormatter.prototype = {
 			this.runFormatter.bind( this ),
 			this.generateFilteredPatch.bind( this ),
 			this.resetChanges.bind( this ),
-		// this.applyPatch.bind( this )
+			this.applyPatch.bind( this )
 		], done );
 
 	}
