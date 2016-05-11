@@ -372,6 +372,8 @@ FeatureFormatter.prototype = {
 
 	applyPatch: function( done ) {
 
+		console.log('Applying filtered patch to format only modified lines...');
+
 		exec(
 			'git apply ' + DIFF_FILENAME,
 			execOptions,
