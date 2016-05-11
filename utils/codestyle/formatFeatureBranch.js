@@ -92,7 +92,9 @@ DiffReader.prototype.read = function() {
 
 				}
 
-				var chunk = { start: lineNums[ 0 ], len: lineNums[ 1 ] };
+				var chunk = {
+					start: parseInt( lineNums[ 0 ], 10 ),
+					len: parseInt( lineNums[ 1 ], 10 ) };
 
 				self.emit( 'chunk', chunk );
 
