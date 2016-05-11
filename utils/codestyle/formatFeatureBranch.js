@@ -15,6 +15,8 @@ var cli = new ArgumentParser( {
 var SCRIPT_DIR = __dirname;
 var BASE_DIR = path.resolve( SCRIPT_DIR, '../../' );
 
+var execOptions = { cwd: BASE_DIR, shell: '/bin/bash' };
+
 // Use a class so we can store intermediate data in `this`
 function FeatureFormatter( args ) {
 
@@ -31,7 +33,7 @@ FeatureFormatter.prototype = {
 
 		exec(
 			'git status -s | grep --no-messages -E "^[^?]{2}" --color=never',
-			{ cwd: BASE_DIR },
+			execOptions,
 			function( err, stdout, stderr ) {
 
 				if ( err ) {
@@ -64,7 +66,7 @@ FeatureFormatter.prototype = {
 		var self = this;
 		exec(
 			'git rev-parse --abbrev-ref HEAD',
-			{ cwd: BASE_DIR },
+			execOptions,
 			function( err, stdout, stderr ) {
 
 				if ( err || stderr.trim() ) {
@@ -94,7 +96,7 @@ FeatureFormatter.prototype = {
 		var self = this;
 		exec(
 			'git --no-pager diff dev..' + this.featureBranchName,
-			{ cwd: BASE_DIR, shell: '/bin/bash' },
+			execOptions,
 			function( err, stdout, stderr ) {
 
 				if ( err || stderr.trim() ) {
@@ -186,28 +188,28 @@ FeatureFormatter.prototype = {
 		var files = Object.keys( this.featuredModifiedLines );
 		async.each( files, function( file, cb ) {
 
-				// strip leading 'a/' or 'b/' inserted by git from file path
-				file = file.replace( /^[ab]\//, '' );
+			// strip leading 'a/' or 'b/' inserted by git from file path
+			file = file.replace( /^[ab]\//, '' );
 
-				console.log( '  ' + file );
-				exec(
-					'./utils/codestyle/codestyle.sh ' + file,
-					{ cwd: BASE_DIR },
-					function( err, stdout, stderr ) {
+			console.log( '  ' + file );
+			exec(
+				'./utils/codestyle/codestyle.sh ' + file,
+				execOptions,
+				function( err, stdout, stderr ) {
 
-						if ( err || stdout.trim() ) {
+					if ( err || stdout.trim() ) {
 
-							return cb( err || stdout.trim() );
-
-						}
-
-						return cb();
+						return cb( err || stdout.trim() );
 
 					}
 
-				);
+					return cb();
 
-			}, function( err ) {
+				}
+
+			);
+
+		}, function( err ) {
 
 				if ( err ) {
 
@@ -269,7 +271,7 @@ if ( require.main === module ) {
 
 		}
 
-	} );
+	});
 
 }
 
