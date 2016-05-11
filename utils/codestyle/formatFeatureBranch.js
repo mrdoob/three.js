@@ -24,8 +24,11 @@ var execOptions = { cwd: BASE_DIR, shell: '/bin/bash' };
 // call chunks overlapping if either endpoint of one lies within the other
 function chunksOverlap( a, b ) {
 
-	if ( ( a.start > b.start && a.start < b.end ) ||
-		( a.end > b.start && a.end < b.end ) ) {
+	var aEnd = a.start + a.len;
+	var bEnd = b.start + b.len;
+
+	if ( ( a.start > b.start && a.start < bEnd ) ||
+		( aEnd > b.start && a.end < bEnd ) ) {
 
 		return true;
 
@@ -77,7 +80,7 @@ DiffReader.prototype.read = function() {
 				// remove leading '+' from line num pair
 				var newChunk = tokens[ 2 ].substring( 1 );
 				var lineNums = newChunk.split( ',' );
-				var chunk = { start: lineNums[ 0 ], end: lineNums[ 1 ] };
+				var chunk = { start: lineNums[ 0 ], len: lineNums[ 1 ] };
 
 				self.emit( 'chunk', chunk );
 
@@ -189,7 +192,6 @@ FeatureFormatter.prototype = {
 
 						if ( /\.js$/.test( filePath ) ) {
 
-							console.log( 'file: ' + filePath );
 							curFile = filePath;
 							result[ curFile ] = [];
 
@@ -204,7 +206,6 @@ FeatureFormatter.prototype = {
 
 						if ( curFile ) {
 
-							console.log( '  ' + chunk.start + ',' + chunk.end );
 							result[ curFile ].push( chunk );
 
 						}
@@ -299,6 +300,8 @@ FeatureFormatter.prototype = {
 
 						var curFile,
 							curFileChunks = [],
+							curFileHeader = [],
+							hasAddedHeader = false,
 							includeChunk = false;
 
 						var filteredDiff = [];
@@ -306,6 +309,9 @@ FeatureFormatter.prototype = {
 						var diffReader = new DiffReader( stdout );
 						diffReader
 							.on( 'file', function( filePath ) {
+
+								curFileHeader = [];
+								hasAddedHeader = false;
 
 								if ( filePath in changes ) {
 
@@ -315,6 +321,7 @@ FeatureFormatter.prototype = {
 								} else {
 
 									curFile = null;
+									curFileChunks = null;
 
 								}
 
@@ -347,10 +354,18 @@ FeatureFormatter.prototype = {
 								// ensure header lines for files are always kept
 								if ( /^(diff|index|---|\+\+\+)/.test( line ) ) {
 
-									filteredDiff.push( line );
+									curFileHeader.push(line);
 
 								} else if ( curFile && includeChunk ) {
 
+									// we only add the header for a file when we know
+									// we will be including chunks from that file
+									if ( !hasAddedHeader ) {
+										curFileHeader.forEach(function ( headerLine ) {
+											filteredDiff.push(headerLine);
+										})
+										hasAddedHeader = true;
+									}
 									filteredDiff.push( line );
 
 								}
