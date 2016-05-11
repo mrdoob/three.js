@@ -34,6 +34,15 @@ function chunksOverlap( a, b ) {
 
 }
 
+// DiffReader
+//
+// Utility class to scan the output from `git diff` and emit events
+// when certain lines are encountered.  Current events are:
+// - file (new file path encountered, returns filePath)
+// - chunk (new chunk encountered, returns start and end line nums of chunk)
+// - line (emitted for every line, always after "descriptor" events above, returns line)
+// - end (emitted when scanning is complete)
+// - error (on error)
 function DiffReader( diffOutput, options ) {
 
 	EventEmitter.call( this );
@@ -42,7 +51,6 @@ function DiffReader( diffOutput, options ) {
 	this.options = options || {};
 
 }
-
 util.inherits( DiffReader, EventEmitter );
 
 DiffReader.prototype.read = function() {
@@ -86,7 +94,10 @@ DiffReader.prototype.read = function() {
 
 };
 
-// Use a class so we can store intermediate data in `this`
+// FeatureFormatter
+//
+// Class to run formatter on lines of code that have been modified
+// between the current branch and `dev` (the main dev branch)
 function FeatureFormatter( args ) {
 
 	this.args = args;
@@ -258,14 +269,14 @@ FeatureFormatter.prototype = {
 
 		}, function( err ) {
 
-				if ( err ) {
+			if ( err ) {
 
-					return done( err );
+				return done( err );
 
-				}
-				done();
+			}
+			done();
 
-			} );
+		} );
 
 	},
 
@@ -434,7 +445,7 @@ if ( require.main === module ) {
 
 		if ( err ) {
 
-			console.log( 'ERROR' );
+			console.log( '\nERROR' );
 			console.log( err );
 
 		} else {
