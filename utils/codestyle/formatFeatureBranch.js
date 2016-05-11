@@ -317,6 +317,7 @@ FeatureFormatter.prototype = {
 
 									curFile = filePath;
 									curFileChunks = changes[ curFile ];
+									console.log('Considering: ' + curFile);
 
 								} else {
 
@@ -335,15 +336,18 @@ FeatureFormatter.prototype = {
 										if ( chunksOverlap( chunk, curFileChunks[ i ] ) ) {
 
 											includeChunk = true;
+											console.log('  including: ' + chunk.start + ',' + chunk.len);
 											return;
 
 										}
 
 									}
+									console.log('  discarding: ' + chunk.start + ',' + chunk.len);
 									includeChunk = false;
 
 								} else {
 
+									console.log('  discarding: ' + chunk.start + ',' + chunk.len);
 									includeChunk = false;
 
 								}
