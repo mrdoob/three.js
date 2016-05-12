@@ -49,6 +49,10 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentScissorTest = null;
 
+	var currentColorBuffer = true;
+	var currentDepthBuffer = true;
+	var currentStencilBuffer = true;
+
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
 	var currentTextureSlot = null;
@@ -337,6 +341,12 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.setDepthBuffer = function ( depthBuffer ) {
+
+		currentDepthBuffer = depthBuffer;
+
+	};
+
 	this.setDepthFunc = function ( depthFunc ) {
 
 		if ( currentDepthFunc !== depthFunc ) {
@@ -421,7 +431,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		// TODO: Rename to setDepthMask
 
-		if ( currentDepthWrite !== depthWrite ) {
+		if ( currentDepthWrite !== depthWrite && currentDepthBuffer ) {
 
 			gl.depthMask( depthWrite );
 			currentDepthWrite = depthWrite;
@@ -430,11 +440,17 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.setColorBuffer = function ( colorBuffer ) {
+
+		currentColorBuffer = colorBuffer;
+
+	};
+
 	this.setColorWrite = function ( colorWrite ) {
 
 		// TODO: Rename to setColorMask
 
-		if ( currentColorWrite !== colorWrite ) {
+		if ( currentColorWrite !== colorWrite && currentColorBuffer ) {
 
 			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
 			currentColorWrite = colorWrite;
@@ -493,12 +509,18 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		// TODO: Rename to setStencilMask
 
-		if ( currentStencilWrite !== stencilWrite ) {
+		if ( currentStencilWrite !== stencilWrite && currentStencilBuffer ) {
 
 			gl.stencilMask( stencilWrite );
 			currentStencilWrite = stencilWrite;
 
 		}
+
+	};
+
+	this.setStencilBuffer = function ( stencilBuffer ) {
+
+		currentStencilBuffer = stencilBuffer;
 
 	};
 

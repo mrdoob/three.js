@@ -32,6 +32,11 @@ THREE.MaskPass.prototype = {
 		state.setColorWrite( false );
 		state.setDepthWrite( false );
 
+		// save this buffer setting for all objects in the mask scene
+
+		state.setColorBuffer( false );
+		state.setDepthBuffer( false );
+
 		// set up stencil
 
 		var writeValue, clearValue;
@@ -58,10 +63,10 @@ THREE.MaskPass.prototype = {
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
-		// re-enable update of color and depth
+		// re-enable update of color and depth for subsequent rendering
 
-		state.setColorWrite( true );
-		state.setDepthWrite( true );
+		state.setColorBuffer( true );
+		state.setDepthBuffer( true );
 
 		// only render where stencil is set to 1
 
