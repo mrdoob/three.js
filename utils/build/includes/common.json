@@ -237,6 +237,7 @@
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
 	"src/renderers/webgl/WebGLBufferRenderer.js",
+	"src/renderers/webgl/WebGLClipping.js",
 	"src/renderers/webgl/WebGLIndexedBufferRenderer.js",
 	"src/renderers/webgl/WebGLExtensions.js",
 	"src/renderers/webgl/WebGLCapabilities.js",

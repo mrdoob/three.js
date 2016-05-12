@@ -123,21 +123,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// clipping
 
+	_clipping = new THREE.WebGLClipping(),
 	_clippingEnabled = false,
 	_localClippingEnabled = false,
-	_clipRenderingShadows = false,
 
-	_numClippingPlanes = 0,
-	_clippingPlanesUniform = {
-			type: '4fv', value: null, needsUpdate: false },
-
-	_globalClippingState = null,
-	_numGlobalClippingPlanes = 0,
-
-	_matrix3 = new THREE.Matrix3(),
 	_sphere = new THREE.Sphere(),
-	_plane = new THREE.Plane(),
-
 
 	// camera matrices cache
 
@@ -1214,7 +1204,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
-		setupGlobalClippingPlanes( this.clippingPlanes, camera );
+		_localClippingEnabled = this.localClippingEnabled;
+		_clippingEnabled = _clipping.init(
+				this.clippingPlanes, _localClippingEnabled, camera );
 
 		projectObject( scene, camera );
 
@@ -1231,12 +1223,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		if ( _clippingEnabled ) {
-
-			_clipRenderingShadows = true;
-			setupClippingPlanes( null );
-
-		}
+		if ( _clippingEnabled ) _clipping.beginShadows();
 
 		setupShadows( lights );
 
@@ -1244,12 +1231,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		setupLights( lights, camera );
 
-		if ( _clippingEnabled ) {
-
-			_clipRenderingShadows = false;
-			resetGlobalClippingState();
-
-		}
+		if ( _clippingEnabled ) _clipping.endShadows();
 
 		//
 
@@ -1386,7 +1368,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				applyMatrix4( object.matrixWorld );
 
 		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
-		if ( _numClippingPlanes === 0 ) return true;
+
+		var numPlanes = _clipping.numPlanes;
+
+		if ( numPlanes === 0 ) return true;
 
 		var planes = _this.clippingPlanes,
 
@@ -1399,7 +1384,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// out when deeper than radius in the negative halfspace
 			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
 
-		} while ( ++ i !== _numClippingPlanes );
+		} while ( ++ i !== numPlanes );
 
 		return true;
 
@@ -1546,7 +1531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters(
-				material, _lights, fog, _numClippingPlanes, object );
+				material, _lights, fog, _clipping.numPlanes, object );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1648,8 +1633,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				! ( material instanceof THREE.RawShaderMaterial ) ||
 				material.clipping === true ) {
 
-			materialProperties.numClippingPlanes = _numClippingPlanes;
-			uniforms.clippingPlanes = _clippingPlanesUniform;
+			materialProperties.numClippingPlanes = _clipping.numPlanes;
+			uniforms.clippingPlanes = _clipping.uniform;
 
 		}
 
@@ -1730,14 +1715,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// we might want to call this function with some ClippingGroup
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
-				setClippingState(
+				_clipping.setState(
 						material.clippingPlanes, material.clipShadows,
 						camera, materialProperties, useCache );
 
 			}
 
 			if ( materialProperties.numClippingPlanes !== undefined &&
-				materialProperties.numClippingPlanes !== _numClippingPlanes ) {
+				materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
 
 				material.needsUpdate = true;
 
@@ -2462,124 +2447,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
-
-	// Clipping
-
-	function setupGlobalClippingPlanes( planes, camera ) {
-
-		_clippingEnabled =
-				_this.clippingPlanes.length !== 0 ||
-				_this.localClippingEnabled ||
-				// enable state of previous frame - the clipping code has to
-				// run another frame in order to reset the state:
-				_numGlobalClippingPlanes !== 0 ||
-				_localClippingEnabled;
-
-		_localClippingEnabled = _this.localClippingEnabled;
-
-		_globalClippingState = setupClippingPlanes( planes, camera, 0 );
-		_numGlobalClippingPlanes = planes !== null ? planes.length : 0;
-
-	}
-
-	function setupClippingPlanes( planes, camera, dstOffset, skipTransform ) {
-
-		var nPlanes = planes !== null ? planes.length : 0,
-			dstArray = null;
-
-		if ( nPlanes !== 0 ) {
-
-			dstArray = _clippingPlanesUniform.value;
-
-			if ( skipTransform !== true || dstArray === null ) {
-
-				var flatSize = dstOffset + nPlanes * 4,
-					viewMatrix = camera.matrixWorldInverse,
-					viewNormalMatrix = _matrix3.getNormalMatrix( viewMatrix );
-
-				if ( dstArray === null || dstArray.length < flatSize ) {
-
-					dstArray = new Float32Array( flatSize );
-
-				}
-
-				for ( var i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
-
-					var plane = _plane.copy( planes[ i ] ).
-							applyMatrix4( viewMatrix, viewNormalMatrix );
-
-					plane.normal.toArray( dstArray, i4 );
-					dstArray[ i4 + 3 ] = plane.constant;
-
-				}
-
-			}
-
-			_clippingPlanesUniform.value = dstArray;
-			_clippingPlanesUniform.needsUpdate = true;
-
-		}
-
-		_numClippingPlanes = nPlanes;
-		return dstArray;
-
-	}
-
-	function resetGlobalClippingState() {
-
-		if ( _clippingPlanesUniform.value !== _globalClippingState ) {
-
-			_clippingPlanesUniform.value = _globalClippingState;
-			_clippingPlanesUniform.needsUpdate = _numGlobalClippingPlanes > 0;
-
-		}
-
-		_numClippingPlanes = _numGlobalClippingPlanes;
-
-	}
-
-	function setClippingState( planes, clipShadows, camera, cache, fromCache ) {
-
-		if ( ! _localClippingEnabled ||
-				planes === null || planes.length === 0 ||
-				_clipRenderingShadows && ! clipShadows ) {
-			// there's no local clipping
-
-			if ( _clipRenderingShadows ) {
-				// there's no global clipping
-
-				setupClippingPlanes( null );
-
-			} else {
-
-				resetGlobalClippingState();
-			}
-
-		} else {
-
-			var nGlobal = _clipRenderingShadows ? 0 : _numGlobalClippingPlanes,
-				lGlobal = nGlobal * 4,
-
-				dstArray = cache.clippingState || null;
-
-			_clippingPlanesUniform.value = dstArray; // ensure unique state
-
-			dstArray = setupClippingPlanes(
-					planes, camera, lGlobal, fromCache );
-
-			for ( var i = 0; i !== lGlobal; ++ i ) {
-
-				dstArray[ i ] = _globalClippingState[ i ];
-
-			}
-
-			cache.clippingState = dstArray;
-			_numClippingPlanes += nGlobal;
-
-		}
-
-	}
-
 
 	// GL state setting
 
