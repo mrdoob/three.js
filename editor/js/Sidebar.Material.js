@@ -10,7 +10,35 @@ Sidebar.Material = function ( editor ) {
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
+	
+	var copiedMaterial;
 
+	//Copy / Paste/ new material
+
+	var materialCPCRow = new UI.Row();
+	materialCPCRow.add( new UI.Text( '' ).setWidth( '90px' ) );
+	var materialCPCRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
+		var material;
+		material = new THREE[ materialClass.getValue() ]();
+		editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue() );
+		update();
+	} );
+	var materialCPCRcopy = new UI.Button( 'Copy' ).onClick( function () {
+		copiedMaterial = currentObject.material;
+		materialCPCRpaste.dom.disabled = false;
+	} );
+	var materialCPCRpaste = new UI.Button( 'Paste' ).setMarginLeft( '7px' ).onClick( function () {
+		if(copiedMaterial)editor.execute( new SetMaterialCommand( currentObject, copiedMaterial ), 'Pasted Material: ' + materialClass.getValue() );
+		refreshUI();
+		update();
+	} );
+	materialCPCRpaste.dom.disabled = true;
+	materialCPCRow.add( materialCPCRcopy );
+	materialCPCRow.add( materialCPCRpaste );
+	materialCPCRow.add( materialCPCRenew );
+
+	container.add( materialCPCRow );	
+	
 	// type
 
 	var materialClassRow = new UI.Row();
