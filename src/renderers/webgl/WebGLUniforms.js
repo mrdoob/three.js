@@ -142,53 +142,224 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		// Single scalar
 
-		setValue1f = function( gl, v ) { gl.uniform1f( this.addr, v ); },
-		setValue1i = function( gl, v ) { gl.uniform1i( this.addr, v ); },
+		setValue1f = function( gl, v, renderer, force ) { 
+			
+			if (force !== false || this._v !== v ) { 
+				
+				gl.uniform1f( this.addr, v ); 
+				this._v = v;
+			}
+			
+		},
+		setValue1i = function( gl, v, renderer, force ) { 
+			
+			if (force !== false || this._v !== v ) { 
+				
+				gl.uniform1i( this.addr, v );  
+				this._v = v;
+
+			}
+			
+		},
 
 		// Single float vector (from flat array or THREE.VectorN)
 
-		setValue2fv = function( gl, v ) {
+		setValue2fv = function( gl, v, renderer, force ) {
 
-			if ( v.x === undefined ) gl.uniform2fv( this.addr, v );
-			else gl.uniform2f( this.addr, v.x, v.y );
+			if ( v.x === undefined ) {
+				
+				if ( force !== false || this._x !== v[0] || this._y !== v[1] ) {
+					
+					gl.uniform2fv( this.addr, v );	
+					this._x = v[0];
+					this._y = v[1];
+
+				}
+				
+			} else {
+				
+				if ( force !== false || this._x !== v.x || this._y !== v.y ) {
+					
+					gl.uniform2f( this.addr, v.x, v.y );
+					this._x = v.x;
+					this._y = v.y;
+					
+				}
+				
+			}
 
 		},
 
-		setValue3fv = function( gl, v ) {
+		setValue3fv = function( gl, v, renderer, force ) {
 
-			if ( v.x !== undefined )
-				gl.uniform3f( this.addr, v.x, v.y, v.z );
-			else if ( v.r !== undefined )
-				gl.uniform3f( this.addr, v.r, v.g, v.b );
-			else
-				gl.uniform3fv( this.addr, v );
+			if ( v.x !== undefined ) {
+				
+				if ( force !== false || this._x !== v.x || this._y !== v.y || this._z !== v.z ) {
+					
+					gl.uniform3f( this.addr, v.x, v.y, v.z );
+					this._x = v.x;
+					this._y = v.y;
+					this._z = v.z;
+					
+				}
+				
+			} else if ( v.r !== undefined ) {
+				
+				if ( force !== false || this._r !== v.r || this._g !== v.g || this._b !== v.b ) {
+					
+					gl.uniform3f( this.addr, v.r, v.g, v.b );
+					this._r = v.r;
+					this._g = v.g;
+					this._b = v.b;
+					
+				}
+				
+			} else {
+				
+				if ( force !== false || this._x !== v[0] || this._y !== v[1] || this._z !== v[2] ) {
+					
+					gl.uniform3fv( this.addr, v );
+					this._x = v[0];
+					this._y = v[1];
+					this._z = v[2];
+					
+				}
+				
+			}
 
 		},
 
-		setValue4fv = function( gl, v ) {
+		setValue4fv = function( gl, v, renderer, force ) {
 
-			if ( v.x === undefined ) gl.uniform4fv( this.addr, v );
-			else gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
-
+			if ( v.x === undefined ) {
+				
+				if ( force !== false || this._x !== v[0] || this._y !== v[1] || this._z !== v[2] || this._w !== v[3] ) {
+					
+					gl.uniform4fv( this.addr, v );
+					this._x = v[0];
+					this._y = v[1];
+					this._z = v[2];
+					this._z = v[3];
+					
+				}
+				
+			} else {
+				
+				if ( force !== false || this._x !== v.x || this._y !== v.y || this._z !== v.z || this._w !== v.w ) {
+					
+					gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+					this._x = v.x;
+					this._y = v.y;
+					this._z = v.z;
+					this._w = v.w;
+					
+				}
+			}
 		},
 
 		// Single matrix (from flat array or MatrixN)
 
-		setValue2fm = function( gl, v ) {
-
-			gl.uniformMatrix2fv( this.addr, false, v.elements || v );
+		setValue2fm = function( gl, v, renderer, force) {
+			
+			var array;
+						
+			if (v.elements) {
+				
+				array = v.elements;
+				
+			} else {
+				
+				array = v;
+			}
+			
+			if ( force !== false || 
+				this._m1 !== array[0] || this._m2 !== array[1] || 
+				this._m3 !== array[2] || this._m4 !== array[3] ) {
+				
+				gl.uniformMatrix2fv( this.addr, false, array );
+				this._m1 = array[0];
+				this._m2 = array[1];
+				this._m3 = array[2];
+				this._m4 = array[3];
+				
+			}
 
 		},
 
-		setValue3fm = function( gl, v ) {
-
-			gl.uniformMatrix3fv( this.addr, false, v.elements || v );
+		setValue3fm = function( gl, v, renderer, force ) {
+			
+			var array;
+						
+			if (v.elements) {
+				
+				array = v.elements;
+				
+			} else {
+				
+				array = v;
+			}
+				
+			if ( force !== false || 
+				this._m1 !== array[0] || this._m2 !== array[1] || this._m3 !== array[2] || 
+				this._m4 !== array[3] || this._m5 !== array[4] || this._m6 !== array[5] || 
+				this._m7 !== array[6] || this._m8 !== array[7] || this._m9 !== array[8] ) {
+				
+				gl.uniformMatrix3fv( this.addr, false, array );
+				this._m1 = array[0];
+				this._m2 = array[1];
+				this._m3 = array[2];
+				this._m4 = array[3];
+				this._m5 = array[4];
+				this._m6 = array[5];
+				this._m7 = array[6];
+				this._m8 = array[7];
+				this._m9 = array[8];
+			
+			}
 
 		},
 
-		setValue4fm = function( gl, v ) {
-
-			gl.uniformMatrix4fv( this.addr, false, v.elements || v );
+		setValue4fm = function( gl, v, renderer, force ) {
+			
+			var array;
+						
+			if (v.elements) {
+				
+				array = v.elements;
+				
+			} else {
+				
+				array = v;
+			}
+			
+				
+			if ( force !== false || 
+				this._m1  !== array[0]  || this._m2  !== array[1]  || this._m3  !== array[2]  || this._m4  !== array[3]  || 
+				this._m5  !== array[4]  || this._m6  !== array[5]  || this._m7  !== array[6]  || this._m8  !== array[7]  || 
+				this._m9  !== array[8]  || this._m10 !== array[9]  || this._m11 !== array[10] || this._m12 !== array[11] || 
+				this._m13 !== array[12] || this._m14 !== array[13] || this._m15 !== array[14] || this._m16 !== array[15] ) {
+				
+				
+				gl.uniformMatrix4fv( this.addr, false, array );
+				this._m1 = array[0];
+				this._m2 = array[1];
+				this._m3 = array[2];
+				this._m4 = array[3];
+				this._m5 = array[4];
+				this._m6 = array[5];
+				this._m7 = array[6];
+				this._m8 = array[7];
+				this._m9 = array[8];
+				this._m10 = array[9];
+				this._m11 = array[10];
+				this._m12 = array[11];
+				this._m13 = array[12];
+				this._m14 = array[13];
+				this._m15 = array[14];
+				this._m16 = array[15];
+				
+			
+			}
 
 		},
 
@@ -381,17 +552,14 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		};
 
-	StructuredUniform.prototype.setValue = function( gl, value ) {
-
-		// Note: Don't need an extra 'renderer' parameter, since samplers
-		// are not allowed in structured uniforms.
+	StructuredUniform.prototype.setValue = function( gl, value, renderer, force ) {
 
 		var seq = this.seq;
 
 		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
 			var u = seq[ i ];
-			u.setValue( gl, value[ u.id ] );
+			u.setValue( gl, value[ u.id ], renderer, force );
 
 		}
 
@@ -491,34 +659,34 @@ THREE.WebGLUniforms = ( function() { // scope
 		};
 
 
-	WebGLUniforms.prototype.setValue = function( gl, name, value ) {
+	WebGLUniforms.prototype.setValue = function( gl, name, value, force ) {
 
 		var u = this.map[ name ];
 
-		if ( u !== undefined ) u.setValue( gl, value, this.renderer );
+		if ( u !== undefined ) u.setValue( gl, value, this.renderer , force );
 
 	};
 
-	WebGLUniforms.prototype.set = function( gl, object, name ) {
+	WebGLUniforms.prototype.set = function( gl, object, name , force) {
 
 		var u = this.map[ name ];
 
-		if ( u !== undefined ) u.setValue( gl, object[ name ], this.renderer );
+		if ( u !== undefined ) u.setValue( gl, object[ name ], this.renderer, force );
 
 	};
 
-	WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
+	WebGLUniforms.prototype.setOptional = function( gl, object, name, force ) {
 
 		var v = object[ name ];
 
-		if ( v !== undefined ) this.setValue( gl, name, v );
+		if ( v !== undefined ) this.setValue( gl, name, v, force );
 
 	};
 
 
 	// Static interface
 
-	WebGLUniforms.upload = function( gl, seq, values, renderer ) {
+	WebGLUniforms.upload = function( gl, seq, values, renderer , force) {
 
 		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -528,7 +696,7 @@ THREE.WebGLUniforms = ( function() { // scope
 			if ( v.needsUpdate !== false ) {
 				// note: always updating when .needsUpdate is undefined
 
-				u.setValue( gl, v.value, renderer );
+				u.setValue( gl, v.value, renderer , force);
 
 			}
 
