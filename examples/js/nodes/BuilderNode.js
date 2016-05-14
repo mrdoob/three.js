@@ -7,7 +7,9 @@ THREE.BuilderNode = function( material ) {
 	this.material = material;
 
 	this.caches = [];
-	this.isVerify = false;
+
+	this.parsing = false;
+	this.optimize = true;
 
 	this.addCache();
 
@@ -90,7 +92,13 @@ THREE.BuilderNode.prototype = {
 
 	getFormatName : function( format ) {
 
-		return format.replace( 'c', 'v3' ).replace( /fv1|iv1/, 'v1' );
+		return format.replace( /c/g, 'v3' ).replace( /fv1|iv1/g, 'v1' );
+
+	},
+
+	isFormatMatrix : function( format ) {
+
+		return /^m/.test( format );
 
 	},
 
@@ -119,11 +127,11 @@ THREE.BuilderNode.prototype = {
 
 			case 'v2=v1': return code + '.x';
 			case 'v2=v3': return 'vec3(' + code + ',0.0)';
-			case 'v2=v4': return 'vec4(' + code + ',0.0,0.0)';
+			case 'v2=v4': return 'vec4(' + code + ',0.0,1.0)';
 
 			case 'v3=v1': return code + '.x';
 			case 'v3=v2': return code + '.xy';
-			case 'v3=v4': return 'vec4(' + code + ',0.0)';
+			case 'v3=v4': return 'vec4(' + code + ',1.0)';
 
 			case 'v4=v1': return code + '.x';
 			case 'v4=v2': return code + '.xy';
@@ -134,7 +142,7 @@ THREE.BuilderNode.prototype = {
 
 	},
 
-	getType : function( format ) {
+	getTypeByFormat : function( format ) {
 
 		return THREE.BuilderNode.type[ format ];
 
@@ -164,7 +172,7 @@ THREE.BuilderNode.prototype = {
 
 	isShader : function( shader ) {
 
-		return this.shader == shader || this.isVerify;
+		return this.shader == shader;
 
 	},
 
@@ -181,7 +189,8 @@ THREE.BuilderNode.type = {
 	'float' : 'fv1',
 	vec2 : 'v2',
 	vec3 : 'v3',
-	vec4 : 'v4'
+	vec4 : 'v4',
+	mat4 : 'v4'
 };
 
 THREE.BuilderNode.constructors = [
