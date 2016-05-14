@@ -49,9 +49,9 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var currentScissorTest = null;
 
-	var currentColorBuffer = true;
-	var currentDepthBuffer = true;
-	var currentStencilBuffer = true;
+	var colorBufferEnabled = true;
+	var depthBufferEnabled = true;
+	var stencilBufferEnabled = true;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
@@ -341,9 +341,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setDepthBuffer = function ( depthBuffer ) {
+	this.enableDepthBuffer = function () {
 
-		currentDepthBuffer = depthBuffer;
+		depthBufferEnabled = true;
+
+	};
+
+	this.disableDepthBuffer = function () {
+
+		depthBufferEnabled = false;
 
 	};
 
@@ -431,7 +437,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		// TODO: Rename to setDepthMask
 
-		if ( currentDepthWrite !== depthWrite && currentDepthBuffer ) {
+		if ( currentDepthWrite !== depthWrite && depthBufferEnabled ) {
 
 			gl.depthMask( depthWrite );
 			currentDepthWrite = depthWrite;
@@ -440,9 +446,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setColorBuffer = function ( colorBuffer ) {
+	this.enableColorBuffer = function () {
 
-		currentColorBuffer = colorBuffer;
+		colorBufferEnabled = true;
+
+	};
+
+	this.disableColorBuffer = function () {
+
+		colorBufferEnabled = false;
 
 	};
 
@@ -450,7 +462,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		// TODO: Rename to setColorMask
 
-		if ( currentColorWrite !== colorWrite && currentColorBuffer ) {
+		if ( currentColorWrite !== colorWrite && colorBufferEnabled ) {
 
 			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
 			currentColorWrite = colorWrite;
@@ -509,7 +521,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		// TODO: Rename to setStencilMask
 
-		if ( currentStencilWrite !== stencilWrite && currentStencilBuffer ) {
+		if ( currentStencilWrite !== stencilWrite && stencilBufferEnabled ) {
 
 			gl.stencilMask( stencilWrite );
 			currentStencilWrite = stencilWrite;
@@ -518,9 +530,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setStencilBuffer = function ( stencilBuffer ) {
+	this.enableStencilBuffer = function () {
 
-		currentStencilBuffer = stencilBuffer;
+		stencilBufferEnabled = true;
+
+	};
+
+	this.disableStencilBuffer = function () {
+
+		stencilBufferEnabled = false;
 
 	};
 
@@ -797,6 +815,10 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		currentFlipSided = null;
 		currentCullFace = null;
+
+		colorBufferEnabled = true;
+		depthBufferEnabled = true;
+		stencilBufferEnabled = true;
 
 	};
 
