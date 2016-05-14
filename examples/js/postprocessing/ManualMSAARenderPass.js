@@ -37,13 +37,9 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 		uniforms: this.compositeUniforms,
 		vertexShader: compositeShader.vertexShader,
 		fragmentShader: compositeShader.fragmentShader,
+		premultipliedAlpha: true,
 		transparent: true,
-		blending: THREE.CustomBlending,
-		blendSrc: THREE.OneFactor,
-		blendDst: THREE.OneFactor,
-		blendSrcAlpha: THREE.OneFactor,
-		blendDstAlpha: THREE.OneFactor,
-		blendEquation: THREE.AddEquation,
+		blending: THREE.AdditiveBlending,
 		depthTest: false,
 		depthWrite: false
 
@@ -76,7 +72,7 @@ THREE.ManualMSAARenderPass.prototype = {
 
 	setSize: function ( width, height ) {
 
-		this.sampleRenderTarget.setSize( width, height );
+		if ( this.sampleRenderTarget ) { this.sampleRenderTarget.setSize( width, height ); }
 
 	},
 
@@ -84,13 +80,6 @@ THREE.ManualMSAARenderPass.prototype = {
 
 		var camera = ( this.camera || this.scene.camera );
 		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
-
-		if( jitterOffsets.length === 1 ) {
-
-			renderer.render( this.scene, camera, writeBuffer, true );
-			return;
-
-		}
 
 		if ( ! this.sampleRenderTarget ) {
 
@@ -101,7 +90,7 @@ THREE.ManualMSAARenderPass.prototype = {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.compositeUniforms[ "scale" ].value = 1.0 / ( jitterOffsets.length );
+		this.compositeUniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
 		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
@@ -115,15 +104,15 @@ THREE.ManualMSAARenderPass.prototype = {
 					readBuffer.width, readBuffer.height );
 			}
 
-			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
-			renderer.render( this.scene2, this.camera2, writeBuffer, ( i === 0 ) );
+			renderer.render( this.scene, camera, this.sampleRenderTarget, true );
+			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
 
 		}
 
 		// reset jitter to nothing.	TODO: add support for orthogonal cameras
 		if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
 
-		renderer.autoClear = true;
+		renderer.autoClear = autoClear;
 
 	}
 
