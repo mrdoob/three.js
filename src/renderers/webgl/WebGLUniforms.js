@@ -365,19 +365,28 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		// Single texture (2D / Cube)
 
-		setValueT1 = function( gl, v, renderer ) {
+		setValueT1 = function( gl, v, renderer, force ) {
 
 			var unit = renderer.allocTextureUnit();
-			gl.uniform1i( this.addr, unit );
-			if ( v ) renderer.setTexture2D( v, unit );
-
+			
+			if (force !== false || this._unit !== unit || this._UUID !== v.UUID) {
+					
+				gl.uniform1i( this.addr, unit );
+				if ( v ) renderer.setTexture2D( v, unit );
+			
+			}
+			
 		},
 
-		setValueT6 = function( gl, v, renderer ) {
+		setValueT6 = function( gl, v, renderer, force ) {
 
 			var unit = renderer.allocTextureUnit();
-			gl.uniform1i( this.addr, unit );
-			if ( v ) renderer.setTextureCube( v, unit );
+			if (force !== false || this._unit !== unit || this._UUID !== v.UUID) {
+					
+				gl.uniform1i( this.addr, unit );
+				if ( v ) renderer.setTextureCube( v, unit );
+			
+			}
 
 		},
 
@@ -692,13 +701,8 @@ THREE.WebGLUniforms = ( function() { // scope
 
 			var u = seq[ i ],
 				v = values[ u.id ];
-
-			if ( v.needsUpdate !== false ) {
-				// note: always updating when .needsUpdate is undefined
-
-				u.setValue( gl, v.value, renderer , force);
-
-			}
+				
+			u.setValue( gl, v.value, renderer , force);
 
 		}
 
