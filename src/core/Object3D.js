@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author elephantatwork / www.elephantatwork.ch
+ * @author EliasHasle
  */
 
 THREE.Object3D = function () {
@@ -341,6 +342,64 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
+	},
+
+	//Replaces oldChild, if found, with newChild, if newChild is av valid child, and returns found oldChild.
+	replace: function(oldChild, newChild) {
+		var index = this.children.indexOf(oldChild);
+		if (index !== -1) return this.replaceAt(index, newChild);
+		//else:
+		console.error("THREE.Object3D.replace: oldChild not found. No replacement done.", oldChild);
+	},
+
+	//Replaces child found at given index with newChild, if newChild is a valid child, and returns found oldChild.
+	replaceAt: function(index, newChild) {
+		if (!(newChild instanceof THREE.Object3D)) {
+			console.error("THREE.Object3D.replaceAt: newChild not an instance of THREE.Object3D.", newChild);
+			return;
+		}
+
+		if (newChild === this) {
+			console.error("THREE.Object3D.replaceAt: newChild can't be added as a child of itself.", newChild);
+			return;
+		}
+
+		if (index < 0 || index >= this.children.length) {
+			console.error("THREE.Object3D.replaceAt: Index %d out of bounds.", index);
+			return;
+		}
+
+		var oldChild = this.children[index];
+
+		if (newChild === oldChild) {
+			//Warning is issued to remind the user not to do dramatic post-processing of oldChild in this case.
+			console.warn(
+				"THREE.Object3D.replaceAt: Child at given index %d equals newChild. Returned object is still a child:",
+				index, oldChild);
+			return oldChild;
+		}
+
+		if (newChild.parent === this) {
+			console.error(
+				"THREE.Object3D.replaceAt: newChild is already a child at another index: %d.",
+				this.children.indexOf(newChild), newChild);
+			return;
+		}
+
+		if (newChild.parent !== null) {
+			var oldParent = newChild.parent;
+			oldParent.remove(newChild);
+			console.warn("THREE.Object3D.replaceAt: newChild stolen from old parent:", oldParent);
+		}
+		
+		oldChild.parent = null; //null is the default value for new Object3Ds.
+		newChild.parent = this;
+		this.children[index] = newChild;
+		
+		oldChild.dispatchEvent({ type: 'removed' });
+		newChild.dispatchEvent({ type: 'added' });
+
+		return oldChild; //oldChild returned for easy post-handling
 	},
 
 	getObjectById: function ( id ) {
