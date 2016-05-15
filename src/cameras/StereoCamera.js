@@ -18,9 +18,7 @@ THREE.StereoCamera = function () {
 
 };
 
-THREE.StereoCamera.prototype = {
-
-	constructor: THREE.StereoCamera,
+Object.assign( THREE.StereoCamera.prototype, {
 
 	update: ( function () {
 
@@ -86,4 +84,4 @@ THREE.StereoCamera.prototype = {
 
 	} )()
 
-};
+} );

@@ -5,9 +5,7 @@ THREE.NRRDLoader = function( manager ) {
 
 };
 
-THREE.NRRDLoader.prototype = {
-
-	constructor: THREE.NRRDLoader,
+Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -586,6 +584,4 @@ THREE.NRRDLoader.prototype = {
 		}
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.NRRDLoader.prototype );
+} );

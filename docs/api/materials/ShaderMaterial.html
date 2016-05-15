@@ -22,6 +22,7 @@
 		<ul>
 			<li>A *ShaderMaterial* will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the *vertexShader* and *fragmentShader* properties must be compiled and run on the GPU using WebGL.</li>
 			<li>As of THREE r72, directly assigning attributes in a *ShaderMaterial* is no longer supported. A [page:BufferGeometry] instance (instead of a [page:Geometry] instance) must be used instead, using [page:BufferAttribute] instances to define custom attributes.</li>
+			<li>As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances are no longer supposed to be used as uniforms. Their [page:Texture texture] property must be used instead.</li>
 		</ul>
 		</div>
 
@@ -262,16 +263,8 @@
 					<td>[page:Texture THREE.Texture]</td>
 				</tr>
 				<tr>
-					<td>sampler2D</td>
-					<td>[page:WebGLRenderTarget THREE.WebGLRenderTarget]</td>
-				</tr>
-				<tr>
 					<td>samplerCube</td>
 					<td>[page:CubeTexture THREE.CubeTexture]</tr>
-				</tr>
-				<tr>
-					<td>samplerCube</td>
-					<td>[page:WebGLRenderTargetCube THREE.WebGLRenderTargetCube]</td>
 				</tr>
 
 			</tbody>

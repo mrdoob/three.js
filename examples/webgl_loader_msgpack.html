@@ -56,7 +56,11 @@ https://github.com/creationix/msgpack-js-browser
 
 			function render() {
 
-				renderer.render( scene, camera );
+				if ( scene !== undefined ) {
+
+					renderer.render( scene, camera );
+
+				}
 
 			}
 
@@ -118,9 +122,6 @@ https://github.com/creationix/msgpack-js-browser
 
 			function init() {
 
-				scene = new THREE.Scene();
-
-				scene.add( new THREE.GridHelper( 10, 2.5 ) );
 				container = document.getElementById( 'viewport' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );

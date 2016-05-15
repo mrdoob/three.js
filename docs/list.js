@@ -143,7 +143,6 @@ var list = {
 
 		"Renderers / WebGL / Plugins": [
 			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
-			[ "ShadowMapPlugin", "api/renderers/webgl/plugins/ShadowMapPlugin" ],
 			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
@@ -199,6 +198,8 @@ var list = {
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
+			[ "ConeBufferGeometry", "api/extras/geometries/ConeBufferGeometry" ],
+			[ "ConeGeometry", "api/extras/geometries/ConeGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],

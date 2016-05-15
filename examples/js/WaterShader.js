@@ -150,9 +150,11 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	this.clipPlane = new THREE.Vector4();
 
-	if ( camera instanceof THREE.PerspectiveCamera )
+	if ( camera instanceof THREE.PerspectiveCamera ) {
+
 		this.camera = camera;
-	else {
+
+	} else {
 
 		this.camera = new THREE.PerspectiveCamera();
 		console.log( this.name + ': camera is not a Perspective Camera!' );
@@ -163,8 +165,8 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	this.mirrorCamera = this.camera.clone();
 
-	this.texture = new THREE.WebGLRenderTarget( width, height );
-	this.tempTexture = new THREE.WebGLRenderTarget( width, height );
+	this.renderTarget = new THREE.WebGLRenderTarget( width, height );
+	this.renderTarget2 = new THREE.WebGLRenderTarget( width, height );
 
 	var mirrorShader = THREE.ShaderLib[ "water" ];
 	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
@@ -178,7 +180,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 		fog: this.fog
 	} );
 
-	this.material.uniforms.mirrorSampler.value = this.texture;
+	this.material.uniforms.mirrorSampler.value = this.renderTarget.texture;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 	this.material.uniforms.alpha.value = this.alpha;
 	this.material.uniforms.time.value = this.time;
@@ -192,10 +194,10 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) ) {
 
-		this.texture.generateMipmaps = false;
-		this.texture.minFilter = THREE.LinearFilter;
-		this.tempTexture.generateMipmaps = false;
-		this.tempTexture.minFilter = THREE.LinearFilter;
+		this.renderTarget.texture.generateMipmaps = false;
+		this.renderTarget.texture.minFilter = THREE.LinearFilter;
+		this.renderTarget2.texture.generateMipmaps = false;
+		this.renderTarget2.texture.minFilter = THREE.LinearFilter;
 
 	}
 

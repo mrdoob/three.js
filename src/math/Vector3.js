@@ -250,9 +250,7 @@ THREE.Vector3.prototype = {
 
 			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
 
-			this.applyQuaternion( quaternion.setFromEuler( euler ) );
-
-			return this;
+			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 		};
 
@@ -266,9 +264,7 @@ THREE.Vector3.prototype = {
 
 			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
 
-			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-			return this;
+			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
 		};
 
@@ -276,10 +272,7 @@ THREE.Vector3.prototype = {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
+		var x = this.x, y = this.y, z = this.z;
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
@@ -295,7 +288,6 @@ THREE.Vector3.prototype = {
 		// input: THREE.Matrix4 affine matrix
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
@@ -311,7 +303,6 @@ THREE.Vector3.prototype = {
 		// input: THREE.Matrix4 projection matrix
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
 
@@ -325,14 +316,8 @@ THREE.Vector3.prototype = {
 
 	applyQuaternion: function ( q ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
-
-		var qx = q.x;
-		var qy = q.y;
-		var qz = q.z;
-		var qw = q.w;
+		var x = this.x, y = this.y, z = this.z;
+		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
 		// calculate quat * vector
 
@@ -387,16 +372,13 @@ THREE.Vector3.prototype = {
 		// vector interpreted as a direction
 
 		var x = this.x, y = this.y, z = this.z;
-
 		var e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
 		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
 		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
 
-		this.normalize();
-
-		return this;
+		return this.normalize();
 
 	},
 
@@ -474,9 +456,7 @@ THREE.Vector3.prototype = {
 
 		var length = this.length();
 
-		this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
-
-		return this;
+		return this.multiplyScalar( Math.max( min, Math.min( max, length ) ) / length );
 
 	},
 
@@ -578,9 +558,7 @@ THREE.Vector3.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
-
-		return this;
+		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
 	},
 
@@ -685,9 +663,7 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x;
-		var dy = this.y - v.y;
-		var dz = this.z - v.z;
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
 
@@ -730,9 +706,9 @@ THREE.Vector3.prototype = {
 		if ( typeof m === 'number' ) {
 
 			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-
-			m = arguments[ 1 ];
-			index = arguments[ 0 ];
+			var temp = m
+			m = index;
+			index = temp;
 
 		}
 

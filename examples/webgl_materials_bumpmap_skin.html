@@ -140,7 +140,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				renderer.autoClear = false;
 
@@ -216,7 +216,7 @@
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 				uniforms[ "tDiffuse" ].value = mapColor;
 
 				uniforms[ "bumpMap" ].value = mapHeight;

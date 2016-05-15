@@ -27,20 +27,12 @@
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -73,16 +65,10 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
-	this.fog = true;
-
-	this.blending = THREE.NormalBlending;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
-
-	this.vertexColors = THREE.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -122,14 +108,10 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.reflectivity = source.reflectivity;
 	this.refractionRatio = source.refractionRatio;
 
-	this.fog = source.fog;
-
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
-
-	this.vertexColors = source.vertexColors;
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;

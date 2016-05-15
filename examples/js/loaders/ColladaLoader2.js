@@ -183,6 +183,12 @@ THREE.ColladaLoader.prototype = {
 		// image
 
 		var imageLoader = new THREE.ImageLoader();
+		
+		if ( this.crossOrigin ) {
+			
+			imageLoader.crossOrigin = this.crossOrigin;
+			
+		}
 
 		function parseImage( xml ) {
 
