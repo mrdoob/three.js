@@ -67,7 +67,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
 		</div>
 
 		<div id="blocker">
@@ -115,8 +115,8 @@
 			initKeyDown
 
 			var loader;
-			var audioListener, soundFilter;
-			var soundArea, collisionArea;
+			var audioListener, soundFilter, soundAnalyser;
+			var soundArea, collisionArea, lightArea, lightIntensity;
 
 			// Initialize Three.JS
 
@@ -139,10 +139,22 @@
 
 				audioListener = loader.audioListener;
 
+				// sound filter
+
 				soundFilter = audioListener.context.createBiquadFilter();
 				soundFilter.type = 'lowpass';
 				soundFilter.Q.value = 10;
 				soundFilter.frequency.value = 440;
+
+				// sound analyser
+
+				soundAnalyser = audioListener.context.createAnalyser();
+				soundAnalyser.smoothingTimeConstant = 0.3;
+				soundAnalyser.fftSize = 1024;
+
+				// assets
+
+				lightArea = loader.getLight("Light2");
 
 				soundArea = loader.getSound3D("Point002");
 				collisionArea = loader.getMesh("Torus003");
@@ -152,6 +164,44 @@
 			};
 
 			loader.load( './models/sea3d/sound.tjs.sea' );
+
+			//
+
+			var updateAudioAmplitude = function() {
+
+				function getAverageVolume(array) {
+
+					var values = 0;
+					var average;
+
+					var length = array.length;
+
+					// get all the frequency amplitudes
+					
+					for (var i = 0; i < length; i++) {
+
+						values += array[i];
+
+					}
+
+					average = values / length;
+
+					return average;
+
+				}
+
+				return function() {
+
+					// get the average for the first channel
+
+					var array =  new Uint8Array( soundAnalyser.frequencyBinCount );
+					soundAnalyser.getByteFrequencyData( array );
+
+					lightIntensity = getAverageVolume( array ) / 50;
+
+				}
+
+			}();
 
 			//
 
@@ -405,23 +455,30 @@
 			var audioPos = new THREE.Vector3();
 			var audioRot = new THREE.Euler();
 
-			function updateSoundFilter( collision, sound3d ) {
+			function updateSoundFilter() {
 
 				// difference position between sound and listener
-				var difPos = new THREE.Vector3().setFromMatrixPosition( sound3d.matrixWorld ).sub(audioPos);
+				var difPos = new THREE.Vector3().setFromMatrixPosition( soundArea.matrixWorld ).sub(audioPos);
 				var length = difPos.length();
 
 				// pick a vector from camera to sound
 				raycaster.set( audioPos, difPos.normalize() );
 
+				// default volume
+				lightIntensity = .5;
+
 				// intersecting sound1
-				if ( length > 50 && raycaster.intersectObjects( [collision] ).length ) {
+				if ( length > 50 && raycaster.intersectObjects( [collisionArea] ).length ) {
 
-					if ( sound3d.getFilter() !== soundFilter ) sound3d.setFilter( soundFilter );
+					if ( soundArea.getFilter() !== soundFilter ) soundArea.setFilter( soundFilter );
 
-				} else if ( sound3d.getFilter() !== undefined ) {
+				} else if ( soundArea.getFilter() === soundFilter ) {
 
-					sound3d.setFilter();
+					soundArea.setFilter( soundAnalyser );
+
+				} else {
+
+					updateAudioAmplitude();
 
 				}
 
@@ -440,7 +497,10 @@
 				loader.audioListener.rotation.copy( audioRot.setFromRotationMatrix( camera.matrixWorld ) );
 
 				// Update sound filter from raycaster intersecting
-				updateSoundFilter( collisionArea, soundArea );
+				updateSoundFilter();
+
+				// Update light from volume
+				lightArea.intensity = lightIntensity;
 
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );

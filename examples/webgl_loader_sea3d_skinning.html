@@ -28,7 +28,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
 			<br/>BoneObject: Object3D attached in a Bone
 			<br/>Click to hidden/show the hat - Right click to run
 		</div>
@@ -96,10 +96,16 @@
 
 				// get meshes
 				player = loader.getMesh("Player");
-
 				hat = loader.getMesh("Hat");
 
 				// events
+
+				// on animation complete example
+				player.animationsData['pass#1'].onComplete = function() {
+
+					console.log("Animation completed!");
+
+				}
 
 				window.addEventListener( 'click', onMouseClick, false );
 				window.addEventListener( 'contextmenu', onRightClick, false );
@@ -153,10 +159,6 @@
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
 
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
-
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -167,7 +169,7 @@
 
 				// play character animation
 				if (player.currentAnimation.name == "idle")
-					player.play("run", .5);
+					player.play("run", .5);// play "pass#1" to caller .onComplete animation example
 				else
 					player.play("idle", .5);
 
