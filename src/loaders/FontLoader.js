@@ -19,7 +19,25 @@ THREE.FontLoader.prototype = {
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.load( url, function ( text ) {
 
-			var font = scope.parse( JSON.parse( text.substring( 65, text.length - 2 ) ) );
+			var fontDataMarker = 'loadFace('
+			var fontDataStart = text.indexOf(fontDataMarker)
+
+			var fontData = text
+
+			if (fontDataStart === -1) {
+				// no marker found, treat as pure json
+			
+				fontData = text
+			
+			}
+			else {
+				// marker found, strip javascript wrapper out
+			
+				fontData = text.substring( fontDataStart + fontDataMarker.length, text.length - 2 )
+			
+			}
+
+			var font = scope.parse( JSON.parse(fontData) );
 
 			if ( onLoad ) onLoad( font );
 
