@@ -27,11 +27,12 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.verifyAndBuildCode( builder, 'v3', 'transform' ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', 'transform' ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );
@@ -95,26 +96,26 @@ THREE.PhongNode.prototype.build = function( builder ) {
 	}
 	else {
 
-		// verify all nodes to reuse generate codes
+		// parse all nodes to reuse generate codes
 
-		this.color.verify( builder );
-		this.specular.verify( builder );
-		this.shininess.verify( builder );
+		this.color.parse( builder );
+		this.specular.parse( builder );
+		this.shininess.parse( builder );
 
-		if ( this.alpha ) this.alpha.verify( builder );
+		if ( this.alpha ) this.alpha.parse( builder );
 
-		if ( this.light ) this.light.verify( builder, 'light' );
+		if ( this.light ) this.light.parse( builder, 'light' );
 
-		if ( this.ao ) this.ao.verify( builder );
-		if ( this.ambient ) this.ambient.verify( builder );
-		if ( this.shadow ) this.shadow.verify( builder );
-		if ( this.emissive ) this.emissive.verify( builder );
+		if ( this.ao ) this.ao.parse( builder );
+		if ( this.ambient ) this.ambient.parse( builder );
+		if ( this.shadow ) this.shadow.parse( builder );
+		if ( this.emissive ) this.emissive.parse( builder );
 
-		if ( this.normal ) this.normal.verify( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.verify( builder );
+		if ( this.normal ) this.normal.parse( builder );
+		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
-		if ( this.environment ) this.environment.verify( builder );
-		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.verify( builder );
+		if ( this.environment ) this.environment.parse( builder );
+		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.parse( builder );
 
 		// build code
 
@@ -143,6 +144,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bsdfs" ],
+			THREE.ShaderChunk[ "ambient_pars" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],

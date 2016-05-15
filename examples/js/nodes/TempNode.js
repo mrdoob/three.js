@@ -35,23 +35,26 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 		var data = material.getDataNode( uuid );
 
-		if ( builder.isShader( 'verify' ) ) {
+		if ( builder.parsing ) {
 
 			if ( data.deps || 0 > 0 ) {
 
-				this.verifyDepsNode( builder, data, output );
-				return '';
+				this.appendDepsNode( builder, data, output );
+
+				return this.generate( builder, type, uuid );
 
 			}
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 		}
-		else if ( data.deps == 1 ) {
+		else if ( ! builder.optimize || data.deps == 1 ) {
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 		}
+
+		uuid = this.getUuid( false );
 
 		var name = this.getTemp( builder, uuid );
 		var type = data.output || this.getType( builder );
@@ -95,9 +98,13 @@ THREE.TempNode.prototype.isUnique = function() {
 
 };
 
-THREE.TempNode.prototype.getUuid = function() {
+THREE.TempNode.prototype.getUuid = function( unique ) {
 
-	return this.constructor.uuid || this.uuid;
+	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
+
+	if ( typeof this.scope == "string" ) uuid = this.scope + '-' + uuid;
+
+	return uuid;
 
 };
 
