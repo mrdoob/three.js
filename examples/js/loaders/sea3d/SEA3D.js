@@ -4059,18 +4059,15 @@ SEA3D.File.prototype.load = function( url ) {
 };
 
 /**
- * EventDispatcher.js
+ * From EventDispatcher.js / https://github.com/mrdoob/eventdispatcher.js/
  * @author mrdoob / http://mrdoob.com/
- * @sunag sunag / http://www.sunag.com.br/
  */
 
-SEA3D.EventDispatcher = function() {}
+var SEA3D.EventDispatcher = function () {};
 
-SEA3D.EventDispatcher.prototype = {
+Object.assign( SEA3D.EventDispatcher.prototype, {
 
-	constructor: SEA3D.EventDispatcher,
-
-	addEventListener: function( type, listener ) {
+	addEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
@@ -4090,7 +4087,7 @@ SEA3D.EventDispatcher.prototype = {
 
 	},
 
-	hasEventListener: function( type, listener ) {
+	hasEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) return false;
 
@@ -4106,7 +4103,7 @@ SEA3D.EventDispatcher.prototype = {
 
 	},
 
-	removeEventListener: function( type, listener ) {
+	removeEventListener: function ( type, listener ) {
 
 		if ( this._listeners === undefined ) return;
 
@@ -4127,7 +4124,7 @@ SEA3D.EventDispatcher.prototype = {
 
 	},
 
-	dispatchEvent: function( event ) {
+	dispatchEvent: function ( event ) {
 
 		if ( this._listeners === undefined ) return;
 
@@ -4138,16 +4135,16 @@ SEA3D.EventDispatcher.prototype = {
 
 			event.target = this;
 
-			var array = [];
+			var array = [], i;
 			var length = listenerArray.length;
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ] = listenerArray[ i ];
 
 			}
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( i = 0; i < length; i ++ ) {
 
 				array[ i ].call( this, event );
 
@@ -4157,13 +4154,4 @@ SEA3D.EventDispatcher.prototype = {
 
 	}
 
-};
-
-SEA3D.EventDispatcher.apply = function( object ) {
-
-	object.addEventListener = SEA3D.EventDispatcher.prototype.addEvenListener;
-	object.hasEventListener = SEA3D.EventDispatcher.prototype.hasEventListener;
-	object.removeEventListener = SEA3D.EventDispatcher.prototype.removeEventListener;
-	object.dispatchEvent = SEA3D.EventDispatcher.prototype.dispatchEvent;
-
-};
+} );
