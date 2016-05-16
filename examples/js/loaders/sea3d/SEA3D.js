@@ -4063,7 +4063,7 @@ SEA3D.File.prototype.load = function( url ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-var SEA3D.EventDispatcher = function () {};
+SEA3D.EventDispatcher = function () {};
 
 Object.assign( SEA3D.EventDispatcher.prototype, {
 
