@@ -743,6 +743,25 @@ Object.defineProperties( THREE.Audio.prototype, {
 			return this;
 
 		}
+	},
+	setFilter : {
+
+		value : function ( filter ) {
+
+			console.warn( 'THREE.Audio: .setFilter has been deprecated. Please use .audio.setFilters.' );
+
+			this.setFilters( filter ? [ filter ] : [] );
+
+		}
+	},
+	getFilter : {
+		value : function () {
+
+			console.warn( 'THREE.Audio: .getFilter has been deprecated. Please use .audio.getFilters.' );
+
+			return this.getFilters()[ 0 ];
+
+		}
 	}
 } );
 
