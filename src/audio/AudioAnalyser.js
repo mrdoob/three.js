@@ -21,6 +21,7 @@ Object.assign( THREE.AudioAnalyser.prototype, {
 		return this.data;
 
 	},
+
 	getAverage: function() {
 
 		var values = 0, data = this.getData();
