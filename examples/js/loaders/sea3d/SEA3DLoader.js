@@ -12,6 +12,7 @@
 THREE.SEA3D = function( config ) {
 
 	this.config = {
+		id : "",
 		scripts : true,
 		runScripts : true,
 		autoPlay : false,
@@ -33,12 +34,8 @@ THREE.SEA3D = function( config ) {
 };
 
 THREE.SEA3D.prototype = {
-	constructor: THREE.SEA3D,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+	constructor: THREE.SEA3D,
 
 	set container ( val ) {
 
@@ -51,7 +48,10 @@ THREE.SEA3D.prototype = {
 		return this.config.container;
 
 	}
+
 };
+
+Object.assign( THREE.SEA3D.prototype, THREE.EventDispatcher.prototype );
 
 //
 //	Defaults
@@ -60,6 +60,403 @@ THREE.SEA3D.prototype = {
 THREE.SEA3D.BACKGROUND_COLOR = 0x333333;
 THREE.SEA3D.HELPER_COLOR = 0x9AB9E5;
 THREE.SEA3D.RTT_SIZE = 512;
+
+//
+//	Domain
+//
+
+THREE.SEA3D.Domain = function( id, objects, container ) {
+
+	this.id = id;
+	this.objects = objects;
+	this.container = container;
+
+	this.scripts = [];
+	this.global = {};
+
+	this.scriptTargets = [];
+
+	this.events = new THREE.EventDispatcher();
+
+};
+
+THREE.SEA3D.Domain.prototype = {
+	constructor: THREE.SEA3D.Domain,
+
+	add : function( src ) {
+
+		this.scripts.push( src );
+
+	},
+
+	remove : function( src ) {
+
+		this.scripts.splice( this.scripts.indexOf( src ), 1 );
+
+	},
+
+	contains : function( src ) {
+
+		return this.scripts.indexOf( src ) != - 1;
+
+	},
+
+	addEvent : function( type, listener ) {
+
+		this.events.addEventListener( type, listener );
+
+	},
+
+	hasEvent : function( type, listener ) {
+
+		return this.events.hasEventListener( type, listener );
+
+	},
+
+	removeEvent : function( type, listener ) {
+
+		this.events.removeEventListener( type, listener );
+
+	},
+
+	print : function() {
+
+		console.log.apply( console, arguments );
+
+	},
+
+	watch : function() {
+
+		console.log.apply( console, 'watch:', arguments );
+
+	},
+
+	runScripts : function() {
+
+		for ( var i = 0; i < this.scriptTargets.length; i ++ ) {
+
+			this.runJSMList( this.scriptTargets[ i ] );
+
+		}
+
+	},
+
+	runJSMList : function( target ) {
+
+		var scripts = target.scripts;
+
+		for ( var i = 0; i < scripts.length; i ++ ) {
+
+			this.runJSM( target, scripts[ i ] );
+
+		}
+
+		return scripts;
+
+	},
+
+	runJSM : function( target, script ) {
+
+		if ( target.local == undefined ) target.local = {};
+
+		var include = {
+			print : this.print,
+			watch : this.watch,
+			sea3d : this,
+			scene : this.container,
+			source : new THREE.SEA3D.ScriptDomain( this, target instanceof THREE.SEA3D.Domain )
+		};
+
+		Object.freeze( include.source );
+
+		THREE.SEA3D.ScriptHandler.add( include.source );
+
+		try {
+
+			this.methods[ script.method ] (
+				include,
+				this.getReference,
+				this.global,
+				target.local,
+				target,
+				script.params
+			);
+
+		}
+		catch ( e ) {
+
+			console.error( 'SEA3D JavaScript: Error running method "' + script.method + '".' );
+			console.error( e );
+
+		}
+
+	},
+
+	getReference : function( ns ) {
+
+		return eval( ns );
+
+	},
+
+	disposeList : function( list ) {
+
+		if ( ! list || ! list.length ) return;
+
+		list = list.concat();
+
+		var i = list.length;
+
+		while ( i -- ) list[ i ].dispose();
+
+	},
+
+	dispatchEvent : function( event ) {
+
+		event.domain = this;
+
+		var scripts = this.scripts.concat(),
+			i = scripts.length;
+
+		while ( i -- ) {
+
+			scripts[ i ].dispatchEvent( event );
+
+		}
+
+		this.events.dispatchEvent( event );
+
+	},
+
+	dispose : function() {
+
+		this.disposeList( this.scripts );
+
+		while ( this.container.children.length ) {
+
+			this.container.remove( this.container.children[ 0 ] );
+
+		}
+
+		var i = THREE.SEA3D.EXTENSIONS_DOMAIN.length;
+
+		while ( i -- ) {
+
+			var domain = THREE.SEA3D.EXTENSIONS_DOMAIN[ i ];
+
+			if ( domain.dispose ) domain.dispose.call( this );
+
+		}
+
+		this.disposeList( this.materials );
+		this.disposeList( this.dummys );
+
+		this.dispatchEvent( { type : "dispose" } );
+
+	}
+};
+
+//
+//	Domain Manager
+//
+
+THREE.SEA3D.DomainManager = function( autoDisposeRootDomain ) {
+
+	this.domains = [];
+	this.autoDisposeRootDomain = autoDisposeRootDomain == undefined ? true : false;
+
+};
+
+THREE.SEA3D.DomainManager.prototype = {
+	constructor: THREE.SEA3D.DomainManager,
+
+	onDisposeDomain : function( e ) {
+
+		this.remove( e.domain );
+
+		if ( this.autoDisposeRootDomain && this.domains.length == 1 ) {
+
+			this.dispose();
+
+		}
+
+	},
+
+	add : function( domain ) {
+
+		this._onDisposeDomain = this._onDisposeDomain || this.onDisposeDomain.bind( this );
+
+		domain.on( "dispose", this._onDisposeDomain );
+
+		this.domains.push( domain );
+
+		this.textures = this.textures || domain.textures;
+		this.cubemaps = this.cubemaps || domain.cubemaps;
+		this.geometries = this.geometries || domain.geometries;
+
+	},
+
+	remove : function( domain ) {
+
+		domain.removeEvent( "dispose", this._onDisposeDomain );
+
+		this.domains.splice( this.domains.indexOf( domain ), 1 );
+
+	},
+
+	contains : function( domain ) {
+
+		return this.domains.indexOf( domain ) != - 1;
+
+	},
+
+	disposeList : function( list ) {
+
+		if ( ! list || ! list.length ) return;
+
+		list = list.concat();
+
+		var i = list.length;
+
+		while ( i -- ) list[ i ].dispose();
+
+	},
+
+	dispose : function() {
+
+		this.disposeList( this.domains );
+		this.disposeList( this.textures );
+		this.disposeList( this.cubemaps );
+		this.disposeList( this.geometries );
+
+	}
+};
+
+//
+//	Script
+//
+
+THREE.SEA3D.ScriptDomain = function( domain, root ) {
+
+	domain = domain || new THREE.SEA3D.Domain();
+	domain.add( this );
+
+	var events = new THREE.EventDispatcher();
+
+	this.getId = function() {
+
+		return domain.id;
+
+	}
+
+	this.isRoot = function() {
+
+		return root;
+
+	}
+
+	this.addEvent = function( type, listener ) {
+
+		events.addEventListener( type, listener );
+
+	}
+
+	this.hasEvent = function( type, listener ) {
+
+		return events.hasEventListener( type, listener );
+
+	}
+
+	this.removeEvent = function( type, listener ) {
+
+		events.removeEventListener( type, listener );
+
+	}
+
+	this.dispatchEvent = function( event ) {
+
+		event.script = this;
+
+		events.dispatchEvent( event );
+
+	}
+
+	this.dispose = function() {
+
+		domain.remove( this );
+
+		if ( root ) domain.dispose();
+
+		this.dispatchEvent( { type : "dispose" } );
+
+	}
+
+};
+
+//
+//	Script Manager
+//
+
+THREE.SEA3D.ScriptManager = function() {
+
+	this.scripts = [];
+
+	var onDisposeScript = ( function( e ) {
+
+		this.remove( e.script );
+
+	} ).bind( this );
+
+	this.add = function( src ) {
+
+		src.addEvent( "dispose", onDisposeScript );
+
+		this.scripts.push( src );
+
+	}
+
+	this.remove = function( src ) {
+
+		src.removeEvent( "dispose", onDisposeScript );
+
+		this.scripts.splice( this.scripts.indexOf( src ), 1 );
+
+	}
+
+	this.contains = function( src ) {
+
+		return this.scripts.indexOf( src ) > - 1;
+
+	}
+
+	this.dispatchEvent = function( event ) {
+
+		var scripts = this.scripts.concat(),
+			i = scripts.length;
+
+		while ( i -- ) {
+
+			scripts[ i ].dispatchEvent( event );
+
+		}
+
+	}
+
+};
+
+//
+//	Script Handler
+//
+
+THREE.SEA3D.ScriptHandler = new THREE.SEA3D.ScriptManager();
+
+THREE.SEA3D.ScriptHandler.dispatchUpdate = function( delta ) {
+
+	this.dispatchEvent( {
+		type : "update",
+		delta : delta
+	} );
+
+};
 
 //
 //	Animator
@@ -541,7 +938,7 @@ THREE.SEA3D.VertexAnimationMesh.prototype.constructor = THREE.SEA3D.VertexAnimat
 
 Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Object3D.prototype );
 
-Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.VertexAnimationMesh.prototype );
+Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Animator.prototype );
 
 THREE.SEA3D.VertexAnimationMesh.prototype.copy = function( source ) {
 
@@ -641,7 +1038,7 @@ THREE.SEA3D.PointLight.prototype.copy = function( source ) {
 };
 
 //
-//	Animation Update
+//	Animation Handler
 //
 
 THREE.SEA3D.AnimationHandler = {
@@ -679,162 +1076,6 @@ THREE.SEA3D.AnimationHandler = {
 };
 
 //
-//	Java Script
-//
-
-THREE.SEA3D.SCRIPT = new SEA3D.ScriptManager();
-
-THREE.SEA3D.SCRIPT.dispatchUpdate = function( delta ) {
-
-	this.dispatchEvent( {
-		type : "update",
-		delta : delta
-	} );
-
-};
-
-THREE.SEA3D.Domain = function( id, objects, container ) {
-
-	SEA3D.Domain.call( this, id );
-
-	this.objects = objects;
-	this.container = container;
-
-};
-
-THREE.SEA3D.Domain.prototype = Object.create( SEA3D.Domain.prototype );
-THREE.SEA3D.Domain.prototype.constructor = THREE.SEA3D.Domain;
-
-THREE.SEA3D.Domain.prototype.runScripts = function() {
-
-	for ( var i = 0; i < this.scriptTargets.length; i ++ ) {
-
-		this.runJSMList( this.scriptTargets[ i ] );
-
-	}
-
-};
-
-THREE.SEA3D.Domain.prototype.runJSMList = function( target ) {
-
-	var scripts = target.scripts;
-
-	for ( var i = 0; i < scripts.length; i ++ ) {
-
-		this.runJSM( target, scripts[ i ] );
-
-	}
-
-	return scripts;
-
-};
-
-THREE.SEA3D.Domain.prototype.runJSM = function( target, script ) {
-
-	if ( target.local == undefined ) target.local = {};
-
-	var include = {
-		print : this.print,
-		watch : this.watch,
-		sea3d : this,
-		scene : this.container,
-		source : new SEA3D.Script( this, target instanceof THREE.SEA3D.Domain )
-	};
-
-	Object.freeze( include.source );
-
-	THREE.SEA3D.SCRIPT.add( include.source );
-
-	try {
-
-		this.methods[ script.method ] (
-			include,
-			this.getReference,
-			this.global,
-			target.local,
-			target,
-			script.params
-		);
-
-	}
-	catch ( e ) {
-
-		console.error( 'SEA3D JavaScript: Error running method "' + script.method + '".' );
-		console.error( e );
-
-	}
-
-};
-
-THREE.SEA3D.Domain.prototype.disposeList = function( list ) {
-
-	if ( ! list || ! list.length ) return;
-
-	list = list.concat();
-
-	var i = list.length;
-
-	while ( i -- ) list[ i ].dispose();
-
-};
-
-THREE.SEA3D.Domain.prototype.dispose = function() {
-
-	SEA3D.Domain.prototype.dispose.call( this );
-
-	while ( this.container.children.length ) {
-
-		this.container.remove( this.container.children[ 0 ] );
-
-	}
-
-	var i = THREE.SEA3D.EXTENSIONS_DOMAIN.length;
-
-	while ( i -- ) {
-
-		var domain = THREE.SEA3D.EXTENSIONS_DOMAIN[ i ];
-
-		if ( domain.dispose ) domain.dispose.call( this );
-
-	}
-
-	this.disposeList( this.materials );
-	this.disposeList( this.dummys );
-
-};
-
-THREE.SEA3D.DomainManager = function( autoDisposeRootDomain ) {
-
-	SEA3D.DomainManager.call( this, autoDisposeRootDomain );
-
-};
-
-THREE.SEA3D.DomainManager.prototype = Object.create( SEA3D.DomainManager.prototype );
-THREE.SEA3D.DomainManager.prototype.constructor = THREE.SEA3D.DomainManager;
-
-THREE.SEA3D.DomainManager.prototype.add = function( domain ) {
-
-	SEA3D.DomainManager.prototype.add.call( this, domain );
-
-	this.textures = this.textures || domain.textures;
-	this.cubemaps = this.cubemaps || domain.cubemaps;
-	this.geometries = this.geometries || domain.geometries;
-
-};
-
-THREE.SEA3D.DomainManager.prototype.disposeList = THREE.SEA3D.Domain.prototype.disposeList;
-
-THREE.SEA3D.DomainManager.prototype.dispose = function() {
-
-	SEA3D.DomainManager.prototype.dispose.call( this );
-
-	this.disposeList( this.textures );
-	this.disposeList( this.cubemaps );
-	this.disposeList( this.geometries );
-
-};
-
-//
 //	Config
 //
 
@@ -866,85 +1107,85 @@ THREE.SEA3D.prototype.setShadowMap = function( light ) {
 //	Output
 //
 
-SEA3D.Domain.prototype.getMesh = THREE.SEA3D.prototype.getMesh = function( name ) {
+THREE.SEA3D.Domain.prototype.getMesh = THREE.SEA3D.prototype.getMesh = function( name ) {
 
 	return this.objects[ "m3d/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getDummy = THREE.SEA3D.prototype.getDummy = function( name ) {
+THREE.SEA3D.Domain.prototype.getDummy = THREE.SEA3D.prototype.getDummy = function( name ) {
 
 	return this.objects[ "dmy/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getLine = THREE.SEA3D.prototype.getLine = function( name ) {
+THREE.SEA3D.Domain.prototype.getLine = THREE.SEA3D.prototype.getLine = function( name ) {
 
 	return this.objects[ "line/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getSound3D = THREE.SEA3D.prototype.getSound3D = function( name ) {
+THREE.SEA3D.Domain.prototype.getSound3D = THREE.SEA3D.prototype.getSound3D = function( name ) {
 
 	return this.objects[ "sn3d/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getMaterial = THREE.SEA3D.prototype.getMaterial = function( name ) {
+THREE.SEA3D.Domain.prototype.getMaterial = THREE.SEA3D.prototype.getMaterial = function( name ) {
 
 	return this.objects[ "mat/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getLight = THREE.SEA3D.prototype.getLight = function( name ) {
+THREE.SEA3D.Domain.prototype.getLight = THREE.SEA3D.prototype.getLight = function( name ) {
 
 	return this.objects[ "lht/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getGLSL = THREE.SEA3D.prototype.getGLSL = function( name ) {
+THREE.SEA3D.Domain.prototype.getGLSL = THREE.SEA3D.prototype.getGLSL = function( name ) {
 
 	return this.objects[ "glsl/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getCamera = THREE.SEA3D.prototype.getCamera = function( name ) {
+THREE.SEA3D.Domain.prototype.getCamera = THREE.SEA3D.prototype.getCamera = function( name ) {
 
 	return this.objects[ "cam/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getTexture = THREE.SEA3D.prototype.getTexture = function( name ) {
+THREE.SEA3D.Domain.prototype.getTexture = THREE.SEA3D.prototype.getTexture = function( name ) {
 
 	return this.objects[ "tex/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getCubeMap = THREE.SEA3D.prototype.getCubeMap = function( name ) {
+THREE.SEA3D.Domain.prototype.getCubeMap = THREE.SEA3D.prototype.getCubeMap = function( name ) {
 
 	return this.objects[ "cmap/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getJointObject = THREE.SEA3D.prototype.getJointObject = function( name ) {
+THREE.SEA3D.Domain.prototype.getJointObject = THREE.SEA3D.prototype.getJointObject = function( name ) {
 
 	return this.objects[ "jnt/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getContainer3D = THREE.SEA3D.prototype.getContainer3D = function( name ) {
+THREE.SEA3D.Domain.prototype.getContainer3D = THREE.SEA3D.prototype.getContainer3D = function( name ) {
 
 	return this.objects[ "c3d/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getSprite = THREE.SEA3D.prototype.getSprite = function( name ) {
+THREE.SEA3D.Domain.prototype.getSprite = THREE.SEA3D.prototype.getSprite = function( name ) {
 
 	return this.objects[ "m2d/" + name ];
 
 };
 
-SEA3D.Domain.prototype.getProperties = THREE.SEA3D.prototype.getProperties = function( name ) {
+THREE.SEA3D.Domain.prototype.getProperties = THREE.SEA3D.prototype.getProperties = function( name ) {
 
 	return this.objects[ "prop/" + name ];
 
