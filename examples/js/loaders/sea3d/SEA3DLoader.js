@@ -278,7 +278,6 @@ THREE.SEA3D.Object3DAnimator.prototype.stop = function() {
 
 };
 
-
 THREE.SEA3D.Object3DAnimator.prototype.setRelative = function( val ) {
 
 	THREE.SEA3D.Animator.prototype.setRelative.call( this, val );
@@ -415,8 +414,7 @@ THREE.SEA3D.Dummy = function( width, height, depth ) {
 THREE.SEA3D.Dummy.prototype = Object.create( THREE.Mesh.prototype );
 THREE.SEA3D.Dummy.prototype.constructor = THREE.SEA3D.Dummy;
 
-THREE.SEA3D.Dummy.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.Dummy.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
+Object.assign( THREE.SEA3D.Dummy.prototype, THREE.SEA3D.Object3D.prototype );
 
 THREE.SEA3D.Dummy.MATERIAL = new THREE.MeshBasicMaterial( { wireframe: true, color: THREE.SEA3D.HELPER_COLOR } );
 
@@ -452,8 +450,7 @@ THREE.SEA3D.Mesh = function( geometry, material ) {
 THREE.SEA3D.Mesh.prototype = Object.create( THREE.Mesh.prototype );
 THREE.SEA3D.Mesh.prototype.constructor = THREE.SEA3D.Mesh;
 
-THREE.SEA3D.Mesh.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.Mesh.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
+Object.assign( THREE.SEA3D.Mesh.prototype, THREE.SEA3D.Object3D.prototype );
 
 THREE.SEA3D.Mesh.prototype.setWeight = function( name, val ) {
 
@@ -495,19 +492,9 @@ THREE.SEA3D.SkinnedMesh = function( geometry, material, useVertexTexture ) {
 THREE.SEA3D.SkinnedMesh.prototype = Object.create( THREE.SkinnedMesh.prototype );
 THREE.SEA3D.SkinnedMesh.prototype.constructor = THREE.SEA3D.SkinnedMesh;
 
-THREE.SEA3D.SkinnedMesh.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.SkinnedMesh.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
+Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.Object3D.prototype );
 
-THREE.SEA3D.SkinnedMesh.prototype.setTimeScale = THREE.SEA3D.Object3DAnimator.prototype.setTimeScale;
-THREE.SEA3D.SkinnedMesh.prototype.getTimeScale = THREE.SEA3D.Object3DAnimator.prototype.getTimeScale;
-
-THREE.SEA3D.SkinnedMesh.prototype.play = THREE.SEA3D.Object3DAnimator.prototype.play;
-THREE.SEA3D.SkinnedMesh.prototype.stop = THREE.SEA3D.Object3DAnimator.prototype.stop;
-THREE.SEA3D.SkinnedMesh.prototype.pause = THREE.SEA3D.Object3DAnimator.prototype.pause;
-THREE.SEA3D.SkinnedMesh.prototype.resume = THREE.SEA3D.Object3DAnimator.prototype.resume;
-
-THREE.SEA3D.SkinnedMesh.prototype.update = THREE.SEA3D.Object3DAnimator.prototype.update;
-THREE.SEA3D.SkinnedMesh.prototype.updateAnimations = THREE.SEA3D.Object3DAnimator.prototype.updateAnimations;
+Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.Animator.prototype );
 
 THREE.SEA3D.SkinnedMesh.prototype.boneByName = function( name ) {
 
@@ -519,8 +506,6 @@ THREE.SEA3D.SkinnedMesh.prototype.boneByName = function( name ) {
 			return bones[ i ];
 
 	}
-
-	return null;
 
 };
 
@@ -554,19 +539,9 @@ THREE.SEA3D.VertexAnimationMesh = function( geometry, material ) {
 THREE.SEA3D.VertexAnimationMesh.prototype = Object.create( THREE.Mesh.prototype );
 THREE.SEA3D.VertexAnimationMesh.prototype.constructor = THREE.SEA3D.VertexAnimationMesh;
 
-THREE.SEA3D.VertexAnimationMesh.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.VertexAnimationMesh.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
+Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Object3D.prototype );
 
-THREE.SEA3D.VertexAnimationMesh.prototype.setTimeScale = THREE.SEA3D.Object3DAnimator.prototype.setTimeScale;
-THREE.SEA3D.VertexAnimationMesh.prototype.getTimeScale = THREE.SEA3D.Object3DAnimator.prototype.getTimeScale;
-
-THREE.SEA3D.VertexAnimationMesh.prototype.play = THREE.SEA3D.Object3DAnimator.prototype.play;
-THREE.SEA3D.VertexAnimationMesh.prototype.stop = THREE.SEA3D.Object3DAnimator.prototype.stop;
-THREE.SEA3D.VertexAnimationMesh.prototype.pause = THREE.SEA3D.Object3DAnimator.prototype.pause;
-THREE.SEA3D.VertexAnimationMesh.prototype.resume = THREE.SEA3D.Object3DAnimator.prototype.resume;
-
-THREE.SEA3D.VertexAnimationMesh.prototype.update = THREE.SEA3D.Object3DAnimator.prototype.update;
-THREE.SEA3D.VertexAnimationMesh.prototype.updateAnimations = THREE.SEA3D.Object3DAnimator.prototype.updateAnimations;
+Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.VertexAnimationMesh.prototype );
 
 THREE.SEA3D.VertexAnimationMesh.prototype.copy = function( source ) {
 
@@ -594,19 +569,7 @@ THREE.SEA3D.Camera = function( fov, aspect, near, far ) {
 THREE.SEA3D.Camera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
 THREE.SEA3D.Camera.prototype.constructor = THREE.SEA3D.Camera;
 
-THREE.SEA3D.Camera.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.Camera.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
-
-THREE.SEA3D.Camera.prototype.setTimeScale = THREE.SEA3D.Object3DAnimator.prototype.setTimeScale;
-THREE.SEA3D.Camera.prototype.getTimeScale = THREE.SEA3D.Object3DAnimator.prototype.getTimeScale;
-
-THREE.SEA3D.Camera.prototype.play = THREE.SEA3D.Object3DAnimator.prototype.play;
-THREE.SEA3D.Camera.prototype.stop = THREE.SEA3D.Object3DAnimator.prototype.stop;
-THREE.SEA3D.Camera.prototype.pause = THREE.SEA3D.Object3DAnimator.prototype.pause;
-THREE.SEA3D.Camera.prototype.resume = THREE.SEA3D.Object3DAnimator.prototype.resume;
-
-THREE.SEA3D.Camera.prototype.update = THREE.SEA3D.Object3DAnimator.prototype.update;
-THREE.SEA3D.Camera.prototype.updateAnimations = THREE.SEA3D.Object3DAnimator.prototype.updateAnimations;
+Object.assign( THREE.SEA3D.Camera.prototype, THREE.SEA3D.Object3D.prototype );
 
 THREE.SEA3D.Camera.prototype.copy = function( source ) {
 
@@ -634,19 +597,7 @@ THREE.SEA3D.OrthographicCamera = function( left, right, top, bottom, near, far )
 THREE.SEA3D.OrthographicCamera.prototype = Object.create( THREE.OrthographicCamera.prototype );
 THREE.SEA3D.OrthographicCamera.prototype.constructor = THREE.SEA3D.OrthographicCamera;
 
-THREE.SEA3D.OrthographicCamera.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.OrthographicCamera.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
-
-THREE.SEA3D.OrthographicCamera.prototype.setTimeScale = THREE.SEA3D.Object3DAnimator.prototype.setTimeScale;
-THREE.SEA3D.OrthographicCamera.prototype.getTimeScale = THREE.SEA3D.Object3DAnimator.prototype.getTimeScale;
-
-THREE.SEA3D.OrthographicCamera.prototype.play = THREE.SEA3D.Object3DAnimator.prototype.play;
-THREE.SEA3D.OrthographicCamera.prototype.stop = THREE.SEA3D.Object3DAnimator.prototype.stop;
-THREE.SEA3D.OrthographicCamera.prototype.pause = THREE.SEA3D.Object3DAnimator.prototype.pause;
-THREE.SEA3D.OrthographicCamera.prototype.resume = THREE.SEA3D.Object3DAnimator.prototype.resume;
-
-THREE.SEA3D.OrthographicCamera.prototype.update = THREE.SEA3D.Object3DAnimator.prototype.update;
-THREE.SEA3D.OrthographicCamera.prototype.updateAnimations = THREE.SEA3D.Object3DAnimator.prototype.updateAnimations;
+Object.assign( THREE.SEA3D.OrthographicCamera.prototype, THREE.SEA3D.Object3D.prototype );
 
 THREE.SEA3D.OrthographicCamera.prototype.copy = function( source ) {
 
@@ -674,19 +625,7 @@ THREE.SEA3D.PointLight = function( hex, intensity, distance, decay ) {
 THREE.SEA3D.PointLight.prototype = Object.create( THREE.PointLight.prototype );
 THREE.SEA3D.PointLight.prototype.constructor = THREE.SEA3D.PointLight;
 
-THREE.SEA3D.PointLight.prototype.setAnimator = THREE.SEA3D.Object3D.prototype.setAnimator;
-THREE.SEA3D.PointLight.prototype.getAnimator = THREE.SEA3D.Object3D.prototype.getAnimator;
-
-THREE.SEA3D.PointLight.prototype.setTimeScale = THREE.SEA3D.Object3DAnimator.prototype.setTimeScale;
-THREE.SEA3D.PointLight.prototype.getTimeScale = THREE.SEA3D.Object3DAnimator.prototype.getTimeScale;
-
-THREE.SEA3D.PointLight.prototype.play = THREE.SEA3D.Object3DAnimator.prototype.play;
-THREE.SEA3D.PointLight.prototype.stop = THREE.SEA3D.Object3DAnimator.prototype.stop;
-THREE.SEA3D.PointLight.prototype.pause = THREE.SEA3D.Object3DAnimator.prototype.pause;
-THREE.SEA3D.PointLight.prototype.resume = THREE.SEA3D.Object3DAnimator.prototype.resume;
-
-THREE.SEA3D.PointLight.prototype.update = THREE.SEA3D.Object3DAnimator.prototype.update;
-THREE.SEA3D.PointLight.prototype.updateAnimations = THREE.SEA3D.Object3DAnimator.prototype.updateAnimations;
+Object.assign( THREE.SEA3D.PointLight.prototype, THREE.SEA3D.Object3D.prototype );
 
 THREE.SEA3D.PointLight.prototype.copy = function( source ) {
 
