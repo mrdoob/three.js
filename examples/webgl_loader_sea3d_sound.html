@@ -115,8 +115,8 @@
 			initKeyDown
 
 			var loader;
-			var audioListener, soundFilter, soundAnalyser;
-			var soundArea, collisionArea, lightArea, lightIntensity;
+			var audioListener, soundFilter, soundAnalyser, soundAnalyzerOutside;
+			var soundArea, collisionArea, lightArea, lightOutside;
 
 			// Initialize Three.JS
 
@@ -150,13 +150,28 @@
 
 				soundAnalyser = audioListener.context.createAnalyser();
 				soundAnalyser.smoothingTimeConstant = 0.3;
-				soundAnalyser.fftSize = 1024;
+				soundAnalyser.fftSize = 512;
 
-				// assets
+				// sound analyser outside
+
+				soundAnalyzerOutside = audioListener.context.createAnalyser();
+				soundAnalyzerOutside.smoothingTimeConstant = 0.3;
+				soundAnalyzerOutside.fftSize = 512;
+
+				// sound asset 1
+
+				lightOutside = loader.getLight("Light1");
+
+				soundOutside = loader.getSound3D("Point001");
+				soundOutside.setFilters( [ soundAnalyzerOutside ] );
+
+				// sound asset 2 + area
 
 				lightArea = loader.getLight("Light2");
 
 				soundArea = loader.getSound3D("Point002");
+				soundArea.setFilters( [ soundAnalyser ] );
+
 				collisionArea = loader.getMesh("Torus003");
 
 				animate();
@@ -167,7 +182,7 @@
 
 			//
 
-			var updateAudioAmplitude = function() {
+			var getAudioAmplitude = function() {
 
 				function getAverageVolume(array) {
 
@@ -190,14 +205,14 @@
 
 				}
 
-				return function() {
+				return function( analyser ) {
 
 					// get the average for the first channel
 
-					var array =  new Uint8Array( soundAnalyser.frequencyBinCount );
-					soundAnalyser.getByteFrequencyData( array );
+					var array = new Uint8Array( analyser.frequencyBinCount );
+					analyser.getByteFrequencyData( array );
 
-					lightIntensity = getAverageVolume( array ) / 50;
+					return getAverageVolume( array ) / 50;
 
 				}
 
@@ -464,23 +479,19 @@
 				// pick a vector from camera to sound
 				raycaster.set( audioPos, difPos.normalize() );
 
-				// default volume
-				lightIntensity = .5;
-
 				// intersecting sound1
 				if ( length > 50 && raycaster.intersectObjects( [collisionArea] ).length ) {
 
-					if ( soundArea.getFilter() !== soundFilter ) soundArea.setFilter( soundFilter );
+					if ( soundArea.getFilters()[1] !== soundFilter ) soundArea.setFilters( [ soundAnalyser, soundFilter ] );
 
-				} else if ( soundArea.getFilter() === soundFilter ) {
+				} else if ( soundArea.getFilters()[1] === soundFilter ) {
 
-					soundArea.setFilter( soundAnalyser );
-
-				} else {
-
-					updateAudioAmplitude();
+					soundArea.setFilters( [ soundAnalyser ] );
 
 				}
+
+				lightOutside.intensity = getAudioAmplitude( soundAnalyzerOutside );
+				lightArea.intensity = getAudioAmplitude( soundAnalyser );
 
 			}
 
@@ -498,9 +509,6 @@
 
 				// Update sound filter from raycaster intersecting
 				updateSoundFilter();
-
-				// Update light from volume
-				lightArea.intensity = lightIntensity;
 
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );
