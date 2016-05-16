@@ -88,7 +88,7 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.source = source;
 
-		this.connect();
+		return this.connect();
 
 	},
 
@@ -104,6 +104,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 		this.source.stop();
 		this.startTime = this.context.currentTime;
 
+		return this;
+
 	},
 
 	stop: function () {
@@ -117,6 +119,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.source.stop();
 		this.startTime = 0;
+
+		return this;
 
 	},
 
@@ -140,6 +144,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		}
 
+		return this;
+
 	},
 
 	disconnect: function () {
@@ -161,6 +167,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 			this.source.disconnect( this.getOutput() );
 
 		}
+
+		return this;
 
 	},
 
@@ -186,6 +194,20 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		}
 
+		return this;
+
+	},
+
+	getFilter: function () {
+
+		return this.getFilters()[ 0 ];
+
+	},
+
+	setFilter: function ( filter ) {
+
+		return this.setFilters( filter ? [ filter ] : [] );
+
 	},
 
 	setPlaybackRate: function ( value ) {
@@ -204,6 +226,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 			this.source.playbackRate.value = this.playbackRate;
 
 		}
+
+		return this;
 
 	},
 
@@ -255,6 +279,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 	setVolume: function ( value ) {
 
 		this.gain.gain.value = value;
+
+		return this;
 
 	}
 
