@@ -6,6 +6,10 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	var _this = this;
 
+	this.colorBuffer = new THREE.WebGLColorBuffer( gl, this );
+	this.depthBuffer = new THREE.WebGLDepthBuffer( gl, this );
+	this.stencilBuffer = new THREE.WebGLStencilBuffer( gl, this );
+
 	var color = new THREE.Vector4();
 
 	var maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
@@ -26,19 +30,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentBlendDstAlpha = null;
 	var currentPremultipledAlpha = false;
 
-	var currentDepthFunc = null;
-	var currentDepthWrite = null;
-
-	var currentColorWrite = null;
-
-	var currentStencilWrite = null;
-	var currentStencilFunc = null;
-	var currentStencilRef = null;
-	var currentStencilMask = null;
-	var currentStencilFail  = null;
-	var currentStencilZFail = null;
-	var currentStencilZPass = null;
-
 	var currentFlipSided = null;
 	var currentCullFace = null;
 
@@ -48,10 +39,6 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 	var currentPolygonOffsetUnits = null;
 
 	var currentScissorTest = null;
-
-	var colorBufferEnabled = true;
-	var depthBufferEnabled = true;
-	var stencilBufferEnabled = true;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
@@ -343,202 +330,85 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.enableDepthBuffer = function () {
 
-		depthBufferEnabled = true;
+		this.depthBuffer.enabled = true;
 
 	};
 
 	this.disableDepthBuffer = function () {
 
-		depthBufferEnabled = false;
+		this.depthBuffer.enabled = false;
 
 	};
 
 	this.setDepthFunc = function ( depthFunc ) {
 
-		if ( currentDepthFunc !== depthFunc ) {
-
-			if ( depthFunc ) {
-
-				switch ( depthFunc ) {
-
-					case THREE.NeverDepth:
-
-						gl.depthFunc( gl.NEVER );
-						break;
-
-					case THREE.AlwaysDepth:
-
-						gl.depthFunc( gl.ALWAYS );
-						break;
-
-					case THREE.LessDepth:
-
-						gl.depthFunc( gl.LESS );
-						break;
-
-					case THREE.LessEqualDepth:
-
-						gl.depthFunc( gl.LEQUAL );
-						break;
-
-					case THREE.EqualDepth:
-
-						gl.depthFunc( gl.EQUAL );
-						break;
-
-					case THREE.GreaterEqualDepth:
-
-						gl.depthFunc( gl.GEQUAL );
-						break;
-
-					case THREE.GreaterDepth:
-
-						gl.depthFunc( gl.GREATER );
-						break;
-
-					case THREE.NotEqualDepth:
-
-						gl.depthFunc( gl.NOTEQUAL );
-						break;
-
-					default:
-
-						gl.depthFunc( gl.LEQUAL );
-
-				}
-
-			} else {
-
-				gl.depthFunc( gl.LEQUAL );
-
-			}
-
-			currentDepthFunc = depthFunc;
-
-		}
+		this.depthBuffer.func( depthFunc );
 
 	};
 
 	this.setDepthTest = function ( depthTest ) {
 
-		if ( depthTest ) {
-
-			this.enable( gl.DEPTH_TEST );
-
-		} else {
-
-			this.disable( gl.DEPTH_TEST );
-
-		}
+		this.depthBuffer.test( depthTest );
 
 	};
 
 	this.setDepthWrite = function ( depthWrite ) {
 
-		// TODO: Rename to setDepthMask
-
-		if ( currentDepthWrite !== depthWrite && depthBufferEnabled ) {
-
-			gl.depthMask( depthWrite );
-			currentDepthWrite = depthWrite;
-
-		}
+		this.depthBuffer.mask( depthWrite );
 
 	};
 
 	this.enableColorBuffer = function () {
 
-		colorBufferEnabled = true;
+		this.colorBuffer.enabled = true;
 
 	};
 
 	this.disableColorBuffer = function () {
 
-		colorBufferEnabled = false;
+		this.colorBuffer.enabled = false;
 
 	};
 
 	this.setColorWrite = function ( colorWrite ) {
 
-		// TODO: Rename to setColorMask
-
-		if ( currentColorWrite !== colorWrite && colorBufferEnabled ) {
-
-			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
-			currentColorWrite = colorWrite;
-
-		}
+		this.colorBuffer.mask( colorWrite );
 
 	};
 
 	this.setStencilFunc = function ( stencilFunc, stencilRef, stencilMask ) {
 
-		if ( currentStencilFunc !== stencilFunc ||
-				 currentStencilRef 	!== stencilRef 	||
-				 currentStencilMask !== stencilMask ) {
-
-			gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
-
-			currentStencilFunc = stencilFunc;
-			currentStencilRef  = stencilRef;
-			currentStencilMask = stencilMask;
-
-		}
+		this.stencilBuffer.func( stencilFunc, stencilRef, stencilMask );
 
 	};
 
 	this.setStencilOp = function ( stencilFail, stencilZFail, stencilZPass ) {
 
-		if ( currentStencilFail	 !== stencilFail 	||
-				 currentStencilZFail !== stencilZFail ||
-				 currentStencilZPass !== stencilZPass ) {
-
-			gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
-
-			currentStencilFail  = stencilFail;
-			currentStencilZFail = stencilZFail;
-			currentStencilZPass = stencilZPass;
-
-		}
+		this.stencilBuffer.op( stencilFail, stencilZFail, stencilZPass );
 
 	};
 
 	this.setStencilTest = function ( stencilTest ) {
 
-		if ( stencilTest ) {
-
-			this.enable( gl.STENCIL_TEST );
-
-		} else {
-
-			this.disable( gl.STENCIL_TEST );
-
-		}
+		this.stencilBuffer.test( stencilTest );
 
 	};
 
 	this.setStencilWrite = function ( stencilWrite ) {
 
-		// TODO: Rename to setStencilMask
-
-		if ( currentStencilWrite !== stencilWrite && stencilBufferEnabled ) {
-
-			gl.stencilMask( stencilWrite );
-			currentStencilWrite = stencilWrite;
-
-		}
+		this.stencilBuffer.mask( stencilWrite );
 
 	};
 
 	this.enableStencilBuffer = function () {
 
-		stencilBufferEnabled = true;
+		this.stencilBuffer.enabled = true;
 
 	};
 
 	this.disableStencilBuffer = function () {
 
-		stencilBufferEnabled = false;
+		this.stencilBuffer.enabled = false;
 
 	};
 
@@ -809,16 +679,233 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		currentBlending = null;
 
-		currentColorWrite = null;
-		currentDepthWrite = null;
-		currentStencilWrite = null;
-
 		currentFlipSided = null;
 		currentCullFace = null;
 
-		colorBufferEnabled = true;
-		depthBufferEnabled = true;
-		stencilBufferEnabled = true;
+		this.colorBuffer.reset();
+		this.depthBuffer.reset();
+		this.stencilBuffer.reset();
+
+	};
+
+};
+
+THREE.WebGLColorBuffer = function ( gl, state ) {
+
+	this.enabled = true;
+
+	var currentColorMask = null;
+
+	this.mask = function ( colorMask ) {
+
+		if ( currentColorMask !== colorMask && this.enabled ) {
+
+			gl.colorMask( colorMask, colorMask, colorMask, colorMask );
+			currentColorMask = colorMask;
+
+		}
+
+	};
+
+	this.reset = function () {
+
+		this.enabled = true;
+
+		currentColorMask = null;
+
+	};
+
+};
+
+THREE.WebGLDepthBuffer = function( gl, state ) {
+
+	this.enabled = true;
+
+	var currentDepthMask = null;
+	var currentDepthFunc = null;
+
+	this.test = function ( depthTest ) {
+
+		if ( depthTest ) {
+
+			state.enable( gl.DEPTH_TEST );
+
+		} else {
+
+			state.disable( gl.DEPTH_TEST );
+
+		}
+
+	};
+
+	this.mask = function( depthMask ){
+
+		if ( currentDepthMask !== depthMask && this.enabled ) {
+
+			gl.depthMask( depthMask );
+			currentDepthMask = depthMask;
+
+		}
+
+	};
+
+	this.func = function ( depthFunc ) {
+
+		if ( currentDepthFunc !== depthFunc ) {
+
+			if ( depthFunc ) {
+
+				switch ( depthFunc ) {
+
+					case THREE.NeverDepth:
+
+						gl.depthFunc( gl.NEVER );
+						break;
+
+					case THREE.AlwaysDepth:
+
+						gl.depthFunc( gl.ALWAYS );
+						break;
+
+					case THREE.LessDepth:
+
+						gl.depthFunc( gl.LESS );
+						break;
+
+					case THREE.LessEqualDepth:
+
+						gl.depthFunc( gl.LEQUAL );
+						break;
+
+					case THREE.EqualDepth:
+
+						gl.depthFunc( gl.EQUAL );
+						break;
+
+					case THREE.GreaterEqualDepth:
+
+						gl.depthFunc( gl.GEQUAL );
+						break;
+
+					case THREE.GreaterDepth:
+
+						gl.depthFunc( gl.GREATER );
+						break;
+
+					case THREE.NotEqualDepth:
+
+						gl.depthFunc( gl.NOTEQUAL );
+						break;
+
+					default:
+
+						gl.depthFunc( gl.LEQUAL );
+
+				}
+
+			} else {
+
+				gl.depthFunc( gl.LEQUAL );
+
+			}
+
+			currentDepthFunc = depthFunc;
+
+		}
+
+	};
+
+	this.reset = function () {
+
+		this.enabled = true;
+
+		currentDepthMask = null;
+		currentDepthFunc = null;
+
+	};
+
+};
+
+THREE.WebGLStencilBuffer = function ( gl, state ) {
+
+	this.enabled = true;
+
+	var currentStencilMask = null;
+	var currentStencilFunc = null;
+	var currentStencilRef = null;
+	var currentStencilFuncMask = null;
+	var currentStencilFail  = null;
+	var currentStencilZFail = null;
+	var currentStencilZPass = null;
+
+	this.test = function ( stencilTest ) {
+
+		if ( stencilTest ) {
+
+			state.enable( gl.STENCIL_TEST );
+
+		} else {
+
+			state.disable( gl.STENCIL_TEST );
+
+		}
+
+	};
+
+	this.mask = function ( stencilMask ) {
+
+		if ( currentStencilMask !== stencilMask && this.enabled ) {
+
+			gl.stencilMask( stencilMask );
+	    currentStencilMask = stencilMask;
+
+		}
+
+	};
+
+	this.func = function ( stencilFunc, stencilRef, stencilMask ) {
+
+		if ( currentStencilFunc !== stencilFunc ||
+				 currentStencilRef 	!== stencilRef 	||
+				 currentStencilFuncMask !== stencilMask ) {
+
+			gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
+
+			currentStencilFunc = stencilFunc;
+			currentStencilRef  = stencilRef;
+			currentStencilFuncMask = stencilMask;
+
+		}
+
+	};
+
+	this.op	 = function ( stencilFail, stencilZFail, stencilZPass ) {
+
+		if ( currentStencilFail	 !== stencilFail 	||
+				 currentStencilZFail !== stencilZFail ||
+				 currentStencilZPass !== stencilZPass ) {
+
+			gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
+
+			currentStencilFail  = stencilFail;
+			currentStencilZFail = stencilZFail;
+			currentStencilZPass = stencilZPass;
+
+		}
+
+	};
+
+	this.reset = function () {
+
+		this.enabled = true;
+
+		currentStencilMask = null;
+		currentStencilFunc = null;
+		currentStencilRef = null;
+		currentStencilFuncMask = null;
+		currentStencilFail = null;
+		currentStencilZFail = null;
+		currentStencilZPass = null;
 
 	};
 
