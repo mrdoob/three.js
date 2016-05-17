@@ -29,13 +29,13 @@ THREE.MaskPass.prototype = {
 
 		// don't update color or depth
 
-		state.setColorWrite( false );
-		state.setDepthWrite( false );
+		state.buffers.color.mask( false );
+		state.buffers.depth.mask( false );
 
-		// save this buffer setting for all objects in the mask scene
+		// lock buffers
 
-		state.disableColorBuffer();
-		state.disableDepthBuffer();
+		state.buffers.color.locked( true );
+		state.buffers.depth.locked( true );
 
 		// set up stencil
 
@@ -53,25 +53,25 @@ THREE.MaskPass.prototype = {
 
 		}
 
-		state.setStencilTest( true );
-		state.setStencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		state.setStencilFunc( context.ALWAYS, writeValue, 0xffffffff );
-		state.clearStencil( clearValue );
+		state.buffers.stencil.test( true );
+		state.buffers.stencil.op( context.REPLACE, context.REPLACE, context.REPLACE );
+		state.buffers.stencil.func( context.ALWAYS, writeValue, 0xffffffff );
+		state.buffers.stencil.clear( clearValue );
 
 		// draw into the stencil buffer
 
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
-		// re-enable update of color and depth buffer for subsequent rendering
+		// unlock color and depth buffer for subsequent rendering
 
-		state.enableColorBuffer();
-		state.enableDepthBuffer();
+		state.buffers.color.locked( false );
+		state.buffers.depth.locked( false );
 
 		// only render where stencil is set to 1
 
-		state.setStencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		state.setStencilOp( context.KEEP, context.KEEP, context.KEEP );
+		state.buffers.stencil.func( context.EQUAL, 1, 0xffffffff );  // draw if == 1
+		state.buffers.stencil.op( context.KEEP, context.KEEP, context.KEEP );
 
 	}
 
@@ -94,7 +94,7 @@ THREE.ClearMaskPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		renderer.state.setStencilTest( false );
+		renderer.state.buffers.stencil.test( false );
 
 	}
 
