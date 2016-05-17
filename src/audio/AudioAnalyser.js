@@ -20,6 +20,22 @@ Object.assign( THREE.AudioAnalyser.prototype, {
 		this.analyser.getByteFrequencyData( this.data );
 		return this.data;
 
+	},
+
+	getAverage: function() {
+
+		var values = 0, data = this.getData();
+
+		// get all the frequency amplitudes
+
+		for (var i = 0; i < data.length; i++) {
+
+			values += data[ i ];
+
+		}
+
+		return values / data.length;
+
 	}
 
 } );

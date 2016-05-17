@@ -49,7 +49,7 @@ THREE.FunctionCallNode.prototype.generate = function( builder, output ) {
 		var inpt = func.inputs[ i ];
 		var param = this.inputs[ i ] || this.inputs[ inpt.name ];
 
-		params.push( param.build( builder, builder.getType( inpt.type ) ) );
+		params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
 
 	}
 
