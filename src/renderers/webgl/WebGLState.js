@@ -268,7 +268,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 				if ( premultipliedAlpha ) {
 
 					gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-					gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.SRC_COLOR, gl.SRC_ALPHA );
+					gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
 
 				} else {
 
