@@ -16366,7 +16366,7 @@ THREE.Audio = function ( listener ) {
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
 
-	this.filter = null;
+	this.filters = [];
 
 };
 
@@ -16393,11 +16393,10 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 	setBuffer: function ( audioBuffer ) {
 
-		var scope = this;
+		this.source.buffer = audioBuffer;
+		this.sourceType = 'buffer';
 
-		scope.source.buffer = audioBuffer;
-		scope.sourceType = 'buffer';
-		if ( scope.autoplay ) scope.play();
+		if ( this.autoplay ) this.play();
 
 		return this;
 
@@ -16431,7 +16430,7 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.source = source;
 
-		this.connect();
+		return this.connect();
 
 	},
 
@@ -16447,6 +16446,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 		this.source.stop();
 		this.startTime = this.context.currentTime;
 
+		return this;
+
 	},
 
 	stop: function () {
@@ -16461,14 +16462,23 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 		this.source.stop();
 		this.startTime = 0;
 
+		return this;
+
 	},
 
 	connect: function () {
 
-		if ( this.filter !== null ) {
+		if ( this.filters.length > 0 ) {
 
-			this.source.connect( this.filter );
-			this.filter.connect( this.getOutput() );
+			this.source.connect( this.filters[ 0 ] );
+
+			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+
+				this.filters[ i - 1 ].connect( this.filters[ i ] );
+
+			}
+
+			this.filters[ this.filters.length - 1 ].connect( this.getOutput() );
 
 		} else {
 
@@ -16476,14 +16486,23 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		}
 
+		return this;
+
 	},
 
 	disconnect: function () {
 
-		if ( this.filter !== null ) {
+		if ( this.filters.length > 0 ) {
 
-			this.source.disconnect( this.filter );
-			this.filter.disconnect( this.getOutput() );
+			this.source.disconnect( this.filters[ 0 ] );
+
+			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+
+				this.filters[ i - 1 ].disconnect( this.filters[ i ] );
+
+			}
+
+			this.filters[ this.filters.length - 1 ].disconnect( this.getOutput() );
 
 		} else {
 
@@ -16491,29 +16510,45 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		}
 
-	},
-
-	getFilter: function () {
-
-		return this.filter;
+		return this;
 
 	},
 
-	setFilter: function ( value ) {
+	getFilters: function () {
 
-		if ( value === undefined ) value = null;
+		return this.filters;
+
+	},
+
+	setFilters: function ( value ) {
+
+		if ( ! value ) value = [];
 
 		if ( this.isPlaying === true ) {
 
 			this.disconnect();
-			this.filter = value;
+			this.filters = value;
 			this.connect();
 
 		} else {
 
-			this.filter = value;
+			this.filters = value;
 
 		}
+
+		return this;
+
+	},
+
+	getFilter: function () {
+
+		return this.getFilters()[ 0 ];
+
+	},
+
+	setFilter: function ( filter ) {
+
+		return this.setFilters( filter ? [ filter ] : [] );
 
 	},
 
@@ -16533,6 +16568,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 			this.source.playbackRate.value = this.playbackRate;
 
 		}
+
+		return this;
 
 	},
 
@@ -16585,6 +16622,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.gain.gain.value = value;
 
+		return this;
+
 	}
 
 } );
@@ -16612,6 +16651,22 @@ Object.assign( THREE.AudioAnalyser.prototype, {
 
 		this.analyser.getByteFrequencyData( this.data );
 		return this.data;
+
+	},
+
+	getAverage: function() {
+
+		var values = 0, data = this.getData();
+
+		// get all the frequency amplitudes
+
+		for (var i = 0; i < data.length; i++) {
+
+			values += data[ i ];
+
+		}
+
+		return values / data.length;
 
 	}
 
