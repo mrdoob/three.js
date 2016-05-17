@@ -857,7 +857,7 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 		if ( currentStencilMask !== stencilMask && this.enabled ) {
 
 			gl.stencilMask( stencilMask );
-	    currentStencilMask = stencilMask;
+			currentStencilMask = stencilMask;
 
 		}
 
@@ -866,8 +866,8 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 	this.func = function ( stencilFunc, stencilRef, stencilMask ) {
 
 		if ( currentStencilFunc !== stencilFunc ||
-				 currentStencilRef 	!== stencilRef 	||
-				 currentStencilFuncMask !== stencilMask ) {
+		     currentStencilRef 	!== stencilRef 	||
+		     currentStencilFuncMask !== stencilMask ) {
 
 			gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
 
@@ -882,8 +882,8 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 	this.op	 = function ( stencilFail, stencilZFail, stencilZPass ) {
 
 		if ( currentStencilFail	 !== stencilFail 	||
-				 currentStencilZFail !== stencilZFail ||
-				 currentStencilZPass !== stencilZPass ) {
+		     currentStencilZFail !== stencilZFail ||
+		     currentStencilZPass !== stencilZPass ) {
 
 			gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
 
