@@ -326,49 +326,49 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.setDepthFunc = function ( depthFunc ) {
 
-		this.buffers.depth.func( depthFunc );
+		this.buffers.depth.setFunc( depthFunc );
 
 	};
 
 	this.setDepthTest = function ( depthTest ) {
 
-		this.buffers.depth.test( depthTest );
+		this.buffers.depth.setTest( depthTest );
 
 	};
 
 	this.setDepthWrite = function ( depthWrite ) {
 
-		this.buffers.depth.mask( depthWrite );
+		this.buffers.depth.setMask( depthWrite );
 
 	};
 
 	this.setColorWrite = function ( colorWrite ) {
 
-		this.buffers.color.mask( colorWrite );
+		this.buffers.color.setMask( colorWrite );
 
 	};
 
 	this.setStencilFunc = function ( stencilFunc, stencilRef, stencilMask ) {
 
-		this.buffers.stencil.func( stencilFunc, stencilRef, stencilMask );
+		this.buffers.stencil.setFunc( stencilFunc, stencilRef, stencilMask );
 
 	};
 
 	this.setStencilOp = function ( stencilFail, stencilZFail, stencilZPass ) {
 
-		this.buffers.stencil.op( stencilFail, stencilZFail, stencilZPass );
+		this.buffers.stencil.setOp( stencilFail, stencilZFail, stencilZPass );
 
 	};
 
 	this.setStencilTest = function ( stencilTest ) {
 
-		this.buffers.stencil.test( stencilTest );
+		this.buffers.stencil.setTest( stencilTest );
 
 	};
 
 	this.setStencilWrite = function ( stencilWrite ) {
 
-		this.buffers.stencil.mask( stencilWrite );
+		this.buffers.stencil.setMask( stencilWrite );
 
 	};
 
@@ -558,19 +558,19 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	this.clearColor = function ( r, g, b, a ) {
 
-		this.buffers.color.clear( r, g, b, a );
+		this.buffers.color.setClear( r, g, b, a );
 
 	};
 
 	this.clearDepth = function ( depth ) {
 
-		this.buffers.depth.clear( depth );
+		this.buffers.depth.setClear( depth );
 
 	};
 
 	this.clearStencil = function ( stencil ) {
 
-		this.buffers.stencil.clear( stencil );
+		this.buffers.stencil.setClear( stencil );
 
 	};
 
@@ -635,15 +635,15 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 THREE.WebGLColorBuffer = function ( gl, state ) {
 
-	this._locked = false;
+	var locked = false;
 
 	var color = new THREE.Vector4();
 	var currentColorMask = null;
 	var currentColorClear = new THREE.Vector4();
 
-	this.mask = function ( colorMask ) {
+	this.setMask = function ( colorMask ) {
 
-		if ( currentColorMask !== colorMask && ! this._locked ) {
+		if ( currentColorMask !== colorMask && ! locked ) {
 
 			gl.colorMask( colorMask, colorMask, colorMask, colorMask );
 			currentColorMask = colorMask;
@@ -652,13 +652,13 @@ THREE.WebGLColorBuffer = function ( gl, state ) {
 
 	};
 
-	this.locked = function ( locked ) {
+	this.setLocked = function ( lock ) {
 
-		this._locked = locked;
+		locked = lock;
 
 	};
 
-	this.clear = function ( r, g, b, a ) {
+	this.setClear = function ( r, g, b, a ) {
 
 		color.set( r, g, b, a );
 
@@ -673,7 +673,7 @@ THREE.WebGLColorBuffer = function ( gl, state ) {
 
 	this.reset = function () {
 
-		this._locked = false;
+		locked = false;
 
 		currentColorMask = null;
 		currentColorClear = new THREE.Vector4();
@@ -684,13 +684,13 @@ THREE.WebGLColorBuffer = function ( gl, state ) {
 
 THREE.WebGLDepthBuffer = function( gl, state ) {
 
-	this.locked = false;
+	var locked = false;
 
 	var currentDepthMask = null;
 	var currentDepthFunc = null;
 	var currentDepthClear = null;
 
-	this.test = function ( depthTest ) {
+	this.setTest = function ( depthTest ) {
 
 		if ( depthTest ) {
 
@@ -704,9 +704,9 @@ THREE.WebGLDepthBuffer = function( gl, state ) {
 
 	};
 
-	this.mask = function( depthMask ){
+	this.setMask = function( depthMask ){
 
-		if ( currentDepthMask !== depthMask && ! this._locked ) {
+		if ( currentDepthMask !== depthMask && ! locked ) {
 
 			gl.depthMask( depthMask );
 			currentDepthMask = depthMask;
@@ -715,7 +715,7 @@ THREE.WebGLDepthBuffer = function( gl, state ) {
 
 	};
 
-	this.func = function ( depthFunc ) {
+	this.setFunc = function ( depthFunc ) {
 
 		if ( currentDepthFunc !== depthFunc ) {
 
@@ -781,13 +781,13 @@ THREE.WebGLDepthBuffer = function( gl, state ) {
 
 	};
 
-	this.locked = function ( locked ) {
+	this.setLocked = function ( lock ) {
 
-		this._locked = locked;
+		locked = lock;
 
 	};
 
-	this.clear = function ( depth ) {
+	this.setClear = function ( depth ) {
 
 		if ( currentDepthClear !== depth ) {
 
@@ -800,7 +800,7 @@ THREE.WebGLDepthBuffer = function( gl, state ) {
 
 	this.reset = function () {
 
-		this._locked = false;
+		locked = false;
 
 		currentDepthMask = null;
 		currentDepthFunc = null;
@@ -812,7 +812,7 @@ THREE.WebGLDepthBuffer = function( gl, state ) {
 
 THREE.WebGLStencilBuffer = function ( gl, state ) {
 
-	this._locked = false;
+	var locked = false;
 
 	var currentStencilMask = null;
 	var currentStencilFunc = null;
@@ -823,7 +823,7 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 	var currentStencilZPass = null;
 	var currentStencilClear = null;
 
-	this.test = function ( stencilTest ) {
+	this.setTest = function ( stencilTest ) {
 
 		if ( stencilTest ) {
 
@@ -837,9 +837,9 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 
 	};
 
-	this.mask = function ( stencilMask ) {
+	this.setMask = function ( stencilMask ) {
 
-		if ( currentStencilMask !== stencilMask && ! this._locked ) {
+		if ( currentStencilMask !== stencilMask && ! locked ) {
 
 			gl.stencilMask( stencilMask );
 			currentStencilMask = stencilMask;
@@ -848,7 +848,7 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 
 	};
 
-	this.func = function ( stencilFunc, stencilRef, stencilMask ) {
+	this.setFunc = function ( stencilFunc, stencilRef, stencilMask ) {
 
 		if ( currentStencilFunc !== stencilFunc ||
 		     currentStencilRef 	!== stencilRef 	||
@@ -864,7 +864,7 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 
 	};
 
-	this.op	 = function ( stencilFail, stencilZFail, stencilZPass ) {
+	this.setOp	 = function ( stencilFail, stencilZFail, stencilZPass ) {
 
 		if ( currentStencilFail	 !== stencilFail 	||
 		     currentStencilZFail !== stencilZFail ||
@@ -880,13 +880,13 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 
 	};
 
-	this.locked = function ( locked ) {
+	this.setLocked = function ( lock ) {
 
-		this._locked = locked;
+		locked = lock;
 
 	};
 
-	this.clear = function ( stencil ) {
+	this.setClear = function ( stencil ) {
 
 		if ( currentStencilClear !== stencil ) {
 
@@ -899,7 +899,7 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 
 	this.reset = function () {
 
-		this._locked = false;
+		locked = false;
 
 		currentStencilMask = null;
 		currentStencilFunc = null;
