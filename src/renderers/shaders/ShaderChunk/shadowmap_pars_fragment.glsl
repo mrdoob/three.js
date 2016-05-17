@@ -22,12 +22,34 @@
 	#endif
 
 	#if defined( SHADOWMAP_TYPE_PCSS )
-		#define LIGHT_SIZE_UV 1.0
-		#define NEAR_PLANE 1.0
+		#define LIGHT_WORLD_SIZE 0.005
+		#define LIGHT_FRUSTUM_WIDTH 3.75
+		#define LIGHT_SIZE_UV (LIGHT_WORLD_SIZE / LIGHT_FRUSTUM_WIDTH) 
+		#define NEAR_PLANE 9.5
 		#define BLOCKER_SEARCH_NUM_SAMPLES 16
 		#define PCF_NUM_SAMPLES 16
-		uniform vec2 poissonDisk[BLOCKER_SEARCH_NUM_SAMPLES];
-
+		vec2 poissonDisk[BLOCKER_SEARCH_NUM_SAMPLES];
+		
+		void initPoissonSamples()
+		{
+			poissonDisk[0] = vec2(-0.94201624, -0.39906216 );
+			poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
+			poissonDisk[2] =  vec2( -0.094184101, -0.92938870 );
+			poissonDisk[3] =  vec2( 0.34495938, 0.29387760 );
+	        poissonDisk[4] = vec2( -0.91588581, 0.45771432 );
+			poissonDisk[5] = vec2( -0.81544232, -0.87912464 );
+			poissonDisk[6] =  vec2( -0.38277543, 0.27676845 );
+			poissonDisk[7] =  vec2( 0.97484398, 0.75648379 );
+			poissonDisk[8] =  vec2( 0.44323325, -0.97511554 );
+			poissonDisk[9] =  vec2( 0.53742981, -0.47373420 );
+			poissonDisk[10] =  vec2( -0.26496911, -0.41893023 );
+			poissonDisk[11] =  vec2( 0.79197514, 0.19090188 );
+			poissonDisk[12] =  vec2( -0.24188840, 0.99706507 );
+			poissonDisk[13] =  vec2( -0.81409955, 0.91437590 );
+			poissonDisk[14] =  vec2( 0.19984126, 0.78641367 );
+			poissonDisk[15] =  vec2( 0.14383161, -0.14100790 ); 
+		}
+		
 		float PenumbraSize(float zReceiver, float zBlocker) //Parallel plane estimation
 		{
 			return (zReceiver - zBlocker) / zBlocker;
@@ -40,7 +62,6 @@
 			float searchWidth = LIGHT_SIZE_UV * (zReceiver - NEAR_PLANE) / zReceiver;
 			float blockerSum = 0.0;
 			numBlockers = 0.0;
-
 			for( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; ++i )
 			{
 				float shadowMapDepth = unpackRGBAToDepth(texture2D(shadowMap, uv + poissonDisk[i] * searchWidth));
@@ -58,7 +79,8 @@
 			for ( int i = 0; i < PCF_NUM_SAMPLES; ++i )
 			{
 				vec2 offset = poissonDisk[i] * filterRadiusUV;
-				sum += unpackRGBAToDepth(texture2D(shadowMap, uv + offset));
+				float depth = unpackRGBAToDepth(texture2D(shadowMap, uv + offset));
+				sum += (zReceiver <= depth) ? 1.0 : 0.0;
 			}
 			return sum / float(PCF_NUM_SAMPLES);
 		}
@@ -67,7 +89,8 @@
 		{
 			vec2 uv = coords.xy;
 			float zReceiver = coords.z; // Assumed to be eye-space z in this code
-
+			
+			initPoissonSamples();
 			// STEP 1: blocker search
 			float avgBlockerDepth = 0.0;
 			float numBlockers = 0.0;
@@ -80,6 +103,7 @@
 			float filterRadiusUV = penumbraRatio * LIGHT_SIZE_UV * NEAR_PLANE / coords.z;
 
 			// STEP 3: filtering
+			//return avgBlockerDepth;
 			return PCF_Filter( shadowMap, uv, zReceiver, filterRadiusUV );
 		}
 
@@ -173,7 +197,7 @@
 			) * ( 1.0 / 9.0 );
 
 		#elif defined( SHADOWMAP_TYPE_PCSS )
-
+		  return PCSS( shadowMap, shadowCoord);
 		  return texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
 
 		#else // no percentage-closer filtering:
