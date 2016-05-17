@@ -1783,48 +1783,49 @@ translation 3.25	0.05	-0.14
 
 
 DEF achterdeur Transform {
-center 0 0 0 
+	center 0 0 0
 	children [
 
 
 		Shape {
-appearance DEF deurkleur Appearance {
-	material         Material {
-	ambientIntensity  0.2
-	diffuseColor      0.8 0.8 0.8
-	emissiveColor     0 0 0
-	shininess         0.1
-	specularColor     0 0 0
-	transparency      0
-}	texture           NULL
-	textureTransform  NULL
-}
+			appearance DEF deurkleur Appearance {
+				material         Material {
+					ambientIntensity  0.2
+					diffuseColor      0.8 0.8 0.8
+					emissiveColor     0 0 0
+					shininess         0.1
+					specularColor     0 0 0
+					transparency      0
+				}
+				texture           NULL
+				textureTransform  NULL
+			}
 			geometry DEF deurInd IndexedFaceSet {
 				color             NULL
 				coord  Coordinate {	#default NULL
 					point [
 
-	0.93	0	-0.025, #0
-	0	0	-0.025, #
-	0	2.09	-0.025, #
-	0.93	2.09	-0.025, #3
+						0.93	0	-0.025, #0
+						0	0	-0.025, #
+						0	2.09	-0.025, #
+						0.93	2.09	-0.025, #3
 
-	0.765	0.6	-0.025, #4
-	0.165	0.6	-0.025, #
-	0.165	1.9	-0.025, #
-	0.765	1.9	-0.025, #7
+						0.765	0.6	-0.025, #4
+						0.165	0.6	-0.025, #
+						0.165	1.9	-0.025, #
+						0.765	1.9	-0.025, #7
 
-	0.93	0	0.025, #0
-	0	0	0.025, #
-	0	2.09	0.025, #
-	0.93	2.09	0.025, #3
+						0.93	0	0.025, #0
+						0	0	0.025, #
+						0	2.09	0.025, #
+						0.93	2.09	0.025, #3
 
-	0.765	0.6	0.025, #4
-	0.165	0.6	0.025, #
-	0.165	1.9	0.025, #
-	0.765	1.9	0.025, #7
+						0.765	0.6	0.025, #4
+						0.165	0.6	0.025, #
+						0.165	1.9	0.025, #
+						0.765	1.9	0.025, #7
 
-	]
+					]
 				}
 				normal            NULL
 				texCoord          NULL
@@ -1834,46 +1835,46 @@ appearance DEF deurkleur Appearance {
 				convex            TRUE
 				coordIndex  [
 	
-	0, 1, 5, 4, -1, 
+					0, 1, 5, 4, -1,
 
-	1, 2, 6, 5, -1,
+					1, 2, 6, 5, -1,
 
-	6, 2, 3, 7, -1,
+					6, 2, 3, 7, -1,
 
-	0, 4, 7, 3, -1, 
-
-
-	1, 0, 8, 9, -1,
-
-	3, 2, 10, 11, -1,
-
-	0, 3, 11, 8, -1,
-
-	2, 1, 9, 10, -1,
+					0, 4, 7, 3, -1,
 
 
-	5, 6, 14, 13, -1,
+					1, 0, 8, 9, -1,
 
-	4, 5, 13, 12, -1,
+					3, 2, 10, 11, -1,
 
-	6, 7, 15, 14, -1,
+					0, 3, 11, 8, -1,
 
-	7, 4, 12, 15, -1,
-
-	
-	9, 8, 12, 13, -1,
-	
-	10, 9, 13, 14, -1,
-
-	11, 10, 14, 15, -1, 
-
-	12, 8, 11, 15, -1,
+					2, 1, 9, 10, -1,
 
 
+					5, 6, 14, 13, -1,
+
+					4, 5, 13, 12, -1,
+
+					6, 7, 15, 14, -1,
+
+					7, 4, 12, 15, -1,
+
+
+					9, 8, 12, 13, -1,
+
+					10, 9, 13, 14, -1,
+
+					11, 10, 14, 15, -1,
+
+					12, 8, 11, 15, -1,
 
 
 
-]     #default []
+
+
+				]     #default []
 				creaseAngle       0
 				normalIndex       []
 				normalPerVertex   TRUE
@@ -3607,7 +3608,7 @@ appearance DEF steen Appearance {
 
 		59, 61, 17, -1,
 
-		17, 61 , 18. -1,
+		17, 61 , 18, -1,
 
 		18, 61, 19, -1,
 
