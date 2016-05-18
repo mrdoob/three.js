@@ -162,7 +162,16 @@ Object.assign( THREE.AnimationClip, {
 
 	},
 
-	findByName: function( clipArray, name ) {
+	findByName: function( objectOrClipArray, name ) {
+
+		var clipArray = objectOrClipArray;
+
+		if ( ! Array.isArray( objectOrClipArray ) ) {
+
+			var o = objectOrClipArray;
+			clipArray = o.geometry && o.geometry.animations || o.animations;
+
+		}
 
 		for ( var i = 0; i < clipArray.length; i ++ ) {
 

@@ -29,11 +29,14 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
-			clipUuid = clipObject ? clipObject.uuid : clip,
+
+			clipObject = typeof clip === 'string' ?
+					THREE.AnimationClip.findByName( root, clip ) : clip,
+
+			clipUuid = clipObject !== null ? clipObject.uuid : clip,
 
 			actionsForClip = this._actionsByClip[ clipUuid ],
-			prototypeAction;
+			prototypeAction = null;
 
 		if ( actionsForClip !== undefined ) {
 
@@ -51,14 +54,8 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 			prototypeAction = actionsForClip.knownActions[ 0 ];
 
 			// also, take the clip from the prototype action
-			clipObject = prototypeAction._clip;
-
-			if ( clip !== clipUuid && clip !== clipObject ) {
-
-				throw new Error(
-						"Different clips with the same name detected!" );
-
-			}
+			if ( clipObject === null )
+				clipObject = prototypeAction._clip;
 
 		}
 
@@ -83,7 +80,10 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
+
+			clipObject = typeof clip === 'string' ?
+					THREE.AnimationClip.findByName( root, clip ) : clip,
+
 			clipUuid = clipObject ? clipObject.uuid : clip,
 
 			actionsForClip = this._actionsByClip[ clipUuid ];
