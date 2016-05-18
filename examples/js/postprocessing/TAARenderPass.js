@@ -30,6 +30,14 @@ THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.protot
 THREE.TAARenderPass.prototype.constructor = THREE.TAARenderPass;
 THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
 
+THREE.TAARenderPass.prototype.setSize = function ( width, height ) {
+
+	THREE.ManualMSAARenderPass.prototype.setSize.call( this, width, height );
+
+	if ( this.holdRenderTarget ) { this.holdRenderTarget.setSize( width, height ); }
+
+};
+
 THREE.TAARenderPass.prototype.render = function ( renderer, writeBuffer, readBuffer, delta ) {
 
 	if( ! this.accumulate ) {

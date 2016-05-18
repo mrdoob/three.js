@@ -135,7 +135,7 @@ THREE.EffectComposer.prototype = {
 
 		for ( i = 0; i < il; i ++ ) {
 
-			pass.setSize( width, height );
+			this.passes[i].setSize( width, height );
 
 		}
 
