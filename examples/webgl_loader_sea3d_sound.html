@@ -458,8 +458,8 @@
 				updateSoundFilter();
 
 				// light intensity from sound amplitude
-				lightOutside.intensity = soundOutsideAnalyser.getAverage() / 50;
-				lightArea.intensity = soundAreaAnalyser.getAverage() / 50;
+				lightOutside.intensity = soundOutsideAnalyser.getAverageFrequency() / 50;
+				lightArea.intensity = soundAreaAnalyser.getAverageFrequency() / 50;
 
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );

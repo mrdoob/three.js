@@ -746,6 +746,17 @@ Object.defineProperties( THREE.Audio.prototype, {
 	}
 } );
 
+Object.defineProperties( THREE.AudioAnalyser.prototype, {
+	getData: {
+		value: function ( file ) {
+
+			console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
+			return this.getFrequencyData();
+
+		}
+	}
+} );
+
 //
 
 THREE.GeometryUtils = {
