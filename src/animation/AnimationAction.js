@@ -270,7 +270,7 @@ THREE.AnimationAction._new.prototype = {
 
 	halt: function( duration ) {
 
-		return this.warp( this._currentTimeScale, 0, duration );
+		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	},
 
