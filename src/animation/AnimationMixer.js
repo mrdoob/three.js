@@ -29,7 +29,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
+			clipObject = typeof clip === 'string' ? this._getClipByNameAndRoot( clip, rootUuid ) : clip,
 			clipUuid = clipObject ? clipObject.uuid : clip,
 
 			actionsForClip = this._actionsByClip[ clipUuid ],
@@ -83,7 +83,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
+			clipObject = typeof clip === 'string' ? this._getClipByNameAndRoot( clip, rootUuid ) : clip,
 			clipUuid = clipObject ? clipObject.uuid : clip,
 
 			actionsForClip = this._actionsByClip[ clipUuid ];
@@ -164,17 +164,6 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		}
 
 		return this;
-
-	},
-
-	// return the first clip with the name
-	getClipByName: function( name ) {
-
-		for ( var i = 0, acts = this._actions; i < acts.length; ++ i ) {
-
-			if ( acts[ i ]._clip.name === name ) return acts[ i ]._clip;
-
-		}
 
 	},
 
@@ -567,6 +556,20 @@ Object.assign( THREE.AnimationMixer.prototype, {
 				this._removeInactiveBinding( binding );
 
 			}
+
+		}
+
+	},
+
+	_getClipByNameAndRoot: function( name, rootUuid ) {
+
+		// return the first clip with the name
+
+		for ( var i = 0, acts = this._actions, actsByClip = this._actionsByClip; i < acts.length; ++ i ) {
+
+			var clip = acts[ i ]._clip;
+
+			if ( clip.name === name && actsByClip[ clip.uuid ] && actsByClip[ clip.uuid ].actionByRoot[ rootUuid ] ) return clip;
 
 		}
 
