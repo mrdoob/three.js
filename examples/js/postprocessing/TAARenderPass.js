@@ -31,8 +31,6 @@ THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
 THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
 Object.assign( THREE.TAARenderPass.prototype, {
 
-	constructor: THREE.TAARenderPass,
-
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		if( ! this.accumulate ) {

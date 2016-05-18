@@ -77,8 +77,6 @@ THREE.BloomPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.BloomPass.prototype, {
 
-	constructor: THREE.BloomPass,
-
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
