@@ -260,9 +260,6 @@ var files = {
 		"css3d_sprites",
 		"css3d_youtube"
 	],
-	"css3d stereo": [
-		"css3dstereo_periodictable",
-	],
 	"misc": [
 		"misc_animation_authoring",
 		"misc_animation_keys",
