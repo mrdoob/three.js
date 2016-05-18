@@ -50,6 +50,7 @@
 	"src/textures/Texture.js",
 	"src/textures/CompressedTexture.js",
 	"src/textures/DataTexture.js",
+	"src/textures/Texture3D.js",
 	"src/textures/VideoTexture.js",
 	"src/objects/Group.js",
 	"src/objects/Line.js",

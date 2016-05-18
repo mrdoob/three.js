@@ -684,6 +684,20 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
+	this.texImage3D = function () {
+
+		try {
+
+			gl.texImage3D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( error );
+
+		}
+
+	};
+
 	// clear values
 
 	this.clearColor = function ( r, g, b, a ) {
