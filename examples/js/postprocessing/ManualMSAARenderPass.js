@@ -32,7 +32,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 	var compositeShader = THREE.CompositeShader;
 	this.compositeUniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
 
-	this.materialComposite = new THREE.ShaderMaterial(	{
+	this.compositeMaterial = new THREE.ShaderMaterial(	{
 
 		uniforms: this.compositeUniforms,
 		vertexShader: compositeShader.vertexShader,
@@ -44,11 +44,6 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 		depthWrite: false
 
 	} );
-
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialComposite );
-	this.scene2.add( this.quad2 );
 
 };
 
@@ -105,7 +100,7 @@ THREE.ManualMSAARenderPass.prototype = {
 			}
 
 			renderer.render( this.scene, camera, this.sampleRenderTarget, true );
-			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
+			renderer.renderPass( this.compositeMaterial, writeBuffer, (i === 0) );
 
 		}
 

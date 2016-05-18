@@ -30,8 +30,6 @@ THREE.RenderPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		this.scene.overrideMaterial = this.overrideMaterial;
-
 		if ( this.clearColor ) {
 
 			this.oldClearColor.copy( renderer.getClearColor() );
@@ -41,15 +39,13 @@ THREE.RenderPass.prototype = {
 
 		}
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		renderer.renderOverride( this.overrideMaterial, this.scene, this.camera, readBuffer, this.clear );
 
 		if ( this.clearColor ) {
 
 			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
 
 		}
-
-		this.scene.overrideMaterial = null;
 
 	}
 

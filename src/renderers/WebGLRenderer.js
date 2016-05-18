@@ -34,6 +34,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var sprites = [];
 	var lensFlares = [];
 
+	var passScene = null, passCamera = null, passQuad = null;
+
 	// public properties
 
 	this.domElement = _canvas;
@@ -1165,6 +1167,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Rendering
+
+	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, forceClear ) {
+
+		this.overrideMaterial = overrideMaterial;
+		this.render( scene, camera, renderTarget, forceClear );
+		this.overrideMaterial = null;
+
+	};
+
+	this.renderPass = function ( passMaterial, renderTarget, forceClear ) {
+
+		if( passScene === null ) {
+			passCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+			passQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+			passScene = new THREE.Scene();
+			passScene.add( passQuad );
+		}
+
+		passQuad.material = passMaterial;
+		this.render( passScene, passCamera, renderTarget, forceClear );
+		passQuad.material = null;
+
+	};
+
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
