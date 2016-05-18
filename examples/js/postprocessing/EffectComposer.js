@@ -48,6 +48,9 @@ THREE.EffectComposer.prototype = {
 
 		this.passes.push( pass );
 
+		var size = this.renderer.getSize();
+		pass.setSize( size.width, size.height );
+
 	},
 
 	insertPass: function ( pass, index ) {
