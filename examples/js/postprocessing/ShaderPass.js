@@ -42,8 +42,6 @@ THREE.ShaderPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.ShaderPass.prototype, {
 
-	constructor: THREE.ShaderPass,
-
 	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( this.uniforms[ this.textureID ] ) {

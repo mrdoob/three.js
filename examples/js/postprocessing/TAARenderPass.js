@@ -29,9 +29,8 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
 
 THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
-Object.assign( THREE.TAARenderPass.prototype, {
 
-	constructor: THREE.TAARenderPass,
+Object.assign( THREE.TAARenderPass.prototype, {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
@@ -111,7 +110,7 @@ Object.assign( THREE.TAARenderPass.prototype, {
 			this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, true );
 		}
-
+		
 		if( accumulationWeight < 1.0 ) {
 			this.compositeUniforms[ "scale" ].value = 1.0 - accumulationWeight;
 			this.compositeUniforms[ "tForeground" ].value = this.holdRenderTarget.texture;

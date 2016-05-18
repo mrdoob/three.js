@@ -39,8 +39,6 @@ THREE.GlitchPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.GlitchPass.prototype, {
 
-	constructor: THREE.GlitchPass,
-
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;

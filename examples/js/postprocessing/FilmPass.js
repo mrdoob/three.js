@@ -38,8 +38,6 @@ THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.FilmPass.prototype, {
 
-	constructor: THREE.FilmPass,
-
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;

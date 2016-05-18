@@ -26,8 +26,6 @@ THREE.RenderPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.RenderPass.prototype, {
 
-	constructor: THREE.RenderPass,
-
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.scene.overrideMaterial = this.overrideMaterial;
