@@ -29,10 +29,10 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			clipObject = ( clip !== clipName ) ? clip : null,
+			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
+			clipUuid = clipObject ? clipObject.uuid : clip,
 
-			actionsForClip = this._actionsByClip[ clipName ],
+			actionsForClip = this._actionsByClip[ clipUuid ],
 			prototypeAction;
 
 		if ( actionsForClip !== undefined ) {
@@ -53,7 +53,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 			// also, take the clip from the prototype action
 			clipObject = prototypeAction._clip;
 
-			if ( clip !== clipName && clip !== clipObject ) {
+			if ( clip !== clipUuid && clip !== clipObject ) {
 
 				throw new Error(
 						"Different clips with the same name detected!" );
@@ -72,7 +72,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		this._bindAction( newAction, prototypeAction );
 
 		// and make the action known to the memory manager
-		this._addInactiveAction( newAction, clipName, rootUuid );
+		this._addInactiveAction( newAction, clipUuid, rootUuid );
 
 		return newAction;
 
@@ -83,8 +83,10 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			actionsForClip = this._actionsByClip[ clipName ];
+			clipObject = typeof clip === 'string' ? this.getClipByName( clip ) : clip,
+			clipUuid = clipObject ? clipObject.uuid : clip,
+
+			actionsForClip = this._actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -165,6 +167,17 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 	},
 
+	// return the first clip with the name
+	getClipByName: function( name ) {
+
+		for ( var i = 0, acts = this._actions; i < acts.length; ++ i ) {
+
+			if ( acts[ i ]._clip.name === name ) return acts[ i ]._clip;
+
+		}
+
+	},
+
 	// return this mixer's root target object
 	getRoot: function() {
 
@@ -176,9 +189,9 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	uncacheClip: function( clip ) {
 
 		var actions = this._actions,
-			clipName = clip.name,
+			clipUuid = clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -208,7 +221,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 			}
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
@@ -220,9 +233,9 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		var rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
 
-		for ( var clipName in actionsByClip ) {
+		for ( var clipUuid in actionsByClip ) {
 
-			var actionByRoot = actionsByClip[ clipName ].actionByRoot,
+			var actionByRoot = actionsByClip[ clipUuid ].actionByRoot,
 				action = actionByRoot[ rootUuid ];
 
 			if ( action !== undefined ) {
@@ -350,13 +363,13 @@ Object.assign( THREE.AnimationMixer.prototype, {
 				// appears to be still using it -> rebind
 
 				var rootUuid = ( action._localRoot || this._root ).uuid,
-					clipName = action._clip.name,
-					actionsForClip = this._actionsByClip[ clipName ];
+					clipUuid = action._clip.uuid,
+					actionsForClip = this._actionsByClip[ clipUuid ];
 
 				this._bindAction( action,
 						actionsForClip && actionsForClip.knownActions[ 0 ] );
 
-				this._addInactiveAction( action, clipName, rootUuid );
+				this._addInactiveAction( action, clipUuid, rootUuid );
 
 			}
 
@@ -462,11 +475,11 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_addInactiveAction: function( action, clipName, rootUuid ) {
+	_addInactiveAction: function( action, clipUuid, rootUuid ) {
 
 		var actions = this._actions,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip === undefined ) {
 
@@ -479,7 +492,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 			action._byClipCacheIndex = 0;
 
-			actionsByClip[ clipName ] = actionsForClip;
+			actionsByClip[ clipUuid ] = actionsForClip;
 
 		} else {
 
@@ -510,9 +523,9 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		action._cacheIndex = null;
 
 
-		var clipName = action._clip.name,
+		var clipUuid = action._clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ],
+			actionsForClip = actionsByClip[ clipUuid ],
 			knownActionsForClip = actionsForClip.knownActions,
 
 			lastKnownAction =
@@ -534,7 +547,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		if ( knownActionsForClip.length === 0 ) {
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
