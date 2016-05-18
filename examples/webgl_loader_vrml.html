@@ -37,6 +37,8 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/loaders/VRMLLoader.js"></script>
+		<script src="js/libs/VrmlParser/vrml.js"></script>
+		<script src="js/libs/VrmlParser/Renderer/ThreeJsRenderer.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -78,11 +80,10 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
-
-					scene.add( object );
-
+				var loader = new THREE.VRMLLoader(vrmlParser);
+				loader.load( 'models/vrml/house.wrl', function ( tree ) {
+					var vrmlParserThreeJsRenderer = new VrmlParser.Renderer.ThreeJsRenderer();
+					vrmlParserThreeJsRenderer.render(tree, scene);
 				} );
 
 				// renderer
