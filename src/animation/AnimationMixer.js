@@ -167,17 +167,6 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 	},
 
-	// return the first clip with the name
-	getClipByName: function( name ) {
-
-		for ( var i = 0, acts = this._actions; i < acts.length; ++ i ) {
-
-			if ( acts[ i ]._clip.name === name ) return acts[ i ]._clip;
-
-		}
-
-	},
-
 	// return this mixer's root target object
 	getRoot: function() {
 
