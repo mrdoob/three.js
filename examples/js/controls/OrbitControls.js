@@ -84,6 +84,36 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// public methods
 	//
 
+	this.panCamera = function ( deltaX, deltaY ) {
+
+		pan( deltaX, deltaY );
+		scope.update();
+	};
+
+	this.dollyInCamera = function() {
+
+		dollyIn( getZoomScale() );
+		scope.update();
+	};
+
+	this.dollyOutCamera = function() {
+
+		dollyOut( getZoomScale() );
+		scope.update();
+	};
+
+	this.rotateCameraLeft = function( angle ) {
+
+		rotateLeft( angle );
+		scope.update();
+	};
+
+	this.rotateCameraUp = function( angle ) {
+
+		rotateUp( angle );
+		scope.update();
+	};
+
 	this.getPolarAngle = function () {
 
 		return spherical.phi;
