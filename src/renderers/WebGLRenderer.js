@@ -1179,18 +1179,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.renderPass = function ( passMaterial, renderTarget, forceClear ) {
 
 		if( passScene === null ) {
+
 			passCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-			passQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+			passQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), new THREE.MeshBasicMaterial() );
 			passScene = new THREE.Scene();
 			passScene.add( passQuad );
+
 		}
 
-		passQuad.material = passMaterial;
-		this.render( passScene, passCamera, renderTarget, forceClear );
-		passQuad.material = null;
+		this.renderOverride( passMaterial, passScene, passCamera, renderTarget, forceClear );
 
 	};
-
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
