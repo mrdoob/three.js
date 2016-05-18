@@ -324,9 +324,11 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setDepthFunc = function ( depthFunc ) {
+	// TODO Deprecate
 
-		this.buffers.depth.setFunc( depthFunc );
+	this.setColorWrite = function ( colorWrite ) {
+
+		this.buffers.color.setMask( colorWrite );
 
 	};
 
@@ -342,9 +344,21 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setColorWrite = function ( colorWrite ) {
+	this.setDepthFunc = function ( depthFunc ) {
 
-		this.buffers.color.setMask( colorWrite );
+		this.buffers.depth.setFunc( depthFunc );
+
+	};
+
+	this.setStencilTest = function ( stencilTest ) {
+
+		this.buffers.stencil.setTest( stencilTest );
+
+	};
+
+	this.setStencilWrite = function ( stencilWrite ) {
+
+		this.buffers.stencil.setMask( stencilWrite );
 
 	};
 
@@ -360,17 +374,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	this.setStencilTest = function ( stencilTest ) {
-
-		this.buffers.stencil.setTest( stencilTest );
-
-	};
-
-	this.setStencilWrite = function ( stencilWrite ) {
-
-		this.buffers.stencil.setMask( stencilWrite );
-
-	};
+	//
 
 	this.setFlipSided = function ( flipSided ) {
 
@@ -554,7 +558,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	};
 
-	// clear values
+	// TODO Deprecate
 
 	this.clearColor = function ( r, g, b, a ) {
 
