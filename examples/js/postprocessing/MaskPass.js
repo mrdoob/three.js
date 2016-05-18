@@ -83,7 +83,7 @@ THREE.ClearMaskPass = function () {
 
 THREE.ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
 
-THREE.ClearMaskPass.prototype = {
+Object.assign( THREE.ClearMaskPass.prototype, {
 
 	constructor: THREE.ClearMaskPass,
 
@@ -93,4 +93,4 @@ THREE.ClearMaskPass.prototype = {
 
 	}
 
-};
+} );
