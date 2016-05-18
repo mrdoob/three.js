@@ -24,7 +24,7 @@ THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clear
 
 THREE.RenderPass.prototype = Object.create( THREE.Pass.prototype );
 
-THREE.RenderPass.prototype = {
+Object.assign( THREE.RenderPass.prototype, {
 
 	constructor: THREE.RenderPass,
 
@@ -53,4 +53,4 @@ THREE.RenderPass.prototype = {
 
 	}
 
-};
+} );

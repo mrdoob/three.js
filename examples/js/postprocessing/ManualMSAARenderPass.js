@@ -54,7 +54,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 THREE.ManualMSAARenderPass.prototype = Object.create( THREE.Pass.prototype );
 
-THREE.ManualMSAARenderPass.prototype = {
+Object.assign( THREE.ManualMSAARenderPass.prototype, {
 
 	constructor: THREE.ManualMSAARenderPass,
 
@@ -116,7 +116,7 @@ THREE.ManualMSAARenderPass.prototype = {
 
 	}
 
-};
+} );
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
