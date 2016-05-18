@@ -131,6 +131,14 @@ THREE.EffectComposer.prototype = {
 		this.renderTarget1.setSize( width, height );
 		this.renderTarget2.setSize( width, height );
 
+		var pass, i, il = this.passes.length;
+
+		for ( i = 0; i < il; i ++ ) {
+
+			pass.setSize( width, height );
+
+		}
+
 	}
 
 };
@@ -155,6 +163,8 @@ THREE.Pass = function () {
 THREE.Pass.prototype = {
 
   constructor: THREE.Pass,
+
+	setSize: function( width, height ) {},
 
   render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
