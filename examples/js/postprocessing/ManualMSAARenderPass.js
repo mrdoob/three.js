@@ -79,7 +79,7 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 		renderer.autoClear = false;
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
-		var roundingRange = 1 / 256;
+		var roundingRange = 1 / 32;
 		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 
 		var width = readBuffer.width, height = readBuffer.height;
@@ -100,7 +100,8 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 				// the theory is that equal weights for each sample lead to an accumulation of roudning errors.
 				// The following equation varyings the sampleWeight so that it is varies uniformly across
 				// a range of scaled values so that the rounding errors each other out.
-				sampleWeight += - ( 1 / 128 ) + ( ( i + 0.5 ) / ( jitterOffsets.length * 64 ) );
+				var uniformCenteredDistribution = ( -0.5 + ( i + 0.5 ) / jitterOffsets.length );
+				sampleWeight += roundingRange * uniformCenteredDistribution;
 			}
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
