@@ -65,8 +65,6 @@ THREE.Object3D = function () {
 		}
 	} );
 
-	this.rotationAutoUpdate = true;
-
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
 
@@ -679,8 +677,6 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 		this.position.copy( source.position );
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
-
-		this.rotationAutoUpdate = source.rotationAutoUpdate;
 
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );

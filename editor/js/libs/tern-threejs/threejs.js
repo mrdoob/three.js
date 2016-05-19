@@ -580,10 +580,6 @@
           "!type": "bool",
           "!doc": "default – false"
         },
-        "rotationAutoUpdate": {
-          "!type": "bool",
-          "!doc": "default – true"
-        },
         "userData": {
           "!type": "object",
           "!doc": "An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned."
