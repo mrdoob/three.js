@@ -151,7 +151,7 @@
 				lightOutside = loader.getLight("Light1");
 
 				soundOutside = loader.getSound3D("Point001");
-				soundOutsideAnalyser = new THREE.AudioAnalyser( soundOutside, 512 );
+				soundOutsideAnalyser = new THREE.AudioAnalyser( soundOutside, 32 );
 
 				// sound asset 2 + area
 
@@ -458,7 +458,7 @@
 				updateSoundFilter();
 
 				// light intensity from sound amplitude
-				lightOutside.intensity = soundOutsideAnalyser.getAverageFrequency() / 50;
+				lightOutside.intensity = soundOutsideAnalyser.getAverageFrequency() / 100;
 				lightArea.intensity = soundAreaAnalyser.getAverageFrequency() / 50;
 
 				// Update SEA3D Animations
