@@ -144,6 +144,7 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				taaRenderPass = new THREE.TAARenderPass( scene, camera );
+				taaRenderPass.unbiased = false;
 				composer.addPass( taaRenderPass );
 
 				renderPass = new THREE.RenderPass( scene, camera );
