@@ -88,8 +88,8 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
 
 			var jitterOffset = jitterOffsets[i];
-			if ( camera.setViewOffset ) {
-				camera.setViewOffset( width, height,
+			if ( this.camera.setViewOffset ) {
+				this.camera.setViewOffset( width, height,
 					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 					width, height );
 			}
