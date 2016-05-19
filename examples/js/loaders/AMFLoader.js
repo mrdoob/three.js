@@ -7,10 +7,10 @@
  * More information about the AMF format: http://amf.wikispaces.com
  *
  * Usage:
- *  var loader = new AMFLoader();
- *  loader.load('/path/to/project.amf', function(objecttree) {
- *      scene.add(objecttree);
- *  });
+ *    var loader = new AMFLoader();
+ *    loader.load('/path/to/project.amf', function(objecttree) {
+ *        scene.add(objecttree);
+ *    });
  *
  * Materials now supported, material colors supported
  * Zip support, requires jszip
