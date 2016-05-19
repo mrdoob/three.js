@@ -87,7 +87,6 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
 
-			// only jitters perspective cameras.	TODO: add support for jittering orthogonal cameras
 			var jitterOffset = jitterOffsets[i];
 			if ( camera.setViewOffset ) {
 				camera.setViewOffset( width, height,
@@ -111,8 +110,7 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 
 		}
 
-		// reset jitter to nothing.	TODO: add support for orthogonal cameras
-		if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+		if ( this.camera.setViewOffset ) this.camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
 
 		renderer.autoClear = autoClear;
 
