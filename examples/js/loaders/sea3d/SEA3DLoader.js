@@ -579,7 +579,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	var animation = this.animations[ name ];
 
-	if ( animation == this.currentAnimation ) { 
+	if ( animation == this.currentAnimation ) {
 
 		if ( offset !== undefined ) this.currentAnimationAction.time = offset;
 		if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
@@ -1810,9 +1810,9 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	var sound3d = new THREE.SEA3D.PointSound( this.audioListener );
 
-	new THREE.AudioLoader().load( sea.sound.tag, function ( buffer ) {
+	new THREE.AudioLoader().load( sea.sound.tag, function( buffer ) {
 
-	sound3d.setBuffer( buffer );
+		sound3d.setBuffer( buffer );
 
 	} );
 
@@ -2355,7 +2355,7 @@ THREE.SEA3D.prototype.readDirectionalLight = function( sea ) {
 
 THREE.SEA3D.PointSound = function( listener ) {
 
-	THREE.PositionalAudio.call( this, listener  );
+	THREE.PositionalAudio.call( this, listener );
 
 };
 
