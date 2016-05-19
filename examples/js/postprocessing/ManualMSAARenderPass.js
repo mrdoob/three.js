@@ -10,7 +10,7 @@
 *
 */
 
-THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
+THREE.ManualMSAARenderPass = function ( scene, camera ) {
 
 	THREE.Pass.call( this );
 
@@ -19,35 +19,25 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 
 	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 
-	this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-	this.params.minFilter = THREE.NearestFilter;
-	this.params.maxFilter = THREE.NearestFilter;
+	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
-	if ( THREE.CompositeShader === undefined ) {
+	var copyShader = THREE.CopyShader;
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
-		console.error( "THREE.ManualMSAARenderPass relies on THREE.CompositeShader" );
-
-	}
-
-	var compositeShader = THREE.CompositeShader;
-	this.compositeUniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
-
-	this.materialComposite = new THREE.ShaderMaterial(	{
-
-		uniforms: this.compositeUniforms,
-		vertexShader: compositeShader.vertexShader,
-		fragmentShader: compositeShader.fragmentShader,
+	this.copyMaterial = new THREE.ShaderMaterial(	{
+		uniforms: this.copyUniforms,
+		vertexShader: copyShader.vertexShader,
+		fragmentShader: copyShader.fragmentShader,
 		premultipliedAlpha: true,
 		transparent: true,
 		blending: THREE.AdditiveBlending,
 		depthTest: false,
 		depthWrite: false
-
 	} );
 
 	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.materialComposite );
+	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), this.copyMaterial );
 	this.scene2.add( this.quad2 );
 
 };
@@ -75,20 +65,20 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		var camera = ( this.camera || this.scene.camera );
-		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
-
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height,
+				{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
 
 		}
+
+		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.compositeUniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
-		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
+		this.copyUniforms[ "opacity" ].value = 1.0 / jitterOffsets.length;
+		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
@@ -101,7 +91,7 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 					readBuffer.width, readBuffer.height );
 			}
 
-			renderer.render( this.scene, camera, this.sampleRenderTarget, true );
+			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
 
 		}
