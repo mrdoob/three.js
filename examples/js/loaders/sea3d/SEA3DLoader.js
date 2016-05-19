@@ -582,6 +582,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	this.previousAnimationAction = this.currentAnimationAction;
 	this.currentAnimationAction = this.mixer.clipAction( animation ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
+	this.currentAnimationAction.clampWhenFinished = true;
 
 	this.previousAnimationData = this.currentAnimationData;
 	this.currentAnimationData = this.animationsData[ name ];
@@ -665,9 +666,9 @@ THREE.SEA3D.Object3DAnimator.prototype.stop = function() {
 
 	if ( this.currentAnimation ) {
 
-		if ( this instanceof THREE.SEA3D.Object3DAnimator ) {
+		var animate = this.object3d.animate;
 
-			var animate = this.object3d.animate;
+		if ( animate && this instanceof THREE.SEA3D.Object3DAnimator ) {
 
 			animate.position.set( 0, 0, 0 );
 			animate.quaternion.set( 0, 0, 0, 1 );
@@ -1456,13 +1457,13 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 					break;
 			}
 
-			var clip = new THREE.AnimationClip( seq.name, - 1, tracks );
-			clip.loop = seq.repeat;
-			clip.timeScale = 1;
-
-			clips.push( clip );
-
 		}
+
+		var clip = new THREE.AnimationClip( seq.name, - 1, tracks );
+		clip.loop = seq.repeat;
+		clip.timeScale = 1;
+
+		clips.push( clip );
 
 	}
 
