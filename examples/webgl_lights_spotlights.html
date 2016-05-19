@@ -41,10 +41,9 @@
 
 		<script src="../build/three.js"></script>
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/libs/tween.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
-
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
 
 		<script>
 
@@ -143,33 +142,36 @@
 
 			}
 
-			function animate( rate ) {
+			function tween( light ) {
 
-				rate = rate || 6;
-				if ( rate < 0.01 ) rate = 0.01;
-				else if ( rate > 1000 ) rate = 1000;
+				new TWEEN.Tween( light ).to( {
+					angle: ( Math.random() * 0.7 ) + 0.1,
+					penumbra: Math.random() + 1
+				}, Math.random() * 3000 + 2000 )
+				.easing( TWEEN.Easing.Quadratic.Out ).start();
 
-				var targ1 = { x: ( ( Math.random() * 30 ) - 15 ), y: ( ( Math.random() * 10 ) + 15 ), z: ( ( Math.random() * 30 ) - 15 ) };
-				TweenMax.to( spotLight1.position, rate / 3, targ1 );
-				TweenMax.to( spotLight1, rate / 2, { angle: ( ( Math.random() * 0.7 ) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
+				new TWEEN.Tween( light.position ).to( {
+					x: ( Math.random() * 30 ) - 15,
+					y: ( Math.random() * 10 ) + 15,
+					z: ( Math.random() * 30 ) - 15
+				}, Math.random() * 3000 + 2000 )
+				.easing( TWEEN.Easing.Quadratic.Out ).start();
 
-				var targ2 = { x: ( ( Math.random() * 30 ) - 15 ), y: ( ( Math.random() * 10 ) + 15 ), z: ( ( Math.random() * 30 ) - 15 ) };
-				TweenMax.to( spotLight2.position, rate, targ2 );
-				TweenMax.to( spotLight2, rate / 3, { angle: ( ( Math.random() * 0.7 ) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
+			}
 
-				var targ3 = { x: ( ( Math.random() * 30 ) - 15 ), y: ( ( Math.random() * 10 ) + 15 ), z: ( ( Math.random() * 30 ) - 15 ) };
-				TweenMax.to( spotLight3.position, rate / 2, targ3 );
-				TweenMax.to( spotLight3, rate, { angle: ( ( Math.random() * 0.7 ) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
+			function animate() {
 
-				setTimeout( function() {
+				tween( spotLight1 );
+				tween( spotLight2 );
+				tween( spotLight3 );
 
-					animate( rate );
-
-				}, rate * 1000 );
+				setTimeout( animate, 5000 );
 
 			}
 
 			function render() {
+
+				TWEEN.update();
 
 				if ( lightHelper1 ) lightHelper1.update();
 				if ( lightHelper2 ) lightHelper2.update();
@@ -183,7 +185,7 @@
 
 			init();
 			render();
-			animate( 4.5 );
+			animate();
 
 		</script>
 	</body>
