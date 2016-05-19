@@ -495,7 +495,7 @@ THREE.SEA3D.Animator.prototype.updateAnimations = function( mixer ) {
 	this.relative = false;
 	this.playing = false;
 
-	this.setTimeScale( 1 );
+	this.timeScale = 1;
 
 	this.animations = [];
 	this.animationsData = {};
@@ -551,15 +551,21 @@ THREE.SEA3D.Animator.prototype.resume = function() {
 
 THREE.SEA3D.Animator.prototype.setTimeScale = function( val ) {
 
-	this.mixer._timeScale = val;
+	this.timeScale = val;
 
-	this.mixer.timeScale = val * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 );
+	if ( this.currentAnimationAction ) this.updateTimeScale();
 
 };
 
 THREE.SEA3D.Animator.prototype.getTimeScale = function() {
 
-	return this.mixer._timeScale;
+	return this.timeScale;
+
+};
+
+THREE.SEA3D.Animator.prototype.updateTimeScale = function() {
+
+	this.currentAnimationAction.setEffectiveTimeScale( this.timeScale * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 ) );
 
 };
 
@@ -584,9 +590,9 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
 
-	this.currentAnimationAction.play();
+	this.updateTimeScale();
 
-	this.mixer.timeScale = this.mixer._timeScale * this.currentAnimation.timeScale;
+	this.currentAnimationAction.play();
 
 	if ( ! this.playing ) this.mixer.update( 0 );
 
