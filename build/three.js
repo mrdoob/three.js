@@ -6531,10 +6531,27 @@ THREE.Frustum.prototype = {
 
 			var geometry = object.geometry;
 
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			if ( geometry.boundingSphere === null )
+				geometry.computeBoundingSphere();
 
-			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( object.matrixWorld );
+			sphere.copy( geometry.boundingSphere )
+				.applyMatrix4( object.matrixWorld );
+
+			return this.intersectsSphere( sphere );
+
+		};
+
+	}(),
+
+	intersectsSprite: function () {
+
+		var sphere = new THREE.Sphere();
+
+		return function ( sprite ) {
+
+			sphere.center.set( 0, 0, 0 );
+			sphere.radius = 0.7071067811865476;
+			sphere.applyMatrix4( sprite.matrixWorld );
 
 			return this.intersectsSphere( sphere );
 
@@ -8508,8 +8525,6 @@ THREE.Object3D = function () {
 		}
 	} );
 
-	this.rotationAutoUpdate = true;
-
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
 
@@ -9122,8 +9137,6 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 		this.position.copy( source.position );
 		this.quaternion.copy( source.quaternion );
 		this.scale.copy( source.scale );
-
-		this.rotationAutoUpdate = source.rotationAutoUpdate;
 
 		this.matrix.copy( source.matrix );
 		this.matrixWorld.copy( source.matrixWorld );
@@ -23562,29 +23575,15 @@ THREE.LOD.prototype.toJSON = function ( meta ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = ( function () {
+THREE.Sprite = function ( material ) {
 
-	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
-	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
-	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
+	THREE.Object3D.call( this );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.type = 'Sprite';
 
-	return function Sprite( material ) {
+	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-		THREE.Object3D.call( this );
-
-		this.type = 'Sprite';
-
-		this.geometry = geometry;
-		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
-
-	};
-
-} )();
+};
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Sprite.prototype.constructor = THREE.Sprite;
@@ -26049,6 +26048,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	// TODO Duplicated code (Frustum)
+
 	function isObjectViewable( object ) {
 
 		var geometry = object.geometry;
@@ -26056,9 +26057,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry.boundingSphere === null )
 			geometry.computeBoundingSphere();
 
-		var sphere = _sphere.
-				copy( geometry.boundingSphere ).
-				applyMatrix4( object.matrixWorld );
+		_sphere.copy( geometry.boundingSphere ).
+			applyMatrix4( object.matrixWorld );
+
+		return isSphereViewable( _sphere );
+
+	}
+
+	function isSpriteViewable( sprite ) {
+
+		_sphere.center.set( 0, 0, 0 );
+		_sphere.radius = 0.7071067811865476;
+		_sphere.applyMatrix4( sprite.matrixWorld );
+
+		return isSphereViewable( _sphere );
+
+	}
+
+	function isSphereViewable( sphere ) {
 
 		if ( ! _frustum.intersectsSphere( sphere ) ) return false;
 
@@ -26095,7 +26111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
+				if ( object.frustumCulled === false || isSpriteViewable( object ) === true ) {
 
 					sprites.push( object );
 
