@@ -484,6 +484,8 @@ THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
 	}
 
+	return this;
+
 };
 
 THREE.SEA3D.Animator.prototype.updateAnimations = function( mixer ) {
@@ -549,6 +551,8 @@ THREE.SEA3D.Animator.prototype.resume = function() {
 
 	}
 
+	return this;
+
 };
 
 THREE.SEA3D.Animator.prototype.setTimeScale = function( val ) {
@@ -575,7 +579,14 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	var animation = this.animations[ name ];
 
-	if ( animation == this.currentAnimation && offset === undefined ) return;
+	if ( animation == this.currentAnimation ) {
+
+		if ( offset !== undefined ) this.currentAnimationAction.time = offset;
+		if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
+
+		return this;
+
+	}
 
 	if ( ! animation ) throw new Error( 'Animation "' + name + '" not found.' );
 
@@ -591,23 +602,22 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	this.currentAnimationData.completed = false;
 
-	if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
-
 	this.updateTimeScale();
 
 	this.currentAnimationAction.play();
+
+	if ( offset !== undefined ) this.currentAnimationAction.time = offset;
+	if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
 
 	if ( ! this.playing ) this.mixer.update( 0 );
 
 	this.playing = true;
 
-	if ( this.previousAnimation ) {
-
-		this.mixer.clipAction( this.previousAnimation ).crossFadeTo( this.mixer.clipAction( this.currentAnimation ), crossfade || 0, true );
-
-	}
+	if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, true );
 
 	THREE.SEA3D.AnimationHandler.addAnimator( this );
+
+	return this;
 
 };
 
@@ -630,6 +640,8 @@ THREE.SEA3D.Animator.prototype.stop = function() {
 		this.playing = false;
 
 	}
+
+	return this;
 
 };
 
@@ -706,6 +718,20 @@ THREE.SEA3D.CameraAnimator = function( clips, object3d ) {
 
 THREE.SEA3D.CameraAnimator.prototype = Object.create( THREE.SEA3D.Object3DAnimator.prototype );
 THREE.SEA3D.CameraAnimator.prototype.constructor = THREE.SEA3D.CameraAnimator;
+
+//
+//	Sound Animator
+//
+
+THREE.SEA3D.SoundAnimator = function( clips, object3d ) {
+
+	THREE.SEA3D.Object3DAnimator.call( this, clips, object3d );
+
+};
+
+THREE.SEA3D.SoundAnimator.prototype = Object.create( THREE.SEA3D.Object3DAnimator.prototype );
+THREE.SEA3D.SoundAnimator.prototype.constructor = THREE.SEA3D.SoundAnimator;
+
 
 //
 //	Light Animator
@@ -1782,9 +1808,14 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	}
 
-	var sound3d = new THREE.PositionalAudio( this.audioListener );
+	var sound3d = new THREE.SEA3D.PointSound( this.audioListener );
 
-	sound3d.load( sea.sound.tag );
+	new THREE.AudioLoader().load( sea.sound.tag, function( buffer ) {
+
+		sound3d.setBuffer( buffer );
+
+	} );
+
 	sound3d.autoplay = sea.autoPlay;
 	sound3d.setLoop( sea.autoPlay );
 	sound3d.setVolume( sea.volume );
@@ -1799,7 +1830,7 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 	this.addSceneObject( sea );
 	this.updateTransform( sound3d, sea );
 
-	this.applyDefaultAnimation( sea, THREE.SEA3D.Object3DAnimator );
+	this.applyDefaultAnimation( sea, THREE.SEA3D.SoundAnimator );
 
 };
 
@@ -2315,6 +2346,34 @@ THREE.SEA3D.prototype.readDirectionalLight = function( sea ) {
 	this.applyDefaultAnimation( sea, THREE.SEA3D.LightAnimator );
 
 	this.updateScene();
+
+};
+
+//
+//	Point Sound
+//
+
+THREE.SEA3D.PointSound = function( listener ) {
+
+	THREE.PositionalAudio.call( this, listener );
+
+};
+
+THREE.SEA3D.PointSound.prototype = Object.create( THREE.PositionalAudio.prototype );
+THREE.SEA3D.PointSound.prototype.constructor = THREE.SEA3D.PointSound;
+
+Object.assign( THREE.SEA3D.PointSound.prototype, THREE.SEA3D.Object3D.prototype );
+
+THREE.SEA3D.PointSound.prototype.copy = function( source ) {
+
+	THREE.PositionalAudio.prototype.copy.call( this, source );
+
+	this.props = source.props;
+	this.scripts = source.scripts;
+
+	if ( this.animation ) this.animation = source.animation.clone( this );
+
+	return this;
 
 };
 
