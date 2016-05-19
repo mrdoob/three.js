@@ -204,20 +204,22 @@ THREE.Matrix3.prototype = {
 
 			return this.identity();
 		}
+		
+		var detInv = 1 / det;
 
-		te[ 0 ] = t11;
-		te[ 1 ] = n31 * n23 - n33 * n21;
-		te[ 2 ] = n32 * n21 - n31 * n22;
+		te[ 0 ] = t11 * detInv;
+		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
+		te[ 2 ] = ( n32 * n21 - n31 * n22 ) * detInv;
 
-		te[ 3 ] = t12;
-		te[ 4 ] = n33 * n11 - n31 * n13;
-		te[ 5 ] = n31 * n12 - n32 * n11;
+		te[ 3 ] = t12 * detInv;
+		te[ 4 ] = ( n33 * n11 - n31 * n13 ) * detInv;
+		te[ 5 ] = ( n31 * n12 - n32 * n11 ) * detInv;
 
-		te[ 6 ] = t13;
-		te[ 7 ] = n21 * n13 - n23 * n11;
-		te[ 8 ] = n22 * n11 - n21 * n12;
+		te[ 6 ] = t13 * detInv;
+		te[ 7 ] = ( n21 * n13 - n23 * n11 ) * detInv;
+		te[ 8 ] = ( n22 * n11 - n21 * n12 ) * detInv;
 
-		return this.multiplyScalar( 1 / det );
+		return this;
 
 	},
 
