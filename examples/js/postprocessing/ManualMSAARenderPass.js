@@ -18,6 +18,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera ) {
 	this.camera = camera;
 
 	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+	this.unbiased = true;
 
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
@@ -77,27 +78,39 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.copyUniforms[ "opacity" ].value = 1.0 / jitterOffsets.length;
+		var baseSampleWeight = 1.0 / jitterOffsets.length;
+		var roundingRange = 1 / 32;
 		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+
+		var width = readBuffer.width, height = readBuffer.height;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
 
-			// only jitters perspective cameras.	TODO: add support for jittering orthogonal cameras
 			var jitterOffset = jitterOffsets[i];
-			if ( camera.setViewOffset ) {
-				camera.setViewOffset( readBuffer.width, readBuffer.height,
+			if ( this.camera.setViewOffset ) {
+				this.camera.setViewOffset( width, height,
 					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
-					readBuffer.width, readBuffer.height );
+					width, height );
 			}
+
+			var sampleWeight = baseSampleWeight;
+			if( this.unbiased ) {
+				// the theory is that equal weights for each sample lead to an accumulation of rounding errors.
+				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
+				// across a range of values whose rounding errors cancel each other out.
+				var uniformCenteredDistribution = ( -0.5 + ( i + 0.5 ) / jitterOffsets.length );
+				sampleWeight += roundingRange * uniformCenteredDistribution;
+			}
+
+			this.copyUniforms[ "opacity" ].value = sampleWeight;
 
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
 
 		}
 
-		// reset jitter to nothing.	TODO: add support for orthogonal cameras
-		if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
 

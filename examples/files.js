@@ -189,6 +189,7 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_msaa",
+		"webgl_postprocessing_msaa_unbiased",
 		"webgl_postprocessing_nodes",
 		"webgl_postprocessing_procedural",
 		"webgl_postprocessing_smaa",

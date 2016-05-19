@@ -45,8 +45,6 @@ Object.assign( THREE.TAARenderPass.prototype, {
 
 		var jitterOffsets = THREE.TAARenderPass.JitterVectors[ 5 ];
 
-		var camera = ( this.camera || this.scene.camera );
-
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
@@ -82,10 +80,9 @@ Object.assign( THREE.TAARenderPass.prototype, {
 			for ( var i = 0; i < numSamplesPerFrame; i ++ ) {
 
 				var j = this.accumulateIndex;
-				// only jitters perspective cameras.	TODO: add support for jittering orthogonal cameras
 				var jitterOffset = jitterOffsets[j];
-				if ( camera.setViewOffset ) {
-					camera.setViewOffset( readBuffer.width, readBuffer.height,
+				if ( this.camera.setViewOffset ) {
+					this.camera.setViewOffset( readBuffer.width, readBuffer.height,
 						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 						readBuffer.width, readBuffer.height );
 				}
@@ -97,9 +94,8 @@ Object.assign( THREE.TAARenderPass.prototype, {
 				if( this.accumulateIndex >= jitterOffsets.length ) break;
 			}
 
-			// reset jitter to nothing.	TODO: add support for orthogonal cameras
-			if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
-
+			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
+			
 		}
 
 		var accumulationWeight = this.accumulateIndex * sampleWeight;
