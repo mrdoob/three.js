@@ -29,6 +29,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
 
 THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
+
 Object.assign( THREE.TAARenderPass.prototype, {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
