@@ -206,6 +206,10 @@ THREE.WebGLProgram = ( function () {
 
 			shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
 
+		} else if ( parameters.shadowMapType === THREE.PCSSSoftShadowMap ) {
+
+			shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCSS';
+
 		}
 
 		var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
