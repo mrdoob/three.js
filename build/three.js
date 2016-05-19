@@ -12760,7 +12760,7 @@ THREE.AnimationAction._new.prototype = {
 
 	halt: function( duration ) {
 
-		return this.warp( this._currentTimeScale, 0, duration );
+		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	},
 
@@ -13166,9 +13166,11 @@ THREE.AnimationAction._new.prototype = {
 
 THREE.AnimationClip = function ( name, duration, tracks ) {
 
-	this.name = name || THREE.Math.generateUUID();
+	this.name = name;
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : -1;
+
+	this.uuid = THREE.Math.generateUUID();
 
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {
@@ -13318,7 +13320,16 @@ Object.assign( THREE.AnimationClip, {
 
 	},
 
-	findByName: function( clipArray, name ) {
+	findByName: function( objectOrClipArray, name ) {
+
+		var clipArray = objectOrClipArray;
+
+		if ( ! Array.isArray( objectOrClipArray ) ) {
+
+			var o = objectOrClipArray;
+			clipArray = o.geometry && o.geometry.animations || o.animations;
+
+		}
 
 		for ( var i = 0; i < clipArray.length; i ++ ) {
 
@@ -13538,11 +13549,14 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			clipObject = ( clip !== clipName ) ? clip : null,
 
-			actionsForClip = this._actionsByClip[ clipName ],
-			prototypeAction;
+			clipObject = typeof clip === 'string' ?
+					THREE.AnimationClip.findByName( root, clip ) : clip,
+
+			clipUuid = clipObject !== null ? clipObject.uuid : clip,
+
+			actionsForClip = this._actionsByClip[ clipUuid ],
+			prototypeAction = null;
 
 		if ( actionsForClip !== undefined ) {
 
@@ -13560,14 +13574,8 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 			prototypeAction = actionsForClip.knownActions[ 0 ];
 
 			// also, take the clip from the prototype action
-			clipObject = prototypeAction._clip;
-
-			if ( clip !== clipName && clip !== clipObject ) {
-
-				throw new Error(
-						"Different clips with the same name detected!" );
-
-			}
+			if ( clipObject === null )
+				clipObject = prototypeAction._clip;
 
 		}
 
@@ -13581,7 +13589,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		this._bindAction( newAction, prototypeAction );
 
 		// and make the action known to the memory manager
-		this._addInactiveAction( newAction, clipName, rootUuid );
+		this._addInactiveAction( newAction, clipUuid, rootUuid );
 
 		return newAction;
 
@@ -13592,8 +13600,13 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			actionsForClip = this._actionsByClip[ clipName ];
+
+			clipObject = typeof clip === 'string' ?
+					THREE.AnimationClip.findByName( root, clip ) : clip,
+
+			clipUuid = clipObject ? clipObject.uuid : clip,
+
+			actionsForClip = this._actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -13685,9 +13698,9 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 	uncacheClip: function( clip ) {
 
 		var actions = this._actions,
-			clipName = clip.name,
+			clipUuid = clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -13717,7 +13730,7 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 
 			}
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
@@ -13729,9 +13742,9 @@ Object.assign( THREE.AnimationMixer.prototype, THREE.EventDispatcher.prototype, 
 		var rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
 
-		for ( var clipName in actionsByClip ) {
+		for ( var clipUuid in actionsByClip ) {
 
-			var actionByRoot = actionsByClip[ clipName ].actionByRoot,
+			var actionByRoot = actionsByClip[ clipUuid ].actionByRoot,
 				action = actionByRoot[ rootUuid ];
 
 			if ( action !== undefined ) {
@@ -13859,13 +13872,13 @@ Object.assign( THREE.AnimationMixer.prototype, {
 				// appears to be still using it -> rebind
 
 				var rootUuid = ( action._localRoot || this._root ).uuid,
-					clipName = action._clip.name,
-					actionsForClip = this._actionsByClip[ clipName ];
+					clipUuid = action._clip.uuid,
+					actionsForClip = this._actionsByClip[ clipUuid ];
 
 				this._bindAction( action,
 						actionsForClip && actionsForClip.knownActions[ 0 ] );
 
-				this._addInactiveAction( action, clipName, rootUuid );
+				this._addInactiveAction( action, clipUuid, rootUuid );
 
 			}
 
@@ -13971,11 +13984,11 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_addInactiveAction: function( action, clipName, rootUuid ) {
+	_addInactiveAction: function( action, clipUuid, rootUuid ) {
 
 		var actions = this._actions,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip === undefined ) {
 
@@ -13988,7 +14001,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 			action._byClipCacheIndex = 0;
 
-			actionsByClip[ clipName ] = actionsForClip;
+			actionsByClip[ clipUuid ] = actionsForClip;
 
 		} else {
 
@@ -14019,9 +14032,9 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		action._cacheIndex = null;
 
 
-		var clipName = action._clip.name,
+		var clipUuid = action._clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ],
+			actionsForClip = actionsByClip[ clipUuid ],
 			knownActionsForClip = actionsForClip.knownActions,
 
 			lastKnownAction =
@@ -14043,7 +14056,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		if ( knownActionsForClip.length === 0 ) {
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
@@ -17291,6 +17304,13 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 			height: height
 		};
 
+		this.updateProjectionMatrix();
+
+	},
+
+	clearViewOffset: function() {
+
+		this.view = null;
 		this.updateProjectionMatrix();
 
 	},
