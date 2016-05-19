@@ -2210,7 +2210,7 @@ vrmlParser = (function() {
     }
 
 
-    	var nodeDefinitions = [];
+    	var nodeDefinitions = {};
     	var routes = [];
 
 

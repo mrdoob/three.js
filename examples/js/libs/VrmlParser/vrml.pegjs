@@ -25,7 +25,7 @@
  *
  */
 {
-	var nodeDefinitions = [];
+	var nodeDefinitions = {};
 	var routes = [];
 }
 
