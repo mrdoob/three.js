@@ -64,6 +64,7 @@
 	"src/extras/helpers/PointLightHelper.js",
 	"src/extras/helpers/SkeletonHelper.js",
 	"src/extras/helpers/SpotLightHelper.js",
+	"src/extras/helpers/AreaLightHelper.js",
 	"src/extras/helpers/VertexNormalsHelper.js",
 	"src/extras/helpers/WireframeHelper.js",
 	"src/extras/objects/ImmediateRenderObject.js",

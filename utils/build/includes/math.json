@@ -11,6 +11,7 @@
 	"src/math/Box3.js",
 	"src/math/Matrix3.js",
 	"src/math/Matrix4.js",
+	"src/math/Polygon.js",
 	"src/math/Ray.js",
 	"src/math/Sphere.js",
 	"src/math/Frustum.js",
