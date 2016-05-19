@@ -134,9 +134,7 @@ THREE.EffectComposer.prototype = {
 		this.renderTarget1.setSize( width, height );
 		this.renderTarget2.setSize( width, height );
 
-		var pass, i, il = this.passes.length;
-
-		for ( i = 0; i < il; i ++ ) {
+		for ( var i = 0; i < this.passes.length; i ++ ) {
 
 			this.passes[i].setSize( width, height );
 
