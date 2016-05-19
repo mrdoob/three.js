@@ -462,15 +462,17 @@ THREE.SEA3D.ScriptHandler.dispatchUpdate = function( delta ) {
 //	Animator
 //
 
-THREE.SEA3D.Animator = function( clips, animationTarget ) {
+THREE.SEA3D.Animator = function( clips, mixer ) {
 
 	this.clips = clips;
 
-	this.updateAnimations( animationTarget );
+	this.updateAnimations( mixer );
 
 };
 
-THREE.SEA3D.Animator.prototype.update = function() {
+THREE.SEA3D.Animator.prototype.update = function( dt ) {
+
+	this.mixer.update( dt );
 
 	if ( ! this.currentAnimationAction.enabled && ! this.currentAnimationData.completed ) {
 
@@ -482,18 +484,18 @@ THREE.SEA3D.Animator.prototype.update = function() {
 
 };
 
-THREE.SEA3D.Animator.prototype.updateAnimations = function( animationTarget ) {
+THREE.SEA3D.Animator.prototype.updateAnimations = function( mixer ) {
 
 	if ( this.playing ) this.stop();
 
-	if ( this.animationTarget ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
+	if ( this.mixer ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
 
-	this.animationTarget = animationTarget;
+	this.mixer = mixer;
 
 	this.relative = false;
 	this.playing = false;
 
-	this.timeScale = 1;
+	this.setTimeScale( 1 );
 
 	this.animations = [];
 	this.animationsData = {};
@@ -549,21 +551,15 @@ THREE.SEA3D.Animator.prototype.resume = function() {
 
 THREE.SEA3D.Animator.prototype.setTimeScale = function( val ) {
 
-	this.timeScale = val;
+	this.mixer._timeScale = val;
 
-	if ( this.currentAnimationAction ) this.updateTimeScale();
+	this.mixer.timeScale = val * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 );
 
 };
 
 THREE.SEA3D.Animator.prototype.getTimeScale = function() {
 
-	return this.timeScale;
-
-};
-
-THREE.SEA3D.Animator.prototype.updateTimeScale = function() {
-
-	this.currentAnimationAction.setEffectiveTimeScale( this.timeScale * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 ) );
+	return this.mixer._timeScale;
 
 };
 
@@ -579,7 +575,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 	this.currentAnimation = animation;
 
 	this.previousAnimationAction = this.currentAnimationAction;
-	this.currentAnimationAction = THREE.SEA3D.AnimationHandler.mixer.clipAction( animation, this.animationTarget ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
+	this.currentAnimationAction = this.mixer.clipAction( animation ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
 
 	this.previousAnimationData = this.currentAnimationData;
 	this.currentAnimationData = this.animationsData[ name ];
@@ -588,19 +584,17 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
 
-	this.updateTimeScale();
-
 	this.currentAnimationAction.play();
 
-	if ( ! this.playing ) THREE.SEA3D.AnimationHandler.mixer.update( 0 );
+	this.mixer.timeScale = this.mixer._timeScale * this.currentAnimation.timeScale;
+
+	if ( ! this.playing ) this.mixer.update( 0 );
 
 	this.playing = true;
 
 	if ( this.previousAnimation ) {
 
-		var toAction = THREE.SEA3D.AnimationHandler.mixer.clipAction( this.currentAnimation, this.animationTarget );
-
-		THREE.SEA3D.AnimationHandler.mixer.clipAction( this.previousAnimation, this.animationTarget ).crossFadeTo( toAction, crossfade || 0, true );
+		this.mixer.clipAction( this.previousAnimation ).crossFadeTo( this.mixer.clipAction( this.currentAnimation ), crossfade || 0, true );
 
 	}
 
@@ -687,7 +681,7 @@ THREE.SEA3D.Object3DAnimator.prototype.setRelative = function( val ) {
 
 	this.object3d.setAnimator( this.relative );
 
-	this.updateAnimations( this.relative ? this.object3d.animate : this.object3d );
+	this.updateAnimations( new THREE.AnimationMixer( this.relative ? this.object3d.animate : this.object3d ) );
 
 };
 
@@ -888,7 +882,7 @@ THREE.SEA3D.SkinnedMesh = function( geometry, material, useVertexTexture ) {
 
 	THREE.SkinnedMesh.call( this, geometry, material, useVertexTexture );
 
-	this.updateAnimations( this );
+	this.updateAnimations( new THREE.AnimationMixer( this ) );
 
 };
 
@@ -935,7 +929,7 @@ THREE.SEA3D.VertexAnimationMesh = function( geometry, material ) {
 
 	this.type = 'MorphAnimMesh';
 
-	this.updateAnimations( this );
+	this.updateAnimations( new THREE.AnimationMixer( this ) );
 
 };
 
@@ -1049,19 +1043,15 @@ THREE.SEA3D.PointLight.prototype.copy = function( source ) {
 
 THREE.SEA3D.AnimationHandler = {
 
-	mixer : new THREE.AnimationMixer(),
-
 	animators : [],
 
 	update : function( dt ) {
-
-		this.mixer.update( dt );
 
 		var i = 0;
 
 		while ( i < this.animators.length ) {
 
-			this.animators[ i ++ ].update();
+			this.animators[ i ++ ].update( dt );
 
 		}
 
@@ -1393,7 +1383,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 				case SEA3D.Stream.DOUBLE:
 				case SEA3D.Stream.DECIMAL:
 
-					var values = data.subarray( start, end );
+					var values = data.slice( start, end );
 					var times = new Float32Array( values.length );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
@@ -1409,7 +1399,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 
 				case SEA3D.Stream.VECTOR3D:
 
-					var values = data.subarray( start, end );
+					var values = data.slice( start, end );
 					var times = new Float32Array( values.length / anm.blockSize );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
@@ -1425,7 +1415,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 
 				case SEA3D.Stream.VECTOR4D:
 
-					var values = data.subarray( start, end );
+					var values = data.slice( start, end );
 					var times = new Float32Array( values.length / anm.blockSize );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
@@ -1785,12 +1775,7 @@ THREE.SEA3D.prototype.readSoundPoint = function( sea ) {
 
 	var sound3d = new THREE.PositionalAudio( this.audioListener );
 
-	new THREE.AudioLoader().load( sea.sound.tag, function ( buffer ) {
-
-		sound3d.setBuffer( buffer );
-
-	} );
-
+	sound3d.load( sea.sound.tag );
 	sound3d.autoplay = sea.autoPlay;
 	sound3d.setLoop( sea.autoPlay );
 	sound3d.setVolume( sea.volume );
@@ -2305,7 +2290,11 @@ THREE.SEA3D.prototype.readDirectionalLight = function( sea ) {
 	var light = new THREE.DirectionalLight( sea.color, sea.multiplier * this.config.multiplier );
 	light.name = sea.name;
 
-	if ( sea.shadow ) this.setShadowMap( light );
+	if ( sea.shadow ) {
+
+		this.setShadowMap( light );
+
+	}
 
 	this.domain.lights = this.lights = this.lights || [];
 	this.lights.push( this.objects[ "lht/" + sea.name ] = sea.tag = light );
