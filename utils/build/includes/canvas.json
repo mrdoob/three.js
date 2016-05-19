@@ -20,7 +20,6 @@
 	"src/core/Raycaster.js",
 	"src/core/Object3D.js",
 	"src/core/Face3.js",
-	"src/core/Face4.js",
 	"src/core/BufferAttribute.js",
 	"src/core/Geometry.js",
 	"src/core/BufferGeometry.js",

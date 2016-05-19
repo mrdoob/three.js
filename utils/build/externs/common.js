@@ -1,4 +1,3 @@
-var AudioContext;
 var console;
 var define;
 var module;
