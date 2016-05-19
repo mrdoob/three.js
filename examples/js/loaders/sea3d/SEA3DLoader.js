@@ -476,6 +476,8 @@ THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
 	if ( ! this.currentAnimationAction.enabled && ! this.currentAnimationData.completed ) {
 
+		this.pause();
+
 		this.currentAnimationData.completed = true;
 
 		if ( this.currentAnimationData.onComplete ) this.currentAnimationData.onComplete( this );
