@@ -110,7 +110,7 @@ Object.assign( THREE.TAARenderPass.prototype, {
 			this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, true );
 		}
-		
+
 		if( accumulationWeight < 1.0 ) {
 			this.compositeUniforms[ "scale" ].value = 1.0 - accumulationWeight;
 			this.compositeUniforms[ "tForeground" ].value = this.holdRenderTarget.texture;

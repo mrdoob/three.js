@@ -148,7 +148,8 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
+				var html = '<span style="margin-right:' + pad + 'px"></span>';
+				html += '<span class="type ' + object.type + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
@@ -164,11 +165,11 @@ Sidebar.Scene = function ( editor ) {
 
 				options.push( { value: object.id, html: html } );
 
-				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
+				addObjects( object.children, pad + 10 );
 
 			}
 
-		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
+		} )( scene.children, 0 );
 
 		outliner.setOptions( options );
 
@@ -232,4 +233,4 @@ Sidebar.Scene = function ( editor ) {
 
 	return container;
 
-}
+};
