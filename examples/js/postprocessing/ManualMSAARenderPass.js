@@ -97,9 +97,9 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 
 			var sampleWeight = baseSampleWeight;
 			if( this.unbiased ) {
-				// the theory is that equal weights for each sample lead to an accumulation of roudning errors.
-				// The following equation varyings the sampleWeight so that it is varies uniformly across
-				// a range of scaled values so that the rounding errors each other out.
+				// the theory is that equal weights for each sample lead to an accumulation of rounding errors.
+				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
+				// across a range of values whose rounding errors cancel each other out.
 				var uniformCenteredDistribution = ( -0.5 + ( i + 0.5 ) / jitterOffsets.length );
 				sampleWeight += roundingRange * uniformCenteredDistribution;
 			}
