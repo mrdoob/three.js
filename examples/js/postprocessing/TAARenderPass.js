@@ -94,8 +94,8 @@ Object.assign( THREE.TAARenderPass.prototype, {
 				if( this.accumulateIndex >= jitterOffsets.length ) break;
 			}
 
-			if ( this.camera.setViewOffset ) this.camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
-
+			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
+			
 		}
 
 		var accumulationWeight = this.accumulateIndex * sampleWeight;

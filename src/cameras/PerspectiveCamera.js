@@ -155,6 +155,13 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 
 	},
 
+	clearViewOffset: function() {
+
+		this.view = null;
+		this.updateProjectionMatrix();
+
+	},
+
 	updateProjectionMatrix: function () {
 
 		var near = this.near,

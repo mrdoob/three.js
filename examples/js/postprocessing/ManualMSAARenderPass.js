@@ -110,7 +110,7 @@ Object.assign( THREE.ManualMSAARenderPass.prototype, {
 
 		}
 
-		if ( this.camera.setViewOffset ) this.camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
 
