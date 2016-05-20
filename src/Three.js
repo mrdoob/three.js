@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '77dev' };
+var THREE = { REVISION: '77' };
 
 //
 
