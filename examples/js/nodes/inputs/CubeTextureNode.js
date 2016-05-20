@@ -35,8 +35,8 @@ THREE.CubeTextureNode.prototype.generate = function( builder, output ) {
 
 	var code;
 
-	if ( bias ) code = 'textureCube(' + cubetex + ',' + coord + ',' + bias + ')';
-	else code = 'textureCube(' + cubetex + ',' + coord + ')';
+	if ( bias ) code = 'texCubeBias(' + cubetex + ',' + coord + ',' + bias + ')';
+	else code = 'texCube(' + cubetex + ',' + coord + ')';
 
 	return builder.format( code, this.type, output );
 

@@ -129,7 +129,7 @@
 		<div>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
+		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.
 		</p>
 		</div>
 		<div>
@@ -159,7 +159,7 @@
 		<h3>[method:Array intersectObjects]( [page:Array objects], [page:Boolean recursive] )</h3>
 		<div>
 		[page:Array objects] — The objects to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
+		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.
 		</div>
 		<div>
 		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].

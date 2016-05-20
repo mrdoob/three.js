@@ -10,9 +10,7 @@ THREE.ClearPass = function () {
 
 };
 
-THREE.ClearPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.ClearPass.prototype = {
+THREE.ClearPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	constructor: THREE.ClearPass,
 
@@ -23,4 +21,4 @@ THREE.ClearPass.prototype = {
 
 	}
 
-};
+} );

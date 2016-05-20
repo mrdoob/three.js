@@ -384,7 +384,7 @@ var Viewport = function ( editor ) {
 
 	signals.geometryChanged.add( function ( object ) {
 
-		if ( object !== null ) {
+		if ( object !== undefined ) {
 
 			selectionBox.update( object );
 

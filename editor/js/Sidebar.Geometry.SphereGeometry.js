@@ -8,7 +8,8 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
@@ -85,7 +86,7 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.SphereGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			widthSegments.getValue(),
 			heightSegments.getValue(),
@@ -99,4 +100,6 @@ Sidebar.Geometry.SphereGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.SphereBufferGeometry = Sidebar.Geometry.SphereGeometry;

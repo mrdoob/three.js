@@ -8,7 +8,8 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
@@ -75,7 +76,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.TorusKnotGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
 			tubularSegments.getValue(),
@@ -88,4 +89,6 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.TorusKnotBufferGeometry = Sidebar.Geometry.TorusKnotGeometry;

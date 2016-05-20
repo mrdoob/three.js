@@ -193,8 +193,8 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.CylinderBufferGeometry' );
 
-		folder.add( data, 'radiusTop', 1, 30 ).onChange( generateGeometry );
-		folder.add( data, 'radiusBottom', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'radiusTop', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'radiusBottom', 0, 30 ).onChange( generateGeometry );
 		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
 		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
@@ -252,6 +252,93 @@ var guis = {
 		generateGeometry();
 
 	},
+
+	ConeBufferGeometry : function( mesh ) {
+
+		var data = {
+			radius : 5,
+			height : 10,
+			radiusSegments : 8,
+			heightSegments : 1,
+			openEnded : false,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ConeBufferGeometry(
+					data.radius,
+					data.height,
+					data.radiusSegments,
+					data.heightSegments,
+					data.openEnded,
+					data.thetaStart,
+					data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ConeBufferGeometry' );
+
+		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'openEnded' ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+
+		generateGeometry();
+
+	},
+
+	ConeGeometry : function( mesh ) {
+
+		var data = {
+			radius : 5,
+			height : 10,
+			radiusSegments : 8,
+			heightSegments : 1,
+			openEnded : false,
+			thetaStart : 0,
+			thetaLength : twoPi,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ConeGeometry(
+					data.radius,
+					data.height,
+					data.radiusSegments,
+					data.heightSegments,
+					data.openEnded,
+					data.thetaStart,
+					data.thetaLength
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ConeGeometry' );
+
+		folder.add( data, 'radius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 50 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 3, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'openEnded' ).onChange( generateGeometry );
+		folder.add( data, 'thetaStart', 0, twoPi ).onChange( generateGeometry );
+		folder.add( data, 'thetaLength', 0, twoPi ).onChange( generateGeometry );
+
+
+		generateGeometry();
+
+	},
+
 
 	CircleBufferGeometry : function( mesh ) {
 
@@ -717,7 +804,7 @@ var guis = {
 		function generateGeometry() {
 
 			var loader = new THREE.FontLoader();
-			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.js', function ( font ) {
+			loader.load( '../../examples/fonts/' + data.font + '_' + data.weight + '.typeface.json', function ( font ) {
 
 				var geometry = new THREE.TextGeometry( data.text, {
 					font: font,

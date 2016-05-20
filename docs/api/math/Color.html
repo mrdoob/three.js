@@ -27,9 +27,31 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( value )</h3>
+		<h3>[name]( r, g, b )</h3>
 		<div>
-		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "hsl(0, 100%, 50%)", "#ff0000", "#f00", or "red", or three arguments that represent color channels.
+		r - the red component of the color if arguments g and b are defined. If they are not defined, it can be a hexadecimal or a CSS-style string or a Color instance.<br />
+		g - The green component of the color if it is defined.<br />
+		b - The blue component of the color if it is defined. 
+		</div>
+		<div>
+		All arguments are optional. The default color is White.<br />
+		When all arguments are defined then r is the red component, g is the green component and b is the blue component of the color.<br />
+		When only r is defined:<br />
+		<ul>
+			<li>It can be a hexadecimal of the color.</li>
+			<li>It can be an another color instance.</li>
+			<li>It can be a CSS style. For Instance:
+				<ul>
+					<li>rgb(250, 0,0)</li>
+					<li>rgb(100%,0%,0%)</li>
+					<li>hsl(0, 100%, 50%)</li>
+					<li>#ff0000</li>
+					<li>#f00</li>
+					<li>red</li>
+				</ul>
+			
+			</li>
+		</ul>
 		</div>
 
 		<h2>Properties</h2>

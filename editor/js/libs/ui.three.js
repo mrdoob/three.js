@@ -334,21 +334,15 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = options[ i ];
-
-		var div = document.createElement( 'div' );
+		var div = options[ i ];
 		div.className = 'option';
-		div.innerHTML = option.html;
-		div.value = option.value;
 		scope.dom.appendChild( div );
 
 		scope.options.push( div );
 
 		div.addEventListener( 'click', onClick, false );
 
-		if ( option.static !== true ) {
-
-			div.draggable = true;
+		if ( div.draggable === true ) {
 
 			div.addEventListener( 'drag', onDrag, false );
 			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this

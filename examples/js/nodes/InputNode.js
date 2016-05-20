@@ -15,8 +15,8 @@ THREE.InputNode.prototype.generate = function( builder, output, uuid, type, ns, 
 
 	var material = builder.material;
 
-	uuid = builder.getUuid( uuid || this.uuid );
-	type = type || this.type;
+	uuid = builder.getUuid( uuid || this.getUuid() );
+	type = type || this.getType( builder );
 
 	var data = material.getDataNode( uuid );
 
@@ -24,7 +24,7 @@ THREE.InputNode.prototype.generate = function( builder, output, uuid, type, ns, 
 
 		if ( ! data.vertex ) {
 
-			data.vertex = material.getVertexUniform( this.value, type, ns, needsUpdate );
+			data.vertex = material.createVertexUniform( type, this.value, ns, needsUpdate );
 
 		}
 
@@ -35,7 +35,7 @@ THREE.InputNode.prototype.generate = function( builder, output, uuid, type, ns, 
 
 		if ( ! data.fragment ) {
 
-			data.fragment = material.getFragmentUniform( this.value, type, ns, needsUpdate );
+			data.fragment = material.createFragmentUniform( type, this.value, ns, needsUpdate );
 
 		}
 
