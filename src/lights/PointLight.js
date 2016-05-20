@@ -9,6 +9,20 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 
 	this.type = 'PointLight';
 
+	Object.defineProperty( this, 'power', {
+		get: function () {
+			// intensity = power per solid angle.
+			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			return this.intensity * 4 * Math.PI;
+
+		},
+		set: function ( power ) {
+			// intensity = power per solid angle.
+			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			this.intensity = power / ( 4 * Math.PI );
+		}
+	} );
+
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
@@ -16,38 +30,21 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 
 };
 
-THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
-THREE.PointLight.prototype.constructor = THREE.PointLight;
+THREE.PointLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-Object.defineProperty( THREE.PointLight.prototype, "power", {
+	constructor: THREE.PointLight,
 
-	get: function () {
+	copy: function ( source ) {
 
-		// intensity = power per solid angle.
-		// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
-		return this.intensity * 4 * Math.PI;
+		THREE.Light.prototype.copy.call( this, source );
 
-	},
+		this.distance = source.distance;
+		this.decay = source.decay;
 
-	set: function ( power ) {
+		this.shadow = source.shadow.clone();
 
-		// intensity = power per solid angle.
-		// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
-		this.intensity = power / ( 4 * Math.PI );
+		return this;
 
 	}
 
 } );
-
-THREE.PointLight.prototype.copy = function ( source ) {
-
-	THREE.Light.prototype.copy.call( this, source );
-
-	this.distance = source.distance;
-	this.decay = source.decay;
-
-	this.shadow = source.shadow.clone();
-
-	return this;
-
-};

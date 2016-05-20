@@ -13,41 +13,44 @@ THREE.Sprite = function ( material ) {
 
 };
 
-THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Sprite.prototype.constructor = THREE.Sprite;
+THREE.Sprite.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-THREE.Sprite.prototype.raycast = ( function () {
+	constructor: THREE.Sprite,
 
-	var matrixPosition = new THREE.Vector3();
+	raycast: ( function () {
 
-	return function raycast( raycaster, intersects ) {
+		var matrixPosition = new THREE.Vector3();
 
-		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+		return function raycast( raycaster, intersects ) {
 
-		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-		var guessSizeSq = this.scale.x * this.scale.y / 4;
+			matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
-		if ( distanceSq > guessSizeSq ) {
+			var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
+			var guessSizeSq = this.scale.x * this.scale.y / 4;
 
-			return;
+			if ( distanceSq > guessSizeSq ) {
 
-		}
+				return;
 
-		intersects.push( {
+			}
 
-			distance: Math.sqrt( distanceSq ),
-			point: this.position,
-			face: null,
-			object: this
+			intersects.push( {
 
-		} );
+				distance: Math.sqrt( distanceSq ),
+				point: this.position,
+				face: null,
+				object: this
 
-	};
+			} );
 
-}() );
+		};
 
-THREE.Sprite.prototype.clone = function () {
+	}() ),
 
-	return new this.constructor( this.material ).copy( this );
+	clone: function () {
 
-};
+		return new this.constructor( this.material ).copy( this );
+
+	}
+
+} );

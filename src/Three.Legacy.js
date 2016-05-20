@@ -8,6 +8,8 @@ Object.assign( THREE, {
 		console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
 		return new THREE.Face3( a, b, c, normal, color, materialIndex );
 	},
+	LineStrip: 0,
+	LinePieces: 1,
 	MeshFaceMaterial: THREE.MultiMaterial,
 	PointCloud: function ( geometry, material ) {
 		console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );

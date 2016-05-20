@@ -14,15 +14,18 @@ THREE.Bone = function ( skin ) {
 
 };
 
-THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Bone.prototype.constructor = THREE.Bone;
+THREE.Bone.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
 
-THREE.Bone.prototype.copy = function ( source ) {
+	constructor: THREE.Bone,
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.skin = source.skin;
+		THREE.Object3D.prototype.copy.call( this, source );
 
-	return this;
+		this.skin = source.skin;
 
-};
+		return this;
+
+	}
+
+} );
