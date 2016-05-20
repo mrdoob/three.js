@@ -32908,7 +32908,6 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
  */
 
 Object.assign( THREE, {
-	CubeGeometry: THREE.BoxGeometry,
 	Face4: function ( a, b, c, d, normal, color, materialIndex ) {
 		console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
 		return new THREE.Face3( a, b, c, normal, color, materialIndex );
@@ -36533,6 +36532,8 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
+
+THREE.CubeGeometry = THREE.BoxGeometry;
 
 // File:src/extras/geometries/BoxBufferGeometry.js
 
