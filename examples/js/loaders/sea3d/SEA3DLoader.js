@@ -1418,7 +1418,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 				case SEA3D.Stream.DOUBLE:
 				case SEA3D.Stream.DECIMAL:
 
-					var values = data.slice( start, end );
+					var values = data.subarray( start, end );
 					var times = new Float32Array( values.length );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
@@ -1434,7 +1434,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 
 				case SEA3D.Stream.VECTOR3D:
 
-					var values = data.slice( start, end );
+					var values = data.subarray( start, end );
 					var times = new Float32Array( values.length / anm.blockSize );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
@@ -1450,7 +1450,7 @@ THREE.SEA3D.prototype.readAnimation = function( sea ) {
 
 				case SEA3D.Stream.VECTOR4D:
 
-					var values = data.slice( start, end );
+					var values = data.subarray( start, end );
 					var times = new Float32Array( values.length / anm.blockSize );
 
 					for ( var k = 0, t = 0; k < times.length; k ++ ) {
