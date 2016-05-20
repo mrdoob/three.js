@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - gpgpu - water</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color: #ffffff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
+			Select <span id="options"></span> water size<br/>
+			Move mouse to disturb water.
+
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/SimulationRenderer.js"></script>
+
+
+		<!-- pass through vertex shader -->
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			void main()	{
+
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<!-- pass through fragment shader -->
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			uniform vec2 resolution;
+			uniform float time;
+			uniform sampler2D texture;
+
+			void main()	{
+
+				vec2 uv = gl_FragCoord.xy / resolution.xy;
+
+				vec3 color = texture2D( texture, uv ).xyz;
+
+				gl_FragColor = vec4( color, 1.0 );
+
+			}
+
+		</script>
+		<!-- end pass through shaders -->
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var hash = document.location.hash.substr( 1 );
+			if ( hash ) hash = parseInt( hash, 0 );
+
+			/* Texture width for simulation */
+			var WIDTH = hash || 32;
+			var NUM_TEXELS = WIDTH * WIDTH;
+
+			var container, stats;
+			var camera, scene, renderer, controls;
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.getElementById( 'waterSize' ).innerText = WIDTH + ' x ' + WIDTH;
+
+			function change(n) {
+				location.hash = n;
+				location.reload();
+				return false;
+			}
+
+
+			var options = '';
+			for ( var i = 4; i < 10; i++ ) {
+				var j = Math.pow( 2, i );
+				options += '<a href="#" onclick="return change(' + j + ')">' + j + 'x' + j + '</a> ';
+			}
+			document.getElementById('options').innerHTML = options;
+
+			var last = performance.now();
+
+			var simulator;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera.position.set( 0, 200, 350 );
+
+				scene = new THREE.Scene();
+
+				var sun = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				sun.position.set( 300, 400, -175 );
+				scene.add( sun );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+//				simulator = new SimulationRenderer(WIDTH, renderer);
+//				simulator.init();
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+				var gui = new dat.GUI();
+
+
+				var effectController = {
+					seperation: 20.0,
+					alignment: 20.0,
+					cohesion: 20.0,
+					freedom: 0.75
+				};
+
+				var valuesChanger = function() {
+
+					simulator.velocityUniforms.seperationDistance.value = effectController.seperation;
+					simulator.velocityUniforms.alignmentDistance.value = effectController.alignment;
+					simulator.velocityUniforms.cohesionDistance.value = effectController.cohesion;
+					simulator.velocityUniforms.freedomFactor.value = effectController.freedom;
+
+				};
+
+//				valuesChanger();
+
+
+				gui.add( effectController, "seperation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
+				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
+				gui.close();
+
+				initWater();
+
+			}
+
+
+			function initWater() {
+
+				var geometry = new THREE.PlaneBufferGeometry( 512, 512, WIDTH - 1, WIDTH -1 );
+				var materialColor = 0x0020C0;
+
+//				var material = new THREE.MeshPhongMaterial( { color: materialColor } );
+/*
+				// For Vertex and Fragment
+				birdUniforms = {
+					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
+					texturePosition: { type: "t", value: null },
+					textureVelocity: { type: "t", value: null },
+					time: { type: "f", value: 1.0 },
+					delta: { type: "f", value: 0.0 }
+				};
+*/
+				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
+				var material = new THREE.ShaderMaterial( {
+
+					uniforms: THREE.UniformsUtils.merge( [
+
+						THREE.UniformsLib[ 'common' ],
+						THREE.UniformsLib[ 'aomap' ],
+						THREE.UniformsLib[ 'lightmap' ],
+						THREE.UniformsLib[ 'emissivemap' ],
+						THREE.UniformsLib[ 'bumpmap' ],
+						THREE.UniformsLib[ 'normalmap' ],
+						THREE.UniformsLib[ 'displacementmap' ],
+						THREE.UniformsLib[ 'fog' ],
+						THREE.UniformsLib[ 'lights' ],
+
+						{
+							"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
+							"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
+							"shininess": { type: "1f", value: 30 }
+
+							// Custom uniforms
+							//heightmap: { type: "t", value: null },
+						}
+
+					] ),
+
+					vertexShader: THREE.ShaderChunk[ 'meshphong_vert' ],
+					fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
+
+				} );
+
+				material.lights = true;
+
+				// Material attributes from MeshPhongMaterial
+				material.color = new THREE.Color( materialColor );
+				material.specular = new THREE.Color( 0x111111 );
+				material.shininess = 30;
+
+				// Sets the uniforms with the material values
+				material.uniforms.diffuse.value = material.color;
+				material.uniforms.specular.value = material.specular;
+				material.uniforms.shininess.value = Math.max( material.shininess, 1e-4 );
+				material.uniforms.opacity.value = material.opacity;
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.matrixAutoUpdate = false;
+				mesh.updateMatrix();
+
+				scene.add( mesh );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length === 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length === 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var now = performance.now();
+				var delta = (now - last) / 1000;
+
+				if (delta > 1) delta = 1; // safety cap on large deltas
+				last = now;
+
+/*
+				birdUniforms.time.value = now;
+				birdUniforms.delta.value = delta;
+
+				simulator.simulate( delta );
+				simulator.velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
+
+				birdUniforms.texturePosition.value = simulator.currentPosition;
+				birdUniforms.textureVelocity.value = simulator.currentVelocity;
+*/
+
+				mouseX = 10000;
+				mouseY = 10000;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
