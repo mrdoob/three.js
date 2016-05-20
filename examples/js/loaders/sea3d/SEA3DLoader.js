@@ -474,11 +474,9 @@ THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
 	this.mixer.update( dt );
 
-	if ( ! this.currentAnimationAction.enabled && ! this.currentAnimationData.completed ) {
+	if ( this.currentAnimationAction.paused ) {
 
 		this.pause();
-
-		this.currentAnimationData.completed = true;
 
 		if ( this.currentAnimationData.onComplete ) this.currentAnimationData.onComplete( this );
 
@@ -581,41 +579,43 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	if ( animation == this.currentAnimation ) {
 
-		if ( offset !== undefined ) this.currentAnimationAction.time = offset;
-		if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 0;
+		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
+		this.currentAnimationAction.paused = false;
 
-		return this;
+		return this.resume();
+
+	} else {
+
+		if ( ! animation ) throw new Error( 'Animation "' + name + '" not found.' );
+
+		this.previousAnimation = this.currentAnimation;
+		this.currentAnimation = animation;
+
+		this.previousAnimationAction = this.currentAnimationAction;
+		this.currentAnimationAction = this.mixer.clipAction( animation ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
+		this.currentAnimationAction.clampWhenFinished = true;
+		this.currentAnimationAction.paused = false;
+
+		this.previousAnimationData = this.currentAnimationData;
+		this.currentAnimationData = this.animationsData[ name ];
+
+		this.updateTimeScale();
+
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 0;
+		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
+
+		this.currentAnimationAction.play();
+
+		if ( ! this.playing ) this.mixer.update( 0 );
+
+		this.playing = true;
+
+		if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, true );
+
+		THREE.SEA3D.AnimationHandler.addAnimator( this );
 
 	}
-
-	if ( ! animation ) throw new Error( 'Animation "' + name + '" not found.' );
-
-	this.previousAnimation = this.currentAnimation;
-	this.currentAnimation = animation;
-
-	this.previousAnimationAction = this.currentAnimationAction;
-	this.currentAnimationAction = this.mixer.clipAction( animation ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
-	this.currentAnimationAction.clampWhenFinished = true;
-
-	this.previousAnimationData = this.currentAnimationData;
-	this.currentAnimationData = this.animationsData[ name ];
-
-	this.currentAnimationData.completed = false;
-
-	this.updateTimeScale();
-
-	this.currentAnimationAction.play();
-
-	if ( offset !== undefined ) this.currentAnimationAction.time = offset;
-	if ( weight !== undefined ) this.currentAnimationAction.setEffectiveWeight( weight );
-
-	if ( ! this.playing ) this.mixer.update( 0 );
-
-	this.playing = true;
-
-	if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, true );
-
-	THREE.SEA3D.AnimationHandler.addAnimator( this );
 
 	return this;
 
