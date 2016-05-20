@@ -187,7 +187,12 @@ THREE.WebGLUniforms = ( function() { // scope
 		},
 
 		setValue4fm = function( gl, v ) {
-
+			if( v.elements ){
+				v.elements[12] = v.origin.x;
+				v.elements[13] = v.origin.y;
+				v.elements[14] = v.origin.z;
+			}
+			//console.log( "Fixed iT?!", v );
 			gl.uniformMatrix4fv( this.addr, false, v.elements || v );
 
 		},
@@ -599,4 +604,3 @@ THREE.WebGLUniforms = ( function() { // scope
 	return WebGLUniforms;
 
 } )();
-

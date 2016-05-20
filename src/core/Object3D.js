@@ -20,7 +20,7 @@ THREE.Object3D = function () {
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
-	var position = new THREE.Vector3();
+	//var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
 	var scale = new THREE.Vector3( 1, 1, 1 );
@@ -43,7 +43,9 @@ THREE.Object3D = function () {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
-			value: position
+			//value: position
+			get: function () { return this.matrix.origin; },
+			set: function (v) { console.log( "ahh do set?" ); this.matrix.origin = v; }
 		},
 		rotation: {
 			enumerable: true,
