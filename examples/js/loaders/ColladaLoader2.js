@@ -139,7 +139,7 @@ THREE.ColladaLoader.prototype = {
 
 		// library
 
-		function parseLibrary( xml, data, libraryName, nodeName, parser ) {
+		function parseLibrary( xml, libraryName, nodeName, parser ) {
 
 			var library = getElementsByTagName( xml, libraryName )[ 0 ];
 
@@ -1551,14 +1551,14 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Parse' );
 
-		parseLibrary( collada, library.images, 'library_images', 'image', parseImage );
-		parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
-		parseLibrary( collada, library.materials, 'library_materials', 'material', parseMaterial );
-		parseLibrary( collada, library.cameras, 'library_cameras', 'camera', parseCamera );
-		parseLibrary( collada, library.lights, 'library_lights', 'light', parseLight );
-		parseLibrary( collada, library.geometries, 'library_geometries', 'geometry', parseGeometry );
-		parseLibrary( collada, library.nodes, 'library_nodes', 'node', parseNode );
-		parseLibrary( collada, library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+		parseLibrary( collada, 'library_images', 'image', parseImage );
+		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, 'library_materials', 'material', parseMaterial );
+		parseLibrary( collada, 'library_cameras', 'camera', parseCamera );
+		parseLibrary( collada, 'library_lights', 'light', parseLight );
+		parseLibrary( collada, 'library_geometries', 'geometry', parseGeometry );
+		parseLibrary( collada, 'library_nodes', 'node', parseNode );
+		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Parse' );
 
