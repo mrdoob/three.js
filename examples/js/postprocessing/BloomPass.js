@@ -73,9 +73,9 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 };
 
-THREE.BloomPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.BloomPass.prototype, {
+	constructor: THREE.BloomPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

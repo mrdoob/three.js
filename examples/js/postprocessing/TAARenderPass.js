@@ -28,9 +28,9 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
 
-THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
+THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARenderPass.prototype ), {
 
-Object.assign( THREE.TAARenderPass.prototype, {
+	constructor: THREE.TAARenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
@@ -95,7 +95,7 @@ Object.assign( THREE.TAARenderPass.prototype, {
 			}
 
 			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
-			
+
 		}
 
 		var accumulationWeight = this.accumulateIndex * sampleWeight;

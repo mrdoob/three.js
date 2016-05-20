@@ -34,7 +34,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 };
 
-THREE.EffectComposer.prototype = {
+Object.assign( THREE.EffectComposer.prototype, {
 
 	swapBuffers: function() {
 
@@ -142,7 +142,7 @@ THREE.EffectComposer.prototype = {
 
 	}
 
-};
+} );
 
 
 THREE.Pass = function () {
@@ -161,9 +161,7 @@ THREE.Pass = function () {
 
 };
 
-THREE.Pass.prototype = {
-
-	constructor: THREE.Pass,
+Object.assign( THREE.Pass.prototype, {
 
 	setSize: function( width, height ) {},
 
@@ -173,4 +171,4 @@ THREE.Pass.prototype = {
 
 	}
 
-};
+} );

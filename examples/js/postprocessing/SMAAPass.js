@@ -104,9 +104,9 @@ THREE.SMAAPass = function ( width, height ) {
 
 };
 
-THREE.SMAAPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.SMAAPass.prototype, {
+	constructor: THREE.SMAAPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

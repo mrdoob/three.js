@@ -43,9 +43,9 @@ THREE.ManualMSAARenderPass = function ( scene, camera ) {
 
 };
 
-THREE.ManualMSAARenderPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.ManualMSAARenderPass.prototype, {
+	constructor: THREE.ManualMSAARenderPass,
 
 	dispose: function() {
 
