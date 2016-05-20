@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - raycast - skinning</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			var scene, camera, renderer, orbit, ambientLight, lights, mesh, bufferMesh, bones, raycaster;
+
+			function initScene () {
+
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.z = 30;
+				camera.position.y = 30;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				orbit = new THREE.OrbitControls( camera, renderer.domElement );
+				orbit.enableZoom = false;
+
+				ambientLight = new THREE.AmbientLight( 0x000000 );
+				scene.add( ambientLight );
+
+				lights = [];
+				lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+
+				lights[ 0 ].position.set( 0, 200, 0 );
+				lights[ 1 ].position.set( 100, 200, 100 );
+				lights[ 2 ].position.set( - 100, - 200, - 100 );
+
+				scene.add( lights[ 0 ] );
+				scene.add( lights[ 1 ] );
+				scene.add( lights[ 2 ] );
+
+				window.addEventListener( 'resize', function () {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				}, false );
+
+				initBones();
+
+			}
+
+			function createGeometry ( sizing ) {
+
+				var geometry = new THREE.CylinderGeometry(
+					5,                       // radiusTop
+					5,                       // radiusBottom
+					sizing.height,           // height
+					8,                       // radiusSegments
+					sizing.segmentCount * 3, // heightSegments
+					true                     // openEnded
+				);
+
+				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+					var vertex = geometry.vertices[ i ];
+					var y = ( vertex.y + sizing.halfHeight );
+
+					var skinIndex = Math.floor( y / sizing.segmentHeight );
+					var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+					geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
+					geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+
+				}
+
+				var min = new THREE.Vector3( -sizing.height, -sizing.height, -sizing.height );
+				var max = min.clone().multiplyScalar( -1 );
+
+				return geometry;
+
+			};
+
+			function createBones ( sizing ) {
+
+				bones = [];
+
+				var prevBone = new THREE.Bone();
+				bones.push( prevBone );
+				prevBone.position.y = - sizing.halfHeight;
+
+				for ( var i = 0; i < sizing.segmentCount; i ++ ) {
+
+					var bone = new THREE.Bone();
+					bone.position.y = sizing.segmentHeight;
+					bones.push( bone );
+					prevBone.add( bone );
+					prevBone = bone;
+
+				}
+
+				return bones;
+
+			};
+
+			function createMesh ( geometry, bones ) {
+
+				var material = new THREE.MeshPhongMaterial( {
+					skinning : true,
+					color: 0x156289,
+					emissive: 0x072534,
+					side: THREE.DoubleSide,
+					shading: THREE.FlatShading
+				} );
+
+				var mesh = new THREE.SkinnedMesh( geometry,	material );
+				var skeleton = new THREE.Skeleton( bones );
+
+				mesh.add( bones[ 0 ] );
+
+				mesh.bind( skeleton );
+
+				return mesh;
+
+			};
+
+			function initBones () {
+
+				var segmentHeight = 8;
+				var segmentCount = 5;
+				var height = segmentHeight * segmentCount;
+				var halfHeight = height * 0.5;
+
+				var sizing = {
+					segmentHeight : segmentHeight,
+					segmentCount : segmentCount,
+					height : height,
+					halfHeight : halfHeight
+				};
+
+				var geometry = createGeometry( sizing );
+				var bones = createBones( sizing );
+				mesh = createMesh( geometry, bones );
+				mesh.position.z = - 5;
+
+				var bufferGeometry = new THREE.BufferGeometry().fromGeometry( geometry );
+				var bufferBones = createBones( sizing );
+				bufferMesh = createMesh( bufferGeometry, bufferBones );
+				bufferMesh.position.z = 5;
+
+				geometry.boundingSphere = new THREE.Sphere( new THREE.Vector3(), sizing.height );
+				bufferGeometry.boundingSphere = new THREE.Sphere( new THREE.Vector3(), sizing.height );
+
+				scene.add( mesh );
+				scene.add( bufferMesh );
+
+			};
+
+			function render () {
+
+				requestAnimationFrame( render );
+
+				var time = Date.now() * 0.001;
+
+				var bone = mesh;
+
+				for ( var i = 0; i < mesh.skeleton.bones.length; i ++ ) {
+
+					mesh.skeleton.bones[ i ].rotation.z = Math.sin( time / 5 ) * 2 / mesh.skeleton.bones.length;
+					bufferMesh.skeleton.bones[ i ].rotation.z = -Math.sin( time / 5 ) * 2 / bufferMesh.skeleton.bones.length;
+
+				}
+
+				renderer.render( scene, camera );
+
+			};
+
+			initScene();
+			render();
+
+			raycaster = new THREE.Raycaster();
+
+			renderer.domElement.addEventListener( 'click', function( event ) {
+
+				var rect = renderer.domElement.getBoundingClientRect();
+
+				var mouseX = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+				var mouseY = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+				raycaster.setFromCamera( new THREE.Vector2( mouseX, mouseY ), camera );
+
+				var intersects = raycaster.intersectObjects( scene.children, true );
+
+				if ( intersects.length > 0 ) {
+
+					var color = intersects[ 0 ].object.material.color;
+					intersects[ 0 ].object.material.color = new THREE.Color( color.b, color.r, color.g );
+
+				}
+
+			}, false );
+
+		</script>
+	</body>
+</html>

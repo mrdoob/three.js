@@ -140,9 +140,9 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 			if ( object.boneTransform ) {
 
-				object.boneTransform( vA, a );
-				object.boneTransform( vB, b );
-				object.boneTransform( vC, c );
+				vA = object.boneTransform( vA, a );
+				vB = object.boneTransform( vB, b );
+				vC = object.boneTransform( vC, c );
 
 			}
 
@@ -314,9 +314,9 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 					if ( this.boneTransform ) {
 
-						this.boneTransform( fvA, face.a );
-						this.boneTransform( fvB, face.b );
-						this.boneTransform( fvC, face.c );
+						fvA = this.boneTransform( fvA, face.a );
+						fvB = this.boneTransform( fvB, face.b );
+						fvC = this.boneTransform( fvC, face.c );
 
 					}
 
