@@ -474,7 +474,7 @@ THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
 	this.mixer.update( dt );
 
-	if ( ( this.currentAnimationAction.paused || ! this.currentAnimationAction.enabled ) && ! this.currentAnimationData.completed ) {
+	if ( this.currentAnimationAction.paused && ! this.currentAnimationData.completed ) {
 
 		this.pause();
 
