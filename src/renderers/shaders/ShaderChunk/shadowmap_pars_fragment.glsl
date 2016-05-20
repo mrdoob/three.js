@@ -27,14 +27,12 @@
 		#define LIGHT_SIZE_UV (LIGHT_WORLD_SIZE / LIGHT_FRUSTUM_WIDTH)
 		#define NEAR_PLANE 9.5
 
-		#define NUM_SAMPLES 7
-		#define NUM_RINGS 5
+		#define NUM_SAMPLES 37
+		#define NUM_RINGS 11
 		#define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
 		#define PCF_NUM_SAMPLES NUM_SAMPLES
 
 		vec2 poissonDisk[NUM_SAMPLES];
-
-		// moving costly divides into consts
 
 		void initPoissonSamples( const in vec2 randomSeed )
 		{
@@ -80,10 +78,14 @@
 		float PCF_Filter(sampler2D shadowMap, vec2 uv, float zReceiver, float filterRadius ) {
 			float sum = 0.0;
 			for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
-				float depth =  unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
+				float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
 				if( zReceiver <= depth ) sum += 1.0;
 			}
-			return sum / float( PCF_NUM_SAMPLES );
+			for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
+				float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ) );
+				if( zReceiver <= depth ) sum += 1.0;
+			}
+			return sum / ( 2.0 * float( PCF_NUM_SAMPLES ) );
 		}
 
 		float PCSS ( sampler2D shadowMap, vec4 coords ) {
