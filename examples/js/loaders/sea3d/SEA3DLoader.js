@@ -474,11 +474,9 @@ THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
 	this.mixer.update( dt );
 
-	if ( this.currentAnimationAction.paused && ! this.currentAnimationData.completed ) {
+	if ( this.currentAnimationAction.paused ) {
 
 		this.pause();
-
-		this.currentAnimationData.completed = true;
 
 		if ( this.currentAnimationData.onComplete ) this.currentAnimationData.onComplete( this );
 
@@ -585,8 +583,6 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
 		this.currentAnimationAction.paused = false;
 
-		this.currentAnimationData.completed = false;
-
 		return this.resume();
 
 	} else {
@@ -603,8 +599,6 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 		this.previousAnimationData = this.currentAnimationData;
 		this.currentAnimationData = this.animationsData[ name ];
-
-		this.currentAnimationData.completed = false;
 
 		this.updateTimeScale();
 
