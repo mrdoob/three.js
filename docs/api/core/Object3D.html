@@ -272,6 +272,46 @@
 		Searches through the object's children and returns the first with a matching id.
 		</div>
 
+		<h3>[method:Vector3 getWorldPosition]([page:Vector3 optionalTarget])</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector representing the position of the object in world space.
+		</div>
+
+		<h3>[method:Quaternion getWorldQuaternion]([page:Quaternion optionalTarget])</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Quaternion` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a quaternion representing the rotation of the object in world space.
+		</div>
+
+		<h3>[method:Euler getWorldRotation]([page:Euler optionalTarget])</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Euler` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns the euler angles representing the rotation of the object in world space.
+		</div>
+
+		<h3>[method:Vector3 getWorldScale]([page:Vector3 optionalTarget])</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector of the scaling factors applied to the object for each axis in world space.
+		</div>
+
+		<h3>[method:Vector3 getWorldDirection]([page:Vector3 optionalTarget])</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector representing the direction of object's positive z-axis in world space.
+		</div>
+
 		<h3>[method:Object3D translateOnAxis]([page:Vector3 axis], [page:Float distance])</h3>
 		<div>
 		axis -- A normalized vector in object space.<br />
