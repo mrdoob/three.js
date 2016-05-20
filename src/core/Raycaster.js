@@ -6,13 +6,14 @@
 
 ( function ( THREE ) {
 
-	THREE.Raycaster = function ( origin, direction, near, far ) {
+	THREE.Raycaster = function ( origin, direction, near, far, intersectHidden ) {
 
 		this.ray = new THREE.Ray( origin, direction );
 		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.near = near || 0;
 		this.far = far || Infinity;
+		this.intersectHidden = intersectHidden || false;
 
 		this.params = {
 			Mesh: {},
@@ -41,7 +42,7 @@
 
 	function intersectObject( object, raycaster, intersects, recursive ) {
 
-		if ( object.visible === false ) return;
+		if ( object.visible === false && !raycaster.intersectHidden ) return;
 
 		object.raycast( raycaster, intersects );
 
