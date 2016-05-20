@@ -177,3 +177,45 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 	}
 
 } );
+
+THREE.SkinnedMesh.prototype.boneTransform = ( function() {
+
+	var result = new THREE.Vector3(), skinIndices = new THREE.Vector4(), skinWeights = new THREE.Vector4();
+	var temp = new THREE.Vector3(), tempMatrix = new THREE.Matrix4(), properties = [ 'x', 'y', 'z', 'w' ];
+
+	return function( vector, index ) {
+
+		if ( this.geometry instanceof THREE.BufferGeometry ) {
+
+			var index4 = index * 4;
+			skinIndices.fromArray( this.geometry.attributes.skinIndex.array, index4 );
+			skinWeights.fromArray( this.geometry.attributes.skinWeights.array, index4 );
+
+		} else if ( this.geometry instanceof THREE.Geometry ) {
+
+			skinIndices.copy( this.geometry.skinIndices[ index ] );
+			skinWeights.copy( this.geometry.skinWeights[ index ] );
+
+		}
+
+		vector.applyMatrix4( this.bindMatrix ); result.set( 0, 0, 0 );
+
+		for ( var i = 0; i < 4; i ++ ) {
+
+			var skinWeight = skinWeights[ properties[ i ] ];
+
+			if ( skinWeight != 0 ) {
+
+				var boneIndex = skinIndices[ properties[ i ] ];
+				tempMatrix.multiplyMatrices( this.skeleton.bones[ boneIndex ].matrixWorld, this.skeleton.boneInverses[ boneIndex ] );
+				result.add( temp.copy( vector ).applyMatrix4( tempMatrix ).multiplyScalar( skinWeight ) );
+
+			}
+
+		}
+
+		vector.copy( result.applyMatrix4( this.bindMatrixInverse ) );
+
+	};
+
+} )();

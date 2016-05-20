@@ -138,6 +138,14 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 			vB.fromArray( positions, b * 3 );
 			vC.fromArray( positions, c * 3 );
 
+			if ( object.boneTransform ) {
+
+				object.boneTransform( vA, a );
+				object.boneTransform( vB, b );
+				object.boneTransform( vC, c );
+
+			}
+
 			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 			if ( intersection ) {
@@ -301,6 +309,14 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 						fvA = vA;
 						fvB = vB;
 						fvC = vC;
+
+					}
+
+					if ( this.boneTransform ) {
+
+						this.boneTransform( fvA, face.a );
+						this.boneTransform( fvB, face.b );
+						this.boneTransform( fvC, face.c );
 
 					}
 
