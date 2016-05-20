@@ -46,8 +46,7 @@
 		<script src="js/SimulationRenderer.js"></script>
 
 
-		<!-- pass through vertex shader -->
-		<script id="vertexShader" type="x-shader/x-vertex">
+		<script id="passThroughVertexShader" type="x-shader/x-vertex">
 
 			void main()	{
 
@@ -57,8 +56,7 @@
 
 		</script>
 
-		<!-- pass through fragment shader -->
-		<script id="fragmentShader" type="x-shader/x-fragment">
+		<script id="passThroughFragmentShader" type="x-shader/x-fragment">
 
 			uniform vec2 resolution;
 			uniform float time;
@@ -75,8 +73,82 @@
 			}
 
 		</script>
-		<!-- end pass through shaders -->
 
+		<script id="waterVertexShader" type="x-shader/x-vertex">
+
+			uniform sampler2D heightmap;
+
+			#define PHONG
+
+			varying vec3 vViewPosition;
+
+			#ifndef FLAT_SHADED
+
+				varying vec3 vNormal;
+
+			#endif
+
+			#include <common>
+			#include <uv_pars_vertex>
+			#include <uv2_pars_vertex>
+			#include <displacementmap_pars_vertex>
+			#include <envmap_pars_vertex>
+			#include <color_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <shadowmap_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
+
+			void main() {
+
+				vec2 hmapSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
+
+				#include <uv_vertex>
+				#include <uv2_vertex>
+				#include <color_vertex>
+
+				// # include <beginnormal_vertex>
+				// Compute normal from heightmap
+				// TODO instead of computing, obtain from heightmap.zw
+				vec3 objectNormal = vec3(
+					( texture2D( heightmap, uv + vec2( - hmapSize.x, 0 ) ).x - texture2D( heightmap, uv + vec2( hmapSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
+					( texture2D( heightmap, uv + vec2( 0, - hmapSize.y ) ).x - texture2D( heightmap, uv + vec2( 0, hmapSize.y ) ).x ) * WIDTH / BOUNDS,
+					1.0 );
+				//<beginnormal_vertex>
+
+				#include <morphnormal_vertex>
+				#include <skinbase_vertex>
+				#include <skinnormal_vertex>
+				#include <defaultnormal_vertex>
+
+			#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
+
+				vNormal = normalize( transformedNormal );
+
+			#endif
+
+				//# include <begin_vertex>
+				float heightValue = texture2D( heightmap, uv ).x;
+				vec3 transformed = vec3( position.x, position.y, heightValue );
+				//<begin_vertex>
+
+				#include <displacementmap_vertex>
+				#include <morphtarget_vertex>
+				#include <skinning_vertex>
+				#include <project_vertex>
+				#include <logdepthbuf_vertex>
+				#include <clipping_planes_vertex>
+
+				vViewPosition = - mvPosition.xyz;
+
+				#include <worldpos_vertex>
+				#include <envmap_vertex>
+				#include <shadowmap_vertex>
+
+			}
+
+		</script>
 
 		<script>
 
@@ -85,9 +157,13 @@
 			var hash = document.location.hash.substr( 1 );
 			if ( hash ) hash = parseInt( hash, 0 );
 
-			/* Texture width for simulation */
-			var WIDTH = hash || 32;
+			// Texture width for simulation
+			var WIDTH = hash || 128;
 			var NUM_TEXELS = WIDTH * WIDTH;
+
+			// Water size in system units
+			var BOUNDS = 512;
+			var BOUNDS_HALF = BOUNDS * 0.5;
 
 			var container, stats;
 			var camera, scene, renderer, controls;
@@ -192,8 +268,9 @@
 
 			function initWater() {
 
-				var geometry = new THREE.PlaneBufferGeometry( 512, 512, WIDTH - 1, WIDTH -1 );
-				var materialColor = 0x0020C0;
+				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH -1 );
+				//var materialColor = 0x0040C0;
+				var materialColor = 0xFFFFFF;
 
 //				var material = new THREE.MeshPhongMaterial( { color: materialColor } );
 /*
@@ -224,20 +301,23 @@
 						{
 							"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 							"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-							"shininess": { type: "1f", value: 30 }
+							"shininess": { type: "1f", value: 30 },
 
 							// Custom uniforms
-							//heightmap: { type: "t", value: null },
+							heightmap: { type: "t", value: null }
 						}
 
 					] ),
 
-					vertexShader: THREE.ShaderChunk[ 'meshphong_vert' ],
+					vertexShader: document.getElementById( 'waterVertexShader' ).textContent,
 					fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
 
 				} );
 
 				material.lights = true;
+
+				material.defines.WIDTH = WIDTH.toFixed( 1 );
+				material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
 				// Material attributes from MeshPhongMaterial
 				material.color = new THREE.Color( materialColor );
@@ -250,6 +330,10 @@
 				material.uniforms.shininess.value = Math.max( material.shininess, 1e-4 );
 				material.uniforms.opacity.value = material.opacity;
 
+				material.uniforms.heightmap.value = generateTexture();
+
+				material.uniforms.map.value
+
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.matrixAutoUpdate = false;
@@ -258,6 +342,33 @@
 				scene.add( mesh );
 
 			}
+
+			function generateTexture() {
+
+				var a = new Float32Array( NUM_TEXELS * 4 );
+
+				var p = 0;
+				for ( var j = 0; j < WIDTH; j++ ) {
+					for ( var i = 0; i < WIDTH; i++ ) {
+
+        					var h = 40 * 0.5 * ( 1 + Math.sin( i * 0.25 ) );
+
+					        a[ p + 0 ] = h;
+						a[ p + 1 ] = 0;
+						a[ p + 2 ] = 0;
+						a[ p + 3 ] = 1;
+
+						p += 4;
+					}
+				}
+
+				var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
+				texture.needsUpdate = true;
+
+				return texture;
+
+			}
+
 
 			function onWindowResize() {
 
