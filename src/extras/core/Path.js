@@ -151,7 +151,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 			xRadius, yRadius,
 			aStartAngle, aEndAngle,
 			aClockwise,
-			aRotation || 0 // aRotation is optional.
+			aRotation || 0, // aRotation is optional.
+			this.curves.length
 		];
 
 		var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
@@ -171,7 +172,7 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 		var points = [];
 
-		for ( var i = 0; i < divisions; i ++ ) {
+		for ( var i = 0; i <= divisions; i ++ ) {
 
 			points.push( this.getPoint( i / divisions ) );
 
@@ -321,42 +322,6 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 				break;
 
-			case 'arc':
-
-				var aX = args[ 0 ], aY = args[ 1 ],
-					aRadius = args[ 2 ],
-					aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
-					aClockwise = !! args[ 5 ];
-
-				var deltaAngle = aEndAngle - aStartAngle;
-				var angle;
-				var tdivisions = divisions * 2;
-
-				for ( var j = 1; j <= tdivisions; j ++ ) {
-
-					var t = j / tdivisions;
-
-					if ( ! aClockwise ) {
-
-						t = 1 - t;
-
-					}
-
-					angle = aStartAngle + t * deltaAngle;
-
-					tx = aX + aRadius * Math.cos( angle );
-					ty = aY + aRadius * Math.sin( angle );
-
-					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
-
-					points.push( new THREE.Vector2( tx, ty ) );
-
-				}
-
-				//console.log(points);
-
-				break;
-
 			case 'ellipse':
 
 				var aX = args[ 0 ], aY = args[ 1 ],
@@ -364,49 +329,16 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 					yRadius = args[ 3 ],
 					aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
 					aClockwise = !! args[ 6 ],
-					aRotation = args[ 7 ];
+					aRotation = args[ 7 ],
+					curveIndex = args[8];
 
+				var ellipse = this.curves[ curveIndex ];
 
-				var deltaAngle = aEndAngle - aStartAngle;
-				var angle;
-				var tdivisions = divisions * 2;
+				for ( var j = 0; j <= divisions; j++ ) {
 
-				var cos, sin;
-				if ( aRotation !== 0 ) {
+					var t = j / divisions;
 
-					cos = Math.cos( aRotation );
-					sin = Math.sin( aRotation );
-
-				}
-
-				for ( var j = 1; j <= tdivisions; j ++ ) {
-
-					var t = j / tdivisions;
-
-					if ( ! aClockwise ) {
-
-						t = 1 - t;
-
-					}
-
-					angle = aStartAngle + t * deltaAngle;
-
-					tx = aX + xRadius * Math.cos( angle );
-					ty = aY + yRadius * Math.sin( angle );
-
-					if ( aRotation !== 0 ) {
-
-						var x = tx, y = ty;
-
-						// Rotate the point about the center of the ellipse.
-						tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
-						ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
-
-					}
-
-					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
-
-					points.push( new THREE.Vector2( tx, ty ) );
+					points.push( ellipse.getPoint( t ) );
 
 				}
 
