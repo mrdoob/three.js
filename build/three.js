@@ -12954,7 +12954,7 @@ THREE.AnimationAction._new.prototype = {
 					if ( timeScale === 0 ) {
 
 						// motion has halted, pause
-						this.pause = true;
+						this.paused = true;
 
 					} else {
 
@@ -13007,7 +13007,7 @@ THREE.AnimationAction._new.prototype = {
 
 				} else break handle_stop;
 
-				if ( this.clampWhenFinished ) this.pause = true;
+				if ( this.clampWhenFinished ) this.paused = true;
 				else this.enabled = false;
 
 				this._mixer.dispatchEvent( {
@@ -28597,6 +28597,7 @@ THREE.WebGLExtensions = function ( gl ) {
 
 			case 'WEBGL_depth_texture':
 				extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
+				break;
 
 			case 'EXT_texture_filter_anisotropic':
 				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
