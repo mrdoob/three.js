@@ -75,6 +75,11 @@
 
 		<script id="heightmapFragmentShader" type="x-shader/x-fragment">
 
+			#include <common>
+
+			uniform vec2 mousePos;
+			uniform float mouseSize;
+
 			#define deltaTime ( 1.0 / 60.0 )
 			#define GRAVITY_CONSTANT ( resolution.x * deltaTime )
 			#define VISCOSITY_CONSTANT 0.001
@@ -111,6 +116,11 @@
 				heightmapValue.y += acel;
 
 				heightmapValue.x += heightmapValue.y * deltaTime;
+
+				// Mouse influence
+				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - mousePos ) * PI / mouseSize, 0.0, PI );
+
+				heightmapValue.x += cos( mousePhase ) + 1.0;
 
 				gl_FragColor = heightmapValue;
 
@@ -180,7 +190,6 @@
 
 				// # include <beginnormal_vertex>
 				// Compute normal from heightmap
-				// TODO instead of computing, obtain from heightmap.zw
 				vec3 objectNormal = vec3(
 					( texture2D( heightmap, uv + vec2( - cellSize.x, 0 ) ).x - texture2D( heightmap, uv + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
 					( texture2D( heightmap, uv + vec2( 0, - cellSize.y ) ).x - texture2D( heightmap, uv + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS,
@@ -237,7 +246,9 @@
 
 			var container, stats;
 			var camera, scene, renderer, controls;
-			var mouseX = 0, mouseY = 0;
+			var mouseMoved = false;
+			var mouseCoords = new THREE.Vector2();
+			var raycaster = new THREE.Raycaster();
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -307,7 +318,7 @@
 
 				document.addEventListener( 'keydown', function( event ) {
 
-					// W Pressed
+					// W Pressed: Toggle wireframe
 					if ( event.keyCode === 87 ) {
 
 						waterMesh.material.wireframe = ! waterMesh.material.wireframe;
@@ -366,7 +377,7 @@
 					uniforms: THREE.UniformsUtils.merge( [
 						THREE.ShaderLib[ 'phong' ].uniforms,
 					    	{
-							heightmap: { type: "t", value: null }
+							heightmap: { type: "t", value: null },
 						}
 					] ),
 					vertexShader: document.getElementById( 'waterVertexShader' ).textContent,
@@ -411,6 +422,10 @@
 
 				heightmapVariable = gpuCompute.addVariable( "heightmap", document.getElementById( 'heightmapFragmentShader' ).textContent, heightmap0 );
 
+				heightmapVariable.material.uniforms.mousePos = { type: "v2", value: new THREE.Vector2( 10000, 10000 ) };
+				heightmapVariable.material.uniforms.mouseSize = { type: "f", value: 20.0 };
+				heightmapVariable.material.defines.BOUNDS = BOUNDS.toFixed( 1 );
+
 				gpuCompute.setVariableDependencies( heightmapVariable, [ heightmapVariable ] );
 
 				var error = gpuCompute.init();
@@ -421,7 +436,7 @@
 				// Smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { type: "t", value: null } } );
 
-				//smoothWater();
+				smoothWater();
 
 			}
 
@@ -489,10 +504,16 @@
 
 			}
 
+			function setMouseCoords( x, y ) {
+
+				mouseCoords.set( ( x / renderer.domElement.width ) * 2 - 1, - ( y / renderer.domElement.height ) * 2 + 1 );
+				mouseMoved = true;
+
+			}
+
 			function onDocumentMouseMove( event ) {
 
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
+				setMouseCoords( event.clientX, event.clientY );
 
 			}
 
@@ -502,8 +523,8 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+					setMouseCoords( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
 
 				}
 
@@ -515,8 +536,8 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+					setMouseCoords( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
 
 				}
 
@@ -541,18 +562,37 @@
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
 
+				// Set uniforms
+				var uniforms = heightmapVariable.material.uniforms;
+				if ( mouseMoved ) {
+
+					this.raycaster.setFromCamera( mouseCoords, camera );
+
+					var intersects = this.raycaster.intersectObject( waterMesh );
+
+					if ( intersects.length > 0 ) {
+					    var point = intersects[ 0 ].point;
+					    uniforms.mousePos.value.set( point.x, - point.z );
+
+					}
+					else {
+					    uniforms.mousePos.value.set( 10000, 10000 );
+					}
+
+					mouseMoved = false;
+				}
+				else {
+					uniforms.mousePos.value.set( 10000, 10000 );
+				}
 
 				// Do the gpu computation
 				gpuCompute.compute();
 
-				// Get output in custom uniform
-				waterUniforms.heightmap.value = gpuCompute.getCurrentTexture( heightmapVariable );
+				// Get compute output in custom uniform
+				waterUniforms.heightmap.value = gpuCompute.getCurrentTexture( heightmapVariable ).texture;
 
 				// Render
 				renderer.render( scene, camera );
-
-				mouseX = 10000;
-				mouseY = 10000;
 
 			}
 
