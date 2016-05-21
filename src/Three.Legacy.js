@@ -378,7 +378,7 @@ Object.defineProperties( THREE.Material.prototype, {
 		}
 	},
 	depthWrite: {
-  	get: function () {
+		get: function () {
 			console.warn( 'THREE.' + this.type + ': .depthWrite is now .depthMask.' );
 			return this.depthMask;
 		},
@@ -388,7 +388,7 @@ Object.defineProperties( THREE.Material.prototype, {
 		}
   },
 	colorWrite: {
-  	get: function () {
+		get: function () {
 			console.warn( 'THREE.' + this.type + ': .colorWrite is now .colorMask.' );
 			return this.colorMask.r;
 		},
