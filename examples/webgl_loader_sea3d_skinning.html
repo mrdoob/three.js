@@ -108,7 +108,7 @@
 
 				animate();
 
-				updatePlayerCountText( 1 );
+				updatePlayerCountDescription( 1 );
 
 			};
 
@@ -116,7 +116,7 @@
 
 			//
 
-			function updatePlayerCountText( count ) {
+			function updatePlayerCountDescription( count ) {
 
 				document.getElementById("playercount").innerText = "Numbers of players " + count + " | Middle click to clone";
 
@@ -128,7 +128,7 @@
 
 				return function() {
 
-					updatePlayerCountText( count );
+					updatePlayerCountDescription( count );
 
 					var PHI = Math.PI * 2 * (Math.sqrt(5) + 1) / 2;  // golden ratio
 					var angle = PHI * count++;
