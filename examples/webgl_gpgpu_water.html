@@ -42,8 +42,9 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/SimplexNoise.js"></script>
 
-		<script src="js/SimulationRenderer.js"></script>
+		<script src="js/GPUComputationRenderer.js"></script>
 
 
 		<script id="passThroughVertexShader" type="x-shader/x-vertex">
@@ -58,7 +59,6 @@
 
 		<script id="passThroughFragmentShader" type="x-shader/x-fragment">
 
-			uniform vec2 resolution;
 			uniform sampler2D texture;
 
 			void main()	{
@@ -72,6 +72,77 @@
 			}
 
 		</script>
+
+		<script id="heightmapFragmentShader" type="x-shader/x-fragment">
+
+			#define deltaTime ( 1.0 / 60.0 )
+			#define GRAVITY_CONSTANT ( resolution.x * deltaTime )
+			#define VISCOSITY_CONSTANT 0.001
+
+			void main()	{
+
+				vec2 cellSize = 1.0 / resolution.xy;
+
+				vec2 uv = gl_FragCoord.xy * cellSize;
+
+				// heightmapValue.x == height
+				// heightmapValue.y == velocity
+				// heightmapValue.z, heightmapValue.w not used
+				vec4 heightmapValue = texture2D( heightmap, uv );
+
+				// Dynamnics
+
+				float acel = 0.0;
+
+				vec4 north = texture2D( heightmap, uv + vec2( 0.0, cellSize.y ) );
+				acel += north.x - heightmapValue.x;
+
+				vec4 south = texture2D( heightmap, uv + vec2( 0.0, - cellSize.y ) );
+				acel += south.x - heightmapValue.x;
+
+				vec4 east = texture2D( heightmap, uv + vec2( cellSize.x, 0.0 ) );
+				acel += east.x - heightmapValue.x;
+
+				vec4 west = texture2D( heightmap, uv + vec2( - cellSize.x, 0.0 ) );
+				acel += west.x - heightmapValue.x;
+
+				acel *= GRAVITY_CONSTANT;
+
+				heightmapValue.y += acel;
+
+				heightmapValue.x += heightmapValue.y * deltaTime;
+
+				gl_FragColor = heightmapValue;
+
+			}
+
+		</script>
+
+		<script id="smoothFragmentShader" type="x-shader/x-fragment">
+
+			uniform sampler2D texture;
+
+			void main()	{
+
+				vec2 cellSize = 1.0 / resolution.xy;
+
+				vec2 uv = gl_FragCoord.xy * cellSize;
+
+				// Computes the mean of texel and 4 neighbours
+				vec4 textureValue = texture2D( texture, uv );
+				textureValue += texture2D( texture, uv + vec2( 0.0, cellSize.y ) );
+				textureValue += texture2D( texture, uv + vec2( 0.0, - cellSize.y ) );
+				textureValue += texture2D( texture, uv + vec2( cellSize.x, 0.0 ) );
+				textureValue += texture2D( texture, uv + vec2( - cellSize.x, 0.0 ) );
+
+				textureValue /= 5.0;
+
+				gl_FragColor = textureValue;
+
+			}
+
+		</script>
+
 
 		<script id="waterVertexShader" type="x-shader/x-vertex">
 
@@ -101,7 +172,7 @@
 
 			void main() {
 
-				vec2 hmapSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
+				vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
 
 				#include <uv_vertex>
 				#include <uv2_vertex>
@@ -111,8 +182,8 @@
 				// Compute normal from heightmap
 				// TODO instead of computing, obtain from heightmap.zw
 				vec3 objectNormal = vec3(
-					( texture2D( heightmap, uv + vec2( - hmapSize.x, 0 ) ).x - texture2D( heightmap, uv + vec2( hmapSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
-					( texture2D( heightmap, uv + vec2( 0, - hmapSize.y ) ).x - texture2D( heightmap, uv + vec2( 0, hmapSize.y ) ).x ) * WIDTH / BOUNDS,
+					( texture2D( heightmap, uv + vec2( - cellSize.x, 0 ) ).x - texture2D( heightmap, uv + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
+					( texture2D( heightmap, uv + vec2( 0, - cellSize.y ) ).x - texture2D( heightmap, uv + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS,
 					1.0 );
 				//<beginnormal_vertex>
 
@@ -189,7 +260,13 @@
 
 			var last = performance.now();
 
-			var simulator;
+			var waterMesh;
+			var gpuCompute;
+			var heightmapVariable;
+			var waterUniforms;
+			var smoothShader;
+
+			var simplex = new SimplexNoise();
 
 			init();
 			animate();
@@ -205,17 +282,18 @@
 				scene = new THREE.Scene();
 
 				var sun = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-				sun.position.set( 300, 400, -175 );
+				sun.position.set( 300, 400, 175 );
 				scene.add( sun );
+
+				var sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
+				sun2.position.set( -100, 250, -200 );
+				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-//				simulator = new SimulationRenderer(WIDTH, renderer);
-//				simulator.init();
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -227,7 +305,17 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				//
+				document.addEventListener( 'keydown', function( event ) {
+
+					// W Pressed
+					if ( event.keyCode === 87 ) {
+
+						waterMesh.material.wireframe = ! waterMesh.material.wireframe;
+						waterMesh.material.needsUpdate = true;
+
+					}
+
+				} , false );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -267,37 +355,20 @@
 
 			function initWater() {
 
-				//var materialColor = 0x0040C0;
-				var materialColor = 0xFFFFFF;
+				var materialColor = 0x0040C0;
+				//var materialColor = 0xFFFFFF;
+				//var materialColor = 0xA0A0A0;
 
 				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH -1 );
 
 				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
 				var material = new THREE.ShaderMaterial( {
-
 					uniforms: THREE.UniformsUtils.merge( [
-
-						THREE.UniformsLib[ 'common' ],
-						THREE.UniformsLib[ 'aomap' ],
-						THREE.UniformsLib[ 'lightmap' ],
-						THREE.UniformsLib[ 'emissivemap' ],
-						THREE.UniformsLib[ 'bumpmap' ],
-						THREE.UniformsLib[ 'normalmap' ],
-						THREE.UniformsLib[ 'displacementmap' ],
-						THREE.UniformsLib[ 'fog' ],
-						THREE.UniformsLib[ 'lights' ],
-
-						{
-							"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-							"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-							"shininess": { type: "1f", value: 30 },
-
-							// Custom uniforms
+						THREE.ShaderLib[ 'phong' ].uniforms,
+					    	{
 							heightmap: { type: "t", value: null }
 						}
-
 					] ),
-
 					vertexShader: document.getElementById( 'waterVertexShader' ).textContent,
 					fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
 
@@ -308,7 +379,7 @@
 				// Material attributes from MeshPhongMaterial
 				material.color = new THREE.Color( materialColor );
 				material.specular = new THREE.Color( 0x111111 );
-				material.shininess = 30;
+				material.shininess = 50;
 
 				// Sets the uniforms with the material values
 				material.uniforms.diffuse.value = material.color;
@@ -316,47 +387,93 @@
 				material.uniforms.shininess.value = Math.max( material.shininess, 1e-4 );
 				material.uniforms.opacity.value = material.opacity;
 
-				// Custom uniforms
-				material.uniforms.heightmap.value = generateTexture();
-
 				// Defines
 				material.defines.WIDTH = WIDTH.toFixed( 1 );
 				material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.matrixAutoUpdate = false;
-				mesh.updateMatrix();
+				waterUniforms = material.uniforms;
 
-				scene.add( mesh );
+				waterMesh = new THREE.Mesh( geometry, material );
+				waterMesh.rotation.x = - Math.PI / 2;
+				waterMesh.matrixAutoUpdate = false;
+				waterMesh.updateMatrix();
+
+				scene.add( waterMesh );
+
+
+				// Creates the gpu computation class
+
+				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+
+				var heightmap0 = gpuCompute.createTexture();
+
+				fillTexture( heightmap0 );
+
+				heightmapVariable = gpuCompute.addVariable( "heightmap", document.getElementById( 'heightmapFragmentShader' ).textContent, heightmap0 );
+
+				gpuCompute.setVariableDependencies( heightmapVariable, [ heightmapVariable ] );
+
+				var error = gpuCompute.init();
+				if ( error !== null ) {
+				    console.error( error );
+				}
+
+				// Smooth the water surface and velocity
+				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { type: "t", value: null } } );
+
+				//smoothWater();
 
 			}
 
-			function generateTexture() {
+			function fillTexture( texture ) {
 
-				var a = new Float32Array( NUM_TEXELS * 4 );
+				var waterMaxHeight = 10;
+
+				function noise( x, y, z ) {
+					var multR = waterMaxHeight;
+					var mult = 0.025;
+					var r = 0;
+					for ( var i = 0; i < 15; i++ ) {
+						r += multR * simplex.noise3d( x * mult, y * mult, z * mult );
+						multR *= 0.53 + 0.025 * i;
+						mult *= 1.25;
+					}
+					return r;
+				}
+
+				var pixels = texture.image.data;
 
 				var p = 0;
 				for ( var j = 0; j < WIDTH; j++ ) {
 					for ( var i = 0; i < WIDTH; i++ ) {
-						var ic = i - WIDTH * 0.5;
-						var jc = j - WIDTH * 0.5;
-        					var h = 40 * 0.5 * ( 1 + Math.sin( Math.sqrt( ic * ic + jc * jc ) * 0.25 ) );
 
-					        a[ p + 0 ] = h;
-						a[ p + 1 ] = 0;
-						a[ p + 2 ] = 0;
-						a[ p + 3 ] = 1;
+						var x = i * 128 / WIDTH;
+						var y = j * 128 / WIDTH;
+
+					        pixels[ p + 0 ] = noise( x, y, 0 );
+						pixels[ p + 1 ] = noise( x, y, 150 );
+						pixels[ p + 2 ] = 0;
+						pixels[ p + 3 ] = 1;
 
 						p += 4;
 					}
 				}
 
-				var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
-				texture.needsUpdate = true;
+			}
 
-				return texture;
+			function smoothWater() {
 
+				var n = WIDTH / 128;
+				for ( var i = 0; i < n; i++ ) {
+
+					smoothShader.uniforms.texture.value = gpuCompute.getCurrentTexture( heightmapVariable ).texture;
+					gpuCompute.doRenderTarget( smoothShader, gpuCompute.getAlternateTexture( heightmapVariable ) );
+
+					smoothShader.uniforms.texture.value = gpuCompute.getAlternateTexture( heightmapVariable ).texture;
+					gpuCompute.doRenderTarget( smoothShader, gpuCompute.getCurrentTexture( heightmapVariable ) );
+
+				}
+				
 			}
 
 
@@ -424,21 +541,18 @@
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
 
-/*
-				birdUniforms.time.value = now;
-				birdUniforms.delta.value = delta;
 
-				simulator.simulate( delta );
-				simulator.velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
+				// Do the gpu computation
+				gpuCompute.compute();
 
-				birdUniforms.texturePosition.value = simulator.currentPosition;
-				birdUniforms.textureVelocity.value = simulator.currentVelocity;
-*/
+				// Get output in custom uniform
+				waterUniforms.heightmap.value = gpuCompute.getCurrentTexture( heightmapVariable );
+
+				// Render
+				renderer.render( scene, camera );
 
 				mouseX = 10000;
 				mouseY = 10000;
-
-				renderer.render( scene, camera );
 
 			}
 

@@ -8,7 +8,10 @@
  *
  * Each variable has a fragment shader that defines the computation made to obtain the variable in question.
  * You can use as many variables you need, and make dependencies so you can use textures of other variables in the shader
- * (the sampler uniforms are added automatically)
+ * (the sampler uniforms are added automatically) Most of the variables will need themselves as dependency.
+ *
+ * The renderer has actually two render targets per variable, to make ping-pong. Textures from the current frame are used
+ * as inputs to render the next textures.
  *
  * The render targets of the variables can be used as input textures for your visualization shaders.
  *
@@ -19,32 +22,33 @@
  * #DEFINE resolution vec2( 1024.0, 1024.0 )
  *
  *
+ *
  * Basic use:
  *
  * // Initialization...
  *
  * // Create computation renderer
- * var compuRender = new THREE.GPUComputationRenderer( sizeX, sizeY, renderer );
+ * var gpuCompute = new GPUComputationRenderer( sizeX, sizeY, renderer );
  *
  * // Create initial state float textures
- * var pos0 = compuRender.createTexture();
- * var vel0 = compuRender.createTexture();
+ * var pos0 = gpuCompute.createTexture();
+ * var vel0 = gpuCompute.createTexture();
  * // and fill in the texture data...
  *
  * // Add texture variables
- * var velVar = compuRender.addVariable( "textureVelocity", fragmentShaderVel, pos0 );
- * var posVar = compuRender.addVariable( "texturePosition", fragmentShaderPos, vel0 );
+ * var velVar = gpuCompute.addVariable( "textureVelocity", fragmentShaderVel, pos0 );
+ * var posVar = gpuCompute.addVariable( "texturePosition", fragmentShaderPos, vel0 );
  *
  * // Add variable dependencies
- * compuRender.setVariableDependencies( velVar, [ velVar, posVar ] );
- * compuRender.setVariableDependencies( posVar, [ velVar, posVar ] );
+ * gpuCompute.setVariableDependencies( velVar, [ velVar, posVar ] );
+ * gpuCompute.setVariableDependencies( posVar, [ velVar, posVar ] );
  *
  * // Add custom uniforms
  * velVar.material.uniforms.time = { type: "f", value: 0.0 };
  *
  * // Check for completeness
- * var error = compuRender.init();
- * if ( error != null ) {
+ * var error = gpuCompute.init();
+ * if ( error !== null ) {
  *		console.error( error );
   * }
  *
@@ -52,16 +56,18 @@
  * // In each frame...
  *
  * // Compute!
- * compuRender.compute();
+ * gpuCompute.compute();
  *
- * // Update texture uniforms in your visualization materials
- * myMaterial.uniforms.myTexture.value = compuRender.getCurrentTexture( posVar );
+ * // Update texture uniforms in your visualization materials with the gpu renderer output
+ * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentTexture( posVar ).texture;
  *
  * // Do your rendering
  * renderer.render( myScene, myCamera );
  *
  *
  *
+ * Also you can use utility functions to create ShaderMaterial and perform rendering between textures,
+ * like aplying filters.
  *
  *
  *
@@ -91,7 +97,13 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		fragmentShader: document.getElementById( 'passThroughFragmentShader' ).textContent
 	} );
 
-	addResolutionDefine( passThruShader );
+	this.addResolutionDefine = function( materialShader ) {
+
+		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+
+	};
+
+	this.addResolutionDefine( passThruShader );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
@@ -99,13 +111,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	this.addVariable = function( variableName, computeFragmentShader, initialValueTexture ) {
 
-		var material = new THREE.ShaderMaterial( {
-			uniforms: {},
-			vertexShader: passThruShader.vertexShader,
-			fragmentShader: computeFragmentShader
-		} );
-
-		addResolutionDefine( material );
+		var material = this.createShaderMaterial( computeFragmentShader );
 
 		var variable = {
 			name: variableName,
@@ -146,42 +152,43 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			var variable = this.variables[ i ];
 
 			// Creates rendertargets and initialize them with input texture
-			variable.renderTargets[ 0 ] = createRenderTarget();
-			variable.renderTargets[ 1 ] = createRenderTarget();
-			renderTexture( variable.initialValueTexture, variable.renderTargets[ 0 ] );
-			renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] );
+			variable.renderTargets[ 0 ] = this.createRenderTarget();
+			variable.renderTargets[ 1 ] = this.createRenderTarget();
+			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 0 ] );
+			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] );
 
 			// Adds dependencies uniforms to the ShaderMaterial
 			var material = variable.material;
 			var uniforms = material.uniforms;
-			for ( var d = 0; d < variable.dependencies.length; d++ ) {
+			if ( variable.dependencies !== null ) {
+				for ( var d = 0; d < variable.dependencies.length; d++ ) {
 
-				var depVar = variable.dependencies[ d ];
+					var depVar = variable.dependencies[ d ];
 
-				if ( depVar.name !== variable.name ) {
+					if ( depVar.name !== variable.name ) {
 
-					// Checks if variable exists
-					var found = false;
-					for ( var j = 0; j < this.variables.length; j++ ) {
+						// Checks if variable exists
+						var found = false;
+						for ( var j = 0; j < this.variables.length; j++ ) {
 
-						if ( depVar.name === this.variables.name ) {
-							found = true;
-							break;
+							if ( depVar.name === this.variables.name ) {
+								found = true;
+								break;
+							}
+
+						}
+						if ( ! found ) {
+							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
 						}
 
 					}
-					if ( ! found ) {
-						return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
-					}
+
+					uniforms[ depVar.name ] = { type: "t", value: null };
+
+					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + variable.material.fragmentShader;
 
 				}
-
-				uniforms[ depVar.name ] = { type: "t", value: null };
-
-				material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + variable.material.fragmentShader;
-
 			}
-
 		}
 
 		this.currentTextureIndex = 0;
@@ -221,19 +228,34 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 		return variable.renderTargets[ this.currentTextureIndex ];
 
-	}
+	};
 
-	this.addResolutionDefine = function( materialShader ) {
+	this.getAlternateTexture = function( variable ) {
 
-		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+		return variable.renderTargets[ this.currentTextureIndex === 0 ? 1 : 0 ];
 
+	};
+
+	this.createShaderMaterial = function( computeFragmentShader, uniforms ) {
+
+		uniforms = uniforms || {};
+
+		var material = new THREE.ShaderMaterial( {
+			uniforms: uniforms,
+			vertexShader: passThruShader.vertexShader,
+			fragmentShader: computeFragmentShader
+		} );
+
+		this.addResolutionDefine( material );
+
+		return material;
 	};
 
 	this.createRenderTarget = function() {
 
 		var renderTarget = new THREE.WebGLRenderTarget( sizeX, sizeY, {
-			wrapS: THREE.RepeatWrapping,
-			wrapT: THREE.RepeatWrapping,
+			wrapS: THREE.ClampToEdgeWrapping,
+			wrapT: THREE.ClampToEdgeWrapping,
 			minFilter: THREE.NearestFilter,
 			magFilter: THREE.NearestFilter,
 			format: THREE.RGBAFormat,
@@ -256,12 +278,15 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 	};
 
 
-	// Takes a texture, and render out as another texture
 	this.renderTexture = function( input, output ) {
+
+		// Takes a texture, and render out in rendertarget
+		// input = Texture
+		// output = RenderTarget
 
 		passThruUniforms.texture.value = input;
 
-		doRenderTarget( passThruShader, output);
+		this.doRenderTarget( passThruShader, output);
 
 	};
 
@@ -269,49 +294,6 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 		mesh.material = material;
 		renderer.render( scene, camera, output );
-
-	};
-
-
-	this.renderPosition = function( position, velocity, output, delta ) {
-
-		mesh.material = positionShader;
-		positionShader.uniforms.texturePosition.value = position;
-		positionShader.uniforms.textureVelocity.value = velocity;
-		positionShader.uniforms.time.value = performance.now();
-		positionShader.uniforms.delta.value = delta;
-		renderer.render( scene, camera, output );
-		this.currentPosition = output.texture;
-
-	};
-
-	this.renderVelocity = function( position, velocity, output, delta ) {
-
-		mesh.material = velocityShader;
-		velocityShader.uniforms.texturePosition.value = position;
-		velocityShader.uniforms.textureVelocity.value = velocity;
-		velocityShader.uniforms.time.value = performance.now();
-		velocityShader.uniforms.delta.value = delta;
-		renderer.render( scene, camera, output );
-		this.currentVelocity = output.texture;
-
-	};
-
-	this.simulate = function( delta ) {
-
-		if ( flipflop ) {
-
-			simulator.renderVelocity( rtPosition1.texture, rtVelocity1.texture, rtVelocity2, delta );
-			simulator.renderPosition( rtPosition1.texture, rtVelocity2.texture, rtPosition2, delta );
-
-		} else {
-
-			simulator.renderVelocity( rtPosition2.texture, rtVelocity2.texture, rtVelocity1, delta );
-			simulator.renderPosition( rtPosition2.texture, rtVelocity1.texture, rtPosition1, delta );
-
-		}
-
-		flipflop = ! flipflop;
 
 	};
 
