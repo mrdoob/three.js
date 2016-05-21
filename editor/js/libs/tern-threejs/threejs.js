@@ -1884,11 +1884,7 @@
     "GridHelper": {
       "!url": "http://threejs.org/docs/#Reference/extras/helpers/GridHelper",
       "prototype": {
-        "!proto": "THREE.Line.prototype",
-        "setColors": {
-          "!type": "fn(colorCenterLine: number, colorGrid: number)",
-          "!doc": "Updates the color of the grid lines."
-        }
+        "!proto": "THREE.Line.prototype"
       },
       "!doc": "The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.",
       "!type": "fn(size: number, step: number)"
