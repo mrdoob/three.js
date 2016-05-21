@@ -502,13 +502,13 @@ THREE.SEA3D.Animator.prototype.updateAnimations = function( mixer ) {
 	this.animations = [];
 	this.animationsData = {};
 
-	var animations = this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations;
+	this.clips = this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations;
 
-	for ( var i = 0; i < animations.length; i ++ ) {
+	for ( var i = 0, clips = this.clips; i < clips.length; i ++ ) {
 
-		var name = animations[ i ].name;
+		var name = clips[ i ].name;
 
-		this.animations[ name ] = this.animations[ i ] = animations[ i ];
+		this.animations[ name ] = this.animations[ i ] = clips[ i ];
 		this.animationsData[ name ] = this.animationsData[ i ] = {};
 
 	}
@@ -857,7 +857,7 @@ THREE.SEA3D.Dummy.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -903,7 +903,7 @@ THREE.SEA3D.Mesh.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -948,7 +948,7 @@ THREE.SEA3D.SkinnedMesh.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -982,7 +982,7 @@ THREE.SEA3D.VertexAnimationMesh.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -1010,7 +1010,7 @@ THREE.SEA3D.Camera.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -1038,7 +1038,7 @@ THREE.SEA3D.OrthographicCamera.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -1066,7 +1066,7 @@ THREE.SEA3D.PointLight.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
@@ -1339,16 +1339,16 @@ THREE.SEA3D.prototype.applyDefaultAnimation = function( sea, animatorClass ) {
 
 		switch ( anm.tag.type ) {
 			case SEA3D.Animation.prototype.type:
-				obj.animation = new animatorClass( anm.tag.tag, obj );
-				obj.animation.setRelative( anm.relative );
+				obj.animator = new animatorClass( anm.tag.tag, obj );
+				obj.animator.setRelative( anm.relative );
 
 				if ( this.config.autoPlay ) {
 
-					obj.animation.play( 0 );
+					obj.animator.play( 0 );
 
 				}
 
-				return obj.animation;
+				return obj.animator;
 				break;
 		}
 
@@ -2371,7 +2371,7 @@ THREE.SEA3D.PointSound.prototype.copy = function( source ) {
 	this.props = source.props;
 	this.scripts = source.scripts;
 
-	if ( this.animation ) this.animation = source.animation.clone( this );
+	if ( this.animator ) this.animator = source.animator.clone( this );
 
 	return this;
 
