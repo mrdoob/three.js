@@ -59,7 +59,6 @@
 		<script id="passThroughFragmentShader" type="x-shader/x-fragment">
 
 			uniform vec2 resolution;
-			uniform float time;
 			uniform sampler2D texture;
 
 			void main()	{
@@ -268,21 +267,11 @@
 
 			function initWater() {
 
-				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH -1 );
 				//var materialColor = 0x0040C0;
 				var materialColor = 0xFFFFFF;
 
-//				var material = new THREE.MeshPhongMaterial( { color: materialColor } );
-/*
-				// For Vertex and Fragment
-				birdUniforms = {
-					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
-					texturePosition: { type: "t", value: null },
-					textureVelocity: { type: "t", value: null },
-					time: { type: "f", value: 1.0 },
-					delta: { type: "f", value: 0.0 }
-				};
-*/
+				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH -1 );
+
 				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
 				var material = new THREE.ShaderMaterial( {
 
@@ -316,9 +305,6 @@
 
 				material.lights = true;
 
-				material.defines.WIDTH = WIDTH.toFixed( 1 );
-				material.defines.BOUNDS = BOUNDS.toFixed( 1 );
-
 				// Material attributes from MeshPhongMaterial
 				material.color = new THREE.Color( materialColor );
 				material.specular = new THREE.Color( 0x111111 );
@@ -330,9 +316,12 @@
 				material.uniforms.shininess.value = Math.max( material.shininess, 1e-4 );
 				material.uniforms.opacity.value = material.opacity;
 
+				// Custom uniforms
 				material.uniforms.heightmap.value = generateTexture();
 
-				material.uniforms.map.value
+				// Defines
+				material.defines.WIDTH = WIDTH.toFixed( 1 );
+				material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - Math.PI / 2;
@@ -350,8 +339,9 @@
 				var p = 0;
 				for ( var j = 0; j < WIDTH; j++ ) {
 					for ( var i = 0; i < WIDTH; i++ ) {
-
-        					var h = 40 * 0.5 * ( 1 + Math.sin( i * 0.25 ) );
+						var ic = i - WIDTH * 0.5;
+						var jc = j - WIDTH * 0.5;
+        					var h = 40 * 0.5 * ( 1 + Math.sin( Math.sqrt( ic * ic + jc * jc ) * 0.25 ) );
 
 					        a[ p + 0 ] = h;
 						a[ p + 1 ] = 0;
