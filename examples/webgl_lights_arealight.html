@@ -62,12 +62,16 @@
 			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
 			var mshBox = new THREE.Mesh(geoBox, matBox);
 			var amb = new THREE.AmbientLight(0x121422);
-			var area = new THREE.AreaLight(0xFFFFFF);
-			var lightHelper;
+
+			// TODO: temp point light for debuggin
+			var dir = new THREE.DirectionalLight(0xFFFFFF);
+			var dirHelper;
+
+			// var area = new THREE.AreaLight(0xFFFFFF);
+			// var areaHelper;
 			var ray = new THREE.Raycaster();
 			var mouseDown = new THREE.Vector2();
 			var mouse = new THREE.Vector2();
-
 
 			var gui, guiElements, param = { color: '0xffffff' };
 
@@ -82,35 +86,54 @@
 
 				cam.position.set(65, 8, -10);
 
-				area.position.set(15, 40, 35);
-				area.castShadow = true;
-				area.penumbra = 0.05;
-				area.decay = 2;
-				area.distance = 500;
-				area.shadow.mapSize.width = 1024;
-				area.shadow.mapSize.height = 1024;
-				area.shadow.camera.near = 0.1;
-				area.shadow.camera.far = 20000;
+				// TODO: this dir light is for debugging only
+				dir.position.set(0, 100, 0);
+				dir.castShadow = true;
 
-        lightHelper = new THREE.AreaLightHelper( area );
+				dir.shadow.camera = new THREE.OrthographicCamera( - 20, 20, 20, - 20, 0.5, 500 );
+				dir.shadow.mapSize.width = 1024;
+				dir.shadow.mapSize.height = 1024;
+				dir.shadow.camera.near = 0.1;
+				dir.shadow.camera.far = 20000;
+
+				dirHelper = new THREE.DirectionalLightHelper( dir );
+
+				// area.position.set(15, 40, 35);
+				// area.castShadow = true;
+				// area.penumbra = 0.05;
+				// area.decay = 2;
+				// area.distance = 500;
+				// area.shadow.mapSize.width = 1024;
+				// area.shadow.mapSize.height = 1024;
+				// area.shadow.camera.near = 0.1;
+				// area.shadow.camera.far = 20000;
+
+				// areaHelper = new THREE.AreaLightHelper( area );
 
 				matFloor.color.set( 0x808080 );
 				randomColor( matBox );
 
 				mshFloor.receiveShadow = true;
-				mshFloor.position.set(0, -0.05, 0);
+				mshFloor.position.set(0, 0, 0);
 
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
-				mshBox.position.set(40, 1.8, 0);
+				mshBox.position.set(0, 5, 0);
 
 				scn.add(cam);
+
 				scn.add(mshFloor);
 				scn.add(mshBox);
+
 				scn.add(amb);
-				scn.add(area);
+
+				scn.add(dir);
+				scn.add(dirHelper);
+
+				// scn.add( area );
+				// scn.add( areaHelper );
+
 				scn.add( new THREE.AxisHelper( 10 ) );
-				scn.add( lightHelper );
 
 				document.body.appendChild(rnd.domElement);
 				onResize();
@@ -127,8 +150,41 @@
 				orb.target = mshBox.position;
 			}
 
+			function tick() {
+
+				update();
+				render();
+
+				requestAnimationFrame(tick);
+
+			}
+
+			function update() {
+
+				var dt = 6000;
+				var qdt = dt / 4.0;
+				var dirSigns = [
+					[  1,  1 ],
+					[ -1,  1 ],
+					[ -1,  1 ],
+					[  1,  1 ]
+				];
+
+				var t = ( Date.now() % dt ) / dt;
+				var r = t * (4.0 * Math.PI);
+				var s = Math.floor( t * dirSigns.length );
+
+				var sign = dirSigns[s];
+				var x = 5.0 * (Math.cos(r) + 1.0) * sign[0];
+				var z = 5.0 * Math.sin(r) * sign[1];
+				var y = Math.cos(3.0 * r) + 5.0;
+
+				mshBox.position.set(x, y, z);
+
+			}
+
 			function render() {
-				lightHelper.update(); // required
+				// areaHelper.update(); // required
 				rnd.render(scn, cam);
 			}
 
@@ -149,30 +205,30 @@
 
 				clearGui();
 
-				addGui( 'light color', area.color.getHex(), function( val ) {
-					area.color.setHex( val );
-					render();
-				}, true );
+				// addGui( 'light color', area.color.getHex(), function( val ) {
+				// 	area.color.setHex( val );
+				// 	render();
+				// }, true );
 
-				addGui( 'intensity', area.intensity, function( val ) {
-					area.intensity = val;
-					render();
-				}, false, 0, 10 );
+				// addGui( 'intensity', area.intensity, function( val ) {
+					// area.intensity = val;
+					// render();
+				// }, false, 0, 10 );
 
-				addGui( 'distance', area.distance, function( val ) {
-					area.distance = val;
-					render();
-				}, false, 0, 1000 );
+				// addGui( 'distance', area.distance, function( val ) {
+					// area.distance = val;
+					// render();
+				// }, false, 0, 1000 );
 
-				addGui( 'penumbra', area.penumbra, function( val ) {
-					area.penumbra = val;
-					render();
-				}, false, 0, 1 );
+				// addGui( 'penumbra', area.penumbra, function( val ) {
+					// area.penumbra = val;
+					// render();
+				// }, false, 0, 1 );
 
-				addGui( 'decay', area.decay, function( val ) {
-					area.decay = val;
-					render();
-				}, false, 0, 100 );
+				// addGui( 'decay', area.decay, function( val ) {
+					// area.decay = val;
+					// render();
+				// }, false, 0, 100 );
 
 			}
 
@@ -251,7 +307,7 @@
 
 			init();
 			buildGui();
-			render();
+			tick();
 
 		</script>
 	</body>

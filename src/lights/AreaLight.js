@@ -2,7 +2,7 @@
  * @author abelnation / http://github.com/abelnation
  */
 
-THREE.AreaLight = function ( polygon, color, intensity, distance, decay ) {
+THREE.AreaLight = function ( color, polygon, intensity, distance, decay ) {
 
 	THREE.Light.call( this, color, intensity );
 
@@ -11,7 +11,7 @@ THREE.AreaLight = function ( polygon, color, intensity, distance, decay ) {
 	this.position.set( 0, 1, 0 );
 	this.updateMatrix();
 
-	this.polygon = ( polygon !== undefined ) ? polygon.clone() : Polygon.makeSquare();
+	this.polygon = ( polygon !== undefined ) ? polygon.clone() : THREE.Polygon.makeSquare();
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1; // for physically correct lights, should be 2.
 

@@ -9,15 +9,16 @@ THREE.Polygon = function ( points ) {
 };
 
 THREE.Polygon.prototype = {
-
 	constructor: THREE.Polygon,
 
 	// points: list of Vector3 objects
 	set: function ( points ) {
 
 		this.points = [];
-		for ( var i = 0; i < points.length; i ++ ) {
-			this.points.push( points[i].copy() );
+		for ( var i = 0; i < points.length; i++ ) {
+
+			this.points.push( points[ i ].copy() );
+
 		}
 		return this;
 
@@ -99,5 +100,17 @@ THREE.Polygon.prototype = {
 		return false;
 
 	}
+};
 
-}
+THREE.Polygon.makeSquare = function ( dim, offset ) {
+
+	offset = ( offset !== undefined ) ? offset : new THREE.Vector3( 0, 0, 0 );
+	var halfDim = dim / 2.0;
+	return new THREE.Polygon( [
+		new THREE.Vector3( - halfDim,   halfDim, 0 ),
+		new THREE.Vector3(   halfDim,   halfDim, 0 ),
+		new THREE.Vector3(   halfDim, - halfDim, 0 ),
+		new THREE.Vector3( - halfDim, - halfDim, 0 )
+	] );
+
+};
