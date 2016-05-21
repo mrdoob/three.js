@@ -219,7 +219,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 			state.setDepthTest( material.depthTest );
-			state.setDepthWrite( material.depthWrite );
+			state.setDepthWrite( material.depthMask );
 
 			if ( material.map ) {
 
@@ -351,7 +351,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	}
 
 	function painterSortStable ( a, b ) {
-		
+
 		if ( a.renderOrder !== b.renderOrder ) {
 
 			return a.renderOrder - b.renderOrder;

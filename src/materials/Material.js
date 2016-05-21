@@ -32,12 +32,12 @@ THREE.Material = function () {
 
 	this.depthFunc = THREE.LessEqualDepth;
 	this.depthTest = true;
-	this.depthWrite = true;
+	this.depthMask = true;
 
 	this.clippingPlanes = null;
 	this.clipShadows = false;
 
-	this.colorWrite = true;
+	this.colorMask = new THREE.WebGLColorMask();
 
 	this.precision = null; // override the renderer's default precision for this material
 
@@ -102,6 +102,10 @@ THREE.Material.prototype = {
 				currentValue.set( newValue );
 
 			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+
+				currentValue.copy( newValue );
+
+			} else if ( currentValue instanceof THREE.WebGLColorMask && newValue instanceof THREE.WebGLColorMask ) {
 
 				currentValue.copy( newValue );
 
@@ -267,9 +271,9 @@ THREE.Material.prototype = {
 
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
-		this.depthWrite = source.depthWrite;
+		this.depthMask = source.depthMask;
 
-		this.colorWrite = source.colorWrite;
+		this.colorMask.copy( source.colorMask );
 
 		this.precision = source.precision;
 

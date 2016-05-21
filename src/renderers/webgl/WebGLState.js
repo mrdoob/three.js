@@ -326,11 +326,27 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	// TODO Deprecate
 
-	this.setColorWrite = function ( colorWrite ) {
+	this.setColorWrite = ( function () {
 
-		this.buffers.color.setMask( colorWrite );
+		var m = new THREE.WebGLColorMask();
 
-	};
+		return function ( colorWrite ) {
+
+			if( typeof( colorWrite ) === "boolean" ){
+
+				m.set( colorWrite, colorWrite, colorWrite, colorWrite );
+
+				this.buffers.color.setMask( m );
+
+			} else {
+
+				this.buffers.color.setMask( colorWrite );
+
+			}
+
+		};
+
+	} () );
 
 	this.setDepthTest = function ( depthTest ) {
 
@@ -642,15 +658,15 @@ THREE.WebGLColorBuffer = function ( gl, state ) {
 	var locked = false;
 
 	var color = new THREE.Vector4();
-	var currentColorMask = null;
 	var currentColorClear = new THREE.Vector4();
+	var currentColorMask = new THREE.WebGLColorMask();
 
 	this.setMask = function ( colorMask ) {
 
-		if ( currentColorMask !== colorMask && ! locked ) {
+		if ( currentColorMask.equals( colorMask ) === false && ! locked ) {
 
-			gl.colorMask( colorMask, colorMask, colorMask, colorMask );
-			currentColorMask = colorMask;
+			gl.colorMask( colorMask.r, colorMask.g, colorMask.b, colorMask.a );
+			currentColorMask.copy( colorMask );
 
 		}
 
@@ -679,7 +695,7 @@ THREE.WebGLColorBuffer = function ( gl, state ) {
 
 		locked = false;
 
-		currentColorMask = null;
+		currentColorMask = new THREE.WebGLColorMask();
 		currentColorClear = new THREE.Vector4();
 
 	};
@@ -913,6 +929,43 @@ THREE.WebGLStencilBuffer = function ( gl, state ) {
 		currentStencilZFail = null;
 		currentStencilZPass = null;
 		currentStencilClear = null;
+
+	};
+
+};
+
+THREE.WebGLColorMask = function ( r, g, b, a ) {
+
+	this.r = r || true;
+	this.g = g || true;
+	this.b = b || true;
+	this.a = a || true;
+
+	this.set = function ( r, g, b, a ) {
+
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
+
+		return this;
+
+	};
+
+	this.equals = function ( m ) {
+
+		return ( ( m.r === this.r ) && ( m.g === this.g ) && ( m.b === this.b ) && ( m.a === this.a ) );
+
+	};
+
+	this.copy = function ( m ) {
+
+		this.r = m.r;
+		this.g = m.g;
+		this.b = m.b;
+		this.a = m.a;
+
+		return this;
 
 	};
 

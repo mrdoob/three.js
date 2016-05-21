@@ -1709,8 +1709,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setDepthFunc( material.depthFunc );
 		state.setDepthTest( material.depthTest );
-		state.setDepthWrite( material.depthWrite );
-		state.setColorWrite( material.colorWrite );
+		state.setDepthWrite( material.depthMask );
+		state.setColorWrite( material.colorMask );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
