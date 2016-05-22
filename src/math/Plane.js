@@ -217,7 +217,7 @@ THREE.Plane.prototype = {
 
 	translate: function ( offset ) {
 
-		this.constant = this.constant - offset.dot( this.normal );
+		this.constant = this.constant - offset;
 
 		return this;
 
