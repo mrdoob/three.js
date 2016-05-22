@@ -596,7 +596,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 		this.previousAnimationAction = this.currentAnimationAction;
 		this.currentAnimationAction = this.mixer.clipAction( animation ).setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
-		this.currentAnimationAction.clampWhenFinished = true;
+		this.currentAnimationAction.clampWhenFinished = ! animation.loop;
 		this.currentAnimationAction.paused = false;
 
 		this.previousAnimationData = this.currentAnimationData;
