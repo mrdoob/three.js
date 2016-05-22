@@ -11,7 +11,7 @@
  * (the sampler uniforms are added automatically) Most of the variables will need themselves as dependency.
  *
  * The renderer has actually two render targets per variable, to make ping-pong. Textures from the current frame are used
- * as inputs to render the next textures.
+ * as inputs to render the textures of the next frame.
  *
  * The render targets of the variables can be used as input textures for your visualization shaders.
  *
@@ -67,7 +67,7 @@
  *
  *
  * Also you can use utility functions to create ShaderMaterial and perform rendering between textures,
- * like aplying filters.
+ * like aplying filters (using doRenderTarget() function)
  *
  *
  *

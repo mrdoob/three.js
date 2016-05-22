@@ -81,8 +81,8 @@
 			uniform float mouseSize;
 
 			#define deltaTime ( 1.0 / 60.0 )
-			#define GRAVITY_CONSTANT ( resolution.x * deltaTime )
-			#define VISCOSITY_CONSTANT 0.001
+			#define GRAVITY_CONSTANT ( resolution.x * deltaTime * 3.0 )
+			#define VISCOSITY_CONSTANT 0.03
 
 			void main()	{
 
@@ -95,31 +95,25 @@
 				// heightmapValue.z, heightmapValue.w not used
 				vec4 heightmapValue = texture2D( heightmap, uv );
 
-				// Dynamnics
-
-				float acel = 0.0;
-
+				// Get neighbours
 				vec4 north = texture2D( heightmap, uv + vec2( 0.0, cellSize.y ) );
-				acel += north.x - heightmapValue.x;
-
 				vec4 south = texture2D( heightmap, uv + vec2( 0.0, - cellSize.y ) );
-				acel += south.x - heightmapValue.x;
-
 				vec4 east = texture2D( heightmap, uv + vec2( cellSize.x, 0.0 ) );
-				acel += east.x - heightmapValue.x;
-
 				vec4 west = texture2D( heightmap, uv + vec2( - cellSize.x, 0.0 ) );
-				acel += west.x - heightmapValue.x;
 
-				acel *= GRAVITY_CONSTANT;
+				float sump = north.x + south.x + east.x + west.x - 4.0 * heightmapValue.x;
 
-				heightmapValue.y += acel;
+				float accel = sump * GRAVITY_CONSTANT;
 
+				// Dynamics
+				heightmapValue.y += accel;
 				heightmapValue.x += heightmapValue.y * deltaTime;
+
+				// Viscosity
+				heightmapValue.x += sump * VISCOSITY_CONSTANT;
 
 				// Mouse influence
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - mousePos ) * PI / mouseSize, 0.0, PI );
-
 				heightmapValue.x += cos( mousePhase ) + 1.0;
 
 				gl_FragColor = heightmapValue;
@@ -272,6 +266,7 @@
 			var last = performance.now();
 
 			var waterMesh;
+			var meshRay;
 			var gpuCompute;
 			var heightmapVariable;
 			var waterUniforms;
@@ -411,6 +406,14 @@
 
 				scene.add( waterMesh );
 
+				// Mesh just for mouse raycasting
+				var geometryRay = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, 1, 1 );
+				meshRay = new THREE.Mesh( geometryRay, new THREE.MeshBasicMaterial( { color: 0xFFFFFF, visible: false } ) );
+				meshRay.rotation.x = - Math.PI / 2;
+				meshRay.matrixAutoUpdate = false;
+				meshRay.updateMatrix();
+				scene.add( meshRay );
+
 
 				// Creates the gpu computation class
 
@@ -436,7 +439,7 @@
 				// Smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { type: "t", value: null } } );
 
-				smoothWater();
+//				smoothWater();
 
 			}
 
@@ -562,13 +565,13 @@
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
 
-				// Set uniforms
+				// Set uniforms: mouse interaction
 				var uniforms = heightmapVariable.material.uniforms;
 				if ( mouseMoved ) {
 
 					this.raycaster.setFromCamera( mouseCoords, camera );
 
-					var intersects = this.raycaster.intersectObject( waterMesh );
+					var intersects = this.raycaster.intersectObject( meshRay );
 
 					if ( intersects.length > 0 ) {
 					    var point = intersects[ 0 ].point;
