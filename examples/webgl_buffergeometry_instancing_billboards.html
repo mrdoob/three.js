@@ -68,7 +68,7 @@
 
 			vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
 			vec3 trTime = vec3(translate.x + time,translate.y + time,translate.z + time);
-      float scale =  sin( trTime.x * 2.1 ) + sin( trTime.y * 3.2 ) + sin( trTime.z * 4.3 );
+			float scale =  sin( trTime.x * 2.1 ) + sin( trTime.y * 3.2 ) + sin( trTime.z * 4.3 );
 			vScale = scale;
 			scale = scale * 10.0 + 10.0;
 			mvPosition.xyz += position * scale;
@@ -86,19 +86,19 @@
 		varying float vScale;
 
 		// HSL to RGB Convertion helpers
-    vec3 HUEtoRGB(float H){
-      float R = abs(H * 6.0 - 3.0) - 1.0;
-      float G = 2.0 - abs(H * 6.0 - 2.0);
-      float B = 2.0 - abs(H * 6.0 - 4.0);
-      return clamp(vec3(R,G,B),0.0,1.0);
-    }
+		vec3 HUEtoRGB(float H){
+			float R = abs(H * 6.0 - 3.0) - 1.0;
+			float G = 2.0 - abs(H * 6.0 - 2.0);
+			float B = 2.0 - abs(H * 6.0 - 4.0);
+			return clamp(vec3(R,G,B),0.0,1.0);
+		}
 
 		vec3 HSLtoRGB(vec3 HSL){
-	    vec3 RGB = HUEtoRGB(HSL.x);
-	    float C = (1.0 - abs(2.0 * HSL.z - 1.0)) * HSL.y;
-	    return (RGB - 0.5) * C + HSL.z;
-    }
-		
+			vec3 RGB = HUEtoRGB(HSL.x);
+			float C = (1.0 - abs(2.0 * HSL.z - 1.0)) * HSL.y;
+			return (RGB - 0.5) * C + HSL.z;
+		}
+
 		void main() {
 			vec4 diffuseColor = texture2D( map, vUv );
 			gl_FragColor = vec4( diffuseColor.xyz * HSLtoRGB(vec3(vScale/5.0, 1.0, 0.5)), diffuseColor.w );
