@@ -1,7 +1,7 @@
 /**
  * @author yomboprime https://github.com/yomboprime
  *
- * Based on SimulationRenderer by zz85
+ * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
  * The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats
  * for each compute element (texel)
@@ -91,19 +91,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		texture: { type: "t", value: null }
 	};
 
-	var passThruShader = new THREE.ShaderMaterial( {
-		uniforms: passThruUniforms,
-		vertexShader: document.getElementById( 'passThroughVertexShader' ).textContent,
-		fragmentShader: document.getElementById( 'passThroughFragmentShader' ).textContent
-	} );
-
-	this.addResolutionDefine = function( materialShader ) {
-
-		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
-
-	};
-
-	this.addResolutionDefine( passThruShader );
+	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
@@ -236,26 +224,43 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.createShaderMaterial = function( computeFragmentShader, uniforms ) {
+	function addResolutionDefine( materialShader ) {
+
+		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
+
+	};
+	this.addResolutionDefine = addResolutionDefine;
+
+
+	// The following functions can be used to compute things manually
+
+	function createShaderMaterial( computeFragmentShader, uniforms ) {
 
 		uniforms = uniforms || {};
 
 		var material = new THREE.ShaderMaterial( {
 			uniforms: uniforms,
-			vertexShader: passThruShader.vertexShader,
+			vertexShader: getPassThroughVertexShader(),
 			fragmentShader: computeFragmentShader
 		} );
 
-		this.addResolutionDefine( material );
+		addResolutionDefine( material );
 
 		return material;
 	};
+	this.createShaderMaterial = createShaderMaterial;
 
-	this.createRenderTarget = function() {
+	this.createRenderTarget = function( wrapS, wrapT, sizeXTexture, sizeYTexture ) {
+		
+		wrapS = wrapS || THREE.ClampToEdgeWrapping;
+		wrapT = wrapT || THREE.ClampToEdgeWrapping;
 
-		var renderTarget = new THREE.WebGLRenderTarget( sizeX, sizeY, {
-			wrapS: THREE.ClampToEdgeWrapping,
-			wrapT: THREE.ClampToEdgeWrapping,
+		sizeXTexture = sizeXTexture || sizeX;
+		sizeYTexture = sizeYTexture || sizeY;
+
+		var renderTarget = new THREE.WebGLRenderTarget( sizeXTexture, sizeYTexture, {
+			wrapS: wrapS,
+			wrapT: wrapT,
 			minFilter: THREE.NearestFilter,
 			magFilter: THREE.NearestFilter,
 			format: THREE.RGBAFormat,
@@ -267,9 +272,12 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
-    this.createTexture = function() {
+    this.createTexture = function( sizeXTexture, sizeYTexture ) {
 
-		var a = new Float32Array( sizeX * sizeY * 4 );
+		sizeXTexture = sizeXTexture || sizeX;
+		sizeYTexture = sizeYTexture || sizeY;
+
+		var a = new Float32Array( sizeXTexture * sizeYTexture * 4 );
 		var texture = new THREE.DataTexture( a, sizeX, sizeY, THREE.RGBAFormat, THREE.FloatType );
 		texture.needsUpdate = true;
 
@@ -297,4 +305,35 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
+	// Shaders
+
+	function getPassThroughVertexShader() {
+
+		return	"void main()	{\n" +
+				"\n" +
+				"	gl_Position = vec4( position, 1.0 );\n" +
+				"\n" +
+				"}\n";
+
+	}
+
+	function getPassThroughFragmentShader() {
+
+		return	"uniform sampler2D texture;\n" +
+				"\n" +
+				"void main() {\n" +
+				"\n" +
+				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
+				"\n" +
+				"	vec3 color = texture2D( texture, uv ).xyz;\n" +
+				"\n" +
+				"	gl_FragColor = vec4( color, 1.0 );\n" +
+				"\n" +
+				"}\n";
+
+	}
+
 }
+
+
+// una funcion, hacer this.funcion = funcion y usarla a l principio

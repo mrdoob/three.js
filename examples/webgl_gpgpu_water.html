@@ -47,32 +47,6 @@
 		<script src="js/GPUComputationRenderer.js"></script>
 
 
-		<script id="passThroughVertexShader" type="x-shader/x-vertex">
-
-			void main()	{
-
-				gl_Position = vec4( position, 1.0 );
-
-			}
-
-		</script>
-
-		<script id="passThroughFragmentShader" type="x-shader/x-fragment">
-
-			uniform sampler2D texture;
-
-			void main()	{
-
-				vec2 uv = gl_FragCoord.xy / resolution.xy;
-
-				vec3 color = texture2D( texture, uv ).xyz;
-
-				gl_FragColor = vec4( color, 1.0 );
-
-			}
-
-		</script>
-
 		<script id="heightmapFragmentShader" type="x-shader/x-fragment">
 
 			#include <common>
@@ -469,7 +443,7 @@
 						var y = j * 128 / WIDTH;
 
 					        pixels[ p + 0 ] = noise( x, y, 0 );
-						pixels[ p + 1 ] = noise( x, y, 150 );
+						pixels[ p + 1 ] = 0;
 						pixels[ p + 2 ] = 0;
 						pixels[ p + 3 ] = 1;
 
