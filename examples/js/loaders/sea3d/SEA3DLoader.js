@@ -579,7 +579,9 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	if ( animation == this.currentAnimation ) {
 
-		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 0;
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
+			( this.currentAnimationAction.timeScale >= 0 ? 0 : this.currentAnimation.duration );
+
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
 		this.currentAnimationAction.paused = false;
 
@@ -602,7 +604,9 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 		this.updateTimeScale();
 
-		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 0;
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
+			( this.currentAnimationAction.timeScale >= 0 ? 0 : this.currentAnimation.duration );
+
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
 
 		this.currentAnimationAction.play();
