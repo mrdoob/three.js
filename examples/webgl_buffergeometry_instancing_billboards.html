@@ -76,7 +76,6 @@
 			gl_Position = projectionMatrix * mvPosition;
 
 		}
-
 	</script>
 	<script id="fshader" type="x-shader/x-fragment">
 		precision highp float;
@@ -86,62 +85,29 @@
 		varying vec2 vUv;
 		varying float vScale;
 
-		float hue2rgb(float f1, float f2, float hue) {
-	    if (hue < 0.0)
-	        hue += 1.0;
-	    else if (hue > 1.0)
-	        hue -= 1.0;
-	    float res;
-	    if ((6.0 * hue) < 1.0)
-	        res = f1 + (f2 - f1) * 6.0 * hue;
-	    else if ((2.0 * hue) < 1.0)
-	        res = f2;
-	    else if ((3.0 * hue) < 2.0)
-	        res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
-	    else
-	        res = f1;
-	    return res;
-	}
+		// HSL to RGB Convertion helpers
+    vec3 HUEtoRGB(float H){
+      float R = abs(H * 6.0 - 3.0) - 1.0;
+      float G = 2.0 - abs(H * 6.0 - 2.0);
+      float B = 2.0 - abs(H * 6.0 - 4.0);
+      return clamp(vec3(R,G,B),0.0,1.0);
+    }
 
-	vec3 hsl2rgb(vec3 hsl) {
-	    vec3 rgb;
-
-	    if (hsl.y == 0.0) {
-	        rgb = vec3(hsl.z);
-	    } else {
-	        float f2;
-
-	        if (hsl.z < 0.5)
-	            f2 = hsl.z * (1.0 + hsl.y);
-	        else
-	            f2 = hsl.z + hsl.y - hsl.y * hsl.z;
-
-	        float f1 = 2.0 * hsl.z - f2;
-
-	        rgb.r = hue2rgb(f1, f2, hsl.x + (1.0/3.0));
-	        rgb.g = hue2rgb(f1, f2, hsl.x);
-	        rgb.b = hue2rgb(f1, f2, hsl.x - (1.0/3.0));
-	    }
-	    return rgb;
-	}
-
-	vec3 hsl2rgb(float h, float s, float l) {
-	    return hsl2rgb(vec3(h, s, l));
-	}
-
+		vec3 HSLtoRGB(vec3 HSL){
+	    vec3 RGB = HUEtoRGB(HSL.x);
+	    float C = (1.0 - abs(2.0 * HSL.z - 1.0)) * HSL.y;
+	    return (RGB - 0.5) * C + HSL.z;
+    }
+		
 		void main() {
 			vec4 diffuseColor = texture2D( map, vUv );
-			gl_FragColor = vec4( diffuseColor.xyz * hsl2rgb(vScale/5.0, 1.0, 0.5), diffuseColor.w );
+			gl_FragColor = vec4( diffuseColor.xyz * HSLtoRGB(vec3(vScale/5.0, 1.0, 0.5)), diffuseColor.w );
 
 			if ( diffuseColor.w < 0.5 ) discard;
-
 		}
-
-
 	</script>
 
 	<script>
-
 		var container, stats;
 
 		var camera, scene, renderer;
@@ -224,8 +190,6 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
-
-		//
 
 		function animate() {
 
