@@ -315,7 +315,7 @@
 				};
 
 				gui.add( effectController, "mouseSize", 1.0, 100.0, 1.0 ).onChange( valuesChanger );
-				gui.add( effectController, "viscosity", 0.0, 0.03, 0.001 ).onChange( valuesChanger );
+				gui.add( effectController, "viscosity", 0.0, 0.1, 0.001 ).onChange( valuesChanger );
 				var buttonSmooth = {
 				    smoothWater: function() {
 					smoothWater();
@@ -453,7 +453,7 @@
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 				var alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
 
-				for ( var i = 0; i < 12; i++ ) {
+				for ( var i = 0; i < 10; i++ ) {
 
 					smoothShader.uniforms.texture.value = currentRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );

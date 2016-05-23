@@ -424,10 +424,9 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var PARTICLES = WIDTH * WIDTH;
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
-			document.getElementById('birds').innerText = PARTICLES;
+			document.getElementById('birds').innerText = BIRDS;
 
 			function change(n) {
 				location.hash = n;
@@ -531,8 +530,8 @@
 				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'fragmentShaderVelocity' ).textContent, dtVelocity );
 				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'fragmentShaderPosition' ).textContent, dtPosition );
 
-				gpuCompute.setVariableDependencies( velocityVariable, [ velocityVariable, positionVariable ] );
-				gpuCompute.setVariableDependencies( positionVariable, [ velocityVariable, positionVariable ] );
+				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
+				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
 				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
