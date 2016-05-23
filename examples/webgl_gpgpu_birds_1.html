@@ -702,7 +702,7 @@
 				birdUniforms.time.value = now;
 				birdUniforms.delta.value = delta;
 
-				velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
+				velocityUniforms.predator.value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
 				mouseX = 10000;
 				mouseY = 10000;
