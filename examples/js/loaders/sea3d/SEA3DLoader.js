@@ -472,7 +472,7 @@ THREE.SEA3D.Animator = function( clips, mixer ) {
 
 THREE.SEA3D.Animator.prototype.update = function( dt ) {
 
-	this.mixer.update( dt );
+	this.mixer.update( dt || 0 );
 
 	if ( this.currentAnimationAction.paused ) {
 
@@ -1104,7 +1104,7 @@ THREE.SEA3D.AnimationHandler = {
 
 		var index = this.animators.indexOf( animator );
 
-		if ( index !== - 1 ) this.animators.splice( this.animators.indexOf( animator ), 1 );
+		if ( index !== - 1 ) this.animators.splice( index, 1 );
 
 	}
 
