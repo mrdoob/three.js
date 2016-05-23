@@ -235,13 +235,13 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		this.currentTextureIndex = nextTextureIndex;
 	};
 
-	this.getCurrentTexture = function( variable ) {
+	this.getCurrentRenderTarget = function( variable ) {
 
 		return variable.renderTargets[ this.currentTextureIndex ];
 
 	};
 
-	this.getAlternateTexture = function( variable ) {
+	this.getAlternateRenderTarget = function( variable ) {
 
 		return variable.renderTargets[ this.currentTextureIndex === 0 ? 1 : 0 ];
 

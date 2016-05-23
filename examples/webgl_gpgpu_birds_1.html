@@ -709,8 +709,8 @@
 
 				gpuCompute.compute();
 
-				birdUniforms.texturePosition.value = gpuCompute.getCurrentTexture( positionVariable ).texture;
-				birdUniforms.textureVelocity.value = gpuCompute.getCurrentTexture( velocityVariable ).texture;
+				birdUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				birdUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

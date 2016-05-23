@@ -450,13 +450,16 @@
 
 			function smoothWater() {
 
+				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
+				var alternateRenderTarget = gpuCompute.getAlternateRenderTarget( heightmapVariable );
+
 				for ( var i = 0; i < 12; i++ ) {
 
-					smoothShader.uniforms.texture.value = gpuCompute.getCurrentTexture( heightmapVariable ).texture;
-					gpuCompute.doRenderTarget( smoothShader, gpuCompute.getAlternateTexture( heightmapVariable ) );
+					smoothShader.uniforms.texture.value = currentRenderTarget.texture;
+					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
 
-					smoothShader.uniforms.texture.value = gpuCompute.getAlternateTexture( heightmapVariable ).texture;
-					gpuCompute.doRenderTarget( smoothShader, gpuCompute.getCurrentTexture( heightmapVariable ) );
+					smoothShader.uniforms.texture.value = alternateRenderTarget.texture;
+					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
 				}
 				
@@ -552,7 +555,7 @@
 				gpuCompute.compute();
 
 				// Get compute output in custom uniform
-				waterUniforms.heightmap.value = gpuCompute.getCurrentTexture( heightmapVariable ).texture;
+				waterUniforms.heightmap.value = gpuCompute.getCurrentRenderTarget( heightmapVariable ).texture;
 
 				// Render
 				renderer.render( scene, camera );
