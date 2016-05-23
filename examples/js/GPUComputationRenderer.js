@@ -21,19 +21,19 @@
  * The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:
  * #DEFINE resolution vec2( 1024.0, 1024.0 )
  *
- *
+ * -------------
  *
  * Basic use:
  *
  * // Initialization...
  *
  * // Create computation renderer
- * var gpuCompute = new GPUComputationRenderer( sizeX, sizeY, renderer );
+ * var gpuCompute = new GPUComputationRenderer( 1024, 1024, renderer );
  *
  * // Create initial state float textures
  * var pos0 = gpuCompute.createTexture();
  * var vel0 = gpuCompute.createTexture();
- * // and fill in the texture data...
+ * // and fill in here the texture data...
  *
  * // Add texture variables
  * var velVar = gpuCompute.addVariable( "textureVelocity", fragmentShaderVel, pos0 );
@@ -64,11 +64,32 @@
  * // Do your rendering
  * renderer.render( myScene, myCamera );
  *
+ * -------------
  *
+ * Also, you can use utility functions to create ShaderMaterial and perform computations (rendering between textures)
+ * Note that the shaders can have multiple input textures.
  *
- * Also you can use utility functions to create ShaderMaterial and perform rendering between textures,
- * like aplying filters (using doRenderTarget() function)
+ * var myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { type: "t", value: null } } );
+ * var myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { type: "t", value: null } } );
  *
+ * var inputTexture = gpuCompute.createTexture();
+ *
+ * // Fill in here inputTexture...
+ *
+ * myFilter1.uniforms.theTexture.value = inputTexture;
+ *
+ * var myRenderTarget = gpuCompute.createRenderTarget();
+ * myFilter2.uniforms.theTexture.value = myRenderTarget.texture;
+ *
+ * var outputRenderTarget = gpuCompute.createRenderTarget();
+ *
+ * // Now use the output texture where you want:
+ * myMaterial.uniforms.map.value = outputRenderTarget.texture;
+ *
+ * // And compute each frame, before rendering to screen:
+ * gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
+ * gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
+ * 
  *
  *
  * @param {int} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
@@ -204,7 +225,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 			}
 
-			// Makes the computation for this variable
+			// Performs the computation for this variable
 			this.doRenderTarget( variable.material, variable.renderTargets[ nextTextureIndex ] );
 
 		}
@@ -334,6 +355,3 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 	}
 
 }
-
-
-// una funcion, hacer this.funcion = funcion y usarla a l principio
