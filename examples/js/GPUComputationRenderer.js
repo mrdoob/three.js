@@ -127,7 +127,9 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			initialValueTexture: initialValueTexture,
 			material: material,
 			dependencies: null,
-			renderTargets: []
+			renderTargets: [],
+			wrapS: null,
+			wrapT: null
 		};
 
 		this.variables.push( variable );
@@ -161,8 +163,8 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			var variable = this.variables[ i ];
 
 			// Creates rendertargets and initialize them with input texture
-			variable.renderTargets[ 0 ] = this.createRenderTarget();
-			variable.renderTargets[ 1 ] = this.createRenderTarget();
+			variable.renderTargets[ 0 ] = this.createRenderTarget( variable.wrapS, variable.wrapT );
+			variable.renderTargets[ 1 ] = this.createRenderTarget( variable.wrapS, variable.wrapT );
 			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 0 ] );
 			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] );
 
@@ -180,7 +182,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 						var found = false;
 						for ( var j = 0; j < this.variables.length; j++ ) {
 
-							if ( depVar.name === this.variables.name ) {
+							if ( depVar.name === this.variables[ j ].name ) {
 								found = true;
 								break;
 							}
