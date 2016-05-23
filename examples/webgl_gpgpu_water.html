@@ -54,10 +54,10 @@
 
 			uniform vec2 mousePos;
 			uniform float mouseSize;
+			uniform float viscosityConstant;
 
 			#define deltaTime ( 1.0 / 60.0 )
 			#define GRAVITY_CONSTANT ( resolution.x * deltaTime * 3.0 )
-			#define VISCOSITY_CONSTANT 0.03
 
 			void main()	{
 
@@ -85,7 +85,7 @@
 				heightmapValue.x += heightmapValue.y * deltaTime;
 
 				// Viscosity
-				heightmapValue.x += sump * VISCOSITY_CONSTANT;
+				heightmapValue.x += sump * viscosityConstant;
 
 				// Mouse influence
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - vec2( mousePos.x, - mousePos.y ) ) * PI / mouseSize, 0.0, PI );
@@ -266,7 +266,7 @@
 				scene.add( sun );
 
 				var sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
-				sun2.position.set( -100, 250, -200 );
+				sun2.position.set( -100, 350, -200 );
 				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
@@ -300,35 +300,33 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-
 				var gui = new dat.GUI();
 
-
 				var effectController = {
-					seperation: 20.0,
-					alignment: 20.0,
-					cohesion: 20.0,
-					freedom: 0.75
+					mouseSize: 20.0,
+					viscosity: 0.03
 				};
 
 				var valuesChanger = function() {
 
-					simulator.velocityUniforms.seperationDistance.value = effectController.seperation;
-					simulator.velocityUniforms.alignmentDistance.value = effectController.alignment;
-					simulator.velocityUniforms.cohesionDistance.value = effectController.cohesion;
-					simulator.velocityUniforms.freedomFactor.value = effectController.freedom;
+					heightmapVariable.material.uniforms.mouseSize.value = effectController.mouseSize;
+					heightmapVariable.material.uniforms.viscosityConstant.value = effectController.viscosity;
 
 				};
 
-//				valuesChanger();
+				gui.add( effectController, "mouseSize", 1.0, 100.0, 1.0 ).onChange( valuesChanger );
+				gui.add( effectController, "viscosity", 0.0, 0.03, 0.001 ).onChange( valuesChanger );
+				var buttonSmooth = {
+				    smoothWater: function() {
+					smoothWater();
+				    }
+				};
+				gui.add( buttonSmooth, 'smoothWater' );
 
-
-				gui.add( effectController, "seperation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
-				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
-				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
-				gui.close();
 
 				initWater();
+
+				valuesChanger();
 
 			}
 
@@ -401,6 +399,7 @@
 
 				heightmapVariable.material.uniforms.mousePos = { type: "v2", value: new THREE.Vector2( 10000, 10000 ) };
 				heightmapVariable.material.uniforms.mouseSize = { type: "f", value: 20.0 };
+				heightmapVariable.material.uniforms.viscosityConstant = { type: "f", value: 0.03 };
 				heightmapVariable.material.defines.BOUNDS = BOUNDS.toFixed( 1 );
 
 				var error = gpuCompute.init();
@@ -408,10 +407,8 @@
 				    console.error( error );
 				}
 
-				// Compute shader to smooth the water surface and velocity
+				// Create compute shader to smooth the water surface and velocity
 				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { type: "t", value: null } } );
-
-//				smoothWater();
 
 			}
 
@@ -453,8 +450,7 @@
 
 			function smoothWater() {
 
-				var n = WIDTH / 128;
-				for ( var i = 0; i < n; i++ ) {
+				for ( var i = 0; i < 12; i++ ) {
 
 					smoothShader.uniforms.texture.value = gpuCompute.getCurrentTexture( heightmapVariable ).texture;
 					gpuCompute.doRenderTarget( smoothShader, gpuCompute.getAlternateTexture( heightmapVariable ) );
