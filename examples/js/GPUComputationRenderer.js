@@ -59,7 +59,7 @@
  * gpuCompute.compute();
  *
  * // Update texture uniforms in your visualization materials with the gpu renderer output
- * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentTexture( posVar ).texture;
+ * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentRenderTarget( posVar ).texture;
  *
  * // Do your rendering
  * renderer.render( myScene, myCamera );

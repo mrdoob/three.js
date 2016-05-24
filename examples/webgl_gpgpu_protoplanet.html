@@ -21,7 +21,7 @@
 			}
 
 			#info {
-				color: #000;
+				color: #ffffff;
 				position: absolute;
 				top: 10px;
 				width: 100%;
@@ -33,7 +33,7 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris<br/>
-			Select <span id="options"></span> protoplanets<br/>
+			Select <span id="options"></span> debris<br/>
 
 		</div>
 
@@ -68,10 +68,12 @@
 
 		</script>
 
-		<!-- Fragment shader for bird's velocity -->
+		<!-- Fragment shader for protoplanet's velocity -->
 		<script id="computeShaderVelocity" type="x-shader/x-fragment">
 
 			#define delta ( 1.0 / 60.0 )
+
+			uniform float gravityConstant;
 
 			void main()	{
 
@@ -88,28 +90,35 @@
 
 		</script>
 
+		<!-- Particles vertex shader -->
 		<script type="x-shader/x-vertex" id="particleVertexShader">
 
 			uniform sampler2D texturePosition;
 			uniform sampler2D textureVelocity;
+			uniform float density;
+			uniform float cameraConstant;
 
 			varying vec4 vColor;
 
 			void main() {
 
-/*
-				vec4 tmpPos = texture2D( texturePosition, reference );
+
+				vec4 tmpPos = texture2D( texturePosition, uv ).xyzw;
 				vec3 pos = tmpPos.xyz;
-				vec3 velocity = texture2D( textureVelocity, reference ).xyz;
-*/
 
-				vColor = vec4( uv.x, uv.y, 0.0, 1.0 );
+				vec4 vTemp = texture2D( textureVelocity, uv ).xyzw;
+				float mass = tmpPos.w;
 
-				vec3 newPosition = position;
 
-				vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
+				vColor = vec4( vTemp.w, uv.y, vTemp.g, 1.0 );
 
-				gl_PointSize = 3.0 * ( 300.0 / -mvPosition.z );
+				vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
+
+				// Real size from density and mass
+				float size = density * mass;
+
+				// Apparent size in pixels
+				gl_PointSize = size * cameraConstant / ( - mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -117,13 +126,17 @@
 
 		</script>
 
-		<!-- bird geometry shader -->
+		<!-- Particles fragment shader -->
 		<script type="x-shader/x-fragment" id="particleFragmentShader">
 
 			varying vec4 vColor;
 
 			void main() {
 
+				float f = length( gl_PointCoord - vec2( 0.5, 0.5 ) );
+				if ( f > 0.5 ) {
+				    discard;
+				}
 				gl_FragColor = vColor;
 
 			}
@@ -145,8 +158,6 @@
 			var camera, scene, renderer, geometry, controls;
 
 			var PARTICLES = WIDTH * WIDTH;
-
-			var RADIUS = 200;
 
 			document.getElementById( 'protoplanets' ).innerText = PARTICLES;
 
@@ -172,6 +183,7 @@
 			var positionUniforms;
 			var velocityUniforms;
 			var particleUniforms;
+			var effectController;
 
 			init();
 			animate();
@@ -194,6 +206,18 @@
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
+				effectController = {
+
+					gravityConstant: 1.0,
+					density: 2.0,
+
+					radius: 200,
+					height: 50,
+					exponent: 0.5,
+					meanMass: 1.0
+
+				};
+
 				initComputeRenderer();
 
 				stats = new Stats();
@@ -203,24 +227,20 @@
 
 				var gui = new dat.GUI();
 
-				var effectController = {
-					gravityConstant: 1.0
-				};
-
 				var valuesChanger = function() {
 
 					velocityUniforms.gravityConstant.value = effectController.gravityConstant;
+					particleUniforms.density.value = effectController.density;
 
 				};
-
-				valuesChanger();
-
 
 				gui.add( effectController, "gravityConstant", 0.0, 100.0, 0.05 ).onChange( valuesChanger );
 
 				gui.close();
 
 				initProtoplanets();
+
+				valuesChanger();
 
 			}
 
@@ -259,9 +279,9 @@
 				var p = 0;
 				for ( var i = 0; i < PARTICLES; i++ ) {
 
-					positions[ p++ ] = ( Math.random() * 2 - 1 ) * RADIUS;
-					positions[ p++ ] = ( Math.random() * 2 - 1 ) * RADIUS;
-					positions[ p++ ] = ( Math.random() * 2 - 1 ) * RADIUS;
+					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p++ ] = 0;//( Math.random() * 2 - 1 ) * effectController.radius;
+					positions[ p++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
 
 				}
 
@@ -282,6 +302,8 @@
 				particleUniforms = {
 					texturePosition: { type: "t", value: null },
 					textureVelocity: { type: "t", value: null },
+					cameraConstant: { type: "f", value: camera.near * window.innerHeight  },
+					density: { type: "f", value: 1.0  }
 				};
 
 				// ShaderMaterial
@@ -290,6 +312,7 @@
 					vertexShader:   document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
+				material.extensions.drawBuffers = true;
 
 				var particles = new THREE.Points( geometry, material );
 				particles.matrixAutoUpdate = false;
@@ -303,16 +326,18 @@
 
 				var theArray = texture.image.data;
 
+				var r = effectController.radius;
+
 				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
 
-					var x = Math.random() * RADIUS;
-					var y = Math.random() * RADIUS;
-					var z = Math.random() * RADIUS;
+					var x = ( Math.random() * 2 - 1 ) * r;
+					var y = ( Math.random() * 2 - 1 ) * r;
+					var z = ( Math.random() * 2 - 1 ) * r;
 
 					theArray[ k + 0 ] = x;
 					theArray[ k + 1 ] = y;
 					theArray[ k + 2 ] = z;
-					theArray[ k + 3 ] = 1;
+					theArray[ k + 3 ] = Math.random() * 9 + 1;
 
 				}
 
@@ -324,14 +349,15 @@
 
 				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
 
-					var x = Math.random() - 0.5;
-					var y = Math.random() - 0.5;
-					var z = Math.random() - 0.5;
+					var vx = Math.random() * 9 + 1;
+					var vy = Math.random();
+					var vz = Math.random() * 9 + 1;
+					var mass = Math.random() * 9 + 1;
 
-					theArray[ k + 0 ] = x * 10;
-					theArray[ k + 1 ] = y * 10;
-					theArray[ k + 2 ] = z * 10;
-					theArray[ k + 3 ] = 1;
+					theArray[ k + 0 ] = vx;
+					theArray[ k + 1 ] = vy;
+					theArray[ k + 2 ] = vz;
+					theArray[ k + 3 ] = mass;
 
 				}
 
@@ -345,6 +371,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				particleUniforms.cameraConstant.value = camera.near * window.innerHeight;
 			}
 
 			function animate() {
@@ -366,8 +393,8 @@
 
 //				gpuCompute.compute();
 
-//				birdUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-//				birdUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				particleUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				particleUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 
