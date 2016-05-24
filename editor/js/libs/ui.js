@@ -347,6 +347,28 @@ UI.Text.prototype.setValue = function ( value ) {
 
 };
 
+// Image                                                                                                                                                                                                                                                                                                                                                    
+UI.Image = function ( image, width, height ) {
+
+        UI.Element.call( this );
+
+        var dom = document.createElement( 'img' );
+    dom.src = image;
+        dom.style.cursor = 'default';
+        dom.style.display = 'inline-block';
+    dom.style.horizontalAlign = "middle";
+        dom.style.verticalAlign = 'middle';
+    dom.width = width;
+        dom.height = height;
+
+        this.dom = dom;
+
+        return this;
+
+};
+
+UI.Image.prototype = Object.create( UI.Element.prototype );
+UI.Image.prototype.constructor = UI.Image;
 
 // Input
 

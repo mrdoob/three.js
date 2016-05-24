@@ -14,6 +14,11 @@ Viewport.Info = function ( editor ) {
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 
+        var logo = new UI.Image( 'imgs/OpenSimApplicationIcon.png', 50, 50 );
+        var div = new UI.Div();
+        div.add( logo );
+        container.add( div );
+
 	var objectsText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var verticesText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var trianglesText = new UI.Text( '0' ).setMarginLeft( '6px' );
