@@ -83,6 +83,8 @@ THREE.Object3D = function () {
 	this.renderOrder = 0;
 
 	this.userData = {};
+	
+	this.referenceData = null;
 
 };
 
@@ -699,6 +701,8 @@ THREE.Object3D.prototype = {
 		this.renderOrder = source.renderOrder;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		
+		this.referenceData = source.referenceData;
 
 		if ( recursive === true ) {
 
