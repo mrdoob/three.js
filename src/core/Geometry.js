@@ -1041,6 +1041,51 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
+		var bones = [];
+		var skinIndices = [];
+		var skinWeights = [];
+		var influencesPerVertex = 0;
+
+		if ( this.bones !== undefined ) {
+
+			for ( var i = 0; i < this.bones.length; i ++ ) {
+
+				bones.push( this.bones[ i ] );
+
+			}
+
+		}
+
+		for ( var i = 0; i < this.skinIndices.length; i ++ ) {
+
+			var array = this.skinIndices[ i ].toArray();
+
+			for ( var j = 0; j < array.length; j ++ ) {
+
+				skinIndices.push( array[ j ] );
+
+			}
+
+		}
+
+		for ( var i = 0; i < this.skinWeights.length; i ++ ) {
+
+			var array = this.skinWeights[ i ].toArray();
+
+			for ( var j = 0; j < array.length; j ++ ) {
+
+				skinWeights.push( array[ j ] );
+
+			}
+
+		}
+
+		if ( this.skinIndices.length > 0 ) {
+
+			influencesPerVertex = this.skinIndices[ 0 ].toArray().length;
+
+		}
+
 		function setBit( value, position, enabled ) {
 
 			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position ) );
@@ -1105,6 +1150,10 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		if ( colors.length > 0 ) data.data.colors = colors;
 		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
 		data.data.faces = faces;
+		if ( bones.length > 0 ) data.data.bones = bones;
+		if ( skinIndices.length > 0 ) data.data.skinIndices = skinIndices;
+		if ( skinWeights.length > 0 ) data.data.skinWeights = skinWeights;
+		if ( influencesPerVertex > 0 ) data.data.influencesPerVertex = influencesPerVertex;
 
 		return data;
 

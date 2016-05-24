@@ -417,7 +417,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function ( data, geometries, materials, skin ) {
 
 			var object;
 
@@ -520,6 +520,29 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+
+					if ( data.skeleton === undefined ) {
+
+						object = new THREE.SkinnedMesh( geometry, material );
+
+					} else {
+
+						object = new THREE.SkinnedMesh( geometry, material, undefined, true );
+
+					}
+
+					break;
+
+				case 'Bone':
+
+					object = new THREE.Bone( skin );
+
+					break;
+
 				case 'LOD':
 
 					object = new THREE.LOD();
@@ -583,7 +606,7 @@ THREE.ObjectLoader.prototype = {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials, ( object instanceof THREE.SkinnedMesh ) ? object : skin ) );
 
 				}
 
@@ -605,6 +628,15 @@ THREE.ObjectLoader.prototype = {
 					}
 
 				}
+
+			}
+
+			if ( data.type === 'SkinnedMesh' && data.skeleton !== undefined ) {
+
+				object.bind( object.createSkeletonFromJSON( data.skeleton ), object.matrixWorld );
+				object.bindMode = data.bindMode;
+				object.bindMatrix.fromArray( data.bindMatrix );
+				object.updateMatrixWorld( true );
 
 			}
 

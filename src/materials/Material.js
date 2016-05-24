@@ -206,6 +206,8 @@ THREE.Material.prototype = {
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
+		if ( this.skinning !== undefined ) data.skinning = this.skinning;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache ( cache ) {
