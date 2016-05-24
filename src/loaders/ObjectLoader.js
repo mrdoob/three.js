@@ -417,7 +417,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials, skin ) {
+		return function ( data, geometries, materials, parent ) {
 
 			var object;
 
@@ -539,6 +539,18 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Bone':
 
+					var skin;
+
+					if ( parent instanceof THREE.SkinnedMesh ) {
+
+						skin = parent;
+
+					} else if ( parent instanceof THREE.Bone ) {
+
+						skin = parent.skin;
+
+					}
+
 					object = new THREE.Bone( skin );
 
 					break;
@@ -606,7 +618,7 @@ THREE.ObjectLoader.prototype = {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials, ( object instanceof THREE.SkinnedMesh ) ? object : skin ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials, object ) );
 
 				}
 
