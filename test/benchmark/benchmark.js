@@ -55,7 +55,7 @@ SuiteUI.prototype.run = function() {
 
 SuiteUI.prototype.complete = function() {
   this.results.style.display = "block";
-  var f = this.suite.sort("fastest");
+  var f = _.orderBy(this.suite, ["hz"], ["desc"]);
   for (var i = 0; i < f.length; i++) {
     var x = f[i];
     var n = document.importNode(this.suiteTestTemplate, true);
