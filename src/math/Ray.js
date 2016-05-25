@@ -276,9 +276,11 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	intersectsSphere: function ( sphere ) {
+	intersectsSphere: function ( sphere, threshold ) {
 
-		return this.distanceToPoint( sphere.center ) <= sphere.radius;
+		var radius = sphere.radius + ( threshold || 0 );
+		
+		return this.distanceSqToPoint( sphere.center ) <= ( radius * radius );
 
 	},
 
