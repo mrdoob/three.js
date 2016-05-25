@@ -56,7 +56,7 @@ IncidentLight directLight;
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, spotlight.shadowCameraNearFar, vSpotShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
