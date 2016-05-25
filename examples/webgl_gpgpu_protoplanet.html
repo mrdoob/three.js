@@ -60,14 +60,14 @@
 
 				vec4 tmpVel = texture2D( textureVelocity, uv );
 				vec3 vel = tmpVel.xyz;
-				
-				vec4 tmpMass tmpVel = texture2D( textureVelocity, uv );
-				float mass = tmpMass.x;
-				float radius = tmpMass.y;
+				float mass = tmpVel.w;
 
-				if ( mass != 0.0 ) {
-				    pos += vel * delta;
+				if ( mass == 0.0 ) {
+				    discard;
 				}
+
+				// Dynamics
+			        pos += vel * delta;
 
 				gl_FragColor = vec4( pos, 1.0 );
 
@@ -78,41 +78,39 @@
 		<!-- Fragment shader for protoplanet's velocity -->
 		<script id="computeShaderVelocity" type="x-shader/x-fragment">
 
+			// For PI declaration:
+			#include <common>
+
 			#define delta ( 1.0 / 60.0 )
 
 			uniform float gravityConstant;
+			uniform float density;
 
-			void main()	{
-
-				vec2 uv = gl_FragCoord.xy / resolution.xy;
-				vec4 tmpPos = texture2D( texturePosition, uv );
-				vec3 position = tmpPos.xyz;
-				vec4 tmpVel = texture2D( textureVelocity, uv );
-				vec3 velocity = tmpVel.xyz;
-				float mass = tmpVel.w;
-//collisions are done in this shader only.
-				gl_FragColor = vec4( velocity, mass );
-
+			float radiusFromMass( float mass ) {
+				// Calculate radius of a sphere from mass and density
+				return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
 			}
 
-		</script>
-
-		<!-- Fragment shader for protoplanet's mass -->
-		<script id="computeShaderMass" type="x-shader/x-fragment">
-
-			#define delta ( 1.0 / 60.0 )
-
 			void main()	{
 
 				vec2 uv = gl_FragCoord.xy / resolution.xy;
-				//vec4 tmpPos = texture2D( texturePosition, uv );
-				//vec3 position = tmpPos.xyz;
-				//vec4 tmpVel = texture2D( textureVelocity, uv );
-				//vec3 velocity = tmpVel.xyz;
-				vec4 tmpMass = texture2D( textureMass, uv );
-				float mass = tmpMass.x;
 
-				gl_FragColor = vec4( mass, tmpMass.yzw );
+				vec4 tmpPos = texture2D( texturePosition, uv );
+				vec3 pos = tmpPos.xyz;
+
+				vec4 tmpVel = texture2D( textureVelocity, uv );
+				vec3 vel = tmpVel.xyz;
+				float mass = tmpVel.w;
+
+				if ( mass == 0.0 ) {
+				    discard;
+				}
+
+				float radius = radiusFromMass( mass );
+
+
+//collisions are done in this shader only.
+				gl_FragColor = vec4( vel, mass );
 
 			}
 
@@ -121,11 +119,14 @@
 		<!-- Particles vertex shader -->
 		<script type="x-shader/x-vertex" id="particleVertexShader">
 
+			// For PI declaration:
+			#include <common>
+
 			uniform sampler2D texturePosition;
 			uniform sampler2D textureVelocity;
-			uniform sampler2D textureMass;
 
 			uniform float cameraConstant;
+			uniform float density;
 
 			varying vec4 vColor;
 
@@ -137,11 +138,7 @@
 
 				vec4 velTemp = texture2D( textureVelocity, uv );
 				vec3 vel = velTemp.xyz;
-				float amem = velTemp.w;
-
-				vec4 massTemp = texture2D( textureMass, uv );
-				float mass = massTemp.x;
-				float radius = massTemp.y;
+				float mass = velTemp.w;
 
 /*
 				if ( mass == 0.0 ) {
@@ -149,17 +146,20 @@
 				}
 */
 
-				vColor = vec4( amem, uv.y, 0.0, 1.0 );
+				vColor = vec4( mass / 12.0, uv.y, 0.0, 1.0 );
 
 				vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
 
-/*
-				v = 4/3 PI r³
-				r = root³(3/4 V / PI )
-*/
+				// Calculate radius of a sphere from mass and density
+				float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
 
 				// Apparent size in pixels
-				gl_PointSize = radius * cameraConstant / ( - mvPosition.z );
+				if ( mass == 0.0 ) {
+					gl_PointSize = 0.0;
+				}
+				else {
+					gl_PointSize = radius * cameraConstant / ( - mvPosition.z );
+				}
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -221,7 +221,6 @@
 			var gpuCompute;
 			var velocityVariable;
 			var positionVariable;
-			var massVariable;
 			var positionUniforms;
 			var velocityUniforms;
 			var particleUniforms;
@@ -236,6 +235,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 5, 15000 );
+				camera.position.y = 300;
 				camera.position.z = 350;
 
 				scene = new THREE.Scene();
@@ -253,8 +253,8 @@
 					gravityConstant: 1.0,
 					density: 0.1,
 
-					radius: 200,
-					height: 50,
+					radius: 300,
+					height: 20,
 					exponent: 0.2,
 					meanMass: 10.0,
 					velocity: 50,
@@ -275,6 +275,8 @@
 				var valuesChanger = function() {
 
 					velocityUniforms.gravityConstant.value = effectController.gravityConstant;
+					velocityUniforms.density.value = effectController.density;
+					particleUniforms.density.value = effectController.density;
 
 				};
 
@@ -300,16 +302,15 @@
 
 				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
 				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
-				massVariable = gpuCompute.addVariable( "textureMass", document.getElementById( 'computeShaderMass' ).textContent, dtMass );
 
-				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable, massVariable ] );
-				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable, massVariable ] );
-				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable, massVariable ] );
+				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
+				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
 				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				velocityUniforms.gravityConstant = { type: "f", value: 1.0 };
+				velocityUniforms.gravityConstant = { type: "f", value: 0.0 };
+				velocityUniforms.density = { type: "f", value: 0.0 };
 
 				var error = gpuCompute.init();
 				if ( error !== null ) {
@@ -349,8 +350,8 @@
 				particleUniforms = {
 					texturePosition: { type: "t", value: null },
 					textureVelocity: { type: "t", value: null },
-					textureMass: { type: "t", value: null },
-					cameraConstant: { type: "f", value: getCameraConstant( camera ) }
+					cameraConstant: { type: "f", value: getCameraConstant( camera ) },
+					density: { type: "f", value: 0.0 }
 				};
 
 				// ShaderMaterial
@@ -373,13 +374,11 @@
 
 				var posArray = texturePosition.image.data;
 				var velArray = textureVelocity.image.data;
-				var massArray = textureMass.image.data;
 
 				var maxR = effectController.radius;
 				var h = effectController.height;
 				var exponent = effectController.exponent;
-				var density = effectController.density;
-				var volConstant = 3 / ( 4 * Math.PI );
+			var density = effectController.density;
 				var meanMass = effectController.meanMass;
 
 				var maxVel = effectController.velocity;
@@ -412,14 +411,7 @@
 					z *= rExp;
 					y = ( Math.random() * 2 - 1 ) * h;
 
-					// Mass
-					var mx = Math.random() * meanMass + 1;
-
-					// Volume = mass / density
-					var volume = mx / density;
-
-					// Radius
-					var my = Math.pow( volume * volConstant, 1 / 3 );
+					var mass = Math.random() * meanMass + 1;
 
 					// Fill in texture values
 					posArray[ k + 0 ] = x;
@@ -430,12 +422,7 @@
 					velArray[ k + 0 ] = vx;
 					velArray[ k + 1 ] = vy;
 					velArray[ k + 2 ] = vz;
-					velArray[ k + 3 ] = Math.random();
-
-					massArray[ k + 0 ] = mx;
-					massArray[ k + 1 ] = my;
-					massArray[ k + 2 ] = 0;
-					massArray[ k + 3 ] = 1;
+					velArray[ k + 3 ] = mass;
 
 				}
 
@@ -476,11 +463,10 @@
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
 
-//				gpuCompute.compute();
+				gpuCompute.compute();
 
 				particleUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
 				particleUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
-				particleUniforms.textureMass.value = gpuCompute.getCurrentRenderTarget( massVariable ).texture;
 
 				renderer.render( scene, camera );
 
