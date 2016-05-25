@@ -1,3 +1,13 @@
+# THREEJS Benchmark Suite
+
+### Example: Adding a New Suite
+
+For adding a new Tests we need two things
+ - Adding the Test File
+ - Linking it on the benchmark.html page
+
+Some example could be like this
+```javascript
 (function() {
   // We want to make sure THREE.JS is loaded for this Benchmark
   var THREE
@@ -25,3 +35,6 @@
 
   })
 })();
+```
+
+Remember that THREEJS library is only accesible via `Bench.THREE`
