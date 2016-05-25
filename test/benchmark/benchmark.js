@@ -1,6 +1,7 @@
 var BenchClass = function() {
   this.suites = [];
   this.THREE = window.THREE ;
+  window.THREE = undefined;
   Benchmark.options.maxTime = 1.0;
   return this;
 }
@@ -46,7 +47,8 @@ SuiteUI.prototype.render = function() {
 }
 
 SuiteUI.prototype.run = function() {
-  this.runButton.style.visibility = "hidden";
+  this.runButton.click = _.noop;
+  this.runButton.innerText = "Running..."
   this.suite.on("complete", this.complete.bind(this));
   this.suite.run({
     async: true
@@ -54,6 +56,7 @@ SuiteUI.prototype.run = function() {
 }
 
 SuiteUI.prototype.complete = function() {
+  this.runButton.style.display = "none";
   this.results.style.display = "block";
   var f = _.orderBy(this.suite, ["hz"], ["desc"]);
   for (var i = 0; i < f.length; i++) {
@@ -61,6 +64,7 @@ SuiteUI.prototype.complete = function() {
     var n = document.importNode(this.suiteTestTemplate, true);
     n.querySelector(".name").innerText = x.name;
     n.querySelector(".ops").innerText = x.hz.toFixed();
+    n.querySelector(".desv").innerText = x.stats.rme.toFixed(2);
     this.results.appendChild(n);
   }
 }

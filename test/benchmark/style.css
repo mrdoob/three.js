@@ -7,7 +7,7 @@ body{
 }
 
 header{
-    
+
 }
 header h1{
     color: #6F0752;
@@ -22,7 +22,7 @@ article{
 }
 
 article header{
-    
+
     display: flex;
 }
 
@@ -67,7 +67,7 @@ article .results > div{
 }
 article .results > div p{
     color:#6F0752;
-    flex-grow:0;
+    flex-grow: 1;
     margin: 0 3px;
     font-size:0.8em;
 }
@@ -86,8 +86,11 @@ article .results > div p{
 }
 
 .results .name{
-    flex-basis:70%;
+    flex-basis:60%;
 }
 .results .time{
-    flex-basis:30%;
+    flex-basis:20%;
+}
+.results .desv{
+    flex-basis:20%;
 }
