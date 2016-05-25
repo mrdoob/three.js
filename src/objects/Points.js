@@ -37,7 +37,7 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+			if ( raycaster.ray.intersectsSphere( sphere, threshold ) === false ) return;
 
 			//
 
