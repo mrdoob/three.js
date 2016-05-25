@@ -306,6 +306,22 @@
 							editor.undo();
 
 						}
+						
+						break;
+						
+					case 87: // Register W for translation transform mode
+						editor.signals.transformModeChanged.dispatch( 'translate' );
+						
+						break;
+						
+					case 69: // Register E for rotation transform mode
+						editor.signals.transformModeChanged.dispatch( 'rotate' );
+						
+						break;
+						
+					case 82: // Register R for scaling transform mode
+						editor.signals.transformModeChanged.dispatch( 'scale' );
+						
 						break;
 
 				}
