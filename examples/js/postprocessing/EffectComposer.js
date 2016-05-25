@@ -61,9 +61,6 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	render: function ( delta ) {
 
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
 		var maskActive = false;
 
 		var pass, i, il = this.passes.length;
