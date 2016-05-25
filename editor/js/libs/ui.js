@@ -362,8 +362,8 @@ UI.Text.prototype.setValue = function ( value ) {
 
 };
 
-// Image                                                                                                                                                                                                                                                                                                                                                    
-UI.Image = function ( image, width, height, opacity ) {
+// Image                                                                                                                                                                                                                                                                                                                                                  
+UI.Image = function ( image, width, height, opacity, onresizeCallback ) {
 
         UI.Element.call( this );
 
@@ -376,6 +376,13 @@ UI.Image = function ( image, width, height, opacity ) {
         dom.width = width;
         dom.height = height;
         dom.style.opacity = opacity;
+        if(onresizeCallback !== undefined) {
+            var thisimg = this;
+            callback = function() {
+                onresizeCallback(thisimg);
+            };
+            window.addEventListener("resize", callback, false);
+        }
 
         this.dom = dom;
 
