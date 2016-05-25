@@ -14,7 +14,9 @@ Viewport.Info = function ( editor ) {
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 
-        var logo = new UI.Image( 'imgs/OpenSimApplicationIcon.png', 50, 50 );
+        var smallerDim = Math.min(window.innerHeight, window.innerWidth);
+        var imgDim = Math.max(smallerDim / 15, 30);
+        var logo = new UI.Image( 'imgs/OpenSimApplicationIcon.png', imgDim, imgDim, 0.5);
         var div = new UI.Div();
         div.add( logo );
         container.add( div );

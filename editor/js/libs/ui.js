@@ -363,18 +363,19 @@ UI.Text.prototype.setValue = function ( value ) {
 };
 
 // Image                                                                                                                                                                                                                                                                                                                                                    
-UI.Image = function ( image, width, height ) {
+UI.Image = function ( image, width, height, opacity ) {
 
         UI.Element.call( this );
 
         var dom = document.createElement( 'img' );
-    dom.src = image;
+        dom.src = image;
         dom.style.cursor = 'default';
         dom.style.display = 'inline-block';
-    dom.style.horizontalAlign = "middle";
+        dom.style.horizontalAlign = "middle";
         dom.style.verticalAlign = 'middle';
-    dom.width = width;
+        dom.width = width;
         dom.height = height;
+        dom.style.opacity = opacity;
 
         this.dom = dom;
 
