@@ -2694,15 +2694,15 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		if ( mesh.geometry.animations === undefined ) {
-
-			mesh.geometry.animations = [];
-
-		}
-
 		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
 
 		if ( clip !== null ) {
+
+			if ( mesh.geometry.animations === undefined ) {
+
+				mesh.geometry.animations = [];
+
+			}
 
 			mesh.geometry.animations.push( clip );
 
@@ -2747,6 +2747,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
+		// TODO: should we use THREE.AnimationClip.CreateFromMorphTargetSequence() instead?
+
 		var tracks = [];
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
@@ -2767,13 +2769,13 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		if ( clip !== null ) {
 
-			if ( mesh.geometry.morphAnimations === undefined ) {
+			if ( mesh.geometry.animations === undefined ) {
 
-				mesh.geometry.morphAnimations = [];
+				mesh.geometry.animations = [];
 
 			}
 
-			mesh.geometry.morphAnimations.push( clip );
+			mesh.geometry.animations.push( clip );
 
 		}
 
@@ -4139,45 +4141,48 @@ THREE.MMDHelper.prototype = {
 
 	setAnimation: function ( mesh ) {
 
-		if ( mesh.geometry.animations !== undefined || mesh.geometry.morphAnimations !== undefined ) {
+		if ( mesh.geometry.animations !== undefined ) {
 
 			mesh.mixer = new THREE.AnimationMixer( mesh );
 
-		}
-
-		if ( mesh.geometry.animations !== undefined ) {
+			var foundAnimation = false;
+			var foundMorphAnimation = false;
 
 			for ( var i = 0; i < mesh.geometry.animations.length; i++ ) {
 
-				var action = mesh.mixer.clipAction( mesh.geometry.animations[ i ] );
+				var clip = mesh.geometry.animations[ i ];
 
-				if ( i === 0 ) {
+				var action = mesh.mixer.clipAction( clip );
 
-					action.play();
+				if ( clip.tracks[ 0 ].name.indexOf( '.morphTargetInfluences' ) === 0 ) {
+
+					if ( ! foundMorphAnimation ) {
+
+						action.play();
+						foundMorphAnimation = true;
+
+					}
+
+				} else {
+
+					if ( ! foundAnimation ) {
+
+						action.play();
+						foundAnimation = true;
+
+					}
 
 				}
 
 			}
 
-			mesh.ikSolver = new THREE.CCDIKSolver( mesh );
+			if ( foundAnimation ) {
 
-			if ( mesh.geometry.grants !== undefined ) {
+				mesh.ikSolver = new THREE.CCDIKSolver( mesh );
 
-				mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
+				if ( mesh.geometry.grants !== undefined ) {
 
-			}
-
-		}
-
-		if ( mesh.geometry.morphAnimations !== undefined ) {
-
-			for ( var i = 0; i < mesh.geometry.morphAnimations.length; i++ ) {
-
-				var action = mesh.mixer.clipAction( mesh.geometry.morphAnimations[ i ] );
-
-				if ( i === 0 ) {
-
-					action.play();
+					mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
 
 				}
 

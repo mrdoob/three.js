@@ -81,8 +81,8 @@
 
 				for(var i = 0; i < loader.meshes.length; i++) {
 
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.play( "root" );
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.play( "root" );
 
 				}
 
@@ -128,7 +128,6 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
@@ -142,8 +141,9 @@
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
-				composer.addPass( copyPass );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
 
 				// events
 
