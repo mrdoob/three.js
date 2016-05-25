@@ -21,6 +21,10 @@ geometry.viewDir = normalize( vViewPosition );
 
 IncidentLight directLight;
 
+#ifdef USE_SHADOWMAP
+	initShadows();
+#endif
+
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
 
 	PointLight pointLight;

@@ -37,7 +37,7 @@
 
 		vec2 poissonDisk[NUM_SAMPLES];
 
-		void initPoissonSamples( const in vec2 randomSeed )	{
+		void initPercentCloserSoftShadow( const in vec2 randomSeed )	{
 			poissonDisk[0] = vec2(-0.94201624, -0.39906216 );
 			poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
 			poissonDisk[2] = vec2( -0.094184101, -0.92938870 );
@@ -92,7 +92,7 @@
 			return blockerDepthSum / float( numBlockers );
 		}
 
-		float PCF_Filter(sampler2D shadowMap, vec2 uv, float zReceiverClipSpace, float filterRadius ) {
+		float percentCloserFilter( sampler2D shadowMap, vec2 uv, float zReceiverClipSpace, float filterRadius ) {
 			float sum = 0.0;
 
 			for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
@@ -102,7 +102,7 @@
 				float depth1 = unpackRGBAToDepth( texture2D( shadowMap, uv + offset ) );
 				if( zReceiverClipSpace <= depth1 ) sum += 1.0;
 
-				float depth2 = unpackRGBAToDepth( texture2D( shadowMap, uv + -offset.yx ) );
+				float depth2 = unpackRGBAToDepth( texture2D( shadowMap, uv - offset.yx ) );
 				if( zReceiverClipSpace <= depth2 ) sum += 1.0;
 
 			}
@@ -110,14 +110,12 @@
 			return sum / ( 2.0 * float( PCF_NUM_SAMPLES ) );
 		}
 
-		float PCSS ( sampler2D shadowMap, vec4 coords ) {
+		float percentCloserSoftShadow( sampler2D shadowMap, vec4 coords ) {
 
 			vec2 uv = coords.xy;
 			float zReceiverClipSpace = coords.z;
 			float zReceiverLightSpace = -perspectiveDepthToViewZ( zReceiverClipSpace, LIGHT_NEAR_PLANE, LIGHT_FAR_PLANE );
 
-			initPoissonSamples( uv );
-			
 			// STEP 1: blocker search
 			float avgBlockerDepthClipSpace = findBlocker( shadowMap, uv, zReceiverClipSpace, zReceiverLightSpace );
 
@@ -131,7 +129,7 @@
 
 			// STEP 3: filtering
 			//return avgBlockerDepth;
-			return PCF_Filter( shadowMap, uv, zReceiverClipSpace, filterRadius );
+			return percentCloserFilter( shadowMap, uv, zReceiverClipSpace, filterRadius );
 		}
 
 	#endif
@@ -161,6 +159,16 @@
 		float c = mix( a, b, f.x );
 
 		return c;
+
+	}
+
+	void initShadows() {
+
+		#if defined( SHADOWMAP_TYPE_PCSS )
+
+		  initPercentCloserSoftShadow( vViewPosition.xy );
+
+		#endif
 
 	}
 
@@ -224,8 +232,8 @@
 			) * ( 1.0 / 9.0 );
 
 		#elif defined( SHADOWMAP_TYPE_PCSS )
-		  return PCSS( shadowMap, shadowCoord);
-		  return texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+
+		  return percentCloserSoftShadow( shadowMap, shadowCoord );
 
 		#else // no percentage-closer filtering:
 
