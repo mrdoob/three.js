@@ -348,9 +348,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 				"\n" +
 				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
 				"\n" +
-				"	vec3 color = texture2D( texture, uv ).xyz;\n" +
-				"\n" +
-				"	gl_FragColor = vec4( color, 1.0 );\n" +
+				"	gl_FragColor = texture2D( texture, uv );\n" +
 				"\n" +
 				"}\n";
 
