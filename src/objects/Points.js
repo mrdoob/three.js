@@ -37,8 +37,10 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( sphere, threshold ) === false ) return;
+			var radius = sphere.radius + threshold;
 
+			if ( raycaster.ray.distanceSqToPoint( sphere.center ) > ( radius * radius ) ) return;
+			
 			//
 
 			inverseMatrix.getInverse( matrixWorld );
