@@ -45,7 +45,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Geometry geometry], [page:Material material])</h3>
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 		<div>
 		geometry — An instance of [page:Geometry].<br />
 		material — An instance of [page:Material] (optional).
@@ -119,7 +119,7 @@
 		Set the animation to play backwards.
 		</div>
 
-		<h3>[method:null playAnimation]([page:String label], [page:Float fps])</h3>
+		<h3>[method:null playAnimation]( [page:String label], [page:Float fps] )</h3>
 		<div>
 		label -- The label of the animation <br />
 		fps -- The frames per second (in seconds)
@@ -128,7 +128,7 @@
 		Starts playing a labeled animation. Animations are defined by calling [page:MorphAnimMesh.parseAnimations parseAnimations].
 		</div>
 
-		<h3>[method:null setFrameRange]([page:Integer start], [page:Integer end])</h3>
+		<h3>[method:null setFrameRange]( [page:Integer start], [page:Integer end] )</h3>
 		<div>
 		start -- The starting frame (morph) index <br />
 		end -- The ending frame (morph) index
@@ -148,7 +148,7 @@
 		a start and end property that represents the frame index.
 		</div>
 
-		<h3>[method:null updateAnimation]([page:Float delta])</h3>
+		<h3>[method:null updateAnimation]( [page:Float delta] )</h3>
 		<div>
 		delta -- The change in time in milliseconds
 		</div>
@@ -156,7 +156,7 @@
 		Update the morphTargetInfluences array on the MorphAnimMesh.
 		</div>
 
-		<h3>[method:null setAnimationLabel]([page:String label], [page:Integer start], [page:Integer end])</h3>
+		<h3>[method:null setAnimationLabel]( [page:String label], [page:Integer start], [page:Integer end] )</h3>
 		<div>
 		label -- The name of the animation <br />
 		start -- The starting frame index <br />
@@ -166,7 +166,7 @@
 		Defines an animation. Sets the geometry.animations[label] to be an object with the start and end properties.
 		</div>
 
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<h3>[method:Object3D clone]( [page:Object3D object] )</h3>
 		<div>
 		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned MorphAnimMesh Object.
 		</div>
