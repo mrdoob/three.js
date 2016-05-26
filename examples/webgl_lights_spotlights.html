@@ -78,7 +78,7 @@
 			function init() {
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCSSSoftShadowMap;
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -128,6 +128,7 @@
 				newObj.decay = 2;
 				newObj.distance = 50;
 
+				newObj.shadow.radius = 5;
 				newObj.shadow.mapSize.width = 1024;
 				newObj.shadow.mapSize.height = 1024;
 
