@@ -86,6 +86,9 @@
 			uniform float gravityConstant;
 			uniform float density;
 
+			const float width = resolution.x;
+			const float height = resolution.y;
+
 			float radiusFromMass( float mass ) {
 				// Calculate radius of a sphere from mass and density
 				return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
@@ -108,8 +111,41 @@
 
 				float radius = radiusFromMass( mass );
 
+				vec3 acceleration = vec3( 0.0 );
 
-//collisions are done in this shader only.
+				// Gravity interaction
+				for ( float y = 0.0; y < height; y++ ) {
+					for ( float x = 0.0; x < width; x++ ) {
+
+						vec2 secondParticleCoords = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
+						vec3 pos2 = texture2D( texturePosition, secondParticleCoords ).xyz;
+						vec4 velTemp2 = texture2D( textureVelocity, secondParticleCoords );
+						vec3 vel2 = velTemp2.xyz;
+						float mass2 = velTemp2.w;
+
+						if ( mass2 == 0.0 ) {
+						    continue;
+						}
+
+						vec3 dPos = pos2 - pos;
+						float distanceSq = dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z;
+
+						if ( distanceSq == 0.0 ) {
+						    continue;
+						}
+
+						float gravityField = gravityConstant * mass2 / distanceSq;
+
+						gravityField = min( gravityField, 1000.0 );
+
+						acceleration += gravityField * normalize( dPos );
+
+					}
+				}
+
+				// Dynamics
+				vel += delta * acceleration;
+
 				gl_FragColor = vec4( vel, mass );
 
 			}
@@ -139,12 +175,6 @@
 				vec4 velTemp = texture2D( textureVelocity, uv );
 				vec3 vel = velTemp.xyz;
 				float mass = velTemp.w;
-
-/*
-				if ( mass == 0.0 ) {
-				    discard;
-				}
-*/
 
 				vColor = vec4( mass / 12.0, uv.y, 0.0, 1.0 );
 
@@ -250,16 +280,16 @@
 
 				effectController = {
 
-					gravityConstant: 1.0,
-					density: 0.1,
+					gravityConstant: 60.0,
+					density: 2,
 
 					radius: 300,
 					height: 20,
 					exponent: 0.2,
-					meanMass: 10.0,
+					meanMass: 15.0,
 					velocity: 50,
 					velocityExponent: 0.2,
-					randVelocity: 5
+					randVelocity: 0
 
 				};
 
@@ -280,7 +310,7 @@
 
 				};
 
-				gui.add( effectController, "gravityConstant", 0.0, 100.0, 0.05 ).onChange( valuesChanger );
+				gui.add( effectController, "gravityConstant", 0.0, 1000.0, 0.05 ).onChange( valuesChanger );
 
 				gui.close();
 
@@ -375,12 +405,10 @@
 				var posArray = texturePosition.image.data;
 				var velArray = textureVelocity.image.data;
 
-				var maxR = effectController.radius;
-				var h = effectController.height;
+				var radius = effectController.radius;
+				var height = effectController.height;
 				var exponent = effectController.exponent;
-			var density = effectController.density;
 				var meanMass = effectController.meanMass;
-
 				var maxVel = effectController.velocity;
 				var velExponent = effectController.velocityExponent;
 				var randVel = effectController.randVelocity;
@@ -398,18 +426,18 @@
 
 					rr = Math.sqrt( rr );
 
-					var rExp = maxR * Math.pow( rr, exponent );
+					var rExp = radius * Math.pow( rr, exponent );
 
 					// Velocity
 					var vel = maxVel * Math.pow( rr, velExponent );
 
 					var vx = vel * z + ( Math.random() * 2 - 1 ) * randVel;
-					var vy = ( Math.random() * 2 - 1 ) * randVel;
+					var vy = 0;//( Math.random() * 2 - 1 ) * randVel * 0.05;
 					var vz = - vel * x + ( Math.random() * 2 - 1 ) * randVel;
 
 					x *= rExp;
 					z *= rExp;
-					y = ( Math.random() * 2 - 1 ) * h;
+					y = 0;//( Math.random() * 2 - 1 ) * height;
 
 					var mass = Math.random() * meanMass + 1;
 
