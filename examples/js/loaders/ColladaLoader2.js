@@ -14,20 +14,16 @@ THREE.ColladaLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		function getBaseUrl( url ) {
-
-			var parts = url.split( '/' );
-			parts.pop();
-			return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
-
-		}
-
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, getBaseUrl( url ) ) );
+			scope.parse( text, url, function ( data ) {
+
+				onLoad( data );
+
+			} )
 
 		}, onProgress, onError );
 
@@ -49,7 +45,9 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text, baseUrl ) {
+	parse: function ( text, url, cb ) {
+
+		var scope = this;
 
 		function getElementsByTagName( xml, name ) {
 
@@ -71,6 +69,49 @@ THREE.ColladaLoader.prototype = {
 			}
 
 			return array;
+
+		}
+
+		/**
+		 * used to have a common callback, after a set of callbacks executes
+		 *
+		 * @param cb
+		 * @returns {{enqueue: enqueue, dequeue: dequeue, check: check}}
+		 * @private
+		 */
+		function callbackQueue( cb ) {
+
+			var counter = 0;
+
+			return {
+				enqueue: function () {
+
+					counter ++;
+
+				},
+
+				dequeue: function () {
+
+					counter --;
+
+					if ( counter == 0 ) {
+
+						cb();
+
+					}
+
+				},
+
+				check: function () { //if queue is empty, execute callback
+
+					if ( counter == 0 ) {
+
+						cb();
+
+					}
+
+				}
+			};
 
 		}
 
@@ -110,7 +151,7 @@ THREE.ColladaLoader.prototype = {
 
 		function parseId( text ) {
 
-			return text.substring( 1 );
+			return ( text.charAt( 0 ) != '#' ) ? text : text.substring( 1 );
 
 		}
 
@@ -139,7 +180,7 @@ THREE.ColladaLoader.prototype = {
 
 		// library
 
-		function parseLibrary( xml, data, libraryName, nodeName, parser ) {
+		function parseLibrary( xml, libraryName, nodeName, parser ) {
 
 			var library = getElementsByTagName( xml, libraryName )[ 0 ];
 
@@ -170,11 +211,11 @@ THREE.ColladaLoader.prototype = {
 
 		// get
 
-		function getBuild( data, builder ) {
+		function getBuild( data, builder, cb ) {
 
 			if ( data.build !== undefined ) return data.build;
 
-			data.build = builder( data );
+			data.build = builder( data, cb );
 
 			return data.build;
 
@@ -183,11 +224,11 @@ THREE.ColladaLoader.prototype = {
 		// image
 
 		var imageLoader = new THREE.ImageLoader();
-		
+
 		if ( this.crossOrigin ) {
-			
+
 			imageLoader.crossOrigin = this.crossOrigin;
-			
+
 		}
 
 		function parseImage( xml ) {
@@ -212,9 +253,9 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getImage( id ) {
+		function getImage( id, cb ) {
 
-			return getBuild( library.images[ id ], buildImage );
+			return getBuild( library.images[ id ], buildImage, id, cb );
 
 		}
 
@@ -523,9 +564,9 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getEffect( id ) {
+		function getEffect( id, cb ) {
 
-			return getBuild( library.effects[ id ], buildEffect );
+			return getBuild( library.effects[ id ], buildEffect, id, cb );
 
 		}
 
@@ -606,10 +647,10 @@ THREE.ColladaLoader.prototype = {
 						texture.repeat.set( technique.repeatU, technique.repeatV );
 
 					} else {
-				
+
 						texture.wrapS = THREE.RepeatWrapping;
 						texture.wrapT = THREE.RepeatWrapping;
-					
+
 					}
 
 					texture.needsUpdate = true;
@@ -661,9 +702,9 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getMaterial( id ) {
+		function getMaterial( id, cb ) {
 
-			return getBuild( library.materials[ id ], buildMaterial );
+			return getBuild( library.materials[ id ], buildMaterial, id, cb );
 
 		}
 
@@ -799,9 +840,10 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getCamera( id ) {
 
-			return getBuild( library.cameras[ id ], buildCamera );
+		function getCamera( id, cb ) {
+
+			return getBuild( library.cameras[ id ], buildCamera, id, cb );
 
 		}
 
@@ -924,9 +966,9 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getLight( id ) {
+		function getLight( id, cb ) {
 
-			return getBuild( library.lights[ id ], buildLight );
+			return getBuild( library.lights[ id ], buildLight, id, cb );
 
 		}
 
@@ -1244,9 +1286,9 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getGeometry( id ) {
+		function getGeometry( id, cb ) {
 
-			return getBuild( library.geometries[ id ], buildGeometry );
+			return getBuild( library.geometries[ id ], buildGeometry, id, cb );
 
 		}
 
@@ -1259,6 +1301,7 @@ THREE.ColladaLoader.prototype = {
 
 			var data = {
 				name: xml.getAttribute( 'name' ),
+				id: xml.getAttribute( 'id' ), //used to reference a node inside a dae file
 				matrix: new THREE.Matrix4(),
 				nodes: [],
 				instanceCameras: [],
@@ -1293,7 +1336,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'instance_node':
-						data.instanceNodes.push( parseId( child.getAttribute( 'url' ) ) );
+						data.instanceNodes.push( child.getAttribute( 'url' ) );
 						break;
 
 					case 'matrix':
@@ -1373,7 +1416,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function buildNode( data ) {
+		function buildNode( data, cb ) {
 
 			var objects = [];
 
@@ -1384,9 +1427,48 @@ THREE.ColladaLoader.prototype = {
 			var instanceGeometries = data.instanceGeometries;
 			var instanceNodes = data.instanceNodes;
 
+			var callbacks = 0;
+
+			function done() {
+				var object;
+
+				if ( nodes.length === 0 && objects.length === 1 ) {
+
+					object = objects[0];
+
+				} else {
+
+					object = new THREE.Group();
+
+					for ( var i = 0; i < objects.length; i++ ) {
+
+						object.add( objects[i] );
+
+					}
+
+				}
+
+				object.name = data.name;
+				matrix.decompose( object.position, object.quaternion, object.scale );
+
+				object.userData._id = data.id; //store the id to be able to reference the node
+				object.userData._fileName = fileName; //id might not be unique across files
+
+				cb( object );
+			}
+
+			var promises = new callbackQueue(done);
+
 			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
-				objects.push( getNode( nodes[ i ] ).clone() );
+				promises.enqueue();
+
+				getNode( nodes[i], function ( node ) {
+
+					objects.push( node.clone() );
+					promises.dequeue();
+
+				} );
 
 			}
 
@@ -1423,40 +1505,107 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			for ( var i = 0, l = instanceNodes.length; i < l; i ++ ) {
+			for ( var i = 0, l = instanceNodes.length; i < l; i++ ) {
 
-				objects.push( getNode( instanceNodes[ i ] ).clone() );
+				promises.enqueue();
 
-			}
+				getInstanceNode( instanceNodes[i], function ( node ) {
 
-			var object;
+					objects.push( node ); //todo why not use clone()?
+					promises.dequeue();
 
-			if ( nodes.length === 0 && objects.length === 1 ) {
-
-				object = objects[ 0 ];
-
-			} else {
-
-				object = new THREE.Group();
-
-				for ( var i = 0; i < objects.length; i ++ ) {
-
-					object.add( objects[ i ] );
-
-				}
+				} );
 
 			}
 
-			object.name = data.name;
-			matrix.decompose( object.position, object.quaternion, object.scale );
-
-			return object;
+			promises.check();
 
 		}
 
-		function getNode( id ) {
+		function getNode( id, cb ) {
 
-			return getBuild( library.nodes[ id ], buildNode );
+			return getBuild( library.nodes[ id ], buildNode, cb );
+
+		}
+
+		/**
+		 * Returns the build from the cache or creates it
+		 *
+		 * @param library
+		 * @param url
+		 * @param cb
+		 * @param builder
+		 */
+		function getInstanceBuild( library, url, cb, builder ) {
+
+			if ( ! library[ url ] ) { //add the instance to the library, if it does not exist
+
+				library[ url ] = {};
+
+			}
+
+			var data = library[ url ];
+
+			if ( data.build !== undefined ) {
+
+				cb( data.build );
+
+			} else {
+
+				(function ( data ) { //capture the state, since the vars may change when cache is called
+
+					function cache( node ) {
+
+						data.build = node;
+						cb( node );
+
+					}
+
+					if ( url.charAt( 0 ) == '#' ) { //relative url
+
+						builder( url.substr( 1 ), cache );
+
+					} else if ( url.indexOf( 'dae' ) > 0 ) { //absolute url
+
+						loadInstance( url, function ( node ) {
+
+							cache( node )
+
+						} );
+
+					} else {
+
+						console.log( 'unknown reference: ' + url );
+
+					}
+
+				})( data ); //todo passed by reference?
+
+			}
+
+		}
+
+		/**
+		 * Loads a collada file from an url and returns the scene or url specified node (file.dae#nodeId)
+		 *
+		 * @param url
+		 * @param cb
+		 */
+		function loadInstance( url, cb ) {
+
+			var loader = new THREE.ColladaLoader( scope.manager );
+
+			loader.load( baseUrl + url, function ( res ) {
+
+				cb( res.node );
+
+			} );
+
+		}
+
+		function getInstanceNode( url, cb ) {
+
+			return getInstanceBuild( library.nodes, url, cb, getNode );
 
 		}
 
@@ -1481,45 +1630,78 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function buildVisualScene( data ) {
+		function buildVisualScene( data, cb ) {
 
 			var group = new THREE.Group();
 			group.name = data.name;
 
 			var children = data.children;
 
+			var counter = new callbackQueue( function () {
+
+				cb( group );
+
+			} );
+
 			for ( var i = 0; i < children.length; i ++ ) {
 
-				group.add( buildNode( children[ i ] ) );
+				counter.enqueue();
+
+				buildNode( children[ i ], function ( node ) {
+
+					group.add( node );
+					counter.dequeue();
+
+				} );
 
 			}
 
-			return group;
+		}
+
+		function getVisualScene( id, cb ) {
+
+			console.time( 'ColladaLoader: getVisualScene: ' + id );
+
+			return getBuild( library.visualScenes[ id ], buildVisualScene, function ( data ) {
+
+				console.timeEnd( 'ColladaLoader: getVisualScene: ' + id );
+				cb( data );
+
+			} );
 
 		}
 
-		function getVisualScene( id ) {
+		function getMainVisualScene( cb ) {
 
-			return getBuild( library.visualScenes[ id ], buildVisualScene );
+			var instance = getElementsByTagName( getElementsByTagName( collada, 'scene' )[ 0 ], 'instance_visual_scene' )[ 0 ];
+
+			/**
+			 * Spec:
+			 * Each instance inherits the local coordinate system from its parent, including the applicable <unit> and
+			 * <up_axis> settings, to determine its position, orientation, and scale.
+			 *
+			 * not 100% clear to me. I assume ip_axis and unit are used only from the main doc
+			 */
+
+			getVisualScene( parseId( instance.getAttribute( 'url' ) ), function ( scene ) {
+
+				var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
+
+				if ( asset.upAxis === 'Z_UP' ) {
+
+					scene.rotation.x = - Math.PI / 2;
+
+				}
+
+				scene.scale.multiplyScalar( asset.unit );
+
+				cb( scene );
+
+			} );
 
 		}
 
 		// scenes
-
-		function parseScene( xml ) {
-
-			var instance = getElementsByTagName( xml, 'instance_visual_scene' )[ 0 ];
-			return getVisualScene( parseId( instance.getAttribute( 'url' ) ) );
-
-		}
-
-		console.time( 'ColladaLoader' );
-
-		if ( text.length === 0 ) {
-
-			return { scene: new THREE.Scene() };
-
-		}
 
 		console.time( 'ColladaLoader: DOMParser' );
 
@@ -1533,8 +1715,6 @@ THREE.ColladaLoader.prototype = {
 
 		var version = collada.getAttribute( 'version' );
 		console.log( 'ColladaLoader: File version', version );
-
-		var asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 
 		//
 
@@ -1551,51 +1731,120 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Parse' );
 
-		parseLibrary( collada, library.images, 'library_images', 'image', parseImage );
-		parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
-		parseLibrary( collada, library.materials, 'library_materials', 'material', parseMaterial );
-		parseLibrary( collada, library.cameras, 'library_cameras', 'camera', parseCamera );
-		parseLibrary( collada, library.lights, 'library_lights', 'light', parseLight );
-		parseLibrary( collada, library.geometries, 'library_geometries', 'geometry', parseGeometry );
-		parseLibrary( collada, library.nodes, 'library_nodes', 'node', parseNode );
-		parseLibrary( collada, library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+		parseLibrary( collada, 'library_images', 'image', parseImage );
+		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, 'library_materials', 'material', parseMaterial );
+		parseLibrary( collada, 'library_cameras', 'camera', parseCamera );
+		parseLibrary( collada, 'library_lights', 'light', parseLight );
+		parseLibrary( collada, 'library_geometries', 'geometry', parseGeometry );
+		parseLibrary( collada, 'library_nodes', 'node', parseNode );
+		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Parse' );
 
-		console.time( 'ColladaLoader: Build' );
+		// --- BUILD ---
 
-		buildLibrary( library.images, buildImage );
-		buildLibrary( library.effects, buildEffect );
-		buildLibrary( library.materials, buildMaterial );
-		buildLibrary( library.cameras, buildCamera );
-		buildLibrary( library.lights, buildLight );
-		buildLibrary( library.geometries, buildGeometry );
-		buildLibrary( library.nodes, buildNode );
-		buildLibrary( library.visualScenes, buildVisualScene );
+		function getFilename( url ) {
 
-		console.timeEnd( 'ColladaLoader: Build' );
-
-		// console.log( library );
-
-		var scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
-
-		if ( asset.upAxis === 'Z_UP' ) {
-
-			scene.rotation.x = - Math.PI / 2;
+			url = url.split( '#' ).shift(); //remove the refId to prevent capturing until '.dae' in a refId
+			var match = url.match( /.*\/(.*\.dae)/i );
+			return ( match ) ? match[ 1 ] : '';
 
 		}
 
-		scene.scale.multiplyScalar( asset.unit );
+		function getBaseUrl( url ) {
 
-		console.timeEnd( 'ColladaLoader' );
+			var parts = url.split( '/' );
+			parts.pop();
+			return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
 
-		// console.log( scene );
+		}
 
-		return {
-			animations: [],
-			kinematics: { joints: [] },
-			scene: scene
-		};
+		function getRefId( url ) {
+
+			return ( url.indexOf( '#' ) >= 0 ) ? url.split( '#' ).pop() : '';
+
+		}
+
+		if ( ! url ) url = '';
+
+		var baseUrl = getBaseUrl( url ).trim();
+		var fileName = getFilename( url ).trim();
+		var refId = getRefId( url ).trim();
+
+		var result = {};
+
+		if ( refId.length == 0 ) { //no refId give, build the Main visual scene
+
+			getMainVisualScene( function ( scene ) {
+
+				result = {
+					animations: [],
+					kinematics: { joints: [] },
+					scene: scene
+				};
+
+				if ( cb ) { // just return the result, if no cb is given
+
+					cb( result );
+
+				}
+
+			} );
+
+		} else {
+
+			if ( library.nodes.hasOwnProperty( refId ) ) {
+
+				getNode( refId, function ( node ) {
+
+					result = {
+						animations: [],
+						kinematics: { joints: [] },
+						node: node
+					};
+
+					if ( cb ) {
+
+						cb( result );
+
+					}
+
+				} );
+
+			} else if ( library.geometries.hasOwnProperty( refId ) ) {
+
+				getGeometry( refId, function ( node ) {
+
+					result = {
+						animations: [],
+						kinematics: { joints: [] },
+						node: node
+					};
+
+					if ( cb ) {
+
+						cb( result );
+
+					}
+
+				} );
+
+			} else {
+
+				console.log( 'Node: ' + refId + ' can not be found in:' + fileName );
+
+			}
+
+		}
+
+		if ( ! cb && ! result ) {
+
+			console.log( 'use the async version of parse, if your file contains references to other files, or specify not to load references in the Manager (not implemented)' );
+
+		}
+
+		return result;
 
 	}
 
