@@ -255,7 +255,7 @@ THREE.ColladaLoader.prototype = {
 
 		function getImage( id, cb ) {
 
-			return getBuild( library.images[ id ], buildImage, id, cb );
+			return getBuild( library.images[ id ], buildImage );
 
 		}
 
@@ -566,7 +566,7 @@ THREE.ColladaLoader.prototype = {
 
 		function getEffect( id, cb ) {
 
-			return getBuild( library.effects[ id ], buildEffect, id, cb );
+			return getBuild( library.effects[ id ], buildEffect );
 
 		}
 
@@ -704,7 +704,13 @@ THREE.ColladaLoader.prototype = {
 
 		function getMaterial( id, cb ) {
 
-			return getBuild( library.materials[ id ], buildMaterial, id, cb );
+			return getBuild( library.materials[ id ], buildMaterial, cb );
+
+		}
+
+		function getInstanceMaterial( url, cb ) {
+
+			return getInstanceBuild( library.materials, url, getMaterial, cb );
 
 		}
 
@@ -843,7 +849,7 @@ THREE.ColladaLoader.prototype = {
 
 		function getCamera( id, cb ) {
 
-			return getBuild( library.cameras[ id ], buildCamera, id, cb );
+			return getBuild( library.cameras[ id ], buildCamera);
 
 		}
 
@@ -968,7 +974,7 @@ THREE.ColladaLoader.prototype = {
 
 		function getLight( id, cb ) {
 
-			return getBuild( library.lights[ id ], buildLight, id, cb );
+			return getBuild( library.lights[ id ], buildLight );
 
 		}
 
@@ -1288,7 +1294,13 @@ THREE.ColladaLoader.prototype = {
 
 		function getGeometry( id, cb ) {
 
-			return getBuild( library.geometries[ id ], buildGeometry, id, cb );
+			return getBuild( library.geometries[ id ], buildGeometry, cb );
+
+		}
+
+		function getInstanceGeometry( url, cb ) {
+
+			return getInstanceBuild( library.geometries, url, getGeometry, cb );
 
 		}
 
@@ -1384,7 +1396,7 @@ THREE.ColladaLoader.prototype = {
 		function parseNodeInstanceGeometry( xml ) {
 
 			var data = {
-				id: parseId( xml.getAttribute( 'url' ) ),
+				id: xml.getAttribute( 'url' ),
 				materials: {}
 			};
 
@@ -1402,7 +1414,7 @@ THREE.ColladaLoader.prototype = {
 						var symbol = instance.getAttribute( 'symbol' );
 						var target = instance.getAttribute( 'target' );
 
-						data.materials[ symbol ] = parseId( target );
+						data.materials[ symbol ] = target;
 
 					}
 
@@ -1486,22 +1498,42 @@ THREE.ColladaLoader.prototype = {
 
 			for ( var i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
+				promises.enqueue();
+
 				var instance = instanceGeometries[ i ];
-				var geometries = getGeometry( instance.id );
 
-				for ( var key in geometries ) {
+				( function ( instance ) {
+					getInstanceGeometry( instance.id, function ( geometries ) {
 
-					var object = geometries[ key ].clone();
+						var waitForMaterials = new callbackQueue( promises.dequeue );
 
-					if ( instance.materials[ key ] !== undefined ) {
+						for ( var key in geometries ) {
 
-						object.material = getMaterial( instance.materials[ key ] );
+							var object = geometries[ key ].clone();
 
-					}
+							if ( instance.materials[ key ] !== undefined ) {
 
-					objects.push( object );
+								waitForMaterials.enqueue();
 
-				}
+								( function ( object ) {
+									getInstanceMaterial( instance.materials[ key ], function ( material ) {
+
+										object.material = material;
+										objects.push( object );
+										waitForMaterials.dequeue();
+
+									} );
+								} )( object )
+
+							}
+
+						}
+
+						waitForMaterials.check();
+
+					} );
+
+				} )( instance )
 
 			}
 
@@ -1536,7 +1568,7 @@ THREE.ColladaLoader.prototype = {
 		 * @param cb
 		 * @param builder
 		 */
-		function getInstanceBuild( library, url, cb, builder ) {
+		function getInstanceBuild( library, url, builder, cb ) {
 
 			if ( ! library[ url ] ) { //add the instance to the library, if it does not exist
 
@@ -1552,7 +1584,7 @@ THREE.ColladaLoader.prototype = {
 
 			} else {
 
-				(function ( data ) { //capture the state, since the vars may change when cache is called
+				( function ( data ) { //capture the state, since the vars may change when cache is called
 
 					function cache( node ) {
 
@@ -1563,7 +1595,13 @@ THREE.ColladaLoader.prototype = {
 
 					if ( url.charAt( 0 ) == '#' ) { //relative url
 
-						builder( url.substr( 1 ), cache );
+						var res = builder( url.substr( 1 ), cache );
+
+						if ( res ) { //builder is sync
+
+							cache( res );
+
+						}
 
 					} else if ( url.indexOf( 'dae' ) > 0 ) { //absolute url
 
@@ -1579,7 +1617,7 @@ THREE.ColladaLoader.prototype = {
 
 					}
 
-				})( data ); //todo passed by reference?
+				} )( data ); //todo passed by reference?
 
 			}
 
@@ -1605,7 +1643,7 @@ THREE.ColladaLoader.prototype = {
 
 		function getInstanceNode( url, cb ) {
 
-			return getInstanceBuild( library.nodes, url, cb, getNode );
+			return getInstanceBuild( library.nodes, url, getNode, cb );
 
 		}
 
@@ -1774,6 +1812,9 @@ THREE.ColladaLoader.prototype = {
 
 		var result = {};
 
+		console.log( refId );
+
+
 		if ( refId.length == 0 ) { //no refId give, build the Main visual scene
 
 			getMainVisualScene( function ( scene ) {
@@ -1781,7 +1822,8 @@ THREE.ColladaLoader.prototype = {
 				result = {
 					animations: [],
 					kinematics: { joints: [] },
-					scene: scene
+					scene: scene,
+					reference: functions
 				};
 
 				if ( cb ) { // just return the result, if no cb is given
@@ -1801,7 +1843,8 @@ THREE.ColladaLoader.prototype = {
 					result = {
 						animations: [],
 						kinematics: { joints: [] },
-						node: node
+						node: node,
+						reference: functions
 					};
 
 					if ( cb ) {
@@ -1814,21 +1857,36 @@ THREE.ColladaLoader.prototype = {
 
 			} else if ( library.geometries.hasOwnProperty( refId ) ) {
 
-				getGeometry( refId, function ( node ) {
+				var node = getGeometry( refId );
 
-					result = {
-						animations: [],
-						kinematics: { joints: [] },
-						node: node
-					};
+				result = {
+					animations: [],
+					kinematics: { joints: [] },
+					node: node,
+					reference: functions
+				};
 
-					if ( cb ) {
+				if ( cb ) {
 
-						cb( result );
+					cb( result );
 
-					}
+				}
 
-				} );
+			} else if ( library.materials.hasOwnProperty( refId ) ) {
+
+				var node = getMaterial( refId );
+
+				result = {
+					animations: [],
+					kinematics: { joints: [] },
+					node: node
+				};
+
+				if ( cb ) {
+
+					cb( result );
+
+				}
 
 			} else {
 
