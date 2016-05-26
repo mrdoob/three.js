@@ -19,7 +19,6 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 		<script src="js/controls/DragControls.js"></script>
-		<script src="js/materials/ShadowMaterial.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -129,9 +128,7 @@
 				container.appendChild( options );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// Controls
 				controls = new THREE.OrbitControls( camera, renderer.domElement );

@@ -132,10 +132,9 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
+				container.appendChild( stats.dom );
+
 				setupTween();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
 
 				//
 

@@ -1,8 +1,19 @@
 {
-  "name": "three.js",
-  "version": "0.75.0",
+  "name": "three",
+  "version": "0.77.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "build/three.js",
+    "build/three.min.js",
+    "src",
+    "examples/js",
+    "examples/fonts",
+    "bower.json"
+  ],
   "directories": {
     "doc": "docs",
     "example": "examples",

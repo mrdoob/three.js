@@ -29,12 +29,11 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
+	this.depthTexture = null;
 
 };
 
-THREE.WebGLRenderTarget.prototype = {
-
-	constructor: THREE.WebGLRenderTarget,
+Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype, {
 
 	setSize: function ( width, height ) {
 
@@ -69,6 +68,7 @@ THREE.WebGLRenderTarget.prototype = {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
+		this.depthTexture = source.depthTexture;
 
 		return this;
 
@@ -80,6 +80,4 @@ THREE.WebGLRenderTarget.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.WebGLRenderTarget.prototype );
+} );

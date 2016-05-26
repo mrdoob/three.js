@@ -1,4 +1,3 @@
-#define STANDARD
 #define PHYSICAL
 
 uniform vec3 diffuse;

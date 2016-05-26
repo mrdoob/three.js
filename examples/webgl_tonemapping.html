@@ -176,7 +176,7 @@
 					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
-					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget;
+					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 					standardMaterial.needsUpdate = true;
 
 				} );
@@ -211,10 +211,7 @@
 				composer.addPass( copyPass );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );

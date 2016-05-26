@@ -103,10 +103,10 @@ function SimulationRenderer( WIDTH, renderer ) {
 		rtVelocity2 = rtVelocity1.clone();
 
 		simulator.renderTexture( dtPosition, rtPosition1 );
-		simulator.renderTexture( rtPosition1, rtPosition2 );
+		simulator.renderTexture( rtPosition1.texture, rtPosition2 );
 
 		simulator.renderTexture( dtVelocity, rtVelocity1 );
-		simulator.renderTexture( rtVelocity1, rtVelocity2 );
+		simulator.renderTexture( rtVelocity1.texture, rtVelocity2 );
 
 		simulator.velocityUniforms.testing.value = 10;
 
@@ -148,7 +148,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 		positionShader.uniforms.time.value = performance.now();
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
-		this.currentPosition = output;
+		this.currentPosition = output.texture;
 
 	};
 
@@ -160,7 +160,7 @@ function SimulationRenderer( WIDTH, renderer ) {
 		velocityShader.uniforms.time.value = performance.now();
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
-		this.currentVelocity = output;
+		this.currentVelocity = output.texture;
 
 	};
 
@@ -168,13 +168,13 @@ function SimulationRenderer( WIDTH, renderer ) {
 
 		if ( flipflop ) {
 
-			simulator.renderVelocity( rtPosition1, rtVelocity1, rtVelocity2, delta );
-			simulator.renderPosition( rtPosition1, rtVelocity2, rtPosition2, delta );
+			simulator.renderVelocity( rtPosition1.texture, rtVelocity1.texture, rtVelocity2, delta );
+			simulator.renderPosition( rtPosition1.texture, rtVelocity2.texture, rtPosition2, delta );
 
 		} else {
 
-			simulator.renderVelocity( rtPosition2, rtVelocity2, rtVelocity1, delta );
-			simulator.renderPosition( rtPosition2, rtVelocity1, rtPosition1, delta );
+			simulator.renderVelocity( rtPosition2.texture, rtVelocity2.texture, rtVelocity1, delta );
+			simulator.renderPosition( rtPosition2.texture, rtVelocity1.texture, rtPosition1, delta );
 
 		}
 

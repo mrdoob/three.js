@@ -10,6 +10,7 @@ var files = {
 		"webgl_clipping",
 		"webgl_clipping_advanced",
 		"webgl_decals",
+		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
 		"webgl_effects_peppersghost",
@@ -151,6 +152,7 @@ var files = {
 		"webgl_materials_video",
 		"webgl_materials_wireframe",
 		"webgl_mirror",
+		"webgl_mirror_nodes",
 		"webgl_modifier_subdivision",
 		"webgl_modifier_tessellation",
 		"webgl_morphnormals",
@@ -170,7 +172,6 @@ var files = {
 		"webgl_octree_raycasting",
 		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
-		"webgl_particles_general",
 		"webgl_performance",
 		"webgl_performance_doublesided",
 		"webgl_performance_static",
@@ -188,7 +189,9 @@ var files = {
 		"webgl_postprocessing_godrays",
 		"webgl_postprocessing_masking",
 		"webgl_postprocessing_msaa",
+		"webgl_postprocessing_msaa_unbiased",
 		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_procedural",
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_ssao",
 		"webgl_postprocessing_taa",
@@ -257,9 +260,6 @@ var files = {
 		"css3d_sandbox",
 		"css3d_sprites",
 		"css3d_youtube"
-	],
-	"css3d stereo": [
-		"css3dstereo_periodictable",
 	],
 	"misc": [
 		"misc_animation_authoring",

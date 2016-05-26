@@ -8,24 +8,27 @@ THREE.SpotLightShadow = function () {
 
 };
 
-THREE.SpotLightShadow.prototype = Object.create( THREE.LightShadow.prototype );
-THREE.SpotLightShadow.prototype.constructor = THREE.SpotLightShadow;
+THREE.SpotLightShadow.prototype = Object.assign( Object.create( THREE.LightShadow.prototype ), {
 
-THREE.SpotLightShadow.prototype.update = function ( light ) {
+	constructor: THREE.SpotLightShadow,
 
-	var fov = THREE.Math.RAD2DEG * 2 * light.angle;
-	var aspect = this.mapSize.width / this.mapSize.height;
-	var far = light.distance || 500;
+	update: function ( light ) {
 
-	var camera = this.camera;
+		var fov = THREE.Math.RAD2DEG * 2 * light.angle;
+		var aspect = this.mapSize.width / this.mapSize.height;
+		var far = light.distance || 500;
 
-	if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
+		var camera = this.camera;
 
-		camera.fov = fov;
-		camera.aspect = aspect;
-		camera.far = far;
-		camera.updateProjectionMatrix();
+		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
+
+			camera.fov = fov;
+			camera.aspect = aspect;
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
 
 	}
 
-};
+} );

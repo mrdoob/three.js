@@ -82,7 +82,7 @@
 		var object, uniforms;
 
 		var loader = new THREE.FontLoader();
-		loader.load( 'fonts/helvetiker_bold.typeface.js', function ( font ) {
+		loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 			init( font );
 			animate();
@@ -170,9 +170,7 @@
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			//
 

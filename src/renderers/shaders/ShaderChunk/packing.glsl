@@ -6,31 +6,40 @@ vec3 unpackRGBToNormal( const in vec3 rgb ) {
   return 1.0 - 2.0 * rgb.xyz;
 }
 
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
 
-vec4 packLinearUnitToRGBA( const in float value ) {
-	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
-	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
-	vec4 res = mod( value * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );
-	res -= res.xxyz * bit_mask;
-	return res;
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+const float ShiftRight8 = 1. / 256.;
+
+vec4 packDepthToRGBA( const in float v ) {
+
+	vec4 r = vec4( fract( v * PackFactors ), v );
+	r.yzw -= r.xyz * ShiftRight8; // tidy overflow
+	return r * PackUpscale;
+
 }
-float unpackRGBAToLinearUnit( const in vec4 rgba ) {
-	const vec4 bitSh = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-	return dot( rgba, bitSh );
+
+float unpackRGBAToDepth( const in vec4 v ) {
+
+	return dot( v, UnpackFactors );
+
 }
 
 // NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
 
-float viewZToLinearClipZ( const in float viewZ, const in float near, const in float far ) {
+float viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {
   return ( viewZ + near ) / ( near - far );
 }
-float linearClipZToViewZ( const in float linearClipZ, const in float near, const in float far ) {
+float OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {
   return linearClipZ * ( near - far ) - near;
 }
 
-float viewZToInvClipZ( const in float viewZ, const in float near, const in float far ) {
+float viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {
   return (( near + viewZ ) * far ) / (( far - near ) * viewZ );
 }
-float invClipZToViewZ( const in float invClipZ, const in float near, const in float far ) {
-  return ( near * far ) / ( ( near - far ) * invClipZ - far );
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( far - near ) * invClipZ - far );
 }

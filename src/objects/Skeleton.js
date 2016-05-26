@@ -28,7 +28,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
-		
+
 		var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
 		size = THREE.Math.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
@@ -75,102 +75,106 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 };
 
-THREE.Skeleton.prototype.calculateInverses = function () {
+Object.assign( THREE.Skeleton.prototype, {
 
-	this.boneInverses = [];
+	calculateInverses: function () {
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
-
-		var inverse = new THREE.Matrix4();
-
-		if ( this.bones[ b ] ) {
-
-			inverse.getInverse( this.bones[ b ].matrixWorld );
-
-		}
-
-		this.boneInverses.push( inverse );
-
-	}
-
-};
-
-THREE.Skeleton.prototype.pose = function () {
-
-	var bone;
-
-	// recover the bind-time world matrices
-
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
-
-		bone = this.bones[ b ];
-
-		if ( bone ) {
-
-			bone.matrixWorld.getInverse( this.boneInverses[ b ] );
-
-		}
-
-	}
-
-	// compute the local matrices, positions, rotations and scales
-
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
-
-		bone = this.bones[ b ];
-
-		if ( bone ) {
-
-			if ( bone.parent ) {
-
-				bone.matrix.getInverse( bone.parent.matrixWorld );
-				bone.matrix.multiply( bone.matrixWorld );
-
-			} else {
-
-				bone.matrix.copy( bone.matrixWorld );
-
-			}
-
-			bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
-
-		}
-
-	}
-
-};
-
-THREE.Skeleton.prototype.update = ( function () {
-
-	var offsetMatrix = new THREE.Matrix4();
-
-	return function update() {
-
-		// flatten bone matrices to array
+		this.boneInverses = [];
 
 		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-			// compute the offset between the current and the original transform
+			var inverse = new THREE.Matrix4();
 
-			var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
+			if ( this.bones[ b ] ) {
 
-			offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
-			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+				inverse.getInverse( this.bones[ b ].matrixWorld );
 
-		}
+			}
 
-		if ( this.useVertexTexture ) {
-
-			this.boneTexture.needsUpdate = true;
+			this.boneInverses.push( inverse );
 
 		}
 
-	};
+	},
 
-} )();
+	pose: function () {
 
-THREE.Skeleton.prototype.clone = function () {
+		var bone;
 
-	return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+		// recover the bind-time world matrices
 
-};
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+			bone = this.bones[ b ];
+
+			if ( bone ) {
+
+				bone.matrixWorld.getInverse( this.boneInverses[ b ] );
+
+			}
+
+		}
+
+		// compute the local matrices, positions, rotations and scales
+
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+			bone = this.bones[ b ];
+
+			if ( bone ) {
+
+				if ( bone.parent ) {
+
+					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.multiply( bone.matrixWorld );
+
+				} else {
+
+					bone.matrix.copy( bone.matrixWorld );
+
+				}
+
+				bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
+
+			}
+
+		}
+
+	},
+
+	update: ( function () {
+
+		var offsetMatrix = new THREE.Matrix4();
+
+		return function update() {
+
+			// flatten bone matrices to array
+
+			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+				// compute the offset between the current and the original transform
+
+				var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
+
+				offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
+				offsetMatrix.toArray( this.boneMatrices, b * 16 );
+
+			}
+
+			if ( this.useVertexTexture ) {
+
+				this.boneTexture.needsUpdate = true;
+
+			}
+
+		};
+
+	} )(),
+
+	clone: function () {
+
+		return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+
+	}
+
+} );

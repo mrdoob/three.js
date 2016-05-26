@@ -30,9 +30,10 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 	//
 
-	var update = function ( object ) {
+	function update( object ) {
 
-		if ( object === null ) return;
+		if ( object === null ) return; // objectSelected.dispatch( null )
+		if ( object === undefined ) return;
 
 		var geometry = object.geometry;
 
@@ -49,11 +50,11 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	signals.objectSelected.add( update );
 	signals.geometryChanged.add( update );
 
 	return container;
 
-}
+};

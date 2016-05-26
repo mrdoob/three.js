@@ -93,7 +93,7 @@
 			];
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 				geometriesParams[ 12 ].args[ 1 ].font = font;
 
@@ -303,9 +303,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

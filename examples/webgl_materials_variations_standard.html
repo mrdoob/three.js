@@ -44,7 +44,7 @@
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/gentilis_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -183,10 +183,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );

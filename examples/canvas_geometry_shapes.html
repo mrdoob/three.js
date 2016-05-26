@@ -82,6 +82,8 @@
 					// line
 
 					var geometry = shape.createPointsGeometry();
+					geometry.vertices.push( geometry.vertices[ 0 ].clone() );
+
 					var material = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333, transparent: true } );
 
 					var line = new THREE.Line( geometry, material );
@@ -298,9 +300,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );

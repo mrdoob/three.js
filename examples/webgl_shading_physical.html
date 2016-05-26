@@ -25,10 +25,6 @@
 			}
 
 			a { color: skyblue; }
-
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #444 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -40,7 +36,6 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/AnimationClipCreator.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -148,7 +143,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
 
 				// OBJECTS
 
@@ -299,7 +294,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 

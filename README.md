@@ -19,48 +19,45 @@ Alternatively see [how to build the library yourself](https://github.com/mrdoob/
 
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the document.body element. Finally it animates the cube within the scene for the camera.
 
-```html
-<script>
+```javascript
+var scene, camera, renderer;
+var geometry, material, mesh;
 
-	var scene, camera, renderer;
-	var geometry, material, mesh;
+init();
+animate();
 
-	init();
-	animate();
+function init() {
 
-	function init() {
+	scene = new THREE.Scene();
 
-		scene = new THREE.Scene();
-		
-		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-		camera.position.z = 1000;
+	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+	camera.position.z = 1000;
 
-		geometry = new THREE.BoxGeometry( 200, 200, 200 );
-		material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+	geometry = new THREE.BoxGeometry( 200, 200, 200 );
+	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
-		mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+	mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh );
 
-		renderer = new THREE.WebGLRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-		document.body.appendChild( renderer.domElement );
+	document.body.appendChild( renderer.domElement );
 
-	}
+}
 
-	function animate() {
+function animate() {
 
-		requestAnimationFrame( animate );
+	requestAnimationFrame( animate );
 
-		mesh.rotation.x += 0.01;
-		mesh.rotation.y += 0.02;
+	mesh.rotation.x += 0.01;
+	mesh.rotation.y += 0.02;
 
-		renderer.render( scene, camera );
+	renderer.render( scene, camera );
 
-	}
-
-</script>
+}
 ```
+
 If everything went well you should see [this](http://jsfiddle.net/hfj7gm6t/).
 
 ### Change log ###

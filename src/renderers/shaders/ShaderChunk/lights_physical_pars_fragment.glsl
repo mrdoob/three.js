@@ -4,6 +4,10 @@ struct PhysicalMaterial {
 	float	specularRoughness;
 	vec3	specularColor;
 
+	#ifndef STANDARD
+		// future
+	#endif
+
 };
 
 void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {

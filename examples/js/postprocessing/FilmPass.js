@@ -34,15 +34,13 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 };
 
-THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.FilmPass.prototype = {
+THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.FilmPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "time" ].value += delta;
 
 		this.quad.material = this.material;
@@ -59,4 +57,4 @@ THREE.FilmPass.prototype = {
 
 	}
 
-};
+} );

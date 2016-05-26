@@ -377,11 +377,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.left = '0px';
-				stats.domElement.style.top = '0px';
-
-				document.getElementById( 'container' ).appendChild(stats.domElement);
+				document.getElementById( 'container' ).appendChild(stats.dom);
 
 				//
 

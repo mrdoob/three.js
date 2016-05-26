@@ -25,6 +25,7 @@
 		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 			
 			// Imaginary functions to calculate the indices and weights
+			// This part will need to be changed depending your skeleton and model
 			var skinIndex = calculateSkinIndex( geometry.vertices, i );
 			var skinWeight = calculateSkinWeight( geometry.vertices, i );
 			

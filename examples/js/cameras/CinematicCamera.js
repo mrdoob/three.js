@@ -123,8 +123,8 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor;
-		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth;
+		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
+		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;
 
 		this.postprocessing.bokeh_uniforms[ "manualdof" ].value = 0;
 		this.postprocessing.bokeh_uniforms[ "shaderFocus" ].value = 0;
@@ -135,7 +135,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms[ "focalDepth" ].value = 0.1;
 
-		console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
+		//console.log( this.postprocessing.bokeh_uniforms[ "focalDepth" ].value );
 
 		this.postprocessing.bokeh_uniforms[ "znear" ].value = this.near;
 		this.postprocessing.bokeh_uniforms[ "zfar" ].value = this.near;

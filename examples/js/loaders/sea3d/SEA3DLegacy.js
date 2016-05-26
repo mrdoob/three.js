@@ -528,7 +528,7 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 		if ( sea.tag ) return sea.tag;
 
 		var animations = [],
-			delta = sea.frameRate / 1000,
+			delta = ( 1000 / sea.frameRate ) / 1000,
 			scale = [ 1, 1, 1 ];
 
 		for ( var i = 0; i < sea.sequence.length; i ++ ) {
@@ -537,14 +537,13 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 			var start = seq.start;
 			var end = start + seq.count;
-			var ns = sea.name + "/" + seq.name;
 
 			var animation = {
-				name: ns,
+				name: seq.name,
 				repeat: seq.repeat,
 				fps: sea.frameRate,
 				JIT: 0,
-				length: delta * ( seq.count - 1 ),
+				length: delta * seq.count,
 				hierarchy: []
 			};
 
@@ -614,7 +613,11 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 			}
 
-			animations.push( animation );
+			var anm = THREE.AnimationClip.parseAnimation( animation, skl.tag );
+			anm.loop = seq.repeat;
+			anm.timeScale = 1;
+
+			animations.push( anm );
 
 		}
 
@@ -679,7 +682,7 @@ THREE.SEA3D.prototype.onHead = function( args ) {
 
 };
 
-THREE.SEA3D.EXTENSIONS.push( function() {
+THREE.SEA3D.EXTENSIONS_LOADER.push( { setTypeRead: function() {
 
 	// CONFIG
 
@@ -687,4 +690,4 @@ THREE.SEA3D.EXTENSIONS.push( function() {
 
 	this.file.typeRead[ SEA3D.Skeleton.prototype.type ] = this.readSkeleton;
 
-} );
+} } );

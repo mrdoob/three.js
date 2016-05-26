@@ -146,6 +146,21 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'ConeGeometry':
+					case 'ConeBufferGeometry':
+
+						geometry = new THREE [ data.type ](
+							data.radius,
+							data.height,
+							data.radialSegments,
+							data.heightSegments,
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
 					case 'SphereGeometry':
 					case 'SphereBufferGeometry':
 
@@ -162,35 +177,11 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'DodecahedronGeometry':
-
-						geometry = new THREE.DodecahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'IcosahedronGeometry':
-
-						geometry = new THREE.IcosahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'OctahedronGeometry':
-
-						geometry = new THREE.OctahedronGeometry(
-							data.radius,
-							data.detail
-						);
-
-						break;
-
 					case 'TetrahedronGeometry':
 
-						geometry = new THREE.TetrahedronGeometry(
+						geometry = new THREE[ data.type ](
 							data.radius,
 							data.detail
 						);
@@ -466,8 +457,13 @@ THREE.ObjectLoader.prototype = {
 
 				case 'PerspectiveCamera':
 
-					object = Object.assign(
-							new THREE.PerspectiveCamera(), data );
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+
+					if ( data.focus !== undefined ) object.focus = data.focus;
+					if ( data.zoom !== undefined ) object.zoom = data.zoom;
+					if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
+					if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
+					if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
 					break;
 

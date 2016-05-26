@@ -15,8 +15,13 @@
 		white-space: nowrap;
 	}
 
+	.Outliner .option:hover {
+		background-color: rgba(21,60,94,0.5);
+	}
+
+
 	.Outliner .option.active {
-		background-color: #153C5E;
+		background-color: rgba(21,60,94,1);
 	}
 
 .Panel.Collapsible.collapsed .Static .Button {

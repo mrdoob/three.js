@@ -65,19 +65,29 @@ Sidebar.History = function ( editor ) {
 		var options = [];
 		var enumerator = 1;
 
-		( function addObjects( objects, pad ) {
+		function buildOption( object ) {
+
+			var option = document.createElement( 'div' );
+			option.value = object.id;
+
+			return option;
+
+		}
+
+		( function addObjects( objects ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #0000cc '>" + enumerator ++ + ". Undo: " + object.name + "</span>";
+				var option = buildOption( object );
+				option.innerHTML = '&nbsp;' + object.name;
 
-				options.push( { value: object.id, html: html } );
+				options.push( option );
 
 			}
 
-		} )( history.undos, '&nbsp;' );
+		} )( history.undos );
 
 
 		( function addObjects( objects, pad ) {
@@ -86,9 +96,11 @@ Sidebar.History = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + "<span style='color: #71544e'>" + enumerator ++ + ". Redo: " +  object.name + "</span>";
+				var option = buildOption( object );
+				option.innerHTML = '&nbsp;' + object.name;
+				option.style.opacity = 0.3;
 
-				options.push( { value: object.id, html: html } );
+				options.push( option );
 
 			}
 

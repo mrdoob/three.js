@@ -10,11 +10,6 @@
 				background-color: #000000;
 				overflow: hidden;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #777 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -272,6 +267,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.renderSingleSided = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -284,7 +280,7 @@
 				// Stats
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// Controls
 

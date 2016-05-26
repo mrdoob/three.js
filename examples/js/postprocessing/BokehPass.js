@@ -39,11 +39,11 @@ THREE.BokehPass = function ( scene, camera, params ) {
 		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
 
 	}
-	
+
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
-	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth;
+	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 
 	bokehUniforms[ "focus" ].value = focus;
 	bokehUniforms[ "aspect" ].value = aspect;
@@ -67,9 +67,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
-THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.BokehPass.prototype = {
+THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.BokehPass,
 
@@ -85,7 +83,7 @@ THREE.BokehPass.prototype = {
 
 		// Render bokeh composite
 
-		this.uniforms[ "tColor" ].value = readBuffer;
+		this.uniforms[ "tColor" ].value = readBuffer.texture;
 
 		if ( this.renderToScreen ) {
 
@@ -101,4 +99,4 @@ THREE.BokehPass.prototype = {
 
 	}
 
-};
+} );

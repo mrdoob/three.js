@@ -57,7 +57,7 @@
 
 				if ( pixel.a < 0.5 ) discard;
 
-				gl_FragData[ 0 ] = packLinearUnitToRGBA( gl_FragCoord.z );
+				gl_FragData[ 0 ] = packDepthToRGBA( gl_FragCoord.z );
 
 			}
 		</script>
@@ -289,9 +289,7 @@
 				// performance monitor
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

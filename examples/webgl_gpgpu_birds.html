@@ -513,9 +513,7 @@
 				simulator.init();
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -662,6 +660,9 @@
 
 				mouseX = 10000;
 				mouseY = 10000;
+
+				birdUniforms.texturePosition.value = simulator.currentPosition;
+				birdUniforms.textureVelocity.value = simulator.currentVelocity;
 
 				renderer.render( scene, camera );
 
