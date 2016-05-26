@@ -23,13 +23,14 @@
 
 	#if defined( SHADOWMAP_TYPE_PCSS )
 		#define PCSS_NUM_POISSON_SAMPLES 16
-		#define ROTATE_POISSON_SAMPLES 1
+		#define PCSS_ROTATE_POISSON_SAMPLES 1
 
 		#define LIGHT_FRUSTUM_WIDTH 3.75 // remove me
 
 		vec2 poissonDisk[PCSS_NUM_POISSON_SAMPLES];
 
 		void initPercentCloserSoftShadow( const in vec2 randomSeed )	{
+
 			poissonDisk[0] = vec2(-0.94201624, -0.39906216 );
 			poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
 			poissonDisk[2] = vec2( -0.094184101, -0.92938870 );
@@ -51,7 +52,7 @@
 				float angle = rand( randomSeed ) * PI2;
 				float c = cos(angle), s = sin(angle);
 				mat2 rotation = mat2( c, s, -s, c );
-				for( int i = 0; i < NUM_SAMPLES; i++ ) {
+				for( int i = 0; i < PCSS_NUM_POISSON_SAMPLES; i++ ) {
 					poissonDisk[i] *= rotation;
 				}
 			#endif
@@ -61,14 +62,14 @@
 			return (zReceiverLightSpace - zBlockerLightSpace) / zBlockerLightSpace;
 		}
 
-		float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiverClipSpace, const in float zReceiverLightSpace, , const in float shadowRadius, const in vec2 shadowCameraNearFar ) {
+		float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiverClipSpace, const in float zReceiverLightSpace, const in float shadowRadius, const in vec2 shadowCameraNearFar ) {
 			// This uses similar triangles to compute what
 			// area of the shadow map we should search
 			float searchRadius = ( shadowRadius / LIGHT_FRUSTUM_WIDTH ) * ( zReceiverLightSpace - shadowCameraNearFar.x ) / zReceiverLightSpace;
 			float blockerDepthSum = 0.0;
 			int numBlockers = 0;
 
-			for( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; i++ ) {
+			for( int i = 0; i < PCSS_NUM_POISSON_SAMPLES; i++ ) {
 
 				float shadowMapDepth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[i] * searchRadius ) );
 
@@ -87,7 +88,7 @@
 		float percentCloserFilter( sampler2D shadowMap, vec2 uv, float zReceiverClipSpace, float filterRadius ) {
 			float sum = 0.0;
 
-			for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
+			for( int i = 0; i < PCSS_NUM_POISSON_SAMPLES; i ++ ) {
 
 				vec2 offset = poissonDisk[i] * filterRadius;
 
@@ -99,7 +100,7 @@
 
 			}
 
-			return sum / ( 2.0 * float( PCF_NUM_SAMPLES ) );
+			return sum / ( 2.0 * float( PCSS_NUM_POISSON_SAMPLES ) );
 		}
 
 		float percentCloserSoftShadow( sampler2D shadowMap, const in float shadowRadius, const in vec2 shadowCameraNearFar, const in vec4 coords ) {
