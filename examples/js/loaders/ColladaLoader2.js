@@ -1812,8 +1812,7 @@ THREE.ColladaLoader.prototype = {
 
 		var result = {};
 
-		console.log( refId );
-
+		console.log(refId)
 
 		if ( refId.length == 0 ) { //no refId give, build the Main visual scene
 
@@ -1822,8 +1821,7 @@ THREE.ColladaLoader.prototype = {
 				result = {
 					animations: [],
 					kinematics: { joints: [] },
-					scene: scene,
-					reference: functions
+					scene: scene
 				};
 
 				if ( cb ) { // just return the result, if no cb is given
@@ -1843,8 +1841,7 @@ THREE.ColladaLoader.prototype = {
 					result = {
 						animations: [],
 						kinematics: { joints: [] },
-						node: node,
-						reference: functions
+						node: node
 					};
 
 					if ( cb ) {
@@ -1862,8 +1859,7 @@ THREE.ColladaLoader.prototype = {
 				result = {
 					animations: [],
 					kinematics: { joints: [] },
-					node: node,
-					reference: functions
+					node: node
 				};
 
 				if ( cb ) {
