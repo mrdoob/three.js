@@ -63,7 +63,7 @@
 				float mass = tmpVel.w;
 
 				if ( mass == 0.0 ) {
-				    discard;
+				    vel = vec3( 0.0 );
 				}
 
 				// Dynamics
@@ -97,6 +97,7 @@
 			void main()	{
 
 				vec2 uv = gl_FragCoord.xy / resolution.xy;
+				float idParticle = uv.y * resolution.x + uv.x;
 
 				vec4 tmpPos = texture2D( texturePosition, uv );
 				vec3 pos = tmpPos.xyz;
@@ -105,9 +106,8 @@
 				vec3 vel = tmpVel.xyz;
 				float mass = tmpVel.w;
 
-				if ( mass == 0.0 ) {
-				    discard;
-				}
+				if ( mass > 0.0 ) {
+				    
 
 				float radius = radiusFromMass( mass );
 
@@ -115,6 +115,7 @@
 
 				// Gravity interaction
 				for ( float y = 0.0; y < height; y++ ) {
+
 					for ( float x = 0.0; x < width; x++ ) {
 
 						vec2 secondParticleCoords = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
@@ -123,16 +124,49 @@
 						vec3 vel2 = velTemp2.xyz;
 						float mass2 = velTemp2.w;
 
+						float idParticle2 = secondParticleCoords.y * resolution.x + secondParticleCoords.x;
+
+						if ( idParticle == idParticle2 ) {
+							continue;
+						}
+
 						if ( mass2 == 0.0 ) {
-						    continue;
+							continue;
 						}
 
 						vec3 dPos = pos2 - pos;
-						float distanceSq = dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z;
+						float distance = length( dPos );
+						float radius2 = radiusFromMass( mass2 );
 
-						if ( distanceSq == 0.0 ) {
-						    continue;
+						if ( distance == 0.0 ) {
+							continue;
 						}
+
+						// Checks collision
+
+						if ( distance < radius + radius2 ) {
+						    
+							if ( idParticle < idParticle2 ) {
+
+								// This particle is aggregated by the other
+								vel = ( vel * mass + vel2 * mass2 ) / ( mass + mass2 );
+								mass += mass2;
+								radius = radiusFromMass( mass );
+
+							}
+							else {
+
+								// This particle dies
+								mass = 0.0;
+								radius = 0.0;
+								vel = vec3( 0.0 );
+								break;
+
+							}
+		    
+						}
+
+						float distanceSq = distance * distance;
 
 						float gravityField = gravityConstant * mass2 / distanceSq;
 
@@ -141,10 +175,16 @@
 						acceleration += gravityField * normalize( dPos );
 
 					}
+
+					if ( mass == 0.0 ) {
+					    break;
+					}
 				}
 
 				// Dynamics
 				vel += delta * acceleration;
+
+				}
 
 				gl_FragColor = vec4( vel, mass );
 
@@ -166,6 +206,12 @@
 
 			varying vec4 vColor;
 
+			float radiusFromMass( float mass ) {
+				// Calculate radius of a sphere from mass and density
+				return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
+			}
+
+
 			void main() {
 
 
@@ -181,7 +227,8 @@
 				vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
 
 				// Calculate radius of a sphere from mass and density
-				float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
+				//float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
+				float radius = radiusFromMass( mass );
 
 				// Apparent size in pixels
 				if ( mass == 0.0 ) {
@@ -280,14 +327,14 @@
 
 				effectController = {
 
-					gravityConstant: 60.0,
+					gravityConstant: 100.0,
 					density: 2,
 
 					radius: 300,
-					height: 20,
+					height: 8,
 					exponent: 0.2,
-					meanMass: 15.0,
-					velocity: 50,
+					maxMass: 15.0,
+					velocity: 70,
 					velocityExponent: 0.2,
 					randVelocity: 0
 
@@ -326,9 +373,8 @@
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
-				var dtMass = gpuCompute.createTexture();
 
-				fillTextures( dtPosition, dtVelocity, dtMass );
+				fillTextures( dtPosition, dtVelocity );
 
 				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
 				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
@@ -400,7 +446,7 @@
 
 			}
 
-			function fillTextures( texturePosition, textureVelocity, textureMass ) {
+			function fillTextures( texturePosition, textureVelocity ) {
 
 				var posArray = texturePosition.image.data;
 				var velArray = textureVelocity.image.data;
@@ -408,7 +454,7 @@
 				var radius = effectController.radius;
 				var height = effectController.height;
 				var exponent = effectController.exponent;
-				var meanMass = effectController.meanMass;
+				var maxMass = effectController.maxMass;
 				var maxVel = effectController.velocity;
 				var velExponent = effectController.velocityExponent;
 				var randVel = effectController.randVelocity;
@@ -439,7 +485,7 @@
 					z *= rExp;
 					y = 0;//( Math.random() * 2 - 1 ) * height;
 
-					var mass = Math.random() * meanMass + 1;
+					var mass = Math.random() * maxMass + 1;
 
 					// Fill in texture values
 					posArray[ k + 0 ] = x;
