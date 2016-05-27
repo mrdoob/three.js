@@ -164,7 +164,6 @@ THREE.AnimationObjectGroup.prototype = {
 	remove: function( var_args ) {
 
 		var objects = this._objects,
-			nObjects = objects.length,
 			nCachedObjects = this.nCachedObjects_,
 			indicesByUUID = this._indicesByUUID,
 			bindings = this._bindings,

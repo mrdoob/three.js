@@ -9,7 +9,7 @@
 
 THREE.Geometry = function () {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: THREE.geometryIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -1202,4 +1202,4 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 } );
 
-THREE.GeometryIdCount = 0;
+THREE.geometryIdCount = 0;

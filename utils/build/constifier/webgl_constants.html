@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>WebGL constant dump</title>
+		<!-- Generator for 'webgl_constants.json' -->
+	</head>
+	<body>
+		<canvas id="canvas" style="display:none"></canvas>
+		<code id="output" style="white-space: pre"></code>
+
+		<script>var module = {};</script>
+		<script src="extractConstants.js"></script>
+		<script>var extractConstants = module.exports</script>
+
+		<script>
+
+			var glContext =
+					document.getElementById( 'canvas' ).getContext( 'webgl' );
+
+			if ( ! glContext ) {
+
+					var message = "GL context creation failed!";
+					alert( message );
+					throw new Error( message );
+
+			}
+
+			document.getElementById( 'output' ).innerHTML =
+					JSON.stringify( extractConstants( glContext ), null, '\t' );
+
+		</script>
+
+	</body>
+</html>
+

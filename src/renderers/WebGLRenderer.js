@@ -517,6 +517,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.dispose = function() {
 
+		THREE.WebGLUniforms.purgeCache();
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
 	};

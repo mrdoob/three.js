@@ -14,11 +14,34 @@ import re
 import shutil
 import tempfile
 
+from constifier import constify
+
 from io import open
+
+def readText(path):
+
+        with open(path,'r',encoding='utf-8') as f:
+            result=f.read()
+            f.close()
+            return result
+
+def writeText(path,contents):
+
+        with open(path,'w',encoding='utf-8') as f:
+            f.write(contents)
+            f.close()
+
+def readJSON(path):
+
+        with open(path,'r',encoding='utf-8') as f:
+            result=json.load(f)
+            f.close()
+            return result
+
 
 def main(argv=None):
 
-	parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
 	parser.add_argument('--include', action='append', required=True)
 	parser.add_argument('--externs', action='append', default=['externs/common.js'])
 	parser.add_argument('--amd', action='store_true', default=False)
@@ -51,8 +74,9 @@ def main(argv=None):
 		tmp.write(u'( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
 	for include in args.include:
-		with open('includes/' + include + '.json','r', encoding='utf-8') as f:
-			files = json.load(f)
+
+                files = readJSON('includes/' + include + '.json')
+
 		for filename in files:
 			tmp.write(u'// File:' + filename)
 			tmp.write(u'\n\n')
@@ -85,8 +109,26 @@ def main(argv=None):
 	else:
 		backup = ''
 		if os.path.exists(output):
-			with open(output, 'r', encoding='utf-8') as f: backup = f.read()
+			backup=readText(output)
 			os.remove(output)
+
+                # Constifier
+
+                #specTempFile = tempfile.NamedTemporaryFile(delete=False)
+                #specTempFile.close()
+
+                specFile = '../../build/three.constspec.json' # specTempFile.name
+
+                if os.system( 'node -e 0' ) == 0:
+                    os.system( 'node constifier/generateThreeSpec.js ' + path + ' ' + specFile )
+                else:
+                    specFile = '../../build/three.constspec.json'
+                    print( "WARNING: Information for constant compression cannot be updated automatically. Please install node.js" )
+
+                writeText( path, constify( readText(path), readJSON(specFile) ) )
+                #os.remove( specTempFile.name )
+
+                # Closure compiler
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
@@ -96,11 +138,11 @@ def main(argv=None):
 		# header
 
 		if os.path.exists(output):
-			with open(output, 'r', encoding='utf-8') as f: text = f.read()
-			with open(output, 'w', encoding='utf-8') as f: f.write('// threejs.org/license\n' + text + sourcemapping)
+			text=readText(output)
+                        writeText(output, '// threejs.org/license\n' + text + sourcemapping)
 		else:
+			writeText(output, backup)
 			print("Minification with Closure compiler failed. Check your Java runtime version.")
-			with open(output, 'w', encoding='utf-8') as f: f.write(backup)
 
 	os.close(fd)
 	os.remove(path)

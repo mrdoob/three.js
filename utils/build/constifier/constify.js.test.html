@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>constify.js standalone test</title>
+	</head>
+	<body>
+
+		<code id="output" style="white-space: pre"></code>
+		<script>var module = {};</script>
+		<script src="constify.js"></script>
+		<script>var constify = module.exports;</script>
+
+		<script>
+
+			function runTest( source, constants ) {
+
+				var spec = [ {
+					contextRegExpString: '^_?gl$',
+					constants: constants
+				} ];
+
+				document.getElementById( 'output' ).
+						innerHTML = constify( source, spec, true );
+
+			}
+
+			// XHR Loader:
+
+			var source = null,
+				constants = null;
+
+			requestText( '../../../build/three.js', function() {
+
+				source = this.response;
+				if ( constants !== null ) runTest( source, constants );
+
+			} );
+
+			requestText( './webgl_constants.json', function() {
+
+				constants = JSON.parse( this.response );
+				if ( source !== null ) runTest( source, constants );
+
+			} );
+
+
+			function requestText( url, onload ) {
+
+				var req = new XMLHttpRequest();
+				req.open( 'GET', url, true );
+				req.responseType = 'text/plain; charset=UTF-8';
+				req.onload = onload;
+				req.send();
+
+			}
+
+		</script>
+
+	</body>
+</html>
+
+
