@@ -9,9 +9,7 @@ THREE.MaterialLoader = function ( manager ) {
 
 };
 
-THREE.MaterialLoader.prototype = {
-
-	constructor: THREE.MaterialLoader,
+Object.assign( THREE.MaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -152,4 +150,4 @@ THREE.MaterialLoader.prototype = {
 
 	}
 
-};
+} );

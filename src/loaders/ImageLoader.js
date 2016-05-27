@@ -8,9 +8,7 @@ THREE.ImageLoader = function ( manager ) {
 
 };
 
-THREE.ImageLoader.prototype = {
-
-	constructor: THREE.ImageLoader,
+Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -48,4 +46,4 @@ THREE.ImageLoader.prototype = {
 
 	}
 
-};
+} );
