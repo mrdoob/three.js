@@ -17855,9 +17855,7 @@ THREE.AudioLoader = function ( manager ) {
 
 };
 
-THREE.AudioLoader.prototype = {
-
-	constructor: THREE.AudioLoader,
+Object.assign( THREE.AudioLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -17877,7 +17875,7 @@ THREE.AudioLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/Cache.js
 
@@ -18238,9 +18236,7 @@ THREE.XHRLoader = function ( manager ) {
 
 };
 
-THREE.XHRLoader.prototype = {
-
-	constructor: THREE.XHRLoader,
+Object.assign( THREE.XHRLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18350,7 +18346,7 @@ THREE.XHRLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/FontLoader.js
 
@@ -18364,9 +18360,7 @@ THREE.FontLoader = function ( manager ) {
 
 };
 
-THREE.FontLoader.prototype = {
-
-	constructor: THREE.FontLoader,
+Object.assign( THREE.FontLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18402,7 +18396,7 @@ THREE.FontLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/ImageLoader.js
 
@@ -18416,9 +18410,7 @@ THREE.ImageLoader = function ( manager ) {
 
 };
 
-THREE.ImageLoader.prototype = {
-
-	constructor: THREE.ImageLoader,
+Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18456,7 +18448,7 @@ THREE.ImageLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/JSONLoader.js
 
@@ -18480,9 +18472,7 @@ THREE.JSONLoader = function ( manager ) {
 
 };
 
-THREE.JSONLoader.prototype = {
-
-	constructor: THREE.JSONLoader,
+Object.assign( THREE.JSONLoader.prototype, {
 
 	// Deprecated
 
@@ -19014,7 +19004,7 @@ THREE.JSONLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/LoadingManager.js
 
@@ -19101,9 +19091,7 @@ THREE.BufferGeometryLoader = function ( manager ) {
 
 };
 
-THREE.BufferGeometryLoader.prototype = {
-
-	constructor: THREE.BufferGeometryLoader,
+Object.assign( THREE.BufferGeometryLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -19188,7 +19176,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/MaterialLoader.js
 
@@ -19203,9 +19191,7 @@ THREE.MaterialLoader = function ( manager ) {
 
 };
 
-THREE.MaterialLoader.prototype = {
-
-	constructor: THREE.MaterialLoader,
+Object.assign( THREE.MaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -19346,7 +19332,7 @@ THREE.MaterialLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/ObjectLoader.js
 
@@ -19361,9 +19347,7 @@ THREE.ObjectLoader = function ( manager ) {
 
 };
 
-THREE.ObjectLoader.prototype = {
-
-	constructor: THREE.ObjectLoader,
+Object.assign( THREE.ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -19966,7 +19950,7 @@ THREE.ObjectLoader.prototype = {
 
 	}()
 
-};
+} );
 
 // File:src/loaders/TextureLoader.js
 
@@ -19980,9 +19964,7 @@ THREE.TextureLoader = function ( manager ) {
 
 };
 
-THREE.TextureLoader.prototype = {
-
-	constructor: THREE.TextureLoader,
+Object.assign( THREE.TextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20020,7 +20002,7 @@ THREE.TextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/CubeTextureLoader.js
 
@@ -20034,9 +20016,7 @@ THREE.CubeTextureLoader = function ( manager ) {
 
 };
 
-THREE.CubeTextureLoader.prototype = {
-
-	constructor: THREE.CubeTextureLoader,
+Object.assign( THREE.CubeTextureLoader.prototype, {
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
@@ -20090,7 +20070,7 @@ THREE.CubeTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/BinaryTextureLoader.js
 
@@ -20109,9 +20089,7 @@ THREE.DataTextureLoader = THREE.BinaryTextureLoader = function ( manager ) {
 
 };
 
-THREE.BinaryTextureLoader.prototype = {
-
-	constructor: THREE.BinaryTextureLoader,
+Object.assign( THREE.BinaryTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20182,7 +20160,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/CompressedTextureLoader.js
 
@@ -20201,10 +20179,7 @@ THREE.CompressedTextureLoader = function ( manager ) {
 
 };
 
-
-THREE.CompressedTextureLoader.prototype = {
-
-	constructor: THREE.CompressedTextureLoader,
+Object.assign( THREE.CompressedTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20320,7 +20295,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/materials/Material.js
 
