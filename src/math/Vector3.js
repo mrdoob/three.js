@@ -226,6 +226,14 @@ THREE.Vector3.prototype = {
 
 	},
 
+	multiplyScalarTmp: function ( scalar ) {
+		if ( isFinite( scalar ) ) {
+			return new THREE.Vector3( this.x * scalar, this.y*scalar,this.z*scalar);
+		} else {
+			return new THREE.Vector3();
+		}
+	},
+
 	multiplyVectors: function ( a, b ) {
 
 		this.x = a.x * b.x;
@@ -298,9 +306,25 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
-		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
-		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + m.origin.x;
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + m.origin.y;
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + m.origin.z;
+
+		return this;
+
+	},
+
+	applyMatrix4Inv: function ( m ) {
+
+		// input: THREE.Matrix4 affine matrix
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[ 0 ] * x + e[ 1 ] * y + e[ 2 ]  * z + m.origin.x;
+		this.y = e[ 4 ] * x + e[ 5 ] * y + e[ 6 ]  * z + m.origin.y;
+		this.z = e[ 8 ] * x + e[ 9 ] * y + e[ 10 ] * z + m.origin.z;
 
 		return this;
 
@@ -315,9 +339,9 @@ THREE.Vector3.prototype = {
 		var e = m.elements;
 		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
 
-		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
-		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
-		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
+		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + m.origin.x ) * d;
+		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + m.origin.y ) * d;
+		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + m.origin.z ) * d;
 
 		return this;
 
@@ -796,5 +820,5 @@ THREE.Vector3Right = new THREE.Vector3( -1, 0, 0 );
 THREE.Vector3Backward = new THREE.Vector3( 0, 0, 1 );
 THREE.Vector3Up = new THREE.Vector3( 0, 1, 0 );
 THREE.Vector3Left = new THREE.Vector3( 1, 0, 0 );
-THREE.Vector3Foreward = new THREE.Vector3( 0, 0, -1 );
+THREE.Vector3Forward = new THREE.Vector3( 0, 0, -1 );
 THREE.Vector3Down = new THREE.Vector3( 0, -1, 0 );

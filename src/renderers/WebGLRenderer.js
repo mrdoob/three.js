@@ -855,6 +855,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if( geometry.uniforms ) {
+			var program = material.program,
+			p_uniforms = program.getUniforms()
+			Object.keys(geometry.uniforms).forEach( function(key){ p_uniforms.setValue( _gl, key, geometry.uniforms[key] );} );
+		}
+
 		if ( updateBuffers ) {
 
 			setupVertexAttributes( material, program, geometry );

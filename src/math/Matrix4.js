@@ -100,9 +100,9 @@ THREE.Matrix4.prototype = {
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
 		this.set(
-			xAxis.x, yAxis.x, zAxis.x, 0,
-			xAxis.y, yAxis.y, zAxis.y, 0,
-			xAxis.z, yAxis.z, zAxis.z, 0,
+			xAxis.x, yAxis.x, zAxis.x, this.origin.x,
+			xAxis.y, yAxis.y, zAxis.y, this.origin.y,
+			xAxis.z, yAxis.z, zAxis.z, this.origin.z,
 			0,       0,       0,       1
 		);
 
@@ -975,7 +975,7 @@ console.trace( "someone wanted an array", this )
 */
 
 
-	RotateOrtho: function( angle, axis1, axis2 ) {
+	rotateOrtho: function( angle, axis1, axis2 ) {
 		if( !angle ) return;
 		// 0 = x;  0
 		// 1 = y;  4
@@ -1063,38 +1063,38 @@ console.trace( "someone wanted an array", this )
 			this.origin.y = y;
 			this.origin.z = z;
 	},
-	RotateRelative: function( x, y, z ){
+	rotateRelative: function( x, y, z ){
 		//console.trace( "rotate starts as ", this )
 		switch( this.tick++ ) {
 			case 0:
-				this.RotateOrtho( x, 1, 2 );
-				this.RotateOrtho( y, 0, 2 );
-				this.RotateOrtho( z, 0, 1 );
+				this.rotateOrtho( x, 1, 2 );
+				this.rotateOrtho( y, 0, 2 );
+				this.rotateOrtho( z, 0, 1 );
 				break;
 			case 1:
-				this.RotateOrtho( y, 0, 2 );
-				this.RotateOrtho( x, 1, 2 );
-				this.RotateOrtho( z, 0, 1 );
+				this.rotateOrtho( y, 0, 2 );
+				this.rotateOrtho( x, 1, 2 );
+				this.rotateOrtho( z, 0, 1 );
 				break;
 			case 2:
-				this.RotateOrtho( z, 0, 1 );
-				this.RotateOrtho( x, 1, 2 );
-				this.RotateOrtho( y, 0, 2 );
+				this.rotateOrtho( z, 0, 1 );
+				this.rotateOrtho( x, 1, 2 );
+				this.rotateOrtho( y, 0, 2 );
 				break;
 			case 3:
-				this.RotateOrtho( x, 1, 2 );
-				this.RotateOrtho( z, 0, 1 );
-				this.RotateOrtho( y, 0, 2 );
+				this.rotateOrtho( x, 1, 2 );
+				this.rotateOrtho( z, 0, 1 );
+				this.rotateOrtho( y, 0, 2 );
 				break;
 			case 4:
-				this.RotateOrtho( y, 0, 2 );
-				this.RotateOrtho( z, 0, 1 );
-				this.RotateOrtho( x, 1, 2 );
+				this.rotateOrtho( y, 0, 2 );
+				this.rotateOrtho( z, 0, 1 );
+				this.rotateOrtho( x, 1, 2 );
 				break;
 			case 5:
-				this.RotateOrtho( z, 0, 1 );
-				this.RotateOrtho( y, 0, 2 );
-				this.RotateOrtho( x, 1, 2 );
+				this.rotateOrtho( z, 0, 1 );
+				this.rotateOrtho( y, 0, 2 );
+				this.rotateOrtho( x, 1, 2 );
 				this.tick = 0;
 				break;
 		}
@@ -1117,7 +1117,8 @@ console.trace( "someone wanted an array", this )
 	get backward() {
 			return new THREE.Vector3( -this.elements[8], -this.elements[9], -this.elements[10] );
         },
-	get inv_right() {
+
+	get inv_left() {
         	return new THREE.Vector3( this.elements[0], this.elements[4], this.elements[8] );
         },
 	get inv_up() {
@@ -1126,6 +1127,7 @@ console.trace( "someone wanted an array", this )
 	get inv_forward() {
         	return new THREE.Vector3( this.elements[2], this.elements[6], this.elements[10] );
         },
+
 	getRoll : function( relativeUp ) {
 		//if( !relativeUp ) relativeUp = THREE.Vector3Up;
 		return Math.asin( this.right.dot( relativeUp ) );
