@@ -44,7 +44,7 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		var image = document.createElement( 'img' );
+		var image = new Image();
 
 		image.addEventListener( 'load', function ( event ) {
 
