@@ -28,7 +28,7 @@ THREE.JSONLoader.prototype = {
 
 		if ( this._statusDomElement === undefined ) {
 
-			this._statusDomElement = document.createElement( 'div' );
+			this._statusDomElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'div' );
 
 		}
 

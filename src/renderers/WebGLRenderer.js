@@ -12,7 +12,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -2727,7 +2727,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var scale = maxSize / Math.max( image.width, image.height );
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = Math.floor( image.width * scale );
 			canvas.height = Math.floor( image.height * scale );
 
@@ -2763,7 +2763,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
 			canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
 
