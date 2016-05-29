@@ -18,9 +18,7 @@ THREE.JSONLoader = function ( manager ) {
 
 };
 
-THREE.JSONLoader.prototype = {
-
-	constructor: THREE.JSONLoader,
+Object.assign( THREE.JSONLoader.prototype, {
 
 	// Deprecated
 
@@ -552,4 +550,4 @@ THREE.JSONLoader.prototype = {
 
 	}
 
-};
+} );

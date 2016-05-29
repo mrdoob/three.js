@@ -9,9 +9,7 @@ THREE.ObjectLoader = function ( manager ) {
 
 };
 
-THREE.ObjectLoader.prototype = {
-
-	constructor: THREE.ObjectLoader,
+Object.assign( THREE.ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -614,4 +612,4 @@ THREE.ObjectLoader.prototype = {
 
 	}()
 
-};
+} );

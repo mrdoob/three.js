@@ -248,6 +248,18 @@ Menubar.File = function ( editor ) {
 
 		} );
 
+		loader.load( '../examples/js/controls/VRControls.js', function ( content ) {
+
+			zip.file( 'js/VRControls.js', content );
+
+		} );
+
+		loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
+
+			zip.file( 'js/VREffect.js', content );
+
+		} );
+
 	} );
 	options.add( option );
 

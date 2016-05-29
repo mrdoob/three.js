@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '77' };
+var THREE = { REVISION: '78dev' };
 
 //
 
@@ -17855,9 +17855,7 @@ THREE.AudioLoader = function ( manager ) {
 
 };
 
-THREE.AudioLoader.prototype = {
-
-	constructor: THREE.AudioLoader,
+Object.assign( THREE.AudioLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -17877,7 +17875,7 @@ THREE.AudioLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/Cache.js
 
@@ -18238,9 +18236,7 @@ THREE.XHRLoader = function ( manager ) {
 
 };
 
-THREE.XHRLoader.prototype = {
-
-	constructor: THREE.XHRLoader,
+Object.assign( THREE.XHRLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18350,7 +18346,7 @@ THREE.XHRLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/FontLoader.js
 
@@ -18364,9 +18360,7 @@ THREE.FontLoader = function ( manager ) {
 
 };
 
-THREE.FontLoader.prototype = {
-
-	constructor: THREE.FontLoader,
+Object.assign( THREE.FontLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18402,7 +18396,7 @@ THREE.FontLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/ImageLoader.js
 
@@ -18416,77 +18410,27 @@ THREE.ImageLoader = function ( manager ) {
 
 };
 
-THREE.ImageLoader.prototype = {
-
-	constructor: THREE.ImageLoader,
+Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.path !== undefined ) url = this.path + url;
-
-		var scope = this;
-
-		var cached = THREE.Cache.get( url );
-
-		if ( cached !== undefined ) {
-
-			scope.manager.itemStart( url );
-
-			if ( onLoad ) {
-
-				setTimeout( function () {
-
-					onLoad( cached );
-
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-			} else {
-
-				scope.manager.itemEnd( url );
-
-			}
-
-			return cached;
-
-		}
-
 		var image = document.createElement( 'img' );
 
-		image.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setPath( this.path );
+		loader.setResponseType( 'blob' );
+		loader.load( url, function ( blob ) {
 
-			THREE.Cache.add( url, this );
+			image.onload = function () {
 
-			if ( onLoad ) onLoad( this );
+				URL.revokeObjectURL( image.src );
+				if ( onLoad ) onLoad( image );
 
-			scope.manager.itemEnd( url );
+			};
 
-		}, false );
+			image.src = URL.createObjectURL( blob );
 
-		if ( onProgress !== undefined ) {
-
-			image.addEventListener( 'progress', function ( event ) {
-
-				onProgress( event );
-
-			}, false );
-
-		}
-
-		image.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemError( url );
-
-		}, false );
-
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
-		scope.manager.itemStart( url );
-
-		image.src = url;
+		}, onProgress, onError );
 
 		return image;
 
@@ -18504,7 +18448,7 @@ THREE.ImageLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/JSONLoader.js
 
@@ -18528,9 +18472,7 @@ THREE.JSONLoader = function ( manager ) {
 
 };
 
-THREE.JSONLoader.prototype = {
-
-	constructor: THREE.JSONLoader,
+Object.assign( THREE.JSONLoader.prototype, {
 
 	// Deprecated
 
@@ -19062,7 +19004,7 @@ THREE.JSONLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/LoadingManager.js
 
@@ -19149,9 +19091,7 @@ THREE.BufferGeometryLoader = function ( manager ) {
 
 };
 
-THREE.BufferGeometryLoader.prototype = {
-
-	constructor: THREE.BufferGeometryLoader,
+Object.assign( THREE.BufferGeometryLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -19236,7 +19176,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/MaterialLoader.js
 
@@ -19251,9 +19191,7 @@ THREE.MaterialLoader = function ( manager ) {
 
 };
 
-THREE.MaterialLoader.prototype = {
-
-	constructor: THREE.MaterialLoader,
+Object.assign( THREE.MaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -19394,7 +19332,7 @@ THREE.MaterialLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/ObjectLoader.js
 
@@ -19409,9 +19347,7 @@ THREE.ObjectLoader = function ( manager ) {
 
 };
 
-THREE.ObjectLoader.prototype = {
-
-	constructor: THREE.ObjectLoader,
+Object.assign( THREE.ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20014,7 +19950,7 @@ THREE.ObjectLoader.prototype = {
 
 	}()
 
-};
+} );
 
 // File:src/loaders/TextureLoader.js
 
@@ -20028,9 +19964,7 @@ THREE.TextureLoader = function ( manager ) {
 
 };
 
-THREE.TextureLoader.prototype = {
-
-	constructor: THREE.TextureLoader,
+Object.assign( THREE.TextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20068,7 +20002,7 @@ THREE.TextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/CubeTextureLoader.js
 
@@ -20082,9 +20016,7 @@ THREE.CubeTextureLoader = function ( manager ) {
 
 };
 
-THREE.CubeTextureLoader.prototype = {
-
-	constructor: THREE.CubeTextureLoader,
+Object.assign( THREE.CubeTextureLoader.prototype, {
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
@@ -20138,7 +20070,7 @@ THREE.CubeTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/BinaryTextureLoader.js
 
@@ -20157,9 +20089,7 @@ THREE.DataTextureLoader = THREE.BinaryTextureLoader = function ( manager ) {
 
 };
 
-THREE.BinaryTextureLoader.prototype = {
-
-	constructor: THREE.BinaryTextureLoader,
+Object.assign( THREE.BinaryTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20230,7 +20160,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/loaders/CompressedTextureLoader.js
 
@@ -20249,10 +20179,7 @@ THREE.CompressedTextureLoader = function ( manager ) {
 
 };
 
-
-THREE.CompressedTextureLoader.prototype = {
-
-	constructor: THREE.CompressedTextureLoader,
+Object.assign( THREE.CompressedTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -20368,7 +20295,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 	}
 
-};
+} );
 
 // File:src/materials/Material.js
 
@@ -22719,6 +22646,16 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 	},
 
+	copy: function ( source ) {
+
+		THREE.Object3D.prototype.copy.call( this, source );
+
+		this.drawMode = source.drawMode;
+
+		return this;
+
+	},
+
 	updateMorphTargets: function () {
 
 		if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
@@ -24071,7 +24008,7 @@ THREE.ShaderChunk[ 'normalmap_pars_fragment' ] = "#ifdef USE_NORMALMAP\n	uniform
 
 // File:src/renderers/shaders/ShaderChunk/packing.glsl
 
-THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n	vec4 r = vec4( fract( v * PackFactors ), v );\n	r.yzw -= r.xyz * ShiftRight8;	return r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n	return dot( v, UnpackFactors );\n}\nfloat viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
+THREE.ShaderChunk[ 'packing' ] = "vec3 packNormalToRGB( const in vec3 normal ) {\n  return normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n  return 1.0 - 2.0 * rgb.xyz;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n	vec4 r = vec4( fract( v * PackFactors ), v );\n	r.yzw -= r.xyz * ShiftRight8;	return r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n	return dot( v, UnpackFactors );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n  return ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n  return linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n  return (( near + viewZ ) * far ) / (( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n  return ( near * far ) / ( ( far - near ) * invClipZ - far );\n}\n";
 
 // File:src/renderers/shaders/ShaderChunk/premultiplied_alpha_fragment.glsl
 
@@ -25244,6 +25181,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.resetGLState = resetGLState;
 
 	this.dispose = function() {
+
+		transparentObjects = [];
+		transparentObjectsLastIndex = -1;
+		opaqueObjects = [];
+		opaqueObjectsLastIndex = -1;
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 

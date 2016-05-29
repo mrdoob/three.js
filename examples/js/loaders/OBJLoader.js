@@ -95,6 +95,8 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
+
 				this.object = {
 					name : name || '',
 					fromDeclaration : ( fromDeclaration !== false ),
@@ -111,6 +113,14 @@ THREE.OBJLoader.prototype = {
 
 						var previous = this._finalize( false );
 
+						// New usemtl declaration overwrites an inherited material, except if faces were declared
+						// after the material, then it must be preserved for proper MultiMaterial continuation.
+						if ( previous && ( previous.inherited || previous.groupCount <= 0 ) ) {
+
+							this.materials.splice( previous.index, 1 );
+
+						}
+
 						var material = {
 							index      : this.materials.length,
 							name       : name || '',
@@ -118,7 +128,21 @@ THREE.OBJLoader.prototype = {
 							smooth     : ( previous !== undefined ? previous.smooth : this.smooth ),
 							groupStart : ( previous !== undefined ? previous.groupEnd : 0 ),
 							groupEnd   : -1,
-							groupCount : -1
+							groupCount : -1,
+							inherited  : false,
+
+							clone : function( index ) {
+								return {
+									index      : ( typeof index === 'number' ? index : this.index ),
+									name       : this.name,
+									mtllib     : this.mtllib,
+									smooth     : this.smooth,
+									groupStart : this.groupEnd,
+									groupEnd   : -1,
+									groupCount : -1,
+									inherited  : false
+								};
+							}
 						};
 
 						this.materials.push( material );
@@ -144,6 +168,7 @@ THREE.OBJLoader.prototype = {
 
 							lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
 							lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
+							lastMultiMaterial.inherited = false;
 
 						}
 
@@ -159,6 +184,20 @@ THREE.OBJLoader.prototype = {
 
 					}
 				};
+
+				// Inherit previous objects material.
+				// Spec tells us that a declared material must be set to all objects until a new material is declared.
+				// If a usemtl declaration is encountered while this new object is being parsed, it will
+				// overwrite the inherited material. Exception being that there was already face declarations
+				// to the inherited material, then it will be preserved for proper MultiMaterial continuation.
+
+				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function" ) {
+
+					var declared = previousMaterial.clone( 0 );
+					declared.inherited = true;
+					this.object.materials.push( declared );
+
+				}
 
 				this.objects.push( this.object );
 
