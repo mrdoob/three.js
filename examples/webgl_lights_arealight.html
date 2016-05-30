@@ -68,14 +68,16 @@
 			var dir = new THREE.DirectionalLight( 0xFFFFFF );
 			var dirHelper;
 
-			var area = new THREE.AreaLight( 0xFFFFFF );
+			var shapes, shapeNames;
+			var area;
 			var areaHelper;
 
 			var ray = new THREE.Raycaster();
 			var mouseDown = new THREE.Vector2();
 			var mouse = new THREE.Vector2();
 
-			var gui, guiElements, param = { color: '0xffffff' };
+			var gui, guiElements;
+			var param = {};
 
 			function init() {
 
@@ -99,6 +101,22 @@
 
 				dirHelper = new THREE.DirectionalLightHelper( dir );
 
+				shapes = {
+					square: THREE.Polygon.makeSquare( 10.0 ),
+					rectangle: THREE.Polygon.makeRectangle( 10.0, 5.0 ),
+					circle: THREE.Polygon.makeCircle( 5.0, 20 ),
+					star: THREE.Polygon.makeStar( 5, 5.0, 2.5 ),
+					triangle: new THREE.Polygon( [
+						new THREE.Vector3( -5.0, -5.0, 0 ),
+						new THREE.Vector3(  0.0,  5.0, 0 ),
+						new THREE.Vector3(  5.0, -5.0, 0 ),
+					] )
+				};
+				shapeNames = Object.keys( shapes );
+
+				console.log( shapes );
+
+				area = new THREE.AreaLight( 0xFFFFFF, undefined, shapes.square );
 				area.position.set( 0, 20, 0 );
 				area.target = mshBox;
 				areaHelper = new THREE.AreaLightHelper( area );
@@ -211,19 +229,32 @@
 
 				clearGui();
 
-				addGui( 'light color', area.color.getHex(), function ( val ) {
+				param = {
+					'light color': area.color.getHex(),
+					intensity: area.intensity,
+					shape: shapeNames[0]
+				};
+
+				gui.add( param, 'shape', shapeNames ).onChange( function ( val ) {
+
+					console.log(val);
+					console.log(shapes[val])
+					area.polygon = shapes[ val ].clone();
+
+				} );
+
+				gui.addColor( param, 'light color' ).onChange( function ( val ) {
 
 					area.color.setHex( val );
 
-				}, true );
+				} );
 
-				addGui( 'intensity', area.intensity, function ( val ) {
+				gui.add( param, 'intensity', 0, 10 ).onChange( function ( val ) {
 
 					area.intensity = val;
+					areaHelper.update();
 
-				}, false, 0, 10 );
-
-				// TODO: area light shape control
+				} );
 
 				// TODO: shadow controls
 				// addGui( 'distance', area.distance, function( val ) {
@@ -240,38 +271,6 @@
 				// area.decay = val;
 				// render();
 				// }, false, 0, 100 );
-
-			}
-
-			function addGui( name, value, callback, isColor, min, max ) {
-
-				var node;
-				param[ name ] = value;
-				if ( isColor ) {
-
-					node = gui.addColor( param, name ).onChange( function () {
-
-						callback( param[ name ] );
-
-					} );
-
-				} else if ( typeof value == 'object' ) {
-
-					node = gui.add( param, name, value ).onChange( function () {
-
-						callback( param[ name ] );
-
-					} );
-
-				} else {
-
-					node = gui.add( param, name, min, max ).onChange( function () {
-
-						callback( param[ name ] );
-
-					} );
-				}
-				return node;
 
 			}
 

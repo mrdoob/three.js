@@ -25,6 +25,8 @@ THREE.AreaLight = function ( color, intensity, polygon ) {
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
 THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
+// TODO: AreaLight update when light shape is changed
+
 THREE.AreaLight.prototype.copy = function ( source ) {
 
 	THREE.Light.prototype.copy.call( this, source );

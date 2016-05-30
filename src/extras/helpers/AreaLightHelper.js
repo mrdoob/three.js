@@ -16,12 +16,14 @@ THREE.AreaLightHelper = function ( light ) {
 		color: light.color,
 		fog: false
 	} );
+
 	this.lightWireMat = new THREE.MeshBasicMaterial( {
 		color: light.color,
 		fog: false,
 		wireframe: true
 	} );
 
+	console.log(light.polygon);
 	console.log(light.polygon.points);
 
 	this.lightShape = new THREE.ShapeGeometry( new THREE.Shape( light.polygon.points ) );
@@ -69,7 +71,13 @@ THREE.AreaLightHelper.prototype.update = function () {
 			.copy( this.light.color )
 			.multiplyScalar( this.light.intensity );
 
+		var oldShape = this.lightShape;
+		this.lightShape = new THREE.ShapeGeometry( new THREE.Shape( this.light.polygon.points ) );
 
+		this.lightMesh.geometry = this.lightShape;
+		this.lightWireMesh.geometry = this.lightShape;
+
+		oldShape.dispose();
 	};
 
 }();

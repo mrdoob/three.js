@@ -26,15 +26,15 @@ THREE.Polygon.prototype = {
 
 	clone: function () {
 
-		// TODO: implement
-		return new this.constructor().copy( this );
+		var result = new this.constructor();
+		result.copy( this );
+		return result;
 
 	},
 
-	copy: function ( sphere ) {
+	copy: function ( polygon ) {
 
-		// TODO: implement
-		return this;
+		this.points = Array.from( polygon.points );
 
 	},
 
@@ -102,17 +102,79 @@ THREE.Polygon.prototype = {
 	}
 };
 
-THREE.Polygon.makeSquare = function ( dim, offset ) {
+THREE.Polygon.makeSquare = function ( dim ) {
 
-	dim = ( dim !== undefined ) ? dim : 10;
-	offset = ( offset !== undefined ) ? offset : new THREE.Vector3( 0, 0, 0 );
-
-	var halfDim = dim / 2.0;
-	return new THREE.Polygon( [
-		new THREE.Vector3( - halfDim,   halfDim, 0 ),
-		new THREE.Vector3(   halfDim,   halfDim, 0 ),
-		new THREE.Vector3(   halfDim, - halfDim, 0 ),
-		new THREE.Vector3( - halfDim, - halfDim, 0 )
-	] );
+	return THREE.Polygon.makeRectangle( dim, dim );
 
 };
+
+THREE.Polygon.makeRectangle = function ( width, height ) {
+
+	width = ( width !== undefined ) ? width : 10;
+	height = ( height !== undefined ) ? height : 10;
+
+	var halfWidth = width / 2.0;
+	var halfHeight = height / 2.0;
+
+	return new THREE.Polygon( [
+		new THREE.Vector3( - halfWidth,   halfHeight, 0 ),
+		new THREE.Vector3(   halfWidth,   halfHeight, 0 ),
+		new THREE.Vector3(   halfWidth, - halfHeight, 0 ),
+		new THREE.Vector3( - halfWidth, - halfHeight, 0 )
+	] );
+
+}
+
+THREE.Polygon.makeCircle = function ( radius, numPoints ) {
+
+	radius = ( radius !== undefined ) ? radius : 10.0;
+	numPoints = ( numPoints !== undefined ) ? numPoints : 5;
+
+	var twoPi = Math.PI * 2.0;
+	var theta = 0.0;
+	var dTheta = twoPi / numPoints;
+
+	var points = [];
+	for ( var i = 0; i < numPoints; i ++ ) {
+
+		theta = dTheta * i;
+		points.push( new THREE.Vector3(
+			Math.cos(theta) * radius,
+			Math.sin(theta) * radius,
+			0
+		) );
+
+	}
+
+	return new THREE.Polygon( points );
+
+}
+
+THREE.Polygon.makeStar = function ( numPoints, outerRadius, innerRadius ) {
+
+	numPoints = ( numPoints !== undefined ) ? numPoints : 5;
+	outerRadius = ( outerRadius !== undefined ) ? outerRadius : 10.0;
+	innerRadius = ( innerRadius !== undefined ) ? innerRadius : 5.0;
+
+	var theta;
+	var dTheta = ( Math.PI * 2.0 ) / numPoints / 2.0;
+	var points = [];
+
+	for ( var i = 0; i < numPoints; i ++ ) {
+
+		theta = dTheta * i * 2;
+		points.push( new THREE.Vector3(
+			outerRadius * Math.cos(theta),
+			outerRadius * Math.sin(theta),
+			0 ) );
+
+		theta += dTheta;
+		points.push( new THREE.Vector3(
+			innerRadius * Math.cos(theta),
+			innerRadius * Math.sin(theta),
+			0 ) );
+
+	}
+
+	return new THREE.Polygon( points );
+}
