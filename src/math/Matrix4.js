@@ -21,8 +21,9 @@ THREE.Matrix4 = function () {
 		0, 0, 0, 1
 
 	] );
+	Object.defineProperty(this, "elements", { writable:false } );
 	this.origin = new THREE.Vector3();
-
+	Object.defineProperty(this, "origin", { writable:false } );
 	this.tick = 0;
 	if ( arguments.length > 0 ) {
 
@@ -262,7 +263,6 @@ THREE.Matrix4.prototype = {
 		te[ 11 ] = 0;
 
 		// bottom row
-
 		this.origin.x = 0;
 		this.origin.y = 0;
 		this.origin.z = 0;
