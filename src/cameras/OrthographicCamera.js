@@ -75,12 +75,15 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 
 		if ( this.view !== null ) {
 
-			var zoom = this.zoom / ( this.view.width / this.view.fullWidth );
+			var scaleW = this.zoom / ( this.view.width / this.view.fullWidth );
+			var scaleH = this.zoom / ( this.view.height / this.view.fullHeight );
+			var biasW = ( this.right - this.left ) / this.view.width;
+			var biasH = ( this.top - this.bottom ) / this.view.height;
 
-			left += this.view.offsetX / zoom;
-			right = left + this.view.width / zoom;
-			top -= this.view.offsetY / zoom;
-			bottom = top - this.view.height / zoom;
+			left += biasW * ( this.view.offsetX / scaleW );
+			right = left + biasW * ( this.view.width / scaleW );
+			top -= biasH * ( this.view.offsetY / scaleH );
+			bottom = top - biasH * ( this.view.height / scaleH );
 
 		}
 
