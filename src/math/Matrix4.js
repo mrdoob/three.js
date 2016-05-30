@@ -22,9 +22,12 @@ THREE.Matrix4 = function () {
 
 	] );
 	Object.defineProperty(this, "elements", { writable:false } );
+
 	this.origin = new THREE.Vector3();
 	Object.defineProperty(this, "origin", { writable:false } );
+
 	this.tick = 0;
+
 	if ( arguments.length > 0 ) {
 
 		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
