@@ -2133,14 +2133,6 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyScalarTmp: function ( scalar ) {
-		if ( isFinite( scalar ) ) {
-			return new THREE.Vector3( this.x * scalar, this.y*scalar,this.z*scalar);
-		} else {
-			return new THREE.Vector3();
-		}
-	},
-
 	multiplyVectors: function ( a, b ) {
 
 		this.x = a.x * b.x;
@@ -2643,9 +2635,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		console.trace( "set from matrix?", m, index)
-		if( index == 3 )
-			return this.copy( m.origin );
+		if( index == 3 ) return this.copy( m.origin );
 		return this.fromArray( m.elements, index * 4 );
 
 	},
@@ -2705,6 +2695,20 @@ THREE.Vector3Up = new THREE.Vector3( 0, 1, 0 );
 THREE.Vector3Left = new THREE.Vector3( 1, 0, 0 );
 THREE.Vector3Forward = new THREE.Vector3( 0, 0, -1 );
 THREE.Vector3Down = new THREE.Vector3( 0, -1, 0 );
+
+["Vector3Unit"
+,"Vector3Zero"
+,"Vector3Right"
+,"Vector3Backward"
+,"Vector3Up"
+,"Vector3Left"
+,"Vector3Forward"
+,"Vector3Down"].forEach( function(key){
+	Object.defineProperty(THREE, key, { writable: false })
+	Object.defineProperty(THREE[key], "x", { writable: false })
+	Object.defineProperty(THREE[key], "y", { writable: false })
+	Object.defineProperty(THREE[key], "z", { writable: false })
+})
 
 // File:src/math/Vector4.js
 
@@ -4817,9 +4821,13 @@ THREE.Matrix4 = function () {
 		0, 0, 0, 1
 
 	] );
+	Object.defineProperty(this, "elements", { writable:false } );
+
 	this.origin = new THREE.Vector3();
+	Object.defineProperty(this, "origin", { writable:false } );
 
 	this.tick = 0;
+
 	if ( arguments.length > 0 ) {
 
 		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
@@ -4861,8 +4869,8 @@ THREE.Matrix4.prototype = {
 	},
 
 	clone: function () {
-		throw "clone unsupported"
-		return new THREE.Matrix4().fromArray( this.elements );
+
+		return new THREE.Matrix4().copy( this );
 
 	},
 
@@ -5058,7 +5066,6 @@ THREE.Matrix4.prototype = {
 		te[ 11 ] = 0;
 
 		// bottom row
-
 		this.origin.x = 0;
 		this.origin.y = 0;
 		this.origin.z = 0;
@@ -5428,7 +5435,7 @@ THREE.Matrix4.prototype = {
 			return this.identity();
 
 		}
-		
+
 		var detInv = 1 / det;
 
 		te[ 0 ] = t11 * detInv;
@@ -5758,7 +5765,6 @@ THREE.Matrix4.prototype = {
 		array[ offset + 13 ] = this.origin.y;
 		array[ offset + 14 ] = this.origin.z;
 		array[ offset + 15 ] = te[ 15 ];
-console.trace( "someone wanted an array", this )
 		return array;
 
 	},
@@ -25804,8 +25810,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if( geometry.uniforms ) {
-			var program = material.program,
-			p_uniforms = program.getUniforms()
+			var p_uniforms = program.getUniforms()
 			Object.keys(geometry.uniforms).forEach( function(key){ p_uniforms.setValue( _gl, key, geometry.uniforms[key] );} );
 		}
 
