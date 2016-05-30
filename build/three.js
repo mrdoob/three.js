@@ -18474,21 +18474,6 @@ THREE.JSONLoader = function ( manager ) {
 
 Object.assign( THREE.JSONLoader.prototype, {
 
-	// Deprecated
-
-	get statusDomElement () {
-
-		if ( this._statusDomElement === undefined ) {
-
-			this._statusDomElement = document.createElement( 'div' );
-
-		}
-
-		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
-		return this._statusDomElement;
-
-	},
-
 	load: function( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
@@ -33210,6 +33195,16 @@ Object.defineProperties( THREE.BufferGeometry.prototype, {
 
 //
 
+Object.defineProperties( THREE.JSONLoader.prototype, {
+	statusDomElement: {
+		get: function () {
+			console.error( 'THREE.JSONLoader: .statusDomElement has been removed.' );
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( THREE.Material.prototype, {
 	wrapAround: {
 		get: function () {
@@ -34843,6 +34838,15 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		var lens = this.getCurveLengths();
 		return lens[ lens.length - 1 ];
+
+	},
+
+	// cacheLengths must be recalculated.
+	updateArcLengths: function () {
+
+		this.needsUpdate = true;
+		this.cacheLengths = null;
+		this.getLengths();
 
 	},
 
