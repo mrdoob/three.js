@@ -151,7 +151,7 @@
 
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
-				light.shadow.radius = 0.2;
+				light.shadow.radius = 0.1;
 
 				var d = 300;
 
@@ -161,6 +161,7 @@
 				light.shadow.camera.bottom = - d;
 
 				light.shadow.camera.far = 1000;
+				light.shadow.camera.near = 0.5;
 
 				scene.add( light );
 
