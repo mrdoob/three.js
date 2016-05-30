@@ -12,24 +12,24 @@ THREE.AreaLightHelper = function ( light ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	var geometry = new THREE.BufferGeometry();
+	this.lightMat = new THREE.MeshBasicMaterial( {
+		color: light.color,
+		fog: false
+	} );
+	this.lightWireMat = new THREE.MeshBasicMaterial( {
+		color: light.color,
+		fog: false,
+		wireframe: true
+	} );
 
-	var positions = [
-		// TODO: decide geometry of area light helper
-	];
+	console.log(light.polygon.points);
 
-	// NOTES:
-	// Geometry should be:
-	// 1. flat polygon in the shape of the light, colored w/ the light color
+	this.lightShape = new THREE.ShapeGeometry( new THREE.Shape( light.polygon.points ) );
+	this.lightMesh = new THREE.Mesh( this.lightShape, this.lightMat );
+	this.lightWireMesh = new THREE.Mesh( this.lightShape, this.lightWireMat );
 
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-
-	var material = new THREE.LineBasicMaterial( { fog: false } );
-
-	// this.cone = new THREE.LineSegments( geometry, material );
-	// TODO: create light shape object
-	this.lightShape = undefined
-	this.add( this.lightShape );
+	this.add( this.lightMesh );
+	this.add( this.lightWireMesh );
 
 	this.update();
 
@@ -40,8 +40,10 @@ THREE.AreaLightHelper.prototype.constructor = THREE.AreaLightHelper;
 
 THREE.AreaLightHelper.prototype.dispose = function () {
 
-	this.lightShape.geometry.dispose();
-	this.lightShape.material.dispose();
+	this.lightMesh.geometry.dispose();
+	this.lightMesh.material.dispose();
+	this.lightWireMesh.geometry.dispose();
+	this.lightWireMesh.material.dispose();
 
 };
 
@@ -52,19 +54,21 @@ THREE.AreaLightHelper.prototype.update = function () {
 
 	return function () {
 
-		// TODO: update light shape geometry
+		vector.setFromMatrixPosition( this.light.matrixWorld );
+		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		// var coneLength = this.light.distance ? this.light.distance : 1000;
-		// var coneWidth = coneLength * Math.tan( this.light.angle );
+		var lookVec = vector2.clone().sub( vector );
+		this.lightMesh.lookAt( lookVec );
+		this.lightWireMesh.lookAt( lookVec );
 
-		// this.lightShape.scale.set( coneWidth, coneWidth, coneLength );
+		this.lightMesh.material.color
+			.copy( this.light.color )
+			.multiplyScalar( this.light.intensity );
 
-		// vector.setFromMatrixPosition( this.light.matrixWorld );
-		// vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+		this.lightWireMesh.material.color
+			.copy( this.light.color )
+			.multiplyScalar( this.light.intensity );
 
-		// this.lightShape.lookAt( vector2.sub( vector ) );
-
-		// this.lightShape.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	};
 

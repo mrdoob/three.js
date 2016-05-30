@@ -104,7 +104,9 @@ THREE.Polygon.prototype = {
 
 THREE.Polygon.makeSquare = function ( dim, offset ) {
 
+	dim = ( dim !== undefined ) ? dim : 10;
 	offset = ( offset !== undefined ) ? offset : new THREE.Vector3( 0, 0, 0 );
+
 	var halfDim = dim / 2.0;
 	return new THREE.Polygon( [
 		new THREE.Vector3( - halfDim,   halfDim, 0 ),

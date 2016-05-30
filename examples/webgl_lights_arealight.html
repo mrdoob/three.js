@@ -46,29 +46,31 @@
 		<script src="js/Detector.js"></script>
 
 		<script>
+
 			var container = document.getElementById( 'container' );
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var rnd = new THREE.WebGLRenderer();
-			var cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
-			var orb = new THREE.OrbitControls(cam, rnd.domElement);
+			var cam = new THREE.PerspectiveCamera( 34, window.innerWidth / window.innerHeight, 0.1, 20000 );
+			var orb = new THREE.OrbitControls( cam, rnd.domElement );
 
 			var scn = new THREE.Scene();
 			var matFloor = new THREE.MeshPhongMaterial();
 			var matBox = new THREE.MeshPhongMaterial();
-			var geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
-			var geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
-			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
-			var mshBox = new THREE.Mesh(geoBox, matBox);
-			var amb = new THREE.AmbientLight(0x121422);
+			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
+			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+			var mshBox = new THREE.Mesh( geoBox, matBox );
+			var amb = new THREE.AmbientLight( 0x121422 );
 
 			// TODO: temp point light for debuggin
-			var dir = new THREE.DirectionalLight(0xFFFFFF);
+			var dir = new THREE.DirectionalLight( 0xFFFFFF );
 			var dirHelper;
 
-			// var area = new THREE.AreaLight(0xFFFFFF);
-			// var areaHelper;
+			var area = new THREE.AreaLight( 0xFFFFFF );
+			var areaHelper;
+
 			var ray = new THREE.Raycaster();
 			var mouseDown = new THREE.Vector2();
 			var mouse = new THREE.Vector2();
@@ -76,78 +78,74 @@
 			var gui, guiElements, param = { color: '0xffffff' };
 
 			function init() {
+
 				rnd.shadowMap.enabled = true;
 				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
 				rnd.gammaInput = true;
 				rnd.gammaOutput = true;
 				rnd.antialias = true;
-				rnd.domElement.addEventListener('mousedown', onDocumentClick);
-				rnd.domElement.addEventListener('mouseup', onDocumentClick);
+				rnd.domElement.addEventListener( 'mousedown', onDocumentClick );
+				rnd.domElement.addEventListener( 'mouseup', onDocumentClick );
 
-				cam.position.set(65, 8, -10);
+				cam.position.set( 65, 8, - 10 );
 
 				// TODO: this dir light is for debugging only
-				dir.position.set(0, 100, 0);
+				dir.position.set( 0, 20, 0 );
 				dir.castShadow = true;
 
-				dir.shadow.camera = new THREE.OrthographicCamera( - 20, 20, 20, - 20, 0.5, 500 );
+				dir.shadow.camera = new THREE.OrthographicCamera( - 20, 20, 20, - 20, 0.1, 20000 );
 				dir.shadow.mapSize.width = 1024;
 				dir.shadow.mapSize.height = 1024;
-				dir.shadow.camera.near = 0.1;
-				dir.shadow.camera.far = 20000;
 
 				dirHelper = new THREE.DirectionalLightHelper( dir );
 
-				// area.position.set(15, 40, 35);
-				// area.castShadow = true;
-				// area.penumbra = 0.05;
-				// area.decay = 2;
-				// area.distance = 500;
-				// area.shadow.mapSize.width = 1024;
-				// area.shadow.mapSize.height = 1024;
-				// area.shadow.camera.near = 0.1;
-				// area.shadow.camera.far = 20000;
+				area.position.set( 0, 20, 0 );
+				area.target = mshBox;
+				areaHelper = new THREE.AreaLightHelper( area );
 
-				// areaHelper = new THREE.AreaLightHelper( area );
+				// TODO: area light shadow
 
 				matFloor.color.set( 0x808080 );
 				randomColor( matBox );
 
 				mshFloor.receiveShadow = true;
-				mshFloor.position.set(0, 0, 0);
+				mshFloor.position.set( 0, 0, 0 );
 
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
-				mshBox.position.set(0, 5, 0);
+				mshBox.position.set( 0, 5, 0 );
 
-				scn.add(cam);
+				scn.add( cam );
 
-				scn.add(mshFloor);
-				scn.add(mshBox);
+				scn.add( mshFloor );
+				scn.add( mshBox );
 
-				scn.add(amb);
+				scn.add( amb );
 
-				scn.add(dir);
-				scn.add(dirHelper);
+				scn.add( dir );
+				scn.add( dirHelper );
 
-				// scn.add( area );
-				// scn.add( areaHelper );
+				scn.add( area );
+				scn.add( areaHelper );
 
 				scn.add( new THREE.AxisHelper( 10 ) );
 
-				document.body.appendChild(rnd.domElement);
+				document.body.appendChild( rnd.domElement );
 				onResize();
-				window.addEventListener('resize', onResize, false);
+				window.addEventListener( 'resize', onResize, false );
 
-				orb.addEventListener('change', render);
+				orb.addEventListener( 'change', render );
 				orb.update();
+
 			}
 
 			function onResize() {
-				rnd.setSize(window.innerWidth, window.innerHeight);
-				cam.aspect = (window.innerWidth / window.innerHeight);
+
+				rnd.setSize( window.innerWidth, window.innerHeight );
+				cam.aspect = ( window.innerWidth / window.innerHeight );
 				cam.updateProjectionMatrix();
 				orb.target = mshBox.position;
+
 			}
 
 			function tick() {
@@ -155,40 +153,47 @@
 				update();
 				render();
 
-				requestAnimationFrame(tick);
+				requestAnimationFrame( tick );
 
 			}
 
 			function update() {
 
+				// move box in figure 8 path
+				// xz is a figure 8
+				// y is gently rising and falling
 				var dt = 6000;
 				var qdt = dt / 4.0;
 				var dirSigns = [
-					[  1,  1 ],
-					[ -1,  1 ],
-					[ -1,  1 ],
-					[  1,  1 ]
+					[ 1,  1 ],
+					[ - 1,  1 ],
+					[ - 1,  1 ],
+					[ 1,  1 ]
 				];
 
 				var t = ( Date.now() % dt ) / dt;
-				var r = t * (4.0 * Math.PI);
+				var r = t * ( 4.0 * Math.PI );
 				var s = Math.floor( t * dirSigns.length );
 
-				var sign = dirSigns[s];
-				var x = 5.0 * (Math.cos(r) + 1.0) * sign[0];
-				var z = 5.0 * Math.sin(r) * sign[1];
-				var y = Math.cos(3.0 * r) + 5.0;
+				var sign = dirSigns[ s ];
+				var x = 5.0 * ( Math.cos( r ) + 1.0 ) * sign[ 0 ];
+				var z = 5.0 * Math.sin( r ) * sign[ 1 ];
+				var y = 2.5 * Math.cos( 0.5 * r ) + 5.0;
 
-				mshBox.position.set(x, y, z);
+				mshBox.position.set( x, y, z );
+				mshBox.updateMatrixWorld();
 
 			}
 
 			function render() {
-				// areaHelper.update(); // required
-				rnd.render(scn, cam);
+
+				areaHelper.update(); // required
+				rnd.render( scn, cam );
+
 			}
 
 			function clearGui() {
+
 				if ( gui ) gui.destroy();
 
 				gui = new dat.GUI();
@@ -199,58 +204,75 @@
 				gStyle.height = "220px";
 
 				gui.open();
+
 			}
 
 			function buildGui() {
 
 				clearGui();
 
-				// addGui( 'light color', area.color.getHex(), function( val ) {
-				// 	area.color.setHex( val );
-				// 	render();
-				// }, true );
+				addGui( 'light color', area.color.getHex(), function ( val ) {
 
-				// addGui( 'intensity', area.intensity, function( val ) {
-					// area.intensity = val;
-					// render();
-				// }, false, 0, 10 );
+					area.color.setHex( val );
 
+				}, true );
+
+				addGui( 'intensity', area.intensity, function ( val ) {
+
+					area.intensity = val;
+
+				}, false, 0, 10 );
+
+				// TODO: area light shape control
+
+				// TODO: shadow controls
 				// addGui( 'distance', area.distance, function( val ) {
-					// area.distance = val;
-					// render();
+				// area.distance = val;
+				// render();
 				// }, false, 0, 1000 );
 
 				// addGui( 'penumbra', area.penumbra, function( val ) {
-					// area.penumbra = val;
-					// render();
+				// area.penumbra = val;
+				// render();
 				// }, false, 0, 1 );
 
 				// addGui( 'decay', area.decay, function( val ) {
-					// area.decay = val;
-					// render();
+				// area.decay = val;
+				// render();
 				// }, false, 0, 100 );
 
 			}
 
 			function addGui( name, value, callback, isColor, min, max ) {
+
 				var node;
 				param[ name ] = value;
 				if ( isColor ) {
-					node = gui.addColor( param, name ).onChange( function() {
+
+					node = gui.addColor( param, name ).onChange( function () {
+
 						callback( param[ name ] );
+
 					} );
-				}
-				else if ( typeof value == 'object' ) {
-					node = gui.add( param, name, value ).onChange( function() {
+
+				} else if ( typeof value == 'object' ) {
+
+					node = gui.add( param, name, value ).onChange( function () {
+
 						callback( param[ name ] );
+
 					} );
-				}
-				else {
-					node = gui.add( param, name, min, max ).onChange( function() {
+
+				} else {
+
+					node = gui.add( param, name, min, max ).onChange( function () {
+
 						callback( param[ name ] );
+
 					} );
 				}
 				return node;
+
 			}
 
 			function onDocumentClick( event ) {
@@ -259,26 +281,25 @@
 
 				var rndDom = rnd.domElement;
 
-				if( event.type === 'mousedown' ) {
+				if ( event.type === 'mousedown' ) {
 
 					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
 					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
 
-				}
-				else {
+				} else {
 
 					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
 					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
 
-					if (mouseDown.distanceTo(mouse) < 0.0075) {
+					if ( mouseDown.distanceTo( mouse ) < 0.0075 ) {
 
 						ray.setFromCamera( mouse, cam );
 						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
 
 						if ( found.length > 0 ) {
 
-							if( event.ctrlKey === false ) randomColor( found[0].object );
-							else found[0].object.material.color.set( 0xffffff );
+							if ( event.ctrlKey === false ) randomColor( found[ 0 ].object );
+							else found[ 0 ].object.material.color.set( 0xffffff );
 
 							render();
 
@@ -301,6 +322,7 @@
 						target.color.setHex( 0xffffff * Math.random() );
 
 					}
+
 				}
 
 			}
