@@ -61,6 +61,13 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 
 	},
 
+	clearViewOffset: function() {
+
+		this.view = null;
+		this.updateProjectionMatrix();
+
+	},
+
 	updateProjectionMatrix: function () {
 
 		var dx = ( this.right - this.left ) / ( 2 * this.zoom );
