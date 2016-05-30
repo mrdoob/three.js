@@ -36,6 +36,8 @@ THREE.UniformsUtils = {
 
 				var parameter_src = uniforms_src[ u ][ p ];
 
+				// TODO (abelnation): need to handle THREE.Polygon here?
+
 				if ( parameter_src instanceof THREE.Color ||
 					 parameter_src instanceof THREE.Vector2 ||
 					 parameter_src instanceof THREE.Vector3 ||

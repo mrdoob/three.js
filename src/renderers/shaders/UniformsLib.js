@@ -120,6 +120,14 @@ THREE.UniformsLib = {
 		"spotShadowMap": { type: "tv", value: [] },
 		"spotShadowMatrix": { type: "m4v", value: [] },
 
+		"areaLights": { type: "sa", value: [], properties: {
+			// TODO (abelnation): finish this section of AreaLight config
+			"color": { type: "c" },
+			"position": { type: "v3" },
+			"direction": { type: "v3" },
+			"polygon": { type: "fa", value: [] }
+		} },
+
 		"pointLights": { type: "sa", value: [], properties: {
 			"color": { type: "c" },
 			"position": { type: "v3" },

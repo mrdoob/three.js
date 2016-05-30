@@ -15,9 +15,9 @@ THREE.AreaLight = function ( color, intensity, polygon ) {
 
 	this.polygon = ( polygon !== undefined ) ? polygon.clone() : THREE.Polygon.makeSquare();
 
-	// TODO: distance/decay
+	// TODO (abelnation): distance/decay
 
-	// TODO: shadows
+	// TODO (abelnation): shadows
 	// this.shadow = new THREE.AreaLightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
 };
@@ -25,7 +25,7 @@ THREE.AreaLight = function ( color, intensity, polygon ) {
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
 THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
-// TODO: AreaLight update when light shape is changed
+// TODO (abelnation): AreaLight update when light shape is changed
 
 THREE.AreaLight.prototype.copy = function ( source ) {
 

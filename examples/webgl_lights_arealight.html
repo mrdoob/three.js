@@ -64,7 +64,7 @@
 			var mshBox = new THREE.Mesh( geoBox, matBox );
 			var amb = new THREE.AmbientLight( 0x121422 );
 
-			// TODO: temp point light for debuggin
+			// TODO (abelnation): temp point light for debugging
 			var dir = new THREE.DirectionalLight( 0xFFFFFF );
 			var dirHelper;
 
@@ -91,7 +91,7 @@
 
 				cam.position.set( 65, 8, - 10 );
 
-				// TODO: this dir light is for debugging only
+				// TODO (abelnation): this dir light is for debugging only
 				dir.position.set( 0, 20, 0 );
 				dir.castShadow = true;
 
@@ -114,14 +114,12 @@
 				};
 				shapeNames = Object.keys( shapes );
 
-				console.log( shapes );
-
 				area = new THREE.AreaLight( 0xFFFFFF, undefined, shapes.square );
 				area.position.set( 0, 20, 0 );
 				area.target = mshBox;
 				areaHelper = new THREE.AreaLightHelper( area );
 
-				// TODO: area light shadow
+				// TODO (abelnation): area light shadow
 
 				matFloor.color.set( 0x808080 );
 				randomColor( matBox );
@@ -237,8 +235,6 @@
 
 				gui.add( param, 'shape', shapeNames ).onChange( function ( val ) {
 
-					console.log(val);
-					console.log(shapes[val])
 					area.polygon = shapes[ val ].clone();
 
 				} );
@@ -256,7 +252,7 @@
 
 				} );
 
-				// TODO: shadow controls
+				// TODO (abelnation): shadow controls
 				// addGui( 'distance', area.distance, function( val ) {
 				// area.distance = val;
 				// render();

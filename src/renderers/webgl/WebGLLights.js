@@ -69,6 +69,19 @@ THREE.WebGLLights = function () {
 				};
 				break;
 
+			case 'AreaLight':
+				uniforms = {
+					position: new THREE.Vector3(),
+					direction: new THREE.Vector3(),
+					color: new THREE.Color(),
+
+					// TODO (abelnation): convert polygon array to 1d array of coord values
+					polygon: new THREE.Polygon(),
+
+					// TODO (abelnation): set AreaLight shadow uniforms
+				};
+				break;
+
 		}
 
 		lights[ light.id ] = uniforms;

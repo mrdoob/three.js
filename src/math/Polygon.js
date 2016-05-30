@@ -40,63 +40,63 @@ THREE.Polygon.prototype = {
 
 	empty: function () {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return;
 
 	},
 
 	containsPoint: function ( point ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return false;
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return 0;
 
 	},
 
 	intersectsSphere: function ( sphere ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return false;
 
 	},
 
 	intersectsBox: function ( box ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return false;
 
 	},
 
 	intersectsPlane: function ( plane ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return false;
 
 	},
 
 	applyMatrix4: function ( matrix ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return this;
 
 	},
 
 	translate: function ( offset ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return this;
 
 	},
 
 	equals: function ( polygon ) {
 
-		// TODO: implement
+		// TODO (abelnation): implement
 		return false;
 
 	}
