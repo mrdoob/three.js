@@ -20,21 +20,6 @@ THREE.JSONLoader = function ( manager ) {
 
 Object.assign( THREE.JSONLoader.prototype, {
 
-	// Deprecated
-
-	get statusDomElement () {
-
-		if ( this._statusDomElement === undefined ) {
-
-			this._statusDomElement = document.createElement( 'div' );
-
-		}
-
-		console.warn( 'THREE.JSONLoader: .statusDomElement has been removed.' );
-		return this._statusDomElement;
-
-	},
-
 	load: function( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
