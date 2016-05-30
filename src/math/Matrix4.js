@@ -65,8 +65,8 @@ THREE.Matrix4.prototype = {
 	},
 
 	clone: function () {
-		throw "clone unsupported"
-		return new THREE.Matrix4().fromArray( this.elements );
+
+		return new THREE.Matrix4().copy( this );
 
 	},
 
@@ -632,7 +632,7 @@ THREE.Matrix4.prototype = {
 			return this.identity();
 
 		}
-		
+
 		var detInv = 1 / det;
 
 		te[ 0 ] = t11 * detInv;
@@ -962,7 +962,6 @@ THREE.Matrix4.prototype = {
 		array[ offset + 13 ] = this.origin.y;
 		array[ offset + 14 ] = this.origin.z;
 		array[ offset + 15 ] = te[ 15 ];
-console.trace( "someone wanted an array", this )
 		return array;
 
 	},

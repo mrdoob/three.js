@@ -728,9 +728,7 @@ THREE.Vector3.prototype = {
 
 		}
 
-		console.trace( "set from matrix?", m, index)
-		if( index == 3 )
-			return this.copy( m.origin );
+		if( index == 3 ) return this.copy( m.origin );
 		return this.fromArray( m.elements, index * 4 );
 
 	},
@@ -790,3 +788,17 @@ THREE.Vector3Up = new THREE.Vector3( 0, 1, 0 );
 THREE.Vector3Left = new THREE.Vector3( 1, 0, 0 );
 THREE.Vector3Forward = new THREE.Vector3( 0, 0, -1 );
 THREE.Vector3Down = new THREE.Vector3( 0, -1, 0 );
+
+["Vector3Unit"
+,"Vector3Zero"
+,"Vector3Right"
+,"Vector3Backward"
+,"Vector3Up"
+,"Vector3Left"
+,"Vector3Forward"
+,"Vector3Down"].forEach( function(key){
+	Object.defineProperty(THREE, key, { writable: false })
+	Object.defineProperty(THREE[key], "x", { writable: false })
+	Object.defineProperty(THREE[key], "y", { writable: false })
+	Object.defineProperty(THREE[key], "z", { writable: false })
+})
