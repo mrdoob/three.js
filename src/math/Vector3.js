@@ -226,14 +226,6 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyScalarTmp: function ( scalar ) {
-		if ( isFinite( scalar ) ) {
-			return new THREE.Vector3( this.x * scalar, this.y*scalar,this.z*scalar);
-		} else {
-			return new THREE.Vector3();
-		}
-	},
-
 	multiplyVectors: function ( a, b ) {
 
 		this.x = a.x * b.x;
