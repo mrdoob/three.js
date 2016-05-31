@@ -158,7 +158,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spot: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
-		area: [].
+		area: [],
 		// TODO (abelnation): arrays for area shadow map and area shadow matrix
 		point: [],
 		pointShadowMap: [],
