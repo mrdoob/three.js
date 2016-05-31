@@ -536,16 +536,16 @@
 				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				positionUniforms.time = { type: "f", value: 0.0 };
-				positionUniforms.delta = { type: "f", value: 0.0 };
-				velocityUniforms.time = { type: "f", value: 1.0 };
-				velocityUniforms.delta = { type: "f", value: 0.0 };
-				velocityUniforms.testing = { type: "f", value: 1.0 };
-				velocityUniforms.seperationDistance = { type: "f", value: 1.0 };
-				velocityUniforms.alignmentDistance = { type: "f", value: 1.0 };
-				velocityUniforms.cohesionDistance = { type: "f", value: 1.0 };
-				velocityUniforms.freedomFactor = { type: "f", value: 1.0 };
-				velocityUniforms.predator = { type: "v3", value: new THREE.Vector3() };
+				positionUniforms.time = { value: 0.0 };
+				positionUniforms.delta = { value: 0.0 };
+				velocityUniforms.time = { value: 1.0 };
+				velocityUniforms.delta = { value: 0.0 };
+				velocityUniforms.testing = { value: 1.0 };
+				velocityUniforms.seperationDistance = { value: 1.0 };
+				velocityUniforms.alignmentDistance = { value: 1.0 };
+				velocityUniforms.cohesionDistance = { value: 1.0 };
+				velocityUniforms.freedomFactor = { value: 1.0 };
+				velocityUniforms.predator = { value: new THREE.Vector3() };
 				velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
 
 				velocityVariable.wrapS = THREE.RepeatWrapping;
@@ -566,11 +566,11 @@
 
 				// For Vertex and Fragment
 				birdUniforms = {
-					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
-					texturePosition: { type: "t", value: null },
-					textureVelocity: { type: "t", value: null },
-					time: { type: "f", value: 1.0 },
-					delta: { type: "f", value: 0.0 }
+					color: { value: new THREE.Color( 0xff2200 ) },
+					texturePosition: { value: null },
+					textureVelocity: { value: null },
+					time: { value: 1.0 },
+					delta: { value: 0.0 }
 				};
 
 				// ShaderMaterial

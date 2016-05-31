@@ -44,7 +44,7 @@
  * gpuCompute.setVariableDependencies( posVar, [ velVar, posVar ] );
  *
  * // Add custom uniforms
- * velVar.material.uniforms.time = { type: "f", value: 0.0 };
+ * velVar.material.uniforms.time = { value: 0.0 };
  *
  * // Check for completeness
  * var error = gpuCompute.init();
@@ -69,8 +69,8 @@
  * Also, you can use utility functions to create ShaderMaterial and perform computations (rendering between textures)
  * Note that the shaders can have multiple input textures.
  *
- * var myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { type: "t", value: null } } );
- * var myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { type: "t", value: null } } );
+ * var myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { value: null } } );
+ * var myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { value: null } } );
  *
  * var inputTexture = gpuCompute.createTexture();
  *
@@ -109,7 +109,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 	camera.position.z = 1;
 
 	var passThruUniforms = {
-		texture: { type: "t", value: null }
+		texture: { value: null }
 	};
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
@@ -194,7 +194,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 					}
 
-					uniforms[ depVar.name ] = { type: "t", value: null };
+					uniforms[ depVar.name ] = { value: null };
 
 					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + variable.material.fragmentShader;
 

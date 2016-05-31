@@ -17,9 +17,9 @@ THREE.ConvolutionShader = {
 
 	uniforms: {
 
-		"tDiffuse":        { type: "t", value: null },
-		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
-		"cKernel":         { type: "fv1", value: [] }
+		"tDiffuse":        { value: null },
+		"uImageIncrement": { value: new THREE.Vector2( 0.001953125, 0.0 ) },
+		"cKernel":         { value: [] }
 
 	},
 
