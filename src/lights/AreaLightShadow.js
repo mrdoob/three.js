@@ -13,6 +13,6 @@ THREE.AreaLightShadow.prototype.constructor = THREE.AreaLightShadow;
 
 THREE.AreaLightShadow.prototype.update = function ( light ) {
 
-	// TODO: implement
+	// TODO (abelnation): implement
 
 };

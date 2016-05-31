@@ -30,6 +30,8 @@ float punctualLightIntensityToIrradianceFactor( const in float lightDistance, co
 		return 1.0;
 }
 
+// TODO (abelnation): implement weighted cosine helpers here for area lights
+
 vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 
 	return RECIPROCAL_PI * diffuseColor;

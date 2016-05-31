@@ -125,6 +125,8 @@ THREE.UniformsLib = {
 			"color": { type: "c" },
 			"position": { type: "v3" },
 			"direction": { type: "v3" },
+			// TODO (abelnation) where do these format codes come from?
+			// TODO (abelnation) confirm correct format code for polygon points
 			"polygon": { type: "fa", value: [] }
 		} },
 

@@ -61,6 +61,27 @@ vec3 directLightColor_Diffuse;
 
 #endif
 
+#if NUM_AREA_LIGHTS > 0
+
+    for ( int i = 0; i < NUM_AREA_LIGHTS; i ++ ) {
+
+        getAreaDirectLightIrradiance( areaLights[ i ], geometry, directLight );
+
+		dotNL = dot( geometry.normal, directLight.direction );
+		directLightColor_Diffuse = PI * directLight.color;
+
+		vLightFront += saturate( dotNL ) * directLightColor_Diffuse;
+
+		#ifdef DOUBLE_SIDED
+
+			vLightBack += saturate( -dotNL ) * directLightColor_Diffuse;
+
+		#endif
+	}
+
+
+#endif
+
 #if NUM_DIR_LIGHTS > 0
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {

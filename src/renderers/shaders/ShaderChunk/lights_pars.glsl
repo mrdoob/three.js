@@ -145,6 +145,9 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
     // TODO (abelnation): AreaLight helpers for computing radiance
 
+	void getAreaDirectLightIrradiance( const in AreaLight areaLight, const in GeometricContext geometry, out IncidentLight directLight  ) {
+        // TODO (abelnation): implement
+    }
 
 #endif
 

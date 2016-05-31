@@ -21,7 +21,7 @@ function render() {
 function animate() {
 
     requestAnimationFrame( animate );
-    
+
     if ( mixer !== null ) {
 
         var delta = clock.getDelta();
@@ -78,7 +78,7 @@ function loadObject( data ) {
     var hasLights = false;
 
     var lights = ['AmbientLight', 'DirectionalLight',
-        'PointLight', 'SpotLight', 'HemisphereLight'];
+        'PointLight', 'SpotLight', 'AreaLight', 'HemisphereLight'];
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 

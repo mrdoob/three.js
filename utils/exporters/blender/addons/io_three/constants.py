@@ -204,6 +204,8 @@ AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
+# TODO (abelnation): confirm this is correct area light string for exporter
+AREA_LIGHT = 'AreaLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
 MESH = 'Mesh'
 EMPTY = 'Empty'
