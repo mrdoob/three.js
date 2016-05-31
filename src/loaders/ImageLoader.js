@@ -12,7 +12,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var image = new Image();
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setPath( this.path );
