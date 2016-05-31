@@ -19293,7 +19293,7 @@ Object.assign( THREE.MaterialLoader.prototype, {
 
 		}
 
-		if ( json.reflectivity ) material.reflectivity = json.reflectivity;
+		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 
 		if ( json.lightMap !== undefined ) material.lightMap = this.getTexture( json.lightMap );
 		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
@@ -20435,8 +20435,8 @@ THREE.Material.prototype = {
 
 		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
 
-		if ( this.roughness !== 0.5 ) data.roughness = this.roughness;
-		if ( this.metalness !== 0.5 ) data.metalness = this.metalness;
+		if ( this.roughness !== undefined ) data.roughness = this.roughness;
+		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
 		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
@@ -21572,7 +21572,7 @@ THREE.PointsMaterial.prototype.copy = function ( source ) {
  *
  * parameters = {
  *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { type: "1f", value: 1.0 }, "parameter2": { type: "1i" value2: 2 } },
+ *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
  *
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
