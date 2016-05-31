@@ -65,7 +65,7 @@
 		float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiverClipSpace, const in float zReceiverLightSpace, const in float shadowRadius, const in vec3 shadowCameraNearFar, const in vec2 randomSeed ) {
 			// This uses similar triangles to compute what
 			// area of the shadow map we should search
-			float lightFrustrumWidth = 2.0 * shadowCameraNearFar.y * tan(shadowCameraNearFar.x*0.5);
+			float lightFrustrumWidth = 2.0 * shadowCameraNearFar.y * tan(shadowCameraNearFar.x * 0.5);
 			float searchRadius = ( shadowRadius / lightFrustrumWidth ) * ( zReceiverLightSpace - shadowCameraNearFar.y ) / zReceiverLightSpace;
 			float blockerDepthSum = 0.0;
 			int numBlockers = 0;
@@ -142,11 +142,11 @@
 
 			// STEP 2: penumbra size
 			float penumbraRatio = penumbraSize( zReceiverLightSpace, avgBlockerDepthLightSpace );
-			float lightFrustrumWidth = 2.0 * shadowCameraNearFar.y * tan(shadowCameraNearFar.x*0.5);
+			float lightFrustrumWidth = 2.0 * shadowCameraNearFar.y * tan(shadowCameraNearFar.x * 0.5);
 			float filterRadius = penumbraRatio * ( shadowRadius/lightFrustrumWidth ) * shadowCameraNearFar.y / zReceiverLightSpace;
 
 			// STEP 3: filtering
-			return zReceiverLightSpace;
+			//return avgBlockerDepthLightSpace;
 			return percentCloserFilter( shadowMap, uv, zReceiverClipSpace, filterRadius, uv );
 		}
 

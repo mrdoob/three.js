@@ -123,7 +123,7 @@
 				var newObj = new THREE.SpotLight( color, 2 );
 
 				newObj.castShadow = true;
-				newObj.angle = 0.75;
+				newObj.angle = 0.5;
 				newObj.penumbra = 0.2;
 				newObj.decay = 1;
 				newObj.distance = 1550;
@@ -131,7 +131,7 @@
 				newObj.shadow.radius = 0.1;
 				newObj.shadow.mapSize.width = 1024;
 				newObj.shadow.mapSize.height = 1024;
-				newObj.shadow.camera.near = 10.5;
+				newObj.shadow.camera.near = 0.5;
 				newObj.shadow.camera.far = 1000;
 
 				return newObj;
