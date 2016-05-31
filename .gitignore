@@ -3,3 +3,5 @@
 .project
 node_modules
 .idea/
+
+utils/codestyle/samples/*.actual.*

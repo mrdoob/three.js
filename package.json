@@ -21,6 +21,7 @@
   },
   "scripts": {
     "build": "cd ./utils/build && node build.js --include common --include extras",
+    "format": "./utils/codestyle/codestyle.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -41,7 +42,13 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "argparse": "^1.0.3",
-    "jscs": "^1.13.1",
+    "async": "^1.5.2",
+    "esformatter": "^0.9.3",
+    "esformatter-eol-last": "^1.0.0",
+    "esformatter-limit-linebreaks": "0.0.3",
+    "esformatter-semicolons": "^1.1.2",
+    "esformatter-spaced-lined-comment": "^2.0.1",
+    "jscs": "3.0.1",
     "uglify-js": "^2.6.0"
   }
 }
