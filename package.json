@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "cd ./utils/build && node build.js --include common --include extras",
-    "build-watch": "chokidar \"./src/**/*.*\" \"./utils/build/includes/*.*\" --initial -c \"npm run build\"",
+    "dev": "chokidar \"./src/**/*.*\" \"./utils/build/includes/*.*\" --initial -c \"npm run build\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
