@@ -113,6 +113,10 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 		var curve = new THREE.SplineCurve( npts );
 		this.curves.push( curve );
 
+		var lastPoint = pts[ pts.length - 1 ];
+		args.push( lastPoint.x );
+		args.push( lastPoint.y );
+
 		this.actions.push( { action: 'splineThru', args: args } );
 
 	},
