@@ -2271,6 +2271,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsPhysical ( uniforms, material ) {
 
+		uniforms.clearCoat.value = material.clearCoat;
+		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
+
 		refreshUniformsStandard( uniforms, material );
 
 	}
