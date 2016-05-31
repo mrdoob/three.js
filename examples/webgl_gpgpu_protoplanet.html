@@ -270,7 +270,7 @@
 			if ( hash ) hash = parseInt( hash, 0 );
 
 			// Texture width for simulation (each texel is a debris particle)
-			var WIDTH = hash || 32;
+			var WIDTH = hash || 64;
 
 			var container, stats;
 			var camera, scene, renderer, geometry, controls;
@@ -312,8 +312,8 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 5, 15000 );
-				camera.position.y = 300;
-				camera.position.z = 350;
+				camera.position.y = 120;
+				camera.position.z = 400;
 
 				scene = new THREE.Scene();
 
@@ -333,7 +333,7 @@
 					// Must restart simulation
 					radius: 300,
 					height: 8,
-					exponent: 0.2,
+					exponent: 0.4,
 					maxMass: 15.0,
 					velocity: 70,
 					velocityExponent: 0.2,
@@ -537,10 +537,10 @@
 
 				folder2.add( effectController, "radius", 10.0, 1000.0, 1.0 );
 				folder2.add( effectController, "height", 0.0, 50.0, 0.01 );
-				folder2.add( effectController, "exponent", 0.0, 10.0, 0.001 );
+				folder2.add( effectController, "exponent", 0.0, 2.0, 0.001 );
 				folder2.add( effectController, "maxMass", 1.0, 50.0, 0.1 );
 				folder2.add( effectController, "velocity", 0.0, 150.0, 0.1 );
-				folder2.add( effectController, "velocityExponent", 0.0, 10.0, 0.01 );
+				folder2.add( effectController, "velocityExponent", 0.0, 1.0, 0.01 );
 				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
 
 				var buttonRestart = {
