@@ -284,8 +284,10 @@
 
 				switch ( event.keyCode ) {
 
-					case 8:
+					case 8: // backspace
 						event.preventDefault(); // prevent browser back
+
+                                        case 46: // delete
 
 						var object = editor.selected;
 
