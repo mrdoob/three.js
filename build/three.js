@@ -18414,7 +18414,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var image = document.createElement( 'img' );
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
 			URL.revokeObjectURL( image.src );
@@ -21921,7 +21921,7 @@ THREE.Texture.prototype = {
 
 			} else {
 
-				canvas = document.createElement( 'canvas' );
+				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 				canvas.width = image.width;
 				canvas.height = image.height;
 
@@ -24669,7 +24669,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -30776,7 +30776,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			var scale = maxSize / Math.max( image.width, image.height );
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = Math.floor( image.width * scale );
 			canvas.height = Math.floor( image.height * scale );
 
@@ -30803,7 +30803,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
 			canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
 
@@ -32561,7 +32561,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
 		};
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		canvas.width = 8;
 		canvas.height = 8;
 
@@ -33631,7 +33631,7 @@ THREE.CanvasRenderer = function () {
 
 	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 
-	this.domElement = document.createElement( 'canvas' );
+	this.domElement = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 	this.clear = function () {};
 	this.render = function () {};
 	this.setClearColor = function () {};
