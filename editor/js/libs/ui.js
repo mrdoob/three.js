@@ -1041,18 +1041,27 @@ UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
 
 // Button
 
-UI.Button = function ( value ) {
+UI.Button = function ( value, shortcut ) {
 
 	UI.Element.call( this );
-
-	var scope = this;
 
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';
 
 	this.dom = dom;
 	this.dom.textContent = value;
-
+	
+	if ( shortcut != null ) {
+		
+		var shortcutDom = document.createElement( 'span' );
+		
+		shortcutDom.className = 'Shortcut';
+		shortcutDom.textContent = '( ' + shortcut + ' )';
+		
+		this.dom.appendChild( shortcutDom );
+		
+	}
+	
 	return this;
 
 };

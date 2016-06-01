@@ -63,6 +63,13 @@ textarea, input { outline: none; } /* osx */
 		border-top-color: #bbb;
 	}
 
+	.Button .Shortcut {
+		position: relative;
+		top: -1px;
+		left: 2px;
+		color: #555;
+	}
+	
 	.Panel.Collapsible.collapsed .Content {
 		display: none;
 	}
