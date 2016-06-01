@@ -224,20 +224,17 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 			if ( image === undefined ) {
 
 				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
-				return;
 
-			}
-
-			if ( image.complete === false ) {
+			} else if ( image.complete === false ) {
 
 				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+
+			} else {
+
+				uploadTexture( textureProperties, texture, slot );
 				return;
 
 			}
-
-			uploadTexture( textureProperties, texture, slot );
-
-			return;
 
 		}
 
