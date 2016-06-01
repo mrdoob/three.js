@@ -18,7 +18,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			var scale = maxSize / Math.max( image.width, image.height );
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = Math.floor( image.width * scale );
 			canvas.height = Math.floor( image.height * scale );
 
@@ -45,7 +45,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
 
-			var canvas = document.createElement( 'canvas' );
+			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 			canvas.width = THREE.Math.nearestPowerOfTwo( image.width );
 			canvas.height = THREE.Math.nearestPowerOfTwo( image.height );
 

@@ -12,7 +12,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,

@@ -12,7 +12,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var image = document.createElement( 'img' );
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
 			URL.revokeObjectURL( image.src );
