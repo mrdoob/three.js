@@ -30765,37 +30765,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	var _infoMemory = info.memory;
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
-	/*
-	var textures = {};
-
-	this.get = function ( texture ) {
-
-		var uuid = texture.uuid;
-		var map = textures[ uuid ];
-
-		if ( map === undefined ) {
-
-			map = {};
-			textures[ uuid ] = map;
-
-		}
-
-		return map;
-
-	};
-
-	this.delete = function ( texture ) {
-
-		delete textures[ texture.uuid ];
-
-	};
-
-	this.clear = function () {
-
-		textures = {};
-
-	};
-	*/
+	//
 
 	function clampToMaxSize ( image, maxSize ) {
 
