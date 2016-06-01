@@ -40,7 +40,7 @@ Object.assign( THREE.Font.prototype, {
 
 			if ( ! glyph ) return;
 
-			var path = new THREE.Path();
+			var path = new THREE.ShapePath();
 
 			var pts = [], b2 = THREE.ShapeUtils.b2, b3 = THREE.ShapeUtils.b3;
 			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;

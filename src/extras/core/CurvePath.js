@@ -139,6 +139,84 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	},
 
+	getSpacedPoints: function ( divisions ) {
+
+		if ( ! divisions ) divisions = 40;
+
+		var points = [];
+
+		for ( var i = 0; i < divisions; i ++ ) {
+
+			points.push( this.getPoint( i / divisions ) );
+
+		}
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	getPoints: function ( divisions ) {
+
+		divisions = divisions || 12;
+
+		var points = [], tmp, last;
+
+		this.curves.forEach(function(curve) {
+
+			var pts = curve instanceof THREE.LineCurve ? 1 : divisions;
+			tmp = curve.getPoints(pts);
+			points = points.concat(tmp);
+
+		});
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		points = this.removeDuplicatesInAPath( points );
+
+		return points;
+
+	},
+
+
+	/* Ensures consecutive vectors of a path
+	 * have no duplicates.
+	 * Arguments: Path is an array of Vector2
+	 */
+	removeDuplicatesInAPath: function ( points ) {
+
+		if ( points.length === 0 ) return points;
+
+		var lastPoint = points[0];
+		var newPath = [ lastPoint ];
+
+		for (var i = 1; i < points.length; i++) {
+			if (lastPoint.distanceTo(points[ i ]) > Number.EPSILON) {
+				lastPoint = points[ i ];
+
+				if ( i !== points.length - 1 || points[0].distanceTo( lastPoint ) > Number.EPSILON ) {
+					newPath.push( lastPoint );
+					// remove last point if it's the same as the first point
+					// TODO Move this to shapeutils only
+				}
+			} else {
+				// console.log('duplicate points at ', i - 1, i);
+			}
+		}
+
+		return newPath;
+
+	},
+
 	/**************************************************************
 	 *	Create Geometries Helpers
 	 **************************************************************/
