@@ -24687,6 +24687,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var morphInfluences = new Float32Array( 8 );
 
+	var emptyTexture = new THREE.Texture();
+
 	var sprites = [];
 	var lensFlares = [];
 
@@ -26995,7 +26997,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			intensity = light.intensity;
 			distance = light.distance;
 
-			shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
+			shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : emptyTexture;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
