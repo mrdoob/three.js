@@ -181,7 +181,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( shadow instanceof THREE.SpotLightShadow ) {
+			if ( shadow instanceof THREE.SpotLightShadow || shadow instanceof THREE.DirectionalLightShadow ) {
 
 				shadow.update( light );
 

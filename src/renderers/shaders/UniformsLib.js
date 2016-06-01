@@ -96,7 +96,8 @@ THREE.UniformsLib = {
 			"shadow": { type: "1i" },
 			"shadowBias": { type: "1f" },
 			"shadowRadius": { type: "1f" },
-			"shadowMapSize": { type: "v2" }
+			"shadowMapSize": { type: "v2" },
+			"shadowCameraParams": { type: "v3" }
 		} },
 
 		"directionalShadowMap": { type: "tv", value: [] },
@@ -115,7 +116,7 @@ THREE.UniformsLib = {
 			"shadowBias": { type: "1f" },
 			"shadowRadius": { type: "1f" },
 			"shadowMapSize": { type: "v2" },
-			"shadowCameraNearFar": { type: "v3" }
+			"shadowCameraParams": { type: "v3" }
 		} },
 
 		"spotShadowMap": { type: "tv", value: [] },
