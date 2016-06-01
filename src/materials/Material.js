@@ -253,6 +253,7 @@ THREE.Material.prototype = {
 
 		this.blending = source.blending;
 		this.side = source.side;
+		this.shading = source.shading;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
