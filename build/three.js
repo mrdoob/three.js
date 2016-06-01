@@ -20546,6 +20546,7 @@ THREE.Material.prototype = {
 
 		this.blending = source.blending;
 		this.side = source.side;
+		this.shading = source.shading;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
@@ -23120,7 +23121,7 @@ Object.assign( THREE.Skeleton.prototype, {
 
 			if ( bone ) {
 
-				if ( bone.parent ) {
+				if ( bone.parent instanceof THREE.Bone ) {
 
 					bone.matrix.getInverse( bone.parent.matrixWorld );
 					bone.matrix.multiply( bone.matrixWorld );
