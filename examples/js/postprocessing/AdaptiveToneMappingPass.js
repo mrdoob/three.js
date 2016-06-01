@@ -52,10 +52,10 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 ),
 		},
 		uniforms: {
-			"lastLum": { type: "t", value: null },
-			"currentLum": { type: "t", value: null },
-			"delta": { type: 'f', value: 0.016 },
-			"tau": { type: 'f', value: 1.0 }
+			"lastLum": { value: null },
+			"currentLum": { value: null },
+			"delta": { value: 0.016 },
+			"tau": { value: 1.0 }
 		},
 		vertexShader: [
 			"varying vec2 vUv;",

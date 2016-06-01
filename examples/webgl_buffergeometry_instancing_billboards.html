@@ -157,8 +157,8 @@
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { type: "t", value: new THREE.TextureLoader().load( "textures/sprites/circle.png" ) },
-					time: { type: "f", value: 0.0 }
+					map: { value: new THREE.TextureLoader().load( "textures/sprites/circle.png" ) },
+					time: { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,

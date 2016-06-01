@@ -3674,20 +3674,20 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "lights" ],
 
 		{
-			"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-			"shininess": { type: "f", value: 30 }
+			"emissive" : { value: new THREE.Color( 0x000000 ) },
+			"specular" : { value: new THREE.Color( 0x111111 ) },
+			"shininess": { value: 30 }
 		},
 
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 		{
-			"outlineDrawing"  : { type: "i", value: 0 },
-			"outlineThickness": { type: "f", value: 0.0 },
-			"outlineColor"    : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"outlineAlpha"    : { type: "f", value: 1.0 },
-			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null },
-			"hasToonTexture"  : { type: "i", value: 0 }
+			"outlineDrawing"  : { value: 0 },
+			"outlineThickness": { value: 0.0 },
+			"outlineColor"    : { value: new THREE.Color( 0x000000 ) },
+			"outlineAlpha"    : { value: 1.0 },
+			"celShading"      : { value: 0 },
+			"toonMap"         : { value: null },
+			"hasToonTexture"  : { value: 0 }
 		}
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 

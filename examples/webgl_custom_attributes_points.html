@@ -141,9 +141,9 @@
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
-					amplitude: { type: "f", value: 1.0 },
-					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
+					amplitude: { value: 1.0 },
+					color:     { value: new THREE.Color( 0xffffff ) },
+					texture:   { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

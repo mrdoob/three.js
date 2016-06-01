@@ -80,6 +80,8 @@ var Storage = function () {
 
 		clear: function () {
 
+			if ( database === undefined ) return;
+
 			var transaction = database.transaction( [ 'states' ], 'readwrite' );
 			var objectStore = transaction.objectStore( 'states' );
 			var request = objectStore.clear();

@@ -112,9 +112,9 @@
 						GEOMETRY_SIZE : gsize,
 						RESOLUTION : res
 					});
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { type: "m4", value: this.ms_Camera.projectionMatrix };
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { type: "m4", value: this.ms_Camera.matrixWorldInverse };
-					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { type: "v3", value: this.ms_Camera.position };
+					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { value: this.ms_Camera.projectionMatrix };
+					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { value: this.ms_Camera.matrixWorldInverse };
+					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { value: this.ms_Camera.position };
 					this.ms_Scene.add(this.ms_Ocean.oceanMesh);
 
 					var gui = new dat.GUI();
