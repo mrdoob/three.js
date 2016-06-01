@@ -1839,7 +1839,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( uCamPos !== undefined ) {
 
 					uCamPos.setValue( _gl,
-							_vector3.setFromMatrixPosition( camera.matrixWorld ) );
+							_vector3.setFromMatrixPosition( camera.matrixWorld ), refreshProgram );
 
 				}
 
@@ -1852,12 +1852,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
-				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse, refreshProgram );
 
 			}
 
-			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
-			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
+			p_uniforms.set( _gl, _this, 'toneMappingExposure', refreshProgram );
+			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint', refreshProgram );
 
 		}
 
@@ -1867,8 +1867,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
-			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
+			p_uniforms.setOptional( _gl, object, 'bindMatrix', refreshProgram );
+			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse', refreshProgram );
 
 			var skeleton = object.skeleton;
 
@@ -1876,13 +1876,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( capabilities.floatVertexTextures && skeleton.useVertexTexture ) {
 
-					p_uniforms.set( _gl, skeleton, 'boneTexture' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureWidth' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureHeight' );
+					p_uniforms.set( _gl, skeleton, 'boneTexture', refreshProgram );
+					p_uniforms.set( _gl, skeleton, 'boneTextureWidth', refreshProgram );
+					p_uniforms.set( _gl, skeleton, 'boneTextureHeight', refreshProgram );
 
 				} else {
 
-					p_uniforms.setOptional( _gl, skeleton, 'boneMatrices' );
+					p_uniforms.setOptional( _gl, skeleton, 'boneMatrices', refreshProgram);
 
 				}
 
@@ -1891,21 +1891,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( refreshMaterial ) {
-
-			if ( material.lights ) {
-
-				// the current material requires lighting info
-
-				// note: all lighting uniforms are always set correctly
-				// they simply reference the renderer's state for their
-				// values
-				//
-				// use the current material's .needsUpdate flags to set
-				// the GL state when required
-
-				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
-
-			}
 
 			// refresh uniforms common to several materials
 
@@ -1973,16 +1958,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			THREE.WebGLUniforms.upload(
-					_gl, materialProperties.uniformsList, m_uniforms, _this );
+					_gl, materialProperties.uniformsList, m_uniforms, _this ,refreshProgram);
 
 		}
 
 
 		// common matrices
 
-		p_uniforms.set( _gl, object, 'modelViewMatrix' );
-		p_uniforms.set( _gl, object, 'normalMatrix' );
-		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+		p_uniforms.set( _gl, object, 'modelViewMatrix', refreshProgram);
+		p_uniforms.set( _gl, object, 'normalMatrix', refreshProgram);
+		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld, refreshProgram);
 
 
 		// dynamic uniforms
@@ -1994,7 +1979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			THREE.WebGLUniforms.evalDynamic(
 					dynUniforms, m_uniforms, object, camera );
 
-			THREE.WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
+			THREE.WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this, refreshProgram );
 
 		}
 
