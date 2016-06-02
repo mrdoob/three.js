@@ -111,7 +111,7 @@
 
 							var reflectivity = 1 - gamma;
 
-							var material = new THREE.MeshPhysicalMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0xff8800, metalness: 0, roughness: 0.5, clearCoat: clearCoat, clearCoatRoughness: clearCoatRoughness, reflectivity: reflectivity, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshPhysicalMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x888888, metalness: 0, roughness: 0.5, clearCoat: clearCoat, clearCoatRoughness: clearCoatRoughness, reflectivity: reflectivity, shading: THREE.SmoothShading, envMap: localReflectionCube } )
 
 							var mesh = new THREE.Mesh( geometry, material );
 
