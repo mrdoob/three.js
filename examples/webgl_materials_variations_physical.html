@@ -63,24 +63,14 @@
 
 				// Materials
 
-				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
-				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-				imgTexture.anisotropy = 16;
-				imgTexture = null;
+				var loader = new THREE.CubeTextureLoader();
+				loader.setPath( 'textures/cube/SwedishRoyalCastle/' );
 
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
-
-				var materials = [];
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				var reflectionCube = loader.load( [
+					'px.jpg', 'nx.jpg',
+					'py.jpg', 'ny.jpg',
+					'pz.jpg', 'nz.jpg'
+				] );
 				reflectionCube.format = THREE.RGBFormat;
 
 				var cubeWidth = 400;
@@ -90,18 +80,9 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				var localReflectionCube;
-
 				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
 					var clearCoat = 1.0 - alpha;
-
-					//if( alphaIndex % 2 === 0 ) {
-						//localReflectionCube = null;
-					//}
-					//else {
-						localReflectionCube = reflectionCube;
-					//}
 
 					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
@@ -111,7 +92,15 @@
 
 							var reflectivity = 1 - gamma;
 
-							var material = new THREE.MeshPhysicalMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x888888, metalness: 0, roughness: 0.5, clearCoat: clearCoat, clearCoatRoughness: clearCoatRoughness, reflectivity: reflectivity, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshPhysicalMaterial( {
+								color: 0x888822,
+								metalness: 0,
+								roughness: 0.5,
+								clearCoat: clearCoat,
+								clearCoatRoughness: clearCoatRoughness,
+								reflectivity: reflectivity,
+								envMap: reflectionCube
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -173,7 +162,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
-			
+
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
