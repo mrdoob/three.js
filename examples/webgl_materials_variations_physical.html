@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Physical Material Variations by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -63,15 +63,6 @@
 
 				// Materials
 
-				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
-				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-				imgTexture.anisotropy = 16;
-				imgTexture = null;
-
-				var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
-
-				var materials = [];
-
 				var loader = new THREE.CubeTextureLoader();
 				loader.setPath( 'textures/cube/SwedishRoyalCastle/' );
 
@@ -89,29 +80,27 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				var localReflectionCube;
-
 				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-					var roughness = 1.0 - alpha;
-
-					if( alphaIndex % 2 === 0 ) {
-						localReflectionCube = null;
-					}
-					else {
-						localReflectionCube = reflectionCube;
-					}
+					var clearCoat = 1.0 - alpha;
 
 					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-						var metalness = beta;
+						var clearCoatRoughness = 1 - beta;
 
 						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color( gamma, 0, 0 ).multiplyScalar( 1 - 0.08 );
+							var reflectivity = 1 - gamma;
 
-							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, metalness: metalness, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshPhysicalMaterial( {
+								color: 0x888822,
+								metalness: 0,
+								roughness: 0.5,
+								clearCoat: clearCoat,
+								clearCoatRoughness: clearCoatRoughness,
+								reflectivity: reflectivity,
+								envMap: reflectionCube
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -143,14 +132,14 @@
 					scene.add( textMesh );
 				}
 
-				addLabel( "+roughness", new THREE.Vector3( -350, 0, 0 ) );
-				addLabel( "-roughness", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( "+clearCoat", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-metalness", new THREE.Vector3( 0, -300, 0 ) );
-				addLabel( "+metalness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
-				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );

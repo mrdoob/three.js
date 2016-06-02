@@ -6,6 +6,11 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
+#ifndef STANDARD
+	uniform float clearCoat;
+	uniform float clearCoatRoughness;
+#endif
+
 uniform float envMapIntensity; // temporary
 
 varying vec3 vViewPosition;
