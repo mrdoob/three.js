@@ -30,6 +30,16 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 	},
 
+	copy: function ( source ) {
+
+		THREE.Object3D.prototype.copy.call( this, source );
+
+		this.drawMode = source.drawMode;
+
+		return this;
+
+	},
+
 	updateMorphTargets: function () {
 
 		if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {

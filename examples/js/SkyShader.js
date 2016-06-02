@@ -18,12 +18,12 @@ THREE.ShaderLib[ 'sky' ] = {
 
 	uniforms: {
 
-		luminance:	 { type: "f", value: 1 },
-		turbidity:	 { type: "f", value: 2 },
-		reileigh:	 { type: "f", value: 1 },
-		mieCoefficient:	 { type: "f", value: 0.005 },
-		mieDirectionalG: { type: "f", value: 0.8 },
-		sunPosition: 	 { type: "v3", value: new THREE.Vector3() }
+		luminance: { value: 1 },
+		turbidity: { value: 2 },
+		reileigh: { value: 1 },
+		mieCoefficient: { value: 0.005 },
+		mieDirectionalG: { value: 0.8 },
+		sunPosition: { value: new THREE.Vector3() }
 
 	},
 

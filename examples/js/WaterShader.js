@@ -11,17 +11,17 @@ THREE.ShaderLib[ 'water' ] = {
 
 	uniforms: THREE.UniformsUtils.merge( [
 		THREE.UniformsLib[ "fog" ], {
-			"normalSampler":    { type: "t", value: null },
-			"mirrorSampler":    { type: "t", value: null },
-			"alpha":            { type: "f", value: 1.0 },
-			"time":             { type: "f", value: 0.0 },
-			"distortionScale":  { type: "f", value: 20.0 },
-			"noiseScale":       { type: "f", value: 1.0 },
-			"textureMatrix" :   { type: "m4", value: new THREE.Matrix4() },
-			"sunColor":         { type: "c", value: new THREE.Color( 0x7F7F7F ) },
-			"sunDirection":     { type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-			"eye":              { type: "v3", value: new THREE.Vector3() },
-			"waterColor":       { type: "c", value: new THREE.Color( 0x555555 ) }
+			"normalSampler":    { value: null },
+			"mirrorSampler":    { value: null },
+			"alpha":            { value: 1.0 },
+			"time":             { value: 0.0 },
+			"distortionScale":  { value: 20.0 },
+			"noiseScale":       { value: 1.0 },
+			"textureMatrix" :   { value: new THREE.Matrix4() },
+			"sunColor":         { value: new THREE.Color( 0x7F7F7F ) },
+			"sunDirection":     { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+			"eye":              { value: new THREE.Vector3() },
+			"waterColor":       { value: new THREE.Color( 0x555555 ) }
 		}
 	] ),
 

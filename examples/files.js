@@ -44,6 +44,8 @@ var files = {
 		"webgl_geometry_text_earcut",
 		"webgl_geometry_text_pnltri",
 		"webgl_gpgpu_birds",
+		"webgl_gpgpu_water",
+		"webgl_gpgpu_protoplanet",
 		"webgl_gpu_particle_system",
 		"webgl_hdr",
 		"webgl_helpers",

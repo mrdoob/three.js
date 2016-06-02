@@ -8,9 +8,7 @@ THREE.FontLoader = function ( manager ) {
 
 };
 
-THREE.FontLoader.prototype = {
-
-	constructor: THREE.FontLoader,
+Object.assign( THREE.FontLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -46,4 +44,4 @@ THREE.FontLoader.prototype = {
 
 	}
 
-};
+} );

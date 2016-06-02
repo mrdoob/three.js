@@ -8,9 +8,7 @@ THREE.CubeTextureLoader = function ( manager ) {
 
 };
 
-THREE.CubeTextureLoader.prototype = {
-
-	constructor: THREE.CubeTextureLoader,
+Object.assign( THREE.CubeTextureLoader.prototype, {
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
@@ -64,4 +62,4 @@ THREE.CubeTextureLoader.prototype = {
 
 	}
 
-};
+} );
