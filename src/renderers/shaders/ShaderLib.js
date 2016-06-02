@@ -93,7 +93,7 @@ THREE.ShaderLib = {
 				"emissive" : { value: new THREE.Color( 0x000000 ) },
 				"roughness": { value: 0.5 },
 				"metalness": { value: 0 },
-				"envMapIntensity" : { value: 1 } // temporary
+				"envMapIntensity" : { value: 1 }, // temporary
 			}
 
 		] ),
@@ -218,7 +218,8 @@ THREE.ShaderLib[ 'physical' ] = {
 		THREE.ShaderLib[ 'standard' ].uniforms,
 
 		{
-			// future
+			"clearCoat": { value: 0 },
+			"clearCoatRoughness": { value: 0 }
 		}
 
 	] ),
