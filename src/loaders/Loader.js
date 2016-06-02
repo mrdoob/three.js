@@ -164,6 +164,14 @@ THREE.Loader.prototype = {
 					case 'mapDiffuseWrap':
 					case 'mapDiffuseAnisotropy':
 						break;
+					case 'mapEmissive':
+						json.emissiveMap = loadTexture( value, m.mapEmissiveRepeat, m.mapEmissiveOffset, m.mapEmissiveWrap, m.mapEmissiveAnisotropy );
+						break;
+					case 'mapEmissiveRepeat':
+					case 'mapEmissiveOffset':
+					case 'mapEmissiveWrap':
+					case 'mapEmissiveAnisotropy':
+						break;
 					case 'mapLight':
 						json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 						break;
