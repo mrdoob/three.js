@@ -116,7 +116,8 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 			return;
 
 		}
-
+		
+		this.isPlaying = false;
 		this.source.stop();
 		this.startTime = 0;
 
