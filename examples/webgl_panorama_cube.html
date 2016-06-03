@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - panorama</title>
+		<title>three.js webgl - panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -39,8 +39,7 @@
 
 		<script>
 
-		var camera;
-		var effect, controls;
+		var camera, controls;
 		var renderer;
 		var scene;
 
@@ -132,8 +131,6 @@
 		function animate() {
 
 			controls.update();
-
-			// camera.rotation.y = - performance.now() / 10000;
 
 			renderer.render( scene, camera );
 
