@@ -62,7 +62,7 @@ textarea, input { outline: none; } /* osx */
 		margin-top: 6px;
 		border-top-color: #bbb;
 	}
-	
+
 	.Panel.Collapsible.collapsed .Content {
 		display: none;
 	}

@@ -1050,7 +1050,7 @@ UI.Button = function ( value ) {
 
 	this.dom = dom;
 	this.dom.textContent = value;
-	
+
 	return this;
 
 };
