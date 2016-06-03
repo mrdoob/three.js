@@ -14,14 +14,14 @@ var Toolbar = function ( editor ) {
 
 	// translate / rotate / scale
 
-	var translate = new UI.Button( 'translate ( e )' ).onClick( function () {
+	var translate = new UI.Button( 'translate ( w )' ).onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
 	buttons.add( translate );
 
-	var rotate = new UI.Button( 'rotate ( w )' ).onClick( function () {
+	var rotate = new UI.Button( 'rotate ( e )' ).onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
 
