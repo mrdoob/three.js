@@ -218,6 +218,8 @@ Menubar.File = function ( editor ) {
 		output.metadata.type = 'App';
 		delete output.history;
 
+		var vr = output.project.vr;
+
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
@@ -234,6 +236,17 @@ Menubar.File = function ( editor ) {
 		var loader = new THREE.XHRLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
+			var includes = [];
+
+			if ( vr ) {
+
+				includes.push( '<script src="js/VRControls.js"></script>' );
+				includes.push( '<script src="js/VREffect.js"></script>' );
+
+			}
+
+			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
+
 			zip.file( 'index.html', content );
 
 		} );
@@ -248,17 +261,21 @@ Menubar.File = function ( editor ) {
 
 		} );
 
-		loader.load( '../examples/js/controls/VRControls.js', function ( content ) {
+		if ( vr ) {
 
-			zip.file( 'js/VRControls.js', content );
+			loader.load( '../examples/js/controls/VRControls.js', function ( content ) {
 
-		} );
+				zip.file( 'js/VRControls.js', content );
 
-		loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
+			} );
 
-			zip.file( 'js/VREffect.js', content );
+			loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
 
-		} );
+				zip.file( 'js/VREffect.js', content );
+
+			} );
+
+		}
 
 	} );
 	options.add( option );

@@ -30,8 +30,7 @@
 	<body ontouchstart="">
 		<script src="js/three.min.js"></script>
 		<script src="js/app.js"></script>
-		<script src="js/VRControls.js"></script>
-		<script src="js/VREffect.js"></script>
+		<!-- includes -->
 		<script>
 
 			var loader = new THREE.XHRLoader();
@@ -54,7 +53,7 @@
 					button.addEventListener( 'click', function ( event ) {
 
 						var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-						window.open( 'http://threejs.org/editor/#file=https://crossorigin.me/' + url + '/app.json' );
+						window.open( 'http://threejs.org/editor/#file=' + url + '/app.json' );
 
 					}, false );
 					document.body.appendChild( button );
