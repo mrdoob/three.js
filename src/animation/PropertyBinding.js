@@ -163,7 +163,7 @@ THREE.PropertyBinding.prototype = {
 		// resolve property
 		var nodeProperty = targetObject[ propertyName ];
 
-		if ( ! nodeProperty ) {
+		if ( nodeProperty === undefined ) {
 
 			var nodeName = parsedPath.nodeName;
 
