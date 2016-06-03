@@ -11,25 +11,33 @@
 				padding: 0px;
 				overflow: hidden;
 			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
 		</style>
 
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js webgl</a> - cube panorama demo.
+		</div>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/controls/VRControls.js"></script>
-		<script src="js/effects/VREffect.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
-
-		if ( WEBVR.isLatestAvailable() === false ) {
-
-			document.body.appendChild( WEBVR.getMessage() );
-
-		}
-
-		//
 
 		var camera;
 		var effect, controls;
@@ -41,26 +49,23 @@
 
 		function init() {
 
+			var container = document.getElementById( 'container' );
+
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+			container.appendChild( renderer.domElement );
 
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.layers.enable( 1 );
+			camera.position.z = 0.01;
 
-			controls = new THREE.VRControls( camera );
-			effect = new THREE.VREffect( renderer );
+			controls = new THREE.OrbitControls( camera );
+			controls.enableZoom = false;
+			controls.enablePan = false;
 
-			if ( WEBVR.isAvailable() === true ) {
-
-				document.body.appendChild( WEBVR.getButton( effect ) );
-
-			}
-
-			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
+			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
 			var materials = [];
 
@@ -72,22 +77,7 @@
 
 			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshFaceMaterial( materials ) );
 			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-			skyBox.layers.set( 1 );
 			scene.add( skyBox );
-
-
-			var materialsR = [];
-
-			for ( var i = 6; i < 12; i ++ ) {
-
-				materialsR.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
-
-			}
-
-			var skyBoxR = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshFaceMaterial( materialsR ) );
-			skyBoxR.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
-			skyBoxR.layers.set( 2 );
-			scene.add( skyBoxR );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -135,7 +125,7 @@
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
 
-			effect.setSize( window.innerWidth, window.innerHeight );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -143,7 +133,9 @@
 
 			controls.update();
 
-			effect.render( scene, camera );
+			// camera.rotation.y = - performance.now() / 10000;
+
+			renderer.render( scene, camera );
 
 			requestAnimationFrame( animate );
 

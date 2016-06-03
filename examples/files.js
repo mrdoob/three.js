@@ -173,6 +173,7 @@ var files = {
 		"webgl_objects_update",
 		"webgl_octree",
 		"webgl_octree_raycasting",
+		"webgl_panorama_cube",
 		"webgl_panorama_dualfisheye",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
