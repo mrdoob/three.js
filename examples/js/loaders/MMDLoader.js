@@ -33,9 +33,9 @@
  *  - shadow support.
  */
 
-THREE.MMDLoader = function ( showStatus, manager ) {
+THREE.MMDLoader = function ( manager ) {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.defaultTexturePath = './models/default/';
 

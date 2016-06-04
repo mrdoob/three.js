@@ -2268,14 +2268,6 @@
           "!type": "boolean",
           "!doc": "If true, the ajax request will use cookies."
         },
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2311,26 +2303,14 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2362,14 +2342,10 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "Base class for implementing loaders.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "LoadingManager": {
       "!url": "http://threejs.org/docs/#Reference/loaders/LoadingManager",
