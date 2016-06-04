@@ -43,10 +43,7 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	lineTo: function ( x, y ) {
 
-		var x0 = this.currentPoint.x;
-		var y0 = this.currentPoint.y;
-
-		var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
+		var curve = new THREE.LineCurve( this.currentPoint.clone(), new THREE.Vector2( x, y ) );
 		this.curves.push( curve );
 
 		this.currentPoint.set( x, y );
@@ -55,11 +52,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
 
-		var x0 = this.currentPoint.x;
-		var y0 = this.currentPoint.y;
-
 		var curve = new THREE.QuadraticBezierCurve(
-			new THREE.Vector2( x0, y0 ),
+			this.currentPoint.clone(),
 			new THREE.Vector2( aCPx, aCPy ),
 			new THREE.Vector2( aX, aY )
 		);
@@ -72,11 +66,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
-		var x0 = this.currentPoint.x;
-		var y0 = this.currentPoint.y;
-
 		var curve = new THREE.CubicBezierCurve(
-			new THREE.Vector2( x0, y0 ),
+			this.currentPoint.clone(),
 			new THREE.Vector2( aCP1x, aCP1y ),
 			new THREE.Vector2( aCP2x, aCP2y ),
 			new THREE.Vector2( aX, aY )
@@ -90,10 +81,7 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	splineThru: function ( pts /*Array of Vector*/ ) {
 
-		var x0 = this.currentPoint.x;
-		var y0 = this.currentPoint.y;
-
-		var npts = [ new THREE.Vector2( x0, y0 ) ].concat( pts );
+		var npts = [ this.currentPoint.clone() ].concat( pts );
 
 		var curve = new THREE.SplineCurve( npts );
 		this.curves.push( curve );
