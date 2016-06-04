@@ -23,11 +23,7 @@
 
 	#endif
 
-	#ifdef DOUBLE_SIDED
-		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-	#else
-		float flipNormal = 1.0;
-	#endif
+	#include <normal_flip>
 
 	#ifdef ENVMAP_TYPE_CUBE
 
@@ -42,7 +38,7 @@
 
 	#elif defined( ENVMAP_TYPE_SPHERE )
 
-		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
+		vec3 reflectView = flipNormal * normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 
 	#endif

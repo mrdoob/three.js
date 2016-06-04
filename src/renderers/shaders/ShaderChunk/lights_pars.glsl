@@ -165,15 +165,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
-		#ifdef DOUBLE_SIDED
-
-			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-		#else
-
-			float flipNormal = 1.0;
-
-		#endif
+		#include <normal_flip>
 
 		vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
 
@@ -238,15 +230,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#endif
 
-		#ifdef DOUBLE_SIDED
-
-			float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-		#else
-
-			float flipNormal = 1.0;
-
-		#endif
+		#include <normal_flip>
 
 		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
@@ -293,7 +277,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		#elif defined( ENVMAP_TYPE_SPHERE )
 
-			vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
+			vec3 reflectView = flipNormal * normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
 
 			#ifdef TEXTURE_LOD_EXT
 
