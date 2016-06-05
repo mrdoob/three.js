@@ -4,7 +4,7 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, lateBonesInitialization ) {
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -13,14 +13,6 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, lateBonesIn
 	this.bindMode = "attached";
 	this.bindMatrix = new THREE.Matrix4();
 	this.bindMatrixInverse = new THREE.Matrix4();
-
-	this.normalizeSkinWeights();
-
-	if ( lateBonesInitialization === true ) {
-
-		return;
-
-	}
 
 	// init bones
 
@@ -65,6 +57,8 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, lateBonesIn
 		}
 
 	}
+
+	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
 	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
@@ -179,40 +173,6 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 	clone: function() {
 
 		return new this.constructor( this.geometry, this.material, this.useVertexTexture ).copy( this );
-
-	},
-
-	createSkeletonFromJSON: function ( json ) {
-
-		var bones = [];
-
-		if ( json.bones !== undefined ) {
-
-			for ( var i = 0, il = json.bones.length; i < il ; i ++ ) {
-
-				bones.push( this.findBoneByName( json.bones[ i ] ) );
-
-			}
-
-		}
-
-		var boneInverses;
-
-		if ( json.boneInverses !== undefined ) {
-
-			boneInverses = [];
-
-			for ( var i = 0, il = json.boneInverses.length; i < il; i ++ ) {
-
-				var inverse = new THREE.Matrix4();
-				inverse.fromArray( json.boneInverses[ i ] );
-				boneInverses.push( inverse );
-
-			}
-
-		}
-
-		return new THREE.Skeleton( bones, boneInverses, json.useVertexTexture );
 
 	},
 

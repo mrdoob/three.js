@@ -189,7 +189,16 @@ Object.assign( THREE.Skeleton.prototype, {
 
 		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			data.bones.push( this.bones[ i ].name );
+			var bone = this.bones[ i ];
+
+			data.bones.push( {
+
+				name: bone.name,
+				position: bone.position.toArray(),
+				rotation: bone.rotation.toArray(),
+				scale: bone.scale.toArray()
+
+			} );
 
 		}
 
@@ -200,6 +209,42 @@ Object.assign( THREE.Skeleton.prototype, {
 		}
 
 		return data;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		if ( json.bones !== undefined ) {
+
+			if ( json.bones.length === this.bones.length ) {
+
+				for ( var i = 0, il = json.bones.length; i < il; i ++ ) {
+
+					var jbone = json.bones[ i ];
+					var bone = this.bones[ i ];
+					bone.position.fromArray( jbone.position );
+					bone.rotation.fromArray( jbone.rotation );
+					bone.scale.fromArray( jbone.scale );
+
+				}
+
+			}
+
+		}
+
+		if ( json.boneInverses !== undefined ) {
+
+			if ( json.boneInverses.length === this.boneInverses.length ) {
+
+				for ( var i = 0, il = json.boneInverses.length; i < il; i ++ ) {
+
+					this.boneInverses[ i ].fromArray( json.boneInverses[ i ] );
+
+				}
+
+			}
+
+		}
 
 	}
 
