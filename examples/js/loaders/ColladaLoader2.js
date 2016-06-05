@@ -1787,7 +1787,7 @@ THREE.ColladaLoader.prototype = {
 
 				if ( asset.upAxis === 'Z_UP' ) {
 
-					//scene.rotation.x = - Math.PI / 2;
+					scene.rotation.x = - Math.PI / 2;
 
 				}
 
