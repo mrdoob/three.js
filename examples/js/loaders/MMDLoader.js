@@ -4521,32 +4521,11 @@ THREE.MMDHelper.prototype = {
 
 	},
 
-	resetPose: function ( mesh ) {
-
-		var bones = mesh.skeleton.bones;
-		var bones2 = mesh.geometry.bones;
-
-		var v = new THREE.Vector3();
-		var q = new THREE.Quaternion();
-
-		for ( var i = 0; i < bones.length; i++ ) {
-
-			var b = bones2[ i ];
-			v.set( b.pos[ 0 ], b.pos[ 1 ], b.pos[ 2 ] );
-			q.set( b.rotq[ 0 ], b.rotq[ 1 ], b.rotq[ 2 ], b.rotq[ 3 ] );
-
-			bones[ i ].position.copy( v );
-			bones[ i ].quaternion.copy( q );
-
-		}
-
-	},
-
 	poseAsVpd: function ( mesh, vpd, params ) {
 
 		if ( ! ( params && params.preventResetPose === true ) ) {
 
-			this.resetPose( mesh );
+			mesh.pose();
 
 		}
 
