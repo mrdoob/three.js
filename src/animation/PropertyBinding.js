@@ -544,27 +544,33 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	// created and tested via https://regex101.com/#javascript
 
 	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
-	var matches = re.exec(trackName);
+	var matches = re.exec( trackName );
 
 	if( ! matches ) {
+
 		throw new Error( "cannot parse trackName at all: " + trackName );
+
 	}
 
-    if (matches.index === re.lastIndex) {
-        re.lastIndex++;
-    }
+	if ( matches.index === re.lastIndex ) {
+
+		re.lastIndex++;
+
+	}
 
 	var results = {
-		// directoryName: matches[1], // (tschw) currently unused
-		nodeName: matches[3], 	// allowed to be null, specified root node.
-		objectName: matches[5],
-		objectIndex: matches[7],
-		propertyName: matches[9],
-		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
+		// directoryName: matches[ 1 ], // (tschw) currently unused
+		nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
+		objectName: matches[ 5 ],
+		objectIndex: matches[ 7 ],
+		propertyName: matches[ 9 ],
+		propertyIndex: matches[ 11 ]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	if( results.propertyName === null || results.propertyName.length === 0 ) {
+
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
+
 	}
 
 	return results;
