@@ -74,14 +74,17 @@ THREE.ColladaLoader.prototype = {
 
 		/**
 		 * used to have a common callback, after a set of callbacks executes
-		 *
+		 * usage: var queue = callbackQueue(whenDoneAll);
+		 * queue.enqueue(); //for each async method
+		 * asyncMethod().onDone(queue.dequeue);
+		 * queue.start();
 		 * @param cb
-		 * @returns {{enqueue: enqueue, dequeue: dequeue, check: check}}
+		 * @returns {{enqueue: enqueue, dequeue: dequeue, start: start}}
 		 * @private
 		 */
 		function callbackQueue( cb ) {
 
-			var counter = 0;
+			var counter = 1; //1 to prevent cb execution on only sync dequeues
 
 			return {
 				enqueue: function () {
@@ -96,19 +99,17 @@ THREE.ColladaLoader.prototype = {
 
 					if ( counter == 0 ) {
 
+						counter -= 20; //to not execute on check again
+
 						cb();
 
 					}
 
 				},
 
-				check: function () { //if queue is empty, execute callback
+				start: function () { //if queue is empty, execute callback
 
-					if ( counter == 0 ) {
-
-						cb();
-
-					}
+					this.dequeue();
 
 				}
 			};
@@ -253,7 +254,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getImage( id, cb ) {
+		function getImage( id ) {
 
 			return getBuild( library.images[ id ], buildImage );
 
@@ -564,7 +565,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getEffect( id, cb ) {
+		function getEffect( id ) {
 
 			return getBuild( library.effects[ id ], buildEffect );
 
@@ -847,9 +848,9 @@ THREE.ColladaLoader.prototype = {
 		}
 
 
-		function getCamera( id, cb ) {
+		function getCamera( id ) {
 
-			return getBuild( library.cameras[ id ], buildCamera);
+			return getBuild( library.cameras[ id ], buildCamera );
 
 		}
 
@@ -972,7 +973,7 @@ THREE.ColladaLoader.prototype = {
 
 		}
 
-		function getLight( id, cb ) {
+		function getLight( id ) {
 
 			return getBuild( library.lights[ id ], buildLight );
 
@@ -1439,22 +1440,21 @@ THREE.ColladaLoader.prototype = {
 			var instanceGeometries = data.instanceGeometries;
 			var instanceNodes = data.instanceNodes;
 
-			var callbacks = 0;
-
 			function done() {
+
 				var object;
 
 				if ( nodes.length === 0 && objects.length === 1 ) {
 
-					object = objects[0];
+					object = objects[ 0 ];
 
 				} else {
 
 					object = new THREE.Group();
 
-					for ( var i = 0; i < objects.length; i++ ) {
+					for ( var i = 0; i < objects.length; i ++ ) {
 
-						object.add( objects[i] );
+						object.add( objects[ i ] );
 
 					}
 
@@ -1467,15 +1467,16 @@ THREE.ColladaLoader.prototype = {
 				object.userData._fileName = fileName; //id might not be unique across files
 
 				cb( object );
+
 			}
 
-			var promises = new callbackQueue(done);
+			var promises = new callbackQueue( done );
 
 			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
 				promises.enqueue();
 
-				getNode( nodes[i], function ( node ) {
+				getNode( nodes[ i ], function ( node ) {
 
 					objects.push( node.clone() );
 					promises.dequeue();
@@ -1503,6 +1504,7 @@ THREE.ColladaLoader.prototype = {
 				var instance = instanceGeometries[ i ];
 
 				( function ( instance ) {
+
 					getInstanceGeometry( instance.id, function ( geometries ) {
 
 						var waitForMaterials = new callbackQueue( promises.dequeue );
@@ -1516,6 +1518,7 @@ THREE.ColladaLoader.prototype = {
 								waitForMaterials.enqueue();
 
 								( function ( object ) {
+
 									getInstanceMaterial( instance.materials[ key ], function ( material ) {
 
 										object.material = material;
@@ -1523,13 +1526,14 @@ THREE.ColladaLoader.prototype = {
 										waitForMaterials.dequeue();
 
 									} );
+
 								} )( object )
 
 							}
 
 						}
 
-						waitForMaterials.check();
+						waitForMaterials.start();
 
 					} );
 
@@ -1537,11 +1541,11 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			for ( var i = 0, l = instanceNodes.length; i < l; i++ ) {
+			for ( var i = 0, l = instanceNodes.length; i < l; i ++ ) {
 
 				promises.enqueue();
 
-				getInstanceNode( instanceNodes[i], function ( node ) {
+				getInstanceNode( instanceNodes[ i ], function ( node ) {
 
 					objects.push( node ); //todo why not use clone()?
 					promises.dequeue();
@@ -1550,7 +1554,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			promises.check();
+			promises.start();
 
 		}
 
@@ -1617,9 +1621,69 @@ THREE.ColladaLoader.prototype = {
 
 					}
 
-				} )( data ); //todo passed by reference?
+				} )( data );
 
 			}
+
+		}
+
+		var files = {};
+
+		function getCachedInstanceByUrl( url, cb ) {
+
+			function CachedColladaLoader( url ) {
+
+				var data = null;
+				var queue = [];
+
+				var loader = new THREE.ColladaLoader( scope.manager );
+
+				loader.load( baseUrl + url, function ( res ) {
+
+					data = res;
+
+					for ( var i = 0; i < queue.length; i ++ ) {
+
+						var callback = queue[ i ];
+						callback( res );
+
+					}
+
+				} );
+
+				return {
+
+					get: function ( callback ) {
+
+						if ( data ) {
+
+							callback( data );
+
+						} else {
+
+							queue.push( callback );
+
+						}
+
+					}
+
+				};
+
+			}
+
+			var filename = getFilename( url );
+
+			if ( ! files[ filename ] ) {
+
+				files[ filename ] = new CachedColladaLoader( url );
+
+			}
+
+			files[ filename ].get( function ( data ) {
+
+				data.reference( getRefId( url ), cb );
+
+			} )
 
 		}
 
@@ -1631,13 +1695,7 @@ THREE.ColladaLoader.prototype = {
 		 */
 		function loadInstance( url, cb ) {
 
-			var loader = new THREE.ColladaLoader( scope.manager );
-
-			loader.load( baseUrl + url, function ( res ) {
-
-				cb( res.node );
-
-			} );
+			getCachedInstanceByUrl( url, cb );
 
 		}
 
@@ -1694,6 +1752,8 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
+			counter.start();
+
 		}
 
 		function getVisualScene( id, cb ) {
@@ -1727,7 +1787,7 @@ THREE.ColladaLoader.prototype = {
 
 				if ( asset.upAxis === 'Z_UP' ) {
 
-					scene.rotation.x = - Math.PI / 2;
+					//scene.rotation.x = - Math.PI / 2;
 
 				}
 
@@ -1785,7 +1845,7 @@ THREE.ColladaLoader.prototype = {
 		function getFilename( url ) {
 
 			url = url.split( '#' ).shift(); //remove the refId to prevent capturing until '.dae' in a refId
-			var match = url.match( /.*\/(.*\.dae)/i );
+			var match = url.match( /(?:.*\/)?(.*\.dae)/i );
 			return ( match ) ? match[ 1 ] : '';
 
 		}
@@ -1812,7 +1872,27 @@ THREE.ColladaLoader.prototype = {
 
 		var result = {};
 
-		console.log(refId)
+		function getElement( refId, cb ) {
+
+			if ( library.nodes.hasOwnProperty( refId ) ) {
+
+				getNode( refId, cb );
+
+			} else if ( library.geometries.hasOwnProperty( refId ) ) {
+
+				cb( getGeometry( refId ) );
+
+			} else if ( library.materials.hasOwnProperty( refId ) ) {
+
+				cb( getMaterial( refId ) );
+
+			} else {
+
+				console.log( 'Node: ' + refId + ' can not be found in:' + fileName );
+
+			}
+
+		}
 
 		if ( refId.length == 0 ) { //no refId give, build the Main visual scene
 
@@ -1821,7 +1901,8 @@ THREE.ColladaLoader.prototype = {
 				result = {
 					animations: [],
 					kinematics: { joints: [] },
-					scene: scene
+					scene: scene,
+					reference: getElement
 				};
 
 				if ( cb ) { // just return the result, if no cb is given
@@ -1834,32 +1915,13 @@ THREE.ColladaLoader.prototype = {
 
 		} else {
 
-			if ( library.nodes.hasOwnProperty( refId ) ) {
-
-				getNode( refId, function ( node ) {
-
-					result = {
-						animations: [],
-						kinematics: { joints: [] },
-						node: node
-					};
-
-					if ( cb ) {
-
-						cb( result );
-
-					}
-
-				} );
-
-			} else if ( library.geometries.hasOwnProperty( refId ) ) {
-
-				var node = getGeometry( refId );
+			getElement( refId, function ( node ) {
 
 				result = {
 					animations: [],
 					kinematics: { joints: [] },
-					node: node
+					node: node,
+					reference: getElement
 				};
 
 				if ( cb ) {
@@ -1868,29 +1930,12 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
-			} else if ( library.materials.hasOwnProperty( refId ) ) {
+			} );
 
-				var node = getMaterial( refId );
-
-				result = {
-					animations: [],
-					kinematics: { joints: [] },
-					node: node
-				};
-
-				if ( cb ) {
-
-					cb( result );
-
-				}
-
-			} else {
-
-				console.log( 'Node: ' + refId + ' can not be found in:' + fileName );
-
-			}
 
 		}
+
+
 
 		if ( ! cb && ! result ) {
 
