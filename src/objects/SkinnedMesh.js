@@ -172,7 +172,7 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 	clone: function() {
 
-		return new this.constructor( this.geometry, this.material, this.useVertexTexture ).copy( this );
+		return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
 
 	}
 
