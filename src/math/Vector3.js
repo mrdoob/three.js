@@ -596,21 +596,15 @@ THREE.Vector3.prototype = {
 
 	projectOnVector: function () {
 
-		var v1, dot;
+		var length = vector.length();
+	
+		var scalar = vector.dot(this) / ( length * length );
+	
+		this.copy( vector );
+	
+		return this.multiplyScalar( scalar );
 
-		return function projectOnVector( vector ) {
-
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-
-			v1.copy( vector ).normalize();
-
-			dot = this.dot( v1 );
-
-			return this.copy( v1 ).multiplyScalar( dot );
-
-		};
-
-	}(),
+	},
 
 	projectOnPlane: function () {
 
