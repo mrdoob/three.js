@@ -35,8 +35,12 @@ THREE.ImageLoader.prototype = {
 				}, 0 );
 
 			} else {
-
-				scope.manager.itemEnd( url );
+				
+				setTimeout( function () {
+					
+					scope.manager.itemEnd( url );
+				
+				}, 0 );
 
 			}
 
