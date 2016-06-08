@@ -67,12 +67,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 				var curve = this.curves[ i ];
 
 				var segmentLength = curve.getLength();
-				var u = 0;
-				if ( segmentLength !== 0 ) {
-
-				  u = 1 - diff / curve.getLength();
-
-				}
+				var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
 
 				return curve.getPointAt( u );
 
@@ -145,7 +140,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		var points = [];
 
-		for ( var i = 0; i < divisions; i ++ ) {
+		for ( var i = 0; i <= divisions; i ++ ) {
 
 			points.push( this.getPoint( i / divisions ) );
 
