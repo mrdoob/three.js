@@ -50,7 +50,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 	function createTexture( type, target, count ) {
 
-		var data = new Uint8Array( 3 );
+		var data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
 		var texture = gl.createTexture();
 
 		gl.bindTexture( type, texture );
@@ -59,7 +59,7 @@ THREE.WebGLState = function ( gl, extensions, paramThreeToGL ) {
 
 		for ( var i = 0; i < count; i ++ ) {
 
-			gl.texImage2D( target + i, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, data );
+			gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
 
 		}
 
