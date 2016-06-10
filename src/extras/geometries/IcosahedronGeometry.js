@@ -19,7 +19,9 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 		 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+	var materialIndices = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ];
+
+	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail, materialIndices );
 
 	this.type = 'IcosahedronGeometry';
 
