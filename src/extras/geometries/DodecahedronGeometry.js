@@ -43,7 +43,9 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 		 1, 12, 14,      1, 14,  5,      1,  5,  9
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+	var materialIndices = [ 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11 ];
+
+	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail, materialIndices );
 
 	this.type = 'DodecahedronGeometry';
 

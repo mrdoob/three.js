@@ -4,7 +4,7 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
+THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail, materialIndices ) {
 
 	THREE.Geometry.call( this );
 
@@ -14,7 +14,8 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		vertices: vertices,
 		indices: indices,
 		radius: radius,
-		detail: detail
+		detail: detail,
+		materialIndices: materialIndices
 	};
 
 	radius = radius || 1;
@@ -38,7 +39,9 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 		var v2 = p[ indices[ i + 1 ] ];
 		var v3 = p[ indices[ i + 2 ] ];
 
-		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, j );
+		var materialIndex = ( materialIndices !== undefined && materialIndices.length > j ) ? materialIndices[ j ] : 0;
+
+		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ], undefined, materialIndex );
 
 	}
 
