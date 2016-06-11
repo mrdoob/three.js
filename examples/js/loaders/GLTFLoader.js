@@ -125,15 +125,19 @@ THREE.GLTFLoader.prototype = {
 
 			var mesh = meshes[ meshId ];
 
-			var geometry = new THREE.BufferGeometry();
-			geometry.name = mesh.name;
+			var geometries = {
+				name: mesh.name,
+				array: []
+			};
 
 			var primitives = mesh.primitives;
 
-			for ( var i = 0; i < 1; /*primitives.length;*/ i ++ ) {
+			for ( var i = 0; i < primitives.length; i ++ ) {
 
-				var primitive = primitives[ 0 ];
+				var primitive = primitives[ i ];
 				var attributes = primitive.attributes;
+
+				var geometry = new THREE.BufferGeometry();
 
 				if ( primitive.indices ) {
 
@@ -164,9 +168,11 @@ THREE.GLTFLoader.prototype = {
 
 				}
 
+				geometries.array.push( geometry );
+
 			}
 
-			mesh._geometry = geometry;
+			mesh._geometries = geometries;
 
 		}
 
@@ -212,7 +218,20 @@ THREE.GLTFLoader.prototype = {
 				for ( var i = 0; i < node.meshes.length; i ++ ) {
 
 					var meshId = node.meshes[ i ];
-					object.add( new THREE.Mesh( meshes[ meshId ]._geometry, new THREE.MeshNormalMaterial() ) );
+
+					var geometries = meshes[ meshId ]._geometries;
+
+					var group = new THREE.Group();
+					group.name = geometries.name;
+					object.add( group );
+
+					var array = geometries.array;
+
+					for ( var j = 0; j < array.length; j ++ ) {
+
+						group.add( new THREE.Mesh( array[ j ], new THREE.MeshNormalMaterial() ) );
+
+					}
 
 				}
 
