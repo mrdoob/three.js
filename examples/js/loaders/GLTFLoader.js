@@ -51,6 +51,15 @@ THREE.GLTFLoader.prototype = {
 
 		console.time( 'GLTFLoader' );
 
+		var library = {
+			buffers: {},
+			bufferViews: {},
+			accessors: {},
+			meshes: {},
+			nodes: {},
+			scenes: {}
+		};
+
 		// buffers
 
 		var buffers = json.buffers;
@@ -65,7 +74,7 @@ THREE.GLTFLoader.prototype = {
 
 				if ( buffer.uri.indexOf( header ) === 0 ) {
 
-					buffer._arraybuffer = stringToArrayBuffer( buffer.uri.substr( header.length ) );
+					library.buffers[ bufferId ] = stringToArrayBuffer( buffer.uri.substr( header.length ) );
 
 				}
 
@@ -80,9 +89,9 @@ THREE.GLTFLoader.prototype = {
 		for ( var bufferViewId in bufferViews ) {
 
 			var bufferView = bufferViews[ bufferViewId ];
-			var arraybuffer = buffers[ bufferView.buffer ]._arraybuffer;
+			var arraybuffer = library.buffers[ bufferView.buffer ];
 
-			bufferView._arraybuffer = arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+			library.bufferViews[ bufferViewId ] = arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
 
 		}
 
@@ -107,13 +116,13 @@ THREE.GLTFLoader.prototype = {
 
 			var accessor = accessors[ accessorId ];
 
-			var arraybuffer = bufferViews[ accessor.bufferView ]._arraybuffer;
+			var arraybuffer = library.bufferViews[ accessor.bufferView ];
 			var itemSize = TYPE_SIZES[ accessor.type ];
 			var TypedArray = COMPONENT_TYPES[ accessor.componentType ];
 
 			var array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
 
-			accessor._bufferattribute = new THREE.BufferAttribute( array, itemSize );
+			library.accessors[ accessorId ] = new THREE.BufferAttribute( array, itemSize );
 
 		}
 
@@ -141,14 +150,14 @@ THREE.GLTFLoader.prototype = {
 
 				if ( primitive.indices ) {
 
-					geometry.setIndex( accessors[ primitive.indices ]._bufferattribute );
+					geometry.setIndex( library.accessors[ primitive.indices ] );
 
 				}
 
 				for ( var attributeId in attributes ) {
 
 					var attribute = attributes[ attributeId ];
-					var bufferAttribute = accessors[ attribute ]._bufferattribute;
+					var bufferAttribute = library.accessors[ attribute ];
 
 					switch ( attributeId ) {
 
@@ -172,7 +181,7 @@ THREE.GLTFLoader.prototype = {
 
 			}
 
-			mesh._geometries = geometries;
+			library.meshes[ meshId ] = geometries;
 
 		}
 
@@ -219,7 +228,7 @@ THREE.GLTFLoader.prototype = {
 
 					var meshId = node.meshes[ i ];
 
-					var geometries = meshes[ meshId ]._geometries;
+					var geometries = library.meshes[ meshId ];
 
 					var group = new THREE.Group();
 					group.name = geometries.name;
@@ -237,7 +246,7 @@ THREE.GLTFLoader.prototype = {
 
 			}
 
-			node._object = object;
+			library.nodes[ nodeId ] = object;
 
 		}
 
@@ -249,7 +258,7 @@ THREE.GLTFLoader.prototype = {
 
 				var child = node.children[ i ];
 
-				node._object.add( nodes[ child ]._object );
+				library.nodes[ nodeId ].add( library.nodes[ child ] );
 
 			}
 
@@ -267,11 +276,11 @@ THREE.GLTFLoader.prototype = {
 			for ( var i = 0; i < scene.nodes.length; i ++ ) {
 
 				var node = scene.nodes[ i ];
-				container.add( nodes[ node ]._object );
+				container.add( library.nodes[ node ] );
 
 			}
 
-			scene._container = container;
+			library.scenes[ sceneId ] = container;
 
 		}
 
@@ -279,7 +288,7 @@ THREE.GLTFLoader.prototype = {
 
 		return {
 
-			scene: json.scenes[ json.scene ]._container
+			scene: library.scenes[ json.scene ]
 
 		};
 
