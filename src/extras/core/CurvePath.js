@@ -28,8 +28,6 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	closePath: function () {
 
-		// TODO Test
-		// and verify for vector3 (needs to implement equals)
 		// Add a line curve if start and end of lines are not connected
 		var startPoint = this.curves[ 0 ].getPoint( 0 );
 		var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
@@ -160,15 +158,29 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		divisions = divisions || 12;
 
-		var points = [], tmp, last;
+		var points = [], tmp, last, curve;
 
-		this.curves.forEach(function(curve) {
+		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
+			curve = curves[i];
 			var pts = curve instanceof THREE.LineCurve ? 1 : divisions;
 			tmp = curve.getPoints(pts);
-			points = points.concat(tmp);
+			if ( last && last.equals( tmp[ 0 ] ) ) {
 
-		});
+				tmp = tmp.slice(1);
+
+			}
+
+			points = points.concat(tmp);
+			last = points[ points.length - 1 ];
+
+		}
+
+		if ( points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+
+			points.pop();
+
+		}
 
 		if ( this.autoClose ) {
 
@@ -176,39 +188,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		}
 
-		points = this.removeDuplicatesInAPath( points );
-
 		return points;
-
-	},
-
-
-	/* Ensures consecutive vectors of a path
-	 * have no duplicates.
-	 * Arguments: Path is an array of Vector2
-	 */
-	removeDuplicatesInAPath: function ( points ) {
-
-		if ( points.length === 0 ) return points;
-
-		var lastPoint = points[0];
-		var newPath = [ lastPoint ];
-
-		for (var i = 1; i < points.length; i++) {
-			if (lastPoint.distanceTo(points[ i ]) > Number.EPSILON) {
-				lastPoint = points[ i ];
-
-				if ( i !== points.length - 1 || points[0].distanceTo( lastPoint ) > Number.EPSILON ) {
-					newPath.push( lastPoint );
-					// remove last point if it's the same as the first point
-					// TODO Move this to shapeutils only
-				}
-			} else {
-				// console.log('duplicate points at ', i - 1, i);
-			}
-		}
-
-		return newPath;
 
 	},
 

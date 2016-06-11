@@ -172,14 +172,11 @@ THREE.ShapePath.prototype = {
 				var tmpPath = inSubpaths[ i ];
 
 				var tmpShape = new THREE.Shape();
-				tmpShape.actions = tmpPath.actions;
 				tmpShape.curves = tmpPath.curves;
 
 				shapes.push( tmpShape );
 
 			}
-
-			//console.log("shape", shapes);
 
 			return shapes;
 
@@ -258,7 +255,6 @@ THREE.ShapePath.prototype = {
 
 			tmpPath = subPaths[ 0 ];
 			tmpShape = new THREE.Shape();
-			tmpShape.actions = tmpPath.actions;
 			tmpShape.curves = tmpPath.curves;
 			shapes.push( tmpShape );
 			return shapes;
@@ -291,7 +287,6 @@ THREE.ShapePath.prototype = {
 				if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
 
 				newShapes[ mainIdx ] = { s: new THREE.Shape(), p: tmpPoints };
-				newShapes[ mainIdx ].s.actions = tmpPath.actions;
 				newShapes[ mainIdx ].s.curves = tmpPath.curves;
 
 				if ( holesFirst )	mainIdx ++;
