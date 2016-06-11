@@ -86,6 +86,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 		var curve = new THREE.SplineCurve( npts );
 		this.curves.push( curve );
 
+		this.currentPoint.copy( pts[ pts.length - 1 ] );
+
 	},
 
 	arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
@@ -116,6 +118,14 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 	absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 		var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+		var firstPoint = curve.getPoint( 0 );
+
+		if ( ! firstPoint.equals( this.currentPoint ) ) {
+
+			this.lineTo( firstPoint.x, firstPoint.y );
+
+		}
+
 		this.curves.push( curve );
 
 		var lastPoint = curve.getPoint( 1 );
