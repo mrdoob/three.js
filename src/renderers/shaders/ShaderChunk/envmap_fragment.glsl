@@ -23,8 +23,6 @@
 
 	#endif
 
-	#include <normal_flip>
-
 	#ifdef ENVMAP_TYPE_CUBE
 
 		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );

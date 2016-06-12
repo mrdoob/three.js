@@ -3864,6 +3864,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "alphamap_fragment" ],
 			THREE.ShaderChunk[ "alphatest_fragment" ],
 			THREE.ShaderChunk[ "specularmap_fragment" ],
+			THREE.ShaderChunk[ "normal_flip" ],
 			THREE.ShaderChunk[ "normal_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_fragment" ],
 
