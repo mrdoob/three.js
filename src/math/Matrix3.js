@@ -95,7 +95,7 @@ THREE.Matrix3.prototype = {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToVector3Array( array, offset, length ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;

@@ -28,7 +28,7 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 	var box = new THREE.Box3();
 
-	return function ( object ) {
+	return function update( object ) {
 
 		if ( object instanceof THREE.Box3 ) {
 

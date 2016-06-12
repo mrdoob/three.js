@@ -91,7 +91,7 @@ THREE.ShapeUtils = {
 
 		// takes in an contour array and returns
 
-		return function ( contour, indices ) {
+		return function triangulate( contour, indices ) {
 
 			var n = contour.length;
 
@@ -700,7 +700,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2 ) {
+		return function b2( t, p0, p1, p2 ) {
 
 			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
 
@@ -739,7 +739,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2, p3 ) {
+		return function b3( t, p0, p1, p2, p3 ) {
 
 			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
 
