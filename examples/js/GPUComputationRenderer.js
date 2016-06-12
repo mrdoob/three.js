@@ -129,7 +129,9 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			dependencies: null,
 			renderTargets: [],
 			wrapS: null,
-			wrapT: null
+			wrapT: null,
+			minFilter: THREE.NearestFilter,
+			magFilter: THREE.NearestFilter
 		};
 
 		this.variables.push( variable );
@@ -163,8 +165,8 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			var variable = this.variables[ i ];
 
 			// Creates rendertargets and initialize them with input texture
-			variable.renderTargets[ 0 ] = this.createRenderTarget( variable.wrapS, variable.wrapT );
-			variable.renderTargets[ 1 ] = this.createRenderTarget( variable.wrapS, variable.wrapT );
+			variable.renderTargets[ 0 ] = this.createRenderTarget( sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter );
+			variable.renderTargets[ 1 ] = this.createRenderTarget( sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter );
 			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 0 ] );
 			this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] );
 
@@ -172,6 +174,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			var material = variable.material;
 			var uniforms = material.uniforms;
 			if ( variable.dependencies !== null ) {
+
 				for ( var d = 0; d < variable.dependencies.length; d++ ) {
 
 					var depVar = variable.dependencies[ d ];
@@ -196,7 +199,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 					uniforms[ depVar.name ] = { value: null };
 
-					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + variable.material.fragmentShader;
+					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
 
 				}
 			}
@@ -213,17 +216,21 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		var currentTextureIndex = this.currentTextureIndex;
 		var nextTextureIndex = this.currentTextureIndex === 0 ? 1 : 0;
 
-		for ( var i = 0; i < this.variables.length; i++ ) {
+		for ( var i = 0, il = this.variables.length; i < il; i++ ) {
 
 			var variable = this.variables[ i ];
 
 			// Sets texture dependencies uniforms
-			var uniforms = variable.material.uniforms;
-			for ( var d = 0; d < variable.dependencies.length; d++ ) {
+			if ( variable.dependencies !== null ) {
 
-				var depVar = variable.dependencies[ d ];
+				var uniforms = variable.material.uniforms;
+				for ( var d = 0, dl = variable.dependencies.length; d < dl; d++ ) {
 
-				uniforms[ depVar.name ].value = depVar.renderTargets[ currentTextureIndex ].texture;
+					var depVar = variable.dependencies[ d ];
+
+					uniforms[ depVar.name ].value = depVar.renderTargets[ currentTextureIndex ].texture;
+
+				}
 
 			}
 
@@ -273,19 +280,22 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 	};
 	this.createShaderMaterial = createShaderMaterial;
 
-	this.createRenderTarget = function( wrapS, wrapT, sizeXTexture, sizeYTexture ) {
-		
-		wrapS = wrapS || THREE.ClampToEdgeWrapping;
-		wrapT = wrapT || THREE.ClampToEdgeWrapping;
+	this.createRenderTarget = function( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
 
 		sizeXTexture = sizeXTexture || sizeX;
 		sizeYTexture = sizeYTexture || sizeY;
 
+		wrapS = wrapS || THREE.ClampToEdgeWrapping;
+		wrapT = wrapT || THREE.ClampToEdgeWrapping;
+
+		minFilter = minFilter || THREE.NearestFilter;
+		magFilter = magFilter || THREE.NearestFilter;
+
 		var renderTarget = new THREE.WebGLRenderTarget( sizeXTexture, sizeYTexture, {
 			wrapS: wrapS,
 			wrapT: wrapT,
-			minFilter: THREE.NearestFilter,
-			magFilter: THREE.NearestFilter,
+			minFilter: minFilter,
+			magFilter: magFilter,
 			format: THREE.RGBAFormat,
 			type: THREE.FloatType,
 			stencilBuffer: false
@@ -319,12 +329,15 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 		this.doRenderTarget( passThruShader, output);
 
+		passThruUniforms.texture.value = null;
+
 	};
 
 	this.doRenderTarget = function( material, output ) {
 
 		mesh.material = material;
 		renderer.render( scene, camera, output );
+		mesh.material = passThruShader;
 
 	};
 
