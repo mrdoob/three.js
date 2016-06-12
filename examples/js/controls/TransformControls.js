@@ -1101,17 +1101,32 @@
 
 		function onPointerUp( event ) {
 
+			event.preventDefault(); // Prevent MouseEvent on mobile
+
 			if ( event.button !== undefined && event.button !== 0 ) return;
 
 			if ( _dragging && ( scope.axis !== null ) ) {
 
 				mouseUpEvent.mode = _mode;
-				scope.dispatchEvent( mouseUpEvent )
+				scope.dispatchEvent( mouseUpEvent );
 
 			}
 
 			_dragging = false;
-			onPointerHover( event );
+
+			if ( event instanceof TouchEvent ) {
+
+				// Force "rollover"
+
+				scope.axis = null;
+				scope.update();
+				scope.dispatchEvent( changeEvent );
+
+			} else {
+
+				onPointerHover( event );
+
+			}
 
 		}
 
