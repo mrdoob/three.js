@@ -424,7 +424,7 @@ THREE.Color.prototype = {
 
 		}
 
-		return function ( h, s, l ) {
+		return function setHSL( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
 			h = THREE.Math.euclideanModulo( h, 1 );
@@ -1104,7 +1104,7 @@ THREE.Quaternion.prototype = {
 
 		var EPS = 0.000001;
 
-		return function ( vFrom, vTo ) {
+		return function setFromUnitVectors( vFrom, vTo ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -3524,7 +3524,7 @@ THREE.Euler.prototype = {
 
 		var matrix;
 
-		return function ( q, order, update ) {
+		return function setFromQuaternion( q, order, update ) {
 
 			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
@@ -3548,7 +3548,7 @@ THREE.Euler.prototype = {
 
 		var q = new THREE.Quaternion();
 
-		return function ( newOrder ) {
+		return function reorder( newOrder ) {
 
 			q.setFromEuler( this );
 			
@@ -3697,7 +3697,7 @@ THREE.Line3.prototype = {
 		var startP = new THREE.Vector3();
 		var startEnd = new THREE.Vector3();
 
-		return function ( point, clampToLine ) {
+		return function closestPointToPointParameter( point, clampToLine ) {
 
 			startP.subVectors( point, this.start );
 			startEnd.subVectors( this.end, this.start );
@@ -3790,7 +3790,7 @@ THREE.Box2.prototype = {
 
 		var v1 = new THREE.Vector2();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 			this.min.copy( center ).sub( halfSize );
@@ -3941,7 +3941,7 @@ THREE.Box2.prototype = {
 
 		var v1 = new THREE.Vector2();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -4061,7 +4061,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -4081,7 +4081,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( object ) {
+		return function setFromObject( object ) {
 
 			var scope = this;
 
@@ -4341,7 +4341,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -4354,7 +4354,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( optionalTarget ) {
+		return function getBoundingSphere( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Sphere();
 
@@ -4401,7 +4401,7 @@ THREE.Box3.prototype = {
 			new THREE.Vector3()
 		];
 
-		return function ( matrix ) {
+		return function applyMatrix4( matrix ) {
 
 			// transform of empty box is an empty box.
 			if( this.isEmpty() ) return this;
@@ -4540,7 +4540,7 @@ THREE.Matrix3.prototype = {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToVector3Array( array, offset, length ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;
@@ -4866,7 +4866,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function ( m ) {
+		return function extractRotation( m ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -5064,7 +5064,7 @@ THREE.Matrix4.prototype = {
 
 		var x, y, z;
 
-		return function ( eye, target, up ) {
+		return function lookAt( eye, target, up ) {
 
 			if ( x === undefined ) {
 
@@ -5197,7 +5197,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToVector3Array( array, offset, length ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;
@@ -5325,7 +5325,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function () {
+		return function getPosition() {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
@@ -5554,7 +5554,7 @@ THREE.Matrix4.prototype = {
 
 		var vector, matrix;
 
-		return function ( position, quaternion, scale ) {
+		return function decompose( position, quaternion, scale ) {
 
 			if ( vector === undefined ) {
 
@@ -5781,7 +5781,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( t ) {
+		return function recast( t ) {
 
 			this.origin.copy( this.at( t, v1 ) );
 
@@ -5817,7 +5817,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceSqToPoint( point ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
@@ -5843,7 +5843,7 @@ THREE.Ray.prototype = {
 		var segDir = new THREE.Vector3();
 		var diff = new THREE.Vector3();
 
-		return function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
 			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
 			// It returns the min distance between the ray and the segment
@@ -5968,7 +5968,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( sphere, optionalTarget ) {
+		return function intersectSphere( sphere, optionalTarget ) {
 
 			v1.subVectors( sphere.center, this.origin );
 			var tca = v1.dot( this.direction );
@@ -6148,7 +6148,7 @@ THREE.Ray.prototype = {
 
 		var v = new THREE.Vector3();
 
-		return function ( box ) {
+		return function intersectsBox( box ) {
 
 			return this.intersectBox( box, v ) !== null;
 
@@ -6164,7 +6164,7 @@ THREE.Ray.prototype = {
 		var edge2 = new THREE.Vector3();
 		var normal = new THREE.Vector3();
 
-		return function ( a, b, c, backfaceCulling, optionalTarget ) {
+		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 
 			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
@@ -6289,7 +6289,7 @@ THREE.Sphere.prototype = {
 
 		var box = new THREE.Box3();
 
-		return function ( points, optionalCenter ) {
+		return function setFromPoints( points, optionalCenter ) {
 
 			var center = this.center;
 
@@ -6521,7 +6521,7 @@ THREE.Frustum.prototype = {
 
 		var sphere = new THREE.Sphere();
 
-		return function ( object ) {
+		return function intersectsObject( object ) {
 
 			var geometry = object.geometry;
 
@@ -6541,7 +6541,7 @@ THREE.Frustum.prototype = {
 
 		var sphere = new THREE.Sphere();
 
-		return function ( sprite ) {
+		return function intersectsSprite( sprite ) {
 
 			sphere.center.set( 0, 0, 0 );
 			sphere.radius = 0.7071067811865476;
@@ -6580,7 +6580,7 @@ THREE.Frustum.prototype = {
 		var p1 = new THREE.Vector3(),
 			p2 = new THREE.Vector3();
 
-		return function ( box ) {
+		return function intersectsBox( box ) {
 
 			var planes = this.planes;
 
@@ -6684,7 +6684,7 @@ THREE.Plane.prototype = {
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
 
-		return function ( a, b, c ) {
+		return function setFromCoplanarPoints( a, b, c ) {
 
 			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
 
@@ -6765,7 +6765,7 @@ THREE.Plane.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( line, optionalTarget ) {
+		return function intersectLine( line, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
@@ -6836,7 +6836,7 @@ THREE.Plane.prototype = {
 		var v1 = new THREE.Vector3();
 		var m1 = new THREE.Matrix3();
 
-		return function ( matrix, optionalNormalMatrix ) {
+		return function applyMatrix4( matrix, optionalNormalMatrix ) {
 
 			var referencePoint = this.coplanarPoint( v1 ).applyMatrix4( matrix );
 
@@ -6974,7 +6974,7 @@ THREE.Math = {
 		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
-		return function () {
+		return function generateUUID() {
 
 			for ( var i = 0; i < 36; i ++ ) {
 
@@ -7319,7 +7319,7 @@ THREE.Triangle.normal = function () {
 
 	var v0 = new THREE.Vector3();
 
-	return function ( a, b, c, optionalTarget ) {
+	return function normal( a, b, c, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -7348,7 +7348,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function ( point, a, b, c, optionalTarget ) {
+	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
 		v0.subVectors( c, a );
 		v1.subVectors( b, a );
@@ -7388,7 +7388,7 @@ THREE.Triangle.containsPoint = function () {
 
 	var v1 = new THREE.Vector3();
 
-	return function ( point, a, b, c ) {
+	return function containsPoint( point, a, b, c ) {
 
 		var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
@@ -7443,7 +7443,7 @@ THREE.Triangle.prototype = {
 		var v0 = new THREE.Vector3();
 		var v1 = new THREE.Vector3();
 
-		return function () {
+		return function area() {
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -8588,7 +8588,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var q1 = new THREE.Quaternion();
 
-		return function ( axis, angle ) {
+		return function rotateOnAxis( axis, angle ) {
 
 			q1.setFromAxisAngle( axis, angle );
 
@@ -8604,7 +8604,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 1, 0, 0 );
 
-		return function ( angle ) {
+		return function rotateX( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -8616,7 +8616,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 0, 1, 0 );
 
-		return function ( angle ) {
+		return function rotateY( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -8628,7 +8628,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 0, 0, 1 );
 
-		return function ( angle ) {
+		return function rotateZ( angle ) {
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -8643,7 +8643,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( axis, distance ) {
+		return function translateOnAxis( axis, distance ) {
 
 			v1.copy( axis ).applyQuaternion( this.quaternion );
 
@@ -8659,7 +8659,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 1, 0, 0 );
 
-		return function ( distance ) {
+		return function translateX( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -8671,7 +8671,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 0, 1, 0 );
 
-		return function ( distance ) {
+		return function translateY( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -8683,7 +8683,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var v1 = new THREE.Vector3( 0, 0, 1 );
 
-		return function ( distance ) {
+		return function translateZ( distance ) {
 
 			return this.translateOnAxis( v1, distance );
 
@@ -8701,7 +8701,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var m1 = new THREE.Matrix4();
 
-		return function ( vector ) {
+		return function worldToLocal( vector ) {
 
 			return vector.applyMatrix4( m1.getInverse( this.matrixWorld ) );
 
@@ -8715,7 +8715,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var m1 = new THREE.Matrix4();
 
-		return function ( vector ) {
+		return function lookAt( vector ) {
 
 			m1.lookAt( vector, this.position, this.up );
 
@@ -8843,7 +8843,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 		var position = new THREE.Vector3();
 		var scale = new THREE.Vector3();
 
-		return function ( optionalTarget ) {
+		return function getWorldQuaternion( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Quaternion();
 
@@ -8861,7 +8861,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var quaternion = new THREE.Quaternion();
 
-		return function ( optionalTarget ) {
+		return function getWorldRotation( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Euler();
 
@@ -8878,7 +8878,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 		var position = new THREE.Vector3();
 		var quaternion = new THREE.Quaternion();
 
-		return function ( optionalTarget ) {
+		return function getWorldScale( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
@@ -8896,7 +8896,7 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 
 		var quaternion = new THREE.Quaternion();
 
-		return function ( optionalTarget ) {
+		return function getWorldDirection( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
@@ -16712,7 +16712,7 @@ Object.defineProperty( THREE, 'AudioContext', {
 
 		var context;
 
-		return function () {
+		return function get() {
 
 			if ( context === undefined ) {
 
@@ -16955,7 +16955,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 	var quaternion = new THREE.Quaternion();
 
-	return function ( optionalTarget ) {
+	return function getWorldDirection( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -16973,7 +16973,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 	var m1 = new THREE.Matrix4();
 
-	return function ( vector ) {
+	return function lookAt( vector ) {
 
 		m1.lookAt( this.position, vector, this.up );
 
@@ -17462,7 +17462,7 @@ Object.assign( THREE.StereoCamera.prototype, {
 		var eyeRight = new THREE.Matrix4();
 		var eyeLeft = new THREE.Matrix4();
 
-		return function update ( camera ) {
+		return function update( camera ) {
 
 			var needsUpdate = focus !== camera.focus || fov !== camera.fov ||
 												aspect !== camera.aspect * this.aspect || near !== camera.near ||
@@ -18018,7 +18018,7 @@ THREE.Loader.prototype = {
 
 		var color, textureLoader, materialLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin ) {
 
 			if ( color === undefined ) color = new THREE.Color();
 			if ( textureLoader === undefined ) textureLoader = new THREE.TextureLoader();
@@ -19815,7 +19815,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials ) {
 
 			var object;
 
@@ -27122,7 +27122,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var warned = false;
 
 		// backwards compatibility: peel texture.texture
-		return function( texture, slot ) {
+		return function setTexture2D( texture, slot ) {
 
 			if ( texture instanceof THREE.WebGLRenderTarget ) {
 
@@ -27147,7 +27147,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var warned = false;
 
-		return function( texture, slot ) {
+		return function setTexture( texture, slot ) {
 
 			if ( ! warned ) {
 
@@ -27166,7 +27166,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var warned = false;
 
-		return function( texture, slot ) {
+		return function setTextureCube( texture, slot ) {
 
 			// backwards compatibility: peel texture.texture
 			if ( texture instanceof THREE.WebGLRenderTargetCube ) {
@@ -33903,7 +33903,7 @@ THREE.ShapeUtils = {
 
 		// takes in an contour array and returns
 
-		return function ( contour, indices ) {
+		return function triangulate( contour, indices ) {
 
 			var n = contour.length;
 
@@ -34512,7 +34512,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2 ) {
+		return function b2( t, p0, p1, p2 ) {
 
 			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
 
@@ -34551,7 +34551,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2, p3 ) {
+		return function b3( t, p0, p1, p2, p3 ) {
 
 			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
 
@@ -40416,7 +40416,7 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 	var box = new THREE.Box3();
 
-	return function ( object ) {
+	return function update( object ) {
 
 		if ( object instanceof THREE.Box3 ) {
 
@@ -40639,7 +40639,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	return function () {
+	return function update() {
 
 		geometry = this.geometry;
 		pointMap = this.pointMap;
@@ -40757,7 +40757,7 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	var v2 = new THREE.Vector3();
 	var v3 = new THREE.Vector3();
 
-	return function () {
+	return function update() {
 
 		v1.setFromMatrixPosition( this.light.matrixWorld );
 		v2.setFromMatrixPosition( this.light.target.matrixWorld );
@@ -41013,7 +41013,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
 
-	return function () {
+	return function update() {
 
 		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
@@ -41270,7 +41270,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 	var vector = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
 
-	return function () {
+	return function update() {
 
 		var coneLength = this.light.distance ? this.light.distance : 1000;
 		var coneWidth = coneLength * Math.tan( this.light.angle );
