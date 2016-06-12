@@ -261,7 +261,7 @@ THREE.Quaternion.prototype = {
 
 		var EPS = 0.000001;
 
-		return function ( vFrom, vTo ) {
+		return function setFromUnitVectors( vFrom, vTo ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 

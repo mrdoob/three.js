@@ -2384,7 +2384,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var warned = false;
 
 		// backwards compatibility: peel texture.texture
-		return function( texture, slot ) {
+		return function setTexture2D( texture, slot ) {
 
 			if ( texture instanceof THREE.WebGLRenderTarget ) {
 
@@ -2409,7 +2409,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var warned = false;
 
-		return function( texture, slot ) {
+		return function setTexture( texture, slot ) {
 
 			if ( ! warned ) {
 
@@ -2428,7 +2428,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var warned = false;
 
-		return function( texture, slot ) {
+		return function setTextureCube( texture, slot ) {
 
 			// backwards compatibility: peel texture.texture
 			if ( texture instanceof THREE.WebGLRenderTargetCube ) {
