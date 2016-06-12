@@ -22,7 +22,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 	var quaternion = new THREE.Quaternion();
 
-	return function ( optionalTarget ) {
+	return function getWorldDirection( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -40,7 +40,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 	var m1 = new THREE.Matrix4();
 
-	return function ( vector ) {
+	return function lookAt( vector ) {
 
 		m1.lookAt( this.position, vector, this.up );
 

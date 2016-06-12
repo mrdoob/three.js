@@ -415,7 +415,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials ) {
 
 			var object;
 

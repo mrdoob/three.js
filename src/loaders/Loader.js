@@ -46,7 +46,7 @@ THREE.Loader.prototype = {
 
 		var color, textureLoader, materialLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin ) {
 
 			if ( color === undefined ) color = new THREE.Color();
 			if ( textureLoader === undefined ) textureLoader = new THREE.TextureLoader();
