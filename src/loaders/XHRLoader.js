@@ -22,15 +22,15 @@ THREE.XHRLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			if ( onLoad ) {
-
-				setTimeout( function () {
-
-					onLoad( cached );
-
-				}, 0 );
-
-			}
+			scope.manager.itemStart( url );
+			
+			setTimeout( function () {
+				
+				if ( onLoad ) onLoad( cached );
+				
+				scope.manager.itemEnd( url );
+				
+			}, 0 );
 
 			return cached;
 
