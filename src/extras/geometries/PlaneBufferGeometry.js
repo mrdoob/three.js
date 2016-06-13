@@ -16,6 +16,8 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 		heightSegments: heightSegments
 	};
 
+	height = height || width;
+
 	var width_half = width / 2;
 	var height_half = height / 2;
 

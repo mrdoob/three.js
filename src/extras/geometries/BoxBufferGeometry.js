@@ -17,6 +17,9 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 		depthSegments: depthSegments
 	};
 
+	height = height || width;
+	depth = depth || width;
+
 	var scope = this;
 
 	// segments
