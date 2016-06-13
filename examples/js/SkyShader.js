@@ -126,6 +126,9 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		"float sunIntensity(float zenithAngleCos)",
 		"{",
+		// This function originally used `exp(n)`, but it returns an incorrect value
+		// on Samsung S6 phones. So it has been replaced with the equivalent `pow(e, n)`.
+		// See https://github.com/mrdoob/three.js/issues/8382
 			"return EE * max(0.0, 1.0 - pow(e, -((cutoffAngle - acos(zenithAngleCos))/steepness)));",
 		"}",
 
