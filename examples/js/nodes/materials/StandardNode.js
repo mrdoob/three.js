@@ -20,18 +20,19 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	var material = builder.material;
 	var code;
 
-	material.define( 'STANDARD' );
+	material.define( 'PHYSICAL' );
 	material.define( 'ALPHATEST', '0.0' );
 
 	material.requestAttrib.light = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.verifyAndBuildCode( builder, 'v3', 'transform' ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', 'transform' ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );
@@ -95,37 +96,41 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	}
 	else {
 
-		// autoblur textures for PBR Material effect
+		// blur textures for PBR effect
 
 		var requires = {
-			bias : new THREE.RoughnessToBlinnExponentNode()
+			bias : new THREE.RoughnessToBlinnExponentNode(),
+			offsetU : 0,
+			offsetV : 0
 		};
 
-		// verify all nodes to reuse generate codes
+		// parse all nodes to reuse generate codes
 
-		this.color.verify( builder );
-		this.roughness.verify( builder );
-		this.metalness.verify( builder );
+		this.color.parse( builder );
+		this.roughness.parse( builder );
+		this.metalness.parse( builder );
 
-		if ( this.alpha ) this.alpha.verify( builder );
+		if ( this.alpha ) this.alpha.parse( builder );
 
-		if ( this.light ) this.light.verify( builder, 'light' );
+		if ( this.light ) this.light.parse( builder, 'light' );
 
-		if ( this.ao ) this.ao.verify( builder );
-		if ( this.ambient ) this.ambient.verify( builder );
-		if ( this.shadow ) this.shadow.verify( builder );
-		if ( this.emissive ) this.emissive.verify( builder );
+		if ( this.ao ) this.ao.parse( builder );
+		if ( this.ambient ) this.ambient.parse( builder );
+		if ( this.shadow ) this.shadow.parse( builder );
+		if ( this.emissive ) this.emissive.parse( builder );
 
-		if ( this.normal ) this.normal.verify( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.verify( builder );
+		if ( this.normal ) this.normal.parse( builder );
+		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
-		if ( this.environment ) this.environment.verify( builder, 'env', requires ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.parse( builder, 'env', requires ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
 
 		var color = this.color.buildCode( builder, 'c' );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
+
+		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
 
@@ -157,7 +162,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bsdfs" ],
 			THREE.ShaderChunk[ "lights_pars" ],
-			THREE.ShaderChunk[ "lights_standard_pars_fragment" ],
+			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 		].join( "\n" ) );
@@ -167,7 +172,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 				THREE.ShaderChunk[ "normal_fragment" ],
 
 				// prevent undeclared material
-			"	StandardMaterial material;",
+			"	PhysicalMaterial material;",
 			"	material.diffuseColor = vec3( 1.0 );",
 
 				color.code,
@@ -215,9 +220,25 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		output.push(
 			// accumulation
-			'material.specularRoughness = clamp( roughnessFactor, 0.001, 1.0 );', // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
-			'material.specularColor = mix( vec3( 0.04 ), diffuseColor, metalnessFactor );',
+			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );' // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
+		);
 
+		if ( reflectivity ) {
+
+			output.push(
+				'material.specularColor = mix( vec3( 0.16 * pow2( ' + reflectivity.builder( builder, 'fv1' ) + ' ) ), diffuseColor, metalnessFactor );'
+			);
+
+		}
+		else {
+
+			output.push(
+				'material.specularColor = mix( vec3( 0.04 ), diffuseColor, metalnessFactor );'
+			);
+
+		}
+
+		output.push(
 			THREE.ShaderChunk[ "lights_template" ]
 		);
 

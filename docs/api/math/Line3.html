@@ -16,7 +16,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 start], [page:Vector3 end])</h3>
+		<h3>[name]( [page:Vector3 start], [page:Vector3 end] )</h3>
 		<div>
 		start -- [page:Vector3] Start of the line segment<br />
 		end -- [page:Vector3] End of the line segment
@@ -38,7 +38,7 @@
 
 
 
-		<h3>[method:Line3 set]([page:Vector3 start], [page:Vector3 end])</h3>
+		<h3>[method:Line3 set]( [page:Vector3 start], [page:Vector3 end] )</h3>
 		<div>
 		start -- [page:Vector3] <br />
 		end -- [page:Vector3]
@@ -47,7 +47,7 @@
 		Sets the start and end values by copying the provided vectors.
 		</div>
 
-		<h3>[method:Line3 copy]([page:Line3 line])</h3>
+		<h3>[method:Line3 copy]( [page:Line3 line] )</h3>
 		<div>
 		line -- [page:Line3]
 		</div>
@@ -60,7 +60,7 @@
 		Return a new copy of this [page:Line3].
 		</div>
 
-		<h3>[method:Boolean equals]([page:Line3 line])</h3>
+		<h3>[method:Boolean equals]( [page:Line3 line] )</h3>
 		<div>
 		line -- [page:Line3]
 		</div>
@@ -78,7 +78,7 @@
 		Returns the line segment's length squared.
 		</div>
 
-		<h3>[method:Line3 applyMatrix4]([page:Matrix4 matrix]) [page:Line3 this]</h3>
+		<h3>[method:Line3 applyMatrix4]( [page:Matrix4 matrix] ) [page:Line3 this]</h3>
 		<div>
 		matrix -- [page:Matrix4]
 		</div>
@@ -86,7 +86,7 @@
 		Apply a matrix transform to the line segment.
 		</div>
 
-		<h3>[method:Vector at]([page:Float t], [page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector at]( [page:Float t], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		t -- [page:Float] Use values 0-1 to return a result on the line segment. <br />
 		optionalTarget -- [page:Vector] Optional target to set the result.
@@ -95,7 +95,7 @@
 		Return a vector at a certain position along the line. When t = 0, it returns the start vector, and when t=1 it returns the end vector.
 		</div>
 
-		<h3>[method:Vector3 center]([page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 center]( [page:Vector3 optionalTarget] )</h3>
 		<div>
 		optionalTarget -- [page:Vector3] Optional target to set the result.
 		</div>
@@ -103,7 +103,7 @@
 		Return the center of the line segment.
 		</div>
 
-		<h3>[method:Vector3 delta]([page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 delta]( [page:Vector3 optionalTarget] )</h3>
 		<div>
 		optionalTarget -- [page:Vector3] Optional target to set the result.
 		</div>
@@ -111,7 +111,7 @@
 		Returns the delta vector of the line segment, or the end vector minus the start vector.
 		</div>
 
-		<h3>[method:Vector3 closestPointToPoint]([page:Vector3 point], [page:Boolean clampToLine], [page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 closestPointToPoint]( [page:Vector3 point], [page:Boolean clampToLine], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		point -- [page:Vector3] <br />
 		clampToLine -- [page:Boolean] <br />
@@ -121,7 +121,7 @@
 		Returns the closets point on the line. If clamp to line is true, then the returned value will be clamped to the line segment.
 		</div>
 
-		<h3>[method:Float closestPointToPointParameter]([page:Vector3 point], [page:Boolean clampToLine])</h3>
+		<h3>[method:Float closestPointToPointParameter]( [page:Vector3 point], [page:Boolean clampToLine] )</h3>
 		<div>
 		point -- [page:Vector3] <br />
 		clampToLine -- [page:Boolean]

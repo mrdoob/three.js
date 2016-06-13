@@ -40,7 +40,6 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
@@ -54,7 +53,9 @@
 			var camera, scene, renderer, composer, copyPass, msaaRenderPass;
 			var gui, stats, texture;
 
-			var param = { MSAASampleLevel: 2 };
+			var param = {
+				sampleLevel: 2
+			};
 
 			init();
 			animate();
@@ -67,19 +68,13 @@
 
 				gui = new dat.GUI();
 
-				var example = gui.add( param, 'MSAASampleLevel', {
+				gui.add( param, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
 					'Level 3: 8 Samples': 3,
 					'Level 4: 16 Samples': 4,
 					'Level 5: 32 Samples': 5
-				} ).onFinishChange( function() {
-
-					if( msaaRenderPass ) {
-						msaaRenderPass.sampleLevel = param.MSAASampleLevel;
-					}
-
 				} );
 
 				gui.open();
@@ -129,7 +124,7 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				msaaRenderPass = new THREE.ManualMSAARenderPass( scene, camera );
-				msaaRenderPass.sampleLevel = param.MSAASampleLevel;
+				msaaRenderPass.unbiased = false;
 				composer.addPass( msaaRenderPass );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
@@ -154,7 +149,6 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				msaaRenderPass.setSize( newWidth, newHeight );
 
 			}
 
@@ -172,6 +166,8 @@
 					child.rotation.y += 0.01;
 
 				}
+
+				msaaRenderPass.sampleLevel = param.sampleLevel;
 
 				composer.render();
 				stats.end();

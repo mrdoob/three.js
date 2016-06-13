@@ -128,14 +128,6 @@
 		default – false
 		</div>
 
-		<h3>[property:Boolean rotationAutoUpdate]</h3>
-		<div>
-		When this is set, then the rotationMatrix gets calculated every frame.
-		</div>
-		<div>
-		default – true
-		</div>
-
 		<h3>[property:object userData]</h3>
 		<div>
 		An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
@@ -151,7 +143,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null applyMatrix]( [page:Matrix4 matrix])</h3>
+		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
 		<div>
 		matrix - matrix
 		</div>
@@ -230,7 +222,7 @@
 		<div>
 		Executes the callback on this object and all descendants.
 		</div>
-		
+
 		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
@@ -239,13 +231,13 @@
 		Like traverse, but the callback will only be executed for visible objects.
 		Descendants of invisible objects are not traversed.
 		</div>
-		
+
 		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
 		<div>
 		callback - A function with as first argument an object3D object.<br />
 		</div>
 		<div>
-		Executes the callback on this object and all ancestors.
+		Executes the callback on all ancestors.
 		</div>
 
 		<h3>[method:null updateMatrix]()</h3>
@@ -264,7 +256,7 @@
 		</div>
 
 
-		<h3>[method:Object3D getObjectByName]([page:String name])</h3>
+		<h3>[method:Object3D getObjectByName]( [page:String name] )</h3>
 		<div>
 		name -- String to match to the children's Object3d.name property. <br />
 		</div>
@@ -272,7 +264,7 @@
 		Searches through the object's children and returns the first with a matching name.
 		</div>
 
-		<h3>[method:Object3D getObjectById]([page:Integer id])</h3>
+		<h3>[method:Object3D getObjectById]( [page:Integer id] )</h3>
 		<div>
 		id -- Unique number of the object instance<br />
 		</div>
@@ -280,7 +272,47 @@
 		Searches through the object's children and returns the first with a matching id.
 		</div>
 
-		<h3>[method:Object3D translateOnAxis]([page:Vector3 axis], [page:Float distance])</h3>
+		<h3>[method:Vector3 getWorldPosition]( [page:Vector3 optionalTarget] )</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector representing the position of the object in world space.
+		</div>
+
+		<h3>[method:Quaternion getWorldQuaternion]( [page:Quaternion optionalTarget] )</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Quaternion` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a quaternion representing the rotation of the object in world space.
+		</div>
+
+		<h3>[method:Euler getWorldRotation]( [page:Euler optionalTarget] )</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Euler` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns the euler angles representing the rotation of the object in world space.
+		</div>
+
+		<h3>[method:Vector3 getWorldScale]( [page:Vector3 optionalTarget] )</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector of the scaling factors applied to the object for each axis in world space.
+		</div>
+
+		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 optionalTarget] )</h3>
+		<div>
+		optionalTarget — Optional target to set the result. Otherwise, a new `Vector3` is instantiated. (optional)<br />
+		</div>
+		<div>
+		Returns a vector representing the direction of object's positive z-axis in world space.
+		</div>
+
+		<h3>[method:Object3D translateOnAxis]( [page:Vector3 axis], [page:Float distance] )</h3>
 		<div>
 		axis -- A normalized vector in object space.<br />
 		distance -- The distance to translate.
@@ -289,7 +321,7 @@
 		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
-		<h3>[method:Object3D rotateOnAxis]([page:Vector3 axis], [page:Float angle])</h3>
+		<h3>[method:Object3D rotateOnAxis]( [page:Vector3 axis], [page:Float angle] )</h3>
 		<div>
 		axis -- A normalized vector in object space. <br />
 		angle -- The angle in radians.
@@ -298,7 +330,7 @@
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
-		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
 		<div>
 		Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:Points] implement this method in order to participate in raycasting.
 		</div>

@@ -105,112 +105,6 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-
-	var ReNamePart = /([\w\d_]+)(\])?(\[|\.)?/g;
-
-	function attachUniformInfo( name, info, root ) {
-		// attaches 'info' at the right spot according to parsed name
-
-		var ctx = root,
-			len = name.length;
-
-		for (; ;) {
-
-			var ids = ctx.ids,
-				infos = ctx.infos,
-
-				match = ReNamePart.exec( name ),
-				matchEnd = ReNamePart.lastIndex,
-
-				id = match[ 1 ],
-				idIsIndex = match[ 2 ] === ']',
-				subscript = match[ 3 ];
-
-			if ( idIsIndex ) id = + id; // avoid parsing strings in renderer
-
-			if ( subscript === undefined ||
-					subscript === '[' && matchEnd + 2 === len ) {
-				// bare name or pure bottom-level array with "[0]" suffix
-
-				if ( ctx === root ) {
-
-					ctx[ id ] = info;
-
-				} else {
-
-					ids.push( id );
-					infos.push( info );
-
-				}
-
-				break;
-
-			} else {
-				// step into context and create it in case it doesn't exist
-
-				if ( ctx === root ) {
-
-					var nextCtx = ctx[ id ];
-
-					if ( nextCtx === undefined ) {
-
-						nextCtx = { ids: [], infos: [] };
-						ctx[ id ] = nextCtx;
-
-					}
-
-					ctx = nextCtx;
-
-				} else {
-
-					var i = ids.indexOf( id );
-
-					if ( i === -1 ) {
-
-						i = ids.length;
-
-						ids.push( id );
-						infos.push( { ids: [], infos: [] } );
-
-					}
-
-					ctx = ctx.infos[ i ];
-
-				}
-
-			}
-
-		}
-
-		// reset stateful RegExp object, because of early exit
-		ReNamePart.lastIndex = 0;
-
-	}
-
-
-	function fetchUniformLocations( gl, program, identifiers ) {
-
-		var uniforms = {};
-
-		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
-
-		for ( var i = 0; i !== n; ++ i ) {
-
-			var info = gl.getActiveUniform( program, i ),
-				name = info.name,
-
-				location = gl.getUniformLocation( program, name );
-
-			// console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
-
-			attachUniformInfo( name, location, uniforms );
-
-		}
-
-		return uniforms;
-
-	}
-
 	function fetchAttributeLocations( gl, program, identifiers ) {
 
 		var attributes = {};
@@ -676,7 +570,8 @@ THREE.WebGLProgram = ( function () {
 
 			if ( cachedUniforms === undefined ) {
 
-				cachedUniforms = fetchUniformLocations( gl, program );
+				cachedUniforms =
+						new THREE.WebGLUniforms( gl, program, renderer );
 
 			}
 

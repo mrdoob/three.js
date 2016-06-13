@@ -13,6 +13,7 @@ THREE.CameraNode = function( scope, camera ) {
 
 THREE.CameraNode.POSITION = 'position';
 THREE.CameraNode.DEPTH = 'depth';
+THREE.CameraNode.TO_VERTEX = 'toVertex';
 
 THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.CameraNode.prototype.constructor = THREE.CameraNode;
@@ -67,6 +68,7 @@ THREE.CameraNode.prototype.isUnique = function( builder ) {
 
 	switch ( this.scope ) {
 		case THREE.CameraNode.DEPTH:
+		case THREE.CameraNode.TO_VERTEX:
 			return true;
 	}
 
@@ -103,6 +105,12 @@ THREE.CameraNode.prototype.generate = function( builder, output ) {
 			builder.include( 'depthcolor' );
 
 			result = 'depthcolor(' + this.near.build( builder, 'fv1' ) + ',' + this.far.build( builder, 'fv1' ) + ')';
+
+			break;
+
+		case THREE.CameraNode.TO_VERTEX:
+
+			result = 'normalize( ' + new THREE.PositionNode( THREE.PositionNode.WORLD ).build( builder, 'v3' ) + ' - cameraPosition )';
 
 			break;
 

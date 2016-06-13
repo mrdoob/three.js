@@ -2694,15 +2694,15 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		if ( mesh.geometry.animations === undefined ) {
-
-			mesh.geometry.animations = [];
-
-		}
-
 		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
 
 		if ( clip !== null ) {
+
+			if ( mesh.geometry.animations === undefined ) {
+
+				mesh.geometry.animations = [];
+
+			}
 
 			mesh.geometry.animations.push( clip );
 
@@ -2747,6 +2747,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
+		// TODO: should we use THREE.AnimationClip.CreateFromMorphTargetSequence() instead?
+
 		var tracks = [];
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
@@ -2767,13 +2769,13 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		if ( clip !== null ) {
 
-			if ( mesh.geometry.morphAnimations === undefined ) {
+			if ( mesh.geometry.animations === undefined ) {
 
-				mesh.geometry.morphAnimations = [];
+				mesh.geometry.animations = [];
 
 			}
 
-			mesh.geometry.morphAnimations.push( clip );
+			mesh.geometry.animations.push( clip );
 
 		}
 
@@ -3713,6 +3715,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
 		THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+		THREE.ShaderChunk[ "clipping_planes_pars_vertex" ],
 
 		// ---- MMD specific for outline drawing
 		"	uniform bool outlineDrawing;",
@@ -3743,6 +3746,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "skinning_vertex" ],
 			THREE.ShaderChunk[ "project_vertex" ],
 			THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+			THREE.ShaderChunk[ "clipping_planes_vertex" ],
 
 		"	vViewPosition = - mvPosition.xyz;",
 
@@ -3776,6 +3780,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"uniform float opacity;",
 
 		THREE.ShaderChunk[ "common" ],
+		THREE.ShaderChunk[ "packing" ],
 		THREE.ShaderChunk[ "color_pars_fragment" ],
 		THREE.ShaderChunk[ "uv_pars_fragment" ],
 		THREE.ShaderChunk[ "uv2_pars_fragment" ],
@@ -3794,6 +3799,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 		THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+		THREE.ShaderChunk[ "clipping_planes_pars_fragment" ],
 
 		// ---- MMD specific for cel shading
 		"	uniform bool outlineDrawing;",
@@ -3815,7 +3821,13 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"#undef RE_Direct",
 		"void RE_Direct_BlinnMMD( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {",
 		"	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );",
-		"	vec3 irradiance = dotNL * PI * directLight.color; // punctual light",
+		"	vec3 irradiance = dotNL * directLight.color;",
+
+		"	#ifndef PHYSICALLY_CORRECT_LIGHTS",
+
+		"		irradiance *= PI; // punctual light",
+
+		"	#endif",
 
 		// ---- MMD specific for toon mapping
 		"	if ( celShading ) {",
@@ -3827,6 +3839,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 
 		"	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;",
 		"}",
+		// ---- MMD specific for toon mapping
 		"#define RE_Direct	RE_Direct_BlinnMMD",
 		// ---- MMD specific for toon mapping
 
@@ -3839,9 +3852,11 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"	}",
 		// ---- MMD specific for outline drawing
 
+			THREE.ShaderChunk[ "clipping_planes_fragment" ],
+
 		"	vec4 diffuseColor = vec4( diffuse, opacity );",
 		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-		"	vec3 totalEmissiveLight = emissive;",
+		"	vec3 totalEmissiveRadiance = emissive;",
 
 			THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 			THREE.ShaderChunk[ "map_fragment" ],
@@ -3859,14 +3874,16 @@ THREE.ShaderLib[ 'mmd' ] = {
 			// modulation
 			THREE.ShaderChunk[ "aomap_fragment" ],
 
-			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
+			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 
 			THREE.ShaderChunk[ "envmap_fragment" ],
-			THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
-			THREE.ShaderChunk[ "fog_fragment" ],
 
 		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
+			THREE.ShaderChunk[ "tonemapping_fragment" ],
+			THREE.ShaderChunk[ "encodings_fragment" ],
+			THREE.ShaderChunk[ "fog_fragment" ],
 
 		"}"
 
@@ -4124,45 +4141,48 @@ THREE.MMDHelper.prototype = {
 
 	setAnimation: function ( mesh ) {
 
-		if ( mesh.geometry.animations !== undefined || mesh.geometry.morphAnimations !== undefined ) {
+		if ( mesh.geometry.animations !== undefined ) {
 
 			mesh.mixer = new THREE.AnimationMixer( mesh );
 
-		}
-
-		if ( mesh.geometry.animations !== undefined ) {
+			var foundAnimation = false;
+			var foundMorphAnimation = false;
 
 			for ( var i = 0; i < mesh.geometry.animations.length; i++ ) {
 
-				var action = mesh.mixer.clipAction( mesh.geometry.animations[ i ] );
+				var clip = mesh.geometry.animations[ i ];
 
-				if ( i === 0 ) {
+				var action = mesh.mixer.clipAction( clip );
 
-					action.play();
+				if ( clip.tracks[ 0 ].name.indexOf( '.morphTargetInfluences' ) === 0 ) {
+
+					if ( ! foundMorphAnimation ) {
+
+						action.play();
+						foundMorphAnimation = true;
+
+					}
+
+				} else {
+
+					if ( ! foundAnimation ) {
+
+						action.play();
+						foundAnimation = true;
+
+					}
 
 				}
 
 			}
 
-			mesh.ikSolver = new THREE.CCDIKSolver( mesh );
+			if ( foundAnimation ) {
 
-			if ( mesh.geometry.grants !== undefined ) {
+				mesh.ikSolver = new THREE.CCDIKSolver( mesh );
 
-				mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
+				if ( mesh.geometry.grants !== undefined ) {
 
-			}
-
-		}
-
-		if ( mesh.geometry.morphAnimations !== undefined ) {
-
-			for ( var i = 0; i < mesh.geometry.morphAnimations.length; i++ ) {
-
-				var action = mesh.mixer.clipAction( mesh.geometry.morphAnimations[ i ] );
-
-				if ( i === 0 ) {
-
-					action.play();
+					mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
 
 				}
 

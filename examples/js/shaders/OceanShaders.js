@@ -46,9 +46,9 @@ THREE.ShaderLib[ 'ocean_subtransform' ] = {
 	},
 	fragmentShader: [
 		//GPU FFT using a Stockham formulation
-		'precision highp float;',
 
-		'const float PI = 3.14159265359;',
+		'precision highp float;',
+		'#include <common>',
 
 		'uniform sampler2D u_input;',
 		'uniform float u_transformSize;',
@@ -96,8 +96,8 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 		'const float CM = 0.23;',
@@ -106,12 +106,8 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 		'uniform float u_resolution;',
 		'uniform float u_size;',
 
-		'float square (float x) {',
-			'return x * x;',
-		'}',
-
 		'float omega (float k) {',
-			'return sqrt(G * k * (1.0 + square(k / KM)));',
+			'return sqrt(G * k * (1.0 + pow2(k / KM)));',
 		'}',
 
 		'float tanh (float x) {',
@@ -130,24 +126,24 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 			'float l_wind = length(u_wind);',
 
 			'float Omega = 0.84;',
-			'float kp = G * square(Omega / l_wind);',
+			'float kp = G * pow2(Omega / l_wind);',
 
 			'float c = omega(k) / k;',
 			'float cp = omega(kp) / kp;',
 
-			'float Lpm = exp(-1.25 * square(kp / k));',
+			'float Lpm = exp(-1.25 * pow2(kp / k));',
 			'float gamma = 1.7;',
 			'float sigma = 0.08 * (1.0 + 4.0 * pow(Omega, -3.0));',
-			'float Gamma = exp(-square(sqrt(k / kp) - 1.0) / 2.0 * square(sigma));',
+			'float Gamma = exp(-pow2(sqrt(k / kp) - 1.0) / 2.0 * pow2(sigma));',
 			'float Jp = pow(gamma, Gamma);',
 			'float Fp = Lpm * Jp * exp(-Omega / sqrt(10.0) * (sqrt(k / kp) - 1.0));',
 			'float alphap = 0.006 * sqrt(Omega);',
 			'float Bl = 0.5 * alphap * cp / c * Fp;',
 
-			'float z0 = 0.000037 * square(l_wind) / G * pow(l_wind / cp, 0.9);',
+			'float z0 = 0.000037 * pow2(l_wind) / G * pow(l_wind / cp, 0.9);',
 			'float uStar = 0.41 * l_wind / log(10.0 / z0);',
 			'float alpham = 0.01 * ((uStar < CM) ? (1.0 + log(uStar / CM)) : (1.0 + 3.0 * log(uStar / CM)));',
-			'float Fm = exp(-0.25 * square(k / KM - 1.0));',
+			'float Fm = exp(-0.25 * pow2(k / KM - 1.0));',
 			'float Bh = 0.5 * alpham * CM / c * Fm * Lpm;',
 
 			'float a0 = log(2.0) / 4.0;',
@@ -180,8 +176,8 @@ THREE.ShaderLib[ 'ocean_phase' ] = {
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 
@@ -224,8 +220,8 @@ THREE.ShaderLib[ 'ocean_spectrum' ] = {
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 

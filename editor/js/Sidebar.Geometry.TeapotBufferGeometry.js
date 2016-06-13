@@ -100,4 +100,4 @@ Sidebar.Geometry.TeapotBufferGeometry = function ( signals, object ) {
 
 	return container;
 
-}
+};

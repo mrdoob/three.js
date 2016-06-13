@@ -4,7 +4,7 @@ var startX, startY, division, completed = 0;
 
 var scene, camera, renderer, loader, sceneId;
 
-importScripts( '../../../build/three.min.js' );
+importScripts( '../../../build/three.js' );
 
 
 self.onmessage = function( e ) {
@@ -564,4 +564,4 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.RaytracingRendererWorker.prototype );
+Object.assign( THREE.RaytracingRendererWorker.prototype, THREE.EventDispatcher.prototype );

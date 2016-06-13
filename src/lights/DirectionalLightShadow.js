@@ -8,5 +8,8 @@ THREE.DirectionalLightShadow = function ( light ) {
 
 };
 
-THREE.DirectionalLightShadow.prototype = Object.create( THREE.LightShadow.prototype );
-THREE.DirectionalLightShadow.prototype.constructor = THREE.DirectionalLightShadow;
+THREE.DirectionalLightShadow.prototype = Object.assign( Object.create( THREE.LightShadow.prototype ), {
+
+	constructor: THREE.DirectionalLightShadow
+
+} );

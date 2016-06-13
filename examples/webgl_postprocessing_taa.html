@@ -41,7 +41,6 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
@@ -145,6 +144,7 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				taaRenderPass = new THREE.TAARenderPass( scene, camera );
+				taaRenderPass.unbiased = false;
 				composer.addPass( taaRenderPass );
 
 				renderPass = new THREE.RenderPass( scene, camera );
@@ -173,7 +173,6 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				taaRenderPass.setSize( newWidth, newHeight );
 
 			}
 

@@ -64,14 +64,14 @@ THREE.BokehShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+
 		"varying vec2 vUv;",
 
 		"uniform sampler2D tColor;",
 		"uniform sampler2D tDepth;",
 		"uniform float textureWidth;",
 		"uniform float textureHeight;",
-
-		"const float PI = 3.14159265;",
 
 		"uniform float focalDepth;  //focal distance value in meters, but you may use autofocus option below",
 		"uniform float focalLength; //focal length in mm",
@@ -226,20 +226,6 @@ THREE.BokehShader = {
 			"return col+mix(vec3(0.0),col,thresh*blur);",
 		"}",
 
-		"vec2 rand(vec2 coord) {",
-			"// generating noise / pattern texture for dithering",
-
-			"float noiseX = ((fract(1.0-coord.s*(textureWidth/2.0))*0.25)+(fract(coord.t*(textureHeight/2.0))*0.75))*2.0-1.0;",
-			"float noiseY = ((fract(1.0-coord.s*(textureWidth/2.0))*0.75)+(fract(coord.t*(textureHeight/2.0))*0.25))*2.0-1.0;",
-
-			"if (noise) {",
-				"noiseX = clamp(fract(sin(dot(coord ,vec2(12.9898,78.233))) * 43758.5453),0.0,1.0)*2.0-1.0;",
-				"noiseY = clamp(fract(sin(dot(coord ,vec2(12.9898,78.233)*2.0)) * 43758.5453),0.0,1.0)*2.0-1.0;",
-			"}",
-
-			"return vec2(noiseX,noiseY);",
-		"}",
-
 		"vec3 debugFocus(vec3 col, float blur, float depth) {",
 			"float edge = 0.002*depth; //distance based edge smoothing",
 			"float m = clamp(smoothstep(0.0,edge,blur),0.0,1.0);",
@@ -320,7 +306,7 @@ THREE.BokehShader = {
 
 			"// calculation of pattern for dithering",
 
-			"vec2 noise = rand(vUv.xy)*dithering*blur;",
+			"vec2 noise = vec2(rand(vUv.xy), rand( vUv.xy + vec2( 0.4, 0.6 ) ) )*dithering*blur;",
 
 			"// getting blur x and y step factor",
 

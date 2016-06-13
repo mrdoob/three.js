@@ -4,7 +4,7 @@
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
-	#if defined( USE_ENVMAP ) && defined( STANDARD )
+	#if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 

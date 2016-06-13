@@ -10,6 +10,51 @@ Sidebar.Scene = function ( editor ) {
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
+	// outliner
+
+	function buildOption( object, draggable ) {
+
+		var option = document.createElement( 'div' );
+		option.draggable = draggable;
+		option.innerHTML = buildHTML( object );
+		option.value = object.id;
+
+		return option;
+
+	}
+
+	function buildHTML( object ) {
+
+		var html = '<span class="type ' + object.type + '"></span> ' + object.name;
+
+		if ( object instanceof THREE.Mesh ) {
+
+			var geometry = object.geometry;
+			var material = object.material;
+
+			html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
+			html += ' <span class="type ' + material.type + '"></span> ' + material.name;
+
+		}
+
+		html += getScript( object.uuid );
+
+		return html;
+
+	}
+
+	function getScript( uuid ) {
+
+		if ( editor.scripts[ uuid ] !== undefined ) {
+
+			return ' <span class="type Script"></span>';
+
+		}
+
+		return '';
+
+	}
+
 	var ignoreObjectSelectedSignal = false;
 
 	var outliner = new UI.Outliner( editor );
@@ -127,20 +172,8 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = [];
 
-		options.push( { static: true, value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
-		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name + getScript( scene.uuid ) } );
-
-		function getScript( uuid ) {
-
-			if ( editor.scripts[ uuid ] !== undefined ) {
-
-				return ' <span class="type Script"></span>';
-
-			}
-
-			return '';
-
-		}
+		options.push( buildOption( camera, false ) );
+		options.push( buildOption( scene, false ) );
 
 		( function addObjects( objects, pad ) {
 
@@ -148,27 +181,15 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
+				var option = buildOption( object, true );
+				option.style.marginLeft = ( pad * 10 ) + 'px';
+				options.push( option );
 
-				if ( object instanceof THREE.Mesh ) {
-
-					var geometry = object.geometry;
-					var material = object.material;
-
-					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
-
-				}
-
-				html += getScript( object.uuid );
-
-				options.push( { value: object.id, html: html } );
-
-				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
+				addObjects( object.children, pad + 1 );
 
 			}
 
-		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
+		} )( scene.children, 1 );
 
 		outliner.setOptions( options );
 
@@ -222,6 +243,25 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
+	signals.objectChanged.add( function ( object ) {
+
+		var options = outliner.options;
+
+		for ( var i = 0; i < options.length; i ++ ) {
+
+			var option = options[ i ];
+
+			if ( option.value === object.id ) {
+
+				option.innerHTML = buildHTML( object );
+				return;
+
+			}
+
+		}
+
+	} );
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
@@ -232,4 +272,4 @@ Sidebar.Scene = function ( editor ) {
 
 	return container;
 
-}
+};

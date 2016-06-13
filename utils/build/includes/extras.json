@@ -25,6 +25,8 @@
 	"src/extras/geometries/CircleBufferGeometry.js",
 	"src/extras/geometries/CylinderBufferGeometry.js",
 	"src/extras/geometries/CylinderGeometry.js",
+	"src/extras/geometries/ConeBufferGeometry.js",
+	"src/extras/geometries/ConeGeometry.js",
 	"src/extras/geometries/EdgesGeometry.js",
 	"src/extras/geometries/ExtrudeGeometry.js",
 	"src/extras/geometries/ShapeGeometry.js",

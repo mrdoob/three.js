@@ -283,11 +283,15 @@ var Viewport = function ( editor ) {
 		switch ( value ) {
 
 			case 'css/light.css':
-				grid.setColors( 0x444444, 0x888888 );
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
+				sceneHelpers.add( grid );
 				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
-				grid.setColors( 0xbbbbbb, 0x888888 );
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
+				sceneHelpers.add( grid );
 				clearColor = 0x333333;
 				break;
 
@@ -384,7 +388,7 @@ var Viewport = function ( editor ) {
 
 	signals.geometryChanged.add( function ( object ) {
 
-		if ( object !== null ) {
+		if ( object !== undefined ) {
 
 			selectionBox.update( object );
 

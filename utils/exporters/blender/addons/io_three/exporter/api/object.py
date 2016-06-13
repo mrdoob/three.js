@@ -378,7 +378,7 @@ def matrix(obj, options):
         parent_inverted = obj.parent.matrix_world.inverted(mathutils.Matrix())
         return parent_inverted * obj.matrix_world
     else:
-        return obj.matrix_world
+        return AXIS_CONVERSION * obj.matrix_world
 
 
 @_object
