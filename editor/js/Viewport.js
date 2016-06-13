@@ -75,7 +75,7 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( object !== null ) {
+		if ( object !== undefined ) {
 
 			switch ( transformControls.getMode() ) {
 
@@ -364,8 +364,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined &&
-				 object instanceof THREE.Sprite === false ) {
+			if ( object.geometry !== undefined ) {
 
 				selectionBox.update( object );
 				selectionBox.visible = true;

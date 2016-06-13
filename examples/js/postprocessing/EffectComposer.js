@@ -91,13 +91,17 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			}
 
-			if ( pass instanceof THREE.MaskPass ) {
+			if ( THREE.MaskPass !== undefined ) {
 
-				maskActive = true;
+				if ( pass instanceof THREE.MaskPass ) {
 
-			} else if ( pass instanceof THREE.ClearMaskPass ) {
+					maskActive = true;
 
-				maskActive = false;
+				} else if ( pass instanceof THREE.ClearMaskPass ) {
+
+					maskActive = false;
+
+				}
 
 			}
 

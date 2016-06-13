@@ -136,8 +136,8 @@
 				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color:   { type: "c", value: new THREE.Color( 0xffffff ) },
-						texture: { type: "t", value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						color:   { value: new THREE.Color( 0xffffff ) },
+						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

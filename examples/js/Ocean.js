@@ -97,9 +97,9 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: "#define HORIZONTAL \n" + oceanHorizontalShader.fragmentShader
 	} );
-	this.materialOceanHorizontal.uniforms.u_transformSize = { type: "f", value: this.resolution };
-	this.materialOceanHorizontal.uniforms.u_subtransformSize = { type: "f", value: null };
-	this.materialOceanHorizontal.uniforms.u_input = { type: "t", value: null };
+	this.materialOceanHorizontal.uniforms.u_transformSize = { value: this.resolution };
+	this.materialOceanHorizontal.uniforms.u_subtransformSize = { value: null };
+	this.materialOceanHorizontal.uniforms.u_input = { value: null };
 	this.materialOceanHorizontal.depthTest = false;
 
 	// 2 - Vertical wave vertices used for FFT
@@ -110,9 +110,9 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: oceanVerticalShader.fragmentShader
 	} );
-	this.materialOceanVertical.uniforms.u_transformSize = { type: "f", value: this.resolution };
-	this.materialOceanVertical.uniforms.u_subtransformSize = { type: "f", value: null };
-	this.materialOceanVertical.uniforms.u_input = { type: "t", value: null };
+	this.materialOceanVertical.uniforms.u_transformSize = { value: this.resolution };
+	this.materialOceanVertical.uniforms.u_subtransformSize = { value: null };
+	this.materialOceanVertical.uniforms.u_input = { value: null };
 	this.materialOceanVertical.depthTest = false;
 
 	// 3 - Initial spectrum used to generate height map
@@ -123,8 +123,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: initialSpectrumShader.fragmentShader
 	} );
-	this.materialInitialSpectrum.uniforms.u_wind = { type: "v2", value: new THREE.Vector2() };
-	this.materialInitialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialInitialSpectrum.uniforms.u_wind = { value: new THREE.Vector2() };
+	this.materialInitialSpectrum.uniforms.u_resolution = { value: this.resolution };
 	this.materialInitialSpectrum.depthTest = false;
 
 	// 4 - Phases used to animate heightmap
@@ -135,7 +135,7 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: phaseShader.fragmentShader
 	} );
-	this.materialPhase.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialPhase.uniforms.u_resolution = { value: this.resolution };
 	this.materialPhase.depthTest = false;
 
 	// 5 - Shader used to update spectrum
@@ -146,8 +146,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: spectrumShader.fragmentShader
 	} );
-	this.materialSpectrum.uniforms.u_initialSpectrum = { type: "t", value: null };
-	this.materialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialSpectrum.uniforms.u_initialSpectrum = { value: null };
+	this.materialSpectrum.uniforms.u_resolution = { value: this.resolution };
 	this.materialSpectrum.depthTest = false;
 
 	// 6 - Shader used to update spectrum normals
@@ -158,8 +158,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: normalShader.fragmentShader
 	} );
-	this.materialNormal.uniforms.u_displacementMap = { type: "t", value: null };
-	this.materialNormal.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialNormal.uniforms.u_displacementMap = { value: null };
+	this.materialNormal.uniforms.u_resolution = { value: this.resolution };
 	this.materialNormal.depthTest = false;
 
 	// 7 - Shader used to update normals
@@ -171,13 +171,13 @@
 		fragmentShader: oceanShader.fragmentShader
 	} );
 	// this.materialOcean.wireframe = true;
-	this.materialOcean.uniforms.u_geometrySize = { type: "f", value: this.resolution };
-	this.materialOcean.uniforms.u_displacementMap = { type: "t", value: this.displacementMapFramebuffer.texture };
-	this.materialOcean.uniforms.u_normalMap = { type: "t", value: this.normalMapFramebuffer.texture };
-	this.materialOcean.uniforms.u_oceanColor = { type: "v3", value: this.oceanColor };
-	this.materialOcean.uniforms.u_skyColor = { type: "v3", value: this.skyColor };
-	this.materialOcean.uniforms.u_sunDirection = { type: "v3", value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
-	this.materialOcean.uniforms.u_exposure = { type: "f", value: this.exposure };
+	this.materialOcean.uniforms.u_geometrySize = { value: this.resolution };
+	this.materialOcean.uniforms.u_displacementMap = { value: this.displacementMapFramebuffer.texture };
+	this.materialOcean.uniforms.u_normalMap = { value: this.normalMapFramebuffer.texture };
+	this.materialOcean.uniforms.u_oceanColor = { value: this.oceanColor };
+	this.materialOcean.uniforms.u_skyColor = { value: this.skyColor };
+	this.materialOcean.uniforms.u_sunDirection = { value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
+	this.materialOcean.uniforms.u_exposure = { value: this.exposure };
 
 	// Disable blending to prevent default premultiplied alpha values
 	this.materialOceanHorizontal.blending = 0;

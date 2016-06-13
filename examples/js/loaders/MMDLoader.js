@@ -33,9 +33,9 @@
  *  - shadow support.
  */
 
-THREE.MMDLoader = function ( showStatus, manager ) {
+THREE.MMDLoader = function ( manager ) {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.defaultTexturePath = './models/default/';
 
@@ -3674,20 +3674,20 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "lights" ],
 
 		{
-			"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-			"shininess": { type: "f", value: 30 }
+			"emissive" : { value: new THREE.Color( 0x000000 ) },
+			"specular" : { value: new THREE.Color( 0x111111 ) },
+			"shininess": { value: 30 }
 		},
 
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 		{
-			"outlineDrawing"  : { type: "i", value: 0 },
-			"outlineThickness": { type: "f", value: 0.0 },
-			"outlineColor"    : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"outlineAlpha"    : { type: "f", value: 1.0 },
-			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null },
-			"hasToonTexture"  : { type: "i", value: 0 }
+			"outlineDrawing"  : { value: 0 },
+			"outlineThickness": { value: 0.0 },
+			"outlineColor"    : { value: new THREE.Color( 0x000000 ) },
+			"outlineAlpha"    : { value: 1.0 },
+			"celShading"      : { value: 0 },
+			"toonMap"         : { value: null },
+			"hasToonTexture"  : { value: 0 }
 		}
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 
@@ -3864,6 +3864,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "alphamap_fragment" ],
 			THREE.ShaderChunk[ "alphatest_fragment" ],
 			THREE.ShaderChunk[ "specularmap_fragment" ],
+			THREE.ShaderChunk[ "normal_flip" ],
 			THREE.ShaderChunk[ "normal_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_fragment" ],
 
@@ -4521,32 +4522,11 @@ THREE.MMDHelper.prototype = {
 
 	},
 
-	resetPose: function ( mesh ) {
-
-		var bones = mesh.skeleton.bones;
-		var bones2 = mesh.geometry.bones;
-
-		var v = new THREE.Vector3();
-		var q = new THREE.Quaternion();
-
-		for ( var i = 0; i < bones.length; i++ ) {
-
-			var b = bones2[ i ];
-			v.set( b.pos[ 0 ], b.pos[ 1 ], b.pos[ 2 ] );
-			q.set( b.rotq[ 0 ], b.rotq[ 1 ], b.rotq[ 2 ], b.rotq[ 3 ] );
-
-			bones[ i ].position.copy( v );
-			bones[ i ].quaternion.copy( q );
-
-		}
-
-	},
-
 	poseAsVpd: function ( mesh, vpd, params ) {
 
 		if ( ! ( params && params.preventResetPose === true ) ) {
 
-			this.resetPose( mesh );
+			mesh.pose();
 
 		}
 

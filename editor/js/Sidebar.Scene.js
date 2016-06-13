@@ -182,7 +182,7 @@ Sidebar.Scene = function ( editor ) {
 				var object = objects[ i ];
 
 				var option = buildOption( object, true );
-				option.style.marginLeft = ( pad * 10 ) + 'px';
+				option.style.paddingLeft = ( pad * 10 ) + 'px';
 				options.push( option );
 
 				addObjects( object.children, pad + 1 );

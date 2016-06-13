@@ -39,7 +39,7 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		}
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );
 
 		if ( this.clearColor ) {
 

@@ -21,12 +21,14 @@
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader2.js"></script>
 		<script src="../examples/js/loaders/FBXLoader.js"></script>
+		<script src="../examples/js/loaders/GLTFLoader.js"></script>
 		<script src="../examples/js/loaders/KMZLoader.js"></script>
 		<script src="../examples/js/loaders/MD2Loader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/PlayCanvasLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/TGALoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
@@ -283,8 +285,11 @@
 
 				switch ( event.keyCode ) {
 
-					case 8:
+					case 8: // backspace
+
 						event.preventDefault(); // prevent browser back
+
+					case 46: // delete
 
 						var object = editor.selected;
 
@@ -306,22 +311,25 @@
 							editor.undo();
 
 						}
-						
+
 						break;
-						
+
 					case 87: // Register W for translation transform mode
+
 						editor.signals.transformModeChanged.dispatch( 'translate' );
-						
+
 						break;
-						
+
 					case 69: // Register E for rotation transform mode
+
 						editor.signals.transformModeChanged.dispatch( 'rotate' );
-						
+
 						break;
-						
+
 					case 82: // Register R for scaling transform mode
+
 						editor.signals.transformModeChanged.dispatch( 'scale' );
-						
+
 						break;
 
 				}

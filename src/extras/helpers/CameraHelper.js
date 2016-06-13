@@ -133,7 +133,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	return function () {
+	return function update() {
 
 		geometry = this.geometry;
 		pointMap = this.pointMap;

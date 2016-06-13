@@ -9,9 +9,7 @@ THREE.MaterialLoader = function ( manager ) {
 
 };
 
-THREE.MaterialLoader.prototype = {
-
-	constructor: THREE.MaterialLoader,
+Object.assign( THREE.MaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -128,7 +126,7 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
-		if ( json.reflectivity ) material.reflectivity = json.reflectivity;
+		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 
 		if ( json.lightMap !== undefined ) material.lightMap = this.getTexture( json.lightMap );
 		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
@@ -152,4 +150,4 @@ THREE.MaterialLoader.prototype = {
 
 	}
 
-};
+} );

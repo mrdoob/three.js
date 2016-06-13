@@ -9,9 +9,7 @@ THREE.ObjectLoader = function ( manager ) {
 
 };
 
-THREE.ObjectLoader.prototype = {
-
-	constructor: THREE.ObjectLoader,
+Object.assign( THREE.ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -417,7 +415,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials ) {
 
 			var object;
 
@@ -614,4 +612,4 @@ THREE.ObjectLoader.prototype = {
 
 	}()
 
-};
+} );

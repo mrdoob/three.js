@@ -13,9 +13,7 @@ THREE.DataTextureLoader = THREE.BinaryTextureLoader = function ( manager ) {
 
 };
 
-THREE.BinaryTextureLoader.prototype = {
-
-	constructor: THREE.BinaryTextureLoader,
+Object.assign( THREE.BinaryTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -86,4 +84,4 @@ THREE.BinaryTextureLoader.prototype = {
 
 	}
 
-};
+} );

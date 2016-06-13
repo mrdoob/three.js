@@ -8,9 +8,7 @@ THREE.XHRLoader = function ( manager ) {
 
 };
 
-THREE.XHRLoader.prototype = {
-
-	constructor: THREE.XHRLoader,
+Object.assign( THREE.XHRLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -120,4 +118,4 @@ THREE.XHRLoader.prototype = {
 
 	}
 
-};
+} );
