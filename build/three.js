@@ -28747,8 +28747,21 @@ THREE.WebGLProgram = ( function () {
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			prefixVertex = '';
-			prefixFragment = '';
+			prefixVertex = [
+
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
+				customDefines
+
+			].filter( filterEmptyLine ).join( '\n' );
+
+			prefixFragment = [
+
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
+				customDefines
+
+			].filter( filterEmptyLine ).join( '\n' );
 
 		} else {
 
