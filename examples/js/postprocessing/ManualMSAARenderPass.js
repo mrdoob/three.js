@@ -10,7 +10,7 @@
 *
 */
 
-THREE.ManualMSAARenderPass = function ( scene, camera ) {
+THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	THREE.Pass.call( this );
 
@@ -86,10 +86,10 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 
 		if ( this.clearColor ) {
 
+			console.log( 'this.clearColor', this.clearColor );
+
 			this.oldClearColor.copy( renderer.getClearColor() );
 			this.oldClearAlpha = renderer.getClearAlpha();
-
-			renderer.setClearColor( this.clearColor, this.clearAlpha );
 
 		}
 
@@ -119,9 +119,12 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 			}
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
-
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
-			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
+			if (i === 0) {
+				renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 0.0 );
+			}
+			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, (i === 0) );
 
 		}
 
@@ -136,6 +139,7 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 	}
 
 } );
+
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)

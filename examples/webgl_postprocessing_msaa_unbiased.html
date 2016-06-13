@@ -55,10 +55,13 @@
 			var cameraO, composerO, copyPassO, msaaRenderPassO;
 			var gui, stats, texture;
 
-			var param = {
+			var params = {
 				sampleLevel: 4,
 				unbiased: true,
-				camera: 'perspective'
+				camera: 'perspective',
+				clearColor: 'black',
+				clearAlpha: 1.0
+		
 			};
 
 			init();
@@ -72,8 +75,8 @@
 
 				gui = new dat.GUI();
 
-				gui.add( param, "unbiased" );
-				gui.add( param, 'sampleLevel', {
+				gui.add( params, "unbiased" );
+				gui.add( params, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
@@ -81,7 +84,9 @@
 					'Level 4: 16 Samples': 4,
 					'Level 5: 32 Samples': 5
 				} );
-				gui.add( param, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
+				gui.add( params, "clearAlpha", 0, 1 );		
 
 				gui.open();
 
@@ -223,13 +228,24 @@
 
 				}
 
-				msaaRenderPassP.sampleLevel = param.sampleLevel;
-				msaaRenderPassP.unbiased = param.unbiased;
+				var newColor = msaaRenderPassP.clearColor;
+				switch( params.clearColor ) {
+					case 'blue': newColor = new THREE.Color( 0x0000ff ); break;
+					case 'red': newColor = new THREE.Color( 0xff0000 ); break;
+					case 'green': newColor = new THREE.Color( 0x00ff00 ); break;
+					case 'white': newColor =  new THREE.Color( 0xffffff ); break;
+					case 'black': newColor =  new THREE.Color( 0x000000 ); break;
+				}
+				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
+				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
 
-				msaaRenderPassO.sampleLevel = param.sampleLevel;
-				msaaRenderPassO.unbiased = param.unbiased;
+				msaaRenderPassP.sampleLevel = params.sampleLevel;
+				msaaRenderPassP.unbiased = params.unbiased;
 
-				if( param.camera === 'perspective' ){
+				msaaRenderPassO.sampleLevel = params.sampleLevel;
+				msaaRenderPassO.unbiased = params.unbiased;
+
+				if( params.camera === 'perspective' ){
 					composerP.render();
 				}else{
 					composerO.render();
