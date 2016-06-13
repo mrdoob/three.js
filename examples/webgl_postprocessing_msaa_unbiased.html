@@ -239,11 +239,8 @@
 				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
 				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
 
-				msaaRenderPassP.sampleLevel = params.sampleLevel;
-				msaaRenderPassP.unbiased = params.unbiased;
-
-				msaaRenderPassO.sampleLevel = params.sampleLevel;
-				msaaRenderPassO.unbiased = params.unbiased;
+				msaaRenderPassP.sampleLevel = msaaRenderPassO.sampleLevel = params.sampleLevel;
+				msaaRenderPassP.unbiased = msaaRenderPassO.unbiased = params.unbiased;
 
 				if( params.camera === 'perspective' ){
 					composerP.render();

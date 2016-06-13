@@ -86,8 +86,6 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 
 		if ( this.clearColor ) {
 
-			console.log( 'this.clearColor', this.clearColor );
-
 			this.oldClearColor.copy( renderer.getClearColor() );
 			this.oldClearAlpha = renderer.getClearAlpha();
 
