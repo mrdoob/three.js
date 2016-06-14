@@ -27,12 +27,10 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		this.scene.overrideMaterial = this.overrideMaterial;
 
-		var oldClearColorHex = 0, oldClearAlpha = 1;
-
 		if ( this.clearColor ) {
 
-			oldClearColorHex = renderer.getClearColor();
-			oldClearAlpha = renderer.getClearAlpha();
+			var oldClearColorHex = renderer.getClearColor();
+			var oldClearAlpha = renderer.getClearAlpha();
 
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 
