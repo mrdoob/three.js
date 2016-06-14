@@ -21,7 +21,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) 
 	this.unbiased = true;
 
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
-	this.clearColor = ( clearColor !== undefined ) ? clearColor : new THREE.Color( 0, 0, 0 );
+	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
 
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
