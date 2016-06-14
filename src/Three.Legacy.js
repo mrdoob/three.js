@@ -376,7 +376,27 @@ Object.defineProperties( THREE.Material.prototype, {
 			console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
 			return new THREE.Color();
 		}
-	}
+	},
+	depthWrite: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .depthWrite is now .depthMask.' );
+			return this.depthMask;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.' + this.type + ': depthWrite is now .depthMask.' );
+			this.depthMask = value;
+		}
+  },
+	colorWrite: {
+		get: function () {
+			console.warn( 'THREE.' + this.type + ': .colorWrite is now .colorMask.' );
+			return this.colorMask.r;
+		},
+		set: function ( value ) {
+			console.warn( 'THREE.' + this.type + ': .colorWrite is now .colorMask.' );
+			this.colorMask.set( value, value, value, value );
+		}
+  }
 } );
 
 Object.defineProperties( THREE.MeshPhongMaterial.prototype, {

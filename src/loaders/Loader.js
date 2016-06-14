@@ -254,8 +254,9 @@ THREE.Loader.prototype = {
 						json.opacity = value;
 						break;
 					case 'depthTest':
-					case 'depthWrite':
-					case 'colorWrite':
+					case 'depthWrite':	// deprecated
+					case 'depthMask':
+					case 'colorWrite':	// deprecated
 					case 'opacity':
 					case 'reflectivity':
 					case 'transparent':
