@@ -118,11 +118,17 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 	absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 		var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
-		var firstPoint = curve.getPoint( 0 );
 
-		if ( ! firstPoint.equals( this.currentPoint ) ) {
+		if ( this.curves.length > 0 ) {
 
-			this.lineTo( firstPoint.x, firstPoint.y );
+			// if a previous curve is present, attempt to join
+			var firstPoint = curve.getPoint( 0 );
+
+			if ( ! firstPoint.equals( this.currentPoint ) ) {
+
+				this.lineTo( firstPoint.x, firstPoint.y );
+
+			}
 
 		}
 
