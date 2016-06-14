@@ -23777,6 +23777,7 @@ THREE.Scene = function () {
 
 	this.type = 'Scene';
 
+	this.background = null;
 	this.fog = null;
 	this.overrideMaterial = null;
 
@@ -23791,6 +23792,7 @@ THREE.Scene.prototype.copy = function ( source, recursive ) {
 
 	THREE.Object3D.prototype.copy.call( this, source, recursive );
 
+	if ( source.background !== null ) this.background = source.background.clone();
 	if ( source.fog !== null ) this.fog = source.fog.clone();
 	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
@@ -24999,6 +25001,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
+	var backgroundCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var backgroundCamera2 = new THREE.PerspectiveCamera();
+	var backgroundPlaneMesh = new THREE.Mesh(
+		new THREE.PlaneBufferGeometry( 2, 2 ),
+		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
+	);
+	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
+	var backgroundBoxMesh = new THREE.Mesh(
+		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.ShaderMaterial( {
+			uniforms: backgroundBoxShader.uniforms,
+			vertexShader: backgroundBoxShader.vertexShader,
+			fragmentShader: backgroundBoxShader.fragmentShader,
+			depthTest: false,
+			depthWrite: false,
+			side: THREE.BackSide
+		} )
+	);
+	objects.update( backgroundPlaneMesh );
+	objects.update( backgroundBoxMesh );
+
+	//
+
 	function getTargetPixelRatio() {
 
 		return _currentRenderTarget === null ? _pixelRatio : 1;
@@ -25658,6 +25683,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
+					if ( buffer === undefined ) {
+
+						console.error( objects, geometryAttribute );
+
+					}
+
 					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
 
 						var data = geometryAttribute.data;
@@ -25832,11 +25863,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lensFlares.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init(
-				this.clippingPlanes, _localClippingEnabled, camera );
+		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
 		projectObject( scene, camera );
-
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
@@ -25875,7 +25904,46 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.setRenderTarget( renderTarget );
 
-		if ( this.autoClear || forceClear ) {
+		//
+
+		var needsClear = this.autoClear || forceClear;
+		var background = scene.background;
+
+		if ( background === null ) {
+
+			glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+		} else if ( background instanceof THREE.CubeTexture ) {
+
+			backgroundCamera2.projectionMatrix = camera.projectionMatrix;
+
+			backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
+			backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
+
+			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
+			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
+
+			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
+
+			needsClear = false;
+
+		} else if ( background instanceof THREE.Texture ) {
+
+			backgroundPlaneMesh.material.map = background;
+
+			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
+
+			needsClear = false;
+
+		} else if ( background instanceof THREE.Color ) {
+
+			glClearColor( background.r, background.g, background.b, 1 );
+
+			needsClear = true;
+
+		}
+
+		if ( needsClear ) {
 
 			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
 
@@ -28749,7 +28817,7 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = [
 
-				'#define SHADER_NAME ' + material.__webglShader.name,
+				'#define SHADER_NAME RawShaderMaterial',
 
 				customDefines
 
@@ -28757,7 +28825,7 @@ THREE.WebGLProgram = ( function () {
 
 			prefixFragment = [
 
-				'#define SHADER_NAME ' + material.__webglShader.name,
+				'#define SHADER_NAME RawShaderMaterial',
 
 				customDefines
 
@@ -40403,7 +40471,9 @@ THREE.ArrowHelper.prototype.setColor = function ( color ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object ) {
+THREE.BoxHelper = function ( object, color ) {
+	
+	if ( color === undefined ) color = 0xffff00;
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 	var positions = new Float32Array( 8 * 3 );
@@ -40412,7 +40482,7 @@ THREE.BoxHelper = function ( object ) {
 	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ) );
 
 	if ( object !== undefined ) {
 
@@ -40613,7 +40683,7 @@ THREE.CameraHelper = function ( camera ) {
 	THREE.LineSegments.call( this, geometry, material );
 
 	this.camera = camera;
-	this.camera.updateProjectionMatrix();
+	if( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
 	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
