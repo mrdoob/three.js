@@ -1653,10 +1653,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material instanceof THREE.MeshPhongMaterial ||
-				material instanceof THREE.MeshLambertMaterial ||
-				material instanceof THREE.MeshStandardMaterial ||
-				material.lights ) {
+		if ( material.lights ) {
 
 			// store the light setup it was created for
 
@@ -1691,7 +1688,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterial( material ) {
 
-		setMaterialFaces( material );
+		if ( material.side !== THREE.DoubleSide )
+			state.enable( _gl.CULL_FACE );
+		else
+			state.disable( _gl.CULL_FACE );
+
+		state.setFlipSided( material.side === THREE.BackSide );
 
 		if ( material.transparent === true ) {
 
@@ -1708,13 +1710,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthWrite( material.depthWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
-
-	}
-
-	function setMaterialFaces( material ) {
-
-		material.side !== THREE.DoubleSide ? state.enable( _gl.CULL_FACE ) : state.disable( _gl.CULL_FACE );
-		state.setFlipSided( material.side === THREE.BackSide );
 
 	}
 
@@ -1888,10 +1883,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshStandardMaterial ||
-				 material.lights ) {
+			if ( material.lights ) {
 
 				// the current material requires lighting info
 
@@ -2076,6 +2068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvScaleMap !== undefined ) {
 
+			// backwards compatibility
 			if ( uvScaleMap instanceof THREE.WebGLRenderTarget ) {
 
 				uvScaleMap = uvScaleMap.texture;
@@ -2090,7 +2083,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
+
+		// don't flip CubeTexture envMaps, flip everything else:
+		//  WebGLRenderTargetCube will be flipped for backwards compatibility
+		//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+		// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+		uniforms.flipEnvMap.value = ( ! ( material.envMap instanceof THREE.CubeTexture ) ) ? 1 : - 1;
 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
@@ -2317,6 +2315,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		color,
 		intensity,
 		distance,
+		shadowMap,
 
 		viewMatrix = camera.matrixWorldInverse,
 
@@ -2332,6 +2331,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
+
+			shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -2359,7 +2360,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.directionalShadowMap[ directionalLength ] = light.shadow.map;
+				_lights.directionalShadowMap[ directionalLength ] = shadowMap;
 				_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 				_lights.directional[ directionalLength ++ ] = uniforms;
 
@@ -2392,7 +2393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.spotShadowMap[ spotLength ] = light.shadow.map;
+				_lights.spotShadowMap[ spotLength ] = shadowMap;
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
@@ -2417,7 +2418,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_lights.pointShadowMap[ pointLength ] = light.shadow.map;
+				_lights.pointShadowMap[ pointLength ] = shadowMap;
 
 				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
 
@@ -2584,39 +2585,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setFaceCulling = function ( cullFace, frontFaceDirection ) {
 
-		if ( cullFace === THREE.CullFaceNone ) {
-
-			state.disable( _gl.CULL_FACE );
-
-		} else {
-
-			if ( frontFaceDirection === THREE.FrontFaceDirectionCW ) {
-
-				_gl.frontFace( _gl.CW );
-
-			} else {
-
-				_gl.frontFace( _gl.CCW );
-
-			}
-
-			if ( cullFace === THREE.CullFaceBack ) {
-
-				_gl.cullFace( _gl.BACK );
-
-			} else if ( cullFace === THREE.CullFaceFront ) {
-
-				_gl.cullFace( _gl.FRONT );
-
-			} else {
-
-				_gl.cullFace( _gl.FRONT_AND_BACK );
-
-			}
-
-			state.enable( _gl.CULL_FACE );
-
-		}
+		state.setCullFace( cullFace );
+		state.setFlipSided( frontFaceDirection === THREE.FrontFaceDirectionCW );
 
 	};
 
@@ -2833,8 +2803,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTexture2D( texture, slot ) {
 
-		if ( texture instanceof THREE.WebGLRenderTarget ) texture = texture.texture;
-
 		var textureProperties = properties.get( texture );
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
@@ -2928,7 +2896,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setCubeTexture ( texture, slot ) {
+	function setTextureCube ( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -3007,7 +2975,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								} else {
 
-									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
+									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()" );
 
 								}
 
@@ -3044,47 +3012,102 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setCubeTextureDynamic ( texture, slot ) {
+	function setTextureCubeDynamic ( texture, slot ) {
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
 		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
 
 	}
 
-	var setTextureWarned = false;
-	this.setTexture = function( texture, slot ) {
-
-		if ( ! setTextureWarned ) {
-
-			console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, " +
-				"use setTexture2D instead." );
-			setTextureWarned = true;
-
-		}
-
-		setTexture2D( texture, slot );
-
-	};
-
 	this.allocTextureUnit = allocTextureUnit;
-	this.setTexture2D = setTexture2D;
-	this.setTextureCube = function( texture, slot ) {
 
-		if ( texture instanceof THREE.CubeTexture ||
-			 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+	//this.setTexture2D = setTexture2D;
+	this.setTexture2D = ( function() {
 
-			// CompressedTexture can have Array in image :/
+		var warned = false;
 
-			setCubeTexture( texture, slot );
+		// backwards compatibility: peel texture.texture
+		return function( texture, slot ) {
 
-		} else {
-			// assumed: texture instanceof THREE.WebGLRenderTargetCube
+			if ( texture instanceof THREE.WebGLRenderTarget ) {
 
-			setCubeTextureDynamic( texture.texture, slot );
+				if ( ! warned ) {
 
-		}
+					console.warn( "THREE.WebGLRenderer.setTexture2D: don't use render targets as textures. Use their .texture property instead." );
+					warned = true;
 
-	};
+				}
+
+				texture = texture.texture;
+
+			}
+
+			setTexture2D( texture, slot );
+
+		};
+
+	}() );
+
+	this.setTexture = ( function() {
+
+		var warned = false;
+
+		return function( texture, slot ) {
+
+			if ( ! warned ) {
+
+				console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
+				warned = true;
+
+			}
+
+			_this.setTexture2D( texture, slot );
+
+		};
+
+	}() );
+
+	this.setTextureCube = ( function() {
+
+		var warned = false;
+
+		return function( texture, slot ) {
+
+			// backwards compatibility: peel texture.texture
+			if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+
+				if ( ! warned ) {
+
+					console.warn( "THREE.WebGLRenderer.setTextureCube: don't use cube render targets as textures. Use their .texture property instead." );
+					warned = true;
+
+				}
+
+				texture = texture.texture;
+
+			}
+
+			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+			// TODO: unify these code paths
+			if ( texture instanceof THREE.CubeTexture ||
+				 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+
+				// CompressedTexture can have Array in image :/
+
+				// this function alone should take care of cube textures
+				setTextureCube( texture, slot );
+
+			} else {
+
+				// assumed: texture property of THREE.WebGLRenderTargetCube
+
+				setTextureCubeDynamic( texture, slot );
+
+			}
+
+		};
+
+	}() );
 
 	// Render targets
 
@@ -3149,7 +3172,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderTarget.depthTexture.needsUpdate = true;
 		}
 
-		_this.setTexture( renderTarget.depthTexture, 0 );
+		_this.setTexture2D( renderTarget.depthTexture, 0 );
 
 		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
@@ -3385,7 +3408,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 
-					if ( ( x > 0 && x <= ( renderTarget.width - width ) ) && ( y > 0 && y <= ( renderTarget.height - height ) ) ) {
+					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
 						_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
 

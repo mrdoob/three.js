@@ -266,7 +266,7 @@ Object.assign( THREE.AnimationClip, {
 			var animationKeys = hierarchyTracks[ h ].keys;
 
 			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length == 0 ) continue;
+			if ( ! animationKeys || animationKeys.length === 0 ) continue;
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
@@ -301,7 +301,7 @@ Object.assign( THREE.AnimationClip, {
 						var animationKey = animationKeys[k];
 
 						times.push( animationKey.time );
-						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 )
+						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
 
 					}
 
@@ -346,4 +346,3 @@ Object.assign( THREE.AnimationClip, {
 	}
 
 } );
-

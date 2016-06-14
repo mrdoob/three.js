@@ -8,7 +8,7 @@ THREE.Points = function ( geometry, material ) {
 
 	this.type = 'Points';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.geometry = geometry !== undefined ? geometry : new THREE.BufferGeometry();
 	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
 
 };

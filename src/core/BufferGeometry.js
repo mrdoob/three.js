@@ -26,9 +26,7 @@ THREE.BufferGeometry = function () {
 
 };
 
-THREE.BufferGeometry.prototype = {
-
-	constructor: THREE.BufferGeometry,
+Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, {
 
 	getIndex: function () {
 
@@ -583,7 +581,7 @@ THREE.BufferGeometry.prototype = {
 		var box = new THREE.Box3();
 		var vector = new THREE.Vector3();
 
-		return function () {
+		return function computeBoundingSphere() {
 
 			if ( this.boundingSphere === null ) {
 
@@ -1015,8 +1013,6 @@ THREE.BufferGeometry.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+} );
 
 THREE.BufferGeometry.MaxIndex = 65535;

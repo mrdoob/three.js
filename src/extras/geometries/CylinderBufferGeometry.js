@@ -33,6 +33,14 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
 
 	// used to calculate buffer length
+	
+	var nbCap = 0;
+	if ( openEnded === false ) {
+
+		if ( radiusTop > 0 ) nbCap++;
+		if ( radiusBottom > 0 ) nbCap++;
+
+	}
 
 	var vertexCount = calculateVertexCount();
 	var indexCount = calculateIndexCount();
@@ -77,7 +85,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 		if ( openEnded === false ) {
 
-			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
+			count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
 
 		}
 
@@ -91,7 +99,7 @@ THREE.CylinderBufferGeometry = function( radiusTop, radiusBottom, height, radial
 
 		if ( openEnded === false ) {
 
-			count += radialSegments * 2 * 3;
+			count += radialSegments * nbCap * 3;
 
 		}
 

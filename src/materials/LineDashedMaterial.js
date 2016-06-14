@@ -9,15 +9,7 @@
  *
  *  scale: <float>,
  *  dashSize: <float>,
- *  gapSize: <float>,
- *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
- *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
- *
- *  fog: <bool>
+ *  gapSize: <float>
  * }
  */
 
@@ -35,11 +27,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
-	this.blending = THREE.NormalBlending;
-
-	this.vertexColors = THREE.NoColors;
-
-	this.fog = true;
+	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -59,10 +47,6 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	this.scale = source.scale;
 	this.dashSize = source.dashSize;
 	this.gapSize = source.gapSize;
-
-	this.vertexColors = source.vertexColors;
-
-	this.fog = source.fog;
 
 	return this;
 

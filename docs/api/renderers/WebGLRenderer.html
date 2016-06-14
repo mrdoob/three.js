@@ -91,27 +91,27 @@
 
 		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<div>
+		This contains the reference to the component implementing shadow mapping.
+		</div>
 
-		<h3>[property:Boolean shadowMapEnabled]</h3>
+		<h3>[property:Boolean shadowMap.enabled]</h3>
 
 		<div>Default is false. If set, use shadow maps in the scene.</div>
 
-
-		<h3>[property:Integer shadowMapType]</h3>
+		<h3>[property:Integer shadowMap.type]</h3>
 
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
+		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
 
-		<h3>[property:Integer shadowMapCullFace]</h3>
+		<div>Default is true. Whether to render the opposite side as specified by the material into the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 
-		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
+		<h3>[property:Boolean shadowMap.renderSingleSided]</h3>
 
-
-		<h3>[property:Boolean shadowMapCascade]</h3>
-
-		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
-
+		<div>Default is true. Whether to treat materials specified as double-sided as if they were specified as front-sided when rendering the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 
 		<h3>[property:Integer maxMorphTargets]</h3>
 
@@ -152,12 +152,6 @@
 		</ul>
 		</div>
 
-		<h3>[property:WebGLShadowMap shadowMap]</h3>
-		<div>
-		This contains the reference to the component implementing shadow mapping.
-		</div>
-
-
 		<h2>Methods</h2>
 
 		<h3>[method:WebGLRenderingContext getContext]()</h3>
@@ -175,11 +169,17 @@
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
 
+		<h3>[method:number getPixelRatio]()</h3>
+		<div>Returns current device pixel ratio used.</div>
+
+		<h3>[method:null setPixelRatio]( [page:number value] )</h3>
+		<div>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</div>
+
 		<h3>[method:Object getSize]()</h3>
 		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
 
 		<h3>[method:null setSize]( [page:Integer width], [page:Integer height], [page:Boolean updateStyle] )</h3>
-		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>
+		<div>Resizes the output canvas to (width, height) with device pixel ratio taken into account, and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>
 
 		<h3>[method:null setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>

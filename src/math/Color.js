@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( color ) {
+THREE.Color = function ( r, g, b ) {
 
-	if ( arguments.length === 3 ) {
+	if ( g === undefined && b === undefined ) {
 
-		return this.fromArray( arguments );
+		// r is THREE.Color, hex or string
+		return this.set( r );
 
 	}
 
-	return this.set( color );
+	return this.setRGB( r, g, b );
 
 };
 

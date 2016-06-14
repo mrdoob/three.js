@@ -40,21 +40,12 @@
  *
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -103,17 +94,10 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.refractionRatio = 0.98;
 
-	this.fog = true;
-
-	this.shading = THREE.SmoothShading;
-	this.blending = THREE.NormalBlending;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
-
-	this.vertexColors = THREE.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -169,16 +153,10 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	this.refractionRatio = source.refractionRatio;
 
-	this.fog = source.fog;
-
-	this.shading = source.shading;
-
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
-
-	this.vertexColors = source.vertexColors;
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;

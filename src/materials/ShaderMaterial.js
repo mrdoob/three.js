@@ -8,20 +8,14 @@
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
  *
- *  shading: THREE.SmoothShading,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
  *  lights: <bool>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -37,22 +31,16 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
 
-	this.shading = THREE.SmoothShading;
-
 	this.linewidth = 1;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
 	this.fog = false; // set to use scene fog
-
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes
 
-	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
-
 	this.skinning = false; // set to use skinning attribute streams
-
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
@@ -101,17 +89,11 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.defines = source.defines;
 
-	this.shading = source.shading;
-
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	this.fog = source.fog;
-
 	this.lights = source.lights;
 	this.clipping = source.clipping;
-
-	this.vertexColors = source.vertexColors;
 
 	this.skinning = source.skinning;
 
