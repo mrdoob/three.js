@@ -22,7 +22,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) 
 
 	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
+	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
@@ -82,7 +82,8 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldClearColorHex = renderer.getClearColor().getHex(), oldClearAlpha = renderer.getClearAlpha();
+		var oldClearColor = renderer.getClearColor().getHex();
+		var oldClearAlpha = renderer.getClearAlpha();
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
@@ -122,7 +123,8 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
-		renderer.setClearColor( oldClearColorHex, oldClearAlpha );
+		renderer.setClearColor( oldClearColor, oldClearAlpha );
+
 	}
 
 } );

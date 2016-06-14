@@ -284,7 +284,7 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = [
 
-				'#define SHADER_NAME ' + material.__webglShader.name,
+				'#define SHADER_NAME RawShaderMaterial',
 
 				customDefines
 
@@ -292,7 +292,7 @@ THREE.WebGLProgram = ( function () {
 
 			prefixFragment = [
 
-				'#define SHADER_NAME ' + material.__webglShader.name,
+				'#define SHADER_NAME RawShaderMaterial',
 
 				customDefines
 
