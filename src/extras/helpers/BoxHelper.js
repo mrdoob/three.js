@@ -2,16 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object ) {
+THREE.BoxHelper = function ( object, hex ) {
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 	var positions = new Float32Array( 8 * 3 );
+	var color = ( hex !== undefined ) ? hex : 0xffff00;
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ) );
 
 	if ( object !== undefined ) {
 
