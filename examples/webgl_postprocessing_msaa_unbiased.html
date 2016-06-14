@@ -231,11 +231,11 @@
 
 				var newColor = msaaRenderPassP.clearColor;
 				switch( params.clearColor ) {
-					case 'blue': newColor = new THREE.Color( 0x0000ff ); break;
-					case 'red': newColor = new THREE.Color( 0xff0000 ); break;
-					case 'green': newColor = new THREE.Color( 0x00ff00 ); break;
-					case 'white': newColor =  new THREE.Color( 0xffffff ); break;
-					case 'black': newColor =  new THREE.Color( 0x000000 ); break;
+					case 'blue': newColor = 0x0000ff; break;
+					case 'red': newColor = 0xff0000; break;
+					case 'green': newColor = 0x00ff00; break;
+					case 'white': newColor = 0xffffff; break;
+					case 'black': newColor = 0x000000; break;
 				}
 				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
 				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
