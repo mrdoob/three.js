@@ -31,7 +31,7 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		if ( this.clearColor ) {
 
-			oldClearColor = renderer.getClearColor();
+			oldClearColorHex = renderer.getClearColor();
 			oldClearAlpha = renderer.getClearAlpha();
 
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
