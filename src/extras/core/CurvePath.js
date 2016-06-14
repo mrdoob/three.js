@@ -163,16 +163,16 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			curve = curves[i];
-			var pts = curve instanceof THREE.LineCurve ? 1 : divisions;
-			tmp = curve.getPoints(pts);
-			if ( last && last.equals( tmp[ 0 ] ) ) {
+			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
 
-				tmp = tmp.slice(1);
+			for ( var j = 0; j < pts.length; j++ ) {
+
+				var tmp = pts[ j ];
+				if ( last && last.equals( tmp ) ) continue; // ensures no consecutive points are duplicates
+				points.push( tmp );
+				last = tmp;
 
 			}
-
-			points = points.concat(tmp);
-			last = points[ points.length - 1 ];
 
 		}
 
