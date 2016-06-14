@@ -1117,11 +1117,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lensFlares.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init(
-				this.clippingPlanes, _localClippingEnabled, camera );
+		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
 		projectObject( scene, camera );
-
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
