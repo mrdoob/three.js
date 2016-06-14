@@ -113,7 +113,7 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 			if (i === 0) {
-				renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 0.0 );
+				renderer.setClearColor( 0x000000, 0.0 );
 			}
 			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, (i === 0) );
 
