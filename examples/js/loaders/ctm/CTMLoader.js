@@ -12,25 +12,6 @@ THREE.CTMLoader = function () {
 
 	THREE.Loader.call( this );
 
-	// Deprecated
-	
-	Object.defineProperties( this, {
-		statusDomElement: {
-			get: function () {
-
-				if ( this._statusDomElement === undefined ) {
-
-					this._statusDomElement = document.createElement( 'div' );
-
-				}
-
-				console.warn( 'THREE.BinaryLoader: .statusDomElement has been removed.' );
-				return this._statusDomElement;
-
-			}
-		},
-	} );
-
 };
 
 THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );

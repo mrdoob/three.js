@@ -155,6 +155,25 @@ var Loader = function ( editor ) {
 
 				break;
 
+				case 'gltf':
+
+					reader.addEventListener( 'load', function ( event ) {
+
+						var contents = event.target.result;
+						var json = JSON.parse( contents );
+
+						var loader = new THREE.GLTFLoader();
+						var collada = loader.parse( json );
+
+						collada.scene.name = filename;
+
+						editor.execute( new AddObjectCommand( collada.scene ) );
+
+					}, false );
+					reader.readAsText( file );
+
+					break;
+
 			case 'js':
 			case 'json':
 

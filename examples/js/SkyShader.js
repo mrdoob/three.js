@@ -18,12 +18,12 @@ THREE.ShaderLib[ 'sky' ] = {
 
 	uniforms: {
 
-		luminance:	 { type: "f", value: 1 },
-		turbidity:	 { type: "f", value: 2 },
-		reileigh:	 { type: "f", value: 1 },
-		mieCoefficient:	 { type: "f", value: 0.005 },
-		mieDirectionalG: { type: "f", value: 0.8 },
-		sunPosition: 	 { type: "v3", value: new THREE.Vector3() }
+		luminance: { value: 1 },
+		turbidity: { value: 2 },
+		reileigh: { value: 1 },
+		mieCoefficient: { value: 0.005 },
+		mieDirectionalG: { value: 0.8 },
+		sunPosition: { value: new THREE.Vector3() }
 
 	},
 
@@ -126,7 +126,10 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		"float sunIntensity(float zenithAngleCos)",
 		"{",
-			"return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));",
+		// This function originally used `exp(n)`, but it returns an incorrect value
+		// on Samsung S6 phones. So it has been replaced with the equivalent `pow(e, n)`.
+		// See https://github.com/mrdoob/three.js/issues/8382
+			"return EE * max(0.0, 1.0 - pow(e, -((cutoffAngle - acos(zenithAngleCos))/steepness)));",
 		"}",
 
 		"// float logLuminance(vec3 c)",

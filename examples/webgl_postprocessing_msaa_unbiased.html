@@ -16,6 +16,8 @@
 				overflow: hidden;
 			}
 
+			a { color: #88f; }
+
 			#info {
 				color: #fff;
 				position: absolute;
@@ -50,12 +52,19 @@
 
 		<script>
 
-			var camera, scene, renderer, composer, copyPass, msaaRenderPass;
+			var scene, renderer, composer, copyPass;
+			var cameraP, msaaRenderPassP;
+			var cameraO, msaaRenderPassO;
 			var gui, stats, texture;
 
-			var param = {
+			var params = {
 				sampleLevel: 4,
-				unbiased: true
+				unbiased: true,
+				camera: 'perspective',
+				clearColor: 'black',
+				clearAlpha: 1.0,
+				autoRotate: true
+		
 			};
 
 			init();
@@ -69,8 +78,8 @@
 
 				gui = new dat.GUI();
 
-				gui.add( param, "unbiased" );
-				gui.add( param, 'sampleLevel', {
+				gui.add( params, "unbiased" );
+				gui.add( params, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
 					'Level 2: 4 Samples': 2,
@@ -78,7 +87,11 @@
 					'Level 4: 16 Samples': 4,
 					'Level 5: 32 Samples': 5
 				} );
-
+				gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
+				gui.add( params, "clearAlpha", 0, 1 );		
+				gui.add( params, "autoRotate" );
+			
 				gui.open();
 
 			}
@@ -89,6 +102,7 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
+				var aspect = width / height;
 				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -101,8 +115,17 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
-				camera.position.z = 7;
+				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
+				cameraP.position.z = 7;
+
+				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
+				cameraO.position.z = 7;
+
+				var fov = THREE.Math.degToRad( cameraP.fov );
+				var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
+				var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
+				cameraO.zoom = height / _height;
+
 
 				scene = new THREE.Scene();
 
@@ -153,14 +176,14 @@
 				// postprocessing
 
 				composer = new THREE.EffectComposer( renderer );
-
-				msaaRenderPass = new THREE.ManualMSAARenderPass( scene, camera );
-				composer.addPass( msaaRenderPass );
-
+				msaaRenderPassP = new THREE.ManualMSAARenderPass( scene, cameraP );
+				composer.addPass( msaaRenderPassP );
+				msaaRenderPassO = new THREE.ManualMSAARenderPass( scene, cameraO );
+				composer.addPass( msaaRenderPassO );
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-		    copyPass.renderToScreen = true;
+				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-
+				
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -169,9 +192,16 @@
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
+				var aspect = width / height;
 
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
+				cameraP.aspect = aspect;
+				cameraO.updateProjectionMatrix();
+
+				cameraO.left = - height * aspect;
+				cameraO.right = height * aspect;
+				cameraO.top = height;
+				cameraO.bottom = - height;
+				cameraO.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
 
@@ -188,19 +218,36 @@
 
 				stats.begin();
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				if( params.autoRotate ) {
+					for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					var child = scene.children[ i ];
+						var child = scene.children[ i ];
 
-					child.rotation.x += 0.005;
-					child.rotation.y += 0.01;
+						child.rotation.x += 0.005;
+						child.rotation.y += 0.01;
 
+					}
 				}
 
-				msaaRenderPass.sampleLevel = param.sampleLevel;
-				msaaRenderPass.unbiased = param.unbiased;
+				var newColor = msaaRenderPassP.clearColor;
+				switch( params.clearColor ) {
+					case 'blue': newColor = 0x0000ff; break;
+					case 'red': newColor = 0xff0000; break;
+					case 'green': newColor = 0x00ff00; break;
+					case 'white': newColor = 0xffffff; break;
+					case 'black': newColor = 0x000000; break;
+				}
+				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
+				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
+
+				msaaRenderPassP.sampleLevel = msaaRenderPassO.sampleLevel = params.sampleLevel;
+				msaaRenderPassP.unbiased = msaaRenderPassO.unbiased = params.unbiased;
+
+				msaaRenderPassP.enabled = ( params.camera === 'perspective' );
+				msaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
 				composer.render();
+
 				stats.end();
 
 			}

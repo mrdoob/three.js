@@ -10,12 +10,12 @@ THREE.BokehShader = {
 
 	uniforms: {
 
-		"tColor":   { type: "t", value: null },
-		"tDepth":   { type: "t", value: null },
-		"focus":    { type: "f", value: 1.0 },
-		"aspect":   { type: "f", value: 1.0 },
-		"aperture": { type: "f", value: 0.025 },
-		"maxblur":  { type: "f", value: 1.0 }
+		"tColor":   { value: null },
+		"tDepth":   { value: null },
+		"focus":    { value: 1.0 },
+		"aspect":   { value: 1.0 },
+		"aperture": { value: 0.025 },
+		"maxblur":  { value: 1.0 }
 
 	},
 

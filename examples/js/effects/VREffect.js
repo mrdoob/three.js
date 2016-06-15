@@ -59,9 +59,10 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	//
 
+	this.isPresenting = false;
 	this.scale = 1;
 
-	var isPresenting = false;
+	var scope = this;
 
 	var rendererSize = renderer.getSize();
 	var rendererPixelRatio = renderer.getPixelRatio();
@@ -70,7 +71,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		rendererSize = { width: width, height: height };
 
-		if ( isPresenting ) {
+		if ( scope.isPresenting ) {
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
 			renderer.setPixelRatio( 1 );
@@ -104,16 +105,16 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	function onFullscreenChange () {
 
-		var wasPresenting = isPresenting;
-		isPresenting = vrHMD !== undefined && ( vrHMD.isPresenting || ( isDeprecatedAPI && document[ fullscreenElement ] instanceof window.HTMLElement ) );
+		var wasPresenting = scope.isPresenting;
+		scope.isPresenting = vrHMD !== undefined && ( vrHMD.isPresenting || ( isDeprecatedAPI && document[ fullscreenElement ] instanceof window.HTMLElement ) );
 
-		if ( wasPresenting === isPresenting ) {
+		if ( wasPresenting === scope.isPresenting ) {
 
 			return;
 
 		}
 
-		if ( isPresenting ) {
+		if ( scope.isPresenting ) {
 
 			rendererPixelRatio = renderer.getPixelRatio();
 			rendererSize = renderer.getSize();
@@ -180,7 +181,8 @@ THREE.VREffect = function ( renderer, onError ) {
 				return;
 
 			}
-			if ( isPresenting === boolean ) {
+
+			if ( scope.isPresenting === boolean ) {
 
 				resolve();
 				return;
@@ -241,7 +243,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.render = function ( scene, camera ) {
 
-		if ( vrHMD && isPresenting ) {
+		if ( vrHMD && scope.isPresenting ) {
 
 			var autoUpdate = scene.autoUpdate;
 

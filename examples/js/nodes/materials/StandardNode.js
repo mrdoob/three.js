@@ -169,6 +169,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		var output = [
 				// prevent undeclared normal
+				THREE.ShaderChunk[ "normal_flip" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 
 				// prevent undeclared material

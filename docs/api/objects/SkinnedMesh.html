@@ -53,7 +53,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture])</h3>
+		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture] )</h3>
 		<div>
         geometry — An instance of [page:Geometry]. [page:Geometry.skinIndices] and [page:Geometry.skinWeights] should be set.<br />
         material — An instance of [page:Material] (optional).<br />
@@ -102,7 +102,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null bind]([page:Skeleton skeleton], [page:Matrix4 bindMatrix])</h3>
+		<h3>[method:null bind]( [page:Skeleton skeleton], [page:Matrix4 bindMatrix] )</h3>
 		<div>
 		skeleton — [page:Skeleton]<br/>
 		bindMatrix — [page:Matrix4] that represents the base transform of the skeleton
@@ -122,7 +122,7 @@
 		This method sets the skinned mesh in the rest pose.
 		</div>
 
-		<h3>[method:Bone addBone]([page:Bone bone])</h3>
+		<h3>[method:Bone addBone]( [page:Bone bone] )</h3>
 		<div>
 		bone — This is the bone that needs to be added. (optional)
 		</div>
@@ -130,13 +130,11 @@
 		This method adds the bone to the skinned mesh when it is provided. It creates a new bone and adds that when no bone is given.
 		</div>
 
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<h3>[method:SkinnedMesh clone]()</h3>
 		<div>
-		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned SkinnedMesh Object.
+		Returns a clone of this SkinnedMesh object and its descendants.
 		</div>
-		<div>
-		Clone a SkinnedMesh Object.
-		</div>
+
 		
 		<h2>Source</h2>
 
