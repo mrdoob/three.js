@@ -284,15 +284,11 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = [
 
-				'#define SHADER_NAME RawShaderMaterial',
-
 				customDefines
 
 			].filter( filterEmptyLine ).join( '\n' );
 
 			prefixFragment = [
-
-				'#define SHADER_NAME RawShaderMaterial',
 
 				customDefines
 
