@@ -1,11 +1,12 @@
 ##### Description of the problem 
 
-...
+(This is NOT a help site. Please read the guidelines above before posting.)
+
 
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r76
+- [ ] r77
 - [ ] ...
 
 ##### Browser

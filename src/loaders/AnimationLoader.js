@@ -8,9 +8,7 @@ THREE.AnimationLoader = function ( manager ) {
 
 };
 
-THREE.AnimationLoader.prototype = {
-
-	constructor: THREE.AnimationLoader,
+Object.assign( THREE.AnimationLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -41,4 +39,4 @@ THREE.AnimationLoader.prototype = {
 
 	}
 
-};
+} );

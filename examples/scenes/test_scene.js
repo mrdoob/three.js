@@ -66,15 +66,6 @@
 					"visible"  : true
 				},
 
-				"sphere_cube" : {
-					"geometry" : "sphere_uvs",
-					"material" : "phong_compressed_cube",
-					"position" : [ -30, -2, -15 ],
-					"rotation" : [ 0, 0, 0 ],
-					"scale"	   : [ 1.5, 1.5, 1.5 ],
-					"visible"  : true
-				},
-
 				"icosahedron" : {
 					"geometry" : "icosahedron",
 					"material" : "faceted_white",
@@ -604,11 +595,6 @@
 			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
 		},
 
-		"phong_compressed_cube": {
-			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16777215, "envMap": "cube_compressed", "bumpMap": "texture_bump_repeat_2", "bumpScale": -0.1 }
-		},
-
 		"lambert_green": {
 			"type": "MeshLambertMaterial",
 			"parameters": { "color": 30481, "blending": "AdditiveBlending", "transparent": true }
@@ -696,7 +682,7 @@
 
 		"multi_2": {
 			"type": "MultiMaterial",
-			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
+			"parameters": { "materials": [ "basic_refraction", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
 		},
 
 		"multi_veyron": {
@@ -729,17 +715,6 @@
 				"textures/cube/SwedishRoyalCastle/pz.jpg"
 			],
 			"mapping": "CubeRefractionMapping"
-		},
-
-		"cube_compressed": {
-			"url": [
-				"textures/cube/Escher/dds/px.dds",
-				 "textures/cube/Escher/dds/nx.dds",
-				 "textures/cube/Escher/dds/py.dds",
-				 "textures/cube/Escher/dds/ny.dds",
-				 "textures/cube/Escher/dds/pz.dds",
-				 "textures/cube/Escher/dds/nz.dds"
-			]
 		},
 
 		"texture_bg": {

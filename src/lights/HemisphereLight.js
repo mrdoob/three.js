@@ -17,15 +17,18 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 };
 
-THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
-THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
+THREE.HemisphereLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-THREE.HemisphereLight.prototype.copy = function ( source ) {
+	constructor: THREE.HemisphereLight,
 
-	THREE.Light.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.groundColor.copy( source.groundColor );
+		THREE.Light.prototype.copy.call( this, source );
 
-	return this;
+		this.groundColor.copy( source.groundColor );
 
-};
+		return this;
+
+	}
+
+} );

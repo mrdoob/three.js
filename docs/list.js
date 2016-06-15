@@ -114,10 +114,9 @@ var list = {
 			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
-			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "Points", "api/objects/Points" ],
-			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Skeleton", "api/objects/Skeleton" ],
+			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
 		],
 
@@ -196,6 +195,8 @@ var list = {
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
+			[ "ConeBufferGeometry", "api/extras/geometries/ConeBufferGeometry" ],
+			[ "ConeGeometry", "api/extras/geometries/ConeGeometry" ],
 			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
 			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],

@@ -12,5 +12,8 @@ THREE.AmbientLight = function ( color, intensity ) {
 
 };
 
-THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
+THREE.AmbientLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
+
+	constructor: THREE.AmbientLight
+
+} );

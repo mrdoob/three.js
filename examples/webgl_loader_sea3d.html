@@ -28,15 +28,10 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
 		</div>
 
 		<script src="../build/three.js"></script>
-
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-		<script src="js/loaders/collada/AnimationHandler.js"></script>
-		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -140,10 +135,6 @@
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
 
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
-
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -173,9 +164,6 @@
 
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );
-
-				// Update Three.JS Animations
-				THREE.AnimationHandler.update( delta );
 
 				render( delta );
 

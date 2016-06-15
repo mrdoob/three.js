@@ -13,9 +13,9 @@ THREE.GLNode = function( type ) {
 
 };
 
-THREE.GLNode.prototype.verify = function( builder, cache, requires ) {
+THREE.GLNode.prototype.parse = function( builder, cache, requires ) {
 
-	builder.isVerify = true;
+	builder.parsing = true;
 
 	var material = builder.material;
 
@@ -26,13 +26,13 @@ THREE.GLNode.prototype.verify = function( builder, cache, requires ) {
 
 	builder.removeCache();
 
-	builder.isVerify = false;
+	builder.parsing = false;
 
 };
 
-THREE.GLNode.prototype.verifyAndBuildCode = function( builder, output, cache, requires ) {
+THREE.GLNode.prototype.parseAndBuildCode = function( builder, output, cache, requires ) {
 
-	this.verify( builder, cache, requires );
+	this.parse( builder, cache, requires );
 
 	return this.buildCode( builder, output, cache, requires );
 
@@ -53,27 +53,12 @@ THREE.GLNode.prototype.buildCode = function( builder, output, cache, requires ) 
 
 };
 
-THREE.GLNode.prototype.verifyDepsNode = function( builder, data, output ) {
-
-	data.deps = ( data.deps || 0 ) + 1;
-
-	var outputLen = builder.getFormatLength( output );
-
-	if ( outputLen > data.outputMax || this.getType( builder ) ) {
-
-		data.outputMax = outputLen;
-		data.output = output;
-
-	}
-
-};
-
 THREE.GLNode.prototype.build = function( builder, output, uuid ) {
 
 	var material = builder.material;
 	var data = material.getDataNode( uuid || this.uuid );
 
-	if ( builder.isShader( 'verify' ) ) this.verifyDepsNode( builder, data, output );
+	if ( builder.parsing ) this.appendDepsNode( builder, data, output );
 
 	if ( this.allow[ builder.shader ] === false ) {
 
@@ -89,6 +74,21 @@ THREE.GLNode.prototype.build = function( builder, output, uuid ) {
 	}
 
 	return this.generate( builder, output, uuid );
+
+};
+
+THREE.GLNode.prototype.appendDepsNode = function( builder, data, output ) {
+
+	data.deps = ( data.deps || 0 ) + 1;
+
+	var outputLen = builder.getFormatLength( output );
+
+	if ( outputLen > ( data.outputMax || 0 ) || this.getType( builder ) ) {
+
+		data.outputMax = outputLen;
+		data.output = output;
+
+	}
 
 };
 

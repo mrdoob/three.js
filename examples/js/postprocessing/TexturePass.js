@@ -34,9 +34,7 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 };
 
-THREE.TexturePass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.TexturePass.prototype = {
+THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.TexturePass,
 
@@ -48,4 +46,4 @@ THREE.TexturePass.prototype = {
 
 	}
 
-};
+} );

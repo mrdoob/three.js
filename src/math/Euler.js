@@ -232,7 +232,7 @@ THREE.Euler.prototype = {
 
 		var matrix;
 
-		return function ( q, order, update ) {
+		return function setFromQuaternion( q, order, update ) {
 
 			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
@@ -256,7 +256,7 @@ THREE.Euler.prototype = {
 
 		var q = new THREE.Quaternion();
 
-		return function ( newOrder ) {
+		return function reorder( newOrder ) {
 
 			q.setFromEuler( this );
 			

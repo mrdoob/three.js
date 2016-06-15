@@ -86,7 +86,7 @@
 			var params = {
 				shadows: true,
 				exposure: 0.68,
-				bulbPower: Object.keys( bulbLuminousPowers )[2],
+				bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
 				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
 			};
 
@@ -107,7 +107,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.x = -4;
 				camera.position.z = 4;
-				camera.position.y = 3;
+				camera.position.y = 2;
 
 				scene = new THREE.Scene();
 
@@ -183,24 +183,18 @@
 				} );
 
 				ballMat = new THREE.MeshStandardMaterial( {
-					roughness: 0,
-					metalness: 0.0,
-					color: 0xffffff
+					color: 0xffffff,
+					roughness: 0.5,
+					metalness: 1.0
 				});
 				textureLoader.load( "../examples/textures/planets/earth_atmos_2048.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					map.repeat.set( 1, 1 );
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 				} );
 				textureLoader.load( "../examples/textures/planets/earth_specular_2048.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
-					map.repeat.set( 1, 1 );
-					ballMat.roughnessMap = map;
+					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 				} );
 
@@ -210,9 +204,10 @@
 				floorMesh.rotation.x = -Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereGeometry( 0.1213, 32, 32 );
+				var ballGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
-				ballMesh.position.set( 1, 0.1213, 1 );
+				ballMesh.position.set( 1, 0.5, 1 );
+				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 

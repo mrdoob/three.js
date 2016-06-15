@@ -73,9 +73,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 };
 
-THREE.BloomPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.BloomPass.prototype = {
+THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.BloomPass,
 
@@ -112,7 +110,7 @@ THREE.BloomPass.prototype = {
 
 	}
 
-};
+} );
 
 THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );

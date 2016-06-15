@@ -35,9 +35,7 @@ THREE.GlitchPass = function ( dt_size ) {
 
 };
 
-THREE.GlitchPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.GlitchPass.prototype = {
+THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.GlitchPass,
 
@@ -114,4 +112,4 @@ THREE.GlitchPass.prototype = {
 
 	}
 
-};
+} );
