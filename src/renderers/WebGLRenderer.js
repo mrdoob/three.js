@@ -1169,7 +1169,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( background instanceof THREE.CubeTexture ) {
 
-			backgroundCamera2.projectionMatrix = camera.projectionMatrix;
+			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
 
 			backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
 			backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
