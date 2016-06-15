@@ -126,6 +126,7 @@ Object.assign( THREE.CompressedTextureLoader.prototype, {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	}
 
