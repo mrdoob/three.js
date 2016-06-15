@@ -11,6 +11,8 @@
 
 THREE.VREffect = function ( renderer, onError ) {
 
+	var scope = this;
+
 	var vrHMD;
 	var isDeprecatedAPI = false;
 	var eyeTranslationL = new THREE.Vector3();
@@ -18,7 +20,9 @@ THREE.VREffect = function ( renderer, onError ) {
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
 
-	function gotVRDevices( devices ) {
+	function gotVRDevices ( devices ) {
+
+		scope.displays = devices;
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
@@ -61,8 +65,6 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.isPresenting = false;
 	this.scale = 1;
-
-	var scope = this;
 
 	var rendererSize = renderer.getSize();
 	var rendererPixelRatio = renderer.getPixelRatio();

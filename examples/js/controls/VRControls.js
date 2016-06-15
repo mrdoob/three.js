@@ -11,7 +11,9 @@ THREE.VRControls = function ( object, onError ) {
 
 	var standingMatrix = new THREE.Matrix4();
 
-	function gotVRDevices( devices ) {
+	function gotVRDevices ( devices ) {
+
+		scope.displays = devices;
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
