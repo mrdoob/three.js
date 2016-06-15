@@ -125,7 +125,6 @@ var files = {
 		"webgl_materials_cubemap_balls_refraction",
 		"webgl_materials_cubemap_dynamic",
 		"webgl_materials_cubemap_dynamic2",
-		"webgl_materials_cubemap_escher",
 		"webgl_materials_cubemap_refraction",
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
