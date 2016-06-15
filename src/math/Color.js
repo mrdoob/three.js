@@ -383,11 +383,11 @@ THREE.Color.prototype = {
 
 	sub: function( color ) {
 
-	this.r -= color.r;
-	this.g -= color.g;
-	this.b -= color.b;
+		this.r -= color.r;
+		this.g -= color.g;
+		this.b -= color.b;
 
-	return this;
+		return this;
 
 	},
 
