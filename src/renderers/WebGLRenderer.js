@@ -1160,14 +1160,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		var needsClear = this.autoClear || forceClear;
 		var background = scene.background;
 
 		if ( background === null ) {
 
 			glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-		} else if ( background instanceof THREE.CubeTexture ) {
+		} else if ( background instanceof THREE.Color ) {
+
+			glClearColor( background.r, background.g, background.b, 1 );
+
+		}
+
+		if ( this.autoClear || forceClear ) {
+
+			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
+
+		}
+
+		if ( background instanceof THREE.CubeTexture ) {
 
 			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
 
@@ -1179,27 +1190,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
 
-			needsClear = false;
-
 		} else if ( background instanceof THREE.Texture ) {
 
 			backgroundPlaneMesh.material.map = background;
 
 			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
-
-			needsClear = false;
-
-		} else if ( background instanceof THREE.Color ) {
-
-			glClearColor( background.r, background.g, background.b, 1 );
-
-			needsClear = true;
-
-		}
-
-		if ( needsClear ) {
-
-			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
 
 		}
 
