@@ -39,7 +39,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
 
 	}
-	
+
 	var bokehShader = THREE.BokehShader;
 	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
@@ -67,9 +67,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
-THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.BokehPass.prototype = {
+THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.BokehPass,
 
@@ -101,4 +99,4 @@ THREE.BokehPass.prototype = {
 
 	}
 
-};
+} );

@@ -580,10 +580,6 @@
           "!type": "bool",
           "!doc": "default – false"
         },
-        "rotationAutoUpdate": {
-          "!type": "bool",
-          "!doc": "default – true"
-        },
         "userData": {
           "!type": "object",
           "!doc": "An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned."
@@ -1888,11 +1884,7 @@
     "GridHelper": {
       "!url": "http://threejs.org/docs/#Reference/extras/helpers/GridHelper",
       "prototype": {
-        "!proto": "THREE.Line.prototype",
-        "setColors": {
-          "!type": "fn(colorCenterLine: number, colorGrid: number)",
-          "!doc": "Updates the color of the grid lines."
-        }
+        "!proto": "THREE.Line.prototype"
       },
       "!doc": "The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.",
       "!type": "fn(size: number, step: number)"
@@ -2276,14 +2268,6 @@
           "!type": "boolean",
           "!doc": "If true, the ajax request will use cookies."
         },
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2319,26 +2303,14 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2370,14 +2342,10 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "Base class for implementing loaders.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "LoadingManager": {
       "!url": "http://threejs.org/docs/#Reference/loaders/LoadingManager",

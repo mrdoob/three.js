@@ -589,13 +589,14 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
+				var array = positions.array;
 				var center = this.boundingSphere.center;
 
-				box.setFromArray( positions );
+				box.setFromArray( array );
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -603,9 +604,9 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = array.length; i < il; i += 3 ) {
 
-					vector.fromArray( positions, i );
+					vector.fromArray( array, i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}

@@ -55,6 +55,9 @@
 
 THREE.WebGLUniforms = ( function() { // scope
 
+	var emptyTexture = new THREE.Texture();
+	var emptyCubeTexture = new THREE.CubeTexture();
+
 	// --- Base for inner nodes (including the root) ---
 
 	var UniformContainer = function() {
@@ -198,7 +201,7 @@ THREE.WebGLUniforms = ( function() { // scope
 
 			var unit = renderer.allocTextureUnit();
 			gl.uniform1i( this.addr, unit );
-			if ( v ) renderer.setTexture2D( v, unit );
+			renderer.setTexture2D( v || emptyTexture, unit );
 
 		},
 
@@ -206,7 +209,7 @@ THREE.WebGLUniforms = ( function() { // scope
 
 			var unit = renderer.allocTextureUnit();
 			gl.uniform1i( this.addr, unit );
-			if ( v ) renderer.setTextureCube( v, unit );
+			renderer.setTextureCube( v || emptyCubeTexture, unit );
 
 		},
 
@@ -299,8 +302,7 @@ THREE.WebGLUniforms = ( function() { // scope
 
 			for ( var i = 0; i !== n; ++ i ) {
 
-				var tex = v[ i ];
-				if ( tex ) renderer.setTexture2D( tex, units[ i ] );
+				renderer.setTexture2D( v[ i ] || emptyTexture, units[ i ] );
 
 			}
 
@@ -315,8 +317,7 @@ THREE.WebGLUniforms = ( function() { // scope
 
 			for ( var i = 0; i !== n; ++ i ) {
 
-				var tex = v[ i ];
-				if ( tex ) renderer.setTextureCube( tex, units[ i ] );
+				renderer.setTextureCube( v[ i ] || emptyCubeTexture, units[ i ] );
 
 			}
 
@@ -599,4 +600,3 @@ THREE.WebGLUniforms = ( function() { // scope
 	return WebGLUniforms;
 
 } )();
-

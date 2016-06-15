@@ -32,7 +32,8 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 	function update( object ) {
 
-		if ( object === null ) return;
+		if ( object === null ) return; // objectSelected.dispatch( null )
+		if ( object === undefined ) return;
 
 		var geometry = object.geometry;
 

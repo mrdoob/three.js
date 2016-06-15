@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
+				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -17,7 +17,7 @@
 				overflow: hidden;
 			}
 
-			a { color: #222 }
+			a { color: #ff2 }
 
 			#info {
 				position: absolute;
@@ -79,7 +79,7 @@
 				Cineon: THREE.CineonToneMapping
 			};
 
-			var camera, scene, renderer, controls, objects = [];
+			var camera, scene, renderer, controls, group;
 			var composer;
 			var standardMaterial, standardMaterialPremultiplied, floorMaterial;
 
@@ -97,7 +97,6 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					bumpScale: - 0.05,
@@ -135,29 +134,30 @@
 					standardMaterial.needsUpdate = true;
 				} );
 
+				group = new THREE.Group();
+				scene.add( group );
+
 				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				torusMesh1.position.x = 0.0;
-				torusMesh1.castShadow = true;
-				torusMesh1.receiveShadow = true;
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
+				var mesh = new THREE.Mesh( geometry, standardMaterial );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				group.add( mesh );
 
 				floorMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					roughnessMap: null,
-					color: 0xffffff,
+					color: 0x888888,
 					metalness: 0.0,
-					roughness: 0.0,
-					shading: THREE.SmoothShading
+					roughness: 1.0,
+					side: THREE.BackSide
 				} );
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				planeMesh1.receiveShadow = true;
-				scene.add( planeMesh1 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				var mesh = new THREE.Mesh( geometry, floorMaterial );
+				mesh.position.y = 50;
+				mesh.rotation.x = - Math.PI * 0.5;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
 
 				// Materials
 				var hdrpath = "../examples/textures/cube/hdrPisa/";
@@ -183,12 +183,14 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.HemisphereLight( 0x111111, 0x000000 ) );
 
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8
+				spotLight.decay = 2;
+				spotLight.distance = 300;
+				spotLight.penumbra = 0.8;
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 
@@ -277,9 +279,9 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
 
-					var object = objects[ i ];
+					var object = group.children[ i ];
 					object.rotation.y += 0.005;
 
 				}

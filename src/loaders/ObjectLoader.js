@@ -9,9 +9,7 @@ THREE.ObjectLoader = function ( manager ) {
 
 };
 
-THREE.ObjectLoader.prototype = {
-
-	constructor: THREE.ObjectLoader,
+Object.assign( THREE.ObjectLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -136,6 +134,21 @@ THREE.ObjectLoader.prototype = {
 						geometry = new THREE[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
+							data.height,
+							data.radialSegments,
+							data.heightSegments,
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
+					case 'ConeGeometry':
+					case 'ConeBufferGeometry':
+
+						geometry = new THREE [ data.type ](
+							data.radius,
 							data.height,
 							data.radialSegments,
 							data.heightSegments,
@@ -402,7 +415,7 @@ THREE.ObjectLoader.prototype = {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials ) {
 
 			var object;
 
@@ -599,4 +612,4 @@ THREE.ObjectLoader.prototype = {
 
 	}()
 
-};
+} );

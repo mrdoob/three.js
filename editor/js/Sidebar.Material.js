@@ -11,6 +11,39 @@ Sidebar.Material = function ( editor ) {
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
+	// New / Copy / Paste
+
+	var copiedMaterial;
+	var managerRow = new UI.Row();
+
+	managerRow.add( new UI.Text( '' ).setWidth( '90px' ) );
+	managerRow.add( new UI.Button( 'New' ).onClick( function () {
+
+		var material = new THREE[ materialClass.getValue() ]();
+		editor.execute( new SetMaterialCommand( currentObject, material ), 'New Material: ' + materialClass.getValue() );
+		update();
+
+	} ) );
+
+	managerRow.add( new UI.Button( 'Copy' ).onClick( function () {
+
+		copiedMaterial = currentObject.material;
+
+	} ) );
+
+	managerRow.add( new UI.Button( 'Paste' ).onClick( function () {
+
+		if ( copiedMaterial === undefined ) return;
+
+		editor.execute( new SetMaterialCommand( currentObject, copiedMaterial ), 'Pasted Material: ' + materialClass.getValue() );
+		refreshUI();
+		update();
+
+	} ) );
+
+	container.add( managerRow );
+
+
 	// type
 
 	var materialClassRow = new UI.Row();

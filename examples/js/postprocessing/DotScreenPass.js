@@ -33,9 +33,7 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 };
 
-THREE.DotScreenPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.DotScreenPass.prototype = {
+THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.DotScreenPass,
 
@@ -58,4 +56,4 @@ THREE.DotScreenPass.prototype = {
 
 	}
 
-};
+} );

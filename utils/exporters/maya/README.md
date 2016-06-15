@@ -21,6 +21,8 @@ Exports Maya models to Three.js' JSON format.  Currently supports exporting the 
 
 (Maya 2016 suggested)
 
+**Please note this plugin will not work with Maya LT, as it does not support PyMel.**
+
 Install [pymel](http://download.autodesk.com/global/docs/maya2014/en_us/PyMel/install.html) if necessary – Maya 2015 and newer will already include this for you. If you need to install PyMel manually, you can clone the latest from the [LumaPictures/pymel](https://github.com/LumaPictures/pymel) repository.
 
 Copy the scripts and plug-ins folders to the appropriate maya folder, where `maya-version` is your current version of Maya (eg. 2013-x64).

@@ -18,9 +18,7 @@ THREE.StereoCamera = function () {
 
 };
 
-THREE.StereoCamera.prototype = {
-
-	constructor: THREE.StereoCamera,
+Object.assign( THREE.StereoCamera.prototype, {
 
 	update: ( function () {
 
@@ -29,7 +27,7 @@ THREE.StereoCamera.prototype = {
 		var eyeRight = new THREE.Matrix4();
 		var eyeLeft = new THREE.Matrix4();
 
-		return function update ( camera ) {
+		return function update( camera ) {
 
 			var needsUpdate = focus !== camera.focus || fov !== camera.fov ||
 												aspect !== camera.aspect * this.aspect || near !== camera.near ||
@@ -86,4 +84,4 @@ THREE.StereoCamera.prototype = {
 
 	} )()
 
-};
+} );

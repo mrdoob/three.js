@@ -43,6 +43,7 @@ void main() {
 
 	vec3 outgoingLight = reflectedLight.indirectDiffuse;
 
+	#include <normal_flip>
 	#include <envmap_fragment>
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );

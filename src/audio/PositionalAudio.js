@@ -11,75 +11,79 @@ THREE.PositionalAudio = function ( listener ) {
 
 };
 
-THREE.PositionalAudio.prototype = Object.create( THREE.Audio.prototype );
-THREE.PositionalAudio.prototype.constructor = THREE.PositionalAudio;
+THREE.PositionalAudio.prototype = Object.assign( Object.create( THREE.Audio.prototype ), {
 
-THREE.PositionalAudio.prototype.getOutput = function () {
+	constructor: THREE.PositionalAudio,
 
-	return this.panner;
+	getOutput: function () {
 
-};
+		return this.panner;
 
-THREE.PositionalAudio.prototype.setRefDistance = function ( value ) {
+	},
 
-	this.panner.refDistance = value;
+	getRefDistance: function () {
 
-};
+		return this.panner.refDistance;
 
-THREE.PositionalAudio.prototype.getRefDistance = function () {
+	},
 
-	return this.panner.refDistance;
+	setRefDistance: function ( value ) {
 
-};
+		this.panner.refDistance = value;
 
-THREE.PositionalAudio.prototype.setRolloffFactor = function ( value ) {
+	},
 
-	this.panner.rolloffFactor = value;
+	getRolloffFactor: function () {
 
-};
+		return this.panner.rolloffFactor;
 
-THREE.PositionalAudio.prototype.getRolloffFactor = function () {
+	},
 
-	return this.panner.rolloffFactor;
+	setRolloffFactor: function ( value ) {
 
-};
+		this.panner.rolloffFactor = value;
 
-THREE.PositionalAudio.prototype.setDistanceModel = function ( value ) {
+	},
 
-	this.panner.distanceModel = value;
+	getDistanceModel: function () {
 
-};
+		return this.panner.distanceModel;
 
-THREE.PositionalAudio.prototype.getDistanceModel = function () {
+	},
 
-	return this.panner.distanceModel;
+	setDistanceModel: function ( value ) {
 
-};
+		this.panner.distanceModel = value;
 
-THREE.PositionalAudio.prototype.setMaxDistance = function ( value ) {
+	},
 
-	this.panner.maxDistance = value;
+	getMaxDistance: function () {
 
-};
+		return this.panner.maxDistance;
 
-THREE.PositionalAudio.prototype.getMaxDistance = function () {
+	},
 
-	return this.panner.maxDistance;
+	setMaxDistance: function ( value ) {
 
-};
+		this.panner.maxDistance = value;
 
-THREE.PositionalAudio.prototype.updateMatrixWorld = ( function () {
+	},
 
-	var position = new THREE.Vector3();
+	updateMatrixWorld: ( function () {
 
-	return function updateMatrixWorld( force ) {
+		var position = new THREE.Vector3();
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		return function updateMatrixWorld( force ) {
 
-		position.setFromMatrixPosition( this.matrixWorld );
+			THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		this.panner.setPosition( position.x, position.y, position.z );
+			position.setFromMatrixPosition( this.matrixWorld );
 
-	};
+			this.panner.setPosition( position.x, position.y, position.z );
 
-} )();
+		};
+
+	} )()
+
+
+} );

@@ -10,5 +10,8 @@ THREE.Group = function () {
 
 };
 
-THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Group.prototype.constructor = THREE.Group;
+THREE.Group.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.Group
+
+} );

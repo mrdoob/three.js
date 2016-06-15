@@ -72,8 +72,9 @@ var WEBVR = {
 
 		var button = document.createElement( 'button' );
 		button.style.position = 'absolute';
-		button.style.left = 'calc(50% - 30px)';
+		button.style.left = 'calc(50% - 50px)';
 		button.style.bottom = '20px';
+		button.style.width = '100px';
 		button.style.border = '0';
 		button.style.padding = '8px';
 		button.style.cursor = 'pointer';
@@ -82,13 +83,20 @@ var WEBVR = {
 		button.style.fontFamily = 'sans-serif';
 		button.style.fontSize = '13px';
 		button.style.fontStyle = 'normal';
+		button.style.textAlign = 'center';
 		button.style.zIndex = '999';
 		button.textContent = 'ENTER VR';
 		button.onclick = function() {
 
-			effect.setFullScreen( true );
+			effect.isPresenting ? effect.exitPresent() : effect.requestPresent();
 
 		};
+
+		window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
+
+			button.textContent = effect.isPresenting ? 'EXIT VR' : 'ENTER VR';
+
+		}, false );
 
 		return button;
 

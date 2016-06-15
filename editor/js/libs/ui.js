@@ -1045,8 +1045,6 @@ UI.Button = function ( value ) {
 
 	UI.Element.call( this );
 
-	var scope = this;
-
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';
 

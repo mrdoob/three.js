@@ -20,6 +20,7 @@ THREE.WebGLExtensions = function ( gl ) {
 
 			case 'WEBGL_depth_texture':
 				extension = gl.getExtension( 'WEBGL_depth_texture' ) || gl.getExtension( 'MOZ_WEBGL_depth_texture' ) || gl.getExtension( 'WEBKIT_WEBGL_depth_texture' );
+				break;
 
 			case 'EXT_texture_filter_anisotropic':
 				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );

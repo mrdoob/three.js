@@ -43,56 +43,20 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/SimulationRenderer.js"></script>
+		<script src="js/GPUComputationRenderer.js"></script>
 
 		<!--
 		TODO: If you're reading this, you may wish to improve this example by
 			- Create a better shading for the birds?
-			- Refactoring the SimulationRenderer to a more generic TextureRenderer / making the GPGPU workflow easier?
 
 		-->
 
 
-
-		<!-- pass through vertex shader -->
-		<script id="vertexShader" type="x-shader/x-vertex">
-
-			void main()	{
-
-				gl_Position = vec4( position, 1.0 );
-
-			}
-
-		</script>
-
-		<!-- pass through fragment shader -->
-		<script id="fragmentShader" type="x-shader/x-fragment">
-
-			uniform vec2 resolution;
-			uniform float time;
-			uniform sampler2D texture;
-
-			void main()	{
-
-				vec2 uv = gl_FragCoord.xy / resolution.xy;
-
-				vec3 color = texture2D( texture, uv ).xyz;
-
-				gl_FragColor = vec4( color, 1.0 );
-
-			}
-
-		</script>
-		<!-- end pass through shaders -->
-
 		<!-- shader for bird's position -->
 		<script id="fragmentShaderPosition" type="x-shader/x-fragment">
 
-			uniform vec2 resolution;
 			uniform float time;
 			uniform float delta;
-			uniform sampler2D textureVelocity;
-			uniform sampler2D texturePosition;
 
 			void main()	{
 
@@ -116,7 +80,6 @@
 		<!-- shader for bird's velocity -->
 		<script id="fragmentShaderVelocity" type="x-shader/x-fragment">
 
-			uniform vec2 resolution;
 			uniform float time;
 			uniform float testing;
 			uniform float delta; // about 0.016
@@ -126,12 +89,8 @@
 			uniform float freedomFactor;
 			uniform vec3 predator;
 
-
-			uniform sampler2D textureVelocity;
-			uniform sampler2D texturePosition;
-
-			const float width = WIDTH;
-			const float height = WIDTH;
+			const float width = resolution.x;
+			const float height = resolution.y;
 
 			const float PI = 3.141592653589793;
 			const float PI_2 = PI * 2.0;
@@ -143,16 +102,16 @@
 			float separationThresh = 0.45;
 			float alignmentThresh = 0.65;
 
-			const float UPPER_BOUNDS = 400.0;
+			const float UPPER_BOUNDS = BOUNDS;
 			const float LOWER_BOUNDS = -UPPER_BOUNDS;
 
 			const float SPEED_LIMIT = 9.0;
 
 			float rand(vec2 co){
-			    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+				return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 			}
 
-			void main()	{
+			void main() {
 
 				zoneRadius = seperationDistance + alignmentDistance + cohesionDistance;
 				separationThresh = seperationDistance / zoneRadius;
@@ -465,10 +424,9 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var PARTICLES = WIDTH * WIDTH;
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
-			document.getElementById('birds').innerText = PARTICLES;
+			document.getElementById('birds').innerText = BIRDS;
 
 			function change(n) {
 				location.hash = n;
@@ -486,7 +444,12 @@
 
 			var last = performance.now();
 
-			var simulator;
+			var gpuCompute;
+			var velocityVariable;
+			var positionVariable;
+			var positionUniforms;
+			var velocityUniforms;
+			var birdUniforms;
 
 			init();
 			animate();
@@ -509,8 +472,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				simulator = new SimulationRenderer(WIDTH, renderer);
-				simulator.init();
+				initComputeRenderer();
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -537,10 +499,10 @@
 
 				var valuesChanger = function() {
 
-					simulator.velocityUniforms.seperationDistance.value = effectController.seperation;
-					simulator.velocityUniforms.alignmentDistance.value = effectController.alignment;
-					simulator.velocityUniforms.cohesionDistance.value = effectController.cohesion;
-					simulator.velocityUniforms.freedomFactor.value = effectController.freedom;
+					velocityUniforms.seperationDistance.value = effectController.seperation;
+					velocityUniforms.alignmentDistance.value = effectController.alignment;
+					velocityUniforms.cohesionDistance.value = effectController.cohesion;
+					velocityUniforms.freedomFactor.value = effectController.freedom;
 
 				};
 
@@ -556,6 +518,47 @@
 
 			}
 
+			function initComputeRenderer() {
+
+    				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+
+				var dtPosition = gpuCompute.createTexture();
+				var dtVelocity = gpuCompute.createTexture();
+				fillPositionTexture( dtPosition );
+				fillVelocityTexture( dtVelocity );
+
+				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'fragmentShaderVelocity' ).textContent, dtVelocity );
+				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'fragmentShaderPosition' ).textContent, dtPosition );
+
+				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
+				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
+
+				positionUniforms = positionVariable.material.uniforms;
+				velocityUniforms = velocityVariable.material.uniforms;
+
+				positionUniforms.time = { value: 0.0 };
+				positionUniforms.delta = { value: 0.0 };
+				velocityUniforms.time = { value: 1.0 };
+				velocityUniforms.delta = { value: 0.0 };
+				velocityUniforms.testing = { value: 1.0 };
+				velocityUniforms.seperationDistance = { value: 1.0 };
+				velocityUniforms.alignmentDistance = { value: 1.0 };
+				velocityUniforms.cohesionDistance = { value: 1.0 };
+				velocityUniforms.freedomFactor = { value: 1.0 };
+				velocityUniforms.predator = { value: new THREE.Vector3() };
+				velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
+
+				velocityVariable.wrapS = THREE.RepeatWrapping;
+				velocityVariable.wrapT = THREE.RepeatWrapping;
+				positionVariable.wrapS = THREE.RepeatWrapping;
+				positionVariable.wrapT = THREE.RepeatWrapping;
+
+				var error = gpuCompute.init();
+				if ( error !== null ) {
+				    console.error( error );
+				}
+
+			}
 
 			function initBirds() {
 
@@ -563,11 +566,11 @@
 
 				// For Vertex and Fragment
 				birdUniforms = {
-					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
-					texturePosition: { type: "t", value: null },
-					textureVelocity: { type: "t", value: null },
-					time: { type: "f", value: 1.0 },
-					delta: { type: "f", value: 0.0 }
+					color: { value: new THREE.Color( 0xff2200 ) },
+					texturePosition: { value: null },
+					textureVelocity: { value: null },
+					time: { value: 1.0 },
+					delta: { value: 0.0 }
 				};
 
 				// ShaderMaterial
@@ -587,6 +590,45 @@
 				scene.add(birdMesh);
 
 			}
+
+			function fillPositionTexture( texture ) {
+
+				var theArray = texture.image.data;
+
+				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
+
+					var x = Math.random() * BOUNDS - BOUNDS_HALF;
+					var y = Math.random() * BOUNDS - BOUNDS_HALF;
+					var z = Math.random() * BOUNDS - BOUNDS_HALF;
+
+					theArray[ k + 0 ] = x;
+					theArray[ k + 1 ] = y;
+					theArray[ k + 2 ] = z;
+					theArray[ k + 3 ] = 1;
+
+				}
+
+			}
+
+			function fillVelocityTexture( texture ) {
+
+				var theArray = texture.image.data;
+
+				for ( var k = 0, kl = theArray.length; k < kl; k += 4 ) {
+
+					var x = Math.random() - 0.5;
+					var y = Math.random() - 0.5;
+					var z = Math.random() - 0.5;
+
+					theArray[ k + 0 ] = x * 10;
+					theArray[ k + 1 ] = y * 10;
+					theArray[ k + 2 ] = z * 10;
+					theArray[ k + 3 ] = 1;
+
+				}
+
+			}
+
 
 			function onWindowResize() {
 
@@ -652,14 +694,22 @@
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
 
+				positionUniforms.time.value = now;
+				positionUniforms.delta.value = delta;
+				velocityUniforms.time.value = now;
+				velocityUniforms.delta.value = delta;
 				birdUniforms.time.value = now;
 				birdUniforms.delta.value = delta;
 
-				simulator.simulate( delta );
-				simulator.velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
+				velocityUniforms.predator.value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
 				mouseX = 10000;
 				mouseY = 10000;
+
+				gpuCompute.compute();
+
+				birdUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				birdUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

@@ -33,7 +33,7 @@ THREE.FunctionNode.prototype.parseReference = function( name ) {
 
 THREE.FunctionNode.prototype.getTypeNode = function( builder, type ) {
 
-	return builder.getType( type ) || type;
+	return builder.getTypeByFormat( type ) || type;
 
 };
 

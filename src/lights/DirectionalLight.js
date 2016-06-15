@@ -18,17 +18,20 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 };
 
-THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
-THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
+THREE.DirectionalLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-THREE.DirectionalLight.prototype.copy = function ( source ) {
+	constructor: THREE.DirectionalLight,
 
-	THREE.Light.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.target = source.target.clone();
+		THREE.Light.prototype.copy.call( this, source );
 
-	this.shadow = source.shadow.clone();
+		this.target = source.target.clone();
 
-	return this;
+		this.shadow = source.shadow.clone();
 
-};
+		return this;
+
+	}
+
+} );
