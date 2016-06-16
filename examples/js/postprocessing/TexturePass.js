@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TexturePass = function ( texture, opacity ) {
+THREE.TexturePass = function ( map, opacity ) {
 
 	THREE.Pass.call( this );
 
@@ -11,10 +11,10 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 	var shader = THREE.CopyShader;
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.map = map;
+	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
 
-	this.uniforms[ "opacity" ].value = ( opacity !== undefined ) ? opacity : 1.0;
-	this.uniforms[ "tDiffuse" ].value = texture;
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -40,10 +40,18 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
+		var oldAutoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
 		this.quad.material = this.material;
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		this.uniforms[ "opacity" ].value = this.opacity;
+		this.uniforms[ "tDiffuse" ].value = this.map;
+		this.material.transparent = ( this.opacity < 1.0 );
 
+		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );
+
+		renderer.autoClear = oldAutoClear;
 	}
 
 } );

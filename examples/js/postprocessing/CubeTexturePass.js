@@ -2,12 +2,14 @@
  * @author bhouston / http://clara.io/
  */
 
-THREE.CubeTexturePass = function ( scene, camera ) {
+THREE.CubeTexturePass = function ( scene, camera, envMap, opacity ) {
 
 	THREE.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
+
+	this.needsSwap = false;
 
 	this.cubeShader = THREE.ShaderLib[ 'cube' ];
 	this.cubeMesh = new THREE.Mesh(
@@ -22,7 +24,8 @@ THREE.CubeTexturePass = function ( scene, camera ) {
 		} )
 	);
 
-	this.envMap = null;
+	this.envMap = envMap;
+	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
 
 	this.cubeScene = new THREE.Scene();
 	this.cubeCamera = new THREE.PerspectiveCamera();
@@ -36,6 +39,9 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
+		var oldAutoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
 		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
 		this.cubeCamera.matrixWorld.extractRotation( this.camera.matrixWorld );
 		this.cubeCamera.matrixWorldInverse.getInverse( this.cubeCamera.matrixWorld );
@@ -43,7 +49,9 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		this.cubeMesh.material.uniforms[ "tCube" ].value = this.envMap;
 		this.cubeMesh.modelViewMatrix.multiplyMatrices( this.cubeCamera.matrixWorldInverse, this.cubeCamera.matrixWorld );
 
-		renderer.render( this.cubeScene, this.cubeCamera, this.renderToScreen ? null : writeBuffer, this.clear );
+		renderer.render( this.cubeScene, this.cubeCamera, this.renderToScreen ? null : readBuffer, this.clear );
+
+		renderer.autoClear = oldAutoClear;
 
 	}
 

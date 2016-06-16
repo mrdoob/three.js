@@ -30,7 +30,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Background Pass Test: Clear, Texture and CubeTexture Passes by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Background Passes Test by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
 
 		<div id="container"></div>
 
@@ -43,7 +43,6 @@
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/ClearPass.js"></script>
 		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/CubeTexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
 
@@ -58,14 +57,15 @@
 			var params = {
 
 				clearPass: true,
-				clearColor: 'black',
+				clearColor: 'white',
 				clearAlpha: 1.0,
 
 				texturePass: true,
+				texturePassOpacity: 1.0,
 
-				cubeTexturePass: true,
+				//cubeTexturePass: true,
 
-				autoRotate: true,
+				//autoRotate: true,
 
 				//camera: 'perspective'
 		
@@ -87,10 +87,11 @@
 				gui.add( params, "clearAlpha", 0, 1 );		
 
 				gui.add( params, "texturePass" );
+				gui.add( params, "texturePassOpacity", 0, 1 );		
 
-				gui.add( params, "cubeTexturePass" );
+				//gui.add( params, "cubeTexturePass" );
 			
-				gui.add( params, "autoRotate" );
+				//gui.add( params, "autoRotate" );
 
 				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
 			
@@ -171,8 +172,13 @@
 				texturePass = new THREE.TexturePass();
 				composer.addPass( texturePass );
 
-				cubeTexturePassP = new THREE.CubeTexturePass( scene, cameraP );
-				composer.addPass( cubeTexturePassP );
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+					texturePass.map = map;
+				});
+
+				//cubeTexturePassP = new THREE.CubeTexturePass( scene, cameraP );
+				//composer.addPass( cubeTexturePassP );
 
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
@@ -226,8 +232,9 @@
 				clearPass.clearAlpha = params.clearAlpha;
 
 				texturePass.enabled = params.texturePass;
+				texturePass.opacity = params.texturePassOpacity;
 
-				cubeTexturePassP.enabled = params.cubeTexturePass;
+				//cubeTexturePassP.enabled = params.cubeTexturePass;
 
 				composer.render();
 
