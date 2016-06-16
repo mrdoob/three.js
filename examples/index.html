@@ -240,7 +240,12 @@
 		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+		<script src="libs\url-search-params.js"></script>
+
 		<script>
+
+		var url = new URL( window.location )
+		console.log( url.searchParams )
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
@@ -371,7 +376,15 @@
 
 		function updateFilter() {
 
-			var exp = new RegExp( filterInput.value, 'gi' );
+			var v = filterInput.value;
+			if( v !== '' ) {
+				window.history.replaceState( {} , '', '?q=' + v );
+			} else {
+				window.history.replaceState( {} , '', window.location.pathname );
+			}
+			if( selected ) window.location.hash = selected
+
+			var exp = new RegExp( v, 'gi' );
 
 			for ( var key in files ) {
 
@@ -458,6 +471,9 @@
 			}
 
 		}
+
+		filterInput.value = url.searchParams.get('q');
+		updateFilter( )
 
 		</script>
 
