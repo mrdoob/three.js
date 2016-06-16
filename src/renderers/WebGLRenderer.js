@@ -1168,7 +1168,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Rendering
 
-	this.renderOverride = function ( overrideMaterial, scene, camera, renderTarget, forceClear ) {
+	this.renderMaterial = function ( overrideMaterial, scene, camera, renderTarget, forceClear ) {
 
 		scene.overrideMaterial = overrideMaterial;
 		this.render( scene, camera, renderTarget, forceClear );
@@ -1187,7 +1187,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		this.renderOverride( passMaterial, passScene, passCamera, renderTarget, forceClear );
+		this.renderMaterial( passMaterial, passScene, passCamera, renderTarget, forceClear );
 
 	};
 
