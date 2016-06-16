@@ -59,6 +59,7 @@
 
 			var params = {
 				sampleLevel: 4,
+				renderToScreen: false,
 				unbiased: true,
 				camera: 'perspective',
 				clearColor: 'black',
@@ -79,6 +80,7 @@
 				gui = new dat.GUI();
 
 				gui.add( params, "unbiased" );
+				gui.add( params, "renderToScreen" );
 				gui.add( params, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
@@ -245,6 +247,9 @@
 
 				msaaRenderPassP.enabled = ( params.camera === 'perspective' );
 				msaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+
+				msaaRenderPassP.renderToScreen = msaaRenderPassO.renderToScreen = params.renderToScreen;
+				copyPass.enabled = !params.renderToScreen;
 
 				composer.render();
 
