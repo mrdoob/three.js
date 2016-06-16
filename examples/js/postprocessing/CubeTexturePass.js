@@ -43,9 +43,7 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		renderer.autoClear = false;
 
 		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
-
-		var matrix = new THREE.Matrix4().extractRotation( this.camera.matrixWorld );
-		this.cubeCamera.quaternion.setFromRotationMatrix( matrix );
+		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
 
 		this.cubeMesh.material.uniforms[ "tCube" ].value = this.envMap;
 		this.cubeMesh.material.uniforms[ "opacity" ].value = this.opacity;
