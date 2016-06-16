@@ -108,21 +108,22 @@
 
 				var material = new THREE.MeshStandardMaterial();
 
-				var path = 'models/obj/cerberus/';
 				var loader = new THREE.OBJLoader();
-				loader.load( path + 'Cerberus.obj', function ( group ) {
+				loader.setPath( 'models/obj/cerberus/' );
+				loader.load( 'Cerberus.obj', function ( group ) {
 
 					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/cerberus/' );
 
 					material.roughness = 1;
 					material.metalness = 1;
 
-					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
-					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
-					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
+					material.map = loader.load( 'Cerberus_A.jpg' );
+					material.roughnessMap = loader.load( 'Cerberus_R.jpg' );
+					material.metalnessMap = loader.load( 'Cerberus_M.jpg' );
+					material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
 					material.map.wrapS = THREE.RepeatWrapping;
 					material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -176,7 +177,15 @@
 				scene.add( controller2 );
 
 				var loader = new THREE.OBJLoader();
-				loader.load( 'models/obj/vr_controller_vive_1_5.obj', function ( object ) {
+				loader.setPath( 'models/obj/vive-controller/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+
+					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/vive-controller/' );
+
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
 
 					controller1.add( object.clone() );
 					controller2.add( object.clone() );

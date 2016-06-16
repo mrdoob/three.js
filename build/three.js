@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '78' };
+var THREE = { REVISION: '79dev' };
 
 //
 
@@ -746,6 +746,16 @@ THREE.Color.prototype = {
 		this.r += s;
 		this.g += s;
 		this.b += s;
+
+		return this;
+
+	},
+
+	sub: function( color ) {
+
+		this.r = Math.max( 0, this.r - color.r );
+		this.g = Math.max( 0, this.g - color.g );
+		this.b = Math.max( 0, this.b - color.b );
 
 		return this;
 

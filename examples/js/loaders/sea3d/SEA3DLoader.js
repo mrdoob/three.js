@@ -569,7 +569,7 @@ THREE.SEA3D.Animator.prototype.getTimeScale = function() {
 
 THREE.SEA3D.Animator.prototype.updateTimeScale = function() {
 
-	this.currentAnimationAction.setEffectiveTimeScale( this.timeScale * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 ) );
+	this.mixer.timeScale = this.timeScale * ( this.currentAnimation ? this.currentAnimation.timeScale : 1 );
 
 };
 
@@ -580,7 +580,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 	if ( animation == this.currentAnimation ) {
 
 		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
-			( this.currentAnimationAction.timeScale >= 0 ? 0 : this.currentAnimation.duration );
+			( this.mixer.timeScale >= 0 ? 0 : this.currentAnimation.duration );
 
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
 		this.currentAnimationAction.paused = false;
@@ -605,7 +605,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 		this.updateTimeScale();
 
 		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
-			( this.currentAnimationAction.timeScale >= 0 ? 0 : this.currentAnimation.duration );
+			( this.mixer.timeScale >= 0 ? 0 : this.currentAnimation.duration );
 
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
 
@@ -928,9 +928,7 @@ THREE.SEA3D.SkinnedMesh = function( geometry, material, useVertexTexture ) {
 THREE.SEA3D.SkinnedMesh.prototype = Object.create( THREE.SkinnedMesh.prototype );
 THREE.SEA3D.SkinnedMesh.prototype.constructor = THREE.SEA3D.SkinnedMesh;
 
-Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.Object3D.prototype );
-
-Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.Animator.prototype );
+Object.assign( THREE.SEA3D.SkinnedMesh.prototype, THREE.SEA3D.Mesh.prototype, THREE.SEA3D.Animator.prototype );
 
 THREE.SEA3D.SkinnedMesh.prototype.boneByName = function( name ) {
 
@@ -975,9 +973,7 @@ THREE.SEA3D.VertexAnimationMesh = function( geometry, material ) {
 THREE.SEA3D.VertexAnimationMesh.prototype = Object.create( THREE.Mesh.prototype );
 THREE.SEA3D.VertexAnimationMesh.prototype.constructor = THREE.SEA3D.VertexAnimationMesh;
 
-Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Object3D.prototype );
-
-Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Animator.prototype );
+Object.assign( THREE.SEA3D.VertexAnimationMesh.prototype, THREE.SEA3D.Mesh.prototype, THREE.SEA3D.Animator.prototype );
 
 THREE.SEA3D.VertexAnimationMesh.prototype.copy = function( source ) {
 
