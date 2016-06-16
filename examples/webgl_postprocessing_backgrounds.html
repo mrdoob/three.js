@@ -30,7 +30,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Background Passes Test by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
 
 		<div id="container"></div>
 
@@ -42,14 +42,17 @@
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/ClearPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/CubeTexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
 			var scene, renderer, composer;
-			var clearPass, texturePass;
+			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
 			//var cameraO, cubeTexturePassO;
 			var gui, stats, texture;
@@ -63,7 +66,10 @@
 				texturePass: true,
 				texturePassOpacity: 1.0,
 
-				//cubeTexturePass: true,
+				cubeTexturePass: true,
+				cubeTexturePassOpacity: 1.0,
+
+				renderPass: true,
 
 				//autoRotate: true,
 
@@ -89,7 +95,10 @@
 				gui.add( params, "texturePass" );
 				gui.add( params, "texturePassOpacity", 0, 1 );		
 
-				//gui.add( params, "cubeTexturePass" );
+				gui.add( params, "cubeTexturePass" );
+				gui.add( params, "cubeTexturePassOpacity", 0, 1 );		
+	
+				gui.add( params, "renderPass" );
 			
 				//gui.add( params, "autoRotate" );
 
@@ -152,7 +161,7 @@
 				light3.position.y = -70;
 				scene.add( light3 );
 
-				var geometry = new THREE.SphereBufferGeometry( 12, 48, 24 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
 
 				var material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
@@ -163,6 +172,14 @@
 				group.add( mesh );
 
 				// postprocessing
+
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -177,13 +194,27 @@
 					texturePass.map = map;
 				});
 
-				//cubeTexturePassP = new THREE.CubeTexturePass( scene, cameraP );
-				//composer.addPass( cubeTexturePassP );
+				cubeTexturePassP = new THREE.CubeTexturePass( scene, cameraP );
+				composer.addPass( cubeTexturePassP );
 
+				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+					cubeTexturePassP.envMap = ldrCubeMap;
+					console.log( "loaded envmap");
+				});
+
+				renderPass = new THREE.RenderPass( scene, cameraP );
+				renderPass.clear = false;
+				composer.addPass( renderPass );
+		
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-				
+		
+				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -218,6 +249,8 @@
 
 				stats.begin();
 
+				cameraP.updateMatrixWorld( true );
+			
 				var newColor = clearPass.clearColor;
 				switch( params.clearColor ) {
 					case 'blue': newColor = 0x0000ff; break;
@@ -234,7 +267,10 @@
 				texturePass.enabled = params.texturePass;
 				texturePass.opacity = params.texturePassOpacity;
 
-				//cubeTexturePassP.enabled = params.cubeTexturePass;
+				cubeTexturePassP.enabled = params.cubeTexturePass;
+				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+
+				renderPass.enabled = params.renderPass;
 
 				composer.render();
 

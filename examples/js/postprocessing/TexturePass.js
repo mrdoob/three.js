@@ -20,7 +20,9 @@ THREE.TexturePass = function ( map, opacity ) {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
+		fragmentShader: shader.fragmentShader,
+		depthTest: false,
+		depthWrite: false
 
 	} );
 

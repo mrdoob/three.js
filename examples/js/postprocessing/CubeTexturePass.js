@@ -13,7 +13,7 @@ THREE.CubeTexturePass = function ( scene, camera, envMap, opacity ) {
 
 	this.cubeShader = THREE.ShaderLib[ 'cube' ];
 	this.cubeMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.BoxBufferGeometry( 10, 10, 10 ),
 		new THREE.ShaderMaterial( {
 			uniforms: this.cubeShader.uniforms,
 			vertexShader: this.cubeShader.vertexShader,
@@ -43,11 +43,13 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		renderer.autoClear = false;
 
 		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
-		this.cubeCamera.matrixWorld.extractRotation( this.camera.matrixWorld );
-		this.cubeCamera.matrixWorldInverse.getInverse( this.cubeCamera.matrixWorld );
+
+		var matrix = new THREE.Matrix4().extractRotation( this.camera.matrixWorld );
+		this.cubeCamera.quaternion.setFromRotationMatrix( matrix );
 
 		this.cubeMesh.material.uniforms[ "tCube" ].value = this.envMap;
-		this.cubeMesh.modelViewMatrix.multiplyMatrices( this.cubeCamera.matrixWorldInverse, this.cubeCamera.matrixWorld );
+		this.cubeMesh.material.uniforms[ "opacity" ].value = this.opacity;
+		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.render( this.cubeScene, this.cubeCamera, this.renderToScreen ? null : readBuffer, this.clear );
 
