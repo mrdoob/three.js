@@ -114,8 +114,15 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		for ( var i = 0, il = _lightShadows.length; i < il; i ++ ) {
 
 			var light = _lightShadows[ i ];
-
 			var shadow = light.shadow;
+
+			if ( shadow === undefined ) {
+
+				console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
+				continue;
+
+			}
+
 			var shadowCamera = shadow.camera;
 
 			_shadowMapSize.copy( shadow.mapSize );

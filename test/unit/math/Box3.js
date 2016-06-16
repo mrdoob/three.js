@@ -51,19 +51,19 @@ test( "setFromPoints", function() {
 	ok( a.max.equals( one3 ), "Passed!" );
 
 	a.setFromPoints( [] );
-	ok( a.empty(), "Passed!" );
+	ok( a.isEmpty(), "Passed!" );
 });
 
 test( "empty/makeEmpty", function() {
 	var a = new THREE.Box3();
 
-	ok( a.empty(), "Passed!" );
+	ok( a.isEmpty(), "Passed!" );
 
 	var a = new THREE.Box3( zero3.clone(), one3.clone() );
-	ok( ! a.empty(), "Passed!" );
+	ok( ! a.isEmpty(), "Passed!" );
 
 	a.makeEmpty();
-	ok( a.empty(), "Passed!" );
+	ok( a.isEmpty(), "Passed!" );
 });
 
 test( "center", function() {

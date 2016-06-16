@@ -50,14 +50,14 @@ THREE.Ray.prototype = {
 		this.direction.copy( v ).sub( this.origin ).normalize();
 
 		return this;
-		
+
 	},
 
 	recast: function () {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( t ) {
+		return function recast( t ) {
 
 			this.origin.copy( this.at( t, v1 ) );
 
@@ -93,7 +93,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceSqToPoint( point ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
@@ -119,9 +119,9 @@ THREE.Ray.prototype = {
 		var segDir = new THREE.Vector3();
 		var diff = new THREE.Vector3();
 
-		return function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-			// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
+			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
 			// It returns the min distance between the ray and the segment
 			// defined by v0 and v1
 			// It can also set two optional targets :
@@ -244,7 +244,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( sphere, optionalTarget ) {
+		return function intersectSphere( sphere, optionalTarget ) {
 
 			v1.subVectors( sphere.center, this.origin );
 			var tca = v1.dot( this.direction );
@@ -424,7 +424,7 @@ THREE.Ray.prototype = {
 
 		var v = new THREE.Vector3();
 
-		return function ( box ) {
+		return function intersectsBox( box ) {
 
 			return this.intersectBox( box, v ) !== null;
 
@@ -440,9 +440,9 @@ THREE.Ray.prototype = {
 		var edge2 = new THREE.Vector3();
 		var normal = new THREE.Vector3();
 
-		return function ( a, b, c, backfaceCulling, optionalTarget ) {
+		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 
-			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );

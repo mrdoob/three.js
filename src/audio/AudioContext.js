@@ -8,7 +8,7 @@ Object.defineProperty( THREE, 'AudioContext', {
 
 		var context;
 
-		return function () {
+		return function get() {
 
 			if ( context === undefined ) {
 

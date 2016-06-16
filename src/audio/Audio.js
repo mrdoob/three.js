@@ -103,6 +103,7 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.source.stop();
 		this.startTime = this.context.currentTime;
+		this.isPlaying = false;
 
 		return this;
 
@@ -119,6 +120,7 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 
 		this.source.stop();
 		this.startTime = 0;
+		this.isPlaying = false;
 
 		return this;
 

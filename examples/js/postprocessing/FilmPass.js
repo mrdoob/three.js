@@ -28,9 +28,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 };
 
-THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.FilmPass.prototype = {
+THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.FilmPass,
 
@@ -51,4 +49,4 @@ THREE.FilmPass.prototype = {
 
 	}
 
-};
+} );

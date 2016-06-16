@@ -72,7 +72,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -92,7 +92,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( object ) {
+		return function setFromObject( object ) {
 
 			var scope = this;
 
@@ -352,7 +352,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -365,7 +365,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( optionalTarget ) {
+		return function getBoundingSphere( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Sphere();
 
@@ -412,7 +412,7 @@ THREE.Box3.prototype = {
 			new THREE.Vector3()
 		];
 
-		return function ( matrix ) {
+		return function applyMatrix4( matrix ) {
 
 			// transform of empty box is an empty box.
 			if( this.isEmpty() ) return this;

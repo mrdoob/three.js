@@ -15,26 +15,25 @@ THREE.AudioAnalyser = function ( audio, fftSize ) {
 
 Object.assign( THREE.AudioAnalyser.prototype, {
 
-	getData: function () {
+	getFrequencyData: function () {
 
 		this.analyser.getByteFrequencyData( this.data );
+
 		return this.data;
 
 	},
 
-	getAverage: function() {
+	getAverageFrequency: function () {
 
-		var values = 0, data = this.getData();
+		var value = 0, data = this.getFrequencyData();
 
-		// get all the frequency amplitudes
+		for ( var i = 0; i < data.length; i ++ ) {
 
-		for (var i = 0; i < data.length; i++) {
-
-			values += data[ i ];
+			value += data[ i ];
 
 		}
 
-		return values / data.length;
+		return value / data.length;
 
 	}
 

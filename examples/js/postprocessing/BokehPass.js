@@ -61,9 +61,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
-THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.BokehPass.prototype = {
+THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.BokehPass,
 
@@ -89,4 +87,4 @@ THREE.BokehPass.prototype = {
 
 	}
 
-};
+} );

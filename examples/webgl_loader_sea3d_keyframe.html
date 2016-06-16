@@ -107,8 +107,8 @@
 
 				for(var i = 0; i < loader.meshes.length; i++) {
 
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.play(id, crossfade, offset);
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.play(id, crossfade, offset);
 
 				}
 
@@ -118,8 +118,8 @@
 
 				for(var i = 0; i < loader.meshes.length; i++) {
 
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.setTimeScale( timeScale );
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.setTimeScale( timeScale );
 
 				}
 
@@ -129,8 +129,8 @@
 
 				for(var i = 0; i < loader.meshes.length; i++) {
 
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.stop();
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.stop();
 
 				}
 
@@ -239,15 +239,15 @@
 
 						var fracture99 = loader.getMesh("Object099");
 
-						//fracture99.animation.setTimeScale( 1 );
-						//fracture99.animation.playing
-						//fracture99.animation.currentAnimation
-						//fracture99.animation.previousAnimation
+						//fracture99.animator.setTimeScale( 1 );
+						//fracture99.animator.playing
+						//fracture99.animator.currentAnimation
+						//fracture99.animator.previousAnimation
 
-						fracture99.animation.play("crash#2", .5, 0);
-						//fracture99.animation.stop();
-						//fracture99.animation.pause();
-						//fracture99.animation.resume();
+						fracture99.animator.play("crash#2", .5, 0);
+						//fracture99.animator.stop();
+						//fracture99.animator.pause();
+						//fracture99.animator.resume();
 
 						description("crash#2 in single object - crossfade 0.5 seconds");
 

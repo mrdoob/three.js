@@ -251,9 +251,9 @@
 
 				controls.update( delta );
 
-				material_sphere1.emissive.b = analyser1.getData()[ 8 ] / 256;
-				material_sphere2.emissive.b = analyser2.getData()[ 8 ] / 256;
-				material_sphere3.emissive.b = analyser3.getData()[ 8 ] / 256;
+				material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
+				material_sphere2.emissive.b = analyser2.getAverageFrequency() / 256;
+				material_sphere3.emissive.b = analyser3.getAverageFrequency() / 256;
 
 				renderer.render( scene, camera );
 

@@ -46,7 +46,7 @@ THREE.Loader.prototype = {
 
 		var color, textureLoader, materialLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin ) {
 
 			if ( color === undefined ) color = new THREE.Color();
 			if ( textureLoader === undefined ) textureLoader = new THREE.TextureLoader();
@@ -155,6 +155,7 @@ THREE.Loader.prototype = {
 					case 'shading':
 						if ( value.toLowerCase() === 'basic' ) json.type = 'MeshBasicMaterial';
 						if ( value.toLowerCase() === 'phong' ) json.type = 'MeshPhongMaterial';
+						if ( value.toLowerCase() === 'standard' ) json.type = 'MeshStandardMaterial';
 						break;
 					case 'mapDiffuse':
 						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
@@ -163,6 +164,14 @@ THREE.Loader.prototype = {
 					case 'mapDiffuseOffset':
 					case 'mapDiffuseWrap':
 					case 'mapDiffuseAnisotropy':
+						break;
+					case 'mapEmissive':
+						json.emissiveMap = loadTexture( value, m.mapEmissiveRepeat, m.mapEmissiveOffset, m.mapEmissiveWrap, m.mapEmissiveAnisotropy );
+						break;
+					case 'mapEmissiveRepeat':
+					case 'mapEmissiveOffset':
+					case 'mapEmissiveWrap':
+					case 'mapEmissiveAnisotropy':
 						break;
 					case 'mapLight':
 						json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
@@ -209,6 +218,22 @@ THREE.Loader.prototype = {
 					case 'mapSpecularOffset':
 					case 'mapSpecularWrap':
 					case 'mapSpecularAnisotropy':
+						break;
+					case 'mapMetalness':
+						json.metalnessMap = loadTexture( value, m.mapMetalnessRepeat, m.mapMetalnessOffset, m.mapMetalnessWrap, m.mapMetalnessAnisotropy );
+						break;
+					case 'mapMetalnessRepeat':
+					case 'mapMetalnessOffset':
+					case 'mapMetalnessWrap':
+					case 'mapMetalnessAnisotropy':
+						break;
+					case 'mapRoughness':
+						json.roughnessMap = loadTexture( value, m.mapRoughnessRepeat, m.mapRoughnessOffset, m.mapRoughnessWrap, m.mapRoughnessAnisotropy );
+						break;
+					case 'mapRoughnessRepeat':
+					case 'mapRoughnessOffset':
+					case 'mapRoughnessWrap':
+					case 'mapRoughnessAnisotropy':
 						break;
 					case 'mapAlpha':
 						json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );

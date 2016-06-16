@@ -76,7 +76,7 @@ THREE.PropertyBinding.prototype = {
 
 		}
 
-		if( objectName ) {
+		if ( objectName ) {
 
 			var objectIndex = parsedPath.objectIndex;
 
@@ -85,14 +85,14 @@ THREE.PropertyBinding.prototype = {
 
 				case 'materials':
 
-					if( ! targetObject.material ) {
+					if ( ! targetObject.material ) {
 
 						console.error( '  can not bind to material as node does not have a material', this );
 						return;
 
 					}
 
-					if( ! targetObject.material.materials ) {
+					if ( ! targetObject.material.materials ) {
 
 						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
 						return;
@@ -105,7 +105,7 @@ THREE.PropertyBinding.prototype = {
 
 				case 'bones':
 
-					if( ! targetObject.skeleton ) {
+					if ( ! targetObject.skeleton ) {
 
 						console.error( '  can not bind to bones as node does not have a skeleton', this );
 						return;
@@ -120,7 +120,7 @@ THREE.PropertyBinding.prototype = {
 					// support resolving morphTarget names into indices.
 					for ( var i = 0; i < targetObject.length; i ++ ) {
 
-						if ( targetObject[i].name === objectIndex ) {
+						if ( targetObject[ i ].name === objectIndex ) {
 
 							objectIndex = i;
 							break;
@@ -147,7 +147,7 @@ THREE.PropertyBinding.prototype = {
 
 			if ( objectIndex !== undefined ) {
 
-				if( targetObject[ objectIndex ] === undefined ) {
+				if ( targetObject[ objectIndex ] === undefined ) {
 
 					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
 					return;
@@ -163,7 +163,7 @@ THREE.PropertyBinding.prototype = {
 		// resolve property
 		var nodeProperty = targetObject[ propertyName ];
 
-		if ( ! nodeProperty ) {
+		if ( nodeProperty === undefined ) {
 
 			var nodeName = parsedPath.nodeName;
 
@@ -214,7 +214,7 @@ THREE.PropertyBinding.prototype = {
 
 				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 
-					if ( targetObject.geometry.morphTargets[i].name === propertyIndex ) {
+					if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
 
 						propertyIndex = i;
 						break;
@@ -544,27 +544,33 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	// created and tested via https://regex101.com/#javascript
 
 	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
-	var matches = re.exec(trackName);
+	var matches = re.exec( trackName );
 
-	if( ! matches ) {
+	if ( ! matches ) {
+
 		throw new Error( "cannot parse trackName at all: " + trackName );
+
 	}
 
-    if (matches.index === re.lastIndex) {
-        re.lastIndex++;
-    }
+	if ( matches.index === re.lastIndex ) {
+
+		re.lastIndex++;
+
+	}
 
 	var results = {
-		// directoryName: matches[1], // (tschw) currently unused
-		nodeName: matches[3], 	// allowed to be null, specified root node.
-		objectName: matches[5],
-		objectIndex: matches[7],
-		propertyName: matches[9],
-		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
+		// directoryName: matches[ 1 ], // (tschw) currently unused
+		nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
+		objectName: matches[ 5 ],
+		objectIndex: matches[ 7 ],
+		propertyName: matches[ 9 ],
+		propertyIndex: matches[ 11 ]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	if( results.propertyName === null || results.propertyName.length === 0 ) {
+	if ( results.propertyName === null || results.propertyName.length === 0 ) {
+
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
+
 	}
 
 	return results;
@@ -573,22 +579,22 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+	if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
 		return root;
 
 	}
 
 	// search into skeleton bones.
-	if( root.skeleton ) {
+	if ( root.skeleton ) {
 
 		var searchSkeleton = function( skeleton ) {
 
 			for( var i = 0; i < skeleton.bones.length; i ++ ) {
 
-				var bone = skeleton.bones[i];
+				var bone = skeleton.bones[ i ];
 
-				if( bone.name === nodeName ) {
+				if ( bone.name === nodeName ) {
 
 					return bone;
 
@@ -601,7 +607,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		var bone = searchSkeleton( root.skeleton );
 
-		if( bone ) {
+		if ( bone ) {
 
 			return bone;
 
@@ -609,15 +615,15 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 	}
 
 	// search into node subtree.
-	if( root.children ) {
+	if ( root.children ) {
 
 		var searchNodeSubtree = function( children ) {
 
 			for( var i = 0; i < children.length; i ++ ) {
 
-				var childNode = children[i];
+				var childNode = children[ i ];
 
-				if( childNode.name === nodeName || childNode.uuid === nodeName ) {
+				if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
 
 					return childNode;
 
@@ -625,7 +631,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 				var result = searchNodeSubtree( childNode.children );
 
-				if( result ) return result;
+				if ( result ) return result;
 
 			}
 
@@ -635,7 +641,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		var subTreeNode = searchNodeSubtree( root.children );
 
-		if( subTreeNode ) {
+		if ( subTreeNode ) {
 
 			return subTreeNode;
 

@@ -49,14 +49,15 @@ UI.Texture = function ( mapping ) {
 		if ( file.type.match( 'image.*' ) ) {
 
 			var reader = new FileReader();
-			reader.addEventListener( 'load', function ( event ) {
 
-				var image = document.createElement( 'img' );
-				image.addEventListener( 'load', function( event ) {
+			if ( file.type === 'image/targa' ) {
 
-					var texture = new THREE.Texture( this, mapping );
+				reader.addEventListener( 'load', function ( event ) {
+
+					var canvas = new THREE.TGALoader().parse( event.target.result );
+
+					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
-					texture.needsUpdate = true;
 
 					scope.setValue( texture );
 
@@ -64,11 +65,32 @@ UI.Texture = function ( mapping ) {
 
 				}, false );
 
-				image.src = event.target.result;
+				reader.readAsArrayBuffer( file );
 
-			}, false );
+			} else {
 
-			reader.readAsDataURL( file );
+				reader.addEventListener( 'load', function ( event ) {
+
+					var image = document.createElement( 'img' );
+					image.addEventListener( 'load', function( event ) {
+
+						var texture = new THREE.Texture( this, mapping );
+						texture.sourceFile = file.name;
+						texture.needsUpdate = true;
+
+						scope.setValue( texture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+					}, false );
+
+					image.src = event.target.result;
+
+				}, false );
+
+				reader.readAsDataURL( file );
+
+			}
 
 		}
 
@@ -334,21 +356,15 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = options[ i ];
-
-		var div = document.createElement( 'div' );
+		var div = options[ i ];
 		div.className = 'option';
-		div.innerHTML = option.html;
-		div.value = option.value;
 		scope.dom.appendChild( div );
 
 		scope.options.push( div );
 
 		div.addEventListener( 'click', onClick, false );
 
-		if ( option.static !== true ) {
-
-			div.draggable = true;
+		if ( div.draggable === true ) {
 
 			div.addEventListener( 'drag', onDrag, false );
 			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this

@@ -10,7 +10,7 @@
 *
 */
 
-THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
+THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	THREE.Pass.call( this );
 
@@ -18,38 +18,31 @@ THREE.ManualMSAARenderPass = function ( scene, camera, params ) {
 	this.camera = camera;
 
 	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+	this.unbiased = true;
 
-	this.params = params || { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-	this.params.minFilter = THREE.NearestFilter;
-	this.params.maxFilter = THREE.NearestFilter;
+	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
+	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
+	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
-	if ( THREE.CompositeShader === undefined ) {
+	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
-		console.error( "THREE.ManualMSAARenderPass relies on THREE.CompositeShader" );
-
-	}
-
-	var compositeShader = THREE.CompositeShader;
-	this.compositeUniforms = THREE.UniformsUtils.clone( compositeShader.uniforms );
-
-	this.compositeMaterial = new THREE.ShaderMaterial(	{
-
-		uniforms: this.compositeUniforms,
-		vertexShader: compositeShader.vertexShader,
-		fragmentShader: compositeShader.fragmentShader,
+	var copyShader = THREE.CopyShader;
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyMaterial = new THREE.ShaderMaterial( {
+		uniforms: this.copyUniforms,
+		vertexShader: copyShader.vertexShader,
+		fragmentShader: copyShader.fragmentShader,
 		premultipliedAlpha: true,
 		transparent: true,
 		blending: THREE.AdditiveBlending,
 		depthTest: false,
 		depthWrite: false
-
 	} );
+
 
 };
 
-THREE.ManualMSAARenderPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.ManualMSAARenderPass.prototype = {
+THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.ManualMSAARenderPass,
 
@@ -64,54 +57,73 @@ THREE.ManualMSAARenderPass.prototype = {
 
 	},
 
-
 	setSize: function ( width, height ) {
 
-		if ( this.sampleRenderTarget ) { this.sampleRenderTarget.setSize( width, height ); }
+		if ( this.sampleRenderTarget )	this.sampleRenderTarget.setSize( width, height );
 
 	},
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		var camera = ( this.camera || this.scene.camera );
-		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
-
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height,
+				{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
 
 		}
+
+		var jitterOffsets = THREE.ManualMSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.compositeUniforms[ "scale" ].value = 1.0 / jitterOffsets.length;
-		this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
+		var oldClearColor = renderer.getClearColor().getHex();
+		var oldClearAlpha = renderer.getClearAlpha();
+
+		var baseSampleWeight = 1.0 / jitterOffsets.length;
+		var roundingRange = 1 / 32;
+		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+
+		var width = readBuffer.width, height = readBuffer.height;
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
 
-			// only jitters perspective cameras.	TODO: add support for jittering orthogonal cameras
 			var jitterOffset = jitterOffsets[i];
-			if ( camera.setViewOffset ) {
-				camera.setViewOffset( readBuffer.width, readBuffer.height,
+			if ( this.camera.setViewOffset ) {
+				this.camera.setViewOffset( width, height,
 					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
-					readBuffer.width, readBuffer.height );
+					width, height );
 			}
 
-			renderer.render( this.scene, camera, this.sampleRenderTarget, true );
-			renderer.renderPass( this.compositeMaterial, writeBuffer, (i === 0) );
+			var sampleWeight = baseSampleWeight;
+			if( this.unbiased ) {
+				// the theory is that equal weights for each sample lead to an accumulation of rounding errors.
+				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
+				// across a range of values whose rounding errors cancel each other out.
+				var uniformCenteredDistribution = ( -0.5 + ( i + 0.5 ) / jitterOffsets.length );
+				sampleWeight += roundingRange * uniformCenteredDistribution;
+			}
+
+			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
+			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
+			if (i === 0) {
+				renderer.setClearColor( 0x000000, 0.0 );
+			}
+			renderer.renderPass( this.copyMaterial, this.renderToScreen ? null : writeBuffer, (i === 0) );
 
 		}
 
-		// reset jitter to nothing.	TODO: add support for orthogonal cameras
-		if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
+		renderer.setClearColor( oldClearColor, oldClearAlpha );
 
 	}
 
-};
+} );
+
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
