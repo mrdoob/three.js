@@ -196,7 +196,6 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 		}
 		//Put something in the adaptive luminance texture so that the scene can render initially
-		this.quad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;
