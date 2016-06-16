@@ -381,6 +381,16 @@ THREE.Color.prototype = {
 
 	},
 
+	sub: function( color ) {
+
+		this.r = Math.max( 0, this.r - color.r );
+		this.g = Math.max( 0, this.g - color.g );
+		this.b = Math.max( 0, this.b - color.b );
+
+		return this;
+
+	},
+
 	add: function ( color ) {
 
 		this.r += color.r;
