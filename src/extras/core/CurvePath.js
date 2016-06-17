@@ -162,7 +162,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
-			var curve = curves[i];
+			var curve = curves[ i ];
 			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
 
 			for ( var j = 0; j < pts.length; j++ ) {
