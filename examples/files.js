@@ -190,6 +190,7 @@ var files = {
 		"webgl_points_sprites",
 		"webgl_postprocessing",
 		"webgl_postprocessing_advanced",
+		"webgl_postprocessing_backgrounds",
 		"webgl_postprocessing_crossfade",
 		"webgl_postprocessing_dof",
 		"webgl_postprocessing_dof2",
