@@ -155,6 +155,7 @@ var files = {
 		"webgl_materials_wireframe",
 		"webgl_mirror",
 		"webgl_mirror_nodes",
+		"webgl_modifier_simplifier",
 		"webgl_modifier_subdivision",
 		"webgl_modifier_tessellation",
 		"webgl_morphnormals",
