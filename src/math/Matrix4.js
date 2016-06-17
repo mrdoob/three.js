@@ -116,7 +116,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function ( m ) {
+		return function extractRotation( m ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -314,7 +314,7 @@ THREE.Matrix4.prototype = {
 
 		var x, y, z;
 
-		return function ( eye, target, up ) {
+		return function lookAt( eye, target, up ) {
 
 			if ( x === undefined ) {
 
@@ -447,7 +447,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToVector3Array( array, offset, length ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;
@@ -575,7 +575,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function () {
+		return function getPosition() {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
@@ -804,7 +804,7 @@ THREE.Matrix4.prototype = {
 
 		var vector, matrix;
 
-		return function ( position, quaternion, scale ) {
+		return function decompose( position, quaternion, scale ) {
 
 			if ( vector === undefined ) {
 

@@ -8,8 +8,6 @@
 
 #else
 
-#include <normal_flip>
-
 	vec3 normal = normalize( vNormal ) * flipNormal;
 
 #endif

@@ -341,8 +341,8 @@
 				var material = new THREE.ShaderMaterial( {
 					uniforms: THREE.UniformsUtils.merge( [
 						THREE.ShaderLib[ 'phong' ].uniforms,
-					    {
-							heightmap: { value: null },
+						{
+							heightmap: { value: null }
 						}
 					] ),
 					vertexShader: document.getElementById( 'waterVertexShader' ).textContent,
@@ -437,7 +437,7 @@
 						var x = i * 128 / WIDTH;
 						var y = j * 128 / WIDTH;
 
-					        pixels[ p + 0 ] = noise( x, y, 0 );
+					        pixels[ p + 0 ] = noise( x, y, 123.4 );
 						pixels[ p + 1 ] = 0;
 						pixels[ p + 2 ] = 0;
 						pixels[ p + 3 ] = 1;
@@ -480,7 +480,7 @@
 
 			function setMouseCoords( x, y ) {
 
-				mouseCoords.set( ( x / renderer.domElement.width ) * 2 - 1, - ( y / renderer.domElement.height ) * 2 + 1 );
+				mouseCoords.set( ( x / renderer.domElement.clientWidth ) * 2 - 1, - ( y / renderer.domElement.clientHeight ) * 2 + 1 );
 				mouseMoved = true;
 
 			}

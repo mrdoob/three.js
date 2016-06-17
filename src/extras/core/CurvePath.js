@@ -28,8 +28,6 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	closePath: function () {
 
-		// TODO Test
-		// and verify for vector3 (needs to implement equals)
 		// Add a line curve if start and end of lines are not connected
 		var startPoint = this.curves[ 0 ].getPoint( 0 );
 		var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
@@ -66,7 +64,8 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 				var diff = curveLengths[ i ] - d;
 				var curve = this.curves[ i ];
 
-				var u = 1 - diff / curve.getLength();
+				var segmentLength = curve.getLength();
+				var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
 
 				return curve.getPointAt( u );
 
@@ -130,6 +129,66 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 		this.cacheLengths = lengths;
 
 		return lengths;
+
+	},
+
+	getSpacedPoints: function ( divisions ) {
+
+		if ( ! divisions ) divisions = 40;
+
+		var points = [];
+
+		for ( var i = 0; i <= divisions; i ++ ) {
+
+			points.push( this.getPoint( i / divisions ) );
+
+		}
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	getPoints: function ( divisions ) {
+
+		divisions = divisions || 12;
+
+		var points = [], tmp, last, curve;
+
+		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
+
+			curve = curves[i];
+			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
+
+			for ( var j = 0; j < pts.length; j++ ) {
+
+				var tmp = pts[ j ];
+				if ( last && last.equals( tmp ) ) continue; // ensures no consecutive points are duplicates
+				points.push( tmp );
+				last = tmp;
+
+			}
+
+		}
+
+		if ( points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+
+			points.pop();
+
+		}
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
 
 	},
 

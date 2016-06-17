@@ -346,6 +346,7 @@ THREE.PLYLoader.prototype = {
 			} else if ( elementName === "face" ) {
 
 				var vertex_indices = element.vertex_indices;
+				var texcoord = element.texcoord;
 
 				if ( vertex_indices.length === 3 ) {
 
@@ -353,12 +354,32 @@ THREE.PLYLoader.prototype = {
 						new THREE.Face3( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] )
 					);
 
+					if ( texcoord ) {
+						geometry.faceVertexUvs[ 0 ].push( [
+							new THREE.Vector2( texcoord[ 0 ], texcoord[ 1 ]),
+							new THREE.Vector2( texcoord[ 2 ], texcoord[ 3 ]),
+							new THREE.Vector2( texcoord[ 4 ], texcoord[ 5 ])
+						] );
+					}
+
 				} else if ( vertex_indices.length === 4 ) {
 
 					geometry.faces.push(
 						new THREE.Face3( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 3 ] ),
 						new THREE.Face3( vertex_indices[ 1 ], vertex_indices[ 2 ], vertex_indices[ 3 ] )
 					);
+
+					if ( texcoord ) {
+						geometry.faceVertexUvs[ 0 ].push( [
+							new THREE.Vector2( texcoord[ 0 ], texcoord[ 1 ]),
+							new THREE.Vector2( texcoord[ 2 ], texcoord[ 3 ]),
+							new THREE.Vector2( texcoord[ 6 ], texcoord[ 7 ])
+						], [
+							new THREE.Vector2( texcoord[ 2 ], texcoord[ 3 ]),
+							new THREE.Vector2( texcoord[ 4 ], texcoord[ 5 ]),
+							new THREE.Vector2( texcoord[ 6 ], texcoord[ 7 ])
+						] );
+					}
 
 				}
 
