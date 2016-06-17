@@ -1848,7 +1848,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshStandardMaterial ||
-				 material instanceof THREE.MeshDepthMaterial ) {
+				 material instanceof THREE.MeshDepthMaterial ||
+				 material instanceof THREE.MeshCubeMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
 
@@ -1868,6 +1869,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.PointsMaterial ) {
 
 				refreshUniformsPoints( m_uniforms, material );
+
+			} else if ( material instanceof THREE.MeshCubeMaterial ) {
+
+				refreshUniformsCube( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -2030,6 +2035,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
+
+	}
+
+	function refreshUniformsCube ( uniforms, material ) {
+
+		uniforms.roughness.value = material.roughness;
+		uniforms.opacity.value = material.opacity;
+		uniforms.envMapIntensity.value = material.envMapIntensity;
 
 	}
 

@@ -38,9 +38,16 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
+
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+
 		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
+
 		<script src="js/postprocessing/ClearPass.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/TexturePass.js"></script>
@@ -54,20 +61,25 @@
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
+			var rgbmCubeRenderTarget, ldrCubeTexture;
+
 			//var cameraO, cubeTexturePassO;
 			var gui, stats, texture;
 
 			var params = {
 
-				clearPass: true,
+				clear: true,
 				clearColor: 'white',
 				clearAlpha: 1.0,
 
-				texturePass: true,
-				texturePassOpacity: 1.0,
+				texture: true,
+				textureOpacity: 1.0,
 
-				cubeTexturePass: true,
-				cubeTexturePassOpacity: 1.0,
+				cubeTexture: true,
+				cubeTextureOpacity: 1.0,
+				cubeTextureEnvMap: 'pisaLDR',
+				cubeTextureEnvMapIntensity: 1.0,
+				cubeTextureRoughness: 0.2,
 
 				renderPass: true,
 
@@ -88,15 +100,18 @@
 
 				gui = new dat.GUI();
 
-				gui.add( params, "clearPass" );
+				gui.add( params, "clear" );
 				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
 				gui.add( params, "clearAlpha", 0, 1 );		
 
-				gui.add( params, "texturePass" );
-				gui.add( params, "texturePassOpacity", 0, 1 );		
+				gui.add( params, "texture" );
+				gui.add( params, "textureOpacity", 0, 1 );		
 
-				gui.add( params, "cubeTexturePass" );
-				gui.add( params, "cubeTexturePassOpacity", 0, 1 );		
+				gui.add( params, "cubeTexture" );
+				gui.add( params, "cubeTextureOpacity", 0, 1 );		
+				gui.add( params, "cubeTextureEnvMap", [ 'pisaLDR', 'pisaRGBM16' ] );		
+				gui.add( params, "cubeTextureEnvMapIntensity", 0, 10 );		
+				gui.add( params, "cubeTextureRoughness", 0, 1 );		
 	
 				gui.add( params, "renderPass" );
 			
@@ -198,10 +213,26 @@
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
-				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
-					cubeTexturePassP.envMap = ldrCubeMap;
-					console.log( "loaded envmap");
+				new THREE.CubeTextureLoader().load( ldrUrls, function ( cubeTexture ) {
+
+					ldrCubeTexture = cubeTexture;
+
 				});
+
+				var rgbmUrls = genCubeUrls( "./textures/cube/pisaRGBM16/", ".png" );
+				new THREE.CubeTextureLoader().load( rgbmUrls, function ( cubeTexture ) {
+
+					cubeTexture.encoding = THREE.RGBM16Encoding;
+
+					var pmremGenerator = new THREE.PMREMGenerator( cubeTexture );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+				} );
 
 				renderPass = new THREE.RenderPass( scene, cameraP );
 				renderPass.clear = false;
@@ -260,15 +291,24 @@
 					case 'black': newColor = 0x000000; break;
 				}
 	
-				clearPass.enabled = params.clearPass;
+				clearPass.enabled = params.clear;
 				clearPass.clearColor = newColor;
 				clearPass.clearAlpha = params.clearAlpha;
 
-				texturePass.enabled = params.texturePass;
-				texturePass.opacity = params.texturePassOpacity;
+				texturePass.enabled = params.texture;
+				texturePass.opacity = params.textureOpacity;
 
-				cubeTexturePassP.enabled = params.cubeTexturePass;
-				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				var newEnvMap = cubeTexturePassP.envMap;
+				switch( params.cubeTextureEnvMap ) {
+					case 'pisaLDR': newEnvMap = ldrCubeTexture; break;
+					case 'pisaRGBM16': newEnvMap = ( rgbmCubeRenderTarget ) ? rgbmCubeRenderTarget.texture : null; break;
+				}
+				console.log('newEnvMap', newEnvMap );
+				cubeTexturePassP.enabled = params.cubeTexture;
+				cubeTexturePassP.opacity = params.cubeTextureOpacity;
+				cubeTexturePassP.envMap = newEnvMap;
+				cubeTexturePassP.envMapIntensity = params.cubeTextureEnvMapIntensity;
+				cubeTexturePassP.roughness = params.cubeTextureRoughness;
 
 				renderPass.enabled = params.renderPass;
 

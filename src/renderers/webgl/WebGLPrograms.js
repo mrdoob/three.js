@@ -10,6 +10,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		MeshPhongMaterial: 'phong',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical',
+		MeshCubeMaterial: 'cube',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points'
@@ -190,6 +191,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
 
 		};
+		console.log( parameters );
 
 		return parameters;
 

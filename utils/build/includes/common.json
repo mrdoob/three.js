@@ -94,6 +94,7 @@
 	"src/materials/MeshBasicMaterial.js",
 	"src/materials/MeshDepthMaterial.js",
 	"src/materials/MeshLambertMaterial.js",
+	"src/materials/MeshCubeMaterial.js",
 	"src/materials/MeshNormalMaterial.js",
 	"src/materials/MeshPhongMaterial.js",
 	"src/materials/MeshStandardMaterial.js",

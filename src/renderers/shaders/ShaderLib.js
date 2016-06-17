@@ -170,11 +170,17 @@ THREE.ShaderLib = {
 
 	'cube': {
 
-		uniforms: {
-			"tCube": { value: null },
-			"tFlip": { value: - 1 },
-			"opacity": { value: 1.0 }
-		},
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ 'common' ],
+	
+			{
+				"envMap": { value: null },
+				"envMapIntensity": { value: 1.0 },
+				"tFlip": { value: - 1 },
+				"opacity": { value: 1.0 },
+				"roughness": { value: 0.0 },
+			}
+		]),
 
 		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],
 		fragmentShader: THREE.ShaderChunk[ 'cube_frag' ]
