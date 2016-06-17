@@ -34722,15 +34722,15 @@ THREE.Curve.prototype = {
 
 		if ( ! divisions ) divisions = 5;
 
-		var d, pts = [];
+		var points = [];
 
-		for ( d = 0; d <= divisions; d ++ ) {
+		for ( var d = 0; d <= divisions; d ++ ) {
 
-			pts.push( this.getPoint( d / divisions ) );
+			points.push( this.getPoint( d / divisions ) );
 
 		}
 
-		return pts;
+		return points;
 
 	},
 
@@ -34740,15 +34740,15 @@ THREE.Curve.prototype = {
 
 		if ( ! divisions ) divisions = 5;
 
-		var d, pts = [];
+		var points = [];
 
-		for ( d = 0; d <= divisions; d ++ ) {
+		for ( var d = 0; d <= divisions; d ++ ) {
 
-			pts.push( this.getPointAt( d / divisions ) );
+			points.push( this.getPointAt( d / divisions ) );
 
 		}
 
-		return pts;
+		return points;
 
 	},
 
@@ -35104,7 +35104,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
-			var curve = curves[i];
+			var curve = curves[ i ];
 			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
 
 			for ( var j = 0; j < pts.length; j++ ) {
