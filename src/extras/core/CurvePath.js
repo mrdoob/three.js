@@ -158,19 +158,21 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		divisions = divisions || 12;
 
-		var points = [], tmp, last, curve;
+		var points = [], last;
 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
-			curve = curves[i];
+			var curve = curves[i];
 			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
 
 			for ( var j = 0; j < pts.length; j++ ) {
 
-				var tmp = pts[ j ];
-				if ( last && last.equals( tmp ) ) continue; // ensures no consecutive points are duplicates
-				points.push( tmp );
-				last = tmp;
+				var point = pts[ j ];
+
+				if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+
+				points.push( point );
+				last = point;
 
 			}
 
