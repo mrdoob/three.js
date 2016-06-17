@@ -194,7 +194,7 @@
 					texturePass.map = map;
 				});
 
-				cubeTexturePassP = new THREE.CubeTexturePass( scene, cameraP );
+				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );

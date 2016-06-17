@@ -2,11 +2,10 @@
  * @author bhouston / http://clara.io/
  */
 
-THREE.CubeTexturePass = function ( scene, camera, envMap, opacity ) {
+THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	THREE.Pass.call( this );
 
-	this.scene = scene;
 	this.camera = camera;
 
 	this.needsSwap = false;
