@@ -144,9 +144,9 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 		function checkBufferGeometryIntersection( object, raycaster, ray, positions, uvs, a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+			vA.fromArray( positions.array, a * positions.stride + positions.offset );
+			vB.fromArray( positions.array, b * positions.stride + positions.offset );
+			vC.fromArray( positions.array, c * positions.stride + positions.offset );
 
 			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
@@ -154,9 +154,9 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 				if ( uvs ) {
 
-					uvA.fromArray( uvs, a * 2 );
-					uvB.fromArray( uvs, b * 2 );
-					uvC.fromArray( uvs, c * 2 );
+					uvA.fromArray( uvs.array, a * uvs.stride + uvs.offset );
+					uvB.fromArray( uvs.array, b * uvs.stride + uvs.offset );
+					uvC.fromArray( uvs.array, c * uvs.stride + uvs.offset );
 
 					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
 
@@ -208,11 +208,43 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 				var a, b, c;
 				var index = geometry.index;
 				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
+				var positions;
+				if ( attributes.position instanceof THREE.InterleavedBufferAttribute ) {
+
+					positions = {
+						array: attributes.position.data.array,
+						offset: attributes.position.offset,
+						stride: attributes.position.data.stride
+					};
+
+				} else {
+
+					positions = {
+						array: attributes.position.array,
+						offset: 0,
+						stride: 3
+					};
+
+				}
 
 				if ( attributes.uv !== undefined ) {
 
-					uvs = attributes.uv.array;
+					if ( attributes.uv instanceof THREE.InterleavedBufferAttribute ) {
+
+						uvs = {
+							array: attributes.uv.data.array,
+							offset: attributes.uv.offset,
+							stride: attributes.uv.data.stride
+						};
+
+					} else {
+
+						uvs = {
+							array: attributes.uv.array,
+							offset: 0,
+							stride: 2
+						};
+					}
 
 				}
 
@@ -240,9 +272,9 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 				} else {
 
 
-					for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+					for ( var i = 0, l = positions.array.length / positions.stride; i < l; i += 3 ) {
 
-						a = i / 3;
+						a = i;
 						b = a + 1;
 						c = a + 2;
 
