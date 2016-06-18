@@ -156,3 +156,25 @@ textarea, input { outline: none; } /* osx */
 .MeshPhongMaterial {
 	color: #ffaa88;
 }
+
+#opensim_toolbar {
+    background-color: #111;
+    float: left;
+    height: 100px;
+}
+
+#opensim_toolbar span{
+    color: white;
+}
+
+#opensim_toolbar button {
+    margin: 3px;
+}
+#opensim_toolbar button img {
+        width: 25px;
+        height: 25px;
+    }
+
+#opensim_toolbar .text {
+    margin-left: 10px;
+}
