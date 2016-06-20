@@ -385,7 +385,7 @@ def generate_material_object(material):
         }
 
     else:
-        print "Unknown type of Material", getMaterialName(material)
+        print ("Unknown type of Material"), getMaterialName(material)
 
     # default to Lambert Material if the current Material type cannot be handeled
     if not material_type:
@@ -2063,7 +2063,7 @@ def copy_textures(textures):
             shutil.copyfile(url, saveFilename)
             texture_dict[url] = True
         except IOError as e:
-            print "I/O error({0}): {1} {2}".format(e.errno, e.strerror, url)
+            print ("I/O error({0}): {1} {2}").format(e.errno, e.strerror, url)
 
 def findFilesWithExt(directory, ext, include_path = True):
     ext = ext.lower()
