@@ -1627,30 +1627,30 @@ THREE.SEA3D.prototype.readContainer3D = function( sea ) {
 
 THREE.SEA3D.prototype.readSprite = function( sea ) {
 
-	var material;
+	var mat;
 
 	if ( sea.material ) {
 
 		if ( ! sea.material.tag.sprite ) {
 
-			material = sea.material.tag.sprite = new THREE.SpriteMaterial();
+			mat = sea.material.tag.sprite = new THREE.SpriteMaterial();
 
-			this.setBlending( material, sea.blendMode );
+			this.setBlending( mat, sea.blendMode );
 
-			material.map = sea.material.tag.map;
-			material.map.flipY = true;
+			mat.map = sea.material.tag.map;
+			mat.map.flipY = true;
 
-			material.color.set( sea.material.tag.color );
-			material.opacity = sea.material.tag.opacity;
-			material.blending = sea.material.tag.blending;
-			material.fog = sea.material.receiveFog;
+			mat.color.set( sea.material.tag.color );
+			mat.opacity = sea.material.tag.opacity;
+			mat.blending = sea.material.tag.blending;
+			mat.fog = sea.material.receiveFog;
 
 		}
-		else material = sea.material.tag.sprite;
+		else mat = sea.material.tag.sprite;
 
 	}
 
-	var sprite = new THREE.Sprite( material );
+	var sprite = new THREE.Sprite( mat );
 	sprite.name = sea.name;
 
 	this.domain.sprites = this.sprites = this.sprites || [];
@@ -2193,7 +2193,7 @@ THREE.SEA3D.prototype.createMaterial = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.setBlending = function( material, blendMode ) {
+THREE.SEA3D.prototype.setBlending = function( mat, blendMode ) {
 
 	if ( blendMode == "normal" ) return;
 
