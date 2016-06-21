@@ -1,11 +1,34 @@
 <html>
 	<head>
+	  <title>three.js webgl - BVHLoader</title>
 		<style>
-			body { margin: 0; }
-			canvas { width: 100%; height: 100% }
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+				color: #000000;
+			}
+}
 		</style>
+
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - BVH Loader
+		</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/BVHLoader.js"></script>
@@ -13,34 +36,29 @@
 
 			var clock = new THREE.Clock();
 
-			var mixer;
-			var skeletonHelper;
-			var camera, controls, scene, renderer;
+			var mixer, skeletonHelper, camera, controls, scene, renderer;
 
 			var mesh;
+			
+			init();
+			animate();
 
 			var loader = new THREE.BVHLoader();
 			loader.load( "models/bvh/pirouette.bvh", ( result ) => {
 
-					// create an empty geometry/mesh to hold the bones
-					var geometry = new THREE.Geometry(); 
-					var material = new THREE.MeshBasicMaterial( { skinning: true } );
-					mesh = new THREE.SkinnedMesh( geometry, material );
-					mesh.add( result.skeleton.bones[0] );
-					mesh.bind( result.skeleton );
-	
-					skeletonHelper = new THREE.SkeletonHelper( mesh );
+					skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+					skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+
+					var boneContainer = new THREE.Object3D();
+					boneContainer.add( result.skeleton.bones[ 0 ] );
 
 					scene.add( skeletonHelper );
-					scene.add( mesh );
+					scene.add( boneContainer );
 	
 					// play animation
-					mixer = new THREE.AnimationMixer( mesh );
+					mixer = new THREE.AnimationMixer( skeletonHelper );
 					mixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play()
 			} );
-			
-			init();
-			animate();
 
 			function init() {
 
@@ -48,7 +66,7 @@
 
 				controls = new THREE.TrackballControls( camera );
 
-				controls.rotateSpeed = 2.5;
+				controls.rotateSpeed = 4.5;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
 
@@ -83,18 +101,18 @@
 
 			function animate() {
 
-				requestAnimationFrame(animate);
+				requestAnimationFrame( animate );
 				controls.update();
 
 				var delta = clock.getDelta();
 
-				if (mixer)
-					mixer.update(delta);
+				if ( mixer )
+					mixer.update( delta );
 
-				if (skeletonHelper)
+				if ( skeletonHelper )
 					skeletonHelper.update();
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 			}
 
 
