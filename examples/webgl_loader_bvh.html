@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/BVHLoader.js"></script>
+		<script>
+
+			var clock = new THREE.Clock();
+
+			var mixer;
+			var skeletonHelper;
+			var camera, controls, scene, renderer;
+
+			var mesh;
+
+			var loader = new THREE.BVHLoader();
+			loader.load( "models/bvh/pirouette.bvh", ( result ) => {
+
+					// create an empty geometry/mesh to hold the bones
+					var geometry = new THREE.Geometry(); 
+					var material = new THREE.MeshBasicMaterial( { skinning: true } );
+					mesh = new THREE.SkinnedMesh( geometry, material );
+					mesh.add( result.skeleton.bones[0] );
+					mesh.bind( result.skeleton );
+	
+					skeletonHelper = new THREE.SkeletonHelper( mesh );
+
+					scene.add( skeletonHelper );
+					scene.add( mesh );
+	
+					// play animation
+					mixer = new THREE.AnimationMixer( mesh );
+					mixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play()
+			} );
+			
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				controls = new THREE.TrackballControls( camera );
+
+				controls.rotateSpeed = 2.5;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
+
+				camera.position.z = 600;
+				camera.position.y = 200;
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xeeeeee );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+			}
+
+			function animate() {
+
+				requestAnimationFrame(animate);
+				controls.update();
+
+				var delta = clock.getDelta();
+
+				if (mixer)
+					mixer.update(delta);
+
+				if (skeletonHelper)
+					skeletonHelper.update();
+
+				renderer.render(scene, camera);
+			}
+
+
+		</script>
+	</body>
+</html>
