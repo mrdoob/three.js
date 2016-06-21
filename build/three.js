@@ -9925,8 +9925,8 @@ THREE.Geometry = function () {
 
 	// update flags
 
-	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
+	this.verticesNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
@@ -11718,18 +11718,19 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			var direct = geometry.__directGeometry;
 
-			if ( direct === undefined ) {
+			if ( direct === undefined || geometry.elementsNeedUpdate === true ) {
 
 				return this.fromGeometry( geometry );
 
 			}
 
-			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
-			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
-			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
-			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
+			direct.verticesNeedUpdate = geometry.verticesNeedUpdate || geometry.elementsNeedUpdate;
+			direct.normalsNeedUpdate = geometry.normalsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.colorsNeedUpdate = geometry.colorsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.uvsNeedUpdate = geometry.uvsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate || geometry.elementsNeedUpdate;
 
+			geometry.elementsNeedUpdate = false;
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
@@ -11740,9 +11741,11 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
+		var attribute;
+
 		if ( geometry.verticesNeedUpdate === true ) {
 
-			var attribute = this.attributes.position;
+			attribute = this.attributes.position;
 
 			if ( attribute !== undefined ) {
 
@@ -11757,7 +11760,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.normalsNeedUpdate === true ) {
 
-			var attribute = this.attributes.normal;
+			attribute = this.attributes.normal;
 
 			if ( attribute !== undefined ) {
 
@@ -11772,7 +11775,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.colorsNeedUpdate === true ) {
 
-			var attribute = this.attributes.color;
+			attribute = this.attributes.color;
 
 			if ( attribute !== undefined ) {
 
@@ -11787,7 +11790,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.uvsNeedUpdate ) {
 
-			var attribute = this.attributes.uv;
+			attribute = this.attributes.uv;
 
 			if ( attribute !== undefined ) {
 
@@ -11802,7 +11805,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.lineDistancesNeedUpdate ) {
 
-			var attribute = this.attributes.lineDistance;
+			attribute = this.attributes.lineDistance;
 
 			if ( attribute !== undefined ) {
 
@@ -24429,7 +24432,7 @@ THREE.UniformsLib = {
 
 // File:src/renderers/shaders/ShaderLib/cube_frag.glsl
 
-THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n	#include <logdepthbuf_fragment>\n}\n";
+THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n	gl_FragColor.a *= opacity;\n	#include <logdepthbuf_fragment>\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/cube_vert.glsl
 
@@ -24699,7 +24702,8 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tCube": { value: null },
-			"tFlip": { value: - 1 }
+			"tFlip": { value: - 1 },
+			"opacity": { value: 1.0 }
 		},
 
 		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],
