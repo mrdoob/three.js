@@ -139,10 +139,14 @@ THREE.BVHLoader.prototype._readFrameData = function( data, frameTime, bone ) {
 	var keyframe = {
 		time: frameTime,
 		position: { x: 0, y: 0, z: 0 },
-		rotation: new THREE.BVHLoader.Quat(),
+		rotation: new THREE.Quaternion(),
 	};
 
 	bone.frames.push( keyframe );
+
+	var vx = new THREE.Vector3( 1, 0, 0 );
+	var vy = new THREE.Vector3( 0, 1, 0 );
+	var vz = new THREE.Vector3( 0, 0, 1 );
 
 	// parse values for each channel in node
 	for ( var i = 0; i < bone.channels.length; ++ i ) {
@@ -159,20 +163,20 @@ THREE.BVHLoader.prototype._readFrameData = function( data, frameTime, bone ) {
 			keyframe.position.z = parseFloat( data.shift().trim() );
 			break;
 		case "Xrotation":
-			var quat = new THREE.BVHLoader.Quat();
-			quat.setFromAxisAngle( 1, 0, 0, parseFloat( data.shift().trim() ) * Math.PI / 180 );
+			var quat = new THREE.Quaternion();
+			quat.setFromAxisAngle( vx, parseFloat( data.shift().trim() ) * Math.PI / 180 );
 
 			keyframe.rotation.multiply( quat );
 			break;
 		case "Yrotation":
-			var quat = new THREE.BVHLoader.Quat();
-			quat.setFromAxisAngle( 0, 1, 0, parseFloat( data.shift().trim() ) * Math.PI / 180 );
+			var quat = new THREE.Quaternion();
+			quat.setFromAxisAngle( vy, parseFloat( data.shift().trim() ) * Math.PI / 180 );
 
 			keyframe.rotation.multiply( quat );
 			break;
 		case "Zrotation":
-			var quat = new THREE.BVHLoader.Quat();
-			quat.setFromAxisAngle( 0, 0, 1, parseFloat( data.shift().trim() ) * Math.PI / 180 );
+			var quat = new THREE.Quaternion();
+			quat.setFromAxisAngle( vz, parseFloat( data.shift().trim() ) * Math.PI / 180 );
 
 			keyframe.rotation.multiply( quat );
 			break;
@@ -399,43 +403,3 @@ THREE.BVHLoader.prototype._nextLine = function( lines ) {
 	return line;
 
 }
-
-/*
- a minimal quaternion implementation to store joint rotations
- used in keyframe data
-*/
-THREE.BVHLoader.Quat = function( x, y, z, w ) {
-
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.w = ( w === undefined ) ? 1 : w;
-
-}
-
-THREE.BVHLoader.Quat.prototype.setFromAxisAngle = function( ax, ay, az, angle ) {
-
-	var angleHalf = angle * 0.5;
-	var sin = Math.sin( angleHalf );
-
-	this.x = ax * sin;
-	this.y = ay * sin;
-	this.z = az * sin;
-	this.w = Math.cos( angleHalf );
-
-}
-
-THREE.BVHLoader.Quat.prototype.multiply = function( quat ) {
-
-	var a = this, b = quat;
-
-	var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
-	var qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
-
-	this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
-	this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
-	this.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
-	this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
-
-}
-
