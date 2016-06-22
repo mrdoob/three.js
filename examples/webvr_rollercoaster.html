@@ -103,13 +103,13 @@
 
 					getPointAt: function ( t ) {
 
-						t = t * PI2;
+						t *= Math.PI;
 
-						var x = Math.sin( t * 3 ) * Math.cos( t * 4 ) * 50;
-						var y = Math.cos( t * 8 ) * 4 + Math.cos( t * 17 ) + 5;
-						var z = Math.sin( t ) * Math.sin( t * 4 ) * 50;
+						var x = Math.sin(t * 4) * Math.cos(t * 6) * 1000;
+						var y = Math.cos(t * 8) * 80 + Math.cos(t * 20 * Math.sin(t)) * 40 + 200;
+						var z = Math.sin(t * 5) * Math.sin(t * 3) * 1000;
 
-						return vector.set( x, y, z ).multiplyScalar( 20 );
+						return vector.set( x, y, z );
 
 					},
 

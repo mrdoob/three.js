@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing manual msaa</title>
+		<title>three.js webgl - postprocessing backgrounds</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -30,10 +30,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Unbiased Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
-			This example shows how to unbias the rounding errors accumulated using high number of MSAA samples on a 8-bit per channel buffer.<br/><br/>
-			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
-		</div>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
 
 		<div id="container"></div>
 
@@ -44,27 +41,39 @@
 		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
+		<script src="js/postprocessing/ClearPass.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/CubeTexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
-			var scene, renderer, composer, copyPass;
-			var cameraP, msaaRenderPassP;
-			var cameraO, msaaRenderPassO;
+			var scene, renderer, composer;
+			var clearPass, texturePass, renderPass;
+			var cameraP, cubeTexturePassP;
+			//var cameraO, cubeTexturePassO;
 			var gui, stats, texture;
 
 			var params = {
-				sampleLevel: 4,
-				renderToScreen: false,
-				unbiased: true,
-				camera: 'perspective',
-				clearColor: 'black',
+
+				clearPass: true,
+				clearColor: 'white',
 				clearAlpha: 1.0,
-				autoRotate: true
+
+				texturePass: true,
+				texturePassOpacity: 1.0,
+
+				cubeTexturePass: true,
+				cubeTexturePassOpacity: 1.0,
+
+				renderPass: true,
+
+				//autoRotate: true,
+
+				//camera: 'perspective'
 		
 			};
 
@@ -79,20 +88,21 @@
 
 				gui = new dat.GUI();
 
-				gui.add( params, "unbiased" );
-				gui.add( params, "renderToScreen" );
-				gui.add( params, 'sampleLevel', {
-					'Level 0: 1 Sample': 0,
-					'Level 1: 2 Samples': 1,
-					'Level 2: 4 Samples': 2,
-					'Level 3: 8 Samples': 3,
-					'Level 4: 16 Samples': 4,
-					'Level 5: 32 Samples': 5
-				} );
-				gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
+				gui.add( params, "clearPass" );
 				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
 				gui.add( params, "clearAlpha", 0, 1 );		
-				gui.add( params, "autoRotate" );
+
+				gui.add( params, "texturePass" );
+				gui.add( params, "texturePassOpacity", 0, 1 );		
+
+				gui.add( params, "cubeTexturePass" );
+				gui.add( params, "cubeTexturePassOpacity", 0, 1 );		
+	
+				gui.add( params, "renderPass" );
+			
+				//gui.add( params, "autoRotate" );
+
+				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
 			
 				gui.open();
 
@@ -120,14 +130,13 @@
 				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
 				cameraP.position.z = 7;
 
-				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
-				cameraO.position.z = 7;
+			//	cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
+			//	cameraO.position.z = 7;
 
-				var fov = THREE.Math.degToRad( cameraP.fov );
-				var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
-				var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
-				cameraO.zoom = height / _height;
-
+			//	var fov = THREE.Math.degToRad( cameraP.fov );
+			//	var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
+			//	var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
+			//	cameraO.zoom = height / _height;
 
 				scene = new THREE.Scene();
 
@@ -152,40 +161,60 @@
 				light3.position.y = -70;
 				scene.add( light3 );
 
-				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
-				scene.add( light3 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
 
-				var geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
-				for ( var i = 0; i < 120; i ++ ) {
+				var material = new THREE.MeshStandardMaterial();
+				material.roughness = 0.5 * Math.random() + 0.25;
+				material.metalness = 0;
+				material.color.setHSL( Math.random(), 1.0, 0.3 );
 
-					var material = new THREE.MeshStandardMaterial();
-					material.roughness = 0.5 * Math.random() + 0.25;
-					material.metalness = 0;
-					material.color.setHSL( Math.random(), 1.0, 0.3 );
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 4 - 2;
-					mesh.position.y = Math.random() * 4 - 2;
-					mesh.position.z = Math.random() * 4 - 2;
-					mesh.rotation.x = Math.random();
-					mesh.rotation.y = Math.random();
-					mesh.rotation.z = Math.random();
-
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 0.2 + 0.05;
-					group.add( mesh );
-				}
+				var mesh = new THREE.Mesh( geometry, material );
+				group.add( mesh );
 
 				// postprocessing
 
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
+
 				composer = new THREE.EffectComposer( renderer );
-				msaaRenderPassP = new THREE.ManualMSAARenderPass( scene, cameraP );
-				composer.addPass( msaaRenderPassP );
-				msaaRenderPassO = new THREE.ManualMSAARenderPass( scene, cameraO );
-				composer.addPass( msaaRenderPassO );
+
+				clearPass = new THREE.ClearPass( params.clearColor, params.clearAlpha );
+				composer.addPass( clearPass );
+
+				texturePass = new THREE.TexturePass();
+				composer.addPass( texturePass );
+
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+					texturePass.map = map;
+				});
+
+				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
+				composer.addPass( cubeTexturePassP );
+
+				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+					cubeTexturePassP.envMap = ldrCubeMap;
+					console.log( "loaded envmap");
+				});
+
+				renderPass = new THREE.RenderPass( scene, cameraP );
+				renderPass.clear = false;
+				composer.addPass( renderPass );
+		
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-				
+		
+				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -197,13 +226,13 @@
 				var aspect = width / height;
 
 				cameraP.aspect = aspect;
-				cameraO.updateProjectionMatrix();
+				cameraP.updateProjectionMatrix();
 
-				cameraO.left = - height * aspect;
+				/*cameraO.left = - height * aspect;
 				cameraO.right = height * aspect;
 				cameraO.top = height;
 				cameraO.bottom = - height;
-				cameraO.updateProjectionMatrix();
+				cameraO.updateProjectionMatrix();*/
 
 				renderer.setSize( width, height );
 
@@ -220,18 +249,9 @@
 
 				stats.begin();
 
-				if( params.autoRotate ) {
-					for ( var i = 0; i < scene.children.length; i ++ ) {
-
-						var child = scene.children[ i ];
-
-						child.rotation.x += 0.005;
-						child.rotation.y += 0.01;
-
-					}
-				}
-
-				var newColor = msaaRenderPassP.clearColor;
+				cameraP.updateMatrixWorld( true );
+			
+				var newColor = clearPass.clearColor;
 				switch( params.clearColor ) {
 					case 'blue': newColor = 0x0000ff; break;
 					case 'red': newColor = 0xff0000; break;
@@ -239,17 +259,18 @@
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
 				}
-				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
-				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
+	
+				clearPass.enabled = params.clearPass;
+				clearPass.clearColor = newColor;
+				clearPass.clearAlpha = params.clearAlpha;
 
-				msaaRenderPassP.sampleLevel = msaaRenderPassO.sampleLevel = params.sampleLevel;
-				msaaRenderPassP.unbiased = msaaRenderPassO.unbiased = params.unbiased;
+				texturePass.enabled = params.texturePass;
+				texturePass.opacity = params.texturePassOpacity;
 
-				msaaRenderPassP.enabled = ( params.camera === 'perspective' );
-				msaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+				cubeTexturePassP.enabled = params.cubeTexturePass;
+				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
 
-				msaaRenderPassP.renderToScreen = msaaRenderPassO.renderToScreen = params.renderToScreen;
-				copyPass.enabled = !params.renderToScreen;
+				renderPass.enabled = params.renderPass;
 
 				composer.render();
 

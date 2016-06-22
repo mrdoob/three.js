@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '78' };
+var THREE = { REVISION: '79dev' };
 
 //
 
@@ -746,6 +746,16 @@ THREE.Color.prototype = {
 		this.r += s;
 		this.g += s;
 		this.b += s;
+
+		return this;
+
+	},
+
+	sub: function( color ) {
+
+		this.r = Math.max( 0, this.r - color.r );
+		this.g = Math.max( 0, this.g - color.g );
+		this.b = Math.max( 0, this.b - color.b );
 
 		return this;
 
@@ -9915,8 +9925,8 @@ THREE.Geometry = function () {
 
 	// update flags
 
-	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
+	this.verticesNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
@@ -11708,18 +11718,19 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			var direct = geometry.__directGeometry;
 
-			if ( direct === undefined ) {
+			if ( direct === undefined || geometry.elementsNeedUpdate === true ) {
 
 				return this.fromGeometry( geometry );
 
 			}
 
-			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
-			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
-			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
-			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			direct.groupsNeedUpdate = geometry.groupsNeedUpdate;
+			direct.verticesNeedUpdate = geometry.verticesNeedUpdate || geometry.elementsNeedUpdate;
+			direct.normalsNeedUpdate = geometry.normalsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.colorsNeedUpdate = geometry.colorsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.uvsNeedUpdate = geometry.uvsNeedUpdate || geometry.elementsNeedUpdate;
+			direct.groupsNeedUpdate = geometry.groupsNeedUpdate || geometry.elementsNeedUpdate;
 
+			geometry.elementsNeedUpdate = false;
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
@@ -11730,9 +11741,11 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
+		var attribute;
+
 		if ( geometry.verticesNeedUpdate === true ) {
 
-			var attribute = this.attributes.position;
+			attribute = this.attributes.position;
 
 			if ( attribute !== undefined ) {
 
@@ -11747,7 +11760,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.normalsNeedUpdate === true ) {
 
-			var attribute = this.attributes.normal;
+			attribute = this.attributes.normal;
 
 			if ( attribute !== undefined ) {
 
@@ -11762,7 +11775,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.colorsNeedUpdate === true ) {
 
-			var attribute = this.attributes.color;
+			attribute = this.attributes.color;
 
 			if ( attribute !== undefined ) {
 
@@ -11777,7 +11790,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.uvsNeedUpdate ) {
 
-			var attribute = this.attributes.uv;
+			attribute = this.attributes.uv;
 
 			if ( attribute !== undefined ) {
 
@@ -11792,7 +11805,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( geometry.lineDistancesNeedUpdate ) {
 
-			var attribute = this.attributes.lineDistance;
+			attribute = this.attributes.lineDistance;
 
 			if ( attribute !== undefined ) {
 
@@ -24419,7 +24432,7 @@ THREE.UniformsLib = {
 
 // File:src/renderers/shaders/ShaderLib/cube_frag.glsl
 
-THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n	#include <logdepthbuf_fragment>\n}\n";
+THREE.ShaderChunk[ 'cube_frag' ] = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n	#include <clipping_planes_fragment>\n	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n	gl_FragColor.a *= opacity;\n	#include <logdepthbuf_fragment>\n}\n";
 
 // File:src/renderers/shaders/ShaderLib/cube_vert.glsl
 
@@ -24689,7 +24702,8 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tCube": { value: null },
-			"tFlip": { value: - 1 }
+			"tFlip": { value: - 1 },
+			"opacity": { value: 1.0 }
 		},
 
 		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],
@@ -25791,6 +25805,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
+
+		} else if ( a.material.program && b.material.program && a.material.program !== b.material.program ) {
+
+			return a.material.program.id - b.material.program.id;
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -34516,7 +34534,7 @@ THREE.ShapeUtils = {
 
 			if ( allPointsMap[ key ] !== undefined ) {
 
-				console.warn( "THREE.Shape: Duplicate point", key );
+				console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
 
 			}
 
@@ -34708,15 +34726,15 @@ THREE.Curve.prototype = {
 
 		if ( ! divisions ) divisions = 5;
 
-		var d, pts = [];
+		var points = [];
 
-		for ( d = 0; d <= divisions; d ++ ) {
+		for ( var d = 0; d <= divisions; d ++ ) {
 
-			pts.push( this.getPoint( d / divisions ) );
+			points.push( this.getPoint( d / divisions ) );
 
 		}
 
-		return pts;
+		return points;
 
 	},
 
@@ -34726,15 +34744,15 @@ THREE.Curve.prototype = {
 
 		if ( ! divisions ) divisions = 5;
 
-		var d, pts = [];
+		var points = [];
 
-		for ( d = 0; d <= divisions; d ++ ) {
+		for ( var d = 0; d <= divisions; d ++ ) {
 
-			pts.push( this.getPointAt( d / divisions ) );
+			points.push( this.getPointAt( d / divisions ) );
 
 		}
 
-		return pts;
+		return points;
 
 	},
 
@@ -34956,8 +34974,6 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	closePath: function () {
 
-		// TODO Test
-		// and verify for vector3 (needs to implement equals)
 		// Add a line curve if start and end of lines are not connected
 		var startPoint = this.curves[ 0 ].getPoint( 0 );
 		var endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
@@ -34994,7 +35010,8 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 				var diff = curveLengths[ i ] - d;
 				var curve = this.curves[ i ];
 
-				var u = 1 - diff / curve.getLength();
+				var segmentLength = curve.getLength();
+				var u = segmentLength === 0 ? 0 : 1 - diff / segmentLength;
 
 				return curve.getPointAt( u );
 
@@ -35058,6 +35075,68 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 		this.cacheLengths = lengths;
 
 		return lengths;
+
+	},
+
+	getSpacedPoints: function ( divisions ) {
+
+		if ( ! divisions ) divisions = 40;
+
+		var points = [];
+
+		for ( var i = 0; i <= divisions; i ++ ) {
+
+			points.push( this.getPoint( i / divisions ) );
+
+		}
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
+
+	},
+
+	getPoints: function ( divisions ) {
+
+		divisions = divisions || 12;
+
+		var points = [], last;
+
+		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
+
+			var curve = curves[ i ];
+			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
+
+			for ( var j = 0; j < pts.length; j++ ) {
+
+				var point = pts[ j ];
+
+				if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+
+				points.push( point );
+				last = point;
+
+			}
+
+		}
+
+		if ( points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+
+			points.pop();
+
+		}
+
+		if ( this.autoClose ) {
+
+			points.push( points[ 0 ] );
+
+		}
+
+		return points;
 
 	},
 
@@ -35144,7 +35223,7 @@ Object.assign( THREE.Font.prototype, {
 
 			if ( ! glyph ) return;
 
-			var path = new THREE.Path();
+			var path = new THREE.ShapePath();
 
 			var pts = [], b2 = THREE.ShapeUtils.b2, b3 = THREE.ShapeUtils.b3;
 			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
@@ -35278,8 +35357,7 @@ Object.assign( THREE.Font.prototype, {
 THREE.Path = function ( points ) {
 
 	THREE.CurvePath.call( this );
-
-	this.actions = [];
+	this.currentPoint = new THREE.Vector2();
 
 	if ( points ) {
 
@@ -35293,11 +35371,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	constructor: THREE.Path,
 
-	// TODO Clean up PATH API
-
 	// Create path using straight lines to connect all points
 	// - vectors: array of Vector2
-
 	fromPoints: function ( vectors ) {
 
 		this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
@@ -35312,52 +35387,37 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	moveTo: function ( x, y ) {
 
-		this.actions.push( { action: 'moveTo', args: [ x, y ] } );
+		this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
 
 	},
 
 	lineTo: function ( x, y ) {
 
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
-
-		var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
+		var curve = new THREE.LineCurve( this.currentPoint.clone(), new THREE.Vector2( x, y ) );
 		this.curves.push( curve );
 
-		this.actions.push( { action: 'lineTo', args: [ x, y ] } );
+		this.currentPoint.set( x, y );
 
 	},
 
 	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
 
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
-
 		var curve = new THREE.QuadraticBezierCurve(
-			new THREE.Vector2( x0, y0 ),
+			this.currentPoint.clone(),
 			new THREE.Vector2( aCPx, aCPy ),
 			new THREE.Vector2( aX, aY )
 		);
 
 		this.curves.push( curve );
 
-		this.actions.push( { action: 'quadraticCurveTo', args: [ aCPx, aCPy, aX, aY ] } );
+		this.currentPoint.set( aX, aY );
 
 	},
 
 	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
-
 		var curve = new THREE.CubicBezierCurve(
-			new THREE.Vector2( x0, y0 ),
+			this.currentPoint.clone(),
 			new THREE.Vector2( aCP1x, aCP1y ),
 			new THREE.Vector2( aCP2x, aCP2y ),
 			new THREE.Vector2( aX, aY )
@@ -35365,38 +35425,25 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 		this.curves.push( curve );
 
-		this.actions.push( { action: 'bezierCurveTo', args: [ aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ] } );
+		this.currentPoint.set( aX, aY );
 
 	},
 
 	splineThru: function ( pts /*Array of Vector*/ ) {
 
-		var args = Array.prototype.slice.call( arguments );
-
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
-
-		var npts = [ new THREE.Vector2( x0, y0 ) ];
-		Array.prototype.push.apply( npts, pts );
+		var npts = [ this.currentPoint.clone() ].concat( pts );
 
 		var curve = new THREE.SplineCurve( npts );
 		this.curves.push( curve );
 
-		var lastPoint = pts[ pts.length - 1 ];
-		args.push( lastPoint.x );
-		args.push( lastPoint.y );
-
-		this.actions.push( { action: 'splineThru', args: args } );
+		this.currentPoint.copy( pts[ pts.length - 1 ] );
 
 	},
 
 	arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = this.currentPoint.x;
+		var y0 = this.currentPoint.y;
 
 		this.absarc( aX + x0, aY + y0, aRadius,
 			aStartAngle, aEndAngle, aClockwise );
@@ -35411,9 +35458,8 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	ellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-		var lastargs = this.actions[ this.actions.length - 1 ].args;
-		var x0 = lastargs[ lastargs.length - 2 ];
-		var y0 = lastargs[ lastargs.length - 1 ];
+		var x0 = this.currentPoint.x;
+		var y0 = this.currentPoint.y;
 
 		this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
 
@@ -35421,335 +35467,57 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 	absellipse: function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
-		var args = [
-			aX, aY,
-			xRadius, yRadius,
-			aStartAngle, aEndAngle,
-			aClockwise,
-			aRotation || 0 // aRotation is optional.
-		];
-
 		var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+		if ( this.curves.length > 0 ) {
+
+			// if a previous curve is present, attempt to join
+			var firstPoint = curve.getPoint( 0 );
+
+			if ( ! firstPoint.equals( this.currentPoint ) ) {
+
+				this.lineTo( firstPoint.x, firstPoint.y );
+
+			}
+
+		}
+
 		this.curves.push( curve );
 
 		var lastPoint = curve.getPoint( 1 );
-		args.push( lastPoint.x );
-		args.push( lastPoint.y );
+		this.currentPoint.copy( lastPoint );
 
-		this.actions.push( { action: 'ellipse', args: args } );
+	}
 
+} );
+
+
+// minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
+THREE.ShapePath = function() {
+	this.subPaths = [];
+	this.currentPath = null;
+}
+
+THREE.ShapePath.prototype = {
+	moveTo: function ( x, y ) {
+		this.currentPath = new THREE.Path();
+		this.subPaths.push(this.currentPath);
+		this.currentPath.moveTo( x, y );
 	},
-
-	getSpacedPoints: function ( divisions ) {
-
-		if ( ! divisions ) divisions = 40;
-
-		var points = [];
-
-		for ( var i = 0; i < divisions; i ++ ) {
-
-			points.push( this.getPoint( i / divisions ) );
-
-			//if ( !this.getPoint( i / divisions ) ) throw "DIE";
-
-		}
-
-		if ( this.autoClose ) {
-
-			points.push( points[ 0 ] );
-
-		}
-
-		return points;
-
+	lineTo: function ( x, y ) {
+		this.currentPath.lineTo( x, y );
 	},
-
-	getPoints: function ( divisions ) {
-
-		divisions = divisions || 12;
-
-		var b2 = THREE.ShapeUtils.b2;
-		var b3 = THREE.ShapeUtils.b3;
-
-		var points = [];
-
-		var cpx, cpy, cpx2, cpy2, cpx1, cpy1, cpx0, cpy0,
-			laste, tx, ty;
-
-		for ( var i = 0, l = this.actions.length; i < l; i ++ ) {
-
-			var item = this.actions[ i ];
-
-			var action = item.action;
-			var args = item.args;
-
-			switch ( action ) {
-
-			case 'moveTo':
-
-				points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
-
-				break;
-
-			case 'lineTo':
-
-				points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
-
-				break;
-
-			case 'quadraticCurveTo':
-
-				cpx  = args[ 2 ];
-				cpy  = args[ 3 ];
-
-				cpx1 = args[ 0 ];
-				cpy1 = args[ 1 ];
-
-				if ( points.length > 0 ) {
-
-					laste = points[ points.length - 1 ];
-
-					cpx0 = laste.x;
-					cpy0 = laste.y;
-
-				} else {
-
-					laste = this.actions[ i - 1 ].args;
-
-					cpx0 = laste[ laste.length - 2 ];
-					cpy0 = laste[ laste.length - 1 ];
-
-				}
-
-				for ( var j = 1; j <= divisions; j ++ ) {
-
-					var t = j / divisions;
-
-					tx = b2( t, cpx0, cpx1, cpx );
-					ty = b2( t, cpy0, cpy1, cpy );
-
-					points.push( new THREE.Vector2( tx, ty ) );
-
-				}
-
-				break;
-
-			case 'bezierCurveTo':
-
-				cpx  = args[ 4 ];
-				cpy  = args[ 5 ];
-
-				cpx1 = args[ 0 ];
-				cpy1 = args[ 1 ];
-
-				cpx2 = args[ 2 ];
-				cpy2 = args[ 3 ];
-
-				if ( points.length > 0 ) {
-
-					laste = points[ points.length - 1 ];
-
-					cpx0 = laste.x;
-					cpy0 = laste.y;
-
-				} else {
-
-					laste = this.actions[ i - 1 ].args;
-
-					cpx0 = laste[ laste.length - 2 ];
-					cpy0 = laste[ laste.length - 1 ];
-
-				}
-
-
-				for ( var j = 1; j <= divisions; j ++ ) {
-
-					var t = j / divisions;
-
-					tx = b3( t, cpx0, cpx1, cpx2, cpx );
-					ty = b3( t, cpy0, cpy1, cpy2, cpy );
-
-					points.push( new THREE.Vector2( tx, ty ) );
-
-				}
-
-				break;
-
-			case 'splineThru':
-
-				laste = this.actions[ i - 1 ].args;
-
-				var last = new THREE.Vector2( laste[ laste.length - 2 ], laste[ laste.length - 1 ] );
-				var spts = [ last ];
-
-				var n = divisions * args[ 0 ].length;
-
-				spts = spts.concat( args[ 0 ] );
-
-				var spline = new THREE.SplineCurve( spts );
-
-				for ( var j = 1; j <= n; j ++ ) {
-
-					points.push( spline.getPointAt( j / n ) );
-
-				}
-
-				break;
-
-			case 'arc':
-
-				var aX = args[ 0 ], aY = args[ 1 ],
-					aRadius = args[ 2 ],
-					aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
-					aClockwise = !! args[ 5 ];
-
-				var deltaAngle = aEndAngle - aStartAngle;
-				var angle;
-				var tdivisions = divisions * 2;
-
-				for ( var j = 1; j <= tdivisions; j ++ ) {
-
-					var t = j / tdivisions;
-
-					if ( ! aClockwise ) {
-
-						t = 1 - t;
-
-					}
-
-					angle = aStartAngle + t * deltaAngle;
-
-					tx = aX + aRadius * Math.cos( angle );
-					ty = aY + aRadius * Math.sin( angle );
-
-					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
-
-					points.push( new THREE.Vector2( tx, ty ) );
-
-				}
-
-				//console.log(points);
-
-				break;
-
-			case 'ellipse':
-
-				var aX = args[ 0 ], aY = args[ 1 ],
-					xRadius = args[ 2 ],
-					yRadius = args[ 3 ],
-					aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
-					aClockwise = !! args[ 6 ],
-					aRotation = args[ 7 ];
-
-
-				var deltaAngle = aEndAngle - aStartAngle;
-				var angle;
-				var tdivisions = divisions * 2;
-
-				var cos, sin;
-				if ( aRotation !== 0 ) {
-
-					cos = Math.cos( aRotation );
-					sin = Math.sin( aRotation );
-
-				}
-
-				for ( var j = 1; j <= tdivisions; j ++ ) {
-
-					var t = j / tdivisions;
-
-					if ( ! aClockwise ) {
-
-						t = 1 - t;
-
-					}
-
-					angle = aStartAngle + t * deltaAngle;
-
-					tx = aX + xRadius * Math.cos( angle );
-					ty = aY + yRadius * Math.sin( angle );
-
-					if ( aRotation !== 0 ) {
-
-						var x = tx, y = ty;
-
-						// Rotate the point about the center of the ellipse.
-						tx = ( x - aX ) * cos - ( y - aY ) * sin + aX;
-						ty = ( x - aX ) * sin + ( y - aY ) * cos + aY;
-
-					}
-
-					//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
-
-					points.push( new THREE.Vector2( tx, ty ) );
-
-				}
-
-				//console.log(points);
-
-				break;
-
-			} // end switch
-
-		}
-
-
-
-		// Normalize to remove the closing point by default.
-		var lastPoint = points[ points.length - 1 ];
-		if ( Math.abs( lastPoint.x - points[ 0 ].x ) < Number.EPSILON &&
-				 Math.abs( lastPoint.y - points[ 0 ].y ) < Number.EPSILON )
-			points.splice( points.length - 1, 1 );
-
-		if ( this.autoClose ) {
-
-			points.push( points[ 0 ] );
-
-		}
-
-		return points;
-
+	quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+		this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
+	},
+	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+		this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
+	},
+	splineThru: function ( pts ) {
+		this.currentPath.splineThru( pts );
 	},
 
 	toShapes: function ( isCCW, noHoles ) {
-
-		function extractSubpaths( inActions ) {
-
-			var subPaths = [], lastPath = new THREE.Path();
-
-			for ( var i = 0, l = inActions.length; i < l; i ++ ) {
-
-				var item = inActions[ i ];
-
-				var args = item.args;
-				var action = item.action;
-
-				if ( action === 'moveTo' ) {
-
-					if ( lastPath.actions.length !== 0 ) {
-
-						subPaths.push( lastPath );
-						lastPath = new THREE.Path();
-
-					}
-
-				}
-
-				lastPath[ action ].apply( lastPath, args );
-
-			}
-
-			if ( lastPath.actions.length !== 0 ) {
-
-				subPaths.push( lastPath );
-
-			}
-
-			// console.log(subPaths);
-
-			return	subPaths;
-
-		}
 
 		function toShapesNoHoles( inSubpaths ) {
 
@@ -35760,14 +35528,11 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 				var tmpPath = inSubpaths[ i ];
 
 				var tmpShape = new THREE.Shape();
-				tmpShape.actions = tmpPath.actions;
 				tmpShape.curves = tmpPath.curves;
 
 				shapes.push( tmpShape );
 
 			}
-
-			//console.log("shape", shapes);
 
 			return shapes;
 
@@ -35834,7 +35599,7 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 		var isClockWise = THREE.ShapeUtils.isClockWise;
 
-		var subPaths = extractSubpaths( this.actions );
+		var subPaths = this.subPaths;
 		if ( subPaths.length === 0 ) return [];
 
 		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
@@ -35846,7 +35611,6 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 
 			tmpPath = subPaths[ 0 ];
 			tmpShape = new THREE.Shape();
-			tmpShape.actions = tmpPath.actions;
 			tmpShape.curves = tmpPath.curves;
 			shapes.push( tmpShape );
 			return shapes;
@@ -35879,7 +35643,6 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 				if ( ( ! holesFirst ) && ( newShapes[ mainIdx ] ) )	mainIdx ++;
 
 				newShapes[ mainIdx ] = { s: new THREE.Shape(), p: tmpPoints };
-				newShapes[ mainIdx ].s.actions = tmpPath.actions;
 				newShapes[ mainIdx ].s.curves = tmpPath.curves;
 
 				if ( holesFirst )	mainIdx ++;
@@ -35980,8 +35743,7 @@ THREE.Path.prototype = Object.assign( Object.create( THREE.CurvePath.prototype )
 		return shapes;
 
 	}
-
-} );
+}
 
 // File:src/extras/core/Shape.js
 
@@ -36076,6 +35838,12 @@ THREE.LineCurve.prototype = Object.create( THREE.Curve.prototype );
 THREE.LineCurve.prototype.constructor = THREE.LineCurve;
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
+
+	if ( t === 1 ) {
+
+		return this.v2.clone();
+
+	}
 
 	var point = this.v2.clone().sub( this.v1 );
 	point.multiplyScalar( t ).add( this.v1 );
@@ -36225,7 +35993,7 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
  *	Ellipse curve
  **************************************************************/
 
-THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+THREE.EllipseCurve = function( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	this.aX = aX;
 	this.aY = aY;
@@ -36237,7 +36005,7 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 	this.aEndAngle = aEndAngle;
 
 	this.aClockwise = aClockwise;
-	
+
 	this.aRotation = aRotation || 0;
 
 };
@@ -36245,25 +36013,37 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
 THREE.EllipseCurve.prototype.constructor = THREE.EllipseCurve;
 
-THREE.EllipseCurve.prototype.getPoint = function ( t ) {
+THREE.EllipseCurve.prototype.getPoint = function( t ) {
 
+	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
+	var samePoints = Math.abs( deltaAngle ) < Number.EPSILON;
 
-	if ( deltaAngle < 0 ) deltaAngle += Math.PI * 2;
-	if ( deltaAngle > Math.PI * 2 ) deltaAngle -= Math.PI * 2;
+	// ensures that deltaAngle is 0 .. 2 PI
+	while ( deltaAngle < 0 ) deltaAngle += twoPi;
+	while ( deltaAngle > twoPi ) deltaAngle -= twoPi;
 
-	var angle;
+	if ( deltaAngle < Number.EPSILON ) {
 
-	if ( this.aClockwise === true ) {
+		if ( samePoints ) {
 
-		angle = this.aEndAngle + ( 1 - t ) * ( Math.PI * 2 - deltaAngle );
+			deltaAngle = 0;
 
-	} else {
+		} else {
 
-		angle = this.aStartAngle + t * deltaAngle;
+			deltaAngle = twoPi;
+
+		}
 
 	}
-	
+
+	if ( this.aClockwise === true && deltaAngle != twoPi && ! samePoints ) {
+
+		deltaAngle = deltaAngle - twoPi;
+
+	}
+
+	var angle = this.aStartAngle + t * deltaAngle;
 	var x = this.aX + this.xRadius * Math.cos( angle );
 	var y = this.aY + this.yRadius * Math.sin( angle );
 
@@ -36272,11 +36052,12 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 		var cos = Math.cos( this.aRotation );
 		var sin = Math.sin( this.aRotation );
 
-		var tx = x, ty = y;
+		var tx = x - this.aX;
+		var ty = y - this.aY;
 
 		// Rotate the point about the center of the ellipse.
-		x = ( tx - this.aX ) * cos - ( ty - this.aY ) * sin + this.aX;
-		y = ( tx - this.aX ) * sin + ( ty - this.aY ) * cos + this.aY;
+		x = tx * cos - ty * sin + this.aX;
+		y = tx * sin + ty * cos + this.aY;
 
 	}
 
@@ -36315,6 +36096,12 @@ THREE.LineCurve3 = THREE.Curve.create(
 	},
 
 	function ( t ) {
+
+		if ( t === 1 ) {
+
+			return this.v2.clone();
+
+		}
 
 		var vector = new THREE.Vector3();
 
