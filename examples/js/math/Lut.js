@@ -26,7 +26,7 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 				color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-				this.lut.push(color);
+				this.lut.push( color );
 
 			}
 
@@ -130,7 +130,11 @@ THREE.Lut.prototype = {
 
 	setLegendOn: function ( parameters ) {
 
-		if ( parameters === undefined ) { parameters = {}; }
+		if ( parameters === undefined ) {
+
+			parameters = {};
+
+		}
 
 		this.legend = {};
 
@@ -165,7 +169,7 @@ THREE.Lut.prototype = {
 
 		var step = 1.0 / this.n;
 
-		for ( var i = 1; i >= 0; i-=step ) {
+		for ( var i = 1; i >= 0; i -= step ) {
 
 			for ( var j = this.map.length - 1; j >= 0; j -- ) {
 
@@ -174,16 +178,16 @@ THREE.Lut.prototype = {
 					var min = this.map[ j - 1 ][ 0 ];
 					var max = this.map[ j ][ 0 ];
 					var color = new THREE.Color( 0xffffff );
-					var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1][ 1 ] );
+					var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1 ][ 1 ] );
 					var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
 					color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-					data[ k * 4     ] = Math.round( color.r * 255 );
+					data[ k * 4 ] = Math.round( color.r * 255 );
 					data[ k * 4 + 1 ] = Math.round( color.g * 255 );
 					data[ k * 4 + 2 ] = Math.round( color.b * 255 );
 					data[ k * 4 + 3 ] = 255;
 
-					k+=1;
+					k += 1;
 
 				}
 
@@ -199,7 +203,7 @@ THREE.Lut.prototype = {
 
 		this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
 
-		if ( this.legend.layout == 'horizontal') {
+		if ( this.legend.layout == 'horizontal' ) {
 
 			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
 
@@ -221,11 +225,23 @@ THREE.Lut.prototype = {
 
 	setLegendLayout: function ( layout ) {
 
-		if ( ! this.legend ) { return false; }
+		if ( ! this.legend ) {
 
-		if ( this.legend.layout == layout ) { return false; }
+			return false;
 
-		if ( layout != 'horizontal' && layout != 'vertical' ) { return false; }
+		}
+
+		if ( this.legend.layout == layout ) {
+
+			return false;
+
+		}
+
+		if ( layout != 'horizontal' && layout != 'vertical' ) {
+
+			return false;
+
+		}
 
 		this.layout = layout;
 
@@ -237,7 +253,7 @@ THREE.Lut.prototype = {
 
 		if ( layout == 'vertical' ) {
 
-			this.legend.mesh.rotation.z = -90 * ( Math.PI / 180 );
+			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
 
 		}
 
@@ -255,11 +271,23 @@ THREE.Lut.prototype = {
 
 	setLegendLabels: function ( parameters, callback ) {
 
-		if ( ! this.legend ) { return false; }
+		if ( ! this.legend ) {
 
-		if ( typeof parameters === 'function') { callback = parameters; }
+			return false;
 
-		if ( parameters === undefined ) { parameters = {}; }
+		}
+
+		if ( typeof parameters === 'function' ) {
+
+			callback = parameters;
+
+		}
+
+		if ( parameters === undefined ) {
+
+			parameters = {};
+
+		}
 
 		this.legend.labels = {};
 
@@ -299,11 +327,10 @@ THREE.Lut.prototype = {
 
 		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-		var txtTitle = new THREE.Texture( canvasTitle );
+		var txtTitle = new THREE.CanvasTexture( canvasTitle );
 		txtTitle.minFilter = THREE.LinearFilter;
-		txtTitle.needsUpdate = true;
 
-		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
+		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle } );
 
 		var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
 
@@ -342,23 +369,19 @@ THREE.Lut.prototype = {
 
 			for ( var i = 0; i < this.legend.labels.ticks; i ++ ) {
 
-				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i ;
+				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i + this.minV;
 
 				if ( callback ) {
 
 					value = callback ( value );
 
-				}
-
-				else {
+				} else {
 
 					if ( this.legend.labels.notation == 'scientific' ) {
 
 						value = value.toExponential( this.legend.labels.decimal );
 
-					}
-
-					else {
+					} else {
 
 						value = value.toFixed( this.legend.labels.decimal );
 
@@ -384,11 +407,10 @@ THREE.Lut.prototype = {
 
 				contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-				var txtTick = new THREE.Texture( canvasTick );
+				var txtTick = new THREE.CanvasTexture( canvasTick );
 				txtTick.minFilter = THREE.LinearFilter;
-				txtTick.needsUpdate = true;
 
-				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
+				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick } );
 
 				var spriteTick = new THREE.Sprite( spriteMaterialTick );
 
@@ -396,7 +418,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'vertical' ) {
 
-					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( value / ( this.maxV - this.minV ) );
+					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
 
 					spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
 
@@ -404,17 +426,25 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'horizontal' ) {
 
-					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( value / ( this.maxV - this.minV ) );
+					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
 
 					if ( this.legend.labels.ticks > 5 ) {
 
-						if ( i % 2 === 0 ) { var offset = 1.7; }
+						if ( i % 2 === 0 ) {
 
-						else { var offset = 2.1; }
+							var offset = 1.7;
+
+						} else {
+
+							var offset = 2.1;
+
+						}
+
+					} else {
+
+						var offset = 1.7;
 
 					}
-
-					else { var offset = 1.7; }
 
 					spriteTick.position.set( position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z );
 
@@ -427,7 +457,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'vertical' ) {
 
-					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
 
 					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z  ) );
 
@@ -437,7 +467,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'horizontal' ) {
 
-					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
 
 					geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z  ) );
 
@@ -463,9 +493,9 @@ THREE.Lut.prototype = {
 
 THREE.ColorMapKeywords = {
 
-  "rainbow":    [ [ 0.0, '0x0000FF' ], [ 0.2, '0x00FFFF' ], [ 0.5, '0x00FF00' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFF0000' ] ],
-  "cooltowarm": [ [ 0.0, '0x3C4EC2' ], [ 0.2, '0x9BBCFF' ], [ 0.5, '0xDCDCDC' ], [ 0.8, '0xF6A385' ],  [ 1.0, '0xB40426' ] ],
-  "blackbody" : [ [ 0.0, '0x000000' ], [ 0.2, '0x780000' ], [ 0.5, '0xE63200' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFFFFFF' ] ],
-  "grayscale" : [ [ 0.0, '0x000000' ], [ 0.2, '0x404040' ], [ 0.5, '0x7F7F80' ], [ 0.8, '0xBFBFBF' ],  [ 1.0, '0xFFFFFF' ] ]
+	"rainbow":    [ [ 0.0, '0x0000FF' ], [ 0.2, '0x00FFFF' ], [ 0.5, '0x00FF00' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFF0000' ] ],
+	"cooltowarm": [ [ 0.0, '0x3C4EC2' ], [ 0.2, '0x9BBCFF' ], [ 0.5, '0xDCDCDC' ], [ 0.8, '0xF6A385' ],  [ 1.0, '0xB40426' ] ],
+	"blackbody" : [ [ 0.0, '0x000000' ], [ 0.2, '0x780000' ], [ 0.5, '0xE63200' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFFFFFF' ] ],
+	"grayscale" : [ [ 0.0, '0x000000' ], [ 0.2, '0x404040' ], [ 0.5, '0x7F7F80' ], [ 0.8, '0xBFBFBF' ],  [ 1.0, '0xFFFFFF' ] ]
 
 };

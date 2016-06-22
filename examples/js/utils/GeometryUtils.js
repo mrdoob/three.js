@@ -9,7 +9,7 @@ THREE.GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		THREE.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
+		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 
 		var matrix;
 
@@ -38,8 +38,8 @@ THREE.GeometryUtils = {
 
 			var point = new THREE.Vector3();
 
-			var a = THREE.Math.random16();
-			var b = THREE.Math.random16();
+			var a = Math.random();
+			var b = Math.random();
 
 			if ( ( a + b ) > 1 ) {
 
@@ -162,7 +162,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.Math.random16() * totalArea;
+			r = Math.random() * totalArea;
 
 			index = binarySearchIndices( r );
 
@@ -202,14 +202,15 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < il; i ++ ) {
 
-			vA.set( vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] );
-			vB.set( vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] );
-			vC.set( vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8] );
+			vA.set( vertices[ i * 9 + 0 ], vertices[ i * 9 + 1 ], vertices[ i * 9 + 2 ] );
+			vB.set( vertices[ i * 9 + 3 ], vertices[ i * 9 + 4 ], vertices[ i * 9 + 5 ] );
+			vC.set( vertices[ i * 9 + 6 ], vertices[ i * 9 + 7 ], vertices[ i * 9 + 8 ] );
 
 			area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
 			totalArea += area;
 
-			cumulativeAreas.push(totalArea);
+			cumulativeAreas.push( totalArea );
+
 		}
 
 		// binary search cumulative areas array
@@ -254,14 +255,14 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.Math.random16() * totalArea;
+			r = Math.random() * totalArea;
 
 			index = binarySearchIndices( r );
 
 			// result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
-			vA.set( vertices[index * 9 + 0], vertices[index * 9 + 1], vertices[index * 9 + 2] );
-			vB.set( vertices[index * 9 + 3], vertices[index * 9 + 4], vertices[index * 9 + 5] );
-			vC.set( vertices[index * 9 + 6], vertices[index * 9 + 7], vertices[index * 9 + 8] );
+			vA.set( vertices[ index * 9 + 0 ], vertices[ index * 9 + 1 ], vertices[ index * 9 + 2 ] );
+			vB.set( vertices[ index * 9 + 3 ], vertices[ index * 9 + 4 ], vertices[ index * 9 + 5 ] );
+			vC.set( vertices[ index * 9 + 6 ], vertices[ index * 9 + 7 ], vertices[ index * 9 + 8 ] );
 			result[ i ] = THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 		}
@@ -292,7 +293,7 @@ THREE.GeometryUtils = {
 
 	center: function ( geometry ) {
 
-		THREE.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
+		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
 		return geometry.center();
 
 	}

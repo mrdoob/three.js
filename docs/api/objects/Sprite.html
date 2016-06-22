@@ -2,21 +2,22 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A sprite is a plane in an 3d scene which faces always towards the camera. </div>
-
+		<div class="desc">A sprite is a plane in an 3d scene which faces always towards the camera.<br /><br />Sprites do not cast shadows, setting <code>castShadow = true</code> will have no effect.</div>
+		
                 <h2>Example</h2>
 
                 <code>
-                var map = THREE.ImageUtils.loadTexture( "sprite.png" );
+                var map = new THREE.TextureLoader().load( "sprite.png" );
                 var material = new THREE.SpriteMaterial( { map: map, color: 0xffffff, fog: true } );
                 var sprite = new THREE.Sprite( material );
                 scene.add( sprite );
@@ -25,7 +26,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:Material material])</h3>
+		<h3>[name]( [page:Material material] )</h3>
 		<div>
                 material — An instance of [page:Material] (optional).
 		</div>
@@ -40,13 +41,14 @@
 		<div>
 		An instance of [page:Material], defining the object's appearance. Default is a [page:SpriteMaterial] which is a white plane.
 		</div>
--
-           	<h2>Methods</h2>
 
-                <h3>[method:Sprite clone]()</h3>
-                <div>
-                This creates a new clone of the sprite.
-                </div>
+
+ 		<h2>Methods</h2>
+
+		<h3>[method:Sprite clone]()</h3>
+		<div>
+		Returns a clone of this Sprite object and its descendants.
+		</div>
 
 
 		<h2>Source</h2>

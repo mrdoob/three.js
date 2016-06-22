@@ -104,7 +104,7 @@ THREE.Spline = function ( points ) {
 			point = ( this.points.length - 1 ) * index;
 			intPoint = Math.floor( point );
 
-			if ( intPoint != oldIntPoint ) {
+			if ( intPoint !== oldIntPoint ) {
 
 				chunkLengths[ intPoint ] = totalLength;
 				oldIntPoint = intPoint;

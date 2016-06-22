@@ -20,14 +20,14 @@ Sidebar.Script = function ( editor ) {
 
 	//
 
-	var scriptsContainer = new UI.Panel();
+	var scriptsContainer = new UI.Row();
 	container.add( scriptsContainer );
 
 	var newScript = new UI.Button( 'New' );
 	newScript.onClick( function () {
 
 		var script = { name: '', source: 'function update( event ) {}' };
-		editor.addScript( editor.selected, script );
+		editor.execute( new AddScriptCommand( editor.selected, script ) );
 
 	} );
 	container.add( newScript );
@@ -45,6 +45,13 @@ Sidebar.Script = function ( editor ) {
 		scriptsContainer.clear();
 
 		var object = editor.selected;
+
+		if ( object === null ) {
+
+			return;
+
+		}
+
 		var scripts = editor.scripts[ object.uuid ];
 
 		if ( scripts !== undefined ) {
@@ -56,9 +63,7 @@ Sidebar.Script = function ( editor ) {
 					var name = new UI.Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
-						script.name = this.getValue();
-
-						signals.scriptChanged.dispatch();
+						editor.execute( new SetScriptValueCommand( editor.selected, script, 'name', this.getValue() ) );
 
 					} );
 					scriptsContainer.add( name );
@@ -78,7 +83,7 @@ Sidebar.Script = function ( editor ) {
 
 						if ( confirm( 'Are you sure?' ) ) {
 
-							editor.removeScript( editor.selected, script );
+							editor.execute( new RemoveScriptCommand( editor.selected, script ) );
 
 						}
 
@@ -115,6 +120,7 @@ Sidebar.Script = function ( editor ) {
 
 	signals.scriptAdded.add( update );
 	signals.scriptRemoved.add( update );
+	signals.scriptChanged.add( update );
 
 	return container;
 

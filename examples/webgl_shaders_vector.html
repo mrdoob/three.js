@@ -24,21 +24,17 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="./js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
-
-		<!-- load the font file from canvas-text -->
-
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<script type="x-shader/x-fragment" id="fs">
 
 			varying vec2 vUv;
 			varying float flip;
 			uniform vec3 color;
-			
+
 			float inCurve(vec2 uv) {
 				return uv.x * uv.x - uv.y;
 			}
@@ -99,36 +95,37 @@
 				t = !t;
 			}
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+			} );
+
+			function init( font ) {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 100, 500 );
 
 				controls = new THREE.OrbitControls( camera );
-				controls.center.set( 0, 100, 0 );
+				controls.target.set( 0, 100, 0 );
 
 				scene = new THREE.Scene();
-				
-				var theText = "&"; // i % & j b 8
 
-				var options = {
-					size: 180,
-					height: 20,
-					curveSegments: 2,
-					font: "helvetiker",
-					bevelEnabled: false
-				};
+				var theText = "&"; // i % & j b 8
 
 				group = new THREE.Group();
 				scene.add( group );
 
 
-				var textMaterial = new THREE.MeshBasicMaterial( { color: new THREE.Color(0, 0, 1 ), overdraw: 0.5, wireframe: true, side: THREE.DoubleSide } );
+				var textMaterial = new THREE.MeshBasicMaterial( {
+					color: new THREE.Color(0, 0, 1 ),
+					side: THREE.DoubleSide,
+					wireframe: true
+				} );
 
-				textShapes = THREE.FontUtils.generateShapes( theText, options );
+				textShapes = font.generateShapes( theText, 180, 2 );
 
 				text3d = new THREE.ShapeGeometry( textShapes );
 
@@ -140,7 +137,7 @@
 				group.add( text );
 
 				//
-				
+
 				vA = new THREE.Vector2();
 				vB = new THREE.Vector2();
 				vDot = new THREE.Vector2();
@@ -217,7 +214,7 @@
 
 					convexhullShape = new THREE.Shape( pts );
 					solidShape = new THREE.Shape( pts2 );
-					
+
 					convexhullShapeGroup.push( convexhullShape );
 					solidShapeGroup.push( solidShape );
 
@@ -243,7 +240,7 @@
 
 				for (var i=0;i<beziers.length;i++) {
 					p = beziers[i];
-					bezierGeometry.vertices.push( new THREE.Vector3(p.x, p.y, 0) );			
+					bezierGeometry.vertices.push( new THREE.Vector3(p.x, p.y, 0) );
 				}
 
 				for (i=0;i<beziers.length;i+=3) {
@@ -258,7 +255,7 @@
 				text3d = new THREE.ShapeGeometry( convexhullShapeGroup );
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-				
+
 				text1 = new THREE.Mesh( text3d, textMaterial );
 
 				text1.position.x = centerOffset + 150;
@@ -268,39 +265,32 @@
 				text3d = new THREE.ShapeGeometry( solidShapeGroup );
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
-				
-				text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) ); 
 
+				text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
 				text2.position.x = centerOffset + 150;
-
 				group.add( text2 );
 
 				//
 				bezierGeometry.computeBoundingBox();
 				bezierGeometry.computeFaceNormals();
 				bezierGeometry.computeVertexNormals();
-				
-				// 
 
-				var uniforms = {
-					color: { type: 'c', value: new THREE.Color(0.45 * 0xffffff) }
-				};
-				var vertexShader = document.getElementById( 'vs' ).textContent;
-				var fragmentShader = document.getElementById( 'fs' ).textContent;
+				bezierGeometry = new THREE.BufferGeometry().fromGeometry( bezierGeometry );
+				bezierGeometry.addAttribute( 'invert', new THREE.Float32Attribute( invert, 1 ) );
 
+				//
 
-				
 				newMaterial = new THREE.ShaderMaterial({
-					attributes: { invert: { type: 'f', value: invert } },
-					uniforms: uniforms,
-					vertexShader: vertexShader,
-					fragmentShader: fragmentShader,
+					uniforms: {
+						color: { value: new THREE.Color(0.45 * 0xffffff) }
+					},
+					vertexShader: document.getElementById( 'vs' ).textContent,
+					fragmentShader: document.getElementById( 'fs' ).textContent,
 					side: THREE.DoubleSide
 				});
 
 
 				text = new THREE.Mesh( bezierGeometry, newMaterial );
-
 				text.position.x = centerOffset;
 				text.position.y = 0;
 				text.position.z = 0;
@@ -315,7 +305,7 @@
 
 				text3d = new THREE.ShapeGeometry( solidShapeGroup );
 				text3d.computeBoundingBox();
-				
+
 				text = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
 				text.position.x = centerOffset;
 				text.position.y = 0;
@@ -335,9 +325,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', toggle, false );
 

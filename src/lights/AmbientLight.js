@@ -2,33 +2,18 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color ) {
+THREE.AmbientLight = function ( color, intensity ) {
 
-	THREE.Light.call( this, color );
+	THREE.Light.call( this, color, intensity );
 
 	this.type = 'AmbientLight';
 
-};
-
-THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
-
-THREE.AmbientLight.prototype.clone = function () {
-
-	var light = new THREE.AmbientLight();
-
-	THREE.Light.prototype.clone.call( this, light );
-
-	return light;
+	this.castShadow = undefined;
 
 };
 
-THREE.AmbientLight.prototype.toJSON = function ( meta ) {
+THREE.AmbientLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	constructor: THREE.AmbientLight
 
-	data.object.color = this.color.getHex();
-
-	return data;
-
-};
+} );

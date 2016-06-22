@@ -91,9 +91,11 @@ THREE.CameraHelper = function ( camera ) {
 
 	}
 
-	THREE.Line.call( this, geometry, material, THREE.LinePieces );
+	THREE.LineSegments.call( this, geometry, material );
 
 	this.camera = camera;
+	if( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
+
 	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
 
@@ -103,17 +105,17 @@ THREE.CameraHelper = function ( camera ) {
 
 };
 
-THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.CameraHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
 THREE.CameraHelper.prototype.update = function () {
 
 	var geometry, pointMap;
-	
+
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
 
-	var setPoint = function ( point, x, y, z ) {
+	function setPoint( point, x, y, z ) {
 
 		vector.set( x, y, z ).unproject( camera );
 
@@ -129,9 +131,9 @@ THREE.CameraHelper.prototype.update = function () {
 
 		}
 
-	};
+	}
 
-	return function () {
+	return function update() {
 
 		geometry = this.geometry;
 		pointMap = this.pointMap;

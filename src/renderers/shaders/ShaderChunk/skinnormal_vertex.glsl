@@ -7,14 +7,6 @@
 	skinMatrix += skinWeight.w * boneMatW;
 	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;
 
-	#ifdef USE_MORPHNORMALS
-
-	vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );
-
-	#else
-
-	vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );
-
-	#endif
+	objectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;
 
 #endif

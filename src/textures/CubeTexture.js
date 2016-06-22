@@ -2,27 +2,32 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
+	images = images !== undefined ? images : [];
 	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
-	
-	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-	this.images = images;
+	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+
+	this.flipY = false;
 
 };
 
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-THREE.CubeTexture.clone = function ( texture ) {
+Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
 
-	if ( texture === undefined ) texture = new THREE.CubeTexture();
+	get: function () {
 
-	THREE.Texture.prototype.clone.call( this, texture );
+		return this.image;
 
-	texture.images = this.images;
+	},
 
-	return texture;
+	set: function ( value ) {
 
-};
+		this.image = value;
+
+	}
+
+} );

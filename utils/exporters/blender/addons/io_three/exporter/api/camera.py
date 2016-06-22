@@ -50,7 +50,7 @@ def bottom(camera):
 
     """
     logger.debug("camera.bottom(%s)", camera)
-    return  -(camera.angle_y * camera.ortho_scale)
+    return -(camera.angle_y * camera.ortho_scale)
 
 
 @_camera

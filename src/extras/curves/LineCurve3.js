@@ -13,6 +13,12 @@ THREE.LineCurve3 = THREE.Curve.create(
 
 	function ( t ) {
 
+		if ( t === 1 ) {
+
+			return this.v2.clone();
+
+		}
+
 		var vector = new THREE.Vector3();
 
 		vector.subVectors( this.v2, this.v1 ); // diff

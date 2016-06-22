@@ -35,6 +35,7 @@ def data(node):
     except KeyError:
         pass
 
+
 def init():
     """Initializing the api module. Required first step before
     initializing the actual export process.
@@ -74,4 +75,3 @@ def scene_name():
 
     """
     return os.path.basename(bpy.data.filepath)
-

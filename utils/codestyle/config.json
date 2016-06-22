@@ -1,0 +1,32 @@
+{
+    "preset": "mdcs",
+    "disallowSpaceAfterPrefixUnaryOperators": ["+", "-"],
+    "disallowNewlineBeforeBlockStatements": true,
+    "requireSpaceAfterBinaryOperators": [","],
+    "disallowKeywordsOnNewLine": ["else"],
+    "excludeFiles": [
+        "../../.c9/",
+        "../../.c9version/",
+        "../../.git/",
+        "../../build/",
+        "../../docs/",
+        "../../editor/",
+        "../../node_modules/",
+        "../../test/",
+        "../../utils/",
+        "../../examples/files/",
+        "../../examples/fonts/",
+        "../../examples/models/",
+        "../../examples/obj/",
+        "../../examples/scenes/",
+        "../../examples/sounds/",
+        "../../examples/textures/",
+        "../../examples/js/libs/",
+        "../../examples/js/loaders/ctm/",
+        "../../examples/js/loaders/gltf/",
+        "../../examples/js/loaders/sea3d/",
+        "../../examples/js/ImprovedNoise.js",
+        "../../examples/js/SimplexNoise.js",
+        "../../examples/js/loaders/UTF8Loader.js"
+        ]
+}

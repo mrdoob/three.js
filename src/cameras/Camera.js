@@ -22,7 +22,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 	var quaternion = new THREE.Quaternion();
 
-	return function ( optionalTarget ) {
+	return function getWorldDirection( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -30,7 +30,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-	}
+	};
 
 }();
 
@@ -40,7 +40,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 	var m1 = new THREE.Matrix4();
 
-	return function ( vector ) {
+	return function lookAt( vector ) {
 
 		m1.lookAt( this.position, vector, this.up );
 
@@ -50,14 +50,19 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
-THREE.Camera.prototype.clone = function ( camera ) {
+THREE.Camera.prototype.clone = function () {
 
-	if ( camera === undefined ) camera = new THREE.Camera();
+	return new this.constructor().copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, camera );
+};
 
-	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
-	camera.projectionMatrix.copy( this.projectionMatrix );
+THREE.Camera.prototype.copy = function ( source ) {
 
-	return camera;
+	THREE.Object3D.prototype.copy.call( this, source );
+
+	this.matrixWorldInverse.copy( source.matrixWorldInverse );
+	this.projectionMatrix.copy( source.projectionMatrix );
+
+	return this;
+
 };

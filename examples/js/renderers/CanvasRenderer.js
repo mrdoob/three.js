@@ -22,8 +22,7 @@ THREE.SpriteCanvasMaterial.prototype.clone = function () {
 
 	var material = new THREE.SpriteCanvasMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
-
+	material.copy( this );
 	material.color.copy( this.color );
 	material.program = this.program;
 
@@ -36,8 +35,6 @@ THREE.SpriteCanvasMaterial.prototype.clone = function () {
 THREE.CanvasRenderer = function ( parameters ) {
 
 	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
-
-	var smoothstep = THREE.Math.smoothstep;
 
 	parameters = parameters || {};
 
@@ -59,7 +56,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_viewportWidth = _canvasWidth,
 	_viewportHeight = _canvasHeight,
 
-	pixelRatio = 1,
+	_pixelRatio = 1,
 
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -115,11 +112,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_normal = new THREE.Vector3(),
 	_normalViewMatrix = new THREE.Matrix3();
 
+	/* TODO
+	_canvas.mozImageSmoothingEnabled = false;
+	_canvas.webkitImageSmoothingEnabled = false;
+	_canvas.msImageSmoothingEnabled = false;
+	_canvas.imageSmoothingEnabled = false;
+	*/
+
 	// dash+gap fallbacks for Firefox and everything else
 
 	if ( _context.setLineDash === undefined ) {
 
-		_context.setLineDash = function () {}
+		_context.setLineDash = function () {};
 
 	}
 
@@ -145,24 +149,36 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
-	//
+	// API
+
+	this.getContext = function () {
+
+		return _context;
+
+	};
+
+	this.getContextAttributes = function () {
+
+		return _context.getContextAttributes();
+
+	};
 
 	this.getPixelRatio = function () {
 
-		return pixelRatio;
+		return _pixelRatio;
 
 	};
 
 	this.setPixelRatio = function ( value ) {
 
-		pixelRatio = value;
+		if ( value !== undefined ) _pixelRatio = value;
 
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvasWidth = width * pixelRatio;
-		_canvasHeight = height * pixelRatio;
+		_canvasWidth = width * _pixelRatio;
+		_canvasHeight = height * _pixelRatio;
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
@@ -177,7 +193,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
+		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
@@ -197,16 +213,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * pixelRatio;
-		_viewportY = y * pixelRatio;
+		_viewportX = x * _pixelRatio;
+		_viewportY = y * _pixelRatio;
 
-		_viewportWidth = width * pixelRatio;
-		_viewportHeight = height * pixelRatio;
+		_viewportWidth = width * _pixelRatio;
+		_viewportHeight = height * _pixelRatio;
 
 	};
 
 	this.setScissor = function () {};
-	this.enableScissorTest = function () {};
+	this.setScissorTest = function () {};
 
 	this.setClearColor = function ( color, alpha ) {
 
@@ -220,7 +236,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		THREE.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		console.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -245,7 +261,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.clear = function () {
 
-		if ( _clearBox.empty() === false ) {
+		if ( _clearBox.isEmpty() === false ) {
 
 			_clearBox.intersect( _clipBox );
 			_clearBox.expandByScalar( 2 );
@@ -298,7 +314,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			THREE.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}
@@ -354,7 +370,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v2.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material );
 
@@ -386,7 +402,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_v3.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
 
@@ -507,53 +523,42 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var texture = material.map;
 
-			if ( texture !== null && texture.image !== undefined ) {
-
-				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
-
-					if ( texture.image.width > 0 ) {
-
-						textureToPattern( texture );
-
-					}
-
-					texture.addEventListener( 'update', onTextureUpdate );
-
-				}
+			if ( texture !== null ) {
 
 				var pattern = _patterns[ texture.id ];
 
-				if ( pattern !== undefined ) {
+				if ( pattern === undefined || pattern.version !== texture.version ) {
 
-					setFillStyle( pattern );
-
-				} else {
-
-					setFillStyle( 'rgba( 0, 0, 0, 1 )' );
+					pattern = textureToPattern( texture );
+					_patterns[ texture.id ] = pattern;
 
 				}
 
-				//
+				if ( pattern.canvas !== undefined ) {
 
-				var bitmap = texture.image;
+					setFillStyle( pattern.canvas );
 
-				var ox = bitmap.width * texture.offset.x;
-				var oy = bitmap.height * texture.offset.y;
+					var bitmap = texture.image;
 
-				var sx = bitmap.width * texture.repeat.x;
-				var sy = bitmap.height * texture.repeat.y;
+					var ox = bitmap.width * texture.offset.x;
+					var oy = bitmap.height * texture.offset.y;
 
-				var cx = scaleX / sx;
-				var cy = scaleY / sy;
+					var sx = bitmap.width * texture.repeat.x;
+					var sy = bitmap.height * texture.repeat.y;
 
-				_context.save();
-				_context.translate( v1.x, v1.y );
-				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
-				_context.translate( - scaleX / 2, - scaleY / 2 );
-				_context.scale( cx, cy );
-				_context.translate( - ox, - oy );
-				_context.fillRect( ox, oy, sx, sy );
-				_context.restore();
+					var cx = scaleX / sx;
+					var cy = scaleY / sy;
+
+					_context.save();
+					_context.translate( v1.x, v1.y );
+					if ( material.rotation !== 0 ) _context.rotate( material.rotation );
+					_context.translate( - scaleX / 2, - scaleY / 2 );
+					_context.scale( cx, cy );
+					_context.translate( - ox, - oy );
+					_context.fillRect( ox, oy, sx, sy );
+					_context.restore();
+
+				}
 
 			} else {
 
@@ -760,14 +765,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_color.r = _color.g = _color.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _camera.near, _camera.far );
-
-			material.wireframe === true
-					 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					 : fillPath( _color );
-
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
@@ -822,20 +819,29 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function onTextureUpdate ( event ) {
-
-		textureToPattern( event.target );
-
-	}
-
 	function textureToPattern( texture ) {
 
-		if ( texture instanceof THREE.CompressedTexture ) return;
+		if ( texture.version === 0 ||
+			texture instanceof THREE.CompressedTexture ||
+			texture instanceof THREE.DataTexture ) {
 
-		var repeatX = texture.wrapS === THREE.RepeatWrapping;
-		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+			return {
+				canvas: undefined,
+				version: texture.version
+			};
+
+		}
 
 		var image = texture.image;
+
+		if ( image.complete === false ) {
+
+			return {
+				canvas: undefined,
+				version: 0
+			};
+
+		}
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = image.width;
@@ -845,45 +851,55 @@ THREE.CanvasRenderer = function ( parameters ) {
 		context.setTransform( 1, 0, 0, - 1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
-		_patterns[ texture.id ] = _context.createPattern(
-			canvas, repeatX === true && repeatY === true
-				 ? 'repeat'
-				 : repeatX === true && repeatY === false
-					 ? 'repeat-x'
-					 : repeatX === false && repeatY === true
-						 ? 'repeat-y'
-						 : 'no-repeat'
-		);
+		var repeatX = texture.wrapS === THREE.RepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+
+		var repeat = 'no-repeat';
+
+		if ( repeatX === true && repeatY === true ) {
+
+			repeat = 'repeat';
+
+		} else if ( repeatX === true ) {
+
+			repeat = 'repeat-x';
+
+		} else if ( repeatY === true ) {
+
+			repeat = 'repeat-y';
+
+		}
+
+		var pattern = _context.createPattern( canvas, repeat );
+
+		if ( texture.onUpdate ) texture.onUpdate( texture );
+
+		return {
+			canvas: pattern,
+			version: texture.version
+		};
 
 	}
 
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture ) return;
+		var pattern = _patterns[ texture.id ];
 
-		if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+		if ( pattern === undefined || pattern.version !== texture.version ) {
 
-			if ( texture.image !== undefined && texture.image.width > 0 ) {
-
-				textureToPattern( texture );
-
-			}
-
-			texture.addEventListener( 'update', onTextureUpdate );
+			pattern = textureToPattern( texture );
+			_patterns[ texture.id ] = pattern;
 
 		}
 
-		var pattern = _patterns[ texture.id ];
+		if ( pattern.canvas !== undefined ) {
 
-		if ( pattern !== undefined ) {
-
-			setFillStyle( pattern );
+			setFillStyle( pattern.canvas );
 
 		} else {
 
-			setFillStyle( 'rgba(0,0,0,1)' );
+			setFillStyle( 'rgba( 0, 0, 0, 1)' );
 			_context.fill();
-
 			return;
 
 		}
@@ -1016,6 +1032,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 			} else if ( value === THREE.SubtractiveBlending ) {
 
 				_context.globalCompositeOperation = 'darker';
+
+			} else if ( value === THREE.MultiplyBlending ) {
+
+				_context.globalCompositeOperation = 'multiply';
 
 			}
 

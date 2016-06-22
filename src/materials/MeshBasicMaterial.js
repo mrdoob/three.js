@@ -7,6 +7,9 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
+ *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMapIntensity: <float>
+ *
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
@@ -17,19 +20,14 @@
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
- *  morphTargets: <bool>,
- *
- *  fog: <bool>
+ *  morphTargets: <bool>
  * }
  */
 
@@ -43,6 +41,9 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.map = null;
 
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
+
 	this.specularMap = null;
 
 	this.alphaMap = null;
@@ -52,19 +53,15 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
-	this.fog = true;
-
-	this.shading = THREE.SmoothShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.vertexColors = THREE.NoColors;
-
 	this.skinning = false;
 	this.morphTargets = false;
+
+	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -73,52 +70,34 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
-THREE.MeshBasicMaterial.prototype.clone = function () {
+THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.MeshBasicMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	THREE.Material.prototype.clone.call( this, material );
+	this.color.copy( source.color );
 
-	material.color.copy( this.color );
+	this.map = source.map;
 
-	material.map = this.map;
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
 
-	material.specularMap = this.specularMap;
+	this.specularMap = source.specularMap;
 
-	material.alphaMap = this.alphaMap;
+	this.alphaMap = source.alphaMap;
 
-	material.envMap = this.envMap;
-	material.combine = this.combine;
-	material.reflectivity = this.reflectivity;
-	material.refractionRatio = this.refractionRatio;
+	this.envMap = source.envMap;
+	this.combine = source.combine;
+	this.reflectivity = source.reflectivity;
+	this.refractionRatio = source.refractionRatio;
 
-	material.fog = this.fog;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
+	this.wireframeLinecap = source.wireframeLinecap;
+	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	material.shading = this.shading;
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
-	material.wireframeLinecap = this.wireframeLinecap;
-	material.wireframeLinejoin = this.wireframeLinejoin;
-
-	material.vertexColors = this.vertexColors;
-
-	material.skinning = this.skinning;
-	material.morphTargets = this.morphTargets;
-
-	return material;
-
-};
-
-THREE.MeshBasicMaterial.prototype.toJSON = function () {
-
-	var data = THREE.Material.prototype.toJSON.call( this );
-
-	data.color = this.color.getHex();
-	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
-	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
-	if ( this.side !== THREE.FrontSide ) data.side = this.side;
-
-	return data;
+	return this;
 
 };

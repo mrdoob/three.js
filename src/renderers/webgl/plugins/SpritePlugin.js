@@ -6,6 +6,7 @@
 THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	var gl = renderer.context;
+	var state = renderer.state;
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -18,7 +19,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	var spriteRotation = new THREE.Quaternion();
 	var spriteScale = new THREE.Vector3();
 
-	var init = function () {
+	function init() {
 
 		var vertices = new Float32Array( [
 			- 0.5, - 0.5,  0, 0,
@@ -71,7 +72,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
 		};
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		canvas.width = 8;
 		canvas.height = 8;
 
@@ -82,7 +83,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		texture = new THREE.Texture( canvas );
 		texture.needsUpdate = true;
 
-	};
+	}
 
 	this.render = function ( scene, camera ) {
 
@@ -98,13 +99,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.useProgram( program );
 
-		renderer.state.initAttributes();
-		renderer.state.enableAttribute( attributes.position );
-		renderer.state.enableAttribute( attributes.uv );
-		renderer.state.disableUnusedAttributes();
+		state.initAttributes();
+		state.enableAttribute( attributes.position );
+		state.enableAttribute( attributes.uv );
+		state.disableUnusedAttributes();
 
-		gl.disable( gl.CULL_FACE );
-		gl.enable( gl.BLEND );
+		state.disable( gl.CULL_FACE );
+		state.enable( gl.BLEND );
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
@@ -114,7 +115,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
-		renderer.state.activeTexture( gl.TEXTURE0 );
+		state.activeTexture( gl.TEXTURE0 );
 		gl.uniform1i( uniforms.map, 0 );
 
 		var oldFogType = 0;
@@ -159,8 +160,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			var sprite = sprites[ i ];
 
-			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
+			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
+			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
 
 		}
 
@@ -176,7 +177,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var material = sprite.material;
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
 
 			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
 
@@ -216,17 +217,17 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			renderer.state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			renderer.state.setDepthTest( material.depthTest );
-			renderer.state.setDepthWrite( material.depthWrite );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			state.setDepthTest( material.depthTest );
+			state.setDepthWrite( material.depthWrite );
 
-			if ( material.map && material.map.image && material.map.image.width ) {
+			if ( material.map ) {
 
-				renderer.setTexture( material.map, 0 );
+				renderer.setTexture2D( material.map, 0 );
 
 			} else {
 
-				renderer.setTexture( texture, 0 );
+				renderer.setTexture2D( texture, 0 );
 
 			}
 
@@ -236,7 +237,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
+		state.enable( gl.CULL_FACE );
 
 		renderer.resetGLState();
 
@@ -324,7 +325,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 					'} else {',
 
 						'const float LOG2 = 1.442695;',
-						'float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
+						'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
 						'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
 
 					'}',
@@ -350,8 +351,12 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	}
 
 	function painterSortStable ( a, b ) {
+		
+		if ( a.renderOrder !== b.renderOrder ) {
 
-		if ( a.z !== b.z ) {
+			return a.renderOrder - b.renderOrder;
+
+		} else if ( a.z !== b.z ) {
 
 			return b.z - a.z;
 

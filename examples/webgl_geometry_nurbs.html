@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-	<!-- based on webgl_geometry_shapes.html and webgl_geometries2.html -->
 	<head>
 		<title>three.js webgl - geometry - NURBS</title>
 		<meta charset="utf-8">
@@ -26,7 +25,7 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve and surface example</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/curves/NURBSCurve.js"></script>
 		<script src="js/curves/NURBSSurface.js"></script>
 		<script src="js/curves/NURBSUtils.js"></script>
@@ -152,7 +151,7 @@
 				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
 				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
@@ -176,9 +175,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );

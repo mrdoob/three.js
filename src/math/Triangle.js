@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -15,7 +15,7 @@ THREE.Triangle.normal = function () {
 
 	var v0 = new THREE.Vector3();
 
-	return function ( a, b, c, optionalTarget ) {
+	return function normal( a, b, c, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -36,7 +36,7 @@ THREE.Triangle.normal = function () {
 
 }();
 
-// static/instance method to calculate barycoordinates
+// static/instance method to calculate barycentric coordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function () {
 
@@ -44,7 +44,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function ( point, a, b, c, optionalTarget ) {
+	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
 		v0.subVectors( c, a );
 		v1.subVectors( b, a );
@@ -60,18 +60,20 @@ THREE.Triangle.barycoordFromPoint = function () {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		// colinear or singular triangle
-		if ( denom == 0 ) {
+		// collinear or singular triangle
+		if ( denom === 0 ) {
+
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
 			return result.set( - 2, - 1, - 1 );
+
 		}
 
 		var invDenom = 1 / denom;
 		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
 		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-		// barycoordinates must always sum to 1
+		// barycentric coordinates must always sum to 1
 		return result.set( 1 - u - v, v, u );
 
 	};
@@ -82,7 +84,7 @@ THREE.Triangle.containsPoint = function () {
 
 	var v1 = new THREE.Vector3();
 
-	return function ( point, a, b, c ) {
+	return function containsPoint( point, a, b, c ) {
 
 		var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
@@ -116,6 +118,12 @@ THREE.Triangle.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( triangle ) {
 
 		this.a.copy( triangle.a );
@@ -131,7 +139,7 @@ THREE.Triangle.prototype = {
 		var v0 = new THREE.Vector3();
 		var v1 = new THREE.Vector3();
 
-		return function () {
+		return function area() {
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -175,15 +183,72 @@ THREE.Triangle.prototype = {
 
 	},
 
+	closestPointToPoint: function () {
+
+		var plane, edgeList, projectedPoint, closestPoint;
+
+		return function closestPointToPoint( point, optionalTarget ) {
+
+			if ( plane === undefined ) {
+
+				plane = new THREE.Plane();
+				edgeList = [ new THREE.Line3(), new THREE.Line3(), new THREE.Line3() ];
+				projectedPoint = new THREE.Vector3();
+				closestPoint = new THREE.Vector3();
+
+			}
+
+			var result = optionalTarget || new THREE.Vector3();
+			var minDistance = Infinity;
+
+			// project the point onto the plane of the triangle
+
+			plane.setFromCoplanarPoints( this.a, this.b, this.c );
+			plane.projectPoint( point, projectedPoint );
+
+			// check if the projection lies within the triangle
+
+			if( this.containsPoint( projectedPoint ) === true ) {
+
+				// if so, this is the closest point
+
+				result.copy( projectedPoint );
+
+			} else {
+
+				// if not, the point falls outside the triangle. the result is the closest point to the triangle's edges or vertices
+
+				edgeList[ 0 ].set( this.a, this.b );
+				edgeList[ 1 ].set( this.b, this.c );
+				edgeList[ 2 ].set( this.c, this.a );
+
+				for( var i = 0; i < edgeList.length; i ++ ) {
+
+					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
+
+					var distance = projectedPoint.distanceToSquared( closestPoint );
+
+					if( distance < minDistance ) {
+
+						minDistance = distance;
+
+						result.copy( closestPoint );
+
+					}
+
+				}
+
+			}
+
+			return result;
+
+		};
+
+	}(),
+
 	equals: function ( triangle ) {
 
 		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Triangle().copy( this );
 
 	}
 

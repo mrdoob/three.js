@@ -60,7 +60,7 @@
 		</div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -144,8 +144,7 @@
 					context.fillStyle = gradient;
 					context.fillRect( 0, 0, canvas.width, canvas.height );
 
-					var shadowTexture = new THREE.Texture( canvas );
-					shadowTexture.needsUpdate = true;
+					var shadowTexture = new THREE.CanvasTexture( canvas );
 
 					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 					var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
@@ -211,7 +210,7 @@
 
 					var materials = [
 
-						new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+						new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
 						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 					];
@@ -238,9 +237,7 @@
 					container.appendChild( renderer.domElement );
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

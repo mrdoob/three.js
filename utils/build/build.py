@@ -10,6 +10,7 @@ if sys.version_info < (2, 7):
 import argparse
 import json
 import os
+import re
 import shutil
 import tempfile
 
@@ -45,29 +46,33 @@ def main(argv=None):
 	fd, path = tempfile.mkstemp()
 	tmp = open(path, 'w', encoding='utf-8')
 	sources = []
-		
+
 	if args.amd:
-		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
+		tmp.write(u'( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
 	for include in args.include:
 		with open('includes/' + include + '.json','r', encoding='utf-8') as f:
 			files = json.load(f)
 		for filename in files:
-			tmp.write('// File:' + filename)
+			tmp.write(u'// File:' + filename)
 			tmp.write(u'\n\n')
 			filename = '../../' + filename
 			sources.append(filename)
 			with open(filename, 'r', encoding='utf-8') as f:
 				if filename.endswith(".glsl"):
-					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "')
-					tmp.write(f.read().replace('\n','\\n'))
+					tmp.write(u'THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + u'\' ] = "')
+					text = f.read()
+					text = re.sub(r"[ \t]*//.*\n", "", text) # remove //
+					text = re.sub(r"[ \t]*/\*[\s\S]*?\*/", "", text) # remove /* */
+					text = re.sub(r"\n+", '\\\\n', text) # \n+ to \n
+					tmp.write(text)
 					tmp.write(u'";\n\n')
 				else:
 					tmp.write(f.read())
 					tmp.write(u'\n')
 
 	if args.amd:
-		tmp.write('exports.THREE = THREE;\n\n} ) );')
+		tmp.write(u'exports.THREE = THREE;\n\n} ) );')
 
 	tmp.close()
 
@@ -85,7 +90,7 @@ def main(argv=None):
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
-		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
+		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs %s --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
 		os.system(cmd)
 
 		# header

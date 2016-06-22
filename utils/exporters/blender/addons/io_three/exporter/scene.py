@@ -10,25 +10,35 @@ from . import (
     io,
     api
 )
-
+from bpy import context
 
 class Scene(base_classes.BaseScene):
     """Class that handles the contruction of a Three scene"""
-    _defaults = {
-        constants.METADATA: constants.DEFAULT_METADATA.copy(),
-        constants.GEOMETRIES: [],
-        constants.MATERIALS: [],
-        constants.IMAGES: [],
-        constants.TEXTURES: []
-    }
 
     def __init__(self, filepath, options=None):
         logger.debug("Scene().__init__(%s, %s)", filepath, options)
+        self._defaults = {
+            constants.METADATA: constants.DEFAULT_METADATA.copy(),
+            constants.GEOMETRIES: [],
+            constants.MATERIALS: [],
+            constants.IMAGES: [],
+            constants.TEXTURES: [],
+            constants.ANIMATION: []
+        }
         base_classes.BaseScene.__init__(self, filepath, options or {})
 
         source_file = api.scene_name()
         if source_file:
             self[constants.METADATA][constants.SOURCE_FILE] = source_file
+        self.__init_animation()
+
+    def __init_animation(self):
+        self[constants.ANIMATION].append({
+            constants.NAME: "default",
+            constants.FPS : context.scene.render.fps,
+            constants.KEYFRAMES: []
+        });
+        pass
 
     @property
     def valid_types(self):
@@ -161,7 +171,7 @@ class Scene(base_classes.BaseScene):
 
         io.dump(self.filepath, data, options=self.options)
 
-        if self.options.get(constants.COPY_TEXTURES):
+        if self.options.get(constants.EXPORT_TEXTURES) and not self.options.get(constants.EMBED_TEXTURES):
             texture_folder = self.options.get(constants.TEXTURE_FOLDER)
             for geo in self[constants.GEOMETRIES]:
                 logger.info("Copying textures from %s", geo.node)

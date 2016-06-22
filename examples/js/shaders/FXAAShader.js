@@ -12,8 +12,8 @@ THREE.FXAAShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { type: "t", value: null },
-		"resolution": { type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"tDiffuse":   { value: null },
+		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -25,7 +25,7 @@ THREE.FXAAShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -83,6 +83,6 @@ THREE.FXAAShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

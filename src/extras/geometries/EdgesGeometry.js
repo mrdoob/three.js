@@ -8,10 +8,15 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
+	var thresholdDot = Math.cos( THREE.Math.DEG2RAD * thresholdAngle );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+
+	function sortFunction( a, b ) {
+
+		return a - b;
+
+	}
 
 	var keys = [ 'a', 'b', 'c' ];
 
@@ -33,7 +38,6 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	var vertices = geometry2.vertices;
 	var faces = geometry2.faces;
-	var numEdges = 0;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -50,7 +54,6 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 			if ( hash[ key ] === undefined ) {
 
 				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
-				numEdges ++;
 
 			} else {
 
@@ -62,9 +65,7 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	}
 
-	var coords = new Float32Array( numEdges * 2 * 3 );
-
-	var index = 0;
+	var coords = [];
 
 	for ( var key in hash ) {
 
@@ -73,20 +74,20 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
-			coords[ index ++ ] = vertex.x;
-			coords[ index ++ ] = vertex.y;
-			coords[ index ++ ] = vertex.z;
+			coords.push( vertex.x );
+			coords.push( vertex.y );
+			coords.push( vertex.z );
 
 			vertex = vertices[ h.vert2 ];
-			coords[ index ++ ] = vertex.x;
-			coords[ index ++ ] = vertex.y;
-			coords[ index ++ ] = vertex.z;
+			coords.push( vertex.x );
+			coords.push( vertex.y );
+			coords.push( vertex.z );
 
 		}
 
 	}
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( coords ), 3 ) );
 
 };
 

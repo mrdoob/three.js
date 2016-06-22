@@ -6,14 +6,8 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *	uvOffset: new THREE.Vector2(),
- *	uvScale: new THREE.Vector2(),
- *
- *  fog: <bool>
+ *	uvScale: new THREE.Vector2()
  * }
  */
 
@@ -29,8 +23,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.rotation = 0;
 
 	this.fog = false;
-
-	// set parameters
+	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -39,29 +32,15 @@ THREE.SpriteMaterial = function ( parameters ) {
 THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
 
-THREE.SpriteMaterial.prototype.clone = function () {
+THREE.SpriteMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.SpriteMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	THREE.Material.prototype.clone.call( this, material );
+	this.color.copy( source.color );
+	this.map = source.map;
 
-	material.color.copy( this.color );
-	material.map = this.map;
+	this.rotation = source.rotation;
 
-	material.rotation = this.rotation;
-
-	material.fog = this.fog;
-
-	return material;
-
-};
-
-THREE.SpriteMaterial.prototype.toJSON = function () {
-
-	var data = THREE.Material.prototype.toJSON.call( this );
-
-	data.color = this.color.getHex();
-
-	return data;
+	return this;
 
 };

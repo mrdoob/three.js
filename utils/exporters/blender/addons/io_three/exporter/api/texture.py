@@ -155,12 +155,20 @@ def wrap(texture):
 
     """
     logger.debug("texture.wrap(%s)", texture)
-    wrapping = {
-        True: constants.WRAPPING.MIRROR,
-        False: constants.WRAPPING.REPEAT
-    }
-    return (wrapping[texture.use_mirror_x],
-            wrapping[texture.use_mirror_y])
+
+    if(texture.extension == "REPEAT"):
+        wrapping = {
+            True: constants.WRAPPING.MIRROR,
+            False: constants.WRAPPING.REPEAT
+        }
+        return (wrapping[texture.use_mirror_x],
+                wrapping[texture.use_mirror_y])
+
+    # provide closest available three.js behavior.
+    # other possible values: "CLIP", "EXTEND", "CLIP_CUBE", "CHECKER",
+    # best match CLAMP behavior
+    else:
+        return (constants.WRAPPING.CLAMP, constants.WRAPPING.CLAMP);
 
 
 def textures():
@@ -174,5 +182,6 @@ def textures():
         if mat.users == 0:
             continue
         for slot in mat.texture_slots:
-            if slot and slot.use and slot.texture.type == IMAGE:
+            if (slot and slot.use and
+                    slot.texture and slot.texture.type == IMAGE):
                 yield slot.texture.name

@@ -20,7 +20,6 @@
 	"DbgIndex" : 0,
 	"DbgName" : "Material",
 	"blending" : "NormalBlending",
-	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.800000011920929, 0.800000011920929, 0.800000011920929],
 	"colorSpecular" : [0.5, 0.5, 0.5],
 	"depthTest" : true,

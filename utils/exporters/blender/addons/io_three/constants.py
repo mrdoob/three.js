@@ -32,6 +32,25 @@ MAPPING_TYPES = type('Mapping', (), {
     'SPHERICAL_REFLECTION': 'SphericalReflectionMapping'
 })
 
+NUMERIC = {
+    'UVMapping': 300,
+    'CubeReflectionMapping': 301,
+    'CubeRefractionMapping': 302,
+    'EquirectangularReflectionMapping': 303,
+    'EquirectangularRefractionMapping': 304,
+    'SphericalReflectionMapping': 305,
+
+    'RepeatWrapping': 1000,
+    'ClampToEdgeWrapping': 1001,
+    'MirroredRepeatWrapping': 1002,
+
+    'NearestFilter': 1003,
+    'NearestMipMapNearestFilter': 1004,
+    'NearestMipMapLinearFilter': 1005,
+    'LinearFilter': 1006,
+    'LinearMipMapNearestFilter': 1007,
+    'LinearMipMapLinearFilter': 1008
+}
 JSON = 'json'
 EXTENSION = '.%s' % JSON
 INDENT = 'indent'
@@ -44,15 +63,26 @@ FACES = 'faces'
 NORMALS = 'normals'
 BONES = 'bones'
 UVS = 'uvs'
+APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
+EXTRA_VGROUPS = 'extraVertexGroups'
+INDEX = 'index'
+DRAW_CALLS = 'drawcalls'
+DC_START = 'start'
+DC_COUNT = 'count'
+DC_INDEX = 'index'
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
 FRAME_STEP = 'frameStep'
 FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
 ANIMATION = 'animations'
+CLIPS="clips"
+KEYFRAMES = 'tracks'
 MORPH_TARGETS = 'morphTargets'
+MORPH_TARGETS_ANIM = 'morphTargetsAnimation'
+BLEND_SHAPES = 'blendShapes'
 POSE = 'pose'
 REST = 'rest'
 SKIN_INDICES = 'skinIndices'
@@ -63,11 +93,13 @@ LIGHTS = 'lights'
 HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
-COPY_TEXTURES = 'copyTextures'
+EXPORT_TEXTURES = 'exportTextures'
+EMBED_TEXTURES = 'embedTextures'
 TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
+CUSTOM_PROPERTIES = 'customProperties'
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
 OFF = 'off'
@@ -76,17 +108,23 @@ GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
 GEOMETRY = 'geometry'
 GEOMETRY_TYPE = 'geometryType'
+INDEX_TYPE = 'indexType'
 
 CRITICAL = 'critical'
 ERROR = 'error'
 WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
+DISABLED = 'disabled'
 
 NONE = 'None'
 MSGPACK = 'msgpack'
 
 PACK = 'pack'
+
+FLOAT_32 = 'Float32Array'
+UINT_16 = 'Uint16Array'
+UINT_32 = 'Uint32Array'
 
 INFLUENCES_PER_VERTEX = 'influencesPerVertex'
 
@@ -95,7 +133,10 @@ EXPORT_OPTIONS = {
     VERTICES: True,
     NORMALS: True,
     UVS: True,
+    APPLY_MODIFIERS: True,
     COLORS: False,
+    EXTRA_VGROUPS: '',
+    INDEX_TYPE: UINT_16,
     MATERIALS: False,
     FACE_MATERIALS: False,
     SCALE: 1,
@@ -106,17 +147,21 @@ EXPORT_OPTIONS = {
     COMPRESSION: None,
     MAPS: False,
     ANIMATION: OFF,
+    KEYFRAMES: False,
     BONES: False,
     SKINNING: False,
     MORPH_TARGETS: False,
+    BLEND_SHAPES: False,
     CAMERAS: False,
     LIGHTS: False,
     HIERARCHY: False,
-    COPY_TEXTURES: True,
+    EXPORT_TEXTURES: True,
+    EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
     ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,
+    CUSTOM_PROPERTIES: False,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,
@@ -125,7 +170,7 @@ EXPORT_OPTIONS = {
 }
 
 
-FORMAT_VERSION = 4.3
+FORMAT_VERSION = 4.4
 VERSION = 'version'
 THREE = 'io_three'
 GENERATOR = 'generator'
@@ -157,7 +202,6 @@ PERSPECTIVE_CAMERA = 'PerspectiveCamera'
 ORTHOGRAPHIC_CAMERA = 'OrthographicCamera'
 AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
-AREA_LIGHT = 'AreaLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
@@ -180,6 +224,7 @@ ROTATION = 'rotation'
 SCALE = 'scale'
 
 UV = 'uv'
+UV2 = 'uv2'
 ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
@@ -232,7 +277,6 @@ SCL = 'scl'
 TIME = 'time'
 KEYS = 'keys'
 
-AMBIENT = 'ambient'
 COLOR = 'color'
 EMISSIVE = 'emissive'
 SPECULAR = 'specular'
@@ -289,6 +333,8 @@ NORMAL_BLENDING = 0
 VERTEX_COLORS_ON = 2
 VERTEX_COLORS_OFF = 0
 
+SIDE_DOUBLE = 2
+
 THREE_BASIC = 'MeshBasicMaterial'
 THREE_LAMBERT = 'MeshLambertMaterial'
 THREE_PHONG = 'MeshPhongMaterial'
@@ -297,6 +343,7 @@ INTENSITY = 'intensity'
 DISTANCE = 'distance'
 ASPECT = 'aspect'
 ANGLE = 'angle'
+DECAY = 'decayExponent'
 
 FOV = 'fov'
 ASPECT = 'aspect'
@@ -310,7 +357,6 @@ BOTTOM = 'bottom'
 
 SHADING = 'shading'
 COLOR_DIFFUSE = 'colorDiffuse'
-COLOR_AMBIENT = 'colorAmbient'
 COLOR_EMISSIVE = 'colorEmissive'
 COLOR_SPECULAR = 'colorSpecular'
 DBG_NAME = 'DbgName'

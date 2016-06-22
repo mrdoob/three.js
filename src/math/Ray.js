@@ -1,5 +1,5 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  */
 
 THREE.Ray = function ( origin, direction ) {
@@ -22,6 +22,12 @@ THREE.Ray.prototype = {
 
 	},
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( ray ) {
 
 		this.origin.copy( ray.origin );
@@ -39,11 +45,19 @@ THREE.Ray.prototype = {
 
 	},
 
+	lookAt: function ( v ) {
+
+		this.direction.copy( v ).sub( this.origin ).normalize();
+
+		return this;
+
+	},
+
 	recast: function () {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( t ) {
+		return function recast( t ) {
 
 			this.origin.copy( this.at( t, v1 ) );
 
@@ -69,11 +83,17 @@ THREE.Ray.prototype = {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
+
+		return Math.sqrt( this.distanceSqToPoint( point ) );
+
+	},
+
+	distanceSqToPoint: function () {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceSqToPoint( point ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
@@ -81,13 +101,13 @@ THREE.Ray.prototype = {
 
 			if ( directionDistance < 0 ) {
 
-				return this.origin.distanceTo( point );
+				return this.origin.distanceToSquared( point );
 
 			}
 
 			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			return v1.distanceTo( point );
+			return v1.distanceToSquared( point );
 
 		};
 
@@ -99,9 +119,9 @@ THREE.Ray.prototype = {
 		var segDir = new THREE.Vector3();
 		var diff = new THREE.Vector3();
 
-		return function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-			// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
+			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
 			// It returns the min distance between the ray and the segment
 			// defined by v0 and v1
 			// It can also set two optional targets :
@@ -220,27 +240,15 @@ THREE.Ray.prototype = {
 
 	}(),
 
-
-	isIntersectionSphere: function ( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) <= sphere.radius;
-
-	},
-
 	intersectSphere: function () {
-
-		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
 
 		var v1 = new THREE.Vector3();
 
-		return function ( sphere, optionalTarget ) {
+		return function intersectSphere( sphere, optionalTarget ) {
 
 			v1.subVectors( sphere.center, this.origin );
-
 			var tca = v1.dot( this.direction );
-
 			var d2 = v1.dot( v1 ) - tca * tca;
-
 			var radius2 = sphere.radius * sphere.radius;
 
 			if ( d2 > radius2 ) return null;
@@ -261,46 +269,27 @@ THREE.Ray.prototype = {
 			// in order to always return an intersect point that is in front of the ray.
 			if ( t0 < 0 ) return this.at( t1, optionalTarget );
 
-			// else t0 is in front of the ray, so return the first collision point scaled by t0 
+			// else t0 is in front of the ray, so return the first collision point scaled by t0
 			return this.at( t0, optionalTarget );
 
-		}
+		};
 
 	}(),
 
-	isIntersectionPlane: function ( plane ) {
+	intersectsSphere: function ( sphere ) {
 
-		// check if the ray lies on the plane first
-
-		var distToPoint = plane.distanceToPoint( this.origin );
-
-		if ( distToPoint === 0 ) {
-
-			return true;
-
-		}
-
-		var denominator = plane.normal.dot( this.direction );
-
-		if ( denominator * distToPoint < 0 ) {
-
-			return true;
-
-		}
-
-		// ray origin is behind the plane (and is pointing behind it)
-
-		return false;
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
 	},
 
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
-		if ( denominator == 0 ) {
+
+		if ( denominator === 0 ) {
 
 			// line is coplanar, return origin
-			if ( plane.distanceToPoint( this.origin ) == 0 ) {
+			if ( plane.distanceToPoint( this.origin ) === 0 ) {
 
 				return 0;
 
@@ -327,29 +316,44 @@ THREE.Ray.prototype = {
 		if ( t === null ) {
 
 			return null;
+
 		}
 
 		return this.at( t, optionalTarget );
 
 	},
 
-	isIntersectionBox: function () {
 
-		var v = new THREE.Vector3();
 
-		return function ( box ) {
+	intersectsPlane: function ( plane ) {
 
-			return this.intersectBox( box, v ) !== null;
+		// check if the ray lies on the plane first
 
-		};
+		var distToPoint = plane.distanceToPoint( this.origin );
 
-	}(),
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	},
 
 	intersectBox: function ( box, optionalTarget ) {
 
-		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
-
-		var tmin,tmax,tymin,tymax,tzmin,tzmax;
+		var tmin, tmax, tymin, tymax, tzmin, tzmax;
 
 		var invdirx = 1 / this.direction.x,
 			invdiry = 1 / this.direction.y,
@@ -366,6 +370,7 @@ THREE.Ray.prototype = {
 
 			tmin = ( box.max.x - origin.x ) * invdirx;
 			tmax = ( box.min.x - origin.x ) * invdirx;
+
 		}
 
 		if ( invdiry >= 0 ) {
@@ -377,6 +382,7 @@ THREE.Ray.prototype = {
 
 			tymin = ( box.max.y - origin.y ) * invdiry;
 			tymax = ( box.min.y - origin.y ) * invdiry;
+
 		}
 
 		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
@@ -397,6 +403,7 @@ THREE.Ray.prototype = {
 
 			tzmin = ( box.max.z - origin.z ) * invdirz;
 			tzmax = ( box.min.z - origin.z ) * invdirz;
+
 		}
 
 		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
@@ -413,6 +420,18 @@ THREE.Ray.prototype = {
 
 	},
 
+	intersectsBox: ( function () {
+
+		var v = new THREE.Vector3();
+
+		return function intersectsBox( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		};
+
+	} )(),
+
 	intersectTriangle: function () {
 
 		// Compute the offset origin, edges, and normal.
@@ -421,9 +440,9 @@ THREE.Ray.prototype = {
 		var edge2 = new THREE.Vector3();
 		var normal = new THREE.Vector3();
 
-		return function ( a, b, c, backfaceCulling, optionalTarget ) {
+		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 
-			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
@@ -504,17 +523,12 @@ THREE.Ray.prototype = {
 		this.direction.normalize();
 
 		return this;
+
 	},
 
 	equals: function ( ray ) {
 
 		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Ray().copy( this );
 
 	}
 

@@ -4,7 +4,6 @@
  *
  * parameters = {
  *  color: <hex>,
- *  emissive: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
  *  opacity: <float>,
@@ -17,11 +16,19 @@
  *  aoMap: new THREE.Texture( <Image> ),
  *  aoMapIntensity: <float>
  *
+ *  emissive: <hex>,
+ *  emissiveIntensity: <float>
+ *  emissiveMap: new THREE.Texture( <Image> ),
+ *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
  *
  *  normalMap: new THREE.Texture( <Image> ),
  *  normalScale: <Vector2>,
+ *
+ *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementScale: <float>,
+ *  displacementBias: <float>,
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -32,21 +39,12 @@
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
  *  morphTargets: <bool>,
- *  morphNormals: <bool>,
- *
- *	fog: <bool>
+ *  morphNormals: <bool>
  * }
  */
 
@@ -57,11 +55,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.type = 'MeshPhongMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
-
-	this.metal = false;
 
 	this.map = null;
 
@@ -71,11 +66,19 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
+	this.emissive = new THREE.Color( 0x000000 );
+	this.emissiveIntensity = 1.0;
+	this.emissiveMap = null;
+
 	this.bumpMap = null;
 	this.bumpScale = 1;
 
 	this.normalMap = null;
 	this.normalScale = new THREE.Vector2( 1, 1 );
+
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
 	this.specularMap = null;
 
@@ -86,16 +89,10 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
-	this.fog = true;
-
-	this.shading = THREE.SmoothShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
-
-	this.vertexColors = THREE.NoColors;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -108,75 +105,54 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;
 
-THREE.MeshPhongMaterial.prototype.clone = function () {
+THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.MeshPhongMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	THREE.Material.prototype.clone.call( this, material );
+	this.color.copy( source.color );
+	this.specular.copy( source.specular );
+	this.shininess = source.shininess;
 
-	material.color.copy( this.color );
-	material.emissive.copy( this.emissive );
-	material.specular.copy( this.specular );
-	material.shininess = this.shininess;
+	this.map = source.map;
 
-	material.metal = this.metal;
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
 
-	material.map = this.map;
+	this.aoMap = source.aoMap;
+	this.aoMapIntensity = source.aoMapIntensity;
 
-	material.lightMap = this.lightMap;
-	material.lightMapIntensity = this.lightMapIntensity;
+	this.emissive.copy( source.emissive );
+	this.emissiveMap = source.emissiveMap;
+	this.emissiveIntensity = source.emissiveIntensity;
 
-	material.aoMap = this.aoMap;
-	material.aoMapIntensity = this.aoMapIntensity;
+	this.bumpMap = source.bumpMap;
+	this.bumpScale = source.bumpScale;
 
-	material.bumpMap = this.bumpMap;
-	material.bumpScale = this.bumpScale;
+	this.normalMap = source.normalMap;
+	this.normalScale.copy( source.normalScale );
 
-	material.normalMap = this.normalMap;
-	material.normalScale.copy( this.normalScale );
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
-	material.specularMap = this.specularMap;
+	this.specularMap = source.specularMap;
 
-	material.alphaMap = this.alphaMap;
+	this.alphaMap = source.alphaMap;
 
-	material.envMap = this.envMap;
-	material.combine = this.combine;
-	material.reflectivity = this.reflectivity;
-	material.refractionRatio = this.refractionRatio;
+	this.envMap = source.envMap;
+	this.combine = source.combine;
+	this.reflectivity = source.reflectivity;
+	this.refractionRatio = source.refractionRatio;
 
-	material.fog = this.fog;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
+	this.wireframeLinecap = source.wireframeLinecap;
+	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	material.shading = this.shading;
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
-	material.wireframeLinecap = this.wireframeLinecap;
-	material.wireframeLinejoin = this.wireframeLinejoin;
-
-	material.vertexColors = this.vertexColors;
-
-	material.skinning = this.skinning;
-	material.morphTargets = this.morphTargets;
-	material.morphNormals = this.morphNormals;
-
-	return material;
-
-};
-
-THREE.MeshPhongMaterial.prototype.toJSON = function () {
-
-	var data = THREE.Material.prototype.toJSON.call( this );
-
-	data.color = this.color.getHex();
-	data.emissive = this.emissive.getHex();
-	data.specular = this.specular.getHex();
-	data.shininess = this.shininess;
-
-	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
-	if ( this.shading !== THREE.SmoothShading ) data.shading = this.shading;
-	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
-	if ( this.side !== THREE.FrontSide ) data.side = this.side;
-
-	return data;
+	return this;
 
 };

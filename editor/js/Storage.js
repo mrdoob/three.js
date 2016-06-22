@@ -7,8 +7,10 @@ var Storage = function () {
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
 	if ( indexedDB === undefined  ) {
+
 		console.warn( 'Storage: IndexedDB not available.' );
 		return { init: function () {}, get: function () {}, set: function () {}, clear: function () {} };
+
 	}
 
 	var name = 'threejs-editor';
@@ -76,19 +78,21 @@ var Storage = function () {
 
 		},
 
-		clear: function ( callback ) {
+		clear: function () {
+
+			if ( database === undefined ) return;
 
 			var transaction = database.transaction( [ 'states' ], 'readwrite' );
 			var objectStore = transaction.objectStore( 'states' );
 			var request = objectStore.clear();
 			request.onsuccess = function ( event ) {
 
-				callback();
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Cleared IndexedDB.' );
 
 			};
 
 		}
 
-	}
+	};
 
 };

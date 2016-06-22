@@ -20,7 +20,7 @@ THREE.SVGRenderer = function () {
 	var _this = this,
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
-	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+	_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
 	_v1, _v2, _v3, _v4,
@@ -36,7 +36,6 @@ THREE.SVGRenderer = function () {
 	_clearColor = new THREE.Color(),
 	_clearAlpha = 1,
 
-	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_centroid = new THREE.Vector3(),
 	_normal = new THREE.Vector3(),
@@ -68,7 +67,7 @@ THREE.SVGRenderer = function () {
 
 	this.setQuality = function( quality ) {
 
-		switch (quality) {
+		switch ( quality ) {
 
 			case "high": _quality = 1; break;
 			case "low": _quality = 0; break;
@@ -125,7 +124,7 @@ THREE.SVGRenderer = function () {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			THREE.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}
@@ -171,7 +170,7 @@ THREE.SVGRenderer = function () {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material );
 
@@ -181,9 +180,9 @@ THREE.SVGRenderer = function () {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
-				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
-				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
-				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
 
 				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
@@ -195,7 +194,7 @@ THREE.SVGRenderer = function () {
 					_v3.positionScreen
 				] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+				if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, element, material );
 
@@ -382,11 +381,6 @@ THREE.SVGRenderer = function () {
 			calculateLight( _lights, _centroid, element.normalModel, _color );
 
 			_color.multiply( _diffuseColor ).add( material.emissive );
-
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
-			_color.setRGB( _w, _w, _w );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 

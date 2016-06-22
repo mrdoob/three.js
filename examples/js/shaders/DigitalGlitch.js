@@ -14,17 +14,17 @@ THREE.DigitalGlitch = {
 
 	uniforms: {
 
-		"tDiffuse":		{ type: "t", value: null },//diffuse texture
-		"tDisp":		{ type: "t", value: null },//displacement texture for digital glitch squares
-		"byp":			{ type: "i", value: 0 },//apply the glitch ?
-		"amount":		{ type: "f", value: 0.08 },
-		"angle":		{ type: "f", value: 0.02 },
-		"seed":			{ type: "f", value: 0.02 },
-		"seed_x":		{ type: "f", value: 0.02 },//-1,1
-		"seed_y":		{ type: "f", value: 0.02 },//-1,1
-		"distortion_x":	{ type: "f", value: 0.5 },
-		"distortion_y":	{ type: "f", value: 0.6 },
-		"col_s":		{ type: "f", value: 0.05 }
+		"tDiffuse":		{ value: null },//diffuse texture
+		"tDisp":		{ value: null },//displacement texture for digital glitch squares
+		"byp":			{ value: 0 },//apply the glitch ?
+		"amount":		{ value: 0.08 },
+		"angle":		{ value: 0.02 },
+		"seed":			{ value: 0.02 },
+		"seed_x":		{ value: 0.02 },//-1,1
+		"seed_y":		{ value: 0.02 },//-1,1
+		"distortion_x":	{ value: 0.5 },
+		"distortion_y":	{ value: 0.6 },
+		"col_s":		{ value: 0.05 }
 	},
 
 	vertexShader: [
@@ -34,7 +34,7 @@ THREE.DigitalGlitch = {
 			"vUv = uv;",
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 		"}"
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 		"uniform int byp;",//should we apply the glitch ?
@@ -98,6 +98,6 @@ THREE.DigitalGlitch = {
 			"}",
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

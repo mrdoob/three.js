@@ -81,14 +81,14 @@ test( "setComponents", function() {
 test( "setFromNormalAndCoplanarPoint", function() {
 	var normal = one3.clone().normalize();
 	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( normal, zero3 );
-	
+
 	ok( a.normal.equals( normal ), "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 });
 
 test( "normalize", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), 2 );
-	
+
 	a.normalize();
 	ok( a.normal.length() == 1, "Passed!" );
 	ok( a.normal.equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
@@ -97,7 +97,7 @@ test( "normalize", function() {
 
 test( "negate/distanceToPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), -2 );
-	
+
 	a.normalize();
 	ok( a.distanceToPoint( new THREE.Vector3( 4, 0, 0 ) ) === 3, "Passed!" );
 	ok( a.distanceToPoint( new THREE.Vector3( 1, 0, 0 ) ) === 0, "Passed!" );
@@ -109,7 +109,7 @@ test( "negate/distanceToPoint", function() {
 
 test( "distanceToPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), -2 );
-	
+
 	a.normalize();
 	ok( a.distanceToPoint( a.projectPoint( zero3.clone() ) ) === 0, "Passed!" );
 	ok( a.distanceToPoint( new THREE.Vector3( 4, 0, 0 ) ) === 3, "Passed!" );
@@ -119,7 +119,7 @@ test( "distanceToSphere", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
 	var b = new THREE.Sphere( new THREE.Vector3( 2, 0, 0 ), 1 );
-	
+
 	ok( a.distanceToSphere( b ) === 1, "Passed!" );
 
 	a.set( new THREE.Vector3( 1, 0, 0 ), 2 );
@@ -132,23 +132,23 @@ test( "isInterestionLine/intersectLine", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
 	var l1 = new THREE.Line3( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) );
-	ok( a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectsLine( l1 ), "Passed!" );
 	ok( a.intersectLine( l1 ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -3 );
 
-	ok( a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectsLine( l1 ), "Passed!" );
 	ok( a.intersectLine( l1 ).equals( new THREE.Vector3( 3, 0, 0 ) ), "Passed!" );
 
 
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -11 );
 
-	ok( ! a.isIntersectionLine( l1 ), "Passed!" );
+	ok( ! a.intersectsLine( l1 ), "Passed!" );
 	ok( a.intersectLine( l1 ) === undefined, "Passed!" );
-	
+
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 11 );
 
-	ok( ! a.isIntersectionLine( l1 ), "Passed!" );
+	ok( ! a.intersectsLine( l1 ), "Passed!" );
 	ok( a.intersectLine( l1 ) === undefined, "Passed!" );
 
 });
@@ -162,7 +162,7 @@ test( "projectPoint", function() {
 	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
 	ok( a.projectPoint( new THREE.Vector3( 0, 0, 0 ) ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
 	ok( a.projectPoint( new THREE.Vector3( 0, 1, 0 ) ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
-	
+
 });
 
 test( "orthoPoint", function() {

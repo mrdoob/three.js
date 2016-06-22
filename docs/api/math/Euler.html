@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -91,7 +92,7 @@
 		WARNING: this discards revolution information.
 		</div>
 
-		<h3>[method:Euler setFromVector3]([page:Vector3 vector], [page:String order]) [page:Euler this]</h3>
+		<h3>[method:Euler setFromVector3]( [page:Vector3 vector], [page:String order] ) [page:Euler this]</h3>
 		<div>
 		vector -- [page:Vector3].
 		order -- [page:string] Order of axes, defaults to 'XYZ' (must be upper case)
@@ -105,7 +106,7 @@
 		Returns the Euler's XYZ properties as a Vector3.
 		</div>
 
-		<h3>[method:Euler fromArray]([page:Array array]) [page:Euler this]</h3>
+		<h3>[method:Euler fromArray]( [page:Array array] ) [page:Euler this]</h3>
 		<div>
 		array -- [page:Array] of length 3 or 4. array[3] is an optional order argument.
 		</div>

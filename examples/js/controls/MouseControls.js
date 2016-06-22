@@ -9,9 +9,9 @@ THREE.MouseControls = function ( object ) {
 	var scope = this;
 	var PI_2 = Math.PI / 2;
 	var mouseQuat = {
-    x: new THREE.Quaternion(),
-    y: new THREE.Quaternion()
-  };
+		x: new THREE.Quaternion(),
+		y: new THREE.Quaternion()
+	};
 	var object = object;
 	var xVector = new THREE.Vector3( 1, 0, 0 );
 	var yVector = new THREE.Vector3( 0, 1, 0 );
@@ -35,9 +35,9 @@ THREE.MouseControls = function ( object ) {
 	this.enabled = true;
 
 	this.orientation = {
-    x: 0,
-    y: 0,
-  };
+		x: 0,
+		y: 0,
+	};
 
 	this.update = function() {
 
@@ -45,10 +45,16 @@ THREE.MouseControls = function ( object ) {
 
 		mouseQuat.x.setFromAxisAngle( xVector, this.orientation.x );
 		mouseQuat.y.setFromAxisAngle( yVector, this.orientation.y );
-		object.quaternion.copy(mouseQuat.y).multiply(mouseQuat.x);
+		object.quaternion.copy( mouseQuat.y ).multiply( mouseQuat.x );
 		return;
 
 	};
+
+	this.dispose = function() {
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+
+	}
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
 

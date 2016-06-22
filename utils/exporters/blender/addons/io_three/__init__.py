@@ -38,9 +38,9 @@ logging.basicConfig(
 
 bl_info = {
     'name': "Three.js Format",
-    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa",
-    'version': (1, 4, 0),
-    'blender': (2, 7, 3),
+    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw, jackcaron, bhouston",
+    'version': (1, 5, 0),
+    'blender': (2, 74, 0),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
     'warning': "Importer not included.",
@@ -116,6 +116,7 @@ bpy.types.Material.THREE_blending_type = EnumProperty(
 
 bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
 bpy.types.Material.THREE_depth_test = BoolProperty(default=True)
+bpy.types.Material.THREE_double_sided = BoolProperty(default=False)
 
 class ThreeMaterial(bpy.types.Panel):
     """Adds custom properties to the Materials of an object"""
@@ -149,6 +150,10 @@ class ThreeMaterial(bpy.types.Panel):
             row = layout.row()
             row.prop(mat, 'THREE_depth_test',
                      text="Enable depth testing")
+
+            row = layout.row()
+            row.prop(mat, 'THREE_double_sided',
+                     text="Double-sided")
 
 def _mag_filters(index):
     """Three.js mag filters
@@ -301,9 +306,21 @@ def restore_export_settings(properties, settings):
         constants.INFLUENCES_PER_VERTEX,
         constants.EXPORT_OPTIONS[constants.INFLUENCES_PER_VERTEX])
 
+    properties.option_apply_modifiers = settings.get(
+        constants.APPLY_MODIFIERS,
+        constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS])
+
+    properties.option_extra_vgroups = settings.get(
+        constants.EXTRA_VGROUPS,
+        constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
+
+    properties.option_index_type = settings.get(
+        constants.INDEX_TYPE,
+        constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
 
     ## Materials {
@@ -345,6 +362,10 @@ def restore_export_settings(properties, settings):
         constants.PRECISION,
         constants.EXPORT_OPTIONS[constants.PRECISION])
 
+    properties.option_custom_properties = settings.get(
+        constants.CUSTOM_PROPERTIES,
+        constants.EXPORT_OPTIONS[constants.CUSTOM_PROPERTIES])
+
     properties.option_logging = settings.get(
         constants.LOGGING,
         constants.EXPORT_OPTIONS[constants.LOGGING])
@@ -357,9 +378,13 @@ def restore_export_settings(properties, settings):
         constants.INDENT,
         constants.EXPORT_OPTIONS[constants.INDENT])
 
-    properties.option_copy_textures = settings.get(
-        constants.COPY_TEXTURES,
-        constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+    properties.option_export_textures = settings.get(
+        constants.EXPORT_TEXTURES,
+        constants.EXPORT_OPTIONS[constants.EXPORT_TEXTURES])
+
+    properties.option_embed_textures = settings.get(
+        constants.EMBED_TEXTURES,
+        constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES])
 
     properties.option_texture_folder = settings.get(
         constants.TEXTURE_FOLDER,
@@ -397,9 +422,17 @@ def restore_export_settings(properties, settings):
         constants.MORPH_TARGETS,
         constants.EXPORT_OPTIONS[constants.MORPH_TARGETS])
 
+    properties.option_blend_shape = settings.get(
+        constants.BLEND_SHAPES,
+        constants.EXPORT_OPTIONS[constants.BLEND_SHAPES])
+
     properties.option_animation_skeletal = settings.get(
         constants.ANIMATION,
         constants.EXPORT_OPTIONS[constants.ANIMATION])
+
+    properties.option_keyframes = settings.get(
+        constants.KEYFRAMES,
+        constants.EXPORT_OPTIONS[constants.KEYFRAMES])
 
     properties.option_frame_step = settings.get(
         constants.FRAME_STEP,
@@ -424,7 +457,10 @@ def set_settings(properties):
         constants.NORMALS: properties.option_normals,
         constants.SKINNING: properties.option_skinning,
         constants.BONES: properties.option_bones,
+        constants.EXTRA_VGROUPS: properties.option_extra_vgroups,
+        constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
         constants.GEOMETRY_TYPE: properties.option_geometry_type,
+        constants.INDEX_TYPE: properties.option_index_type,
 
         constants.MATERIALS: properties.option_materials,
         constants.UVS: properties.option_uv_coords,
@@ -436,10 +472,12 @@ def set_settings(properties):
         constants.SCALE: properties.option_scale,
         constants.ENABLE_PRECISION: properties.option_round_off,
         constants.PRECISION: properties.option_round_value,
+        constants.CUSTOM_PROPERTIES: properties.option_custom_properties,
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
-        constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.EXPORT_TEXTURES: properties.option_export_textures,
+        constants.EMBED_TEXTURES: properties.option_embed_textures,
         constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
         constants.SCENE: properties.option_export_scene,
@@ -450,7 +488,9 @@ def set_settings(properties):
         constants.HIERARCHY: properties.option_hierarchy,
 
         constants.MORPH_TARGETS: properties.option_animation_morph,
+        constants.BLEND_SHAPES: properties.option_blend_shape,
         constants.ANIMATION: properties.option_animation_skeletal,
+        constants.KEYFRAMES: properties.option_keyframes,
         constants.FRAME_STEP: properties.option_frame_step,
         constants.FRAME_INDEX_AS_TIME: properties.option_frame_index_as_time,
         constants.INFLUENCES_PER_VERTEX: properties.option_influences
@@ -490,6 +530,10 @@ def animation_options():
     ]
 
     return anim
+
+def resolve_conflicts(self, context):
+    if(not self.option_export_textures):
+        self.option_embed_textures = False;
 
 class ExportThree(bpy.types.Operator, ExportHelper):
     """Class that handles the export properties"""
@@ -555,6 +599,28 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export bones",
         default=constants.EXPORT_OPTIONS[constants.BONES])
 
+    option_extra_vgroups = StringProperty(
+        name="Extra Vertex Groups",
+        description="Non-skinning vertex groups to export (comma-separated, w/ star wildcard, BufferGeometry only).",
+        default=constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
+    option_apply_modifiers = BoolProperty(
+        name="Apply Modifiers",
+        description="Apply Modifiers to mesh objects",
+        default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
+    )
+
+    index_buffer_types = [
+        (constants.NONE,) * 3,
+        (constants.UINT_16,) * 3,
+        (constants.UINT_32,) * 3]
+
+    option_index_type = EnumProperty(
+        name="Index Buffer",
+        description="Index buffer type that will be used for BufferGeometry objects.",
+        items=index_buffer_types,
+        default=constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
+
     option_scale = FloatProperty(
         name="Scale",
         description="Scale vertices",
@@ -576,7 +642,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Floating point precision",
         default=constants.EXPORT_OPTIONS[constants.PRECISION])
 
+    option_custom_properties = BoolProperty(
+        name="Custom Props",
+        description="Export custom properties as userData",
+        default=False)
+
     logging_types = [
+        (constants.DISABLED, constants.DISABLED, constants.DISABLED),
         (constants.DEBUG, constants.DEBUG, constants.DEBUG),
         (constants.INFO, constants.INFO, constants.INFO),
         (constants.WARNING, constants.WARNING, constants.WARNING),
@@ -587,13 +659,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="",
         description="Logging verbosity level",
         items=logging_types,
-        default=constants.DEBUG)
+        default=constants.DISABLED)
 
     option_geometry_type = EnumProperty(
         name="Type",
         description="Geometry type",
         items=_geometry_types()[1:],
-        default=constants.GEOMETRY)
+        default=constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
 
     option_export_scene = BoolProperty(
         name="Scene",
@@ -612,10 +684,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Embed animation data with the geometry data",
         default=constants.EXPORT_OPTIONS[constants.EMBED_ANIMATION])
 
-    option_copy_textures = BoolProperty(
-        name="Copy textures",
-        description="Copy textures",
-        default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+    option_export_textures = BoolProperty(
+        name="Export textures",
+        description="Export textures",
+        default=constants.EXPORT_OPTIONS[constants.EXPORT_TEXTURES],
+        update=resolve_conflicts)
+
+    option_embed_textures = BoolProperty(
+        name="Embed textures",
+        description="Embed base64 textures in .json",
+        default=constants.EXPORT_OPTIONS[constants.EMBED_TEXTURES])
 
     option_texture_folder = StringProperty(
         name="Texture folder",
@@ -642,11 +720,21 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export animation (morphs)",
         default=constants.EXPORT_OPTIONS[constants.MORPH_TARGETS])
 
+    option_blend_shape = BoolProperty(
+        name="Blend Shape animation",
+        description="Export Blend Shapes",
+        default=constants.EXPORT_OPTIONS[constants.BLEND_SHAPES])
+
     option_animation_skeletal = EnumProperty(
         name="",
         description="Export animation (skeletal)",
         items=animation_options(),
         default=constants.OFF)
+
+    option_keyframes = BoolProperty(
+        name="Keyframe animation",
+        description="Export animation (keyframes)",
+        default=constants.EXPORT_OPTIONS[constants.KEYFRAMES])
 
     option_frame_index_as_time = BoolProperty(
         name="Frame index as time",
@@ -752,7 +840,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_skinning')
 
         row = layout.row()
+        row.prop(self.properties, 'option_extra_vgroups')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_apply_modifiers')
+
+        row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_index_type')
 
         ## }
 
@@ -782,10 +879,19 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_animation_morph')
 
         row = layout.row()
+        row.prop(self.properties, 'option_blend_shape')
+
+        row = layout.row()
         row.label(text="Skeletal animations:")
 
         row = layout.row()
         row.prop(self.properties, 'option_animation_skeletal')
+
+        row = layout.row()
+        row.label(text="Keyframe animations:")
+
+        row = layout.row()
+        row.prop(self.properties, 'option_keyframes')
 
         layout.row()
         row = layout.row()
@@ -833,7 +939,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_maps')
 
         row = layout.row()
-        row.prop(self.properties, 'option_copy_textures')
+        row.prop(self.properties, 'option_export_textures')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_embed_textures')
+        row.enabled = self.properties.option_export_textures
 
         row = layout.row()
         row.prop(self.properties, 'option_texture_folder')
@@ -846,6 +956,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_round_off')
         row = layout.row()
         row.prop(self.properties, 'option_round_value')
+
+        layout.row()
+        row = layout.row()
+        row.label(text="Custom Properties")
+
+        row = layout.row()
+        row.prop(self.properties, 'option_custom_properties')
 
         layout.row()
         row = layout.row()

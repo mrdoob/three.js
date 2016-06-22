@@ -19,30 +19,15 @@ def _material(func):
 
         """
 
+        material = None
         if isinstance(name, types.Material):
             material = name
-        else:
+        elif name:
             material = data.materials[name]
 
-        return func(material, *args, **kwargs)
+        return func(material, *args, **kwargs) if material else None
 
     return inner
-
-
-@_material
-def ambient_color(material):
-    """
-
-    :param material:
-    :return: rgb value
-    :rtype: tuple
-
-    """
-    logger.debug("material.ambient_color(%s)", material)
-    diffuse = diffuse_color(material)
-    return (material.ambient * diffuse[0],
-            material.ambient * diffuse[1],
-            material.ambient * diffuse[2])
 
 
 @_material
@@ -73,7 +58,7 @@ def bump_map(material):
     logger.debug("material.bump_map(%s)", material)
     for texture in _valid_textures(material):
         if texture.use_map_normal and not \
-        texture.texture.use_normal_map:
+           texture.texture.use_normal_map:
             return texture.texture
 
 
@@ -125,6 +110,24 @@ def depth_write(material):
 
 
 @_material
+def double_sided(material):
+    """
+
+    :param material:
+    :return: THREE_double_sided value
+    :rtype: bool
+
+    """
+    logger.debug("material.double_sided(%s)", material)
+    try:
+        write = material.THREE_double_sided
+    except AttributeError:
+        logger.debug("No THREE_double_sided attribute found")
+        write = False
+    return write
+
+
+@_material
 def diffuse_color(material):
     """
 
@@ -150,7 +153,7 @@ def diffuse_map(material):
     logger.debug("material.diffuse_map(%s)", material)
     for texture in _valid_textures(material):
         if texture.use_map_color_diffuse and not \
-        texture.blend_type == MULTIPLY:
+           texture.blend_type == MULTIPLY:
             return texture.texture
 
 
@@ -181,7 +184,7 @@ def light_map(material):
     logger.debug("material.light_map(%s)", material)
     for texture in _valid_textures(material, strict_use=False):
         if texture.use_map_color_diffuse and \
-        texture.blend_type == MULTIPLY:
+           texture.blend_type == MULTIPLY:
             return texture.texture
 
 
@@ -196,7 +199,7 @@ def normal_scale(material):
     logger.debug("material.normal_scale(%s)", material)
     for texture in _valid_textures(material):
         if texture.use_map_normal:
-            return texture.normal_factor
+            return (texture.normal_factor, texture.normal_factor)
 
 
 @_material
@@ -210,7 +213,7 @@ def normal_map(material):
     logger.debug("material.normal_map(%s)", material)
     for texture in _valid_textures(material):
         if texture.use_map_normal and \
-        texture.texture.use_normal_map:
+           texture.texture.use_normal_map:
             return texture.texture
 
 
@@ -239,6 +242,9 @@ def shading(material):
         True: constants.PHONG,
         False: constants.LAMBERT
     }
+
+    if material.use_shadeless:
+        return constants.BASIC
 
     return dispatch[material.specular_intensity > 0.0]
 
@@ -339,6 +345,7 @@ def used_materials():
         if material.users > 0:
             yield material.name
 
+
 @_material
 def visible(material):
     """
@@ -384,7 +391,10 @@ def _valid_textures(material, strict_use=True):
             in_use = texture.use
         else:
             in_use = True
-        if texture.texture.type != IMAGE or not in_use:
+        if not in_use:
+            continue
+        if not texture.texture or texture.texture.type != IMAGE:
+            logger.warning("Unable to export non-image texture %s", texture)
             continue
         logger.debug("Valid texture found %s", texture)
         yield texture

@@ -2,51 +2,45 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.BufferGeometry = function ( signals ) {
+Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
-	var container = new UI.Panel();
+	var signals = editor.signals;
 
-	// vertices
+	var container = new UI.Row();
 
-	var verticesRow = new UI.Panel();
-	var vertices = new UI.Text().setFontSize( '12px' );
+	function update( object ) {
 
-	verticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
-	verticesRow.add( vertices );
-
-	container.add( verticesRow );
-
-	// faces
-
-	var facesRow = new UI.Panel();
-	var faces = new UI.Text().setFontSize( '12px' );
-
-	facesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
-	facesRow.add( faces );
-
-	container.add( facesRow );
-
-	//
-
-	var update = function ( object ) {
-
-		if ( object === null ) return;
+		if ( object === null ) return; // objectSelected.dispatch( null )
+		if ( object === undefined ) return;
 
 		var geometry = object.geometry;
 
-		if ( geometry instanceof THREE.BufferGeometry ) { 
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
+			container.clear();
 			container.setDisplay( 'block' );
 
-			vertices.setValue( ( geometry.attributes.position.array.length / 3 ).format() );
+			var index = geometry.index;
 
-			if ( geometry.attributes.index !== undefined ) {
+			if ( index !== null ) {
 
-				faces.setValue( ( geometry.attributes.index.array.length / 3 ).format() );
+				var panel = new UI.Row();
+				panel.add( new UI.Text( 'index' ).setWidth( '90px' ) );
+				panel.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
+				container.add( panel );
 
-			} else {
+			}
 
-				faces.setValue( ( geometry.attributes.position.array.length / 9 ).format() );
+			var attributes = geometry.attributes;
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var panel = new UI.Row();
+				panel.add( new UI.Text( name ).setWidth( '90px' ) );
+				panel.add( new UI.Text( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
+				container.add( panel );
 
 			}
 
@@ -56,11 +50,11 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 		}
 
-	};
+	}
 
 	signals.objectSelected.add( update );
 	signals.geometryChanged.add( update );
 
 	return container;
 
-}
+};

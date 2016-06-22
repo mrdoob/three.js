@@ -27,12 +27,23 @@ var APP = {
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+
+			if ( json.project.shadows ) {
+
+				renderer.shadowMap.enabled = true;
+				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			}
+
 			this.dom = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
+				init: [],
+				start: [],
+				stop: [],
 				keydown: [],
 				keyup: [],
 				mousedown: [],
@@ -44,9 +55,28 @@ var APP = {
 				update: []
 			};
 
+			var scriptWrapParams = 'player,renderer,scene,camera';
+			var scriptWrapResultObj = {};
+
+			for ( var eventKey in events ) {
+
+				scriptWrapParams += ',' + eventKey;
+				scriptWrapResultObj[ eventKey ] = eventKey;
+
+			}
+
+			var scriptWrapResult = JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				if ( object === undefined ) {
+
+					console.warn( 'APP.Player: Script without object.', uuid );
+					continue;
+
+				}
 
 				var scripts = json.scripts[ uuid ];
 
@@ -54,7 +84,7 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( 'player, scene, keydown, keyup, mousedown, mouseup, mousemove, touchstart, touchend, touchmove, update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
+					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
 
 					for ( var name in functions ) {
 
@@ -62,7 +92,7 @@ var APP = {
 
 						if ( events[ name ] === undefined ) {
 
-							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							console.warn( 'APP.Player: Event type not supported (', name, ')' );
 							continue;
 
 						}
@@ -75,6 +105,8 @@ var APP = {
 
 			}
 
+			dispatch( events.init, arguments );
+
 		};
 
 		this.setCamera = function ( value ) {
@@ -83,10 +115,9 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-
 			if ( vr === true ) {
 
-				if ( camera.parent === undefined ) {
+				if ( camera.parent === null ) {
 
 					// camera needs to be in the scene so camera2 matrix updates
 
@@ -126,7 +157,7 @@ var APP = {
 
 			scene = value;
 
-		},
+		};
 
 		this.setSize = function ( width, height ) {
 
@@ -142,7 +173,7 @@ var APP = {
 
 		};
 
-		var dispatch = function ( array, event ) {
+		function dispatch( array, event ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
@@ -150,15 +181,23 @@ var APP = {
 
 			}
 
-		};
+		}
 
 		var prevTime, request;
 
-		var animate = function ( time ) {
+		function animate( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time, delta: time - prevTime } );
+			try {
+
+				dispatch( events.update, { time: time, delta: time - prevTime } );
+
+			} catch ( e ) {
+
+				console.error( ( e.message || e ), ( e.stack || "" ) );
+
+			}
 
 			if ( vr === true ) {
 
@@ -173,7 +212,7 @@ var APP = {
 
 			prevTime = time;
 
-		};
+		}
 
 		this.play = function () {
 
@@ -185,6 +224,8 @@ var APP = {
 			document.addEventListener( 'touchstart', onDocumentTouchStart );
 			document.addEventListener( 'touchend', onDocumentTouchEnd );
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
+
+			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
 			prevTime = performance.now();
@@ -202,59 +243,61 @@ var APP = {
 			document.removeEventListener( 'touchend', onDocumentTouchEnd );
 			document.removeEventListener( 'touchmove', onDocumentTouchMove );
 
+			dispatch( events.stop, arguments );
+
 			cancelAnimationFrame( request );
 
 		};
 
 		//
 
-		var onDocumentKeyDown = function ( event ) {
+		function onDocumentKeyDown( event ) {
 
 			dispatch( events.keydown, event );
 
-		};
+		}
 
-		var onDocumentKeyUp = function ( event ) {
+		function onDocumentKeyUp( event ) {
 
 			dispatch( events.keyup, event );
 
-		};
+		}
 
-		var onDocumentMouseDown = function ( event ) {
+		function onDocumentMouseDown( event ) {
 
 			dispatch( events.mousedown, event );
 
-		};
+		}
 
-		var onDocumentMouseUp = function ( event ) {
+		function onDocumentMouseUp( event ) {
 
 			dispatch( events.mouseup, event );
 
-		};
+		}
 
-		var onDocumentMouseMove = function ( event ) {
+		function onDocumentMouseMove( event ) {
 
 			dispatch( events.mousemove, event );
 
-		};
+		}
 
-		var onDocumentTouchStart = function ( event ) {
+		function onDocumentTouchStart( event ) {
 
 			dispatch( events.touchstart, event );
 
-		};
+		}
 
-		var onDocumentTouchEnd = function ( event ) {
+		function onDocumentTouchEnd( event ) {
 
 			dispatch( events.touchend, event );
 
-		};
+		}
 
-		var onDocumentTouchMove = function ( event ) {
+		function onDocumentTouchMove( event ) {
 
 			dispatch( events.touchmove, event );
 
-		};
+		}
 
 	}
 

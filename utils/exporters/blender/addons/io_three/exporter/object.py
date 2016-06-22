@@ -46,11 +46,17 @@ class Object(base_classes.BaseNode):
         self[constants.COLOR] = api.light.color(self.data)
         self[constants.INTENSITY] = api.light.intensity(self.data)
 
-        if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
-            self[constants.DISTANCE] = api.light.distance(self.data)
+        # Commented out because Blender's distance is not a cutoff value.
+        #if self[constants.TYPE] != constants.DIRECTIONAL_LIGHT:
+        #    self[constants.DISTANCE] = api.light.distance(self.data)
+        self[constants.DISTANCE] = 0;
 
-        if self[constants.TYPE] == constants.SPOT_LIGHT:
+        lightType = self[constants.TYPE]
+        if lightType == constants.SPOT_LIGHT:
             self[constants.ANGLE] = api.light.angle(self.data)
+            self[constants.DECAY] = api.light.falloff(self.data)
+        elif lightType == constants.POINT_LIGHT:
+            self[constants.DECAY] = api.light.falloff(self.data)
 
     def _init_mesh(self):
         """Initialize mesh attributes"""
@@ -109,7 +115,7 @@ class Object(base_classes.BaseNode):
 
         lights = (constants.AMBIENT_LIGHT,
                   constants.DIRECTIONAL_LIGHT,
-                  constants.AREA_LIGHT, constants.POINT_LIGHT,
+                  constants.POINT_LIGHT,
                   constants.SPOT_LIGHT, constants.HEMISPHERE_LIGHT)
 
         if self[constants.TYPE] == constants.MESH:
@@ -119,12 +125,25 @@ class Object(base_classes.BaseNode):
         elif self[constants.TYPE] in lights:
             self._init_light()
 
+        no_anim = (None, False, constants.OFF)
+        if self.options.get(constants.KEYFRAMES) not in no_anim:
+            logger.info("Export Transform Animation for %s", self.node)
+            if self._scene:
+                # only when exporting scene
+                tracks = api.object.animated_xform(self.node, self.options)
+                merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
+                for track in tracks:
+                    merge.append(track)
+
         if self.options.get(constants.HIERARCHY, False):
             for child in api.object.children(self.node, self.scene.valid_types):
                 if not self.get(constants.CHILDREN):
                     self[constants.CHILDREN] = [Object(child, parent=self)]
                 else:
                     self[constants.CHILDREN].append(Object(child, parent=self))
+
+        if self.options.get(constants.CUSTOM_PROPERTIES, False):
+            self[constants.USER_DATA] = api.object.custom_properties(self.node)
 
     def _root_setup(self):
         """Applies to a root/scene object"""

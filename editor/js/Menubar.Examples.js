@@ -33,7 +33,7 @@ Menubar.Examples = function ( editor ) {
 
 			var item = items[ i ];
 
-			var option = new UI.Panel();
+			var option = new UI.Row();
 			option.setClass( 'option' );
 			option.setTextContent( item.title );
 			option.onClick( function () {

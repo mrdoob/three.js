@@ -49,17 +49,35 @@ def init(filename, level=constants.DEBUG):
         LOGGER.addHandler(file_handler)
 
 
+def _logger(func):
+
+    def inner(*args):
+        if LOGGER is not None:
+            func(*args)
+
+    return inner
+
+
+@_logger
 def info(*args):
     LOGGER.info(*args)
 
+
+@_logger
 def debug(*args):
     LOGGER.debug(*args)
 
+
+@_logger
 def warning(*args):
     LOGGER.warning(*args)
 
+
+@_logger
 def error(*args):
     LOGGER.error(*args)
 
+
+@_logger
 def critical(*args):
     LOGGER.critical(*args)

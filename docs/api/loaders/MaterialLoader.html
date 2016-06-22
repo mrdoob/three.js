@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -34,14 +35,6 @@
 		</div>
 		<div>
 		Begin loading from url and return the [page:Material] object that will contain the data.
-		</div>
-
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
-		<div>
-		[page:String value] — The crossOrigin string.
-		</div>
-		<div>
-		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
 		<h3>[method:Material parse]( [page:Object json] )</h3>

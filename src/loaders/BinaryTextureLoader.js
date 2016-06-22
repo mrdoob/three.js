@@ -4,31 +4,31 @@
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
  */
 
-THREE.DataTextureLoader = THREE.BinaryTextureLoader = function () {
+THREE.DataTextureLoader = THREE.BinaryTextureLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	// override in sub classes
 	this._parser = null;
 
 };
 
-THREE.BinaryTextureLoader.prototype = {
-
-	constructor: THREE.BinaryTextureLoader,
+Object.assign( THREE.BinaryTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var texture = new THREE.DataTexture( );
+		var texture = new THREE.DataTexture();
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
 
 			var texData = scope._parser( buffer );
 
-			if ( !texData ) return;
+			if ( ! texData ) return;
 
 			if ( undefined !== texData.image ) {
 
@@ -84,4 +84,4 @@ THREE.BinaryTextureLoader.prototype = {
 
 	}
 
-};
+} );

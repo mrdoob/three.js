@@ -2,44 +2,49 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+
 THREE.PointLight = function ( color, intensity, distance, decay ) {
 
-	THREE.Light.call( this, color );
+	THREE.Light.call( this, color, intensity );
 
 	this.type = 'PointLight';
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	Object.defineProperty( this, 'power', {
+		get: function () {
+			// intensity = power per solid angle.
+			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			return this.intensity * 4 * Math.PI;
+
+		},
+		set: function ( power ) {
+			// intensity = power per solid angle.
+			// ref: equation (15) from http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+			this.intensity = power / ( 4 * Math.PI );
+		}
+	} );
+
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-};
-
-THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
-THREE.PointLight.prototype.constructor = THREE.PointLight;
-
-THREE.PointLight.prototype.clone = function () {
-
-	var light = new THREE.PointLight();
-
-	THREE.Light.prototype.clone.call( this, light );
-
-	light.intensity = this.intensity;
-	light.distance = this.distance;
-	light.decay = this.decay;
-
-	return light;
+	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
 };
 
-THREE.PointLight.prototype.toJSON = function ( meta ) {
+THREE.PointLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	constructor: THREE.PointLight,
 
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-	data.object.distance = this.distance;
-	data.object.decay = this.decay;
+	copy: function ( source ) {
 
-	return data;
+		THREE.Light.prototype.copy.call( this, source );
 
-};
+		this.distance = source.distance;
+		this.decay = source.decay;
+
+		this.shadow = source.shadow.clone();
+
+		return this;
+
+	}
+
+} );

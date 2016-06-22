@@ -27,16 +27,12 @@
 				padding: 5px;
 				z-index:100;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #888 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/ShaderGodRays.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -54,7 +50,7 @@
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
 
-			var treeMesh, sphereMesh;
+			var sphereMesh;
 
 			var sunPosition = new THREE.Vector3( 0, 1000, -1000 );
 			var screenSpacePosition = new THREE.Vector3();
@@ -94,20 +90,13 @@
 
 				// tree
 
-				var loader = new THREE.JSONLoader();
+				var loader = new THREE.OBJLoader();
+				loader.load( "models/obj/tree.obj", function ( object ) {
 
-				loader.load( "obj/tree/tree.js", function( geometry ) {
-
-					treeMesh = new THREE.Mesh( geometry, materialScene );
-					treeMesh.position.set( 0, -150, -150 );
-
-					var sc = 400;
-					treeMesh.scale.set( sc, sc, sc );
-
-					treeMesh.matrixAutoUpdate = false;
-					treeMesh.updateMatrix();
-
-					scene.add( treeMesh );
+					object.material = materialScene;
+					object.position.set( 0, -150, -150 );
+					object.scale.multiplyScalar( 400 );
+					scene.add( object );
 
 				} );
 
@@ -115,10 +104,7 @@
 
 				var geo = new THREE.SphereGeometry( 1, 20, 10 );
 				sphereMesh = new THREE.Mesh( geo, materialScene );
-
-				var sc = 20;
-				sphereMesh.scale.set( sc, sc, sc );
-
+				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
 				//
@@ -135,7 +121,7 @@
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -264,8 +250,9 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 
@@ -316,14 +303,14 @@
 					screenSpacePosition.y *= window.innerHeight;
 
 					renderer.setScissor( screenSpacePosition.x - sunsqW / 2, screenSpacePosition.y - sunsqH / 2, sunsqW, sunsqH );
-					renderer.enableScissorTest( true );
+					renderer.setScissorTest( true );
 
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
 
-					renderer.enableScissorTest( false );
+					renderer.setScissorTest( false );
 
 					// -- Draw scene objects --
 
@@ -358,7 +345,7 @@
 					var stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
 
@@ -370,7 +357,7 @@
 					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays2.texture;
 
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays1  );
 
@@ -380,14 +367,14 @@
 					stepLen = filterLen * Math.pow( TAPS_PER_PASS, -pass );
 
 					postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepLen;
-					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1;
+					postprocessing.godrayGenUniforms[ "tInput" ].value = postprocessing.rtTextureGodRays1.texture;
 
 					renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
 
 					// final pass - composite god-rays onto colors
 
-					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors;
-					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2;
+					postprocessing.godrayCombineUniforms["tColors"].value = postprocessing.rtTextureColors.texture;
+					postprocessing.godrayCombineUniforms["tGodRays"].value = postprocessing.rtTextureGodRays2.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 

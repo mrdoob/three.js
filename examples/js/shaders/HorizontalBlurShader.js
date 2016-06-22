@@ -14,8 +14,8 @@ THREE.HorizontalBlurShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"h":        { type: "f", value: 1.0 / 512.0 }
+		"tDiffuse": { value: null },
+		"h":        { value: 1.0 / 512.0 }
 
 	},
 
@@ -30,7 +30,7 @@ THREE.HorizontalBlurShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -57,6 +57,6 @@ THREE.HorizontalBlurShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -8,9 +8,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( showStatus ) {
+THREE.CTMLoader = function () {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 
 };
 
@@ -65,7 +65,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 				// load joined CTM file
 
 				var partUrl = basePath + jsonObject.data;
-				var parametersPart = { useWorker: parameters.useWorker, offsets: jsonObject.offsets };
+				var parametersPart = { useWorker: parameters.useWorker, worker:parameters.worker, offsets: jsonObject.offsets };
 				scope.load( partUrl, callbackFinal, parametersPart );
 
 			}
@@ -121,12 +121,12 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							var ctmFile = files[ i ];
 
 							var e1 = Date.now();
-							// THREE.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+							// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							THREE.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
+							console.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
 
 						}
 
@@ -149,13 +149,13 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 					}
 
 					//var e = Date.now();
-					//THREE.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
+					//console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
 
 				}
 
 			} else {
 
-				THREE.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -219,7 +219,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		if ( normals !== undefined ) {
@@ -246,8 +246,6 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 	Model.prototype.constructor = Model;
 
 	var geometry = new Model();
-
-	geometry.computeOffsets();
 
 	// compute vertex normals if not present in the CTM model
 	if ( geometry.attributes.normal === undefined ) {

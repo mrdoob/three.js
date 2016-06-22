@@ -8,10 +8,10 @@ THREE.ColorCorrectionShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"powRGB":   { type: "v3", value: new THREE.Vector3( 2, 2, 2 ) },
-		"mulRGB":   { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) },
-		"addRGB":   { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
+		"tDiffuse": { value: null },
+		"powRGB":   { value: new THREE.Vector3( 2, 2, 2 ) },
+		"mulRGB":   { value: new THREE.Vector3( 1, 1, 1 ) },
+		"addRGB":   { value: new THREE.Vector3( 0, 0, 0 ) }
 
 	},
 
@@ -27,7 +27,7 @@ THREE.ColorCorrectionShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -45,6 +45,6 @@ THREE.ColorCorrectionShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

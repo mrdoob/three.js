@@ -1,13 +1,20 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / https://clara.io
+ * @author WestLangley / http://github.com/WestLangley
  *
  * parameters = {
+ *
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
+ *  map: new THREE.Texture( <Image> ),
+ *
+ *  alphaMap: new THREE.Texture( <Image> ),
+ *
+ *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementScale: <float>,
+ *  displacementBias: <float>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
@@ -20,9 +27,24 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.type = 'MeshDepthMaterial';
 
+	this.depthPacking = THREE.BasicDepthPacking;
+
+	this.skinning = false;
 	this.morphTargets = false;
+
+	this.map = null;
+
+	this.alphaMap = null;
+
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
+
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
+
+	this.fog = false;
+	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -31,26 +53,26 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.MeshDepthMaterial.prototype.constructor = THREE.MeshDepthMaterial;
 
-THREE.MeshDepthMaterial.prototype.clone = function () {
+THREE.MeshDepthMaterial.prototype.copy = function ( source ) {
 
-	var material = new THREE.MeshDepthMaterial();
+	THREE.Material.prototype.copy.call( this, source );
 
-	THREE.Material.prototype.clone.call( this, material );
+	this.depthPacking = source.depthPacking;
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
 
-	return material;
+	this.map = source.map;
 
-};
+	this.alphaMap = source.alphaMap;
 
-THREE.MeshDepthMaterial.prototype.toJSON = function () {
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
 
-	var data = THREE.Material.prototype.toJSON.call( this );
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
-	if ( this.side !== THREE.FrontSide ) data.side = this.side;
-
-	return data;
+	return this;
 
 };

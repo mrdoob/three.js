@@ -1,11 +1,11 @@
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Box3 = function ( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.min = ( min !== undefined ) ? min : new THREE.Vector3( + Infinity, + Infinity, + Infinity );
 	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
 
 };
@@ -23,13 +23,44 @@ THREE.Box3.prototype = {
 
 	},
 
+	setFromArray: function ( array ) {
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, l = array.length; i < l; i += 3 ) {
+
+			var x = array[ i ];
+			var y = array[ i + 1 ];
+			var z = array[ i + 2 ];
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		this.makeEmpty();
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.expandByPoint( points[ i ] )
+			this.expandByPoint( points[ i ] );
 
 		}
 
@@ -41,7 +72,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -57,11 +88,11 @@ THREE.Box3.prototype = {
 	setFromObject: function () {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and childrens', world transforms
+		// accounting for both the object's, and children's, world transforms
 
 		var v1 = new THREE.Vector3();
 
-		return function ( object ) {
+		return function setFromObject( object ) {
 
 			var scope = this;
 
@@ -82,7 +113,6 @@ THREE.Box3.prototype = {
 						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 							v1.copy( vertices[ i ] );
-
 							v1.applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
@@ -95,8 +125,7 @@ THREE.Box3.prototype = {
 
 						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-
+							v1.fromArray( positions, i );
 							v1.applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );
@@ -115,6 +144,12 @@ THREE.Box3.prototype = {
 
 	}(),
 
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
 	copy: function ( box ) {
 
 		this.min.copy( box.min );
@@ -126,14 +161,14 @@ THREE.Box3.prototype = {
 
 	makeEmpty: function () {
 
-		this.min.x = this.min.y = this.min.z = Infinity;
+		this.min.x = this.min.y = this.min.z = + Infinity;
 		this.max.x = this.max.y = this.max.z = - Infinity;
 
 		return this;
 
 	},
 
-	empty: function () {
+	isEmpty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
@@ -185,8 +220,8 @@ THREE.Box3.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ||
-		     point.z < this.min.z || point.z > this.max.z ) {
+				 point.y < this.min.y || point.y > this.max.y ||
+				 point.z < this.min.z || point.z > this.max.z ) {
 
 			return false;
 
@@ -225,19 +260,84 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
 		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ||
-		     box.max.z < this.min.z || box.min.z > this.max.z ) {
+				 box.max.y < this.min.y || box.min.y > this.max.y ||
+				 box.max.z < this.min.z || box.min.z > this.max.z ) {
 
 			return false;
 
 		}
 
 		return true;
+
+	},
+
+	intersectsSphere: ( function () {
+
+		var closestPoint;
+
+		return function intersectsSphere( sphere ) {
+
+			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+
+			// Find the point on the AABB closest to the sphere center.
+			this.clampPoint( sphere.center, closestPoint );
+
+			// If that point is inside the sphere, the AABB and sphere intersect.
+			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+		};
+
+	} )(),
+
+	intersectsPlane: function ( plane ) {
+
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
+
+		var min, max;
+
+		if ( plane.normal.x > 0 ) {
+
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+
+		} else {
+
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+
+		}
+
+		if ( plane.normal.y > 0 ) {
+
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+
+		} else {
+
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+
+		}
+
+		if ( plane.normal.z > 0 ) {
+
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+
+		} else {
+
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+
+		}
+
+		return ( min <= plane.constant && max >= plane.constant );
 
 	},
 
@@ -252,7 +352,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -265,7 +365,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( optionalTarget ) {
+		return function getBoundingSphere( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Sphere();
 
@@ -282,6 +382,9 @@ THREE.Box3.prototype = {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
+
+		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
+		if( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 
@@ -309,7 +412,10 @@ THREE.Box3.prototype = {
 			new THREE.Vector3()
 		];
 
-		return function ( matrix ) {
+		return function applyMatrix4( matrix ) {
+
+			// transform of empty box is an empty box.
+			if( this.isEmpty() ) return this;
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
@@ -319,9 +425,8 @@ THREE.Box3.prototype = {
 			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
 			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
 
-			this.makeEmpty();
 			this.setFromPoints( points );
 
 			return this;
@@ -342,12 +447,6 @@ THREE.Box3.prototype = {
 	equals: function ( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Box3().copy( this );
 
 	}
 

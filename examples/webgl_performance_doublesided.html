@@ -12,16 +12,11 @@
 				font-weight: bold;
 				overflow:hidden;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #eee !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -80,7 +75,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
@@ -117,7 +112,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );

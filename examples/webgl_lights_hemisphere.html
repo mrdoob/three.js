@@ -32,11 +32,6 @@
 
 			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
 			strong { color: red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #555 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -50,7 +45,7 @@
 			press <strong>h</strong> to toggle hemisphere light, <strong>d</strong> to toggle directional light
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -95,7 +90,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer, dirLight, hemiLight;
-			var morphs = [];
+			var mixers = [];
 			var stats;
 
 			var clock = new THREE.Clock();
@@ -159,7 +154,6 @@
 
 				dirLight.shadowCameraFar = 3500;
 				dirLight.shadowBias = -0.0001;
-				dirLight.shadowDarkness = 0.35;
 				//dirLight.shadowCameraVisible = true;
 
 				// GROUND
@@ -180,10 +174,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: 	 { type: "c", value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset:		 { type: "f", value: 33 },
-					exponent:	 { type: "f", value: 0.6 }
+					topColor:    { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset:      { value: 33 },
+					exponent:    { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( hemiLight.color );
 
@@ -201,24 +195,22 @@
 
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
-					morphColorsToFaceColors( geometry );
-					geometry.computeMorphNormals();
-
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
-					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
-
-					meshAnim.duration = 1000;
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					var s = 0.35;
-					meshAnim.scale.set( s, s, s );
-					meshAnim.position.y = 15;
-					meshAnim.rotation.y = -1;
+					mesh.scale.set( s, s, s );
+					mesh.position.y = 15;
+					mesh.rotation.y = -1;
 
-					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = true;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
 
-					scene.add( meshAnim );
-					morphs.push( meshAnim );
+					scene.add( mesh );
+
+					var mixer = new THREE.AnimationMixer( mesh );
+					mixer.clipAction( geometry.animations[ 0 ] ).setDuration( 1 ).play();
+					mixers.push( mixer );
 
 				} );
 
@@ -234,33 +226,17 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', onKeyDown, false );
-
-			}
-
-			function morphColorsToFaceColors( geometry ) {
-
-				if ( geometry.morphColors && geometry.morphColors.length ) {
-
-					var colorMap = geometry.morphColors[ 0 ];
-
-					for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-
-						geometry.faces[ i ].color = colorMap.colors[ i ];
-
-					}
-
-				}
 
 			}
 
@@ -277,12 +253,12 @@
 
 				switch ( event.keyCode ) {
 
-					case 72: /*h*/
+					case 72: // h
 
 					hemiLight.visible = !hemiLight.visible;
 					break;
 
-					case 68: /*d*/
+					case 68: // d
 
 					dirLight.visible = !dirLight.visible;
 					break;
@@ -308,10 +284,9 @@
 
 				//controls.update();
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
+				for ( var i = 0; i < mixers.length; i ++ ) {
 
-					morph = morphs[ i ];
-					morph.updateAnimation( 1000 * delta );
+					mixers[ i ].update( delta );
 
 				}
 

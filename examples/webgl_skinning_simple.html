@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -23,7 +23,7 @@
 
 			var container, stats, controls;
 			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, groundMaterial, planeGeometry;
+			var skinnedMesh, animation, groundMaterial, planeGeometry, mixer;
 
 			init();
 			animate();
@@ -48,9 +48,7 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
 				planeGeometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
@@ -71,11 +69,17 @@
 
 					}
 
-					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MultiMaterial(materials));
 					skinnedMesh.scale.set( 1, 1, 1 );
+
+					// Note: We test the corresponding code path with this example -
+					// you shouldn't include the next line into your own code:
+					skinnedMesh.skeleton.useVertexTexture = false;
+
 					scene.add( skinnedMesh );
-					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
-					animation.play();
+
+					mixer = new THREE.AnimationMixer( skinnedMesh );
+					mixer.clipAction( skinnedMesh.geometry.animations[ 0 ] ).play();
 
 				});
 
@@ -85,7 +89,7 @@
 
 				requestAnimationFrame( animate );
 
-				THREE.AnimationHandler.update( clock.getDelta() );
+				if( mixer ) mixer.update( clock.getDelta() );
 
 				controls.update();
 

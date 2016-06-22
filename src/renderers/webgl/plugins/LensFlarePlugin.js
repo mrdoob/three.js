@@ -6,20 +6,20 @@
 THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	var gl = renderer.context;
+	var state = renderer.state;
 
 	var vertexBuffer, elementBuffer;
-	var program, attributes, uniforms;
-	var hasVertexTexture;
+	var shader, program, attributes, uniforms;
 
 	var tempTexture, occlusionTexture;
 
-	var init = function () {
+	function init() {
 
 		var vertices = new Float32Array( [
-			-1, -1,  0, 0,
-			 1, -1,  1, 0,
+			- 1, - 1,  0, 0,
+			 1, - 1,  1, 0,
 			 1,  1,  1, 1,
-			-1,  1,  0, 1
+			- 1,  1,  0, 1
 		] );
 
 		var faces = new Uint16Array( [
@@ -43,207 +43,113 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		tempTexture      = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
-		renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
+		state.bindTexture( gl.TEXTURE_2D, tempTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+		state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		hasVertexTexture = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
+		shader = {
 
-		var shader;
+			vertexShader: [
 
-		if ( hasVertexTexture ) {
+				"uniform lowp int renderType;",
 
-			shader = {
+				"uniform vec3 screenPosition;",
+				"uniform vec2 scale;",
+				"uniform float rotation;",
 
-				vertexShader: [
+				"uniform sampler2D occlusionMap;",
 
-					"uniform lowp int renderType;",
+				"attribute vec2 position;",
+				"attribute vec2 uv;",
 
-					"uniform vec3 screenPosition;",
-					"uniform vec2 scale;",
-					"uniform float rotation;",
+				"varying vec2 vUV;",
+				"varying float vVisibility;",
 
-					"uniform sampler2D occlusionMap;",
+				"void main() {",
 
-					"attribute vec2 position;",
-					"attribute vec2 uv;",
+					"vUV = uv;",
 
-					"varying vec2 vUV;",
-					"varying float vVisibility;",
+					"vec2 pos = position;",
 
-					"void main() {",
+					"if ( renderType == 2 ) {",
 
-						"vUV = uv;",
+						"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
+						"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
 
-						"vec2 pos = position;",
+						"vVisibility =        visibility.r / 9.0;",
+						"vVisibility *= 1.0 - visibility.g / 9.0;",
+						"vVisibility *=       visibility.b / 9.0;",
+						"vVisibility *= 1.0 - visibility.a / 9.0;",
 
-						"if( renderType == 2 ) {",
+						"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+						"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
 
-							"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
+					"}",
 
-							"vVisibility =        visibility.r / 9.0;",
-							"vVisibility *= 1.0 - visibility.g / 9.0;",
-							"vVisibility *=       visibility.b / 9.0;",
-							"vVisibility *= 1.0 - visibility.a / 9.0;",
+					"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 
-							"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-							"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"}"
 
-						"}",
+			].join( "\n" ),
 
-						"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			fragmentShader: [
 
-					"}"
+				"uniform lowp int renderType;",
 
-				].join( "\n" ),
+				"uniform sampler2D map;",
+				"uniform float opacity;",
+				"uniform vec3 color;",
 
-				fragmentShader: [
+				"varying vec2 vUV;",
+				"varying float vVisibility;",
 
-					"uniform lowp int renderType;",
+				"void main() {",
 
-					"uniform sampler2D map;",
-					"uniform float opacity;",
-					"uniform vec3 color;",
+					// pink square
 
-					"varying vec2 vUV;",
-					"varying float vVisibility;",
+					"if ( renderType == 0 ) {",
 
-					"void main() {",
+						"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 
-						// pink square
+					// restore
 
-						"if( renderType == 0 ) {",
+					"} else if ( renderType == 1 ) {",
 
-							"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+						"gl_FragColor = texture2D( map, vUV );",
 
-						// restore
+					// flare
 
-						"} else if( renderType == 1 ) {",
+					"} else {",
 
-							"gl_FragColor = texture2D( map, vUV );",
+						"vec4 texture = texture2D( map, vUV );",
+						"texture.a *= opacity * vVisibility;",
+						"gl_FragColor = texture;",
+						"gl_FragColor.rgb *= color;",
 
-						// flare
+					"}",
 
-						"} else {",
+				"}"
 
-							"vec4 texture = texture2D( map, vUV );",
-							"texture.a *= opacity * vVisibility;",
-							"gl_FragColor = texture;",
-							"gl_FragColor.rgb *= color;",
+			].join( "\n" )
 
-						"}",
-
-					"}"
-
-				].join( "\n" )
-
-			};
-
-		} else {
-
-			shader = {
-
-				vertexShader: [
-
-					"uniform lowp int renderType;",
-
-					"uniform vec3 screenPosition;",
-					"uniform vec2 scale;",
-					"uniform float rotation;",
-
-					"attribute vec2 position;",
-					"attribute vec2 uv;",
-
-					"varying vec2 vUV;",
-
-					"void main() {",
-
-						"vUV = uv;",
-
-						"vec2 pos = position;",
-
-						"if( renderType == 2 ) {",
-
-							"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-							"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
-
-						"}",
-
-						"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
-
-					"}"
-
-				].join( "\n" ),
-
-				fragmentShader: [
-
-					"precision mediump float;",
-
-					"uniform lowp int renderType;",
-
-					"uniform sampler2D map;",
-					"uniform sampler2D occlusionMap;",
-					"uniform float opacity;",
-					"uniform vec3 color;",
-
-					"varying vec2 vUV;",
-
-					"void main() {",
-
-						// pink square
-
-						"if( renderType == 0 ) {",
-
-							"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
-
-						// restore
-
-						"} else if( renderType == 1 ) {",
-
-							"gl_FragColor = texture2D( map, vUV );",
-
-						// flare
-
-						"} else {",
-
-							"float visibility = texture2D( occlusionMap, vec2( 0.5, 0.1 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) ).a;",
-							"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) ).a;",
-							"visibility = ( 1.0 - visibility / 4.0 );",
-
-							"vec4 texture = texture2D( map, vUV );",
-							"texture.a *= opacity * visibility;",
-							"gl_FragColor = texture;",
-							"gl_FragColor.rgb *= color;",
-
-						"}",
-
-					"}"
-
-				].join( "\n" )
-
-			};
-
-		}
+		};
 
 		program = createProgram( shader );
 
@@ -263,7 +169,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 			screenPosition: gl.getUniformLocation( program, "screenPosition" )
 		};
 
-	};
+	}
 
 	/*
 	 * Render lens flares
@@ -271,21 +177,26 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 	 *         reads these back and calculates occlusion.
 	 */
 
-	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
+	this.render = function ( scene, camera, viewport ) {
 
 		if ( flares.length === 0 ) return;
 
 		var tempPosition = new THREE.Vector3();
 
-		var invAspect = viewportHeight / viewportWidth,
-			halfViewportWidth = viewportWidth * 0.5,
-			halfViewportHeight = viewportHeight * 0.5;
+		var invAspect = viewport.w / viewport.z,
+			halfViewportWidth = viewport.z * 0.5,
+			halfViewportHeight = viewport.w * 0.5;
 
-		var size = 16 / viewportHeight,
+		var size = 16 / viewport.w,
 			scale = new THREE.Vector2( size * invAspect, size );
 
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
 			screenPositionPixels = new THREE.Vector2( 1, 1 );
+
+		var validArea = new THREE.Box2();
+
+		validArea.min.set( 0, 0 );
+		validArea.max.set( viewport.z - 16, viewport.w - 16 );
 
 		if ( program === undefined ) {
 
@@ -295,13 +206,13 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.useProgram( program );
 
-		renderer.state.initAttributes();
-		renderer.state.enableAttribute( attributes.vertex );
-		renderer.state.enableAttribute( attributes.uv );
-		renderer.state.disableUnusedAttributes();
+		state.initAttributes();
+		state.enableAttribute( attributes.vertex );
+		state.enableAttribute( attributes.uv );
+		state.disableUnusedAttributes();
 
 		// loop through all lens flares to update their occlusion and positions
-		// setup gl and common used attribs/unforms
+		// setup gl and common used attribs/uniforms
 
 		gl.uniform1i( uniforms.occlusionMap, 0 );
 		gl.uniform1i( uniforms.map, 1 );
@@ -312,19 +223,19 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
-		gl.disable( gl.CULL_FACE );
-		gl.depthMask( false );
+		state.disable( gl.CULL_FACE );
+		state.setDepthWrite( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
-			size = 16 / viewportHeight;
+			size = 16 / viewport.w;
 			scale.set( size * invAspect, size );
 
 			// calc object screen position
 
 			var flare = flares[ i ];
 
-			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
+			tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
 			tempPosition.applyMatrix4( camera.matrixWorldInverse );
 			tempPosition.applyProjection( camera.projectionMatrix );
@@ -333,22 +244,22 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			screenPosition.copy( tempPosition );
 
-			screenPositionPixels.x = screenPosition.x * halfViewportWidth + halfViewportWidth;
-			screenPositionPixels.y = screenPosition.y * halfViewportHeight + halfViewportHeight;
+			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
+
+			screenPositionPixels.x = viewport.x + ( screenPosition.x * halfViewportWidth ) + halfViewportWidth - 8;
+			screenPositionPixels.y = viewport.y + ( screenPosition.y * halfViewportHeight ) + halfViewportHeight - 8;
 
 			// screen cull
 
-			if ( hasVertexTexture || (
-				screenPositionPixels.x > 0 &&
-				screenPositionPixels.x < viewportWidth &&
-				screenPositionPixels.y > 0 &&
-				screenPositionPixels.y < viewportHeight ) ) {
+			if ( validArea.containsPoint( screenPositionPixels ) === true ) {
 
 				// save current RGB to temp texture
 
-				renderer.state.activeTexture( gl.TEXTURE1 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				state.activeTexture( gl.TEXTURE0 );
+				state.bindTexture( gl.TEXTURE_2D, null );
+				state.activeTexture( gl.TEXTURE1 );
+				state.bindTexture( gl.TEXTURE_2D, tempTexture );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
 
 
 				// render pink quad
@@ -357,26 +268,26 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform2f( uniforms.scale, scale.x, scale.y );
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				gl.disable( gl.BLEND );
-				gl.enable( gl.DEPTH_TEST );
+				state.disable( gl.BLEND );
+				state.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
 				// copy result to occlusionMap
 
-				renderer.state.activeTexture( gl.TEXTURE0 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
-				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				state.activeTexture( gl.TEXTURE0 );
+				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x, screenPositionPixels.y, 16, 16, 0 );
 
 
 				// restore graphics
 
 				gl.uniform1i( uniforms.renderType, 1 );
-				gl.disable( gl.DEPTH_TEST );
+				state.disable( gl.DEPTH_TEST );
 
-				renderer.state.activeTexture( gl.TEXTURE1 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
+				state.activeTexture( gl.TEXTURE1 );
+				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
@@ -397,7 +308,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// render flares
 
 				gl.uniform1i( uniforms.renderType, 2 );
-				gl.enable( gl.BLEND );
+				state.enable( gl.BLEND );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
@@ -409,7 +320,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						screenPosition.y = sprite.y;
 						screenPosition.z = sprite.z;
 
-						size = sprite.size * sprite.scale / viewportHeight;
+						size = sprite.size * sprite.scale / viewport.w;
 
 						scale.x = size * invAspect;
 						scale.y = size;
@@ -421,8 +332,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						gl.uniform1f( uniforms.opacity, sprite.opacity );
 						gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						renderer.state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-						renderer.setTexture( sprite.texture, 1 );
+						state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
+						renderer.setTexture2D( sprite.texture, 1 );
 
 						gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
@@ -436,9 +347,9 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
-		gl.enable( gl.DEPTH_TEST );
-		gl.depthMask( true );
+		state.enable( gl.CULL_FACE );
+		state.enable( gl.DEPTH_TEST );
+		state.setDepthWrite( true );
 
 		renderer.resetGLState();
 

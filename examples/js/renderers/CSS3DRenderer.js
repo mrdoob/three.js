@@ -98,7 +98,7 @@ THREE.CSS3DRenderer = function () {
 
 	var epsilon = function ( value ) {
 
-		return Math.abs( value ) < 0.000001 ? 0 : value;
+		return Math.abs( value ) < Number.EPSILON ? 0 : value;
 
 	};
 
@@ -212,7 +212,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * _height;
+		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.getEffectiveFOV() * 0.5 ) ) * _height;
 
 		if ( cache.camera.fov !== fov ) {
 
@@ -227,7 +227,7 @@ THREE.CSS3DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

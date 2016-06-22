@@ -1,0 +1,49 @@
+{
+  "name": "three",
+  "version": "0.78.0",
+  "description": "JavaScript 3D library",
+  "main": "build/three.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "build/three.js",
+    "build/three.min.js",
+    "src",
+    "examples/js",
+    "examples/fonts",
+    "bower.json"
+  ],
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "cd ./utils/build && node build.js --include common --include extras",
+    "dev": "chokidar \"./src/**/*.*\" \"./utils/build/includes/*.*\" --initial -c \"npm run build\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
+  "keywords": [
+    "three",
+    "three.js",
+    "3d",
+    "webgl"
+  ],
+  "author": "mrdoob",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrdoob/three.js/issues"
+  },
+  "homepage": "http://threejs.org/",
+  "devDependencies": {
+    "argparse": "^1.0.3",
+    "chokidar-cli": "1.2.0",
+    "jscs": "^1.13.1",
+    "uglify-js": "^2.6.0"
+    }
+}
