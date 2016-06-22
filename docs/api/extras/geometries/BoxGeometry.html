@@ -14,7 +14,32 @@
 
 		<div class="desc">BoxGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.</div>
 
-		<iframe src='scenes/geometry-browser.html#BoxGeometry'></iframe>
+		<iframe id="scene"></iframe>
+
+		<script>
+
+		// iOS8 workaround
+
+		window.onload = function() {
+
+			var scene = document.getElementById( 'scene' );
+
+			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+				scene.addEventListener( 'load', function ( event ) {
+
+					scene.contentWindow.innerWidth -= 10;
+					scene.contentWindow.innerHeight -= 2;
+
+				} );
+
+			}
+
+			scene.src = 'scenes/geometry-browser.html#BoxGeometry';
+
+		}
+
+		</script>
 
 		<h2>Example</h2>
 
@@ -26,7 +51,6 @@
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]([page:Float width], [page:Float height], [page:Float depth], [page:Integer widthSegments], [page:Integer heightSegments], [page:Integer depthSegments])</h3>
 		<div>
 		width — Width of the sides on the X axis.<br />
@@ -36,7 +60,6 @@
 		heightSegments — Optional. Number of segmented faces along the height of the sides. Default is 1.<br />
 		depthSegments — Optional. Number of segmented faces along the depth of the sides. Default is 1.
 		</div>
-
 
 		<h2>Properties</h2>
 
