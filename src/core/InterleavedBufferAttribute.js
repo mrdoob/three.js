@@ -10,7 +10,7 @@ THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offse
 	this.itemSize = itemSize;
 	this.offset = offset;
 
-	this.normalized = normalized;
+	this.normalized = normalized === true;
 
 };
 
