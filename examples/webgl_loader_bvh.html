@@ -1,0 +1,122 @@
+<html>
+	<head>
+	  <title>three.js webgl - BVHLoader</title>
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				padding: 10px;
+				width: 100%;
+				text-align: center;
+				color: #000000;
+			}
+}
+		</style>
+
+	</head>
+	<body>
+		<div id="info">
+						<a href="http://threejs.org" target="_blank">three.js</a> - BVH Loader - 
+						animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
+		</div>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/BVHLoader.js"></script>
+		<script>
+
+			var clock = new THREE.Clock();
+
+			var mixer, skeletonHelper, camera, controls, scene, renderer;
+
+			var mesh;
+			
+			init();
+			animate();
+
+			var loader = new THREE.BVHLoader();
+			loader.load( "models/bvh/pirouette.bvh", function( result ) {
+
+					skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+					skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+
+					var boneContainer = new THREE.Object3D();
+					boneContainer.add( result.skeleton.bones[ 0 ] );
+
+					scene.add( skeletonHelper );
+					scene.add( boneContainer );
+	
+					// play animation
+					mixer = new THREE.AnimationMixer( skeletonHelper );
+					mixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play()
+			} );
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				controls = new THREE.TrackballControls( camera );
+
+				controls.rotateSpeed = 4.5;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
+
+				camera.position.z = 600;
+				camera.position.y = 200;
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xeeeeee );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+				var delta = clock.getDelta();
+
+				if ( mixer )
+					mixer.update( delta );
+
+				if ( skeletonHelper )
+					skeletonHelper.update();
+
+				renderer.render( scene, camera );
+			}
+
+
+		</script>
+	</body>
+</html>
