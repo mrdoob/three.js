@@ -27,25 +27,24 @@
 	</head>
 	<body>
 		<div id="info">
-						<a href="http://threejs.org" target="_blank">three.js</a> - BVH Loader - 
-						animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - BVH Loader -
+			animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
 		</div>
 		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/BVHLoader.js"></script>
 		<script>
 
 			var clock = new THREE.Clock();
 
-			var mixer, skeletonHelper, camera, controls, scene, renderer;
+			var camera, controls, scene, renderer;
+			var mixer, skeletonHelper;
 
-			var mesh;
-			
 			init();
 			animate();
 
 			var loader = new THREE.BVHLoader();
-			loader.load( "models/bvh/pirouette.bvh", function( result ) {
+			loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
 					skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
 					skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
@@ -55,29 +54,23 @@
 
 					scene.add( skeletonHelper );
 					scene.add( boneContainer );
-	
+
 					// play animation
 					mixer = new THREE.AnimationMixer( skeletonHelper );
-					mixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play()
+					mixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
+
 			} );
 
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 200, 400 );
 
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 4.5;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
+				controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
 
-				camera.position.z = 600;
-				camera.position.y = 200;
+				scene.add( new THREE.GridHelper( 200, 100 ) );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -88,6 +81,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
 			function onWindowResize() {
@@ -97,7 +91,6 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
 			}
 
 			function animate() {
@@ -107,15 +100,12 @@
 
 				var delta = clock.getDelta();
 
-				if ( mixer )
-					mixer.update( delta );
-
-				if ( skeletonHelper )
-					skeletonHelper.update();
+				if ( mixer ) mixer.update( delta );
+				if ( skeletonHelper ) skeletonHelper.update();
 
 				renderer.render( scene, camera );
-			}
 
+			}
 
 		</script>
 	</body>
