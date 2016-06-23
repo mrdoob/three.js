@@ -181,7 +181,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			}
 
 			// TODO (abelnation): is this needed?
-			if (shadow instanceof THREE.AreaLightShadow ) {
+			if (shadow instanceof THREE.RectAreaLightShadow ) {
 
 				shadow.update( light );
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - area light</title>
+		<title>three.js webgl - lights - rect light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -35,12 +35,12 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the area light and it's edge - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
-			Right click and drag to move OrbitControls, center across the edge of the shadow.<br />
+			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the rect light and it's edge - by <a href="http://github.com/abelnation" target="_blank">abelnation</a><br />
+			Click and drag to move OrbitControls, center across the edge of the shadow.<br />
 			Click to set random color CTRL-Click for White.<br />
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -56,21 +56,28 @@
 			var orb = new THREE.OrbitControls( cam, rnd.domElement );
 
 			var scn = new THREE.Scene();
-			var matFloor = new THREE.MeshPhongMaterial();
-			var matBox = new THREE.MeshPhongMaterial();
+
+			var matParams = {
+				specular: 0xFFFFFF,
+				shininess: 40
+			}
+
+			var matFloor = new THREE.MeshPhongMaterial( matParams );
+			var matBox = new THREE.MeshPhongMaterial( matParams );
 			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
 			var mshBox = new THREE.Mesh( geoBox, matBox );
-			var amb = new THREE.AmbientLight( 0x121422 );
+
+			var amb = new THREE.AmbientLight( 0x080808 );
 
 			// TODO (abelnation): temp point light for debugging
 			var dir = new THREE.DirectionalLight( 0xFFFFFF );
-			var dirHelper;
+			var dirHelper = new THREE.DirectionalLightHelper( dir );
 
 			var shapes, shapeNames;
-			var area;
-			var areaHelper;
+			var rectLight;
+			var rectLightHelper;
 
 			var ray = new THREE.Raycaster();
 			var mouseDown = new THREE.Vector2();
@@ -81,6 +88,19 @@
 
 			function init() {
 
+				var gl = rnd.context;
+
+				// Check for float-RT support
+				if (!gl.getExtension("OES_texture_float")) {
+					alert("OES_texture_float not supported");
+					throw "missing webgl extension";
+				}
+
+				if (!gl.getExtension("OES_texture_float_linear")) {
+					alert("OES_texture_float_linear not supported");
+					throw "missing webgl extension";
+				}
+
 				rnd.shadowMap.enabled = true;
 				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
 				rnd.gammaInput = true;
@@ -89,37 +109,30 @@
 				rnd.domElement.addEventListener( 'mousedown', onDocumentClick );
 				rnd.domElement.addEventListener( 'mouseup', onDocumentClick );
 
-				cam.position.set( 65, 8, - 10 );
+				cam.position.set( 0, 100, 0 );
 
-				// TODO (abelnation): this dir light is for debugging only
-				dir.position.set( 0, 20, 0 );
-				dir.castShadow = true;
+				// shapes = {
+				// 	square: THREE.Polygon.makeSquare( 10.0 ),
+				// 	rectangle: THREE.Polygon.makeRectangle( 10.0, 5.0 ),
+				// 	circle: THREE.Polygon.makeCircle( 5.0, 20 ),
+				// 	star: THREE.Polygon.makeStar( 5, 5.0, 2.5 ),
+				// 	triangle: new THREE.Polygon( [
+				// 		new THREE.Vector3( -5.0, -5.0, 0 ),
+				// 		new THREE.Vector3(  0.0,  5.0, 0 ),
+				// 		new THREE.Vector3(  5.0, -5.0, 0 ),
+				// 	] )
+				// };
+				// shapeNames = Object.keys( shapes );
 
-				dir.shadow.camera = new THREE.OrthographicCamera( - 20, 20, 20, - 20, 0.1, 20000 );
-				dir.shadow.mapSize.width = 1024;
-				dir.shadow.mapSize.height = 1024;
+				rectLight = new THREE.RectAreaLight( 0xFFFFFF, undefined, 10, 3 );
+				rectLight.matrixAutoUpdate = true;
+				rectLight.intensity = 2.0;
+				rectLight.position.set( 5, 5, 0 );
+				// rectLight.target = mshBox;
+				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+				rectLight.add( rectLightHelper );
 
-				dirHelper = new THREE.DirectionalLightHelper( dir );
-
-				shapes = {
-					square: THREE.Polygon.makeSquare( 10.0 ),
-					rectangle: THREE.Polygon.makeRectangle( 10.0, 5.0 ),
-					circle: THREE.Polygon.makeCircle( 5.0, 20 ),
-					star: THREE.Polygon.makeStar( 5, 5.0, 2.5 ),
-					triangle: new THREE.Polygon( [
-						new THREE.Vector3( -5.0, -5.0, 0 ),
-						new THREE.Vector3(  0.0,  5.0, 0 ),
-						new THREE.Vector3(  5.0, -5.0, 0 ),
-					] )
-				};
-				shapeNames = Object.keys( shapes );
-
-				area = new THREE.AreaLight( 0xFFFFFF, undefined, shapes.square );
-				area.position.set( 0, 20, 0 );
-				area.target = mshBox;
-				areaHelper = new THREE.AreaLightHelper( area );
-
-				// TODO (abelnation): area light shadow
+				// TODO (abelnation): rect light shadow
 
 				matFloor.color.set( 0x808080 );
 				randomColor( matBox );
@@ -136,15 +149,15 @@
 				scn.add( mshFloor );
 				scn.add( mshBox );
 
-				scn.add( amb );
+				// scn.add( amb );
 
-				scn.add( dir );
-				scn.add( dirHelper );
+				// scn.add( dir );
+				// scn.add( dirHelper );
 
-				scn.add( area );
-				scn.add( areaHelper );
+				scn.add( rectLight );
+				// scn.add( rectLightHelper );
 
-				scn.add( new THREE.AxisHelper( 10 ) );
+				// scn.add( new THREE.AxisHelper( 10 ) );
 
 				document.body.appendChild( rnd.domElement );
 				onResize();
@@ -175,9 +188,6 @@
 
 			function update() {
 
-				// move box in figure 8 path
-				// xz is a figure 8
-				// y is gently rising and falling
 				var dt = 6000;
 				var qdt = dt / 4.0;
 				var dirSigns = [
@@ -186,24 +196,42 @@
 					[ - 1,  1 ],
 					[ 1,  1 ]
 				];
+				var t = ( Date.now() / 1000 );
 
-				var t = ( Date.now() % dt ) / dt;
-				var r = t * ( 4.0 * Math.PI );
-				var s = Math.floor( t * dirSigns.length );
+				// move light in circle around center
+				// change light height with sine curve
 
-				var sign = dirSigns[ s ];
-				var x = 5.0 * ( Math.cos( r ) + 1.0 ) * sign[ 0 ];
-				var z = 5.0 * Math.sin( r ) * sign[ 1 ];
-				var y = 2.5 * Math.cos( 0.5 * r ) + 5.0;
+				var r = 10.0;
 
-				mshBox.position.set( x, y, z );
-				mshBox.updateMatrixWorld();
+				var lx = r * Math.cos( t );
+				var lz = r * Math.sin( t );
+
+				var ly = 5.0 + 5.0 * Math.sin( t / 3.0 );
+				// var ly = 7.0;
+
+				rectLight.position.set( lx, ly, lz );
+				rectLight.lookAt( mshBox.position );
+				rectLight.updateMatrixWorld();
+
+				// // move box in figure 8 path
+				// // xz is a figure 8
+				// // y is gently rising and falling
+				// 				var r = t * ( 4.0 * Math.PI );
+				// var s = Math.floor( t * dirSigns.length );
+                //
+				// var sign = dirSigns[ s ];
+				// var x = 5.0 * ( Math.cos( r ) + 1.0 ) * sign[ 0 ];
+				// var z = 5.0 * Math.sin( r ) * sign[ 1 ];
+				// var y = 2.5 * Math.cos( 0.5 * r ) + 5.0;
+                //
+				// mshBox.position.set( x, y, z );
+				// mshBox.updateMatrixWorld();
 
 			}
 
 			function render() {
 
-				areaHelper.update(); // required
+				rectLightHelper.update(); // required
 				rnd.render( scn, cam );
 
 			}
@@ -228,43 +256,64 @@
 				clearGui();
 
 				param = {
-					'light color': area.color.getHex(),
-					intensity: area.intensity,
-					shape: shapeNames[0]
+					'light color': rectLight.color.getHex(),
+					intensity: rectLight.intensity,
+					width: rectLight.width,
+					height: rectLight.height,
+					shininess: matFloor.shininess,
+					// shape: shapeNames[0]
 				};
 
-				gui.add( param, 'shape', shapeNames ).onChange( function ( val ) {
+				gui.add( param, 'width', 0.1, 20).onChange( function ( val ) {
 
-					area.polygon = shapes[ val ].clone();
+					rectLight.width = val;
 
 				} );
+
+				gui.add( param, 'height', 0.1, 20).onChange( function ( val ) {
+
+					rectLight.height = val;
+
+				} );
+
+				// gui.add( param, 'shape', shapeNames ).onChange( function ( val ) {
+                //
+				// 	rectLight.polygon = shapes[ val ].clone();
+                //
+				// } );
 
 				gui.addColor( param, 'light color' ).onChange( function ( val ) {
 
-					area.color.setHex( val );
+					rectLight.color.setHex( val );
 
 				} );
 
-				gui.add( param, 'intensity', 0, 10 ).onChange( function ( val ) {
+				gui.add( param, 'intensity', 0, 20 ).onChange( function ( val ) {
 
-					area.intensity = val;
-					areaHelper.update();
+					rectLight.intensity = val;
+
+				} );
+
+				gui.add( param, 'shininess', 0, 100000 ).onChange( function ( val ) {
+
+					matBox.shininess = val;
+					matFloor.shininess = val;
 
 				} );
 
 				// TODO (abelnation): shadow controls
-				// addGui( 'distance', area.distance, function( val ) {
-				// area.distance = val;
+				// addGui( 'distance', rectLight.distance, function( val ) {
+				// rectLight.distance = val;
 				// render();
 				// }, false, 0, 1000 );
 
-				// addGui( 'penumbra', area.penumbra, function( val ) {
-				// area.penumbra = val;
+				// addGui( 'penumbra', rectLight.penumbra, function( val ) {
+				// rectLight.penumbra = val;
 				// render();
 				// }, false, 0, 1 );
 
-				// addGui( 'decay', area.decay, function( val ) {
-				// area.decay = val;
+				// addGui( 'decay', rectLight.decay, function( val ) {
+				// rectLight.decay = val;
 				// render();
 				// }, false, 0, 100 );
 

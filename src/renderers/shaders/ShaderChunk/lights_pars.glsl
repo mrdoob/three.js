@@ -125,29 +125,22 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			directLight.visible = false;
 
 		}
-
 	}
 
 #endif
 
 
-#if NUM_AREA_LIGHTS > 0
+#if NUM_RECT_AREA_LIGHTS > 0
 
-    struct AreaLight {
-        vec3 position;
-        vec3 direction;
-        vec3 color;
+	struct RectAreaLight {
+		vec3 color;
+		vec3 position;
+		float width;
+		float height;
+		mat4 rotationMatrix;
+	};
 
-        // TODO (abelnation): add AreaLight polygon to struct
-    };
-
-    uniform AreaLight areaLights[ NUM_AREA_LIGHTS ];
-
-    // TODO (abelnation): AreaLight helpers for computing radiance
-
-	void getAreaDirectLightIrradiance( const in AreaLight areaLight, const in GeometricContext geometry, out IncidentLight directLight  ) {
-        // TODO (abelnation): implement
-    }
+	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
 
 #endif
 

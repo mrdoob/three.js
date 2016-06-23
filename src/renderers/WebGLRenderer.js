@@ -144,6 +144,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_projScreenMatrix = new THREE.Matrix4(),
 
 	_vector3 = new THREE.Vector3(),
+	_matrix4 = new THREE.Matrix4(),
 
 	// light arrays cache
 
@@ -1666,7 +1667,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
-			uniforms.areaLights.value = _lights.area;
+			uniforms.rectAreaLights.value = _lights.area;
 			uniforms.pointLights.value = _lights.point;
 			uniforms.hemisphereLights.value = _lights.hemi;
 
@@ -2286,7 +2287,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
-		uniforms.areaLights.needsUpdate = value;
+		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
@@ -2403,24 +2404,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
-			} else if ( light instanceof THREE.AreaLight ) {
+			} else if ( light instanceof THREE.RectAreaLight ) {
 
 				var uniforms = lightCache.get( light );
+
+				uniforms.color.copy( color ).multiplyScalar( intensity );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				uniforms.width = light.width;
+				uniforms.height = light.height;
 
-				// TODO (abelnation): AreaLight distance?
+				_matrix4.copy( light.matrixWorld );
+				_matrix4.premultiply( viewMatrix );
+				uniforms.rotationMatrix.extractRotation( _matrix4 );
+
+				// TODO (abelnation): RectAreaLight distance?
 				// uniforms.distance = distance;
 
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-				_vector3.setFromMatrixPosition( light.target.matrixWorld );
-				uniforms.direction.sub( _vector3 );
-				uniforms.direction.transformDirection( viewMatrix );
-
-				// TODO (abelnation): AreaLight shadow info to uniforms
+				// TODO (abelnation): RectAreaLight shadow info to uniforms
 
 				_lights.area[ areaLength ++ ] = uniforms;
 
@@ -2495,8 +2498,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			hemiLength,
 			_lights.shadows.length
 		].join(',');
-
-			directionalLength + ',' + pointLength + ',' + spotLength + ',' + areaLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
 

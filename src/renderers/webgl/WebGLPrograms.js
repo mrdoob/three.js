@@ -23,7 +23,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numAreaLights",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
 	];
@@ -171,7 +171,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
-			numAreaLights: lights.area.length,
+			numRectAreaLights: lights.area.length,
 			numHemiLights: lights.hemi.length,
 
 			numClippingPlanes: nClipPlanes,

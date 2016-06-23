@@ -95,6 +95,9 @@ THREE.Texture.prototype = {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
+		this.needsUpdate = source.needsUpdate;
+		this.version = source.version;
+
 		return this;
 
 	},

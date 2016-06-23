@@ -81,17 +81,16 @@ IncidentLight directLight;
 
 #endif
 
-#if ( NUM_AREA_LIGHTS > 0 ) && defined( RE_Direct )
+#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Area )
 
-    AreaLight areaLight;
+    RectAreaLight rectAreaLight;
 
- 	for ( int i = 0; i < NUM_AREA_LIGHTS; i ++ ) {
+ 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
-		areaLight = areaLights[ i ];
+		rectAreaLight = rectAreaLights[ i ];
 
-        // TODO (abelnation): compute direct light from AreaLight
-
-        RE_Direct( directLight, geometry, material, reflectedLight );
+        // TODO (abelnation): compute direct light from RectAreaLight
+		RE_Area( rectAreaLight, geometry, material, reflectedLight );
 
 	}
 

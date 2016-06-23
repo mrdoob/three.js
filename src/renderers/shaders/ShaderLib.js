@@ -58,6 +58,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'normalmap' ],
 			THREE.UniformsLib[ 'displacementmap' ],
 			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'ltc_brdf' ],
 			THREE.UniformsLib[ 'lights' ],
 
 			{
@@ -216,6 +217,7 @@ THREE.ShaderLib[ 'physical' ] = {
 	uniforms: THREE.UniformsUtils.merge( [
 
 		THREE.ShaderLib[ 'standard' ].uniforms,
+		THREE.UniformsLib[ 'ltc_brdf' ],
 
 		{
 			// future

@@ -78,7 +78,7 @@ function loadObject( data ) {
     var hasLights = false;
 
     var lights = ['AmbientLight', 'DirectionalLight',
-        'PointLight', 'SpotLight', 'AreaLight', 'HemisphereLight'];
+        'PointLight', 'SpotLight', 'RectAreaLight', 'HemisphereLight'];
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 
