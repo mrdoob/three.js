@@ -34097,6 +34097,21 @@ THREE.ShapeUtils = {
 
 	triangulateShape: function ( contour, holes ) {
 
+		function removeDupEndPts(points) {
+
+			var l = points.length;
+
+			if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+
+				points.pop();
+
+			}
+
+		}
+
+		removeDupEndPts( contour );
+		holes.forEach( removeDupEndPts );
+
 		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 
 			// inOtherPt needs to be collinear to the inSegment
@@ -35124,13 +35139,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		}
 
-		if ( points[ points.length - 1 ].equals( points[ 0 ] ) ) {
-
-			points.pop();
-
-		}
-
-		if ( this.autoClose ) {
+		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 
@@ -40786,20 +40795,22 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step, color1, color2 ) {
+THREE.GridHelper = function ( size, segments, color1, color2 ) {
 
+	segments = segments || 1;
 	color1 = new THREE.Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new THREE.Color( color2 !== undefined ? color2 : 0x888888 );
 
-	var vertices = [];
-	var colors = [];
+	var center = segments / 2;
+	var step = ( size * 2 ) / segments;
+	var vertices = [], colors = [];
 
-	for ( var i = - size, j = 0; i <= size; i += step ) {
+	for ( var i = 0, j = 0, k = - size; i <= segments; i ++, k += step ) {
 
-		vertices.push( - size, 0, i, size, 0, i );
-		vertices.push( i, 0, - size, i, 0, size );
+		vertices.push( - size, 0, k, size, 0, k );
+		vertices.push( k, 0, - size, k, 0, size );
 
-		var color = i === 0 ? color1 : color2;
+		var color = i === center ? color1 : color2;
 
 		color.toArray( colors, j ); j += 3;
 		color.toArray( colors, j ); j += 3;
