@@ -178,13 +178,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		}
 
-		if ( points[ points.length - 1 ].equals( points[ 0 ] ) ) {
-
-			points.pop();
-
-		}
-
-		if ( this.autoClose ) {
+		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 
