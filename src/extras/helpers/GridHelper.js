@@ -15,7 +15,7 @@ THREE.GridHelper = function ( size, step, color1, color2 ) {
 		vertices.push( - size, 0, i, size, 0, i );
 		vertices.push( i, 0, - size, i, 0, size );
 
-		var color = i === 0 ? color1 : color2;
+		var color = ( Math.abs( i ) < Math.pow( 2, - 50 ) ) ? color1 : color2;
 
 		color.toArray( colors, j ); j += 3;
 		color.toArray( colors, j ); j += 3;
