@@ -21,7 +21,7 @@ function render() {
 function animate() {
 
     requestAnimationFrame( animate );
-    
+
     if ( mixer !== null ) {
 
         var delta = clock.getDelta();
@@ -47,7 +47,7 @@ function onWindowResize() {
 function setupScene( result, data ) {
 
     scene = new THREE.Scene();
-    scene.add( new THREE.GridHelper( 10, 2.5 ) );
+    scene.add( new THREE.GridHelper( 10, 8 ) );
 
 }
 

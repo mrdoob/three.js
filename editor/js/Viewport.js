@@ -19,7 +19,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 1 );
+	var grid = new THREE.GridHelper( 30, 60 );
 	sceneHelpers.add( grid );
 
 	//
@@ -284,13 +284,13 @@ var Viewport = function ( editor ) {
 
 			case 'css/light.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
+				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
 				sceneHelpers.add( grid );
 				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
+				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
 				sceneHelpers.add( grid );
 				clearColor = 0x333333;
 				break;
