@@ -21,8 +21,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: _renderTargetL },
-			"mapRight": { type: "t", value: _renderTargetR }
+			"mapLeft": { value: _renderTargetL.texture },
+			"mapRight": { value: _renderTargetR.texture }
 
 		},
 
@@ -70,10 +70,12 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.setSize( width, height );
-		_renderTargetR.setSize( width, height );
-
 		renderer.setSize( width, height );
+
+		var pixelRatio = renderer.getPixelRatio();
+
+		_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
+		_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
 
 	};
 

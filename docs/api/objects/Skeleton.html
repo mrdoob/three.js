@@ -38,7 +38,7 @@
 		elbow.position.y = 0;
 		hand.position.y = 5;
 		
-		var armSkeleton = THREE.Skeleton( bones );
+		var armSkeleton = new THREE.Skeleton( bones );
 		
 		// See THREE.SkinnedMesh for an example of usage with a mesh
 		</code>
@@ -123,8 +123,9 @@
 		
 		<h3>[method:Skeleton clone]()</h3>
 		<div>
-		Clone a Skeleton Object.
+		Returns a clone of this Skeleton object.
 		</div>
+
 		
 		<h2>Source</h2>
 

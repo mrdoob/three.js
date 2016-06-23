@@ -1,7 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>WebGL NodeMaterial</title>
+		<title>three.js webgl - node material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -33,7 +33,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Material
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src='js/geometries/TeapotBufferGeometry.js'></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -1299,7 +1299,7 @@
 
 					}, true );
 
-					addGui( 'hardBody', colorB.value.getHex(), function( val ) {
+					addGui( 'rigidBody', colorB.value.getHex(), function( val ) {
 
 						colorB.value.setHex( val );
 

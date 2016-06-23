@@ -139,7 +139,7 @@ THREE.ColladaLoader.prototype = {
 
 		// library
 
-		function parseLibrary( xml, data, libraryName, nodeName, parser ) {
+		function parseLibrary( xml, libraryName, nodeName, parser ) {
 
 			var library = getElementsByTagName( xml, libraryName )[ 0 ];
 
@@ -183,6 +183,7 @@ THREE.ColladaLoader.prototype = {
 		// image
 
 		var imageLoader = new THREE.ImageLoader();
+		imageLoader.setCrossOrigin( this.crossOrigin );
 
 		function parseImage( xml ) {
 
@@ -420,7 +421,87 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'texture':
-						data[ child.nodeName ] = child.getAttribute( 'texture' );
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), extra: parseEffectParameterTexture( child ) };
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTexture( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'extra':
+						data = parseEffectParameterTextureExtra( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTextureExtra( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'technique':
+						data[ child.nodeName ] = parseEffectParameterTextureExtraTechnique( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectParameterTextureExtraTechnique( xml ) {
+
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'repeatU':
+					case 'repeatV':
+					case 'offsetU':
+					case 'offsetV':
+						data[ child.nodeName ] = parseFloat( child.textContent );
+						break;
+
+					case 'wrapU':
+					case 'wrapV':
+						data[ child.nodeName ] = parseInt( child.textContent );
 						break;
 
 				}
@@ -497,24 +578,42 @@ THREE.ColladaLoader.prototype = {
 
 			material.name = data.name;
 
-			function getTexture( sid ) {
+			function getTexture( textureObject ) {
 
-				var sampler = effect.profile.samplers[ sid ];
+				var sampler = effect.profile.samplers[ textureObject.id ];
 
 				if ( sampler !== undefined ) {
 
 					var surface = effect.profile.surfaces[ sampler.source ];
 
 					var texture = new THREE.Texture( getImage( surface.init_from ) );
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
+
+					var extra = textureObject.extra;
+
+					if ( extra !== undefined && extra.technique !== undefined ) {
+
+						var technique = extra.technique;
+
+						texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+						texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+
+						texture.offset.set( technique.offsetU, technique.offsetV );
+						texture.repeat.set( technique.repeatU, technique.repeatV );
+
+					} else {
+
+						texture.wrapS = THREE.RepeatWrapping;
+						texture.wrapT = THREE.RepeatWrapping;
+
+					}
+
 					texture.needsUpdate = true;
 
 					return texture;
 
 				}
 
-				console.error( 'ColladaLoder: Undefined sampler', sid );
+				console.error( 'ColladaLoder: Undefined sampler', textureObject.id );
 
 				return null;
 
@@ -1447,14 +1546,14 @@ THREE.ColladaLoader.prototype = {
 
 		console.time( 'ColladaLoader: Parse' );
 
-		parseLibrary( collada, library.images, 'library_images', 'image', parseImage );
-		parseLibrary( collada, library.effects, 'library_effects', 'effect', parseEffect );
-		parseLibrary( collada, library.materials, 'library_materials', 'material', parseMaterial );
-		parseLibrary( collada, library.cameras, 'library_cameras', 'camera', parseCamera );
-		parseLibrary( collada, library.lights, 'library_lights', 'light', parseLight );
-		parseLibrary( collada, library.geometries, 'library_geometries', 'geometry', parseGeometry );
-		parseLibrary( collada, library.nodes, 'library_nodes', 'node', parseNode );
-		parseLibrary( collada, library.visualScenes, 'library_visual_scenes', 'visual_scene', parseVisualScene );
+		parseLibrary( collada, 'library_images', 'image', parseImage );
+		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
+		parseLibrary( collada, 'library_materials', 'material', parseMaterial );
+		parseLibrary( collada, 'library_cameras', 'camera', parseCamera );
+		parseLibrary( collada, 'library_lights', 'light', parseLight );
+		parseLibrary( collada, 'library_geometries', 'geometry', parseGeometry );
+		parseLibrary( collada, 'library_nodes', 'node', parseNode );
+		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Parse' );
 

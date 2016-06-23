@@ -28,7 +28,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Lambert Material Variantions by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -44,7 +44,7 @@
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/gentilis_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -59,7 +59,15 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
+				//
+
+				var reflectionCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/SwedishRoyalCastle/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				reflectionCube.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = reflectionCube;
 
 				// Materials
 
@@ -71,17 +79,6 @@
 				var shininess = 50, specular = 0x333333, shading = THREE.SmoothShading;
 
 				var materials = [];
-
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
 
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
@@ -186,10 +183,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );

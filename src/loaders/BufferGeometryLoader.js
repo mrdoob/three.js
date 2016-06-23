@@ -8,9 +8,7 @@ THREE.BufferGeometryLoader = function ( manager ) {
 
 };
 
-THREE.BufferGeometryLoader.prototype = {
-
-	constructor: THREE.BufferGeometryLoader,
+Object.assign( THREE.BufferGeometryLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -57,7 +55,7 @@ THREE.BufferGeometryLoader.prototype = {
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
-			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
+			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize, attribute.normalized ) );
 
 		}
 
@@ -95,4 +93,4 @@ THREE.BufferGeometryLoader.prototype = {
 
 	}
 
-};
+} );

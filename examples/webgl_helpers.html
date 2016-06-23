@@ -14,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script>
 
@@ -45,8 +45,7 @@
 
 				scene.add( new THREE.PointLightHelper( light, 5 ) );
 
-				var helper = new THREE.GridHelper( 200, 10 );
-				helper.setColors( 0x0000ff, 0x808080 );
+				var helper = new THREE.GridHelper( 200, 10, 0x0000ff, 0x808080 );
 				helper.position.y = - 150;
 				scene.add( helper );
 

@@ -30,7 +30,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
@@ -88,7 +88,6 @@
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setBaseUrl( 'obj/male02/' );
 				mtlLoader.setPath( 'obj/male02/' );
 				mtlLoader.load( 'male02_dds.mtl', function( materials ) {
 

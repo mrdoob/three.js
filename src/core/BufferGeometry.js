@@ -26,9 +26,7 @@ THREE.BufferGeometry = function () {
 
 };
 
-THREE.BufferGeometry.prototype = {
-
-	constructor: THREE.BufferGeometry,
+Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, {
 
 	getIndex: function () {
 
@@ -141,6 +139,8 @@ THREE.BufferGeometry.prototype = {
 			this.computeBoundingSphere();
 
 		}
+
+		return this;
 
 	},
 
@@ -550,47 +550,38 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		var vector = new THREE.Vector3();
+		if ( this.boundingBox === null ) {
 
-		return function () {
+			this.boundingBox = new THREE.Box3();
 
-			if ( this.boundingBox === null ) {
+		}
 
-				this.boundingBox = new THREE.Box3();
+		var positions = this.attributes.position.array;
 
-			}
+		if ( positions !== undefined ) {
 
-			var positions = this.attributes.position.array;
+			this.boundingBox.setFromArray( positions );
 
-			if ( positions ) {
+		} else {
 
-				this.boundingBox.setFromArray( positions );
+			this.boundingBox.makeEmpty();
 
-			}
+		}
 
-			if ( positions === undefined || positions.length === 0 ) {
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				this.boundingBox.min.set( 0, 0, 0 );
-				this.boundingBox.max.set( 0, 0, 0 );
+			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
-			}
+		}
 
-			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
-
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
-
-			}
-
-		};
-
-	}(),
+	},
 
 	computeBoundingSphere: function () {
 
 		var box = new THREE.Box3();
 		var vector = new THREE.Vector3();
 
-		return function () {
+		return function computeBoundingSphere() {
 
 			if ( this.boundingSphere === null ) {
 
@@ -598,13 +589,14 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
+				var array = positions.array;
 				var center = this.boundingSphere.center;
 
-				box.setFromArray( positions );
+				box.setFromArray( array );
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -612,9 +604,9 @@ THREE.BufferGeometry.prototype = {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = array.length; i < il; i += 3 ) {
 
-					vector.fromArray( positions, i );
+					vector.fromArray( array, i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
@@ -925,7 +917,8 @@ THREE.BufferGeometry.prototype = {
 			data.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
-				array: array
+				array: array,
+				normalized: attribute.normalized
 			};
 
 		}
@@ -1007,7 +1000,7 @@ THREE.BufferGeometry.prototype = {
 		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 			var group = groups[ i ];
-			this.addGroup( group.start, group.count );
+			this.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 
@@ -1021,8 +1014,6 @@ THREE.BufferGeometry.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+} );
 
 THREE.BufferGeometry.MaxIndex = 65535;

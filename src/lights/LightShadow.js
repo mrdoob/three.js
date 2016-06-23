@@ -16,9 +16,7 @@ THREE.LightShadow = function ( camera ) {
 
 };
 
-THREE.LightShadow.prototype = {
-
-	constructor: THREE.LightShadow,
+Object.assign( THREE.LightShadow.prototype, {
 
 	copy: function ( source ) {
 
@@ -39,4 +37,4 @@ THREE.LightShadow.prototype = {
 
 	}
 
-};
+} );

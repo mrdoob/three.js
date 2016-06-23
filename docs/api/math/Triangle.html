@@ -16,7 +16,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 a], [page:Vector3 b], [page:Vector3 c])</h3>
+		<h3>[name]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c] )</h3>
 		<div>
 		a -- [page:Vector3] <br />
 		b -- [page:Vector3] <br />
@@ -50,7 +50,7 @@
 
 
 
-		<h3>[method:Triangle setFromPointsAndIndices]([page:Array points], [page:Integer i0], [page:Integer i1], [page:Integer i2]) [page:Triangle this]</h3>
+		<h3>[method:Triangle setFromPointsAndIndices]( [page:Array points], [page:Integer i0], [page:Integer i1], [page:Integer i2] ) [page:Triangle this]</h3>
 		<div>
 		points -- [page:Array] of [page:Vector3]s <br />
 		i0 -- [page:Integer] index <br />
@@ -61,7 +61,7 @@
 		Sets the triangle's vectors to the vectors in the array.
 		</div>
 
-		<h3>[method:Triangle set]([page:Vector3 a], [page:Vector3 b], [page:Vector3 c]) [page:Triangle this]</h3>
+		<h3>[method:Triangle set]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c] ) [page:Triangle this]</h3>
 		<div>
 		a -- [page:Vector3] <br />
 		b -- [page:Vector3] <br />
@@ -71,7 +71,7 @@
 		Sets the triangle's vectors to the passed vectors.
 		</div>
 
-		<h3>[method:Vector3 normal]([page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 normal]( [page:Vector3 optionalTarget] )</h3>
 		<div>
 		optionalTarget -- Optional [page:Vector3] target to set the result.
 		</div>
@@ -79,7 +79,7 @@
 		Return the calculated normal of the triangle.
 		</div>
 
-		<h3>[method:Vector3 barycoordFromPoint]([page:Vector3 point], [page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 barycoordFromPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		point -- [page:Vector3] <br />
 		optionalTarget -- Optional [page:Vector3] target to set the result.
@@ -99,7 +99,7 @@
 		Return the area of the triangle.
 		</div>
 
-		<h3>[method:Vector3 midpoint]([page:Vector3 optionalTarget])</h3>
+		<h3>[method:Vector3 midpoint]( [page:Vector3 optionalTarget] )</h3>
 		<div>
 		optionalTarget -- Optional [page:Vector3] target to set the result.
 		</div>
@@ -107,7 +107,7 @@
 		Return the midpoint of the triangle. Optionally sets a target vector.
 		</div>
 
-		<h3>[method:Boolean equals]([page:Triangle triangle])</h3>
+		<h3>[method:Boolean equals]( [page:Triangle triangle] )</h3>
 		<div>
 		triangle -- [page:Triangle]
 		</div>
@@ -115,7 +115,7 @@
 		Checks to see if two triangles are equal (share the same vectors).
 		</div>
 
-		<h3>[method:Plane plane]([page:Plane optionalTarget])</h3>
+		<h3>[method:Plane plane]( [page:Plane optionalTarget] )</h3>
 		<div>
 		optionalTarget -- Optional [page:Plane] target to set the result.
 		</div>
@@ -123,7 +123,7 @@
 		Return a [page:Plane plane] based on the triangle. Optionally sets a target plane.
 		</div>
 
-		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
+		<h3>[method:Boolean containsPoint]( [page:Vector3 point] )</h3>
 		<div>
 		point -- [page:Vector3]
 		</div>
@@ -131,7 +131,16 @@
 		Checks to see if the passed vector is within the triangle.
 		</div>
 
-		<h3>[method:Triangle copy]([page:Triangle triangle])</h3>
+		<h3>[method:Vector3 closestPointToPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
+		<div>
+		point -- [page:Vector3] <br />
+		optionalTarget -- Optional [page:Vector3] target to set the result.
+		</div>
+		<div>
+		Returns the closest point on the triangle.
+		</div>
+
+		<h3>[method:Triangle copy]( [page:Triangle triangle] )</h3>
 		<div>
 		triangle -- [page:Triangle]
 		</div>

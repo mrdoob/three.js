@@ -21,16 +21,9 @@
 
 	#endif
 
-	float unpackDepth( const in vec4 rgba_depth ) {
-
-		const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-		return dot( rgba_depth, bit_shift );
-
-	}
-
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
-		return step( compare, unpackDepth( texture2D( depths, uv ) ) );
+		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
 
 	}
 

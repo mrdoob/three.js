@@ -453,6 +453,39 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 
 }
 
+function guiMeshStandardMaterial ( gui, mesh, material, geometry ) {
+
+	var data = {
+		color : material.color.getHex(),
+		emissive : material.emissive.getHex(),
+		envMaps : envMapKeys,
+		map : textureMapKeys,
+		lightMap : textureMapKeys,
+		specularMap : textureMapKeys,
+		alphaMap : textureMapKeys
+	};
+
+	var folder = gui.addFolder('THREE.MeshStandardMaterial');
+
+	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
+	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
+
+	folder.add( material, 'roughness', 0, 1 );
+	folder.add( material, 'metalness', 0, 1 );
+	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
+	folder.add( material, 'wireframe' );
+	folder.add( material, 'wireframeLinewidth', 0, 10 );
+	folder.add( material, 'vertexColors', constants.colors);
+	folder.add( material, 'fog' );
+	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
+	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
+	folder.add( data, 'lightMap', textureMapKeys ).onChange( updateTexture( material, 'lightMap', textureMaps ) );
+	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
+
+	// TODO roughnessMap and metalnessMap
+
+}
+
 function chooseFromHash ( gui, mesh, geometry ) {
 
 	var selectedMaterial = window.location.hash.substring(1) || "MeshBasicMaterial";
@@ -485,6 +518,16 @@ function chooseFromHash ( gui, mesh, geometry ) {
 		material = new THREE.MeshPhongMaterial({color: 0x2194CE});
 		guiMaterial( gui, mesh, material, geometry );
 		guiMeshPhongMaterial( gui, mesh, material, geometry );
+
+		return material;
+
+		break;
+
+	case "MeshStandardMaterial" :
+
+		material = new THREE.MeshStandardMaterial({color: 0x2194CE});
+		guiMaterial( gui, mesh, material, geometry );
+		guiMeshStandardMaterial( gui, mesh, material, geometry );
 
 		return material;
 

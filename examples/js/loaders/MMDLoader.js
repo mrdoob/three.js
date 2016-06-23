@@ -29,13 +29,13 @@
  *  - light motion in vmd support.
  *  - SDEF support.
  *  - uv/material/bone morphing support.
- *  - supply skinning support.
+ *  - more precise grant skinning support.
  *  - shadow support.
  */
 
-THREE.MMDLoader = function ( showStatus, manager ) {
+THREE.MMDLoader = function ( manager ) {
 
-	THREE.Loader.call( this, showStatus );
+	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.defaultTexturePath = './models/default/';
 
@@ -136,29 +136,14 @@ THREE.MMDLoader.prototype.loadAudio = function ( url, callback, onProgress, onEr
 
 	var listener = new THREE.AudioListener();
 	var audio = new THREE.Audio( listener );
+	var loader = new THREE.AudioLoader( this.manager );
 
-	audio.load( url );
+	loader.load( url, function ( buffer ) {
 
-	/*
-	 * Note: THREE.Audio doesn't support onReady callback
-	 *       so doing polling instead.
-	 * TODO: discuss if THREE.Audio.load() should support callback.
-	 */
-	function polling ( buffer ) {
+		audio.setBuffer( buffer );
+		callback( audio, listener );
 
-		if ( audio.source.buffer === null ) {
-
-			setTimeout( polling, 0 );
-
-		} else {
-
-			callback( audio, listener );
-
-		}
-
-	};
-
-	setTimeout( polling, 0 );
+	}, onProgress, onError );
 
 };
 
@@ -471,7 +456,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.toonIndex = dv.getInt8();
 			p.edgeFlag = dv.getUint8();
 			p.faceCount = dv.getUint32() / 3;
-			p.fileName = dv.getChars( 20 );
+			p.fileName = dv.getSjisStringsAsUnicode( 20 );
 			return p;
 
 		};
@@ -943,7 +928,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 			p.type = dv.getUint8();
 
-			var indexSize = metadata.vertexIndexSize;
+			var indexSize = metadata.boneIndexSize;
 
 			if ( p.type === 0 ) {  // BDEF1
 
@@ -1004,7 +989,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 		var parseFace = function () {
 
 			var p = {};
-			p.indices = dv.getIndexArray( metadata.vertexIndexSize, 3 );
+			p.indices = dv.getIndexArray( metadata.vertexIndexSize, 3, true );
 			return p;
 
 		};
@@ -1122,8 +1107,19 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 			if ( p.flag & 0x100 || p.flag & 0x200 ) {
 
-				p.supplyParentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
-				p.supplyRatio = dv.getFloat32();
+				// Note: I don't think Grant is an appropriate name
+				//       but I found that some English translated MMD tools use this term
+				//       so I've named it Grant so far.
+				//       I'd rename to more appropriate name from Grant later.
+				var grant = {};
+
+				grant.isLocal = ( p.flag & 0x80 ) !== 0 ? true : false;
+				grant.affectRotation = ( p.flag & 0x100 ) !== 0 ? true : false;
+				grant.affectPosition = ( p.flag & 0x200 ) !== 0 ? true : false;
+				grant.parentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
+				grant.ratio = dv.getFloat32();
+
+				p.grant = grant;
 
 			}
 
@@ -1218,7 +1214,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 				} else if ( p.type === 1 ) {  // vertex morph
 
 					var m = {};
-					m.index = dv.getIndex( pmx.metadata.vertexIndexSize );
+					m.index = dv.getIndex( pmx.metadata.vertexIndexSize, true );
 					m.position = dv.getFloat32Array( 3 );
 					p.elements.push( m );
 
@@ -1233,7 +1229,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 				} else if ( p.type === 3 ) {  // uv morph
 
 					var m = {};
-					m.index = dv.getIndex( pmx.metadata.vertexIndexSize );
+					m.index = dv.getIndex( pmx.metadata.vertexIndexSize, true );
 					m.uv = dv.getFloat32Array( 4 );
 					p.elements.push( m );
 
@@ -1271,7 +1267,6 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 			pmx.morphs.push( parseMorph() );
 
 		}
-
 
 	};
 
@@ -1875,6 +1870,44 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		}
 
 		geometry.iks = iks;
+
+	};
+
+	var initGrants = function () {
+
+		if ( model.metadata.format === 'pmd' ) {
+
+			return;
+
+		}
+
+		var grants = [];
+
+		for ( var i = 0; i < model.metadata.boneCount; i++ ) {
+
+			var b = model.bones[ i ];
+			var grant = b.grant;
+
+			if ( grant === undefined ) {
+
+				continue;
+
+			}
+
+			var param = {};
+
+			param.index = i;
+			param.parentIndex = grant.parentIndex;
+			param.ratio = grant.ratio;
+			param.isLocal = grant.isLocal;
+			param.affectRotation = grant.affectRotation;
+			param.affectPosition = grant.affectPosition;
+
+			grants.push( param );
+
+		}
+
+		geometry.grants = grants;
 
 	};
 
@@ -2578,6 +2611,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	initFaces();
 	initBones();
 	initIKs();
+	initGrants();
 	initMorphs();
 	initMaterials();
 	initPhysics();
@@ -2659,15 +2693,15 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
-		if ( mesh.geometry.animations === undefined ) {
-
-			mesh.geometry.animations = [];
-
-		}
-
 		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
 
 		if ( clip !== null ) {
+
+			if ( mesh.geometry.animations === undefined ) {
+
+				mesh.geometry.animations = [];
+
+			}
 
 			mesh.geometry.animations.push( clip );
 
@@ -2712,6 +2746,8 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		}
 
+		// TODO: should we use THREE.AnimationClip.CreateFromMorphTargetSequence() instead?
+
 		var tracks = [];
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
@@ -2732,13 +2768,13 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		if ( clip !== null ) {
 
-			if ( mesh.geometry.morphAnimations === undefined ) {
+			if ( mesh.geometry.animations === undefined ) {
 
-				mesh.geometry.morphAnimations = [];
+				mesh.geometry.animations = [];
 
 			}
 
-			mesh.geometry.morphAnimations.push( clip );
+			mesh.geometry.animations.push( clip );
 
 		}
 
@@ -3412,18 +3448,18 @@ THREE.MMDLoader.DataView.prototype = {
 
 	},
 
-	getIndex: function ( type ) {
+	getIndex: function ( type, isUnsigned ) {
 
 		switch ( type ) {
 
 			case 1:
-				return this.getInt8();
+				return ( isUnsigned === true ) ? this.getUint8() : this.getInt8();
 
 			case 2:
-				return this.getInt16();
+				return ( isUnsigned === true ) ? this.getUint16() : this.getInt16();
 
 			case 4:
-				return this.getInt32();
+				return this.getInt32(); // No Uint32
 
 			default:
 				throw 'unknown number type ' + type + ' exception.';
@@ -3432,13 +3468,13 @@ THREE.MMDLoader.DataView.prototype = {
 
 	},
 
-	getIndexArray: function ( type, size ) {
+	getIndexArray: function ( type, size, isUnsigned ) {
 
 		var a = [];
 
 		for ( var i = 0; i < size; i++ ) {
 
-			a.push( this.getIndex( type ) );
+			a.push( this.getIndex( type, isUnsigned ) );
 
 		}
 
@@ -3634,24 +3670,23 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.UniformsLib[ "normalmap" ],
 		THREE.UniformsLib[ "displacementmap" ],
 		THREE.UniformsLib[ "fog" ],
-		THREE.UniformsLib[ "ambient" ],
 		THREE.UniformsLib[ "lights" ],
 
 		{
-			"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-			"shininess": { type: "f", value: 30 }
+			"emissive" : { value: new THREE.Color( 0x000000 ) },
+			"specular" : { value: new THREE.Color( 0x111111 ) },
+			"shininess": { value: 30 }
 		},
 
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 		{
-			"outlineDrawing"  : { type: "i", value: 0 },
-			"outlineThickness": { type: "f", value: 0.0 },
-			"outlineColor"    : { type: "c", value: new THREE.Color( 0x000000 ) },
-			"outlineAlpha"    : { type: "f", value: 1.0 },
-			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null },
-			"hasToonTexture"  : { type: "i", value: 0 }
+			"outlineDrawing"  : { value: 0 },
+			"outlineThickness": { value: 0.0 },
+			"outlineColor"    : { value: new THREE.Color( 0x000000 ) },
+			"outlineAlpha"    : { value: 1.0 },
+			"celShading"      : { value: 0 },
+			"toonMap"         : { value: null },
+			"hasToonTexture"  : { value: 0 }
 		}
 		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 
@@ -3674,12 +3709,12 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "uv2_pars_vertex" ],
 		THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
 		THREE.ShaderChunk[ "envmap_pars_vertex" ],
-		THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 		THREE.ShaderChunk[ "color_pars_vertex" ],
 		THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
 		THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+		THREE.ShaderChunk[ "clipping_planes_pars_vertex" ],
 
 		// ---- MMD specific for outline drawing
 		"	uniform bool outlineDrawing;",
@@ -3710,12 +3745,12 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "skinning_vertex" ],
 			THREE.ShaderChunk[ "project_vertex" ],
 			THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+			THREE.ShaderChunk[ "clipping_planes_vertex" ],
 
 		"	vViewPosition = - mvPosition.xyz;",
 
 			THREE.ShaderChunk[ "worldpos_vertex" ],
 			THREE.ShaderChunk[ "envmap_vertex" ],
-			THREE.ShaderChunk[ "lights_phong_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 		// ---- MMD specific for outline drawing
@@ -3744,6 +3779,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"uniform float opacity;",
 
 		THREE.ShaderChunk[ "common" ],
+		THREE.ShaderChunk[ "packing" ],
 		THREE.ShaderChunk[ "color_pars_fragment" ],
 		THREE.ShaderChunk[ "uv_pars_fragment" ],
 		THREE.ShaderChunk[ "uv2_pars_fragment" ],
@@ -3755,7 +3791,6 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "envmap_pars_fragment" ],
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		THREE.ShaderChunk[ "bsdfs" ],
-		THREE.ShaderChunk[ "ambient_pars" ],
 		THREE.ShaderChunk[ "lights_pars" ],
 		THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 		THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -3763,6 +3798,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 		THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+		THREE.ShaderChunk[ "clipping_planes_pars_fragment" ],
 
 		// ---- MMD specific for cel shading
 		"	uniform bool outlineDrawing;",
@@ -3784,7 +3820,13 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"#undef RE_Direct",
 		"void RE_Direct_BlinnMMD( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {",
 		"	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );",
-		"	vec3 irradiance = dotNL * PI * directLight.color; // punctual light",
+		"	vec3 irradiance = dotNL * directLight.color;",
+
+		"	#ifndef PHYSICALLY_CORRECT_LIGHTS",
+
+		"		irradiance *= PI; // punctual light",
+
+		"	#endif",
 
 		// ---- MMD specific for toon mapping
 		"	if ( celShading ) {",
@@ -3796,6 +3838,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 
 		"	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;",
 		"}",
+		// ---- MMD specific for toon mapping
 		"#define RE_Direct	RE_Direct_BlinnMMD",
 		// ---- MMD specific for toon mapping
 
@@ -3808,9 +3851,11 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"	}",
 		// ---- MMD specific for outline drawing
 
+			THREE.ShaderChunk[ "clipping_planes_fragment" ],
+
 		"	vec4 diffuseColor = vec4( diffuse, opacity );",
 		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-		"	vec3 totalEmissiveLight = emissive;",
+		"	vec3 totalEmissiveRadiance = emissive;",
 
 			THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 			THREE.ShaderChunk[ "map_fragment" ],
@@ -3818,6 +3863,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 			THREE.ShaderChunk[ "alphamap_fragment" ],
 			THREE.ShaderChunk[ "alphatest_fragment" ],
 			THREE.ShaderChunk[ "specularmap_fragment" ],
+			THREE.ShaderChunk[ "normal_flip" ],
 			THREE.ShaderChunk[ "normal_fragment" ],
 			THREE.ShaderChunk[ "emissivemap_fragment" ],
 
@@ -3828,14 +3874,16 @@ THREE.ShaderLib[ 'mmd' ] = {
 			// modulation
 			THREE.ShaderChunk[ "aomap_fragment" ],
 
-			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveLight;",
+			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 
 			THREE.ShaderChunk[ "envmap_fragment" ],
-			THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
-			THREE.ShaderChunk[ "fog_fragment" ],
 
 		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
+			THREE.ShaderChunk[ "tonemapping_fragment" ],
+			THREE.ShaderChunk[ "encodings_fragment" ],
+			THREE.ShaderChunk[ "fog_fragment" ],
 
 		"}"
 
@@ -3928,14 +3976,76 @@ THREE.MMDAudioManager.prototype = {
 
 };
 
+THREE.MMDGrantSolver = function ( mesh ) {
+
+	this.mesh = mesh;
+
+};
+
+THREE.MMDGrantSolver.prototype = {
+
+	constructor: THREE.MMDGrantSolver,
+
+	update: function () {
+
+		var q = new THREE.Quaternion();
+
+		return function () {
+
+			for ( var i = 0; i < this.mesh.geometry.grants.length; i ++ ) {
+
+				var g = this.mesh.geometry.grants[ i ];
+				var b = this.mesh.skeleton.bones[ g.index ];
+				var pb = this.mesh.skeleton.bones[ g.parentIndex ];
+
+				if ( g.isLocal ) {
+
+					// TODO: implement
+					if ( g.affectPosition ) {
+
+					}
+
+					// TODO: implement
+					if ( g.affectRotation ) {
+
+					}
+
+				} else {
+
+					// TODO: implement
+					if ( g.affectPosition ) {
+
+					}
+
+					if ( g.affectRotation ) {
+
+						q.set( 0, 0, 0, 1 );
+						q.slerp( pb.quaternion, g.ratio );
+						b.quaternion.multiply( q );
+						b.updateMatrixWorld( true );
+
+					}
+
+				}
+
+			}
+
+		};
+
+	}()
+
+};
+
 THREE.MMDHelper = function ( renderer ) {
 
 	this.renderer = renderer;
+	this.effect = null;
 
 	this.meshes = [];
 
 	this.doAnimation = true;
 	this.doIk = true;
+	this.doGrant = true;
 	this.doPhysics = true;
 	this.doOutlineDrawing = true;
 	this.doCameraAnimation = true;
@@ -3969,11 +4079,23 @@ THREE.MMDHelper.prototype = {
 
 		mesh.mixer = null;
 		mesh.ikSolver = null;
+		mesh.grantSolver = null;
 		mesh.physics = null;
 		this.meshes.push( mesh );
 
 		// workaround until I make IK and Physics Animation plugin
 		this.initBackupBones( mesh );
+
+	},
+
+	/*
+	 * Note: There may be a possibility that Outline wouldn't work well with Effect.
+	 *       In such a case, try to set doOutlineDrawing = false or
+	 *       manually comment out renderer.clear() in *Effect.render().
+	 */
+	setEffect: function ( effect ) {
+
+		this.effect = effect;
 
 	},
 
@@ -4019,47 +4141,52 @@ THREE.MMDHelper.prototype = {
 
 	setAnimation: function ( mesh ) {
 
-		if ( mesh.geometry.animations !== undefined || mesh.geometry.morphAnimations !== undefined ) {
+		if ( mesh.geometry.animations !== undefined ) {
 
 			mesh.mixer = new THREE.AnimationMixer( mesh );
 
-		}
-
-		if ( mesh.geometry.animations !== undefined ) {
+			var foundAnimation = false;
+			var foundMorphAnimation = false;
 
 			for ( var i = 0; i < mesh.geometry.animations.length; i++ ) {
 
-				var action = mesh.mixer.clipAction( mesh.geometry.animations[ i ] );
+				var clip = mesh.geometry.animations[ i ];
 
-				if ( i === 0 ) {
+				var action = mesh.mixer.clipAction( clip );
 
-					action.play();
+				if ( clip.tracks[ 0 ].name.indexOf( '.morphTargetInfluences' ) === 0 ) {
+
+					if ( ! foundMorphAnimation ) {
+
+						action.play();
+						foundMorphAnimation = true;
+
+					}
+
+				} else {
+
+					if ( ! foundAnimation ) {
+
+						action.play();
+						foundAnimation = true;
+
+					}
 
 				}
 
 			}
 
-		}
+			if ( foundAnimation ) {
 
-		if ( mesh.geometry.morphAnimations !== undefined ) {
+				mesh.ikSolver = new THREE.CCDIKSolver( mesh );
 
-			for ( var i = 0; i < mesh.geometry.morphAnimations.length; i++ ) {
+				if ( mesh.geometry.grants !== undefined ) {
 
-				var action = mesh.mixer.clipAction( mesh.geometry.morphAnimations[ i ] );
-
-				if ( i === 0 ) {
-
-					action.play();
+					mesh.grantSolver = new THREE.MMDGrantSolver( mesh );
 
 				}
 
 			}
-
-		}
-
-		if ( mesh.geometry.animations !== undefined ) {
-
-			mesh.ikSolver = new THREE.CCDIKSolver( mesh );
 
 		}
 
@@ -4209,13 +4336,14 @@ THREE.MMDHelper.prototype = {
 
 		var mixer = mesh.mixer;
 		var ikSolver = mesh.ikSolver;
+		var grantSolver = mesh.grantSolver;
 		var physics = mesh.physics;
 
 		if ( mixer !== null && this.doAnimation === true ) {
 
 			mixer.update( delta );
 
-			// workaround until I make IK and Physics Animation plugin
+			// workaround until I make IK, Grant, and Physics Animation plugin
 			this.backupBones( mesh );
 
 		}
@@ -4223,6 +4351,12 @@ THREE.MMDHelper.prototype = {
 		if ( ikSolver !== null && this.doIk === true ) {
 
 			ikSolver.update();
+
+		}
+
+		if ( grantSolver !== null && this.doGrant === true ) {
+
+			grantSolver.update();
 
 		}
 
@@ -4283,7 +4417,7 @@ THREE.MMDHelper.prototype = {
 	renderMain: function ( scene, camera ) {
 
 		this.setupMainRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 	},
 
@@ -4293,9 +4427,23 @@ THREE.MMDHelper.prototype = {
 		this.renderer.shadowMap.enabled = false;
 
 		this.setupOutlineRendering();
-		this.renderer.render( scene, camera );
+		this.callRender( scene, camera );
 
 		this.renderer.shadowMap.enabled = tmpEnabled;
+
+	},
+
+	callRender: function ( scene, camera ) {
+
+		if ( this.effect === null ) {
+
+			this.renderer.render( scene, camera );
+
+		} else {
+
+			this.effect.render( scene, camera );
+
+		}
 
 	},
 
@@ -4373,32 +4521,11 @@ THREE.MMDHelper.prototype = {
 
 	},
 
-	resetPose: function ( mesh ) {
-
-		var bones = mesh.skeleton.bones;
-		var bones2 = mesh.geometry.bones;
-
-		var v = new THREE.Vector3();
-		var q = new THREE.Quaternion();
-
-		for ( var i = 0; i < bones.length; i++ ) {
-
-			var b = bones2[ i ];
-			v.set( b.pos[ 0 ], b.pos[ 1 ], b.pos[ 2 ] );
-			q.set( b.rotq[ 0 ], b.rotq[ 1 ], b.rotq[ 2 ], b.rotq[ 3 ] );
-
-			bones[ i ].position.copy( v );
-			bones[ i ].quaternion.copy( q );
-
-		}
-
-	},
-
 	poseAsVpd: function ( mesh, vpd, params ) {
 
 		if ( ! ( params && params.preventResetPose === true ) ) {
 
-			this.resetPose( mesh );
+			mesh.pose();
 
 		}
 
@@ -4442,14 +4569,23 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( params && params.preventIk === true ) {
+		if ( params === undefined || params.preventIk !== true ) {
 
-			return;
+			var solver = new THREE.CCDIKSolver( mesh );
+			solver.update();
 
 		}
 
-		var solver = new THREE.CCDIKSolver( mesh );
-		solver.update();
+		if ( params === undefined || params.preventGrant !== true ) {
+
+			if ( mesh.geometry.grants !== undefined ) {
+
+				var solver = new THREE.MMDGrantSolver( mesh );
+				solver.update();
+
+			}
+
+		}
 
 	},
 

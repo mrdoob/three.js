@@ -4,6 +4,8 @@
 
 THREE.SMAAPass = function ( width, height ) {
 
+	THREE.Pass.call( this );
+
 	// render targets
 
 	this.edgesRT = new THREE.WebGLRenderTarget( width, height, {
@@ -68,7 +70,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAShader[1].uniforms );
 
 	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT;
+	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
 	this.uniformsWeights[ "tArea" ].value = this.areaTexture;
 	this.uniformsWeights[ "tSearch" ].value = this.searchTexture;
 
@@ -84,7 +86,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAAShader[2].uniforms );
 
 	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
-	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT;
+	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;
 
 	this.materialBlend = new THREE.ShaderMaterial( {
 		uniforms: this.uniformsBlend,
@@ -92,13 +94,7 @@ THREE.SMAAPass = function ( width, height ) {
 		fragmentShader: THREE.SMAAShader[2].fragmentShader
 	} );
 
-	//
-
-	this.renderToScreen = false;
-
-	this.enabled = true;
 	this.needsSwap = false;
-	this.clear = false;
 
 	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene  = new THREE.Scene();
@@ -108,13 +104,15 @@ THREE.SMAAPass = function ( width, height ) {
 
 };
 
-THREE.SMAAPass.prototype = {
+THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.SMAAPass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		// pass 1
 
-		this.uniformsEdges[ "tDiffuse" ].value = readBuffer;
+		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
 
 		this.quad.material = this.materialEdges;
 
@@ -128,7 +126,7 @@ THREE.SMAAPass.prototype = {
 
 		// pass 3
 
-		this.uniformsBlend[ "tColor" ].value = readBuffer;
+		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
 
 		this.quad.material = this.materialBlend;
 
@@ -163,4 +161,4 @@ THREE.SMAAPass.prototype = {
 		return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEIAAAAhCAAAAABIXyLAAAAAOElEQVRIx2NgGAWjYBSMglEwEICREYRgFBZBqDCSLA2MGPUIVQETE9iNUAqLR5gIeoQKRgwXjwAAGn4AtaFeYLEAAAAASUVORK5CYII=';
 	}
 
-};
+} );

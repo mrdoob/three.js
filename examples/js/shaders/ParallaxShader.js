@@ -14,11 +14,11 @@ THREE.ParallaxShader = {
 	},
 
 	uniforms: {
-		"bumpMap": { type: "t", value: null },
-		"map": { type: "t", value: null },
-		"parallaxScale": { type: "f", value: null },
-		"parallaxMinLayers": { type: "f", value: null },
-		"parallaxMaxLayers": { type: "f", value: null }
+		"bumpMap": { value: null },
+		"map": { value: null },
+		"parallaxScale": { value: null },
+		"parallaxMinLayers": { value: null },
+		"parallaxMaxLayers": { value: null }
 	},
 
 	vertexShader: [

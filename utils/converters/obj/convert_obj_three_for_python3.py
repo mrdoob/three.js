@@ -281,7 +281,7 @@ def translate(vertices, t):
     """Translate array of vertices by vector t.
     """
 
-    for i in xrange(len(vertices)):
+    for i in range(len(vertices)):
         vertices[i][0] += t[0]
         vertices[i][1] += t[1]
         vertices[i][2] += t[2]
@@ -687,19 +687,19 @@ def generate_face(f, fc):
 
     # must clamp in case on polygons bigger than quads
 
-    for i in xrange(nVertices):
+    for i in range(nVertices):
         index = f['vertex'][i] - 1
         faceData.append(index)
 
     faceData.append( f['material'] )
 
     if hasFaceVertexUvs:
-        for i in xrange(nVertices):
+        for i in range(nVertices):
             index = f['uv'][i] - 1
             faceData.append(index)
 
     if hasFaceVertexNormals:
-        for i in xrange(nVertices):
+        for i in range(nVertices):
             index = f['normal'][i] - 1
             faceData.append(index)
 

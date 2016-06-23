@@ -13,9 +13,9 @@ THREE.PCDLoader = function( manager ) {
 	this.littleEndian = true;
 
 };
-THREE.PCDLoader.prototype = {
 
-	constructor: THREE.PCDLoader,
+
+Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function( url, onLoad, onProgress, onError ) {
 
@@ -33,7 +33,7 @@ THREE.PCDLoader.prototype = {
 
 	binarryToStr: function( data ) {
 
-		text = "";
+		var text = "";
 		var charArray = new Uint8Array( data );
 		for ( var i = 0; i < data.byteLength; i ++ ) {
 
@@ -125,7 +125,7 @@ THREE.PCDLoader.prototype = {
 
 	parse: function( data, url ) {
 
-		textData = this.binarryToStr( data );
+		var textData = this.binarryToStr( data );
 
 		// Parse the header
 		// Header is always ascii format
@@ -246,6 +246,4 @@ THREE.PCDLoader.prototype = {
 
 	},
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.PCDLoader.prototype );
+} );

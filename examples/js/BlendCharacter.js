@@ -11,6 +11,54 @@ THREE.BlendCharacter = function () {
 
 		var scope = this;
 
+		var loader = new THREE.ObjectLoader();
+		loader.load( url, function( loadedObject ) {
+
+			// The exporter does not currently allow exporting a skinned mesh by itself
+			// so we must fish it out of the hierarchy it is embedded in (scene)
+			loadedObject.traverse( function( object ) {
+
+				if ( object instanceof THREE.SkinnedMesh ) {
+
+					scope.skinnedMesh = object;
+
+				}
+
+			} );
+
+			THREE.SkinnedMesh.call( scope, scope.skinnedMesh.geometry, scope.skinnedMesh.material );
+
+			// If we didn't successfully find the mesh, bail out
+			if ( scope.skinnedMesh == undefined ) {
+
+				console.log( 'unable to find skinned mesh in ' + url );
+				return;
+
+			}
+
+			scope.material.skinning = true;
+
+			scope.mixer = new THREE.AnimationMixer( scope );
+			scope.mixer = scope.mixer;
+
+			// Create the animations
+			for ( var i = 0; i < scope.geometry.animations.length; ++ i ) {
+
+				scope.mixer.clipAction( scope.geometry.animations[ i ] );
+
+			}
+
+			// Loading is complete, fire the callback
+			if ( onLoad !== undefined ) onLoad();
+
+		} );
+
+	};
+
+	this.loadJSON = function ( url, onLoad ) {
+
+		var scope = this;
+
 		var loader = new THREE.JSONLoader();
 		loader.load( url, function( geometry, materials ) {
 
@@ -35,7 +83,7 @@ THREE.BlendCharacter = function () {
 		} );
 
 	};
-
+	
 	this.update = function( dt ) {
 
 		this.mixer.update( dt );

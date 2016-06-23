@@ -31,7 +31,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - raycasting - points </div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -160,7 +160,7 @@
 				}
 
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				geometry.addDrawCall( 0, indices.length );
+				geometry.addGroup( 0, indices.length );
 
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.Points( geometry, material );
@@ -276,9 +276,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

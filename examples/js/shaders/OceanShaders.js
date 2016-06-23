@@ -23,9 +23,6 @@
 
 
 THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
-	varying: {
-		"vUV": { type: "v2" }
-	},
 	vertexShader: [
 		'varying vec2 vUV;',
 
@@ -37,18 +34,15 @@ THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
 };
 THREE.ShaderLib[ 'ocean_subtransform' ] = {
 	uniforms: {
-		"u_input": { type: "t", value: null },
-		"u_transformSize": { type: "f", value: 512.0 },
-		"u_subtransformSize": { type: "f", value: 250.0 }
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_input": { value: null },
+		"u_transformSize": { value: 512.0 },
+		"u_subtransformSize": { value: 250.0 }
 	},
 	fragmentShader: [
 		//GPU FFT using a Stockham formulation
-		'precision highp float;',
 
-		'const float PI = 3.14159265359;',
+		'precision highp float;',
+		'#include <common>',
 
 		'uniform sampler2D u_input;',
 		'uniform float u_transformSize;',
@@ -90,14 +84,14 @@ THREE.ShaderLib[ 'ocean_subtransform' ] = {
 };
 THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
-		"u_wind": { type: "v2", value: new THREE.Vector2( 10.0, 10.0 ) },
-		"u_resolution": { type: "f", value: 512.0 },
-		"u_size": { type: "f", value: 250.0 },
+		"u_wind": { value: new THREE.Vector2( 10.0, 10.0 ) },
+		"u_resolution": { value: 512.0 },
+		"u_size": { value: 250.0 },
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 		'const float CM = 0.23;',
@@ -106,12 +100,8 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 		'uniform float u_resolution;',
 		'uniform float u_size;',
 
-		'float square (float x) {',
-			'return x * x;',
-		'}',
-
 		'float omega (float k) {',
-			'return sqrt(G * k * (1.0 + square(k / KM)));',
+			'return sqrt(G * k * (1.0 + pow2(k / KM)));',
 		'}',
 
 		'float tanh (float x) {',
@@ -130,24 +120,24 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 			'float l_wind = length(u_wind);',
 
 			'float Omega = 0.84;',
-			'float kp = G * square(Omega / l_wind);',
+			'float kp = G * pow2(Omega / l_wind);',
 
 			'float c = omega(k) / k;',
 			'float cp = omega(kp) / kp;',
 
-			'float Lpm = exp(-1.25 * square(kp / k));',
+			'float Lpm = exp(-1.25 * pow2(kp / k));',
 			'float gamma = 1.7;',
 			'float sigma = 0.08 * (1.0 + 4.0 * pow(Omega, -3.0));',
-			'float Gamma = exp(-square(sqrt(k / kp) - 1.0) / 2.0 * square(sigma));',
+			'float Gamma = exp(-pow2(sqrt(k / kp) - 1.0) / 2.0 * pow2(sigma));',
 			'float Jp = pow(gamma, Gamma);',
 			'float Fp = Lpm * Jp * exp(-Omega / sqrt(10.0) * (sqrt(k / kp) - 1.0));',
 			'float alphap = 0.006 * sqrt(Omega);',
 			'float Bl = 0.5 * alphap * cp / c * Fp;',
 
-			'float z0 = 0.000037 * square(l_wind) / G * pow(l_wind / cp, 0.9);',
+			'float z0 = 0.000037 * pow2(l_wind) / G * pow(l_wind / cp, 0.9);',
 			'float uStar = 0.41 * l_wind / log(10.0 / z0);',
 			'float alpham = 0.01 * ((uStar < CM) ? (1.0 + log(uStar / CM)) : (1.0 + 3.0 * log(uStar / CM)));',
-			'float Fm = exp(-0.25 * square(k / KM - 1.0));',
+			'float Fm = exp(-0.25 * pow2(k / KM - 1.0));',
 			'float Bh = 0.5 * alpham * CM / c * Fm * Lpm;',
 
 			'float a0 = log(2.0) / 4.0;',
@@ -170,18 +160,15 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 };
 THREE.ShaderLib[ 'ocean_phase' ] = {
 	uniforms: {
-		"u_phases": { type: "t", value: null },
-		"u_deltaTime": { type: "f", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_phases": { value: null },
+		"u_deltaTime": { value: null },
+		"u_resolution": { value: null },
+		"u_size": { value: null },
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 
@@ -213,19 +200,16 @@ THREE.ShaderLib[ 'ocean_phase' ] = {
 };
 THREE.ShaderLib[ 'ocean_spectrum' ] = {
 	uniforms: {
-		"u_size": { type: "f", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_choppiness": { type: "f", value: null },
-		"u_phases": { type: "t", value: null },
-		"u_initialSpectrum": { type: "t", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_size": { value: null },
+		"u_resolution": { value: null },
+		"u_choppiness": { value: null },
+		"u_phases": { value: null },
+		"u_initialSpectrum": { value: null },
 	},
 	fragmentShader: [
 		'precision highp float;',
+		'#include <common>',
 
-		'const float PI = 3.14159265359;',
 		'const float G = 9.81;',
 		'const float KM = 370.0;',
 
@@ -280,12 +264,9 @@ THREE.ShaderLib[ 'ocean_spectrum' ] = {
 };
 THREE.ShaderLib[ 'ocean_normals' ] = {
 	uniforms: {
-		"u_displacementMap": { type: "t", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_displacementMap": { value: null },
+		"u_resolution": { value: null },
+		"u_size": { value: null },
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -317,21 +298,17 @@ THREE.ShaderLib[ 'ocean_normals' ] = {
 };
 THREE.ShaderLib[ 'ocean_main' ] = {
 	uniforms: {
-		"u_displacementMap": { type: "t", value: null },
-		"u_normalMap": { type: "t", value: null },
-		"u_geometrySize": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-		"u_projectionMatrix": { type: "m4", value: null },
-		"u_viewMatrix": { type: "m4", value: null },
-		"u_cameraPosition": { type: "v3", value: null },
-		"u_skyColor": { type: "v3", value: null },
-		"u_oceanColor": { type: "v3", value: null },
-		"u_sunDirection": { type: "v3", value: null },
-		"u_exposure": { type: "f", value: null },
-	},
-	varying: {
-		"vPos": { type: "v3" },
-		"vUV": { type: "v2" }
+		"u_displacementMap": { value: null },
+		"u_normalMap": { value: null },
+		"u_geometrySize": { value: null },
+		"u_size": { value: null },
+		"u_projectionMatrix": { value: null },
+		"u_viewMatrix": { value: null },
+		"u_cameraPosition": { value: null },
+		"u_skyColor": { value: null },
+		"u_oceanColor": { value: null },
+		"u_sunDirection": { value: null },
+		"u_exposure": { value: null },
 	},
 	vertexShader: [
 		'precision highp float;',

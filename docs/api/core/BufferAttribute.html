@@ -15,17 +15,17 @@
 		</div>
 
 		<h2>Constructor</h2>
-		<h3>[name]([page:TypedArray array], [page:Integer itemSize])</h3>
+		<h3>[name]( [page:TypedArray array], [page:Integer itemSize], [page:Boolean normalized] )</h3>
 		<div>
 		Instantiates this attribute with data from the associated buffer.
-		itemSize gives the number of values of the array that should be associated with a particular vertex.
+		itemSize gives the number of values of the array that should be associated with a particular vertex. normalized indicates how the underlying data in the buffer maps to the values in the GLSL shader code. 
 		</div>
 
 		<h2>Properties</h2>
 
 		<h3>[property:TypedArray array]</h3>
 		<div>
-		Stores the data associated with this attribute. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].
+		Stores the data associated with this attribute. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry].  [page:TypedArray array] can be an instance of UInt8Array, Int8Array, UInt16Array, Int16Array, or Float32Array.
 		</div>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -42,6 +42,11 @@
 		<h3>[property:Boolean needsUpdate]</h3>
 		<div>
 		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
+		</div>
+
+		<h3>[property:Boolean normalized]</h3>
+		<div>
+		Indicates how the underlying data in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values will be converted to floats which contain the exact value, i.e. 32767 becomes 32767.0f.
 		</div>
 
 		<h3>[property:Integer version]</h3>

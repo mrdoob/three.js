@@ -8,11 +8,11 @@ THREE.FresnelShader = {
 
 	uniforms: {
 
-		"mRefractionRatio": { type: "f", value: 1.02 },
-		"mFresnelBias": { type: "f", value: 0.1 },
-		"mFresnelPower": { type: "f", value: 2.0 },
-		"mFresnelScale": { type: "f", value: 1.0 },
-		"tCube": { type: "t", value: null }
+		"mRefractionRatio": { value: 1.02 },
+		"mFresnelBias": { value: 0.1 },
+		"mFresnelPower": { value: 2.0 },
+		"mFresnelScale": { value: 1.0 },
+		"tCube": { value: null }
 
 	},
 

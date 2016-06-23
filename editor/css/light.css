@@ -16,8 +16,12 @@
 		white-space: nowrap;
 	}
 
-	.Outliner .option.active {
+	.Outliner .option:hover {
 		background-color: rgba(0,0,0,0.02);
+	}
+
+	.Outliner .option.active {
+		background-color: rgba(0,0,0,0.04);
 	}
 
 input.Number {

@@ -31,11 +31,6 @@
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -46,7 +41,7 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/ShaderSkin.js"></script>
 
@@ -173,7 +168,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 
@@ -214,7 +209,7 @@
 				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerScene.addPass( renderModelUV );
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
 
 				//
 
@@ -241,12 +236,12 @@
 
 				//
 
-				uniforms[ "tBlur1" ].value = composerScene.renderTarget2;
-				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2;
-				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2;
-				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2;
+				uniforms[ "tBlur1" ].value = composerScene.renderTarget2.texture;
+				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2.texture;
+				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2.texture;
+				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2.texture;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 
 				//
 

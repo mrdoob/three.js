@@ -2,7 +2,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function( shader, textureID ) {
+THREE.ShaderPass = function ( shader, textureID ) {
+
+	THREE.Pass.call( this );
 
 	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
@@ -12,8 +14,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 		this.material = shader;
 
-	}
-	else if ( shader ) {
+	} else if ( shader ) {
 
 		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -28,13 +29,6 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 	}
 
-	this.renderToScreen = false;
-
-	this.enabled = true;
-	this.needsSwap = true;
-	this.clear = false;
-
-
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene = new THREE.Scene();
 
@@ -43,13 +37,15 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 };
 
-THREE.ShaderPass.prototype = {
+THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	render: function( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.ShaderPass,
+
+	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].value = readBuffer;
+			this.uniforms[ this.textureID ].value = readBuffer.texture;
 
 		}
 
@@ -67,4 +63,4 @@ THREE.ShaderPass.prototype = {
 
 	}
 
-};
+} );

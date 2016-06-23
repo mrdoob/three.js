@@ -25,32 +25,31 @@ THREE.ShaderSkin = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
 
-				"enableBump"	: { type: "i", value: 0 },
-				"enableSpecular": { type: "i", value: 0 },
+				"enableBump": { value: 0 },
+				"enableSpecular": { value: 0 },
 
-				"tDiffuse"	: { type: "t", value: null },
-				"tBeckmann"	: { type: "t", value: null },
+				"tDiffuse": { value: null },
+				"tBeckmann": { value: null },
 
-				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-				"opacity": 	  { type: "f", value: 1 },
+				"diffuse": { value: new THREE.Color( 0xeeeeee ) },
+				"specular": { value: new THREE.Color( 0x111111 ) },
+				"opacity": { value: 1 },
 
-				"uRoughness": 	  		{ type: "f", value: 0.15 },
-				"uSpecularBrightness": 	{ type: "f", value: 0.75 },
+				"uRoughness": { value: 0.15 },
+				"uSpecularBrightness": { value: 0.75 },
 
-				"bumpMap"	: { type: "t", value: null },
-				"bumpScale" : { type: "f", value: 1 },
+				"bumpMap": { value: null },
+				"bumpScale": { value: 1 },
 
-				"specularMap" : { type: "t", value: null },
+				"specularMap": { value: null },
 
-				"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+				"offsetRepeat": { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-				"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
+				"uWrapRGB": { value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
 			}
 
@@ -84,7 +83,7 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "bsdfs" ],
-			THREE.ShaderChunk[ "ambient_pars" ],
+			THREE.ShaderChunk[ "packing" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -247,11 +246,9 @@ THREE.ShaderSkin = {
 
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
+				"gl_FragColor = linearToOutputTexel( vec4( outgoingLight, diffuseColor.a ) );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
 				THREE.ShaderChunk[ "fog_fragment" ],
-
-				"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
-
 
 			"}"
 
@@ -311,31 +308,30 @@ THREE.ShaderSkin = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ],
 
 			{
 
-				"passID": { type: "i", value: 0 },
+				"passID": { value: 0 },
 
-				"tDiffuse"	: { type: "t", value: null },
-				"tNormal"	: { type: "t", value: null },
+				"tDiffuse"	: { value: null },
+				"tNormal"	: { value: null },
 
-				"tBlur1"	: { type: "t", value: null },
-				"tBlur2"	: { type: "t", value: null },
-				"tBlur3"	: { type: "t", value: null },
-				"tBlur4"	: { type: "t", value: null },
+				"tBlur1"	: { value: null },
+				"tBlur2"	: { value: null },
+				"tBlur3"	: { value: null },
+				"tBlur4"	: { value: null },
 
-				"tBeckmann"	: { type: "t", value: null },
+				"tBeckmann"	: { value: null },
 
-				"uNormalScale": { type: "f", value: 1.0 },
+				"uNormalScale": { value: 1.0 },
 
-				"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-				"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-				"opacity": 	  { type: "f", value: 1 },
+				"diffuse":  { value: new THREE.Color( 0xeeeeee ) },
+				"specular": { value: new THREE.Color( 0x111111 ) },
+				"opacity": 	  { value: 1 },
 
-				"uRoughness": 	  		{ type: "f", value: 0.15 },
-				"uSpecularBrightness": 	{ type: "f", value: 0.75 }
+				"uRoughness": 	  		{ value: 0.15 },
+				"uSpecularBrightness": 	{ value: 0.75 }
 
 			}
 
@@ -370,7 +366,6 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "ambient_pars" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
@@ -550,9 +545,9 @@ THREE.ShaderSkin = {
 
 				"}",
 
-				THREE.ShaderChunk[ "fog_fragment" ],
-
 				"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
+				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"}"
 

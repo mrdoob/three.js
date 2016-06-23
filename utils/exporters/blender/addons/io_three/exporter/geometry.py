@@ -148,7 +148,7 @@ class Geometry(base_classes.BaseNode):
     def copy_textures(self, texture_folder=''):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
-        if self.options.get(constants.COPY_TEXTURES):
+        if self.options.get(constants.EXPORT_TEXTURES) and not self.options.get(constants.EMBED_TEXTURES):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
@@ -558,12 +558,13 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.SKINNING)
             influences = self.options.get(
                 constants.INFLUENCES_PER_VERTEX, 2)
+            anim_type = self.options.get(constants.ANIMATION)
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
-                self.node, bone_map, influences) or []
+                self.node, bone_map, influences, anim_type) or []
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
-                self.node, bone_map, influences) or []
+                self.node, bone_map, influences, anim_type) or []
 
         if self.options.get(constants.BLEND_SHAPES):
             logger.info("Parsing %s", constants.BLEND_SHAPES)

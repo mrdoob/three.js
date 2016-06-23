@@ -31,8 +31,6 @@
 
 			b { color: lightgreen }
 
-			#stats { position: absolute; top:0; left: 0 }
-
 			.renderer_label {
 				position: absolute;
 				bottom: 1em;
@@ -88,7 +86,7 @@
 			Logarithmic handles all but the smallest objects with ease
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -135,7 +133,7 @@
 				container = document.getElementById( 'container' );
 
 				var loader = new THREE.FontLoader();
-				loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var scene = initScene( font );
 
@@ -148,7 +146,7 @@
 				} );
 
 				stats = new Stats();
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
 				border = document.getElementById( 'renderer_border' );

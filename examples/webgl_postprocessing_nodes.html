@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing</title>
+		<title>three.js webgl - postprocessing with nodes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,7 +31,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Post-Processing
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -414,9 +414,6 @@
 						var scale = new THREE.FloatNode( 128 );
 						var fade = new THREE.FloatNode( 1 );
 						var uv = new THREE.UVNode();
-						var tex = new THREE.TextureNode( lensflare2 );
-
-						var mask = new THREE.Math1Node( new THREE.SwitchNode( tex, 'x' ), THREE.Math1Node.INVERT );
 
 						var blocks = new THREE.OperatorNode(
 							uv,
@@ -435,22 +432,14 @@
 							THREE.OperatorNode.DIV
 						);
 
-						var maskAlpha = new THREE.OperatorNode(
-							mask,
-							fade,
-							THREE.OperatorNode.MUL
-						);
-
-						var fadeCoord = new THREE.Math3Node(
+						var fadeScreen = new THREE.Math3Node(
 							uv,
 							coord,
-							maskAlpha,
+							fade,
 							THREE.Math3Node.MIX
 						);
 
-						var screen = new THREE.ScreenNode( fadeCoord );
-
-						nodepass.value = screen;
+						nodepass.value = new THREE.ScreenNode( fadeScreen );
 
 						// GUI
 

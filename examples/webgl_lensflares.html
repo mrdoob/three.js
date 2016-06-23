@@ -31,11 +31,6 @@
 			a:hover {
 				color: #0080ff;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -45,7 +40,7 @@
 			textures from <a href="http://ro.me">ro.me</a> - fly with WASD/RF/QE + mouse
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FlyControls.js"></script>
 
@@ -177,7 +172,7 @@
 				// stats
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// events
 

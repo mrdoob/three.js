@@ -8,18 +8,13 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>[name]</h1><br />
 
 		<div>The goal of this section is to give a brief introduction to Three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page in case you get stuck and need help.</div>
 
-		<h2>What is Three.js?</h2>
-
-		<div>Let's try to describe it briefly:</div>
-
-		<div>Three.js is a library that makes WebGL - 3D in the browser - easy to use. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
-
 		<h2>Before we start</h2>
-		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of <a href="http://threejs.org/build/three.min.js">three.min.js</a> in the js/ directory, and open it in your browser.</div>
+
+		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of <a href="http://threejs.org/build/three.js">three.js</a> in the js/ directory, and open it in your browser.</div>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -33,7 +28,7 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.min.js"&gt;&lt;/script&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
 					// Our Javascript will go here.
 				&lt;/script&gt;
@@ -65,9 +60,9 @@
 		<div>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, Three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</div>
 
 		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the app render at half size.</div>
-		
+
 		<div>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong>. For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</div>
-		
+
 		<div>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</div>
 
 		<div><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</div>
@@ -132,7 +127,7 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.min.js"&gt;&lt;/script&gt;
+				&lt;script src="js/three.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
 					var scene = new THREE.Scene();
 					var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );

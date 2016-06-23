@@ -32,11 +32,6 @@
 			.c { color:#fa0 }
 
 			a { color:red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #777 !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -53,7 +48,7 @@
 		anisotropy: <span class="c" id="val_right"></span><br/>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -167,7 +162,7 @@
 				// STATS1
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

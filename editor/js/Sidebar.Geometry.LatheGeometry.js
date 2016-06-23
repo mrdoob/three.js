@@ -8,7 +8,8 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// segments
 
@@ -63,9 +64,17 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	var addPointButton = new UI.Button( '+' ).onClick( function() {
 
-		var point = pointsUI[ pointsUI.length - 1 ];
+		if( pointsUI.length === 0 ){
 
-		pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
+			pointsList.add( createPointRow( 0, 0 ) );
+
+		} else {
+
+			var point = pointsUI[ pointsUI.length - 1 ];
+
+			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
+
+		}
 
 		update();
 
@@ -125,17 +134,17 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 		}
 
-		var geometry = new THREE.LatheGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
 			phiLength.getValue() / 180 * Math.PI
-		);
-
-		editor.execute( new SetGeometryCommand( object, geometry ) );
+		) ) );
 
 	}
 
 	return container;
 
 };
+
+Sidebar.Geometry.LatheBufferGeometry = Sidebar.Geometry.LatheGeometry;

@@ -10,8 +10,8 @@ THREE.SepiaShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"amount":   { type: "f", value: 1.0 }
+		"tDiffuse": { value: null },
+		"amount":   { value: 1.0 }
 
 	},
 

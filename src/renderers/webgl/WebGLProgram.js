@@ -2,17 +2,82 @@ THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
-	// TODO: Combine the regex
-	var structRe = /^([\w\d_]+)\.([\w\d_]+)$/;
-	var arrayStructRe = /^([\w\d_]+)\[(\d+)\]\.([\w\d_]+)$/;
-	var arrayRe = /^([\w\d_]+)\[0\]$/;
+	function getEncodingComponents( encoding ) {
+
+		switch ( encoding ) {
+
+			case THREE.LinearEncoding:
+				return [ 'Linear','( value )' ];
+			case THREE.sRGBEncoding:
+				return [ 'sRGB','( value )' ];
+			case THREE.RGBEEncoding:
+				return [ 'RGBE','( value )' ];
+			case THREE.RGBM7Encoding:
+				return [ 'RGBM','( value, 7.0 )' ];
+			case THREE.RGBM16Encoding:
+				return [ 'RGBM','( value, 16.0 )' ];
+			case THREE.RGBDEncoding:
+				return [ 'RGBD','( value, 256.0 )' ];
+			case THREE.GammaEncoding:
+				return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
+			default:
+				throw new Error( 'unsupported encoding: ' + encoding );
+
+		}
+
+	}
+
+	function getTexelDecodingFunction( functionName, encoding ) {
+
+		var components = getEncodingComponents( encoding );
+		return "vec4 " + functionName + "( vec4 value ) { return " + components[ 0 ] + "ToLinear" + components[ 1 ] + "; }";
+
+	}
+
+	function getTexelEncodingFunction( functionName, encoding ) {
+
+		var components = getEncodingComponents( encoding );
+		return "vec4 " + functionName + "( vec4 value ) { return LinearTo" + components[ 0 ] + components[ 1 ] + "; }";
+
+	}
+
+	function getToneMappingFunction( functionName, toneMapping ) {
+
+		var toneMappingName;
+
+		switch ( toneMapping ) {
+
+			case THREE.LinearToneMapping:
+				toneMappingName = "Linear";
+				break;
+
+			case THREE.ReinhardToneMapping:
+				toneMappingName = "Reinhard";
+				break;
+
+			case THREE.Uncharted2ToneMapping:
+				toneMappingName = "Uncharted2";
+				break;
+
+			case THREE.CineonToneMapping:
+				toneMappingName = "OptimizedCineon";
+				break;
+
+			default:
+				throw new Error( 'unsupported toneMapping: ' + toneMapping );
+
+		}
+
+		return "vec3 " + functionName + "( vec3 color ) { return " + toneMappingName + "ToneMapping( color ); }";
+
+	}
 
 	function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 		extensions = extensions || {};
 
 		var chunks = [
-			( extensions.derivatives || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+			( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
@@ -37,90 +102,6 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		return chunks.join( '\n' );
-
-	}
-
-	function fetchUniformLocations( gl, program, identifiers ) {
-
-		var uniforms = {};
-
-		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
-
-		for ( var i = 0; i < n; i ++ ) {
-
-			var info = gl.getActiveUniform( program, i );
-			var name = info.name;
-			var location = gl.getUniformLocation( program, name );
-
-			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
-
-			var matches = structRe.exec( name );
-			if ( matches ) {
-
-				var structName = matches[ 1 ];
-				var structProperty = matches[ 2 ];
-
-				var uniformsStruct = uniforms[ structName ];
-
-				if ( ! uniformsStruct ) {
-
-					uniformsStruct = uniforms[ structName ] = {};
-
-				}
-
-				uniformsStruct[ structProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayStructRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-				var arrayIndex = matches[ 2 ];
-				var arrayProperty = matches[ 3 ];
-
-				var uniformsArray = uniforms[ arrayName ];
-
-				if ( ! uniformsArray ) {
-
-					uniformsArray = uniforms[ arrayName ] = [];
-
-				}
-
-				var uniformsArrayIndex = uniformsArray[ arrayIndex ];
-
-				if ( ! uniformsArrayIndex ) {
-
-					uniformsArrayIndex = uniformsArray[ arrayIndex ] = {};
-
-				}
-
-				uniformsArrayIndex[ arrayProperty ] = location;
-
-				continue;
-
-			}
-
-			matches = arrayRe.exec( name );
-
-			if ( matches ) {
-
-				var arrayName = matches[ 1 ];
-
-				uniforms[ arrayName ] = location;
-
-				continue;
-
-			}
-
-			uniforms[ name ] = location;
-
-		}
-
-		return uniforms;
 
 	}
 
@@ -158,6 +139,28 @@ THREE.WebGLProgram = ( function () {
 			.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
 			.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 			.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
+
+	}
+
+	function parseIncludes( string ) {
+
+		var pattern = /#include +<([\w\d.]+)>/g;
+
+		function replace( match, include ) {
+
+			var replace = THREE.ShaderChunk[ include ];
+
+			if ( replace === undefined ) {
+
+				throw new Error( 'Can not resolve #include <' + include + '>' );
+
+			}
+
+			return parseIncludes( replace );
+
+		}
+
+		return string.replace( pattern, replace );
 
 	}
 
@@ -218,6 +221,11 @@ THREE.WebGLProgram = ( function () {
 					envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 					break;
 
+				case THREE.CubeUVReflectionMapping:
+				case THREE.CubeUVRefractionMapping:
+					envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
+					break;
+
 				case THREE.EquirectangularReflectionMapping:
 				case THREE.EquirectangularRefractionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_EQUIREC';
@@ -274,8 +282,17 @@ THREE.WebGLProgram = ( function () {
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			prefixVertex = '';
-			prefixFragment = '';
+			prefixVertex = [
+
+				customDefines
+
+			].filter( filterEmptyLine ).join( '\n' );
+
+			prefixFragment = [
+
+				customDefines
+
+			].filter( filterEmptyLine ).join( '\n' );
 
 		} else {
 
@@ -290,8 +307,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				'#define MAX_BONES ' + parameters.maxBones,
@@ -321,15 +336,15 @@ THREE.WebGLProgram = ( function () {
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 				parameters.flipSided ? '#define FLIP_SIDED' : '',
 
+				'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
+
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
 
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
-
 
 				'uniform mat4 modelMatrix;',
 				'uniform mat4 modelViewMatrix;',
@@ -384,7 +399,6 @@ THREE.WebGLProgram = ( function () {
 
 			].filter( filterEmptyLine ).join( '\n' );
 
-
 			prefixFragment = [
 
 				customExtensions,
@@ -398,8 +412,6 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
-				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
-				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
@@ -426,9 +438,14 @@ THREE.WebGLProgram = ( function () {
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 				parameters.flipSided ? '#define FLIP_SIDED' : '',
 
+				'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
+
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-				parameters.pointLightShadows > 0 ? '#define POINT_LIGHT_SHADOWS' : '',
+
+				parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : '',
+
+				parameters.physicallyCorrectLights ? "#define PHYSICALLY_CORRECT_LIGHTS" : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
@@ -438,13 +455,28 @@ THREE.WebGLProgram = ( function () {
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
 
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? "#define TONE_MAPPING" : '',
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+				( parameters.toneMapping !== THREE.NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
+
+				( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
+				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
+				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
+				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
+				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
+
+				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : '',
+
 				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
 		}
 
+		vertexShader = parseIncludes( vertexShader, parameters );
 		vertexShader = replaceLightNums( vertexShader, parameters );
+
+		fragmentShader = parseIncludes( fragmentShader, parameters );
 		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 		if ( material instanceof THREE.ShaderMaterial === false ) {
@@ -547,7 +579,8 @@ THREE.WebGLProgram = ( function () {
 
 			if ( cachedUniforms === undefined ) {
 
-				cachedUniforms = fetchUniformLocations( gl, program );
+				cachedUniforms =
+						new THREE.WebGLUniforms( gl, program, renderer );
 
 			}
 

@@ -12,12 +12,16 @@ THREE.Material = function () {
 	this.name = '';
 	this.type = 'Material';
 
+	this.fog = true;
+	this.lights = true;
+
+	this.blending = THREE.NormalBlending;
 	this.side = THREE.FrontSide;
+	this.shading = THREE.SmoothShading; // THREE.FlatShading, THREE.SmoothShading
+	this.vertexColors = THREE.NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 	this.opacity = 1;
 	this.transparent = false;
-
-	this.blending = THREE.NormalBlending;
 
 	this.blendSrc = THREE.SrcAlphaFactor;
 	this.blendDst = THREE.OneMinusSrcAlphaFactor;
@@ -30,6 +34,9 @@ THREE.Material = function () {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.clippingPlanes = null;
+	this.clipShadows = false;
+
 	this.colorWrite = true;
 
 	this.precision = null; // override the renderer's default precision for this material
@@ -39,6 +46,7 @@ THREE.Material = function () {
 	this.polygonOffsetUnits = 0;
 
 	this.alphaTest = 0;
+	this.premultipliedAlpha = false;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
@@ -52,16 +60,15 @@ THREE.Material.prototype = {
 
 	constructor: THREE.Material,
 
-	get needsUpdate () {
+	get needsUpdate() {
 
 		return this._needsUpdate;
 
 	},
 
-	set needsUpdate ( value ) {
+	set needsUpdate( value ) {
 
 		if ( value === true ) this.update();
-
 		this._needsUpdate = value;
 
 	},
@@ -137,12 +144,13 @@ THREE.Material.prototype = {
 		// standard Material serialization
 		data.uuid = this.uuid;
 		data.type = this.type;
+
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
 
-		if ( this.roughness !== 0.5 ) data.roughness = this.roughness;
-		if ( this.metalness !== 0.5 ) data.metalness = this.metalness;
+		if ( this.roughness !== undefined ) data.roughness = this.roughness;
+		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
 		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
@@ -186,14 +194,15 @@ THREE.Material.prototype = {
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 
-		if ( this.vertexColors !== undefined && this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
-		if ( this.shading !== undefined && this.shading !== THREE.SmoothShading ) data.shading = this.shading;
-		if ( this.blending !== undefined && this.blending !== THREE.NormalBlending ) data.blending = this.blending;
-		if ( this.side !== undefined && this.side !== THREE.FrontSide ) data.side = this.side;
+		if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.shading !== THREE.SmoothShading ) data.shading = this.shading;
+		if ( this.side !== THREE.FrontSide ) data.side = this.side;
+		if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 
@@ -239,12 +248,16 @@ THREE.Material.prototype = {
 
 		this.name = source.name;
 
+		this.fog = source.fog;
+		this.lights = source.lights;
+
+		this.blending = source.blending;
 		this.side = source.side;
+		this.shading = source.shading;
+		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
 		this.transparent = source.transparent;
-
-		this.blending = source.blending;
 
 		this.blendSrc = source.blendSrc;
 		this.blendDst = source.blendDst;
@@ -267,9 +280,27 @@ THREE.Material.prototype = {
 
 		this.alphaTest = source.alphaTest;
 
+		this.premultipliedAlpha = source.premultipliedAlpha;
+
 		this.overdraw = source.overdraw;
 
 		this.visible = source.visible;
+		this.clipShadows = source.clipShadows;
+
+		var srcPlanes = source.clippingPlanes,
+			dstPlanes = null;
+
+		if ( srcPlanes !== null ) {
+
+			var n = srcPlanes.length;
+			dstPlanes = new Array( n );
+
+			for ( var i = 0; i !== n; ++ i )
+				dstPlanes[ i ] = srcPlanes[ i ].clone();
+
+		}
+
+		this.clippingPlanes = dstPlanes;
 
 		return this;
 
@@ -289,6 +320,6 @@ THREE.Material.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
+Object.assign( THREE.Material.prototype, THREE.EventDispatcher.prototype );
 
 THREE.MaterialIdCount = 0;

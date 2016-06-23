@@ -42,11 +42,6 @@
 
 		  display: none;
 		}
-
-		#stats { position: absolute; top:0; left: 0 }
-		#stats #fps { background: transparent !important }
-		#stats #fps #fpsText { color: #aaa !important }
-		#stats #fps #fpsGraph { display: none }
 	</style>
 </head>
 
@@ -59,7 +54,7 @@
 		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
-	<script src="../build/three.min.js"></script>
+	<script src="../build/three.js"></script>
 
 	<script src="js/controls/OrbitControls.js"></script>
 
@@ -181,7 +176,7 @@
 			// STATS
 
 			stats = new Stats();
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			// COMPOSER
 

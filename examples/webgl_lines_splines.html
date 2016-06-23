@@ -44,7 +44,7 @@
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
@@ -144,9 +144,7 @@
 
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild(stats.domElement);
+				//container.appendChild(stats.dom);
 
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );

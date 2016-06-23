@@ -224,7 +224,7 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectAngleRow );
 
-	// penumrba
+	// penumbra
 
 	var objectPenumbraRow = new UI.Row();
 	var objectPenumbra = new UI.Number().setRange( 0, 1 ).onChange( update );
@@ -462,20 +462,16 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			if ( object.castShadow !== objectCastShadow.getValue() ) {
+			if ( object.castShadow !== undefined && object.castShadow !== objectCastShadow.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'castShadow', objectCastShadow.getValue() ) );
 
 			}
 
-			if ( object.receiveShadow !== undefined ) {
+			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
-				if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
-
-					editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
-					object.material.needsUpdate = true;
-
-				}
+				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
+				object.material.needsUpdate = true;
 
 			}
 

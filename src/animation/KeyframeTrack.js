@@ -62,7 +62,7 @@ THREE.KeyframeTrack.prototype = {
 
 	setInterpolation: function( interpolation ) {
 
-		var factoryMethod = undefined;
+		var factoryMethod;
 
 		switch ( interpolation ) {
 
@@ -386,8 +386,6 @@ Object.assign( THREE.KeyframeTrack, {
 
 		if ( json.times === undefined ) {
 
-			console.warn( "legacy JSON format detected, converting" );
-
 			var times = [], values = [];
 
 			THREE.AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
@@ -486,7 +484,7 @@ Object.assign( THREE.KeyframeTrack, {
 
 				return THREE.StringKeyframeTrack;
 
-		};
+		}
 
 		throw new Error( "Unsupported typeName: " + typeName );
 

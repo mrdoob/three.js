@@ -177,15 +177,7 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				try {
-
-					array[ i ]( event );
-
-				} catch ( e ) {
-
-					console.error( ( e.message || e ), ( e.stack || "" ) );
-
-				}
+				array[ i ]( event );
 
 			}
 
@@ -197,7 +189,15 @@ var APP = {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time, delta: time - prevTime } );
+			try {
+
+				dispatch( events.update, { time: time, delta: time - prevTime } );
+
+			} catch ( e ) {
+
+				console.error( ( e.message || e ), ( e.stack || "" ) );
+
+			}
 
 			if ( vr === true ) {
 
