@@ -18,18 +18,11 @@ THREE.MaterialLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 
@@ -56,10 +49,12 @@ THREE.MaterialLoader.prototype = {
 	parse: function ( json ) {
 
 		var material = new THREE[ json.type ];
-		material.uuid = json.uuid;
 
+		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
 		if ( json.color !== undefined ) material.color.setHex( json.color );
+		if ( json.roughness !== undefined ) material.roughness = json.roughness;
+		if ( json.metalness !== undefined ) material.metalness = json.metalness;
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
@@ -75,6 +70,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
+		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 
@@ -97,11 +93,31 @@ THREE.MaterialLoader.prototype = {
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
 		if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
-		if ( json.normalScale )	material.normalScale = new THREE.Vector2( json.normalScale, json.normalScale );
+		if ( json.normalScale !== undefined ) {
+
+			var normalScale = json.normalScale;
+
+			if ( Array.isArray( normalScale ) === false ) {
+
+				// Blender exporter used to export a scalar. See #7459
+
+				normalScale = [ normalScale, normalScale ];
+
+			}
+
+			material.normalScale = new THREE.Vector2().fromArray( normalScale );
+
+		}
 
 		if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
 		if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
 		if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
+
+		if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
+		if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
+
+		if ( json.emissiveMap !== undefined ) material.emissiveMap = this.getTexture( json.emissiveMap );
+		if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;
 
 		if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
 
@@ -120,7 +136,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
-		// MeshFaceMaterial
+		// MultiMaterial
 
 		if ( json.materials !== undefined ) {
 

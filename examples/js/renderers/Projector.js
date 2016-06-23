@@ -161,7 +161,7 @@ THREE.Projector = function () {
 
 		var normalMatrix = new THREE.Matrix3();
 
-		var setObject = function ( value ) {
+		function setObject( value ) {
 
 			object = value;
 			material = object.material;
@@ -171,9 +171,9 @@ THREE.Projector = function () {
 			normals.length = 0;
 			uvs.length = 0;
 
-		};
+		}
 
-		var projectVertex = function ( vertex ) {
+		function projectVertex( vertex ) {
 
 			var position = vertex.position;
 			var positionWorld = vertex.positionWorld;
@@ -192,30 +192,30 @@ THREE.Projector = function () {
 					 positionScreen.y >= - 1 && positionScreen.y <= 1 &&
 					 positionScreen.z >= - 1 && positionScreen.z <= 1;
 
-		};
+		}
 
-		var pushVertex = function ( x, y, z ) {
+		function pushVertex( x, y, z ) {
 
 			_vertex = getNextVertexInPool();
 			_vertex.position.set( x, y, z );
 
 			projectVertex( _vertex );
 
-		};
+		}
 
-		var pushNormal = function ( x, y, z ) {
+		function pushNormal( x, y, z ) {
 
 			normals.push( x, y, z );
 
-		};
+		}
 
-		var pushUv = function ( x, y ) {
+		function pushUv( x, y ) {
 
 			uvs.push( x, y );
 
-		};
+		}
 
-		var checkTriangleVisibility = function ( v1, v2, v3 ) {
+		function checkTriangleVisibility( v1, v2, v3 ) {
 
 			if ( v1.visible === true || v2.visible === true || v3.visible === true ) return true;
 
@@ -223,20 +223,20 @@ THREE.Projector = function () {
 			_points3[ 1 ] = v2.positionScreen;
 			_points3[ 2 ] = v3.positionScreen;
 
-			return _clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) );
+			return _clipBox.intersectsBox( _boundingBox.setFromPoints( _points3 ) );
 
-		};
+		}
 
-		var checkBackfaceCulling = function ( v1, v2, v3 ) {
+		function checkBackfaceCulling( v1, v2, v3 ) {
 
 			return ( ( v3.positionScreen.x - v1.positionScreen.x ) *
 				    ( v2.positionScreen.y - v1.positionScreen.y ) -
 				    ( v3.positionScreen.y - v1.positionScreen.y ) *
 				    ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-		};
+		}
 
-		var pushLine = function ( a, b ) {
+		function pushLine( a, b ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -253,9 +253,9 @@ THREE.Projector = function () {
 
 			_renderData.elements.push( _line );
 
-		};
+		}
 
-		var pushTriangle = function ( a, b, c ) {
+		function pushTriangle( a, b, c ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -298,7 +298,7 @@ THREE.Projector = function () {
 
 			}
 
-		};
+		}
 
 		return {
 			setObject: setObject,
@@ -478,7 +478,7 @@ THREE.Projector = function () {
 
 					var material = object.material;
 
-					var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+					var isFaceMaterial = material instanceof THREE.MultiMaterial;
 					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {

@@ -70,12 +70,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 3200;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.z = 3;
+				camera.focalLength = 3;
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
 
 				var path = "textures/cube/pisa/";
 				var format = '.png';
@@ -85,16 +86,16 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.position.x = Math.random() * 10 - 5;
+					mesh.position.y = Math.random() * 10 - 5;
+					mesh.position.z = Math.random() * 10 - 5;
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
 
@@ -118,7 +119,7 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				scene.add( mesh );
 
 				//
@@ -153,8 +154,8 @@
 
 			function onDocumentMouseMove(event) {
 
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+				mouseX = ( event.clientX - windowHalfX ) / 100;
+				mouseY = ( event.clientY - windowHalfY ) / 100;
 
 			}
 
@@ -181,8 +182,8 @@
 
 					var sphere = spheres[ i ];
 
-					sphere.position.x = 5000 * Math.cos( timer + i );
-					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+					sphere.position.x = 5 * Math.cos( timer + i );
+					sphere.position.y = 5 * Math.sin( timer + i * 1.1 );
 
 				}
 

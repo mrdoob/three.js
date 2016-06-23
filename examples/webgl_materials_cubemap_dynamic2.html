@@ -45,14 +45,18 @@
 			lat = 0, onMouseDownLat = 0,
 			phi = 0, theta = 0;
 
-			var texture = THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg', THREE.UVMapping, function () {
+			var textureLoader = new THREE.TextureLoader();
 
-				init();
+			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
+
+				texture.mapping = THREE.UVMapping;
+
+				init( texture );
 				animate();
 
 			} );
 
-			function init() {
+			function init( texture ) {
 
 				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
 
@@ -67,7 +71,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera );
 
 				document.body.appendChild( renderer.domElement );

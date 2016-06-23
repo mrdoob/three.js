@@ -199,7 +199,7 @@
 				uniforms2 = {
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+					texture: { type: "t", value: new THREE.TextureLoader().load( "textures/disturb.jpg" ) }
 				};
 
 				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;

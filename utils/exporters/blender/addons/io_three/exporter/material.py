@@ -32,14 +32,14 @@ class Material(base_classes.BaseNode):
         self[constants.COLOR] = utilities.rgb2int(diffuse)
 
         if self[constants.TYPE] != constants.THREE_BASIC:
-            ambient = api.material.ambient_color(self.node)
-            self[constants.AMBIENT] = utilities.rgb2int(ambient)
-
             emissive = api.material.emissive_color(self.node)
             self[constants.EMISSIVE] = utilities.rgb2int(emissive)
 
         vertex_color = api.material.use_vertex_colors(self.node)
-        self[constants.VERTEX_COLORS] = vertex_color
+        if vertex_color:
+            self[constants.VERTEX_COLORS] = constants.VERTEX_COLORS_ON
+        else:
+            self[constants.VERTEX_COLORS] = constants.VERTEX_COLORS_OFF
 
         self[constants.BLENDING] = api.material.blending(self.node)
 

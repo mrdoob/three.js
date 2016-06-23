@@ -322,7 +322,7 @@ def restore_export_settings(properties, settings):
         constants.INDEX_TYPE,
         constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
-   
+
     ## Materials {
     properties.option_materials = settings.get(
         constants.MATERIALS,

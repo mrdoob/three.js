@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - exporter - obj</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				font-family: Monospace;
@@ -10,7 +11,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			
+
 			#info {
 				color: #fff;
 				position: absolute;
@@ -36,13 +37,13 @@
 				overflow : auto;
 				z-index: 100;
 			}
-			
+
 			span.link {
 				color: skyblue;
 				cursor: pointer;
 				text-decoration : underline;
 			}
-			
+
 			a {
 				color: skyblue
 			}
@@ -59,7 +60,7 @@
 			<span class="link" id="transformed">transformed</span>
 			- <span class="link" id="export">export to obj</span>
 		</div>
-		
+
 		<script src="../build/three.min.js"></script>
 		<script src="js/exporters/OBJExporter.js"></script>
 
@@ -76,7 +77,7 @@
 				floatingDiv.style.display = 'block';
 				floatingDiv.innerHTML = result.split ('\n').join ('<br />');
 			}
-			
+
 			function addGeometry (type)
 			{
 				for (var i = 0; i < scene.children.length; i++) {
@@ -87,9 +88,9 @@
 						i--;
 					}
 				}
-				
+
 				console.log (renderer.info);
-	
+
 				if (type == 1) {
 					var material = new THREE.MeshLambertMaterial ( { color : 0x00cc00 } );
 					var geometry = new THREE.Geometry ();
@@ -97,7 +98,7 @@
 					geometry.vertices.push (new THREE.Vector3 (50, -50, 0));
 					geometry.vertices.push (new THREE.Vector3 (50, 50, 0));
 					var face = new THREE.Face3 (0, 1, 2);
-					geometry.faces.push (face);	
+					geometry.faces.push (face);
 					geometry.computeFaceNormals ();
 					scene.add( new THREE.Mesh( geometry, material ) );
 				} else if (type == 2) {
@@ -115,7 +116,7 @@
 					geometry.vertices.push (new THREE.Vector3 (-50, -50, 0));
 					geometry.vertices.push (new THREE.Vector3 (50, -50, 0));
 					geometry.vertices.push (new THREE.Vector3 (50, 50, 0));
-					geometry.faces.push (new THREE.Face3 (0, 1, 2));	
+					geometry.faces.push (new THREE.Face3 (0, 1, 2));
 					geometry.computeFaceNormals ();
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = -200;
@@ -141,7 +142,7 @@
 					scene.add( mesh3 );
 				}
 			}
-			
+
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
@@ -158,21 +159,21 @@
 				scene.add( light );
 
 				addGeometry (1);
-				
+
 				window.addEventListener( 'click', onWindowClick, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseover', onDocumentMouseMove, false );
-				
+
 				document.getElementById( 'triangle' ).addEventListener( 'click', function() { addGeometry (1); });
 				document.getElementById( 'cube' ).addEventListener( 'click', function() { addGeometry (2); });
 				document.getElementById( 'cylinder' ).addEventListener( 'click', function() { addGeometry (3); });
 				document.getElementById( 'both' ).addEventListener( 'click', function() { addGeometry (4); });
 				document.getElementById( 'transformed' ).addEventListener( 'click', function() { addGeometry (5); });
-				
+
 				exportButton = document.getElementById( 'export' );
 				exportButton.addEventListener( 'click', function() { exportToObj (); });
-				
+
 				floatingDiv = document.createElement ('div');
 				floatingDiv.className = 'floating';
 				document.body.appendChild (floatingDiv);
@@ -189,13 +190,13 @@
 					}
 					target = target.parentElement;
 				}
-				
+
 				if (needToClose) {
 					floatingDiv.style.display = 'none';
 				}
 
-			}			
-			
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;

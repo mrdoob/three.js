@@ -78,11 +78,11 @@
 				var fragmentShader = shader.fragmentShader;
 
 				var texture1 = new THREE.CanvasTexture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
-				var texture2 = THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' );
+				var texture2 = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				var materials = [
 
-					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
+					new THREE.MeshNormalMaterial(),
 					new THREE.MeshDepthMaterial(),
 					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
@@ -90,8 +90,7 @@
 					new THREE.MeshBasicMaterial( { map: texture2 } ),
 					new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, transparent: true } ),
 					new THREE.MeshLambertMaterial( { map: texture2 } ),
-					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
-					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
+					new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
 					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
 					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
 

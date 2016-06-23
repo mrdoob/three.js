@@ -40,6 +40,14 @@ THREE.Color.prototype = {
 
 	},
 
+	setScalar: function ( scalar ) {
+
+		this.r = scalar;
+		this.g = scalar;
+		this.b = scalar;
+
+	},
+
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );

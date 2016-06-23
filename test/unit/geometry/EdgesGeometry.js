@@ -85,6 +85,7 @@ test( "tetrahedron", function() {
 // HELPERS
 //
 
+
 function testEdges ( vertList, idxList, numAfter ) {
 
 	var geoms = createGeometries ( vertList, idxList );
@@ -152,7 +153,7 @@ function createIndexedBufferGeometry ( vertList, idxList ) {
 
 	vertices = vertices.subarray( 0, 3 * numVerts );
 
-	geom.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+	geom.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 	geom.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 	geom.computeFaceNormals();
@@ -163,7 +164,7 @@ function createIndexedBufferGeometry ( vertList, idxList ) {
 
 function addDrawCalls ( geometry ) {
 
-	var numTris = geometry.getAttribute( 'index' ).count / 3;
+	var numTris = geometry.index.count / 3;
 
 	var offset = 0;
 	for ( var i = 0 ; i < numTris; i ++ ) {
@@ -171,8 +172,7 @@ function addDrawCalls ( geometry ) {
 		var start = i * 3;
 		var count = 3;
 
-		geometry.addDrawCall ( start, count, offset );
-
+		geometry.addGroup( start, count );
 	}
 
 	return geometry;
@@ -193,8 +193,8 @@ function countEdges ( geom ) {
 
 	}
 
-	var indices = geom.getAttribute( 'index' );
-	if ( indices !== undefined ) {
+	var indices = geom.index;
+	if ( indices ) {
 
 		return indices.count;
 

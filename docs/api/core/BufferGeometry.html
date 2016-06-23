@@ -52,7 +52,7 @@
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
-		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
+		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_custom_attributes_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
 
 
 		<h3>Accessing attributes</h3>
@@ -144,13 +144,6 @@
 		<div>
 		Bounding sphere.
 		<code>{ radius: float }</code>
-		</div>
-
-		<h3>[property:Array morphTargets]</h3>
-		<div>
-		Array of morph targets. Each morph target is a Javascript object:
-		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
-		Morph vertices match number and order of primary vertices.
 		</div>
 
 		<h2>Methods</h2>

@@ -74,6 +74,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -87,7 +88,7 @@
 
 			var canvas;
 
-			var scenes = [], camera, renderer, emptyScene;
+			var scenes = [], renderer;
 
 			init();
 			animate();
@@ -96,43 +97,59 @@
 
 				canvas = document.getElementById( "c" );
 
-				camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100 );
-				camera.position.z = 2;
-
 				var geometries = [
 					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.SphereGeometry( 0.5, 12, 12 ),
+					new THREE.SphereGeometry( 0.5, 12, 8 ),
 					new THREE.DodecahedronGeometry( 0.5 ),
 					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 ),
 				];
 
-				var template = document.getElementById("template").text;
-				var content = document.getElementById("content");
+				var template = document.getElementById( "template" ).text;
+				var content = document.getElementById( "content" );
 
-				var emptyScene = new THREE.Scene();
-
-				for ( var i =  0; i < 100; i ++ ) {
+				for ( var i =  0; i < 40; i ++ ) {
 
 					var scene = new THREE.Scene();
 
 					// make a list item
 					var element = document.createElement( "div" );
 					element.className = "list-item";
-					element.innerHTML = template.replace('$', i + 1 );
+					element.innerHTML = template.replace( '$', i + 1 );
 
 					// Look up the element that represents the area
 					// we want to render the scene
-					scene.element = element.querySelector(".scene");
+					scene.userData.element = element.querySelector( ".scene" );
 					content.appendChild( element );
+
+					var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
+					camera.position.z = 2;
+					scene.userData.camera = camera;
+
+					var controls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
+					controls.minDistance = 2;
+					controls.maxDistance = 5;
+					controls.enablePan = false;
+					controls.enableZoom = false;
+					scene.userData.controls = controls;
 
 					// add one random mesh to each scene
 					var geometry = geometries[ geometries.length * Math.random() | 0 ];
-					var material = new THREE.MeshLambertMaterial( { color: 0xffffff * Math.random() } );
+
+					var material = new THREE.MeshStandardMaterial( {
+
+						color: new THREE.Color().setHSL( Math.random(), 1, 0.75 ),
+						roughness: 0.5,
+						metalness: 0,
+						shading: THREE.FlatShading
+
+					} );
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
-					light = new THREE.HemisphereLight( 0xffbbbb, 0x444488 );
-					light.position.set( - 0.5, 0.8, 1 );
+					scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+
+					var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+					light.position.set( 1, 1, 1 );
 					scene.add( light );
 
 					scenes.push( scene );
@@ -141,7 +158,8 @@
 
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.setClearColor( 0xFFFFFF );
+				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 
 			}
 
@@ -152,7 +170,7 @@
 
 				if ( canvas.width !== width || canvas.height != height ) {
 
-					renderer.setSize ( width, height, false );
+					renderer.setSize( width, height, false );
 
 				}
 
@@ -169,19 +187,21 @@
 
 				updateSize();
 
-				renderer.setClearColor( 0xFFFFFF );
-				renderer.clear( true );
-				renderer.setClearColor( 0xE0E0E0 );
+				renderer.setClearColor( 0xffffff );
+				renderer.setScissorTest( false );
+				renderer.clear();
 
-				renderer.enableScissorTest( true );
+				renderer.setClearColor( 0xe0e0e0 );
+				renderer.setScissorTest( true );
+
 				scenes.forEach( function( scene ) {
+
 					// so something moves
-					scene.children[0].rotation.x = Date.now() * 0.00111;
-					scene.children[0].rotation.z = Date.now() * 0.001;
+					scene.children[0].rotation.y = Date.now() * 0.001;
 
 					// get the element that is a place holder for where we want to
 					// draw the scene
-					var element = scene.element;
+					var element = scene.userData.element;
 
 					// get its position relative to the page's viewport
 					var rect = element.getBoundingClientRect();
@@ -189,7 +209,9 @@
 					// check if it's offscreen. If so skip it
 					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
 						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
-					  return;  // it's off screen
+
+						return;  // it's off screen
+
 					}
 
 					// set the viewport
@@ -198,14 +220,19 @@
 					var left   = rect.left;
 					var bottom = renderer.domElement.clientHeight - rect.bottom;
 
-					camera.aspect = width / height;
-					camera.updateProjectionMatrix();
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
+
+					var camera = scene.userData.camera;
+
+					//camera.aspect = width / height; // not changing in this example
+					//camera.updateProjectionMatrix();
+
+					//scene.userData.controls.update();
+
 					renderer.render( scene, camera );
 
 				} );
-				renderer.enableScissorTest( false );
 
 			}
 

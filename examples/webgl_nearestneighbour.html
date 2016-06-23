@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8">
 		<title>three.js webgl - nearest neighbour</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			html, body {
 				width: 100%;
@@ -45,7 +47,7 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				gl_PointSize = 4.0 * ( 300.0 / length( mvPosition.xyz ) );
+				gl_PointSize = 4.0 * ( 300.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -94,18 +96,20 @@
 				controls.movementSpeed = 100;
 				controls.lookSpeed = 0.1;
 
+				var textureLoader = new THREE.TextureLoader();
+
 				var materials = [
 
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/px.jpg' ) } ), // right
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/nx.jpg' ) } ), // left
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/py.jpg' ) } ), // top
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/ny.jpg' ) } ), // bottom
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/pz.jpg' ) } ), // back
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/cube/skybox/nz.jpg' ) } )  // front
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/px.jpg' ) } ), // right
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nx.jpg' ) } ), // left
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/py.jpg' ) } ), // top
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/ny.jpg' ) } ), // bottom
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/pz.jpg' ) } ), // back
+					new THREE.MeshBasicMaterial( { map: textureLoader.load( 'textures/cube/skybox/nz.jpg' ) } )  // front
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 7, 7, 7 ), new THREE.MultiMaterial( materials ) );
 				mesh.scale.x = - 1;
 				scene.add(mesh);
 
@@ -117,7 +121,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// create the custom shader
-				var imagePreviewTexture = THREE.ImageUtils.loadTexture( 'textures/crate.gif');
+				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif');
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 

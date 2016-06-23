@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - materials - dynamic cube reflection</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				background: #000;
@@ -163,7 +164,7 @@
 				ambientLight = new THREE.AmbientLight( 0x555555 );
 				scene.add( ambientLight );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI/2, 1 );
+				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI/2 );
 				spotLight.position.set( 0, 1800, 1500 );
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
@@ -241,9 +242,10 @@
 				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
 
 				// FLARES
+				var textureLoader = new THREE.TextureLoader();
 
-				flareA = THREE.ImageUtils.loadTexture( "textures/lensflare2.jpg" );
-				flareB = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
+				flareA = textureLoader.load( "textures/lensflare2.jpg" );
+				flareB = textureLoader.load( "textures/lensflare0.png" );
 
 				// CARS - VEYRON
 
@@ -493,7 +495,7 @@
 
 				// GROUND
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/cube/Park3Med/ny.jpg" );
+				var texture = new THREE.TextureLoader().load( "textures/cube/Park3Med/ny.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 50, 50 );
 

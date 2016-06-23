@@ -389,9 +389,11 @@ class Geometry(base_classes.BaseNode):
                      api.mesh.buffer_position, 3)
         uvs_tuple = (constants.UV, option_uvs,
                      api.mesh.buffer_uv, 2)
+        uvs2_tuple = (constants.UV2, option_uvs,
+                     lambda m: api.mesh.buffer_uv(m, layer=1), 2)
         normals_tuple = (constants.NORMAL, option_normals,
                          api.mesh.buffer_normal, 3)
-        dispatch = (pos_tuple, uvs_tuple, normals_tuple)
+        dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple)
 
         for key, option, func, size in dispatch:
 
@@ -568,7 +570,6 @@ class Geometry(base_classes.BaseNode):
             mt = api.mesh.blend_shapes(self.node, self.options) or []
             self[constants.MORPH_TARGETS] = mt
             if len(mt) > 0 and self._scene:  # there's blend shapes, let check for animation
-                #self[constants.CLIPS] = api.mesh.animated_blend_shapes(self.node, self.options) or []
                 tracks = api.mesh.animated_blend_shapes(self.node, self[constants.NAME], self.options) or []
                 merge = self._scene[constants.ANIMATION][0][constants.KEYFRAMES]
                 for track in tracks:

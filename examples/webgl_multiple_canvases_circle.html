@@ -1,141 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>three.js webgl - multiple canvases - circle</title>
-  <style type="text/css" media="screen">
-    body {
-      background-color: #555;
-      color: white;
+	<title>three.js webgl - multiple canvases - circle</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style type="text/css" media="screen">
+		body {
+			background-color: #555;
+			color: white;
 			font-family:Monospace;
 			font-size:13px;
 			text-align:center;
 			margin: 0px;
-		  overflow: hidden;
+			overflow: hidden;
 			width: 100%;
 			height: 100%;
-    }
+		}
 
-    #container {
-      width: 100%;
-      height: 700px;
-      -webkit-perspective: 800px;
-      -webkit-perspective-origin: 50% 225px;
+		#container {
+			width: 100%;
+			height: 700px;
+			-webkit-perspective: 800px;
+			-webkit-perspective-origin: 50% 225px;
 			-moz-perspective: 800px;
 			-moz-perspective-origin: 50% 225px;
 			perspective: 800px;
 			perspective-origin: 50% 225px;
-    }
-    #stage {
-      width: 100%;
-      height: 100%;
-      -webkit-transform-style: preserve-3d;
-      -moz-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-    }
+		}
+		#stage {
+			width: 100%;
+			height: 100%;
+			-webkit-transform-style: preserve-3d;
+			-moz-transform-style: preserve-3d;
+			transform-style: preserve-3d;
+		}
 
-    #shape {
-      position: relative;
-      top: 160px;
-      margin: 0 auto;
-      height: 200px;
-      width: 200px;
-      -webkit-transform: translateZ(-0px);
-      -webkit-transform-style: preserve-3d;
+		#shape {
+			position: relative;
+			top: 160px;
+			margin: 0 auto;
+			height: 200px;
+			width: 200px;
+			-webkit-transform: translateZ(-0px);
+			-webkit-transform-style: preserve-3d;
 			-moz-transform: translateZ(-0px);
 			-moz-transform-style: preserve-3d;
 			transform: translateZ(-0px);
 			transform-style: preserve-3d;
-    }
+		}
 
-    .ring {
-      position: absolute;
-      height: 300px;
-      width: 200px;
-      text-align: center;
-      font-family: Times, serif;
-      font-size: 124pt;
-      color: black;
-      background-color: #fff;
-    }
+		.ring {
+			position: absolute;
+			height: 300px;
+			width: 200px;
+			text-align: center;
+			font-family: Times, serif;
+			font-size: 124pt;
+			color: black;
+			background-color: #fff;
+		}
 
-    #shape {
-      border: 0px;
-      background-color: rgba(255, 255, 255, 0);
-    }
+		#shape {
+			border: 0px;
+			background-color: rgba(255, 255, 255, 0);
+		}
 
-    .ring > .r1 {
-      -webkit-transform: rotateY(300deg) translateZ(-380px);
-      -moz-transform: rotateY(300deg) translateZ(-380px);
-      transform: rotateY(300deg) translateZ(-380px);
-    }
+		.ring > .r1 {
+			-webkit-transform: rotateY(300deg) translateZ(-380px);
+			-moz-transform: rotateY(300deg) translateZ(-380px);
+			transform: rotateY(300deg) translateZ(-380px);
+		}
 
-    .ring > .r2 {
-      -webkit-transform: rotateY(330deg) translateZ(-380px);
-      -moz-transform: rotateY(330deg) translateZ(-380px);
-      transform: rotateY(330deg) translateZ(-380px);
-    }
+		.ring > .r2 {
+			-webkit-transform: rotateY(330deg) translateZ(-380px);
+			-moz-transform: rotateY(330deg) translateZ(-380px);
+			transform: rotateY(330deg) translateZ(-380px);
+		}
 
-    .ring > .r3 {
-      -webkit-transform: rotateY(0deg) translateZ(-380px);
-      -moz-transform: rotateY(0deg) translateZ(-380px);
-      transform: rotateY(0deg) translateZ(-380px);
-    }
+		.ring > .r3 {
+			-webkit-transform: rotateY(0deg) translateZ(-380px);
+			-moz-transform: rotateY(0deg) translateZ(-380px);
+			transform: rotateY(0deg) translateZ(-380px);
+		}
 
-    .ring > .r4 {
-      -webkit-transform: rotateY(30deg) translateZ(-380px);
-      -moz-transform: rotateY(30deg) translateZ(-380px);
-      transform: rotateY(30deg) translateZ(-380px);
-    }
+		.ring > .r4 {
+			-webkit-transform: rotateY(30deg) translateZ(-380px);
+			-moz-transform: rotateY(30deg) translateZ(-380px);
+			transform: rotateY(30deg) translateZ(-380px);
+		}
 
-    .ring > .r5 {
-      -webkit-transform: rotateY(60deg) translateZ(-380px);
-      -moz-transform: rotateY(60deg) translateZ(-380px);
-      transform: rotateY(60deg) translateZ(-380px);
-    }
+		.ring > .r5 {
+			-webkit-transform: rotateY(60deg) translateZ(-380px);
+			-moz-transform: rotateY(60deg) translateZ(-380px);
+			transform: rotateY(60deg) translateZ(-380px);
+		}
 
-  	#info {
+		#info {
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
 		}
 
-    #help {
+		#help {
 				position: absolute;
 				top: 50px; width: 100%;
-        text-align: center;
-    }
-    #help>div {
-        margin: auto;
-        padding: 1em;
-        background-color: rgba(0,0,0,0.3);
-        width: 50%;
-    }
+				text-align: center;
+		}
+		#help>div {
+				margin: auto;
+				padding: 1em;
+				background-color: rgba(0,0,0,0.3);
+				width: 50%;
+		}
 
-  </style>
+	</style>
 </head>
 <body>
 
-  <div id="container">
-    <div id="stage">
-      <div id="shape" class="ring backfaces">
-        <div id="container1" class="ring r1"></div>
-        <div id="container2" class="ring r2"></div>
-        <div id="container3" class="ring r3"></div>
-        <div id="container4" class="ring r4"></div>
-        <div id="container5" class="ring r5"></div>
-      </div>
-    </div>
-  </div>
+	<div id="container">
+		<div id="stage">
+			<div id="shape" class="ring backfaces">
+				<div id="container1" class="ring r1"></div>
+				<div id="container2" class="ring r2"></div>
+				<div id="container3" class="ring r3"></div>
+				<div id="container4" class="ring r4"></div>
+				<div id="container5" class="ring r5"></div>
+			</div>
+		</div>
+	</div>
 
 	<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - circle</div>
-  <div id="help" gstyle="display: none">
-    <div>
-    This example is shows how to setup multi-monitor displays like <a href="http://code.google.com/p/liquid-galaxy/">Google's Liquid Galaxy using three.js</a>.
-    Here 5 monitors are simulated using 3d css. WebGL is then rendered onto each one.<br/>
-    Note: 3d css support required! Use Chrome, Safari or Firefox 10
-    </div>
-  </div>
+	<div id="help" gstyle="display: none">
+		<div>
+		This example is shows how to setup multi-monitor displays like <a href="http://code.google.com/p/liquid-galaxy/">Google's Liquid Galaxy using three.js</a>.
+		Here 5 monitors are simulated using 3d css. WebGL is then rendered onto each one.<br/>
+		Note: 3d css support required! Use Chrome, Safari or Firefox 10
+		</div>
+	</div>
 
 		<script type="text/javascript" src="../build/three.min.js"></script>
 
@@ -164,9 +165,9 @@
 
 				apps.push( new App( 'container1', rot * -2 * fudge ) );
 				apps.push( new App( 'container2', rot * -1 * fudge ) );
-				apps.push( new App( 'container3', rot *  0 * fudge ) );
-				apps.push( new App( 'container4', rot *  1 * fudge ) );
-				apps.push( new App( 'container5', rot *  2 * fudge ) );
+				apps.push( new App( 'container3', rot *	0 * fudge ) );
+				apps.push( new App( 'container4', rot *	1 * fudge ) );
+				apps.push( new App( 'container5', rot *	2 * fudge ) );
 
 			}
 
@@ -283,7 +284,7 @@
 
 					var materials = [
 
-						new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+						new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
 						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
 
 					];

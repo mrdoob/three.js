@@ -106,9 +106,7 @@
 
 				light.castShadow = true;
 				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
-				light.shadowMapDarkness = 0.95;
-				// light.shadowCameraVisible = true;
+				light.shadowMapHeight = 512;
 				light.shadowCameraNear = 100;
 				light.shadowCameraFar = 1200;
 				light.shadowCameraTop = 350;
@@ -117,11 +115,12 @@
 				light.shadowCameraLeft = -1000;
 
 				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 
 				//  GROUND
 
-				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
@@ -147,10 +146,9 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.shadowMap.enabled = true;
 
-				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-				// renderer.shadowMap.debug = true;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				// STATS
 

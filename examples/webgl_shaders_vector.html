@@ -29,10 +29,6 @@
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
-
 		<script type="x-shader/x-fragment" id="fs">
 
 			varying vec2 vUv;
@@ -99,10 +95,15 @@
 				t = !t;
 			}
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
+
+			} );
+
+			function init( font ) {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 100, 500 );
@@ -114,14 +115,6 @@
 
 				var theText = "&"; // i % & j b 8
 
-				var options = {
-					size: 180,
-					height: 20,
-					curveSegments: 2,
-					font: "helvetiker",
-					bevelEnabled: false
-				};
-
 				group = new THREE.Group();
 				scene.add( group );
 
@@ -132,7 +125,7 @@
 					wireframe: true
 				} );
 
-				textShapes = THREE.FontUtils.generateShapes( theText, options );
+				textShapes = font.generateShapes( theText, 180, 2 );
 
 				text3d = new THREE.ShapeGeometry( textShapes );
 

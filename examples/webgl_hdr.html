@@ -126,7 +126,7 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
+				var texture = new THREE.TextureLoader().load( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 

@@ -15,7 +15,7 @@
  *  dashSize: <float>,
  *  gapSize: <float>,
  *
- *  vertexColors: <bool>
+ *  vertexColors: THREE.NoColors / THREE.FaceColors / THREE.VertexColors
  *
  *  fog: <bool>
  * }
@@ -35,7 +35,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 

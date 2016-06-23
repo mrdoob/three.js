@@ -86,7 +86,9 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.mapping = THREE.CubeRefractionMapping;
+				
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
 				for ( var i = 0; i < 500; i ++ ) {

@@ -56,12 +56,45 @@ function checkGeometryClone( geom ) {
 	var copy = geom.clone();
 	QUnit.assert.notEqual( copy.uuid, geom.uuid, "clone uuid should differ from original" );
 	QUnit.assert.notEqual( copy.id, geom.id, "clone id should differ from original" );
-	QUnit.assert.smartEqual( copy, geom, "clone is equal to original" );
 
+	var excludedProperties = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
+
+	var differingProp = getDifferingProp( geom, copy, excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
+
+	differingProp = getDifferingProp( copy, geom, excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
 	checkGeometryJsonRoundtrip( copy );
 
+}
+
+function getDifferingProp( geometryA, geometryB, excludedProperties) {
+	excludedProperties = excludedProperties || [];
+
+	var geometryKeys = Object.keys( geometryA );
+	var cloneKeys = Object.keys( geometryB );
+
+	var keysWhichAreNotChecked = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
+	var differingProp = undefined;
+
+	for ( var i = 0, l = geometryKeys.length; i < l; i++ ) {
+
+		var key = geometryKeys[ i ];
+
+		if ( excludedProperties.indexOf(key) >= 0 ) {
+			continue;
+		}
+
+		if ( cloneKeys.indexOf( key ) < 0 ) {
+			differingProp = key;
+			break;
+		}
+
+	}
+
+	return differingProp;
 }
 
 // Compare json file with its source geometry.
@@ -72,22 +105,31 @@ function checkGeometryJsonWriting( geom, json ) {
 	QUnit.assert.equalKey( geom, json, 'uuid' );
 	QUnit.assert.equal( json.id, undefined, "should not persist id" );
 
+	var params = geom.parameters;
+	if ( !params ) {
+
+		return;
+
+	}
+
 	// All parameters from geometry should be persisted.
-	_.forOwn( geom.parameters, function ( val, key ) {
+	var keys = Object.keys( params );
+	for ( var i = 0, l = keys.length; i < l; i++ ) {
 
-		QUnit.assert.equalKey( geom.parameters, json, key );
+		QUnit.assert.equalKey( params, json, keys[ i ] );
 
-	});
+	}
 
 	// All parameters from json should be transfered to the geometry.
 	// json is flat. Ignore first level json properties that are not parameters.
 	var notParameters = [ "metadata", "uuid", "type" ];
-	_.forOwn( json, function ( val, key ) {
+	var keys = Object.keys( json );
+	for ( var i = 0, l = keys.length; i < l; i++ ) {
 
-		if ( notParameters.indexOf( key) === -1 ) QUnit.assert.equalKey( geom.parameters, json, key );
+		var key = keys[ i ];
+		if ( notParameters.indexOf( key) === -1 ) QUnit.assert.equalKey( params, json, key );
 
-	});
-
+	}
 }
 
 // Check parsing and reconstruction of json geometry
@@ -98,9 +140,21 @@ function checkGeometryJsonReading( json, geom ) {
 	var loader = new THREE.ObjectLoader();
 	var output = loader.parseGeometries( wrap );
 
-	QUnit.assert.ok( output[geom.uuid], 'geometry matching source uuid not in output' );
-	QUnit.assert.smartEqual( output[geom.uuid], geom, 'Reconstruct geometry from ObjectLoader' );
+	QUnit.assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
+	// QUnit.assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
 
+	var differing = getDifferingProp(output[ geom.uuid ], geom, ['bones']);
+	if (differing) {
+		console.log(differing);
+	}
+
+	var excludedProperties = [ 'bones' ];
+
+	var differingProp = getDifferingProp( output[ geom.uuid ], geom, excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
+
+	differingProp = getDifferingProp( geom, output[ geom.uuid ], excludedProperties );
+	ok( differingProp === undefined, 'properties are equal' );
 }
 
 // Verify geom -> json -> geom
@@ -115,22 +169,35 @@ function checkGeometryJsonRoundtrip( geom ) {
 // Look for undefined and NaN values in numerical fieds.
 function checkFinite( geom ) {
 
-	var isNotFinite = _.any( geom.vertices, function ( v ) {
+	var allVerticesAreFinite = true;
 
-		return ! ( _.isFinite( v.x ) || _.isFinite( v.y ) || _.isFinite( v.z ) );
+	var vertices = geom.vertices || [];
 
-	});
+	for ( var i = 0, l = vertices.length; i < l; i++ ) {
+
+		var v = geom.vertices[ i ];
+
+		if ( !( isFinite( v.x ) || isFinite( v.y ) || isFinite( v.z ) ) ) {
+
+			allVerticesAreFinite = false;
+			break;
+
+		}
+
+	}
 
 	// TODO Buffers, normal, etc.
 
-	QUnit.assert.ok( isNotFinite === false, "contains non-finite coordinates" );
+	QUnit.assert.ok( allVerticesAreFinite, "contains only finite coordinates" );
 
 }
 
 // Run common geometry tests.
 function runStdGeometryTests( assert, geometries ) {
 
-	_.each( geometries, function( geom ) {
+	for ( var i = 0, l = geometries.length; i < l; i++ ) {
+
+		var geom = geometries[ i ];
 
 		checkFinite( geom );
 
@@ -140,7 +207,7 @@ function runStdGeometryTests( assert, geometries ) {
 		// json round trip
 		checkGeometryJsonRoundtrip( geom );
 
-	});
+	}
 
 }
 
@@ -154,15 +221,16 @@ function runStdGeometryTests( assert, geometries ) {
 // Run common light tests.
 function runStdLightTests( assert, lights ) {
 
-	_.each( lights, function( light ) {
+	for ( var i = 0, l = lights.length; i < l; i++ ) {
+
+		var light = lights[i];
 
 		// Clone
 		checkLightClone( light );
 
 		// json round trip
 		checkLightJsonRoundtrip( light );
-
-	});
+	}
 
 }
 
@@ -185,9 +253,11 @@ function checkLightClone( light ) {
 function checkLightJsonWriting( light, json ) {
 
 	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
-	QUnit.assert.equalKey( light, json, 'type' );
-	QUnit.assert.equalKey( light, json, 'uuid' );
-	QUnit.assert.equal( json.id, undefined, "should not persist id" );
+
+	var object = json.object;
+	QUnit.assert.equalKey( light, object, 'type' );
+	QUnit.assert.equalKey( light, object, 'uuid' );
+	QUnit.assert.equal( object.id, undefined, "should not persist id" );
 
 }
 
@@ -205,8 +275,7 @@ function checkLightJsonReading( json, light ) {
 function checkLightJsonRoundtrip( light ) {
 
 	var json = light.toJSON();
-	checkLightJsonWriting( light, json.object );
+	checkLightJsonWriting( light, json );
 	checkLightJsonReading( json, light );
 
 }
-

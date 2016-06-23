@@ -2,20 +2,31 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function ( shader, textureID ) {
+THREE.ShaderPass = function( shader, textureID ) {
 
 	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	if ( shader instanceof THREE.ShaderMaterial ) {
 
-	this.material = new THREE.ShaderMaterial( {
+		this.uniforms = shader.uniforms;
 
-		defines: shader.defines || {},
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
+		this.material = shader;
 
-	} );
+	}
+	else if ( shader ) {
+
+		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+		this.material = new THREE.ShaderMaterial( {
+
+			defines: shader.defines || {},
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader
+
+		} );
+
+	}
 
 	this.renderToScreen = false;
 
@@ -25,7 +36,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
+	this.scene = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
@@ -34,7 +45,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 THREE.ShaderPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function( renderer, writeBuffer, readBuffer, delta ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 

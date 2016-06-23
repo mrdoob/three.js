@@ -96,16 +96,32 @@
 
 		<h3>[property:Array skinWeights]</h3>
 		<div>
-		Array of [page:Vector4 Vector4s] representing the skinning weights as used in a [page:SkinnedMesh],
-		The weights match the number and order of vertices in the geometry. The weighted values
-		are typically between the values of 0 and 1 and affect the amount that the individuals bones affect
-		a given vertex.
+		When working with a [page:SkinnedMesh], each vertex can have up to 4 [page:Bone bones] affecting it.
+		The skinWeights property is an array of weight values that correspond to the order of the vertices in
+		the geometry. So for instance, the first skinWeight would correspond to the first vertex in the geometry.
+		Since each vertex can be modified by 4 bones, a [page:Vector4] is used to represent the skin weights
+		for that vertex.
+		</div>
+		<div>
+		The values of the vector should typically be between 0 and 1. For instance when set to 0 the bone
+		transformation will have no affect. When set to 0.5 it will have 50% affect. When set to 100%, it will
+		have 100% affect. If there is only 1 bone associated with the vertex then you only need to worry about
+		the first component of the vector, the rest can be ignored and set to 0.
 		</div>
 
 		<h3>[property:Array skinIndices]</h3>
 		<div>
-		Array of [page:Vector4 Vector4s] representing the indices of individual bones in the [page:Skeleton.bones] array,
-		The indices match the number and order of vertices in the geometry.
+		Just like the skinWeights property, the skinIndices' values correspond to the geometry's vertices.
+		Each vertex can have up to 4 bones associated with it. So if you look at the first vertex, and the
+		first skinIndex, this will tell you the bones associated with that vertex. For example the first vertex
+		could have a value of <strong>( 10.05, 30.10, 12.12 )</strong>. Then the first skin index could have the
+		value of <strong>( 10, 2, 0, 0 )</strong>. The first skin weight could have the value of
+		<strong>( 0.8, 0.2, 0, 0 )</strong>. In affect this would take the first vertex, and then the bone
+		<strong>mesh.bones[10]</strong> and apply it 80% of the way. Then it would take the bone <strong>skeleton.bones[2]</strong>
+		and apply it 20% of the way. The next two values have a weight of 0, so they would have no affect.
+		</div>
+		<div>
+		In code another example could look like this:
 		<code>
 		// e.g.
 		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 0 );
@@ -118,7 +134,7 @@
 		skeleton.bones[0]; // weight of 0.2
 		skeleton.bones[5]; // weight of 0.5
 		skeleton.bones[9]; // weight of 0.3
-		skeleton.bones[0]; // weight of 0
+		skeleton.bones[10]; // weight of 0
 		</code>
 		</div>
 
@@ -271,13 +287,15 @@
 		<h3>[method:null normalize]()</h3>
 		<div>
 		Normalize the geometry. <br />
-		Make the geometry centered and has a bounding sphere whose raidus equals to 1.0.
+		Make the geometry centered and has a bounding sphere whose radius equals to 1.0.
 		</div>
 
 		<h3>[method:Geometry clone]()</h3>
 		<div>
 		Creates a new clone of the Geometry.
 		</div>
+		
+		<div>This method copies only vertices, faces and uvs. It does not copy any other properties of the geometry.</div>
 
 		<h3>[method:null dispose]()</h3>
 		<div>

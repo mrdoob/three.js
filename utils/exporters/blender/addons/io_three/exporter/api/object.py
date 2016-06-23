@@ -174,8 +174,12 @@ EXPORTED_TRACKABLE_FIELDS = [ "location", "scale", "rotation_quaternion" ]
 
 @_object
 def animated_xform(obj, options):
+    if obj.animation_data is None:
+        return []
     fcurves = obj.animation_data
     if not fcurves:
+        return []
+    if fcurves.action is None:
         return []
     fcurves = fcurves.action.fcurves
 

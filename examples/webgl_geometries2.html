@@ -54,7 +54,7 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 

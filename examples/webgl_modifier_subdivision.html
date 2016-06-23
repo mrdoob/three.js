@@ -20,10 +20,6 @@
 		<script src="js/modifiers/SubdivisionModifier.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
-
 		<script>
 
 			var container, stats;
@@ -71,21 +67,26 @@
 				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
 				{ type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
 				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector3(0,0,0),
-					new THREE.Vector3(0,50,50),
-					new THREE.Vector3(0,10,100),
-					new THREE.Vector3(0,50,150),
-					new THREE.Vector3(0,0,200) ] ]},
+					new THREE.Vector2(0,0),
+					new THREE.Vector2(50,50),
+					new THREE.Vector2(10,100),
+					new THREE.Vector2(50,150),
+					new THREE.Vector2(0,200) ] ]},
 				{ type: 'TextGeometry', args: ['&', {
-										size: 200,
-										height: 50,
-										curveSegments: 1,
-										font: "helvetiker"
-
-									}]},
+						size: 200,
+						height: 50,
+						curveSegments: 1
+					}]},
 				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
 
 			];
+
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+
+				geometriesParams[ 8 ].args[ 1 ].font = font;
+
+			} );
 
 			var loader = new THREE.JSONLoader();
 			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
@@ -248,7 +249,7 @@
 				group.add( mesh );
 
 				var meshmaterials = [
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
 					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe: true, opacity: 0.8, transparent: true } )
 				];
 

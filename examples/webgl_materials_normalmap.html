@@ -118,13 +118,15 @@
 				directionalLight.position.set( 1, -0.5, -1 );
 				scene.add( directionalLight );
 
+				var textureLoader = new THREE.TextureLoader();
+
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
-					specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
-					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" ),
+					specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
+					normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
@@ -164,7 +166,9 @@
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+				var canvas = renderer.context.canvas;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / canvas.width, 1 / canvas.height );
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.4;
 

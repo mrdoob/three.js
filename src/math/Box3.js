@@ -5,7 +5,7 @@
 
 THREE.Box3 = function ( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.min = ( min !== undefined ) ? min : new THREE.Vector3( + Infinity, + Infinity, + Infinity );
 	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
 
 };
@@ -20,6 +20,39 @@ THREE.Box3.prototype = {
 		this.max.copy( max );
 
 		return this;
+
+	},
+
+	setFromArray: function ( array ) {
+
+		this.makeEmpty();
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, il = array.length; i < il; i += 3 ) {
+
+			var x = array[ i ];
+			var y = array[ i + 1 ];
+			var z = array[ i + 2 ];
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
 
 	},
 
@@ -59,15 +92,17 @@ THREE.Box3.prototype = {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var v1 = new THREE.Vector3();
+		var box;
 
 		return function ( object ) {
 
+			if ( box === undefined ) box = new THREE.Box3();
+
 			var scope = this;
 
-			object.updateMatrixWorld( true );
-
 			this.makeEmpty();
+
+			object.updateMatrixWorld( true );
 
 			object.traverse( function ( node ) {
 
@@ -75,35 +110,15 @@ THREE.Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
+					if ( geometry.boundingBox === null ) {
 
-						var vertices = geometry.vertices;
-
-						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-							v1.copy( vertices[ i ] );
-
-							v1.applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
-
-					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
-
-						var positions = geometry.attributes[ 'position' ].array;
-
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-
-							v1.applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
+						geometry.computeBoundingBox();
 
 					}
+
+					box.copy( geometry.boundingBox );
+					box.applyMatrix4( node.matrixWorld );
+					scope.union( box );
 
 				}
 
@@ -132,14 +147,14 @@ THREE.Box3.prototype = {
 
 	makeEmpty: function () {
 
-		this.min.x = this.min.y = this.min.z = Infinity;
+		this.min.x = this.min.y = this.min.z = + Infinity;
 		this.max.x = this.max.y = this.max.z = - Infinity;
 
 		return this;
 
 	},
 
-	empty: function () {
+	isEmpty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
@@ -191,8 +206,8 @@ THREE.Box3.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ||
-		     point.z < this.min.z || point.z > this.max.z ) {
+				 point.y < this.min.y || point.y > this.max.y ||
+				 point.z < this.min.z || point.z > this.max.z ) {
 
 			return false;
 
@@ -231,19 +246,84 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersectionBox: function ( box ) {
+	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
 		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ||
-		     box.max.z < this.min.z || box.min.z > this.max.z ) {
+				 box.max.y < this.min.y || box.min.y > this.max.y ||
+				 box.max.z < this.min.z || box.min.z > this.max.z ) {
 
 			return false;
 
 		}
 
 		return true;
+
+	},
+
+	intersectsSphere: ( function () {
+
+		var closestPoint;
+
+		return function intersectsSphere( sphere ) {
+
+			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+
+			// Find the point on the AABB closest to the sphere center.
+			this.clampPoint( sphere.center, closestPoint );
+
+			// If that point is inside the sphere, the AABB and sphere intersect.
+			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+		};
+
+	} )(),
+
+	intersectsPlane: function ( plane ) {
+
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
+
+		var min, max;
+
+		if ( plane.normal.x > 0 ) {
+
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+
+		} else {
+
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+
+		}
+
+		if ( plane.normal.y > 0 ) {
+
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+
+		} else {
+
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+
+		}
+
+		if ( plane.normal.z > 0 ) {
+
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+
+		} else {
+
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+
+		}
+
+		return ( min <= plane.constant && max >= plane.constant );
 
 	},
 
@@ -325,7 +405,7 @@ THREE.Box3.prototype = {
 			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
 			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
 
 			this.makeEmpty();
 			this.setFromPoints( points );

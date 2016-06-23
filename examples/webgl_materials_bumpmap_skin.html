@@ -192,19 +192,21 @@
 
 			function createScene( geometry, scale ) {
 
-				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var textureLoader = new THREE.TextureLoader();
+
+				var mapHeight = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var mapSpecular = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
+				var mapSpecular = textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
-				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapColor = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
@@ -234,7 +236,8 @@
 
 				uniforms[ "bumpScale" ].value = 8;
 
-				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true, derivatives: true } );
+				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				material.extensions.derivatives = true;
 
 				mesh = new THREE.Mesh( geometry, material );
 

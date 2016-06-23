@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - materials - compressed textures</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -62,13 +63,13 @@
 				geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 
-     
-          
+
+
 
 				/*
 
 				*/
-              
+
     			var onCube1Loaded = function(texture){
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
@@ -82,8 +83,8 @@
 					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
     			};
-     
-    
+
+
 				var loader = new THREE.PVRLoader();
 
 				var disturb_4bpp_rgb            = loader.load( 'textures/compressed/disturb_4bpp_rgb.pvr');
@@ -96,8 +97,8 @@
 				var park3_cube_mip_2bpp_rgb_v3  = loader.load( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr', onCube2Loaded );
 
 
-				disturb_2bpp_rgb.minFilter = 
-				disturb_2bpp_rgb.magFilter = 
+				disturb_2bpp_rgb.minFilter =
+				disturb_2bpp_rgb.magFilter =
 				flare_4bpp_rgba.minFilter  =
 				flare_4bpp_rgba.magFilter  =
 				disturb_4bpp_rgb.minFilter =
@@ -116,7 +117,7 @@
 				var material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
 
 				var material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3       } );
-			
+
 
 				var mesh = new THREE.Mesh( geometry, material1 );
 				mesh.position.x = -500;

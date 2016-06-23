@@ -239,16 +239,3 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
-
-THREE.PolyhedronGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.PolyhedronGeometry(
-		parameters.vertices,
-		parameters.indices,
-		parameters.radius,
-		parameters.detail
-	);
-
-};

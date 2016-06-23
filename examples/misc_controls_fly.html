@@ -77,6 +77,8 @@
 			var geometry, meshPlanet, meshClouds, meshMoon;
 			var dirLight, pointLight, ambientLight;
 
+			var textureLoader = new THREE.TextureLoader();
+
 			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
 
 			var clock = new THREE.Clock();
@@ -111,9 +113,9 @@
 
 					specular: 0x333333,
 					shininess: 15,
-					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
-					specularMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ),
-					normalMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" ),
+					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
+					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
+					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
 					normalScale: new THREE.Vector2( 0.85, 0.85 )
 
 				} );
@@ -131,7 +133,7 @@
 
 				var materialClouds = new THREE.MeshLambertMaterial( {
 
-					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
+					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
 
 				} );
@@ -145,7 +147,7 @@
 
 				var materialMoon = new THREE.MeshPhongMaterial( {
 
-					map: THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" )
+					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
 
 				} );
 

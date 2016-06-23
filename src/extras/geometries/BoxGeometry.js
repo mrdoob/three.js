@@ -126,19 +126,4 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
-THREE.BoxGeometry.prototype.clone = function () {
-
-	var parameters = this.parameters;
-
-	return new THREE.BoxGeometry(
-		parameters.width,
-		parameters.height,
-		parameters.depth,
-		parameters.widthSegments,
-		parameters.heightSegments,
-		parameters.depthSegments
-	);
-
-};
-
-THREE.CubeGeometry = THREE.BoxGeometry; // backwards compatibility
+THREE.CubeGeometry = THREE.BoxGeometry;

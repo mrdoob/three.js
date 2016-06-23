@@ -134,15 +134,19 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeReflectionMapping );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+
+				// textures
+
+				var textureLoader = new THREE.TextureLoader();
+
+				var normalMap = textureLoader.load( "textures/normal/ninja/normal.jpg" );
+
+				var aoMap = textureLoader.load( "textures/normal/ninja/ao.jpg" );
+
+				var displacementMap = textureLoader.load( "textures/normal/ninja/displacement.jpg" );
 
 				// material
-
-				var normalMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
-
-				var aoMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
-
-				var displacementMap = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
 
 				var material = new THREE.MeshPhongMaterial( {
 

@@ -94,7 +94,7 @@
 
 				}
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 

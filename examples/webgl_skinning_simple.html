@@ -71,12 +71,12 @@
 
 					}
 
-					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MultiMaterial(materials));
 					skinnedMesh.scale.set( 1, 1, 1 );
 					scene.add( skinnedMesh );
 
 					mixer = new THREE.AnimationMixer( skinnedMesh );
-					mixer.addAction( new THREE.AnimationAction( skinnedMesh.geometry.animations[0] ) );					
+					mixer.clipAction( skinnedMesh.geometry.animations[ 0 ] ).play();
 
 				});
 

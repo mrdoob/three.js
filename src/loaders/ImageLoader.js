@@ -14,6 +14,8 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
 		var cached = THREE.Cache.get( url );
@@ -85,6 +87,12 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 

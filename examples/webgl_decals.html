@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>WebGL decals</title>
@@ -46,8 +46,9 @@
 		var controls;
 		var mouse = new THREE.Vector2();
 
-		var decalDiffuse = THREE.ImageUtils.loadTexture( 'textures/decal/decal-diffuse.png' );
-		var decalNormal = THREE.ImageUtils.loadTexture( 'textures/decal/decal-normal.jpg' );
+		var textureLoader = new THREE.TextureLoader();
+		var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
+		var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 
 		var decalMaterial = new THREE.MeshPhongMaterial( {
 			specular: 0x444444,
@@ -230,9 +231,9 @@
 
 				var material = new THREE.MeshPhongMaterial( {
 					specular: 0x111111,
-					map: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Map-COL.jpg' ),
-					specularMap: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Map-SPEC.jpg' ),
-					normalMap: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					map: textureLoader.load( 'obj/leeperrysmith/Map-COL.jpg' ),
+					specularMap: textureLoader.load( 'obj/leeperrysmith/Map-SPEC.jpg' ),
+					normalMap: textureLoader.load( 'obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 ),
 					shininess: 25
 				} );

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - OBJ MTL loader</title>
+		<title>three.js webgl - OBJLoader + MTLLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -27,14 +27,14 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - OBJMTLLoader test
+		<a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/loaders/DDSLoader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJMTLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -61,7 +61,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 100;
+				camera.position.z = 250;
 
 				// scene
 
@@ -83,19 +83,28 @@
 					}
 				};
 
-				var onError = function ( xhr ) {
-				};
-
+				var onError = function ( xhr ) { };
 
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
-				var loader = new THREE.OBJMTLLoader();
-				loader.load( 'obj/male02/male02.obj', 'obj/male02/male02_dds.mtl', function ( object ) {
+				var mtlLoader = new THREE.MTLLoader();
+				mtlLoader.setBaseUrl( 'obj/male02/' );
+				mtlLoader.setPath( 'obj/male02/' );
+				mtlLoader.load( 'male02_dds.mtl', function( materials ) {
 
-					object.position.y = - 80;
-					scene.add( object );
+					materials.preload();
 
-				}, onProgress, onError );
+					var objLoader = new THREE.OBJLoader();
+					objLoader.setMaterials( materials );
+					objLoader.setPath( 'obj/male02/' );
+					objLoader.load( 'male02.obj', function ( object ) {
+
+						object.position.y = - 95;
+						scene.add( object );
+
+					}, onProgress, onError );
+
+				});
 
 				//
 

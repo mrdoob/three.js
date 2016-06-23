@@ -37,20 +37,20 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 };
 
 THREE.OrthographicCamera.prototype.copy = function ( source ) {
-	
+
 	THREE.Camera.prototype.copy.call( this, source );
-	
+
 	this.left = source.left;
 	this.right = source.right;
 	this.top = source.top;
 	this.bottom = source.bottom;
 	this.near = source.near;
 	this.far = source.far;
-	
+
 	this.zoom = source.zoom;
-	
+
 	return this;
-		
+
 };
 
 THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {

@@ -84,7 +84,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// LIGHTS
 

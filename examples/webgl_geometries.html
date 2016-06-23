@@ -49,7 +49,7 @@
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
@@ -101,7 +101,7 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+					points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, ( i - 5 ) * 2 ) );
 
 				}
 

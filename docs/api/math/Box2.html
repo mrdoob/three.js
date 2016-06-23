@@ -22,7 +22,7 @@
 		max -- Upper (x, y) boundary of the box.
 		</div>
 		<div>
-		Creates a box bounded by min and max. 
+		Creates a box bounded by min and max.
 		</div>
 
 
@@ -33,12 +33,12 @@
 		<h3>[property:Vector2 min]</h3>
 		<div>
 		Lower (x, y) boundary of this box.
-		</div> 
+		</div>
 
 		<h3>[property:Vector2 max]</h3>
 		<div>
 		Upper (x, y) boundary of this box.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -70,7 +70,7 @@
 		Clamps *point* within the bounds of this box.
 		</div>
 
-		<h3>[method:Boolean isIntersectionBox]([page:Box2 box])</h3>
+		<h3>[method:Boolean intersectsBox]([page:Box2 box])</h3>
 		<div>
 		box -- Box to check for intersection against.
 		</div>
@@ -99,7 +99,7 @@
 		box -- Box that will be unioned with this box.
 		</div>
 		<div>
-		Unions this box with *box* setting the upper bound of this box to the greater of the 
+		Unions this box with *box* setting the upper bound of this box to the greater of the
 		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
 		lower bounds.
 		</div>
@@ -108,7 +108,7 @@
 		<div>
 		point -- [page:Vector2]<br/>
 		optionalTarget -- [page:Vector2]<br/>
-		
+
 		</div>
 		<div>
 		Returns a point as a proportion of this box's width and height.
@@ -139,7 +139,7 @@
 		</div>
 		<div>
 		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,</br>
-		this function also returns true. 
+		this function also returns true.
 		</div>
 
 		<h3>[method:Box2 translate]([page:Vector2 offset]) [page:Box2 this]</h3>
@@ -177,7 +177,7 @@
 		</div>
 		<div>
 		Expands this box equilaterally by *vector*. The width of this box will be
-		expanded by the x component of *vector* in both directions. The height of 
+		expanded by the x component of *vector* in both directions. The height of
 		this box will be expanded by the y component of *vector* in both directions.
 		</div>
 
@@ -222,7 +222,7 @@
 		<h3>[method:Box2 setFromCenterAndSize]([page:Vector2 center], [page:Vector2 size]) [page:Box2 this]</h3>
 		<div>
 		center -- Desired center position of the box. <br />
-		size -- Desired x and y dimensions of the box. 
+		size -- Desired x and y dimensions of the box.
 		</div>
 		<div>
 		Centers this box on *center* and sets this box's width and height to the values specified

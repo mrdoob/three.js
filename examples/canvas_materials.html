@@ -67,15 +67,22 @@
 
 				var geometry = new THREE.SphereGeometry( 100, 14, 7 );
 
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthTexture = textureLoader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+				var envMap = textureLoader.load( 'textures/envmap.png' );
+				envMap.mapping = THREE.SphericalReflectionMapping;
+
 				var materials = [
 
 					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
 					new THREE.MeshNormalMaterial( { overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', THREE.SphericalReflectionMapping ), overdraw: 0.5 } )
+					new THREE.MeshBasicMaterial( { map: earthTexture } ),
+					new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } )
 
 				];
 
@@ -86,7 +93,7 @@
 
 				}
 
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
+				materials.push( new THREE.MultiMaterial( materials ) );
 
 				objects = [];
 

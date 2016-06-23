@@ -147,9 +147,12 @@
 					vertexShader: shader.vertexShader,
 					uniforms: uniforms
 				};
+
+				var textureLoader = new THREE.TextureLoader();
+
 				material = new THREE.ShaderMaterial( parameters );
-				material.map = THREE.ImageUtils.loadTexture( 'textures/brick_diffuse.jpg' );
-				material.bumpMap = THREE.ImageUtils.loadTexture( 'textures/brick_bump.jpg' );
+				material.map = textureLoader.load( 'textures/brick_diffuse.jpg' );
+				material.bumpMap = textureLoader.load( 'textures/brick_bump.jpg' );
 				material.map.anisotropy = 4;
 				material.bumpMap.anisotropy = 4;
 				uniforms[ 'map' ].value = material.map;

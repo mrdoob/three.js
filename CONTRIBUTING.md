@@ -13,7 +13,7 @@ How to report a bug
 1. Specify the revision number of the three.js library where the bug occurred.
 2. Specify your browser version, operating system, and graphics card. (for example, Chrome 23.0.1271.95, Windows 7, Nvidia Quadro 2000M)
 3. Describe the problem in detail. Explain what happened, and what you expected would happen.
-4. Provide a small test-case (http://jsfiddle.net). If a test-case is not possible, provide a link to a live version of your application.
+4. Provide a small test-case (http://jsfiddle.net). [Here is a fiddle](http://jsfiddle.net/akmcv7Lh/) you can edit that runs the current version. [And here is a fiddle](http://jsfiddle.net/hw9rcLL8/) that uses the dev branch. If a test-case is not possible, provide a link to a live version of your application.
 5. If helpful, include a screenshot. Annotate the screenshot for clarity.
 
 

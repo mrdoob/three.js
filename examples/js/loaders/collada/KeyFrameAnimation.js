@@ -84,7 +84,7 @@ THREE.KeyFrameAnimation.prototype = {
 
 				var keys = this.data.hierarchy[ h ].keys;
 
-				if ( keys.length ) {
+				if ( keys.length > 1 ) {
 
 					node.animationCache.prevKey = keys[ 0 ];
 					node.animationCache.nextKey = keys[ 1 ];
@@ -101,17 +101,12 @@ THREE.KeyFrameAnimation.prototype = {
 		}
 
 		this.isPaused = false;
-
-		THREE.AnimationHandler.play( this );
-
 	},
 
 	stop: function () {
 
 		this.isPlaying = false;
 		this.isPaused  = false;
-
-		THREE.AnimationHandler.stop( this );
 
 		// reset JIT matrix and remove cache
 

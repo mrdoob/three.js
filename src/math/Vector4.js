@@ -30,6 +30,17 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setScalar: function ( scalar ) {
+
+		this.x = scalar;
+		this.y = scalar;
+		this.z = scalar;
+		this.w = scalar;
+
+		return this;
+
+	},
+
 	setX: function ( x ) {
 
 		this.x = x;
@@ -201,15 +212,19 @@ THREE.Vector4.prototype = {
 	multiplyScalar: function ( scalar ) {
 
 		if ( isFinite( scalar ) ) {
+
 			this.x *= scalar;
 			this.y *= scalar;
 			this.z *= scalar;
 			this.w *= scalar;
+
 		} else {
+
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
 			this.w = 0;
+
 		}
 
 		return this;

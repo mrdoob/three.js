@@ -53,7 +53,6 @@ THREE.BinaryLoader.prototype = {
 		var scope = this;
 
 		var jsonloader = new THREE.XHRLoader( this.manager );
-		jsonloader.setCrossOrigin( this.crossOrigin );
 		jsonloader.load( url, function ( data ) {
 
 			var json = JSON.parse( data );
@@ -61,7 +60,6 @@ THREE.BinaryLoader.prototype = {
 			var bufferUrl = binaryPath + json.buffers;
 
 			var bufferLoader = new THREE.XHRLoader( scope.manager );
-			bufferLoader.setCrossOrigin( scope.crossOrigin );
 			bufferLoader.setResponseType( 'arraybuffer' );
 			bufferLoader.load( bufferUrl, function ( bufData ) {
 

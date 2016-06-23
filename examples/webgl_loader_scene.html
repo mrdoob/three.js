@@ -214,7 +214,7 @@
 							if( object.geometry && object.geometry.animations && object.geometry.animations.length > 0 ) {
 
 								var mixer = new THREE.AnimationMixer( object );
-								mixer.addAction( new THREE.AnimationAction( object.geometry.animations[0] ) );
+								mixer.clipAction( object.geometry.animations[0] ).play();
 								mixers.push( mixer );
 
 							}

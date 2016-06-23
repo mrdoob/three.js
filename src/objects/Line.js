@@ -35,21 +35,20 @@ THREE.Line.prototype.raycast = ( function () {
 		var precisionSq = precision * precision;
 
 		var geometry = this.geometry;
-
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+		var matrixWorld = this.matrixWorld;
 
 		// Checking boundingSphere distance to ray
 
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
 		sphere.copy( geometry.boundingSphere );
-		sphere.applyMatrix4( this.matrixWorld );
+		sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
+		if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
-			return;
+		//
 
-		}
-
-		inverseMatrix.getInverse( this.matrixWorld );
+		inverseMatrix.getInverse( matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 		var vStart = new THREE.Vector3();
@@ -62,11 +61,11 @@ THREE.Line.prototype.raycast = ( function () {
 
 			var index = geometry.index;
 			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
 
 			if ( index !== null ) {
 
 				var indices = index.array;
-				var positions = attributes.position.array;
 
 				for ( var i = 0, l = indices.length - 1; i < l; i += step ) {
 
@@ -102,8 +101,6 @@ THREE.Line.prototype.raycast = ( function () {
 				}
 
 			} else {
-
-				var positions = attributes.position.array;
 
 				for ( var i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
 

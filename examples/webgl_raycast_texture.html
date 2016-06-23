@@ -214,6 +214,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( new THREE.Color( 0xEEEEEE, 1.0 ) );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 

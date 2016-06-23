@@ -52,9 +52,11 @@
 				var amount = 200;
 				var radius = 500;
 
-				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png", undefined, createHUDSprites );
-				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
-				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
+				var textureLoader = new THREE.TextureLoader();
+
+				var mapA = textureLoader.load( "textures/sprite0.png", createHUDSprites );
+				var mapB = textureLoader.load( "textures/sprite1.png" );
+				mapC = textureLoader.load( "textures/sprite2.png" );
 
 				group = new THREE.Group();
 
@@ -113,7 +115,7 @@
 
 				var width = material.map.image.width;
 				var height = material.map.image.height;
-				
+
 				spriteTL = new THREE.Sprite( material );
 				spriteTL.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteTL );
@@ -129,7 +131,7 @@
 				spriteBR = new THREE.Sprite( material );
 				spriteBR.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteBR );
-				
+
 				spriteC = new THREE.Sprite( material );
 				spriteC.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteC );

@@ -11,7 +11,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	// render targets
 
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
 	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );

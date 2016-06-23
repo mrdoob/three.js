@@ -50,8 +50,7 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				//gl_PointSize = size;
-				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+				gl_PointSize = size * ( 300.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -144,7 +143,7 @@
 				uniforms: {
 					amplitude: { type: "f", value: 1.0 },
 					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
+					texture:   { type: "t", value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

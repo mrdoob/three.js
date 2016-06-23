@@ -1,6 +1,6 @@
 {
   "name": "three.js",
-  "version": "0.73.0",
+  "version": "0.74.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "directories": {
@@ -9,6 +9,7 @@
     "test": "test"
   },
   "scripts": {
+    "build": "cd ./utils/build && node build.js --include common --include extras",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,7 +29,8 @@
   },
   "homepage": "http://threejs.org/",
   "devDependencies": {
+    "argparse": "^1.0.3",
     "jscs": "^1.13.1",
-    "lodash": "^3.10.0"
+    "uglify-js": "^2.6.0"
   }
 }

@@ -52,6 +52,8 @@ THREE.InterleavedBuffer.prototype = {
 		this.stride = source.stride;
 		this.dynamic = source.dynamic;
 
+		return this;
+
 	},
 
 	copyAt: function ( index1, attribute, index2 ) {

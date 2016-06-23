@@ -28,43 +28,43 @@ THREE.CompressedTextureLoader.prototype = {
 		texture.image = images;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+
+		function loadTexture( i ) {
+
+			loader.load( url[ i ], function ( buffer ) {
+
+				var texDatas = scope._parser( buffer, true );
+
+				images[ i ] = {
+					width: texDatas.width,
+					height: texDatas.height,
+					format: texDatas.format,
+					mipmaps: texDatas.mipmaps
+				};
+
+				loaded += 1;
+
+				if ( loaded === 6 ) {
+
+					if ( texDatas.mipmapCount === 1 )
+						texture.minFilter = THREE.LinearFilter;
+
+					texture.format = texDatas.format;
+					texture.needsUpdate = true;
+
+					if ( onLoad ) onLoad( texture );
+
+				}
+
+			}, onProgress, onError );
+
+		}
 
 		if ( Array.isArray( url ) ) {
 
 			var loaded = 0;
-
-			var loadTexture = function ( i ) {
-
-				loader.load( url[ i ], function ( buffer ) {
-
-					var texDatas = scope._parser( buffer, true );
-
-					images[ i ] = {
-						width: texDatas.width,
-						height: texDatas.height,
-						format: texDatas.format,
-						mipmaps: texDatas.mipmaps
-					};
-
-					loaded += 1;
-
-					if ( loaded === 6 ) {
-
-						if ( texDatas.mipmapCount === 1 )
- 							texture.minFilter = THREE.LinearFilter;
-
-						texture.format = texDatas.format;
-						texture.needsUpdate = true;
-
-						if ( onLoad ) onLoad( texture );
-
-					}
-
-				}, onProgress, onError );
-
-			};
 
 			for ( var i = 0, il = url.length; i < il; ++ i ) {
 
@@ -126,9 +126,9 @@ THREE.CompressedTextureLoader.prototype = {
 
 	},
 
-	setCrossOrigin: function ( value ) {
+	setPath: function ( value ) {
 
-		this.crossOrigin = value;
+		this.path = value;
 
 	}
 

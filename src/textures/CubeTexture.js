@@ -19,9 +19,9 @@ THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 THREE.CubeTexture.prototype.copy = function ( source ) {
 
 	THREE.Texture.prototype.copy.call( this, source );
-	
+
 	this.images = source.images;
-	
+
 	return this;
 
 };

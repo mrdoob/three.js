@@ -14,13 +14,13 @@
 	"ignore": [
 		"**/.*",
 		"*.md",
-		"docs",
-		"editor",
-		"examples/*",
-		"!examples/js",
-		"src",
-		"test",
-		"utils",
-		"LICENSE"
+		"/docs",
+		"/editor",
+		"/examples/*",
+		"!/examples/js",
+		"/src",
+		"/test",
+		"/utils",
+		"/LICENSE"
 	]
 }

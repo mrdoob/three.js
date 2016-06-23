@@ -122,10 +122,12 @@
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				var textureLoader = new THREE.TextureLoader();
+
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = -1.5;
 
-				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -142,11 +144,14 @@
 				uniforms[ "passID" ].value = 1;
 
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, derivatives: true };
-				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true, derivatives: true };
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
 				material = new THREE.ShaderMaterial( parameters );
+				material.extensions.derivatives = true;
+
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
+				materialUV.extensions.derivatives = true;
 
 				// LOADER
 

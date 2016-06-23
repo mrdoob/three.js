@@ -18,8 +18,8 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
-		<script src="js/renderers/Projector.js"></script>
 		<script src="js/controls/DragControls.js"></script>
+		<script src="js/materials/ShadowMaterial.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -71,18 +71,20 @@
 				light.position.set( 0, 1500, 200 );
 				light.castShadow = true;
 				light.shadowCameraNear = 200;
-				light.shadowCameraFar = camera.far;
+				light.shadowCameraFar = 2000;
 				light.shadowCameraFov = 70;
 				light.shadowBias = -0.000222;
-				light.shadowDarkness = 0.25;
 				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 1024;
 				scene.add( light );
 				spotlight = light;
 
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+
 				var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new THREE.MeshBasicMaterial( { color: 0xeeeeee } );
+				var planeMaterial = new THREE.ShadowMaterial();
+				planeMaterial.opacity = 0.2;
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = -200;
@@ -101,6 +103,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );

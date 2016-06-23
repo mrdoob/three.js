@@ -2,15 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
+Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
 
-	var container = new UI.Panel();
+	var signals = editor.signals;
+
+	var container = new UI.Row();
 
 	var parameters = object.geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Panel();
+	var radiusRow = new UI.Row();
 	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
@@ -20,7 +22,7 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 
 	// detail
 
-	var detailRow = new UI.Panel();
+	var detailRow = new UI.Row();
 	var detail = new UI.Integer( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
 	detailRow.add( new UI.Text( 'Detail' ).setWidth( '90px' ) );
@@ -33,14 +35,10 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 
 	function update() {
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.IcosahedronGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE.IcosahedronGeometry(
 			radius.getValue(),
 			detail.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
+		) ) );
 
 		signals.objectChanged.dispatch( object );
 

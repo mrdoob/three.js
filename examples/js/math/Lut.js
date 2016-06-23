@@ -369,7 +369,7 @@ THREE.Lut.prototype = {
 
 			for ( var i = 0; i < this.legend.labels.ticks; i ++ ) {
 
-				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i ;
+				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i + this.minV;
 
 				if ( callback ) {
 
@@ -418,7 +418,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'vertical' ) {
 
-					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( value / ( this.maxV - this.minV ) );
+					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
 
 					spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
 
@@ -426,7 +426,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'horizontal' ) {
 
-					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( value / ( this.maxV - this.minV ) );
+					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) );
 
 					if ( this.legend.labels.ticks > 5 ) {
 
@@ -457,7 +457,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'vertical' ) {
 
-					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
 
 					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z  ) );
 
@@ -467,7 +467,7 @@ THREE.Lut.prototype = {
 
 				if ( this.legend.layout == 'horizontal' ) {
 
-					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( ( value - this.minV ) / ( this.maxV - this.minV ) * 0.99 );
 
 					geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z  ) );
 

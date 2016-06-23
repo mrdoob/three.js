@@ -92,10 +92,10 @@
 		Sets this matrix as the normal matrix (upper left 3x3)of the passed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix *m*.
 		</div>
 
-		<h3>[method:Matrix3 getInverse]([page:Matrix4 m], [page:Boolean throwOnInvertible]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 getInverse]([page:Matrix4 m], [page:Boolean throwOnDegenerate]) [page:Matrix3 this]</h3>
 		<div>
 		m -- [page:Matrix4]<br />
-		throwOnInvertible -- [Page:Boolean] If true, throw an error if the matrix is invertible.
+		throwOnDegenerate -- [Page:Boolean] If true, throw an error if the matrix is degenerate (not invertible).
 		</div>
 		<div>
 		Set this matrix to the inverse of the passed matrix.
@@ -117,7 +117,7 @@
 		<h3>[method:Matrix3 identity]() [page:Matrix3 this]</h3>
 		<div>
 		Resets this matrix to identity.<br/><br/>
-		
+
 		1, 0, 0<br/>
 		0, 1, 0<br/>
 		0, 0, 1<br/>

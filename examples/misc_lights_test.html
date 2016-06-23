@@ -42,8 +42,7 @@
 
 			var camera, scene, canvasRenderer, webglRenderer;
 
-			var mesh, zmesh, geometry;
-			var materialSpheres, materialTorus;
+			var mesh, zmesh, geometry, material;
 
 			var directionalLight, pointLight;
 
@@ -51,8 +50,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-			var lightAdded = false;
 
 			var clock = new THREE.Clock();
 
@@ -73,12 +70,12 @@
 
 				// Spheres
 
-				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
+				geometry = new THREE.SphereGeometry( 100, 16, 8 );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5, shininess: 0 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
-					mesh = new THREE.Mesh( geometry, materialSpheres );
+					mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
@@ -89,8 +86,8 @@
 
 				// Torus
 
-				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), materialTorus );
+				geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				// Lights
@@ -100,12 +97,19 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, -70, 100 ).normalize();
-				//scene.add( directionalLight );
+
+				setTimeout( function () {
+
+					scene.add( directionalLight );
+
+				}, 3000 );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				scene.add( pointLight );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				geometry = new THREE.SphereGeometry( 100, 8, 4 );
+				material = new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
@@ -169,18 +173,6 @@
 			function render() {
 
 				var delta = clock.getDelta();
-				var r = clock.getElapsedTime();
-
-				if ( ! lightAdded && r >= 3.0 ) {
-
-					scene.add( directionalLight );
-
-					materialTorus.needsUpdate = true;
-					materialSpheres.needsUpdate = true;
-
-					lightAdded = true;
-
-				}
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
@@ -209,6 +201,7 @@
 
 				}
 
+				var r = clock.getElapsedTime();
 
 				pointLight.position.x = 200 * Math.cos( r );
 				pointLight.position.z = 200 * Math.sin( r );

@@ -75,8 +75,7 @@
 
 				pickingScene = new THREE.Scene();
 				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				pickingTexture.minFilter = THREE.LinearFilter;
-				pickingTexture.generateMipmaps = false;
+				pickingTexture.texture.minFilter = THREE.LinearFilter;
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
@@ -87,7 +86,7 @@
 				var geometry = new THREE.Geometry(),
 				pickingGeometry = new THREE.Geometry(),
 				pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
-				defaultMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors	} );
+				defaultMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0	} );
 
 				function applyVertexColors( g, c ) {
 

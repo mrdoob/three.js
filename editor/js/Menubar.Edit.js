@@ -18,27 +18,65 @@ Menubar.Edit = function ( editor ) {
 
 	// Undo
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Undo' );
-	option.onClick( function () {
+	var undo = new UI.Row();
+	undo.setClass( 'option' );
+	undo.setTextContent( 'Undo (Ctrl+Z)' );
+	undo.onClick( function () {
 
-		editor.history.undo();
+		editor.undo();
 
 	} );
-	options.add( option );
+	options.add( undo );
 
 	// Redo
 
-	var option = new UI.Panel();
+	var redo = new UI.Row();
+	redo.setClass( 'option' );
+	redo.setTextContent( 'Redo (Ctrl+Shift+Z)' );
+	redo.onClick( function () {
+
+		editor.redo();
+
+	} );
+	options.add( redo );
+
+	// Clear History
+
+	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Redo' );
+	option.setTextContent( 'Clear History' );
 	option.onClick( function () {
 
-		editor.history.redo();
+		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
+
+			editor.history.clear();
+
+		}
 
 	} );
 	options.add( option );
+
+
+	editor.signals.historyChanged.add( function () {
+
+		var history = editor.history;
+
+		undo.setClass( 'option' );
+		redo.setClass( 'option' );
+
+		if ( history.undos.length == 0 ) {
+
+			undo.setClass( 'inactive' );
+
+		}
+
+		if ( history.redos.length == 0 ) {
+
+			redo.setClass( 'inactive' );
+
+		}
+
+	} );
 
 	// ---
 
@@ -46,7 +84,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Clone
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clone' );
 	option.onClick( function () {
@@ -57,15 +95,14 @@ Menubar.Edit = function ( editor ) {
 
 		object = object.clone();
 
-		editor.addObject( object );
-		editor.select( object );
+		editor.execute( new AddObjectCommand( object ) );
 
 	} );
 	options.add( option );
 
 	// Delete
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Delete' );
 	option.onClick( function () {
@@ -75,15 +112,16 @@ Menubar.Edit = function ( editor ) {
 		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var parent = object.parent;
-		editor.removeObject( object );
-		editor.select( parent );
+		if ( parent === undefined ) return; // avoid deleting the camera or scene
+
+		editor.execute( new RemoveObjectCommand( object ) );
 
 	} );
 	options.add( option );
 
 	// Minify shaders
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Minify Shaders' );
 	option.onClick( function() {
@@ -108,6 +146,7 @@ Menubar.Edit = function ( editor ) {
 
 		}
 
+		var cmds = [];
 		root.traverse( function ( object ) {
 
 			var material = object.material;
@@ -119,8 +158,8 @@ Menubar.Edit = function ( editor ) {
 					var shader = glslprep.minifyGlsl( [
 							material.vertexShader, material.fragmentShader ] );
 
-					material.vertexShader = shader[ 0 ];
-					material.fragmentShader = shader[ 1 ];
+					cmds.push( new SetMaterialValueCommand( object, 'vertexShader', shader[ 0 ] ) );
+					cmds.push( new SetMaterialValueCommand( object, 'fragmentShader', shader[ 1 ] ) );
 
 					++nMaterialsChanged;
 
@@ -147,6 +186,12 @@ Menubar.Edit = function ( editor ) {
 			}
 
 		} );
+
+		if ( nMaterialsChanged > 0 ) {
+
+			editor.execute( new MultiCmdsCommand( cmds ), 'Minify Shaders' );
+
+		}
 
 		window.alert( nMaterialsChanged +
 				" material(s) were changed.\n" + errors.join( "\n" ) );

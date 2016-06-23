@@ -83,7 +83,7 @@ THREE.GPUParticleSystem = function(options) {
       '{',
       'const vec4 bit_shift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);',
       'const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);',
-      'vec4 res = fract(depth * bit_shift);',
+      'vec4 res = mod(depth*bit_shift*vec4(255), vec4(256))/vec4(255);',
       'res -= res.xxyz * bit_mask;',
       'return res;',
       '}',
@@ -198,10 +198,12 @@ THREE.GPUParticleSystem = function(options) {
     return ++i >= self.rand.length ? self.rand[i = 1] : self.rand[i];
   }
 
-  self.particleNoiseTex = THREE.ImageUtils.loadTexture("textures/perlin-512.png");
+  var textureLoader = new THREE.TextureLoader();
+
+  self.particleNoiseTex = textureLoader.load("textures/perlin-512.png");
   self.particleNoiseTex.wrapS = self.particleNoiseTex.wrapT = THREE.RepeatWrapping;
 
-  self.particleSpriteTex = THREE.ImageUtils.loadTexture("textures/particle2.png");
+  self.particleSpriteTex = textureLoader.load("textures/particle2.png");
   self.particleSpriteTex.wrapS = self.particleSpriteTex.wrapT = THREE.RepeatWrapping;
 
   self.particleShaderMat = new THREE.ShaderMaterial({

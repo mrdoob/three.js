@@ -112,25 +112,30 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var vertices = new THREE.Float32Attribute( triangles * 3 * 3, 3 );
+				var vertices = new Float32Array( triangles * 3 * 3 );
 
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( var i = 0, l = triangles * 3 * 3; i < l; i += 3 ) {
 
-					vertices.setXYZ( i, Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-
-				}
-
-				geometry.addAttribute( 'position', vertices );
-
-				var colors = new THREE.Float32Attribute( triangles * 3 * 4, 4 );
-
-				for ( var i = 0, l = colors.count; i < l; i ++ ) {
-
-					colors.setXYZW( i, Math.random(), Math.random(), Math.random(), Math.random() );
+					vertices[ i     ] = Math.random() - 0.5;
+					vertices[ i + 1 ] = Math.random() - 0.5;
+					vertices[ i + 2 ] = Math.random() - 0.5;
 
 				}
 
-				geometry.addAttribute( 'color', colors );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+				var colors = new Float32Array( triangles * 3 * 4 );
+
+				for ( var i = 0, l = triangles * 3 * 4; i < l; i += 4 ) {
+
+					colors[ i     ] = Math.random();
+					colors[ i + 1 ] = Math.random();
+					colors[ i + 2 ] = Math.random();
+					colors[ i + 3 ] = Math.random();
+
+				}
+
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
 
 				// material
 

@@ -13,6 +13,7 @@
 				font-size:13px;
 				text-align:center;
 				font-weight: bold;
+				text-align:center;
 			}
 
 			a {
@@ -62,8 +63,7 @@
 			var camera, scene, renderer,
 				materials = [], objects = [],
 				singleMaterial, zmaterial = [],
-				parameters, i, j, k, h, color, x, y, z, s, n, nobjects,
-				material_depth, cubeMaterial;
+				parameters, i, j, k, h, color, x, y, z, s, n, nobjects, cubeMaterial;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -95,8 +95,6 @@
 
 				renderer.sortObjects = false;
 
-				material_depth = new THREE.MeshDepthMaterial();
-
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
@@ -105,7 +103,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );

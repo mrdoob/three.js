@@ -30,6 +30,10 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 				break;
 
+			case 'WEBGL_compressed_texture_etc1':
+				extension = gl.getExtension( 'WEBGL_compressed_texture_etc1' );
+				break;
+
 			default:
 				extension = gl.getExtension( name );
 

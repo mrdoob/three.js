@@ -21,7 +21,7 @@
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -53,7 +53,7 @@
 		<div>
 		The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.
 		</div>
-		
+
 		<div>
 		NOTE: tiling of images in textures only functions if image dimensions are powers of two (2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, ...) in terms of pixels. Individual dimensions need not be equal, but each must be a power of two. This is a limitation of WebGL, not Three.js.
 		</div>

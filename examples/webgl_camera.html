@@ -48,12 +48,14 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
+			var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 			var container, stats;
 			var camera, scene, renderer, mesh;
 			var cameraRig, activeCamera, activeHelper;
 			var cameraPerspective, cameraOrtho;
 			var cameraPerspectiveHelper, cameraOrthoHelper;
+			var frustumSize = 600;
 
 			init();
 			animate();
@@ -67,17 +69,16 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
 				camera.position.z = 2500;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
 
 				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
 				scene.add( cameraPerspectiveHelper );
 
 				//
-
-				cameraOrtho = new THREE.OrthographicCamera( 0.5 * SCREEN_WIDTH / - 2, 0.5 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, 150, 1000 );
+				cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
 
 				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
 				scene.add( cameraOrthoHelper );
@@ -193,19 +194,20 @@
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
+				aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = 0.5 * aspect;
 				camera.updateProjectionMatrix();
 
-				cameraPerspective.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraPerspective.aspect = 0.5 * aspect;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left   = - 0.5 * SCREEN_WIDTH / 2;
-				cameraOrtho.right  =   0.5 * SCREEN_WIDTH / 2;
-				cameraOrtho.top    =   SCREEN_HEIGHT / 2;
-				cameraOrtho.bottom = - SCREEN_HEIGHT / 2;
+				cameraOrtho.left   = - 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.right  =   0.5 * frustumSize * aspect / 2;
+				cameraOrtho.top    =   frustumSize / 2;
+				cameraOrtho.bottom = - frustumSize / 2;
 				cameraOrtho.updateProjectionMatrix();
 
 			}

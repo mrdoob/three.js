@@ -18,6 +18,7 @@ THREE.TextureLoader.prototype = {
 
 		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
@@ -38,6 +39,12 @@ THREE.TextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
 
 	}
 

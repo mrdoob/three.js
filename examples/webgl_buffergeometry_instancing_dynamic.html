@@ -241,7 +241,7 @@
 			geometry.addAttribute( 'orientation', orientations ); // per mesh orientation
 
 			// material
-			var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+			var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 			texture.anisotropy = renderer.getMaxAnisotropy();
 
 			var material = new THREE.RawShaderMaterial( {

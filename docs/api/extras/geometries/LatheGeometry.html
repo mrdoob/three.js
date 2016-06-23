@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Z axis.</div>
+		<div class="desc">Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.</div>
 
 
 		<h2>Example</h2>
@@ -20,7 +20,7 @@
 		<code>
 		var points = [];
 		for ( var i = 0; i < 10; i ++ ) {
-			points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 15 + 50, ( i - 5 ) * 2 ) );
 
 		}
 		var geometry = new THREE.LatheGeometry( points );
@@ -34,7 +34,7 @@
 
 		<h3>[name]([page:Array points], [page:Integer segments], [page:Float phiStart], [page:Float phiLength])</h3>
 		<div>
-		points — Array of Vector3s. Since this rotates around Z axis, the y-values can be set to 0<br />
+		points — Array of Vector2s.<br />
 		segments — the number of circumference segments to generate. Default is 12.<br />
 		phiStart — the starting angle in radians. Default is 0.<br />
 		phiLength — the radian (0 to 2*PI) range of the lathed section 2*PI is a closed lathe, less than 2PI is a portion. Default is 2*PI

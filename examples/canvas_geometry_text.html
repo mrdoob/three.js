@@ -23,10 +23,6 @@
 
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/helvetiker_regular.typeface.js"></script>
-
 
 		<script>
 
@@ -34,7 +30,7 @@
 
 			var camera, scene, renderer;
 
-			var group, text;
+			var group;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -45,10 +41,15 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
+
+			} );
+
+			function init( font ) {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -78,34 +79,35 @@
 
 				}
 
-				var text3d = new THREE.TextGeometry( theText, {
+				var geometry = new THREE.TextGeometry( theText, {
 
+					font: font,
 					size: 80,
 					height: 20,
-					curveSegments: 2,
-					font: "helvetiker"
+					curveSegments: 2
 
 				});
 
-				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
+				geometry.computeBoundingBox();
 
-				var material = new THREE.MeshFaceMaterial( [
+				var centerOffset = -0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+
+				var material = new THREE.MultiMaterial( [
 					new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: 0.5 } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 } )
 				] );
 
-				text = new THREE.Mesh( text3d, material );
+				var mesh = new THREE.Mesh( geometry, material );
 
-				text.position.x = centerOffset;
-				text.position.y = 100;
-				text.position.z = 0;
+				mesh.position.x = centerOffset;
+				mesh.position.y = 100;
+				mesh.position.z = 0;
 
-				text.rotation.x = 0;
-				text.rotation.y = Math.PI * 2;
+				mesh.rotation.x = 0;
+				mesh.rotation.y = Math.PI * 2;
 
 				group = new THREE.Group();
-				group.add( text );
+				group.add( mesh );
 
 				scene.add( group );
 

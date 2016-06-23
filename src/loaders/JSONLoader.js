@@ -44,7 +44,6 @@ THREE.JSONLoader.prototype = {
 		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
@@ -53,17 +52,23 @@ THREE.JSONLoader.prototype = {
 
 			if ( metadata !== undefined ) {
 
-				if ( metadata.type === 'object' ) {
+				var type = metadata.type;
 
-					console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
-					return;
+				if ( type !== undefined ) {
 
-				}
+					if ( type.toLowerCase() === 'object' ) {
 
-				if ( metadata.type === 'scene' ) {
+						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+						return;
 
-					console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
-					return;
+					}
+
+					if ( type.toLowerCase() === 'scene' ) {
+
+						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.SceneLoader instead.' );
+						return;
+
+					}
 
 				}
 
@@ -72,13 +77,7 @@ THREE.JSONLoader.prototype = {
 			var object = scope.parse( json, texturePath );
 			onLoad( object.geometry, object.materials );
 
-		} );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
+		}, onProgress, onError );
 
 	},
 
@@ -498,20 +497,30 @@ THREE.JSONLoader.prototype = {
 
 			// parse old style Bone/Hierarchy animations
 			var animations = [];
+
 			if ( json.animation !== undefined ) {
+
 				animations.push( json.animation );
+
 			}
+
 			if ( json.animations !== undefined ) {
+
 				if ( json.animations.length ) {
+
 					animations = animations.concat( json.animations );
+
 				} else {
+
 					animations.push( json.animations );
+
 				}
+
 			}
 
 			for ( var i = 0; i < animations.length; i ++ ) {
 
-				var clip = THREE.AnimationClip.parseAnimation( animations[i], geometry.bones );
+				var clip = THREE.AnimationClip.parseAnimation( animations[ i ], geometry.bones );
 				if ( clip ) outputAnimations.push( clip );
 
 			}
