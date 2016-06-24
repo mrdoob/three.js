@@ -45,7 +45,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var points;
 
 			init();
 			animate();
@@ -67,7 +67,7 @@
 				var geometry = new THREE.BufferGeometry();
 
 				var interleaved_buffer_float32 = new Float32Array( particles * 4 );
-				interleaved_buffer_uint8 = new Uint8Array(interleaved_buffer_float32.buffer)
+				var interleaved_buffer_uint8 = new Uint8Array( interleaved_buffer_float32.buffer );
 
 				var color = new THREE.Color();
 
@@ -81,7 +81,7 @@
 					var y = Math.random() * n - n2;
 					var z = Math.random() * n - n2;
 
-					interleaved_buffer_float32[ i ]     = x;
+					interleaved_buffer_float32[ i + 0 ] = x;
 					interleaved_buffer_float32[ i + 1 ] = y;
 					interleaved_buffer_float32[ i + 2 ] = z;
 
@@ -93,27 +93,28 @@
 
 					color.setRGB( vx, vy, vz );
 
-					interleaved_buffer_uint8[ 4*(i + 3)+0] = color.r*255;
-					interleaved_buffer_uint8[ 4*(i + 3)+1] = color.g*255;
-					interleaved_buffer_uint8[ 4*(i + 3)+2] = color.b*255;
-					interleaved_buffer_uint8[ 4*(i + 3)+3] = 0;
+					var j = ( i + 3 ) * 4;
+
+					interleaved_buffer_uint8[ j + 0 ] = color.r * 255;
+					interleaved_buffer_uint8[ j + 1 ] = color.g * 255;
+					interleaved_buffer_uint8[ j + 2 ] = color.b * 255;
+					interleaved_buffer_uint8[ j + 3 ] = 0;
 
 				}
 
-				ibp = new THREE.InterleavedBuffer(interleaved_buffer_float32, 4);
-				ibc = new THREE.InterleavedBuffer(interleaved_buffer_uint8, 16);
-				
-				geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute(ibp, 3, 0, false ) );
-				geometry.addAttribute( 'color', new THREE.InterleavedBufferAttribute(ibc, 3, 12, true ) );
+				var ibp = new THREE.InterleavedBuffer( interleaved_buffer_float32, 4 );
+				var ibc = new THREE.InterleavedBuffer( interleaved_buffer_uint8, 16 );
 
-				geometry.computeBoundingSphere();
+				geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute( ibp, 3, 0, false ) );
+				geometry.addAttribute( 'color', new THREE.InterleavedBufferAttribute( ibc, 3, 12, true ) );
+				// geometry.computeBoundingSphere();
 
 				//
 
 				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
 
-				particleSystem = new THREE.Points( geometry, material );
-				scene.add( particleSystem );
+				points = new THREE.Points( geometry, material );
+				scene.add( points );
 
 				//
 
@@ -159,8 +160,8 @@
 
 				var time = Date.now() * 0.001;
 
-				particleSystem.rotation.x = time * 0.25;
-				particleSystem.rotation.y = time * 0.5;
+				points.rotation.x = time * 0.25;
+				points.rotation.y = time * 0.5;
 
 				renderer.render( scene, camera );
 
