@@ -9777,13 +9777,15 @@ THREE.InstancedInterleavedBuffer.prototype.copy = function ( source ) {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
+THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset, normalized ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
+
+	this.normalized = normalized === true;
 
 };
 
@@ -9802,6 +9804,12 @@ THREE.InterleavedBufferAttribute.prototype = {
 	get count() {
 
 		return this.data.count;
+
+	},
+
+	get array() {
+
+		return this.data.array;
 
 	},
 
