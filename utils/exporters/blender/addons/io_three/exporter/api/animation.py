@@ -271,7 +271,7 @@ def _parse_pose_action(action, armature, options):
 
             pos = (pos.x, pos.z, -pos.y)
             rot = (rot.x, rot.z, -rot.y, rot.w)
-            scl = (scl.x, scl.y, scl.z)
+            scl = (scl.x, scl.z, -scl.y)
 
 
             keyframe = {constants.TIME: time}
