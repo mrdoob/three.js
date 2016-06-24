@@ -194,7 +194,18 @@ THREE.ConvexGeometry = function( vertices ) {
 	}
 
 	this.computeFaceNormals();
-	this.computeVertexNormals();
+
+	// Compute flat vertex normals
+	for ( var i = 0; i < this.faces.length; i ++ ) {
+
+		var face = this.faces[ i ];
+		var normal = face.normal;
+
+		face.vertexNormals[ 0 ] = normal.clone();
+		face.vertexNormals[ 1 ] = normal.clone();
+		face.vertexNormals[ 2 ] = normal.clone();
+
+	}
 
 };
 
