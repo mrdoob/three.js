@@ -312,8 +312,17 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( ! customMaterial ) {
 
-			var useMorphing = geometry.morphTargets !== undefined &&
-					geometry.morphTargets.length > 0 && material.morphTargets;
+			var useMorphing, morphTargets;
+
+			if ( material.morphTargets ) {
+
+				if ( geometry instanceof THREE.Geometry ) morphTargets = geometry.morphTargets;
+
+				if ( geometry instanceof THREE.BufferGeometry && geometry.morphAttributes !== undefined ) morphTargets = geometry.morphAttributes.position;
+
+				if ( morphTargets !== undefined && morphTargets.length > 0 ) useMorphing = true;
+
+			}
 
 			var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
 
