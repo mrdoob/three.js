@@ -18,6 +18,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 		image.onload = function () {
 
 			URL.revokeObjectURL( image.src );
+
 			if ( onLoad ) onLoad( image );
 
 			scope.manager.itemEnd( url );
@@ -40,6 +41,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 			}, onProgress, onError );
 
 		}
+
 		scope.manager.itemStart( url );
 
 		return image;
