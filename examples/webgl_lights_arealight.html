@@ -59,7 +59,7 @@
 
 			var matParams = {
 				specular: 0xFFFFFF,
-				shininess: 40
+				shininess: 10000
 			}
 
 			var matFloor = new THREE.MeshPhongMaterial( matParams );
@@ -91,6 +91,7 @@
 				var gl = rnd.context;
 
 				// Check for float-RT support
+				// TODO (abelnation): figure out fall-back for float textures
 				if (!gl.getExtension("OES_texture_float")) {
 					alert("OES_texture_float not supported");
 					throw "missing webgl extension";
@@ -109,7 +110,8 @@
 				rnd.domElement.addEventListener( 'mousedown', onDocumentClick );
 				rnd.domElement.addEventListener( 'mouseup', onDocumentClick );
 
-				cam.position.set( 0, 100, 0 );
+				// cam.position.set( 0, 100, 0 );
+				cam.position.set( 45, 20, 45 );
 
 				// shapes = {
 				// 	square: THREE.Polygon.makeSquare( 10.0 ),
@@ -124,7 +126,7 @@
 				// };
 				// shapeNames = Object.keys( shapes );
 
-				rectLight = new THREE.RectAreaLight( 0xFFFFFF, undefined, 10, 3 );
+				rectLight = new THREE.RectAreaLight( 0xFFFFFF, undefined, 2, 10 );
 				rectLight.matrixAutoUpdate = true;
 				rectLight.intensity = 2.0;
 				rectLight.position.set( 5, 5, 0 );
