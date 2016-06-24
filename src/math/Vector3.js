@@ -597,9 +597,9 @@ THREE.Vector3.prototype = {
 	projectOnVector: function ( vector ) {
 
 		var scalar = vector.dot( this ) / vector.lengthSq();
-	
+
 		return this.copy( vector ).multiplyScalar( scalar );
-	
+
 	},
 
 	projectOnPlane: function () {
@@ -634,6 +634,19 @@ THREE.Vector3.prototype = {
 		};
 
 	}(),
+
+	quaternionTo: function ( v ) {
+		var d = this.dot(v);
+		var axis = this.clone();
+		axis.cross(v);
+    var qw = Math.sqrt(this.lengthSq()*v.lengthSq()) + d;
+
+		// Vectors are PI apart
+		if (qw < 0.0001) {
+			return (new THREE.Quaternion( -this.z, this.y, this.x, 0 )).normalize();
+		}
+	  return (new THREE.Quaternion( axis.x, axis.y, axis.z, qw )).normalize();
+	},
 
 	angleTo: function ( v ) {
 
@@ -704,6 +717,10 @@ THREE.Vector3.prototype = {
 
 		return this.fromArray( m.elements, index * 4 );
 
+	},
+
+	isFinite: function () {
+		return isFinite(this.x) && isFinite(this.y) && isFinite(this.z);
 	},
 
 	equals: function ( v ) {
