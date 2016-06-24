@@ -2,17 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, segments, color1, color2 ) {
+THREE.GridHelper = function ( size, divisions, color1, color2 ) {
 
-	segments = segments || 1;
+	divisions = divisions || 1;
 	color1 = new THREE.Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new THREE.Color( color2 !== undefined ? color2 : 0x888888 );
 
-	var center = segments / 2;
-	var step = ( size * 2 ) / segments;
+	var center = divisions / 2;
+	var step = ( size * 2 ) / divisions;
 	var vertices = [], colors = [];
 
-	for ( var i = 0, j = 0, k = - size; i <= segments; i ++, k += step ) {
+	for ( var i = 0, j = 0, k = - size; i <= divisions; i ++, k += step ) {
 
 		vertices.push( - size, 0, k, size, 0, k );
 		vertices.push( k, 0, - size, k, 0, size );
