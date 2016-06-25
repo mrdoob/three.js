@@ -15,7 +15,7 @@ var APP = {
 
 		var events = {};
 
-		this.dom = undefined;
+		this.dom = document.createElement( 'div' );
 
 		this.width = 500;
 		this.height = 500;
@@ -35,7 +35,7 @@ var APP = {
 
 			}
 
-			this.dom = renderer.domElement;
+			this.dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -133,21 +133,17 @@ var APP = {
 				controls = new THREE.VRControls( camera );
 				effect = new THREE.VREffect( renderer );
 
-				document.addEventListener( 'keyup', function ( event ) {
+				if ( WEBVR.isAvailable() === true ) {
 
-					switch ( event.keyCode ) {
-						case 90:
-							controls.zeroSensor();
-							break;
-					}
+					this.dom.appendChild( WEBVR.getButton( effect ) );
 
-				} );
+				}
 
-				this.dom.addEventListener( 'dblclick', function () {
+				if ( WEBVR.isLatestAvailable() === false ) {
 
-					effect.setFullScreen( true );
+					this.dom.appendChild( WEBVR.getMessage() );
 
-				} );
+				}
 
 			}
 
@@ -246,6 +242,13 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
+
+		};
+
+		this.dispose = function () {
+
+			this.dom.removeChild( renderer.domElement );
+			renderer.dispose();
 
 		};
 
