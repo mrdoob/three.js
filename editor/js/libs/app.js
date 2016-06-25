@@ -247,7 +247,12 @@ var APP = {
 
 		this.dispose = function () {
 
-			this.dom.removeChild( renderer.domElement );
+			while ( this.dom.children.length ) {
+
+				this.dom.removeChild( this.dom.firstChild );
+
+			}
+
 			renderer.dispose();
 
 		};
