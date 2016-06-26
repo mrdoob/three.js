@@ -486,6 +486,8 @@ Editor.prototype = {
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				editable: this.config.getKey( 'project/editable' ),
+				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
+				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
