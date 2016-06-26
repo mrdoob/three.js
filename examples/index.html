@@ -284,9 +284,14 @@
 		button.id = 'button';
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
-
-			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
-
+			try{
+				var array = location.href.split('/');
+				array.pop();
+				window.open( 'view-source:'+ array.join('/')+ '/' + selected + '.html' );
+			}catch(err){
+				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+				console.log(err);
+			}
 		}, false );
 		button.style.display = 'none';
 		document.body.appendChild( button );
