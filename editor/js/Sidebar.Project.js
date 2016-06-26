@@ -67,7 +67,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 	rendererPropertiesRow.add( rendererAntialias );
-
+	
 	// shadow
 
 	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), 'shadows' ).onChange( function () {
@@ -80,6 +80,26 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( rendererPropertiesRow );
 
+	//gamma input
+	
+	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'gammaInput' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaInput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaInput );
+	
+	//gamma output
+	
+	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'gammaOutput' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaOutput );
+	
 	// Editable
 
 	var editableRow = new UI.Row();
@@ -113,11 +133,11 @@ Sidebar.Project = function ( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows ) {
+	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
 
 		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
 
@@ -127,8 +147,9 @@ Sidebar.Project = function ( editor ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
-
+		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
+		renderer.gammaInput = gammaIn;
+		renderer.gammaOutput = gammaOut;
 		if ( shadows && renderer.shadowMap ) {
 
 			renderer.shadowMap.enabled = true;
