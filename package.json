@@ -20,7 +20,8 @@
     "test": "test"
   },
   "scripts": {
-    "build": "cd ./utils/build && node build.js --include common --include extras",
+    "build": "node utils/build/build.js --include common --include extras",
+    "build-min": "node utils/build/build.js --include common --include extras --minify",
     "dev": "chokidar \"./src/**/*.*\" \"./utils/build/includes/*.*\" --initial -c \"npm run build\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -45,5 +46,5 @@
     "chokidar-cli": "1.2.0",
     "jscs": "^1.13.1",
     "uglify-js": "^2.6.0"
-    }
+  }
 }
