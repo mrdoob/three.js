@@ -399,8 +399,6 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeVertexNormals: function ( areaWeighted ) {
 
-		this.computeFaceNormals();
-
 		if ( areaWeighted === undefined ) areaWeighted = true;
 
 		var v, vl, f, fl, face, vertices;
@@ -440,6 +438,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			}
 
 		} else {
+
+			this.computeFaceNormals();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
