@@ -170,11 +170,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x0a0a0a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;

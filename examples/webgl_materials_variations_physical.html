@@ -78,20 +78,20 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
 					var clearCoat = 1.0 - alpha;
 
-					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
+					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
 						var clearCoatRoughness = 1 - beta;
 
-						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							var reflectivity = 1 - gamma;
 
 							var material = new THREE.MeshPhysicalMaterial( {
-								color: 0x888822,
+								color: 0x880000,
 								metalness: 0,
 								roughness: 0.5,
 								clearCoat: clearCoat,
@@ -156,11 +156,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x0a0a0a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
