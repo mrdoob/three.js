@@ -23,10 +23,11 @@ var APP = {
 		this.load = function ( json ) {
 
 			vr = json.project.vr;
-
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.gammaInput = json.project.gammaInput;
+			renderer.gammaOutput = json.project.gammaOutput;
 
 			if ( json.project.shadows ) {
 
