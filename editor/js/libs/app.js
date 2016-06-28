@@ -27,7 +27,7 @@ var APP = {
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.gammaInput = json.project.gammaInput;
-			renderer.gammaOutput = true;
+			renderer.gammaOutput = json.project.gammaOutput;
 
 			if ( json.project.shadows ) {
 
