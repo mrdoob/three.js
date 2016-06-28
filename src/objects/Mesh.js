@@ -142,34 +142,47 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 		}
 
-		function checkBufferGeometryIntersection( object, raycaster, ray, positions, uvs, a, b, c ) {
+        function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+            vA.x = position.getX( a );
+            vA.y = position.getY( a );
+            vA.z = position.getZ( a );
+            
+            vB.x = position.getX( b );
+            vB.y = position.getY( b );
+            vB.z = position.getZ( b );
+            
+            vC.x = position.getX( c );
+            vC.y = position.getY( c );
+            vC.z = position.getZ( c );
 
-			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
+            var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
-			if ( intersection ) {
+            if ( intersection ) {
 
-				if ( uvs ) {
+                if ( uv ) {
 
-					uvA.fromArray( uvs, a * 2 );
-					uvB.fromArray( uvs, b * 2 );
-					uvC.fromArray( uvs, c * 2 );
+                    uvA.x = uv.getX( a );
+                    uvA.y = uv.getY( a );
 
-					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
+                    uvB.x = uv.getX( b );
+                    uvB.y = uv.getY( b );
 
-				}
+                    uvC.x = uv.getX( c );
+                    uvC.y = uv.getY( c );
 
-				intersection.face = new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) );
-				intersection.faceIndex = a;
+                    intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
 
-			}
+                }
 
-			return intersection;
+                intersection.face = new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) );
+                intersection.faceIndex = a;
 
-		}
+            }
+
+            return intersection;
+
+        }
 
 		return function raycast( raycaster, intersects ) {
 
@@ -207,26 +220,18 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 
 				var a, b, c;
 				var index = geometry.index;
-				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
-
-				if ( attributes.uv !== undefined ) {
-
-					uvs = attributes.uv.array;
-
-				}
+				var position = geometry.attributes.position;
+				var uv = geometry.attributes.uv;
 
 				if ( index !== null ) {
 
-					var indices = index.array;
+					for ( var i = 0, l = index.count; i < l; i += 3 ) {
 
-					for ( var i = 0, l = indices.length; i < l; i += 3 ) {
+						a = index.getX( i );
+						b = index.getX( i + 1 );
+						c = index.getX( i + 2 );
 
-						a = indices[ i ];
-						b = indices[ i + 1 ];
-						c = indices[ i + 2 ];
-
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 						if ( intersection ) {
 
@@ -240,13 +245,13 @@ THREE.Mesh.prototype = Object.assign( Object.create( THREE.Object3D.prototype ),
 				} else {
 
 
-					for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+					for ( var i = 0, l = position.count; i < l; i += 3 ) {
 
-						a = i / 3;
+						a = i;
 						b = a + 1;
 						c = a + 2;
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 						if ( intersection ) {
 
