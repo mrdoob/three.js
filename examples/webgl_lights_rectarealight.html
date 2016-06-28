@@ -35,7 +35,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the rect light's diffuse and specular components - by <a href="http://github.com/abelnation" target="_blank">abelnation</a><br />
+			<a href="http://threejs.org" target="_blank">three.js</a> - Demo of RectAreaLight on Phong and Standard Material Meshes - by <a href="http://github.com/abelnation" target="_blank">abelnation</a><br />
 			Click and drag to move OrbitControls.<br />
 			<br />
 		</div>
@@ -56,24 +56,37 @@
 			var orb = new THREE.OrbitControls( cam, rnd.domElement );
 
 			var scn = new THREE.Scene();
+			var origin = new THREE.Object3D();
 
-			var matParams = {
+			var matPhongParams = {
 				specular: 0xFFFFFF,
 				shininess: 1000
-			}
+			};
+			var matStdParams = {
+				roughness: 0.044676705160855, // calculated from shininess = 1000
+				metalness: 0.0
+			};
 
-			var matFloor = new THREE.MeshPhongMaterial( matParams );
-			var matObjects = new THREE.MeshPhongMaterial( matParams );
+			var matPhongFloor = new THREE.MeshPhongMaterial( matPhongParams );
+			var matPhongObjects = new THREE.MeshPhongMaterial( matPhongParams );
+
+			var matStdFloor = new THREE.MeshStandardMaterial( matStdParams );
+			var matStdObjects = new THREE.MeshStandardMaterial( matStdParams );
 
 			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
 			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
 			var geoSphere = new THREE.SphereGeometry( 1.5, 32, 32 );
 			var geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 100, 16 );
 
-			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
-			var mshBox = new THREE.Mesh( geoBox, matObjects );
-			var mshSphere = new THREE.Mesh( geoSphere, matObjects );
-			var mshKnot = new THREE.Mesh( geoKnot, matObjects );
+			var mshPhongFloor = new THREE.Mesh( geoFloor, matPhongFloor );
+			var mshPhongBox = new THREE.Mesh( geoBox, matPhongObjects );
+			var mshPhongSphere = new THREE.Mesh( geoSphere, matPhongObjects );
+			var mshPhongKnot = new THREE.Mesh( geoKnot, matPhongObjects );
+
+			var mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
+			var mshStdBox = new THREE.Mesh( geoBox, matStdObjects );
+			var mshStdSphere = new THREE.Mesh( geoSphere, matStdObjects );
+			var mshStdKnot = new THREE.Mesh( geoKnot, matStdObjects );
 
 			var amb = new THREE.AmbientLight( 0x000000 );
 
@@ -117,38 +130,59 @@
 				rectLight.position.set( 5, 5, 0 );
 
 				// TODO: ensure RectAreaLight handles target param correctly
-				// rectLight.target = mshBox;
+				// rectLight.target = mshPhongBox;
 
 				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
 				rectLight.add( rectLightHelper );
 
 				// TODO (abelnation): rect light shadow
 
-				matFloor.color.set( 0x808080 );
-				matObjects.color.set( 0xA00000 );
-
-				mshFloor.receiveShadow = true;
-				mshFloor.position.set( 0, 0, 0 );
-
-				mshBox.castShadow = true;
-				mshBox.receiveShadow = true;
-				mshBox.position.set( 0, 5, 0 );
-				mshBox.rotation.set( 0, Math.PI / 2.0, 0 );
-
-				mshSphere.castShadow = true;
-				mshSphere.receiveShadow = true;
-				mshSphere.position.set(-5, 5, 0 );
-
-				mshKnot.position.set( 5, 5, 0 );
-				mshKnot.castShadow = true;
-				mshKnot.receiveShadow = true;
-
 				scn.add( cam );
+				scn.add( origin );
 
-				scn.add( mshFloor );
-				scn.add( mshBox );
-				scn.add( mshSphere );
-				scn.add( mshKnot );
+				matPhongFloor.color.set( 0x808080 );
+				matPhongObjects.color.set( 0xA00000 );
+				matStdFloor.color.set( 0x808080 );
+				matStdObjects.color.set( 0xA00000 );
+
+				mshPhongFloor.receiveShadow = true;
+				mshPhongFloor.position.set( 0, 0, 0 );
+
+				mshPhongBox.castShadow = true;
+				mshPhongBox.receiveShadow = true;
+				mshPhongBox.position.set( 0, 5, 5 );
+				mshPhongBox.rotation.set( 0, Math.PI / 2.0, 0 );
+
+				mshPhongSphere.castShadow = true;
+				mshPhongSphere.receiveShadow = true;
+				mshPhongSphere.position.set(-5, 5, 5 );
+
+				mshPhongKnot.position.set( 5, 5, 5 );
+				mshPhongKnot.castShadow = true;
+				mshPhongKnot.receiveShadow = true;
+
+				scn.add( mshPhongFloor );
+				scn.add( mshPhongBox );
+				scn.add( mshPhongSphere );
+				scn.add( mshPhongKnot );
+
+				mshStdBox.castShadow = true;
+				mshStdBox.receiveShadow = true;
+				mshStdBox.position.set( 0, 5, -5 );
+				mshStdBox.rotation.set( 0, Math.PI / 2.0, 0 );
+
+				mshStdSphere.castShadow = true;
+				mshStdSphere.receiveShadow = true;
+				mshStdSphere.position.set(-5, 5, -5 );
+
+				mshStdKnot.position.set( 5, 5, -5 );
+				mshStdKnot.castShadow = true;
+				mshStdKnot.receiveShadow = true;
+
+				scn.add( mshStdFloor );
+				scn.add( mshStdBox );
+				scn.add( mshStdSphere );
+				scn.add( mshStdKnot );
 
 				scn.add( amb );
 
@@ -168,7 +202,7 @@
 				rnd.setSize( window.innerWidth, window.innerHeight );
 				cam.aspect = ( window.innerWidth / window.innerHeight );
 				cam.updateProjectionMatrix();
-				orb.target = mshBox.position;
+				orb.target = mshPhongBox.position;
 
 			}
 
@@ -198,7 +232,7 @@
 				// move light in circle around center
 				// change light height with sine curve
 
-				var r = 10.0;
+				var r = 15.0;
 
 				var lx = r * Math.cos( t );
 				var lz = r * Math.sin( t );
@@ -206,7 +240,7 @@
 				var ly = 5.0 + 5.0 * Math.sin( t / 3.0 );
 
 				rectLight.position.set( lx, ly, lz );
-				rectLight.lookAt( mshBox.position );
+				rectLight.lookAt( origin.position );
 				rectLight.updateMatrixWorld();
 
 			}
@@ -233,70 +267,117 @@
 
 			}
 
+			function blinnToGGX( blinnExp ) {
+				return Math.sqrt( 2.0 / ( blinnExp + 2.0 ) );
+			}
+
+			function GGXToBlinn( roughness ) {
+				return ( 2.0 / Math.pow( roughness + 0.0001, 2 ) - 2.0 );
+			}
+
 			function buildGui() {
 
 				clearGui();
 
 				param = {
 					motion: true,
-					'light color': rectLight.color.getHex(),
-					'floor color': matFloor.color.getHex(),
-					'object color': matObjects.color.getHex(),
-					'ambient light color': amb.color.getHex(),
-					intensity: rectLight.intensity,
 					width: rectLight.width,
 					height: rectLight.height,
-					shininess: matFloor.shininess,
+					color: rectLight.color.getHex(),
+					intensity: rectLight.intensity,
+					'ambient light color': amb.color.getHex(),
+					'floor color p': matPhongFloor.color.getHex(),
+					'object color p': matPhongObjects.color.getHex(),
+					'shininess p': matPhongFloor.shininess,
+					'floor color s': matStdFloor.color.getHex(),
+					'object color s': matStdObjects.color.getHex(),
+					'roughness s': matStdFloor.roughness,
+					'metalness s': matStdFloor.metalness,
+
 				};
 
 				gui.add( param, 'motion' );
 
-				gui.add( param, 'width', 0.1, 20).onChange( function ( val ) {
+				var lightFolder = gui.addFolder( 'Light' );
+				lightFolder.add( param, 'width', 0.1, 20).onChange( function ( val ) {
 
 					rectLight.width = val;
 
 				} );
 
-				gui.add( param, 'height', 0.1, 20).onChange( function ( val ) {
+				lightFolder.add( param, 'height', 0.1, 20).onChange( function ( val ) {
 
 					rectLight.height = val;
 
 				} );
 
-				gui.addColor( param, 'light color' ).onChange( function ( val ) {
+				lightFolder.addColor( param, 'color' ).onChange( function ( val ) {
 
 					rectLight.color.setHex( val );
 
 				} );
 
-				gui.addColor( param, 'floor color' ).onChange( function ( val ) {
-
-					matFloor.color.setHex( val );
-
-				} );
-
-				gui.addColor( param, 'object color' ).onChange( function ( val ) {
-
-					matObjects.color.setHex( val );
-
-				} );
-
-				gui.addColor( param, 'ambient light color' ).onChange( function ( val ) {
-
-					amb.color.setHex( val );
-
-				} );
-
-				gui.add( param, 'intensity', 0, 200 ).onChange( function ( val ) {
+				lightFolder.add( param, 'intensity', 0.0, 200.0 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
 
 				} );
 
-				gui.add( param, 'shininess', 0, 1000 ).onChange( function ( val ) {
+				lightFolder.addColor( param, 'ambient light color' ).onChange( function ( val ) {
 
-					matObjects.shininess = val;
-					matFloor.shininess = val;
+					amb.color.setHex( val );
+
+				} );
+
+				var phongFolder = gui.addFolder( 'Phong Material' );
+				phongFolder.addColor( param, 'floor color p' ).onChange( function ( val ) {
+
+						matPhongFloor.color.setHex( val );
+
+					} );
+
+				phongFolder.addColor( param, 'object color p' ).onChange( function ( val ) {
+
+					matPhongObjects.color.setHex( val );
+
+				} );
+
+				phongFolder.add( param, 'shininess p', 0.0, 1000.0 ).listen().onChange( function ( val ) {
+
+					matPhongObjects.shininess = val;
+					matPhongFloor.shininess = val;
+
+					param['roughness s'] = blinnToGGX( val );
+
+				} );
+
+				var standardFolder = gui.addFolder( 'Standard Material' );
+				standardFolder.addColor( param, 'floor color s' ).onChange( function ( val ) {
+
+					matStdFloor.color.setHex( val );
+
+				} );
+
+				standardFolder.addColor( param, 'object color s' ).onChange( function ( val ) {
+
+					matStdObjects.color.setHex( val );
+
+				} );
+
+				standardFolder.add( param, 'roughness s', 0.0, 1.0 ).listen().onChange( function ( val ) {
+
+					matStdObjects.roughness = val;
+					matStdFloor.roughness = val;
+
+					param['shininess p'] = GGXToBlinn( val );
+
+				} );
+
+				// TODO (abelnation): use env map to reflect metal property
+				standardFolder.add( param, 'metalness s', 0.0, 1.0 ).onChange( function ( val ) {
+
+					matStdObjects.metalness = val;
+					matStdFloor.metalness = val;
 
 				} );
 

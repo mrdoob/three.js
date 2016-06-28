@@ -18,8 +18,8 @@ struct BlinnPhongMaterial {
 
 void RE_Direct_RectArea_BlinnPhong( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 matDiffColor =  material.diffuseColor;
-	vec3 matSpecColor =  material.specularColor;
+	vec3 matDiffColor = material.diffuseColor;
+	vec3 matSpecColor = material.specularColor;
 	vec3 lightColor   = rectAreaLight.color;
 
 	float roughness = BlinnExponentToGGXRoughness( material.specularShininess );
@@ -32,7 +32,7 @@ void RE_Direct_RectArea_BlinnPhong( const in RectAreaLight rectAreaLight, const 
 			ltcMat, ltcMag );
 	vec3 diff = Rect_Area_Light_Diffuse_Reflectance(
 			geometry,
-			rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight);
+			rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
 
 	// TODO (abelnation): note why division by 2PI is necessary
 	reflectedLight.directSpecular += lightColor * matSpecColor * spec / PI2;
