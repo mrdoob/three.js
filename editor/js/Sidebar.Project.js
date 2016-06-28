@@ -57,8 +57,7 @@ Sidebar.Project = function ( editor ) {
 
 	// antialiasing
 
-	var rendererPropertiesRow = new UI.Row();
-	rendererPropertiesRow.add( new UI.Text( '' ).setWidth( '90px' ) );
+	var rendererPropertiesRow = new UI.Row().setMarginLeft( '90px' );
 
 	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
 
@@ -67,7 +66,7 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 	rendererPropertiesRow.add( rendererAntialias );
-	
+
 	// shadow
 
 	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), 'shadows' ).onChange( function () {
@@ -78,28 +77,30 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	container.add( rendererPropertiesRow );
+	rendererPropertiesRow.add( new UI.Break() );
 
-	//gamma input
-	
-	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'gammaInput' ).onChange( function () {
+	// gamma input
+
+	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'γ input' ).onChange( function () {
 
 		config.setKey( 'project/renderer/gammaInput', this.getValue() );
 		updateRenderer();
 
 	} );
 	rendererPropertiesRow.add( rendererGammaInput );
-	
-	//gamma output
-	
-	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'gammaOutput' ).onChange( function () {
+
+	// gamma output
+
+	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'γ output' ).onChange( function () {
 
 		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
 		updateRenderer();
 
 	} );
 	rendererPropertiesRow.add( rendererGammaOutput );
-	
+
+	container.add( rendererPropertiesRow );
+
 	// Editable
 
 	var editableRow = new UI.Row();

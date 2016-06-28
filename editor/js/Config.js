@@ -10,10 +10,9 @@ var Config = function ( name ) {
 
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
-		'project/renderer/shadows': true,
-		'project/renderer/softShadows': false,
 		'project/renderer/gammaInput': false,
 		'project/renderer/gammaOutput': false,
+		'project/renderer/shadows': true,
 		'project/editable': false,
 		'project/vr': false,
 
