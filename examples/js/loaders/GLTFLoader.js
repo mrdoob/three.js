@@ -193,17 +193,21 @@ THREE.GLTFLoader.prototype = {
 
 			var values = material.values;
 
-			if ( Array.isArray( values.diffuse ) ) _material.color.fromArray( values.diffuse );
+			if ( Array.isArray( values.diffuse ) ) {
+
+					_material.color.fromArray( values.diffuse );
+
+			} else if ( typeof( values.diffuse ) === 'string' ) {
+
+					_material.map = library.textures[ values.diffuse ];
+
+			}
+
 			if ( Array.isArray( values.emission ) ) _material.emissive.fromArray( values.emission );
 			if ( Array.isArray( values.specular ) ) _material.specular.fromArray( values.specular );
 
 			if ( values.shininess !== undefined ) _material.shininess = values.shininess;
 
-			if ( typeof( material.values.diffuse ) === 'string' ) {
-
-				_material.map = library.textures[ material.values.diffuse ];
-
-			}
 
 			library.materials[ materialId ] = _material;
 
