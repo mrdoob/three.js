@@ -401,6 +401,8 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 				}
 
+				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
+
 				textures[ data.uuid ] = texture;
 
 			}
