@@ -865,7 +865,17 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
+
+		var isRoot = meta === undefined;
+
+		if ( isRoot ) {
+
+			meta = {
+				buffers: {}
+			};
+
+		}
 
 		var data = {
 			metadata: {
@@ -910,20 +920,47 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		var attributes = this.attributes;
+		var attributes = this.attributes,
+			attribute, array;
 
 		for ( var key in attributes ) {
 
-			var attribute = attributes[ key ];
+			attribute = attributes[ key ];
 
-			var array = Array.prototype.slice.call( attribute.array );
+			if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			data.data.attributes[ key ] = {
-				itemSize: attribute.itemSize,
-				type: attribute.array.constructor.name,
-				array: array,
-				normalized: attribute.normalized
-			};
+				if ( meta.buffers[ attribute.data.uuid ] === undefined ) {
+
+					array = Array.prototype.slice.call( attribute.data.array );
+
+					meta.buffers[ attribute.data.uuid ] = {
+						id: attribute.data.uuid,
+						type: attribute.data.array.constructor.name,
+						array: array,
+						stride: attribute.data.stride
+					};
+
+				}
+
+				data.data.attributes[ key ] = {
+					buffer: attribute.data.uuid,
+					itemSize: attribute.itemSize,
+					offset: attribute.offset,
+					normalized: attribute.normalized
+				};
+
+			} else {
+
+				array = Array.prototype.slice.call( attribute.array );
+
+				data.data.attributes[ key ] = {
+					itemSize: attribute.itemSize,
+					type: attribute.array.constructor.name,
+					array: array,
+					normalized: attribute.normalized
+				};
+
+			}
 
 		}
 
@@ -943,6 +980,30 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
 			};
+
+		}
+
+		function extractFromCache ( cache ) {
+
+			var values = [];
+
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+
+			return values;
+
+		}
+
+		if ( isRoot ) {
+
+			var buffers = extractFromCache( meta.buffers );
+
+			if ( buffers.length > 0 ) data.buffers = buffers;
 
 		}
 
