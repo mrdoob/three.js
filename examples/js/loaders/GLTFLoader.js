@@ -55,6 +55,8 @@ THREE.GLTFLoader.prototype = {
 			buffers: {},
 			bufferViews: {},
 			accessors: {},
+			textures: {},
+			materials: {},
 			meshes: {},
 			nodes: {},
 			scenes: {}
@@ -127,6 +129,86 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
+		// textures
+
+		var FILTERS = {
+			9728: THREE.NearestFilter,
+			9729: THREE.LinearFilter,
+			9984: THREE.NearestMipMapNearestFilter,
+			9985: THREE.LinearMipMapNearestFilter,
+			9986: THREE.NearestMipMapLinearFilter,
+			9987: THREE.LinearMipMapLinearFilter
+		};
+
+		var WRAPPINGS = {
+			33071: THREE.ClampToEdgeWrapping,
+			33648: THREE.MirroredRepeatWrapping,
+			10497: THREE.RepeatWrapping
+		};
+
+		var textures = json.textures;
+
+		for ( var textureId in textures ) {
+
+			var texture = textures[ textureId ];
+
+			var _texture = new THREE.Texture();
+			_texture.flipY = false;
+
+			if ( texture.source ) {
+
+				var source = json.images[ texture.source ];
+
+				_texture.image = new Image();
+				_texture.image.src = source.uri;
+				_texture.needsUpdate = true;
+
+			}
+
+			if ( texture.sampler ) {
+
+				var sampler = json.samplers[ texture.sampler ];
+
+				_texture.magFilter = FILTERS[ sampler.magFilter ];
+				_texture.minFilter = FILTERS[ sampler.minFilter ];
+				_texture.wrapS = WRAPPINGS[ sampler.wrapS ];
+				_texture.wrapT = WRAPPINGS[ sampler.wrapT ];
+
+			}
+
+			library.textures[ textureId ] = _texture;
+
+		}
+
+		// materials
+
+		var materials = json.materials;
+
+		for ( var materialId in materials ) {
+
+			var material = materials[ materialId ];
+
+			var _material = new THREE.MeshPhongMaterial();
+			_material.name = material.name;
+
+			var values = material.values;
+
+			if ( Array.isArray( values.diffuse ) ) _material.color.fromArray( values.diffuse );
+			if ( Array.isArray( values.emission ) ) _material.emissive.fromArray( values.emission );
+			if ( Array.isArray( values.specular ) ) _material.specular.fromArray( values.specular );
+
+			if ( values.shininess !== undefined ) _material.shininess = values.shininess;
+
+			if ( typeof( material.values.diffuse ) === 'string' ) {
+
+				_material.map = library.textures[ material.values.diffuse ];
+
+			}
+
+			library.materials[ materialId ] = _material;
+
+		}
+
 		// meshes
 
 		var meshes = json.meshes;
@@ -135,10 +217,8 @@ THREE.GLTFLoader.prototype = {
 
 			var mesh = meshes[ meshId ];
 
-			var geometries = {
-				name: mesh.name,
-				array: []
-			};
+			var group = new THREE.Group();
+			group.name = mesh.name;
 
 			var primitives = mesh.primitives;
 
@@ -178,11 +258,13 @@ THREE.GLTFLoader.prototype = {
 
 				}
 
-				geometries.array.push( geometry );
+				var material = library.materials[ primitive.material ];
+
+				group.add( new THREE.Mesh( geometry, material ) );
 
 			}
 
-			library.meshes[ meshId ] = geometries;
+			library.meshes[ meshId ] = group;
 
 		}
 
@@ -228,20 +310,9 @@ THREE.GLTFLoader.prototype = {
 				for ( var i = 0; i < node.meshes.length; i ++ ) {
 
 					var meshId = node.meshes[ i ];
+					var group = library.meshes[ meshId ];
 
-					var geometries = library.meshes[ meshId ];
-
-					var group = new THREE.Group();
-					group.name = geometries.name;
-					object.add( group );
-
-					var array = geometries.array;
-
-					for ( var j = 0; j < array.length; j ++ ) {
-
-						group.add( new THREE.Mesh( array[ j ], new THREE.MeshNormalMaterial() ) );
-
-					}
+					object.add( group.clone() );
 
 				}
 
