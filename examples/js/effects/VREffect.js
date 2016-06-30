@@ -67,6 +67,12 @@ THREE.VREffect = function ( renderer, onError ) {
 	var rendererSize = renderer.getSize();
 	var rendererPixelRatio = renderer.getPixelRatio();
 
+	this.getVRDisplay = function () {
+
+		return vrHMD;
+
+	};
+
 	this.setSize = function ( width, height ) {
 
 		rendererSize = { width: width, height: height };
