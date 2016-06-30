@@ -123,7 +123,8 @@ THREE.Box3.prototype = {
 
 						var positions = geometry.attributes[ 'position' ].array;
 
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+						// three-bmfont-text creates BufferdGeometries that are not modulo 3 long.
+						for ( var i = 0, il = positions.length; i + 2 < il; i += 3 ) {
 
 							v1.fromArray( positions, i );
 							v1.applyMatrix4( node.matrixWorld );
