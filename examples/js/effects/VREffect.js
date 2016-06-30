@@ -96,6 +96,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	this.setFOV = function(FOVL, FOVR) {
+
+		eyeFOVL = FOVL;
+		eyeFOVR = FOVR;
+
+	};
+
 	// fullscreen
 
 	var canvas = renderer.domElement;
