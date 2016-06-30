@@ -27,8 +27,9 @@ var APP = {
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.gammaInput = json.project.gammaInput;
-			renderer.gammaOutput = json.project.gammaOutput;
+
+			if ( json.project.gammaInput ) renderer.gammaInput = true;
+			if ( json.project.gammaOutput ) renderer.gammaOutput = true;
 
 			if ( json.project.shadows ) {
 
