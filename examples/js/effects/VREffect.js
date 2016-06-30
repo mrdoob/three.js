@@ -287,7 +287,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
 
 			renderer.setScissorTest( true );
-			renderer.clear();
+			if ( renderer.autoClear ) renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
