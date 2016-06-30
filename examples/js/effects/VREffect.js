@@ -233,6 +233,20 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	this.requestAnimationFrame = function ( f ) {
+
+		if ( ! isDeprecatedAPI && vrHMD !== undefined ) {
+
+			vrHMD.requestAnimationFrame( f );
+
+		} else {
+
+			window.requestAnimationFrame( f );
+
+		}
+
+	};
+
 	// render
 
 	var cameraL = new THREE.PerspectiveCamera();
