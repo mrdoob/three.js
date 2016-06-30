@@ -13,13 +13,15 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	var isWebVR1 = true;
 
-	var vrDisplay;
+	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
 
 	function gotVRDisplays( displays ) {
+
+		vrDisplays = displays;
 
 		for ( var i = 0; i < displays.length; i ++ ) {
 
@@ -71,6 +73,12 @@ THREE.VREffect = function ( renderer, onError ) {
 	this.getVRDisplay = function () {
 
 		return vrDisplay;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		return vrDisplays;
 
 	};
 

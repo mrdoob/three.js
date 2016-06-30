@@ -7,7 +7,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrDisplay;
+	var vrDisplay, vrDisplays;
 
 	var standingMatrix = new THREE.Matrix4();
 
@@ -63,6 +63,12 @@ THREE.VRControls = function ( object, onError ) {
 	this.getVRDisplay = function () {
 
 		return vrDisplay;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		return vrDisplays;
 
 	};
 
