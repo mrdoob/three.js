@@ -17253,7 +17253,7 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
  * @author tschw
  */
 
-THREE.PerspectiveCamera = function( fov, aspect, near, far ) {
+THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	THREE.Camera.call( this );
 
@@ -25067,23 +25067,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var backgroundCamera2 = new THREE.PerspectiveCamera();
 	var backgroundPlaneMesh = new THREE.Mesh(
 		new THREE.PlaneBufferGeometry( 2, 2 ),
-		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
+		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 	);
 	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
-	var backgroundBoxSubdiv = capabilities.logarithmicDepthBuffer ? 4 : 1; // Workaround for logarithmicDepthBuffer #9235
 	var backgroundBoxMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5, backgroundBoxSubdiv, backgroundBoxSubdiv, backgroundBoxSubdiv ),
+		new THREE.BoxBufferGeometry( 5, 5, 5, 2, 2, 2 ),
 		new THREE.ShaderMaterial( {
 			uniforms: backgroundBoxShader.uniforms,
 			vertexShader: backgroundBoxShader.vertexShader,
 			fragmentShader: backgroundBoxShader.fragmentShader,
+			side: THREE.BackSide,
 			depthTest: false,
 			depthWrite: false,
-			side: THREE.BackSide
+			fog: false
 		} )
 	);
-	objects.update( backgroundPlaneMesh );
-	objects.update( backgroundBoxMesh );
 
 	//
 
@@ -25995,11 +25993,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
 			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
 
+			objects.update( backgroundBoxMesh );
+
 			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
 
 		} else if ( background instanceof THREE.Texture ) {
 
 			backgroundPlaneMesh.material.map = background;
+
+			objects.update( backgroundPlaneMesh );
 
 			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
 
@@ -29396,7 +29398,7 @@ THREE.WebGLPrograms = function ( renderer, capabilities ) {
 
 			vertexColors: material.vertexColors,
 
-			fog: fog,
+			fog: !! fog,
 			useFog: material.fog,
 			fogExp: fog instanceof THREE.FogExp2,
 
