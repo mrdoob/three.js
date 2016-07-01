@@ -25071,7 +25071,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	);
 	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
 	var backgroundBoxMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5, 2, 2, 2 ),
+		new THREE.BoxBufferGeometry( 5, 5, 5 ),
 		new THREE.ShaderMaterial( {
 			uniforms: backgroundBoxShader.uniforms,
 			vertexShader: backgroundBoxShader.vertexShader,
