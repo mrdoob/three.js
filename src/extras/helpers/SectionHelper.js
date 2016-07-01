@@ -1,7 +1,6 @@
 /**
  * Will draw a mesh with backside material or color set to the passed value.
- * Can be used for faking a sliced geometry.
- * A demo can be found here:
+ * Can be used for faking the cutting plane of a sliced geometry.
  *
  * @author wilt
  * Based on THREE.EdgesHelper by WestLangley / http://github.com/WestLangley
