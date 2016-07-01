@@ -21,7 +21,6 @@ option_ignore_texture_collision = False
 option_texture_output_dir = 'maps'
 option_transparency_detection = True
 option_prefix = True
-option_geometry = False
 option_forced_y_up = False
 option_default_camera = False
 option_default_light = False
@@ -45,14 +44,14 @@ copied_texture_dict = {}
 WEB_FORMATS = ['PNG', 'JPEG', 'GIF']
 
 FBX_TEXTURE_BINDINGS = {
-  'DiffuseColor': 'map',
-  'EmissiveColor': 'emissiveMap',
-  'SpecularColor': 'specularMap',
-  'NormalMap': 'normalMap',
-  'Bump': 'bumpMap',
-  'TransparencyFactor': 'alphaMap',
-  'ReflectionColor': 'envMap',
-  'AmbientFactor': 'aoMap'
+    'DiffuseColor': 'map',
+    'EmissiveColor': 'emissiveMap',
+    'SpecularColor': 'specularMap',
+    'NormalMap': 'normalMap',
+    'Bump': 'bumpMap',
+    'TransparencyFactor': 'alphaMap',
+    'ReflectionColor': 'envMap',
+    'AmbientFactor': 'aoMap'
 }
 
 THREE_REPEAT_WRAPPING = 1000
@@ -358,11 +357,11 @@ def generate_material_object(material, texture_dict, material_list, material_dic
 
         material_type = 'MeshLambertMaterial'
         material_object = {
-          'color': diffuse,
-          'emissive': emissive,
-          'reflectivity': reflectivity,
-          'transparent': transparent,
-          'opacity': opacity
+            'color': diffuse,
+            'emissive': emissive,
+            'reflectivity': reflectivity,
+            'transparent': transparent,
+            'opacity': opacity
         }
 
     elif material.GetClassId().Is(FbxSurfacePhong.ClassId):
@@ -378,14 +377,14 @@ def generate_material_object(material, texture_dict, material_list, material_dic
 
         material_type = 'MeshPhongMaterial'
         material_object = {
-          'color': diffuse,
-          'emissive': emissive,
-          'specular': specular,
-          'shininess': shininess,
-          'bumpScale': bump_scale,
-          'reflectivity': reflectivity,
-          'transparent': transparent,
-          'opacity': opacity
+            'color': diffuse,
+            'emissive': emissive,
+            'specular': specular,
+            'shininess': shininess,
+            'bumpScale': bump_scale,
+            'reflectivity': reflectivity,
+            'transparent': transparent,
+            'opacity': opacity
         }
 
     else:
@@ -401,11 +400,11 @@ def generate_material_object(material, texture_dict, material_list, material_dic
 
         material_type = 'MeshBasicMaterial'
         material_object = {
-          'color': diffuse,
-          'emissive': emissive,
-          'reflectivity': reflectivity,
-          'transparent': transparent,
-          'opacity': opacity
+            'color': diffuse,
+            'emissive': emissive,
+            'reflectivity': reflectivity,
+            'transparent': transparent,
+            'opacity': opacity
         }
 
     if option_textures:
@@ -437,10 +436,10 @@ def generate_multi_material_object(node, submaterial_uuids, material_list, mater
     material_name = get_multi_material_name(node)
 
     material_list.append({
-      type_key: material_type,
-      uuid_key: material_uuid,
-      name_key: material_name,
-      'referencedMaterials': submaterial_uuids
+        type_key: material_type,
+        uuid_key: material_uuid,
+        name_key: material_name,
+        'referencedMaterials': submaterial_uuids
     })
     material_dict[material_name] = material_uuid
 
@@ -583,15 +582,15 @@ def generate_texture_data(texture, image_dict, texture_list, texture_dict):
         texture_uuid = str(uuid.uuid4())
 
         texture_list.append({
-          uuid_key: texture_uuid,
-          name_key: texture_name,
-          'image': image_uuid,
-          'wrap': [wrap_mode_s, wrap_mode_t],
-          'repeat': serialize_vector2((repeat_s, repeat_t)),
-          'offset': serialize_vector2(texture.GetUVTranslation()),
-          'magFilter': THREE_LINEAR_FILTER,
-          'minFilter': THREE_LINEAR_MIP_MAP_LINEAR_FILTER,
-          'anisotropy': True
+            uuid_key: texture_uuid,
+            name_key: texture_name,
+            'image': image_uuid,
+            'wrap': [wrap_mode_s, wrap_mode_t],
+            'repeat': serialize_vector2((repeat_s, repeat_t)),
+            'offset': serialize_vector2(texture.GetUVTranslation()),
+            'magFilter': THREE_LINEAR_FILTER,
+            'minFilter': THREE_LINEAR_MIP_MAP_LINEAR_FILTER,
+            'anisotropy': True
         })
         texture_dict[texture_name] = texture_uuid
 
@@ -696,13 +695,7 @@ def extract_fbx_vertex_positions(mesh):
 
         transform = None
 
-        if option_geometry:
-            # FbxMeshes are local to their node, we need the vertices in global space
-            # when scene nodes are not exported
-            transform = node.EvaluateGlobalTransform()
-            transform = FbxMatrix(transform) * geo_transform
-
-        elif has_geometric_transform:
+        if has_geometric_transform:
             transform = geo_transform
 
         if transform:
@@ -769,13 +762,7 @@ def extract_fbx_vertex_normals(mesh):
 
             transform = None
 
-            if option_geometry:
-                # FbxMeshes are local to their node, we need the vertices in global space
-                # when scene nodes are not exported
-                transform = node.EvaluateGlobalTransform()
-                transform = FbxMatrix(transform) * geo_transform
-
-            elif has_geometric_transform:
+            if has_geometric_transform:
                 transform = geo_transform
 
             if transform:
@@ -1153,7 +1140,7 @@ def generate_uv_indices_for_poly(poly_index, mesh_uv_values, mesh_uv_indices, uv
 
     return output_poly_uv_indices
 
-def process_mesh_vertices(mesh_list):
+def process_geometry_vertices(mesh_list):
     vertex_offset = 0
     vertex_offset_list = [0]
     vertices = []
@@ -1165,7 +1152,6 @@ def process_mesh_vertices(mesh_list):
         vertex_offset_list.append(vertex_offset)
 
     return vertices, vertex_offset_list
-
 
 def process_mesh_materials(mesh_list):
     material_offset = 0
@@ -1380,197 +1366,106 @@ def generate_mesh_face(mesh, polygon_index, vertex_indices, normals, colors, uv_
 # #####################################################
 # Generate JSONLoader compatible Geometry
 # #####################################################
-def generate_geometry_data(node, geometry_dict):
-    mesh = node.GetNodeAttribute()
+def generate_geometry_data(node):
+    geometry = node.GetNodeAttribute()
 
     # This is done in order to keep the scene output and non-scene output code DRY
-    mesh_list = [ mesh ]
+    geometry_list = [ geometry ]
 
     # Extract the mesh data into arrays
-    vertices, vertex_offsets = process_mesh_vertices(mesh_list)
-    materials, material_offsets = process_mesh_materials(mesh_list)
+    vertices, vertex_offsets = process_geometry_vertices(geometry_list)
+    materials, material_offsets = process_mesh_materials(geometry_list)
 
-    normals_to_indices = generate_unique_normals_dictionary(mesh_list)
-    colors_to_indices = generate_unique_colors_dictionary(mesh_list)
-    uvs_to_indices_list = generate_unique_uvs_dictionary_layers(mesh_list)
-
-    normal_values = generate_normals_from_dictionary(normals_to_indices)
-    color_values = generate_colors_from_dictionary(colors_to_indices)
-    uv_values = generate_uvs_from_dictionary_layers(uvs_to_indices_list)
-
-    # Generate mesh faces for the Three.js file format
-    faces = process_mesh_polygons(mesh_list,
-                                  normals_to_indices,
-                                  colors_to_indices,
-                                  uvs_to_indices_list,
-                                  vertex_offsets,
-                                  material_offsets)
-
-    # Generate counts for uvs, vertices, normals, colors, and faces
-    nuvs = []
-    for layer_index, uvs in enumerate(uv_values):
-        nuvs.append(str(len(uvs)))
-
+    # Count then flatten vertices
     nvertices = len(vertices)
-    nnormals = len(normal_values)
-    ncolors = len(color_values)
-    nfaces = len(faces)
-
-    # Flatten the arrays, currently they are in the form of [[0, 1, 2], [3, 4, 5], ...]
     vertices = [val for v in vertices for val in v]
-    normal_values = [val for n in normal_values for val in n]
-    color_values = [c for c in color_values]
-    faces = [val for f in faces for val in f]
-    uv_values = generate_uvs(uv_values)
 
     # Disable automatic json indenting when pretty printing for the arrays
     if option_pretty_print:
-        nuvs = NoIndent(nuvs)
         vertices = ChunkedIndent(vertices, 15, True)
-        normal_values = ChunkedIndent(normal_values, 15, True)
-        color_values = ChunkedIndent(color_values, 15)
-        faces = ChunkedIndent(faces, 30)
 
     metadata = {
-      'vertices': nvertices,
-      'normals': nnormals,
-      'colors': ncolors,
-      'faces': nfaces,
-      'uvs': nuvs
+        'vertices': nvertices
     }
+
+    if geometry.GetAttributeType() == FbxNodeAttribute.eMesh:
+        normals_to_indices = generate_unique_normals_dictionary(geometry_list)
+        colors_to_indices = generate_unique_colors_dictionary(geometry_list)
+        uvs_to_indices_list = generate_unique_uvs_dictionary_layers(geometry_list)
+
+        normal_values = generate_normals_from_dictionary(normals_to_indices)
+        color_values = generate_colors_from_dictionary(colors_to_indices)
+        uv_values = generate_uvs_from_dictionary_layers(uvs_to_indices_list)
+
+        # Generate mesh faces for the Three.js file format
+        faces = process_mesh_polygons(geometry_list,
+                                      normals_to_indices,
+                                      colors_to_indices,
+                                      uvs_to_indices_list,
+                                      vertex_offsets,
+                                      material_offsets)
+
+        # Generate counts for uvs, normals, colors, and faces
+        nuvs = []
+        for layer_index, uvs in enumerate(uv_values):
+            nuvs.append(str(len(uvs)))
+
+        nnormals = len(normal_values)
+        ncolors = len(color_values)
+        nfaces = len(faces)
+
+        # Flatten the arrays, currently they are in the form of [[0, 1, 2], [3, 4, 5], ...]
+        normal_values = [val for n in normal_values for val in n]
+        color_values = [c for c in color_values]
+        faces = [val for f in faces for val in f]
+        uv_values = generate_uvs(uv_values)
+
+        # Disable automatic json indenting when pretty printing for the arrays
+        if option_pretty_print:
+            nuvs = NoIndent(nuvs)
+            normal_values = ChunkedIndent(normal_values, 15, True)
+            color_values = ChunkedIndent(color_values, 15)
+            faces = ChunkedIndent(faces, 30)
+
+        metadata['normals'] = nnormals
+        metadata['colors'] = ncolors
+        metadata['faces'] = nfaces
+        metadata['uvs'] = nuvs
+    else:
+        normal_values = None
+        color_values = None
+        uv_values = None
+        faces = None
 
     geometry_name = get_geometry_name(node)
 
     return {
-      name_key: geometry_name,
-      'scale': 1,
-      'vertices': vertices,
-      'normals': [] if nnormals <= 0 else normal_values,
-      'colors': [] if ncolors <= 0 else color_values,
-      'uvs': uv_values,
-      'faces': faces,
-      metadata_key: metadata
+        name_key: geometry_name,
+        'scale': 1,
+        'vertices': vertices,
+        'normals': [] if not normal_values else normal_values,
+        'colors': [] if not color_values else color_values,
+        'uvs': [] if not uv_values else uv_values,
+        'faces': [] if not faces else faces,
+        metadata_key: metadata
     }
-
-# #####################################################
-# Generate Mesh Object (for non-scene output)
-# #####################################################
-def generate_non_scene_output(scene):
-    mesh_list = generate_mesh_list(scene)
-
-    # Extract the mesh data into arrays
-    vertices, vertex_offsets = process_mesh_vertices(mesh_list)
-    materials, material_offsets = process_mesh_materials(mesh_list)
-
-    normals_to_indices = generate_unique_normals_dictionary(mesh_list)
-    colors_to_indices = generate_unique_colors_dictionary(mesh_list)
-    uvs_to_indices_list = generate_unique_uvs_dictionary_layers(mesh_list)
-
-    normal_values = generate_normals_from_dictionary(normals_to_indices)
-    color_values = generate_colors_from_dictionary(colors_to_indices)
-    uv_values = generate_uvs_from_dictionary_layers(uvs_to_indices_list)
-
-    # Generate mesh faces for the Three.js file format
-    faces = process_mesh_polygons(mesh_list,
-                                  normals_to_indices,
-                                  colors_to_indices,
-                                  uvs_to_indices_list,
-                                  vertex_offsets,
-                                  material_offsets)
-
-    # Generate counts for uvs, vertices, normals, colors, and faces
-    nuvs = []
-    for layer_index, uvs in enumerate(uv_values):
-        nuvs.append(str(len(uvs)))
-
-    nvertices = len(vertices)
-    nnormals = len(normal_values)
-    ncolors = len(color_values)
-    nfaces = len(faces)
-
-    # Flatten the arrays, currently they are in the form of [[0, 1, 2], [3, 4, 5], ...]
-    vertices = [val for v in vertices for val in v]
-    normal_values = [val for n in normal_values for val in n]
-    color_values = [c for c in color_values]
-    faces = [val for f in faces for val in f]
-    uv_values = generate_uvs(uv_values)
-
-    # Disable json indenting when pretty printing for the arrays
-    if option_pretty_print:
-        nuvs = NoIndent(nuvs)
-        vertices = NoIndent(vertices)
-        normal_values = NoIndent(normal_values)
-        color_values = NoIndent(color_values)
-        faces = NoIndent(faces)
-
-    metadata = {
-      'formatVersion': 3,
-      type_key: 'geometry',
-      'generatedBy': 'convert-to-threejs.py',
-      'vertices': nvertices,
-      'normals': nnormals,
-      'colors': ncolors,
-      'faces': nfaces,
-      'uvs': nuvs
-    }
-
-    return {
-      'scale': 1,
-      'materials': [],
-      'vertices': vertices,
-      'normals': [] if nnormals <= 0 else normal_values,
-      'colors': [] if ncolors <= 0 else color_values,
-      'uvs': uv_values,
-      'faces': faces,
-      metadata_key: metadata
-    }
-
-def generate_mesh_list_from_hierarchy(node, mesh_list):
-    if node.GetNodeAttribute() == None:
-        pass
-    else:
-        attribute_type = (node.GetNodeAttribute().GetAttributeType())
-        if attribute_type == FbxNodeAttribute.eMesh or \
-                        attribute_type == FbxNodeAttribute.eNurbs or \
-                        attribute_type == FbxNodeAttribute.eNurbsSurface or \
-                        attribute_type == FbxNodeAttribute.ePatch:
-
-            if attribute_type != FbxNodeAttribute.eMesh:
-                converter.TriangulateInPlace(node)
-
-            mesh_list.append(node.GetNodeAttribute())
-
-    for i in range(node.GetChildCount()):
-        generate_mesh_list_from_hierarchy(node.GetChild(i), mesh_list)
-
-def generate_mesh_list(scene):
-    mesh_list = []
-    node = scene.GetRootNode()
-    if node:
-        for i in range(node.GetChildCount()):
-            generate_mesh_list_from_hierarchy(node.GetChild(i), mesh_list)
-    return mesh_list
 
 def generate_geometry_list_from_hierarchy(node, geometry_list, geometry_dict):
     if node.GetNodeAttribute() == None:
         pass
     else:
         attribute_type = (node.GetNodeAttribute().GetAttributeType())
-        if attribute_type == FbxNodeAttribute.eMesh or \
-                        attribute_type == FbxNodeAttribute.eNurbs or \
-                        attribute_type == FbxNodeAttribute.eNurbsSurface or \
-                        attribute_type == FbxNodeAttribute.ePatch:
-
-            if attribute_type != FbxNodeAttribute.eMesh:
+        if attribute_type in FBX_GEOMETRY_TYPES:
+            if attribute_type in FBX_ABSTRACT_GEOMETRY_TYPES:
                 converter.TriangulateInPlace(node)
 
-            geometry_data = generate_geometry_data(node, geometry_dict)
+            geometry_data = generate_geometry_data(node)
             geometry_uuid = str(uuid.uuid4())
 
             geometry_list.append({
-              type_key: 'Geometry',
-              uuid_key: geometry_uuid,
-              data_key: geometry_data
+                type_key: 'Geometry',
+                uuid_key: geometry_uuid,
+                data_key: geometry_data
             })
             geometry_dict[geometry_data[name_key]] = geometry_uuid
 
@@ -1636,12 +1531,12 @@ def generate_default_light():
     intensity = 80.0
 
     return {
-      type_key: 'DirectionalLight',
-      uuid_key: str(uuid.uuid4()),
-      name_key: 'DirectionalLight',
-      'color': pack_color(color),
-      'intensity': intensity/100.00,
-      'direction': serialize_vector3(direction)
+        type_key: 'DirectionalLight',
+        uuid_key: str(uuid.uuid4()),
+        name_key: 'DirectionalLight',
+        'color': pack_color(color),
+        'intensity': intensity/100.00,
+        'direction': serialize_vector3(direction)
     }
 
 def generate_light_object(node):
@@ -1670,36 +1565,36 @@ def generate_light_object(node):
             direction = matrix.MultNormalize(FbxVector4(0,1,0,1))
 
         output = {
-          type_key: 'DirectionalLight',
-          'color': pack_color(light.Color.Get()),
-          'intensity': light.Intensity.Get()/100.0,
-          'direction': serialize_vector3(direction),
-          # TODO: ObjectLoader doesn't support targets
-          #'target': getObjectName(node.GetTarget())
+            type_key: 'DirectionalLight',
+            'color': pack_color(light.Color.Get()),
+            'intensity': light.Intensity.Get()/100.0,
+            'direction': serialize_vector3(direction),
+            # TODO: ObjectLoader doesn't support targets
+            #'target': getObjectName(node.GetTarget())
         }
 
     elif light_type == "point":
 
         output = {
-          type_key: 'PointLight',
-          'color': pack_color(light.Color.Get()),
-          'intensity': light.Intensity.Get()/100.0,
-          'position': serialize_vector3(position),
-          'distance': light.FarAttenuationEnd.Get()
+            type_key: 'PointLight',
+            'color': pack_color(light.Color.Get()),
+            'intensity': light.Intensity.Get()/100.0,
+            'position': serialize_vector3(position),
+            'distance': light.FarAttenuationEnd.Get()
         }
 
     elif light_type == "spot":
 
         output = {
-          type_key: 'SpotLight',
-          'color': pack_color(light.Color.Get()),
-          'intensity': light.Intensity.Get()/100.0,
-          'position': serialize_vector3(position),
-          'distance': light.FarAttenuationEnd.Get(),
-          'angle': light.OuterAngle.Get()*math.pi/180,
-          'exponent': light.DecayType.Get(),
-          # TODO: ObjectLoader doesn't support targets
-          #'target': getObjectName(node.GetTarget())
+            type_key: 'SpotLight',
+            'color': pack_color(light.Color.Get()),
+            'intensity': light.Intensity.Get()/100.0,
+            'position': serialize_vector3(position),
+            'distance': light.FarAttenuationEnd.Get(),
+            'angle': light.OuterAngle.Get()*math.pi/180,
+            'exponent': light.DecayType.Get(),
+            # TODO: ObjectLoader doesn't support targets
+            #'target': getObjectName(node.GetTarget())
         }
 
     return output
@@ -1714,10 +1609,10 @@ def generate_ambient_light(scene):
         return None
 
     return {
-      type_key: 'AmbientLight',
-      uuid_key: str(uuid.uuid4()),
-      name_key: 'AmbientLight',
-      'color': pack_color(ambient_color),
+        type_key: 'AmbientLight',
+        uuid_key: str(uuid.uuid4()),
+        name_key: 'AmbientLight',
+        'color': pack_color(ambient_color),
     }
 
 # #####################################################
@@ -1730,13 +1625,13 @@ def generate_default_camera():
     fov = 75
 
     return {
-      type_key: 'PerspectiveCamera',
-      uuid_key: str(uuid.uuid4()),
-      name_key: 'DefaultCamera',
-      'fov': fov,
-      'near': near,
-      'far': far,
-      'position': serialize_vector3(position)
+        type_key: 'PerspectiveCamera',
+        uuid_key: str(uuid.uuid4()),
+        name_key: 'DefaultCamera',
+        'fov': fov,
+        'near': near,
+        'far': far,
+        'position': serialize_vector3(position)
     }
 
 def generate_camera_object(node):
@@ -1757,12 +1652,12 @@ def generate_camera_object(node):
         fov = camera.FieldOfView.Get()
 
         output = {
-          type_key: 'PerspectiveCamera',
-          'fov': fov,
-          'aspect': aspect,
-          'near': near,
-          'far': far,
-          'position': serialize_vector3(position)
+            type_key: 'PerspectiveCamera',
+            'fov': fov,
+            'aspect': aspect,
+            'near': near,
+            'far': far,
+            'position': serialize_vector3(position)
         }
 
     elif projection == "orthogonal":
@@ -1773,47 +1668,46 @@ def generate_camera_object(node):
         bottom = ""
 
         output = {
-          type_key: 'PerspectiveCamera',
-          'left': left,
-          'right': right,
-          'top': top,
-          'bottom': bottom,
-          'near': near,
-          'far': far,
-          'position': serialize_vector3(position)
+            type_key: 'PerspectiveCamera',
+            'left': left,
+            'right': right,
+            'top': top,
+            'bottom': bottom,
+            'near': near,
+            'far': far,
+            'position': serialize_vector3(position)
         }
 
     return output
 
 # #####################################################
-# Generate Mesh Node Object
+# Generate Geometry Node Object
 # #####################################################
-def generate_mesh_object(node, geometry_dict, material_dict):
-    mesh = node.GetNodeAttribute()
+def generate_geometry_object(geometry_type, node, geometry_dict, material_dict):
+    geometry = node.GetNodeAttribute()
     transform = node.EvaluateLocalTransform()
     position = transform.GetT()
     scale = transform.GetS()
     quaternion = transform.GetQ()
 
-    mesh_node = mesh.GetNode() # Same as node unless the mesh is instanced
-    material_count = mesh_node.GetMaterialCount()
+    geometry_node = geometry.GetNode() # Same as node unless the mesh is instanced
+    material_count = geometry_node.GetMaterialCount()
     material_name = ""
 
     if material_count > 0:
         material_names = []
 
         for i in range(material_count):
-            material = mesh_node.GetMaterial(i)
+            material = geometry_node.GetMaterial(i)
             material_names.append(get_material_name(material))
 
-        material_name = get_multi_material_name(mesh_node) if material_count > 1 else material_names[0]
+        material_name = get_multi_material_name(geometry_node) if material_count > 1 else material_names[0]
     else:
-        mesh_name = 'Mesh_%s_%s' % (mesh.GetUniqueID(), mesh.GetName()) if len(mesh.GetName()) > 0 else 'Mesh_%s' % mesh.GetUniqueID()
-        sys.stderr.write("WARNING: Mesh '%s' has no materials\n" % mesh_name)
+        sys.stderr.write("WARNING: %s '%s' has no materials\n" % (geometry_type, get_object_name(node)))
 
     output = {
-        type_key: 'Mesh',
-        'geometry': geometry_dict[get_geometry_name(mesh_node)],
+        type_key: geometry_type,
+        'geometry': geometry_dict[get_geometry_name(geometry_node)],
         'position': serialize_vector3(position),
         'quaternion': serialize_vector4(quaternion),
         'scale': serialize_vector3(scale),
@@ -1844,11 +1738,11 @@ def generate_generic_object(node):
         node_type = node_types[node.GetNodeAttribute().GetAttributeType()]
 
     return {
-      type_key: node_type,
-      'position': serialize_vector3(position),
-      'quaternion': serialize_vector4(quaternion),
-      'scale': serialize_vector3(scale),
-      'visible': True
+        type_key: node_type,
+        'position': serialize_vector3(position),
+        'quaternion': serialize_vector4(quaternion),
+        'scale': serialize_vector3(scale),
+        'visible': True
     }
 
 # #####################################################
@@ -1860,11 +1754,13 @@ def generate_object(node, geometry_dict, material_dict):
     else:
         attribute_type = (node.GetNodeAttribute().GetAttributeType())
         if attribute_type == FbxNodeAttribute.eMesh:
-            object_data = generate_mesh_object(node, geometry_dict, material_dict)
+            object_data = generate_geometry_object('Mesh', node, geometry_dict, material_dict)
         elif attribute_type == FbxNodeAttribute.eLight:
             object_data = generate_light_object(node)
         elif attribute_type == FbxNodeAttribute.eCamera:
             object_data = generate_camera_object(node)
+        elif attribute_type == FbxNodeAttribute.eLine:
+            object_data = generate_geometry_object('LineSegments', node, geometry_dict, material_dict)
         else:
             object_data = generate_generic_object(node)
 
@@ -1900,13 +1796,13 @@ def generate_scene_object(scene, geometry_dict, material_dict):
             children.append(generate_object(node.GetChild(i), geometry_dict, material_dict))
 
     return {
-      type_key: 'Scene',
-      uuid_key: str(uuid.uuid4()),
-      name_key: 'Scene',
-      'position': serialize_vector3((0,0,0)),
-      'rotation': serialize_vector3((0,0,0)),
-      'scale': serialize_vector3((1,1,1)),
-      children_key: children
+        type_key: 'Scene',
+        uuid_key: str(uuid.uuid4()),
+        name_key: 'Scene',
+        'position': serialize_vector3((0,0,0)),
+        'rotation': serialize_vector3((0,0,0)),
+        'scale': serialize_vector3((1,1,1)),
+        children_key: children
     }
 
 # #####################################################
@@ -1920,25 +1816,19 @@ def extract_scene(scene):
     object = generate_scene_object(scene, geometry_dict, material_dict)
 
     metadata = {
-      'formatVersion': 4.3,
-      type_key: 'Object',
-      'generatedBy': 'convert-to-threejs.py'
+        'formatVersion': 4.3,
+        type_key: 'Object',
+        'generatedBy': 'convert-to-threejs.py'
     }
 
     return {
-      'geometries': geometries,
-      'images': images,
-      'textures': textures,
-      'materials': materials,
-      'object': object,
-      metadata_key: metadata
+        'geometries': geometries,
+        'images': images,
+        'textures': textures,
+        'materials': materials,
+        'object': object,
+        metadata_key: metadata
     }
-
-# #####################################################
-# Generate Non-Scene Output
-# #####################################################
-def extract_geometry(scene):
-    return generate_non_scene_output(scene)
 
 # #####################################################
 # File Helpers
@@ -1979,7 +1869,6 @@ if __name__ == "__main__":
     parser.add_option("-o", "--texture-output-dir", dest="textureoutputdir", help="write copied textures to specified directory (relative to the output .js file)", metavar='DIR', default='maps')
     parser.add_option('-a', '--no-transparency-detection', action='store_true', dest='notransparencydetection', help="don't automatically enable transparency for materials with diffuse maps containing alpha", default=False)
     parser.add_option('-u', '--force-prefix', action='store_true', dest='prefix', help="prefix all object names in output file to ensure uniqueness", default=False)
-    parser.add_option('-f', '--flatten-scene', action='store_true', dest='geometry', help="merge all geometries and apply node transforms", default=False)
     parser.add_option('-y', '--force-y-up', action='store_true', dest='forceyup', help="ensure that the y axis shows up", default=False)
     parser.add_option('-c', '--add-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--add-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
@@ -1995,7 +1884,6 @@ if __name__ == "__main__":
     option_texture_output_dir = options.textureoutputdir
     option_transparency_detection = not options.notransparencydetection
     option_prefix = options.prefix
-    option_geometry = options.geometry
     option_forced_y_up = options.forceyup
     option_default_camera = options.defcamera
     option_default_light = options.deflight
@@ -2006,7 +1894,20 @@ if __name__ == "__main__":
     sdk_manager, scene = InitializeSdkObjects()
     converter = FbxGeometryConverter(sdk_manager)
 
+    FBX_GEOMETRY_TYPES = [FbxNodeAttribute.eMesh,
+                          FbxNodeAttribute.eNurbs,
+                          FbxNodeAttribute.eNurbsSurface,
+                          FbxNodeAttribute.ePatch,
+                          FbxNodeAttribute.eLine]
+
+    FBX_ABSTRACT_GEOMETRY_TYPES = [
+        FbxNodeAttribute.eNurbs,
+        FbxNodeAttribute.eNurbsSurface,
+        FbxNodeAttribute.ePatch
+    ]
+
     identify_present = False
+
     try:
         popen = subprocess.Popen(('identify', '-help'), stdout=subprocess.PIPE)
         popen.communicate()
@@ -2034,7 +1935,7 @@ if __name__ == "__main__":
             sys.stderr.write('\nWARNING: ImageMagick (convert) not found installed in PATH.\nTextures will not automatically be converted to web compatible file formats\n')
             texture_conversion_enabled = False
 
-# The converter takes an FBX file as an argument.
+    # The converter takes an FBX file as an argument.
     if len(args) > 1:
         print("\nLoading file: %s" % args[0])
         result = LoadScene(sdk_manager, scene, args[0])
@@ -2076,10 +1977,7 @@ if __name__ == "__main__":
             data_key = 'zy_data'
             children_key = 'zz_children'
 
-        if option_geometry:
-            output_content = extract_geometry(scene)
-        else:
-            output_content = extract_scene(scene)
+        output_content = extract_scene(scene)
 
         if option_pretty_print:
             output_string = json.dumps(output_content, indent=4, cls=CustomEncoder, separators=(',', ': '), sort_keys=True)
