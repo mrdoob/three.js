@@ -13525,7 +13525,7 @@ Object.assign( THREE.AnimationClip, {
 			} else {
 				// ...assume skeletal animation
 
-				var boneName = '.bones[' + bones[ hierarchyTracks[h].parent ].name + ']';
+				var boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
 						THREE.VectorKeyframeTrack, boneName + '.position',
@@ -25070,8 +25070,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
 	);
 	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
+	var backgroundBoxSubdiv = capabilities.logarithmicDepthBuffer ? 4 : 1; // Workaround for logarithmicDepthBuffer #9235
 	var backgroundBoxMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.BoxBufferGeometry( 5, 5, 5, backgroundBoxSubdiv, backgroundBoxSubdiv, backgroundBoxSubdiv ),
 		new THREE.ShaderMaterial( {
 			uniforms: backgroundBoxShader.uniforms,
 			vertexShader: backgroundBoxShader.vertexShader,
@@ -35177,7 +35178,12 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var pts = curve.getPoints( curve instanceof THREE.LineCurve ? 1 : divisions );
+			var resolution = curve instanceof THREE.EllipseCurve ? divisions * 2
+				: curve instanceof THREE.LineCurve ? 1
+				: curve instanceof THREE.SplineCurve ? divisions * curve.points.length
+				: divisions;
+
+			var pts = curve.getPoints( resolution );
 
 			for ( var j = 0; j < pts.length; j++ ) {
 
