@@ -24,10 +24,7 @@ Object.assign( THREE.XHRLoader.prototype, {
 
 			setTimeout( function () {
 
-				if ( onLoad ) {
-
-					onLoad( cached );
-				}
+				if ( onLoad ) onLoad( cached );
 
 				scope.manager.itemEnd( url );
 
