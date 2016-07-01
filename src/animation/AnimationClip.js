@@ -326,7 +326,7 @@ Object.assign( THREE.AnimationClip, {
 			} else {
 				// ...assume skeletal animation
 
-				var boneName = '.bones[' + bones[ hierarchyTracks[h].parent ].name + ']';
+				var boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
 						THREE.VectorKeyframeTrack, boneName + '.position',
