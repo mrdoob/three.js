@@ -191,8 +191,19 @@
 						mm.color.setHex( 0x000000 );
 						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.metalness = 0.9;
-						mm.roughness = 0.2;
+						mm.metalness = 0.5;
+						mm.roughness = 0.3;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "tire_car" ) !== -1 ) {
+
+						var mm = new THREE.MeshStandardMaterial();
+
+						mm.color.setHex( 0x000000 );
+						mm.lightMap = m.map;
+						mm.metalness = 0.1;
+						mm.roughness = 0.9;
 
 						materials[ i ] = mm;
 
