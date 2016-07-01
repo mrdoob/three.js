@@ -247,7 +247,7 @@
 			var p = window.location.search.indexOf( '?q=' )
 			if( p !== -1 ) {
 				return window.location.search.substr( 3 );
-			} 
+			}
 			return ''
 		}
 
@@ -285,7 +285,17 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+			try {
+
+				var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
+				window.open( 'view-source:' + url + '/' + selected + '.html' );
+
+			} catch ( e ) {
+
+				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+				console.log( e );
+
+			}
 
 		}, false );
 		button.style.display = 'none';

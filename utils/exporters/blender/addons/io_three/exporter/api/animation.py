@@ -200,78 +200,63 @@ def _parse_pose_action(action, armature, options):
     start_frame = action.frame_range[0]
     frame_length = end_frame - start_frame
 
+
     frame_step = options.get(constants.FRAME_STEP, 1)
     used_frames = int(frame_length / frame_step) + 1
 
+    frame_index_as_time = options[constants.FRAME_INDEX_AS_TIME]
+
     keys = []
-    channels_location = []
-    channels_rotation = []
-    channels_scale = []
+
+    bone_index = 0;
 
     for pose_bone in armature.pose.bones:
         logger.info("Processing channels for %s",
                     pose_bone.bone.name)
         keys.append([])
-        channels_location.append(
-            _find_channels(action,
-                           pose_bone.bone,
-                           'location'))
-        channels_rotation.append(
-            _find_channels(action,
-                           pose_bone.bone,
-                           'rotation_quaternion'))
-        channels_rotation.append(
-            _find_channels(action,
-                           pose_bone.bone,
-                           'rotation_euler'))
-        channels_scale.append(
-            _find_channels(action,
-                           pose_bone.bone,
-                           'scale'))
 
-    frame_step = options[constants.FRAME_STEP]
-    frame_index_as_time = options[constants.FRAME_INDEX_AS_TIME]
-    for frame_index in range(0, used_frames):
-        if frame_index == used_frames - 1:
-            frame = end_frame
-        else:
-            frame = start_frame + frame_index * frame_step
+        channels_location = _find_channels( action, pose_bone.bone, 'location' )
+        channels_rotation_q = _find_channels( action, pose_bone.bone, 'rotation_quaternion' )
+        channels_rotation = ( _find_channels( action, pose_bone.bone, 'rotation_euler' ))
+        channels_scale = _find_channels( action, pose_bone.bone, 'scale' )
 
-        logger.info("Processing frame %d", frame)
+        keyframes_times_location = []
+        keyframes_times_rotation = []
+        keyframes_times_scale = []
+        keyframes_times = []
 
-        time = frame - start_frame
-        if frame_index_as_time is False:
-            time = time / fps
-
-        context.scene.frame_set(frame)
-
-        bone_index = 0
-
-        def has_keyframe_at(channels, frame):
-            """
-
-            :param channels:
-            :param frame:
-
-            """
-            def find_keyframe_at(channel, frame):
-                """
-
-                :param channel:
-                :param frame:
-
-                """
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        return keyframe
-                return None
-
+        def add_keyframes_times(target, channels):
             for channel in channels:
-                if not find_keyframe_at(channel, frame) is None:
-                    return True
-            return False
+                for keyframe in channel.keyframe_points:
+                    time = int(keyframe.co[0])
+                    if not time in target:
+                        target.append(time)
+            return target
 
-        for pose_bone in armature.pose.bones:
+        add_keyframes_times(keyframes_times_location, channels_location)
+        add_keyframes_times(keyframes_times_rotation, channels_rotation_q)
+        add_keyframes_times(keyframes_times_rotation, channels_rotation)
+        add_keyframes_times(keyframes_times_scale, channels_scale)
+
+        def merge_times( target, source):
+            for time in source:
+                if not time in target:
+                    target.append(time)
+            return target
+
+        merge_times(keyframes_times, keyframes_times_location)
+        merge_times(keyframes_times, keyframes_times_rotation)
+        merge_times(keyframes_times, keyframes_times_scale)
+
+        keyframes_times.sort()
+
+        for keyframe_time in keyframes_times:
+
+            context.scene.frame_set(keyframe_time)
+
+            time = keyframe_time - start_frame
+            if frame_index_as_time is False:
+                time = time / fps
 
             logger.info("Processing bone %s", pose_bone.bone.name)
             if pose_bone.parent is None:
@@ -284,49 +269,37 @@ def _parse_pose_action(action, armature, options):
             pos, rot, scl = bone_matrix.decompose()
             rot = _normalize_quaternion(rot)
 
-            pchange = True or has_keyframe_at(
-                channels_location[bone_index], frame)
-            rchange = True or has_keyframe_at(
-                channels_rotation[bone_index], frame)
-            schange = True or has_keyframe_at(
-                channels_scale[bone_index], frame)
-
             pos = (pos.x, pos.z, -pos.y)
             rot = (rot.x, rot.z, -rot.y, rot.w)
-            scl = (scl.x, scl.z, scl.y)
+            scl = (scl.x, scl.z, -scl.y)
+
 
             keyframe = {constants.TIME: time}
-            if frame == start_frame or frame == end_frame:
-                keyframe.update({
-                    constants.POS: pos,
-                    constants.ROT: rot,
-                    constants.SCL: scl
-                })
-            elif any([pchange, rchange, schange]):
-                if pchange is True:
+
+            if keyframe_time in keyframes_times_location:
                     keyframe[constants.POS] = pos
-                if rchange is True:
+            if keyframe_time in keyframes_times_rotation:
                     keyframe[constants.ROT] = rot
-                if schange is True:
+            if keyframe_time in keyframes_times_scale:
                     keyframe[constants.SCL] = scl
 
-            if len(keyframe.keys()) > 1:
+            if len(keyframe.keys()) > 0:
                 logger.info("Recording keyframe data for %s %s",
                             pose_bone.bone.name, str(keyframe))
                 keys[bone_index].append(keyframe)
             else:
                 logger.info("No anim data to record for %s",
                             pose_bone.bone.name)
-
-            bone_index += 1
+        bone_index += 1
 
     hierarchy = []
     bone_index = 0
     for pose_bone in armature.pose.bones:
-        hierarchy.append({
-            constants.PARENT: bone_index - 1,
-            constants.KEYS: keys[bone_index]
-        })
+        if len(keys[bone_index]) > 0:
+            hierarchy.append({
+                constants.PARENT: bone_index,
+                constants.KEYS: keys[bone_index],
+            })
         bone_index += 1
 
     if frame_index_as_time is False:
@@ -355,18 +328,12 @@ def _find_channels(action, bone, channel_type):
     """
     result = []
 
-    if len(action.groups):
-
-        group_index = -1
-        for index, group in enumerate(action.groups):
+    if len(action.groups) > 0:
+        for group in action.groups:
             if group.name == bone.name:
-                group_index = index
-                # @TODO: break?
-
-        if group_index > -1:
-            for channel in action.groups[group_index].channels:
-                if channel_type in channel.data_path:
-                    result.append(channel)
+                for channel in group.channels:
+                    if channel_type in channel.data_path:
+                        result.append(channel)
 
     else:
         bone_label = '"%s"' % bone.name

@@ -268,8 +268,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
 	);
 	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
+	var backgroundBoxSubdiv = capabilities.logarithmicDepthBuffer ? 4 : 1; // Workaround for logarithmicDepthBuffer #9235
 	var backgroundBoxMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.BoxBufferGeometry( 5, 5, 5, backgroundBoxSubdiv, backgroundBoxSubdiv, backgroundBoxSubdiv ),
 		new THREE.ShaderMaterial( {
 			uniforms: backgroundBoxShader.uniforms,
 			vertexShader: backgroundBoxShader.vertexShader,
