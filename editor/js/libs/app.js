@@ -154,10 +154,18 @@ var APP = {
 			this.width = width;
 			this.height = height;
 
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			if ( camera ) {
 
-			renderer.setSize( width, height );
+				camera.aspect = this.width / this.height;
+				camera.updateProjectionMatrix();
+
+			}
+
+			if ( renderer ) {
+
+				renderer.setSize( width, height );
+
+			}
 
 		};
 
@@ -248,6 +256,10 @@ var APP = {
 			}
 
 			renderer.dispose();
+
+			camera = undefined;
+			scene = undefined;
+			renderer = undefined;
 
 		};
 
