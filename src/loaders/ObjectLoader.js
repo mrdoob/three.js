@@ -535,6 +535,12 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					break;
 
+				case 'LineSegments':
+
+					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
 				case 'PointCloud':
 				case 'Points':
 
