@@ -74,7 +74,7 @@
 				//autoRotate: true,
 
 				//camera: 'perspective'
-		
+
 			};
 
 			init();
@@ -89,21 +89,21 @@
 				gui = new dat.GUI();
 
 				gui.add( params, "clearPass" );
-				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
-				gui.add( params, "clearAlpha", 0, 1 );		
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
+				gui.add( params, "clearAlpha", 0, 1 );
 
 				gui.add( params, "texturePass" );
-				gui.add( params, "texturePassOpacity", 0, 1 );		
+				gui.add( params, "texturePassOpacity", 0, 1 );
 
 				gui.add( params, "cubeTexturePass" );
-				gui.add( params, "cubeTexturePassOpacity", 0, 1 );		
-	
+				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
+
 				gui.add( params, "renderPass" );
-			
+
 				//gui.add( params, "autoRotate" );
 
 				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
-			
+
 				gui.open();
 
 			}
@@ -206,11 +206,11 @@
 				renderPass = new THREE.RenderPass( scene, cameraP );
 				renderPass.clear = false;
 				composer.addPass( renderPass );
-		
+
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-		
+
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
@@ -250,7 +250,7 @@
 				stats.begin();
 
 				cameraP.updateMatrixWorld( true );
-			
+
 				var newColor = clearPass.clearColor;
 				switch( params.clearColor ) {
 					case 'blue': newColor = 0x0000ff; break;
@@ -259,7 +259,7 @@
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
 				}
-	
+
 				clearPass.enabled = params.clearPass;
 				clearPass.clearColor = newColor;
 				clearPass.clearAlpha = params.clearAlpha;
