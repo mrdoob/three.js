@@ -165,7 +165,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 			var curve = curves[ i ];
 			var resolution = curve instanceof THREE.EllipseCurve ? divisions * 2
 				: curve instanceof THREE.LineCurve ? 1
-				: curve instanceof THREE.SplineCurve ? divisions * curves.points.length
+				: curve instanceof THREE.SplineCurve ? divisions * curve.points.length
 				: divisions;
 
 			var pts = curve.getPoints( resolution );
