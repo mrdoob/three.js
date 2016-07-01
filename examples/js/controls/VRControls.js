@@ -7,25 +7,27 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrInput;
+	var vrDisplay, vrDisplays;
 
 	var standingMatrix = new THREE.Matrix4();
 
-	function gotVRDevices( devices ) {
+	function gotVRDisplays( displays ) {
 
-		for ( var i = 0; i < devices.length; i ++ ) {
+		vrDisplays = displays;
 
-			if ( ( 'VRDisplay' in window && devices[ i ] instanceof VRDisplay ) ||
-				 ( 'PositionSensorVRDevice' in window && devices[ i ] instanceof PositionSensorVRDevice ) ) {
+		for ( var i = 0; i < displays.length; i ++ ) {
 
-				vrInput = devices[ i ];
+			if ( ( 'VRDisplay' in window && displays[ i ] instanceof VRDisplay ) ||
+				 ( 'PositionSensorVRDevice' in window && displays[ i ] instanceof PositionSensorVRDevice ) ) {
+
+				vrDisplay = displays[ i ];
 				break;  // We keep the first we encounter
 
 			}
 
 		}
 
-		if ( !vrInput ) {
+		if ( vrDisplay === undefined ) {
 
 			if ( onError ) onError( 'VR input not available.' );
 
@@ -35,12 +37,12 @@ THREE.VRControls = function ( object, onError ) {
 
 	if ( navigator.getVRDisplays ) {
 
-		navigator.getVRDisplays().then( gotVRDevices );
+		navigator.getVRDisplays().then( gotVRDisplays );
 
 	} else if ( navigator.getVRDevices ) {
 
 		// Deprecated API.
-		navigator.getVRDevices().then( gotVRDevices );
+		navigator.getVRDevices().then( gotVRDisplays );
 
 	}
 
@@ -58,6 +60,18 @@ THREE.VRControls = function ( object, onError ) {
 	// standing=true but the VRDisplay doesn't provide stageParameters.
 	this.userHeight = 1.6;
 
+	this.getVRDisplay = function () {
+
+		return vrDisplay;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		return vrDisplays;
+
+	};
+
 	this.getStandingMatrix = function () {
 
 		return standingMatrix;
@@ -66,11 +80,11 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.update = function () {
 
-		if ( vrInput ) {
+		if ( vrDisplay ) {
 
-			if ( vrInput.getPose ) {
+			if ( vrDisplay.getPose ) {
 
-				var pose = vrInput.getPose();
+				var pose = vrDisplay.getPose();
 
 				if ( pose.orientation !== null ) {
 
@@ -91,7 +105,7 @@ THREE.VRControls = function ( object, onError ) {
 			} else {
 
 				// Deprecated API.
-				var state = vrInput.getState();
+				var state = vrDisplay.getState();
 
 				if ( state.orientation !== null ) {
 
@@ -113,11 +127,11 @@ THREE.VRControls = function ( object, onError ) {
 
 			if ( this.standing ) {
 
-				if ( vrInput.stageParameters ) {
+				if ( vrDisplay.stageParameters ) {
 
 					object.updateMatrix();
 
-					standingMatrix.fromArray(vrInput.stageParameters.sittingToStandingTransform);
+					standingMatrix.fromArray( vrDisplay.stageParameters.sittingToStandingTransform );
 					object.applyMatrix( standingMatrix );
 
 				} else {
@@ -136,21 +150,21 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.resetPose = function () {
 
-		if ( vrInput ) {
+		if ( vrDisplay ) {
 
-			if ( vrInput.resetPose !== undefined ) {
+			if ( vrDisplay.resetPose !== undefined ) {
 
-				vrInput.resetPose();
+				vrDisplay.resetPose();
 
-			} else if ( vrInput.resetSensor !== undefined ) {
+			} else if ( vrDisplay.resetSensor !== undefined ) {
 
 				// Deprecated API.
-				vrInput.resetSensor();
+				vrDisplay.resetSensor();
 
-			} else if ( vrInput.zeroSensor !== undefined ) {
+			} else if ( vrDisplay.zeroSensor !== undefined ) {
 
 				// Really deprecated API.
-				vrInput.zeroSensor();
+				vrDisplay.zeroSensor();
 
 			}
 
@@ -174,7 +188,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.dispose = function () {
 
-		vrInput = null;
+		vrDisplay = null;
 
 	};
 

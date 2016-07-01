@@ -194,7 +194,9 @@
 
 				}, false );
 				video.loop = true;
+				video.muted = true;
 				video.src = 'textures/kinect.webm';
+				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();

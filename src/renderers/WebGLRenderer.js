@@ -268,8 +268,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
 	);
 	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
+	var backgroundBoxSubdiv = capabilities.logarithmicDepthBuffer ? 4 : 1; // Workaround for logarithmicDepthBuffer #9235
 	var backgroundBoxMesh = new THREE.Mesh(
-		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.BoxBufferGeometry( 5, 5, 5, backgroundBoxSubdiv, backgroundBoxSubdiv, backgroundBoxSubdiv ),
 		new THREE.ShaderMaterial( {
 			uniforms: backgroundBoxShader.uniforms,
 			vertexShader: backgroundBoxShader.vertexShader,
@@ -1041,6 +1042,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
+
+		} else if ( a.material.program && b.material.program && a.material.program !== b.material.program ) {
+
+			return a.material.program.id - b.material.program.id;
 
 		} else if ( a.material.id !== b.material.id ) {
 

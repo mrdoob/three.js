@@ -191,6 +191,21 @@ THREE.ShapeUtils = {
 
 	triangulateShape: function ( contour, holes ) {
 
+		function removeDupEndPts(points) {
+
+			var l = points.length;
+
+			if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+
+				points.pop();
+
+			}
+
+		}
+
+		removeDupEndPts( contour );
+		holes.forEach( removeDupEndPts );
+
 		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 
 			// inOtherPt needs to be collinear to the inSegment
@@ -628,7 +643,7 @@ THREE.ShapeUtils = {
 
 			if ( allPointsMap[ key ] !== undefined ) {
 
-				console.warn( "THREE.Shape: Duplicate point", key );
+				console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
 
 			}
 

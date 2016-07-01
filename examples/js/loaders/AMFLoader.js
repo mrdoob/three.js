@@ -424,8 +424,10 @@ THREE.AMFLoader.prototype = {
 
 		for ( var id in amfObjects ) {
 
-			var meshes = amfObjects[ id ].meshes;
+			var part = amfObjects[ id ];
+			var meshes = part.meshes;
 			var newObject = new THREE.Group();
+			newObject.name = part.name || '';
 
 			for ( var i = 0; i < meshes.length; i ++ ) {
 
