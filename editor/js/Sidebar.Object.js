@@ -109,9 +109,9 @@ Sidebar.Object = function ( editor ) {
 	// rotation
 
 	var objectRotationRow = new UI.Row();
-	var objectRotationX = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
-	var objectRotationY = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
-	var objectRotationZ = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationX = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
 
 	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );

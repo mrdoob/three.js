@@ -808,18 +808,26 @@ UI.Number.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setRange = function ( min, max ) {
+UI.Number.prototype.setPrecision = function ( precision ) {
 
-	this.min = min;
-	this.max = max;
+	this.precision = precision;
 
 	return this;
 
 };
 
-UI.Number.prototype.setPrecision = function ( precision ) {
+UI.Number.prototype.setStep = function ( step ) {
 
-	this.precision = precision;
+	this.step = step;
+
+	return this;
+
+};
+
+UI.Number.prototype.setRange = function ( min, max ) {
+
+	this.min = min;
+	this.max = max;
 
 	return this;
 
@@ -972,6 +980,14 @@ UI.Integer.prototype.setValue = function ( value ) {
 		this.dom.value = value;
 
 	}
+
+	return this;
+
+};
+
+UI.Number.prototype.setStep = function ( step ) {
+
+	this.step = step;
 
 	return this;
 
