@@ -286,7 +286,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getTargetPixelRatio() {
 
-		return _currentRenderTarget === null ? _pixelRatio : 1;
+		return _pixelRatio;
 
 	}
 
@@ -2554,10 +2554,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_currentScissor.copy( renderTarget.scissor );
+			_currentScissor.copy( renderTarget.scissor ).multiplyScalar( _pixelRatio );
 			_currentScissorTest = renderTarget.scissorTest;
 
-			_currentViewport.copy( renderTarget.viewport );
+			_currentViewport.copy( renderTarget.viewport ).multiplyScalar( _pixelRatio );
 
 		} else {
 
