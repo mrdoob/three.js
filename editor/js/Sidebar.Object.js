@@ -94,18 +94,6 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectNameRow );
 
-	/*
-	// parent
-
-	var objectParentRow = new UI.Row();
-	var objectParent = new UI.Select().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
-
-	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
-	objectParentRow.add( objectParent );
-
-	container.add( objectParentRow );
-	*/
-
 	// position
 
 	var objectPositionRow = new UI.Row();
@@ -360,20 +348,6 @@ Sidebar.Object = function ( editor ) {
 
 		if ( object !== null ) {
 
-			/*
-			if ( object.parent !== null ) {
-
-				var newParentId = parseInt( objectParent.getValue() );
-
-				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
-
-					editor.execute( new MoveObjectCommand( object, editor.scene.getObjectById( newParentId ) ) );
-
-				}
-
-			}
-			*/
-
 			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
 			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
@@ -507,7 +481,6 @@ Sidebar.Object = function ( editor ) {
 	function updateRows( object ) {
 
 		var properties = {
-			// 'parent': objectParentRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -567,23 +540,6 @@ Sidebar.Object = function ( editor ) {
 
 	} );
 
-	/*
-	signals.sceneGraphChanged.add( function () {
-
-		var scene = editor.scene;
-		var options = {};
-
-		scene.traverse( function ( object ) {
-
-			options[ object.id ] = object.name;
-
-		} );
-
-		objectParent.setOptions( options );
-
-	} );
-	*/
-
 	signals.objectChanged.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
@@ -606,14 +562,6 @@ Sidebar.Object = function ( editor ) {
 
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
-
-		/*
-		if ( object.parent !== null ) {
-
-			objectParent.setValue( object.parent.id );
-
-		}
-		*/
 
 		objectPositionX.setValue( object.position.x );
 		objectPositionY.setValue( object.position.y );
