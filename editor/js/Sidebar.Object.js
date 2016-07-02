@@ -109,9 +109,9 @@ Sidebar.Object = function ( editor ) {
 	// rotation
 
 	var objectRotationRow = new UI.Row();
-	var objectRotationX = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectRotationY = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectRotationZ = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectRotationX = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UI.Number().setUnit( '°' ).setWidth( '50px' ).onChange( update );
 
 	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
@@ -355,7 +355,7 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			var newRotation = new THREE.Euler( objectRotationX.getValue(), objectRotationY.getValue(), objectRotationZ.getValue() );
+			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
 				editor.execute( new SetRotationCommand( object, newRotation ) );
@@ -567,9 +567,9 @@ Sidebar.Object = function ( editor ) {
 		objectPositionY.setValue( object.position.y );
 		objectPositionZ.setValue( object.position.z );
 
-		objectRotationX.setValue( object.rotation.x );
-		objectRotationY.setValue( object.rotation.y );
-		objectRotationZ.setValue( object.rotation.z );
+		objectRotationX.setValue( object.rotation.x * THREE.Math.RAD2DEG );
+		objectRotationY.setValue( object.rotation.y * THREE.Math.RAD2DEG );
+		objectRotationZ.setValue( object.rotation.z * THREE.Math.RAD2DEG );
 
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );
