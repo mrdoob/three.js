@@ -4130,16 +4130,36 @@ THREE.Box3.prototype = {
 
 						}
 
-					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-						var positions = geometry.attributes[ 'position' ].array;
+						var attribute = geometry.attributes.position;
 
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+						if ( attribute !== undefined ) {
 
-							v1.fromArray( positions, i );
-							v1.applyMatrix4( node.matrixWorld );
+							var array, offset, stride;
 
-							scope.expandByPoint( v1 );
+							if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+								array = attribute.data.array;
+								offset = attribute.offset;
+								stride = attribute.data.stride;
+
+							} else {
+
+								array = attribute.array;
+								offset = 0;
+								stride = 3;
+
+							}
+
+							for ( var i = offset, il = array.length; i < il; i += stride ) {
+
+								v1.fromArray( array, i );
+								v1.applyMatrix4( node.matrixWorld );
+
+								scope.expandByPoint( v1 );
+
+							}
 
 						}
 
@@ -40324,7 +40344,7 @@ THREE.ArrowHelper.prototype.setColor = function ( color ) {
  */
 
 THREE.BoxHelper = function ( object, color ) {
-	
+
 	if ( color === undefined ) color = 0xffff00;
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
