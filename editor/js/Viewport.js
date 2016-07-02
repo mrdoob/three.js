@@ -28,6 +28,8 @@ var Viewport = function ( editor ) {
 
 	//
 
+	var box = new THREE.Box3();
+
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
@@ -364,9 +366,11 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined ) {
+			box.setFromObject( object );
 
-				selectionBox.update( object );
+			if ( box.isEmpty() === false ) {
+
+				selectionBox.update( box );
 				selectionBox.visible = true;
 
 			}
