@@ -264,16 +264,13 @@
 			event.preventDefault();
 		} );
 
-		// iOS8 workaround
+		// iOS iframe auto-resize workaround
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			viewer.addEventListener( 'load', function ( event ) {
-
-				viewer.contentWindow.innerWidth -= 10;
-				viewer.contentWindow.innerHeight -= 2;
-
-			} );
+			viewer.style.width = window.innerWidth - 310 + 'px';
+			viewer.style.height = window.innerHeight + 'px';
+			viewer.setAttribute( 'scrolling', 'no' );
 
 		}
 
