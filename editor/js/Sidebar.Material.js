@@ -893,10 +893,6 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			refreshUI( false );
-
-			signals.materialChanged.dispatch( material );
-
 		}
 
 		if ( textureWarning ) {
