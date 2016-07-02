@@ -4681,7 +4681,7 @@
         },
         "reflect": {
           "!type": "fn(normal: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length."
+          "!doc": "Reflect incident vector off of plane orthogonal to normal. Normal is assumed to have unit length."
         },
         "fromArray": {
           "!type": "fn(array: []) -> +THREE.Vector3",
@@ -4689,7 +4689,7 @@
         },
         "multiply": {
           "!type": "fn(v: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Multipies this vector by vector v."
+          "!doc": "Multiplies this vector by vector v."
         },
         "applyProjection": {
           "!type": "fn(m: +THREE.Matrix4) -> +THREE.Vector3",
@@ -4701,7 +4701,7 @@
         },
         "applyEuler": {
           "!type": "fn(euler: +THREE.Euler) -> +THREE.Vector3",
-          "!doc": "Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying."
+          "!doc": "Applies euler transform to this vector by converting the [page:Euler] object to a [page:Quaternion] and applying."
         },
         "applyQuaternion": {
           "!type": "fn(quaternion: +THREE.Quaternion) -> +THREE.Vector3",
