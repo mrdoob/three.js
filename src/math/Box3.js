@@ -54,6 +54,37 @@ THREE.Box3.prototype = {
 
 	},
 
+	setFromBuffer: function ( buffer ) {
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, l = buffer.count; i < l; i ++ ) {
+
+			var x = buffer.getX( i );
+			var y = buffer.getY( i );
+			var z = buffer.getZ( i );
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		this.makeEmpty();
@@ -119,13 +150,15 @@ THREE.Box3.prototype = {
 
 						}
 
-					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.position !== undefined ) {
 
-						var positions = geometry.attributes[ 'position' ].array;
+						var position = geometry.attributes.position;
 
-						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+						for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-							v1.fromArray( positions, i );
+							v1.x = position.getX( i );
+							v1.y = position.getY( i );
+							v1.z = position.getZ( i );
 							v1.applyMatrix4( node.matrixWorld );
 
 							scope.expandByPoint( v1 );

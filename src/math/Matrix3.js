@@ -119,21 +119,20 @@ THREE.Matrix3.prototype = {
 
 		var v1;
 
-		return function applyToBuffer( buffer, offset, length ) {
+		return function applyToBuffer( buffer, count ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
+			if ( count === undefined ) count = buffer.count;
 
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
+			for ( var i = 0; i < count; i ++ ) {
 
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = buffer.getX( i );
+				v1.y = buffer.getY( i );
+				v1.z = buffer.getZ( i );
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 

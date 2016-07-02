@@ -112,7 +112,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( position !== undefined ) {
 
-			matrix.applyToVector3Array( position.array );
+			matrix.applyToBuffer( position );
 			position.needsUpdate = true;
 
 		}
@@ -123,7 +123,7 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToVector3Array( normal.array );
+			normalMatrix.applyToBuffer( normal );
 			normal.needsUpdate = true;
 
 		}
@@ -559,11 +559,11 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		var positions = this.attributes.position.array;
+		var position = this.attributes.position;
 
-		if ( positions !== undefined ) {
+		if ( position !== undefined ) {
 
-			this.boundingBox.setFromArray( positions );
+			this.boundingBox.setFromBuffer( position );
 
 		} else {
 
@@ -592,14 +592,13 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 			}
 
-			var positions = this.attributes.position;
+			var position = this.attributes.position;
 
-			if ( positions ) {
+			if ( position ) {
 
-				var array = positions.array;
 				var center = this.boundingSphere.center;
 
-				box.setFromArray( array );
+				box.setFromBuffer( position );
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -607,9 +606,11 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = array.length; i < il; i += 3 ) {
+				for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-					vector.fromArray( array, i );
+					vector.x = position.getX( i );
+					vector.y = position.getY( i );
+					vector.z = position.getZ( i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
@@ -799,21 +800,21 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes.normal.array;
+		var normal = this.attributes.normal;
 
 		var x, y, z, n;
 
-		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+		for ( var i = 0, il = normal.count; i < il; i ++ ) {
 
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
+			x = normal.getX( i );
+			y = normal.getY( i );
+			z = normal.getZ( i );
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals[ i ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
+			normal.setX( i, x * n );
+			normal.setY( i, y * n );
+			normal.setZ( i, z * n );
 
 		}
 
@@ -864,7 +865,17 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
+
+		var isRoot = meta === undefined;
+
+		if ( isRoot ) {
+
+			meta = {
+				buffers: {}
+			};
+
+		}
 
 		var data = {
 			metadata: {
@@ -909,20 +920,47 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		}
 
-		var attributes = this.attributes;
+		var attributes = this.attributes,
+			attribute, array;
 
 		for ( var key in attributes ) {
 
-			var attribute = attributes[ key ];
+			attribute = attributes[ key ];
 
-			var array = Array.prototype.slice.call( attribute.array );
+			if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			data.data.attributes[ key ] = {
-				itemSize: attribute.itemSize,
-				type: attribute.array.constructor.name,
-				array: array,
-				normalized: attribute.normalized
-			};
+				if ( meta.buffers[ attribute.data.uuid ] === undefined ) {
+
+					array = Array.prototype.slice.call( attribute.data.array );
+
+					meta.buffers[ attribute.data.uuid ] = {
+						id: attribute.data.uuid,
+						type: attribute.data.array.constructor.name,
+						array: array,
+						stride: attribute.data.stride
+					};
+
+				}
+
+				data.data.attributes[ key ] = {
+					buffer: attribute.data.uuid,
+					itemSize: attribute.itemSize,
+					offset: attribute.offset,
+					normalized: attribute.normalized
+				};
+
+			} else {
+
+				array = Array.prototype.slice.call( attribute.array );
+
+				data.data.attributes[ key ] = {
+					itemSize: attribute.itemSize,
+					type: attribute.array.constructor.name,
+					array: array,
+					normalized: attribute.normalized
+				};
+
+			}
 
 		}
 
@@ -942,6 +980,30 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
 			};
+
+		}
+
+		function extractFromCache ( cache ) {
+
+			var values = [];
+
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+
+			return values;
+
+		}
+
+		if ( isRoot ) {
+
+			var buffers = extractFromCache( meta.buffers );
+
+			if ( buffers.length > 0 ) data.buffers = buffers;
 
 		}
 
