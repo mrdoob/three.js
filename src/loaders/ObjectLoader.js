@@ -524,6 +524,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					break;
 
+
 				case 'LOD':
 
 					object = new THREE.LOD();
