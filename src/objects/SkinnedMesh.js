@@ -186,6 +186,46 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 		return data;
 
+	},
+
+	findBoneByName: function ( name ) {
+
+		var skin = this;
+
+		function traverse ( object, name ) {
+
+			for ( var i = 0, il = object.children.length; i < il; i ++ ) {
+
+				var child = object.children[ i ];
+
+				if ( ! ( child instanceof THREE.Bone ) || child.skin !== skin ) {
+
+					continue;
+
+				}
+
+				if ( child.name === name ) {
+
+					return child;
+
+				}
+
+				var result = traverse( child, name );
+
+				if ( result !== null ) {
+
+					return result;
+
+				}
+
+			}
+
+			return null;
+
+		}
+
+		return traverse( this, name );
+
 	}
 
 } );

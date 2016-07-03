@@ -609,17 +609,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 								} else if ( data.type === 'Bone' ) {
 
-									// should make a method THREE.Skeleton.findBoneByName() ?
-									for ( var i = 0, il = object.skeleton.bones.length; i < il; i ++ ) {
-
-										if ( object.skeleton.bones[ i ].name === data.name ) {
-
-											parent = object.skeleton.bones[ i ];
-											break;
-
-										}
-
-									}
+									parent = object.findBoneByName( data.name );
 
 								}
 
