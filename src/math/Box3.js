@@ -121,29 +121,15 @@ THREE.Box3.prototype = {
 
 					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-						var attribute = geometry.attributes.position;
+						var position = geometry.attributes.position;
 
-						if ( attribute !== undefined ) {
+						if ( position !== undefined ) {
 
-							var array, offset, stride;
+							for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-							if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
-
-								array = attribute.data.array;
-								offset = attribute.offset;
-								stride = attribute.data.stride;
-
-							} else {
-
-								array = attribute.array;
-								offset = 0;
-								stride = 3;
-
-							}
-
-							for ( var i = offset, il = array.length; i < il; i += stride ) {
-
-								v1.fromArray( array, i );
+								v1.x = position.getX( i );
+								v1.y = position.getY( i );
+								v1.z = position.getZ( i );
 								v1.applyMatrix4( node.matrixWorld );
 
 								scope.expandByPoint( v1 );
