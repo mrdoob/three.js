@@ -76,8 +76,8 @@
 		Set by [page:.fromGeometry]().
 		</div>
 
-		<h4>[page:BufferAttribute index] (itemSize: 3)</h4>
-		Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles," and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.
+		<h4>[page:BufferAttribute index] (itemSize: 1)</h4>
+		Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles," and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. Each face is therefore defined by three consecutive vertex indices in this attribute.
 
 		If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous positions represent a single triangle.
 		</div>
