@@ -26,8 +26,8 @@
 
 			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-				scene.style.width = window.getComputedStyle( scene, null ).getPropertyValue( 'width' );
-				scene.style.height = window.getComputedStyle( scene, null ).getPropertyValue( 'height' );
+				scene.style.width = getComputedStyle( scene ).width;
+				scene.style.height = getComputedStyle( scene ).height;
 				scene.setAttribute( 'scrolling', 'no' );
 
 			}
