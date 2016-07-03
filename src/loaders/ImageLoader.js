@@ -12,11 +12,16 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
+
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
 			URL.revokeObjectURL( image.src );
+
 			if ( onLoad ) onLoad( image );
+
+			scope.manager.itemEnd( url );
 
 		};
 
@@ -26,7 +31,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 		} else {
 
-			var loader = new THREE.XHRLoader( this.manager );
+			var loader = new THREE.XHRLoader();
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
 			loader.load( url, function ( blob ) {
@@ -37,6 +42,8 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 		}
 
+		scope.manager.itemStart( url );
+
 		return image;
 
 	},
@@ -44,12 +51,14 @@ Object.assign( THREE.ImageLoader.prototype, {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	}
 

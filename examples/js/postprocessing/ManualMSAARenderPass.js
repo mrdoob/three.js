@@ -10,7 +10,7 @@
 *
 */
 
-THREE.ManualMSAARenderPass = function ( scene, camera ) {
+THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	THREE.Pass.call( this );
 
@@ -19,6 +19,10 @@ THREE.ManualMSAARenderPass = function ( scene, camera ) {
 
 	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 	this.unbiased = true;
+
+	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
+	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
+	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
@@ -78,6 +82,9 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 		var autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
+		var oldClearColor = renderer.getClearColor().getHex();
+		var oldClearAlpha = renderer.getClearAlpha();
+
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
 		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
@@ -104,19 +111,24 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 			}
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
-
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
-			renderer.render( this.scene2, this.camera2, writeBuffer, (i === 0) );
+			if (i === 0) {
+				renderer.setClearColor( 0x000000, 0.0 );
+			}
+			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, (i === 0) );
 
 		}
 
 		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		renderer.autoClear = autoClear;
+		renderer.setClearColor( oldClearColor, oldClearAlpha );
 
 	}
 
 } );
+
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)

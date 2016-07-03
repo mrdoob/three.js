@@ -20,15 +20,15 @@ Object.assign( THREE.XHRLoader.prototype, {
 
 		if ( cached !== undefined ) {
 
-			if ( onLoad ) {
+			scope.manager.itemStart( url );
 
-				setTimeout( function () {
+			setTimeout( function () {
 
-					onLoad( cached );
+				if ( onLoad ) onLoad( cached );
 
-				}, 0 );
+				scope.manager.itemEnd( url );
 
-			}
+			}, 0 );
 
 			return cached;
 
@@ -103,18 +103,21 @@ Object.assign( THREE.XHRLoader.prototype, {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	},
 
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
+		return this;
 
 	},
 
 	setWithCredentials: function ( value ) {
 
 		this.withCredentials = value;
+		return this;
 
 	}
 

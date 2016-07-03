@@ -172,7 +172,8 @@ THREE.ShaderLib = {
 
 		uniforms: {
 			"tCube": { value: null },
-			"tFlip": { value: - 1 }
+			"tFlip": { value: - 1 },
+			"opacity": { value: 1.0 }
 		},
 
 		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],

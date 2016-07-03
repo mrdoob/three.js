@@ -242,6 +242,7 @@ Menubar.File = function ( editor ) {
 
 				includes.push( '<script src="js/VRControls.js"></script>' );
 				includes.push( '<script src="js/VREffect.js"></script>' );
+				includes.push( '<script src="js/WebVR.js"></script>' );
 
 			}
 
@@ -272,6 +273,12 @@ Menubar.File = function ( editor ) {
 			loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
 
 				zip.file( 'js/VREffect.js', content );
+
+			} );
+
+			loader.load( '../examples/js/WebVR.js', function ( content ) {
+
+				zip.file( 'js/WebVR.js', content );
 
 			} );
 

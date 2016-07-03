@@ -82,7 +82,7 @@ THREE.Frustum.prototype = {
 
 		var sphere = new THREE.Sphere();
 
-		return function ( object ) {
+		return function intersectsObject( object ) {
 
 			var geometry = object.geometry;
 
@@ -102,7 +102,7 @@ THREE.Frustum.prototype = {
 
 		var sphere = new THREE.Sphere();
 
-		return function ( sprite ) {
+		return function intersectsSprite( sprite ) {
 
 			sphere.center.set( 0, 0, 0 );
 			sphere.radius = 0.7071067811865476;
@@ -141,7 +141,7 @@ THREE.Frustum.prototype = {
 		var p1 = new THREE.Vector3(),
 			p2 = new THREE.Vector3();
 
-		return function ( box ) {
+		return function intersectsBox( box ) {
 
 			var planes = this.planes;
 

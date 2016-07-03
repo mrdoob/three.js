@@ -84,7 +84,7 @@ THREE.Color.prototype = {
 
 		}
 
-		return function ( h, s, l ) {
+		return function setHSL( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
 			h = THREE.Math.euclideanModulo( h, 1 );
@@ -406,6 +406,16 @@ THREE.Color.prototype = {
 		this.r += s;
 		this.g += s;
 		this.b += s;
+
+		return this;
+
+	},
+
+	sub: function( color ) {
+
+		this.r = Math.max( 0, this.r - color.r );
+		this.g = Math.max( 0, this.g - color.g );
+		this.b = Math.max( 0, this.b - color.b );
 
 		return this;
 

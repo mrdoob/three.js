@@ -362,16 +362,6 @@ Object.defineProperties( THREE.BufferGeometry.prototype, {
 
 //
 
-Object.defineProperties( THREE.JSONLoader.prototype, {
-	statusDomElement: {
-		get: function () {
-			console.error( 'THREE.JSONLoader: .statusDomElement has been removed.' );
-		}
-	}
-} );
-
-//
-
 Object.defineProperties( THREE.Material.prototype, {
 	wrapAround: {
 		get: function () {

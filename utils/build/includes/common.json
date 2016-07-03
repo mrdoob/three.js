@@ -180,6 +180,7 @@
 	"src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl",
+	"src/renderers/shaders/ShaderChunk/normal_flip.glsl",
 	"src/renderers/shaders/ShaderChunk/normal_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/normalmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/packing.glsl",

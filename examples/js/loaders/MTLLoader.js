@@ -259,7 +259,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 						if ( this.options && this.options.ignoreZeroRGBs ) {
 
-							if ( value[ 0 ] === 0 && value[ 1 ] === 0 && value[ 1 ] === 0 ) {
+							if ( value[ 0 ] === 0 && value[ 1 ] === 0 && value[ 2 ] === 0 ) {
 
 								// ignore
 

@@ -50,7 +50,6 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube, cubeTarget;
 
 			var mesh, zmesh, geometry;
 
@@ -74,10 +73,21 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 2000;
 
-				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				//
+
+				var r = "textures/cube/Park3Med/";
+
+				var urls = [
+					r + "px.jpg", r + "nx.jpg",
+					r + "py.jpg", r + "ny.jpg",
+					r + "pz.jpg", r + "nz.jpg"
+				];
+
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -97,44 +107,15 @@
 
 				// material samples
 
-				var r = "textures/cube/Park3Med/";
-
-				var urls = [
-					r + "px.jpg", r + "nx.jpg",
-					r + "py.jpg", r + "ny.jpg",
-					r + "pz.jpg", r + "nz.jpg"
-				];
-
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.mapping = THREE.CubeRefractionMapping;
-
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
 				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				sceneCube.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -158,9 +139,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = window.innerWidth / window.innerHeight;
-				cameraCube.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -216,13 +194,9 @@
 
 				camera.lookAt( scene.position );
 
-				cameraCube.rotation.copy( camera.rotation );
-
 				pointLight.position.x = 1500 * Math.cos( timer );
 				pointLight.position.z = 1500 * Math.sin( timer );
 
-				renderer.clear();
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}

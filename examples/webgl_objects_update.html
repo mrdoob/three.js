@@ -18,19 +18,19 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
 			var objectNewGeometry;
 			var objectToggleAddRemove;
 			var objectRandomizeFaces;
+			var objectRandomizeMaterialIndices;
 
 			init();
 			animate();
@@ -41,68 +41,32 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 1500;
+				camera.position.z = 600;
 
 				scene = new THREE.Scene();
 
-				var light, object;
-
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
-
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
-
-				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
-
-				//var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
-
 				//
 
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( -400, 0, 200 );
+				var object = createObject( createMultiMaterial(), 1 );
+				object.position.set( -100, 100, 0 );
 				scene.add( object );
 				objectNewGeometry = object;
 
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( -200, 0, 200 );
+				object = createObject( createMultiMaterial(), 1 );
+				object.position.set( 100, 100, 0 );
 				scene.add( object );
 				objectToggleAddRemove = object;
 
 				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( 0, 0, 200 );
+				object.position.set( -100, -100, 0 );
 				scene.add( object );
 				objectRandomizeFaces = object;
-/*
-				These are not yet used but they are ready to be shown
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( 200, 0, 200 );
-				scene.add( object );
-
-				//
 
 				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( -400, 0, 0 );
+				object.position.set( 100, -100, 0 );
 				scene.add( object );
+				objectRandomizeMaterialIndices = object;
 
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( -200, 0, 0 );
-				scene.add( object );
-
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( 0, 0, 0 );
-				scene.add( object );
-
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( 200, 0, 0 );
-				scene.add( object );
-
-				object = createObject( createMultiMaterial(), 4 );
-				object.position.set( 400, 0, 0 );
-				scene.add( object );
-				*/
 				//
 
 				//
@@ -112,38 +76,40 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function createObject(material, segments ){
-				var geometry = createGeometry(segments);
-				var mesh = new THREE.Mesh( geometry , material);
-				return mesh;
+			function createObject( material, segments ){
+
+				var geometry = createGeometry( segments );
+				return new THREE.Mesh( geometry, material );
+
 			}
-			function createGeometry(segments){
+
+			function createGeometry( segments ) {
+
 				var matrix = new THREE.Matrix4();
 				var euler = new THREE.Euler();
 				var geometry = new THREE.BoxGeometry( 100, 100, 100, segments, segments, segments );
-				geometry.applyMatrix(matrix.makeRotationFromEuler(euler.set(parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI)));
+				geometry.applyMatrix(matrix.makeRotationFromEuler(euler.set(Math.random()*2*Math.PI,Math.random()*2*Math.PI,Math.random()*2*Math.PI)));
 				return geometry;
+
 			}
 
 			function createMultiMaterial(){
-				var materials = [];
-				materials.push(new THREE.MeshBasicMaterial({color: 0xff0000}));
-				materials.push(new THREE.MeshBasicMaterial({color: 0xffff00}));
-				materials.push(new THREE.MeshBasicMaterial({color: 0x00ff00}));
-				materials.push(new THREE.MeshBasicMaterial({color: 0x00ffff}));
-				materials.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
-				materials.push(new THREE.MeshBasicMaterial({color: 0xff00ff}));
-				var material = new THREE.MultiMaterial(materials);
-				return material;
+				var materials = [
+					new THREE.MeshBasicMaterial( { color: 0xff0000 } ),
+					new THREE.MeshBasicMaterial( { color: 0xffff00 } ),
+					new THREE.MeshBasicMaterial( { color: 0x00ff00 } ),
+					new THREE.MeshBasicMaterial( { color: 0x00ffff } ),
+					new THREE.MeshBasicMaterial( { color: 0x0000ff } ),
+					new THREE.MeshBasicMaterial( { color: 0xff00ff } )
+				];
+
+				return new THREE.MultiMaterial( materials );
 			}
 
 			function onWindowResize() {
@@ -159,52 +125,60 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				setTimeout( animate, 1000 );
 
 				render();
-				stats.update();
 
 			}
 
-			function randomizeFaces(object){
-				for(var i = 0,l=object.geometry.faces.length;i<l;i++){
+			function randomizeFaces( object ) {
 
-					object.geometry.faces[i].materialIndex = Math.floor(Math.random() * 6);
+				var geometry = object.geometry;
+				var faces = geometry.faces;
+
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+					faces[ i ].a = Math.floor( Math.random() * geometry.vertices.length );
+					faces[ i ].b = Math.floor( Math.random() * geometry.vertices.length );
+					faces[ i ].c = Math.floor( Math.random() * geometry.vertices.length );
 
 				}
-				object.geometry.groupsNeedUpdate = true;
+
+				geometry.elementsNeedUpdate = true;
+
+			}
+
+			function randomizeMaterialIndices( object ) {
+
+				var geometry = object.geometry;
+				var faces = geometry.faces;
+
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+					faces[ i ].materialIndex = Math.floor( Math.random() * 6 );
+
+				}
+
+				geometry.groupsNeedUpdate = true;
+
 			}
 
 			function render() {
 
-				var timer = Date.now() * 0.001;
+				objectNewGeometry.geometry = createGeometry( 1 );
 
-				if (parseInt(timer,10)%2 === 0){
+				if ( scene.children.indexOf( objectToggleAddRemove ) === -1 ) {
 
-					if (scene.children.indexOf(objectToggleAddRemove) === -1) {
-
-
-						objectNewGeometry.geometry = createGeometry(1);
-						randomizeFaces(objectRandomizeFaces);
-
-						scene.add(objectToggleAddRemove);
-
-					}
+					scene.add( objectToggleAddRemove );
 
 				} else {
 
-					if (scene.children.indexOf(objectToggleAddRemove) !== -1) {
-
-						objectNewGeometry.geometry = createGeometry(1);
-						randomizeFaces(objectRandomizeFaces);
-
-						scene.remove(objectToggleAddRemove);
-
-					}
+					scene.remove( objectToggleAddRemove );
 
 				}
 
-				camera.lookAt( scene.position );
+				randomizeFaces( objectRandomizeFaces );
+				randomizeMaterialIndices( objectRandomizeMaterialIndices );
 
 				renderer.render( scene, camera );
 

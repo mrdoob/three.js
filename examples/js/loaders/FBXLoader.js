@@ -16,9 +16,9 @@
 
 ( function() {
 
-	THREE.FBXLoader = function ( showStatus, manager ) {
+	THREE.FBXLoader = function ( manager ) {
 
-		THREE.Loader.call( this, showStatus );
+		THREE.Loader.call( this );
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.textureLoader = null;
 		this.textureBasePath = null;

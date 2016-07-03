@@ -19,7 +19,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 1 );
+	var grid = new THREE.GridHelper( 30, 60 );
 	sceneHelpers.add( grid );
 
 	//
@@ -27,6 +27,8 @@ var Viewport = function ( editor ) {
 	var camera = editor.camera;
 
 	//
+
+	var box = new THREE.Box3();
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
@@ -75,7 +77,7 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( object !== null ) {
+		if ( object !== undefined ) {
 
 			switch ( transformControls.getMode() ) {
 
@@ -284,13 +286,13 @@ var Viewport = function ( editor ) {
 
 			case 'css/light.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
+				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
 				sceneHelpers.add( grid );
 				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
+				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
 				sceneHelpers.add( grid );
 				clearColor = 0x333333;
 				break;
@@ -364,10 +366,11 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined &&
-				 object instanceof THREE.Sprite === false ) {
+			box.setFromObject( object );
 
-				selectionBox.update( object );
+			if ( box.isEmpty() === false ) {
+
+				selectionBox.update( box );
 				selectionBox.visible = true;
 
 			}

@@ -74,6 +74,25 @@ scene.add( camera );</code>
 
 		<h2>Methods</h2>
 
+		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
+		<div>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera
+		</div>
+
+		<div>
+		Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups. For an example on how to use it see [page:PerspectiveCamera].
+		</div>
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<div>
+		Removes any offset set by the .setViewOffset method.
+		</div>
+
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<div>
 		Updates the camera projection matrix. Must be called after change of parameters.

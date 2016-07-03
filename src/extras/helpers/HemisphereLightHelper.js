@@ -47,7 +47,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
 
-	return function () {
+	return function update() {
 
 		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );

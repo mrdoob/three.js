@@ -78,12 +78,12 @@
 				camera.add( crosshair );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -119,7 +119,7 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
+				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -170,7 +170,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}
