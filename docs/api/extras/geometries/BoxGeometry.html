@@ -14,11 +14,11 @@
 
 		<div class="desc">BoxGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.</div>
 
-		<iframe id="scene"></iframe>
+		<iframe id="scene" onload="workaround()" src="scenes/geometry-browser.html#BoxGeometry"></iframe>
 
 		<script>
 
-		window.onload = function() {
+		function workaround() {
 
 			var scene = document.getElementById( 'scene' );
 
@@ -31,8 +31,6 @@
 				scene.setAttribute( 'scrolling', 'no' );
 
 			}
-
-			scene.src = 'scenes/geometry-browser.html#BoxGeometry';
 
 		}
 
