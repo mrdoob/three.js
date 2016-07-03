@@ -509,9 +509,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					if ( geometry.bones && geometry.bones.length > 0 ) {
 
-						var useVertexTexture = ( data.skeleton !== undefined ) ? data.skeleton.useVertexTexture : undefined;
-
-						object = new THREE.SkinnedMesh( geometry, material, useVertexTexture );
+						object = new THREE.SkinnedMesh( geometry, material );
 
 						if ( data.skeleton !== undefined ) object.skeleton.fromJSON( data.skeleton );
 						if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
