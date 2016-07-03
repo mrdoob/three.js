@@ -507,13 +507,18 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					break;
 
 				case 'Mesh':
+				case 'SkinnedMesh':
 
 					var geometry = getGeometry( data.geometry );
 					var material = getMaterial( data.material );
 
 					if ( geometry.bones && geometry.bones.length > 0 ) {
 
-						object = new THREE.SkinnedMesh( geometry, material );
+						object = new THREE.SkinnedMesh( geometry, material, geometry.useVertexTexture );
+
+						if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+						if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+						object.updateMatrixWorld( true );
 
 					} else {
 
@@ -582,11 +587,73 @@ Object.assign( THREE.ObjectLoader.prototype, {
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
-			if ( data.children !== undefined ) {
+			/*
+			 * SkinnedMesh creates Bone instances as its children in the constructor
+			 * so skip Bone instance creation here.
+			 */
+			if ( data.type === 'SkinnedMesh' ) {
 
-				for ( var child in data.children ) {
+				var scope = this;
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+				function traverse ( data ) {
+
+					if ( data.children !== undefined ) {
+
+						for ( var child in data.children ) {
+
+							if ( data.children[ child ].type !== 'Bone' ) {
+
+								var parent;
+
+								if( data.type === 'SkinnedMesh' ) {
+
+									parent = object;
+
+								} else if ( data.type === 'Bone' ) {
+
+									// should make a method THREE.Skeleton.findBoneByName() ?
+									for ( var i = 0, il = object.skeleton.bones.length; i < il; i ++ ) {
+
+										if ( object.skeleton.bones[ i ].name === data.name ) {
+
+											parent = object.skeleton.bones[ i ];
+											break;
+
+										}
+
+									}
+
+								}
+
+								if ( parent ) {
+
+									parent.add( scope.parseObject( data.children[ child ], geometries, materials ) );
+
+								}
+
+							} else {
+
+								traverse( data.children[ child ] );
+
+							}
+
+						}
+
+					}
+
+				}
+
+				traverse( data );
+
+			} else {
+
+				if ( data.children !== undefined ) {
+
+					for ( var child in data.children ) {
+
+						object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+					}
 
 				}
 

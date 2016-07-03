@@ -20,6 +20,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 	// convenience) for THREE.SkinnedMesh to do this.
 
 	var bones = [];
+	var boneInverses;
 
 	if ( this.geometry && this.geometry.bones !== undefined ) {
 
@@ -56,12 +57,24 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		}
 
+		if ( this.geometry.boneInverses !== undefined ) {
+
+			boneInverses = [];
+
+			for ( var i = 0, il = this.geometry.boneInverses.length; i < il; i ++ ) {
+
+				boneInverses.push( new THREE.Matrix4().fromArray( this.geometry.boneInverses[ i ] ) );
+
+			}
+
+		}
+
 	}
 
 	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
-	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
+	this.bind( new THREE.Skeleton( bones, boneInverses, useVertexTexture ), this.matrixWorld );
 
 };
 
@@ -173,6 +186,77 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 	clone: function() {
 
 		return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
+
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = THREE.Mesh.prototype.toJSON.call( this, meta );
+
+		data.object.bindMode = this.bindMode;
+		data.object.bindMatrix = this.bindMatrix.toArray();
+
+		var geometry;
+
+		for ( var i = 0, il = data.geometries.length; i < il; i ++ ) {
+
+			if ( data.geometries[ i ].uuid === this.geometry.uuid ) {
+
+				geometry = data.geometries[ i ].data;
+				break;
+
+			}
+
+		}
+
+		// the following code should be in THREE.Skeleton?
+		var scope = this;
+
+		function getParentIndex ( bone ) {
+
+			if ( ! bone.parent instanceof THREE.Bone ) return -1;
+
+			for ( var i = 0, il = scope.skeleton.bones.length; i < il; i ++ ) {
+
+				if ( scope.skeleton.bones[ i ] === bone.parent ) return i;
+
+			}
+
+			return -1;
+
+		}
+
+		var bones = [];
+
+		for ( var i = 0, il = this.skeleton.bones.length; i < il; i ++ ) {
+
+			var bone = this.skeleton.bones[ i ];
+
+			bones.push( {
+
+				name: bone.name,
+				parent: getParentIndex( bone ),
+				pos: bone.position.toArray(),
+				rotq: bone.quaternion.toArray(),
+				scl: bone.scale.toArray()
+
+			} );
+
+		}
+
+		var boneInverses = [];
+
+		for ( var i = 0, il = this.skeleton.boneInverses.length; i < il; i ++ ) {
+
+			boneInverses.push( this.skeleton.boneInverses[ i ].toArray() );
+
+		}
+
+		if ( bones.length > 0 ) geometry.bones = bones;
+		if ( boneInverses.length > 0 ) geometry.boneInverses = boneInverses;
+		geometry.useVertexTexture = this.skeleton.useVertexTexture;
+
+		return data;
 
 	}
 
