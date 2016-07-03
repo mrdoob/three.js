@@ -415,7 +415,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 		var matrix = new THREE.Matrix4();
 
-		return function ( data, geometries, materials ) {
+		return function ( data, geometries, materials, parent ) {
 
 			var object;
 
@@ -502,7 +502,6 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					break;
 
 				case 'Mesh':
-				case 'SkinnedMesh':
 
 					var geometry = getGeometry( data.geometry );
 					var material = getMaterial( data.material );
@@ -510,11 +509,6 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					if ( geometry.bones && geometry.bones.length > 0 ) {
 
 						object = new THREE.SkinnedMesh( geometry, material );
-
-						if ( data.skeleton !== undefined ) object.skeleton.fromJSON( data.skeleton );
-						if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
-						if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
-						object.updateMatrixWorld( true );
 
 					} else {
 
@@ -524,6 +518,40 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+
+					if ( data.skeleton === undefined ) {
+
+						object = new THREE.SkinnedMesh( geometry, material );
+
+					} else {
+
+						object = new THREE.SkinnedMesh( geometry, material, undefined, true );
+
+					}
+
+					break;
+
+				case 'Bone':
+
+					var skin;
+
+					if ( parent instanceof THREE.SkinnedMesh ) {
+
+						skin = parent;
+
+					} else if ( parent instanceof THREE.Bone ) {
+
+						skin = parent.skin;
+
+					}
+
+					object = new THREE.Bone( skin );
+
+					break;
 
 				case 'LOD':
 
@@ -584,63 +612,11 @@ Object.assign( THREE.ObjectLoader.prototype, {
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
-			/*
-			 * SkinnedMesh creates Bone instances as its children in the constructor
-			 * so skip Bone instance creation here.
-			 */
-			if ( data.type === 'SkinnedMesh' ) {
+			if ( data.children !== undefined ) {
 
-				var scope = this;
+				for ( var child in data.children ) {
 
-				function traverse ( data ) {
-
-					if ( data.children !== undefined ) {
-
-						for ( var child in data.children ) {
-
-							if ( data.children[ child ].type !== 'Bone' ) {
-
-								var parent;
-
-								if( data.type === 'SkinnedMesh' ) {
-
-									parent = object;
-
-								} else if ( data.type === 'Bone' ) {
-
-									parent = object.findBoneByName( data.name );
-
-								}
-
-								if ( parent ) {
-
-									parent.add( scope.parseObject( data.children[ child ], geometries, materials ) );
-
-								}
-
-							} else {
-
-								traverse( data.children[ child ] );
-
-							}
-
-						}
-
-					}
-
-				}
-
-				traverse( data );
-
-			} else {
-
-				if ( data.children !== undefined ) {
-
-					for ( var child in data.children ) {
-
-						object.add( this.parseObject( data.children[ child ], geometries, materials ) );
-
-					}
+					object.add( this.parseObject( data.children[ child ], geometries, materials, object ) );
 
 				}
 
@@ -662,6 +638,15 @@ Object.assign( THREE.ObjectLoader.prototype, {
 					}
 
 				}
+
+			}
+
+			if ( data.type === 'SkinnedMesh' && data.skeleton !== undefined ) {
+
+				object.bind( object.createSkeletonFromJSON( data.skeleton ), object.matrixWorld );
+				object.bindMode = data.bindMode;
+				object.bindMatrix.fromArray( data.bindMatrix );
+				object.updateMatrixWorld( true );
 
 			}
 
