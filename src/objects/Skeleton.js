@@ -175,32 +175,6 @@ Object.assign( THREE.Skeleton.prototype, {
 
 		return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
 
-	},
-
-	toJSON: function () {
-
-		var data = {
-
-			bones: [],
-			boneInverses: [],
-			useVertexTexture: this.useVertexTexture
-
-		};
-
-		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
-
-			data.bones.push( this.bones[ i ].name );
-
-		}
-
-		for ( var i = 0, il = this.boneInverses.length; i < il; i ++ ) {
-
-			data.boneInverses.push( this.boneInverses[ i ].toArray() );
-
-		}
-
-		return data;
-
 	}
 
 } );
