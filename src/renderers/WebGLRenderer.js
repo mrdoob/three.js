@@ -261,6 +261,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
+	var backgroundCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var backgroundCamera2 = new THREE.PerspectiveCamera();
+	var backgroundPlaneMesh = new THREE.Mesh(
+		new THREE.PlaneBufferGeometry( 2, 2 ),
+		new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } )
+	);
+	var backgroundBoxShader = THREE.ShaderLib[ 'cube' ];
+	var backgroundBoxMesh = new THREE.Mesh(
+		new THREE.BoxBufferGeometry( 5, 5, 5 ),
+		new THREE.ShaderMaterial( {
+			uniforms: backgroundBoxShader.uniforms,
+			vertexShader: backgroundBoxShader.vertexShader,
+			fragmentShader: backgroundBoxShader.fragmentShader,
+			depthTest: false,
+			depthWrite: false,
+			side: THREE.BackSide
+		} )
+	);
+	objects.update( backgroundPlaneMesh );
+	objects.update( backgroundBoxMesh );
+
+	//
+
 	function getTargetPixelRatio() {
 
 		return _currentRenderTarget === null ? _pixelRatio : 1;
@@ -1019,6 +1042,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
 
+		} else if ( a.material.program && b.material.program && a.material.program !== b.material.program ) {
+
+			return a.material.program.id - b.material.program.id;
+
 		} else if ( a.material.id !== b.material.id ) {
 
 			return a.material.id - b.material.id;
@@ -1094,11 +1121,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lensFlares.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init(
-				this.clippingPlanes, _localClippingEnabled, camera );
+		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
 		projectObject( scene, camera );
-
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
@@ -1137,9 +1162,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.setRenderTarget( renderTarget );
 
+		//
+
+		var background = scene.background;
+
+		if ( background === null ) {
+
+			glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+		} else if ( background instanceof THREE.Color ) {
+
+			glClearColor( background.r, background.g, background.b, 1 );
+
+		}
+
 		if ( this.autoClear || forceClear ) {
 
 			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
+
+		}
+
+		if ( background instanceof THREE.CubeTexture ) {
+
+			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
+
+			backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
+			backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
+
+			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
+			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
+
+			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
+
+		} else if ( background instanceof THREE.Texture ) {
+
+			backgroundPlaneMesh.material.map = background;
+
+			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
 
 		}
 

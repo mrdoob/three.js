@@ -103,18 +103,21 @@ Object.assign( THREE.XHRLoader.prototype, {
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	},
 
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
+		return this;
 
 	},
 
 	setWithCredentials: function ( value ) {
 
 		this.withCredentials = value;
+		return this;
 
 	}
 

@@ -240,7 +240,16 @@
 		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+
 		<script>
+
+		function extractQuery() {
+			var p = window.location.search.indexOf( '?q=' )
+			if( p !== -1 ) {
+				return window.location.search.substr( 3 );
+			} 
+			return ''
+		}
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
@@ -371,7 +380,15 @@
 
 		function updateFilter() {
 
-			var exp = new RegExp( filterInput.value, 'gi' );
+			var v = filterInput.value;
+			if( v !== '' ) {
+				window.history.replaceState( {} , '', '?q=' + v );
+			} else {
+				window.history.replaceState( {} , '', window.location.pathname );
+			}
+			if( selected ) window.location.hash = selected
+
+			var exp = new RegExp( v, 'gi' );
 
 			for ( var key in files ) {
 
@@ -458,6 +475,9 @@
 			}
 
 		}
+
+		filterInput.value = extractQuery()
+		updateFilter( )
 
 		</script>
 

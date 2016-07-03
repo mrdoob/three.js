@@ -123,7 +123,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
-		return function () {
+		return function update () {
 
 			var position = scope.object.position;
 
@@ -324,7 +324,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var offset = new THREE.Vector3();
 
-		return function( deltaX, deltaY ) {
+		return function pan ( deltaX, deltaY ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 

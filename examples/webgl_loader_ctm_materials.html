@@ -33,7 +33,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - baked + real-time illumination -
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
 		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a> -
 		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
@@ -66,7 +66,6 @@
 			var mesh;
 
 			var textureCube;
-			var cameraCube, sceneCube;
 
 			var loader;
 
@@ -95,14 +94,6 @@
 
 				// SCENE
 
-				scene = new THREE.Scene();
-
-				// SKYBOX
-
-				sceneCube = new THREE.Scene();
-				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				sceneCube.add( cameraCube );
-
 				var r = "textures/cube/pisa/";
 				var urls = [
 					r + "px.png", r + "nx.png",
@@ -112,21 +103,8 @@
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
+				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -148,8 +126,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
-
-				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -294,9 +270,6 @@
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-				cameraCube.updateProjectionMatrix();
-
 			}
 
 
@@ -322,10 +295,6 @@
 
 				controls.update();
 
-				cameraCube.rotation.copy( camera.rotation );
-
-				renderer.clear();
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}
