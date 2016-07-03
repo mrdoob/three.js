@@ -501,6 +501,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					break;
 
+				case 'Mesh':
 				case 'SkinnedMesh':
 
 					var geometry = getGeometry( data.geometry );
