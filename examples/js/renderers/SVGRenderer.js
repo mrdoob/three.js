@@ -224,6 +224,11 @@ THREE.SVGRenderer = function () {
 				if(that.scalar){
 				    transform+=' scale('+that.scalar(distance)+')' ;
 				}
+				if(that.opacity){
+
+					node.setAttribute("fill-opacity",that.opacity(distance));
+				
+				}
 
 				node.setAttribute( 'transform', transform );
 
