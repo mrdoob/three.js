@@ -206,6 +206,7 @@ THREE.SVGRenderer = function () {
 		}
 
 		var _sortArray=[];
+		var that=this;
 		scene.traverseVisible( function ( object ) {
 
 			 if ( object instanceof THREE.SVGObject ) {
@@ -218,7 +219,13 @@ THREE.SVGRenderer = function () {
 
 				var node = object.node;
 				var distance=object.position.distanceTo(camera.position);
-				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+				var transform='translate(' + x + ',' + y + ')';
+
+				if(that.scalar){
+				    transform+=' scale('+that.scalar(distance)+')' ;
+				}
+
+				node.setAttribute( 'transform', transform );
 
 				_sortArray.push([distance,node]);
 
