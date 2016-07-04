@@ -116,8 +116,8 @@ THREE.VREffect = function ( renderer, onError ) {
 	var requestFullscreen;
 	var exitFullscreen;
 	var fullscreenElement;
-	var leftBounds = [0.0, 0.0, 0.5, 0.5];
-	var rightBounds = [0.5, 0.0, 0.5, 1.0];
+	var leftBounds = [ 0.0, 0.0, 0.5, 0.5 ];
+	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
 	function onFullscreenChange () {
 
@@ -134,11 +134,14 @@ THREE.VREffect = function ( renderer, onError ) {
 				eyeWidth = eyeParamsL.renderWidth;
 				eyeHeight = eyeParamsL.renderHeight;
 
-				if ( vrHMD.getLayers ) {
+				if ( vrDisplay.getLayers ) {
+
 					var layers = vrHMD.getLayers();
 					if (layers.length) {
-						leftBounds = layers[0].leftBounds || [0.0, 0.0, 0.5, 1.0];
-						rightBounds = layers[0].rightBounds || [0.5, 0.0, 0.5, 1.0];
+
+						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
+						rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
+
 					}
 				}
 
