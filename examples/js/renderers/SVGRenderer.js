@@ -53,7 +53,7 @@ THREE.SVGRenderer = function () {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
-	this.sortSVG = this.sortSVG||true;
+	this.sortSVG = this.sortSVG||false;
 
 	this.info = {
 
