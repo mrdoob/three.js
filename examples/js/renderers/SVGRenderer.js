@@ -249,13 +249,15 @@ THREE.SVGRenderer = function () {
 
 			});
 
+		 }
+
 			_sortArray.forEach(function(x){
 
 				_svg.appendChild(x[1]);
 
 			});
 
-		}
+		
 	};
 
 	function calculateLights( lights ) {
