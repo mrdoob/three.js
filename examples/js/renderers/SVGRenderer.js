@@ -207,6 +207,7 @@ THREE.SVGRenderer = function () {
 
 		var _sortArray=[];
 		var that=this;
+
 		scene.traverseVisible( function ( object ) {
 
 			 if ( object instanceof THREE.SVGObject ) {
@@ -222,7 +223,9 @@ THREE.SVGRenderer = function () {
 				var transform=(x&&y)?'translate(' + x + ',' + y + ')':'';
 
 				if(that.scalar){
+
 				    transform+=' scale('+that.scalar(distance)+')' ;
+
 				}
 				if(that.opacity){
 
@@ -236,17 +239,23 @@ THREE.SVGRenderer = function () {
 
 			}
 
-		} );
+		});
 
 		if(this.sortSVG){
-			_sortArray.sort(function(a,b){
-				return b[0]-a[0];
-			})
-			_sortArray.forEach(function(x){
-				_svg.appendChild(x[1]);
-			})
-		}
 
+			_sortArray.sort(function(a,b){
+
+				return b[0]-a[0];
+
+			});
+
+			_sortArray.forEach(function(x){
+
+				_svg.appendChild(x[1]);
+
+			});
+
+		}
 	};
 
 	function calculateLights( lights ) {
