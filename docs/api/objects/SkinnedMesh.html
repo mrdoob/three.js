@@ -14,9 +14,25 @@
 
 		<div class="desc">A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.</div>
 
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
 		<h2>Example</h2>
-		
-		<iframe src='scenes/bones-browser.html'></iframe>
 		
 		<code>
 		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
@@ -49,9 +65,7 @@
 		armSkeleton.bones[ 1 ].rotation.x = 0.2;
 		</code>
 		
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture] )</h3>
 		<div>
@@ -60,9 +74,7 @@
 		useVertexTexture -- Defines whether a vertex texture can be used (optional).
 		</div>
 
-
 		<h2>Properties</h2>
-
 
 		<h3>[property:array bones]</h3>
 		<div>
@@ -135,7 +147,6 @@
 		Returns a clone of this SkinnedMesh object and its descendants.
 		</div>
 
-		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
