@@ -219,7 +219,7 @@ THREE.SVGRenderer = function () {
 
 				var node = object.node;
 				var distance=object.position.distanceTo(camera.position);
-				var transform='translate(' + x + ',' + y + ')';
+				var transform=(x&&y)?'translate(' + x + ',' + y + ')':'';
 
 				if(that.scalar){
 				    transform+=' scale('+that.scalar(distance)+')' ;
