@@ -53,6 +53,7 @@ THREE.SVGRenderer = function () {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
+	this.sortSVG = this.sortSVG||true;
 
 	this.info = {
 
@@ -204,6 +205,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
+		var _sortArray=[];
 		scene.traverseVisible( function ( object ) {
 
 			 if ( object instanceof THREE.SVGObject ) {
@@ -215,13 +217,23 @@ THREE.SVGRenderer = function () {
 				var y = - _vector3.y * _svgHeightHalf;
 
 				var node = object.node;
+				var distance=object.position.distanceTo(camera.position);
 				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
 
-				_svg.appendChild( node );
+				_sortArray.push([distance,node]);
 
 			}
 
 		} );
+
+		if(this.sortSVG){
+			_sortArray.sort(function(a,b){
+				return b[0]-a[0];
+			})
+			_sortArray.forEach(function(x){
+				_svg.appendChild(x[1]);
+			})
+		}
 
 	};
 
