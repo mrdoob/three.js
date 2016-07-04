@@ -136,7 +136,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				if ( vrDisplay.getLayers ) {
 
-					var layers = vrHMD.getLayers();
+					var layers = vrDisplay.getLayers();
 					if (layers.length) {
 
 						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
