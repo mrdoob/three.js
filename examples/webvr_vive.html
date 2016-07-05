@@ -38,6 +38,8 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			var container;
 			var camera, scene, renderer;
 			var effect, controls;
@@ -226,6 +228,8 @@
 
 			function render() {
 
+				var delta = clock.getDelta() * 60;
+
 				controls.update();
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
@@ -257,7 +261,7 @@
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += 0.01 * delta;
 
 				}
 
