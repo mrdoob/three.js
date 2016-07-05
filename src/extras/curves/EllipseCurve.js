@@ -46,9 +46,17 @@ THREE.EllipseCurve.prototype.getPoint = function( t ) {
 
 	}
 
-	if ( this.aClockwise === true && deltaAngle != twoPi && ! samePoints ) {
+	if ( this.aClockwise === true && ! samePoints ) {
 
-		deltaAngle = deltaAngle - twoPi;
+		if ( deltaAngle === twoPi ) {
+
+			deltaAngle = - twoPi;
+
+		} else {
+
+			deltaAngle = deltaAngle - twoPi;
+
+		}
 
 	}
 
