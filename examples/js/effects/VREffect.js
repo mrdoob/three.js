@@ -116,7 +116,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var requestFullscreen;
 	var exitFullscreen;
 	var fullscreenElement;
-	var leftBounds = [ 0.0, 0.0, 0.5, 0.5 ];
+	var leftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
 	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
 	function onFullscreenChange () {
