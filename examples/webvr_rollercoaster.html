@@ -204,9 +204,13 @@
 			var velocity = 0;
 			var progress = 0;
 
+			var clock = new THREE.Clock();
+
 			function animate( time ) {
 
 				effect.requestAnimationFrame( animate );
+
+				var delta = clock.getDelta() * 60;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
 
@@ -216,7 +220,7 @@
 
 				//
 
-				progress += velocity;
+				progress += velocity * delta;
 				progress = progress % 1;
 
 				position.copy( curve.getPointAt( progress ) );
@@ -226,7 +230,7 @@
 
 				tangent.copy( curve.getTangentAt( progress ) );
 
-				velocity -= tangent.y * 0.0000015;
+				velocity -= tangent.y * 0.0000015 * delta;
 				velocity = Math.max( velocity, 0.00004 );
 
 				train.lookAt( lookAt.copy( position ).sub( tangent ) );

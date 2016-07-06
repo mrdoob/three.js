@@ -35,6 +35,8 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			var container;
 			var camera, scene, raycaster, renderer;
 			var effect, controls;
@@ -177,6 +179,8 @@
 
 			function render() {
 
+				var delta = clock.getDelta() * 60;
+
 				if ( isMouseDown === true ) {
 
 					var cube = room.children[ 0 ];
@@ -184,9 +188,9 @@
 
 					cube.position.set( 0, 0, - 0.75 );
 					cube.position.applyQuaternion( camera.quaternion );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
 					cube.userData.velocity.applyQuaternion( camera.quaternion );
 					room.add( cube );
 
@@ -224,7 +228,7 @@
 
 					var cube = room.children[ i ];
 
-					cube.userData.velocity.multiplyScalar( 0.999 );
+					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
 
 					cube.position.add( cube.userData.velocity );
 
@@ -249,9 +253,9 @@
 
 					}
 
-					cube.rotation.x += cube.userData.velocity.x * 2;
-					cube.rotation.y += cube.userData.velocity.y * 2;
-					cube.rotation.z += cube.userData.velocity.z * 2;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 
