@@ -55,7 +55,9 @@ Object.assign( THREE.ObjectLoader.prototype, {
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
-		var object = this.parseObject( json.object, geometries, materials );
+		var skeletons = this.parseSkeletons( json.skeletons );
+
+		var object = this.parseObject( json.object, geometries, materials, skeletons );
 
 		if ( json.animations ) {
 
@@ -416,11 +418,25 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 	},
 
+	parseSkeletons: function ( json ) {
+
+		var skeletons = {};
+
+		for ( var i = 0; i < json.length; i ++ ) {
+
+			skeletons[ json[ i ].uuid ] = json[ i ];
+
+		}
+
+		return skeletons;
+
+	},
+
 	parseObject: function () {
 
 		var matrix = new THREE.Matrix4();
 
-		return function parseObject( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials, skeletons ) {
 
 			var object;
 
@@ -447,6 +463,20 @@ Object.assign( THREE.ObjectLoader.prototype, {
 				}
 
 				return materials[ name ];
+
+			}
+
+			function getSkeleton( name ) {
+
+				if ( name === undefined ) return undefined;
+
+				if ( skeletons[ name ] === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: Undefined skeleton', name );
+
+				}
+
+				return skeletons[ name ];
 
 			}
 
@@ -511,10 +541,21 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					var geometry = getGeometry( data.geometry );
 					var material = getMaterial( data.material );
+					var skeleton = getSkeleton( data.skeleton );
+
+					// override bones if skeleton exists
+					if ( skeleton !== undefined ) {
+
+						geometry.bones = skeleton.bones;
+						geometry.boneInverses = skeleton.boneInverses;
+
+					}
 
 					if ( geometry.bones && geometry.bones.length > 0 ) {
 
-						object = new THREE.SkinnedMesh( geometry, material, geometry.useVertexTexture );
+						var useVertexTexture = ( skeleton !== undefined ) ? skeleton.useVertexTexture : undefined;
+
+						object = new THREE.SkinnedMesh( geometry, material, useVertexTexture );
 
 						if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
 						if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
@@ -627,7 +668,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 								if ( parent ) {
 
-									parent.add( scope.parseObject( data.children[ child ], geometries, materials ) );
+									parent.add( scope.parseObject( data.children[ child ], geometries, materials, skeletons ) );
 
 								}
 
@@ -651,7 +692,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					for ( var child in data.children ) {
 
-						object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+						object.add( this.parseObject( data.children[ child ], geometries, materials, skeletons ) );
 
 					}
 

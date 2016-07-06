@@ -557,7 +557,8 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 				geometries: {},
 				materials: {},
 				textures: {},
-				images: {}
+				images: {},
+				skeletons: {}
 			};
 
 			output.metadata = {
@@ -629,11 +630,13 @@ Object.assign( THREE.Object3D.prototype, THREE.EventDispatcher.prototype, {
 			var materials = extractFromCache( meta.materials );
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
+			var skeletons = extractFromCache( meta.skeletons );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
 			if ( textures.length > 0 ) output.textures = textures;
 			if ( images.length > 0 ) output.images = images;
+			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 
 		}
 

@@ -7,6 +7,8 @@
 
 THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
 	this.identityMatrix = new THREE.Matrix4();
@@ -174,6 +176,61 @@ Object.assign( THREE.Skeleton.prototype, {
 	clone: function () {
 
 		return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+
+	},
+
+	toJSON: function () {
+
+		var data = {};
+
+		var scope = this;
+
+		function getParentIndex ( bone ) {
+
+			if ( ! bone.parent instanceof THREE.Bone ) return -1;
+
+			for ( var i = 0, il = scope.bones.length; i < il; i ++ ) {
+
+				if ( scope.bones[ i ] === bone.parent ) return i;
+
+			}
+
+			return -1;
+
+		}
+
+		var bones = [];
+
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+
+			var bone = this.bones[ i ];
+
+			bones.push( {
+
+				name: bone.name,
+				parent: getParentIndex( bone ),
+				pos: bone.position.toArray(),
+				rotq: bone.quaternion.toArray(),
+				scl: bone.scale.toArray()
+
+			} );
+
+		}
+
+		var boneInverses = [];
+
+		for ( var i = 0, il = this.boneInverses.length; i < il; i ++ ) {
+
+			boneInverses.push( this.boneInverses[ i ].toArray() );
+
+		}
+
+		data.uuid = this.uuid;
+		data.bones = bones;
+		data.boneInverses = boneInverses;
+		data.useVertexTexture = this.useVertexTexture;
+
+		return data;
 
 	}
 

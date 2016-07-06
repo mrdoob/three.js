@@ -89,10 +89,6 @@ Object.assign( THREE.BufferGeometryLoader.prototype, {
 
 		}
 
-		if ( json.data.bones !== undefined ) geometry.bones = json.data.bones.slice( 0 );
-		if ( json.data.boneInverses !== undefined ) geometry.boneInverses = json.data.boneInverses.slice( 0 );
-		if ( json.data.useVertexTexture !== undefined ) geometry.useVertexTexture = json.data.useVertexTexture;
-
 		return geometry;
 
 	}

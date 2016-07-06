@@ -191,72 +191,78 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 	toJSON: function ( meta ) {
 
+		var isRootObject = ( meta === undefined || meta === '' );
+
+		if ( isRootObject ) {
+
+			meta = {
+				geometries: {},
+				materials: {},
+				textures: {},
+				images: {},
+				skeletons: {}
+			};
+
+		}
+
 		var data = THREE.Mesh.prototype.toJSON.call( this, meta );
 
-		data.object.bindMode = this.bindMode;
-		data.object.bindMatrix = this.bindMatrix.toArray();
+		if ( isRootObject ) {
 
-		var geometry;
+			data.metadata = {
+				version: 4.4,
+				type: 'SkinnedMesh',
+				generator: 'SkinnedMesh.toJSON'
+			};
 
-		for ( var i = 0, il = data.geometries.length; i < il; i ++ ) {
-
-			if ( data.geometries[ i ].uuid === this.geometry.uuid ) {
-
-				geometry = data.geometries[ i ].data;
-				break;
-
-			}
 
 		}
 
-		// the following code should be in THREE.Skeleton?
-		var scope = this;
+		var object = data.object;
 
-		function getParentIndex ( bone ) {
+		object.bindMode = this.bindMode;
+		object.bindMatrix = this.bindMatrix.toArray();
 
-			if ( ! bone.parent instanceof THREE.Bone ) return -1;
+		if ( meta.skeletons[ this.skeleton.uuid ] === undefined ) {
 
-			for ( var i = 0, il = scope.skeleton.bones.length; i < il; i ++ ) {
-
-				if ( scope.skeleton.bones[ i ] === bone.parent ) return i;
-
-			}
-
-			return -1;
+			meta.skeletons[ this.skeleton.uuid ] = this.skeleton.toJSON( meta );
+			object.skeleton = this.skeleton.uuid;
 
 		}
 
-		var bones = [];
+		// copied from Object3D
+		if ( isRootObject ) {
 
-		for ( var i = 0, il = this.skeleton.bones.length; i < il; i ++ ) {
+			var geometries = extractFromCache( meta.geometries );
+			var materials = extractFromCache( meta.materials );
+			var textures = extractFromCache( meta.textures );
+			var images = extractFromCache( meta.images );
+			var skeletons = extractFromCache( meta.skeletons );
 
-			var bone = this.skeleton.bones[ i ];
-
-			bones.push( {
-
-				name: bone.name,
-				parent: getParentIndex( bone ),
-				pos: bone.position.toArray(),
-				rotq: bone.quaternion.toArray(),
-				scl: bone.scale.toArray()
-
-			} );
-
-		}
-
-		var boneInverses = [];
-
-		for ( var i = 0, il = this.skeleton.boneInverses.length; i < il; i ++ ) {
-
-			boneInverses.push( this.skeleton.boneInverses[ i ].toArray() );
+			if ( geometries.length > 0 ) data.geometries = geometries;
+			if ( materials.length > 0 ) data.materials = materials;
+			if ( textures.length > 0 ) data.textures = textures;
+			if ( images.length > 0 ) data.images = images;
+			if ( skeletons.length > 0 ) data.skeletons = skeletons;
 
 		}
-
-		if ( bones.length > 0 ) geometry.bones = bones;
-		if ( boneInverses.length > 0 ) geometry.boneInverses = boneInverses;
-		geometry.useVertexTexture = this.skeleton.useVertexTexture;
 
 		return data;
+
+		// copied from Object3D
+		function extractFromCache ( cache ) {
+
+			var values = [];
+			for ( var key in cache ) {
+
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+			return values;
+
+		}
 
 	}
 
