@@ -421,6 +421,7 @@ THREE.Box3.prototype = {
 		if( this.isEmpty() ) return this;
 
 		var points = this.getPoints();
+		points[ 0 ].applyMatrix4( matrix ); // 000
 		points[ 1 ].applyMatrix4( matrix ); // 001
 		points[ 2 ].applyMatrix4( matrix ); // 010
 		points[ 3 ].applyMatrix4( matrix ); // 011
