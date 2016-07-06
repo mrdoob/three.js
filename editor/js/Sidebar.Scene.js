@@ -76,6 +76,25 @@ Sidebar.Scene = function ( editor ) {
 	container.add( outliner );
 	container.add( new UI.Break() );
 
+	/*
+	// background
+
+	var backgroundRow = new UI.Row();
+	var background = new UI.Select().setOptions( {
+
+		'None': 'None',
+		'Color': 'Color',
+		'Texture': 'Texture'
+
+	} ).setWidth( '150px' );
+	background.onChange( function () {} );
+
+	backgroundRow.add( new UI.Text( 'Background' ).setWidth( '90px' ) );
+	backgroundRow.add( background );
+
+	container.add( backgroundRow );
+	*/
+
 	// fog
 
 	function updateFogParameters() {
