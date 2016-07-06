@@ -399,41 +399,41 @@ THREE.Box3.prototype = {
 
 	},
 
-	applyMatrix4: function () {
+	getPoints: function () {
 
-		var points = [
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3()
+		return [
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			new THREE.Vector3().set( this.min.x, this.min.y, this.min.z ), // 000
+			new THREE.Vector3().set( this.min.x, this.min.y, this.max.z ), // 001
+			new THREE.Vector3().set( this.min.x, this.max.y, this.min.z ), // 010
+			new THREE.Vector3().set( this.min.x, this.max.y, this.max.z ), // 011
+			new THREE.Vector3().set( this.max.x, this.min.y, this.min.z ), // 100
+			new THREE.Vector3().set( this.max.x, this.min.y, this.max.z ), // 101
+			new THREE.Vector3().set( this.max.x, this.max.y, this.min.z ), // 110
+			new THREE.Vector3().set( this.max.x, this.max.y, this.max.z )  // 111
 		];
 
-		return function applyMatrix4( matrix ) {
+	},
 
-			// transform of empty box is an empty box.
-			if( this.isEmpty() ) return this;
+	applyMatrix4: function applyMatrix4( matrix ) {
 
-			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
+		// transform of empty box is an empty box.
+		if( this.isEmpty() ) return this;
 
-			this.setFromPoints( points );
+		var points = this.getPoints();
+		points[ 1 ].applyMatrix4( matrix ); // 001
+		points[ 2 ].applyMatrix4( matrix ); // 010
+		points[ 3 ].applyMatrix4( matrix ); // 011
+		points[ 4 ].applyMatrix4( matrix ); // 100
+		points[ 5 ].applyMatrix4( matrix ); // 101
+		points[ 6 ].applyMatrix4( matrix ); // 110
+		points[ 7 ].applyMatrix4( matrix ); // 111
 
-			return this;
+		this.setFromPoints( points );
 
-		};
+		return this;
 
-	}(),
+	},
 
 	translate: function ( offset ) {
 
