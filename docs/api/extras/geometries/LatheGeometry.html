@@ -14,10 +14,25 @@
 
 		<div class="desc">Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.</div>
 
+		<iframe id="scene" src="scenes/geometry-browser.html#LatheGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Example</h2>
-
-		<iframe src='scenes/geometry-browser.html#LatheGeometry'></iframe>
 
 		<code>
 		var points = [];
@@ -32,7 +47,6 @@
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]([page:Array points], [page:Integer segments], [page:Float phiStart], [page:Float phiLength])</h3>
 		<div>
 		points — Array of Vector2s. The x-coordinate of each point must be greater than zero.<br />
@@ -43,7 +57,6 @@
 		<div>
 		This creates a LatheBufferGeometry based on the parameters.
 		</div>
-
 
 		<h2>Source</h2>
 

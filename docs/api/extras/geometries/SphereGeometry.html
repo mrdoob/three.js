@@ -14,9 +14,25 @@
 
 		<div class="desc">A class for generating sphere geometries</div>
 
-		<h2>Example</h2>
+		<iframe id="scene" src="scenes/geometry-browser.html#SphereGeometry"></iframe>
 
-		<iframe src='scenes/geometry-browser.html#SphereGeometry'></iframe>
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
 
 		<code>var geometry = new THREE.SphereGeometry( 5, 32, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -25,7 +41,6 @@
 		</code>
 
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([page:Float radius], [page:Integer widthSegments], [page:Integer heightSegments], [page:Float phiStart], [page:Float phiLength], [page:Float thetaStart], [page:Float thetaLength])</h3>
 
@@ -42,7 +57,6 @@
 		<div>
 		The geometry is created by sweeping and calculating vertexes around the Y axis (horizontal sweep) and the Z axis (vertical sweep). Thus, incomplete spheres (akin to <em>'sphere slices'</em>) can be created through the use of different values of phiStart, phiLength, thetaStart and thetaLength, in order to define the points in which we start (or end) calculating those vertices.
 		</div>
-
 
 		<h2>Properties</h2>
 
