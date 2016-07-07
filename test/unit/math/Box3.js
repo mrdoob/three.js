@@ -299,6 +299,52 @@ test( "applyMatrix4", function() {
 	ok( compareBox( d.clone().applyMatrix4( m ), d.clone().translate( t1 ) ), "Passed!" );
 });
 
+test( "getCorners", function() {
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+
+	var b = a.getCorners();
+
+	ok( b[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( b[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	ok( b[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	ok( b[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
+	ok( b[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( b[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
+	ok( b[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	ok( b[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+
+	var c = [
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone()
+	];
+
+	var d = a.getCorners(c);
+
+	ok( d[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( d[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	ok( d[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	ok( d[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
+	ok( d[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( d[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
+	ok( d[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	ok( d[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+
+	ok( d[0] === c[0], "Passed!" );
+	ok( d[1] === c[1], "Passed!" );
+	ok( d[2] === c[2], "Passed!" );
+	ok( d[3] === c[3], "Passed!" );
+	ok( d[4] === c[4], "Passed!" );
+	ok( d[5] === c[5], "Passed!" );
+	ok( d[6] === c[6], "Passed!" );
+	ok( d[7] === c[7], "Passed!" );
+});
+
 test( "translate", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 	var b = new THREE.Box3( zero3.clone(), one3.clone() );
