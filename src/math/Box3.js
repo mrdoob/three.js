@@ -428,23 +428,15 @@ THREE.Box3.prototype = {
 
 	applyMatrix4: function () {
 
-		var points = [
-			new THREE.Vector3(), // 000
-			new THREE.Vector3(), // 001
-			new THREE.Vector3(), // 010
-			new THREE.Vector3(), // 011
-			new THREE.Vector3(), // 100
-			new THREE.Vector3(), // 101
-			new THREE.Vector3(), // 110
-			new THREE.Vector3()  // 111
-		];
+		// Will be initialized on first method call
+		var points = null;
 
 		return function applyMatrix4( matrix ) {
 
 			// transform of empty box is an empty box.
 			if ( this.isEmpty() ) return this;
 
-			this.getCorners( points );
+			points = this.getCorners( points );
 			points[ 0 ].applyMatrix4( matrix );
 			points[ 1 ].applyMatrix4( matrix );
 			points[ 2 ].applyMatrix4( matrix );
