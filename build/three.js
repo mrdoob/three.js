@@ -25156,7 +25156,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new THREE.WebGLShadowMap( this, _lights, objects );
+	var shadowMap = new THREE.WebGLShadowMap( this, _lights, objects, capabilities );
 
 	this.shadowMap = shadowMap;
 
@@ -29644,7 +29644,7 @@ THREE.WebGLShader = ( function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
+THREE.WebGLShadowMap = function ( _renderer, _lights, _objects, capabilities ) {
 
 	var _gl = _renderer.context,
 	_state = _renderer.state,
@@ -29767,6 +29767,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var shadowCamera = shadow.camera;
 
 			_shadowMapSize.copy( shadow.mapSize );
+			_shadowMapSize.min( capabilities.maxTextureSize, capabilities.maxTextureSize );
 
 			if ( light instanceof THREE.PointLight ) {
 
@@ -36127,9 +36128,17 @@ THREE.EllipseCurve.prototype.getPoint = function( t ) {
 
 	}
 
-	if ( this.aClockwise === true && deltaAngle != twoPi && ! samePoints ) {
+	if ( this.aClockwise === true && ! samePoints ) {
 
-		deltaAngle = deltaAngle - twoPi;
+		if ( deltaAngle === twoPi ) {
+
+			deltaAngle = - twoPi;
+
+		} else {
+
+			deltaAngle = deltaAngle - twoPi;
+
+		}
 
 	}
 
