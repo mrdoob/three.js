@@ -74,7 +74,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		if ( scope.isPresenting ) {
 
 			var eyeParamsL = vrHMD.getEyeParameters( 'left' );
-			renderer.setPixelRatio( 1 );
+			renderer.setPixelRatio( rendererPixelRatio );
 
 			if ( isDeprecatedAPI ) {
 
@@ -134,7 +134,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			renderer.setPixelRatio( 1 );
+			renderer.setPixelRatio( rendererPixelRatio );
 			renderer.setSize( eyeWidth * 2, eyeHeight, false );
 
 		} else {
