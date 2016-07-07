@@ -116,22 +116,15 @@ THREE.VREffect = function ( renderer, onError ) {
 	var requestFullscreen;
 	var exitFullscreen;
 	var fullscreenElement;
+	var leftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
+	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
 	function onFullscreenChange () {
 
 		var wasPresenting = scope.isPresenting;
 		scope.isPresenting = vrDisplay !== undefined && ( vrDisplay.isPresenting || ( ! isWebVR1 && document[ fullscreenElement ] instanceof window.HTMLElement ) );
 
-		if ( wasPresenting === scope.isPresenting ) {
-
-			return;
-
-		}
-
 		if ( scope.isPresenting ) {
-
-			rendererPixelRatio = renderer.getPixelRatio();
-			rendererSize = renderer.getSize();
 
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeWidth, eyeHeight;
@@ -141,6 +134,17 @@ THREE.VREffect = function ( renderer, onError ) {
 				eyeWidth = eyeParamsL.renderWidth;
 				eyeHeight = eyeParamsL.renderHeight;
 
+				if ( vrDisplay.getLayers ) {
+
+					var layers = vrDisplay.getLayers();
+					if (layers.length) {
+
+						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
+						rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
+
+					}
+				}
+
 			} else {
 
 				eyeWidth = eyeParamsL.renderRect.width;
@@ -148,10 +152,17 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			renderer.setPixelRatio( 1 );
-			renderer.setSize( eyeWidth * 2, eyeHeight, false );
+			if ( !wasPresenting ) {
 
-		} else {
+				rendererPixelRatio = renderer.getPixelRatio();
+				rendererSize = renderer.getSize();
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( eyeWidth * 2, eyeHeight, false );
+
+			}
+
+		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
 			renderer.setSize( rendererSize.width, rendererSize.height );
@@ -311,8 +322,18 @@ THREE.VREffect = function ( renderer, onError ) {
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
-			renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
-			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
+			renderRectL = {
+				x: Math.round( size.width * leftBounds[ 0 ] ),
+				y: Math.round( size.height * leftBounds[ 1 ] ),
+				width: Math.round( size.width * leftBounds[ 2 ] ),
+				height:  Math.round(size.height * leftBounds[ 3 ] )
+			};
+			renderRectR = {
+				x: Math.round( size.width * rightBounds[ 0 ] ),
+				y: Math.round( size.height * rightBounds[ 1 ] ),
+				width: Math.round( size.width * rightBounds[ 2 ] ),
+				height:  Math.round(size.height * rightBounds[ 3 ] )
+			};
 
 			renderer.setScissorTest( true );
 
