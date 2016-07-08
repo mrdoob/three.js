@@ -401,7 +401,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// Specular map
 
 					if ( params.specularMap ) break; // Keep the first encountered texture
-					console.log("here");
+
 					params.specularMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
 					params.specularMap.wrapS = this.wrap;
 					params.specularMap.wrapT = this.wrap;
