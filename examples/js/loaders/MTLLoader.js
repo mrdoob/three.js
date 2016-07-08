@@ -396,6 +396,18 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_ks':
+
+					// Specular map
+
+					if ( params.specularMap ) break; // Keep the first encountered texture
+
+					params.specularMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
+					params.specularMap.wrapS = this.wrap;
+					params.specularMap.wrapT = this.wrap;
+
+					break;
+
 				case 'ns':
 
 					// The specular exponent (defines the focus of the specular highlight)
