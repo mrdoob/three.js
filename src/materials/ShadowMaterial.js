@@ -17,7 +17,7 @@ function ShadowMaterial () {
 				opacity: { value: 1.0 }
 			}
 		] ),
-		vertexShader: ShaderChunk[ 'shadow_vert' ],
+		vertexShader: ShaderChunk[ 'shadow_vert' ], 
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );
 

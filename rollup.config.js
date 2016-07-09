@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import string from 'rollup-plugin-string';
 
 var outro = `
 Object.defineProperty( exports, 'AudioContext', {
@@ -14,6 +15,11 @@ export default {
 	dest: 'build/three.js',
 	moduleName: 'THREE',
 	format: 'umd',
+	plugins: [
+		string({
+			include: '**/*.glsl'
+		})
+	],
 
 	outro: outro,
 	footer: footer
