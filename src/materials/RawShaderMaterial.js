@@ -1,14 +1,20 @@
+import { ShaderMaterial } from './ShaderMaterial';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RawShaderMaterial = function ( parameters ) {
+function RawShaderMaterial ( parameters ) {
+	this.isRawShaderMaterial = this.isShaderMaterial = this.isMaterial = true;
 
-	THREE.ShaderMaterial.call( this, parameters );
+	ShaderMaterial.call( this, parameters );
 
 	this.type = 'RawShaderMaterial';
 
 };
 
-THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
+RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
+RawShaderMaterial.prototype.constructor = RawShaderMaterial;
+
+
+export { RawShaderMaterial };

@@ -1,4 +1,11 @@
-THREE.WebGLProgram = ( function () {
+import { WebGLUniforms } from './WebGLUniforms';
+import { WebGLShader } from './WebGLShader';
+import { ShaderChunk } from '../shaders/ShaderChunk';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants';
+
+var WebGLProgram;
+
+WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
@@ -6,19 +13,19 @@ THREE.WebGLProgram = ( function () {
 
 		switch ( encoding ) {
 
-			case THREE.LinearEncoding:
+			case LinearEncoding:
 				return [ 'Linear','( value )' ];
-			case THREE.sRGBEncoding:
+			case sRGBEncoding:
 				return [ 'sRGB','( value )' ];
-			case THREE.RGBEEncoding:
+			case RGBEEncoding:
 				return [ 'RGBE','( value )' ];
-			case THREE.RGBM7Encoding:
+			case RGBM7Encoding:
 				return [ 'RGBM','( value, 7.0 )' ];
-			case THREE.RGBM16Encoding:
+			case RGBM16Encoding:
 				return [ 'RGBM','( value, 16.0 )' ];
-			case THREE.RGBDEncoding:
+			case RGBDEncoding:
 				return [ 'RGBD','( value, 256.0 )' ];
-			case THREE.GammaEncoding:
+			case GammaEncoding:
 				return [ 'Gamma','( value, float( GAMMA_FACTOR ) )' ];
 			default:
 				throw new Error( 'unsupported encoding: ' + encoding );
@@ -47,19 +54,19 @@ THREE.WebGLProgram = ( function () {
 
 		switch ( toneMapping ) {
 
-			case THREE.LinearToneMapping:
+			case LinearToneMapping:
 				toneMappingName = "Linear";
 				break;
 
-			case THREE.ReinhardToneMapping:
+			case ReinhardToneMapping:
 				toneMappingName = "Reinhard";
 				break;
 
-			case THREE.Uncharted2ToneMapping:
+			case Uncharted2ToneMapping:
 				toneMappingName = "Uncharted2";
 				break;
 
-			case THREE.CineonToneMapping:
+			case CineonToneMapping:
 				toneMappingName = "OptimizedCineon";
 				break;
 
@@ -148,7 +155,7 @@ THREE.WebGLProgram = ( function () {
 
 		function replace( match, include ) {
 
-			var replace = THREE.ShaderChunk[ include ];
+			var replace = ShaderChunk[ include ];
 
 			if ( replace === undefined ) {
 
@@ -198,11 +205,11 @@ THREE.WebGLProgram = ( function () {
 
 		var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 
-		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
+		if ( parameters.shadowMapType === PCFShadowMap ) {
 
 			shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF';
 
-		} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
+		} else if ( parameters.shadowMapType === PCFSoftShadowMap ) {
 
 			shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
 
@@ -216,22 +223,22 @@ THREE.WebGLProgram = ( function () {
 
 			switch ( material.envMap.mapping ) {
 
-				case THREE.CubeReflectionMapping:
-				case THREE.CubeRefractionMapping:
+				case CubeReflectionMapping:
+				case CubeRefractionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 					break;
 
-				case THREE.CubeUVReflectionMapping:
-				case THREE.CubeUVRefractionMapping:
+				case CubeUVReflectionMapping:
+				case CubeUVRefractionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
 					break;
 
-				case THREE.EquirectangularReflectionMapping:
-				case THREE.EquirectangularRefractionMapping:
+				case EquirectangularReflectionMapping:
+				case EquirectangularRefractionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_EQUIREC';
 					break;
 
-				case THREE.SphericalReflectionMapping:
+				case SphericalReflectionMapping:
 					envMapTypeDefine = 'ENVMAP_TYPE_SPHERE';
 					break;
 
@@ -239,8 +246,8 @@ THREE.WebGLProgram = ( function () {
 
 			switch ( material.envMap.mapping ) {
 
-				case THREE.CubeRefractionMapping:
-				case THREE.EquirectangularRefractionMapping:
+				case CubeRefractionMapping:
+				case EquirectangularRefractionMapping:
 					envMapModeDefine = 'ENVMAP_MODE_REFRACTION';
 					break;
 
@@ -248,15 +255,15 @@ THREE.WebGLProgram = ( function () {
 
 			switch ( material.combine ) {
 
-				case THREE.MultiplyOperation:
+				case MultiplyOperation:
 					envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 					break;
 
-				case THREE.MixOperation:
+				case MixOperation:
 					envMapBlendingDefine = 'ENVMAP_BLENDING_MIX';
 					break;
 
-				case THREE.AddOperation:
+				case AddOperation:
 					envMapBlendingDefine = 'ENVMAP_BLENDING_ADD';
 					break;
 
@@ -280,7 +287,7 @@ THREE.WebGLProgram = ( function () {
 
 		var prefixVertex, prefixFragment;
 
-		if ( material instanceof THREE.RawShaderMaterial ) {
+		if ( (material && material.isRawShaderMaterial) ) {
 
 			prefixVertex = [
 
@@ -455,11 +462,11 @@ THREE.WebGLProgram = ( function () {
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
 
-				( parameters.toneMapping !== THREE.NoToneMapping ) ? "#define TONE_MAPPING" : '',
-				( parameters.toneMapping !== THREE.NoToneMapping ) ? THREE.ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
-				( parameters.toneMapping !== THREE.NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
+				( parameters.toneMapping !== NoToneMapping ) ? "#define TONE_MAPPING" : '',
+				( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '',  // this code is required here because it is used by the toneMapping() function defined below
+				( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
-				( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? THREE.ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
+				( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
 				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
@@ -479,7 +486,7 @@ THREE.WebGLProgram = ( function () {
 		fragmentShader = parseIncludes( fragmentShader, parameters );
 		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
-		if ( material instanceof THREE.ShaderMaterial === false ) {
+		if ( (material && material.isShaderMaterial) === false ) {
 
 			vertexShader = unrollLoops( vertexShader );
 			fragmentShader = unrollLoops( fragmentShader );
@@ -492,8 +499,8 @@ THREE.WebGLProgram = ( function () {
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
 
-		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+		var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+		var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
@@ -580,7 +587,7 @@ THREE.WebGLProgram = ( function () {
 			if ( cachedUniforms === undefined ) {
 
 				cachedUniforms =
-						new THREE.WebGLUniforms( gl, program, renderer );
+						new WebGLUniforms( gl, program, renderer );
 
 			}
 
@@ -652,3 +659,6 @@ THREE.WebGLProgram = ( function () {
 	};
 
 } )();
+
+
+export { WebGLProgram };

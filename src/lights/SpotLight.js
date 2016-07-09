@@ -1,17 +1,22 @@
+import { Light } from './Light';
+import { SpotLightShadow } from './SpotLightShadow';
+import { Object3D } from '../core/Object3D';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay ) {
+function SpotLight ( color, intensity, distance, angle, penumbra, decay ) {
+	this.isSpotLight = true;
 
-	THREE.Light.call( this, color, intensity );
+	Light.call( this, color, intensity );
 
 	this.type = 'SpotLight';
 
-	this.position.copy( THREE.Object3D.DefaultUp );
+	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
 
-	this.target = new THREE.Object3D();
+	this.target = new Object3D();
 
 	Object.defineProperty( this, 'power', {
 		get: function () {
@@ -31,17 +36,17 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay 
 	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-	this.shadow = new THREE.SpotLightShadow();
+	this.shadow = new SpotLightShadow();
 
 };
 
-THREE.SpotLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
+SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	constructor: THREE.SpotLight,
+	constructor: SpotLight,
 
 	copy: function ( source ) {
 
-		THREE.Light.prototype.copy.call( this, source );
+		Light.prototype.copy.call( this, source );
 
 		this.distance = source.distance;
 		this.angle = source.angle;
@@ -57,3 +62,6 @@ THREE.SpotLight.prototype = Object.assign( Object.create( THREE.Light.prototype 
 	}
 
 } );
+
+
+export { SpotLight };

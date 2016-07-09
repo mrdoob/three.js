@@ -1,3 +1,5 @@
+import { Vector3 } from './Vector3';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -5,7 +7,8 @@
  * @author tschw
  */
 
-THREE.Matrix3 = function () {
+function Matrix3 () {
+	this.isMatrix3 = true;
 
 	this.elements = new Float32Array( [
 
@@ -23,9 +26,9 @@ THREE.Matrix3 = function () {
 
 };
 
-THREE.Matrix3.prototype = {
+Matrix3.prototype = {
 
-	constructor: THREE.Matrix3,
+	constructor: Matrix3,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -97,7 +100,7 @@ THREE.Matrix3.prototype = {
 
 		return function applyToVector3Array( array, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
@@ -121,7 +124,7 @@ THREE.Matrix3.prototype = {
 
 		return function applyToBuffer( buffer, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
@@ -169,7 +172,7 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( matrix instanceof THREE.Matrix4 ) {
+		if ( (matrix && matrix.isMatrix4) ) {
 
 			console.error( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
@@ -300,3 +303,6 @@ THREE.Matrix3.prototype = {
 	}
 
 };
+
+
+export { Matrix3 };

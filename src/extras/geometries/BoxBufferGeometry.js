@@ -1,10 +1,15 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector3 } from '../../math/Vector3';
+import { BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+	this.isBoxBufferGeometry = this.isBufferGeometry = true;
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'BoxBufferGeometry';
 
@@ -52,10 +57,10 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
 
 	// build geometry
-	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setIndex( new BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
 	// helper functions
 
@@ -100,7 +105,7 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 		var vertexCounter = 0;
 		var groupCount = 0;
 
-		var vector = new THREE.Vector3();
+		var vector = new Vector3();
 
 		// generate vertices, normals and uvs
 
@@ -190,5 +195,8 @@ THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, height
 
 };
 
-THREE.BoxBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.BoxBufferGeometry.prototype.constructor = THREE.BoxBufferGeometry;
+BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
+
+
+export { BoxBufferGeometry };

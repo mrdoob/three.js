@@ -1,18 +1,25 @@
+import { Mesh } from './Mesh';
+import { Vector4 } from '../math/Vector4';
+import { Skeleton } from './Skeleton';
+import { Bone } from './Bone';
+import { Matrix4 } from '../math/Matrix4';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author ikerr / http://verold.com
  */
 
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
+function SkinnedMesh ( geometry, material, useVertexTexture ) {
+	this.isSkinnedMesh = true;
 
-	THREE.Mesh.call( this, geometry, material );
+	Mesh.call( this, geometry, material );
 
 	this.type = 'SkinnedMesh';
 
 	this.bindMode = "attached";
-	this.bindMatrix = new THREE.Matrix4();
-	this.bindMatrixInverse = new THREE.Matrix4();
+	this.bindMatrix = new Matrix4();
+	this.bindMatrixInverse = new Matrix4();
 
 	// init bones
 
@@ -29,7 +36,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			bone = new THREE.Bone( this );
+			bone = new Bone( this );
 			bones.push( bone );
 
 			bone.name = gbone.name;
@@ -61,14 +68,14 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
-	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
+	this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 };
 
 
-THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
-	constructor: THREE.SkinnedMesh,
+	constructor: SkinnedMesh,
 
 	bind: function( skeleton, bindMatrix ) {
 
@@ -97,7 +104,7 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 	normalizeSkinWeights: function () {
 
-		if ( this.geometry instanceof THREE.Geometry ) {
+		if ( (this.geometry && this.geometry.isGeometry) ) {
 
 			for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
@@ -117,9 +124,9 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 			}
 
-		} else if ( this.geometry instanceof THREE.BufferGeometry ) {
+		} else if ( (this.geometry && this.geometry.isBufferGeometry) ) {
 
-			var vec = new THREE.Vector4();
+			var vec = new Vector4();
 
 			var skinWeight = this.geometry.attributes.skinWeight;
 
@@ -152,7 +159,7 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 
 	updateMatrixWorld: function( force ) {
 
-		THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
+		Mesh.prototype.updateMatrixWorld.call( this, true );
 
 		if ( this.bindMode === "attached" ) {
 
@@ -177,3 +184,6 @@ THREE.SkinnedMesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype
 	}
 
 } );
+
+
+export { SkinnedMesh };

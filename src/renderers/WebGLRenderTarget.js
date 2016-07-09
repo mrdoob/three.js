@@ -1,3 +1,9 @@
+import { EventDispatcher } from '../core/EventDispatcher';
+import { Texture } from '../textures/Texture';
+import { LinearFilter } from '../constants';
+import { Vector4 } from '../math/Vector4';
+import { _Math } from '../math/Math';
+
 /**
  * @author szimek / https://github.com/szimek/
  * @author alteredq / http://alteredqualia.com/
@@ -9,23 +15,24 @@
  * Texture parameters for an auto-generated target texture
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
-THREE.WebGLRenderTarget = function ( width, height, options ) {
+function WebGLRenderTarget ( width, height, options ) {
+	this.isWebGLRenderTarget = true;
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.width = width;
 	this.height = height;
 
-	this.scissor = new THREE.Vector4( 0, 0, width, height );
+	this.scissor = new Vector4( 0, 0, width, height );
 	this.scissorTest = false;
 
-	this.viewport = new THREE.Vector4( 0, 0, width, height );
+	this.viewport = new Vector4( 0, 0, width, height );
 
 	options = options || {};
 
-	if ( options.minFilter === undefined ) options.minFilter = THREE.LinearFilter;
+	if ( options.minFilter === undefined ) options.minFilter = LinearFilter;
 
-	this.texture = new THREE.Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
@@ -33,7 +40,7 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 };
 
-Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype, {
+Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
 	setSize: function ( width, height ) {
 
@@ -81,3 +88,6 @@ Object.assign( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototyp
 	}
 
 } );
+
+
+export { WebGLRenderTarget };

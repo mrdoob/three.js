@@ -1,3 +1,8 @@
+import { CubeTexture } from '../../textures/CubeTexture';
+import { Texture } from '../../textures/Texture';
+
+var WebGLUniforms;
+
 /**
  *
  * Uniforms of a program.
@@ -53,10 +58,10 @@
  *
  */
 
-THREE.WebGLUniforms = ( function() { // scope
+WebGLUniforms = ( function() { // scope
 
-	var emptyTexture = new THREE.Texture();
-	var emptyCubeTexture = new THREE.CubeTexture();
+	var emptyTexture = new Texture();
+	var emptyCubeTexture = new CubeTexture();
 
 	// --- Base for inner nodes (including the root) ---
 
@@ -600,3 +605,6 @@ THREE.WebGLUniforms = ( function() { // scope
 	return WebGLUniforms;
 
 } )();
+
+
+export { WebGLUniforms };

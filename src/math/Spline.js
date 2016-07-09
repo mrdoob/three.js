@@ -1,3 +1,5 @@
+import { Vector3 } from './Vector3';
+
 /**
  * Spline from Tween.js, slightly optimized (and trashed)
  * http://sole.github.com/tween.js/examples/05_spline.html
@@ -6,7 +8,8 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Spline = function ( points ) {
+function Spline ( points ) {
+	this.isSpline = true;
 
 	this.points = points;
 
@@ -75,8 +78,8 @@ THREE.Spline = function ( points ) {
 
 		var i, index, nSamples, position,
 			point = 0, intPoint = 0, oldIntPoint = 0,
-			oldPosition = new THREE.Vector3(),
-			tmpVec = new THREE.Vector3(),
+			oldPosition = new Vector3(),
+			tmpVec = new Vector3(),
 			chunkLengths = [],
 			totalLength = 0;
 
@@ -128,7 +131,7 @@ THREE.Spline = function ( points ) {
 			realDistance,
 			sampling, position,
 			newpoints = [],
-			tmpVec = new THREE.Vector3(),
+			tmpVec = new Vector3(),
 			sl = this.getLength();
 
 		newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
@@ -174,3 +177,6 @@ THREE.Spline = function ( points ) {
 	}
 
 };
+
+
+export { Spline };

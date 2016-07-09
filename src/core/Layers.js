@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Layers = function () {
+function Layers () {
+	this.isLayers = true;
 
 	this.mask = 1;
 
 };
 
-THREE.Layers.prototype = {
+Layers.prototype = {
 
-	constructor: THREE.Layers,
+	constructor: Layers,
 
 	set: function ( channel ) {
 
@@ -43,3 +44,6 @@ THREE.Layers.prototype = {
 	}
 
 };
+
+
+export { Layers };

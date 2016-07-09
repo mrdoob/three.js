@@ -1,18 +1,23 @@
+import { Mesh } from '../../objects/Mesh';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLightHelper = function ( light, sphereSize ) {
+function PointLightHelper ( light, sphereSize ) {
+	this.isPointLightHelper = this.isMesh = true;
 
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	var geometry = new THREE.SphereBufferGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
+	var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
+	var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	THREE.Mesh.call( this, geometry, material );
+	Mesh.call( this, geometry, material );
 
 	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -41,17 +46,17 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 };
 
-THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
-THREE.PointLightHelper.prototype.constructor = THREE.PointLightHelper;
+PointLightHelper.prototype = Object.create( Mesh.prototype );
+PointLightHelper.prototype.constructor = PointLightHelper;
 
-THREE.PointLightHelper.prototype.dispose = function () {
+PointLightHelper.prototype.dispose = function () {
 
 	this.geometry.dispose();
 	this.material.dispose();
 
 };
 
-THREE.PointLightHelper.prototype.update = function () {
+PointLightHelper.prototype.update = function () {
 
 	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
@@ -71,3 +76,6 @@ THREE.PointLightHelper.prototype.update = function () {
 	*/
 
 };
+
+
+export { PointLightHelper };

@@ -1,3 +1,9 @@
+import { Geometry } from '../../core/Geometry';
+import { Face3 } from '../../core/Face3';
+import { Vector3 } from '../../math/Vector3';
+import { ShapeUtils } from '../ShapeUtils';
+import { ExtrudeGeometry } from './ExtrudeGeometry';
+
 /**
  * @author jonobr1 / http://jonobr1.com
  *
@@ -14,9 +20,10 @@
  * }
  **/
 
-THREE.ShapeGeometry = function ( shapes, options ) {
+function ShapeGeometry ( shapes, options ) {
+	this.isShapeGeometry = this.isGeometry = true;
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'ShapeGeometry';
 
@@ -28,13 +35,13 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 };
 
-THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ShapeGeometry.prototype.constructor = THREE.ShapeGeometry;
+ShapeGeometry.prototype = Object.create( Geometry.prototype );
+ShapeGeometry.prototype.constructor = ShapeGeometry;
 
 /**
  * Add an array of shapes to THREE.ShapeGeometry.
  */
-THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
+ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
 
@@ -49,13 +56,13 @@ THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 /**
  * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
  */
-THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
+ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	if ( options === undefined ) options = {};
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var material = options.material;
-	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
+	var uvgen = options.UVGenerator === undefined ? ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
 
 	//
 
@@ -67,7 +74,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.ShapeUtils.isClockWise( vertices );
+	var reverse = ! ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -79,7 +86,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 			hole = holes[ i ];
 
-			if ( THREE.ShapeUtils.isClockWise( hole ) ) {
+			if ( ShapeUtils.isClockWise( hole ) ) {
 
 				holes[ i ] = hole.reverse();
 
@@ -91,7 +98,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	var faces = THREE.ShapeUtils.triangulateShape( vertices, holes );
+	var faces = ShapeUtils.triangulateShape( vertices, holes );
 
 	// Vertices
 
@@ -111,7 +118,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 		vert = vertices[ i ];
 
-		this.vertices.push( new THREE.Vector3( vert.x, vert.y, 0 ) );
+		this.vertices.push( new Vector3( vert.x, vert.y, 0 ) );
 
 	}
 
@@ -123,9 +130,12 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 		var b = face[ 1 ] + shapesOffset;
 		var c = face[ 2 ] + shapesOffset;
 
-		this.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		this.faces.push( new Face3( a, b, c, null, null, material ) );
 		this.faceVertexUvs[ 0 ].push( uvgen.generateTopUV( this, a, b, c ) );
 
 	}
 
 };
+
+
+export { ShapeGeometry };

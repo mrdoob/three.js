@@ -1,25 +1,31 @@
+import { Quaternion } from './Quaternion';
+import { Vector3 } from './Vector3';
+import { Matrix4 } from './Matrix4';
+import { _Math } from './Math';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
  */
 
-THREE.Euler = function ( x, y, z, order ) {
+function Euler ( x, y, z, order ) {
+	this.isEuler = true;
 
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
-	this._order = order || THREE.Euler.DefaultOrder;
+	this._order = order || Euler.DefaultOrder;
 
 };
 
-THREE.Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
-THREE.Euler.DefaultOrder = 'XYZ';
+Euler.DefaultOrder = 'XYZ';
 
-THREE.Euler.prototype = {
+Euler.prototype = {
 
-	constructor: THREE.Euler,
+	constructor: Euler,
 
 	get x () {
 
@@ -107,7 +113,7 @@ THREE.Euler.prototype = {
 
 	setFromRotationMatrix: function ( m, order, update ) {
 
-		var clamp = THREE.Math.clamp;
+		var clamp = _Math.clamp;
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
@@ -234,7 +240,7 @@ THREE.Euler.prototype = {
 
 		return function setFromQuaternion( q, order, update ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.makeRotationFromQuaternion( q );
 
@@ -254,7 +260,7 @@ THREE.Euler.prototype = {
 
 		// WARNING: this discards revolution information -bhouston
 
-		var q = new THREE.Quaternion();
+		var q = new Quaternion();
 
 		return function reorder( newOrder ) {
 
@@ -307,7 +313,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			return new THREE.Vector3( this._x, this._y, this._z );
+			return new Vector3( this._x, this._y, this._z );
 
 		}
 
@@ -324,3 +330,6 @@ THREE.Euler.prototype = {
 	onChangeCallback: function () {}
 
 };
+
+
+export { Euler };

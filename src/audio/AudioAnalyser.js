@@ -2,7 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioAnalyser = function ( audio, fftSize ) {
+function AudioAnalyser ( audio, fftSize ) {
+	this.isAudioAnalyser = true;
 
 	this.analyser = audio.context.createAnalyser();
 	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
@@ -13,7 +14,7 @@ THREE.AudioAnalyser = function ( audio, fftSize ) {
 
 };
 
-Object.assign( THREE.AudioAnalyser.prototype, {
+Object.assign( AudioAnalyser.prototype, {
 
 	getFrequencyData: function () {
 
@@ -38,3 +39,6 @@ Object.assign( THREE.AudioAnalyser.prototype, {
 	}
 
 } );
+
+
+export { AudioAnalyser };
