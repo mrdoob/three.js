@@ -1,3 +1,5 @@
+import './polyfills.js';
+
 export { SpritePlugin } from './renderers/webgl/plugins/SpritePlugin.js';
 export { LensFlarePlugin } from './renderers/webgl/plugins/LensFlarePlugin.js';
 export { WebGLUniforms } from './renderers/webgl/WebGLUniforms.js';
