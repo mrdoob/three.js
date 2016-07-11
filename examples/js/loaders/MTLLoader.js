@@ -390,7 +390,12 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.map ) break; // Keep the first encountered texture
 
-					params.map = this.loadTexture( resolveURL( this.baseUrl, value ) );
+					var texParams = this.getTextureParams( value, params );
+
+					params.map = this.loadTexture( resolveURL( this.baseUrl, texParams.url ) );
+					params.map.repeat.copy( texParams.scale );
+					params.map.offset.copy( texParams.offset );
+
 					params.map.wrapS = this.wrap;
 					params.map.wrapT = this.wrap;
 
@@ -446,7 +451,12 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.bumpMap ) break; // Keep the first encountered texture
 
-					params.bumpMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
+					var texParams = this.getTextureParams( value, params );					
+
+					params.bumpMap = this.loadTexture( resolveURL( this.baseUrl, texParams.url ) );
+					params.bumpMap.repeat.copy( texParams.scale );
+					params.bumpMap.offset.copy( texParams.offset );
+ 
 					params.bumpMap.wrapS = this.wrap;
 					params.bumpMap.wrapT = this.wrap;
 
@@ -461,6 +471,46 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
+	},
+
+	getTextureParams: function( value, matParams ) {
+
+		var texParams = {
+
+			scale: new THREE.Vector2( 1, 1 ),
+			offset: new THREE.Vector2( 0, 0 ),
+
+		 };
+
+		var items = value.split(/\s+/);
+		var pos;
+
+		pos = items.indexOf('-bm');
+		if (pos >= 0) {
+
+			matParams.bumpScale = parseFloat( items[pos+1] );
+			items.splice( pos, 2 );
+
+		}
+
+		pos = items.indexOf('-s');
+		if (pos >= 0) {
+
+			texParams.scale.set( parseFloat( items[pos+1] ), parseFloat( items[pos+2] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		pos = items.indexOf('-o');
+		if (pos >= 0) {
+
+			texParams.offset.set( parseFloat( items[pos+1] ), parseFloat( items[pos+2] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		texParams.url = items.join(' ').trim();
+		return texParams;
 
 	},
 
