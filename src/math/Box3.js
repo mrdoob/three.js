@@ -102,7 +102,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function setFromObject( object ) {
+		return function expandByObject( object ) {
 
 			var scope = this;
 
