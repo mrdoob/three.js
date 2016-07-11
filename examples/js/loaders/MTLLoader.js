@@ -390,7 +390,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( params.map ) break; // Keep the first encountered texture
 
-					texParams = this.getTextureParams( value, params );
+					var texParams = this.getTextureParams( value, params );
 
 					params.map = this.loadTexture( resolveURL( this.baseUrl, texParams.url ) );
 					params.map.repeat.copy( texParams.scale );
@@ -463,7 +463,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	getTextureParams: function( value, matParams ) {
 
-		texParams = {
+		var texParams = {
 
 			scale: new THREE.Vector2( 1, 1 ),
 			offset: new THREE.Vector2( 0, 0 ),
