@@ -476,7 +476,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		pos = items.indexOf('-bm');
 		if (pos >= 0) {
 
-			matParams.bumpScale = parseFloat( items[1] );
+			matParams.bumpScale = parseFloat( items[pos+1] );
 			items.splice( pos, 2 );
 
 		}
