@@ -497,7 +497,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-		texParams.url = items.join(' ');
+		texParams.url = items.join(' ').trim();
 		return texParams;
 
 	},
