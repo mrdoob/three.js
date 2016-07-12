@@ -1,0 +1,19 @@
+{
+	"object": {
+		"uuid": "48EA0291-024E-47E6-9ACE-C6B3B5BED3D0",
+		"type": "Model",
+		"name": "OpenSimModel",
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			]
+	},
+	"metadata": {
+		"version": 4.4,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		],
+	"materials": [
+		]
+}
