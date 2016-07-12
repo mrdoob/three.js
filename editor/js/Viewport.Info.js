@@ -14,6 +14,19 @@ Viewport.Info = function ( editor ) {
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 
+        var smallerDim = Math.min(window.innerHeight, window.innerWidth);
+        var imgDim = Math.max(smallerDim / 15, 30);
+        var logo = new UI.Image('imgs/OpenSimApplicationIcon.png', imgDim, imgDim, 0.5, 
+                                function(img) {
+                                    var smallerDim = Math.min(window.innerHeight, window.innerWidth);
+                                    var imgDim = Math.max(smallerDim / 15, 30);
+                                    img.dom.width = imgDim;
+                                    img.dom.height = imgDim;
+                                });
+        var div = new UI.Div();
+        div.add( logo );
+        container.add( div );
+
 	var objectsText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var verticesText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var trianglesText = new UI.Text( '0' ).setMarginLeft( '6px' );

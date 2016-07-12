@@ -11,6 +11,7 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
+		<script src="websocket.js" type="text/javascript"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
@@ -37,8 +38,6 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
-
-		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -82,9 +81,6 @@
 		<script src="js/Player.js"></script>
 		<script src="js/Script.js"></script>
 
-		<script src="../examples/js/effects/VREffect.js"></script>
-		<script src="../examples/js/controls/VRControls.js"></script>
-
 		<script src="js/Storage.js"></script>
 
 		<script src="js/Editor.js"></script>
@@ -95,7 +91,7 @@
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
-		<script src="js/Menubar.Play.js"></script>
+                <script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
@@ -117,8 +113,6 @@
 		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
-		<script src="../examples/js/geometries/TeapotBufferGeometry.js"></script>
-		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.LatheGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Animation.js"></script>
@@ -149,6 +143,7 @@
 		<script src="js/commands/SetMaterialMapCommand.js"></script>
 		<script src="js/commands/SetSceneCommand.js"></script>
 
+		<script type="text/javascript" src="websocket.js"></script>
 		<!-- <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="qyqgfqd9j8z890t"></script> -->
 
 		<script>
@@ -217,7 +212,7 @@
 
 				function saveState( scene ) {
 
-					if ( editor.config.getKey( 'autosave' ) === false ) {
+					if ( true ) { // avoid saving state for now
 
 						return;
 
@@ -349,6 +344,7 @@
 			//
 
 			var isLoadingFromHash = false;
+			var file = 'scene.json';
 			var hash = window.location.hash;
 
 			if ( hash.substr( 1, 5 ) === 'file=' ) {
