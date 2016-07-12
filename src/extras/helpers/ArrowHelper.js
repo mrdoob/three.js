@@ -16,10 +16,10 @@
 
 THREE.ArrowHelper = ( function () {
 
-	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+	var lineGeometry = new THREE.BufferGeometry();
+	lineGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+	var coneGeometry = new THREE.CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.translate( 0, - 0.5, 0 );
 
 	return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
@@ -34,12 +34,10 @@ THREE.ArrowHelper = ( function () {
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 		this.position.copy( origin );
-		
-		if ( headLength < length ) {
-			this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
-			this.line.matrixAutoUpdate = false;
-			this.add( this.line );
-		}
+
+		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
+		this.line.matrixAutoUpdate = false;
+		this.add( this.line );
 
 		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
@@ -48,7 +46,7 @@ THREE.ArrowHelper = ( function () {
 		this.setDirection( dir );
 		this.setLength( length, headLength, headWidth );
 
-	}
+	};
 
 }() );
 
@@ -91,10 +89,8 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	if ( headLength < length ){
-		this.line.scale.set( 1, length - headLength, 1 );
-		this.line.updateMatrix();
-	}
+	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
+	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
 	this.cone.position.y = length;
@@ -104,7 +100,7 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 
 THREE.ArrowHelper.prototype.setColor = function ( color ) {
 
-	if ( this.line !== undefined ) this.line.material.color.set( color );
-	this.cone.material.color.set( color );
+	this.line.material.color.copy( color );
+	this.cone.material.color.copy( color );
 
 };

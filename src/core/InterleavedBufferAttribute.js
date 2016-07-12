@@ -26,7 +26,7 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get count() {
 
-		return this.data.array.length / this.data.stride;
+		return this.data.count;
 
 	},
 

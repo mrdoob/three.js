@@ -49,14 +49,41 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
+		if ( buffergeometry.index !== null ) {
+
+			deleteAttribute( buffergeometry.index );
+
+		}
+
 		deleteAttributes( buffergeometry.attributes );
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];
 
+		// TODO
+
 		var property = properties.get( geometry );
-		if ( property.wireframe ) deleteAttribute( property.wireframe );
+
+		if ( property.wireframe ) {
+
+			deleteAttribute( property.wireframe );
+
+		}
+
+		properties.delete( geometry );
+
+		var bufferproperty = properties.get( buffergeometry );
+
+		if ( bufferproperty.wireframe ) {
+
+			deleteAttribute( bufferproperty.wireframe );
+
+		}
+
+		properties.delete( buffergeometry );
+
+		//
 
 		info.memory.geometries --;
 

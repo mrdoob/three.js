@@ -10,25 +10,18 @@ THREE.BabylonLoader = function ( manager ) {
 
 THREE.BabylonLoader.prototype = {
 
-	constructor: THREE.ObjectLoader,
+	constructor: THREE.BabylonLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 

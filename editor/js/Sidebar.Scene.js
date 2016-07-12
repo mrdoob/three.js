@@ -6,20 +6,59 @@ Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/scene/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
+	var container = new UI.Panel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 
-		editor.config.setKey( 'ui/sidebar/scene/collapsed', boolean );
+	// outliner
 
-	} );
+	function buildOption( object, draggable ) {
 
-	container.addStatic( new UI.Text( 'SCENE' ) );
-	container.add( new UI.Break() );
+		var option = document.createElement( 'div' );
+		option.draggable = draggable;
+		option.innerHTML = buildHTML( object );
+		option.value = object.id;
+
+		return option;
+
+	}
+
+	function buildHTML( object ) {
+
+		var html = '<span class="type ' + object.type + '"></span> ' + object.name;
+
+		if ( object instanceof THREE.Mesh ) {
+
+			var geometry = object.geometry;
+			var material = object.material;
+
+			html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
+			html += ' <span class="type ' + material.type + '"></span> ' + material.name;
+
+		}
+
+		html += getScript( object.uuid );
+
+		return html;
+
+	}
+
+	function getScript( uuid ) {
+
+		if ( editor.scripts[ uuid ] !== undefined ) {
+
+			return ' <span class="type Script"></span>';
+
+		}
+
+		return '';
+
+	}
 
 	var ignoreObjectSelectedSignal = false;
 
 	var outliner = new UI.Outliner( editor );
+	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
 
 		ignoreObjectSelectedSignal = true;
@@ -49,7 +88,7 @@ Sidebar.Scene = function ( editor ) {
 
 	};
 
-	var fogTypeRow = new UI.Panel();
+	var fogTypeRow = new UI.Row();
 	var fogType = new UI.Select().setOptions( {
 
 		'None': 'None',
@@ -73,7 +112,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// fog color
 
-	var fogColorRow = new UI.Panel();
+	var fogColorRow = new UI.Row();
 	fogColorRow.setDisplay( 'none' );
 
 	var fogColor = new UI.Color().setValue( '#aaaaaa' )
@@ -90,7 +129,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// fog near
 
-	var fogNearRow = new UI.Panel();
+	var fogNearRow = new UI.Row();
 	fogNearRow.setDisplay( 'none' );
 
 	var fogNear = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
@@ -100,7 +139,7 @@ Sidebar.Scene = function ( editor ) {
 
 	container.add( fogNearRow );
 
-	var fogFarRow = new UI.Panel();
+	var fogFarRow = new UI.Row();
 	fogFarRow.setDisplay( 'none' );
 
 	// fog far
@@ -114,7 +153,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// fog density
 
-	var fogDensityRow = new UI.Panel();
+	var fogDensityRow = new UI.Row();
 	fogDensityRow.setDisplay( 'none' );
 
 	var fogDensity = new UI.Number( 0.00025 ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).onChange( updateFogParameters );
@@ -133,8 +172,8 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = [];
 
-		// options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
-		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
+		options.push( buildOption( camera, false ) );
+		options.push( buildOption( scene, false ) );
 
 		( function addObjects( objects, pad ) {
 
@@ -142,25 +181,15 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
+				var option = buildOption( object, true );
+				option.style.paddingLeft = ( pad * 10 ) + 'px';
+				options.push( option );
 
-				if ( object instanceof THREE.Mesh ) {
-
-					var geometry = object.geometry;
-					var material = object.material;
-
-					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
-					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
-
-				}
-
-				options.push( { value: object.id, html: html } );
-
-				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
+				addObjects( object.children, pad + 1 );
 
 			}
 
-		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
+		} )( scene.children, 1 );
 
 		outliner.setOptions( options );
 
@@ -214,6 +243,25 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
+	signals.objectChanged.add( function ( object ) {
+
+		var options = outliner.options;
+
+		for ( var i = 0; i < options.length; i ++ ) {
+
+			var option = options[ i ];
+
+			if ( option.value === object.id ) {
+
+				option.innerHTML = buildHTML( object );
+				return;
+
+			}
+
+		}
+
+	} );
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
@@ -224,4 +272,4 @@ Sidebar.Scene = function ( editor ) {
 
 	return container;
 
-}
+};

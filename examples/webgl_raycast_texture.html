@@ -67,7 +67,7 @@
 				Y <input type="number" value="1" step="0.1" onchange="setRepeatV(this)" />
 			</div>
 		</fieldset>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script>
 
 			CanvasTexture = function ( parentTexture ) {
@@ -214,6 +214,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( new THREE.Color( 0xEEEEEE, 1.0 ) );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 

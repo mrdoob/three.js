@@ -10,16 +10,27 @@ THREE.MTLLoader = function( manager ) {
 
 };
 
-THREE.MTLLoader.prototype = {
+Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 
-	constructor: THREE.MTLLoader,
-
+	/**
+	 * Loads and parses a MTL asset from a URL.
+	 *
+	 * @param {String} url - URL to the MTL file.
+	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
+	 * @param {Function} [onProgress] - Callback for download progress.
+	 * @param {Function} [onError] - Callback for download errors.
+	 *
+	 * @see setPath setTexturePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setPath and/or setTexturePath explicitly prior to load.
+	 */
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -28,9 +39,47 @@ THREE.MTLLoader.prototype = {
 
 	},
 
-	setBaseUrl: function( value ) {
+	/**
+	 * Set base path for resolving references.
+	 * If set this path will be prepended to each loaded and found reference.
+	 *
+	 * @see setTexturePath
+	 * @param {String} path
+	 *
+	 * @example
+	 *     mtlLoader.setPath( 'assets/obj/' );
+	 *     mtlLoader.load( 'my.mtl', ... );
+	 */
+	setPath: function ( path ) {
 
-		this.baseUrl = value;
+		this.path = path;
+
+	},
+
+	/**
+	 * Set base path for resolving texture references.
+	 * If set this path will be prepended found texture reference.
+	 * If not set and setPath is, it will be used as texture base path.
+	 *
+	 * @see setPath
+	 * @param {String} path
+	 *
+	 * @example
+	 *     mtlLoader.setPath( 'assets/obj/' );
+	 *     mtlLoader.setTexturePath( 'assets/textures/' );
+	 *     mtlLoader.load( 'my.mtl', ... );
+	 */
+	setTexturePath: function( path ) {
+
+		this.texturePath = path;
+
+	},
+
+	setBaseUrl: function( path ) {
+
+		console.warn( 'THREE.MTLLoader: .setBaseUrl() is deprecated. Use .setTexturePath( path ) for texture path or .setPath( path ) for general base path instead.' );
+
+		this.setTexturePath( path );
 
 	},
 
@@ -47,13 +96,19 @@ THREE.MTLLoader.prototype = {
 	},
 
 	/**
-	 * Parses loaded MTL file
-	 * @param text - Content of MTL file
+	 * Parses a MTL file.
+	 *
+	 * @param {String} text - Content of MTL file
 	 * @return {THREE.MTLLoader.MaterialCreator}
+	 *
+	 * @see setPath setTexturePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setPath and/or setTexturePath explicitly prior to parse.
 	 */
 	parse: function ( text ) {
 
-		var lines = text.split( "\n" );
+		var lines = text.split( '\n' );
 		var info = {};
 		var delimiter_pattern = /\s+/;
 		var materialsInfo = {};
@@ -75,10 +130,10 @@ THREE.MTLLoader.prototype = {
 			var key = ( pos >= 0 ) ? line.substring( 0, pos ) : line;
 			key = key.toLowerCase();
 
-			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : "";
+			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : '';
 			value = value.trim();
 
-			if ( key === "newmtl" ) {
+			if ( key === 'newmtl' ) {
 
 				// New material
 
@@ -87,7 +142,7 @@ THREE.MTLLoader.prototype = {
 
 			} else if ( info ) {
 
-				if ( key === "ka" || key === "kd" || key === "ks" ) {
+				if ( key === 'ka' || key === 'kd' || key === 'ks' ) {
 
 					var ss = value.split( delimiter_pattern, 3 );
 					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
@@ -102,7 +157,7 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.materialOptions );
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
@@ -110,7 +165,7 @@ THREE.MTLLoader.prototype = {
 
 	}
 
-};
+} );
 
 /**
  * Create a new THREE-MTLLoader.MaterialCreator
@@ -124,14 +179,12 @@ THREE.MTLLoader.prototype = {
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
  *                                  Default: false
- *                  invertTransparency: If transparency need to be inverted (inversion is needed if d = 0 is fully opaque)
- *                                      Default: false (d = 1 is fully opaque)
  * @constructor
  */
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	this.baseUrl = baseUrl;
+	this.baseUrl = baseUrl || '';
 	this.options = options;
 	this.materialsInfo = {};
 	this.materials = {};
@@ -218,20 +271,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 						break;
 
-					case 'd':
-
-						// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-						//   d is dissolve for current material
-						//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
-						if ( this.options && this.options.invertTransparency ) {
-
-							value = 1 - value;
-
-						}
-
-						break;
-
 					default:
 
 						break;
@@ -307,9 +346,24 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		};
 
+		var resolveURL = function ( baseUrl, url ) {
+
+			if ( typeof url !== 'string' || url === '' )
+				return '';
+
+			// Absolute URL
+			if ( /^https?:\/\//i.test( url ) ) {
+				return url;
+			}
+
+			return baseUrl + url;
+		};
+
 		for ( var prop in mat ) {
 
 			var value = mat[ prop ];
+
+			if ( value === '' ) continue;
 
 			switch ( prop.toLowerCase() ) {
 
@@ -319,20 +373,14 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params[ 'color' ] = new THREE.Color().fromArray( value );
-
-					break;
-
-				case 'ka':
-
-					// Ambient color (color under shadow) using RGB values
+					params.color = new THREE.Color().fromArray( value );
 
 					break;
 
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params[ 'specular' ] = new THREE.Color().fromArray( value );
+					params.specular = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -340,9 +388,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
-					params[ 'map' ].wrapS = this.wrap;
-					params[ 'map' ].wrapT = this.wrap;
+					if ( params.map ) break; // Keep the first encountered texture
+
+					params.map = this.loadTexture( resolveURL( this.baseUrl, value ) );
+					params.map.wrapS = this.wrap;
+					params.map.wrapT = this.wrap;
 
 					break;
 
@@ -351,20 +401,27 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params[ 'shininess' ] = parseFloat( value );
+					params.shininess = parseFloat( value );
 
 					break;
 
 				case 'd':
 
-					// According to MTL format (http://paulbourke.net/dataformats/mtl/):
-					//   d is dissolve for current material
-					//   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
-
 					if ( value < 1 ) {
 
-						params[ 'transparent' ] = true;
-						params[ 'opacity' ] = value;
+						params.opacity = value;
+						params.transparent = true;
+
+					}
+
+					break;
+
+				case 'Tr':
+
+					if ( value > 0 ) {
+
+						params.opacity = 1 - value;
+						params.transparent = true;
 
 					}
 
@@ -375,11 +432,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Bump texture map
 
-					if ( params[ 'bumpMap' ] ) break; // Avoid loading twice.
+					if ( params.bumpMap ) break; // Keep the first encountered texture
 
-					params[ 'bumpMap' ] = this.loadTexture( this.baseUrl + value );
-					params[ 'bumpMap' ].wrapS = this.wrap;
-					params[ 'bumpMap' ].wrapT = this.wrap;
+					params.bumpMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
+					params.bumpMap.wrapS = this.wrap;
+					params.bumpMap.wrapT = this.wrap;
 
 					break;
 
@@ -395,33 +452,20 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	},
 
-
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
 		var loader = THREE.Loader.Handlers.get( url );
 		var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
 
-		if ( loader !== null ) {
+		if ( loader === null ) {
 
-			texture = loader.load( url, onLoad );
-
-		} else {
-
-			texture = new THREE.Texture();
-
-			loader = new THREE.ImageLoader( manager );
-			loader.setCrossOrigin( this.crossOrigin );
-			loader.load( url, function ( image ) {
-
-				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
-				texture.needsUpdate = true;
-
-				if ( onLoad ) onLoad( texture );
-
-			}, onProgress, onError );
+			loader = new THREE.TextureLoader( manager );
 
 		}
+
+		if ( loader.setCrossOrigin ) loader.setCrossOrigin( this.crossOrigin );
+		texture = loader.load( url, onLoad, onProgress, onError );
 
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
@@ -430,37 +474,3 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 	}
 
 };
-
-THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
-
-	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
-
-		var canvas = document.createElement( "canvas" );
-		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
-		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
-
-		var ctx = canvas.getContext( "2d" );
-		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-		return canvas;
-
-	}
-
-	return image;
-
-};
-
-THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
-
-	-- x;
-
-	for ( var i = 1; i < 32; i <<= 1 ) {
-
-		x = x | x >> i;
-
-	}
-
-	return x + 1;
-
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.MTLLoader.prototype );

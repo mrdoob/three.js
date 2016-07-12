@@ -94,7 +94,7 @@ THREE.CameraHelper = function ( camera ) {
 	THREE.LineSegments.call( this, geometry, material );
 
 	this.camera = camera;
-	this.camera.updateProjectionMatrix();
+	if( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
 	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -133,7 +133,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	return function () {
+	return function update() {
 
 		geometry = this.geometry;
 		pointMap = this.pointMap;

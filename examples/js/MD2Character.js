@@ -33,7 +33,6 @@ THREE.MD2Character = function () {
 
 		var weaponsTextures = [];
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
-
 		// SKINS
 
 		this.skinsBody = loadTextures( config.baseUrl + "skins/", config.skins );
@@ -154,17 +153,14 @@ THREE.MD2Character = function () {
 		if ( this.meshBody ) {
 
 			if( this.meshBody.activeAction ) {
-				scope.mixer.removeAction( this.meshBody.activeAction );
+				this.meshBody.activeAction.stop();
 				this.meshBody.activeAction = null;
 			}
 
-			var clip = THREE.AnimationClip.findByName( this.meshBody.geometry.animations, clipName );
-			if( clip ) {
+			var action = this.mixer.clipAction( clipName, this.meshBody );
+			if( action ) {
 
-				var action = new THREE.AnimationAction( clip, this.mixer.time ).setLocalRoot( this.meshBody );
-				scope.mixer.addAction( action );
-
-				this.meshBody.activeAction = action;
+				this.meshBody.activeAction = action.play();
 
 			}
 
@@ -183,22 +179,23 @@ THREE.MD2Character = function () {
 		if ( scope.meshWeapon ) {
 
 			if( this.meshWeapon.activeAction ) {
-				scope.mixer.removeAction( this.meshWeapon.activeAction );
+				this.meshWeapon.activeAction.stop();
 				this.meshWeapon.activeAction = null;
 			}
 
-			var clip = THREE.AnimationClip.findByName( this.meshWeapon.geometry.animations, clipName );
-			if( clip ) {
+			var geometry = this.meshWeapon.geometry,
+				animations = geometry.animations;
 
-				var action = new THREE.AnimationAction( clip ).syncWith( this.meshBody.activeAction ).setLocalRoot( this.meshWeapon );
-				scope.mixer.addAction( action );
+			var action = this.mixer.clipAction( clipName, this.meshWeapon );
+			if( action ) {
 
-				this.meshWeapon.activeAction = action;
+				this.meshWeapon.activeAction =
+						action.syncWith( this.meshBody.activeAction ).play();
 
 			}
 
 		}
-			
+
 	}
 
 	this.update = function ( delta ) {
@@ -209,12 +206,13 @@ THREE.MD2Character = function () {
 
 	function loadTextures( baseUrl, textureUrls ) {
 
-		var mapping = THREE.UVMapping;
+		var textureLoader = new THREE.TextureLoader();
 		var textures = [];
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {
 
-			textures[ i ] = THREE.ImageUtils.loadTexture( baseUrl + textureUrls[ i ], mapping, checkLoadingComplete );
+			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
 
 		}
@@ -240,7 +238,7 @@ THREE.MD2Character = function () {
 
 		mesh.materialTexture = materialTexture;
 		mesh.materialWireframe = materialWireframe;
-	
+
 		return mesh;
 
 	}

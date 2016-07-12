@@ -110,19 +110,12 @@
 			this._baseDir = url.substr( 0, url.lastIndexOf( '/' ) + 1 );
 
 			var loader = new THREE.XHRLoader( this.manager );
-			loader.setCrossOrigin( this.crossOrigin );
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( text ) {
 
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
 
 		},
 

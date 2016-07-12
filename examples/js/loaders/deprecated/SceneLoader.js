@@ -29,18 +29,11 @@ THREE.SceneLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			scope.parse( JSON.parse( text ), onLoad, url );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 
@@ -231,7 +224,7 @@ THREE.SceneLoader.prototype = {
 
 							if ( ! objJSON.material ) {
 
-								material = new THREE.MeshFaceMaterial( result.face_materials[ objJSON.geometry ] );
+								material = new THREE.MultiMaterial( result.face_materials[ objJSON.geometry ] );
 
 							}
 
@@ -239,9 +232,9 @@ THREE.SceneLoader.prototype = {
 							// if there is just empty face material
 							// (must create new material as each model has its own face material)
 
-							if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
+							if ( ( material instanceof THREE.MultiMaterial ) && material.materials.length === 0 ) {
 
-								material = new THREE.MeshFaceMaterial( result.face_materials[ objJSON.geometry ] );
+								material = new THREE.MultiMaterial( result.face_materials[ objJSON.geometry ] );
 
 							}
 
@@ -352,7 +345,7 @@ THREE.SceneLoader.prototype = {
 								break;
 
 							case 'SpotLight':
-								light = new THREE.SpotLight( color, intensity, distance, 1 );
+								light = new THREE.SpotLight( color, intensity, distance );
 								light.angle = objJSON.angle;
 								light.position.fromArray( position );
 								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
@@ -898,26 +891,27 @@ THREE.SceneLoader.prototype = {
 			if ( Array.isArray( textureJSON.url ) ) {
 
 				var count = textureJSON.url.length;
-				var url_array = [];
+				var urls = [];
 
 				for ( var i = 0; i < count; i ++ ) {
 
-					url_array[ i ] = get_url( textureJSON.url[ i ], data.urlBaseType );
+					urls[ i ] = get_url( textureJSON.url[ i ], data.urlBaseType );
 
 				}
 
-				var loader = THREE.Loader.Handlers.get( url_array[ 0 ] );
+				var loader = THREE.Loader.Handlers.get( urls[ 0 ] );
 
 				if ( loader !== null ) {
 
-					texture = loader.load( url_array, generateTextureCallback( count ) );
+					texture = loader.load( urls, generateTextureCallback( count ) );
 
 					if ( textureJSON.mapping !== undefined )
 						texture.mapping = textureJSON.mapping;
 
 				} else {
 
-					texture = THREE.ImageUtils.loadTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
+					texture = new THREE.CubeTextureLoader().load( urls, generateTextureCallback( count ) );
+					texture.mapping = textureJSON.mapping;
 
 				}
 
@@ -1083,7 +1077,7 @@ THREE.SceneLoader.prototype = {
 
 		}
 
-		// second pass through all materials to initialize MeshFaceMaterials
+		// second pass through all materials to initialize MultiMaterials
 		// that could be referring to other materials out of order
 
 		for ( matID in data.materials ) {

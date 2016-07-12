@@ -9,9 +9,6 @@ function SmartComparer() {
 	// Diagnostic message, when comparison fails.
 	var message;
 
-	// Keys to skip during object comparison.
-	var omitKeys = [ 'id', 'uuid' ];
-
 	return {
 
 		areEqual: areEqual,
@@ -47,7 +44,7 @@ function SmartComparer() {
 		}
 
 		// Don't compare functions.
-		if ( _.isFunction( val1 ) && _.isFunction( val2 ) ) return true;
+		if ( isFunction( val1 ) && isFunction( val2 ) ) return true;
 
 		// Array comparison.
 		var arrCmp = compareArrays( val1, val2 );
@@ -68,13 +65,30 @@ function SmartComparer() {
 
 		// if (JSON.stringify( val1 ) == JSON.stringify( val2 ) ) return true;
 
-		// Continue with default comparison.
-		if ( _.isEqual( val1, val2 ) ) return true;
-
 		// Object differs (unknown reason).
 		return makeFail( 'Values differ', val1, val2 );
 	}
 
+	function isFunction(value) {
+
+		// The use of `Object#toString` avoids issues with the `typeof` operator
+		// in Safari 8 which returns 'object' for typed array constructors, and
+		// PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+		var tag = isObject(value) ? Object.prototype.toString.call(value) : '';
+
+		return tag == '[object Function]' || tag == '[object GeneratorFunction]';
+
+  }
+
+	function isObject(value) {
+
+		// Avoid a V8 JIT bug in Chrome 19-20.
+		// See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+		var type = typeof value;
+
+		return !!value && (type == 'object' || type == 'function');
+
+  }
 
 	function compareArrays( val1, val2 ) {
 
@@ -107,8 +121,8 @@ function SmartComparer() {
 
 	function compareObjects( val1, val2 ) {
 
-		var isObj1 = _.isObject( val1 );
-		var isObj2 = _.isObject( val2 );
+		var isObj1 = isObject( val1 );
+		var isObj2 = isObject( val2 );
 
 		// Compare type.
 		if ( isObj1 !== isObj2 ) return makeFail( 'Values are not both objects' );
@@ -117,38 +131,57 @@ function SmartComparer() {
 		if ( !isObj1 ) return undefined;
 
 		// Compare keys.
-		var keys1 = _( val1 ).keys().difference( omitKeys ).value();
-		var keys2 = _( val2 ).keys().difference( omitKeys ).value();
+		var keys1 = Object.keys( val1 );
+		var keys2 = Object.keys( val2 );
 
-		var missingActual = _.difference( keys1, keys2 );
-		if ( missingActual.length !== 0 ) {
+		for ( var i = 0, l = keys1.length; i < l; i++ ) {
 
-			return makeFail( 'Property "' + missingActual[0] + '" is unexpected.' );
+			if (keys2.indexOf(keys1[ i ]) < 0) {
+
+				return makeFail( 'Property "' + keys1[ i ] + '" is unexpected.' );
+
+			}
 
 		}
 
-		var missingExpected = _.difference( keys2, keys1 );
-		if ( missingExpected.length !== 0 ) {
+		for ( var i = 0, l = keys2.length; i < l; i++ ) {
 
-			return makeFail( 'Property "' + missingExpected[0] + '" is missing.' );
+			if (keys1.indexOf(keys2[ i ]) < 0) {
+
+				return makeFail( 'Property "' + keys2[ i ] + '" is missing.' );
+
+			}
 
 		}
 
 		// Keys are the same. For each key, compare content until a difference is found.
-		var hadDifference = _.any( keys1, function ( key ) {
+		var hadDifference = false;
 
-			var prop1 = val1[key];
-			var prop2 = val2[key];
+		for ( var i = 0, l = keys1.length; i < l; i++ ) {
+
+			var key = keys1[ i ];
+
+			if (key === "uuid" || key === "id") {
+
+				continue;
+
+			}
+
+			var prop1 = val1[ key ];
+			var prop2 = val2[ key ];
 
 			// Compare property content.
 			var eq = areEqual( prop1, prop2 );
 
 			// In case of failure, an message should already be set.
 			// Add context to low level message.
-			if ( !eq ) addContext( 'property "' + key + '"' );
-			return !eq;
+			if ( !eq ) {
 
-		});
+				addContext( 'property "' + key + '"' );
+				hadDifference = true;
+
+			}
+		}
 
 		return ! hadDifference;
 

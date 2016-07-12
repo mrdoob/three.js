@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color ) {
+THREE.AmbientLight = function ( color, intensity ) {
 
-	THREE.Light.call( this, color );
+	THREE.Light.call( this, color, intensity );
 
 	this.type = 'AmbientLight';
 
@@ -12,5 +12,8 @@ THREE.AmbientLight = function ( color ) {
 
 };
 
-THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
+THREE.AmbientLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
+
+	constructor: THREE.AmbientLight
+
+} );

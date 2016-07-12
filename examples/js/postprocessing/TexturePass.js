@@ -4,6 +4,8 @@
 
 THREE.TexturePass = function ( texture, opacity ) {
 
+	THREE.Pass.call( this );
+
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.TexturePass relies on THREE.CopyShader" );
 
@@ -22,9 +24,7 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 	} );
 
-	this.enabled = true;
 	this.needsSwap = false;
-
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
@@ -34,14 +34,16 @@ THREE.TexturePass = function ( texture, opacity ) {
 
 };
 
-THREE.TexturePass.prototype = {
+THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.TexturePass,
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.quad.material = this.material;
 
-		renderer.render( this.scene, this.camera, readBuffer );
+		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 
 	}
 
-};
+} );

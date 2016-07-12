@@ -31,7 +31,6 @@ THREE.VRMLLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -44,13 +43,14 @@ THREE.VRMLLoader.prototype = {
 
 		this.crossOrigin = value;
 
-		THREE.ImageUtils.crossOrigin = value;
-
 	},
 
 	parse: function ( data ) {
 
 		var texturePath = this.texturePath || '';
+
+		var textureLoader = new THREE.TextureLoader( this.manager );
+		textureLoader.setCrossOrigin( this.crossOrigin );
 
 		var parseV1 = function ( lines, scene ) {
 
@@ -203,6 +203,8 @@ THREE.VRMLLoader.prototype = {
 
 			};
 
+			var index = [];
+
 			var parseProperty = function ( node, line ) {
 
 				var parts = [], part, property = {}, fieldName;
@@ -213,7 +215,7 @@ THREE.VRMLLoader.prototype = {
 				 */
 				var regex = /[^\s,\[\]]+/g;
 
-				var point, index, angles, colors;
+				var point, angles, colors;
 
 				while ( null != ( part = regex.exec( line ) ) ) {
 
@@ -255,8 +257,6 @@ THREE.VRMLLoader.prototype = {
 					// the parts hold the indexes as strings
 					if ( parts.length > 0 ) {
 
-						index = [];
-
 						for ( var ind = 0; ind < parts.length; ind ++ ) {
 
 							// the part should either be positive integer or -1
@@ -290,6 +290,15 @@ THREE.VRMLLoader.prototype = {
 
 					// end
 					if ( /]/.exec( line ) ) {
+
+						if ( index.length > 0 ) {
+
+							this.indexes.push( index );
+
+						}
+
+						// start new one
+						index = [];
 
 						this.isRecordingFaces = false;
 						node[this.recordingFieldname] = this.indexes;
@@ -573,7 +582,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /USE/.exec( data ) ) {
 
-						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
+						var defineKey = /USE\s+?([^\s]+)/.exec( data )[ 1 ];
 
 						if ( undefined == defines[ defineKey ] ) {
 
@@ -620,7 +629,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
 
 					}
@@ -657,7 +666,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 
 						defines[ object.name ] = object;
 
@@ -763,7 +772,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'DEF' ) > -1 ) {
 
-									var name = /DEF\s+(\w+)/.exec( child.string )[ 1 ];
+									var name = /DEF\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									defines[ name ] = geometry.vertices;
 
@@ -771,7 +780,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'USE' ) > -1 ) {
 
-									var defineKey = /USE\s+(\w+)/.exec( child.string )[ 1 ];
+									var defineKey = /USE\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									geometry.vertices = defines[ defineKey ];
 								}
@@ -853,7 +862,7 @@ THREE.VRMLLoader.prototype = {
 						// see if it's a define
 						if ( /DEF/.exec( data.string ) ) {
 
-							geometry.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+							geometry.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 							defines[ geometry.name ] = geometry;
 
 						}
@@ -911,7 +920,7 @@ THREE.VRMLLoader.prototype = {
 
 							if ( /DEF/.exec( data.string ) ) {
 
-								material.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+								material.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 
 								defines[ material.name ] = material;
 
@@ -929,7 +938,7 @@ THREE.VRMLLoader.prototype = {
 
 								parent.material.name = textureName[ 1 ];
 
-								parent.material.map = THREE.ImageUtils.loadTexture (texturePath + textureName[ 1 ]);
+								parent.material.map = textureLoader.load( texturePath + textureName[ 1 ] );
 
 							}
 

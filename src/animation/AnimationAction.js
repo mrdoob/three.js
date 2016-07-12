@@ -1,165 +1,665 @@
 /**
  *
- * A clip that has been explicitly scheduled.
+ * Action provided by AnimationMixer for scheduling clip playback on specific
+ * objects.
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
+ * @author tschw
+ *
  */
 
-THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
+THREE.AnimationAction = function() {
 
-	if ( clip === undefined ) throw new Error( 'clip is null' );
-	this.clip = clip;
-	this.localRoot = null;
-	this.startTime = startTime || 0;
-	this.timeScale = timeScale || 1;
-	this.weight = weight || 1;
-	this.loop = loop || THREE.LoopRepeat;
-	this.loopCount = 0;
-	this.enabled = true;	// allow for easy disabling of the action.
+	throw new Error( "THREE.AnimationAction: " +
+			"Use mixer.clipAction for construction." );
 
-	this.actionTime = - this.startTime;
-	this.clipTime = 0;
-
-	this.propertyBindings = [];
 };
 
-/*
-THREE.LoopOnce = 2200;
-THREE.LoopRepeat = 2201;
-THREE.LoopPingPing = 2202;
-*/
+THREE.AnimationAction._new =
+		function AnimationAction( mixer, clip, localRoot ) {
 
-THREE.AnimationAction.prototype = {
+	this._mixer = mixer;
+	this._clip = clip;
+	this._localRoot = localRoot || null;
 
-	constructor: THREE.AnimationAction,
+	var tracks = clip.tracks,
+		nTracks = tracks.length,
+		interpolants = new Array( nTracks );
 
-	setLocalRoot: function( localRoot ) {
+	var interpolantSettings = {
+			endingStart: 	THREE.ZeroCurvatureEnding,
+			endingEnd:		THREE.ZeroCurvatureEnding
+	};
 
-		this.localRoot = localRoot;
+	for ( var i = 0; i !== nTracks; ++ i ) {
+
+		var interpolant = tracks[ i ].createInterpolant( null );
+		interpolants[ i ] = interpolant;
+		interpolant.settings = interpolantSettings;
+
+	}
+
+	this._interpolantSettings = interpolantSettings;
+
+	this._interpolants = interpolants;	// bound by the mixer
+
+	// inside: PropertyMixer (managed by the mixer)
+	this._propertyBindings = new Array( nTracks );
+
+	this._cacheIndex = null;			// for the memory manager
+	this._byClipCacheIndex = null;		// for the memory manager
+
+	this._timeScaleInterpolant = null;
+	this._weightInterpolant = null;
+
+	this.loop = THREE.LoopRepeat;
+	this._loopCount = -1;
+
+	// global mixer time when the action is to be started
+	// it's set back to 'null' upon start of the action
+	this._startTime = null;
+
+	// scaled local time of the action
+	// gets clamped or wrapped to 0..clip.duration according to loop
+	this.time = 0;
+
+	this.timeScale = 1;
+	this._effectiveTimeScale = 1;
+
+	this.weight = 1;
+	this._effectiveWeight = 1;
+
+	this.repetitions = Infinity; 		// no. of repetitions when looping
+
+	this.paused = false;				// false -> zero effective time scale
+	this.enabled = true;				// true -> zero effective weight
+
+	this.clampWhenFinished 	= false;	// keep feeding the last frame?
+
+	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
+	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
+
+};
+
+THREE.AnimationAction._new.prototype = {
+
+	constructor: THREE.AnimationAction._new,
+
+	// State & Scheduling
+
+	play: function() {
+
+		this._mixer._activateAction( this );
 
 		return this;
 
 	},
 
-	updateTime: function( clipDeltaTime ) {
+	stop: function() {
 
-		var previousClipTime = this.clipTime;
-   		var previousLoopCount = this.loopCount;
-   		var previousActionTime = this.actionTime;
+		this._mixer._deactivateAction( this );
 
-		var duration = this.clip.duration;
+		return this.reset();
 
-		this.actionTime = this.actionTime + clipDeltaTime;
+	},
 
-		if ( this.loop === THREE.LoopOnce ) {
+	reset: function() {
 
-			this.loopCount = 0;
-			this.clipTime = Math.min( Math.max( this.actionTime, 0 ), duration );
+		this.paused = false;
+		this.enabled = true;
 
-			// if time is changed since last time, see if we have hit a start/end limit
-			if ( this.clipTime !== previousClipTime ) {
+		this.time = 0;			// restart clip
+		this._loopCount = -1;	// forget previous loops
+		this._startTime = null;	// forget scheduling
 
-				if ( this.clipTime === duration ) {
+		return this.stopFading().stopWarping();
 
-					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: 1 } );
+	},
 
-				} else if ( this.clipTime === 0 ) {
+	isRunning: function() {
 
-					this.mixer.dispatchEvent( { type: 'finished', action: this, direction: -1 } );
+		var start = this._startTime;
 
-				}
+		return this.enabled && ! this.paused && this.timeScale !== 0 &&
+				this._startTime === null && this._mixer._isActiveAction( this );
 
-			}
+	},
 
+	// return true when play has been called
+	isScheduled: function() {
 
-			return this.clipTime;
+		return this._mixer._isActiveAction( this );
+
+	},
+
+	startAt: function( time ) {
+
+		this._startTime = time;
+
+		return this;
+
+	},
+
+	setLoop: function( mode, repetitions ) {
+
+		this.loop = mode;
+		this.repetitions = repetitions;
+
+		return this;
+
+	},
+
+	// Weight
+
+	// set the weight stopping any scheduled fading
+	// although .enabled = false yields an effective weight of zero, this
+	// method does *not* change .enabled, because it would be confusing
+	setEffectiveWeight: function( weight ) {
+
+		this.weight = weight;
+
+		// note: same logic as when updated at runtime
+		this._effectiveWeight = this.enabled ? weight : 0;
+
+		return this.stopFading();
+
+	},
+
+	// return the weight considering fading and .enabled
+	getEffectiveWeight: function() {
+
+		return this._effectiveWeight;
+
+	},
+
+	fadeIn: function( duration ) {
+
+		return this._scheduleFading( duration, 0, 1 );
+
+	},
+
+	fadeOut: function( duration ) {
+
+		return this._scheduleFading( duration, 1, 0 );
+
+	},
+
+	crossFadeFrom: function( fadeOutAction, duration, warp ) {
+
+		var mixer = this._mixer;
+
+		fadeOutAction.fadeOut( duration );
+		this.fadeIn( duration );
+
+		if( warp ) {
+
+			var fadeInDuration = this._clip.duration,
+				fadeOutDuration = fadeOutAction._clip.duration,
+
+				startEndRatio = fadeOutDuration / fadeInDuration,
+				endStartRatio = fadeInDuration / fadeOutDuration;
+
+			fadeOutAction.warp( 1.0, startEndRatio, duration );
+			this.warp( endStartRatio, 1.0, duration );
 
 		}
 
-		this.loopCount = Math.floor( this.actionTime / duration );
+		return this;
 
-		var newClipTime = this.actionTime - this.loopCount * duration;
-		newClipTime = newClipTime % duration;
+	},
 
-		// if we are ping pong looping, ensure that we go backwards when appropriate
-		if ( this.loop == THREE.LoopPingPong ) {
+	crossFadeTo: function( fadeInAction, duration, warp ) {
 
-			if ( Math.abs( this.loopCount % 2 ) === 1 ) {
+		return fadeInAction.crossFadeFrom( this, duration, warp );
 
-				newClipTime = duration - newClipTime;
+	},
 
-			}
+	stopFading: function() {
+
+		var weightInterpolant = this._weightInterpolant;
+
+		if ( weightInterpolant !== null ) {
+
+			this._weightInterpolant = null;
+			this._mixer._takeBackControlInterpolant( weightInterpolant );
 
 		}
 
-		this.clipTime = newClipTime;
+		return this;
 
-		if ( this.loopCount !== previousLoopCount ) {
+	},
 
-   			this.mixer.dispatchEvent( { type: 'loop', action: this, loopDelta: ( this.loopCount - this.loopCount ) } );
+	// Time Scale Control
 
-   		}
+	// set the weight stopping any scheduled warping
+	// although .paused = true yields an effective time scale of zero, this
+	// method does *not* change .paused, because it would be confusing
+	setEffectiveTimeScale: function( timeScale ) {
 
-	   	return this.clipTime;
+		this.timeScale = timeScale;
+		this._effectiveTimeScale = this.paused ? 0 :timeScale;
+
+		return this.stopWarping();
+
+	},
+
+	// return the time scale considering warping and .paused
+	getEffectiveTimeScale: function() {
+
+		return this._effectiveTimeScale;
+
+	},
+
+	setDuration: function( duration ) {
+
+		this.timeScale = this._clip.duration / duration;
+
+		return this.stopWarping();
 
 	},
 
 	syncWith: function( action ) {
 
-		this.actionTime = action.actionTime;
+		this.time = action.time;
 		this.timeScale = action.timeScale;
 
-		return this;
-	},
-
-	warpToDuration: function( duration ) {
-
-		this.timeScale = this.clip.duration / duration;
-
-		return this;
-	},
-
-	init: function( time ) {
-
-		this.clipTime = time - this.startTime;
-
-		return this;
+		return this.stopWarping();
 
 	},
 
-	update: function( clipDeltaTime ) {
+	halt: function( duration ) {
 
-		this.updateTime( clipDeltaTime );
-
-		var clipResults = this.clip.getAt( this.clipTime );
-
-		return clipResults;
+		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	},
 
-	getTimeScaleAt: function( time ) {
+	warp: function( startTimeScale, endTimeScale, duration ) {
 
-		if ( this.timeScale.getAt ) {
-			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
-			return this.timeScale.getAt( time );
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._timeScaleInterpolant,
+
+			timeScale = this.timeScale;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._timeScaleInterpolant = interpolant;
 
 		}
 
-		return this.timeScale;
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now;
+		times[ 1 ] = now + duration;
+
+		values[ 0 ] = startTimeScale / timeScale;
+		values[ 1 ] = endTimeScale / timeScale;
+
+		return this;
 
 	},
 
-	getWeightAt: function( time ) {
+	stopWarping: function() {
 
-		if ( this.weight.getAt ) {
-			// pass in time, not clip time, allows for fadein/fadeout across multiple loops of the clip
-			return this.weight.getAt( time );
+		var timeScaleInterpolant = this._timeScaleInterpolant;
+
+		if ( timeScaleInterpolant !== null ) {
+
+			this._timeScaleInterpolant = null;
+			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
 
 		}
 
-		return this.weight;
+		return this;
+
+	},
+
+	// Object Accessors
+
+	getMixer: function() {
+
+		return this._mixer;
+
+	},
+
+	getClip: function() {
+
+		return this._clip;
+
+	},
+
+	getRoot: function() {
+
+		return this._localRoot || this._mixer._root;
+
+	},
+
+	// Interna
+
+	_update: function( time, deltaTime, timeDirection, accuIndex ) {
+		// called by the mixer
+
+		var startTime = this._startTime;
+
+		if ( startTime !== null ) {
+
+			// check for scheduled start of action
+
+			var timeRunning = ( time - startTime ) * timeDirection;
+			if ( timeRunning < 0 || timeDirection === 0 ) {
+
+				return; // yet to come / don't decide when delta = 0
+
+			}
+
+			// start
+
+			this._startTime = null; // unschedule
+			deltaTime = timeDirection * timeRunning;
+
+		}
+
+		// apply time scale and advance time
+
+		deltaTime *= this._updateTimeScale( time );
+		var clipTime = this._updateTime( deltaTime );
+
+		// note: _updateTime may disable the action resulting in
+		// an effective weight of 0
+
+		var weight = this._updateWeight( time );
+
+		if ( weight > 0 ) {
+
+			var interpolants = this._interpolants;
+			var propertyMixers = this._propertyBindings;
+
+			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+				interpolants[ j ].evaluate( clipTime );
+				propertyMixers[ j ].accumulate( accuIndex, weight );
+
+			}
+
+		}
+
+	},
+
+	_updateWeight: function( time ) {
+
+		var weight = 0;
+
+		if ( this.enabled ) {
+
+			weight = this.weight;
+			var interpolant = this._weightInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				weight *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopFading();
+
+					if ( interpolantValue === 0 ) {
+
+						// faded out, disable
+						this.enabled = false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this._effectiveWeight = weight;
+		return weight;
+
+	},
+
+	_updateTimeScale: function( time ) {
+
+		var timeScale = 0;
+
+		if ( ! this.paused ) {
+
+			timeScale = this.timeScale;
+
+			var interpolant = this._timeScaleInterpolant;
+
+			if ( interpolant !== null ) {
+
+				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+
+				timeScale *= interpolantValue;
+
+				if ( time > interpolant.parameterPositions[ 1 ] ) {
+
+					this.stopWarping();
+
+					if ( timeScale === 0 ) {
+
+						// motion has halted, pause
+						this.paused = true;
+
+					} else {
+
+						// warp done - apply final time scale
+						this.timeScale = timeScale;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this._effectiveTimeScale = timeScale;
+		return timeScale;
+
+	},
+
+	_updateTime: function( deltaTime ) {
+
+		var time = this.time + deltaTime;
+
+		if ( deltaTime === 0 ) return time;
+
+		var duration = this._clip.duration,
+
+			loop = this.loop,
+			loopCount = this._loopCount;
+
+		if ( loop === THREE.LoopOnce ) {
+
+			if ( loopCount === -1 ) {
+				// just started
+
+				this.loopCount = 0;
+				this._setEndings( true, true, false );
+
+			}
+
+			handle_stop: {
+
+				if ( time >= duration ) {
+
+					time = duration;
+
+				} else if ( time < 0 ) {
+
+					time = 0;
+
+				} else break handle_stop;
+
+				if ( this.clampWhenFinished ) this.paused = true;
+				else this.enabled = false;
+
+				this._mixer.dispatchEvent( {
+					type: 'finished', action: this,
+					direction: deltaTime < 0 ? -1 : 1
+				} );
+
+			}
+
+		} else { // repetitive Repeat or PingPong
+
+			var pingPong = ( loop === THREE.LoopPingPong );
+
+			if ( loopCount === -1 ) {
+				// just started
+
+				if ( deltaTime >= 0 ) {
+
+					loopCount = 0;
+
+					this._setEndings(
+							true, this.repetitions === 0, pingPong );
+
+				} else {
+
+					// when looping in reverse direction, the initial
+					// transition through zero counts as a repetition,
+					// so leave loopCount at -1
+
+					this._setEndings(
+							this.repetitions === 0, true, pingPong );
+
+				}
+
+			}
+
+			if ( time >= duration || time < 0 ) {
+				// wrap around
+
+				var loopDelta = Math.floor( time / duration ); // signed
+				time -= duration * loopDelta;
+
+				loopCount += Math.abs( loopDelta );
+
+				var pending = this.repetitions - loopCount;
+
+				if ( pending < 0 ) {
+					// have to stop (switch state, clamp time, fire event)
+
+					if ( this.clampWhenFinished ) this.paused = true;
+					else this.enabled = false;
+
+					time = deltaTime > 0 ? duration : 0;
+
+					this._mixer.dispatchEvent( {
+						type: 'finished', action: this,
+						direction: deltaTime > 0 ? 1 : -1
+					} );
+
+				} else {
+					// keep running
+
+					if ( pending === 0 ) {
+						// entering the last round
+
+						var atStart = deltaTime < 0;
+						this._setEndings( atStart, ! atStart, pingPong );
+
+					} else {
+
+						this._setEndings( false, false, pingPong );
+
+					}
+
+					this._loopCount = loopCount;
+
+					this._mixer.dispatchEvent( {
+						type: 'loop', action: this, loopDelta: loopDelta
+					} );
+
+				}
+
+			}
+
+			if ( pingPong && ( loopCount & 1 ) === 1 ) {
+				// invert time for the "pong round"
+
+				this.time = time;
+				return duration - time;
+
+			}
+
+		}
+
+		this.time = time;
+		return time;
+
+	},
+
+	_setEndings: function( atStart, atEnd, pingPong ) {
+
+		var settings = this._interpolantSettings;
+
+		if ( pingPong ) {
+
+			settings.endingStart 	= THREE.ZeroSlopeEnding;
+			settings.endingEnd		= THREE.ZeroSlopeEnding;
+
+		} else {
+
+			// assuming for LoopOnce atStart == atEnd == true
+
+			if ( atStart ) {
+
+				settings.endingStart = this.zeroSlopeAtStart ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingStart = THREE.WrapAroundEnding;
+
+			}
+
+			if ( atEnd ) {
+
+				settings.endingEnd = this.zeroSlopeAtEnd ?
+						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+
+			} else {
+
+				settings.endingEnd 	 = THREE.WrapAroundEnding;
+
+			}
+
+		}
+
+	},
+
+	_scheduleFading: function( duration, weightNow, weightThen ) {
+
+		var mixer = this._mixer, now = mixer.time,
+			interpolant = this._weightInterpolant;
+
+		if ( interpolant === null ) {
+
+			interpolant = mixer._lendControlInterpolant(),
+			this._weightInterpolant = interpolant;
+
+		}
+
+		var times = interpolant.parameterPositions,
+			values = interpolant.sampleValues;
+
+		times[ 0 ] = now; 				values[ 0 ] = weightNow;
+		times[ 1 ] = now + duration;	values[ 1 ] = weightThen;
+
+		return this;
 
 	}
 
 };
+

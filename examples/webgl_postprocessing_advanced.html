@@ -40,7 +40,7 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ColorifyShader.js"></script>
@@ -117,7 +117,7 @@
 				//
 
 				var materialColor = new THREE.MeshBasicMaterial( {
-					map: THREE.ImageUtils.loadTexture( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+					map:  new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
 					depthTest: false
 				} );
 
@@ -155,9 +155,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				//container.appendChild( stats.dom );
 
 				//
 
@@ -208,7 +206,12 @@
 
 				//
 
-				var rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
+				var rtParameters = {
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBFormat,
+					stencilBuffer: true
+				};
 
 				var rtWidth  = width / 2;
 				var rtHeight = height / 2;
@@ -231,7 +234,7 @@
 
 				//
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
 
 				//
 
@@ -284,7 +287,7 @@
 
 				//onWindowResize();
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -314,7 +317,7 @@
 				composer3.setSize( halfWidth, halfHeight );
 				composer4.setSize( halfWidth, halfHeight );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
@@ -329,13 +332,13 @@
 
 			function createMesh( geometry, scene, scale ) {
 
-				var mat2 = new THREE.MeshLambertMaterial( {
+				var mat2 = new THREE.MeshPhongMaterial( {
 
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
-					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: new THREE.TextureLoader().load( "obj/leeperrysmith/Map-COL.jpg" ),
+					normalMap: new THREE.TextureLoader().load("obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );
@@ -354,8 +357,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 
@@ -365,9 +369,7 @@
 
 				if ( mesh ) mesh.rotation.y = -time;
 
-				renderer.setViewport( 0, 0, 2 * halfWidth, 2 * halfHeight );
-
-				renderer.clear();
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				composerScene.render( delta );
 
 				renderer.setViewport( 0, 0, halfWidth, halfHeight );

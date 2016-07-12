@@ -2,13 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.BufferGeometry = function ( signals ) {
+Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
-	var container = new UI.Panel();
+	var signals = editor.signals;
+
+	var container = new UI.Row();
 
 	function update( object ) {
 
-		if ( object === null ) return;
+		if ( object === null ) return; // objectSelected.dispatch( null )
+		if ( object === undefined ) return;
 
 		var geometry = object.geometry;
 
@@ -21,7 +24,7 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 			if ( index !== null ) {
 
-				var panel = new UI.Panel();
+				var panel = new UI.Row();
 				panel.add( new UI.Text( 'index' ).setWidth( '90px' ) );
 				panel.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
 				container.add( panel );
@@ -32,9 +35,11 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 			for ( var name in attributes ) {
 
-				var panel = new UI.Panel();
+				var attribute = attributes[ name ];
+
+				var panel = new UI.Row();
 				panel.add( new UI.Text( name ).setWidth( '90px' ) );
-				panel.add( new UI.Text( ( attributes[ name ].count ).format() ).setFontSize( '12px' ) );
+				panel.add( new UI.Text( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
 				container.add( panel );
 
 			}
@@ -45,11 +50,11 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 		}
 
-	};
+	}
 
 	signals.objectSelected.add( update );
 	signals.geometryChanged.add( update );
 
 	return container;
 
-}
+};

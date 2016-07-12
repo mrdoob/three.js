@@ -21,7 +21,7 @@ Sidebar.Animation = function ( editor ) {
 	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
-	var animationsRow = new UI.Panel();
+	var animationsRow = new UI.Row();
 	container.add( animationsRow );
 
 	/*
@@ -36,7 +36,7 @@ Sidebar.Animation = function ( editor ) {
 
 				var material = child.material;
 
-				if ( material instanceof THREE.MeshFaceMaterial ) {
+				if ( material instanceof THREE.MultiMaterial ) {
 
 					for ( var i = 0; i < material.materials.length; i ++ ) {
 

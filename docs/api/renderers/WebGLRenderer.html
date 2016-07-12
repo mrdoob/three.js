@@ -72,6 +72,16 @@
 		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
 
+		<h3>[property:Array clippingPlanes]</h3>
+
+		<div>User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply globally. Points in space whose dot product with the plane is negative are cut away. Default is [].</div>
+
+		<h3>[property:Boolean localClippingEnabled]</h3>
+
+		<div>Defines whether the renderer respects object-level clipping planes. Default is false.</div>
+
+
+
 		<h3>[property:Boolean gammaInput]</h3>
 
 		<div>Default is false. If set, then it expects that all textures and colors are premultiplied gamma.</div>
@@ -81,32 +91,27 @@
 
 		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<div>
+		This contains the reference to the component implementing shadow mapping.
+		</div>
 
-		<h3>[property:Boolean shadowMapEnabled]</h3>
+		<h3>[property:Boolean shadowMap.enabled]</h3>
 
 		<div>Default is false. If set, use shadow maps in the scene.</div>
 
-
-		<h3>[property:Integer shadowMapType]</h3>
+		<h3>[property:Integer shadowMap.type]</h3>
 
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
+		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
 
-		<h3>[property:Integer shadowMapCullFace]</h3>
+		<div>Default is true. Whether to render the opposite side as specified by the material into the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 
-		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
+		<h3>[property:Boolean shadowMap.renderSingleSided]</h3>
 
-
-		<h3>[page:Boolean shadowMapDebug]</h3>
-
-		<div>Default is false. If set, then the shadowmaps get a specific color to identify which shadow is from which shadowmap.</div>
-
-
-		<h3>[property:Boolean shadowMapCascade]</h3>
-
-		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
-
+		<div>Default is true. Whether to treat materials specified as double-sided as if they were specified as front-sided when rendering the shadow map. When disabled, an appropriate shadow.bias must be set on the light source for surfaces that can both cast and receive shadows at the same time to render correctly.</div>
 
 		<h3>[property:Integer maxMorphTargets]</h3>
 
@@ -118,11 +123,6 @@
 		<div>Default is 4. The maximum number of MorphNormals allowed in a shader. Keep in mind that the standard materials only allow 4 MorphNormals. </div>
 
 
-		<h3>[property:Boolean autoScaleCubemaps]</h3>
-
-		<div>Default is true. If set, then Cubemaps are scaled, when they are bigger than the maximum size, to make sure that they aren't bigger than the maximum size.</div>
-
-
 		<h3>[property:Object info]</h3>
 
 		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
@@ -130,7 +130,6 @@
 		<ul>
 			<li>memory:
 				<ul>
-					<li>programs</li>
 					<li>geometries</li>
 					<li>textures</li>
 				</ul>
@@ -143,14 +142,10 @@
 					<li>points</li>
 				</ul>
 			</li>
+			<li>programs
+			</li>
 		</ul>
 		</div>
-
-		<h3>[property:ShadowMapPlugin shadowMapPlugin]</h3>
-		<div>
-		This contains the reference to the shadowMapPlugin.
-		</div>
-
 
 		<h2>Methods</h2>
 
@@ -169,8 +164,17 @@
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
 
-		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
-		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
+		<h3>[method:number getPixelRatio]()</h3>
+		<div>Returns current device pixel ratio used.</div>
+
+		<h3>[method:null setPixelRatio]( [page:number value] )</h3>
+		<div>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</div>
+
+		<h3>[method:Object getSize]()</h3>
+		<div>Returns an object containing the width and height of the renderer's output canvas, in pixels.</div>
+
+		<h3>[method:null setSize]( [page:Integer width], [page:Integer height], [page:Boolean updateStyle] )</h3>
+		<div>Resizes the output canvas to (width, height) with device pixel ratio taken into account, and also sets the viewport to fit that size, starting in (0, 0). Setting updateStyle to true adds explicit pixel units to the output canvas style.</div>
 
 		<h3>[method:null setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>
@@ -179,8 +183,10 @@
 		<h3>[method:null setScissor]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the scissor area from (x, y) to (x + width, y + height).</div>
 
-		<h3>[method:null enableScissorTest]( [page:Boolean enable] )</h3>
-		<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
+		<div>NOTE: The point (x, y) is the lower left corner of the area to be set for both of these methods. The area is defined from left to right in width but bottom to top in height. The sense of the vertical definition is opposite to the fill direction of an HTML canvas element.</div>
+
+		<h3>[method:null setScissorTest]( [page:Boolean boolean] )</h3>
+		<div>Enable or disable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
 
 		<h3>[method:null setClearColor]( [page:Color color], [page:Float alpha] )</h3>
 		<div>Sets the clear color and opacity.</div>
@@ -198,11 +204,11 @@
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
 
 		<h3>[method:null clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
-		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
+		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s). This method initializes the color buffer to the current clear color value.</div>
 		<div>Arguments default to true.</div>
 
 		<h3>[method:null renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
-		<div>object — an instance of [page:Object3D]]<br />
+		<div>object — an instance of [page:Object3D]<br />
 		program — an instance of shaderProgram<br />
 		shading — an instance of Material<br />
 		</div>
@@ -224,6 +230,9 @@
 		<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
 		<div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
 		<div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
+
+		<h3>[method:null readRenderTargetPixels]( [page:WebGLRenderTarget renderTarget], [page:Float x], [page:Float y], [page:Float width], [page:Float height], buffer )</h3>
+		<div>Reads the pixel data from the renderTarget into the buffer you pass in. Buffer should be a Javascript Uint8Array instantiated with new Uint8Array( renderTargetWidth * renderTargetWidth * 4 ) to account for size and color information. This is a wrapper around gl.readPixels.</div>
 
 		<h3>[method:null renderImmediateObject]( camera, lights, fog, material, object )</h3>
 		<div>Renders an immediate Object using a camera.</div>
@@ -249,10 +258,10 @@
 
 		<h3>[method:null setRenderTarget]( [page:WebGLRenderTarget renderTarget] )</h3>
 		<div>
-		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated.<br />
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated (optional).<br />
 		</div>
 		<div>
-		This method sets the active rendertarget.
+		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
 		</div>
 
 		<h3>[method:boolean supportsCompressedTextureS3TC]()</h3>

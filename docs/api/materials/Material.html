@@ -108,6 +108,17 @@
 		Sets the alpha value to be used when running an alpha test. Default is *0*.
 		</div>
 
+		<h3>[property:Array clippingPlanes]</h3>
+
+		<div>
+		User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply to the objects this material is attached to. Points in space whose dot product with the plane is negative are cut away. Default is [].
+		</div>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<div>
+		Defines whether to clip shadows according to the clipping planes specified on this material. Default is false.
+		</div>
+
 		<h3>[property:Float overdraw]</h3>
 		<div>
 		Amount of triangle expansion at draw time. This is a workaround for cases when gaps appear between triangles when using [page:CanvasRenderer]. *0.5* tends to give good results across browsers. Default is *0*.
@@ -139,7 +150,7 @@
 		
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 		
-		<h3>[method:Material clone]([page:material material])</h3>
+		<h3>[method:Material clone]( [page:material material] )</h3>
 		<div>
 		material -- this material gets the cloned information (optional). 
 		</div>
@@ -152,7 +163,7 @@
 		This disposes the material. Textures of a material don't get disposed. These needs to be disposed by [page:Texture Texture]. 
 		</div>
 
-		<h3>[method:null setValues]([page:object values])</h3>
+		<h3>[method:null setValues]( [page:object values] )</h3>
 		<div>
 		values -- a container with parameters.
 		</div>

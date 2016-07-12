@@ -31,7 +31,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - billboards - alphatest</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -49,7 +49,7 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				gl_PointSize = size * ( 150.0 / length( mvPosition.xyz ) );
+				gl_PointSize = size * ( 150.0 / -mvPosition.z );
 
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -210,16 +210,16 @@
 
 			//
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" );
+			var texture = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
 
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
-					amplitude: { type: "f", value: 1.0 },
-					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: texture },
+					amplitude: { value: 1.0 },
+					color:     { value: new THREE.Color( 0xffffff ) },
+					texture:   { value: texture },
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -241,9 +241,7 @@
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			//
 

@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( color ) {
+THREE.Color = function ( r, g, b ) {
 
-	if ( arguments.length === 3 ) {
+	if ( g === undefined && b === undefined ) {
 
-		return this.fromArray( arguments );
+		// r is THREE.Color, hex or string
+		return this.set( r );
 
 	}
 
-	return this.set( color );
+	return this.setRGB( r, g, b );
 
 };
 
@@ -37,6 +38,14 @@ THREE.Color.prototype = {
 		}
 
 		return this;
+
+	},
+
+	setScalar: function ( scalar ) {
+
+		this.r = scalar;
+		this.g = scalar;
+		this.b = scalar;
 
 	},
 
@@ -75,7 +84,7 @@ THREE.Color.prototype = {
 
 		}
 
-		return function ( h, s, l ) {
+		return function setHSL( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
 			h = THREE.Math.euclideanModulo( h, 1 );

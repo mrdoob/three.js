@@ -24,11 +24,6 @@
 			}
 
 			a { color: red }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -38,7 +33,7 @@
 			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/collada/Animation.js"></script>
 		<script src="js/loaders/collada/AnimationHandler.js"></script>
 		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
@@ -59,7 +54,7 @@
 			var dae;
 
 			var clock = new THREE.Clock();
-			var mixers = [];
+			var mixer;
 
 			// Collada model
 
@@ -102,6 +97,8 @@
 
 				// Add Blender exported Collada model
 
+				mixer = new THREE.AnimationMixer( scene );
+
 				var loader = new THREE.JSONLoader();
 				loader.load( 'models/animated/monster/monster.js', function ( geometry, materials ) {
 
@@ -111,7 +108,7 @@
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 
-					var faceMaterial = new THREE.MeshFaceMaterial( materials );
+					var faceMaterial = new THREE.MultiMaterial( materials );
 
 					for ( var i = 0; i < 729; i ++ ) {
 
@@ -136,14 +133,11 @@
 						mesh.updateMatrix();
 
 						scene.add( mesh );
-						
-						var mixer = new THREE.AnimationMixer( mesh );
-						mixer.addAction( new THREE.AnimationAction( geometry.animations[0] ).warpToDuration( 1 ) );
 
-						// random animation offset
-						mixer.update( 1000 * Math.random() );
-
-						mixers.push( mixer );
+						mixer.clipAction( geometry.animations[0], mesh )
+								.setDuration( 1 )			// one second
+								.startAt( - Math.random() )	// random phase (already running)
+								.play();					// let's go
 
 					}
 
@@ -172,7 +166,7 @@
 				// Stats
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// Events
 
@@ -203,11 +197,7 @@
 
 				THREE.AnimationHandler.update( delta );
 
-				for ( var i = 0; i < mixers.length; i ++ ) {
-
-					mixers[ i ].update( delta );
-
-				}
+				mixer.update( delta );
 
 
 				render();

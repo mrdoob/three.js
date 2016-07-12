@@ -4,7 +4,6 @@
 		<title>three.js webgl - geometry - extrude shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
 		<style>
 			body {
 				font-family: Monospace;
@@ -20,7 +19,7 @@
 
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script>
@@ -67,13 +66,16 @@
 
 				//
 
-				var closedSpline = new THREE.ClosedSplineCurve3( [
+				var closedSpline = new THREE.CatmullRomCurve3( [
 					new THREE.Vector3( -60, -100,  60 ),
 					new THREE.Vector3( -60,   20,  60 ),
 					new THREE.Vector3( -60,  120,  60 ),
 					new THREE.Vector3(  60,   20, -60 ),
 					new THREE.Vector3(  60, -100, -60 )
 				] );
+
+				closedSpline.type = 'catmullrom';
+				closedSpline.closed = true;
 
 				var extrudeSettings = {
 					steps			: 100,
@@ -168,7 +170,7 @@
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
 				mesh.position.set( 50, 100, 50 );
 

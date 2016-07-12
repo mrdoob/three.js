@@ -17,5 +17,10 @@
 	"src/math/Plane.js",
 	"src/math/Math.js",
 	"src/math/Spline.js",
-	"src/math/Triangle.js"
+	"src/math/Triangle.js",
+	"src/math/Interpolant.js",
+	"src/math/interpolants/CubicInterpolant.js",
+	"src/math/interpolants/DiscreteInterpolant.js",
+	"src/math/interpolants/LinearInterpolant.js",
+	"src/math/interpolants/QuaternionLinearInterpolant.js"
 ]

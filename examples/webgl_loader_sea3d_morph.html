@@ -28,10 +28,11 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<div id="description">Flag is Vertex Animation / Teapot is Morpher</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -42,9 +43,6 @@
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
-
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
 
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
@@ -90,6 +88,7 @@
 				controls = new THREE.OrbitControls( camera );
 
 				// get mesh
+
 				teapot = loader.getMesh("Teapot01");
 
 				// events
@@ -121,9 +120,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// post-processing
 
@@ -146,10 +143,6 @@
 
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
-
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
 
 				// events
 
@@ -188,6 +181,9 @@
 				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 

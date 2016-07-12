@@ -8,9 +8,7 @@ THREE.TextureLoader = function ( manager ) {
 
 };
 
-THREE.TextureLoader.prototype = {
-
-	constructor: THREE.TextureLoader,
+Object.assign( THREE.TextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -18,6 +16,7 @@ THREE.TextureLoader.prototype = {
 
 		var loader = new THREE.ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
@@ -38,7 +37,15 @@ THREE.TextureLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
-};
+} );

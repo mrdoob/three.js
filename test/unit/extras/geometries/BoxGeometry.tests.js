@@ -21,7 +21,7 @@
 			box = new THREE.BoxGeometry( parameters.width, parameters.height, parameters.depth );
 			cube = new THREE.CubeGeometry( parameters.width, parameters.height, parameters.depth );
 			boxWithSegments = new THREE.BoxGeometry( parameters.width, parameters.height, parameters.depth,
-													 parameters.widthSegments, parameters.heightSegments, parameters.depthSegments );
+													parameters.widthSegments, parameters.heightSegments, parameters.depthSegments );
 
 			geometries = [ box, cube, boxWithSegments ];
 

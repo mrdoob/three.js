@@ -7,7 +7,7 @@ var onDocumentLoad = function ( event ) {
 
 	if ( section == 'manual' ) {
 
-		name = name.replace(/\-/g, ' ');
+		name = name.replace( /\-/g, ' ' );
 
 		path = pathname.replace( /\ /g, '-' );
 		path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
@@ -20,22 +20,22 @@ var onDocumentLoad = function ( event ) {
 
 	var text = document.body.innerHTML;
 
-	text = text.replace(/\[name\]/gi, name);
-	text = text.replace(/\[path\]/gi, path);
-	text = text.replace(/\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
-	text = text.replace(/\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:"+name+".$1 $2]" ); // [page:.member title] to [page:name.member title]
-	text = text.replace(/\[page:([\w\.]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
-	// text = text.replace(/\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('" + name + ".$1')\" title=\"$1\">$2</a>" );
+	text = text.replace( /\[name\]/gi, name );
+	text = text.replace( /\[path\]/gi, path );
+	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
+	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, "[page:" + name + ".$1 $2]" ); // [page:.member title] to [page:name.member title]
+	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
-	text = text.replace(/\[(?:member|property|method):([\w]+)\]/gi, "[member:$1 $1]" ); // [member:name] to [member:name title]
-	text = text.replace(/\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('"+name+".$2')\" target=\"_parent\" title=\""+name+".$2\" class=\"permalink\">#</a> .<a href=\"javascript:window.parent.goTo('$1')\" title=\"$1\" id=\"$2\">$2</a> " );
+	text = text.replace( /\[(?:member|property|method):([\w]+)\]/gi, "[member:$1 $1]" ); // [member:name] to [member:name title]
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]/gi, "<a href=\"javascript:window.parent.goTo('" + name + ".$2')\" target=\"_parent\" title=\"" + name + ".$2\" class=\"permalink\">#</a> .<a href=\"javascript:window.parent.goTo('$1')\" title=\"$1\" id=\"$2\">$2</a> " );
 
-	text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
-	text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\#]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
-	text = text.replace(/\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\#]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
+	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
 
-	text = text.replace(/\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
-	text = text.replace(/\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../../../../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
+	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
+	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
 
 
 	document.body.innerHTML = text;

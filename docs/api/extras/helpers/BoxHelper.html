@@ -18,7 +18,7 @@
 		<h2>Example</h2>
 
 		<code>var sphere = new THREE.SphereGeometry();
-		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial(0xff0000) );
+		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
 		var box = new THREE.BoxHelper( object );
 		scene.add( box );
 		</code>
@@ -26,7 +26,11 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Object3D object] )</h3>
+		<h3>[name]( [page:Object3D object], [page:Color color] )</h3>
+		<div>
+		object -- Object3D -- the object3D to show the world-axis-aligned boundingbox.<br />
+		color -- The color of the helper. This can be a [page:Color], a hexadecimal value and an CSS-Color name. Default is 0xffff00
+		</div>
 		<div>Creates a new wireframe box matching the size of the passed box.</div>
 
 		<h2>Properties</h2>

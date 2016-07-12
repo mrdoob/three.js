@@ -31,11 +31,6 @@
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -46,7 +41,7 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/ShaderSkin.js"></script>
 
@@ -122,10 +117,12 @@
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				var textureLoader = new THREE.TextureLoader();
+
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = -1.5;
 
-				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -142,11 +139,14 @@
 				uniforms[ "passID" ].value = 1;
 
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, derivatives: true };
-				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true, derivatives: true };
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
 				material = new THREE.ShaderMaterial( parameters );
+				material.extensions.derivatives = true;
+
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
+				materialUV.extensions.derivatives = true;
 
 				// LOADER
 
@@ -168,7 +168,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 
@@ -209,7 +209,7 @@
 				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerScene.addPass( renderModelUV );
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
 
 				//
 
@@ -236,12 +236,12 @@
 
 				//
 
-				uniforms[ "tBlur1" ].value = composerScene.renderTarget2;
-				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2;
-				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2;
-				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2;
+				uniforms[ "tBlur1" ].value = composerScene.renderTarget2.texture;
+				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2.texture;
+				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2.texture;
+				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2.texture;
 
-				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 
 				//
 

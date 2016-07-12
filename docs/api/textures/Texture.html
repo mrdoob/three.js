@@ -21,7 +21,7 @@
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -53,7 +53,7 @@
 		<div>
 		The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.
 		</div>
-		
+
 		<div>
 		NOTE: tiling of images in textures only functions if image dimensions are powers of two (2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, ...) in terms of pixels. Individual dimensions need not be equal, but each must be a power of two. This is a limitation of WebGL, not Three.js.
 		</div>
@@ -115,7 +115,7 @@
 
 		<h3>[property:array mipmaps]</h3>
 		<div>
-		Array of mipmaps generated.
+		Array of user-specified mipmaps (optional).
 		</div>
 
 		<h3>[property:number unpackAlignment]</h3>
@@ -128,6 +128,11 @@
 		False by default, which is the norm for PNG images. Set to true if the RGB values have been stored premultiplied by alpha.
 		</div>
 
+		<h3>[property:number encoding]</h3>
+		<div>
+		Set to THREE.LinearEncoding by default, but supports sRGB, RGBE, RGBM, RGBD, LogLuv and Gamma corrected encodings.  IMPORTANT: If this value is changed on a texture after the material has been used, it is necessary to trigger a Material.needsUpdate for this value to be realized in the shader.
+		</div>
+
 		<h3>[property:object onUpdate]</h3>
 		<div>
 		A callback function, called when the texture is updated (e.g., when needsUpdate has been set to true and then the texture is used).
@@ -138,12 +143,12 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>.clone([page:Texture texture])</h3>
+		<h3>[method:Material clone]( [page:Texture texture] )</h3>
 		<div>
 		Make copy of texture. Note this is not a "deep copy", the image is shared.
 		</div>
 
-		<h3>.dispose()</h3>
+		<h3>[method:null dispose]()</h3>
 		<div>
 		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
 		</div>

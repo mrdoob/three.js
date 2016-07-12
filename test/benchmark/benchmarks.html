@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ThreeJS Benchmark Tests - Using Files in /src</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:700" rel="stylesheet" type="text/css">
+  <link href="normalize.css" rel="stylesheet" type="text/css">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <script src="../../build/three.min.js"></script>
+  <script src="vendor/lodash.min.js"></script>
+  <script src="vendor/benchmark-2.1.0.min.js"></script>
+  <script src="benchmark.js"></script>
+
+  <script src="core/Vector3Components.js"></script>
+  <script src="core/Vector3Storage.js"></script>
+  <script src="core/Vector3Length.js"></script>
+  <script src="core/Float32Array.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Three JS Benchmarks Suite</h1>
+  </header>
+  <section>
+  </section>
+
+  <template id="suite">
+    <article>
+      <header>
+        <h2></h2>
+        <h3>Start</h3>
+      </header>
+      <div class="results">
+        <div class"head">
+          <p class="name">Name</p>
+          <p class="ops">Ops / Sec</p>
+          <p class="desv">±</p>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <template id="suite-test">
+    <div>
+      <p class="name"></p>
+      <p class="ops"></p>
+      <p class="desv"></p>
+    </div>
+  </template>
+
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
-	THREE.Light.call( this, skyColor );
+	THREE.Light.call( this, skyColor, intensity );
 
 	this.type = 'HemisphereLight';
 
@@ -14,20 +14,21 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 	this.updateMatrix();
 
 	this.groundColor = new THREE.Color( groundColor );
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
 };
 
-THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
-THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
+THREE.HemisphereLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
 
-THREE.HemisphereLight.prototype.copy = function ( source ) {
+	constructor: THREE.HemisphereLight,
 
-	THREE.Light.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.groundColor.copy( source.groundColor );
-	this.intensity = source.intensity;
+		THREE.Light.prototype.copy.call( this, source );
 
-	return this;
+		this.groundColor.copy( source.groundColor );
 
-};
+		return this;
+
+	}
+
+} );

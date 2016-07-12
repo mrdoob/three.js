@@ -27,9 +27,31 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( value )</h3>
+		<h3>[name]( r, g, b )</h3>
 		<div>
-		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "hsl(0, 100%, 50%)", "#ff0000", "#f00", or "red", or three arguments that represent color channels.
+		r - the red component of the color if arguments g and b are defined. If they are not defined, it can be a hexadecimal or a CSS-style string or a Color instance.<br />
+		g - The green component of the color if it is defined.<br />
+		b - The blue component of the color if it is defined. 
+		</div>
+		<div>
+		All arguments are optional. The default color is White.<br />
+		When all arguments are defined then r is the red component, g is the green component and b is the blue component of the color.<br />
+		When only r is defined:<br />
+		<ul>
+			<li>It can be a hexadecimal of the color.</li>
+			<li>It can be an another color instance.</li>
+			<li>It can be a CSS style. For Instance:
+				<ul>
+					<li>rgb(250, 0,0)</li>
+					<li>rgb(100%,0%,0%)</li>
+					<li>hsl(0, 100%, 50%)</li>
+					<li>#ff0000</li>
+					<li>#f00</li>
+					<li>red</li>
+				</ul>
+			
+			</li>
+		</ul>
 		</div>
 
 		<h2>Properties</h2>
@@ -51,12 +73,29 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:Color set]( value ) [page:Color this]</h3>
+		<div>
+		value -- either an instance of [page:Color], a [page:Integer hexadecimal] value, or a css style [page:String string]
+		</div>
+		<div>
+		Delegates to .copy, .setStyle, or .setHex depending on input type.
+		</div>
+
 		<h3>[method:Color copy]( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		color — Color to copy.
 		</div>
 		<div>
 		Copies given color.
+		</div>
+
+		<h3>[method:Color fromArray]( [page:Array array], [page:Integer offset] ) [page:Color this]</h3>
+		<div>
+		array -- [page:Array] [r, g, b] <br />
+		offset -- [page:Integer] An optional offset into the array.
+		</div>
+		<div>
+		Sets this color's components based on an array formatted like [r, g, b]
 		</div>
 
 		<h3>[method:Color copyGammaToLinear]( [page:Color color] ) [page:Color this]</h3>
@@ -136,7 +175,7 @@
 		Sets color from hsl
 		</div>
 
-		<h3>.getHSL() [page:Object hsl]</h3>
+		<h3>[method:Object getHSL]() [page:Object hsl]</h3>
 		<div>
 		Returns an object with properties h, s, and l.
 		</div>
@@ -179,30 +218,23 @@
 		Linear interpolation of this colors rgb values and the rgb values of the first argument. The alpha argument can be thought of as the percent between the two colors, where 0 is this color and 1 is the first argument.
 		</div>
 
-		<h3>[method:Array toArray]( [page:Array array] )</h3>
-		<div>
-		array -- Optional array to store the color.
-		</div>
-		<div>
-		Returns an array [r,g,b]
-		</div>
-
 		<h3>[method:Color equals]( [page:Color c] ) [page:Color this]</h3>
 		<div>
 		Compares this color and c and returns true if they are the same, false otherwise.
 		</div>
 
-		<h3>[method:Color clone]()</h3>
+		<h3>[method:Color clone]() [page:Color this]</h3>
 		<div>
 		Clones this color.
 		</div>
 
-		<h3>[method:Color set]( value ) [page:Color this]</h3>
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Color this]</h3>
 		<div>
-		value -- either an instance of [page:Color], a [page:Integer hexadecimal] value, or a css style [page:String string]
+		array -- An optional array to store the color to. <br />
+		offset -- An optional offset into the array.
 		</div>
 		<div>
-		Delegates to .copy, .setStyle, or .setHex depending on input type.
+		Returns an array [r,g,b]
 		</div>
 
 		<h2>Source</h2>

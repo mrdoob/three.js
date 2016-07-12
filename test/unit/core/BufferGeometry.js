@@ -174,18 +174,10 @@ test( "computeBoundingBox", function() {
 	ok( bb.max.x === 13 && bb.max.y === 5 && bb.max.z === 6, "max values are set correctly" );
 
 
-	bb = getBBForVertices( [] );
-
-	ok( bb.min.x === 0 && bb.min.y === 0 && bb.min.z === 0, "since there are no values given, the bb has size = 0" );
-	ok( bb.max.x === 0 && bb.max.y === 0 && bb.max.z === 0, "since there are no values given, the bb has size = 0" );
-
-
 	bb = getBBForVertices( [-1, -1, -1] );
 
 	ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, "since there is only one vertex, max and min are equal" );
 	ok( bb.min.x === -1 && bb.min.y === -1 && bb.min.z === -1, "since there is only one vertex, min and max are this vertex" );
-
-	bb = getBBForVertices( [-1] );
 });
 
 test( "computeBoundingSphere", function() {

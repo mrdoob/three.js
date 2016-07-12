@@ -35,7 +35,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - raw shader demo</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -112,32 +112,37 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				var vertices = new THREE.Float32Attribute( triangles * 3 * 3, 3 );
+				var vertices = new Float32Array( triangles * 3 * 3 );
 
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( var i = 0, l = triangles * 3 * 3; i < l; i += 3 ) {
 
-					vertices.setXYZ( i, Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-
-				}
-
-				geometry.addAttribute( 'position', vertices );
-
-				var colors = new THREE.Float32Attribute( triangles * 3 * 4, 4 );
-
-				for ( var i = 0, l = colors.count; i < l; i ++ ) {
-
-					colors.setXYZW( i, Math.random(), Math.random(), Math.random(), Math.random() );
+					vertices[ i     ] = Math.random() - 0.5;
+					vertices[ i + 1 ] = Math.random() - 0.5;
+					vertices[ i + 2 ] = Math.random() - 0.5;
 
 				}
 
-				geometry.addAttribute( 'color', colors );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+				var colors = new Uint8Array( triangles * 3 * 4 );
+
+				for ( var i = 0, l = triangles * 3 * 4; i < l; i += 4 ) {
+
+					colors[ i     ] = Math.random() * 255;
+					colors[ i + 1 ] = Math.random() * 255;
+					colors[ i + 2 ] = Math.random() * 255;
+					colors[ i + 3 ] = Math.random() * 255;
+
+				}
+
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4, true ) );
 
 				// material
 
 				var material = new THREE.RawShaderMaterial( {
 
 					uniforms: {
-						time: { type: "f", value: 1.0 }
+						time: { value: 1.0 }
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -156,9 +161,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

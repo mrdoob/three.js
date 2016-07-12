@@ -10,5 +10,8 @@ THREE.LineSegments = function ( geometry, material ) {
 
 };
 
-THREE.LineSegments.prototype = Object.create( THREE.Line.prototype );
-THREE.LineSegments.prototype.constructor = THREE.LineSegments;
+THREE.LineSegments.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
+
+	constructor: THREE.LineSegments
+
+} );

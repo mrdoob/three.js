@@ -5,6 +5,9 @@
 
 THREE.Math = {
 
+	DEG2RAD: Math.PI / 180,
+	RAD2DEG: 180 / Math.PI,
+
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
@@ -13,7 +16,7 @@ THREE.Math = {
 		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
-		return function () {
+		return function generateUUID() {
 
 			for ( var i = 0; i < 36; i ++ ) {
 
@@ -89,12 +92,10 @@ THREE.Math = {
 
 	},
 
-	// Random float from <0, 1> with 16 bits of randomness
-	// (standard Math.random() creates repetitive patterns when applied over larger space)
-
 	random16: function () {
 
-		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
+		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
+		return Math.random();
 
 	},
 
@@ -122,29 +123,17 @@ THREE.Math = {
 
 	},
 
-	degToRad: function () {
+	degToRad: function ( degrees ) {
 
-		var degreeToRadiansFactor = Math.PI / 180;
+		return degrees * THREE.Math.DEG2RAD;
 
-		return function ( degrees ) {
+	},
 
-			return degrees * degreeToRadiansFactor;
+	radToDeg: function ( radians ) {
 
-		};
+		return radians * THREE.Math.RAD2DEG;
 
-	}(),
-
-	radToDeg: function () {
-
-		var radianToDegreesFactor = 180 / Math.PI;
-
-		return function ( radians ) {
-
-			return radians * radianToDegreesFactor;
-
-		};
-
-	}(),
+	},
 
 	isPowerOfTwo: function ( value ) {
 

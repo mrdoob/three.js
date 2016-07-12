@@ -14,21 +14,21 @@ var Toolbar = function ( editor ) {
 
 	// translate / rotate / scale
 
-	var translate = new UI.Button( 'translate' ).onClick( function () {
+	var translate = new UI.Button( 'translate ( w )' ).onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
 	buttons.add( translate );
 
-	var rotate = new UI.Button( 'rotate' ).onClick( function () {
+	var rotate = new UI.Button( 'rotate ( e )' ).onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
 	buttons.add( rotate );
 
-	var scale = new UI.Button( 'scale' ).onClick( function () {
+	var scale = new UI.Button( 'scale ( r )' ).onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'scale' );
 
@@ -38,20 +38,17 @@ var Toolbar = function ( editor ) {
 	// grid
 
 	var grid = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
-	buttons.add( new UI.Text( 'Grid: ' ) );
+	buttons.add( new UI.Text( 'grid: ' ) );
 	buttons.add( grid );
 
-	var snap = new UI.Checkbox( false ).onChange( update ).setMarginLeft( '10px' );
+	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
 	buttons.add( snap );
-	buttons.add( new UI.Text( 'snap' ).setMarginLeft( '3px' ) );
 
-	var local = new UI.Checkbox( false ).onChange( update ).setMarginLeft( '10px' );
+	var local = new UI.THREE.Boolean( false, 'local' ).onChange( update );
 	buttons.add( local );
-	buttons.add( new UI.Text( 'local' ).setMarginLeft( '3px' ) );
 
-	var showGrid = new UI.Checkbox().onChange( update ).setValue( true ).setMarginLeft( '10px' );
+	var showGrid = new UI.THREE.Boolean( true, 'show' ).onChange( update );
 	buttons.add( showGrid );
-	buttons.add( new UI.Text( 'show' ).setMarginLeft( '3px' ) );
 
 	function update() {
 

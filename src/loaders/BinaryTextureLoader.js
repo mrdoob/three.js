@@ -13,9 +13,7 @@ THREE.DataTextureLoader = THREE.BinaryTextureLoader = function ( manager ) {
 
 };
 
-THREE.BinaryTextureLoader.prototype = {
-
-	constructor: THREE.BinaryTextureLoader,
+Object.assign( THREE.BinaryTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -24,7 +22,6 @@ THREE.BinaryTextureLoader.prototype = {
 		var texture = new THREE.DataTexture();
 
 		var loader = new THREE.XHRLoader( this.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
@@ -85,12 +82,6 @@ THREE.BinaryTextureLoader.prototype = {
 
 		return texture;
 
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
 	}
 
-};
+} );

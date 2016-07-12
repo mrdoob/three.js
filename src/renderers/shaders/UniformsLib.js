@@ -6,124 +6,151 @@ THREE.UniformsLib = {
 
 	common: {
 
-		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity" : { type: "f", value: 1.0 },
+		"diffuse": { value: new THREE.Color( 0xeeeeee ) },
+		"opacity": { value: 1.0 },
 
-		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"map": { value: null },
+		"offsetRepeat": { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-		"specularMap" : { type: "t", value: null },
-		"alphaMap" : { type: "t", value: null },
+		"specularMap": { value: null },
+		"alphaMap": { value: null },
 
-		"envMap" : { type: "t", value: null },
-		"flipEnvMap" : { type: "f", value: - 1 },
-		"reflectivity" : { type: "f", value: 1.0 },
-		"refractionRatio" : { type: "f", value: 0.98 }
+		"envMap": { value: null },
+		"flipEnvMap": { value: - 1 },
+		"reflectivity": { value: 1.0 },
+		"refractionRatio": { value: 0.98 }
 
 	},
 
 	aomap: {
 
-		"aoMap" : { type: "t", value: null },
-		"aoMapIntensity" : { type: "f", value: 1 },
+		"aoMap": { value: null },
+		"aoMapIntensity": { value: 1 }
 
 	},
 
 	lightmap: {
 
-		"lightMap" : { type: "t", value: null },
-		"lightMapIntensity" : { type: "f", value: 1 },
+		"lightMap": { value: null },
+		"lightMapIntensity": { value: 1 }
 
 	},
 
 	emissivemap: {
 
-		"emissiveMap" : { type: "t", value: null },
+		"emissiveMap": { value: null }
 
 	},
 
 	bumpmap: {
 
-		"bumpMap" : { type: "t", value: null },
-		"bumpScale" : { type: "f", value: 1 }
+		"bumpMap": { value: null },
+		"bumpScale": { value: 1 }
 
 	},
 
 	normalmap: {
 
-		"normalMap" : { type: "t", value: null },
-		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		"normalMap": { value: null },
+		"normalScale": { value: new THREE.Vector2( 1, 1 ) }
 
 	},
 
 	displacementmap: {
 
-		"displacementMap" : { type: "t", value: null },
-		"displacementScale" : { type: "f", value: 1 },
-		"displacementBias" : { type: "f", value: 0 }
+		"displacementMap": { value: null },
+		"displacementScale": { value: 1 },
+		"displacementBias": { value: 0 }
 
 	},
 
-	fog : {
+	roughnessmap: {
 
-		"fogDensity" : { type: "f", value: 0.00025 },
-		"fogNear" : { type: "f", value: 1 },
-		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
+		"roughnessMap": { value: null }
+
+	},
+
+	metalnessmap: {
+
+		"metalnessMap": { value: null }
+
+	},
+
+	fog: {
+
+		"fogDensity": { value: 0.00025 },
+		"fogNear": { value: 1 },
+		"fogFar": { value: 2000 },
+		"fogColor": { value: new THREE.Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor" : { type: "fv", value: [] },
+		"ambientLightColor": { value: [] },
 
-		"directionalLightDirection" : { type: "fv", value: [] },
-		"directionalLightColor" : { type: "fv", value: [] },
+		"directionalLights": { value: [], properties: {
+			"direction": {},
+			"color": {},
 
-		"hemisphereLightDirection" : { type: "fv", value: [] },
-		"hemisphereLightSkyColor" : { type: "fv", value: [] },
-		"hemisphereLightGroundColor" : { type: "fv", value: [] },
+			"shadow": {},
+			"shadowBias": {},
+			"shadowRadius": {},
+			"shadowMapSize": {}
+		} },
 
-		"pointLightColor" : { type: "fv", value: [] },
-		"pointLightPosition" : { type: "fv", value: [] },
-		"pointLightDistance" : { type: "fv1", value: [] },
-		"pointLightDecay" : { type: "fv1", value: [] },
+		"directionalShadowMap": { value: [] },
+		"directionalShadowMatrix": { value: [] },
 
-		"spotLightColor" : { type: "fv", value: [] },
-		"spotLightPosition" : { type: "fv", value: [] },
-		"spotLightDirection" : { type: "fv", value: [] },
-		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] },
-		"spotLightDecay" : { type: "fv1", value: [] }
+		"spotLights": { value: [], properties: {
+			"color": {},
+			"position": {},
+			"direction": {},
+			"distance": {},
+			"coneCos": {},
+			"penumbraCos": {},
+			"decay": {},
+
+			"shadow": {},
+			"shadowBias": {},
+			"shadowRadius": {},
+			"shadowMapSize": {}
+		} },
+
+		"spotShadowMap": { value: [] },
+		"spotShadowMatrix": { value: [] },
+
+		"pointLights": { value: [], properties: {
+			"color": {},
+			"position": {},
+			"decay": {},
+			"distance": {},
+
+			"shadow": {},
+			"shadowBias": {},
+			"shadowRadius": {},
+			"shadowMapSize": {}
+		} },
+
+		"pointShadowMap": { value: [] },
+		"pointShadowMatrix": { value: [] },
+
+		"hemisphereLights": { value: [], properties: {
+			"direction": {},
+			"skyColor": {},
+			"groundColor": {}
+		} }
 
 	},
 
 	points: {
 
-		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity" : { type: "f", value: 1.0 },
-		"size" : { type: "f", value: 1.0 },
-		"scale" : { type: "f", value: 1.0 },
-		"map" : { type: "t", value: null },
-		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
-
-		"fogDensity" : { type: "f", value: 0.00025 },
-		"fogNear" : { type: "f", value: 1 },
-		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
-
-	},
-
-	shadowmap: {
-
-		"shadowMap": { type: "tv", value: [] },
-		"shadowMapSize": { type: "v2v", value: [] },
-
-		"shadowBias" : { type: "fv1", value: [] },
-		"shadowDarkness": { type: "fv1", value: [] },
-
-		"shadowMatrix" : { type: "m4v", value: [] }
+		"diffuse": { value: new THREE.Color( 0xeeeeee ) },
+		"opacity": { value: 1.0 },
+		"size": { value: 1.0 },
+		"scale": { value: 1.0 },
+		"map": { value: null },
+		"offsetRepeat": { value: new THREE.Vector4( 0, 0, 1, 1 ) }
 
 	}
 

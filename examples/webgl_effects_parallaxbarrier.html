@@ -55,7 +55,7 @@
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/effects/ParallaxBarrierEffect.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
@@ -163,7 +163,12 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Bridge2/')
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+
 				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -182,26 +187,9 @@
 				pointLight.position.set( 2000, 1200, 10000 );
 				scene.add( pointLight );
 
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				scene.add( mesh );
-
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
@@ -215,21 +203,11 @@
 				if ( STATS_ENABLED ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
-
-				var r = "textures/cube/Bridge2/";
-				var urls = [ r + "posx.jpg", r + "negx.jpg",
-							 r + "posy.jpg", r + "negy.jpg",
-							 r + "posz.jpg", r + "negz.jpg" ];
-
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				// common materials
 
@@ -562,7 +540,7 @@
 
 				geometry.sortFacesByMaterialIndex();
 
-				var m = new THREE.MeshFaceMaterial(),
+				var m = new THREE.MultiMaterial(),
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,
 					materials = CARS[ car ].materials,

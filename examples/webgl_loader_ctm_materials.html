@@ -28,23 +28,18 @@
 				z-index:100;
 				display:block;
 			}
-
-			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - baked + real-time illumination -
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
 		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a> -
 		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -71,7 +66,6 @@
 			var mesh;
 
 			var textureCube;
-			var cameraCube, sceneCube;
 
 			var loader;
 
@@ -100,37 +94,17 @@
 
 				// SCENE
 
-				scene = new THREE.Scene();
-
-				// SKYBOX
-
-				sceneCube = new THREE.Scene();
-				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				sceneCube.add( cameraCube );
-
 				var r = "textures/cube/pisa/";
-				var urls = [ r + "px.png", r + "nx.png",
-							 r + "py.png", r + "ny.png",
-							 r + "pz.png", r + "nz.png" ];
+				var urls = [
+					r + "px.png", r + "nx.png",
+					r + "py.png", r + "ny.png",
+					r + "pz.png", r + "nz.png"
+				];
 
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
+				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -153,8 +127,6 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 
-				renderer.autoClear = false;
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -165,7 +137,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -180,7 +152,7 @@
 
 				loaderCTM = new THREE.CTMLoader();
 
-				var position = new THREE.Vector3( -105, -78, -40 );
+				var position = new THREE.Vector3( -105, -78, -30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
 				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
@@ -214,31 +186,37 @@
 
 					if ( m.name.indexOf( "Body" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x000000 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.75;
+						mm.metalness = 0.9;
+						mm.roughness = 0.2;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x808080 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.combine = THREE.MultiplyOperation;
+						mm.metalness = 0.9;
+						mm.roughness = 0.5;
 
 						materials[ i ] = mm;
 
 					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
-						mm.envMap = textureCube;
 						mm.color.copy( m.color );
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.25;
+//						mm.lightMap = m.map;
+						mm.envMap = textureCube;
+						mm.metalness = 1;
+						mm.roughtness = 0.1;
 						mm.opacity = m.opacity;
 						mm.transparent = true;
 
@@ -248,6 +226,7 @@
 
 						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
 
+						mm.specularMap = m.map;
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
 						mm.metal = true;
@@ -270,7 +249,7 @@
 
 				hackMaterials( materials );
 
-				var material = new THREE.MeshFaceMaterial( materials );
+				var material = new THREE.MultiMaterial( materials );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );
@@ -290,9 +269,6 @@
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-				cameraCube.updateProjectionMatrix();
 
 			}
 
@@ -319,10 +295,6 @@
 
 				controls.update();
 
-				cameraCube.rotation.copy( camera.rotation );
-
-				renderer.clear();
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}

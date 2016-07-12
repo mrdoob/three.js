@@ -8,27 +8,18 @@ THREE.AnimationLoader = function ( manager ) {
 
 };
 
-THREE.AnimationLoader.prototype = {
-
-	constructor: THREE.AnimationLoader,
+Object.assign( THREE.AnimationLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	},
 
@@ -38,7 +29,7 @@ THREE.AnimationLoader.prototype = {
 
 		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = THREE.AnimationClip.parse( json[i] );
+			var clip = THREE.AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 
@@ -48,4 +39,4 @@ THREE.AnimationLoader.prototype = {
 
 	}
 
-};
+} );

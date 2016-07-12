@@ -48,8 +48,22 @@ Don't forget the visit the FBX SDK documentation website:
   http://docs.autodesk.com/FBX/2013/ENU/FBX-SDK-Documentation/cpp_ref/index.html
 ```
 
+*Note:* If you use the OSX installer, it will install the Python packages into the following folder.
+
+```
+/Applications/Autodesk/FBX Python SDK/[VERSION]/lib/
+```
+
+If the tool still can't find the FBX SDK, you may need to copy the `fbx.so`, `FbxCommon.py` and `sip.so` files into your site_packages folder. 
+
+If you don't know your site_packages folder, run `python` from shell and paste this:
+
+```py
+import site; site.getsitepackages()
+```
+
 ### Python
-* Requires Python 2.6 or 3.1 (The FBX SDK requires one of these versions)
+* Requires Python 2.6, 2.7 or 3.1 (The FBX SDK requires one of these versions)
 
 ``` bash
 sudo apt-get install build-essential

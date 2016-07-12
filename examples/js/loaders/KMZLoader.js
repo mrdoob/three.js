@@ -17,7 +17,6 @@ THREE.KMZLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 

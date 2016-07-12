@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function ( array, itemSize ) {
+THREE.BufferAttribute = function ( array, itemSize, normalized ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
@@ -13,19 +13,13 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
+	this.normalized = normalized === true;
 
 };
 
 THREE.BufferAttribute.prototype = {
 
 	constructor: THREE.BufferAttribute,
-
-	get length() {
-
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-		return this.array.length;
-
-	},
 
 	get count() {
 

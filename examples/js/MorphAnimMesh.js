@@ -31,19 +31,18 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	if( this.activeAction ) {
 
-		this.mixer.removeAction( this.activeAction );
+		this.activeAction.stop();
 		this.activeAction = null;
 		
 	}
 
-	var clip = THREE.AnimationClip.findByName( this.geometry.animations, label );
+	var clip = THREE.AnimationClip.findByName( this, label );
 
 	if ( clip ) {
 
-		var action = new THREE.AnimationAction( clip );
+		var action = this.mixer.clipAction( clip );
 		action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
-		this.mixer.addAction( action );
-		this.activeAction = action;
+		this.activeAction = action.play();
 
 	} else {
 

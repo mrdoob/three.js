@@ -40,9 +40,7 @@ THREE.DirectGeometry = function () {
 
 };
 
-THREE.DirectGeometry.prototype = {
-
-	constructor: THREE.DirectGeometry,
+Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
 	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
@@ -118,9 +116,11 @@ THREE.DirectGeometry.prototype = {
 		var morphTargets = geometry.morphTargets;
 		var morphTargetsLength = morphTargets.length;
 
+		var morphTargetsPosition;
+
 		if ( morphTargetsLength > 0 ) {
 
-			var morphTargetsPosition = [];
+			morphTargetsPosition = [];
 
 			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
@@ -135,9 +135,11 @@ THREE.DirectGeometry.prototype = {
 		var morphNormals = geometry.morphNormals;
 		var morphNormalsLength = morphNormals.length;
 
+		var morphTargetsNormal;
+
 		if ( morphNormalsLength > 0 ) {
 
-			var morphTargetsNormal = [];
+			morphTargetsNormal = [];
 
 			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
@@ -281,6 +283,4 @@ THREE.DirectGeometry.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );
+} );

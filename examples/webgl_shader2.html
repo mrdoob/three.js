@@ -36,7 +36,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -192,14 +192,14 @@
 				var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					time: { type: "f", value: 1.0 },
-					resolution: { type: "v2", value: new THREE.Vector2() }
+					time:       { value: 1.0 },
+					resolution: { value: new THREE.Vector2() }
 				};
 
 				uniforms2 = {
-					time: { type: "f", value: 1.0 },
-					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+					time:       { value: 1.0 },
+					resolution: { value: new THREE.Vector2() },
+					texture:    { value: new THREE.TextureLoader().load( "textures/disturb.jpg" ) }
 				};
 
 				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
@@ -233,9 +233,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				onWindowResize();
 

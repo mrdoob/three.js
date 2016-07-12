@@ -368,7 +368,7 @@
         },
         "materialIndex": {
           "!type": "number",
-          "!doc": "Material index (points to [page:MeshFaceMaterial MeshFaceMaterial.materials])."
+          "!doc": "Material index (points to [page:MultiMaterial MultiMaterial.materials])."
         },
         "clone": {
           "!type": "fn() -> +THREE.Face3",
@@ -579,10 +579,6 @@
         "matrixWorldNeedsUpdate": {
           "!type": "bool",
           "!doc": "default – false"
-        },
-        "rotationAutoUpdate": {
-          "!type": "bool",
-          "!doc": "default – true"
         },
         "userData": {
           "!type": "object",
@@ -960,7 +956,7 @@
       "prototype": {
         "createMultiMaterialObject": {
           "!type": "fn(geometry: +THREE.Geometry, materials: []) -> +THREE.Object3D",
-          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as Meshfacematerial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
+          "!doc": "Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as MultiMaterial which defines multiple material for 1 mesh.<br>\n\t\tThis is mostly useful for object that need a material and a wireframe implementation."
         },
         "attach": {
           "!type": "fn(child: +THREE.Object3D, scene: +THREE.Object3D, parent: +THREE.Object3D)",
@@ -1618,7 +1614,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Z axis.",
+      "!doc": "Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.",
       "!type": "fn(points: [], segments: number, phiStart: number, phiLength: number)"
     },
     "OctahedronGeometry": {
@@ -1888,11 +1884,7 @@
     "GridHelper": {
       "!url": "http://threejs.org/docs/#Reference/extras/helpers/GridHelper",
       "prototype": {
-        "!proto": "THREE.Line.prototype",
-        "setColors": {
-          "!type": "fn(colorCenterLine: number, colorGrid: number)",
-          "!doc": "Updates the color of the grid lines."
-        }
+        "!proto": "THREE.Line.prototype"
       },
       "!doc": "The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.",
       "!type": "fn(size: number, step: number)"
@@ -2276,14 +2268,6 @@
           "!type": "boolean",
           "!doc": "If true, the ajax request will use cookies."
         },
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2319,26 +2303,14 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
-        "showStatus": {
-          "!type": "bool",
-          "!doc": "If true, show loading status in the statusDomElement."
-        },
-        "statusDomElement": {
-          "!type": "DOMElement",
-          "!doc": "This is the recipient of status messages."
-        },
         "onLoadStart": {
           "!type": "function",
           "!doc": "The default is a function with empty body."
@@ -2370,14 +2342,10 @@
         "extractUrlBase": {
           "!type": "fn(url: string) -> string",
           "!doc": "Extract the base from the URL."
-        },
-        "addStatusElement": {
-          "!type": "fn() -> DOMElement",
-          "!doc": "Add a DOM element to indicate the progress and return the DOMElement"
         }
       },
       "!doc": "Base class for implementing loaders.",
-      "!type": "fn(showStatus: bool)"
+      "!type": "fn()"
     },
     "LoadingManager": {
       "!url": "http://threejs.org/docs/#Reference/loaders/LoadingManager",
@@ -2839,8 +2807,8 @@
       "!doc": "A material for drawing geometry by depth. Depth is based off of the camera near and far plane. White is nearest, black is farthest.",
       "!type": "fn(parameters: object)"
     },
-    "MeshFaceMaterial": {
-      "!url": "http://threejs.org/docs/#Reference/materials/MeshFaceMaterial",
+    "MultiMaterial": {
+      "!url": "http://threejs.org/docs/#Reference/materials/MultiMaterial",
       "prototype": {
         "materials": {
           "!type": "[]",
@@ -5291,10 +5259,6 @@
         "generateMipmaps": {
           "!type": "boolean",
           "!doc": "Whether to generate mipmaps (if possible) for a texture. True by default."
-        },
-        "shareDepthFrom": {
-          "!type": "+THREE.WebGLRenderTarget",
-          "!doc": "Shares the depth from another WebGLRenderTarget. Default is null."
         },
         "setSize": {
           "!type": "fn(width: number, height: number)",

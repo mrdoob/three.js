@@ -31,7 +31,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -104,9 +104,9 @@
 
 			uniforms = {
 
-				amplitude: { type: "f", value: 1.0 },
-				color:     { type: "c", value: new THREE.Color( 0xff2200 ) },
-				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/water.jpg" ) },
+				amplitude: { value: 1.0 },
+				color:     { value: new THREE.Color( 0xff2200 ) },
+				texture:   { value: new THREE.TextureLoader().load( "textures/water.jpg" ) },
 
 			};
 
@@ -148,9 +148,7 @@
 			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+			container.appendChild( stats.dom );
 
 			//
 
