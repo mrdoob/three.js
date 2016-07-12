@@ -402,25 +402,32 @@ THREE.Box3.prototype = {
 	getCorners: function ( optionalTarget ) {
 
 		var result = optionalTarget || [
-				new THREE.Vector3(), // 000
-				new THREE.Vector3(), // 001
-				new THREE.Vector3(), // 010
-				new THREE.Vector3(), // 011
-				new THREE.Vector3(), // 100
-				new THREE.Vector3(), // 101
-				new THREE.Vector3(), // 110
-				new THREE.Vector3()  // 111
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3(),
+				new THREE.Vector3()
 			];
 
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		result[ 0 ].set( this.min.x, this.min.y, this.min.z ); // 000
-		result[ 1 ].set( this.min.x, this.min.y, this.max.z ); // 001
-		result[ 2 ].set( this.min.x, this.max.y, this.min.z ); // 010
-		result[ 3 ].set( this.min.x, this.max.y, this.max.z ); // 011
-		result[ 4 ].set( this.max.x, this.min.y, this.min.z ); // 100
-		result[ 5 ].set( this.max.x, this.min.y, this.max.z ); // 101
-		result[ 6 ].set( this.max.x, this.max.y, this.min.z ); // 110
-		result[ 7 ].set( this.max.x, this.max.y, this.max.z ); // 111
+		/**
+		 *   0____1
+		 * 4/|__5/|   y
+		 * | 3__|_2   | z
+		 * 7/___6/    0/___x
+		 *
+		 * Order of corners corresponds to DirectX bounding box model
+		 */
+		result[ 0 ].set( this.min.x, this.max.y, this.max.z ); // 011
+		result[ 1 ].set( this.max.x, this.max.y, this.max.z ); // 111
+		result[ 2 ].set( this.max.x, this.min.y, this.max.z ); // 101
+		result[ 3 ].set( this.min.x, this.min.y, this.max.z ); // 001
+		result[ 4 ].set( this.min.x, this.max.y, this.min.z ); // 010
+		result[ 5 ].set( this.max.x, this.max.y, this.min.z ); // 110
+		result[ 6 ].set( this.max.x, this.min.y, this.min.z ); // 100
+		result[ 7 ].set( this.min.x, this.min.y, this.min.z ); // 000
 
 		return result;
 
