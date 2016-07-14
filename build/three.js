@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '79dev' };
+var THREE = { REVISION: '79' };
 
 //
 
@@ -17707,7 +17707,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 	this.type = 'DirectionalLight';
 
-	this.position.set( 0, 1, 0 );
+	this.position.copy( THREE.Object3D.DefaultUp );
 	this.updateMatrix();
 
 	this.target = new THREE.Object3D();
@@ -17766,7 +17766,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 	this.castShadow = undefined;
 
-	this.position.set( 0, 1, 0 );
+	this.position.copy( THREE.Object3D.DefaultUp );
 	this.updateMatrix();
 
 	this.groundColor = new THREE.Color( groundColor );
@@ -17854,7 +17854,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, penumbra, decay 
 
 	this.type = 'SpotLight';
 
-	this.position.set( 0, 1, 0 );
+	this.position.copy( THREE.Object3D.DefaultUp );
 	this.updateMatrix();
 
 	this.target = new THREE.Object3D();
