@@ -289,6 +289,58 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 			}
 
+			var resolveReferences = function ( material, uuidStack ) {
+
+				if ( material.materials !== undefined ) {
+
+					for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
+
+						var submaterial = material.materials[ i ];
+
+						if ( submaterial instanceof THREE.Reference ) {
+
+							if ( uuidStack.indexOf( submaterial.uuid ) < 0 ) {
+
+								var resolvedMaterial = materials[ submaterial.uuid ];
+
+								if ( resolvedMaterial ) {
+
+									material.materials[ i ] = resolvedMaterial;
+
+								} else {
+
+									console.warn( 'THREE.ObjectLoader.parseMaterials: Failed to resolve referenced material', submaterial.uuid );
+
+								}
+
+							} else {
+
+								console.warn( 'THREE.ObjectLoader.parseMaterials: Cyclic material reference detected', submaterial.uuid );
+
+							}
+
+
+						} else {
+
+							resolveReferences( material, uuidStack.concat( submaterial.uuid ) );
+
+						}
+
+					}
+
+				}
+
+			};
+
+			for ( var key in materials ) {
+
+				if ( materials.hasOwnProperty( key ) ) {
+
+					resolveReferences( materials[ key ], [ key ] );
+
+				}
+
+			}
 		}
 
 		return materials;
@@ -535,6 +587,12 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 					break;
 
+				case 'LineSegments':
+
+					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
 				case 'PointCloud':
 				case 'Points':
 
@@ -571,7 +629,17 @@ Object.assign( THREE.ObjectLoader.prototype, {
 			} else {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
-				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+
+				if ( data.rotation !== undefined ) {
+
+					object.rotation.fromArray( data.rotation );
+
+				} else if ( data.quaternion !== undefined ) {
+
+					object.quaternion.fromArray( data.quaternion );
+
+				}
+
 				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
 
 			}
