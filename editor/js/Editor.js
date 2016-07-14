@@ -22,6 +22,13 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
+		// vr
+
+		enterVR: new Signal(),
+
+		enteredVR: new Signal(),
+		exitedVR: new Signal(),
+
 		// actions
 
 		showModal: new Signal(),
@@ -484,6 +491,8 @@ Editor.prototype = {
 
 			metadata: {},
 			project: {
+				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
+				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				editable: this.config.getKey( 'project/editable' ),
 				vr: this.config.getKey( 'project/vr' )

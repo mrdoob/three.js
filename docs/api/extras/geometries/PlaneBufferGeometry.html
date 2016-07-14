@@ -14,9 +14,25 @@
 
 		<div class="desc">This is the [page:BufferGeometry] port of [page:PlaneGeometry].</div>
 
-		<h2>Example</h2>
+		<iframe id="scene" src="scenes/geometry-browser.html#PlaneBufferGeometry"></iframe>
 
-		<iframe src='scenes/geometry-browser.html#PlaneBufferGeometry'></iframe>
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
 
 		<code>var geometry = new THREE.PlaneBufferGeometry( 5, 20, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
@@ -24,9 +40,7 @@
 		scene.add( plane );
 		</code>
 
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([page:Float width], [page:Float height], [page:Integer widthSegments], [page:Integer heightSegments])</h3>
 		<div>
@@ -35,7 +49,6 @@
 		widthSegments — Optional. Default is 1. <br />
 		heightSegments — Optional. Default is 1.
 		</div>
-
 
 		<h2>Properties</h2>
 

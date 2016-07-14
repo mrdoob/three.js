@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - cubes</title>
+		<title>three.js webvr - htc vive</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -38,6 +38,8 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			var container;
 			var camera, scene, renderer;
 			var effect, controls;
@@ -67,13 +69,13 @@
 				scene.add( camera );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				room.position.y = 3;
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -108,21 +110,22 @@
 
 				var material = new THREE.MeshStandardMaterial();
 
-				var path = 'models/obj/cerberus/';
 				var loader = new THREE.OBJLoader();
-				loader.load( path + 'Cerberus.obj', function ( group ) {
+				loader.setPath( 'models/obj/cerberus/' );
+				loader.load( 'Cerberus.obj', function ( group ) {
 
 					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/cerberus/' );
 
 					material.roughness = 1;
 					material.metalness = 1;
 
-					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
-					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
-					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
+					material.map = loader.load( 'Cerberus_A.jpg' );
+					material.roughnessMap = loader.load( 'Cerberus_R.jpg' );
+					material.metalnessMap = loader.load( 'Cerberus_M.jpg' );
+					material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
 					material.map.wrapS = THREE.RepeatWrapping;
 					material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -156,7 +159,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
+				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -175,15 +178,16 @@
 				controller2.standingMatrix = controls.getStandingMatrix();
 				scene.add( controller2 );
 
-				var vivePath = 'models/obj/vive-controller/';
 				var loader = new THREE.OBJLoader();
-				loader.load( vivePath + 'vr_controller_vive_1_5.obj', function ( object ) {
+				loader.setPath( 'models/obj/vive-controller/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 
 					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/vive-controller/' );
 
-					var controller = object.children[0];
-					controller.material.map = loader.load( vivePath + 'onepointfive_texture.png' );
-					controller.material.specularMap = loader.load( vivePath + 'onepointfive_spec.png' );
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
 
 					controller1.add( object.clone() );
 					controller2.add( object.clone() );
@@ -217,12 +221,14 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}
 
 			function render() {
+
+				var delta = clock.getDelta() * 60;
 
 				controls.update();
 
@@ -255,7 +261,7 @@
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += 0.01 * delta;
 
 				}
 

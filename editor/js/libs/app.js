@@ -28,6 +28,9 @@ var APP = {
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
+			if ( json.project.gammaInput ) renderer.gammaInput = true;
+			if ( json.project.gammaOutput ) renderer.gammaOutput = true;
+
 			if ( json.project.shadows ) {
 
 				renderer.shadowMap.enabled = true;
@@ -148,15 +151,21 @@ var APP = {
 
 		this.setSize = function ( width, height ) {
 
-			if ( renderer._fullScreen ) return;
-
 			this.width = width;
 			this.height = height;
 
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			if ( camera ) {
 
-			renderer.setSize( width, height );
+				camera.aspect = this.width / this.height;
+				camera.updateProjectionMatrix();
+
+			}
+
+			if ( renderer ) {
+
+				renderer.setSize( width, height );
+
+			}
 
 		};
 
@@ -247,6 +256,10 @@ var APP = {
 			}
 
 			renderer.dispose();
+
+			camera = undefined;
+			scene = undefined;
+			renderer = undefined;
 
 		};
 

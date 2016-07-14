@@ -111,7 +111,8 @@
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
-		<script src="js/Menubar.Examples.js"></script>
+		<script src="js/Menubar.View.js"></script>
+		<!-- <script src="js/Menubar.Examples.js"></script> -->
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -165,6 +166,9 @@
 		<script src="js/commands/SetSceneCommand.js"></script>
 
 		<!-- <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="qyqgfqd9j8z890t"></script> -->
+
+		<script src="js/libs/html2canvas.js"></script>
+		<script src="js/libs/three.html.js"></script>
 
 		<script>
 
@@ -395,6 +399,51 @@
 
 			}, false );
 			*/
+
+			// VR
+
+			var groupVR;
+
+			// TODO: Use editor.signals.enteredVR (WebVR 1.0)
+
+			editor.signals.enterVR.add( function () {
+
+				if ( groupVR === undefined ) {
+
+					groupVR = new THREE.HTMLGroup( viewport.dom );
+					editor.sceneHelpers.add( groupVR );
+
+					var mesh = new THREE.HTMLMesh( sidebar.dom );
+					mesh.position.set( 15, 0, 15 );
+					mesh.rotation.y = - 0.5;
+					groupVR.add( mesh );
+
+					var signals = editor.signals;
+
+					function updateTexture() {
+
+						mesh.material.map.update();
+
+					}
+
+					signals.objectSelected.add( updateTexture );
+					signals.objectAdded.add( updateTexture );
+					signals.objectChanged.add( updateTexture );
+					signals.objectRemoved.add( updateTexture );
+					signals.sceneGraphChanged.add( updateTexture );
+					signals.historyChanged.add( updateTexture );
+
+				}
+
+				groupVR.visible = true;
+
+			} );
+
+			editor.signals.exitedVR.add( function () {
+
+				if ( groupVR !== undefined ) groupVR.visible = false;
+
+			} );
 
 		</script>
 	</body>

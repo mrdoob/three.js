@@ -14,10 +14,25 @@
 
 		<div class="desc">This is the [page:BufferGeometry] port of [page:CylinderGeometry].</div>
 
+		<iframe id="scene" src="scenes/geometry-browser.html#CylinderBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Example</h2>
-
-		<iframe src='scenes/geometry-browser.html#CylinderBufferGeometry'></iframe>
 
 		<code>var geometry = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -25,9 +40,7 @@
 		scene.add( cylinder );
 		</code>
 
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([page:Float radiusTop], [page:Float radiusBottom], [page:Float height], [page:Integer radiusSegments], [page:Integer heightSegments], [page:Boolean openEnded], [page:Float thetaStart], [page:Float thetaLength])</h3>
 		<div>
@@ -41,13 +54,11 @@
 		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cylinder.
 		</div>
 
-
 		<h2>Properties</h2>
 
 		<div>
 		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>
-
 
 		<h2>Source</h2>
 

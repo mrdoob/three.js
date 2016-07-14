@@ -237,6 +237,15 @@
 
 		<script src="list.js"></script>
 		<script>
+
+			function extractQuery() {
+				var p = window.location.search.indexOf( '?q=' )
+				if( p !== -1 ) {
+					return window.location.search.substr( 3 );
+				} 
+				return ''
+			}
+
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
@@ -253,6 +262,7 @@
 			var MEMBER_DELIMITER = '.';
 			var nameCategoryMap = {};
 			var sections = [];
+			var selected = null;
 
 			var content = document.getElementById( 'content' );
 
@@ -341,6 +351,14 @@
 
 			function updateFilter() {
 
+				var v = filterInput.value;
+				if( v !== '' ) {
+					window.history.replaceState( {} , '', '?q=' + v );
+				} else {
+					window.history.replaceState( {} , '', window.location.pathname );
+				}
+				if( selected ) window.location.hash = selected
+
 				var exp = new RegExp( filterInput.value, 'gi' );
 				for( var j in nameCategoryMap ) {
 					var res = nameCategoryMap[ j ].name.match( exp );
@@ -396,6 +414,7 @@
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
+				selected = url
 
 				window.location.hash = url;
 				window.document.title = title;
@@ -428,6 +447,9 @@
 				'                                         / __/  /  \\__  \\',
 				'                                         \\/____/\\/_____/'
 			].join('\n'));
+
+			filterInput.value = extractQuery()
+			updateFilter( )
 
 		</script>
 		<script src="../build/three.min.js"></script> <!-- console sandbox -->

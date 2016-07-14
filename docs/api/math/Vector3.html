@@ -130,33 +130,38 @@
 
 		<h3>[method:Float lengthSq]() [page:Vector3 this]</h3>
 		<div>
-		Computes squared length of this vector.
+		Computes the squared length of this vector.
 		</div>
 
 		<h3>[method:Float length]() [page:Vector3 this]</h3>
 		<div>
-		Computes length of this vector.
+		Computes the length of this vector.
 		</div>
 
 		<h3>[method:Float lengthManhattan]() [page:Vector3 this]</h3>
 		<div>
-		Computes Manhattan length of this vector.<br />
+		Computes the Manhattan length of this vector.<br />
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
 		<h3>[method:Vector3 normalize]() [page:Vector3 this]</h3>
 		<div>
-		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by it's length.
+		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by its length.
 		</div>
 
-		<h3>[method:Float distanceTo]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<h3>[method:Float distanceTo]( [page:Vector3 v] )</h3>
 		<div>
-		Computes distance of this vector to *v*.
+		Computes the distance from this vector to *v*.
 		</div>
 
-		<h3>[method:Float distanceToSquared]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<h3>[method:Float distanceToSquared]( [page:Vector3 v] )</h3>
 		<div>
-		Computes squared distance of this vector to *v*.
+		Computes the squared distance from this vector to *v*.
+		</div>
+
+		<h3>[method:Float distanceToManhattan]( [page:Vector3 v] )</h3>
+		<div>
+		Computes the Manhattan distance from this vector to *v*.
 		</div>
 
 		<h3>[method:Vector3 setLength]( [page:Float l] ) [page:Vector3 this]</h3>
@@ -389,7 +394,7 @@
 		normal -- [page:Vector3] the normal to the reflecting plane
 		</div>
 		<div>
-		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
+		Reflect incident vector off of plane orthogonal to normal. Normal is assumed to have unit length.
 		</div>
 
 		<h3>[method:Vector3 multiply]( [page:Vector3 v] ) [page:Vector3 this]</h3>
@@ -397,7 +402,7 @@
 		v -- [page:Vector3] <br />
 		</div>
 		<div>
-		Multipies this vector by vector v.
+		Multiplies this vector by vector v.
 		</div>
 
 		<h3>[method:Vector3 applyProjection]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
@@ -413,7 +418,7 @@
 		euler -- [page:Euler]
 		</div>
 		<div>
-		Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying.
+		Applies euler transform to this vector by converting the [page:Euler] object to a [page:Quaternion] and applying.
 		</div>
 
 		<h3>[method:Vector3 applyQuaternion]( [page:Quaternion quaternion] ) [page:Vector3 this]</h3>

@@ -2664,10 +2664,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 				}
 			);
 
-		}
-
-		for ( var i = 0; i < orderedMotions.length; i++ ) {
-
 			var array = orderedMotions[ i ];
 			var keys = animation.hierarchy[ i ].keys;
 			var bone = bones[ i ];
@@ -2682,12 +2678,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 			}
 
-		}
-
-		for ( var i = 0; i < orderedMotions.length; i++ ) {
-
-			var bone = bones[ i ];
-			var keys = animation.hierarchy[ i ].keys;
 			helper.insertBoneAnimationKeyAtTimeZero( keys, bone );
 			helper.insertStartBoneAnimationKey( keys );
 
@@ -2727,10 +2717,6 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
 			morphAnimation.hierarchy.push( { keys: [] } );
-
-		}
-
-		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
 			var array = orderedMorphs[ i ];
 			var keys = morphAnimation.hierarchy[ i ].keys;
