@@ -360,7 +360,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 			return baseUrl + url;
 		};
 		
-		var setMapForType = function ( mapType, value ) {
+		function setMapForType ( mapType, value ) {
 
 			if ( params[ mapType ] ) return; // Keep the first encountered texture
 
