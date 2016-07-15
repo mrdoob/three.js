@@ -262,15 +262,41 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		if ( isWebVR1 && vrDisplay !== undefined ) {
 
-			vrDisplay.requestAnimationFrame( f );
+			return vrDisplay.requestAnimationFrame( f );
 
 		} else {
 
-			window.requestAnimationFrame( f );
+			return window.requestAnimationFrame( f );
 
 		}
 
 	};
+	
+	this.cancelAnimationFrame = function ( h ) {
+
+		if ( isWebVR1 && vrDisplay !== undefined ) {
+
+			vrDisplay.cancelAnimationFrame( h );
+
+		} else {
+
+			window.cancelAnimationFrame( h );
+
+		}
+
+	};
+	
+	this.submitFrame = function () {
+
+		if ( isWebVR1 && vrDisplay !== undefined && scope.isPresenting ) {
+
+			vrDisplay.submitFrame();
+
+		}
+
+	};
+
+	this.autoSubmitFrame = true;
 
 	// render
 
@@ -335,9 +361,18 @@ THREE.VREffect = function ( renderer, onError ) {
 				height:  Math.round(size.height * rightBounds[ 3 ] )
 			};
 
-			renderer.setScissorTest( true );
+			if (renderTarget) {
+				
+				renderer.setRenderTarget(renderTarget);
+				renderTarget.scissorTest = true;
+				
+			} else  {
+				
+				renderer.setScissorTest( true );
+			
+			}
 
-			if ( renderer.autoClear ) renderer.clear();
+			if ( renderer.autoClear || forceClear ) renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
@@ -353,26 +388,55 @@ THREE.VREffect = function ( renderer, onError ) {
 
 
 			// render left eye
-			renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
-			renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+			if ( renderTarget ) {
+
+				renderTarget.viewport.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+				renderTarget.scissor.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+
+			} else {
+
+				renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+				renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+
+			}
 			renderer.render( scene, cameraL, renderTarget, forceClear );
 
 			// render right eye
-			renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
-			renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+			if (renderTarget) {
+
+				renderTarget.viewport.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+  				renderTarget.scissor.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+
+			} else {
+
+				renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+				renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+
+			}
 			renderer.render( scene, cameraR, renderTarget, forceClear );
 
-			renderer.setScissorTest( false );
+			if (renderTarget) {
 
+				renderTarget.viewport.set( 0, 0, size.width, size.height );
+				renderTarget.scissor.set( 0, 0, size.width, size.height );
+				renderTarget.scissorTest = false;
+				renderer.setRenderTarget( null );
+
+			} else {
+				
+				renderer.setScissorTest( false );
+
+			}
+			
 			if ( autoUpdate ) {
 
 				scene.autoUpdate = true;
 
 			}
 
-			if ( isWebVR1 ) {
+			if ( scope.autoSubmitFrame ) {
 
-				vrDisplay.submitFrame();
+				scope.submitFrame();
 
 			}
 

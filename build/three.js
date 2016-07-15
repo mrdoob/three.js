@@ -19308,7 +19308,7 @@
   function WebGLRenderer ( parameters ) {
   	this.isWebGLRenderer = true;
 
-  	console.log( 'THREE.WebGLRenderer', "79dev" );
+  	console.log( 'THREE.WebGLRenderer', "80dev" );
 
   	parameters = parameters || {};
 
@@ -28652,6 +28652,12 @@
   				case 'Line':
 
   					object = new Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
+
+  					break;
+
+  				case 'LineSegments':
+
+  					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
 
   					break;
 
