@@ -34,16 +34,38 @@ function onMessage(evt) {
     console.log("received: " + evt.data);
     msg = JSON.parse(evt.data);
     //alert("received: " + msg);
-    if (msg.Op=="Select")
+    if (msg.Op=="Select"){
         editor.selectByUuid( msg.UUID, true );
+    }
     else if (msg.Op=="Frame") {
         //alert("uuid: " + msg.name);
-        var o = editor.scene.getObjectByName( msg.name);
-        //alert("mat before: " + o.matrix);
-        o.matrixAutoUpdate = false;
-        o.matrix.fromArray(msg.matrix);
+        var transforms = msg.Transforms;
+        for (var i = 0; i < transforms.length; i ++ ) {
+            var oneBodyTransform = transforms[i];
+            var o = editor.scene.getObjectByName( oneBodyTransform.name);
+            //alert("mat before: " + o.matrix);
+            o.matrixAutoUpdate = false;
+            o.matrix.fromArray(oneBodyTransform.matrix);
+        }
+        /*
+        var paths = msg.paths;
+        for (var i = 0; i < paths.length; i ++ ) {
+            var onePathUpdate = paths[i];
+            var o = editor.scene.getObjectByProperty( 'uuid', onePathUpdate.uuid);
+            var pathobj = o.geometry.attributes.position;
+            pathobj[0] = onePathUpdate.positions[0];
+            pathobj[1] = onePathUpdate.positions[1];
+            pathobj[2] = onePathUpdate.positions[2];
+            pathobj[3] = onePathUpdate.positions[3];
+            pathobj[4] = onePathUpdate.positions[4];
+            pathobj[5] = onePathUpdate.positions[5];
+            //o.geometry.attributes.position.needsUpdate = true;
+            //alert("mat before: " + o.matrix);
+            o.matrixAutoUpdate = false;
+            o.geometry.verticesNeedUpdate = true;
+            o.updateMatrix();
+        } */
         onWindowResize();
-        //o.updateMatrix();
         //alert("mat after: " + o.matrix);
    }
     //drawImageText(evt.data);
