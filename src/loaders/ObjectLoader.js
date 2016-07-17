@@ -578,6 +578,7 @@ Object.assign( THREE.ObjectLoader.prototype, {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
 				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+				if ( data.quaternion !== undefined ) object.quaternion.fromArray( data.quaternion );
 				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
 
 			}
