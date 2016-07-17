@@ -163,14 +163,14 @@
 
 						uniforms: {
 
-							"map": { type: "t", value: texture },
-							"width": { type: "f", value: width },
-							"height": { type: "f", value: height },
-							"nearClipping": { type: "f", value: nearClipping },
-							"farClipping": { type: "f", value: farClipping },
+							"map":          { value: texture },
+							"width":        { value: width },
+							"height":       { value: height },
+							"nearClipping": { value: nearClipping },
+							"farClipping":  { value: farClipping },
 
-							"pointSize": { type: "f", value: 2 },
-							"zOffset": { type: "f", value: 1000 }
+							"pointSize":    { value: 2 },
+							"zOffset":      { value: 1000 }
 
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
@@ -194,7 +194,9 @@
 
 				}, false );
 				video.loop = true;
+				video.muted = true;
 				video.src = 'textures/kinect.webm';
+				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();

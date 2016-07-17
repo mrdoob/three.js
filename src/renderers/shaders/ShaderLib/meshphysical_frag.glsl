@@ -6,6 +6,11 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
+#ifndef STANDARD
+	uniform float clearCoat;
+	uniform float clearCoatRoughness;
+#endif
+
 uniform float envMapIntensity; // temporary
 
 varying vec3 vViewPosition;
@@ -56,6 +61,7 @@ void main() {
 	#include <specularmap_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
+	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>
 

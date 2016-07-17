@@ -283,7 +283,7 @@
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -294,7 +294,7 @@
 
 				currentLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,

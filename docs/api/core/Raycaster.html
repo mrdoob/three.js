@@ -59,7 +59,8 @@
 			[example:webgl_interactive_raycasting_points Raycasting to Points], 
 			[example:webgl_geometry_terrain_raycast Terrain raycasting], 
 			[example:webgl_octree_raycasting Raycasting using an octree],
-			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]</div>
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels],
+			[example:webgl_raycast_texture Raycast to a Texture]</div>
 
 
 		<div>
@@ -144,6 +145,7 @@
         [page:Integer faceIndex] – index of the intersected face<br />
         [page:Array indices] – indices of vertices comprising the intersected face<br />
         [page:Object3D object] – the intersected object
+        [page:Vector2 uv] - U,V coordinates at point of intersection
     	</p>
         <p>
         When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 

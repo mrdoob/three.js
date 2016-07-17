@@ -123,11 +123,6 @@
 		<div>Default is 4. The maximum number of MorphNormals allowed in a shader. Keep in mind that the standard materials only allow 4 MorphNormals. </div>
 
 
-		<h3>[property:Boolean autoScaleCubemaps]</h3>
-
-		<div>Default is true. If set, then Cubemaps are scaled, when they are bigger than the maximum size, to make sure that they aren't bigger than the maximum size.</div>
-
-
 		<h3>[property:Object info]</h3>
 
 		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
@@ -213,7 +208,7 @@
 		<div>Arguments default to true.</div>
 
 		<h3>[method:null renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
-		<div>object — an instance of [page:Object3D]]<br />
+		<div>object — an instance of [page:Object3D]<br />
 		program — an instance of shaderProgram<br />
 		shading — an instance of Material<br />
 		</div>
@@ -263,10 +258,10 @@
 
 		<h3>[method:null setRenderTarget]( [page:WebGLRenderTarget renderTarget] )</h3>
 		<div>
-		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated.<br />
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated (optional).<br />
 		</div>
 		<div>
-		This method sets the active rendertarget.
+		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
 		</div>
 
 		<h3>[method:boolean supportsCompressedTextureS3TC]()</h3>

@@ -45,7 +45,7 @@ THREE.Plane.prototype = {
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
 
-		return function ( a, b, c ) {
+		return function setFromCoplanarPoints( a, b, c ) {
 
 			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
 
@@ -126,7 +126,7 @@ THREE.Plane.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( line, optionalTarget ) {
+		return function intersectLine( line, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
@@ -197,7 +197,7 @@ THREE.Plane.prototype = {
 		var v1 = new THREE.Vector3();
 		var m1 = new THREE.Matrix3();
 
-		return function ( matrix, optionalNormalMatrix ) {
+		return function applyMatrix4( matrix, optionalNormalMatrix ) {
 
 			var referencePoint = this.coplanarPoint( v1 ).applyMatrix4( matrix );
 

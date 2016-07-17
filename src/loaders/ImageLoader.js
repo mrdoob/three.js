@@ -8,77 +8,41 @@ THREE.ImageLoader = function ( manager ) {
 
 };
 
-THREE.ImageLoader.prototype = {
-
-	constructor: THREE.ImageLoader,
+Object.assign( THREE.ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.path !== undefined ) url = this.path + url;
-
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		image.onload = function () {
 
-		if ( cached !== undefined ) {
+			URL.revokeObjectURL( image.src );
 
-			scope.manager.itemStart( url );
-
-			if ( onLoad ) {
-
-				setTimeout( function () {
-
-					onLoad( cached );
-
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-			} else {
-
-				scope.manager.itemEnd( url );
-
-			}
-
-			return cached;
-
-		}
-
-		var image = document.createElement( 'img' );
-
-		image.addEventListener( 'load', function ( event ) {
-
-			THREE.Cache.add( url, this );
-
-			if ( onLoad ) onLoad( this );
+			if ( onLoad ) onLoad( image );
 
 			scope.manager.itemEnd( url );
 
-		}, false );
+		};
 
-		if ( onProgress !== undefined ) {
+		if ( url.indexOf( 'data:' ) === 0 ) {
 
-			image.addEventListener( 'progress', function ( event ) {
+			image.src = url;
 
-				onProgress( event );
+		} else {
 
-			}, false );
+			var loader = new THREE.XHRLoader();
+			loader.setPath( this.path );
+			loader.setResponseType( 'blob' );
+			loader.load( url, function ( blob ) {
+
+				image.src = URL.createObjectURL( blob );
+
+			}, onProgress, onError );
 
 		}
 
-		image.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemError( url );
-
-		}, false );
-
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
 		scope.manager.itemStart( url );
-
-		image.src = url;
 
 		return image;
 
@@ -87,13 +51,15 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
 
 	},
 
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	}
 
-};
+} );

@@ -17,11 +17,11 @@
 
 		<h2>Example</h2>
 
-		<div>[example:canvas_effects_stereo effects / stereo ]</div>
 		<div>[example:canvas_geometry_birds geometry / birds ]</div>
 		<div>[example:canvas_geometry_cube geometry / cube ]</div>
 		<div>[example:webgl_animation_skinning_blending animation / skinning / blending ]</div>
 		<div>[example:webgl_animation_skinning_morph animation / skinning / blending ]</div>
+		<div>[example:webgl_effects_stereo effects / stereo ]</div>
 		<div>[example:webgl_interactive_cubes interactive / cubes ]</div>
 		<div>[example:webgl_loader_collada_skinning loader / collada / skinning ]</div>
 
@@ -88,7 +88,7 @@ scene.add( camera );</code>
 
 		<h3>[method:Float getFilmHeight]()</h3>
 		<div>
-		Returns the height of the image on the film. If .aspect is less than or equal to one (portrait format), the result equals .fimlGauge.
+		Returns the height of the image on the film. If .aspect is less than or equal to one (portrait format), the result equals .filmGauge.
 		</div>
 
 		<h3>[method:null setFocalLength]( [page:Float focalLength] )</h3>
@@ -155,6 +155,11 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 </code>
 
 		Note there is no reason monitors have to be the same size or in a grid.
+		</div>
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<div>
+		Removes any offset set by the .setViewOffset method.
 		</div>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>

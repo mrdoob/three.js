@@ -61,9 +61,6 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	render: function ( delta ) {
 
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
 		var maskActive = false;
 
 		var pass, i, il = this.passes.length;
@@ -72,7 +69,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			pass = this.passes[ i ];
 
-			if ( ! pass.enabled ) continue;
+			if ( pass.enabled === false ) continue;
 
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
@@ -94,13 +91,17 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			}
 
-			if ( pass instanceof THREE.MaskPass ) {
+			if ( THREE.MaskPass !== undefined ) {
 
-				maskActive = true;
+				if ( pass instanceof THREE.MaskPass ) {
 
-			} else if ( pass instanceof THREE.ClearMaskPass ) {
+					maskActive = true;
 
-				maskActive = false;
+				} else if ( pass instanceof THREE.ClearMaskPass ) {
+
+					maskActive = false;
+
+				}
 
 			}
 

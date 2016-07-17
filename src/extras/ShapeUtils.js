@@ -91,7 +91,7 @@ THREE.ShapeUtils = {
 
 		// takes in an contour array and returns
 
-		return function ( contour, indices ) {
+		return function triangulate( contour, indices ) {
 
 			var n = contour.length;
 
@@ -190,6 +190,21 @@ THREE.ShapeUtils = {
 	} )(),
 
 	triangulateShape: function ( contour, holes ) {
+
+		function removeDupEndPts(points) {
+
+			var l = points.length;
+
+			if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+
+				points.pop();
+
+			}
+
+		}
+
+		removeDupEndPts( contour );
+		holes.forEach( removeDupEndPts );
 
 		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 
@@ -628,7 +643,7 @@ THREE.ShapeUtils = {
 
 			if ( allPointsMap[ key ] !== undefined ) {
 
-				console.warn( "THREE.Shape: Duplicate point", key );
+				console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
 
 			}
 
@@ -700,7 +715,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2 ) {
+		return function b2( t, p0, p1, p2 ) {
 
 			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
 
@@ -739,7 +754,7 @@ THREE.ShapeUtils = {
 
 		}
 
-		return function ( t, p0, p1, p2, p3 ) {
+		return function b3( t, p0, p1, p2, p3 ) {
 
 			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
 

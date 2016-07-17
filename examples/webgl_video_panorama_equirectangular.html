@@ -65,9 +65,11 @@
 				var video = document.createElement( 'video' );
 				video.width = 640;
 				video.height = 360;
-				video.autoplay = true;
 				video.loop = true;
+				video.muted = true;
 				video.src = "textures/pano.webm";
+				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+				video.play();
 
 				var texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.LinearFilter;

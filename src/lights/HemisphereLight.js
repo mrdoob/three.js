@@ -10,7 +10,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
 	this.castShadow = undefined;
 
-	this.position.set( 0, 1, 0 );
+	this.position.copy( THREE.Object3D.DefaultUp );
 	this.updateMatrix();
 
 	this.groundColor = new THREE.Color( groundColor );

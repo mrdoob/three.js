@@ -74,7 +74,7 @@ def fov(camera):
 
     """
     logger.debug("camera.fov(%s)", camera)
-    return camera.lens
+    return camera.angle
 
 
 @_camera
