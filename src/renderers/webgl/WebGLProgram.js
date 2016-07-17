@@ -393,9 +393,7 @@ THREE.WebGLProgram = ( function () {
 				'	attribute vec4 skinIndex;',
 				'	attribute vec4 skinWeight;',
 
-				'#endif',
-
-				'\n'
+				'#endif'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
@@ -465,9 +463,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
 				parameters.outputEncoding ? getTexelEncodingFunction( "linearToOutputTexel", parameters.outputEncoding ) : '',
 
-				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : '',
-
-				'\n'
+				parameters.depthPacking ? "#define DEPTH_PACKING " + material.depthPacking : ''
 
 			].filter( filterEmptyLine ).join( '\n' );
 
@@ -486,8 +482,19 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var vertexGlsl = prefixVertex + vertexShader;
-		var fragmentGlsl = prefixFragment + fragmentShader;
+		var vertexGlsl = [
+
+			prefixVertex,
+			vertexShader
+
+		].join( '\n' );
+
+		var fragmentGlsl = [
+
+			prefixFragment,
+			fragmentShader
+
+		].join( '\n' );
 
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
