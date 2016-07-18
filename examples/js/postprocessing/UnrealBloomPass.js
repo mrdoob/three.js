@@ -142,6 +142,23 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		this.renderTargetBright.dispose();
 	},
 
+	setSize: function ( width, height ) {
+
+		var resx = Math.round(width/2);
+		var resy = Math.round(height/2);
+
+		this.renderTargetBright.setSize(resx, resy);
+
+		for( var i=0; i<this.nMips; i++) {
+
+			this.renderTargetsHorizontal[i].setSize(resx, resy);
+			this.renderTargetsVertical[i].setSize(resx, resy);
+
+			resx = Math.round(resx/2);
+			resy = Math.round(resy/2);
+		}
+	},
+
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		this.oldClearColor.copy( renderer.getClearColor() );

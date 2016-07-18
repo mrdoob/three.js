@@ -208,8 +208,9 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
+				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 				renderer.setSize( width, height );
-
+				composer.setSize( width, height );
 			}
 
 			//
