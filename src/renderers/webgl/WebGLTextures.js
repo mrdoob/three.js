@@ -158,6 +158,17 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		}
 
+		if ( renderTarget instanceof THREE.WebGLMultiRenderTarget && renderTargetProperties.__webglAttachments ) {
+
+			for ( var i = 0; i < renderTarget.attachments.length; i ++ ) {
+
+				var attachmentProperties = properties.get( renderTarget.attachments[ i ] );
+				_gl.deleteTexture( attachmentProperties.__webglTexture );
+
+			}
+
+		}
+
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
 			for ( var i = 0; i < 6; i ++ ) {
@@ -532,13 +543,13 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+	function setupFrameBufferTexture ( framebuffer, width, height, texture, attachment, textureTarget ) {
 
-		var glFormat = paramThreeToGL( renderTarget.texture.format );
-		var glType = paramThreeToGL( renderTarget.texture.type );
-		state.texImage2D( textureTarget, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+		var glFormat = paramThreeToGL( texture.format );
+		var glType = paramThreeToGL( texture.type );
+		state.texImage2D( textureTarget, 0, glFormat, width, height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 	}
@@ -648,9 +659,28 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-		textureProperties.__webglTexture = _gl.createTexture();
+		if ( renderTarget instanceof THREE.WebGLMultiRenderTarget ) {
 
-		_infoMemory.textures ++;
+			renderTargetProperties.__webglAttachmentTextures = [ ];
+			renderTargetProperties.__webglAttachments = [ ];
+
+			for ( var i = 0; i < renderTarget.attachments.length; i ++ ) {
+
+				var attachmentProperties = properties.get( renderTarget.attachments[ i ] );
+				attachmentProperties.__webglTexture = _gl.createTexture();
+				renderTargetProperties.__webglAttachments[ i ] = _gl.COLOR_ATTACHMENT0 + i;
+
+				_infoMemory.textures ++;
+
+			}
+
+		} else {
+
+			textureProperties.__webglTexture = _gl.createTexture();
+
+			_infoMemory.textures ++;
+
+		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
@@ -682,7 +712,7 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			for ( var i = 0; i < 6; i ++ ) {
 
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget.width, renderTarget.height, renderTarget.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
 
 			}
 
@@ -691,11 +721,35 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 		} else {
 
-			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-			setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+			if ( renderTarget instanceof THREE.WebGLMultiRenderTarget ) {
 
-			if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+				for ( var i = 0; i < renderTarget.attachments.length; i ++ ) {
+
+					var attachment = renderTarget.attachments[ i ];
+					var attachmentProperties = properties.get( attachment );
+					state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
+					setTextureParameters( _gl.TEXTURE_2D, attachment, isTargetPowerOfTwo );
+					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer,
+						renderTarget.width,
+						renderTarget.height,
+						attachment,
+						_gl.COLOR_ATTACHMENT0 + i,
+						_gl.TEXTURE_2D );
+
+					if ( attachment.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+
+				}
+
+			} else {
+
+				state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+				setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget.width, renderTarget.height, renderTarget.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+
+				if ( renderTarget.texture.generateMipmaps && isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
+
+			}
+
 			state.bindTexture( _gl.TEXTURE_2D, null );
 
 		}
@@ -712,20 +766,37 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 	function updateRenderTargetMipmap( renderTarget ) {
 
+		var target = renderTarget instanceof THREE.WebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+
 		var texture = renderTarget.texture;
 
-		if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
-				texture.minFilter !== THREE.NearestFilter &&
-				texture.minFilter !== THREE.LinearFilter ) {
+		if ( renderTarget instanceof THREE.WebGLMultiRenderTarget ) {
 
-			var target = renderTarget instanceof THREE.WebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
-			var webglTexture = properties.get( texture ).__webglTexture;
+			for ( var i = 0; i < renderTarget.attachments.length; i ++ ) {
 
-			state.bindTexture( target, webglTexture );
-			_gl.generateMipmap( target );
-			state.bindTexture( target, null );
+				texture = properties.get( renderTarget.attachments[ i ] ).__webglTexture;
+
+				state.bindTexture( target, texture );
+				_gl.generateMipmap( target );
+
+			}
+
+		} else {
+
+			if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
+					texture.minFilter !== THREE.NearestFilter &&
+					texture.minFilter !== THREE.LinearFilter ) {
+
+				var webglTexture = properties.get( texture ).__webglTexture;
+
+				state.bindTexture( target, webglTexture );
+				_gl.generateMipmap( target );
+
+			}
 
 		}
+
+		state.bindTexture( target, null );
 
 	}
 
