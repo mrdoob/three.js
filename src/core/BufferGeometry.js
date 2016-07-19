@@ -328,13 +328,13 @@ Object.assign( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var direct = geometry.__directGeometry;
+			if( geometry.__directGeometry === undefined || geometry.elementsNeedUpdate ) {
 
-			if ( direct === undefined || geometry.elementsNeedUpdate === true ) {
-
-				return this.fromGeometry( geometry );
+				this.fromGeometry( geometry );
 
 			}
+
+			var direct = geometry.__directGeometry;
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate || geometry.elementsNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate || geometry.elementsNeedUpdate;
