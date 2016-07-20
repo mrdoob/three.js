@@ -47,7 +47,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 
 		} else {
 
-			if( onReady ) onReady( vrDisplay );
+			if ( onReady ) onReady( vrDisplay );
 
 		}
 
