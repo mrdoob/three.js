@@ -5,14 +5,14 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function FogExp2( color, density ) {
+function FogExp2 ( color, density ) {
 
 	this.name = '';
 
 	this.color = new Color( color );
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
-};
+}
 
 FogExp2.prototype.isFogExp2 = true;
 
