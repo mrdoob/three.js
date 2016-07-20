@@ -28,8 +28,8 @@ Fog.prototype.toJSON = function ( meta ) {
 
 	return {
 		color: this.color.getHex(),
-		far: this.far,
-		near: this.near
+		near: this.near,
+		far: this.far
 	};
 
 };
