@@ -552,12 +552,6 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 	}
 
-	if ( matches.index === re.lastIndex ) {
-
-		re.lastIndex++;
-
-	}
-
 	var results = {
 		// directoryName: matches[ 1 ], // (tschw) currently unused
 		nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
