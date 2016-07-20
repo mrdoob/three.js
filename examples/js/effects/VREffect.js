@@ -9,7 +9,7 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function ( renderer, onError, onReady ) {
 
 	var isWebVR1 = true;
 
@@ -45,6 +45,10 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( onError ) onError( 'HMD not available' );
 
+		} else {
+
+			if( onReady ) onReady( vrDisplay );
+			
 		}
 
 	}
