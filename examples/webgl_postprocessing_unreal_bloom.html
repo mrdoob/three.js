@@ -6,17 +6,17 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
+				font-weight: bold;
 			}
-			a { color: #88f }
+			a {
+				color:#00ff78;
+			}
 
 			#info {
 				color: #fff;
@@ -26,16 +26,13 @@
 				text-align: center;
 				display:block;
 			}
+			.dg.ac {
+				z-index: 1 !important; /* FIX DAT.GUI */
+			}
 		</style>
 	</head>
 	<body>
-		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank">Prashant Sharma</a> and <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
-			This Bloom Pass is inspired by the bloom pass of the Unreal Engine. It creates a mip map chain of bloom textures and blur them <br>
-			with different radii. Because of the weigted combination of mips, and since larger blurs are done on higher mips this bloom <br>
-			is better in quality and performance.<br>
-			</div>
-		<div id="container"></div>
+
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
@@ -59,6 +56,13 @@
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/LuminosityHighPassShader.js"></script>
 		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank">Prashant Sharma</a> and <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			This Bloom Pass is inspired by the bloom pass of the Unreal Engine. It creates a mip map chain of bloom textures and blur them <br>
+			with different radii. Because of the weigted combination of mips, and since larger blurs are done on higher mips this bloom <br>
+			is better in quality and performance.<br>
+		</div>
 
 		<script>
 
@@ -160,17 +164,21 @@
 				container.appendChild( renderer.domElement );
 
 				renderScene = new THREE.RenderPass(scene, camera);
+
 		    // renderScene.clear = true;
 		    effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
 		    effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
-		    effectFXAA.renderToScreen = true;
+
+				var copyShader = new THREE.ShaderPass(THREE.CopyShader);
+				copyShader.renderToScreen = true;
 
 		    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);//1.0, 9, 0.5, 512);
 				composer = new THREE.EffectComposer(renderer);
 		    composer.setSize(window.innerWidth, window.innerHeight);
 		    composer.addPass(renderScene);
+				composer.addPass(effectFXAA);
 		    composer.addPass(bloomPass);
-		    composer.addPass(effectFXAA);
+				composer.addPass(copyShader);
 				//renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -208,9 +216,9 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
+				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 			}
 
 			//

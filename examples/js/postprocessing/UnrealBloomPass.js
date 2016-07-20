@@ -63,7 +63,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	// Gaussian Blur Materials
 	this.separableBlurMaterials = [];
-	var kernelSizeArray = [3, 5, 9, 15, 21];
+	var kernelSizeArray = [3, 5, 7, 9, 11];
 	var resx = Math.round(this.resolution.x/2);
 	var resy = Math.round(this.resolution.y/2);
 
@@ -153,6 +153,8 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 			this.renderTargetsHorizontal[i].setSize(resx, resy);
 			this.renderTargetsVertical[i].setSize(resx, resy);
+
+			this.separableBlurMaterials[i].uniforms[ "texSize" ].value = new THREE.Vector2(resx, resy);
 
 			resx = Math.round(resx/2);
 			resy = Math.round(resy/2);
@@ -248,25 +250,18 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 				\
 				void main() {\n\
 					vec2 invSize = 1.0 / texSize;\
-					float weightSum = 0.0;\
-					vec3 diffuseSum = vec3(0.0);\
-					float fSigma = float(KERNEL_RADIUS);\
-					for( int i = -KERNEL_RADIUS; i < KERNEL_RADIUS; i +=2 ) {\
+					float fSigma = float(SIGMA);\
+					float weightSum = gaussianPdf(0.0, fSigma);\
+					vec3 diffuseSum = texture2D( colorTexture, vUv).rgb * weightSum;\
+					for( int i = 1; i < KERNEL_RADIUS; i ++ ) {\
 						float x = float(i);\
-						float w1 = gaussianPdf(x, fSigma);\
-						float w2 = gaussianPdf(x + 1.0, fSigma);\
-						float w1Plusw2 = w1 + w2;\
-						float t = w2/w1Plusw2;\
-						vec2 uvoffset = direction * invSize * ( x + t );\
-						vec3 interpolatedSample = texture2D( colorTexture, vUv + uvoffset).rgb;\
-						diffuseSum += interpolatedSample * w1Plusw2;\
-						weightSum += w1Plusw2;\
+						float w = gaussianPdf(x, fSigma);\
+						vec2 uvOffset = direction * invSize * x;\
+						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset).rgb;\
+						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset).rgb;\
+						diffuseSum += (sample1 + sample2) * w;\
+						weightSum += 2.0 * w;\
 					}\
-					float w = gaussianPdf(fSigma, fSigma);\
-					vec2 uvoffset = direction * invSize * float(KERNEL_RADIUS);\
-					vec3 sample = texture2D( colorTexture, vUv + uvoffset).rgb * w;\
-					diffuseSum += sample;\
-					weightSum += w;\
 					gl_FragColor = vec4(diffuseSum/weightSum, 1.0);\n\
 				}"
 		} );
