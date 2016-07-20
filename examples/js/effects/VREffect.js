@@ -48,7 +48,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 		} else {
 
 			if( onReady ) onReady( vrDisplay );
-			
+
 		}
 
 	}
@@ -429,6 +429,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 			} else {
 				
 				renderer.setScissorTest( false );
+				renderer.setViewport( 0, 0, size.width, size.height );
 
 			}
 			
