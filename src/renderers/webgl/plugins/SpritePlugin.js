@@ -113,6 +113,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
+			if( camera.projectionMatrix.elements ){
+				if( camera.projectionMatrix.elements[12] != camera.projectionMatrix.origin.x )
+					console.log( "UPloaded origin to projection matrix...", camera.projectionMatrix )
+				camera.projectionMatrix.elements[12] = camera.projectionMatrix.origin.x;
+				camera.projectionMatrix.elements[13] = camera.projectionMatrix.origin.y;
+				camera.projectionMatrix.elements[14] = camera.projectionMatrix.origin.z;
+			}
 		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 		state.activeTexture( gl.TEXTURE0 );
@@ -161,7 +168,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var sprite = sprites[ i ];
 
 			sprite.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite.modelViewMatrix.elements[ 14 ];
+			sprite.z = - sprite.modelViewMatrix.origin.z;//elements[ 14 ];
 
 		}
 
@@ -179,7 +186,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			if ( material.visible === false ) continue;
 
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix.elements );
+			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite.modelViewMatrix );
 
 			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
 
