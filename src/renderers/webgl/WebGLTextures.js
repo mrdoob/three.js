@@ -595,7 +595,20 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 		setTexture2D( renderTarget.depthTexture, 0 );
 
 		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		if ( renderTarget.depthTexture.format === THREE.DepthFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else if ( renderTarget.depthTexture.format === THREE.DepthStencilFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else {
+
+			throw new Error('Unknown depthTexture format')
+
+		}
 
 	}
 
