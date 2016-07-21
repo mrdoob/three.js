@@ -2716,6 +2716,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( p === THREE.LuminanceFormat ) return _gl.LUMINANCE;
 		if ( p === THREE.LuminanceAlphaFormat ) return _gl.LUMINANCE_ALPHA;
 		if ( p === THREE.DepthFormat ) return _gl.DEPTH_COMPONENT;
+		if ( p === THREE.DepthStencilFormat ) return _gl.DEPTH_STENCIL;
 
 		if ( p === THREE.AddEquation ) return _gl.FUNC_ADD;
 		if ( p === THREE.SubtractEquation ) return _gl.FUNC_SUBTRACT;
@@ -2770,6 +2771,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( p === THREE.MinEquation ) return extension.MIN_EXT;
 			if ( p === THREE.MaxEquation ) return extension.MAX_EXT;
+
+		}
+
+		extension = extension.get( 'WEBGL_depth_textures' );
+
+		if ( extension !== null ){
+
+			if ( p === THREE.UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 		}
 

@@ -255,21 +255,22 @@ Object.assign( THREE, {
 
 	// Pixel types
 
-	//UnsignedByteType: 1009,
 	UnsignedShort4444Type: 1016,
 	UnsignedShort5551Type: 1017,
 	UnsignedShort565Type: 1018,
+	UnsignedInt248Type: 1019,
 
 	// Pixel formats
 
-	AlphaFormat: 1019,
-	RGBFormat: 1020,
-	RGBAFormat: 1021,
-	LuminanceFormat: 1022,
-	LuminanceAlphaFormat: 1023,
+	AlphaFormat: 1020,
+	RGBFormat: 1021,
+	RGBAFormat: 1022,
+	LuminanceFormat: 1023,
+	LuminanceAlphaFormat: 1024,
 	// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-	RGBEFormat: THREE.RGBAFormat, //1024;
-	DepthFormat: 1026,
+	RGBEFormat: THREE.RGBAFormat,
+	DepthFormat: 1025,
+	DepthStencilFormat: 1026,
 
 	// DDS / ST3C Compressed texture formats
 
