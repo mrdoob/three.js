@@ -27,6 +27,7 @@ Fog.prototype.clone = function () {
 Fog.prototype.toJSON = function ( meta ) {
 
 	return {
+		type: 'Fog',
 		color: this.color.getHex(),
 		near: this.near,
 		far: this.far

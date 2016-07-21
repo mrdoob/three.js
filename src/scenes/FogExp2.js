@@ -25,6 +25,7 @@ FogExp2.prototype.clone = function () {
 FogExp2.prototype.toJSON = function ( meta ) {
 
 	return {
+		type: 'FogExp2',
 		color: this.color.getHex(),
 		density: this.density
 	};

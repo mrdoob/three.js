@@ -488,11 +488,11 @@ Object.assign( ObjectLoader.prototype, {
 					
 					if ( data.fog !== undefined ) {
 						
-						if ( data.fog.density !== undefined ) {
+						if ( data.fog.type === 'FogExp2' ) {
 						
 							object.fog = new FogExp2(data.fog.color, data.fog.density);
 							
-						} else {
+						} else if ( data.fog.type === 'Fog' ) {
 						
 							object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
 							
