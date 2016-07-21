@@ -29,7 +29,7 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
-	this.depthTexture = null;
+	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 };
 
