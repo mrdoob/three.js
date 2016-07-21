@@ -7,6 +7,12 @@ Sidebar.Project = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 
+	signals.fogTypeChanged.add(function () {
+		
+		updateRenderer();
+		
+	});
+	
 	var rendererTypes = {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
