@@ -72,3 +72,9 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;
 
 }
+
+float gaussianPdf(in float x, in float sigma) {
+
+	return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
+
+}
