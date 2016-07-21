@@ -58,7 +58,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'normalmap' ],
 			THREE.UniformsLib[ 'displacementmap' ],
 			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'ltc_brdf' ],
+			// TODO (abelnation): include LTC brdf data
 			THREE.UniformsLib[ 'lights' ],
 
 			{
@@ -88,8 +88,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'roughnessmap' ],
 			THREE.UniformsLib[ 'metalnessmap' ],
 			THREE.UniformsLib[ 'fog' ],
+			// TODO (abelnation): include LTC brdf data
 			THREE.UniformsLib[ 'lights' ],
-			THREE.UniformsLib[ 'ltc_brdf' ],
 
 			{
 				"emissive" : { value: new THREE.Color( 0x000000 ) },

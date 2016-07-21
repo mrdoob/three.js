@@ -14,6 +14,11 @@ THREE.RectAreaLight = function ( color, intensity, width, height ) {
 	this.width = ( width !== undefined ) ? width : 10;
 	this.height = ( height !== undefined ) ? height : 10;
 
+	// TODO (abelnation): remove this warning when RectAreaLight is fully included in build files
+	if (THREE.UniformsLib['ltc_brdf'] == undefined) {
+		console.warn( 'RectAreaLight will not function properly without including examples/js/lights/RectAreaLightUniformsLib.js' );
+	}
+
 	// TODO (abelnation): distance/decay
 
 };
