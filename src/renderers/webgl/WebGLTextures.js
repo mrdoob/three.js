@@ -443,6 +443,14 @@ THREE.WebGLTextures = function ( _gl, extensions, state, properties, capabilitie
 
 			}
 
+			// Depth stencil textures need the DEPTH_STENCIL internal format
+			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+			if ( texture.format === THREE.DepthStencilFormat ) {
+
+				internalFormat = _gl.DEPTH_STENCIL;
+
+			}
+
 			state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, null );
 
 		} else if ( texture instanceof THREE.DataTexture ) {
