@@ -1,15 +1,16 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>OpenSim 4.0 Visualizer 022916</title>
+		<title>OpenSim 4.0 Visualizer 071816</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="stats.min.js"></script>
 	</head>
 	<body ontouchstart="">
 		<link href="css/main.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
 		<script src="websocket.js" type="text/javascript"></script>
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
@@ -77,6 +78,7 @@
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
+		<script src="js/Sidebar.SceneSettings.js"></script>                
 		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Settings.js"></script>
 		<script src="js/Sidebar.Properties.js"></script>
@@ -123,7 +125,6 @@
 		<script src="js/commands/SetMaterialColorCommand.js"></script>
 		<script src="js/commands/SetMaterialMapCommand.js"></script>
 		<script src="js/commands/SetSceneCommand.js"></script>
-
 		<script type="text/javascript" src="websocket.js"></script>
 		<!-- <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="qyqgfqd9j8z890t"></script> -->
 
@@ -137,6 +138,8 @@
 			};
 
 			//
+			stats = new Stats();
+			document.body.appendChild( stats.domElement );
 
 			var editor = new OpenSimEditor();
 
@@ -149,8 +152,8 @@
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			var toolbar = new Toolbar( editor );
-			document.body.appendChild( toolbar.dom );
+			//var toolbar = new Toolbar( editor );
+			//document.body.appendChild( toolbar.dom );
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
@@ -328,21 +331,21 @@
 			//
 
 			var isLoadingFromHash = false;
-			var file = 'scene.json';
+			var file = 'model.json';
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 5 ) === 'file=' ) {
+			if ( true) {
 
-				var file = hash.substr( 6 );
+				//var file = hash.substr( 6 );
 
 				if ( true ) {
 
 					var loader = new THREE.XHRLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
-
-						editor.clear();
-						editor.fromJSON( JSON.parse( text ) );
+						var json = JSON.parse( text );
+						//editor.clear();
+						editor.addfromJSON( json );
 
 					} );
 

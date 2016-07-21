@@ -219,3 +219,7 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
+#stats { position: absolute; bottom:0; left: 0 }
+#stats #fps { background: transparent !important }
+#stats #fps #fpsText { color: #777 !important }
+#stats #fps #fpsGraph { display: none }
