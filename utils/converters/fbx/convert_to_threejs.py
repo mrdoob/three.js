@@ -1685,6 +1685,8 @@ def generate_light_object(node):
 
         }
 
+    # TODO (abelnation): handle area lights
+
     return output
 
 def generate_ambient_light(scene):

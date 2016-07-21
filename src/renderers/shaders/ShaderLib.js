@@ -58,6 +58,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'normalmap' ],
 			THREE.UniformsLib[ 'displacementmap' ],
 			THREE.UniformsLib[ 'fog' ],
+			// TODO (abelnation): include LTC brdf data
 			THREE.UniformsLib[ 'lights' ],
 
 			{
@@ -87,6 +88,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ 'roughnessmap' ],
 			THREE.UniformsLib[ 'metalnessmap' ],
 			THREE.UniformsLib[ 'fog' ],
+			// TODO (abelnation): include LTC brdf data
 			THREE.UniformsLib[ 'lights' ],
 
 			{
