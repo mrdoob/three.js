@@ -543,12 +543,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var index = trackName.lastIndexOf( '/' );
-	var directoryName = trackName.slice( 0, Math.max( 0, index ) );
-
-	var re = /^([^.[\]]+)?(?:\.([^.[\]]+)(?:\[([^[\]]+)\])?)?\.(?:([^.[\]]+)(?:\[([^[\]]+)\])?)$/;
-	re.lastIndex = index + 1;
-
+	var re = /^((?:[\w]+\/)*)([\w-\d]+)?(?:\.([\w]+)(?:\[([^[\]]+)\])?)?\.([\w]+)(?:\[([^[\]]+)\])?$/;
 	var matches = re.exec( trackName );
 
 	if ( ! matches ) {
@@ -564,12 +559,12 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	}
 
 	var results = {
-		// directoryName: directoryName, // (tschw) currently unused
-		nodeName: matches[ 1 ], 	// allowed to be null, specified root node.
-		objectName: matches[ 2 ],
-		objectIndex: matches[ 3 ],
-		propertyName: matches[ 4 ],
-		propertyIndex: matches[ 5 ]	// allowed to be null, specifies that the whole property is set.
+		// directoryName: matches[ 1 ], // (tschw) currently unused
+		nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+		objectName: matches[ 3 ],
+		objectIndex: matches[ 4 ],
+		propertyName: matches[ 5 ],
+		propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	if ( results.propertyName === null || results.propertyName.length === 0 ) {
