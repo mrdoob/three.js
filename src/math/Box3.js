@@ -85,20 +85,28 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	setFromObject: function () {
+	setFromObject: function ( object ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
+		this.makeEmpty();
+
+		this.expandByObject( object );
+
+		return this;
+
+	},
+
+	expandByObject: function () {
+
 		var v1 = new THREE.Vector3();
 
-		return function setFromObject( object ) {
+		return function expandByObject( object ) {
 
 			var scope = this;
 
 			object.updateMatrixWorld( true );
-
-			this.makeEmpty();
 
 			object.traverse( function ( node ) {
 
