@@ -2774,7 +2774,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		extension = extension.get( 'WEBGL_depth_textures' );
+		extension = extensions.get( 'WEBGL_depth_texture' );
 
 		if ( extension !== null ){
 
