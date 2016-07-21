@@ -125,6 +125,7 @@ Object.assign( THREE, {
 	BasicShadowMap: 0,
 	PCFShadowMap: 1,
 	PCFSoftShadowMap: 2,
+	PCSSShadowMap: 3,
 
 	// MATERIAL CONSTANTS
 
