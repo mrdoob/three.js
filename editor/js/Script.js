@@ -421,7 +421,7 @@ var Script = function ( editor ) {
 		}
 
 	} );
-
+    /*
 	signals.refreshScriptEditor.add( function ( object, script, cursorPosition ) {
 
 		if ( currentScript !== script ) return;
@@ -440,7 +440,7 @@ var Script = function ( editor ) {
 		codemirror.setHistory( history ); // setting the history to previous state
 
 	} );
-
+    */
 	return container;
 
 };

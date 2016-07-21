@@ -26,7 +26,7 @@ var OpenSimViewport = function ( editor ) {
 	var skyboxMesh;
 	createBackdrop('sky');
 	var groundPlane;
-	createGroundPlane('bricks');
+	createGroundPlane('redbricks');
 	//
 	createLights();
 	
@@ -40,7 +40,9 @@ var OpenSimViewport = function ( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var matrix = new THREE.Matrix4();
+	var objectPositionOnDown = null;
+	var objectRotationOnDown = null;
+	var objectScaleOnDown = null;
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
@@ -57,6 +59,8 @@ var OpenSimViewport = function ( editor ) {
 
 			}
 
+			signals.refreshSidebarObject3D.dispatch( object );
+
 		}
 
 		render();
@@ -66,7 +70,9 @@ var OpenSimViewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		matrix.copy( object.matrix );
+		objectPositionOnDown = object.position.clone();
+		objectRotationOnDown = object.rotation.clone();
+		objectScaleOnDown = object.scale.clone();
 
 		controls.enabled = false;
 
@@ -75,26 +81,44 @@ var OpenSimViewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( matrix.equals( object.matrix ) === false ) {
+		if ( object !== undefined ) {
 
-			( function ( matrix1, matrix2 ) {
+			switch ( transformControls.getMode() ) {
 
-				editor.history.add(
-					function () {
-						matrix1.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
-					},
-					function () {
-						matrix2.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
+				case 'translate':
+
+					if ( ! objectPositionOnDown.equals( object.position ) ) {
+
+						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
+
 					}
-				);
 
-			} )( matrix.clone(), object.matrix.clone() );
+					break;
+
+				case 'rotate':
+
+					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+
+						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
+
+					}
+
+					break;
+
+				case 'scale':
+
+					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+
+						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
+
+					}
+
+					break;
+
+			}
 
 		}
 
-		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );
@@ -124,7 +148,7 @@ var OpenSimViewport = function ( editor ) {
 
 		return raycaster.intersectObjects( objects );
 
-	};
+	}
 
 	var onDownPosition = new THREE.Vector2();
 	var onUpPosition = new THREE.Vector2();
@@ -135,11 +159,11 @@ var OpenSimViewport = function ( editor ) {
 		var rect = dom.getBoundingClientRect();
 		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
-	};
+	}
 
 	function handleClick() {
 
-		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
+		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			var intersects = getIntersects( onUpPosition, objects );
 
@@ -169,7 +193,7 @@ var OpenSimViewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	function onMouseDown( event ) {
 
@@ -180,7 +204,7 @@ var OpenSimViewport = function ( editor ) {
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onMouseUp( event ) {
 
@@ -191,7 +215,7 @@ var OpenSimViewport = function ( editor ) {
 
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onTouchStart( event ) {
 
@@ -202,7 +226,7 @@ var OpenSimViewport = function ( editor ) {
 
 		document.addEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onTouchEnd( event ) {
 
@@ -215,7 +239,7 @@ var OpenSimViewport = function ( editor ) {
 
 		document.removeEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onDoubleClick( event ) {
 
@@ -232,7 +256,7 @@ var OpenSimViewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'touchstart', onTouchStart, false );
@@ -265,11 +289,15 @@ var OpenSimViewport = function ( editor ) {
 		switch ( value ) {
 
 			case 'css/light.css':
-				grid.setColors( 0x444444, 0x888888 );
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
+				sceneHelpers.add( grid );
 				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
-				grid.setColors( 0xbbbbbb, 0x888888 );
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
+				sceneHelpers.add( grid );
 				clearColor = 0x333333;
 				break;
 
@@ -342,8 +370,7 @@ var OpenSimViewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined &&
-				 object instanceof THREE.Sprite === false ) {
+			if ( object.geometry !== undefined ) {
 
 				selectionBox.update( object );
 				selectionBox.visible = true;
@@ -364,9 +391,13 @@ var OpenSimViewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( function ( geometry ) {
+	signals.geometryChanged.add( function ( object ) {
 
-		selectionBox.update( editor.selected );
+		if ( object !== undefined ) {
+
+			selectionBox.update( object );
+
+		}
 
 		render();
                 var json = JSON.stringify({
@@ -380,24 +411,22 @@ var OpenSimViewport = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		var materialsNeedUpdate = false;
-
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.push( child );
 
 		} );
 
-		if ( materialsNeedUpdate === true ) updateMaterials();
-
 	} );
 
 	signals.objectChanged.add( function ( object ) {
 
+		if ( editor.selected === object ) {
+
 		selectionBox.update( object );
 		transformControls.update();
+
+		}
 
 		if ( object instanceof THREE.PerspectiveCamera ) {
 
@@ -485,8 +514,6 @@ var OpenSimViewport = function ( editor ) {
 
 			}
 
-			updateMaterials();
-
 			oldFogType = fogType;
 
 		}
@@ -519,6 +546,11 @@ var OpenSimViewport = function ( editor ) {
 
 	signals.windowResize.add( function () {
 
+		// TODO: Move this out?
+
+		editor.DEFAULT_CAMERA.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		editor.DEFAULT_CAMERA.updateProjectionMatrix();
+
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 		camera.updateProjectionMatrix();
 
@@ -543,30 +575,6 @@ var OpenSimViewport = function ( editor ) {
 
 	//
 
-	function updateMaterials() {
-
-		editor.scene.traverse( function ( node ) {
-
-			if ( node.material ) {
-
-				node.material.needsUpdate = true;
-
-				if ( node.material instanceof THREE.MeshFaceMaterial ) {
-
-					for ( var i = 0; i < node.material.materials.length; i ++ ) {
-
-						node.material.materials[ i ].needsUpdate = true;
-
-					}
-
-				}
-
-			}
-
-		} );
-
-	}
-
 	function updateFog( root ) {
 
 		if ( root.fog ) {
@@ -585,6 +593,7 @@ var OpenSimViewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
+		/*
 		// animations
 
 		if ( THREE.AnimationHandler != undefined && THREE.AnimationHandler.animations.length > 0 ) {
@@ -607,6 +616,8 @@ var OpenSimViewport = function ( editor ) {
 
 		}
 
+		*/
+
 	}
 
 	function render() {
@@ -626,20 +637,24 @@ var OpenSimViewport = function ( editor ) {
 	}
 	function createBackdrop(choice) {
 	    // load the cube textures
+	    // you need to create an instance of the loader...
+	    var loader = new THREE.CubeTextureLoader();
+	    // and then set your CORS config
+	    loader.setCrossOrigin( 'anonymous' );
 	    var urlPrefix = "images/" + choice + "/";
 	    var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
 		urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
 		urlPrefix + "pz.jpg", urlPrefix + "nz.jpg"];
-	    var textureCube = THREE.ImageUtils.loadTextureCube(urls);
+	    var textureCube = loader.load( urls );
+	    textureCube.format = THREE.RGBFormat;
 
 	    // init the cube shadder
-	    var shader = THREE.ShaderLib['cube'];
-	    var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-	    uniforms['tCube'].value = textureCube;
+	    var shader = THREE.ShaderLib["cube"];
+	    shader.uniforms[ "tCube" ].value = textureCube;
 	    var material = new THREE.ShaderMaterial({
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
-		uniforms: uniforms,
+		uniforms: shader.uniforms,
 		depthWrite: false,
 		side: THREE.DoubleSide
 	    });
@@ -652,7 +667,7 @@ var OpenSimViewport = function ( editor ) {
 	}
 	function createGroundPlane(choice) {
 		var textureLoader = new THREE.TextureLoader();
-		var texture1 = textureLoader.load( "textures/bricks.jpg" );
+		var texture1 = textureLoader.load( "textures/redbricks.jpg" );
 		var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 		texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 		texture1.repeat.set( 128, 128 );
@@ -677,4 +692,4 @@ var OpenSimViewport = function ( editor ) {
 	}
 	return container;
 
-}
+};

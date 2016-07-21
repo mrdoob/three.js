@@ -56,7 +56,7 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
-
+/*
 	editor.signals.historyChanged.add( function () {
 
 		var history = editor.history;
@@ -77,7 +77,7 @@ Menubar.Edit = function ( editor ) {
 		}
 
 	} );
-
+*/
 	// ---
 
 	options.add( new UI.HorizontalRule() );

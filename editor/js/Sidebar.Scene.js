@@ -45,7 +45,7 @@ Sidebar.Scene = function ( editor ) {
 
 	function getScript( uuid ) {
 
-		if ( editor.scripts[ uuid ] !== undefined ) {
+		if ( editor.scripts !== undefined && editor.scripts[ uuid ] !== undefined ) {
 
 			return ' <span class="type Script"></span>';
 

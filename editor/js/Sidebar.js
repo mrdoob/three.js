@@ -40,7 +40,8 @@ var Sidebar = function ( editor ) {
 	container.add( project );
 
 	var settings = new UI.Span().add(
-		new Sidebar.Settings( editor ),
+		new Sidebar.Settings(editor),
+		new Sidebar.SceneSettings(editor),
 		new Sidebar.History( editor )
 	);
 	container.add( settings );

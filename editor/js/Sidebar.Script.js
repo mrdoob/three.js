@@ -46,7 +46,7 @@ Sidebar.Script = function ( editor ) {
 
 		var object = editor.selected;
 
-		if ( object === null ) {
+		if ( object === null || editor.scripts === undefined) {
 
 			return;
 
