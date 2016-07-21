@@ -1,10 +1,19 @@
 /**
  * @author Matt DesLauriers / @mattdesl
+ * @author atix / arthursilber.de
  */
 
-THREE.DepthTexture = function ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+THREE.DepthTexture = function ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 
-  THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, THREE.DepthFormat, type, anisotropy );
+  format = format !== undefined ? format : THREE.DepthFormat;
+
+  if ( format !== THREE.DepthFormat && format !== THREE.DepthStencilFormat ) {
+
+    throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
+
+  }
+
+  THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
   this.image = { width: width, height: height };
 
