@@ -23,9 +23,7 @@ var OpenSimViewport = function ( editor ) {
 	sceneHelpers.add( grid );
 	grid.visible = false;
 
-	var skyboxMesh;
-	createBackdrop('sky');
-	var groundPlane;
+	createBackground(scene, 'sky');
 	createGroundPlane('redbricks');
 	//
 	createLights();
@@ -267,7 +265,6 @@ var OpenSimViewport = function ( editor ) {
 
 	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
-
 		transformControls.update();
 		signals.cameraChanged.dispatch( camera );
 
@@ -624,7 +621,7 @@ var OpenSimViewport = function ( editor ) {
 
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
-
+		stats.update();
 		renderer.clear();
 		renderer.render( scene, camera );
 
@@ -635,39 +632,18 @@ var OpenSimViewport = function ( editor ) {
 		}
 
 	}
-	function createBackdrop(choice) {
+	function createBackground(scene, choice) {
 	    // load the cube textures
 	    // you need to create an instance of the loader...
-	    var loader = new THREE.CubeTextureLoader();
+	    var textureloader = new THREE.CubeTextureLoader().setPath('images/'+choice+'/');
 	    // and then set your CORS config
-	    loader.setCrossOrigin( 'anonymous' );
-	    var urlPrefix = "images/" + choice + "/";
-	    var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
-		urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
-		urlPrefix + "pz.jpg", urlPrefix + "nz.jpg"];
-	    var textureCube = loader.load( urls );
-	    textureCube.format = THREE.RGBFormat;
-
-	    // init the cube shadder
-	    var shader = THREE.ShaderLib["cube"];
-	    shader.uniforms[ "tCube" ].value = textureCube;
-	    var material = new THREE.ShaderMaterial({
-		fragmentShader: shader.fragmentShader,
-		vertexShader: shader.vertexShader,
-		uniforms: shader.uniforms,
-		depthWrite: false,
-		side: THREE.DoubleSide
-	    });
-
-	    // build the skybox Mesh
-	    skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(100000, 100000, 100000, 1, 1, 1), material);
-	    skyboxMesh.name = 'Backdrop';
-	    // add it to the scene
-	    this.editor.addObject(skyboxMesh);
+	    textureloader.load( ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"] );
+	    textureloader.mapping = THREE.CubeRefactionMapping;
+	    scene.background = textureloader;
 	}
 	function createGroundPlane(choice) {
 		var textureLoader = new THREE.TextureLoader();
-		var texture1 = textureLoader.load( "textures/redbricks.jpg" );
+		var texture1 = textureLoader.load( "textures/"+choice+".jpg" );
 		var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 		texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 		texture1.repeat.set( 128, 128 );
@@ -679,7 +655,7 @@ var OpenSimViewport = function ( editor ) {
 		groundPlane.scale.set( 500, 500, 500 );
 		groundPlane.receiveShadow = true;
 		this.editor.addObject(groundPlane);
-
+		this.editor.groundPlane = groundPlane;
 	}
 	function createLights() {
 		amb = new THREE.AmbientLight(0x000000);

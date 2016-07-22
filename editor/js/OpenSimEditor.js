@@ -96,7 +96,6 @@ var OpenSimEditor = function () {
 	this.selected = null;
 	this.helpers = {};
 	this.groundPlane = null;
-	this.skyboxMesh = null;
 	this.textureCube = null;
 	this.groundMaterial = null;
 };
@@ -555,13 +554,6 @@ OpenSimEditor.prototype = {
 			depthWrite: false,
 			side: THREE.DoubleSide
 		});
-
-		// build the skybox Mesh
-		//skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(100000, 100000, 100000, 1, 1, 1), material);
-		//skyboxMesh.name = 'Backdrop';
-		// add it to the scene
-		//this.addObject(skyboxMesh);
-		//this.skyboxMesh = skyboxMesh;
 	},
 
 	updateBackdrop: function (choice) {
@@ -570,6 +562,7 @@ OpenSimEditor.prototype = {
 		    this.signals.objectChanged.dispatch( skyboxMesh );
 		    return;
 		}
+		/*
 		this.skyboxMesh.visible = true;
 		var urlPrefix = "images/" + choice + "/";
 				var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
@@ -588,6 +581,7 @@ OpenSimEditor.prototype = {
 		});
 		this.skyboxMesh.material = material;
 		this.signals.materialChanged.dispatch( this.skyboxMesh );
+		*/
 	},
 
 	createGroundPlane: function (choice) {
