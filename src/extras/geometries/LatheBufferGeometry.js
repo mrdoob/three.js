@@ -47,7 +47,6 @@ function LatheBufferGeometry ( points, segments, phiStart, phiLength ) {
 
 	// helper variables
 	var index = 0, indexOffset = 0, base;
-	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
 	var vertex = new Vector3();
 	var uv = new Vector2();

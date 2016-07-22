@@ -79,13 +79,6 @@ WebGLUniforms = ( function() { // scope
 		arrayCacheF32 = [],
 		arrayCacheI32 = [],
 
-		uncacheTemporaryArrays = function() {
-
-			arrayCacheF32.length = 0;
-			arrayCacheI32.length = 0;
-
-		},
-
 	// Flattening for arrays of vectors and matrices
 
 		flatten = function( array, nBlocks, blockSize ) {
