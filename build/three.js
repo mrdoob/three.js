@@ -94,8 +94,7 @@
    * https://github.com/mrdoob/eventdispatcher.js/
    */
 
-  function EventDispatcher () {
-  	this.isEventDispatcher = true;};
+  function EventDispatcher () {}
 
   Object.assign( EventDispatcher.prototype, {
 
@@ -484,7 +483,6 @@
    */
 
   function Vector2 ( x, y ) {
-  	this.isVector2 = true;
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -494,6 +492,8 @@
   Vector2.prototype = {
 
   	constructor: Vector2,
+
+  	isVector2: true,
 
   	get width() {
 
@@ -964,7 +964,6 @@
    */
 
   function Texture ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
-  	this.isTexture = true;
 
   	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
 
@@ -1015,6 +1014,8 @@
   Texture.prototype = {
 
   	constructor: Texture,
+
+  	isTexture: true,
 
   	set needsUpdate( value ) {
 
@@ -1255,7 +1256,6 @@
    */
 
   function Matrix4 () {
-  	this.isMatrix4 = true;
 
   	this.elements = new Float32Array( [
 
@@ -1277,6 +1277,8 @@
   Matrix4.prototype = {
 
   	constructor: Matrix4,
+
+  	isMatrix4: true,
 
   	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
@@ -1873,7 +1875,7 @@
   			return this.identity();
 
   		}
-  		
+
   		var detInv = 1 / det;
 
   		te[ 0 ] = t11 * detInv;
@@ -2218,7 +2220,6 @@
    */
 
   function Quaternion ( x, y, z, w ) {
-  	this.isQuaternion = true;
 
   	this._x = x || 0;
   	this._y = y || 0;
@@ -2807,7 +2808,6 @@
    */
 
   function Vector3 ( x, y, z ) {
-  	this.isVector3 = true;
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -2818,6 +2818,8 @@
   Vector3.prototype = {
 
   	constructor: Vector3,
+
+  	isVector3: true,
 
   	set: function ( x, y, z ) {
 
@@ -3397,9 +3399,9 @@
   	projectOnVector: function ( vector ) {
 
   		var scalar = vector.dot( this ) / vector.lengthSq();
-  	
+
   		return this.copy( vector ).multiplyScalar( scalar );
-  	
+
   	},
 
   	projectOnPlane: function () {
@@ -3565,7 +3567,6 @@
    */
 
   function SpritePlugin ( renderer, sprites ) {
-  	this.isSpritePlugin = true;
 
   	var gl = renderer.context;
   	var state = renderer.state;
@@ -3939,7 +3940,6 @@
    */
 
   function Box2 ( min, max ) {
-  	this.isBox2 = true;
 
   	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
   	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
@@ -4178,7 +4178,6 @@
    */
 
   function LensFlarePlugin ( renderer, flares ) {
-  	this.isLensFlarePlugin = true;
 
   	var gl = renderer.context;
   	var state = renderer.state;
@@ -4561,7 +4560,6 @@
    */
 
   function CubeTexture ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
-  	this.isCubeTexture = this.isTexture = true;
 
   	images = images !== undefined ? images : [];
   	mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
@@ -4574,6 +4572,8 @@
 
   CubeTexture.prototype = Object.create( Texture.prototype );
   CubeTexture.prototype.constructor = CubeTexture;
+
+  CubeTexture.prototype.isCubeTexture = true;
 
   Object.defineProperty( CubeTexture.prototype, 'images', {
 
@@ -5192,7 +5192,6 @@
   */
 
   function WebGLTextures ( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
-  	this.isWebGLTextures = true;
 
   	var _infoMemory = info.memory;
   	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
@@ -5936,7 +5935,6 @@
    */
 
   function Vector4 ( x, y, z, w ) {
-  	this.isVector4 = true;
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -5948,6 +5946,8 @@
   Vector4.prototype = {
 
   	constructor: Vector4,
+
+  	isVector4: true,
 
   	set: function ( x, y, z, w ) {
 
@@ -6559,7 +6559,6 @@
   */
 
   function WebGLState ( gl, extensions, paramThreeToGL ) {
-  	this.isWebGLState = true;
 
   	var _this = this;
 
@@ -7195,7 +7194,6 @@
   };
 
   function WebGLColorBuffer ( gl, state ) {
-  	this.isWebGLColorBuffer = true;
 
   	var locked = false;
 
@@ -7245,7 +7243,6 @@
   };
 
   function WebGLDepthBuffer( gl, state ) {
-  	this.isWebGLDepthBuffer = true;
 
   	var locked = false;
 
@@ -7374,7 +7371,6 @@
   };
 
   function WebGLStencilBuffer ( gl, state ) {
-  	this.isWebGLStencilBuffer = true;
 
   	var locked = false;
 
@@ -7490,7 +7486,6 @@
    * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
   */
   function WebGLRenderTarget ( width, height, options ) {
-  	this.isWebGLRenderTarget = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -7515,6 +7510,8 @@
   };
 
   Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
+
+  	isWebGLRenderTarget: true,
 
   	setSize: function ( width, height ) {
 
@@ -7569,7 +7566,6 @@
    */
 
   function Material () {
-  	this.isMaterial = true;
 
   	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
 
@@ -7625,6 +7621,8 @@
   Material.prototype = {
 
   	constructor: Material,
+
+  	isMaterial: true,
 
   	get needsUpdate() {
 
@@ -7981,7 +7979,6 @@
    */
 
   function ShaderMaterial ( parameters ) {
-  	this.isShaderMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -8039,6 +8036,8 @@
 
   ShaderMaterial.prototype = Object.create( Material.prototype );
   ShaderMaterial.prototype.constructor = ShaderMaterial;
+
+  ShaderMaterial.prototype.isShaderMaterial = true;
 
   ShaderMaterial.prototype.copy = function ( source ) {
 
@@ -8404,7 +8403,6 @@
    */
 
   function Color ( r, g, b ) {
-  	this.isColor = true;
 
   	if ( g === undefined && b === undefined ) {
 
@@ -8420,6 +8418,8 @@
   Color.prototype = {
 
   	constructor: Color,
+
+  	isColor: true,
 
   	r: 1, g: 1, b: 1,
 
@@ -9325,7 +9325,6 @@
    */
 
   function MeshDepthMaterial ( parameters ) {
-  	this.isMeshDepthMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -9357,6 +9356,8 @@
   MeshDepthMaterial.prototype = Object.create( Material.prototype );
   MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
 
+  MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
+
   MeshDepthMaterial.prototype.copy = function ( source ) {
 
   	Material.prototype.copy.call( this, source );
@@ -9387,7 +9388,6 @@
    */
 
   function Box3 ( min, max ) {
-  	this.isBox3 = true;
 
   	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
   	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
@@ -9397,6 +9397,8 @@
   Box3.prototype = {
 
   	constructor: Box3,
+
+  	isBox3: true,
 
   	set: function ( min, max ) {
 
@@ -9862,7 +9864,6 @@
    */
 
   function Sphere ( center, radius ) {
-  	this.isSphere = true;
 
   	this.center = ( center !== undefined ) ? center : new Vector3();
   	this.radius = ( radius !== undefined ) ? radius : 0;
@@ -10040,7 +10041,6 @@
    */
 
   function Matrix3 () {
-  	this.isMatrix3 = true;
 
   	this.elements = new Float32Array( [
 
@@ -10061,6 +10061,8 @@
   Matrix3.prototype = {
 
   	constructor: Matrix3,
+
+  	isMatrix3: true,
 
   	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -10235,7 +10237,7 @@
 
   			return this.identity();
   		}
-  		
+
   		var detInv = 1 / det;
 
   		te[ 0 ] = t11 * detInv;
@@ -10337,7 +10339,6 @@
    */
 
   function Plane ( normal, constant ) {
-  	this.isPlane = true;
 
   	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
   	this.constant = ( constant !== undefined ) ? constant : 0;
@@ -10573,7 +10574,6 @@
    */
 
   function Frustum ( p0, p1, p2, p3, p4, p5 ) {
-  	this.isFrustum = true;
 
   	this.planes = [
 
@@ -10771,7 +10771,6 @@
    */
 
   function WebGLShadowMap ( _renderer, _lights, _objects, capabilities ) {
-  	this.isWebGLShadowMap = true;
 
   	var _gl = _renderer.context,
   	_state = _renderer.state,
@@ -11262,7 +11261,6 @@
   */
 
   function WebGLProperties () {
-  	this.isWebGLProperties = true;
 
   	var properties = {};
 
@@ -11952,7 +11950,6 @@
   } )();
 
   function WebGLPrograms ( renderer, capabilities ) {
-  	this.isWebGLPrograms = true;
 
   	var programs = [];
 
@@ -12242,7 +12239,6 @@
    */
 
   function BufferAttribute ( array, itemSize, normalized ) {
-  	this.isBufferAttribute = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -12260,6 +12256,8 @@
   BufferAttribute.prototype = {
 
   	constructor: BufferAttribute,
+
+  	isBufferAttribute: true,
 
   	get count() {
 
@@ -12546,63 +12544,54 @@
   //
 
   function Int8Attribute ( array, itemSize ) {
-  	this.isInt8Attribute = true;
 
   	return new BufferAttribute( new Int8Array( array ), itemSize );
 
   };
 
   function Uint8Attribute ( array, itemSize ) {
-  	this.isUint8Attribute = true;
 
   	return new BufferAttribute( new Uint8Array( array ), itemSize );
 
   };
 
   function Uint8ClampedAttribute ( array, itemSize ) {
-  	this.isUint8ClampedAttribute = true;
 
   	return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
   };
 
   function Int16Attribute ( array, itemSize ) {
-  	this.isInt16Attribute = true;
 
   	return new BufferAttribute( new Int16Array( array ), itemSize );
 
   };
 
   function Uint16Attribute ( array, itemSize ) {
-  	this.isUint16Attribute = true;
 
   	return new BufferAttribute( new Uint16Array( array ), itemSize );
 
   };
 
   function Int32Attribute ( array, itemSize ) {
-  	this.isInt32Attribute = true;
 
   	return new BufferAttribute( new Int32Array( array ), itemSize );
 
   };
 
   function Uint32Attribute ( array, itemSize ) {
-  	this.isUint32Attribute = true;
 
   	return new BufferAttribute( new Uint32Array( array ), itemSize );
 
   };
 
   function Float32Attribute ( array, itemSize ) {
-  	this.isFloat32Attribute = true;
 
   	return new BufferAttribute( new Float32Array( array ), itemSize );
 
   };
 
   function Float64Attribute ( array, itemSize ) {
-  	this.isFloat64Attribute = true;
 
   	return new BufferAttribute( new Float64Array( array ), itemSize );
 
@@ -12612,7 +12601,6 @@
   // Deprecated
 
   function DynamicBufferAttribute ( array, itemSize ) {
-  	this.isDynamicBufferAttribute = true;
 
   	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
   	return new BufferAttribute( array, itemSize ).setDynamic( true );
@@ -12625,7 +12613,6 @@
    */
 
   function Face3 ( a, b, c, normal, color, materialIndex ) {
-  	this.isFace3 = true;
 
   	this.a = a;
   	this.b = b;
@@ -12687,7 +12674,6 @@
    */
 
   function Euler ( x, y, z, order ) {
-  	this.isEuler = true;
 
   	this._x = x || 0;
   	this._y = y || 0;
@@ -12703,6 +12689,8 @@
   Euler.prototype = {
 
   	constructor: Euler,
+
+  	isEuler: true,
 
   	get x () {
 
@@ -12942,7 +12930,7 @@
   		return function reorder( newOrder ) {
 
   			q.setFromEuler( this );
-  			
+
   			return this.setFromQuaternion( q, newOrder );
 
   		};
@@ -13013,7 +13001,6 @@
    */
 
   function Layers () {
-  	this.isLayers = true;
 
   	this.mask = 1;
 
@@ -13064,7 +13051,6 @@
    */
 
   function Object3D () {
-  	this.isObject3D = true;
 
   	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
 
@@ -13146,6 +13132,8 @@
   Object3D.DefaultMatrixAutoUpdate = true;
 
   Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+
+  	isObject3D: true,
 
   	applyMatrix: function ( matrix ) {
 
@@ -13782,8 +13770,6 @@
    */
 
   function Geometry () {
-  	this.isGeometry = true;
-
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
   	this.uuid = exports.Math.generateUUID();
@@ -13820,6 +13806,8 @@
   };
 
   Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+
+  	isGeometry: true,
 
   	applyMatrix: function ( matrix ) {
 
@@ -14985,7 +14973,6 @@
    */
 
   function DirectGeometry () {
-  	this.isDirectGeometry = true;
 
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
@@ -15274,8 +15261,6 @@
    */
 
   function BufferGeometry () {
-  	this.isBufferGeometry = true;
-
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
   	this.uuid = exports.Math.generateUUID();
@@ -15298,6 +15283,8 @@
   };
 
   Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+
+  	isBufferGeometry: true,
 
   	getIndex: function () {
 
@@ -16297,7 +16284,6 @@
   */
 
   function WebGLGeometries ( gl, properties, info ) {
-  	this.isWebGLGeometries = true;
 
   	var geometries = {};
 
@@ -16442,7 +16428,6 @@
   */
 
   function WebGLObjects ( gl, properties, info ) {
-  	this.isWebGLObjects = true;
 
   	var geometries = new WebGLGeometries( gl, properties, info );
 
@@ -16669,7 +16654,6 @@
   */
 
   function WebGLLights () {
-  	this.isWebGLLights = true;
 
   	var lights = {};
 
@@ -16747,7 +16731,6 @@
   };
 
   function WebGLCapabilities ( gl, extensions, parameters ) {
-  	this.isWebGLCapabilities = true;
 
   	var maxAnisotropy;
 
@@ -16843,7 +16826,6 @@
   */
 
   function WebGLExtensions ( gl ) {
-  	this.isWebGLExtensions = true;
 
   	var extensions = {};
 
@@ -16903,7 +16885,6 @@
   */
 
   function WebGLIndexedBufferRenderer ( _gl, extensions, _infoRender ) {
-  	this.isWebGLIndexedBufferRenderer = true;
 
   	var mode;
 
@@ -16967,7 +16948,6 @@
   };
 
   function WebGLClipping() {
-  	this.isWebGLClipping = true;
 
   	var scope = this,
 
@@ -17124,7 +17104,6 @@
   */
 
   function WebGLBufferRenderer ( _gl, extensions, _infoRender ) {
-  	this.isWebGLBufferRenderer = true;
 
   	var mode;
 
@@ -17190,7 +17169,6 @@
    */
 
   function WebGLRenderTargetCube ( width, height, options ) {
-  	this.isWebGLRenderTargetCube = this.isWebGLRenderTarget = true;
 
   	WebGLRenderTarget.call( this, width, height, options );
 
@@ -17202,12 +17180,13 @@
   WebGLRenderTargetCube.prototype = Object.create( WebGLRenderTarget.prototype );
   WebGLRenderTargetCube.prototype.constructor = WebGLRenderTargetCube;
 
+  WebGLRenderTargetCube.prototype.isWebGLRenderTargetCube = true;
+
   /**
    * @author Mugen87 / https://github.com/Mugen87
    */
 
   function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-  	this.isBoxBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -17403,7 +17382,6 @@
    */
 
   function Ray ( origin, direction ) {
-  	this.isRay = true;
 
   	this.origin = ( origin !== undefined ) ? origin : new Vector3();
   	this.direction = ( direction !== undefined ) ? direction : new Vector3();
@@ -17940,7 +17918,6 @@
    */
 
   function Line3 ( start, end ) {
-  	this.isLine3 = true;
 
   	this.start = ( start !== undefined ) ? start : new Vector3();
   	this.end = ( end !== undefined ) ? end : new Vector3();
@@ -18069,7 +18046,6 @@
    */
 
   function Triangle ( a, b, c ) {
-  	this.isTriangle = true;
 
   	this.a = ( a !== undefined ) ? a : new Vector3();
   	this.b = ( b !== undefined ) ? b : new Vector3();
@@ -18354,7 +18330,6 @@
    */
 
   function MeshBasicMaterial ( parameters ) {
-  	this.isMeshBasicMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -18392,6 +18367,8 @@
 
   MeshBasicMaterial.prototype = Object.create( Material.prototype );
   MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
+
+  MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
   MeshBasicMaterial.prototype.copy = function ( source ) {
 
@@ -18433,7 +18410,6 @@
    */
 
   function Mesh ( geometry, material ) {
-  	this.isMesh = true;
 
   	Object3D.call( this );
 
@@ -18451,6 +18427,8 @@
   Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Mesh,
+
+  	isMesh: true,
 
   	setDrawMode: function ( value ) {
 
@@ -18785,7 +18763,6 @@
    */
 
   function PlaneBufferGeometry ( width, height, widthSegments, heightSegments ) {
-  	this.isPlaneBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -18884,7 +18861,6 @@
   */
 
   function Camera () {
-  	this.isCamera = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -18897,6 +18873,8 @@
 
   Camera.prototype = Object.create( Object3D.prototype );
   Camera.prototype.constructor = Camera;
+
+  Camera.prototype.isCamera = true;
 
   Camera.prototype.getWorldDirection = function () {
 
@@ -18955,7 +18933,6 @@
    */
 
   function PerspectiveCamera ( fov, aspect, near, far ) {
-  	this.isPerspectiveCamera = true;
 
   	Camera.call( this );
 
@@ -18981,6 +18958,8 @@
   PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
   	constructor: PerspectiveCamera,
+
+  	isPerspectiveCamera: true,
 
   	copy: function ( source ) {
 
@@ -19172,7 +19151,6 @@
    */
 
   function OrthographicCamera ( left, right, top, bottom, near, far ) {
-  	this.isOrthographicCamera = true;
 
   	Camera.call( this );
 
@@ -19196,6 +19174,8 @@
   OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
   	constructor: OrthographicCamera,
+
+  	isOrthographicCamera: true,
 
   	copy: function ( source ) {
 
@@ -19296,7 +19276,6 @@
    */
 
   function WebGLRenderer ( parameters ) {
-  	this.isWebGLRenderer = true;
 
   	console.log( 'THREE.WebGLRenderer', "80dev" );
 
@@ -22075,7 +22054,6 @@
    */
 
   function FogExp2 ( color, density ) {
-  	this.isFogExp2 = true;
 
   	this.name = '';
 
@@ -22083,6 +22061,8 @@
   	this.density = ( density !== undefined ) ? density : 0.00025;
 
   };
+
+  FogExp2.prototype.isFogExp2 = true;
 
   FogExp2.prototype.clone = function () {
 
@@ -22096,7 +22076,6 @@
    */
 
   function Fog ( color, near, far ) {
-  	this.isFog = true;
 
   	this.name = '';
 
@@ -22106,6 +22085,8 @@
   	this.far = ( far !== undefined ) ? far : 1000;
 
   };
+
+  Fog.prototype.isFog = true;
 
   Fog.prototype.clone = function () {
 
@@ -22118,7 +22099,6 @@
    */
 
   function Scene () {
-  	this.isScene = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -22156,7 +22136,6 @@
    */
 
   function LensFlare ( texture, size, distance, blending, color ) {
-  	this.isLensFlare = true;
 
   	Object3D.call( this );
 
@@ -22176,6 +22155,8 @@
   LensFlare.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: LensFlare,
+
+  	isLensFlare: true,
 
   	copy: function ( source ) {
 
@@ -22260,7 +22241,6 @@
    */
 
   function SpriteMaterial ( parameters ) {
-  	this.isSpriteMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -22300,7 +22280,6 @@
    */
 
   function Sprite ( material ) {
-  	this.isSprite = true;
 
   	Object3D.call( this );
 
@@ -22313,6 +22292,8 @@
   Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Sprite,
+
+  	isSprite: true,
 
   	raycast: ( function () {
 
@@ -22359,7 +22340,6 @@
    */
 
   function LOD () {
-  	this.isLOD = true;
 
   	Object3D.call( this );
 
@@ -22530,7 +22510,6 @@
    */
 
   function DataTexture ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
-  	this.isDataTexture = this.isTexture = true;
 
   	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
@@ -22547,6 +22526,8 @@
   DataTexture.prototype = Object.create( Texture.prototype );
   DataTexture.prototype.constructor = DataTexture;
 
+  DataTexture.prototype.isDataTexture = true;
+
   /**
    * @author mikael emtinger / http://gomo.se/
    * @author alteredq / http://alteredqualia.com/
@@ -22555,7 +22536,6 @@
    */
 
   function Skeleton ( bones, boneInverses, useVertexTexture ) {
-  	this.isSkeleton = true;
 
   	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
@@ -22736,7 +22716,6 @@
    */
 
   function Bone ( skin ) {
-  	this.isBone = true;
 
   	Object3D.call( this );
 
@@ -22749,6 +22728,8 @@
   Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Bone,
+
+  	isBone: true,
 
   	copy: function ( source ) {
 
@@ -22769,7 +22750,6 @@
    */
 
   function SkinnedMesh ( geometry, material, useVertexTexture ) {
-  	this.isSkinnedMesh = true;
 
   	Mesh.call( this, geometry, material );
 
@@ -22834,6 +22814,8 @@
   SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
   	constructor: SkinnedMesh,
+
+  	isSkinnedMesh: true,
 
   	bind: function( skeleton, bindMatrix ) {
 
@@ -22958,7 +22940,6 @@
    */
 
   function LineBasicMaterial ( parameters ) {
-  	this.isLineBasicMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -22979,6 +22960,8 @@
   LineBasicMaterial.prototype = Object.create( Material.prototype );
   LineBasicMaterial.prototype.constructor = LineBasicMaterial;
 
+  LineBasicMaterial.prototype.isLineBasicMaterial = true;
+
   LineBasicMaterial.prototype.copy = function ( source ) {
 
   	Material.prototype.copy.call( this, source );
@@ -22998,7 +22981,6 @@
    */
 
   function Line ( geometry, material, mode ) {
-  	this.isLine = true;
 
   	if ( mode === 1 ) {
 
@@ -23019,6 +23001,8 @@
   Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Line,
+
+  	isLine: true,
 
   	raycast: ( function () {
 
@@ -23182,7 +23166,6 @@
    */
 
   function LineSegments ( geometry, material ) {
-  	this.isLineSegments = true;
 
   	Line.call( this, geometry, material );
 
@@ -23192,7 +23175,9 @@
 
   LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
-  	constructor: LineSegments
+  	constructor: LineSegments,
+
+  	isLineSegments: true
 
   } );
 
@@ -23211,7 +23196,6 @@
    */
 
   function PointsMaterial ( parameters ) {
-  	this.isPointsMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -23233,6 +23217,8 @@
   PointsMaterial.prototype = Object.create( Material.prototype );
   PointsMaterial.prototype.constructor = PointsMaterial;
 
+  PointsMaterial.prototype.isPointsMaterial = true;
+
   PointsMaterial.prototype.copy = function ( source ) {
 
   	Material.prototype.copy.call( this, source );
@@ -23253,7 +23239,6 @@
    */
 
   function Points ( geometry, material ) {
-  	this.isPoints = true;
 
   	Object3D.call( this );
 
@@ -23267,6 +23252,8 @@
   Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Points,
+
+  	isPoints: true,
 
   	raycast: ( function () {
 
@@ -23388,7 +23375,6 @@
    */
 
   function Group () {
-  	this.isGroup = true;
 
   	Object3D.call( this );
 
@@ -23407,7 +23393,6 @@
    */
 
   function VideoTexture ( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
-  	this.isVideoTexture = this.isTexture = true;
 
   	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
@@ -23439,7 +23424,6 @@
    */
 
   function CompressedTexture ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
-  	this.isCompressedTexture = this.isTexture = true;
 
   	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
@@ -23461,12 +23445,13 @@
   CompressedTexture.prototype = Object.create( Texture.prototype );
   CompressedTexture.prototype.constructor = CompressedTexture;
 
+  CompressedTexture.prototype.isCompressedTexture = true;
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
   function CanvasTexture ( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
-  	this.isCanvasTexture = this.isTexture = true;
 
   	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
@@ -23482,7 +23467,6 @@
    */
 
   function DepthTexture ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
-  	this.isDepthTexture = this.isTexture = true;
 
     Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
 
@@ -23501,12 +23485,13 @@
   DepthTexture.prototype = Object.create( Texture.prototype );
   DepthTexture.prototype.constructor = DepthTexture;
 
+  DepthTexture.prototype.isDepthTexture = true;
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
   function ShadowMaterial () {
-  	this.isShadowMaterial = this.isShaderMaterial = this.isMaterial = true;
 
   	ShaderMaterial.call( this, {
   		uniforms: exports.UniformsUtils.merge( [
@@ -23515,7 +23500,7 @@
   				opacity: { value: 1.0 }
   			}
   		] ),
-  		vertexShader: ShaderChunk[ 'shadow_vert' ], 
+  		vertexShader: ShaderChunk[ 'shadow_vert' ],
   		fragmentShader: ShaderChunk[ 'shadow_frag' ]
   	} );
 
@@ -23539,12 +23524,13 @@
   ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
   ShadowMaterial.prototype.constructor = ShadowMaterial;
 
+  ShadowMaterial.prototype.isShadowMaterial = true;
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
   function RawShaderMaterial ( parameters ) {
-  	this.isRawShaderMaterial = this.isShaderMaterial = this.isMaterial = true;
 
   	ShaderMaterial.call( this, parameters );
 
@@ -23555,12 +23541,13 @@
   RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
   RawShaderMaterial.prototype.constructor = RawShaderMaterial;
 
+  RawShaderMaterial.prototype.isRawShaderMaterial = true;
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
   function MultiMaterial ( materials ) {
-  	this.isMultiMaterial = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -23575,6 +23562,8 @@
   MultiMaterial.prototype = {
 
   	constructor: MultiMaterial,
+
+  	isMultiMaterial: true,
 
   	toJSON: function ( meta ) {
 
@@ -23676,7 +23665,6 @@
    */
 
   function MeshStandardMaterial ( parameters ) {
-  	this.isMeshStandardMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -23736,6 +23724,8 @@
 
   MeshStandardMaterial.prototype = Object.create( Material.prototype );
   MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
+
+  MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
   MeshStandardMaterial.prototype.copy = function ( source ) {
 
@@ -23802,7 +23792,6 @@
    */
 
   function MeshPhysicalMaterial ( parameters ) {
-  	this.isMeshPhysicalMaterial = this.isMeshStandardMaterial = this.isMaterial = true;
 
   	MeshStandardMaterial.call( this );
 
@@ -23821,6 +23810,8 @@
 
   MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
   MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
+
+  MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
   MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
@@ -23888,7 +23879,6 @@
    */
 
   function MeshPhongMaterial ( parameters ) {
-  	this.isMeshPhongMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -23944,6 +23934,8 @@
 
   MeshPhongMaterial.prototype = Object.create( Material.prototype );
   MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;
+
+  MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
   MeshPhongMaterial.prototype.copy = function ( source ) {
 
@@ -24009,7 +24001,6 @@
    */
 
   function MeshNormalMaterial ( parameters ) {
-  	this.isMeshNormalMaterial = this.isMaterial = true;
 
   	Material.call( this, parameters );
 
@@ -24028,6 +24019,8 @@
 
   MeshNormalMaterial.prototype = Object.create( Material.prototype );
   MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
+
+  MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 
   MeshNormalMaterial.prototype.copy = function ( source ) {
 
@@ -24079,7 +24072,6 @@
    */
 
   function MeshLambertMaterial ( parameters ) {
-  	this.isMeshLambertMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -24123,6 +24115,8 @@
 
   MeshLambertMaterial.prototype = Object.create( Material.prototype );
   MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
+
+  MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
   MeshLambertMaterial.prototype.copy = function ( source ) {
 
@@ -24180,7 +24174,6 @@
    */
 
   function LineDashedMaterial ( parameters ) {
-  	this.isLineDashedMaterial = this.isMaterial = true;
 
   	Material.call( this );
 
@@ -24202,6 +24195,8 @@
 
   LineDashedMaterial.prototype = Object.create( Material.prototype );
   LineDashedMaterial.prototype.constructor = LineDashedMaterial;
+
+  LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
   LineDashedMaterial.prototype.copy = function ( source ) {
 
@@ -24268,7 +24263,6 @@
    */
 
   function LoadingManager ( onLoad, onProgress, onError ) {
-  	this.isLoadingManager = true;
 
   	var scope = this;
 
@@ -24340,7 +24334,6 @@
    */
 
   function XHRLoader ( manager ) {
-  	this.isXHRLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24468,7 +24461,6 @@
    */
 
   function CompressedTextureLoader ( manager ) {
-  	this.isCompressedTextureLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24690,7 +24682,6 @@
    */
 
   function ImageLoader ( manager ) {
-  	this.isImageLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24757,7 +24748,6 @@
    */
 
   function CubeTextureLoader ( manager ) {
-  	this.isCubeTextureLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24826,7 +24816,6 @@
    */
 
   function TextureLoader ( manager ) {
-  	this.isTextureLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24884,7 +24873,6 @@
    */
 
   function Light ( color, intensity ) {
-  	this.isLight = true;
 
   	Object3D.call( this );
 
@@ -24900,6 +24888,8 @@
   Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
   	constructor: Light,
+
+  	isLight: true,
 
   	copy: function ( source ) {
 
@@ -24937,7 +24927,6 @@
    */
 
   function HemisphereLight ( skyColor, groundColor, intensity ) {
-  	this.isHemisphereLight = true;
 
   	Light.call( this, skyColor, intensity );
 
@@ -24956,6 +24945,8 @@
 
   	constructor: HemisphereLight,
 
+  	isHemisphereLight: true,
+
   	copy: function ( source ) {
 
   		Light.prototype.copy.call( this, source );
@@ -24973,7 +24964,6 @@
    */
 
   function LightShadow ( camera ) {
-  	this.isLightShadow = true;
 
   	this.camera = camera;
 
@@ -25015,7 +25005,6 @@
    */
 
   function SpotLightShadow () {
-  	this.isSpotLightShadow = true;
 
   	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
@@ -25024,6 +25013,8 @@
   SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
   	constructor: SpotLightShadow,
+
+  	isSpotLightShadow: true,
 
   	update: function ( light ) {
 
@@ -25051,7 +25042,6 @@
    */
 
   function SpotLight ( color, intensity, distance, angle, penumbra, decay ) {
-  	this.isSpotLight = true;
 
   	Light.call( this, color, intensity );
 
@@ -25088,6 +25078,8 @@
 
   	constructor: SpotLight,
 
+  	isSpotLight: true,
+
   	copy: function ( source ) {
 
   		Light.prototype.copy.call( this, source );
@@ -25113,7 +25105,6 @@
 
 
   function PointLight ( color, intensity, distance, decay ) {
-  	this.isPointLight = true;
 
   	Light.call( this, color, intensity );
 
@@ -25144,6 +25135,8 @@
 
   	constructor: PointLight,
 
+  	isPointLight: true,
+
   	copy: function ( source ) {
 
   		Light.prototype.copy.call( this, source );
@@ -25164,7 +25157,6 @@
    */
 
   function DirectionalLightShadow ( light ) {
-  	this.isDirectionalLightShadow = true;
 
   	LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -25182,7 +25174,6 @@
    */
 
   function DirectionalLight ( color, intensity ) {
-  	this.isDirectionalLight = true;
 
   	Light.call( this, color, intensity );
 
@@ -25200,6 +25191,8 @@
   DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
   	constructor: DirectionalLight,
+
+  	isDirectionalLight: true,
 
   	copy: function ( source ) {
 
@@ -25220,7 +25213,6 @@
    */
 
   function AmbientLight ( color, intensity ) {
-  	this.isAmbientLight = true;
 
   	Light.call( this, color, intensity );
 
@@ -25232,7 +25224,9 @@
 
   AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-  	constructor: AmbientLight
+  	constructor: AmbientLight,
+
+  	isAmbientLight: true,
 
   } );
 
@@ -25420,7 +25414,6 @@
 
   function Interpolant(
   		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-  	this.isInterpolant = true;
 
   	this.parameterPositions = parameterPositions;
   	this._cachedIndex = 0;
@@ -25667,7 +25660,6 @@
 
   function CubicInterpolant(
   		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-  	this.isCubicInterpolant = true;
 
   	Interpolant.call(
   			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -25815,7 +25807,6 @@
 
   function LinearInterpolant(
   		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-  	this.isLinearInterpolant = true;
 
   	Interpolant.call(
   			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -25863,7 +25854,6 @@
 
   function DiscreteInterpolant(
   		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-  	this.isDiscreteInterpolant = true;
 
   	Interpolant.call(
   			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -26221,7 +26211,6 @@
   }
 
   function KeyframeTrackConstructor ( name, times, values, interpolation ) {
-  	this.isKeyframeTrack = true;
 
   	if( name === undefined ) throw new Error( "track name is undefined" );
 
@@ -26254,7 +26243,6 @@
    */
 
   function VectorKeyframeTrack ( name, times, values, interpolation ) {
-  	this.isVectorKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26281,7 +26269,6 @@
 
   function QuaternionLinearInterpolant(
   		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-  	this.isQuaternionLinearInterpolant = true;
 
   	Interpolant.call(
   			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -26326,7 +26313,6 @@
    */
 
   function QuaternionKeyframeTrack ( name, times, values, interpolation ) {
-  	this.isQuaternionKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26364,7 +26350,6 @@
    */
 
   function NumberKeyframeTrack ( name, times, values, interpolation ) {
-  	this.isNumberKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26394,7 +26379,6 @@
    */
 
   function StringKeyframeTrack ( name, times, values, interpolation ) {
-  	this.isStringKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26427,7 +26411,6 @@
    */
 
   function BooleanKeyframeTrack ( name, times, values ) {
-  	this.isBooleanKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values );
 
@@ -26463,7 +26446,6 @@
    */
 
   function ColorKeyframeTrack ( name, times, values, interpolation ) {
-  	this.isColorKeyframeTrack = true;
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26637,7 +26619,6 @@
    */
 
   function AnimationClip ( name, duration, tracks ) {
-  	this.isAnimationClip = true;
 
   	this.name = name;
   	this.tracks = tracks;
@@ -26994,7 +26975,6 @@
    */
 
   function MaterialLoader ( manager ) {
-  	this.isMaterialLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
   	this.textures = {};
@@ -27149,7 +27129,6 @@
    */
 
   function BufferGeometryLoader ( manager ) {
-  	this.isBufferGeometryLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -27247,7 +27226,6 @@
    */
 
   function Loader () {
-  	this.isLoader = true;
 
   	this.onLoadStart = function () {};
   	this.onLoadProgress = function () {};
@@ -27573,7 +27551,6 @@
    */
 
   function JSONLoader ( manager ) {
-  	this.isJSONLoader = true;
 
   	if ( typeof manager === 'boolean' ) {
 
@@ -28112,7 +28089,6 @@
    */
 
   function ObjectLoader ( manager ) {
-  	this.isObjectLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
   	this.texturePath = '';
@@ -29537,10 +29513,7 @@
    *	Abstract Curve base class
    **************************************************************/
 
-  function Curve () {
-  	this.isCurve = true;
-
-  };
+  function Curve () {}
 
   Curve.prototype = {
 
@@ -29793,7 +29766,6 @@
    **************************************************************/
 
   function LineCurve ( v1, v2 ) {
-  	this.isLineCurve = this.isCurve = true;
 
   	this.v1 = v1;
   	this.v2 = v2;
@@ -29802,6 +29774,8 @@
 
   LineCurve.prototype = Object.create( Curve.prototype );
   LineCurve.prototype.constructor = LineCurve;
+
+  LineCurve.prototype.isLineCurve = true;
 
   LineCurve.prototype.getPoint = function ( t ) {
 
@@ -29845,7 +29819,6 @@
    **************************************************************/
 
   function CurvePath () {
-  	this.isCurvePath = true;
 
   	this.curves = [];
 
@@ -30074,7 +30047,6 @@
    **************************************************************/
 
   function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
-  	this.isEllipseCurve = this.isCurve = true;
 
   	this.aX = aX;
   	this.aY = aY;
@@ -30093,6 +30065,8 @@
 
   EllipseCurve.prototype = Object.create( Curve.prototype );
   EllipseCurve.prototype.constructor = EllipseCurve;
+
+  EllipseCurve.prototype.isEllipseCurve = true;
 
   EllipseCurve.prototype.getPoint = function( t ) {
 
@@ -30209,7 +30183,6 @@
    **************************************************************/
 
   function SplineCurve ( points /* array of Vector2 */ ) {
-  	this.isSplineCurve = this.isCurve = true;
 
   	this.points = ( points == undefined ) ? [] : points;
 
@@ -30217,6 +30190,8 @@
 
   SplineCurve.prototype = Object.create( Curve.prototype );
   SplineCurve.prototype.constructor = SplineCurve;
+
+  SplineCurve.prototype.isSplineCurve = true;
 
   SplineCurve.prototype.getPoint = function ( t ) {
 
@@ -30245,7 +30220,6 @@
    **************************************************************/
 
   function CubicBezierCurve ( v0, v1, v2, v3 ) {
-  	this.isCubicBezierCurve = this.isCurve = true;
 
   	this.v0 = v0;
   	this.v1 = v1;
@@ -30261,7 +30235,7 @@
 
   	var b3 = exports.ShapeUtils.b3;
 
-  	return new Vector2( 
+  	return new Vector2(
   		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
   		b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
   	);
@@ -30272,7 +30246,7 @@
 
   	var tangentCubicBezier = exports.CurveUtils.tangentCubicBezier;
 
-  	return new Vector2( 
+  	return new Vector2(
   		tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
   		tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
   	).normalize();
@@ -30285,7 +30259,6 @@
 
 
   function QuadraticBezierCurve ( v0, v1, v2 ) {
-  	this.isQuadraticBezierCurve = this.isCurve = true;
 
   	this.v0 = v0;
   	this.v1 = v1;
@@ -30457,7 +30430,6 @@
    */
 
   function TubeGeometry ( path, segments, radius, radialSegments, closed, taper ) {
-  	this.isTubeGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -30774,7 +30746,6 @@
    **/
 
   function ExtrudeGeometry ( shapes, options ) {
-  	this.isExtrudeGeometry = this.isGeometry = true;
 
   	if ( typeof( shapes ) === "undefined" ) {
 
@@ -31472,7 +31443,6 @@
    **/
 
   function ShapeGeometry ( shapes, options ) {
-  	this.isShapeGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -31600,7 +31570,6 @@
   // STEP 3b - Triangulate each shape, add faces.
 
   function Shape () {
-  	this.isShape = true;
 
   	Path.apply( this, arguments );
 
@@ -31670,7 +31639,6 @@
    **/
 
   function Path ( points ) {
-  	this.isPath = true;
 
   	CurvePath.call( this );
   	this.currentPoint = new Vector2();
@@ -31689,7 +31657,6 @@
 
   // minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
   function ShapePath() {
-  	this.isShapePath = true;
   	this.subPaths = [];
   	this.currentPath = null;
   }
@@ -31947,13 +31914,14 @@
    */
 
   function Font ( data ) {
-  	this.isFont = true;
 
   	this.data = data;
 
   };
 
   Object.assign( Font.prototype, {
+
+  	isFont: true,
 
   	generateShapes: function ( text, size, divisions ) {
 
@@ -32112,7 +32080,6 @@
    */
 
   function FontLoader ( manager ) {
-  	this.isFontLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -32171,7 +32138,6 @@
    */
 
   function AudioLoader ( manager ) {
-  	this.isAudioLoader = true;
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -32204,7 +32170,6 @@
    */
 
   function StereoCamera () {
-  	this.isStereoCamera = true;
 
   	this.type = 'StereoCamera';
 
@@ -32296,7 +32261,6 @@
    */
 
   function CubeCamera ( near, far, cubeResolution ) {
-  	this.isCubeCamera = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -32381,7 +32345,6 @@
    */
 
   function AudioListener () {
-  	this.isAudioListener = true;
 
   	Object3D.call( this );
 
@@ -32490,7 +32453,6 @@
    */
 
   function Audio ( listener ) {
-  	this.isAudio = true;
 
   	Object3D.call( this );
 
@@ -32780,7 +32742,6 @@
    */
 
   function PositionalAudio ( listener ) {
-  	this.isPositionalAudio = true;
 
   	Audio.call( this, listener );
 
@@ -32871,7 +32832,6 @@
    */
 
   function AudioAnalyser ( audio, fftSize ) {
-  	this.isAudioAnalyser = true;
 
   	this.analyser = audio.context.createAnalyser();
   	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
@@ -32919,7 +32879,6 @@
    */
 
   function PropertyMixer ( binding, typeName, valueSize ) {
-  	this.isPropertyMixer = true;
 
   	this.binding = binding;
   	this.valueSize = valueSize;
@@ -33124,7 +33083,6 @@
    */
 
   function PropertyBinding ( rootNode, path, parsedPath ) {
-  	this.isPropertyBinding = true;
 
   	this.path = path;
   	this.parsedPath = parsedPath ||
@@ -33801,7 +33759,6 @@
    */
 
   function AnimationObjectGroup( var_args ) {
-  	this.isAnimationObjectGroup = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -33843,6 +33800,8 @@
   AnimationObjectGroup.prototype = {
 
   	constructor: AnimationObjectGroup,
+
+  	isAnimationObjectGroup: true,
 
   	add: function( var_args ) {
 
@@ -34151,7 +34110,6 @@
    */
 
   function AnimationAction() {
-  	this.isAnimationAction = true;
 
   	throw new Error( "THREE.AnimationAction: " +
   			"Use mixer.clipAction for construction." );
@@ -34812,7 +34770,6 @@
    */
 
   function AnimationMixer( root ) {
-  	this.isAnimationMixer = true;
 
   	this._root = root;
   	this._initMemoryManager();
@@ -35545,7 +35502,6 @@
    */
 
   function Uniform ( value ) {
-  	this.isUniform = true;
 
   	if ( typeof value === 'string' ) {
 
@@ -35580,8 +35536,6 @@
    */
 
   function InstancedBufferGeometry () {
-  	this.isInstancedBufferGeometry = this.isBufferGeometry = true;
-
   	BufferGeometry.call( this );
 
   	this.type = 'InstancedBufferGeometry';
@@ -35591,6 +35545,8 @@
 
   InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
   InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
+
+  InstancedBufferGeometry.prototype.isBufferGeometry = true;
 
   InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
@@ -35641,7 +35597,6 @@
    */
 
   function InterleavedBufferAttribute ( interleavedBuffer, itemSize, offset, normalized ) {
-  	this.isInterleavedBufferAttribute = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -35657,6 +35612,8 @@
   InterleavedBufferAttribute.prototype = {
 
   	constructor: InterleavedBufferAttribute,
+
+  	isInterleavedBufferAttribute: true,
 
   	get length() {
 
@@ -35776,7 +35733,6 @@
    */
 
   function InterleavedBuffer ( array, stride ) {
-  	this.isInterleavedBuffer = true;
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -35793,6 +35749,8 @@
   InterleavedBuffer.prototype = {
 
   	constructor: InterleavedBuffer,
+
+  	isInterleavedBuffer: true,
 
   	get length () {
 
@@ -35868,7 +35826,6 @@
    */
 
   function InstancedInterleavedBuffer ( array, stride, meshPerAttribute ) {
-  	this.isInstancedInterleavedBuffer = this.isInterleavedBuffer = true;
 
   	InterleavedBuffer.call( this, array, stride );
 
@@ -35878,6 +35835,8 @@
 
   InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
   InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
+
+  InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
 
   InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 
@@ -35894,7 +35853,6 @@
    */
 
   function InstancedBufferAttribute ( array, itemSize, meshPerAttribute ) {
-  	this.isInstancedBufferAttribute = this.isBufferAttribute = true;
 
   	BufferAttribute.call( this, array, itemSize );
 
@@ -35904,6 +35862,8 @@
 
   InstancedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
   InstancedBufferAttribute.prototype.constructor = InstancedBufferAttribute;
+
+  InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
   InstancedBufferAttribute.prototype.copy = function ( source ) {
 
@@ -35922,7 +35882,6 @@
    */
 
   function Raycaster ( origin, direction, near, far ) {
-  	this.isRaycaster = true;
 
   	this.ray = new Ray( origin, direction );
   	// direction is assumed to be normalized (for accurate distance calculations)
@@ -36053,7 +36012,6 @@
    */
 
   function Clock ( autoStart ) {
-  	this.isClock = true;
 
   	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
@@ -36128,7 +36086,6 @@
    */
 
   function Spline ( points ) {
-  	this.isSpline = true;
 
   	this.points = points;
 
@@ -36308,7 +36265,6 @@
    */
 
   function Spherical ( radius, phi, theta ) {
-  	this.isSpherical = true;
 
   	this.radius = ( radius !== undefined ) ? radius : 1.0;
   	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
@@ -36385,7 +36341,6 @@
    */
 
   function MorphBlendMesh( geometry, material ) {
-  	this.isMorphBlendMesh = this.isMesh = true;
 
   	Mesh.call( this, geometry, material );
 
@@ -36702,7 +36657,6 @@
    */
 
   function ImmediateRenderObject ( material ) {
-  	this.isImmediateRenderObject = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -36714,12 +36668,13 @@
   ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
   ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
+  ImmediateRenderObject.prototype.isImmediateRenderObject = true;
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
   function WireframeGeometry ( geometry ) {
-  	this.isWireframeGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -36903,7 +36858,6 @@
    */
 
   function WireframeHelper ( object, hex ) {
-  	this.isWireframeHelper = this.isLineSegments = true;
 
   	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
@@ -36923,7 +36877,6 @@
   */
 
   function VertexNormalsHelper ( object, size, hex, linewidth ) {
-  	this.isVertexNormalsHelper = this.isLineSegments = true;
 
   	this.object = object;
 
@@ -37071,7 +37024,6 @@
   */
 
   function SpotLightHelper ( light ) {
-  	this.isSpotLightHelper = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -37155,7 +37107,6 @@
    */
 
   function SkeletonHelper ( object ) {
-  	this.isSkeletonHelper = this.isLineSegments = true;
 
   	this.bones = this.getBoneList( object );
 
@@ -37255,7 +37206,6 @@
    */
 
   function SphereBufferGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-  	this.isSphereBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -37358,7 +37308,6 @@
    */
 
   function PointLightHelper ( light, sphereSize ) {
-  	this.isPointLightHelper = this.isMesh = true;
 
   	this.light = light;
   	this.light.updateMatrixWorld();
@@ -37432,7 +37381,6 @@
    */
 
   function SphereGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-  	this.isSphereGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -37461,7 +37409,6 @@
    */
 
   function HemisphereLightHelper ( light, sphereSize ) {
-  	this.isHemisphereLightHelper = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -37522,7 +37469,6 @@
    */
 
   function GridHelper ( size, divisions, color1, color2 ) {
-  	this.isGridHelper = this.isLineSegments = true;
 
   	divisions = divisions || 1;
   	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
@@ -37571,7 +37517,6 @@
   */
 
   function FaceNormalsHelper ( object, size, hex, linewidth ) {
-  	this.isFaceNormalsHelper = this.isLineSegments = true;
 
   	// FaceNormalsHelper only supports THREE.Geometry
 
@@ -37682,7 +37627,6 @@
    */
 
   function EdgesGeometry ( geometry, thresholdAngle ) {
-  	this.isEdgesGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -37785,7 +37729,6 @@
    */
 
   function EdgesHelper ( object, hex, thresholdAngle ) {
-  	this.isEdgesHelper = this.isLineSegments = true;
 
   	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
@@ -37806,7 +37749,6 @@
    */
 
   function DirectionalLightHelper ( light, size ) {
-  	this.isDirectionalLightHelper = this.isObject3D = true;
 
   	Object3D.call( this );
 
@@ -37890,7 +37832,6 @@
    */
 
   function CameraHelper ( camera ) {
-  	this.isCameraHelper = this.isLineSegments = true;
 
   	var geometry = new Geometry();
   	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
@@ -38077,7 +38018,6 @@
    */
 
   function BoxGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-  	this.isBoxGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -38109,7 +38049,6 @@
   // a helper to show the world-axis-aligned bounding box for an object
 
   function BoundingBoxHelper ( object, hex ) {
-  	this.isBoundingBoxHelper = this.isMesh = true;
 
   	var color = ( hex !== undefined ) ? hex : 0x888888;
 
@@ -38139,7 +38078,6 @@
    */
 
   function BoxHelper ( object, color ) {
-  	this.isBoxHelper = this.isLineSegments = true;
 
   	if ( color === undefined ) color = 0xffff00;
 
@@ -38225,7 +38163,6 @@
    */
 
   function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-  	this.isCylinderBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -38658,7 +38595,6 @@
    */
 
   function AxisHelper ( size ) {
-  	this.isAxisHelper = this.isLineSegments = true;
 
   	size = size || 1;
 
@@ -38697,7 +38633,6 @@
    */
 
   function ParametricGeometry ( func, slices, stacks ) {
-  	this.isParametricGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -38781,7 +38716,6 @@
   */
 
   function PolyhedronGeometry ( vertices, indices, radius, detail ) {
-  	this.isPolyhedronGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39018,7 +38952,6 @@
    */
 
   function TetrahedronGeometry ( radius, detail ) {
-  	this.isTetrahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
   	var vertices = [
   		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
@@ -39047,7 +38980,6 @@
    */
 
   function OctahedronGeometry ( radius, detail ) {
-  	this.isOctahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
   	var vertices = [
   		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
@@ -39076,7 +39008,6 @@
    */
 
   function IcosahedronGeometry ( radius, detail ) {
-  	this.isIcosahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
   	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -39112,7 +39043,6 @@
    */
 
   function DodecahedronGeometry ( radius, detail ) {
-  	this.isDodecahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
   	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
   	var r = 1 / t;
@@ -39173,7 +39103,6 @@
    * see: http://www.blackpawn.com/texts/pqtorus/
    */
   function TorusKnotBufferGeometry ( radius, tube, tubularSegments, radialSegments, p, q ) {
-  	this.isTorusKnotBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -39338,7 +39267,6 @@
    */
 
   function TorusKnotGeometry ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
-  	this.isTorusKnotGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39368,7 +39296,6 @@
    */
 
   function TorusBufferGeometry ( radius, tube, radialSegments, tubularSegments, arc ) {
-  	this.isTorusBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -39498,7 +39425,6 @@
    */
 
   function TorusGeometry ( radius, tube, radialSegments, tubularSegments, arc ) {
-  	this.isTorusGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39539,7 +39465,6 @@
    */
 
   function TextGeometry ( text, parameters ) {
-  	this.isTextGeometry = this.isExtrudeGeometry = this.isGeometry = true;
 
   	parameters = parameters || {};
 
@@ -39578,7 +39503,6 @@
    */
 
   function RingBufferGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-  	this.isRingBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -39700,7 +39624,6 @@
    */
 
   function RingGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-  	this.isRingGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39728,7 +39651,6 @@
    */
 
   function PlaneGeometry ( width, height, widthSegments, heightSegments ) {
-  	this.isPlaneGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39760,7 +39682,6 @@
    //    2PI is a closed lathe, less than 2PI is a portion.
 
   function LatheBufferGeometry ( points, segments, phiStart, phiLength ) {
-  	this.isLatheBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -39919,7 +39840,6 @@
   //    2PI is a closed lathe, less than 2PI is a portion.
 
   function LatheGeometry ( points, segments, phiStart, phiLength ) {
-  	this.isLatheGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39945,7 +39865,6 @@
    */
 
   function CylinderGeometry ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-  	this.isCylinderGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -39978,7 +39897,6 @@
   	radius, height,
   	radialSegments, heightSegments,
   	openEnded, thetaStart, thetaLength ) {
-  	this.isConeGeometry = this.isCylinderGeometry = this.isGeometry = true;
 
   	CylinderGeometry.call( this,
   		0, radius, height,
@@ -40010,7 +39928,6 @@
   	radius, height,
   	radialSegments, heightSegments,
   	openEnded, thetaStart, thetaLength ) {
-  	this.isConeBufferGeometry = this.isBufferGeometry = true;
 
   	CylinderBufferGeometry.call( this,
   		0, radius, height,
@@ -40038,7 +39955,6 @@
    */
 
   function CircleBufferGeometry ( radius, segments, thetaStart, thetaLength ) {
-  	this.isCircleBufferGeometry = this.isBufferGeometry = true;
 
   	BufferGeometry.call( this );
 
@@ -40107,7 +40023,6 @@
    */
 
   function CircleGeometry ( radius, segments, thetaStart, thetaLength ) {
-  	this.isCircleGeometry = this.isGeometry = true;
 
   	Geometry.call( this );
 
@@ -40316,7 +40231,6 @@
 
 
   function ClosedSplineCurve3 ( points ) {
-  	this.isClosedSplineCurve3 = this.isCatmullRomCurve3 = true;
 
   	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
 
@@ -40462,7 +40376,6 @@
    **************************************************************/
 
   function ArcCurve ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
-  	this.isArcCurve = this.isEllipseCurve = this.isCurve = true;
 
   	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
