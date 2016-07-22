@@ -9,7 +9,6 @@ import { Quaternion } from '../Quaternion';
 
 function QuaternionLinearInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-	this.isQuaternionLinearInterpolant = true;
 
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );

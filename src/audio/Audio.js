@@ -6,7 +6,6 @@ import { Object3D } from '../core/Object3D';
  */
 
 function Audio ( listener ) {
-	this.isAudio = true;
 
 	Object3D.call( this );
 

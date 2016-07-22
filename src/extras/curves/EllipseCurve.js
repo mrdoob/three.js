@@ -6,7 +6,6 @@ import { Vector2 } from '../../math/Vector2';
  **************************************************************/
 
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
-	this.isEllipseCurve = this.isCurve = true;
 
 	this.aX = aX;
 	this.aY = aY;
@@ -25,6 +24,8 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 EllipseCurve.prototype = Object.create( Curve.prototype );
 EllipseCurve.prototype.constructor = EllipseCurve;
+
+EllipseCurve.prototype.isEllipseCurve = true;
 
 EllipseCurve.prototype.getPoint = function( t ) {
 

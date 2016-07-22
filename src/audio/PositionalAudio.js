@@ -7,7 +7,6 @@ import { Object3D } from '../core/Object3D';
  */
 
 function PositionalAudio ( listener ) {
-	this.isPositionalAudio = true;
 
 	Audio.call( this, listener );
 

@@ -16,7 +16,6 @@ import { AnimationClip } from './AnimationClip';
  */
 
 function AnimationMixer( root ) {
-	this.isAnimationMixer = true;
 
 	this._root = root;
 	this._initMemoryManager();

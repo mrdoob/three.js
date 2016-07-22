@@ -3,7 +3,6 @@
  */
 
 function AudioAnalyser ( audio, fftSize ) {
-	this.isAudioAnalyser = true;
 
 	this.analyser = audio.context.createAnalyser();
 	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;

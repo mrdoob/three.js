@@ -8,7 +8,6 @@ import { getAudioContext } from './AudioContext';
  */
 
 function AudioListener () {
-	this.isAudioListener = true;
 
 	Object3D.call( this );
 

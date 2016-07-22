@@ -6,7 +6,6 @@ import { Interpolant } from '../Interpolant';
 
 function LinearInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-	this.isLinearInterpolant = true;
 
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );

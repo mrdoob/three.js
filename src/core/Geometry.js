@@ -20,8 +20,6 @@ import { _Math } from '../math/Math';
  */
 
 function Geometry () {
-	this.isGeometry = true;
-
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
 	this.uuid = _Math.generateUUID();
@@ -58,6 +56,8 @@ function Geometry () {
 };
 
 Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+
+	isGeometry: true,
 
 	applyMatrix: function ( matrix ) {
 

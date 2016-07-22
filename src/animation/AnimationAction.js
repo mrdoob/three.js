@@ -12,7 +12,6 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  */
 
 function AnimationAction() {
-	this.isAnimationAction = true;
 
 	throw new Error( "THREE.AnimationAction: " +
 			"Use mixer.clipAction for construction." );
