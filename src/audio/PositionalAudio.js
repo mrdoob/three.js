@@ -1,20 +1,19 @@
-import { Vector3 } from '../math/Vector3';
-import { Audio } from './Audio';
-import { Object3D } from '../core/Object3D';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Vector3 } from '../math/Vector3';
+import { Audio } from './Audio';
+import { Object3D } from '../core/Object3D';
+
 function PositionalAudio ( listener ) {
-	this.isPositionalAudio = true;
 
 	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
 
-};
+}
 
 PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
@@ -92,6 +91,5 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 
 } );
-
 
 export { PositionalAudio };

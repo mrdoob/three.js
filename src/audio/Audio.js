@@ -1,12 +1,11 @@
-import { Object3D } from '../core/Object3D';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
+import { Object3D } from '../core/Object3D';
+
 function Audio ( listener ) {
-	this.isAudio = true;
 
 	Object3D.call( this );
 
@@ -29,7 +28,7 @@ function Audio ( listener ) {
 
 	this.filters = [];
 
-};
+}
 
 Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -290,6 +289,5 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	}
 
 } );
-
 
 export { Audio };
