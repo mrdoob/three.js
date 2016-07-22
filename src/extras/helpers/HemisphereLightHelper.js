@@ -11,7 +11,7 @@ import { Color } from '../../math/Color';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function HemisphereLightHelper ( light, sphereSize ) {
+function HemisphereLightHelper( light, sphereSize ) {
 
 	Object3D.call( this );
 

@@ -6,7 +6,7 @@ import { Ray } from '../math/Ray';
  * @author stephomi / http://stephaneginier.com/
  */
 
-function Raycaster ( origin, direction, near, far ) {
+function Raycaster( origin, direction, near, far ) {
 
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)

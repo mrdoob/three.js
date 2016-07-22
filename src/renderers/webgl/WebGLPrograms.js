@@ -1,7 +1,7 @@
 import { WebGLProgram } from './WebGLProgram';
 import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 
-function WebGLPrograms ( renderer, capabilities ) {
+function WebGLPrograms( renderer, capabilities ) {
 
 	var programs = [];
 
@@ -32,7 +32,7 @@ function WebGLPrograms ( renderer, capabilities ) {
 	];
 
 
-	function allocateBones ( object ) {
+	function allocateBones( object ) {
 
 		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 

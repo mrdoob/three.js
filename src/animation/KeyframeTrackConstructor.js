@@ -1,6 +1,6 @@
 import { AnimationUtils } from './AnimationUtils';
 
-function KeyframeTrackConstructor ( name, times, values, interpolation ) {
+function KeyframeTrackConstructor( name, times, values, interpolation ) {
 
 	if( name === undefined ) throw new Error( "track name is undefined" );
 

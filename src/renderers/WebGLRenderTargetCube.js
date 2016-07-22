@@ -4,7 +4,7 @@ import { WebGLRenderTarget } from './WebGLRenderTarget';
  * @author alteredq / http://alteredqualia.com
  */
 
-function WebGLRenderTargetCube ( width, height, options ) {
+function WebGLRenderTargetCube( width, height, options ) {
 
 	WebGLRenderTarget.call( this, width, height, options );
 

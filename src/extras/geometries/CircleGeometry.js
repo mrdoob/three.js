@@ -5,7 +5,7 @@ import { CircleBufferGeometry } from './CircleBufferGeometry';
  * @author hughes
  */
 
-function CircleGeometry ( radius, segments, thetaStart, thetaLength ) {
+function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	Geometry.call( this );
 

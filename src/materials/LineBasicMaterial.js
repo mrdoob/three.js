@@ -15,7 +15,7 @@ import { Color } from '../math/Color';
  * }
  */
 
-function LineBasicMaterial ( parameters ) {
+function LineBasicMaterial( parameters ) {
 
 	Material.call( this );
 

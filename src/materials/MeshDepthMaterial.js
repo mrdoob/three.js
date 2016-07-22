@@ -24,7 +24,7 @@ import { BasicDepthPacking } from '../constants';
  * }
  */
 
-function MeshDepthMaterial ( parameters ) {
+function MeshDepthMaterial( parameters ) {
 
 	Material.call( this );
 

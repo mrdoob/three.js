@@ -4,7 +4,7 @@ import { Curve } from '../core/Curve';
  *	Line
  **************************************************************/
 
-function LineCurve ( v1, v2 ) {
+function LineCurve( v1, v2 ) {
 
 	this.v1 = v1;
 	this.v2 = v2;

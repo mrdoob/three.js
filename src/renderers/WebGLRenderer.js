@@ -39,7 +39,7 @@ import { Color } from '../math/Color';
  * @author tschw
  */
 
-function WebGLRenderer ( parameters ) {
+function WebGLRenderer( parameters ) {
 
 	console.log( 'THREE.WebGLRenderer', "80dev" );
 
@@ -1068,7 +1068,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function painterSortStable ( a, b ) {
+	function painterSortStable( a, b ) {
 
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
@@ -1094,7 +1094,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function reversePainterSortStable ( a, b ) {
+	function reversePainterSortStable( a, b ) {
 
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
@@ -1973,7 +1973,7 @@ function WebGLRenderer ( parameters ) {
 
 	// Uniforms (refresh uniforms objects)
 
-	function refreshUniformsCommon ( uniforms, material ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -2073,14 +2073,14 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsLine ( uniforms, material ) {
+	function refreshUniformsLine( uniforms, material ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 
 	}
 
-	function refreshUniformsDash ( uniforms, material ) {
+	function refreshUniformsDash( uniforms, material ) {
 
 		uniforms.dashSize.value = material.dashSize;
 		uniforms.totalSize.value = material.dashSize + material.gapSize;
@@ -2088,7 +2088,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsPoints ( uniforms, material ) {
+	function refreshUniformsPoints( uniforms, material ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
@@ -2108,7 +2108,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsFog ( uniforms, fog ) {
+	function refreshUniformsFog( uniforms, fog ) {
 
 		uniforms.fogColor.value = fog.color;
 
@@ -2125,7 +2125,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsLambert ( uniforms, material ) {
+	function refreshUniformsLambert( uniforms, material ) {
 
 		if ( material.lightMap ) {
 
@@ -2142,7 +2142,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsPhong ( uniforms, material ) {
+	function refreshUniformsPhong( uniforms, material ) {
 
 		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
@@ -2184,7 +2184,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsStandard ( uniforms, material ) {
+	function refreshUniformsStandard( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
@@ -2245,7 +2245,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function refreshUniformsPhysical ( uniforms, material ) {
+	function refreshUniformsPhysical( uniforms, material ) {
 
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
@@ -2256,7 +2256,7 @@ function WebGLRenderer ( parameters ) {
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
+	function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
 		uniforms.ambientLightColor.needsUpdate = value;
 
@@ -2269,7 +2269,7 @@ function WebGLRenderer ( parameters ) {
 
 	// Lighting
 
-	function setupShadows ( lights ) {
+	function setupShadows( lights ) {
 
 		var lightShadowsLength = 0;
 
@@ -2289,7 +2289,7 @@ function WebGLRenderer ( parameters ) {
 
 	}
 
-	function setupLights ( lights, camera ) {
+	function setupLights( lights, camera ) {
 
 		var l, ll, light,
 		r = 0, g = 0, b = 0,
@@ -2707,7 +2707,7 @@ function WebGLRenderer ( parameters ) {
 
 	// Map three.js constants to WebGL constants
 
-	function paramThreeToGL ( p ) {
+	function paramThreeToGL( p ) {
 
 		var extension;
 

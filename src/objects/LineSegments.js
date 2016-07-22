@@ -4,7 +4,7 @@ import { Line } from './Line';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LineSegments ( geometry, material ) {
+function LineSegments( geometry, material ) {
 
 	Line.call( this, geometry, material );
 

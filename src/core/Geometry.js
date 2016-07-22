@@ -19,7 +19,8 @@ import { _Math } from '../math/Math';
  * @author bhouston / http://clara.io
  */
 
-function Geometry () {
+function Geometry() {
+
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
 	this.uuid = _Math.generateUUID();
@@ -1216,7 +1217,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 var count = 0;
-function GeometryIdCount () { return count++; };
+function GeometryIdCount() { return count++; };
 
 
 export { GeometryIdCount, Geometry };

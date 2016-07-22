@@ -4,7 +4,7 @@ import { CylinderGeometry } from './CylinderGeometry';
  * @author abelnation / http://github.com/abelnation
  */
 
-function ConeGeometry (
+function ConeGeometry(
 	radius, height,
 	radialSegments, heightSegments,
 	openEnded, thetaStart, thetaLength ) {

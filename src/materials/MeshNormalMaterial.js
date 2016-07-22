@@ -11,7 +11,7 @@ import { Material } from './Material';
  * }
  */
 
-function MeshNormalMaterial ( parameters ) {
+function MeshNormalMaterial( parameters ) {
 
 	Material.call( this, parameters );
 

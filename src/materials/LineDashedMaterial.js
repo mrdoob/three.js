@@ -16,7 +16,7 @@ import { Color } from '../math/Color';
  * }
  */
 
-function LineDashedMaterial ( parameters ) {
+function LineDashedMaterial( parameters ) {
 
 	Material.call( this );
 

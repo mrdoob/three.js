@@ -4,7 +4,7 @@ import { BufferGeometry } from '../../core/BufferGeometry';
 * @author mrdoob / http://mrdoob.com/
 */
 
-function WebGLGeometries ( gl, properties, info ) {
+function WebGLGeometries( gl, properties, info ) {
 
 	var geometries = {};
 

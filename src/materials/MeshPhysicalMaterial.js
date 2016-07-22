@@ -8,7 +8,7 @@ import { MeshStandardMaterial } from './MeshStandardMaterial';
  * }
  */
 
-function MeshPhysicalMaterial ( parameters ) {
+function MeshPhysicalMaterial( parameters ) {
 
 	MeshStandardMaterial.call( this );
 

@@ -6,7 +6,7 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	BufferGeometry.call( this );
 
@@ -63,7 +63,7 @@ function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments
 
 	// helper functions
 
-	function calculateVertexCount ( w, h, d ) {
+	function calculateVertexCount( w, h, d ) {
 
 		var vertices = 0;
 
@@ -76,7 +76,7 @@ function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments
 
 	}
 
-	function calculateIndexCount ( w, h, d ) {
+	function calculateIndexCount( w, h, d ) {
 
 		var index = 0;
 
@@ -89,7 +89,7 @@ function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments
 
 	}
 
-	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
 		var segmentWidth	= width / gridX;
 		var segmentHeight = height / gridY;

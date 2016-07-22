@@ -10,7 +10,7 @@ import { Vector2 } from '../math/Vector2';
  * @author szimek / https://github.com/szimek/
  */
 
-function Texture ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
 
@@ -287,7 +287,7 @@ Texture.prototype = {
 Object.assign( Texture.prototype, EventDispatcher.prototype );
 
 var count = 0;
-function TextureIdCount () { return count++; };
+function TextureIdCount() { return count++; };
 
 
 export { TextureIdCount, Texture };

@@ -4,7 +4,7 @@ import { EllipseCurve } from './EllipseCurve';
  *	Arc curve
  **************************************************************/
 
-function ArcCurve ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 

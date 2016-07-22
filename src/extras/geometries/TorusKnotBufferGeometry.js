@@ -8,7 +8,7 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  *
  * see: http://www.blackpawn.com/texts/pqtorus/
  */
-function TorusKnotBufferGeometry ( radius, tube, tubularSegments, radialSegments, p, q ) {
+function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
 	BufferGeometry.call( this );
 

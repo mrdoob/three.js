@@ -5,7 +5,7 @@ import { SphereBufferGeometry } from './SphereBufferGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function SphereGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	Geometry.call( this );
 

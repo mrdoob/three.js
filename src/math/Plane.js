@@ -5,7 +5,7 @@ import { Vector3 } from './Vector3';
  * @author bhouston / http://clara.io
  */
 
-function Plane ( normal, constant ) {
+function Plane( normal, constant ) {
 
 	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
 	this.constant = ( constant !== undefined ) ? constant : 0;

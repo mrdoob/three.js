@@ -94,7 +94,7 @@
    * https://github.com/mrdoob/eventdispatcher.js/
    */
 
-  function EventDispatcher () {}
+  function EventDispatcher() {}
 
   Object.assign( EventDispatcher.prototype, {
 
@@ -482,7 +482,7 @@
    * @author zz85 / http://www.lab4games.net/zz85/blog
    */
 
-  function Vector2 ( x, y ) {
+  function Vector2( x, y ) {
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -963,7 +963,7 @@
    * @author szimek / https://github.com/szimek/
    */
 
-  function Texture ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+  function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
   	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
 
@@ -1240,7 +1240,7 @@
   Object.assign( Texture.prototype, EventDispatcher.prototype );
 
   var count = 0;
-  function TextureIdCount () { return count++; };
+  function TextureIdCount() { return count++; };
 
   /**
    * @author mrdoob / http://mrdoob.com/
@@ -1255,7 +1255,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function Matrix4 () {
+  function Matrix4() {
 
   	this.elements = new Float32Array( [
 
@@ -2219,7 +2219,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Quaternion ( x, y, z, w ) {
+  function Quaternion( x, y, z, w ) {
 
   	this._x = x || 0;
   	this._y = y || 0;
@@ -2807,7 +2807,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function Vector3 ( x, y, z ) {
+  function Vector3( x, y, z ) {
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -3566,7 +3566,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function SpritePlugin ( renderer, sprites ) {
+  function SpritePlugin( renderer, sprites ) {
 
   	var gl = renderer.context;
   	var state = renderer.state;
@@ -3808,7 +3808,7 @@
 
   	};
 
-  	function createProgram () {
+  	function createProgram() {
 
   		var program = gl.createProgram();
 
@@ -3915,7 +3915,7 @@
 
   	}
 
-  	function painterSortStable ( a, b ) {
+  	function painterSortStable( a, b ) {
 
   		if ( a.renderOrder !== b.renderOrder ) {
 
@@ -3939,7 +3939,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Box2 ( min, max ) {
+  function Box2( min, max ) {
 
   	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
   	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
@@ -4177,7 +4177,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function LensFlarePlugin ( renderer, flares ) {
+  function LensFlarePlugin( renderer, flares ) {
 
   	var gl = renderer.context;
   	var state = renderer.state;
@@ -4529,7 +4529,7 @@
 
   	};
 
-  	function createProgram ( shader ) {
+  	function createProgram( shader ) {
 
   		var program = gl.createProgram();
 
@@ -4559,7 +4559,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function CubeTexture ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+  function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
   	images = images !== undefined ? images : [];
   	mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
@@ -5191,14 +5191,14 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLTextures ( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
+  function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
 
   	var _infoMemory = info.memory;
   	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
   	//
 
-  	function clampToMaxSize ( image, maxSize ) {
+  	function clampToMaxSize( image, maxSize ) {
 
   		if ( image.width > maxSize || image.height > maxSize ) {
 
@@ -5262,7 +5262,7 @@
 
   	// Fallback filters for non-power-of-2 textures
 
-  	function filterFallback ( f ) {
+  	function filterFallback( f ) {
 
   		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
 
@@ -5402,7 +5402,7 @@
 
   	}
 
-  	function setTextureCube ( texture, slot ) {
+  	function setTextureCube( texture, slot ) {
 
   		var textureProperties = properties.get( texture );
 
@@ -5518,14 +5518,14 @@
 
   	}
 
-  	function setTextureCubeDynamic ( texture, slot ) {
+  	function setTextureCubeDynamic( texture, slot ) {
 
   		state.activeTexture( _gl.TEXTURE0 + slot );
   		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
 
   	}
 
-  	function setTextureParameters ( textureType, texture, isPowerOfTwoImage ) {
+  	function setTextureParameters( textureType, texture, isPowerOfTwoImage ) {
 
   		var extension;
 
@@ -5721,7 +5721,7 @@
   	// Render targets
 
   	// Setup storage for target texture and bind it to correct framebuffer
-  	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+  	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
   		var glFormat = paramThreeToGL( renderTarget.texture.format );
   		var glType = paramThreeToGL( renderTarget.texture.type );
@@ -5733,7 +5733,7 @@
   	}
 
   	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-  	function setupRenderBufferStorage ( renderbuffer, renderTarget ) {
+  	function setupRenderBufferStorage( renderbuffer, renderTarget ) {
 
   		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -5759,7 +5759,7 @@
   	}
 
   	// Setup resources for a Depth Texture for a FBO (needs an extension)
-  	function setupDepthTexture ( framebuffer, renderTarget ) {
+  	function setupDepthTexture( framebuffer, renderTarget ) {
 
   		var isCube = ( (renderTarget && renderTarget.isWebGLRenderTargetCube) );
   		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');
@@ -5934,7 +5934,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function Vector4 ( x, y, z, w ) {
+  function Vector4( x, y, z, w ) {
 
   	this.x = x || 0;
   	this.y = y || 0;
@@ -6558,7 +6558,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLState ( gl, extensions, paramThreeToGL ) {
+  function WebGLState( gl, extensions, paramThreeToGL ) {
 
   	var _this = this;
 
@@ -7193,7 +7193,7 @@
 
   };
 
-  function WebGLColorBuffer ( gl, state ) {
+  function WebGLColorBuffer( gl, state ) {
 
   	var locked = false;
 
@@ -7370,7 +7370,7 @@
 
   };
 
-  function WebGLStencilBuffer ( gl, state ) {
+  function WebGLStencilBuffer( gl, state ) {
 
   	var locked = false;
 
@@ -7485,7 +7485,7 @@
    * Texture parameters for an auto-generated target texture
    * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
   */
-  function WebGLRenderTarget ( width, height, options ) {
+  function WebGLRenderTarget( width, height, options ) {
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -7565,7 +7565,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Material () {
+  function Material() {
 
   	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
 
@@ -7772,7 +7772,7 @@
 
   		// TODO: Copied from Object3D.toJSON
 
-  		function extractFromCache ( cache ) {
+  		function extractFromCache( cache ) {
 
   			var values = [];
 
@@ -7887,7 +7887,7 @@
   Object.assign( Material.prototype, EventDispatcher.prototype );
 
   var count$1 = 0;
-  function MaterialIdCount () { return count$1++; };
+  function MaterialIdCount() { return count$1++; };
 
   /**
    * Uniform Utilities
@@ -7978,7 +7978,7 @@
    * }
    */
 
-  function ShaderMaterial ( parameters ) {
+  function ShaderMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -8402,7 +8402,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Color ( r, g, b ) {
+  function Color( r, g, b ) {
 
   	if ( g === undefined && b === undefined ) {
 
@@ -9324,7 +9324,7 @@
    * }
    */
 
-  function MeshDepthMaterial ( parameters ) {
+  function MeshDepthMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -9387,7 +9387,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function Box3 ( min, max ) {
+  function Box3( min, max ) {
 
   	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
   	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
@@ -9863,7 +9863,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Sphere ( center, radius ) {
+  function Sphere( center, radius ) {
 
   	this.center = ( center !== undefined ) ? center : new Vector3();
   	this.radius = ( radius !== undefined ) ? radius : 0;
@@ -10040,7 +10040,7 @@
    * @author tschw
    */
 
-  function Matrix3 () {
+  function Matrix3() {
 
   	this.elements = new Float32Array( [
 
@@ -10338,7 +10338,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Plane ( normal, constant ) {
+  function Plane( normal, constant ) {
 
   	this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
   	this.constant = ( constant !== undefined ) ? constant : 0;
@@ -10573,7 +10573,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Frustum ( p0, p1, p2, p3, p4, p5 ) {
+  function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
   	this.planes = [
 
@@ -10770,7 +10770,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function WebGLShadowMap ( _renderer, _lights, _objects, capabilities ) {
+  function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
   	var _gl = _renderer.context,
   	_state = _renderer.state,
@@ -11260,7 +11260,7 @@
   * @author fordacious / fordacious.github.io
   */
 
-  function WebGLProperties () {
+  function WebGLProperties() {
 
   	var properties = {};
 
@@ -11949,7 +11949,7 @@
 
   } )();
 
-  function WebGLPrograms ( renderer, capabilities ) {
+  function WebGLPrograms( renderer, capabilities ) {
 
   	var programs = [];
 
@@ -11980,7 +11980,7 @@
   	];
 
 
-  	function allocateBones ( object ) {
+  	function allocateBones( object ) {
 
   		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
@@ -12238,7 +12238,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function BufferAttribute ( array, itemSize, normalized ) {
+  function BufferAttribute( array, itemSize, normalized ) {
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -12251,7 +12251,7 @@
   	this.version = 0;
   	this.normalized = normalized === true;
 
-  };
+  }
 
   BufferAttribute.prototype = {
 
@@ -12543,76 +12543,75 @@
 
   //
 
-  function Int8Attribute ( array, itemSize ) {
+  function Int8Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Int8Array( array ), itemSize );
 
-  };
+  }
 
-  function Uint8Attribute ( array, itemSize ) {
+  function Uint8Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Uint8Array( array ), itemSize );
 
-  };
+  }
 
-  function Uint8ClampedAttribute ( array, itemSize ) {
+  function Uint8ClampedAttribute( array, itemSize ) {
 
   	return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
-  };
+  }
 
-  function Int16Attribute ( array, itemSize ) {
+  function Int16Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Int16Array( array ), itemSize );
 
-  };
+  }
 
-  function Uint16Attribute ( array, itemSize ) {
+  function Uint16Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Uint16Array( array ), itemSize );
 
-  };
+  }
 
-  function Int32Attribute ( array, itemSize ) {
+  function Int32Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Int32Array( array ), itemSize );
 
-  };
+  }
 
-  function Uint32Attribute ( array, itemSize ) {
+  function Uint32Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Uint32Array( array ), itemSize );
 
-  };
+  }
 
-  function Float32Attribute ( array, itemSize ) {
+  function Float32Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Float32Array( array ), itemSize );
 
-  };
+  }
 
-  function Float64Attribute ( array, itemSize ) {
+  function Float64Attribute( array, itemSize ) {
 
   	return new BufferAttribute( new Float64Array( array ), itemSize );
 
-  };
-
+  }
 
   // Deprecated
 
-  function DynamicBufferAttribute ( array, itemSize ) {
+  function DynamicBufferAttribute( array, itemSize ) {
 
   	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
   	return new BufferAttribute( array, itemSize ).setDynamic( true );
 
-  };
+  }
 
   /**
    * @author mrdoob / http://mrdoob.com/
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Face3 ( a, b, c, normal, color, materialIndex ) {
+  function Face3( a, b, c, normal, color, materialIndex ) {
 
   	this.a = a;
   	this.b = b;
@@ -12673,7 +12672,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Euler ( x, y, z, order ) {
+  function Euler( x, y, z, order ) {
 
   	this._x = x || 0;
   	this._y = y || 0;
@@ -13000,7 +12999,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Layers () {
+  function Layers() {
 
   	this.mask = 1;
 
@@ -13050,7 +13049,7 @@
    * @author elephantatwork / www.elephantatwork.ch
    */
 
-  function Object3D () {
+  function Object3D() {
 
   	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
 
@@ -13690,7 +13689,7 @@
   		// extract data from the cache hash
   		// remove metadata on each item
   		// and return as array
-  		function extractFromCache ( cache ) {
+  		function extractFromCache( cache ) {
 
   			var values = [];
   			for ( var key in cache ) {
@@ -13758,7 +13757,7 @@
   } );
 
   var count$3 = 0;
-  function Object3DIdCount () { return count$3++; };
+  function Object3DIdCount() { return count$3++; };
 
   /**
    * @author mrdoob / http://mrdoob.com/
@@ -13769,7 +13768,8 @@
    * @author bhouston / http://clara.io
    */
 
-  function Geometry () {
+  function Geometry() {
+
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
   	this.uuid = exports.Math.generateUUID();
@@ -14966,13 +14966,13 @@
   } );
 
   var count$2 = 0;
-  function GeometryIdCount () { return count$2++; };
+  function GeometryIdCount() { return count$2++; };
 
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function DirectGeometry () {
+  function DirectGeometry() {
 
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
@@ -15260,7 +15260,8 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function BufferGeometry () {
+  function BufferGeometry() {
+
   	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
   	this.uuid = exports.Math.generateUUID();
@@ -16283,7 +16284,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLGeometries ( gl, properties, info ) {
+  function WebGLGeometries( gl, properties, info ) {
 
   	var geometries = {};
 
@@ -16427,7 +16428,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLObjects ( gl, properties, info ) {
+  function WebGLObjects( gl, properties, info ) {
 
   	var geometries = new WebGLGeometries( gl, properties, info );
 
@@ -16653,7 +16654,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLLights () {
+  function WebGLLights() {
 
   	var lights = {};
 
@@ -16730,7 +16731,7 @@
 
   };
 
-  function WebGLCapabilities ( gl, extensions, parameters ) {
+  function WebGLCapabilities( gl, extensions, parameters ) {
 
   	var maxAnisotropy;
 
@@ -16825,7 +16826,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLExtensions ( gl ) {
+  function WebGLExtensions( gl ) {
 
   	var extensions = {};
 
@@ -16884,7 +16885,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLIndexedBufferRenderer ( _gl, extensions, _infoRender ) {
+  function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
 
   	var mode;
 
@@ -17103,7 +17104,7 @@
   * @author mrdoob / http://mrdoob.com/
   */
 
-  function WebGLBufferRenderer ( _gl, extensions, _infoRender ) {
+  function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
   	var mode;
 
@@ -17168,7 +17169,7 @@
    * @author alteredq / http://alteredqualia.com
    */
 
-  function WebGLRenderTargetCube ( width, height, options ) {
+  function WebGLRenderTargetCube( width, height, options ) {
 
   	WebGLRenderTarget.call( this, width, height, options );
 
@@ -17186,7 +17187,7 @@
    * @author Mugen87 / https://github.com/Mugen87
    */
 
-  function BoxBufferGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+  function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
   	BufferGeometry.call( this );
 
@@ -17243,7 +17244,7 @@
 
   	// helper functions
 
-  	function calculateVertexCount ( w, h, d ) {
+  	function calculateVertexCount( w, h, d ) {
 
   		var vertices = 0;
 
@@ -17256,7 +17257,7 @@
 
   	}
 
-  	function calculateIndexCount ( w, h, d ) {
+  	function calculateIndexCount( w, h, d ) {
 
   		var index = 0;
 
@@ -17269,7 +17270,7 @@
 
   	}
 
-  	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+  	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
   		var segmentWidth	= width / gridX;
   		var segmentHeight = height / gridY;
@@ -17381,7 +17382,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Ray ( origin, direction ) {
+  function Ray( origin, direction ) {
 
   	this.origin = ( origin !== undefined ) ? origin : new Vector3();
   	this.direction = ( direction !== undefined ) ? direction : new Vector3();
@@ -17917,7 +17918,7 @@
    * @author bhouston / http://clara.io
    */
 
-  function Line3 ( start, end ) {
+  function Line3( start, end ) {
 
   	this.start = ( start !== undefined ) ? start : new Vector3();
   	this.end = ( end !== undefined ) ? end : new Vector3();
@@ -18045,7 +18046,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Triangle ( a, b, c ) {
+  function Triangle( a, b, c ) {
 
   	this.a = ( a !== undefined ) ? a : new Vector3();
   	this.b = ( b !== undefined ) ? b : new Vector3();
@@ -18329,7 +18330,7 @@
    * }
    */
 
-  function MeshBasicMaterial ( parameters ) {
+  function MeshBasicMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -18409,7 +18410,7 @@
    * @author jonobr1 / http://jonobr1.com/
    */
 
-  function Mesh ( geometry, material ) {
+  function Mesh( geometry, material ) {
 
   	Object3D.call( this );
 
@@ -18762,7 +18763,7 @@
    * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
    */
 
-  function PlaneBufferGeometry ( width, height, widthSegments, heightSegments ) {
+  function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
   	BufferGeometry.call( this );
 
@@ -18860,7 +18861,7 @@
    * @author WestLangley / http://github.com/WestLangley
   */
 
-  function Camera () {
+  function Camera() {
 
   	Object3D.call( this );
 
@@ -18932,7 +18933,7 @@
    * @author tschw
    */
 
-  function PerspectiveCamera ( fov, aspect, near, far ) {
+  function PerspectiveCamera( fov, aspect, near, far ) {
 
   	Camera.call( this );
 
@@ -19150,7 +19151,7 @@
    * @author arose / http://github.com/arose
    */
 
-  function OrthographicCamera ( left, right, top, bottom, near, far ) {
+  function OrthographicCamera( left, right, top, bottom, near, far ) {
 
   	Camera.call( this );
 
@@ -19275,7 +19276,7 @@
    * @author tschw
    */
 
-  function WebGLRenderer ( parameters ) {
+  function WebGLRenderer( parameters ) {
 
   	console.log( 'THREE.WebGLRenderer', "80dev" );
 
@@ -20304,7 +20305,7 @@
 
   	}
 
-  	function painterSortStable ( a, b ) {
+  	function painterSortStable( a, b ) {
 
   		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
@@ -20330,7 +20331,7 @@
 
   	}
 
-  	function reversePainterSortStable ( a, b ) {
+  	function reversePainterSortStable( a, b ) {
 
   		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
@@ -21209,7 +21210,7 @@
 
   	// Uniforms (refresh uniforms objects)
 
-  	function refreshUniformsCommon ( uniforms, material ) {
+  	function refreshUniformsCommon( uniforms, material ) {
 
   		uniforms.opacity.value = material.opacity;
 
@@ -21309,14 +21310,14 @@
 
   	}
 
-  	function refreshUniformsLine ( uniforms, material ) {
+  	function refreshUniformsLine( uniforms, material ) {
 
   		uniforms.diffuse.value = material.color;
   		uniforms.opacity.value = material.opacity;
 
   	}
 
-  	function refreshUniformsDash ( uniforms, material ) {
+  	function refreshUniformsDash( uniforms, material ) {
 
   		uniforms.dashSize.value = material.dashSize;
   		uniforms.totalSize.value = material.dashSize + material.gapSize;
@@ -21324,7 +21325,7 @@
 
   	}
 
-  	function refreshUniformsPoints ( uniforms, material ) {
+  	function refreshUniformsPoints( uniforms, material ) {
 
   		uniforms.diffuse.value = material.color;
   		uniforms.opacity.value = material.opacity;
@@ -21344,7 +21345,7 @@
 
   	}
 
-  	function refreshUniformsFog ( uniforms, fog ) {
+  	function refreshUniformsFog( uniforms, fog ) {
 
   		uniforms.fogColor.value = fog.color;
 
@@ -21361,7 +21362,7 @@
 
   	}
 
-  	function refreshUniformsLambert ( uniforms, material ) {
+  	function refreshUniformsLambert( uniforms, material ) {
 
   		if ( material.lightMap ) {
 
@@ -21378,7 +21379,7 @@
 
   	}
 
-  	function refreshUniformsPhong ( uniforms, material ) {
+  	function refreshUniformsPhong( uniforms, material ) {
 
   		uniforms.specular.value = material.specular;
   		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
@@ -21420,7 +21421,7 @@
 
   	}
 
-  	function refreshUniformsStandard ( uniforms, material ) {
+  	function refreshUniformsStandard( uniforms, material ) {
 
   		uniforms.roughness.value = material.roughness;
   		uniforms.metalness.value = material.metalness;
@@ -21481,7 +21482,7 @@
 
   	}
 
-  	function refreshUniformsPhysical ( uniforms, material ) {
+  	function refreshUniformsPhysical( uniforms, material ) {
 
   		uniforms.clearCoat.value = material.clearCoat;
   		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
@@ -21492,7 +21493,7 @@
 
   	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-  	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
+  	function markUniformsLightsNeedsUpdate( uniforms, value ) {
 
   		uniforms.ambientLightColor.needsUpdate = value;
 
@@ -21505,7 +21506,7 @@
 
   	// Lighting
 
-  	function setupShadows ( lights ) {
+  	function setupShadows( lights ) {
 
   		var lightShadowsLength = 0;
 
@@ -21525,7 +21526,7 @@
 
   	}
 
-  	function setupLights ( lights, camera ) {
+  	function setupLights( lights, camera ) {
 
   		var l, ll, light,
   		r = 0, g = 0, b = 0,
@@ -21943,7 +21944,7 @@
 
   	// Map three.js constants to WebGL constants
 
-  	function paramThreeToGL ( p ) {
+  	function paramThreeToGL( p ) {
 
   		var extension;
 
@@ -22053,7 +22054,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function FogExp2 ( color, density ) {
+  function FogExp2( color, density ) {
 
   	this.name = '';
 
@@ -22075,7 +22076,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Fog ( color, near, far ) {
+  function Fog( color, near, far ) {
 
   	this.name = '';
 
@@ -22098,7 +22099,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Scene () {
+  function Scene() {
 
   	Object3D.call( this );
 
@@ -22135,7 +22136,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function LensFlare ( texture, size, distance, blending, color ) {
+  function LensFlare( texture, size, distance, blending, color ) {
 
   	Object3D.call( this );
 
@@ -22240,7 +22241,7 @@
    * }
    */
 
-  function SpriteMaterial ( parameters ) {
+  function SpriteMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -22279,7 +22280,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Sprite ( material ) {
+  function Sprite( material ) {
 
   	Object3D.call( this );
 
@@ -22339,7 +22340,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function LOD () {
+  function LOD() {
 
   	Object3D.call( this );
 
@@ -22509,7 +22510,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function DataTexture ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+  function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
   	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
@@ -22535,7 +22536,7 @@
    * @author ikerr / http://verold.com
    */
 
-  function Skeleton ( bones, boneInverses, useVertexTexture ) {
+  function Skeleton( bones, boneInverses, useVertexTexture ) {
 
   	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
@@ -22715,7 +22716,7 @@
    * @author ikerr / http://verold.com
    */
 
-  function Bone ( skin ) {
+  function Bone( skin ) {
 
   	Object3D.call( this );
 
@@ -22749,7 +22750,7 @@
    * @author ikerr / http://verold.com
    */
 
-  function SkinnedMesh ( geometry, material, useVertexTexture ) {
+  function SkinnedMesh( geometry, material, useVertexTexture ) {
 
   	Mesh.call( this, geometry, material );
 
@@ -22939,7 +22940,7 @@
    * }
    */
 
-  function LineBasicMaterial ( parameters ) {
+  function LineBasicMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -22980,7 +22981,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Line ( geometry, material, mode ) {
+  function Line( geometry, material, mode ) {
 
   	if ( mode === 1 ) {
 
@@ -23165,7 +23166,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function LineSegments ( geometry, material ) {
+  function LineSegments( geometry, material ) {
 
   	Line.call( this, geometry, material );
 
@@ -23195,7 +23196,7 @@
    * }
    */
 
-  function PointsMaterial ( parameters ) {
+  function PointsMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -23238,7 +23239,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Points ( geometry, material ) {
+  function Points( geometry, material ) {
 
   	Object3D.call( this );
 
@@ -23374,7 +23375,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Group () {
+  function Group() {
 
   	Object3D.call( this );
 
@@ -23392,7 +23393,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function VideoTexture ( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+  function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
   	Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
@@ -23423,7 +23424,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function CompressedTexture ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+  function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
   	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
@@ -23451,7 +23452,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function CanvasTexture ( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+  function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
   	Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
@@ -23466,7 +23467,7 @@
    * @author Matt DesLauriers / @mattdesl
    */
 
-  function DepthTexture ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+  function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
 
     Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
 
@@ -23491,7 +23492,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function ShadowMaterial () {
+  function ShadowMaterial() {
 
   	ShaderMaterial.call( this, {
   		uniforms: exports.UniformsUtils.merge( [
@@ -23530,7 +23531,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function RawShaderMaterial ( parameters ) {
+  function RawShaderMaterial( parameters ) {
 
   	ShaderMaterial.call( this, parameters );
 
@@ -23547,7 +23548,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function MultiMaterial ( materials ) {
+  function MultiMaterial( materials ) {
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -23664,7 +23665,7 @@
    * }
    */
 
-  function MeshStandardMaterial ( parameters ) {
+  function MeshStandardMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -23791,7 +23792,7 @@
    * }
    */
 
-  function MeshPhysicalMaterial ( parameters ) {
+  function MeshPhysicalMaterial( parameters ) {
 
   	MeshStandardMaterial.call( this );
 
@@ -23878,7 +23879,7 @@
    * }
    */
 
-  function MeshPhongMaterial ( parameters ) {
+  function MeshPhongMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -24000,7 +24001,7 @@
    * }
    */
 
-  function MeshNormalMaterial ( parameters ) {
+  function MeshNormalMaterial( parameters ) {
 
   	Material.call( this, parameters );
 
@@ -24071,7 +24072,7 @@
    * }
    */
 
-  function MeshLambertMaterial ( parameters ) {
+  function MeshLambertMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -24173,7 +24174,7 @@
    * }
    */
 
-  function LineDashedMaterial ( parameters ) {
+  function LineDashedMaterial( parameters ) {
 
   	Material.call( this );
 
@@ -24262,7 +24263,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function LoadingManager ( onLoad, onProgress, onError ) {
+  function LoadingManager( onLoad, onProgress, onError ) {
 
   	var scope = this;
 
@@ -24333,7 +24334,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function XHRLoader ( manager ) {
+  function XHRLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24460,7 +24461,7 @@
    * Abstract Base class to block based textures loader (dds, pvr, ...)
    */
 
-  function CompressedTextureLoader ( manager ) {
+  function CompressedTextureLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24595,7 +24596,7 @@
    */
 
   var DataTextureLoader = BinaryTextureLoader;
-  function BinaryTextureLoader ( manager ) {
+  function BinaryTextureLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24681,7 +24682,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function ImageLoader ( manager ) {
+  function ImageLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24747,7 +24748,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function CubeTextureLoader ( manager ) {
+  function CubeTextureLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24815,7 +24816,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function TextureLoader ( manager ) {
+  function TextureLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -24872,7 +24873,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Light ( color, intensity ) {
+  function Light( color, intensity ) {
 
   	Object3D.call( this );
 
@@ -24926,7 +24927,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function HemisphereLight ( skyColor, groundColor, intensity ) {
+  function HemisphereLight( skyColor, groundColor, intensity ) {
 
   	Light.call( this, skyColor, intensity );
 
@@ -24963,7 +24964,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function LightShadow ( camera ) {
+  function LightShadow( camera ) {
 
   	this.camera = camera;
 
@@ -25004,7 +25005,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function SpotLightShadow () {
+  function SpotLightShadow() {
 
   	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
@@ -25041,7 +25042,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function SpotLight ( color, intensity, distance, angle, penumbra, decay ) {
+  function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 
   	Light.call( this, color, intensity );
 
@@ -25104,7 +25105,7 @@
    */
 
 
-  function PointLight ( color, intensity, distance, decay ) {
+  function PointLight( color, intensity, distance, decay ) {
 
   	Light.call( this, color, intensity );
 
@@ -25156,7 +25157,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function DirectionalLightShadow ( light ) {
+  function DirectionalLightShadow( light ) {
 
   	LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -25173,7 +25174,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function DirectionalLight ( color, intensity ) {
+  function DirectionalLight( color, intensity ) {
 
   	Light.call( this, color, intensity );
 
@@ -25212,7 +25213,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function AmbientLight ( color, intensity ) {
+  function AmbientLight( color, intensity ) {
 
   	Light.call( this, color, intensity );
 
@@ -26210,7 +26211,7 @@
 
   }
 
-  function KeyframeTrackConstructor ( name, times, values, interpolation ) {
+  function KeyframeTrackConstructor( name, times, values, interpolation ) {
 
   	if( name === undefined ) throw new Error( "track name is undefined" );
 
@@ -26242,7 +26243,7 @@
    * @author tschw
    */
 
-  function VectorKeyframeTrack ( name, times, values, interpolation ) {
+  function VectorKeyframeTrack( name, times, values, interpolation ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26312,7 +26313,7 @@
    * @author tschw
    */
 
-  function QuaternionKeyframeTrack ( name, times, values, interpolation ) {
+  function QuaternionKeyframeTrack( name, times, values, interpolation ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26349,7 +26350,7 @@
    * @author tschw
    */
 
-  function NumberKeyframeTrack ( name, times, values, interpolation ) {
+  function NumberKeyframeTrack( name, times, values, interpolation ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26378,7 +26379,7 @@
    * @author tschw
    */
 
-  function StringKeyframeTrack ( name, times, values, interpolation ) {
+  function StringKeyframeTrack( name, times, values, interpolation ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26410,7 +26411,7 @@
    * @author tschw
    */
 
-  function BooleanKeyframeTrack ( name, times, values ) {
+  function BooleanKeyframeTrack( name, times, values ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values );
 
@@ -26445,7 +26446,7 @@
    * @author tschw
    */
 
-  function ColorKeyframeTrack ( name, times, values, interpolation ) {
+  function ColorKeyframeTrack( name, times, values, interpolation ) {
 
   	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
@@ -26478,7 +26479,7 @@
    * @author tschw
    */
 
-  function KeyframeTrack ( name, times, values, interpolation ) {
+  function KeyframeTrack( name, times, values, interpolation ) {
   	KeyframeTrackConstructor.apply( this, arguments );
   };
 
@@ -26618,7 +26619,7 @@
    * @author David Sarno / http://lighthaus.us/
    */
 
-  function AnimationClip ( name, duration, tracks ) {
+  function AnimationClip( name, duration, tracks ) {
 
   	this.name = name;
   	this.tracks = tracks;
@@ -26974,7 +26975,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function MaterialLoader ( manager ) {
+  function MaterialLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
   	this.textures = {};
@@ -27128,7 +27129,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function BufferGeometryLoader ( manager ) {
+  function BufferGeometryLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -27225,7 +27226,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Loader () {
+  function Loader() {
 
   	this.onLoadStart = function () {};
   	this.onLoadProgress = function () {};
@@ -27550,7 +27551,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function JSONLoader ( manager ) {
+  function JSONLoader( manager ) {
 
   	if ( typeof manager === 'boolean' ) {
 
@@ -28088,7 +28089,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function ObjectLoader ( manager ) {
+  function ObjectLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
   	this.texturePath = '';
@@ -29513,7 +29514,7 @@
    *	Abstract Curve base class
    **************************************************************/
 
-  function Curve () {}
+  function Curve() {}
 
   Curve.prototype = {
 
@@ -29765,7 +29766,7 @@
    *	Line
    **************************************************************/
 
-  function LineCurve ( v1, v2 ) {
+  function LineCurve( v1, v2 ) {
 
   	this.v1 = v1;
   	this.v2 = v2;
@@ -29818,7 +29819,7 @@
    *  curves, but retains the api of a curve
    **************************************************************/
 
-  function CurvePath () {
+  function CurvePath() {
 
   	this.curves = [];
 
@@ -30182,7 +30183,7 @@
    *	Spline curve
    **************************************************************/
 
-  function SplineCurve ( points /* array of Vector2 */ ) {
+  function SplineCurve( points /* array of Vector2 */ ) {
 
   	this.points = ( points == undefined ) ? [] : points;
 
@@ -30219,7 +30220,7 @@
    *	Cubic Bezier curve
    **************************************************************/
 
-  function CubicBezierCurve ( v0, v1, v2, v3 ) {
+  function CubicBezierCurve( v0, v1, v2, v3 ) {
 
   	this.v0 = v0;
   	this.v1 = v1;
@@ -30258,7 +30259,7 @@
    **************************************************************/
 
 
-  function QuadraticBezierCurve ( v0, v1, v2 ) {
+  function QuadraticBezierCurve( v0, v1, v2 ) {
 
   	this.v0 = v0;
   	this.v1 = v1;
@@ -30293,9 +30294,7 @@
 
   };
 
-  var PathPrototype;
-
-  PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
+  var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
   	fromPoints: function ( vectors ) {
 
@@ -30429,7 +30428,7 @@
    * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
    */
 
-  function TubeGeometry ( path, segments, radius, radialSegments, closed, taper ) {
+  function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
 
   	Geometry.call( this );
 
@@ -30745,7 +30744,7 @@
    * }
    **/
 
-  function ExtrudeGeometry ( shapes, options ) {
+  function ExtrudeGeometry( shapes, options ) {
 
   	if ( typeof( shapes ) === "undefined" ) {
 
@@ -30895,7 +30894,7 @@
   	}
 
 
-  	function scalePt2 ( pt, vec, size ) {
+  	function scalePt2( pt, vec, size ) {
 
   		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
 
@@ -31442,7 +31441,7 @@
    * }
    **/
 
-  function ShapeGeometry ( shapes, options ) {
+  function ShapeGeometry( shapes, options ) {
 
   	Geometry.call( this );
 
@@ -31569,7 +31568,7 @@
   // STEP 3a - Extract points from each shape, turn to vertices
   // STEP 3b - Triangulate each shape, add faces.
 
-  function Shape () {
+  function Shape() {
 
   	Path.apply( this, arguments );
 
@@ -31638,7 +31637,7 @@
    *
    **/
 
-  function Path ( points ) {
+  function Path( points ) {
 
   	CurvePath.call( this );
   	this.currentPoint = new Vector2();
@@ -31913,7 +31912,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Font ( data ) {
+  function Font( data ) {
 
   	this.data = data;
 
@@ -32079,7 +32078,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function FontLoader ( manager ) {
+  function FontLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -32125,19 +32124,23 @@
 
   var context;
 
-  function getAudioContext () {
+  function getAudioContext() {
+
   	if ( context === undefined ) {
+
   		context = new ( window.AudioContext || window.webkitAudioContext )();
+
   	}
 
   	return context;
+
   }
 
   /**
    * @author Reece Aaron Lecrivain / http://reecenotes.com/
    */
 
-  function AudioLoader ( manager ) {
+  function AudioLoader( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
@@ -32169,7 +32172,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function StereoCamera () {
+  function StereoCamera() {
 
   	this.type = 'StereoCamera';
 
@@ -32260,7 +32263,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function CubeCamera ( near, far, cubeResolution ) {
+  function CubeCamera( near, far, cubeResolution ) {
 
   	Object3D.call( this );
 
@@ -32340,11 +32343,7 @@
   CubeCamera.prototype = Object.create( Object3D.prototype );
   CubeCamera.prototype.constructor = CubeCamera;
 
-  /**
-   * @author mrdoob / http://mrdoob.com/
-   */
-
-  function AudioListener () {
+  function AudioListener() {
 
   	Object3D.call( this );
 
@@ -32357,7 +32356,7 @@
 
   	this.filter = null;
 
-  };
+  }
 
   AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -32447,12 +32446,7 @@
 
   } );
 
-  /**
-   * @author mrdoob / http://mrdoob.com/
-   * @author Reece Aaron Lecrivain / http://reecenotes.com/
-   */
-
-  function Audio ( listener ) {
+  function Audio( listener ) {
 
   	Object3D.call( this );
 
@@ -32475,7 +32469,7 @@
 
   	this.filters = [];
 
-  };
+  }
 
   Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -32737,18 +32731,14 @@
 
   } );
 
-  /**
-   * @author mrdoob / http://mrdoob.com/
-   */
-
-  function PositionalAudio ( listener ) {
+  function PositionalAudio( listener ) {
 
   	Audio.call( this, listener );
 
   	this.panner = this.context.createPanner();
   	this.panner.connect( this.gain );
 
-  };
+  }
 
   PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
@@ -32831,7 +32821,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function AudioAnalyser ( audio, fftSize ) {
+  function AudioAnalyser( audio, fftSize ) {
 
   	this.analyser = audio.context.createAnalyser();
   	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
@@ -32840,7 +32830,7 @@
 
   	audio.getOutput().connect( this.analyser );
 
-  };
+  }
 
   Object.assign( AudioAnalyser.prototype, {
 
@@ -32878,7 +32868,7 @@
    * @author tschw
    */
 
-  function PropertyMixer ( binding, typeName, valueSize ) {
+  function PropertyMixer( binding, typeName, valueSize ) {
 
   	this.binding = binding;
   	this.valueSize = valueSize;
@@ -33082,7 +33072,7 @@
    * @author tschw
    */
 
-  function PropertyBinding ( rootNode, path, parsedPath ) {
+  function PropertyBinding( rootNode, path, parsedPath ) {
 
   	this.path = path;
   	this.parsedPath = parsedPath ||
@@ -35501,7 +35491,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Uniform ( value ) {
+  function Uniform( value ) {
 
   	if ( typeof value === 'string' ) {
 
@@ -35535,7 +35525,8 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function InstancedBufferGeometry () {
+  function InstancedBufferGeometry() {
+
   	BufferGeometry.call( this );
 
   	this.type = 'InstancedBufferGeometry';
@@ -35596,7 +35587,7 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function InterleavedBufferAttribute ( interleavedBuffer, itemSize, offset, normalized ) {
+  function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -35732,7 +35723,7 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function InterleavedBuffer ( array, stride ) {
+  function InterleavedBuffer( array, stride ) {
 
   	this.uuid = exports.Math.generateUUID();
 
@@ -35825,7 +35816,7 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function InstancedInterleavedBuffer ( array, stride, meshPerAttribute ) {
+  function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
   	InterleavedBuffer.call( this, array, stride );
 
@@ -35852,7 +35843,7 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function InstancedBufferAttribute ( array, itemSize, meshPerAttribute ) {
+  function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
 
   	BufferAttribute.call( this, array, itemSize );
 
@@ -35881,7 +35872,7 @@
    * @author stephomi / http://stephaneginier.com/
    */
 
-  function Raycaster ( origin, direction, near, far ) {
+  function Raycaster( origin, direction, near, far ) {
 
   	this.ray = new Ray( origin, direction );
   	// direction is assumed to be normalized (for accurate distance calculations)
@@ -36011,7 +36002,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Clock ( autoStart ) {
+  function Clock( autoStart ) {
 
   	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
@@ -36085,7 +36076,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Spline ( points ) {
+  function Spline( points ) {
 
   	this.points = points;
 
@@ -36264,7 +36255,7 @@
    * The equator starts at positive z.
    */
 
-  function Spherical ( radius, phi, theta ) {
+  function Spherical( radius, phi, theta ) {
 
   	this.radius = ( radius !== undefined ) ? radius : 1.0;
   	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
@@ -36656,7 +36647,7 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function ImmediateRenderObject ( material ) {
+  function ImmediateRenderObject( material ) {
 
   	Object3D.call( this );
 
@@ -36674,7 +36665,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function WireframeGeometry ( geometry ) {
+  function WireframeGeometry( geometry ) {
 
   	BufferGeometry.call( this );
 
@@ -36857,7 +36848,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function WireframeHelper ( object, hex ) {
+  function WireframeHelper( object, hex ) {
 
   	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
@@ -36876,7 +36867,7 @@
    * @author WestLangley / http://github.com/WestLangley
   */
 
-  function VertexNormalsHelper ( object, size, hex, linewidth ) {
+  function VertexNormalsHelper( object, size, hex, linewidth ) {
 
   	this.object = object;
 
@@ -37023,7 +37014,7 @@
    * @author WestLangley / http://github.com/WestLangley
   */
 
-  function SpotLightHelper ( light ) {
+  function SpotLightHelper( light ) {
 
   	Object3D.call( this );
 
@@ -37106,7 +37097,7 @@
    * @author ikerr / http://verold.com
    */
 
-  function SkeletonHelper ( object ) {
+  function SkeletonHelper( object ) {
 
   	this.bones = this.getBoneList( object );
 
@@ -37205,7 +37196,7 @@
    * based on THREE.SphereGeometry
    */
 
-  function SphereBufferGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+  function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
   	BufferGeometry.call( this );
 
@@ -37307,7 +37298,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function PointLightHelper ( light, sphereSize ) {
+  function PointLightHelper( light, sphereSize ) {
 
   	this.light = light;
   	this.light.updateMatrixWorld();
@@ -37380,7 +37371,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function SphereGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+  function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
   	Geometry.call( this );
 
@@ -37408,7 +37399,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function HemisphereLightHelper ( light, sphereSize ) {
+  function HemisphereLightHelper( light, sphereSize ) {
 
   	Object3D.call( this );
 
@@ -37468,7 +37459,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function GridHelper ( size, divisions, color1, color2 ) {
+  function GridHelper( size, divisions, color1, color2 ) {
 
   	divisions = divisions || 1;
   	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
@@ -37516,7 +37507,7 @@
    * @author WestLangley / http://github.com/WestLangley
   */
 
-  function FaceNormalsHelper ( object, size, hex, linewidth ) {
+  function FaceNormalsHelper( object, size, hex, linewidth ) {
 
   	// FaceNormalsHelper only supports THREE.Geometry
 
@@ -37626,7 +37617,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function EdgesGeometry ( geometry, thresholdAngle ) {
+  function EdgesGeometry( geometry, thresholdAngle ) {
 
   	BufferGeometry.call( this );
 
@@ -37728,7 +37719,7 @@
    * an edge is only rendered if the angle is at least 10 degrees.
    */
 
-  function EdgesHelper ( object, hex, thresholdAngle ) {
+  function EdgesHelper( object, hex, thresholdAngle ) {
 
   	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
@@ -37748,7 +37739,7 @@
    * @author WestLangley / http://github.com/WestLangley
    */
 
-  function DirectionalLightHelper ( light, size ) {
+  function DirectionalLightHelper( light, size ) {
 
   	Object3D.call( this );
 
@@ -37831,7 +37822,7 @@
    *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
    */
 
-  function CameraHelper ( camera ) {
+  function CameraHelper( camera ) {
 
   	var geometry = new Geometry();
   	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
@@ -38017,7 +38008,7 @@
    * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
    */
 
-  function BoxGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+  function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
   	Geometry.call( this );
 
@@ -38048,7 +38039,7 @@
 
   // a helper to show the world-axis-aligned bounding box for an object
 
-  function BoundingBoxHelper ( object, hex ) {
+  function BoundingBoxHelper( object, hex ) {
 
   	var color = ( hex !== undefined ) ? hex : 0x888888;
 
@@ -38077,7 +38068,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function BoxHelper ( object, color ) {
+  function BoxHelper( object, color ) {
 
   	if ( color === undefined ) color = 0xffff00;
 
@@ -38594,7 +38585,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function AxisHelper ( size ) {
+  function AxisHelper( size ) {
 
   	size = size || 1;
 
@@ -38632,7 +38623,7 @@
    *
    */
 
-  function ParametricGeometry ( func, slices, stacks ) {
+  function ParametricGeometry( func, slices, stacks ) {
 
   	Geometry.call( this );
 
@@ -38715,7 +38706,7 @@
    * @author WestLangley / http://github.com/WestLangley
   */
 
-  function PolyhedronGeometry ( vertices, indices, radius, detail ) {
+  function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
   	Geometry.call( this );
 
@@ -38951,7 +38942,7 @@
    * @author timothypratley / https://github.com/timothypratley
    */
 
-  function TetrahedronGeometry ( radius, detail ) {
+  function TetrahedronGeometry( radius, detail ) {
 
   	var vertices = [
   		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
@@ -38979,7 +38970,7 @@
    * @author timothypratley / https://github.com/timothypratley
    */
 
-  function OctahedronGeometry ( radius, detail ) {
+  function OctahedronGeometry( radius, detail ) {
 
   	var vertices = [
   		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
@@ -39007,7 +38998,7 @@
    * @author timothypratley / https://github.com/timothypratley
    */
 
-  function IcosahedronGeometry ( radius, detail ) {
+  function IcosahedronGeometry( radius, detail ) {
 
   	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -39042,7 +39033,7 @@
    * @author Abe Pazos / https://hamoid.com
    */
 
-  function DodecahedronGeometry ( radius, detail ) {
+  function DodecahedronGeometry( radius, detail ) {
 
   	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
   	var r = 1 / t;
@@ -39102,7 +39093,7 @@
    *
    * see: http://www.blackpawn.com/texts/pqtorus/
    */
-  function TorusKnotBufferGeometry ( radius, tube, tubularSegments, radialSegments, p, q ) {
+  function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
   	BufferGeometry.call( this );
 
@@ -39266,7 +39257,7 @@
    * @author oosmoxiecode
    */
 
-  function TorusKnotGeometry ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+  function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
   	Geometry.call( this );
 
@@ -39295,7 +39286,7 @@
    * @author Mugen87 / https://github.com/Mugen87
    */
 
-  function TorusBufferGeometry ( radius, tube, radialSegments, tubularSegments, arc ) {
+  function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
   	BufferGeometry.call( this );
 
@@ -39424,7 +39415,7 @@
    * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
    */
 
-  function TorusGeometry ( radius, tube, radialSegments, tubularSegments, arc ) {
+  function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
   	Geometry.call( this );
 
@@ -39464,7 +39455,7 @@
    * }
    */
 
-  function TextGeometry ( text, parameters ) {
+  function TextGeometry( text, parameters ) {
 
   	parameters = parameters || {};
 
@@ -39502,7 +39493,7 @@
    * @author Mugen87 / https://github.com/Mugen87
    */
 
-  function RingBufferGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+  function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
   	BufferGeometry.call( this );
 
@@ -39623,7 +39614,7 @@
    * @author Kaleb Murphy
    */
 
-  function RingGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+  function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
   	Geometry.call( this );
 
@@ -39650,7 +39641,7 @@
    * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
    */
 
-  function PlaneGeometry ( width, height, widthSegments, heightSegments ) {
+  function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
   	Geometry.call( this );
 
@@ -39681,7 +39672,7 @@
    // phiLength - the radian (0 to 2PI) range of the lathed section
    //    2PI is a closed lathe, less than 2PI is a portion.
 
-  function LatheBufferGeometry ( points, segments, phiStart, phiLength ) {
+  function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
   	BufferGeometry.call( this );
 
@@ -39839,7 +39830,7 @@
   // phiLength - the radian (0 to 2PI) range of the lathed section
   //    2PI is a closed lathe, less than 2PI is a portion.
 
-  function LatheGeometry ( points, segments, phiStart, phiLength ) {
+  function LatheGeometry( points, segments, phiStart, phiLength ) {
 
   	Geometry.call( this );
 
@@ -39864,7 +39855,7 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function CylinderGeometry ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+  function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
   	Geometry.call( this );
 
@@ -39893,7 +39884,7 @@
    * @author abelnation / http://github.com/abelnation
    */
 
-  function ConeGeometry (
+  function ConeGeometry(
   	radius, height,
   	radialSegments, heightSegments,
   	openEnded, thetaStart, thetaLength ) {
@@ -39924,7 +39915,7 @@
    * @author: abelnation / http://github.com/abelnation
    */
 
-  function ConeBufferGeometry (
+  function ConeBufferGeometry(
   	radius, height,
   	radialSegments, heightSegments,
   	openEnded, thetaStart, thetaLength ) {
@@ -39954,7 +39945,7 @@
    * @author benaadams / https://twitter.com/ben_a_adams
    */
 
-  function CircleBufferGeometry ( radius, segments, thetaStart, thetaLength ) {
+  function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
   	BufferGeometry.call( this );
 
@@ -40022,7 +40013,7 @@
    * @author hughes
    */
 
-  function CircleGeometry ( radius, segments, thetaStart, thetaLength ) {
+  function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
   	Geometry.call( this );
 
@@ -40230,7 +40221,7 @@
    **************************************************************/
 
 
-  function ClosedSplineCurve3 ( points ) {
+  function ClosedSplineCurve3( points ) {
 
   	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
 
@@ -40247,7 +40238,7 @@
    **************************************************************/
 
 
-  exports.SplineCurve3 = Curve.create(
+  var SplineCurve3 = Curve.create(
 
   	function ( points /* array of Vector3 */ ) {
 
@@ -40375,7 +40366,7 @@
    *	Arc curve
    **************************************************************/
 
-  function ArcCurve ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
+  function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
   	EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
@@ -40639,6 +40630,7 @@
   exports.BoxBufferGeometry = BoxBufferGeometry;
   exports.BoxGeometry = BoxGeometry;
   exports.ClosedSplineCurve3 = ClosedSplineCurve3;
+  exports.SplineCurve3 = SplineCurve3;
   exports.ArcCurve = ArcCurve;
   exports.EllipseCurve = EllipseCurve;
   exports.SplineCurve = SplineCurve;

@@ -5,7 +5,7 @@ import { TorusKnotBufferGeometry } from './TorusKnotBufferGeometry';
  * @author oosmoxiecode
  */
 
-function TorusKnotGeometry ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
 	Geometry.call( this );
 

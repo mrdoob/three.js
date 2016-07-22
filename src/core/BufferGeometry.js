@@ -15,7 +15,8 @@ import { GeometryIdCount } from './Geometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function BufferGeometry () {
+function BufferGeometry() {
+
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
 	this.uuid = _Math.generateUUID();

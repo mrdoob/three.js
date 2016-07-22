@@ -7,7 +7,7 @@ import { Object3D } from '../core/Object3D';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function DirectionalLight ( color, intensity ) {
+function DirectionalLight( color, intensity ) {
 
 	Light.call( this, color, intensity );
 

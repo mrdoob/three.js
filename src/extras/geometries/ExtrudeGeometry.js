@@ -29,7 +29,7 @@ import { TubeGeometry } from './TubeGeometry';
  * }
  **/
 
-function ExtrudeGeometry ( shapes, options ) {
+function ExtrudeGeometry( shapes, options ) {
 
 	if ( typeof( shapes ) === "undefined" ) {
 
@@ -179,7 +179,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 
-	function scalePt2 ( pt, vec, size ) {
+	function scalePt2( pt, vec, size ) {
 
 		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
 

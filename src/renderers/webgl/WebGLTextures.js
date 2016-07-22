@@ -5,14 +5,14 @@ import { _Math } from '../../math/Math';
 * @author mrdoob / http://mrdoob.com/
 */
 
-function WebGLTextures ( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
 
 	var _infoMemory = info.memory;
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
 	//
 
-	function clampToMaxSize ( image, maxSize ) {
+	function clampToMaxSize( image, maxSize ) {
 
 		if ( image.width > maxSize || image.height > maxSize ) {
 
@@ -76,7 +76,7 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 
 	// Fallback filters for non-power-of-2 textures
 
-	function filterFallback ( f ) {
+	function filterFallback( f ) {
 
 		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
 
@@ -216,7 +216,7 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 
 	}
 
-	function setTextureCube ( texture, slot ) {
+	function setTextureCube( texture, slot ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -332,14 +332,14 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 
 	}
 
-	function setTextureCubeDynamic ( texture, slot ) {
+	function setTextureCubeDynamic( texture, slot ) {
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
 		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
 
 	}
 
-	function setTextureParameters ( textureType, texture, isPowerOfTwoImage ) {
+	function setTextureParameters( textureType, texture, isPowerOfTwoImage ) {
 
 		var extension;
 
@@ -535,7 +535,7 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 	// Render targets
 
 	// Setup storage for target texture and bind it to correct framebuffer
-	function setupFrameBufferTexture ( framebuffer, renderTarget, attachment, textureTarget ) {
+	function setupFrameBufferTexture( framebuffer, renderTarget, attachment, textureTarget ) {
 
 		var glFormat = paramThreeToGL( renderTarget.texture.format );
 		var glType = paramThreeToGL( renderTarget.texture.type );
@@ -547,7 +547,7 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	function setupRenderBufferStorage ( renderbuffer, renderTarget ) {
+	function setupRenderBufferStorage( renderbuffer, renderTarget ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -573,7 +573,7 @@ function WebGLTextures ( _gl, extensions, state, properties, capabilities, param
 	}
 
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
-	function setupDepthTexture ( framebuffer, renderTarget ) {
+	function setupDepthTexture( framebuffer, renderTarget ) {
 
 		var isCube = ( (renderTarget && renderTarget.isWebGLRenderTargetCube) );
 		if ( isCube ) throw new Error('Depth Texture with cube render targets is not supported!');

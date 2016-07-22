@@ -4,7 +4,8 @@ import { BufferGeometry } from './BufferGeometry';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InstancedBufferGeometry () {
+function InstancedBufferGeometry() {
+
 	BufferGeometry.call( this );
 
 	this.type = 'InstancedBufferGeometry';

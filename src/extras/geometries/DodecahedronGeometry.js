@@ -4,7 +4,7 @@ import { PolyhedronGeometry } from './PolyhedronGeometry';
  * @author Abe Pazos / https://hamoid.com
  */
 
-function DodecahedronGeometry ( radius, detail ) {
+function DodecahedronGeometry( radius, detail ) {
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 	var r = 1 / t;

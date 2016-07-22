@@ -14,7 +14,7 @@ import { Path } from './Path';
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-function Shape () {
+function Shape() {
 
 	Path.apply( this, arguments );
 

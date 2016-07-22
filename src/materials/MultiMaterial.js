@@ -4,7 +4,7 @@ import { _Math } from '../math/Math';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function MultiMaterial ( materials ) {
+function MultiMaterial( materials ) {
 
 	this.uuid = _Math.generateUUID();
 

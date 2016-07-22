@@ -40,7 +40,7 @@ import { Color } from '../math/Color';
  * }
  */
 
-function MeshLambertMaterial ( parameters ) {
+function MeshLambertMaterial( parameters ) {
 
 	Material.call( this );
 

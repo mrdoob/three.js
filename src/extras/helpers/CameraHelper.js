@@ -15,7 +15,7 @@ import { Geometry } from '../../core/Geometry';
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-function CameraHelper ( camera ) {
+function CameraHelper( camera ) {
 
 	var geometry = new Geometry();
 	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );

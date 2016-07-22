@@ -2,7 +2,7 @@
 * @author fordacious / fordacious.github.io
 */
 
-function WebGLProperties () {
+function WebGLProperties() {
 
 	var properties = {};
 

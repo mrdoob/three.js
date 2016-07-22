@@ -5,7 +5,7 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-function Vector2 ( x, y ) {
+function Vector2( x, y ) {
 
 	this.x = x || 0;
 	this.y = y || 0;

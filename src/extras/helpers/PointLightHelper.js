@@ -7,7 +7,7 @@ import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function PointLightHelper ( light, sphereSize ) {
+function PointLightHelper( light, sphereSize ) {
 
 	this.light = light;
 	this.light.updateMatrixWorld();

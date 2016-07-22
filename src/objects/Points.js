@@ -10,7 +10,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Points ( geometry, material ) {
+function Points( geometry, material ) {
 
 	Object3D.call( this );
 

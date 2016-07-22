@@ -20,7 +20,7 @@ import { Geometry } from '../../core/Geometry';
  * }
  */
 
-function TextGeometry ( text, parameters ) {
+function TextGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 

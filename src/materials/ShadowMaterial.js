@@ -7,7 +7,7 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ShadowMaterial () {
+function ShadowMaterial() {
 
 	ShaderMaterial.call( this, {
 		uniforms: UniformsUtils.merge( [

@@ -22,7 +22,7 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  * }
  */
 
-function ShaderMaterial ( parameters ) {
+function ShaderMaterial( parameters ) {
 
 	Material.call( this );
 

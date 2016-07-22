@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Uniform ( value ) {
+function Uniform( value ) {
 
 	if ( typeof value === 'string' ) {
 

@@ -9,7 +9,7 @@ import { Vector3 } from '../math/Vector3';
  * @author WestLangley / http://github.com/WestLangley
 */
 
-function Camera () {
+function Camera() {
 
 	Object3D.call( this );
 

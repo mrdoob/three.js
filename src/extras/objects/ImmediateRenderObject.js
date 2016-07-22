@@ -4,7 +4,7 @@ import { Object3D } from '../../core/Object3D';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function ImmediateRenderObject ( material ) {
+function ImmediateRenderObject( material ) {
 
 	Object3D.call( this );
 

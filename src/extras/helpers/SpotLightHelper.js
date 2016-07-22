@@ -11,7 +11,7 @@ import { BufferGeometry } from '../../core/BufferGeometry';
  * @author WestLangley / http://github.com/WestLangley
 */
 
-function SpotLightHelper ( light ) {
+function SpotLightHelper( light ) {
 
 	Object3D.call( this );
 

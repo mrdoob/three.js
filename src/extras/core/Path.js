@@ -10,7 +10,7 @@ import { CurvePath } from './CurvePath';
  *
  **/
 
-function Path ( points ) {
+function Path( points ) {
 
 	CurvePath.call( this );
 	this.currentPoint = new Vector2();

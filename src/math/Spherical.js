@@ -10,7 +10,7 @@ import { _Math } from './Math';
  * The equator starts at positive z.
  */
 
-function Spherical ( radius, phi, theta ) {
+function Spherical( radius, phi, theta ) {
 
 	this.radius = ( radius !== undefined ) ? radius : 1.0;
 	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole

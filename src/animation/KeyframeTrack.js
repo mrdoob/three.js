@@ -18,7 +18,7 @@ import { KeyframeTrackConstructor } from './KeyframeTrackConstructor';
  * @author tschw
  */
 
-function KeyframeTrack ( name, times, values, interpolation ) {
+function KeyframeTrack( name, times, values, interpolation ) {
 	KeyframeTrackConstructor.apply( this, arguments );
 };
 

@@ -9,7 +9,7 @@ import { BufferGeometry } from '../../core/BufferGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function AxisHelper ( size ) {
+function AxisHelper( size ) {
 
 	size = size || 1;
 

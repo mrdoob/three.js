@@ -6,7 +6,7 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Vector4 ( x, y, z, w ) {
+function Vector4( x, y, z, w ) {
 
 	this.x = x || 0;
 	this.y = y || 0;

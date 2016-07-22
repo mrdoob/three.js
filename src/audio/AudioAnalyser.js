@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function AudioAnalyser ( audio, fftSize ) {
+function AudioAnalyser( audio, fftSize ) {
 
 	this.analyser = audio.context.createAnalyser();
 	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
@@ -11,7 +11,7 @@ function AudioAnalyser ( audio, fftSize ) {
 
 	audio.getOutput().connect( this.analyser );
 
-};
+}
 
 Object.assign( AudioAnalyser.prototype, {
 
@@ -38,6 +38,5 @@ Object.assign( AudioAnalyser.prototype, {
 	}
 
 } );
-
 
 export { AudioAnalyser };

@@ -2,7 +2,7 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-function EventDispatcher () {}
+function EventDispatcher() {}
 
 Object.assign( EventDispatcher.prototype, {
 
