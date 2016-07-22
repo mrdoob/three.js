@@ -7,7 +7,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function TextureLoader ( manager ) {
+function TextureLoader( manager ) {
 	this.isTextureLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

@@ -11,7 +11,7 @@ import { PerspectiveCamera } from './PerspectiveCamera';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CubeCamera ( near, far, cubeResolution ) {
+function CubeCamera( near, far, cubeResolution ) {
 	this.isCubeCamera = this.isObject3D = true;
 
 	Object3D.call( this );

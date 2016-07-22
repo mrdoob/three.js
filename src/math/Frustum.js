@@ -8,7 +8,7 @@ import { Plane } from './Plane';
  * @author bhouston / http://clara.io
  */
 
-function Frustum ( p0, p1, p2, p3, p4, p5 ) {
+function Frustum( p0, p1, p2, p3, p4, p5 ) {
 	this.isFrustum = true;
 
 	this.planes = [

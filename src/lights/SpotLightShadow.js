@@ -6,7 +6,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function SpotLightShadow () {
+function SpotLightShadow() {
 	this.isSpotLightShadow = true;
 
 	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );

@@ -6,7 +6,7 @@ import { CurveUtils } from '../CurveUtils';
  *	Spline curve
  **************************************************************/
 
-function SplineCurve ( points /* array of Vector2 */ ) {
+function SplineCurve( points /* array of Vector2 */ ) {
 	this.isSplineCurve = this.isCurve = true;
 
 	this.points = ( points == undefined ) ? [] : points;

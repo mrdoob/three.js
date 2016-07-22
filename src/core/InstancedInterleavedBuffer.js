@@ -4,7 +4,7 @@ import { InterleavedBuffer } from './InterleavedBuffer';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InstancedInterleavedBuffer ( array, stride, meshPerAttribute ) {
+function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 	this.isInstancedInterleavedBuffer = this.isInterleavedBuffer = true;
 
 	InterleavedBuffer.call( this, array, stride );

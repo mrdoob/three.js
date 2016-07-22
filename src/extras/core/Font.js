@@ -6,7 +6,7 @@ import { ShapePath } from './Path';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Font ( data ) {
+function Font( data ) {
 	this.isFont = true;
 
 	this.data = data;

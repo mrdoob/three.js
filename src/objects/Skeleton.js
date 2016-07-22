@@ -10,7 +10,7 @@ import { _Math } from '../math/Math';
  * @author ikerr / http://verold.com
  */
 
-function Skeleton ( bones, boneInverses, useVertexTexture ) {
+function Skeleton( bones, boneInverses, useVertexTexture ) {
 	this.isSkeleton = true;
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;

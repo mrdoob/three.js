@@ -6,7 +6,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author bhouston / http://clara.io/
  */
 
-function AnimationLoader ( manager ) {
+function AnimationLoader( manager ) {
 	this.isAnimationLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

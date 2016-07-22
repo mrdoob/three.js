@@ -15,7 +15,7 @@ import { Frustum } from '../../math/Frustum';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLShadowMap ( _renderer, _lights, _objects, capabilities ) {
+function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	this.isWebGLShadowMap = true;
 
 	var _gl = _renderer.context,

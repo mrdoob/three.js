@@ -15,7 +15,7 @@ import { _Math } from '../math/Math';
  * @author elephantatwork / www.elephantatwork.ch
  */
 
-function Object3D () {
+function Object3D() {
 	this.isObject3D = true;
 
 	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
@@ -654,7 +654,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		// extract data from the cache hash
 		// remove metadata on each item
 		// and return as array
-		function extractFromCache ( cache ) {
+		function extractFromCache( cache ) {
 
 			var values = [];
 			for ( var key in cache ) {
@@ -722,7 +722,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 } );
 
 var count = 0;
-function Object3DIdCount () { return count++; };
+function Object3DIdCount() { return count++; };
 
 
 export { Object3DIdCount, Object3D };

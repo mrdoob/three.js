@@ -4,7 +4,7 @@ import { Vector2 } from './Vector2';
  * @author bhouston / http://clara.io
  */
 
-function Box2 ( min, max ) {
+function Box2( min, max ) {
 	this.isBox2 = true;
 
 	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );

@@ -6,7 +6,7 @@ import { PlaneBufferGeometry } from './PlaneBufferGeometry';
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-function PlaneGeometry ( width, height, widthSegments, heightSegments ) {
+function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 	this.isPlaneGeometry = this.isGeometry = true;
 
 	Geometry.call( this );

@@ -8,7 +8,7 @@ var CubeGeometry;
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-function BoxGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 	this.isBoxGeometry = this.isGeometry = true;
 
 	Geometry.call( this );

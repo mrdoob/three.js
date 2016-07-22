@@ -6,7 +6,7 @@ import { Vector3 } from '../math/Vector3';
 import { Audio } from './Audio';
 import { Object3D } from '../core/Object3D';
 
-function PositionalAudio ( listener ) {
+function PositionalAudio( listener ) {
 
 	Audio.call( this, listener );
 

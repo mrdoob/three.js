@@ -4,7 +4,7 @@ var DefaultLoadingManager;
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LoadingManager ( onLoad, onProgress, onError ) {
+function LoadingManager( onLoad, onProgress, onError ) {
 	this.isLoadingManager = true;
 
 	var scope = this;

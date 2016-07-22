@@ -7,7 +7,7 @@ import { Quaternion } from '../../../math/Quaternion';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function SpritePlugin ( renderer, sprites ) {
+function SpritePlugin( renderer, sprites ) {
 	this.isSpritePlugin = true;
 
 	var gl = renderer.context;
@@ -250,7 +250,7 @@ function SpritePlugin ( renderer, sprites ) {
 
 	};
 
-	function createProgram () {
+	function createProgram() {
 
 		var program = gl.createProgram();
 
@@ -357,7 +357,7 @@ function SpritePlugin ( renderer, sprites ) {
 
 	}
 
-	function painterSortStable ( a, b ) {
+	function painterSortStable( a, b ) {
 
 		if ( a.renderOrder !== b.renderOrder ) {
 

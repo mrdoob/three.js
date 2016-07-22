@@ -1,6 +1,6 @@
 var context;
 
-export function getAudioContext () {
+export function getAudioContext() {
 
 	if ( context === undefined ) {
 

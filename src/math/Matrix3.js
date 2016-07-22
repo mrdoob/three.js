@@ -7,7 +7,7 @@ import { Vector3 } from './Vector3';
  * @author tschw
  */
 
-function Matrix3 () {
+function Matrix3() {
 	this.isMatrix3 = true;
 
 	this.elements = new Float32Array( [

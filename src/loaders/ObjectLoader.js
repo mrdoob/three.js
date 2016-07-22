@@ -28,7 +28,7 @@ import { XHRLoader } from './XHRLoader';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader ( manager ) {
+function ObjectLoader( manager ) {
 	this.isObjectLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

@@ -7,7 +7,7 @@ import { Object3D } from '../core/Object3D';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LOD () {
+function LOD() {
 	this.isLOD = true;
 
 	Object3D.call( this );

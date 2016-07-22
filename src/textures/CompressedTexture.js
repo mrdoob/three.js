@@ -4,7 +4,7 @@ import { Texture } from './Texture';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function CompressedTexture ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 	this.isCompressedTexture = this.isTexture = true;
 
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );

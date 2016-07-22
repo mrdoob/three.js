@@ -10,7 +10,7 @@ import { Matrix4 } from '../math/Matrix4';
  * @author ikerr / http://verold.com
  */
 
-function SkinnedMesh ( geometry, material, useVertexTexture ) {
+function SkinnedMesh( geometry, material, useVertexTexture ) {
 	this.isSkinnedMesh = true;
 
 	Mesh.call( this, geometry, material );

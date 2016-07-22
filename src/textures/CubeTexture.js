@@ -5,7 +5,7 @@ import { CubeReflectionMapping } from '../constants';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function CubeTexture ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 	this.isCubeTexture = this.isTexture = true;
 
 	images = images !== undefined ? images : [];

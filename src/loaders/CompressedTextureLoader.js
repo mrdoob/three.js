@@ -9,7 +9,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-function CompressedTextureLoader ( manager ) {
+function CompressedTextureLoader( manager ) {
 	this.isCompressedTextureLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

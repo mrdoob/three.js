@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-function WebGLIndexedBufferRenderer ( _gl, extensions, _infoRender ) {
+function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
 	this.isWebGLIndexedBufferRenderer = true;
 
 	var mode;

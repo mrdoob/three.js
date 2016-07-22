@@ -5,7 +5,7 @@ import { NearestFilter, UnsignedShortType, DepthFormat } from '../constants';
  * @author Matt DesLauriers / @mattdesl
  */
 
-function DepthTexture ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
 	this.isDepthTexture = this.isTexture = true;
 
   Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );

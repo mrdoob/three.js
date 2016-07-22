@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function AudioAnalyser ( audio, fftSize ) {
+function AudioAnalyser( audio, fftSize ) {
 
 	this.analyser = audio.context.createAnalyser();
 	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;

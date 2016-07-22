@@ -5,7 +5,7 @@ import { RingBufferGeometry } from './RingBufferGeometry';
  * @author Kaleb Murphy
  */
 
-function RingGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 	this.isRingGeometry = this.isGeometry = true;
 
 	Geometry.call( this );

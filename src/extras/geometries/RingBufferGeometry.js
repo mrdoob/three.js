@@ -7,7 +7,7 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function RingBufferGeometry ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 	this.isRingBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );

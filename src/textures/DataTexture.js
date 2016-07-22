@@ -5,7 +5,7 @@ import { NearestFilter } from '../constants';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function DataTexture ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 	this.isDataTexture = this.isTexture = true;
 
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );

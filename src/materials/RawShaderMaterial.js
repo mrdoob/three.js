@@ -4,7 +4,7 @@ import { ShaderMaterial } from './ShaderMaterial';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function RawShaderMaterial ( parameters ) {
+function RawShaderMaterial( parameters ) {
 	this.isRawShaderMaterial = this.isShaderMaterial = this.isMaterial = true;
 
 	ShaderMaterial.call( this, parameters );

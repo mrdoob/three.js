@@ -7,7 +7,7 @@ import { Vector3 } from '../../../math/Vector3';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function LensFlarePlugin ( renderer, flares ) {
+function LensFlarePlugin( renderer, flares ) {
 	this.isLensFlarePlugin = true;
 
 	var gl = renderer.context;
@@ -360,7 +360,7 @@ function LensFlarePlugin ( renderer, flares ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram( shader ) {
 
 		var program = gl.createProgram();
 

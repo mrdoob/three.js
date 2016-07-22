@@ -4,7 +4,7 @@ import { _Math } from '../math/Math';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InterleavedBuffer ( array, stride ) {
+function InterleavedBuffer( array, stride ) {
 	this.isInterleavedBuffer = true;
 
 	this.uuid = _Math.generateUUID();

@@ -15,7 +15,7 @@ import { Color } from '../math/Color';
  * }
  */
 
-function PointsMaterial ( parameters ) {
+function PointsMaterial( parameters ) {
 	this.isPointsMaterial = this.isMaterial = true;
 
 	Material.call( this );

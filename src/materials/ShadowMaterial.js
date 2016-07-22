@@ -7,7 +7,7 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ShadowMaterial () {
+function ShadowMaterial() {
 	this.isShadowMaterial = this.isShaderMaterial = this.isMaterial = true;
 
 	ShaderMaterial.call( this, {

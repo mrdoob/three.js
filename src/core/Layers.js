@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Layers () {
+function Layers() {
 	this.isLayers = true;
 
 	this.mask = 1;

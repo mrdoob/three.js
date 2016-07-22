@@ -5,7 +5,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ImageLoader ( manager ) {
+function ImageLoader( manager ) {
 	this.isImageLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

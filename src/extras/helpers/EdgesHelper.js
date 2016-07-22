@@ -12,7 +12,7 @@ import { EdgesGeometry } from '../geometries/EdgesGeometry';
  * an edge is only rendered if the angle is at least 10 degrees.
  */
 
-function EdgesHelper ( object, hex, thresholdAngle ) {
+function EdgesHelper( object, hex, thresholdAngle ) {
 	this.isEdgesHelper = this.isLineSegments = true;
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;

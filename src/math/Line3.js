@@ -5,7 +5,7 @@ import { _Math } from './Math';
  * @author bhouston / http://clara.io
  */
 
-function Line3 ( start, end ) {
+function Line3( start, end ) {
 	this.isLine3 = true;
 
 	this.start = ( start !== undefined ) ? start : new Vector3();

@@ -5,7 +5,7 @@
 
 import { Object3D } from '../core/Object3D';
 
-function Audio ( listener ) {
+function Audio( listener ) {
 
 	Object3D.call( this );
 

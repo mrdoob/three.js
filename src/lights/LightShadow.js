@@ -5,7 +5,7 @@ import { Vector2 } from '../math/Vector2';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function LightShadow ( camera ) {
+function LightShadow( camera ) {
 	this.isLightShadow = true;
 
 	this.camera = camera;

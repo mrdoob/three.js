@@ -6,7 +6,7 @@ import { Object3D } from '../core/Object3D';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function SpotLight ( color, intensity, distance, angle, penumbra, decay ) {
+function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 	this.isSpotLight = true;
 
 	Light.call( this, color, intensity );

@@ -15,7 +15,7 @@ import { GeometryIdCount } from './Geometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function BufferGeometry () {
+function BufferGeometry() {
 	this.isBufferGeometry = true;
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );

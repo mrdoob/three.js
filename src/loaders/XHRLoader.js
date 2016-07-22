@@ -5,7 +5,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function XHRLoader ( manager ) {
+function XHRLoader( manager ) {
 	this.isXHRLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

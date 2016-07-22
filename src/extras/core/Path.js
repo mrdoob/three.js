@@ -10,7 +10,7 @@ import { CurvePath } from './CurvePath';
  *
  **/
 
-function Path ( points ) {
+function Path( points ) {
 	this.isPath = true;
 
 	CurvePath.call( this );

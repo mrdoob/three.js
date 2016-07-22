@@ -6,7 +6,7 @@ import { Object3D } from '../core/Object3D';
  * @author arose / http://github.com/arose
  */
 
-function OrthographicCamera ( left, right, top, bottom, near, far ) {
+function OrthographicCamera( left, right, top, bottom, near, far ) {
 	this.isOrthographicCamera = true;
 
 	Camera.call( this );

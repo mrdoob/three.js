@@ -5,7 +5,7 @@ import { CylinderBufferGeometry } from './CylinderBufferGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function CylinderGeometry ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 	this.isCylinderGeometry = this.isGeometry = true;
 
 	Geometry.call( this );

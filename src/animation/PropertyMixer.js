@@ -10,7 +10,7 @@ import { Quaternion } from '../math/Quaternion';
  * @author tschw
  */
 
-function PropertyMixer ( binding, typeName, valueSize ) {
+function PropertyMixer( binding, typeName, valueSize ) {
 	this.isPropertyMixer = true;
 
 	this.binding = binding;

@@ -13,7 +13,7 @@ import { _Math } from '../math/Math';
  * @author David Sarno / http://lighthaus.us/
  */
 
-function AnimationClip ( name, duration, tracks ) {
+function AnimationClip( name, duration, tracks ) {
 	this.isAnimationClip = true;
 
 	this.name = name;

@@ -8,7 +8,7 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Loader () {
+function Loader() {
 	this.isLoader = true;
 
 	this.onLoadStart = function () {};

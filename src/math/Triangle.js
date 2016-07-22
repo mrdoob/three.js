@@ -7,7 +7,7 @@ import { Plane } from './Plane';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Triangle ( a, b, c ) {
+function Triangle( a, b, c ) {
 	this.isTriangle = true;
 
 	this.a = ( a !== undefined ) ? a : new Vector3();

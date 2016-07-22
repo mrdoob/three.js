@@ -4,7 +4,7 @@ import { Light } from './Light';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function AmbientLight ( color, intensity ) {
+function AmbientLight( color, intensity ) {
 	this.isAmbientLight = true;
 
 	Light.call( this, color, intensity );

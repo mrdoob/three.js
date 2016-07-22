@@ -9,7 +9,7 @@ import { Box3 } from '../../math/Box3';
 
 // a helper to show the world-axis-aligned bounding box for an object
 
-function BoundingBoxHelper ( object, hex ) {
+function BoundingBoxHelper( object, hex ) {
 	this.isBoundingBoxHelper = this.isMesh = true;
 
 	var color = ( hex !== undefined ) ? hex : 0x888888;

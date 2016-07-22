@@ -4,7 +4,7 @@ import { BufferAttribute } from './BufferAttribute';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-function InstancedBufferAttribute ( array, itemSize, meshPerAttribute ) {
+function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
 	this.isInstancedBufferAttribute = this.isBufferAttribute = true;
 
 	BufferAttribute.call( this, array, itemSize );

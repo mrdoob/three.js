@@ -8,7 +8,7 @@ import { Uint16Attribute, Uint32Attribute, BufferAttribute } from '../../core/Bu
  * based on THREE.SphereGeometry
  */
 
-function SphereBufferGeometry ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 	this.isSphereBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );

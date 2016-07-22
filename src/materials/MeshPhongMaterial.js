@@ -53,7 +53,7 @@ import { Color } from '../math/Color';
  * }
  */
 
-function MeshPhongMaterial ( parameters ) {
+function MeshPhongMaterial( parameters ) {
 	this.isMeshPhongMaterial = this.isMaterial = true;
 
 	Material.call( this );

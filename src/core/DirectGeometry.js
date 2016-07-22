@@ -8,7 +8,7 @@ import { GeometryIdCount } from './Geometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function DirectGeometry () {
+function DirectGeometry() {
 	this.isDirectGeometry = true;
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );

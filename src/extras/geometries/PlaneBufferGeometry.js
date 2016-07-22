@@ -6,7 +6,7 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-function PlaneBufferGeometry ( width, height, widthSegments, heightSegments ) {
+function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 	this.isPlaneBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );

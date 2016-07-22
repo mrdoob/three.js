@@ -11,7 +11,7 @@ import { Quaternion } from './Quaternion';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Vector3 ( x, y, z ) {
+function Vector3( x, y, z ) {
 	this.isVector3 = true;
 
 	this.x = x || 0;

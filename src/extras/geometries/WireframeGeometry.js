@@ -5,7 +5,7 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WireframeGeometry ( geometry ) {
+function WireframeGeometry( geometry ) {
 	this.isWireframeGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );

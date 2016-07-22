@@ -11,7 +11,7 @@ import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function DirectionalLightHelper ( light, size ) {
+function DirectionalLightHelper( light, size ) {
 	this.isDirectionalLightHelper = this.isObject3D = true;
 
 	Object3D.call( this );

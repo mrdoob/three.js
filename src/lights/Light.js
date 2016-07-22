@@ -6,7 +6,7 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Light ( color, intensity ) {
+function Light( color, intensity ) {
 	this.isLight = true;
 
 	Object3D.call( this );

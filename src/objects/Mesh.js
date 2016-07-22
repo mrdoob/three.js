@@ -17,7 +17,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
  * @author jonobr1 / http://jonobr1.com/
  */
 
-function Mesh ( geometry, material ) {
+function Mesh( geometry, material ) {
 	this.isMesh = true;
 
 	Object3D.call( this );

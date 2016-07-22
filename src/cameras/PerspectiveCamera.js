@@ -9,7 +9,7 @@ import { _Math } from '../math/Math';
  * @author tschw
  */
 
-function PerspectiveCamera ( fov, aspect, near, far ) {
+function PerspectiveCamera( fov, aspect, near, far ) {
 	this.isPerspectiveCamera = true;
 
 	Camera.call( this );

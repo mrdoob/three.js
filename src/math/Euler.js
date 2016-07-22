@@ -9,7 +9,7 @@ import { _Math } from './Math';
  * @author bhouston / http://clara.io
  */
 
-function Euler ( x, y, z, order ) {
+function Euler( x, y, z, order ) {
 	this.isEuler = true;
 
 	this._x = x || 0;

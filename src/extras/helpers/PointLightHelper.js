@@ -7,7 +7,7 @@ import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function PointLightHelper ( light, sphereSize ) {
+function PointLightHelper( light, sphereSize ) {
 	this.isPointLightHelper = this.isMesh = true;
 
 	this.light = light;

@@ -14,7 +14,7 @@ import { Vector3 } from './Vector3';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Matrix4 () {
+function Matrix4() {
 	this.isMatrix4 = true;
 
 	this.elements = new Float32Array( [

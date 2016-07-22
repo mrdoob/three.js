@@ -5,7 +5,7 @@ import { WebGLGeometries } from './WebGLGeometries';
 * @author mrdoob / http://mrdoob.com/
 */
 
-function WebGLObjects ( gl, properties, info ) {
+function WebGLObjects( gl, properties, info ) {
 	this.isWebGLObjects = true;
 
 	var geometries = new WebGLGeometries( gl, properties, info );

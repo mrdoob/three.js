@@ -9,7 +9,7 @@ import { Color } from '../../math/Color';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function GridHelper ( size, divisions, color1, color2 ) {
+function GridHelper( size, divisions, color1, color2 ) {
 	this.isGridHelper = this.isLineSegments = true;
 
 	divisions = divisions || 1;

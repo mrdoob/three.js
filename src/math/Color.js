@@ -6,7 +6,7 @@ var ColorKeywords;
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Color ( r, g, b ) {
+function Color( r, g, b ) {
 	this.isColor = true;
 
 	if ( g === undefined && b === undefined ) {

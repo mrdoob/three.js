@@ -10,7 +10,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 var DataTextureLoader = BinaryTextureLoader;
-function BinaryTextureLoader ( manager ) {
+function BinaryTextureLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

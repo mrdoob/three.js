@@ -7,7 +7,7 @@ import { SpriteMaterial } from '../materials/SpriteMaterial';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Sprite ( material ) {
+function Sprite( material ) {
 	this.isSprite = true;
 
 	Object3D.call( this );

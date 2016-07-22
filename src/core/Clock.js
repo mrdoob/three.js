@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Clock ( autoStart ) {
+function Clock( autoStart ) {
 	this.isClock = true;
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;

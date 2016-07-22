@@ -11,7 +11,7 @@ import { LineSegments } from './LineSegments';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Line ( geometry, material, mode ) {
+function Line( geometry, material, mode ) {
 	this.isLine = true;
 
 	if ( mode === 1 ) {

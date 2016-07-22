@@ -15,7 +15,7 @@ import { _Math } from '../../math/Math';
  // phiLength - the radian (0 to 2PI) range of the lathed section
  //    2PI is a closed lathe, less than 2PI is a portion.
 
-function LatheBufferGeometry ( points, segments, phiStart, phiLength ) {
+function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 	this.isLatheBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );

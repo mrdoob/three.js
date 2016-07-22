@@ -7,7 +7,7 @@ import { Quaternion } from '../math/Quaternion';
 import { Object3D } from '../core/Object3D';
 import { getAudioContext } from './AudioContext';
 
-function AudioListener () {
+function AudioListener() {
 
 	Object3D.call( this );
 

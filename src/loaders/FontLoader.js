@@ -6,7 +6,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function FontLoader ( manager ) {
+function FontLoader( manager ) {
 	this.isFontLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

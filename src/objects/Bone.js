@@ -6,7 +6,7 @@ import { Object3D } from '../core/Object3D';
  * @author ikerr / http://verold.com
  */
 
-function Bone ( skin ) {
+function Bone( skin ) {
 	this.isBone = true;
 
 	Object3D.call( this );

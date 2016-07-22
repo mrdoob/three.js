@@ -14,7 +14,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function JSONLoader ( manager ) {
+function JSONLoader( manager ) {
 	this.isJSONLoader = true;
 
 	if ( typeof manager === 'boolean' ) {

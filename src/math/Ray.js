@@ -4,7 +4,7 @@ import { Vector3 } from './Vector3';
  * @author bhouston / http://clara.io
  */
 
-function Ray ( origin, direction ) {
+function Ray( origin, direction ) {
 	this.isRay = true;
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();

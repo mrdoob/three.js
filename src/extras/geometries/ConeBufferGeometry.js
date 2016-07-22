@@ -5,7 +5,7 @@ import { CylinderBufferGeometry } from './CylinderBufferGeometry';
  * @author: abelnation / http://github.com/abelnation
  */
 
-function ConeBufferGeometry (
+function ConeBufferGeometry(
 	radius, height,
 	radialSegments, heightSegments,
 	openEnded, thetaStart, thetaLength ) {

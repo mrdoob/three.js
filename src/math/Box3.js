@@ -6,7 +6,7 @@ import { Sphere } from './Sphere';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Box3 ( min, max ) {
+function Box3( min, max ) {
 	this.isBox3 = true;
 
 	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );

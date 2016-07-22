@@ -7,7 +7,7 @@ import { TorusBufferGeometry } from './TorusBufferGeometry';
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-function TorusGeometry ( radius, tube, radialSegments, tubularSegments, arc ) {
+function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 	this.isTorusGeometry = this.isGeometry = true;
 
 	Geometry.call( this );

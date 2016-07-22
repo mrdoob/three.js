@@ -7,7 +7,7 @@ import { ShapeUtils } from '../ShapeUtils';
  *	Cubic Bezier curve
  **************************************************************/
 
-function CubicBezierCurve ( v0, v1, v2, v3 ) {
+function CubicBezierCurve( v0, v1, v2, v3 ) {
 	this.isCubicBezierCurve = this.isCurve = true;
 
 	this.v0 = v0;

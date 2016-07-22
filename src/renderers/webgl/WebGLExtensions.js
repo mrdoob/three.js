@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-function WebGLExtensions ( gl ) {
+function WebGLExtensions( gl ) {
 	this.isWebGLExtensions = true;
 
 	var extensions = {};

@@ -7,7 +7,7 @@ import { DefaultLoadingManager } from './LoadingManager';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function MaterialLoader ( manager ) {
+function MaterialLoader( manager ) {
 	this.isMaterialLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

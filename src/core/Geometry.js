@@ -19,7 +19,7 @@ import { _Math } from '../math/Math';
  * @author bhouston / http://clara.io
  */
 
-function Geometry () {
+function Geometry() {
 	this.isGeometry = true;
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
@@ -1216,7 +1216,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 } );
 
 var count = 0;
-function GeometryIdCount () { return count++; };
+function GeometryIdCount() { return count++; };
 
 
 export { GeometryIdCount, Geometry };

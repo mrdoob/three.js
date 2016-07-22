@@ -5,7 +5,7 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function FogExp2 ( color, density ) {
+function FogExp2( color, density ) {
 	this.isFogExp2 = true;
 
 	this.name = '';
