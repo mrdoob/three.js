@@ -4667,13 +4667,6 @@
   		arrayCacheF32 = [],
   		arrayCacheI32 = [],
 
-  		uncacheTemporaryArrays = function() {
-
-  			arrayCacheF32.length = 0;
-  			arrayCacheI32.length = 0;
-
-  		},
-
   	// Flattening for arrays of vectors and matrices
 
   		flatten = function( array, nBlocks, blockSize ) {
@@ -33943,7 +33936,6 @@
   	remove: function( var_args ) {
 
   		var objects = this._objects,
-  			nObjects = objects.length,
   			nCachedObjects = this.nCachedObjects_,
   			indicesByUUID = this._indicesByUUID,
   			bindings = this._bindings,
@@ -34269,8 +34261,6 @@
 
   	isRunning: function() {
 
-  		var start = this._startTime;
-
   		return this.enabled && ! this.paused && this.timeScale !== 0 &&
   				this._startTime === null && this._mixer._isActiveAction( this );
 
@@ -34336,8 +34326,6 @@
   	},
 
   	crossFadeFrom: function( fadeOutAction, duration, warp ) {
-
-  		var mixer = this._mixer;
 
   		fadeOutAction.fadeOut( duration );
   		this.fadeIn( duration );
@@ -39803,7 +39791,6 @@
 
   	// helper variables
   	var index = 0, indexOffset = 0, base;
-  	var inversePointLength = 1.0 / ( points.length - 1 );
   	var inverseSegments = 1.0 / segments;
   	var vertex = new Vector3();
   	var uv = new Vector2();
