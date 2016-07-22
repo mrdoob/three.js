@@ -18,7 +18,9 @@ Menubar.Status = function ( editor ) {
 		if ( value === true ) {
 
 			editor.signals.sceneGraphChanged.dispatch();
-
+			saveLocal.dom.style.display="none";
+		} else {
+			saveLocal.dom.style.display="";
 		}
 
 	} );
@@ -35,6 +37,15 @@ Menubar.Status = function ( editor ) {
 		autosave.text.setTextDecoration( 'none' );
 
 	} );
+	
+	var saveLocal = new UI.Button( 'Save' ).onClick( function () {
+		editor.signals.savingStarted.dispatch();
+		editor.storage.set( editor.toJSON() );
+		editor.signals.savingFinished.dispatch();
+	} );
+	
+	if(autosave.getValue() == true)saveLocal.dom.style.display="none";
+	container.add( saveLocal );	
 
 	var version = new UI.Text( 'r' + THREE.REVISION );
 	version.setClass( 'title' );
