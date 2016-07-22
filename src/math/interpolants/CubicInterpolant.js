@@ -1,3 +1,7 @@
+import { ZeroCurvatureEnding } from '../../constants';
+import { Interpolant } from '../Interpolant';
+import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants';
+
 /**
  * Fast and simple cubic spline interpolant.
  *
@@ -8,10 +12,11 @@
  * @author tschw
  */
 
-THREE.CubicInterpolant = function(
+function CubicInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	this.isCubicInterpolant = true;
 
-	THREE.Interpolant.call(
+	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	this._weightPrev = -0;
@@ -21,15 +26,15 @@ THREE.CubicInterpolant = function(
 
 };
 
-THREE.CubicInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+CubicInterpolant.prototype =
+		Object.assign( Object.create( Interpolant.prototype ), {
 
-	constructor: THREE.CubicInterpolant,
+	constructor: CubicInterpolant,
 
 	DefaultSettings_: {
 
-		endingStart: 	THREE.ZeroCurvatureEnding,
-		endingEnd:		THREE.ZeroCurvatureEnding
+		endingStart: 	ZeroCurvatureEnding,
+		endingEnd:		ZeroCurvatureEnding
 
 	},
 
@@ -46,7 +51,7 @@ THREE.CubicInterpolant.prototype =
 
 			switch ( this.getSettings_().endingStart ) {
 
-				case THREE.ZeroSlopeEnding:
+				case ZeroSlopeEnding:
 
 					// f'(t0) = 0
 					iPrev = i1;
@@ -54,7 +59,7 @@ THREE.CubicInterpolant.prototype =
 
 					break;
 
-				case THREE.WrapAroundEnding:
+				case WrapAroundEnding:
 
 					// use the other end of the curve
 					iPrev = pp.length - 2;
@@ -76,7 +81,7 @@ THREE.CubicInterpolant.prototype =
 
 			switch ( this.getSettings_().endingEnd ) {
 
-				case THREE.ZeroSlopeEnding:
+				case ZeroSlopeEnding:
 
 					// f'(tN) = 0
 					iNext = i1;
@@ -84,7 +89,7 @@ THREE.CubicInterpolant.prototype =
 
 					break;
 
-				case THREE.WrapAroundEnding:
+				case WrapAroundEnding:
 
 					// use the other end of the curve
 					iNext = 1;
@@ -150,3 +155,6 @@ THREE.CubicInterpolant.prototype =
 	}
 
 } );
+
+
+export { CubicInterpolant };

@@ -1,3 +1,10 @@
+import { Geometry } from '../../core/Geometry';
+import { Vector2 } from '../../math/Vector2';
+import { Face3 } from '../../core/Face3';
+import { Vector3 } from '../../math/Vector3';
+import { ShapeUtils } from '../ShapeUtils';
+import { TubeGeometry } from './TubeGeometry';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -22,7 +29,8 @@
  * }
  **/
 
-THREE.ExtrudeGeometry = function ( shapes, options ) {
+function ExtrudeGeometry ( shapes, options ) {
+	this.isExtrudeGeometry = this.isGeometry = true;
 
 	if ( typeof( shapes ) === "undefined" ) {
 
@@ -31,7 +39,7 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	}
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'ExtrudeGeometry';
 
@@ -51,10 +59,10 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 };
 
-THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
+ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
+ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
-THREE.ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	var sl = shapes.length;
 
@@ -67,7 +75,7 @@ THREE.ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 };
 
-THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
+ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -85,7 +93,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var extrudePts, extrudeByPath = false;
 
 	// Use default WorldUVGenerator if no UV generators are specified.
-	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
+	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
 
 	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
@@ -100,13 +108,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
 
-		splineTube = options.frames !== undefined ? options.frames : new THREE.TubeGeometry.FrenetFrames( extrudePath, steps, false );
+		splineTube = options.frames !== undefined ? options.frames : new TubeGeometry.FrenetFrames( extrudePath, steps, false );
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
-		binormal = new THREE.Vector3();
-		normal = new THREE.Vector3();
-		position2 = new THREE.Vector3();
+		binormal = new Vector3();
+		normal = new Vector3();
+		position2 = new Vector3();
 
 	}
 
@@ -132,7 +140,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.ShapeUtils.isClockWise( vertices );
+	var reverse = ! ShapeUtils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -144,7 +152,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			ahole = holes[ h ];
 
-			if ( THREE.ShapeUtils.isClockWise( ahole ) ) {
+			if ( ShapeUtils.isClockWise( ahole ) ) {
 
 				holes[ h ] = ahole.reverse();
 
@@ -157,7 +165,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 
-	var faces = THREE.ShapeUtils.triangulateShape( vertices, holes );
+	var faces = ShapeUtils.triangulateShape( vertices, holes );
 
 	/* Vertices */
 
@@ -243,7 +251,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
 			if ( v_trans_lensq <= 2 ) {
 
-				return	new THREE.Vector2( v_trans_x, v_trans_y );
+				return	new Vector2( v_trans_x, v_trans_y );
 
 			} else {
 
@@ -304,7 +312,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		return	new THREE.Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 	}
 
@@ -616,7 +624,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function v( x, y, z ) {
 
-		scope.vertices.push( new THREE.Vector3( x, y, z ) );
+		scope.vertices.push( new Vector3( x, y, z ) );
 
 	}
 
@@ -626,7 +634,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, c, null, null, 0 ) );
+		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
 
 		var uvs = uvgen.generateTopUV( scope, a, b, c );
 
@@ -641,8 +649,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, d, null, null, 1 ) );
-		scope.faces.push( new THREE.Face3( b, c, d, null, null, 1 ) );
+		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
+		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
 
 		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
@@ -653,7 +661,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 };
 
-THREE.ExtrudeGeometry.WorldUVGenerator = {
+ExtrudeGeometry.WorldUVGenerator = {
 
 	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
 
@@ -664,9 +672,9 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 		var c = vertices[ indexC ];
 
 		return [
-			new THREE.Vector2( a.x, a.y ),
-			new THREE.Vector2( b.x, b.y ),
-			new THREE.Vector2( c.x, c.y )
+			new Vector2( a.x, a.y ),
+			new Vector2( b.x, b.y ),
+			new Vector2( c.x, c.y )
 		];
 
 	},
@@ -683,22 +691,25 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 		if ( Math.abs( a.y - b.y ) < 0.01 ) {
 
 			return [
-				new THREE.Vector2( a.x, 1 - a.z ),
-				new THREE.Vector2( b.x, 1 - b.z ),
-				new THREE.Vector2( c.x, 1 - c.z ),
-				new THREE.Vector2( d.x, 1 - d.z )
+				new Vector2( a.x, 1 - a.z ),
+				new Vector2( b.x, 1 - b.z ),
+				new Vector2( c.x, 1 - c.z ),
+				new Vector2( d.x, 1 - d.z )
 			];
 
 		} else {
 
 			return [
-				new THREE.Vector2( a.y, 1 - a.z ),
-				new THREE.Vector2( b.y, 1 - b.z ),
-				new THREE.Vector2( c.y, 1 - c.z ),
-				new THREE.Vector2( d.y, 1 - d.z )
+				new Vector2( a.y, 1 - a.z ),
+				new Vector2( b.y, 1 - b.z ),
+				new Vector2( c.y, 1 - c.z ),
+				new Vector2( d.y, 1 - d.z )
 			];
 
 		}
 
 	}
 };
+
+
+export { ExtrudeGeometry };

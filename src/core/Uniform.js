@@ -2,7 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Uniform = function ( value ) {
+function Uniform ( value ) {
+	this.isUniform = true;
 
 	if ( typeof value === 'string' ) {
 
@@ -17,9 +18,9 @@ THREE.Uniform = function ( value ) {
 
 };
 
-THREE.Uniform.prototype = {
+Uniform.prototype = {
 
-	constructor: THREE.Uniform,
+	constructor: Uniform,
 
 	onUpdate: function ( callback ) {
 
@@ -31,3 +32,6 @@ THREE.Uniform.prototype = {
 	}
 
 };
+
+
+export { Uniform };

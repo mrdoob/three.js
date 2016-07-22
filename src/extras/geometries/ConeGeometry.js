@@ -1,13 +1,16 @@
+import { CylinderGeometry } from './CylinderGeometry';
+
 /**
  * @author abelnation / http://github.com/abelnation
  */
 
-THREE.ConeGeometry = function (
+function ConeGeometry (
 	radius, height,
 	radialSegments, heightSegments,
 	openEnded, thetaStart, thetaLength ) {
+	this.isConeGeometry = this.isCylinderGeometry = this.isGeometry = true;
 
-	THREE.CylinderGeometry.call( this,
+	CylinderGeometry.call( this,
 		0, radius, height,
 		radialSegments, heightSegments,
 		openEnded, thetaStart, thetaLength );
@@ -26,5 +29,8 @@ THREE.ConeGeometry = function (
 
 };
 
-THREE.ConeGeometry.prototype = Object.create( THREE.CylinderGeometry.prototype );
-THREE.ConeGeometry.prototype.constructor = THREE.ConeGeometry;
+ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
+ConeGeometry.prototype.constructor = ConeGeometry;
+
+
+export { ConeGeometry };

@@ -1,21 +1,27 @@
+import { MultiplyOperation } from '../constants';
+import { Vector2 } from '../math/Vector2';
+import { XHRLoader } from './XHRLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MaterialLoader = function ( manager ) {
+function MaterialLoader ( manager ) {
+	this.isMaterialLoader = true;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.textures = {};
 
 };
 
-Object.assign( THREE.MaterialLoader.prototype, {
+Object.assign( MaterialLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -103,7 +109,7 @@ Object.assign( THREE.MaterialLoader.prototype, {
 
 			}
 
-			material.normalScale = new THREE.Vector2().fromArray( normalScale );
+			material.normalScale = new Vector2().fromArray( normalScale );
 
 		}
 
@@ -122,7 +128,7 @@ Object.assign( THREE.MaterialLoader.prototype, {
 		if ( json.envMap !== undefined ) {
 
 			material.envMap = this.getTexture( json.envMap );
-			material.combine = THREE.MultiplyOperation;
+			material.combine = MultiplyOperation;
 
 		}
 
@@ -151,3 +157,6 @@ Object.assign( THREE.MaterialLoader.prototype, {
 	}
 
 } );
+
+
+export { MaterialLoader };

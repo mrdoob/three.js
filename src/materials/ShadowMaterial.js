@@ -1,18 +1,24 @@
+import { ShaderMaterial } from './ShaderMaterial';
+import { ShaderChunk } from '../renderers/shaders/ShaderChunk';
+import { UniformsLib } from '../renderers/shaders/UniformsLib';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ShadowMaterial = function () {
+function ShadowMaterial () {
+	this.isShadowMaterial = this.isShaderMaterial = this.isMaterial = true;
 
-	THREE.ShaderMaterial.call( this, {
-		uniforms: THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "lights" ],
+	ShaderMaterial.call( this, {
+		uniforms: UniformsUtils.merge( [
+			UniformsLib[ "lights" ],
 			{
 				opacity: { value: 1.0 }
 			}
 		] ),
-		vertexShader: THREE.ShaderChunk[ 'shadow_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'shadow_frag' ]
+		vertexShader: ShaderChunk[ 'shadow_vert' ], 
+		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );
 
 	this.lights = true;
@@ -32,5 +38,8 @@ THREE.ShadowMaterial = function () {
 
 };
 
-THREE.ShadowMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.ShadowMaterial.prototype.constructor = THREE.ShadowMaterial;
+ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
+ShadowMaterial.prototype.constructor = ShadowMaterial;
+
+
+export { ShadowMaterial };

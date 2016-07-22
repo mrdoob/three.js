@@ -1,22 +1,29 @@
+import { Texture } from './Texture';
+import { NearestFilter, UnsignedShortType, DepthFormat } from '../constants';
+
 /**
  * @author Matt DesLauriers / @mattdesl
  */
 
-THREE.DepthTexture = function ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+function DepthTexture ( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+	this.isDepthTexture = this.isTexture = true;
 
-  THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, THREE.DepthFormat, type, anisotropy );
+  Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
 
   this.image = { width: width, height: height };
 
-  this.type = type !== undefined ? type : THREE.UnsignedShortType;
+  this.type = type !== undefined ? type : UnsignedShortType;
 
-  this.magFilter = magFilter !== undefined ? magFilter : THREE.NearestFilter;
-  this.minFilter = minFilter !== undefined ? minFilter : THREE.NearestFilter;
+  this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+  this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
   this.flipY = false;
   this.generateMipmaps  = false;
 
 };
 
-THREE.DepthTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.DepthTexture.prototype.constructor = THREE.DepthTexture;
+DepthTexture.prototype = Object.create( Texture.prototype );
+DepthTexture.prototype.constructor = DepthTexture;
+
+
+export { DepthTexture };

@@ -1,24 +1,30 @@
+import { InterleavedBuffer } from './InterleavedBuffer';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedInterleavedBuffer = function ( array, stride, meshPerAttribute ) {
+function InstancedInterleavedBuffer ( array, stride, meshPerAttribute ) {
+	this.isInstancedInterleavedBuffer = this.isInterleavedBuffer = true;
 
-	THREE.InterleavedBuffer.call( this, array, stride );
+	InterleavedBuffer.call( this, array, stride );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
 };
 
-THREE.InstancedInterleavedBuffer.prototype = Object.create( THREE.InterleavedBuffer.prototype );
-THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterleavedBuffer;
+InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
+InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
 
-THREE.InstancedInterleavedBuffer.prototype.copy = function ( source ) {
+InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 
-	THREE.InterleavedBuffer.prototype.copy.call( this, source );
+	InterleavedBuffer.prototype.copy.call( this, source );
 
 	this.meshPerAttribute = source.meshPerAttribute;
 
 	return this;
 
 };
+
+
+export { InstancedInterleavedBuffer };

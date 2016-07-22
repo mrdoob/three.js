@@ -1,4 +1,6 @@
-THREE.WebGLShader = ( function () {
+var WebGLShader;
+
+WebGLShader = ( function () {
 
 	function addLineNumbers( string ) {
 
@@ -41,3 +43,6 @@ THREE.WebGLShader = ( function () {
 	};
 
 } )();
+
+
+export { WebGLShader };

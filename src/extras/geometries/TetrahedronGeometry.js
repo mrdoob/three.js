@@ -1,8 +1,11 @@
+import { PolyhedronGeometry } from './PolyhedronGeometry';
+
 /**
  * @author timothypratley / https://github.com/timothypratley
  */
 
-THREE.TetrahedronGeometry = function ( radius, detail ) {
+function TetrahedronGeometry ( radius, detail ) {
+	this.isTetrahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
 	var vertices = [
 		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
@@ -12,7 +15,7 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 		 2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
 	this.type = 'TetrahedronGeometry';
 
@@ -23,5 +26,8 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 };
 
-THREE.TetrahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
-THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
+TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+
+
+export { TetrahedronGeometry };

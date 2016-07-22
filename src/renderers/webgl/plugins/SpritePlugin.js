@@ -1,9 +1,14 @@
+import { Texture } from '../../../textures/Texture';
+import { Vector3 } from '../../../math/Vector3';
+import { Quaternion } from '../../../math/Quaternion';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function ( renderer, sprites ) {
+function SpritePlugin ( renderer, sprites ) {
+	this.isSpritePlugin = true;
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -15,9 +20,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	// decompose matrixWorld
 
-	var spritePosition = new THREE.Vector3();
-	var spriteRotation = new THREE.Quaternion();
-	var spriteScale = new THREE.Vector3();
+	var spritePosition = new Vector3();
+	var spriteRotation = new Quaternion();
+	var spriteScale = new Vector3();
 
 	function init() {
 
@@ -80,7 +85,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		context.fillStyle = 'white';
 		context.fillRect( 0, 0, 8, 8 );
 
-		texture = new THREE.Texture( canvas );
+		texture = new Texture( canvas );
 		texture.needsUpdate = true;
 
 	}
@@ -126,7 +131,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 			gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
 
-			if ( fog instanceof THREE.Fog ) {
+			if ( (fog && fog.isFog) ) {
 
 				gl.uniform1f( uniforms.fogNear, fog.near );
 				gl.uniform1f( uniforms.fogFar, fog.far );
@@ -135,7 +140,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 				oldFogType = 1;
 				sceneFogType = 1;
 
-			} else if ( fog instanceof THREE.FogExp2 ) {
+			} else if ( (fog && fog.isFogExp2) ) {
 
 				gl.uniform1f( uniforms.fogDensity, fog.density );
 
@@ -371,3 +376,6 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	}
 
 };
+
+
+export { SpritePlugin };

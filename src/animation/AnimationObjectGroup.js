@@ -1,3 +1,6 @@
+import { PropertyBinding } from './PropertyBinding';
+import { _Math } from '../math/Math';
+
 /**
  *
  * A group of objects that receives a shared animation state.
@@ -29,9 +32,10 @@
  * @author tschw
  */
 
-THREE.AnimationObjectGroup = function( var_args ) {
+function AnimationObjectGroup( var_args ) {
+	this.isAnimationObjectGroup = true;
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	// cached objects followed by the active ones
 	this._objects = Array.prototype.slice.call( arguments );
@@ -68,9 +72,9 @@ THREE.AnimationObjectGroup = function( var_args ) {
 
 };
 
-THREE.AnimationObjectGroup.prototype = {
+AnimationObjectGroup.prototype = {
 
-	constructor: THREE.AnimationObjectGroup,
+	constructor: AnimationObjectGroup,
 
 	add: function( var_args ) {
 
@@ -102,7 +106,7 @@ THREE.AnimationObjectGroup.prototype = {
 				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
 
 					bindings[ j ].push(
-							new THREE.PropertyBinding(
+							new PropertyBinding(
 								object, paths[ j ], parsedPaths[ j ] ) );
 
 				}
@@ -138,7 +142,7 @@ THREE.AnimationObjectGroup.prototype = {
 						// for objects that are cached, the binding may
 						// or may not exist
 
-						binding = new THREE.PropertyBinding(
+						binding = new PropertyBinding(
 								object, paths[ j ], parsedPaths[ j ] );
 
 					}
@@ -327,7 +331,7 @@ THREE.AnimationObjectGroup.prototype = {
 			var object = objects[ i ];
 
 			bindingsForPath[ i ] =
-					new THREE.PropertyBinding( object, path, parsedPath );
+					new PropertyBinding( object, path, parsedPath );
 
 		}
 
@@ -368,3 +372,6 @@ THREE.AnimationObjectGroup.prototype = {
 
 };
 
+
+
+export { AnimationObjectGroup };

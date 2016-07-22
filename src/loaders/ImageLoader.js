@@ -1,14 +1,18 @@
+import { XHRLoader } from './XHRLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+function ImageLoader ( manager ) {
+	this.isImageLoader = true;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 };
 
-Object.assign( THREE.ImageLoader.prototype, {
+Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -31,7 +35,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 		} else {
 
-			var loader = new THREE.XHRLoader();
+			var loader = new XHRLoader();
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
 			loader.load( url, function ( blob ) {
@@ -63,3 +67,6 @@ Object.assign( THREE.ImageLoader.prototype, {
 	}
 
 } );
+
+
+export { ImageLoader };

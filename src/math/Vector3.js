@@ -1,3 +1,7 @@
+import { _Math } from './Math';
+import { Matrix4 } from './Matrix4';
+import { Quaternion } from './Quaternion';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
@@ -7,7 +11,8 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Vector3 = function ( x, y, z ) {
+function Vector3 ( x, y, z ) {
+	this.isVector3 = true;
 
 	this.x = x || 0;
 	this.y = y || 0;
@@ -15,9 +20,9 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-THREE.Vector3.prototype = {
+Vector3.prototype = {
 
-	constructor: THREE.Vector3,
+	constructor: Vector3,
 
 	set: function ( x, y, z ) {
 
@@ -242,13 +247,13 @@ THREE.Vector3.prototype = {
 
 		return function applyEuler( euler ) {
 
-			if ( euler instanceof THREE.Euler === false ) {
+			if ( (euler && euler.isEuler) === false ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 			}
 
-			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
@@ -262,7 +267,7 @@ THREE.Vector3.prototype = {
 
 		return function applyAxisAngle( axis, angle ) {
 
-			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -342,7 +347,7 @@ THREE.Vector3.prototype = {
 
 		return function project( camera ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 			return this.applyProjection( matrix );
@@ -357,7 +362,7 @@ THREE.Vector3.prototype = {
 
 		return function unproject( camera ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 			return this.applyProjection( matrix );
@@ -438,8 +443,8 @@ THREE.Vector3.prototype = {
 
 			if ( min === undefined ) {
 
-				min = new THREE.Vector3();
-				max = new THREE.Vector3();
+				min = new Vector3();
+				max = new Vector3();
 
 			}
 
@@ -608,7 +613,7 @@ THREE.Vector3.prototype = {
 
 		return function projectOnPlane( planeNormal ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			v1.copy( this ).projectOnVector( planeNormal );
 
@@ -627,7 +632,7 @@ THREE.Vector3.prototype = {
 
 		return function reflect( normal ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
@@ -641,7 +646,7 @@ THREE.Vector3.prototype = {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( THREE.Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( _Math.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -758,3 +763,6 @@ THREE.Vector3.prototype = {
 	}
 
 };
+
+
+export { Vector3 };

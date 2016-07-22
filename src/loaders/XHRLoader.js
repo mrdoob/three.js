@@ -1,14 +1,18 @@
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.XHRLoader = function ( manager ) {
+function XHRLoader ( manager ) {
+	this.isXHRLoader = true;
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 };
 
-Object.assign( THREE.XHRLoader.prototype, {
+Object.assign( XHRLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -16,7 +20,7 @@ Object.assign( THREE.XHRLoader.prototype, {
 
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -42,7 +46,7 @@ Object.assign( THREE.XHRLoader.prototype, {
 
 			var response = event.target.response;
 
-			THREE.Cache.add( url, response );
+			Cache.add( url, response );
 
 			if ( this.status === 200 ) {
 
@@ -122,3 +126,6 @@ Object.assign( THREE.XHRLoader.prototype, {
 	}
 
 } );
+
+
+export { XHRLoader };

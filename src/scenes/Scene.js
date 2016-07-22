@@ -1,10 +1,13 @@
+import { Object3D } from '../core/Object3D';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Scene = function () {
+function Scene () {
+	this.isScene = this.isObject3D = true;
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Scene';
 
@@ -16,12 +19,12 @@ THREE.Scene = function () {
 
 };
 
-THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Scene.prototype.constructor = THREE.Scene;
+Scene.prototype = Object.create( Object3D.prototype );
+Scene.prototype.constructor = Scene;
 
-THREE.Scene.prototype.copy = function ( source, recursive ) {
+Scene.prototype.copy = function ( source, recursive ) {
 
-	THREE.Object3D.prototype.copy.call( this, source, recursive );
+	Object3D.prototype.copy.call( this, source, recursive );
 
 	if ( source.background !== null ) this.background = source.background.clone();
 	if ( source.fog !== null ) this.fog = source.fog.clone();
@@ -33,3 +36,6 @@ THREE.Scene.prototype.copy = function ( source, recursive ) {
 	return this;
 
 };
+
+
+export { Scene };

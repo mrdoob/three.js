@@ -1,11 +1,17 @@
+import { Geometry } from '../../core/Geometry';
+import { BoxBufferGeometry } from './BoxBufferGeometry';
+
+var CubeGeometry;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+function BoxGeometry ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+	this.isBoxGeometry = this.isGeometry = true;
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'BoxGeometry';
 
@@ -18,12 +24,15 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		depthSegments: depthSegments
 	};
 
-	this.fromBufferGeometry( new THREE.BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
+	this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
 	this.mergeVertices();
 
 };
 
-THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
+BoxGeometry.prototype = Object.create( Geometry.prototype );
+BoxGeometry.prototype.constructor = BoxGeometry;
 
-THREE.CubeGeometry = THREE.BoxGeometry;
+CubeGeometry = BoxGeometry;
+
+
+export { CubeGeometry, BoxGeometry };

@@ -1,10 +1,13 @@
+import { Light } from './Light';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color, intensity ) {
+function AmbientLight ( color, intensity ) {
+	this.isAmbientLight = true;
 
-	THREE.Light.call( this, color, intensity );
+	Light.call( this, color, intensity );
 
 	this.type = 'AmbientLight';
 
@@ -12,8 +15,11 @@ THREE.AmbientLight = function ( color, intensity ) {
 
 };
 
-THREE.AmbientLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
+AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	constructor: THREE.AmbientLight
+	constructor: AmbientLight
 
 } );
+
+
+export { AmbientLight };

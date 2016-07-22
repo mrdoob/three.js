@@ -1,8 +1,11 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+
 /**
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, properties, info ) {
+function WebGLGeometries ( gl, properties, info ) {
+	this.isWebGLGeometries = true;
 
 	var geometries = {};
 
@@ -20,15 +23,15 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 		var buffergeometry;
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( (geometry && geometry.isBufferGeometry) ) {
 
 			buffergeometry = geometry;
 
-		} else if ( geometry instanceof THREE.Geometry ) {
+		} else if ( (geometry && geometry.isGeometry) ) {
 
 			if ( geometry._bufferGeometry === undefined ) {
 
-				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
 
 			}
 
@@ -91,7 +94,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
@@ -126,7 +129,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	function removeAttributeBuffer( attribute ) {
 
-		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
 
 			properties.delete( attribute.data );
 
@@ -141,3 +144,6 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 	this.get = get;
 
 };
+
+
+export { WebGLGeometries };

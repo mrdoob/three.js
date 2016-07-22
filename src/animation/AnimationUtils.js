@@ -1,15 +1,17 @@
+var AnimationUtils;
+
 /**
  * @author tschw
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationUtils = {
+AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function( array, from, to ) {
 
-		if ( THREE.AnimationUtils.isTypedArray( array ) ) {
+		if ( AnimationUtils.isTypedArray( array ) ) {
 
 			return new array.constructor( array.subarray( from, to ) );
 
@@ -157,3 +159,6 @@ THREE.AnimationUtils = {
 	}
 
 };
+
+
+export { AnimationUtils };
