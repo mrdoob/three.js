@@ -15,7 +15,6 @@ import { Path } from './Path';
 // STEP 3b - Triangulate each shape, add faces.
 
 function Shape() {
-	this.isShape = true;
 
 	Path.apply( this, arguments );
 

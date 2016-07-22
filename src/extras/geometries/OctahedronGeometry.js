@@ -5,7 +5,6 @@ import { PolyhedronGeometry } from './PolyhedronGeometry';
  */
 
 function OctahedronGeometry( radius, detail ) {
-	this.isOctahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
 	var vertices = [
 		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1

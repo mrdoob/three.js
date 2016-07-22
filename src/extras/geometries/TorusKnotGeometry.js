@@ -6,7 +6,6 @@ import { TorusKnotBufferGeometry } from './TorusKnotBufferGeometry';
  */
 
 function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
-	this.isTorusKnotGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

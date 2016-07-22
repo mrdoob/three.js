@@ -7,7 +7,6 @@ import { CurveUtils } from '../CurveUtils';
  **************************************************************/
 
 function SplineCurve( points /* array of Vector2 */ ) {
-	this.isSplineCurve = this.isCurve = true;
 
 	this.points = ( points == undefined ) ? [] : points;
 
@@ -15,6 +14,8 @@ function SplineCurve( points /* array of Vector2 */ ) {
 
 SplineCurve.prototype = Object.create( Curve.prototype );
 SplineCurve.prototype.constructor = SplineCurve;
+
+SplineCurve.prototype.isSplineCurve = true;
 
 SplineCurve.prototype.getPoint = function ( t ) {
 

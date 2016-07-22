@@ -5,7 +5,6 @@ import { Vector3 } from './Vector3';
  */
 
 function Ray( origin, direction ) {
-	this.isRay = true;
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();
 	this.direction = ( direction !== undefined ) ? direction : new Vector3();

@@ -5,7 +5,6 @@ import { PolyhedronGeometry } from './PolyhedronGeometry';
  */
 
 function IcosahedronGeometry( radius, detail ) {
-	this.isIcosahedronGeometry = this.isPolyhedronGeometry = this.isGeometry = true;
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 

@@ -3,7 +3,6 @@
  */
 
 function Layers() {
-	this.isLayers = true;
 
 	this.mask = 1;
 

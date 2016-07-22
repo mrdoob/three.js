@@ -54,7 +54,6 @@ import { Color } from '../math/Color';
  */
 
 function MeshPhongMaterial( parameters ) {
-	this.isMeshPhongMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -110,6 +109,8 @@ function MeshPhongMaterial( parameters ) {
 
 MeshPhongMaterial.prototype = Object.create( Material.prototype );
 MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;
+
+MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
 MeshPhongMaterial.prototype.copy = function ( source ) {
 

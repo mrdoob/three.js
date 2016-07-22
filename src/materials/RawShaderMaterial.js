@@ -5,7 +5,6 @@ import { ShaderMaterial } from './ShaderMaterial';
  */
 
 function RawShaderMaterial( parameters ) {
-	this.isRawShaderMaterial = this.isShaderMaterial = this.isMaterial = true;
 
 	ShaderMaterial.call( this, parameters );
 
@@ -15,6 +14,8 @@ function RawShaderMaterial( parameters ) {
 
 RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
 RawShaderMaterial.prototype.constructor = RawShaderMaterial;
+
+RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
 
 export { RawShaderMaterial };

@@ -22,7 +22,6 @@
 
 function Interpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-	this.isInterpolant = true;
 
 	this.parameterPositions = parameterPositions;
 	this._cachedIndex = 0;

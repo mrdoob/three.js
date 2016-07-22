@@ -6,7 +6,6 @@ import { Vector4 } from '../../math/Vector4';
 */
 
 function WebGLState( gl, extensions, paramThreeToGL ) {
-	this.isWebGLState = true;
 
 	var _this = this;
 
@@ -642,7 +641,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 };
 
 function WebGLColorBuffer( gl, state ) {
-	this.isWebGLColorBuffer = true;
 
 	var locked = false;
 
@@ -692,7 +690,6 @@ function WebGLColorBuffer( gl, state ) {
 };
 
 function WebGLDepthBuffer( gl, state ) {
-	this.isWebGLDepthBuffer = true;
 
 	var locked = false;
 
@@ -821,7 +818,6 @@ function WebGLDepthBuffer( gl, state ) {
 };
 
 function WebGLStencilBuffer( gl, state ) {
-	this.isWebGLStencilBuffer = true;
 
 	var locked = false;
 

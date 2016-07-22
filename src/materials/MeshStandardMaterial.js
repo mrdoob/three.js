@@ -54,7 +54,6 @@ import { Color } from '../math/Color';
  */
 
 function MeshStandardMaterial( parameters ) {
-	this.isMeshStandardMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -114,6 +113,8 @@ function MeshStandardMaterial( parameters ) {
 
 MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
+
+MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 MeshStandardMaterial.prototype.copy = function ( source ) {
 

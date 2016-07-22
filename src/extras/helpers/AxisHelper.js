@@ -10,7 +10,6 @@ import { BufferGeometry } from '../../core/BufferGeometry';
  */
 
 function AxisHelper( size ) {
-	this.isAxisHelper = this.isLineSegments = true;
 
 	size = size || 1;
 

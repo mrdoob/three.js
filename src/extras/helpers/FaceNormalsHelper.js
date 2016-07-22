@@ -11,7 +11,6 @@ import { BufferGeometry } from '../../core/BufferGeometry';
 */
 
 function FaceNormalsHelper( object, size, hex, linewidth ) {
-	this.isFaceNormalsHelper = this.isLineSegments = true;
 
 	// FaceNormalsHelper only supports THREE.Geometry
 

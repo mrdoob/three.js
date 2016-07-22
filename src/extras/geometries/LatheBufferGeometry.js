@@ -16,7 +16,6 @@ import { _Math } from '../../math/Math';
  //    2PI is a closed lathe, less than 2PI is a portion.
 
 function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
-	this.isLatheBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

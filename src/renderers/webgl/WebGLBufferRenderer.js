@@ -3,7 +3,6 @@
 */
 
 function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
-	this.isWebGLBufferRenderer = true;
 
 	var mode;
 

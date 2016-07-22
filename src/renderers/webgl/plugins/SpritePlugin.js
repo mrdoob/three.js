@@ -8,7 +8,6 @@ import { Quaternion } from '../../../math/Quaternion';
  */
 
 function SpritePlugin( renderer, sprites ) {
-	this.isSpritePlugin = true;
 
 	var gl = renderer.context;
 	var state = renderer.state;

@@ -7,7 +7,6 @@ import { Vector3 } from '../../math/Vector3';
  */
 
 function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-	this.isTorusBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

@@ -9,7 +9,6 @@ import { BufferGeometry } from '../../core/BufferGeometry';
  */
 
 function BoxHelper( object, color ) {
-	this.isBoxHelper = this.isLineSegments = true;
 
 	if ( color === undefined ) color = 0xffff00;
 

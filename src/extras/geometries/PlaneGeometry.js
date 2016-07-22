@@ -7,7 +7,6 @@ import { PlaneBufferGeometry } from './PlaneBufferGeometry';
  */
 
 function PlaneGeometry( width, height, widthSegments, heightSegments ) {
-	this.isPlaneGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

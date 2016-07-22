@@ -6,7 +6,6 @@ import { Vector2 } from '../math/Vector2';
  */
 
 function LightShadow( camera ) {
-	this.isLightShadow = true;
 
 	this.camera = camera;
 

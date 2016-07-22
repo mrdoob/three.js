@@ -16,7 +16,6 @@ import { GeometryIdCount } from './Geometry';
  */
 
 function BufferGeometry() {
-	this.isBufferGeometry = true;
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
@@ -40,6 +39,8 @@ function BufferGeometry() {
 };
 
 Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+
+	isBufferGeometry: true,
 
 	getIndex: function () {
 

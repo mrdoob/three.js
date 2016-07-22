@@ -14,7 +14,6 @@ import { _Math } from '../math/Math';
  */
 
 function AnimationClip( name, duration, tracks ) {
-	this.isAnimationClip = true;
 
 	this.name = name;
 	this.tracks = tracks;

@@ -8,7 +8,6 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  */
 
 function ShadowMaterial() {
-	this.isShadowMaterial = this.isShaderMaterial = this.isMaterial = true;
 
 	ShaderMaterial.call( this, {
 		uniforms: UniformsUtils.merge( [
@@ -17,7 +16,7 @@ function ShadowMaterial() {
 				opacity: { value: 1.0 }
 			}
 		] ),
-		vertexShader: ShaderChunk[ 'shadow_vert' ], 
+		vertexShader: ShaderChunk[ 'shadow_vert' ],
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );
 
@@ -40,6 +39,8 @@ function ShadowMaterial() {
 
 ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
 ShadowMaterial.prototype.constructor = ShadowMaterial;
+
+ShadowMaterial.prototype.isShadowMaterial = true;
 
 
 export { ShadowMaterial };

@@ -12,7 +12,6 @@ import { Material } from './Material';
  */
 
 function MeshNormalMaterial( parameters ) {
-	this.isMeshNormalMaterial = this.isMaterial = true;
 
 	Material.call( this, parameters );
 
@@ -31,6 +30,8 @@ function MeshNormalMaterial( parameters ) {
 
 MeshNormalMaterial.prototype = Object.create( Material.prototype );
 MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
+
+MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 
 MeshNormalMaterial.prototype.copy = function ( source ) {
 

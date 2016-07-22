@@ -7,7 +7,6 @@ import { Object3D } from '../core/Object3D';
  */
 
 function OrthographicCamera( left, right, top, bottom, near, far ) {
-	this.isOrthographicCamera = true;
 
 	Camera.call( this );
 
@@ -31,6 +30,8 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
 	constructor: OrthographicCamera,
+
+	isOrthographicCamera: true,
 
 	copy: function ( source ) {
 

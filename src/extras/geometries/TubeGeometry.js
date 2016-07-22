@@ -20,7 +20,6 @@ import { Vector2 } from '../../math/Vector2';
  */
 
 function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
-	this.isTubeGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

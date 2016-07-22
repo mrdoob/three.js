@@ -17,7 +17,6 @@ import { Color } from '../math/Color';
  */
 
 function LineDashedMaterial( parameters ) {
-	this.isLineDashedMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -39,6 +38,8 @@ function LineDashedMaterial( parameters ) {
 
 LineDashedMaterial.prototype = Object.create( Material.prototype );
 LineDashedMaterial.prototype.constructor = LineDashedMaterial;
+
+LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
 LineDashedMaterial.prototype.copy = function ( source ) {
 

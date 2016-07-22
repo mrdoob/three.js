@@ -12,7 +12,6 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
  */
 
 function VectorKeyframeTrack( name, times, values, interpolation ) {
-	this.isVectorKeyframeTrack = true;
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 

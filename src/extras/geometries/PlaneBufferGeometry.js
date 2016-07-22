@@ -7,7 +7,6 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  */
 
 function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
-	this.isPlaneBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

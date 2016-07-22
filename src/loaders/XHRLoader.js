@@ -6,7 +6,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function XHRLoader( manager ) {
-	this.isXHRLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

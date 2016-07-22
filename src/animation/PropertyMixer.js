@@ -11,7 +11,6 @@ import { Quaternion } from '../math/Quaternion';
  */
 
 function PropertyMixer( binding, typeName, valueSize ) {
-	this.isPropertyMixer = true;
 
 	this.binding = binding;
 	this.valueSize = valueSize;

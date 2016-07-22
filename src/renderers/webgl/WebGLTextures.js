@@ -6,7 +6,6 @@ import { _Math } from '../../math/Math';
 */
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
-	this.isWebGLTextures = true;
 
 	var _infoMemory = info.memory;
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );

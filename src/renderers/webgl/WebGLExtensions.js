@@ -3,7 +3,6 @@
 */
 
 function WebGLExtensions( gl ) {
-	this.isWebGLExtensions = true;
 
 	var extensions = {};
 

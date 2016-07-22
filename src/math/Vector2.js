@@ -6,7 +6,6 @@
  */
 
 function Vector2( x, y ) {
-	this.isVector2 = true;
 
 	this.x = x || 0;
 	this.y = y || 0;
@@ -16,6 +15,8 @@ function Vector2( x, y ) {
 Vector2.prototype = {
 
 	constructor: Vector2,
+
+	isVector2: true,
 
 	get width() {
 

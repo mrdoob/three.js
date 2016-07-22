@@ -9,7 +9,6 @@
  */
 
 function PropertyBinding( rootNode, path, parsedPath ) {
-	this.isPropertyBinding = true;
 
 	this.path = path;
 	this.parsedPath = parsedPath ||

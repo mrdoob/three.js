@@ -11,7 +11,6 @@ import { _Math } from '../math/Math';
  */
 
 function Skeleton( bones, boneInverses, useVertexTexture ) {
-	this.isSkeleton = true;
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 

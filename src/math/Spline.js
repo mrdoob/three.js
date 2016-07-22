@@ -9,7 +9,6 @@ import { Vector3 } from './Vector3';
  */
 
 function Spline( points ) {
-	this.isSpline = true;
 
 	this.points = points;
 

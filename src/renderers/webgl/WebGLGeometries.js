@@ -5,7 +5,6 @@ import { BufferGeometry } from '../../core/BufferGeometry';
 */
 
 function WebGLGeometries( gl, properties, info ) {
-	this.isWebGLGeometries = true;
 
 	var geometries = {};
 

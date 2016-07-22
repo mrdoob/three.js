@@ -7,7 +7,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function AudioLoader( manager ) {
-	this.isAudioLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

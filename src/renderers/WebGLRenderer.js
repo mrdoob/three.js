@@ -40,7 +40,6 @@ import { Color } from '../math/Color';
  */
 
 function WebGLRenderer( parameters ) {
-	this.isWebGLRenderer = true;
 
 	console.log( 'THREE.WebGLRenderer', "80dev" );
 
@@ -2812,6 +2811,5 @@ function WebGLRenderer( parameters ) {
 	}
 
 };
-
 
 export { WebGLRenderer };

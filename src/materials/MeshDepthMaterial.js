@@ -25,7 +25,6 @@ import { BasicDepthPacking } from '../constants';
  */
 
 function MeshDepthMaterial( parameters ) {
-	this.isMeshDepthMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -56,6 +55,8 @@ function MeshDepthMaterial( parameters ) {
 
 MeshDepthMaterial.prototype = Object.create( Material.prototype );
 MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
+
+MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 
 MeshDepthMaterial.prototype.copy = function ( source ) {
 

@@ -8,7 +8,6 @@ import { Plane } from './Plane';
  */
 
 function Triangle( a, b, c ) {
-	this.isTriangle = true;
 
 	this.a = ( a !== undefined ) ? a : new Vector3();
 	this.b = ( b !== undefined ) ? b : new Vector3();

@@ -21,7 +21,6 @@ import { Geometry } from '../../core/Geometry';
  */
 
 function TextGeometry( text, parameters ) {
-	this.isTextGeometry = this.isExtrudeGeometry = this.isGeometry = true;
 
 	parameters = parameters || {};
 

@@ -36,7 +36,6 @@ import { Color } from '../math/Color';
  */
 
 function MeshBasicMaterial( parameters ) {
-	this.isMeshBasicMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -74,6 +73,8 @@ function MeshBasicMaterial( parameters ) {
 
 MeshBasicMaterial.prototype = Object.create( Material.prototype );
 MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
+
+MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
 MeshBasicMaterial.prototype.copy = function ( source ) {
 

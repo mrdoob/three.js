@@ -7,13 +7,14 @@ import { ShapePath } from './Path';
  */
 
 function Font( data ) {
-	this.isFont = true;
 
 	this.data = data;
 
 };
 
 Object.assign( Font.prototype, {
+
+	isFont: true,
 
 	generateShapes: function ( text, size, divisions ) {
 

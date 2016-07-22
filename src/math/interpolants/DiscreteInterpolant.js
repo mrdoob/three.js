@@ -10,7 +10,6 @@ import { Interpolant } from '../Interpolant';
 
 function DiscreteInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-	this.isDiscreteInterpolant = true;
 
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );

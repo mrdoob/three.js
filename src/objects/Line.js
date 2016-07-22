@@ -12,7 +12,6 @@ import { LineSegments } from './LineSegments';
  */
 
 function Line( geometry, material, mode ) {
-	this.isLine = true;
 
 	if ( mode === 1 ) {
 
@@ -33,6 +32,8 @@ function Line( geometry, material, mode ) {
 Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Line,
+
+	isLine: true,
 
 	raycast: ( function () {
 

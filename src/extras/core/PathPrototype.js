@@ -6,9 +6,7 @@ import { CubicBezierCurve } from '../curves/CubicBezierCurve';
 import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve';
 import { LineCurve } from '../curves/LineCurve';
 
-var PathPrototype;
-
-PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
+var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 	fromPoints: function ( vectors ) {
 

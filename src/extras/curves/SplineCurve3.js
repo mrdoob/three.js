@@ -2,14 +2,12 @@ import { Vector3 } from '../../math/Vector3';
 import { CurveUtils } from '../CurveUtils';
 import { Curve } from '../core/Curve';
 
-var SplineCurve3;
-
 /**************************************************************
  *	Spline 3D curve
  **************************************************************/
 
 
-SplineCurve3 = Curve.create(
+var SplineCurve3 = Curve.create(
 
 	function ( points /* array of Vector3 */ ) {
 

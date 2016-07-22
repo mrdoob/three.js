@@ -3,7 +3,6 @@
 */
 
 function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
-	this.isWebGLIndexedBufferRenderer = true;
 
 	var mode;
 

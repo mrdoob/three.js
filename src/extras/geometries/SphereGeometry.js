@@ -6,7 +6,6 @@ import { SphereBufferGeometry } from './SphereBufferGeometry';
  */
 
 function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-	this.isSphereGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

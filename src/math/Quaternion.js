@@ -8,7 +8,6 @@ import { Vector3 } from './Vector3';
  */
 
 function Quaternion( x, y, z, w ) {
-	this.isQuaternion = true;
 
 	this._x = x || 0;
 	this._y = y || 0;

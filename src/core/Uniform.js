@@ -3,7 +3,6 @@
  */
 
 function Uniform( value ) {
-	this.isUniform = true;
 
 	if ( typeof value === 'string' ) {
 

@@ -14,7 +14,6 @@ import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants';
 
 function CubicInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
-	this.isCubicInterpolant = true;
 
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );

@@ -7,7 +7,6 @@ import { Sphere } from './Sphere';
  */
 
 function Box3( min, max ) {
-	this.isBox3 = true;
 
 	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
 	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
@@ -17,6 +16,8 @@ function Box3( min, max ) {
 Box3.prototype = {
 
 	constructor: Box3,
+
+	isBox3: true,
 
 	set: function ( min, max ) {
 

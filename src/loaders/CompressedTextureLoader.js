@@ -10,7 +10,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function CompressedTextureLoader( manager ) {
-	this.isCompressedTextureLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

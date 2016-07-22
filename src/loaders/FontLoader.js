@@ -7,7 +7,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function FontLoader( manager ) {
-	this.isFontLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

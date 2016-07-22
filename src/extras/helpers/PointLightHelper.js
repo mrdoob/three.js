@@ -8,7 +8,6 @@ import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry';
  */
 
 function PointLightHelper( light, sphereSize ) {
-	this.isPointLightHelper = this.isMesh = true;
 
 	this.light = light;
 	this.light.updateMatrixWorld();

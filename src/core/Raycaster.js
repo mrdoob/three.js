@@ -7,7 +7,6 @@ import { Ray } from '../math/Ray';
  */
 
 function Raycaster( origin, direction, near, far ) {
-	this.isRaycaster = true;
 
 	this.ray = new Ray( origin, direction );
 	// direction is assumed to be normalized (for accurate distance calculations)

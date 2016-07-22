@@ -10,7 +10,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function BufferGeometryLoader( manager ) {
-	this.isBufferGeometryLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

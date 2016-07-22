@@ -6,7 +6,6 @@ import { NearestFilter, UnsignedShortType, DepthFormat } from '../constants';
  */
 
 function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
-	this.isDepthTexture = this.isTexture = true;
 
   Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
 
@@ -25,5 +24,6 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 DepthTexture.prototype = Object.create( Texture.prototype );
 DepthTexture.prototype.constructor = DepthTexture;
 
+DepthTexture.prototype.isDepthTexture = true;
 
 export { DepthTexture };

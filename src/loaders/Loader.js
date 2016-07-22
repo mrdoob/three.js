@@ -9,7 +9,6 @@ import { Color } from '../math/Color';
  */
 
 function Loader() {
-	this.isLoader = true;
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
