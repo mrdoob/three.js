@@ -1,16 +1,22 @@
+import { Vector4 } from '../../math/Vector4';
+import { Color } from '../../math/Color';
+import { Vector2 } from '../../math/Vector2';
+
+var UniformsLib;
+
 /**
  * Uniforms library for shared webgl shaders
  */
 
-THREE.UniformsLib = {
+UniformsLib = {
 
 	common: {
 
-		"diffuse": { value: new THREE.Color( 0xeeeeee ) },
+		"diffuse": { value: new Color( 0xeeeeee ) },
 		"opacity": { value: 1.0 },
 
 		"map": { value: null },
-		"offsetRepeat": { value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) },
 
 		"specularMap": { value: null },
 		"alphaMap": { value: null },
@@ -52,7 +58,7 @@ THREE.UniformsLib = {
 	normalmap: {
 
 		"normalMap": { value: null },
-		"normalScale": { value: new THREE.Vector2( 1, 1 ) }
+		"normalScale": { value: new Vector2( 1, 1 ) }
 
 	},
 
@@ -81,7 +87,7 @@ THREE.UniformsLib = {
 		"fogDensity": { value: 0.00025 },
 		"fogNear": { value: 1 },
 		"fogFar": { value: 2000 },
-		"fogColor": { value: new THREE.Color( 0xffffff ) }
+		"fogColor": { value: new Color( 0xffffff ) }
 
 	},
 
@@ -145,13 +151,16 @@ THREE.UniformsLib = {
 
 	points: {
 
-		"diffuse": { value: new THREE.Color( 0xeeeeee ) },
+		"diffuse": { value: new Color( 0xeeeeee ) },
 		"opacity": { value: 1.0 },
 		"size": { value: 1.0 },
 		"scale": { value: 1.0 },
 		"map": { value: null },
-		"offsetRepeat": { value: new THREE.Vector4( 0, 0, 1, 1 ) }
+		"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) }
 
 	}
 
 };
+
+
+export { UniformsLib };

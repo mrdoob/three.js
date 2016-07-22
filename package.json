@@ -20,9 +20,9 @@
     "test": "test"
   },
   "scripts": {
-    "build": "node utils/build/build.js --include common --include extras",
-    "build-min": "node utils/build/build.js --include common --include extras --minify",
-    "dev": "chokidar \"./src/**/*.*\" \"./utils/build/includes/*.*\" --initial -c \"npm run build\"",
+    "build": "rollup -c",
+    "build-min": "rollup -c && uglifyjs build/three.js -cm > build/three.min.js",
+    "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -45,6 +45,8 @@
     "argparse": "^1.0.3",
     "chokidar-cli": "1.2.0",
     "jscs": "^1.13.1",
+    "rollup": "^0.33.1",
+    "rollup-plugin-string": "^2.0.2",
     "uglify-js": "^2.6.0"
   }
 }
