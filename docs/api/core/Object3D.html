@@ -135,7 +135,7 @@
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
 		<div>
-		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
+		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform. Suppose c is a grandchild of a, a -> b -> c, then c.matrixWorld = a.matrix * b.matrix * c.matrix.
 		</div>
 
 
