@@ -24,26 +24,51 @@ SceneUtils = {
 
 	},
 
-	detach: function ( child, parent, scene ) {
 
-		child.applyMatrix( parent.matrixWorld );
-		parent.remove( child );
-		scene.add( child );
+	updateWorldMatrixHard: function ( obj ) {
+
+		var a_matrix = new Matrix4();
+
+		obj.matrixWorld.identity();
+
+		for ( var a = obj; a !== null; a = a.parent){
+
+			a_matrix.compose( a.position, a.quaternion, a.scale );
+
+			obj.matrixWorld.premultiply( a_matrix );
+
+		}
 
 	},
 
-	attach: function ( child, scene, parent ) {
+	detach: function ( child ) {
 
-		var matrixWorldInverse = new Matrix4();
-		matrixWorldInverse.getInverse( parent.matrixWorld );
-		child.applyMatrix( matrixWorldInverse );
+		if (child.parent == null) return;
 
-		scene.remove( child );
-		parent.add( child );
+		SceneUtils.updateWorldMatrixHard( child );
+		
+		child.matrix.copy( child.matrixWorld );
+
+		child.matrix.decompose( child.position, child.quaternion, child.scale );
+
+		child.parent.remove( child )
+	
+	},
+
+	attach: function ( child, parent ) {
+
+		SceneUtils.updateWorldMatrixHard( child );
+
+		SceneUtils.updateWorldMatrixHard( parent );
+
+		child.matrix.getInverse( parent.matrixWorld ).multiply( child.matrixWorld  );
+		 
+		child.matrix.decompose( child.position, child.quaternion, child.scale );
+
+		parent.add( child )
 
 	}
 
-};
-
+}
 
 export { SceneUtils };
