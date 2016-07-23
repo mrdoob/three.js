@@ -34,6 +34,7 @@ Object.assign( THREE.ImageLoader.prototype, {
 			var loader = new THREE.XHRLoader();
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
+			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( blob ) {
 
 				image.src = URL.createObjectURL( blob );
@@ -51,6 +52,13 @@ Object.assign( THREE.ImageLoader.prototype, {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
 		return this;
 
 	},
