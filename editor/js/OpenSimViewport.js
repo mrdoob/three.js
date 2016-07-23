@@ -19,18 +19,11 @@ var OpenSimViewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 500, 25 );
-	sceneHelpers.add( grid );
-	grid.visible = false;
-
-	createBackground(scene, 'sky');
-	createGroundPlane('redbricks');
-	//
-	createLights();
+	//var grid = new THREE.GridHelper( 500, 25 );
+	//sceneHelpers.add( grid );
+	//grid.visible = false;
 	
 	var camera = editor.camera;
-
-	//
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
@@ -286,15 +279,15 @@ var OpenSimViewport = function ( editor ) {
 		switch ( value ) {
 
 			case 'css/light.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
-				sceneHelpers.add( grid );
+				//sceneHelpers.remove( grid );
+				//grid = new THREE.GridHelper( 30, 1, 0x444444, 0x888888 );
+				//sceneHelpers.add( grid );
 				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
-				sceneHelpers.add( grid );
+				//sceneHelpers.remove( grid );
+				//grid = new THREE.GridHelper( 30, 1, 0xbbbbbb, 0x888888 );
+				//sceneHelpers.add( grid );
 				clearColor = 0x333333;
 				break;
 
@@ -631,40 +624,6 @@ var OpenSimViewport = function ( editor ) {
 
 		}
 
-	}
-	function createBackground(scene, choice) {
-	    // load the cube textures
-	    // you need to create an instance of the loader...
-	    var textureloader = new THREE.CubeTextureLoader().setPath('images/'+choice+'/');
-	    // and then set your CORS config
-	    textureloader.load( ["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"] );
-	    textureloader.mapping = THREE.CubeRefactionMapping;
-	    scene.background = textureloader;
-	}
-	function createGroundPlane(choice) {
-		var textureLoader = new THREE.TextureLoader();
-		var texture1 = textureLoader.load( "textures/"+choice+".jpg" );
-		var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
-		texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
-		texture1.repeat.set( 128, 128 );
-		var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-		groundPlane = new THREE.Mesh( geometry, material1 );
-		groundPlane.name = 'GroundPlane';
-		groundPlane.rotation.x = - Math.PI / 2;
-		groundPlane.position.y = -.01;
-		groundPlane.scale.set( 500, 500, 500 );
-		groundPlane.receiveShadow = true;
-		this.editor.addObject(groundPlane);
-		this.editor.groundPlane = groundPlane;
-	}
-	function createLights() {
-		amb = new THREE.AmbientLight(0x000000);
-		amb.name = 'AmbientLight';
-		this.editor.addObject(amb);
-		directionalLight =  new THREE.DirectionalLight( {color: 16777215});
-		directionalLight.castShadow = false;
-		directionalLight.name = 'DirectionalLight';
-		this.editor.addObject(directionalLight);
 	}
 	return container;
 

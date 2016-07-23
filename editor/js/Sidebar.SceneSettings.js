@@ -7,8 +7,8 @@ Sidebar.SceneSettings = function (editor) {
     var config = editor.config;
     var signals = editor.signals;
 
-    var backdrops = {
-        'nobackdrop': 'No Backdrop',
+    var backgrounds = {
+        'nobackground': 'No Background',
         'sky': 'Sky',
         'desert': 'Desert'
     };
@@ -32,24 +32,24 @@ Sidebar.SceneSettings = function (editor) {
     container.addStatic(new UI.Text('SCENE SETTINGS'));
     container.add(new UI.Break());
 
-    // Backdrop
+    // Background
 
-    var backdropTypeRow = new UI.Panel();
-    var backdropType = new UI.Select().setOptions(backdrops).setWidth('150px').onChange(function () {
+    var backgroundTypeRow = new UI.Panel();
+    var backgroundType = new UI.Select().setOptions(backgrounds).setWidth('150px').onChange(function () {
 
         var value = this.getValue();
 
 
-        config.setKey('backdrop', value);
+        config.setKey('background', value);
 
         // change  editor.config
-        editor.updateBackdrop(value);
+        editor.updateBackground(value);
     });
 
-    backdropTypeRow.add(new UI.Text('Backdrop').setWidth('90px'));
-    backdropTypeRow.add(backdropType);
+    backgroundTypeRow.add(new UI.Text('Background').setWidth('90px'));
+    backgroundTypeRow.add(backgroundType);
 
-    container.add(backdropTypeRow);
+    container.add(backgroundTypeRow);
 
     // Floor
     var floorTypeRow = new UI.Panel();
@@ -60,10 +60,10 @@ Sidebar.SceneSettings = function (editor) {
 
         config.setKey('floor', value);
         // change  editor.config
-        editor.updateFloor(value);
+        editor.updateGroundPlane(value);
     });
 
-    floorTypeRow.add(new UI.Text('Floor').setWidth('90px'));
+    floorTypeRow.add(new UI.Text('Ground').setWidth('90px'));
     floorTypeRow.add(floorType);
 
     container.add(floorTypeRow);

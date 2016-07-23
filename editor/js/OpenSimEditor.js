@@ -95,9 +95,14 @@ var OpenSimEditor = function () {
 
 	this.selected = null;
 	this.helpers = {};
+	
 	this.groundPlane = null;
-	this.textureCube = null;
 	this.groundMaterial = null;
+	
+	this.createLights();
+	this.createBackground('sky');
+	this.createGroundPlane('redbricks');
+
 };
 
 OpenSimEditor.prototype = {
@@ -535,73 +540,57 @@ OpenSimEditor.prototype = {
 
 	},
 
-	createBackdrop: function(choice) {
-		// load the cube textures
-		var urlPrefix = "images/" + choice + "/";
-		var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
-		urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
-		urlPrefix + "pz.jpg", urlPrefix + "nz.jpg"];
-		this.textureCube = THREE.ImageUtils.loadTextureCube(urls);
-
-		// init the cube shadder
-		var shader = THREE.ShaderLib['cube'];
-		var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-		uniforms['tCube'].value = this.textureCube;
-		var material = new THREE.ShaderMaterial({
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: uniforms,
-			depthWrite: false,
-			side: THREE.DoubleSide
-		});
+	createBackground: function(choice) {
+	    // load the cube textures
+	    // you need to create an instance of the loader...
+	    var textureloader = new THREE.CubeTextureLoader();
+	    var path = 'images/'+choice+'/';
+	    textureloader.setPath(path);
+	    // and then set your CORS config
+	    var textureCube = textureloader.load( ["px.jpg",
+		"nx.jpg", "py.jpg", "ny.jpg", 
+		"pz.jpg", "nz.jpg"] );
+	    textureCube.format = THREE.RGBFormat;
+	    textureloader.mapping = THREE.CubeRefactionMapping;
+	    this.scene.background = textureCube;
 	},
-
-	updateBackdrop: function (choice) {
-		if (choice == 'nobackdrop') {
-		    this.skyboxMesh.visible = false;
-		    this.signals.objectChanged.dispatch( skyboxMesh );
-		    return;
-		}
-		/*
-		this.skyboxMesh.visible = true;
-		var urlPrefix = "images/" + choice + "/";
-				var urls = [urlPrefix + "px.jpg", urlPrefix + "nx.jpg",
-				urlPrefix + "py.jpg", urlPrefix + "ny.jpg",
-				urlPrefix + "pz.jpg", urlPrefix + "nz.jpg"];
-		this.textureCube = THREE.ImageUtils.loadTextureCube(urls);
-		var shader = THREE.ShaderLib['cube'];
-		var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-		uniforms['tCube'].value = this.textureCube;
-		var material = new THREE.ShaderMaterial({
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: uniforms,
-			depthWrite: false,
-			side: THREE.DoubleSide
-		});
-		this.skyboxMesh.material = material;
-		this.signals.materialChanged.dispatch( this.skyboxMesh );
-		*/
-	},
-
-	createGroundPlane: function (choice) {
+	
+	createGroundPlane: function(choice) {
 		var textureLoader = new THREE.TextureLoader();
-		var texture1 = textureLoader.load("textures/"+choice);
+		var texture1 = textureLoader.load( "textures/"+choice+".jpg" );
+		var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 		texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
-		texture1.repeat.set(128, 128);
-		this.groundMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, map: texture1 });
-		var geometry = new THREE.PlaneBufferGeometry(100, 100);
-		groundPlane = new THREE.Mesh(geometry, this.groundMaterial);
+		texture1.repeat.set( 128, 128 );
+		var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+		groundPlane = new THREE.Mesh( geometry, material1 );
 		groundPlane.name = 'GroundPlane';
-		groundPlane.rotation.x = -Math.PI / 2;
+		groundPlane.rotation.x = - Math.PI / 2;
 		groundPlane.position.y = -.01;
-		groundPlane.scale.set(500, 500, 500);
+		groundPlane.scale.set( 500, 500, 500 );
 		groundPlane.receiveShadow = true;
 		this.addObject(groundPlane);
 		this.groundPlane = groundPlane;
 	},
+	createLights: function () {
+		amb = new THREE.AmbientLight(0x000000);
+		amb.name = 'AmbientLight';
+		this.addObject(amb);
+		directionalLight =  new THREE.DirectionalLight( {color: 16777215});
+		directionalLight.castShadow = false;
+		directionalLight.name = 'DirectionalLight';
+		this.addObject(directionalLight);
+	},
+	updateBackground: function (choice) {
+		if (choice == 'nobackground') {
+		    //this.skyboxMesh.visible = false;
+		    this.scene.background = null;
+		    this.signals.objectChanged.dispatch( this.scene.background );
+		    return;
+		}
+		this.createBackground(choice);
+	},
 
-	updateFloor: function (choice) {
+	updateGroundPlane: function (choice) {
 		if (choice == 'nofloor') {
 		    this.groundPlane.visible = false;
 		    this.signals.objectChanged.dispatch( groundPlane );
