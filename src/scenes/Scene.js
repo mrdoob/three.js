@@ -45,9 +45,6 @@ Scene.prototype.toJSON = function ( meta ) {
 		
 		data.object.fog = this.fog.toJSON();
 
-<<<<<<< HEAD
-export { Scene };
-=======
 	}
 
 	return data;
@@ -55,4 +52,3 @@ export { Scene };
 };
 	
 export { Scene };
->>>>>>> adds toJSON methods to scene and fog objects
