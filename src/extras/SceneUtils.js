@@ -25,17 +25,19 @@ SceneUtils = {
 	},
 
 
-	updateWorldMatrixHard: function ( obj ) {
+	updateMatrixWorldOfAncestors: function ( obj ) {
 
-		var a_matrix = new Matrix4();
+		var ancestors = [];
 
-		obj.matrixWorld.identity();
+		for ( var a = obj; a !== null; a = a.parent) ancestors.push( a );
 
-		for ( var a = obj; a !== null; a = a.parent){
+		for ( var a = ancestors.pop() ; a !== undefined ; a = ancestors.pop() ){
 
-			a_matrix.compose( a.position, a.quaternion, a.scale );
+			a.matrix.compose( a.position, a.quaternion, a.scale );
 
-			obj.matrixWorld.premultiply( a_matrix );
+			if ( a.parent === null) a.matrixWorld.copy ( a.matrix );
+
+			if ( a.parent !== null) a.matrixWorld.multiplyMatrices( a.parent.matrixWorld, a.matrix );
 
 		}
 
@@ -45,7 +47,7 @@ SceneUtils = {
 
 		if (child.parent == null) return;
 
-		SceneUtils.updateWorldMatrixHard( child );
+		SceneUtils.updateMatrixWorldOfAncestors( child );
 		
 		child.matrix.copy( child.matrixWorld );
 
@@ -57,9 +59,9 @@ SceneUtils = {
 
 	attach: function ( child, parent ) {
 
-		SceneUtils.updateWorldMatrixHard( child );
+		SceneUtils.updateMatrixWorldOfAncestors( child );
 
-		SceneUtils.updateWorldMatrixHard( parent );
+		SceneUtils.updateMatrixWorldOfAncestors( parent );
 
 		child.matrix.getInverse( parent.matrixWorld ).multiply( child.matrixWorld  );
 		 
