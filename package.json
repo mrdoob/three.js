@@ -47,6 +47,7 @@
     "chokidar-cli": "1.2.0",
     "jscs": "^1.13.1",
     "rollup": "^0.34.8",
+    "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
   }
 }
