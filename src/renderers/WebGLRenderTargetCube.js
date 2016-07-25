@@ -5,7 +5,6 @@ import { WebGLRenderTarget } from './WebGLRenderTarget';
  */
 
 function WebGLRenderTargetCube( width, height, options ) {
-	this.isWebGLRenderTargetCube = this.isWebGLRenderTarget = true;
 
 	WebGLRenderTarget.call( this, width, height, options );
 
@@ -16,6 +15,8 @@ function WebGLRenderTargetCube( width, height, options ) {
 
 WebGLRenderTargetCube.prototype = Object.create( WebGLRenderTarget.prototype );
 WebGLRenderTargetCube.prototype.constructor = WebGLRenderTargetCube;
+
+WebGLRenderTargetCube.prototype.isWebGLRenderTargetCube = true;
 
 
 export { WebGLRenderTargetCube };

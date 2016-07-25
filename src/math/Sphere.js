@@ -7,7 +7,6 @@ import { Vector3 } from './Vector3';
  */
 
 function Sphere( center, radius ) {
-	this.isSphere = true;
 
 	this.center = ( center !== undefined ) ? center : new Vector3();
 	this.radius = ( radius !== undefined ) ? radius : 0;

@@ -11,7 +11,6 @@ import { Vector2 } from '../math/Vector2';
  */
 
 function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
-	this.isTexture = true;
 
 	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
 
@@ -62,6 +61,8 @@ Texture.DEFAULT_MAPPING = UVMapping;
 Texture.prototype = {
 
 	constructor: Texture,
+
+	isTexture: true,
 
 	set needsUpdate( value ) {
 

@@ -8,7 +8,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function TextureLoader( manager ) {
-	this.isTextureLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
@@ -22,6 +21,7 @@ Object.assign( TextureLoader.prototype, {
 
 		var loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
+		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( this.path );
 		loader.load( url, function ( image ) {
 
@@ -51,12 +51,21 @@ Object.assign( TextureLoader.prototype, {
 
 	},
 
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
+		return this;
+
+	},
+
 	setPath: function ( value ) {
 
 		this.path = value;
 		return this;
 
 	}
+
+
 
 } );
 

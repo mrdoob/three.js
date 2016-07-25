@@ -5,7 +5,6 @@ import { _Math } from '../math/Math';
  */
 
 function InterleavedBuffer( array, stride ) {
-	this.isInterleavedBuffer = true;
 
 	this.uuid = _Math.generateUUID();
 
@@ -22,6 +21,8 @@ function InterleavedBuffer( array, stride ) {
 InterleavedBuffer.prototype = {
 
 	constructor: InterleavedBuffer,
+
+	isInterleavedBuffer: true,
 
 	get length () {
 

@@ -7,7 +7,6 @@ var ColorKeywords;
  */
 
 function Color( r, g, b ) {
-	this.isColor = true;
 
 	if ( g === undefined && b === undefined ) {
 
@@ -23,6 +22,8 @@ function Color( r, g, b ) {
 Color.prototype = {
 
 	constructor: Color,
+
+	isColor: true,
 
 	r: 1, g: 1, b: 1,
 

@@ -11,7 +11,6 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
  */
 
 function NumberKeyframeTrack( name, times, values, interpolation ) {
-	this.isNumberKeyframeTrack = true;
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 

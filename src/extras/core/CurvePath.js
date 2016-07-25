@@ -14,7 +14,6 @@ import { LineCurve } from '../curves/LineCurve';
  **************************************************************/
 
 function CurvePath() {
-	this.isCurvePath = true;
 
 	this.curves = [];
 

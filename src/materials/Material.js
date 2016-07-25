@@ -8,7 +8,6 @@ import { _Math } from '../math/Math';
  */
 
 function Material() {
-	this.isMaterial = true;
 
 	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
 
@@ -64,6 +63,8 @@ function Material() {
 Material.prototype = {
 
 	constructor: Material,
+
+	isMaterial: true,
 
 	get needsUpdate() {
 

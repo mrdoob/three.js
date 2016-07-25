@@ -1,14 +1,12 @@
 import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, DepthFormat } from '../constants';
+import { NearestFilter, UnsignedShortType, DepthFormat, DepthStencilFormat } from '../constants';
 
 /**
  * @author Matt DesLauriers / @mattdesl
  * @author atix / arthursilber.de
  */
 
-
 function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
-	this.isDepthTexture = this.isTexture = true;
 
   format = format !== undefined ? format : DepthFormat;
 
@@ -34,5 +32,6 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 DepthTexture.prototype = Object.create( Texture.prototype );
 DepthTexture.prototype.constructor = DepthTexture;
+DepthTexture.prototype.isDepthTexture = true;
 
 export { DepthTexture };

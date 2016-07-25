@@ -11,7 +11,6 @@ import { Sphere } from '../../math/Sphere';
 */
 
 function PolyhedronGeometry( vertices, indices, radius, detail ) {
-	this.isPolyhedronGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

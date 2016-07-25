@@ -16,7 +16,6 @@ import { Color } from '../math/Color';
  */
 
 function PointsMaterial( parameters ) {
-	this.isPointsMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -37,6 +36,8 @@ function PointsMaterial( parameters ) {
 
 PointsMaterial.prototype = Object.create( Material.prototype );
 PointsMaterial.prototype.constructor = PointsMaterial;
+
+PointsMaterial.prototype.isPointsMaterial = true;
 
 PointsMaterial.prototype.copy = function ( source ) {
 

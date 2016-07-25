@@ -7,7 +7,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function AnimationLoader( manager ) {
-	this.isAnimationLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

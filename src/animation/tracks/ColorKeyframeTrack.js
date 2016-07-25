@@ -12,7 +12,6 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
  */
 
 function ColorKeyframeTrack( name, times, values, interpolation ) {
-	this.isColorKeyframeTrack = true;
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 

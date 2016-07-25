@@ -8,7 +8,6 @@ import { Object3D } from '../core/Object3D';
  */
 
 function LOD() {
-	this.isLOD = true;
 
 	Object3D.call( this );
 

@@ -5,7 +5,6 @@ import { Object3D } from '../core/Object3D';
  */
 
 function Group() {
-	this.isGroup = true;
 
 	Object3D.call( this );
 

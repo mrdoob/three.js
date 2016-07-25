@@ -5,7 +5,6 @@ var DefaultLoadingManager;
  */
 
 function LoadingManager( onLoad, onProgress, onError ) {
-	this.isLoadingManager = true;
 
 	var scope = this;
 

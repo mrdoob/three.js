@@ -7,7 +7,6 @@ import { Vector2 } from '../../math/Vector2';
 */
 
 function WebGLLights() {
-	this.isWebGLLights = true;
 
 	var lights = {};
 

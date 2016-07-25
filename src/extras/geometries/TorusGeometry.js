@@ -8,7 +8,6 @@ import { TorusBufferGeometry } from './TorusBufferGeometry';
  */
 
 function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-	this.isTorusGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

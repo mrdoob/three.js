@@ -8,7 +8,6 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  */
 
 function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-	this.isCylinderBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

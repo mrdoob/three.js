@@ -7,7 +7,6 @@ import { BufferAttribute } from '../../core/BufferAttribute';
  */
 
 function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-	this.isBoxBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

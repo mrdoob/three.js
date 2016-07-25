@@ -3,7 +3,6 @@
  */
 
 function Clock( autoStart ) {
-	this.isClock = true;
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 

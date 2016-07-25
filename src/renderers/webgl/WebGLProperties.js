@@ -3,7 +3,6 @@
 */
 
 function WebGLProperties() {
-	this.isWebGLProperties = true;
 
 	var properties = {};
 

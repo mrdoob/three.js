@@ -9,7 +9,6 @@ import { Uint16Attribute, Uint32Attribute, BufferAttribute } from '../../core/Bu
  */
 
 function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-	this.isSphereBufferGeometry = this.isBufferGeometry = true;
 
 	BufferGeometry.call( this );
 

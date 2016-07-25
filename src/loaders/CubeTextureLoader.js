@@ -7,7 +7,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function CubeTextureLoader( manager ) {
-	this.isCubeTextureLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 

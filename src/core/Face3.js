@@ -7,7 +7,6 @@ import { Vector3 } from '../math/Vector3';
  */
 
 function Face3( a, b, c, normal, color, materialIndex ) {
-	this.isFace3 = true;
 
 	this.a = a;
 	this.b = b;

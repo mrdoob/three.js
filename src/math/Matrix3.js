@@ -8,7 +8,6 @@ import { Vector3 } from './Vector3';
  */
 
 function Matrix3() {
-	this.isMatrix3 = true;
 
 	this.elements = new Float32Array( [
 
@@ -29,6 +28,8 @@ function Matrix3() {
 Matrix3.prototype = {
 
 	constructor: Matrix3,
+
+	isMatrix3: true,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -207,7 +208,7 @@ Matrix3.prototype = {
 
 			return this.identity();
 		}
-		
+
 		var detInv = 1 / det;
 
 		te[ 0 ] = t11 * detInv;

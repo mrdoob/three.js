@@ -8,7 +8,6 @@ import { Vector3 } from '../../../math/Vector3';
  */
 
 function LensFlarePlugin( renderer, flares ) {
-	this.isLensFlarePlugin = true;
 
 	var gl = renderer.context;
 	var state = renderer.state;

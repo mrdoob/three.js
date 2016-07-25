@@ -11,7 +11,6 @@ import { BufferGeometry } from '../../core/BufferGeometry';
 */
 
 function VertexNormalsHelper( object, size, hex, linewidth ) {
-	this.isVertexNormalsHelper = this.isLineSegments = true;
 
 	this.object = object;
 

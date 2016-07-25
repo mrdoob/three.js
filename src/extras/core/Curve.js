@@ -33,10 +33,7 @@
  *	Abstract Curve base class
  **************************************************************/
 
-function Curve() {
-	this.isCurve = true;
-
-};
+function Curve() {}
 
 Curve.prototype = {
 

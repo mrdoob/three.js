@@ -15,7 +15,6 @@ import { DefaultLoadingManager } from './LoadingManager';
  */
 
 function JSONLoader( manager ) {
-	this.isJSONLoader = true;
 
 	if ( typeof manager === 'boolean' ) {
 

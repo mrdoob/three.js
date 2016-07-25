@@ -5,7 +5,6 @@ import { Vector2 } from './Vector2';
  */
 
 function Box2( min, max ) {
-	this.isBox2 = true;
 
 	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
 	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );

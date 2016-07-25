@@ -6,7 +6,6 @@ import { RingBufferGeometry } from './RingBufferGeometry';
  */
 
 function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-	this.isRingGeometry = this.isGeometry = true;
 
 	Geometry.call( this );
 

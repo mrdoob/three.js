@@ -16,7 +16,6 @@ import { Color } from '../math/Color';
  */
 
 function LineBasicMaterial( parameters ) {
-	this.isLineBasicMaterial = this.isMaterial = true;
 
 	Material.call( this );
 
@@ -36,6 +35,8 @@ function LineBasicMaterial( parameters ) {
 
 LineBasicMaterial.prototype = Object.create( Material.prototype );
 LineBasicMaterial.prototype.constructor = LineBasicMaterial;
+
+LineBasicMaterial.prototype.isLineBasicMaterial = true;
 
 LineBasicMaterial.prototype.copy = function ( source ) {
 

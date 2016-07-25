@@ -9,7 +9,6 @@ import { _Math } from '../math/Math';
  */
 
 function BufferAttribute( array, itemSize, normalized ) {
-	this.isBufferAttribute = true;
 
 	this.uuid = _Math.generateUUID();
 
@@ -27,6 +26,8 @@ function BufferAttribute( array, itemSize, normalized ) {
 BufferAttribute.prototype = {
 
 	constructor: BufferAttribute,
+
+	isBufferAttribute: true,
 
 	get count() {
 

@@ -18,7 +18,6 @@ import { BufferGeometry } from '../core/BufferGeometry';
  */
 
 function Mesh( geometry, material ) {
-	this.isMesh = true;
 
 	Object3D.call( this );
 
@@ -36,6 +35,8 @@ function Mesh( geometry, material ) {
 Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Mesh,
+
+	isMesh: true,
 
 	setDrawMode: function ( value ) {
 

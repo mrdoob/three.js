@@ -9,7 +9,6 @@ import { MeshStandardMaterial } from './MeshStandardMaterial';
  */
 
 function MeshPhysicalMaterial( parameters ) {
-	this.isMeshPhysicalMaterial = this.isMeshStandardMaterial = this.isMaterial = true;
 
 	MeshStandardMaterial.call( this );
 
@@ -28,6 +27,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
 MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
+
+MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
 MeshPhysicalMaterial.prototype.copy = function ( source ) {
 

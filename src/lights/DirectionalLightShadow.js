@@ -6,7 +6,6 @@ import { OrthographicCamera } from '../cameras/OrthographicCamera';
  */
 
 function DirectionalLightShadow( light ) {
-	this.isDirectionalLightShadow = true;
 
 	LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 

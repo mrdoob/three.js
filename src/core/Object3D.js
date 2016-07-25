@@ -16,7 +16,6 @@ import { _Math } from '../math/Math';
  */
 
 function Object3D() {
-	this.isObject3D = true;
 
 	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
 
@@ -98,6 +97,8 @@ Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
 Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+
+	isObject3D: true,
 
 	applyMatrix: function ( matrix ) {
 

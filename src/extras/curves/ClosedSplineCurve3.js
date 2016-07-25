@@ -6,7 +6,6 @@ import { CatmullRomCurve3 } from './CatmullRomCurve3';
 
 
 function ClosedSplineCurve3( points ) {
-	this.isClosedSplineCurve3 = this.isCatmullRomCurve3 = true;
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
 

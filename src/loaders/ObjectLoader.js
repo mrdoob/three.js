@@ -29,7 +29,6 @@ import { XHRLoader } from './XHRLoader';
  */
 
 function ObjectLoader( manager ) {
-	this.isObjectLoader = true;
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';

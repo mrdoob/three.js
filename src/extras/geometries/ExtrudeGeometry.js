@@ -30,7 +30,6 @@ import { TubeGeometry } from './TubeGeometry';
  **/
 
 function ExtrudeGeometry( shapes, options ) {
-	this.isExtrudeGeometry = this.isGeometry = true;
 
 	if ( typeof( shapes ) === "undefined" ) {
 

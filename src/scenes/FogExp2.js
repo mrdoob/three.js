@@ -6,7 +6,6 @@ import { Color } from '../math/Color';
  */
 
 function FogExp2( color, density ) {
-	this.isFogExp2 = true;
 
 	this.name = '';
 
@@ -14,6 +13,8 @@ function FogExp2( color, density ) {
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
 };
+
+FogExp2.prototype.isFogExp2 = true;
 
 FogExp2.prototype.clone = function () {
 

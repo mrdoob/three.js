@@ -11,7 +11,6 @@ import { CurvePath } from './CurvePath';
  **/
 
 function Path( points ) {
-	this.isPath = true;
 
 	CurvePath.call( this );
 	this.currentPoint = new Vector2();
@@ -30,7 +29,6 @@ PathPrototype.constructor = Path;
 
 // minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
 function ShapePath() {
-	this.isShapePath = true;
 	this.subPaths = [];
 	this.currentPath = null;
 }

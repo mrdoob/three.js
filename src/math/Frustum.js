@@ -9,7 +9,6 @@ import { Plane } from './Plane';
  */
 
 function Frustum( p0, p1, p2, p3, p4, p5 ) {
-	this.isFrustum = true;
 
 	this.planes = [
 

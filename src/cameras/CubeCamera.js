@@ -12,7 +12,6 @@ import { PerspectiveCamera } from './PerspectiveCamera';
  */
 
 function CubeCamera( near, far, cubeResolution ) {
-	this.isCubeCamera = this.isObject3D = true;
 
 	Object3D.call( this );
 

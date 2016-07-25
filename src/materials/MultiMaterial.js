@@ -5,7 +5,6 @@ import { _Math } from '../math/Math';
  */
 
 function MultiMaterial( materials ) {
-	this.isMultiMaterial = true;
 
 	this.uuid = _Math.generateUUID();
 
@@ -20,6 +19,8 @@ function MultiMaterial( materials ) {
 MultiMaterial.prototype = {
 
 	constructor: MultiMaterial,
+
+	isMultiMaterial: true,
 
 	toJSON: function ( meta ) {
 

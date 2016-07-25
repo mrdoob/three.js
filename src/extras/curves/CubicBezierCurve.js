@@ -8,7 +8,6 @@ import { ShapeUtils } from '../ShapeUtils';
  **************************************************************/
 
 function CubicBezierCurve( v0, v1, v2, v3 ) {
-	this.isCubicBezierCurve = this.isCurve = true;
 
 	this.v0 = v0;
 	this.v1 = v1;
@@ -24,7 +23,7 @@ CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 	var b3 = ShapeUtils.b3;
 
-	return new Vector2( 
+	return new Vector2(
 		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
 		b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
 	);
@@ -35,7 +34,7 @@ CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	var tangentCubicBezier = CurveUtils.tangentCubicBezier;
 
-	return new Vector2( 
+	return new Vector2(
 		tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
 		tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
 	).normalize();

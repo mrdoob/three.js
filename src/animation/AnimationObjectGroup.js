@@ -33,7 +33,6 @@ import { _Math } from '../math/Math';
  */
 
 function AnimationObjectGroup( var_args ) {
-	this.isAnimationObjectGroup = true;
 
 	this.uuid = _Math.generateUUID();
 
@@ -75,6 +74,8 @@ function AnimationObjectGroup( var_args ) {
 AnimationObjectGroup.prototype = {
 
 	constructor: AnimationObjectGroup,
+
+	isAnimationObjectGroup: true,
 
 	add: function( var_args ) {
 

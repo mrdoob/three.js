@@ -8,7 +8,6 @@ function ConeGeometry(
 	radius, height,
 	radialSegments, heightSegments,
 	openEnded, thetaStart, thetaLength ) {
-	this.isConeGeometry = this.isCylinderGeometry = this.isGeometry = true;
 
 	CylinderGeometry.call( this,
 		0, radius, height,

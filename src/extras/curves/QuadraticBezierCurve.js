@@ -9,7 +9,6 @@ import { ShapeUtils } from '../ShapeUtils';
 
 
 function QuadraticBezierCurve( v0, v1, v2 ) {
-	this.isQuadraticBezierCurve = this.isCurve = true;
 
 	this.v0 = v0;
 	this.v1 = v1;

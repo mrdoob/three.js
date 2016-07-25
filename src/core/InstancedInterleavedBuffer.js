@@ -5,7 +5,6 @@ import { InterleavedBuffer } from './InterleavedBuffer';
  */
 
 function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
-	this.isInstancedInterleavedBuffer = this.isInterleavedBuffer = true;
 
 	InterleavedBuffer.call( this, array, stride );
 
@@ -15,6 +14,8 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
 InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
+
+InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
 
 InstancedInterleavedBuffer.prototype.copy = function ( source ) {
 

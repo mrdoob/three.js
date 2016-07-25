@@ -10,7 +10,6 @@ import { Color } from '../../math/Color';
  */
 
 function GridHelper( size, divisions, color1, color2 ) {
-	this.isGridHelper = this.isLineSegments = true;
 
 	divisions = divisions || 1;
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
