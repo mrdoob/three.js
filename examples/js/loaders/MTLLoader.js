@@ -338,6 +338,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		// Create material
 
+		var scope = this;
 		var mat = this.materialsInfo[ materialName ];
 		var params = {
 
@@ -358,6 +359,22 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			return baseUrl + url;
 		};
+		
+		function setMapForType ( mapType, value ) {
+
+			if ( params[ mapType ] ) return; // Keep the first encountered texture
+
+			var texParams = scope.getTextureParams( value, params );
+			var map = scope.loadTexture( resolveURL( scope.baseUrl, texParams.url ) );
+			
+			map.repeat.copy( texParams.scale );
+			map.offset.copy( texParams.offset );
+
+			map.wrapS = scope.wrap;
+			map.wrapT = scope.wrap;
+			
+			params[ mapType ] = map;
+		}
 
 		for ( var prop in mat ) {
 
@@ -388,11 +405,24 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					if ( params.map ) break; // Keep the first encountered texture
+					setMapForType( "map", value );
 
-					params.map = this.loadTexture( resolveURL( this.baseUrl, value ) );
-					params.map.wrapS = this.wrap;
-					params.map.wrapT = this.wrap;
+					break;
+
+				case 'map_ks':
+
+					// Specular map
+					
+					setMapForType( "specularMap", value );
+
+					break;
+
+				case 'map_bump':
+				case 'bump':
+
+					// Bump texture map				
+					
+					setMapForType( "bumpMap", value );
 
 					break;
 
@@ -427,19 +457,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
-				case 'map_bump':
-				case 'bump':
-
-					// Bump texture map
-
-					if ( params.bumpMap ) break; // Keep the first encountered texture
-
-					params.bumpMap = this.loadTexture( resolveURL( this.baseUrl, value ) );
-					params.bumpMap.wrapS = this.wrap;
-					params.bumpMap.wrapT = this.wrap;
-
-					break;
-
 				default:
 					break;
 
@@ -449,6 +466,46 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
+	},
+
+	getTextureParams: function( value, matParams ) {
+
+		var texParams = {
+
+			scale: new THREE.Vector2( 1, 1 ),
+			offset: new THREE.Vector2( 0, 0 ),
+
+		 };
+
+		var items = value.split(/\s+/);
+		var pos;
+
+		pos = items.indexOf('-bm');
+		if (pos >= 0) {
+
+			matParams.bumpScale = parseFloat( items[pos+1] );
+			items.splice( pos, 2 );
+
+		}
+
+		pos = items.indexOf('-s');
+		if (pos >= 0) {
+
+			texParams.scale.set( parseFloat( items[pos+1] ), parseFloat( items[pos+2] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		pos = items.indexOf('-o');
+		if (pos >= 0) {
+
+			texParams.offset.set( parseFloat( items[pos+1] ), parseFloat( items[pos+2] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		texParams.url = items.join(' ').trim();
+		return texParams;
 
 	},
 

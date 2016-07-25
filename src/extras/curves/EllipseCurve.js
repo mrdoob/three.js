@@ -1,8 +1,11 @@
+import { Curve } from '../core/Curve';
+import { Vector2 } from '../../math/Vector2';
+
 /**************************************************************
  *	Ellipse curve
  **************************************************************/
 
-THREE.EllipseCurve = function( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
+function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	this.aX = aX;
 	this.aY = aY;
@@ -19,10 +22,12 @@ THREE.EllipseCurve = function( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle,
 
 };
 
-THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
-THREE.EllipseCurve.prototype.constructor = THREE.EllipseCurve;
+EllipseCurve.prototype = Object.create( Curve.prototype );
+EllipseCurve.prototype.constructor = EllipseCurve;
 
-THREE.EllipseCurve.prototype.getPoint = function( t ) {
+EllipseCurve.prototype.isEllipseCurve = true;
+
+EllipseCurve.prototype.getPoint = function( t ) {
 
 	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
@@ -46,9 +51,17 @@ THREE.EllipseCurve.prototype.getPoint = function( t ) {
 
 	}
 
-	if ( this.aClockwise === true && deltaAngle != twoPi && ! samePoints ) {
+	if ( this.aClockwise === true && ! samePoints ) {
 
-		deltaAngle = deltaAngle - twoPi;
+		if ( deltaAngle === twoPi ) {
+
+			deltaAngle = - twoPi;
+
+		} else {
+
+			deltaAngle = deltaAngle - twoPi;
+
+		}
 
 	}
 
@@ -70,6 +83,9 @@ THREE.EllipseCurve.prototype.getPoint = function( t ) {
 
 	}
 
-	return new THREE.Vector2( x, y );
+	return new Vector2( x, y );
 
 };
+
+
+export { EllipseCurve };

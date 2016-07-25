@@ -1,3 +1,8 @@
+import { Matrix4 } from '../math/Matrix4';
+import { FloatType, RGBAFormat } from '../constants';
+import { DataTexture } from '../textures/DataTexture';
+import { _Math } from '../math/Math';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -5,13 +10,13 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
+function Skeleton( bones, boneInverses, useVertexTexture ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
-	this.identityMatrix = new THREE.Matrix4();
+	this.identityMatrix = new Matrix4();
 
 	// copy the bone array
 
@@ -32,14 +37,14 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 
 		var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-		size = THREE.Math.nextPowerOfTwo( Math.ceil( size ) );
+		size = _Math.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
 
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
 		this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
-		this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
+		this.boneTexture = new DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, RGBAFormat, FloatType );
 
 	} else {
 
@@ -67,7 +72,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-				this.boneInverses.push( new THREE.Matrix4() );
+				this.boneInverses.push( new Matrix4() );
 
 			}
 
@@ -77,7 +82,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 };
 
-Object.assign( THREE.Skeleton.prototype, {
+Object.assign( Skeleton.prototype, {
 
 	calculateInverses: function () {
 
@@ -85,7 +90,7 @@ Object.assign( THREE.Skeleton.prototype, {
 
 		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-			var inverse = new THREE.Matrix4();
+			var inverse = new Matrix4();
 
 			if ( this.bones[ b ] ) {
 
@@ -125,7 +130,7 @@ Object.assign( THREE.Skeleton.prototype, {
 
 			if ( bone ) {
 
-				if ( bone.parent instanceof THREE.Bone ) {
+				if ( (bone.parent && bone.parent.isBone) ) {
 
 					bone.matrix.getInverse( bone.parent.matrixWorld );
 					bone.matrix.multiply( bone.matrixWorld );
@@ -146,7 +151,7 @@ Object.assign( THREE.Skeleton.prototype, {
 
 	update: ( function () {
 
-		var offsetMatrix = new THREE.Matrix4();
+		var offsetMatrix = new Matrix4();
 
 		return function update() {
 
@@ -175,7 +180,7 @@ Object.assign( THREE.Skeleton.prototype, {
 
 	clone: function () {
 
-		return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+		return new Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
 
 	},
 
@@ -235,3 +240,6 @@ Object.assign( THREE.Skeleton.prototype, {
 	}
 
 } );
+
+
+export { Skeleton };

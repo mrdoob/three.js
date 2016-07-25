@@ -14,8 +14,23 @@
 
 		<div class="desc">This is the [page:BufferGeometry] port of [page:TorusKnotGeometry].</div>
 
-		<iframe src='scenes/geometry-browser.html#TorusKnotBufferGeometry'></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#TorusKnotBufferGeometry"></iframe>
 
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Example</h2>
 
@@ -25,9 +40,7 @@
 		scene.add( torusKnot );
 		</code>
 
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([page:Float radius], [page:Float tube], [page:Integer tubularSegments], [page:Integer radialSegments], [page:Integer p], [page:Integer q])</h3>
 		<div>
@@ -41,14 +54,11 @@
 			</ul>
 		</div>
 
-
 		<h2>Properties</h2>
-
 
 		<div>
 		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>
-
 
 		<h2>Source</h2>
 

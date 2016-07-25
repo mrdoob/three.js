@@ -3,9 +3,11 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-THREE.Audio = function ( listener ) {
+import { Object3D } from '../core/Object3D';
 
-	THREE.Object3D.call( this );
+function Audio( listener ) {
+
+	Object3D.call( this );
 
 	this.type = 'Audio';
 
@@ -26,11 +28,11 @@ THREE.Audio = function ( listener ) {
 
 	this.filters = [];
 
-};
+}
 
-THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.Audio,
+	constructor: Audio,
 
 	getOutput: function () {
 
@@ -287,3 +289,5 @@ THREE.Audio.prototype = Object.assign( Object.create( THREE.Object3D.prototype )
 	}
 
 } );
+
+export { Audio };

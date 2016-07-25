@@ -1,3 +1,11 @@
+import { ShaderChunk } from './ShaderChunk';
+import { UniformsUtils } from './UniformsUtils';
+import { Vector3 } from '../../math/Vector3';
+import { UniformsLib } from './UniformsLib';
+import { Color } from '../../math/Color';
+
+var ShaderLib;
+
 /**
  * Webgl Shader Library for three.js
  *
@@ -7,90 +15,90 @@
  */
 
 
-THREE.ShaderLib = {
+ShaderLib = {
 
 	'basic': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'fog' ]
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'fog' ]
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'meshbasic_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshbasic_frag' ]
+		vertexShader: ShaderChunk[ 'meshbasic_vert' ],
+		fragmentShader: ShaderChunk[ 'meshbasic_frag' ]
 
 	},
 
 	'lambert': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'lightmap' ],
-			THREE.UniformsLib[ 'emissivemap' ],
-			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'lights' ],
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 
 			{
-				"emissive" : { value: new THREE.Color( 0x000000 ) }
+				"emissive" : { value: new Color( 0x000000 ) }
 			}
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'meshlambert_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshlambert_frag' ]
+		vertexShader: ShaderChunk[ 'meshlambert_vert' ],
+		fragmentShader: ShaderChunk[ 'meshlambert_frag' ]
 
 	},
 
 	'phong': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'lightmap' ],
-			THREE.UniformsLib[ 'emissivemap' ],
-			THREE.UniformsLib[ 'bumpmap' ],
-			THREE.UniformsLib[ 'normalmap' ],
-			THREE.UniformsLib[ 'displacementmap' ],
-			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'lights' ],
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 
 			{
-				"emissive" : { value: new THREE.Color( 0x000000 ) },
-				"specular" : { value: new THREE.Color( 0x111111 ) },
+				"emissive" : { value: new Color( 0x000000 ) },
+				"specular" : { value: new Color( 0x111111 ) },
 				"shininess": { value: 30 }
 			}
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'meshphong_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
+		vertexShader: ShaderChunk[ 'meshphong_vert' ],
+		fragmentShader: ShaderChunk[ 'meshphong_frag' ]
 
 	},
 
 	'standard': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'lightmap' ],
-			THREE.UniformsLib[ 'emissivemap' ],
-			THREE.UniformsLib[ 'bumpmap' ],
-			THREE.UniformsLib[ 'normalmap' ],
-			THREE.UniformsLib[ 'displacementmap' ],
-			THREE.UniformsLib[ 'roughnessmap' ],
-			THREE.UniformsLib[ 'metalnessmap' ],
-			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'lights' ],
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'roughnessmap' ],
+			UniformsLib[ 'metalnessmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 
 			{
-				"emissive" : { value: new THREE.Color( 0x000000 ) },
+				"emissive" : { value: new Color( 0x000000 ) },
 				"roughness": { value: 0.5 },
 				"metalness": { value: 0 },
 				"envMapIntensity" : { value: 1 }, // temporary
@@ -98,31 +106,31 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'meshphysical_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshphysical_frag' ]
+		vertexShader: ShaderChunk[ 'meshphysical_vert' ],
+		fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
 
 	},
 
 	'points': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'points' ],
-			THREE.UniformsLib[ 'fog' ]
+			UniformsLib[ 'points' ],
+			UniformsLib[ 'fog' ]
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'points_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'points_frag' ]
+		vertexShader: ShaderChunk[ 'points_vert' ],
+		fragmentShader: ShaderChunk[ 'points_frag' ]
 
 	},
 
 	'dashed': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'fog' ],
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'fog' ],
 
 			{
 				"scale"    : { value: 1 },
@@ -132,22 +140,22 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'linedashed_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'linedashed_frag' ]
+		vertexShader: ShaderChunk[ 'linedashed_vert' ],
+		fragmentShader: ShaderChunk[ 'linedashed_frag' ]
 
 	},
 
 	'depth': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: UniformsUtils.merge( [
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'displacementmap' ]
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'displacementmap' ]
 
 		] ),
 
-		vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'depth_frag' ]
+		vertexShader: ShaderChunk[ 'depth_vert' ],
+		fragmentShader: ShaderChunk[ 'depth_frag' ]
 
 	},
 
@@ -159,8 +167,8 @@ THREE.ShaderLib = {
 
 		},
 
-		vertexShader: THREE.ShaderChunk[ 'normal_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'normal_frag' ]
+		vertexShader: ShaderChunk[ 'normal_vert' ],
+		fragmentShader: ShaderChunk[ 'normal_frag' ]
 
 	},
 
@@ -176,8 +184,8 @@ THREE.ShaderLib = {
 			"opacity": { value: 1.0 }
 		},
 
-		vertexShader: THREE.ShaderChunk[ 'cube_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'cube_frag' ]
+		vertexShader: ShaderChunk[ 'cube_vert' ],
+		fragmentShader: ShaderChunk[ 'cube_frag' ]
 
 	},
 
@@ -192,8 +200,8 @@ THREE.ShaderLib = {
 			"tFlip": { value: - 1 }
 		},
 
-		vertexShader: THREE.ShaderChunk[ 'equirect_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'equirect_frag' ]
+		vertexShader: ShaderChunk[ 'equirect_vert' ],
+		fragmentShader: ShaderChunk[ 'equirect_frag' ]
 
 	},
 
@@ -201,22 +209,22 @@ THREE.ShaderLib = {
 
 		uniforms: {
 
-			"lightPos": { value: new THREE.Vector3() }
+			"lightPos": { value: new Vector3() }
 
 		},
 
-		vertexShader: THREE.ShaderChunk[ 'distanceRGBA_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'distanceRGBA_frag' ]
+		vertexShader: ShaderChunk[ 'distanceRGBA_vert' ],
+		fragmentShader: ShaderChunk[ 'distanceRGBA_frag' ]
 
 	}
 
 };
 
-THREE.ShaderLib[ 'physical' ] = {
+ShaderLib[ 'physical' ] = {
 
-	uniforms: THREE.UniformsUtils.merge( [
+	uniforms: UniformsUtils.merge( [
 
-		THREE.ShaderLib[ 'standard' ].uniforms,
+		ShaderLib[ 'standard' ].uniforms,
 
 		{
 			"clearCoat": { value: 0 },
@@ -225,7 +233,10 @@ THREE.ShaderLib[ 'physical' ] = {
 
 	] ),
 
-	vertexShader: THREE.ShaderChunk[ 'meshphysical_vert' ],
-	fragmentShader: THREE.ShaderChunk[ 'meshphysical_frag' ]
+	vertexShader: ShaderChunk[ 'meshphysical_vert' ],
+	fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
 
 };
+
+
+export { ShaderLib };

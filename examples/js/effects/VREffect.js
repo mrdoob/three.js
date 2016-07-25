@@ -116,22 +116,15 @@ THREE.VREffect = function ( renderer, onError ) {
 	var requestFullscreen;
 	var exitFullscreen;
 	var fullscreenElement;
+	var leftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
+	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
 	function onFullscreenChange () {
 
 		var wasPresenting = scope.isPresenting;
 		scope.isPresenting = vrDisplay !== undefined && ( vrDisplay.isPresenting || ( ! isWebVR1 && document[ fullscreenElement ] instanceof window.HTMLElement ) );
 
-		if ( wasPresenting === scope.isPresenting ) {
-
-			return;
-
-		}
-
 		if ( scope.isPresenting ) {
-
-			rendererPixelRatio = renderer.getPixelRatio();
-			rendererSize = renderer.getSize();
 
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeWidth, eyeHeight;
@@ -141,6 +134,17 @@ THREE.VREffect = function ( renderer, onError ) {
 				eyeWidth = eyeParamsL.renderWidth;
 				eyeHeight = eyeParamsL.renderHeight;
 
+				if ( vrDisplay.getLayers ) {
+
+					var layers = vrDisplay.getLayers();
+					if (layers.length) {
+
+						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
+						rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
+
+					}
+				}
+
 			} else {
 
 				eyeWidth = eyeParamsL.renderRect.width;
@@ -148,10 +152,17 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			renderer.setPixelRatio( 1 );
-			renderer.setSize( eyeWidth * 2, eyeHeight, false );
+			if ( !wasPresenting ) {
 
-		} else {
+				rendererPixelRatio = renderer.getPixelRatio();
+				rendererSize = renderer.getSize();
+
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( eyeWidth * 2, eyeHeight, false );
+
+			}
+
+		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
 			renderer.setSize( rendererSize.width, rendererSize.height );
@@ -251,15 +262,41 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		if ( isWebVR1 && vrDisplay !== undefined ) {
 
-			vrDisplay.requestAnimationFrame( f );
+			return vrDisplay.requestAnimationFrame( f );
 
 		} else {
 
-			window.requestAnimationFrame( f );
+			return window.requestAnimationFrame( f );
 
 		}
 
 	};
+	
+	this.cancelAnimationFrame = function ( h ) {
+
+		if ( isWebVR1 && vrDisplay !== undefined ) {
+
+			vrDisplay.cancelAnimationFrame( h );
+
+		} else {
+
+			window.cancelAnimationFrame( h );
+
+		}
+
+	};
+	
+	this.submitFrame = function () {
+
+		if ( isWebVR1 && vrDisplay !== undefined && scope.isPresenting ) {
+
+			vrDisplay.submitFrame();
+
+		}
+
+	};
+
+	this.autoSubmitFrame = true;
 
 	// render
 
@@ -311,12 +348,31 @@ THREE.VREffect = function ( renderer, onError ) {
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
-			renderRectL = { x: 0, y: 0, width: size.width / 2, height: size.height };
-			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
+			renderRectL = {
+				x: Math.round( size.width * leftBounds[ 0 ] ),
+				y: Math.round( size.height * leftBounds[ 1 ] ),
+				width: Math.round( size.width * leftBounds[ 2 ] ),
+				height:  Math.round(size.height * leftBounds[ 3 ] )
+			};
+			renderRectR = {
+				x: Math.round( size.width * rightBounds[ 0 ] ),
+				y: Math.round( size.height * rightBounds[ 1 ] ),
+				width: Math.round( size.width * rightBounds[ 2 ] ),
+				height:  Math.round(size.height * rightBounds[ 3 ] )
+			};
 
-			renderer.setScissorTest( true );
+			if (renderTarget) {
+				
+				renderer.setRenderTarget(renderTarget);
+				renderTarget.scissorTest = true;
+				
+			} else  {
+				
+				renderer.setScissorTest( true );
+			
+			}
 
-			if ( renderer.autoClear ) renderer.clear();
+			if ( renderer.autoClear || forceClear ) renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
@@ -332,26 +388,55 @@ THREE.VREffect = function ( renderer, onError ) {
 
 
 			// render left eye
-			renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
-			renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+			if ( renderTarget ) {
+
+				renderTarget.viewport.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+				renderTarget.scissor.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+
+			} else {
+
+				renderer.setViewport( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+				renderer.setScissor( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+
+			}
 			renderer.render( scene, cameraL, renderTarget, forceClear );
 
 			// render right eye
-			renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
-			renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+			if (renderTarget) {
+
+				renderTarget.viewport.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+  				renderTarget.scissor.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+
+			} else {
+
+				renderer.setViewport( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+				renderer.setScissor( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+
+			}
 			renderer.render( scene, cameraR, renderTarget, forceClear );
 
-			renderer.setScissorTest( false );
+			if (renderTarget) {
 
+				renderTarget.viewport.set( 0, 0, size.width, size.height );
+				renderTarget.scissor.set( 0, 0, size.width, size.height );
+				renderTarget.scissorTest = false;
+				renderer.setRenderTarget( null );
+
+			} else {
+				
+				renderer.setScissorTest( false );
+
+			}
+			
 			if ( autoUpdate ) {
 
 				scene.autoUpdate = true;
 
 			}
 
-			if ( isWebVR1 ) {
+			if ( scope.autoSubmitFrame ) {
 
-				vrDisplay.submitFrame();
+				scope.submitFrame();
 
 			}
 
