@@ -67,6 +67,7 @@
 		<script src="js/Config.js"></script>
 		<script src="js/History.js"></script>
 		<script src="js/Loader.js"></script>
+		<script src="js/OpenSim_Toolbar.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
@@ -155,8 +156,8 @@
 			//var toolbar = new Toolbar( editor );
 			//document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor );
-			document.body.appendChild( menubar.dom );
+			<!-- var menubar = new Menubar( editor ); -->
+			<!-- document.body.appendChild( menubar.dom ); -->
 
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
@@ -165,6 +166,9 @@
 			var dialog = new UI.Dialog();
 			document.body.appendChild( dialog.dom );
 			*/
+
+			var opensim_toolbar = new OpenSim_Toolbar(editor);
+			document.body.appendChild(opensim_toolbar.dom);
 
 			//
 
