@@ -314,7 +314,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( autoUpdate ) {
 
-				scene.updateMatrixWorld();
+				scene.updateChildrenMatrixWorld();
 				scene.autoUpdate = false;
 
 			}
@@ -374,7 +374,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( renderer.autoClear || forceClear ) renderer.clear();
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( camera.parent === null ) camera.updateChildrenMatrixWorld();
 
 			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
 			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );

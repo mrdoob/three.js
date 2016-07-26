@@ -225,11 +225,11 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateChildrenMatrixWorld();
 
 		// update camera matrices
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateChildrenMatrixWorld();
 
 
 		sceneJSON = scene.toJSON();

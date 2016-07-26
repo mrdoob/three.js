@@ -130,9 +130,9 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
+		scene.updateChildrenMatrixWorld();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateChildrenMatrixWorld();
 
 		_stereo.update( camera );
 

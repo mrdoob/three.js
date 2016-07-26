@@ -766,11 +766,11 @@ THREE.SEA3D.Object3D.prototype.constructor = THREE.SEA3D.Object3D;
 // Relative Animation Extension ( Only used if relative animation is enabled )
 // TODO: It can be done with shader
 
-THREE.SEA3D.Object3D.prototype.updateAnimateMatrix = function( force ) {
+THREE.SEA3D.Object3D.prototype.updateAnimateMatrix = function() {
 
 	if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-	if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+	if ( this.matrixWorldNeedsUpdate === true) {
 
 		if ( this.parent === null ) {
 
@@ -787,18 +787,8 @@ THREE.SEA3D.Object3D.prototype.updateAnimateMatrix = function( force ) {
 		this.matrixWorld.multiplyMatrices( this.matrixWorld, this.animate.matrix );
 
 		this.matrixWorldNeedsUpdate = false;
-
-		force = true;
-
 	}
 
-	// update children
-
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-		this.children[ i ].updateMatrixWorld( force );
-
-	}
 
 };
 
@@ -811,13 +801,13 @@ THREE.SEA3D.Object3D.prototype.setAnimator = function( val ) {
 
 		this.animate = new THREE.Object3D();
 
-		this.updateMatrixWorld = THREE.SEA3D.Object3D.prototype.updateAnimateMatrix;
+		this._updateMatrixWorld = THREE.SEA3D.Object3D.prototype.updateAnimateMatrix;
 
 	} else {
 
 		delete this.animate;
 
-		this.updateMatrixWorld = THREE.Object3D.prototype.updateMatrixWorld;
+		this._updateMatrixWorld = THREE.Object3D.prototype.updateMatrixWorld;
 
 	}
 

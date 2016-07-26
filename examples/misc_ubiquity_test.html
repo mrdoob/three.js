@@ -253,7 +253,7 @@
 
 				group.rotation.x += 0.01;
 
-				scene.updateMatrixWorld();
+				scene.updateChildrenMatrixWorld();
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );

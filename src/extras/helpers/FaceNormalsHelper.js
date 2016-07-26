@@ -66,7 +66,7 @@ FaceNormalsHelper.prototype.update = ( function () {
 
 	return function update() {
 
-		this.object.updateMatrixWorld( true );
+		this.object.updateMatrixWorld();
 
 		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 

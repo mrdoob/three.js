@@ -40,7 +40,7 @@ SetRotationCommand.prototype = {
 	execute: function () {
 
 		this.object.rotation.copy( this.newRotation );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -48,7 +48,7 @@ SetRotationCommand.prototype = {
 	undo: function () {
 
 		this.object.rotation.copy( this.oldRotation );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},

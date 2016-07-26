@@ -11,7 +11,7 @@ THREE.Gyroscope = function () {
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
 
-THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
+THREE.Gyroscope.prototype._updateMatrixWorld = ( function () {
 
 	var translationObject = new THREE.Vector3();
 	var quaternionObject = new THREE.Quaternion();
@@ -21,13 +21,13 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function updateMatrixWorld( force ) {
+	return function _updateMatrixWorld( force ) {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
 		// update matrixWorld
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+		if ( this.matrixWorldNeedsUpdate ) {
 
 			if ( this.parent !== null ) {
 
@@ -47,16 +47,6 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 
 
 			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateMatrixWorld( force );
 
 		}
 

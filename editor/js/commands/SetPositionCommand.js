@@ -39,7 +39,7 @@ SetPositionCommand.prototype = {
 	execute: function () {
 
 		this.object.position.copy( this.newPosition );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -47,7 +47,7 @@ SetPositionCommand.prototype = {
 	undo: function () {
 
 		this.object.position.copy( this.oldPosition );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},

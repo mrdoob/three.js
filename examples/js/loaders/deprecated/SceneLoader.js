@@ -130,7 +130,7 @@ THREE.SceneLoader.prototype = {
 			if ( position || rotation || scale ) {
 
 				result.scene.updateMatrix();
-				result.scene.updateMatrixWorld();
+				result.scene.updateChildrenMatrixWorld();
 
 			}
 

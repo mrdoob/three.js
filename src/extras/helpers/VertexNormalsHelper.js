@@ -67,7 +67,7 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 		var keys = [ 'a', 'b', 'c' ];
 
-		this.object.updateMatrixWorld( true );
+		this.object.updateMatrixWorld();
 
 		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 

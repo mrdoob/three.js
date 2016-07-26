@@ -73,13 +73,13 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	_updateMatrixWorld: ( function () {
 
 		var position = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+		return function _updateMatrixWorld() {
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+			Object3D.prototype._updateMatrixWorld.call( this );
 
 			position.setFromMatrixPosition( this.matrixWorld );
 

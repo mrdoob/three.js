@@ -123,7 +123,7 @@ THREE.CCDIKSolver.prototype = {
 
 					}
 
-					link.updateMatrixWorld( true );
+					link.updateMatrixWorld();
 
 				}
 

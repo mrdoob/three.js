@@ -152,7 +152,7 @@
 
 				controls.update( clock.getDelta() );
 
-				scene.updateMatrixWorld();
+				scene.updateChildrenMatrixWorld();
 				scene.traverse( function ( object ) {
 
 					if ( object instanceof THREE.LOD ) {
