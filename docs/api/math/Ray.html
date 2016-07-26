@@ -138,7 +138,15 @@
 		<div>
 		Intersect this [page:Ray] with a [page:Plane], returning the intersection point or *null* if there is no intersection.
 		</div>
-		function ( a, b, c, backfaceCulling, optionalTarget )
+
+		<h3>[method:Vector3 intersectSphere]( [page:Sphere sphere], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
+		<div>
+		sphere -- [page:Sphere] The [page:Sphere] to intersect with.<br />
+		optionalTarget -- [page:Vector3] The [page:Vector3] to store the result in, or *null* to create a new [page:Vector3].
+		</div>
+		<div>
+		Intersect this [page:Ray] with a [page:Sphere], returning the intersection point or *null* if there is no intersection.
+		</div>
 
 		<h3>[method:Vector3 intersectTriangle]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c], [page:Boolean backfaceCulling], [page:Vector3 optionalTarget] = null ) [page:Vector3]?</h3>
 		<div>
