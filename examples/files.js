@@ -201,6 +201,7 @@ var files = {
 		"webgl_postprocessing_msaa",
 		"webgl_postprocessing_msaa_unbiased",
 		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_outline",
 		"webgl_postprocessing_procedural",
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_ssao",
