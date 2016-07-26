@@ -361,10 +361,10 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		//for ( b = bevelSegments; b > 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * ( 1 - t );
+		z = bevelThickness * Math.cos ( t * Math.PI / 2 ); // curved
+		//z = bevelThickness * ( 1 - t ); //linear
 
-		//z = bevelThickness * t;
-		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ); // curved
+		bs = bevelSize * Math.sin ( t * Math.PI / 2 ); // curved
 		//bs = bevelSize * t; // linear
 
 		// contract shape
@@ -462,9 +462,11 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * ( 1 - t );
-		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
+		z = bevelThickness * Math.cos ( t * Math.PI / 2 ); // curved
+		//z = bevelThickness * ( 1 - t ); //linear
+		
 		bs = bevelSize * Math.sin ( t * Math.PI / 2 );
+		//bs = bevelSize * t; // linear
 
 		// contract shape
 
