@@ -29,6 +29,7 @@ export default {
 	dest: 'build/three.js',
 	moduleName: 'THREE',
 	format: 'umd',
+	indent: '\t',
 	plugins: [
 		glsl()
 	],
