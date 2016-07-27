@@ -529,6 +529,15 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new DirectionalLight( data.color, data.intensity );
 
+					if ( data.shadow ) {
+
+						if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+						if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+						if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+						if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+					}
+
 					break;
 
 				case 'PointLight':
@@ -540,6 +549,15 @@ Object.assign( ObjectLoader.prototype, {
 				case 'SpotLight':
 
 					object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+
+					if ( data.shadow ) {
+
+						if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+						if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+						if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+						if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+					}
 
 					break;
 

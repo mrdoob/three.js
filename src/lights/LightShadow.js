@@ -38,6 +38,22 @@ Object.assign( LightShadow.prototype, {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	toJSON: function () {
+
+		var object = {};
+
+		if ( this.bias !== 0 ) object.bias = this.bias;
+		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+
+		var camera = this.camera.toJSON( false ).object;
+		delete camera.matrix;
+		object.camera = camera;
+
+		return object;
+
 	}
 
 } );
