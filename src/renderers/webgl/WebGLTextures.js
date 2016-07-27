@@ -446,6 +446,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 			}
 
+			// Depth stencil textures need the DEPTH_STENCIL internal format
+			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+			if ( texture.format === THREE.DepthStencilFormat ) {
+
+				internalFormat = _gl.DEPTH_STENCIL;
+
+			}
+
 			state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, null );
 
 		} else if ( (texture && texture.isDataTexture) ) {
@@ -598,7 +606,20 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 		setTexture2D( renderTarget.depthTexture, 0 );
 
 		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		if ( renderTarget.depthTexture.format === THREE.DepthFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else if ( renderTarget.depthTexture.format === THREE.DepthStencilFormat ) {
+
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+		} else {
+
+			throw new Error('Unknown depthTexture format')
+
+		}
 
 	}
 

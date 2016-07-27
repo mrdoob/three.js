@@ -2749,6 +2749,7 @@ function WebGLRenderer( parameters ) {
 		if ( p === LuminanceFormat ) return _gl.LUMINANCE;
 		if ( p === LuminanceAlphaFormat ) return _gl.LUMINANCE_ALPHA;
 		if ( p === DepthFormat ) return _gl.DEPTH_COMPONENT;
+		if ( p === DepthStencilFormat ) return _gl.DEPTH_STENCIL;
 
 		if ( p === AddEquation ) return _gl.FUNC_ADD;
 		if ( p === SubtractEquation ) return _gl.FUNC_SUBTRACT;
@@ -2803,6 +2804,14 @@ function WebGLRenderer( parameters ) {
 
 			if ( p === MinEquation ) return extension.MIN_EXT;
 			if ( p === MaxEquation ) return extension.MAX_EXT;
+
+		}
+
+		extension = extensions.get( 'WEBGL_depth_texture' );
+
+		if ( extension !== null ){
+
+			if ( p === THREE.UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 		}
 
