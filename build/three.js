@@ -267,17 +267,19 @@
   var IntType = 1013;
   var UnsignedIntType = 1014;
   var FloatType = 1015;
-  var HalfFloatType = 1025;
-  var UnsignedShort4444Type = 1016;
-  var UnsignedShort5551Type = 1017;
-  var UnsignedShort565Type = 1018;
-  var AlphaFormat = 1019;
-  var RGBFormat = 1020;
-  var RGBAFormat = 1021;
-  var LuminanceFormat = 1022;
-  var LuminanceAlphaFormat = 1023;
+  var HalfFloatType = 1016;
+  var UnsignedShort4444Type = 1017;
+  var UnsignedShort5551Type = 1018;
+  var UnsignedShort565Type = 1019;
+  var UnsignedInt248Type = 1020;
+  var AlphaFormat = 1021;
+  var RGBFormat = 1022;
+  var RGBAFormat = 1023;
+  var LuminanceFormat = 1024;
+  var LuminanceAlphaFormat = 1025;
   var RGBEFormat = RGBAFormat;
   var DepthFormat = 1026;
+  var DepthStencilFormat = 1027;
   var RGB_S3TC_DXT1_Format = 2001;
   var RGBA_S3TC_DXT1_Format = 2002;
   var RGBA_S3TC_DXT3_Format = 2003;
@@ -5632,6 +5634,14 @@
 
   			}
 
+  			// Depth stencil textures need the DEPTH_STENCIL internal format
+  			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
+  			if ( texture.format === DepthStencilFormat ) {
+
+  				internalFormat = _gl.DEPTH_STENCIL;
+
+  			}
+
   			state.texImage2D( _gl.TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, glFormat, glType, null );
 
   		} else if ( (texture && texture.isDataTexture) ) {
@@ -5784,7 +5794,20 @@
   		setTexture2D( renderTarget.depthTexture, 0 );
 
   		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
-  		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+  		if ( renderTarget.depthTexture.format === DepthFormat ) {
+
+  			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+  		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
+
+  			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
+
+  		} else {
+
+  			throw new Error('Unknown depthTexture format')
+
+  		}
 
   	}
 
@@ -7505,7 +7528,7 @@
 
   	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
   	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
-  	this.depthTexture = null;
+  	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
   };
 
@@ -21986,6 +22009,7 @@
   		if ( p === LuminanceFormat ) return _gl.LUMINANCE;
   		if ( p === LuminanceAlphaFormat ) return _gl.LUMINANCE_ALPHA;
   		if ( p === DepthFormat ) return _gl.DEPTH_COMPONENT;
+  		if ( p === DepthStencilFormat ) return _gl.DEPTH_STENCIL;
 
   		if ( p === AddEquation ) return _gl.FUNC_ADD;
   		if ( p === SubtractEquation ) return _gl.FUNC_SUBTRACT;
@@ -22043,6 +22067,14 @@
 
   		}
 
+  		extension = extensions.get( 'WEBGL_depth_texture' );
+
+  		if ( extension !== null ){
+
+  			if ( p === THREE.UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
+
+  		}
+
   		return 0;
 
   	}
@@ -22054,14 +22086,14 @@
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function FogExp2( color, density ) {
+  function FogExp2 ( color, density ) {
 
   	this.name = '';
 
   	this.color = new Color( color );
   	this.density = ( density !== undefined ) ? density : 0.00025;
 
-  };
+  }
 
   FogExp2.prototype.isFogExp2 = true;
 
@@ -22071,12 +22103,22 @@
 
   };
 
+  FogExp2.prototype.toJSON = function ( meta ) {
+
+  	return {
+  		type: 'FogExp2',
+  		color: this.color.getHex(),
+  		density: this.density
+  	};
+
+  };
+
   /**
    * @author mrdoob / http://mrdoob.com/
    * @author alteredq / http://alteredqualia.com/
    */
 
-  function Fog( color, near, far ) {
+  function Fog ( color, near, far ) {
 
   	this.name = '';
 
@@ -22085,7 +22127,7 @@
   	this.near = ( near !== undefined ) ? near : 1;
   	this.far = ( far !== undefined ) ? far : 1000;
 
-  };
+  }
 
   Fog.prototype.isFog = true;
 
@@ -22095,12 +22137,23 @@
 
   };
 
+  Fog.prototype.toJSON = function ( meta ) {
+
+  	return {
+  		type: 'Fog',
+  		color: this.color.getHex(),
+  		near: this.near,
+  		far: this.far
+  	};
+
+  };
+
   /**
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function Scene() {
-
+  function Scene () {
+  	
   	Object3D.call( this );
 
   	this.type = 'Scene';
@@ -22111,9 +22164,10 @@
 
   	this.autoUpdate = true; // checked by the renderer
 
-  };
+  }
 
   Scene.prototype = Object.create( Object3D.prototype );
+
   Scene.prototype.constructor = Scene;
 
   Scene.prototype.copy = function ( source, recursive ) {
@@ -22128,6 +22182,20 @@
   	this.matrixAutoUpdate = source.matrixAutoUpdate;
 
   	return this;
+
+  };
+
+  Scene.prototype.toJSON = function ( meta ) {
+
+  	var data = Object3D.prototype.toJSON.call( this, meta );
+  	
+  	if ( this.fog != null ) {
+  		
+  		data.object.fog = this.fog.toJSON();
+
+  	}
+
+  	return data;
 
   };
 
@@ -23465,11 +23533,20 @@
 
   /**
    * @author Matt DesLauriers / @mattdesl
+   * @author atix / arthursilber.de
    */
 
-  function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+  function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 
-    Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
+    format = format !== undefined ? format : DepthFormat;
+
+    if ( format !== DepthFormat && format !== DepthStencilFormat ) {
+
+      throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
+
+    }
+
+    Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
     this.image = { width: width, height: height };
 
@@ -23485,7 +23562,6 @@
 
   DepthTexture.prototype = Object.create( Texture.prototype );
   DepthTexture.prototype.constructor = DepthTexture;
-
   DepthTexture.prototype.isDepthTexture = true;
 
   /**
@@ -28107,12 +28183,12 @@
    * @author mrdoob / http://mrdoob.com/
    */
 
-  function ObjectLoader( manager ) {
+  function ObjectLoader ( manager ) {
 
   	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
   	this.texturePath = '';
 
-  };
+  }
 
   Object.assign( ObjectLoader.prototype, {
 
@@ -28561,6 +28637,20 @@
 
   					object = new Scene();
 
+  					
+  					if ( data.fog !== undefined ) {
+  						
+  						if ( data.fog.type === 'FogExp2' ) {
+  						
+  							object.fog = new FogExp2(data.fog.color, data.fog.density);
+  							
+  						} else if ( data.fog.type === 'Fog' ) {
+  						
+  							object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
+  							
+  						}
+  					}
+
   					break;
 
   				case 'PerspectiveCamera':
@@ -28642,7 +28732,7 @@
 
   				case 'LineSegments':
 
-  					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+  					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
 
   					break;
 
@@ -29503,7 +29593,7 @@
    *
    * Some common of Curve methods
    * .getPoint(t), getTangent(t)
-   * .getPointAt(u), getTagentAt(u)
+   * .getPointAt(u), getTangentAt(u)
    * .getPoints(), .getSpacedPoints()
    * .getLength()
    * .updateArcLengths()
@@ -40741,6 +40831,7 @@
   exports.UnsignedShort4444Type = UnsignedShort4444Type;
   exports.UnsignedShort5551Type = UnsignedShort5551Type;
   exports.UnsignedShort565Type = UnsignedShort565Type;
+  exports.UnsignedInt248Type = UnsignedInt248Type;
   exports.AlphaFormat = AlphaFormat;
   exports.RGBFormat = RGBFormat;
   exports.RGBAFormat = RGBAFormat;
@@ -40748,6 +40839,7 @@
   exports.LuminanceAlphaFormat = LuminanceAlphaFormat;
   exports.RGBEFormat = RGBEFormat;
   exports.DepthFormat = DepthFormat;
+  exports.DepthStencilFormat = DepthStencilFormat;
   exports.RGB_S3TC_DXT1_Format = RGB_S3TC_DXT1_Format;
   exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
   exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
