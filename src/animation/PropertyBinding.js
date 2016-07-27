@@ -543,7 +543,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^((?:[\w]+\/)*)([\w-\d]+)?(?:\.([\w]+)(?:\[([^[\]]+)\])?)?\.([\w]+)(?:\[([^[\]]+)\])?$/;
+	var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
 	var matches = re.exec( trackName );
 
 	if ( ! matches ) {
