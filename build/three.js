@@ -187,6 +187,7 @@
 
   } );
 
+  var REVISION = '80dev';
   var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
   var CullFaceNone = 0;
   var CullFaceBack = 1;
@@ -27127,6 +27128,7 @@
   		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
   		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
   		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+  		if ( json.fog !== undefined ) material.fog = json.fog;
   		if ( json.shading !== undefined ) material.shading = json.shading;
   		if ( json.blending !== undefined ) material.blending = json.blending;
   		if ( json.side !== undefined ) material.side = json.side;
@@ -40747,6 +40749,7 @@
   exports.Font = Font;
   exports.CurvePath = CurvePath;
   exports.Curve = Curve;
+  exports.REVISION = REVISION;
   exports.MOUSE = MOUSE;
   exports.CullFaceNone = CullFaceNone;
   exports.CullFaceBack = CullFaceBack;
