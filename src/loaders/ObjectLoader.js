@@ -4,9 +4,12 @@ import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
+import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
 import { SkinnedMesh } from '../objects/SkinnedMesh';
+import { Fog } from '../scenes/Fog';
+import { FogExp2 } from '../scenes/FogExp2';
 import { HemisphereLight } from '../lights/HemisphereLight';
 import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
@@ -28,12 +31,12 @@ import { XHRLoader } from './XHRLoader';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader( manager ) {
+function ObjectLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';
 
-};
+}
 
 Object.assign( ObjectLoader.prototype, {
 
@@ -482,6 +485,20 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new Scene();
 
+					
+					if ( data.fog !== undefined ) {
+						
+						if ( data.fog.type === 'FogExp2' ) {
+						
+							object.fog = new FogExp2(data.fog.color, data.fog.density);
+							
+						} else if ( data.fog.type === 'Fog' ) {
+						
+							object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
+							
+						}
+					}
+
 					break;
 
 				case 'PerspectiveCamera':
@@ -563,7 +580,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				case 'LineSegments':
 
-					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 

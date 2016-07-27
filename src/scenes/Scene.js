@@ -4,8 +4,8 @@ import { Object3D } from '../core/Object3D';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Scene() {
-
+function Scene () {
+	
 	Object3D.call( this );
 
 	this.type = 'Scene';
@@ -16,9 +16,10 @@ function Scene() {
 
 	this.autoUpdate = true; // checked by the renderer
 
-};
+}
 
 Scene.prototype = Object.create( Object3D.prototype );
+
 Scene.prototype.constructor = Scene;
 
 Scene.prototype.copy = function ( source, recursive ) {
@@ -36,5 +37,18 @@ Scene.prototype.copy = function ( source, recursive ) {
 
 };
 
+Scene.prototype.toJSON = function ( meta ) {
 
+	var data = Object3D.prototype.toJSON.call( this, meta );
+	
+	if ( this.fog != null ) {
+		
+		data.object.fog = this.fog.toJSON();
+
+	}
+
+	return data;
+
+};
+	
 export { Scene };
