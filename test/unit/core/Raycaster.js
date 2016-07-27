@@ -10,6 +10,7 @@ test( "intersectObjects", function() {
 
 	ok ( raycaster.intersectObjects( objectsToCheck ).length === 1,
 		"no recursive search should lead to one hit" );
+	
 
 	ok ( raycaster.intersectObjects( objectsToCheck, true ).length === 3,
 		"recursive search should lead to three hits" );
@@ -107,7 +108,7 @@ function getObjectsToCheck() {
 
 	for ( var i = 0; i < objects.length; i++ ) {
 
-		objects[ i ].updateMatrixWorld();
+		objects[ i ].updateChildrenMatrixWorld();
 
 	}
 
