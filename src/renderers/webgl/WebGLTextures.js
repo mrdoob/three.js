@@ -1,4 +1,4 @@
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
+import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
 
 /**
@@ -448,7 +448,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 			// Depth stencil textures need the DEPTH_STENCIL internal format
 			// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
-			if ( texture.format === THREE.DepthStencilFormat ) {
+			if ( texture.format === DepthStencilFormat ) {
 
 				internalFormat = _gl.DEPTH_STENCIL;
 
@@ -607,11 +607,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		var webglDepthTexture = properties.get( renderTarget.depthTexture ).__webglTexture;
 
-		if ( renderTarget.depthTexture.format === THREE.DepthFormat ) {
+		if ( renderTarget.depthTexture.format === DepthFormat ) {
 
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
 
-		} else if ( renderTarget.depthTexture.format === THREE.DepthStencilFormat ) {
+		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
 
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
 
