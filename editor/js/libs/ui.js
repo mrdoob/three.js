@@ -1086,7 +1086,7 @@ UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
 
 // Button
 
-UI.Button = function ( value ) {
+UI.Button = function ( value, image ) {
 
 	UI.Element.call( this );
 
@@ -1094,7 +1094,14 @@ UI.Button = function ( value ) {
 	dom.className = 'Button';
 
 	this.dom = dom;
+
+    if(value)
 	this.dom.textContent = value;
+    else if(image) {
+        var img = new UI.Image(image);
+        this.add(img);
+    } else
+        console.error('Invalid arguments');
 
 	return this;
 
