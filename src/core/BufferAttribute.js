@@ -10,6 +10,12 @@ import { _Math } from '../math/Math';
 
 function BufferAttribute( array, itemSize, normalized ) {
 
+	if (array.buffer instanceof ArrayBuffer === false) {
+
+		throw new TypeError( 'THREE.BufferAttribute: array should be an instance of Uint8Array, Int8Array, Uint16Array, Int16Array, or Float32Array.' );
+
+	}
+
 	this.uuid = _Math.generateUUID();
 
 	this.array = array;
