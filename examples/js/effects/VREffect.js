@@ -19,7 +19,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
 
-	function gotVRDisplays( displays ) {
+	function gotVRDisplays ( displays ) {
 
 		vrDisplays = displays;
 
@@ -137,12 +137,13 @@ THREE.VREffect = function ( renderer, onError ) {
 				if ( vrDisplay.getLayers ) {
 
 					var layers = vrDisplay.getLayers();
-					if (layers.length) {
+					if ( layers.length ) {
 
 						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
 						rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
 
 					}
+
 				}
 
 			} else {
@@ -271,7 +272,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 	};
-	
+
 	this.cancelAnimationFrame = function ( h ) {
 
 		if ( isWebVR1 && vrDisplay !== undefined ) {
@@ -285,7 +286,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 	};
-	
+
 	this.submitFrame = function () {
 
 		if ( isWebVR1 && vrDisplay !== undefined && scope.isPresenting ) {
@@ -361,13 +362,13 @@ THREE.VREffect = function ( renderer, onError ) {
 				height:  Math.round(size.height * rightBounds[ 3 ] )
 			};
 
-			if (renderTarget) {
-				
-				renderer.setRenderTarget(renderTarget);
+			if ( renderTarget ) {
+
+				renderer.setRenderTarget( renderTarget );
 				renderTarget.scissorTest = true;
-				
+
 			} else  {
-				
+
 				renderer.setScissorTest( true );
 			
 			}
@@ -390,8 +391,8 @@ THREE.VREffect = function ( renderer, onError ) {
 			// render left eye
 			if ( renderTarget ) {
 
-				renderTarget.viewport.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
-				renderTarget.scissor.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+				renderTarget.viewport.set( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+				renderTarget.scissor.set( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
 
 			} else {
 
@@ -402,10 +403,10 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.render( scene, cameraL, renderTarget, forceClear );
 
 			// render right eye
-			if (renderTarget) {
+			if ( renderTarget ) {
 
-				renderTarget.viewport.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
-  				renderTarget.scissor.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+				renderTarget.viewport.set( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+				renderTarget.scissor.set( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
 
 			} else {
 
@@ -415,7 +416,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			}
 			renderer.render( scene, cameraR, renderTarget, forceClear );
 
-			if (renderTarget) {
+			if ( renderTarget ) {
 
 				renderTarget.viewport.set( 0, 0, size.width, size.height );
 				renderTarget.scissor.set( 0, 0, size.width, size.height );
@@ -452,7 +453,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	//
 
-	function fovToNDCScaleOffset( fov ) {
+	function fovToNDCScaleOffset ( fov ) {
 
 		var pxscale = 2.0 / ( fov.leftTan + fov.rightTan );
 		var pxoffset = ( fov.leftTan - fov.rightTan ) * pxscale * 0.5;
@@ -462,7 +463,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	function fovPortToProjection( fov, rightHanded, zNear, zFar ) {
+	function fovPortToProjection ( fov, rightHanded, zNear, zFar ) {
 
 		rightHanded = rightHanded === undefined ? true : rightHanded;
 		zNear = zNear === undefined ? 0.01 : zNear;
@@ -509,7 +510,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	function fovToProjection( fov, rightHanded, zNear, zFar ) {
+	function fovToProjection ( fov, rightHanded, zNear, zFar ) {
 
 		var DEG2RAD = Math.PI / 180.0;
 
