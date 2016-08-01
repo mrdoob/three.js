@@ -25,6 +25,20 @@ var OpenSimToolbar = function ( editor ) {
 	function viewfromPlusX() {
 		var modelObject = editor.scene.getObjectByName('OpenSimModel');
 		var bbox = new THREE.Box3().setFromObject(modelObject);
+		var center = new THREE.Vector3();
+		bbox.center(center);
+		//var helper = new THREE.BoundingBoxHelper(modelObject, 0xff0000);
+		//helper.update();
+	    // If you want a visible bounding box
+		//editor.scene.add(helper);
+	    // create a sphere at new CameraPos
+		var newpos = new THREE.Vector3();
+		newpos.copy(center);
+		newpos.x = bbox.max.x + 500;
+		editor.camera.position.copy(newpos);
+		editor.camera.lookAt(center.x, center.y, center.z);
+		editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
+		editor.camera.updateProjectionMatrix();
 	};
 
 	var viewminx = new UI.Button('-X').onClick(function () {
@@ -32,6 +46,22 @@ var OpenSimToolbar = function ( editor ) {
 	});
 	buttons.add(viewminx);
 	function viewfromMinusX() {
+	    var modelObject = editor.scene.getObjectByName('OpenSimModel');
+	    var bbox = new THREE.Box3().setFromObject(modelObject);
+	    var center = new THREE.Vector3();
+	    bbox.center(center);
+	    //var helper = new THREE.BoundingBoxHelper(modelObject, 0xff0000);
+	    //helper.update();
+	    // If you want a visible bounding box
+	    //editor.scene.add(helper);
+	    // create a sphere at new CameraPos
+	    var newpos = new THREE.Vector3();
+	    newpos.copy(center);
+	    newpos.x = bbox.min.x - 500;
+	    editor.camera.position.copy(newpos);
+	    editor.camera.lookAt(center.x, center.y, center.z);
+	    editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
+	    editor.camera.updateProjectionMatrix();
 	};
 
 	var viewminy = new UI.Button('-Y').onClick(function () {
