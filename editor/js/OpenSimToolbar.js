@@ -23,9 +23,9 @@ var OpenSimToolbar = function ( editor ) {
 	buttons.add(viewx);
 
 	function viewfromPlusX() {
+		var center = new THREE.Vector3();
 		var modelObject = editor.scene.getObjectByName('OpenSimModel');
 		var bbox = new THREE.Box3().setFromObject(modelObject);
-		var center = new THREE.Vector3();
 		bbox.center(center);
 		//var helper = new THREE.BoundingBoxHelper(modelObject, 0xff0000);
 		//helper.update();
@@ -34,10 +34,14 @@ var OpenSimToolbar = function ( editor ) {
 	    // create a sphere at new CameraPos
 		var newpos = new THREE.Vector3();
 		newpos.copy(center);
-		newpos.x = bbox.max.x + 500;
+		var fov = editor.camera.fov * (Math.PI / 180);
+	    // Calculate the camera distance
+		var objectSize = Math.max(bbox.max.y - bbox.min.y, bbox.max.x - bbox.min.x);
+		var distance = Math.abs(objectSize / Math.sin(fov / 2));
+		newpos.x = bbox.max.x + distance;
 		editor.camera.position.copy(newpos);
 		editor.camera.lookAt(center.x, center.y, center.z);
-		editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
+		//editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
 		editor.camera.updateProjectionMatrix();
 	};
 
@@ -57,10 +61,14 @@ var OpenSimToolbar = function ( editor ) {
 	    // create a sphere at new CameraPos
 	    var newpos = new THREE.Vector3();
 	    newpos.copy(center);
-	    newpos.x = bbox.min.x - 500;
+	    var fov = editor.camera.fov * (Math.PI / 180);
+	    // Calculate the camera distance
+	    var objectSize = Math.max(bbox.max.y - bbox.min.y, bbox.max.x - bbox.min.x);
+	    var distance = Math.abs(objectSize / Math.sin(fov / 2));
+	    newpos.x = bbox.min.x - distance;
 	    editor.camera.position.copy(newpos);
 	    editor.camera.lookAt(center.x, center.y, center.z);
-	    editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
+	    //editor.camera.fov = 2 * Math.atan((bbox.max.y - bbox.min.y) / 1000) * (180 / Math.PI);
 	    editor.camera.updateProjectionMatrix();
 	};
 
