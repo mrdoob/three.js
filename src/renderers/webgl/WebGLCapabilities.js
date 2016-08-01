@@ -1,4 +1,4 @@
-THREE.WebGLCapabilities = function ( gl, extensions, parameters ) {
+function WebGLCapabilities( gl, extensions, parameters ) {
 
 	var maxAnisotropy;
 
@@ -88,3 +88,6 @@ THREE.WebGLCapabilities = function ( gl, extensions, parameters ) {
 	}
 
 };
+
+
+export { WebGLCapabilities };

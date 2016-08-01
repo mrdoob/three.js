@@ -1,3 +1,8 @@
+import { CubeTexture } from '../../textures/CubeTexture';
+import { Texture } from '../../textures/Texture';
+
+var WebGLUniforms;
+
 /**
  *
  * Uniforms of a program.
@@ -53,10 +58,10 @@
  *
  */
 
-THREE.WebGLUniforms = ( function() { // scope
+WebGLUniforms = ( function() { // scope
 
-	var emptyTexture = new THREE.Texture();
-	var emptyCubeTexture = new THREE.CubeTexture();
+	var emptyTexture = new Texture();
+	var emptyCubeTexture = new CubeTexture();
 
 	// --- Base for inner nodes (including the root) ---
 
@@ -73,13 +78,6 @@ THREE.WebGLUniforms = ( function() { // scope
 
 		arrayCacheF32 = [],
 		arrayCacheI32 = [],
-
-		uncacheTemporaryArrays = function() {
-
-			arrayCacheF32.length = 0;
-			arrayCacheI32.length = 0;
-
-		},
 
 	// Flattening for arrays of vectors and matrices
 
@@ -600,3 +598,6 @@ THREE.WebGLUniforms = ( function() { // scope
 	return WebGLUniforms;
 
 } )();
+
+
+export { WebGLUniforms };

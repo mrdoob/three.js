@@ -1,20 +1,24 @@
+import { BufferGeometry } from './BufferGeometry';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferGeometry = function () {
+function InstancedBufferGeometry() {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'InstancedBufferGeometry';
 	this.maxInstancedCount = undefined;
 
 };
 
-THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
+InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
 
-THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
+InstancedBufferGeometry.prototype.isBufferGeometry = true;
+
+InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
 	this.groups.push( {
 
@@ -26,7 +30,7 @@ THREE.InstancedBufferGeometry.prototype.addGroup = function ( start, count, inst
 
 };
 
-THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
+InstancedBufferGeometry.prototype.copy = function ( source ) {
 
 	var index = source.index;
 
@@ -57,3 +61,6 @@ THREE.InstancedBufferGeometry.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { InstancedBufferGeometry };
