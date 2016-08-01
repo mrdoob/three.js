@@ -100,7 +100,7 @@
 		<script src="js/Sidebar.Animation.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Sidebar.History.js"></script>
-		<script src="js/Toolbar.js"></script>
+		<script src="js/OpenSimToolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
 		<script src="js/OpenSimViewport.js"></script>
@@ -152,8 +152,8 @@
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			//var toolbar = new Toolbar( editor );
-			//document.body.appendChild( toolbar.dom );
+			var toolbar = new OpenSimToolbar(editor);
+			document.body.appendChild( toolbar.dom );
 
 			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );

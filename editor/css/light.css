@@ -187,7 +187,7 @@ input.Number {
 
 #toolbar {
 	position: absolute;
-	left: 0;
+	left: 100px;
 	right: 300px;
 	bottom: 0;
 	height: 32px;
