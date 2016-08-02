@@ -45,7 +45,7 @@ Sidebar.SceneSettings = function (editor) {
         // change  editor.config
         editor.updateBackground(value);
     });
-
+    backgroundType.setValue('sky');
     backgroundTypeRow.add(new UI.Text('Background').setWidth('90px'));
     backgroundTypeRow.add(backgroundType);
 
@@ -62,7 +62,7 @@ Sidebar.SceneSettings = function (editor) {
         // change  editor.config
         editor.updateGroundPlane(value);
     });
-
+    floorType.setValue('redbricks');
     floorTypeRow.add(new UI.Text('Ground').setWidth('90px'));
     floorTypeRow.add(floorType);
 
