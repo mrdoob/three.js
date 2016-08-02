@@ -151,6 +151,10 @@ Material.prototype = {
 		data.uuid = this.uuid;
 		data.type = this.type;
 
+		data.depthFunc = this.depthFunc;
+		data.depthTest = this.depthTest;
+		data.depthWrite = this.depthWrite;
+
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( (this.color && this.color.isColor) ) data.color = this.color.getHex();
