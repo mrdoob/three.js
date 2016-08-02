@@ -19,7 +19,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
 
-	function gotVRDisplays ( displays ) {
+	function gotVRDisplays( displays ) {
 
 		vrDisplays = displays;
 
@@ -119,7 +119,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var leftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
 	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
-	function onFullscreenChange () {
+	function onFullscreenChange() {
 
 		var wasPresenting = scope.isPresenting;
 		scope.isPresenting = vrDisplay !== undefined && ( vrDisplay.isPresenting || ( ! isWebVR1 && document[ fullscreenElement ] instanceof window.HTMLElement ) );
@@ -453,7 +453,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	//
 
-	function fovToNDCScaleOffset ( fov ) {
+	function fovToNDCScaleOffset( fov ) {
 
 		var pxscale = 2.0 / ( fov.leftTan + fov.rightTan );
 		var pxoffset = ( fov.leftTan - fov.rightTan ) * pxscale * 0.5;
@@ -463,7 +463,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	function fovPortToProjection ( fov, rightHanded, zNear, zFar ) {
+	function fovPortToProjection( fov, rightHanded, zNear, zFar ) {
 
 		rightHanded = rightHanded === undefined ? true : rightHanded;
 		zNear = zNear === undefined ? 0.01 : zNear;
@@ -510,7 +510,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	function fovToProjection ( fov, rightHanded, zNear, zFar ) {
+	function fovToProjection( fov, rightHanded, zNear, zFar ) {
 
 		var DEG2RAD = Math.PI / 180.0;
 
