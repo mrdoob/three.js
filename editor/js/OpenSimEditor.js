@@ -576,8 +576,14 @@ OpenSimEditor.prototype = {
 		amb.name = 'AmbientLight';
 		this.addObject(amb);
 		directionalLight =  new THREE.DirectionalLight( {color: 16777215});
-		directionalLight.castShadow = false;
+		directionalLight.castShadow = true;
 		directionalLight.name = 'DirectionalLight';
+                directionalLight.shadow.camera.bottom = -1000;
+                directionalLight.shadow.camera.far = 2000;
+                directionalLight.shadow.camera.left = -1000;
+                directionalLight.shadow.camera.right = 1000;
+                directionalLight.shadow.camera.top = 1000;
+                
 		this.addObject(directionalLight);
 	},
 	updateBackground: function (choice) {
