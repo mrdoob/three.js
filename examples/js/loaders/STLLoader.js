@@ -244,13 +244,13 @@ THREE.STLLoader.prototype = {
 		if ( typeof buf !== "string" ) {
 
 			var array_buffer = new Uint8Array( buf );
-			var str = '';
+			var strArray = [];
 			for ( var i = 0; i < buf.byteLength; i ++ ) {
 
-				str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
+				strArray.push(String.fromCharCode( array_buffer[ i ] )); // implicitly assumes little-endian
 
 			}
-			return str;
+			return strArray.join('');
 
 		} else {
 
