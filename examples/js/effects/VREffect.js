@@ -271,7 +271,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 	};
-	
+
 	this.cancelAnimationFrame = function ( h ) {
 
 		if ( isWebVR1 && vrDisplay !== undefined ) {
@@ -285,7 +285,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 	};
-	
+
 	this.submitFrame = function () {
 
 		if ( isWebVR1 && vrDisplay !== undefined && scope.isPresenting ) {
@@ -305,6 +305,9 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
+
+	this.preRenderL = null;
+	this.preRenderR = null;
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
@@ -352,24 +355,24 @@ THREE.VREffect = function ( renderer, onError ) {
 				x: Math.round( size.width * leftBounds[ 0 ] ),
 				y: Math.round( size.height * leftBounds[ 1 ] ),
 				width: Math.round( size.width * leftBounds[ 2 ] ),
-				height:  Math.round(size.height * leftBounds[ 3 ] )
+				height:  Math.round( size.height * leftBounds[ 3 ] )
 			};
 			renderRectR = {
 				x: Math.round( size.width * rightBounds[ 0 ] ),
 				y: Math.round( size.height * rightBounds[ 1 ] ),
 				width: Math.round( size.width * rightBounds[ 2 ] ),
-				height:  Math.round(size.height * rightBounds[ 3 ] )
+				height:  Math.round( size.height * rightBounds[ 3 ] )
 			};
 
-			if (renderTarget) {
-				
-				renderer.setRenderTarget(renderTarget);
+			if ( renderTarget ) {
+
+				renderer.setRenderTarget( renderTarget );
 				renderTarget.scissorTest = true;
-				
+
 			} else  {
-				
+
 				renderer.setScissorTest( true );
-			
+
 			}
 
 			if ( renderer.autoClear || forceClear ) renderer.clear();
@@ -388,10 +391,12 @@ THREE.VREffect = function ( renderer, onError ) {
 
 
 			// render left eye
+			if ( this.preRenderL ) this.preRenderL( cameraL );
+
 			if ( renderTarget ) {
 
-				renderTarget.viewport.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
-				renderTarget.scissor.set(renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height);
+				renderTarget.viewport.set( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
+				renderTarget.scissor.set( renderRectL.x, renderRectL.y, renderRectL.width, renderRectL.height );
 
 			} else {
 
@@ -402,10 +407,12 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.render( scene, cameraL, renderTarget, forceClear );
 
 			// render right eye
-			if (renderTarget) {
+			if ( this.preRenderR ) this.preRenderR( cameraR );
 
-				renderTarget.viewport.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
-  				renderTarget.scissor.set(renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height);
+			if ( renderTarget ) {
+
+				renderTarget.viewport.set( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
+				renderTarget.scissor.set( renderRectR.x, renderRectR.y, renderRectR.width, renderRectR.height );
 
 			} else {
 
@@ -415,7 +422,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			}
 			renderer.render( scene, cameraR, renderTarget, forceClear );
 
-			if (renderTarget) {
+			if ( renderTarget ) {
 
 				renderTarget.viewport.set( 0, 0, size.width, size.height );
 				renderTarget.scissor.set( 0, 0, size.width, size.height );
@@ -423,11 +430,11 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setRenderTarget( null );
 
 			} else {
-				
+
 				renderer.setScissorTest( false );
 
 			}
-			
+
 			if ( autoUpdate ) {
 
 				scene.autoUpdate = true;
