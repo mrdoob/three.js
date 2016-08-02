@@ -7,6 +7,7 @@ import { Line } from '../objects/Line';
 import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
+import { Bone } from '../objects/Bone';
 import { SkinnedMesh } from '../objects/SkinnedMesh';
 import { Fog } from '../scenes/Fog';
 import { FogExp2 } from '../scenes/FogExp2';
@@ -563,6 +564,21 @@ Object.assign( ObjectLoader.prototype, {
 						object = new Mesh( geometry, material );
 
 					}
+
+					break;
+
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+
+					object = new SkinnedMesh( geometry, material );
+
+					break;
+
+				case 'Bone':
+
+					object = new Bone();
 
 					break;
 
