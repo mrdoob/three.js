@@ -13,33 +13,7 @@ var OpenSimToolbar = function ( editor ) {
 	container.add( buttons );
 
 	var camera = editor.camera;
-	// translate / rotate / scale
-
-	var viewx = new UI.Button('+X').onClick(function () {
-
-		viewfromPlusX();
-
-	});
-	buttons.add(viewx);
-
-	function viewfromPlusX() {
-		var bbox = computeModelBbox();
-		var center = new THREE.Vector3();
-		bbox.center(center);
-	    //var helper = new THREE.BoundingBoxHelper(modelObject, 0xff0000);
-		//helper.update();
-	    // If you want a visible bounding box
-		//editor.scene.add(helper);
-	    // create a sphere at new CameraPos
-		var newpos = new THREE.Vector3().copy(center);
-		var fov = editor.camera.fov * (Math.PI / 180);
-	    // Calculate the camera distance
-		var objectSize = Math.max(bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z);
-		var distance = Math.abs(objectSize / Math.sin(fov / 2));
-		newpos.x = bbox.max.x + distance;
-		updateCamera(newpos, center);
-	};
-
+    // -X
 	var viewminx = new UI.Button('-X').onClick(function () {
 		viewfromMinusX();
 	});
@@ -56,7 +30,32 @@ var OpenSimToolbar = function ( editor ) {
 	    newpos.x = bbox.min.x - distance;
 	    updateCamera(newpos, center);
 	};
+    // +X
+	var viewx = new UI.Button('+X').onClick(function () {
 
+	    viewfromPlusX();
+
+	});
+	buttons.add(viewx);
+
+	function viewfromPlusX() {
+	    var bbox = computeModelBbox();
+	    var center = new THREE.Vector3();
+	    bbox.center(center);
+	    //var helper = new THREE.BoundingBoxHelper(modelObject, 0xff0000);
+	    //helper.update();
+	    // If you want a visible bounding box
+	    //editor.scene.add(helper);
+	    // create a sphere at new CameraPos
+	    var newpos = new THREE.Vector3().copy(center);
+	    var fov = editor.camera.fov * (Math.PI / 180);
+	    // Calculate the camera distance
+	    var objectSize = Math.max(bbox.max.y - bbox.min.y, bbox.max.z - bbox.min.z);
+	    var distance = Math.abs(objectSize / Math.sin(fov / 2));
+	    newpos.x = bbox.max.x + distance;
+	    updateCamera(newpos, center);
+	};
+    // -Y
 	var viewminy = new UI.Button('-Y').onClick(function () {
 	    viewfromMinusY();
 	});
@@ -73,7 +72,7 @@ var OpenSimToolbar = function ( editor ) {
 	    newpos.y = bbox.min.y - distance;
 	    updateCamera(newpos, center);
 	};
-
+    // +Y
 	var viewplusy = new UI.Button('+Y').onClick(function () {
 	    viewfromPlusY();
 	});
@@ -90,6 +89,7 @@ var OpenSimToolbar = function ( editor ) {
 	    newpos.y = bbox.max.y + distance;
 	    updateCamera(newpos, center);
 	};
+    // -Z
 	var viewminz = new UI.Button('-Z').onClick(function () {
 	    viewfromMinusZ();
 	});
@@ -106,6 +106,7 @@ var OpenSimToolbar = function ( editor ) {
 	    newpos.z = bbox.min.z - distance;
 	    updateCamera(newpos, center);
 	};
+    // +Z
 	var viewplusz = new UI.Button('+Z').onClick(function () {
 	    viewfromPlusZ();
 	});
@@ -122,6 +123,13 @@ var OpenSimToolbar = function ( editor ) {
 	    newpos.z = bbox.max.z + distance;
 	    updateCamera(newpos, center);
 	};
+	var snapshot = new UI.Button('Snap').onClick(function () {
+	    var canvas = document.getElementById("viewport");
+	    var img    = canvas.toDataURL("image/png");
+	    document.write('<img src="' + img + '"/>');
+	});
+	buttons.add(snapshot);
+
 	function updateCamera(newposition, viewCenter) {
 	    editor.camera.position.copy(newposition);
 	    editor.camera.lookAt(viewCenter.x, viewCenter.y, viewCenter.z);
