@@ -69,7 +69,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 
 			for ( var i = 0, il = this.geometry.boneInverses.length; i < il; i ++ ) {
 
-				boneInverses.push( new THREE.Matrix4().fromArray( this.geometry.boneInverses[ i ] ) );
+				boneInverses.push( new Matrix4().fromArray( this.geometry.boneInverses[ i ] ) );
 
 			}
 
@@ -213,7 +213,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		}
 
-		var data = THREE.Mesh.prototype.toJSON.call( this, meta );
+		var data = Mesh.prototype.toJSON.call( this, meta );
 
 		if ( isRootObject ) {
 

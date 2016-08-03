@@ -12,7 +12,7 @@ import { _Math } from '../math/Math';
 
 function Skeleton( bones, boneInverses, useVertexTexture ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 

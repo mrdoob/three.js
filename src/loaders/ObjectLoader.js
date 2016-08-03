@@ -5,6 +5,7 @@ import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
 import { LOD } from '../objects/LOD';
+import { Bone } from '../objects/Bone';
 import { Mesh } from '../objects/Mesh';
 import { SkinnedMesh } from '../objects/SkinnedMesh';
 import { HemisphereLight } from '../lights/HemisphereLight';
