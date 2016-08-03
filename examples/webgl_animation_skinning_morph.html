@@ -78,60 +78,15 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			animate();
 
 			function init() {
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.z = 2200;
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
-
-				scene.add( camera );
-
-				// GROUND
-
-				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshPhongMaterial( { emissive: 0x888888 } );
-
-				var ground = new THREE.Mesh( geometry, material );
-				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = -Math.PI/2;
-				scene.add( ground );
-
-				ground.receiveShadow = true;
-
-
-				// LIGHTS
-
-				scene.add( new THREE.HemisphereLight( 0x111111, 0x444444 ) );
-
-				var light = new THREE.DirectionalLight( 0xebf3ff, 1.5 );
-				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
-				scene.add( light );
-
-				light.castShadow = true;
-
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
-
-				var d = 390;
-
-				light.shadow.camera.left = -d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d * 1.5;
-				light.shadow.camera.bottom = -d;
-
-				light.shadow.camera.far = 3500;
-
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -151,20 +106,69 @@
 
 				//
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
+				var loader = new THREE.ObjectLoader();
 
-					createScene( geometry, materials, 0, FLOOR, -300, 60 )
+				loader.load( 'models/skinned/knight.json', function ( result ) {
 
-					// GUI
+					scene = result;
+					scene.updateMatrixWorld();
+					renderer.setClearColor( scene.fog.color );
+
+					camera = scene.getObjectByName( 'Camera' );
+
+					mesh = scene.getObjectByName( 'Knight Mesh' );
+
+					mesh2 = mesh.clone( true );
+					mesh2.name = "Lil' Bro Mesh";
+					mesh2.position.x -= 240;
+					mesh2.position.z += 500;
+					mesh2.scale.set( 30, 30, 30 );
+					mesh2.rotation.y = THREE.Math.degToRad( 60 );
+					mesh2.visible = false;
+					mesh2.material = mesh2.material.clone();
+					scene.add( mesh2 );
+
+					var meshBones = [];
+					mesh.traverse( function ( object ) { if ( object.type === 'Bone' ) meshBones.push( object ); } );
+					mesh.bind( new THREE.Skeleton( meshBones ), mesh.matrixWorld );
+					mesh.material.skinning = true;
+					mesh.material.morphTargets = true;
+
+					meshBones = [];
+					mesh2.traverse( function ( object ) { if ( object.type === 'Bone' ) meshBones.push( object ); } );
+					mesh2.bind( new THREE.Skeleton( meshBones ), mesh2.matrixWorld );
+					mesh2.material.skinning = true;
+					mesh2.material.morphTargets = true;
+
+					var light = scene.getObjectByName( 'Directional' );
+					light.castShadow = true;
+					light.shadow.mapSize.width = 1024;
+					light.shadow.mapSize.height = 1024;
+					var d = 390;
+					light.shadow.camera.left = -d;
+					light.shadow.camera.right = d;
+					light.shadow.camera.top = d * 1.5;
+					light.shadow.camera.bottom = -d;
+					light.shadow.camera.far = 3500;
+
+					helper = new THREE.SkeletonHelper( mesh );
+					helper.material.linewidth = 3;
+					helper.visible = false;
+					scene.add( helper );
+
+					mixer = new THREE.AnimationMixer( mesh );
+
+					bonesClip = result.animations[ 0 ];
+					facesClip = result.animations[ 1 ];
 
 					initGUI();
 
+					window.addEventListener( 'resize', onWindowResize, false );
+					onWindowResize();
+
+					animate();
+
 				} );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -177,75 +181,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function createScene( geometry, materials, x, y, z, s ) {
-
-				//ensureLoop( geometry.animation );
-
-				geometry.computeBoundingBox();
-				var bb = geometry.boundingBox;
-
-				var path = "textures/cube/Park2/";
-				var format = '.jpg';
-				var urls = [
-						path + 'posx' + format, path + 'negx' + format,
-						path + 'posy' + format, path + 'negy' + format,
-						path + 'posz' + format, path + 'negz' + format
-					];
-
-				for ( var i = 0; i < materials.length; i ++ ) {
-
-					var m = materials[ i ];
-					m.skinning = true;
-					m.morphTargets = true;
-
-					m.specular.setHSL( 0, 0, 0.1 );
-
-					m.color.setHSL( 0.6, 0, 0.6 );
-
-					//m.map = map;
-					//m.envMap = envMap;
-					//m.bumpMap = bumpMap;
-					//m.bumpScale = 2;
-
-					//m.combine = THREE.MixOperation;
-					//m.reflectivity = 0.75;
-
-				}
-
-				mesh = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
-				mesh.name = "Knight Mesh";
-				mesh.position.set( x, y - bb.min.y * s, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-
-
-				mesh2 = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial( materials ) );
-				mesh2.name = "Lil' Bro Mesh";
-				mesh2.position.set( x - 240, y - bb.min.y * s, z + 500 );
-				mesh2.scale.set( s / 2, s / 2, s / 2 );
-				mesh2.rotation.y = THREE.Math.degToRad( 60 );
-
-				mesh2.visible = false;
-
-				mesh2.castShadow = true;
-				mesh2.receiveShadow = true;
-				scene.add( mesh2 );
-
-				helper = new THREE.SkeletonHelper( mesh );
-				helper.material.linewidth = 3;
-				helper.visible = false;
-				scene.add( helper );
-
-				mixer = new THREE.AnimationMixer( mesh );
-
-				bonesClip = geometry.animations[0];
-				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', mesh.geometry.morphTargets, 3 );
 
 			}
 
