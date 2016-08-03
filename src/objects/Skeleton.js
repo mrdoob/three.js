@@ -2,6 +2,7 @@ import { Matrix4 } from '../math/Matrix4';
 import { FloatType, RGBAFormat } from '../constants';
 import { DataTexture } from '../textures/DataTexture';
 import { _Math } from '../math/Math';
+import { Bone } from './Bone';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -192,7 +193,7 @@ Object.assign( Skeleton.prototype, {
 
 		function getParentIndex ( bone ) {
 
-			if ( ! bone.parent instanceof THREE.Bone ) return -1;
+			if ( ! bone.parent instanceof Bone ) return -1;
 
 			for ( var i = 0, il = scope.bones.length; i < il; i ++ ) {
 
