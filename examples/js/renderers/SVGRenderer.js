@@ -53,6 +53,7 @@ THREE.SVGRenderer = function () {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
+	this.useBSP = false;
 
 	this.info = {
 
@@ -137,7 +138,7 @@ THREE.SVGRenderer = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements, this.useBSP );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 

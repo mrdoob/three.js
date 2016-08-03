@@ -40,6 +40,24 @@ THREE.RenderableFace = function () {
 
 //
 
+THREE.RenderableFace.prototype.copy = function ( face ) {
+
+	this.v1.copy( face.v1 );
+	this.v2.copy( face.v2 );
+	this.v3.copy( face.v3 );
+
+	this.normalModel.copy( face.normalModel );
+
+	this.vertexNormalsModel = face.vertexNormalsModel;
+	this.vertexNormalsLength = face.vertexNormalsLength;
+
+	this.color = face.color;
+	this.material = face.material;
+	this.uvs = face.uvs;
+	this.renderOrder = face.renderOrder;
+
+};
+
 THREE.RenderableVertex = function () {
 
 	this.position = new THREE.Vector3();
@@ -74,6 +92,16 @@ THREE.RenderableLine = function () {
 
 };
 
+THREE.RenderableLine.prototype.copy = function ( line ) {
+
+	this.v1.copy( line.v1 );
+	this.v2.copy( line.v2 );
+
+	this.vertexColors = line.vertexColors;
+	this.material = line.material;
+
+};
+
 //
 
 THREE.RenderableSprite = function () {
@@ -99,7 +127,7 @@ THREE.RenderableSprite = function () {
 THREE.Projector = function () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
-	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
+	_vertex, _camera, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
 	_face, _faceCount, _facePool = [], _facePoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
 	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
@@ -316,13 +344,15 @@ THREE.Projector = function () {
 
 	var renderList = new RenderList();
 
-	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
+	this.projectScene = function ( scene, camera, sortObjects, sortElements, useBSP ) {
 
 		_faceCount = 0;
 		_lineCount = 0;
 		_spriteCount = 0;
 
 		_renderData.elements.length = 0;
+
+		_camera = camera;
 
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
@@ -378,7 +408,7 @@ THREE.Projector = function () {
 
 		} );
 
-		if ( sortObjects === true ) {
+		if ( sortObjects === true && useBSP !== true ) {
 
 			_renderData.objects.sort( painterSort );
 
@@ -739,9 +769,18 @@ THREE.Projector = function () {
 
 		}
 
-		if ( sortElements === true ) {
+		if ( sortElements === true && useBSP !== true ) {
 
 			_renderData.elements.sort( painterSort );
+
+		}
+
+		//
+
+		if ( useBSP === true ) {
+
+			var tree = new BSPTree( _renderData.elements );
+			_renderData.elements = tree.toArray();
 
 		}
 
@@ -855,6 +894,503 @@ THREE.Projector = function () {
 		}
 
 	}
+
+	//
+
+	function BSPTree( data ) {
+
+		if ( data.length ) {
+
+			this.root = BSPTree.utils.createNode( data[ 0 ] );
+			for ( var i = 1; i < data.length; i ++ ) {
+
+				this.insert( data[ i ] );
+
+			}
+
+		}
+
+	}
+
+	BSPTree.prototype.insert = function ( element, compareWith ) {
+
+		compareWith = compareWith || this.root;
+		var node = ( element instanceof BSPTree.Node ) ?
+					element :
+					BSPTree.utils.createNode( element );
+
+		var comparison = node.isBehind( compareWith );
+		if ( comparison === undefined ) {
+
+			var fragments = node.separate(
+				compareWith.getNormal(),
+				compareWith.getPointOnPlane()
+			);
+
+			var self = this;
+
+			fragments.forEach( function ( f ) {
+
+				self.insert( f, compareWith );
+
+			} );
+			return;
+
+		}
+
+		if ( comparison === 0 ) {
+
+			var nodeRenderOrder = BSPTree.utils.getRenderOrder( node );
+			var otherRenderOrder = BSPTree.utils.getRenderOrder( compareWith );
+
+			if ( nodeRenderOrder > otherRenderOrder ) {
+
+				comparison = - 1;
+
+			} else {
+
+				comparison = 1;
+
+			}
+
+		}
+
+		if ( comparison === 1 ) {
+
+			if ( ! compareWith.back ) {
+
+				compareWith.back = node;
+
+			} else {
+
+				this.insert( node, compareWith.back );
+
+			}
+
+		} else {
+
+			if ( ! compareWith.front ) {
+
+				compareWith.front = node;
+
+			} else {
+
+				this.insert( node, compareWith.front );
+
+			}
+
+		}
+
+	};
+
+	BSPTree.prototype.toArray = function () {
+
+		var output = [];
+
+		if ( this.root ) {
+
+			this.root.traverse( function ( elem ) {
+
+				output.push( elem );
+
+			} );
+
+		}
+
+		return output;
+
+	}
+
+	BSPTree.utils = {
+		createNode: function ( element ) {
+
+			return new ( element.v3 ? BSPTree.TriangleNode : BSPTree.LineNode )( element );
+
+		},
+		getPointSign: function ( normal, point, pointOnPlane ) {
+
+			return this.sign( normal.dot( point.clone().sub( pointOnPlane ) ) );
+
+		},
+		getRenderOrder: function ( node ) {
+
+			if ( typeof node.element.renderOrder === 'number' ) {
+
+				return node.element.renderOrder;
+
+			} else {
+
+				return 0;
+
+			}
+
+		},
+		isPointInSegment: function ( point, p1, p2 ) {
+
+			// This function assumes that point lies on the line
+			// and determines whether it is in line _segment_
+			var minX = Math.min( p1.x, p2.x );
+			var minY = Math.min( p1.y, p2.y );
+			var minZ = Math.min( p1.z, p2.z );
+			var maxX = Math.max( p1.x, p2.x );
+			var maxY = Math.max( p1.y, p2.y );
+			var maxZ = Math.max( p1.z, p2.z );
+
+			return ( point.x >= minX && point.x <= maxX ) &&
+				   ( point.y >= minY && point.y <= maxY ) &&
+				   ( point.z >= minZ && point.z <= maxZ );
+
+		},
+		isZero: function ( x ) {
+
+			return Math.abs( x ) < this.EPSILON;
+
+		},
+		linePlaneIntersection: function ( normal, pointOnPlane, p1, p2 ) {
+
+			var upper = pointOnPlane.clone().sub( p1 );
+			upper = upper.dot( normal );
+
+			var l = p2.clone().sub( p1 );
+			var lower = l.dot( normal );
+
+			if ( lower === 0 ) return undefined;
+
+			var d = upper / lower;
+
+			var intersectionPoint = l.multiplyScalar( d ).add( p1 );
+
+			return BSPTree.utils.isPointInSegment(
+				intersectionPoint, p1, p2
+			) ? intersectionPoint : undefined;
+
+		},
+		pointsEqual: function ( p1, p2 ) {
+
+			return this.isZero( p2.distanceTo( p1 ) );
+
+		},
+		projectVertex: function ( vertex ) {
+
+			var oldModelMatrix = _modelMatrix;
+			_modelMatrix = this.IDENTITY_MATRIX;
+			renderList.projectVertex( vertex );
+			vertex.positionScreen.w = 1;
+			_modelMatrix = oldModelMatrix;
+
+		},
+		sign: function ( x ) {
+
+			if ( Math.abs(x) < 1e-2 ) {
+
+				return 0;
+
+			} else if ( x > 0 ) {
+
+				return 1;
+
+			} else {
+
+				return - 1;
+
+			}
+
+		},
+
+		EPSILON: 1e-20,
+		IDENTITY_MATRIX: new THREE.Matrix4()
+	}
+
+
+	BSPTree.Node = function () {
+
+		this.back = null;
+		this.front = null;
+
+	}
+
+	BSPTree.Node.prototype.isBehind = function ( node ) {
+
+		var normal = node.getNormal();
+		var point = node.getPointOnPlane();
+
+		var viewer = _camera.position;
+		var viewerSign = BSPTree.utils.getPointSign( normal, viewer, point );
+		var thisSign = this.getSign( normal, point );
+
+		if ( thisSign === undefined ) return undefined;
+
+		if ( thisSign === 0 ) return 0;
+
+		if ( viewerSign !== thisSign ) {
+
+			return 1;
+
+		} else {
+
+			return - 1;
+
+		}
+
+	}
+
+	BSPTree.Node.prototype.traverse = function ( callback ) {
+
+		if ( ! callback ) {
+
+			return;
+
+		}
+
+		if ( this.back ) {
+
+			this.back.traverse( callback );
+
+		}
+
+		callback( this.element );
+
+		if ( this.front ) {
+
+			this.front.traverse( callback );
+
+		}
+
+	}
+
+
+	BSPTree.LineNode = function ( element ) {
+
+		this.element = element;
+		this.isTriangle = false;
+
+	};
+	BSPTree.LineNode.prototype = Object.create( BSPTree.Node.prototype );
+
+	BSPTree.LineNode.prototype.getNormal = function () {
+
+		var l = new THREE.Line3(
+			this.element.v1.positionWorld,
+			this.element.v2.positionWorld
+		);
+		var pt = l.closestPointToPoint( _camera.position, false );
+		return pt.sub( _camera.position );
+
+	}
+
+	BSPTree.LineNode.prototype.getPointOnPlane = function () {
+
+		return this.element.v1.positionWorld;
+
+	}
+
+	BSPTree.LineNode.prototype.getSign = function ( normal, pointOnPlane ) {
+
+		var s1 = BSPTree.utils.getPointSign( normal, this.element.v1.positionWorld, pointOnPlane );
+		var s2 = BSPTree.utils.getPointSign( normal, this.element.v2.positionWorld, pointOnPlane );
+
+		var sMax = Math.max( s1, s2 );
+		var sMin = Math.min( s1, s2 );
+
+		switch ( Math.abs( sMax - sMin ) ){
+			case 0:
+				return sMax;
+			case 1:
+				return sMax || sMin;
+			case 2:
+				return undefined;
+		}
+
+	}
+
+	BSPTree.LineNode.prototype.separate = function ( normal, point ) {
+
+		var intersectionPoint = BSPTree.utils.linePlaneIntersection(
+			normal, point,
+			this.element.v1.positionWorld,
+			this.element.v2.positionWorld
+		);
+
+		if ( intersectionPoint ) {
+
+			var newLine = getNextLineInPool();
+			newLine.copy( this.element );
+
+			var vertex = getNextVertexInPool();
+			vertex.position.copy( intersectionPoint );
+			BSPTree.utils.projectVertex( vertex );
+
+			newLine.v1.copy( vertex );
+			newLine.v2 = this.element.v2;
+			this.element.v2 = vertex;
+
+			return [ this, BSPTree.utils.createNode( newLine ) ];
+
+		} else {
+
+			return [ this ];
+
+		}
+
+	}
+
+
+	BSPTree.TriangleNode = function ( element ) {
+
+		this.element = element;
+		this.isTriangle = true;
+
+	};
+	BSPTree.TriangleNode.prototype = Object.create( BSPTree.Node.prototype );
+
+	BSPTree.TriangleNode.prototype.getNormal = function () {
+
+		return this.element.normalModel;
+
+	}
+
+	BSPTree.TriangleNode.prototype.getPointOnPlane = function () {
+
+		return this.element.v1.positionWorld;
+
+	}
+
+	BSPTree.TriangleNode.prototype.getSign = function ( normal, pointOnPlane ) {
+
+		var s1 = BSPTree.utils.getPointSign( normal, this.element.v1.positionWorld, pointOnPlane );
+		var s2 = BSPTree.utils.getPointSign( normal, this.element.v2.positionWorld, pointOnPlane );
+		var s3 = BSPTree.utils.getPointSign( normal, this.element.v3.positionWorld, pointOnPlane );
+
+		var sMax = Math.max( s1, s2, s3 );
+		var sMin = Math.min( s1, s2, s3 );
+
+		switch ( Math.abs( sMax - sMin ) ){
+			case 0:
+				return sMax;
+			case 1:
+				return sMax || sMin;
+			case 2:
+				return undefined;
+		}
+
+	}
+
+	BSPTree.TriangleNode.prototype.separate = function ( normal, pointOnPlane ) {
+
+		var p1 = this.element.v1.positionWorld;
+		var p2 = this.element.v2.positionWorld;
+		var p3 = this.element.v3.positionWorld;
+
+		// Intersection points
+		var i12 = BSPTree.utils.linePlaneIntersection(
+			normal, pointOnPlane, p1, p2
+		);
+		var i23 = BSPTree.utils.linePlaneIntersection(
+			normal, pointOnPlane, p2, p3
+		);
+		var i31 = BSPTree.utils.linePlaneIntersection(
+			normal, pointOnPlane, p3, p1
+		);
+
+		if ( i12 && i23 && i31 ) {
+
+			// Special case, one split point is a vertex
+			// In this case we split triangle into two
+			var iVertex, iSide;
+
+			var vertex = getNextVertexInPool();
+			var newTriangle = getNextFaceInPool();
+			newTriangle.copy( this.element );
+
+			if ( BSPTree.utils.pointsEqual( i12, i23 ) ) {
+
+				vertex.position = i31;
+				BSPTree.utils.projectVertex( vertex );
+
+				this.element.v3.copy( vertex );
+				newTriangle.v1 = vertex;
+
+			} else if ( BSPTree.utils.pointsEqual( i23, i31 ) ) {
+
+				vertex.position = i12;
+				BSPTree.utils.projectVertex( vertex );
+
+				this.element.v1.copy( vertex );
+				newTriangle.v2 = vertex;
+
+			} else {
+
+				vertex.position = i23;
+				BSPTree.utils.projectVertex( vertex );
+
+				this.element.v2.copy( vertex );
+				newTriangle.v3 = vertex;
+
+			}
+
+			return [ this, BSPTree.utils.createNode( newTriangle ) ];
+
+		} else {
+
+			var t1 = getNextFaceInPool();
+			var t2 = getNextFaceInPool();
+
+			t1.copy( this.element );
+			t2.copy( this.element );
+
+			var v1 = getNextVertexInPool();
+			var v2 = getNextVertexInPool();
+
+			// Split triangle into three triangles
+			if ( ! i12 ) {
+
+				this.element.v1.position = i31;
+				this.element.v2.position = i23;
+				BSPTree.utils.projectVertex( this.element.v1 );
+				BSPTree.utils.projectVertex( this.element.v2 );
+
+				t1.v2.copy( this.element.v2 );
+				t1.v3.copy( this.element.v1 );
+
+				t2.v3.copy( this.element.v2 );
+
+			} else if ( ! i23 ) {
+
+				this.element.v2.position = i12;
+				this.element.v3.position = i31;
+				BSPTree.utils.projectVertex( this.element.v2 );
+				BSPTree.utils.projectVertex( this.element.v3 );
+
+				t1.v1.copy( this.element.v2 );
+				t1.v3.copy( this.element.v3 );
+
+				t2.v1.copy( this.element.v3 );
+
+			} else {
+
+				this.element.v1.position = i12;
+				this.element.v3.position = i23;
+				BSPTree.utils.projectVertex( this.element.v1 );
+				BSPTree.utils.projectVertex( this.element.v3 );
+
+				t1.v1.copy( this.element.v1 );
+				t1.v2.copy( this.element.v3 );
+
+				t2.v2.copy( this.element.v1 );
+
+			}
+
+			return [
+				this,
+				BSPTree.utils.createNode( t1 ),
+				BSPTree.utils.createNode( t2 )
+			]
+
+		}
+
+	}
+
+	//
 
 	function clipLine( s1, s2 ) {
 
