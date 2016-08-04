@@ -13,8 +13,14 @@
 				font-style: normal;
 			}
 
-			* {
+			*,
+			*:before,
+			*:after {
+				-moz-box-sizing: border-box;
 				box-sizing: border-box;
+				-webkit-font-smoothing: antialiased;
+				font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
 			}
 
 			html {
@@ -87,14 +93,30 @@
 				overflow: auto;
 			}
 
-			#button {
+			#buttonContainer {
 				position: fixed;
 				bottom: 20px;
 				right: 20px;
+				z-index: 100;
+			}
+
+			.button {
+				display: inline-block;
+				margin-right: 5px;
 				padding: 8px;
 				color: #fff;
 				background-color: #555;
 				opacity: 0.7;
+				cursor: pointer;
+			}
+
+			.button--active {
+				background-color: #FFF;
+				color: #000;
+			}
+
+			.button:last-child {
+				margin-right: 0;
 			}
 
 			#button:hover {
@@ -179,12 +201,59 @@
 				top: 22px;
 			}
 
+			#modalContainer {
+				display: none;
+				width: calc(100% - 310px);
+				height: 100vh;
+				position: fixed;
+				top: 0;
+				right: 0;
+				background: #000;
+				background: rgba(0, 0, 0, 0.8);
+				color: #FFF;
+			}
+
+			#modalContainer.modalContainer--active {
+				display: block;
+			}
+
+			.modalContainer__inner-content {
+				height: 100%;
+				overflow: auto;
+				padding: 30px 3%;
+			}
+
+			.modalContainer__close-button {
+				width: 40px;
+				height: 40px;
+				position: absolute;
+				top: 10px;
+				right: 25px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+				font-size: 1.6em;
+				text-align: center;
+				line-height: 40px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			#modalContainer pre {
+				margin: 0;
+				white-space: pre-wrap;
+				white-space: -moz-pre-wrap !important;
+				white-space: -pre-wrap;
+				white-space: -o-pre-wrap;
+				word-wrap: break-word;
+			}
+
 			@media all and ( max-width: 640px ) {
-				h1{
+				h1 {
 					margin-top: 20px;
 					margin-bottom: 20px;
 				}
-				#panel{
+				#panel {
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -195,7 +264,7 @@
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
 				}
-				#content{
+				#content {
 					position: absolute;
 					left: 0;
 					top: 90px;
@@ -205,18 +274,23 @@
 					line-height: 22px;
 					overflow: auto;
 				}
-				#viewer{
+				#viewer {
 					position: absolute;
 					left: 0;
 					top: 56px;
 					width: 100%;
 					height: calc(100% - 56px);
 				}
-				#expandButton{
+				#expandButton {
 					display: block;
 				}
-				#panel.collapsed{
+				#panel.collapsed {
 					height: 56px;
+				}
+				#modalContainer {
+					width: 100%;
+					height: calc(100vh - 56px);
+					top: 56px;
 				}
 			}
 
@@ -277,16 +351,29 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var button = document.createElement( 'div' );
-		button.id = 'button';
-		button.textContent = 'View source';
-		button.addEventListener( 'click', function ( event ) {
+		var buttonContainer = document.createElement( 'div' );
+		buttonContainer.id = 'buttonContainer';
+		document.body.appendChild( buttonContainer );
+
+		var buttonViewSource = document.createElement( 'div' );
+		buttonViewSource.classList.add( 'button', 'button--view-source' );
+		buttonViewSource.textContent = 'View source';
+		buttonViewSource.addEventListener( 'click', function ( event ) {
+
+			toggleModal();
+
+		}, false );
+		buttonContainer.appendChild( buttonViewSource );
+
+		var buttonGithub = document.createElement( 'div' );
+		buttonGithub.classList.add( 'button' , 'button--view-github' );
+		buttonGithub.textContent = 'View on Github';
+		buttonGithub.addEventListener( 'click', function ( event ) {
 
 			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
 
 		}, false );
-		button.style.display = 'none';
-		document.body.appendChild( button );
+		buttonContainer.appendChild( buttonGithub );
 
 		var links = {};
 		var selected = null;
@@ -346,10 +433,69 @@
 			window.location.hash = file;
 			viewer.focus();
 
-			button.style.display = '';
 			panel.classList.toggle( 'collapsed' );
 
+			getFileSource( file );
+
 			selected = file;
+
+		}
+
+		// Get Raw Source
+
+		function getFileSource( file ) {
+
+			var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
+			var sourceFile = url + '/' + file + '.html';
+
+			var request = new XMLHttpRequest();
+			request.open('GET', sourceFile, true);
+			request.send(null);
+			request.onreadystatechange = function() {
+
+				if ( request.readyState === 4 ) {
+					setModal( request.responseText );
+				}
+
+			}
+
+		}
+
+		// Modal
+
+		var modalContainer = document.createElement( 'div' );
+		modalContainer.id = 'modalContainer';
+
+		var modalInnerContent = document.createElement( 'div' );
+		modalInnerContent.classList.add( 'modalContainer__inner-content' );
+		modalContainer.appendChild( modalInnerContent );
+
+		var modalCloseButton = document.createElement( 'div' );
+		modalCloseButton.classList.add( 'modalContainer__close-button' );
+		modalCloseButton.textContent = 'X';
+		modalCloseButton.addEventListener( 'click', toggleModal );
+		modalContainer.appendChild( modalCloseButton );
+
+		document.body.appendChild( modalContainer );
+
+		function toggleModal() {
+
+			modalContainer.classList.toggle('modalContainer--active');
+			buttonViewSource.classList.toggle('button--active');
+
+		}
+
+		function setModal( source ) {
+
+			modalInnerContent.innerHTML = '';
+
+			var modalContainerPre = document.createElement( 'pre' );
+			var modalContainerCode = document.createElement( 'code' );
+			modalContainerCode.textContent = source;
+
+			modalContainerPre.appendChild( modalContainerCode );
+
+			modalInnerContent.appendChild( modalContainerPre );
 
 		}
 
