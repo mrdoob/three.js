@@ -10,15 +10,15 @@ THREE.StereoEffect = function ( renderer ) {
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
 
-	this.setSize = function ( width, height ) {
+	this.setEyeSeparation = function ( eyeSep ) {
 
-		renderer.setSize( width, height );
+		_stereo.eyeSep = eyeSep;
 
 	};
 
-	this.setEyeSep = function ( eyeSep ) {
+	this.setSize = function ( width, height ) {
 
-		_stereo.eyeSep = eyeSep;
+		renderer.setSize( width, height );
 
 	};
 
