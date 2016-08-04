@@ -205,19 +205,29 @@ PropertyBinding.prototype = {
 
 				}
 
-				if ( ! targetObject.geometry.morphTargets ) {
+				if ( targetObject.geometry.morphTargets ) {
 
-					console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
-					return;
+					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 
-				}
+						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
 
-				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+							propertyIndex = i;
+							break;
 
-					if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+						}
 
-						propertyIndex = i;
-						break;
+					}
+
+				} else if ( targetObject.geometry.morphAttributes.position ) {
+
+					for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
+
+						if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
+
+							propertyIndex = i;
+							break;
+
+						}
 
 					}
 

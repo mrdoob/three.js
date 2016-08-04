@@ -18473,16 +18473,20 @@
 
 		updateMorphTargets: function () {
 
-			if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
+			var morphTargets = this.geometry.isBufferGeometry ?
+					this.geometry.morphAttributes.position:
+					this.geometry.morphTargets;
+
+			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
 				this.morphTargetBase = - 1;
 				this.morphTargetInfluences = [];
 				this.morphTargetDictionary = {};
 
-				for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+				for ( var m = 0, ml = morphTargets.length; m < ml; m ++ ) {
 
 					this.morphTargetInfluences.push( 0 );
-					this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+					this.morphTargetDictionary[ morphTargets[ m ].name ] = m;
 
 				}
 
@@ -27282,6 +27286,51 @@
 
 			}
 
+			var morphAttributes = json.data.morphAttributes;
+
+			if ( morphAttributes !== undefined ) {
+
+				for ( var type in morphAttributes ) {
+
+					attribute = attributes[ type ];
+
+					if ( attribute === undefined ) {
+
+						console.warn( 'no matching ' + type + ' attribute found for morphAttribute: ', type );
+
+					}
+
+					var morphAttributeType = morphAttributes[ type ];
+
+					var array = [];
+
+					for ( var name in morphAttributeType ) {
+
+						var morphAttribute = morphAttributeType[ name ];
+
+						if ( attribute.type !== morphAttribute.type || attribute.itemSize !== morphAttribute.itemSize || attribute.array.length !== morphAttribute.array.length ) {
+
+							console.warn( 'morph attribute ' + type + ' type does not match attribute ' + type + ' type' );
+
+						}
+
+						var typedArray = new TYPED_ARRAYS[ morphAttribute.type ]( morphAttribute.array );
+						var bufferAtrribute = new BufferAttribute( typedArray, morphAttribute.itemSize, morphAttribute.normalized );
+
+						// !!! Fix this - AnimationClip expects 
+						// a name property, but BufferAttribute's don't have a name property !!!
+						bufferAtrribute.name = morphAttribute.name;
+
+						array.push( bufferAtrribute );
+
+					}
+
+					geometry.morphAttributes[ type ] = array;
+
+				}
+
+			}
+
 			var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
 			if ( groups !== undefined ) {
@@ -28717,6 +28766,21 @@
 							object = new Mesh( geometry, material );
 
 						}
+
+						break;
+
+					case 'SkinnedMesh':
+
+						var geometry = getGeometry( data.geometry );
+						var material = getMaterial( data.material );
+
+						object = new SkinnedMesh( geometry, material );
+
+						break;
+
+					case 'Bone':
+
+						object = new Bone();
 
 						break;
 
@@ -33375,19 +33439,29 @@
 
 					}
 
-					if ( ! targetObject.geometry.morphTargets ) {
+					if ( targetObject.geometry.morphTargets ) {
 
-						console.error( '  can not bind to morphTargetInfluences becasuse node does not have a geometry.morphTargets', this );
-						return;
+						for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 
-					}
+							if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
 
-					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
+								propertyIndex = i;
+								break;
 
-						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
+							}
 
-							propertyIndex = i;
-							break;
+						}
+
+					} else if ( targetObject.geometry.morphAttributes.position ) {
+
+						for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
+
+							if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
+
+								propertyIndex = i;
+								break;
+
+							}
 
 						}
 
