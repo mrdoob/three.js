@@ -543,7 +543,7 @@ PropertyBinding.parseTrackName = function( trackName ) {
 	//	  .bone[Armature.DEF_cog].position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
+	var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
 	var matches = re.exec( trackName );
 
 	if ( ! matches ) {
@@ -560,11 +560,11 @@ PropertyBinding.parseTrackName = function( trackName ) {
 
 	var results = {
 		// directoryName: matches[ 1 ], // (tschw) currently unused
-		nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
-		objectName: matches[ 5 ],
-		objectIndex: matches[ 7 ],
-		propertyName: matches[ 9 ],
-		propertyIndex: matches[ 11 ]	// allowed to be null, specifies that the whole property is set.
+		nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+		objectName: matches[ 3 ],
+		objectIndex: matches[ 4 ],
+		propertyName: matches[ 5 ],
+		propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	if ( results.propertyName === null || results.propertyName.length === 0 ) {
