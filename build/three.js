@@ -7789,6 +7789,11 @@
 
 			if ( this.opacity < 1 ) data.opacity = this.opacity;
 			if ( this.transparent === true ) data.transparent = this.transparent;
+
+			data.depthFunc = this.depthFunc;
+			data.depthTest = this.depthTest;
+			data.depthWrite = this.depthWrite;
+
 			if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 			if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 			if ( this.wireframe === true ) data.wireframe = this.wireframe;
@@ -32284,6 +32289,8 @@
 
 		this.aspect = 1;
 
+		this.eyeSep = 0.064;
+
 		this.cameraL = new PerspectiveCamera();
 		this.cameraL.layers.enable( 1 );
 		this.cameraL.matrixAutoUpdate = false;
@@ -32321,7 +32328,7 @@
 					// http://paulbourke.net/stereographics/stereorender/
 
 					var projectionMatrix = camera.projectionMatrix.clone();
-					var eyeSep = 0.064 / 2;
+					var eyeSep = this.eyeSep / 2;
 					var eyeSepOnProjection = eyeSep * near / focus;
 					var ymax = near * Math.tan( exports.Math.DEG2RAD * fov * 0.5 );
 					var xmin, xmax;
@@ -33713,7 +33720,7 @@
 		//	  .bone[Armature.DEF_cog].position
 		// created and tested via https://regex101.com/#javascript
 
-		var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
+		var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
 		var matches = re.exec( trackName );
 
 		if ( ! matches ) {
@@ -33722,19 +33729,13 @@
 
 		}
 
-		if ( matches.index === re.lastIndex ) {
-
-			re.lastIndex++;
-
-		}
-
 		var results = {
 			// directoryName: matches[ 1 ], // (tschw) currently unused
-			nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
-			objectName: matches[ 5 ],
-			objectIndex: matches[ 7 ],
-			propertyName: matches[ 9 ],
-			propertyIndex: matches[ 11 ]	// allowed to be null, specifies that the whole property is set.
+			nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+			objectName: matches[ 3 ],
+			objectIndex: matches[ 4 ],
+			propertyName: matches[ 5 ],
+			propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
 		};
 
 		if ( results.propertyName === null || results.propertyName.length === 0 ) {
