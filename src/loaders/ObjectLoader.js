@@ -485,17 +485,17 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new Scene();
 
-					
+
 					if ( data.fog !== undefined ) {
-						
+
 						if ( data.fog.type === 'FogExp2' ) {
-						
+
 							object.fog = new FogExp2(data.fog.color, data.fog.density);
-							
+
 						} else if ( data.fog.type === 'Fog' ) {
-						
+
 							object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
-							
+
 						}
 					}
 
@@ -529,15 +529,6 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new DirectionalLight( data.color, data.intensity );
 
-					if ( data.shadow ) {
-
-						if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
-						if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
-						if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
-						if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
-
-					}
-
 					break;
 
 				case 'PointLight':
@@ -549,15 +540,6 @@ Object.assign( ObjectLoader.prototype, {
 				case 'SpotLight':
 
 					object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
-
-					if ( data.shadow ) {
-
-						if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
-						if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
-						if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
-						if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
-
-					}
 
 					break;
 
@@ -646,6 +628,15 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
+			if ( data.shadow ) {
+
+				if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+				if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+				if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+				if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+			}
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
