@@ -66,6 +66,51 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		}
 
+		var morphAttributes = json.data.morphAttributes;
+
+		if ( morphAttributes !== undefined ) {
+
+			for ( var type in morphAttributes ) {
+
+				attribute = attributes[ type ];
+
+				if ( attribute === undefined ) {
+
+					console.warn( 'no matching ' + type + ' attribute found for morphAttribute: ', type );
+
+				}
+
+				var morphAttributeType = morphAttributes[ type ];
+
+				var array = [];
+
+				for ( var name in morphAttributeType ) {
+
+					var morphAttribute = morphAttributeType[ name ];
+
+					if ( attribute.type !== morphAttribute.type || attribute.itemSize !== morphAttribute.itemSize || attribute.array.length !== morphAttribute.array.length ) {
+
+						console.warn( 'morph attribute ' + type + ' type does not match attribute ' + type + ' type' );
+
+					}
+
+					var typedArray = new TYPED_ARRAYS[ morphAttribute.type ]( morphAttribute.array );
+					var bufferAtrribute = new BufferAttribute( typedArray, morphAttribute.itemSize, morphAttribute.normalized );
+
+					// !!! Fix this - AnimationClip expects 
+					// a name property, but BufferAttribute's don't have a name property !!!
+					bufferAtrribute.name = morphAttribute.name;
+
+					array.push( bufferAtrribute );
+
+				}
+
+				geometry.morphAttributes[ type ] = array;
+
+			}
+
+		}
+
 		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
 		if ( groups !== undefined ) {
