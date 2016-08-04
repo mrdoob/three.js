@@ -12,6 +12,8 @@ function StereoCamera() {
 
 	this.aspect = 1;
 
+	this.eyeSep = 0.064;
+
 	this.cameraL = new PerspectiveCamera();
 	this.cameraL.layers.enable( 1 );
 	this.cameraL.matrixAutoUpdate = false;
@@ -49,7 +51,7 @@ Object.assign( StereoCamera.prototype, {
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				var eyeSep = 0.064 / 2;
+				var eyeSep = this.eyeSep / 2;
 				var eyeSepOnProjection = eyeSep * near / focus;
 				var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
 				var xmin, xmax;

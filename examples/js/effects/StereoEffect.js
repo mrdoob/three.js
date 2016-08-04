@@ -16,6 +16,12 @@ THREE.StereoEffect = function ( renderer ) {
 
 	};
 
+	this.setEyeSep = function ( eyeSep ) {
+
+		_stereo.eyeSep = eyeSep;
+
+	};
+
 	this.render = function ( scene, camera ) {
 
 		scene.updateMatrixWorld();
