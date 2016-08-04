@@ -151,10 +151,6 @@ Material.prototype = {
 		data.uuid = this.uuid;
 		data.type = this.type;
 
-		data.depthFunc = this.depthFunc;
-		data.depthTest = this.depthTest;
-		data.depthWrite = this.depthWrite;
-
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( (this.color && this.color.isColor) ) data.color = this.color.getHex();
@@ -211,6 +207,11 @@ Material.prototype = {
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
+
+		data.depthFunc = this.depthFunc;
+		data.depthTest = this.depthTest;
+		data.depthWrite = this.depthWrite;
+
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
