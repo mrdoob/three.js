@@ -38,7 +38,6 @@ Object.assign( XHRLoader.prototype, {
 		}
 
 		var request = new XMLHttpRequest();
-		request.overrideMimeType( 'text/plain' );
 		request.open( 'GET', url, true );
 
 		request.addEventListener( 'load', function ( event ) {
@@ -94,6 +93,8 @@ Object.assign( XHRLoader.prototype, {
 
 		if ( this.responseType !== undefined ) request.responseType = this.responseType;
 		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+
+		if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
 
 		request.send( null );
 
