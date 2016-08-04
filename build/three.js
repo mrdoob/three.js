@@ -1869,7 +1869,11 @@
 
 				var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-				if ( throwOnDegenerate || false ) {} else {
+				if ( throwOnDegenerate === true ) {
+
+					throw new Error( msg );
+
+				} else {
 
 					console.warn( msg );
 
@@ -10258,7 +10262,11 @@
 
 				var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-				if ( throwOnDegenerate || false ) {} else {
+				if ( throwOnDegenerate === true ) {
+
+					throw new Error( msg );
+
+				} else {
 
 					console.warn( msg );
 
@@ -24449,7 +24457,6 @@
 			}
 
 			var request = new XMLHttpRequest();
-			request.overrideMimeType( 'text/plain' );
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
@@ -24505,6 +24512,8 @@
 
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+
+			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
 
 			request.send( null );
 
