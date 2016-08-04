@@ -16,7 +16,7 @@ function StringKeyframeTrack( name, times, values, interpolation ) {
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
 StringKeyframeTrack.prototype =
 		Object.assign( Object.create( KeyframeTrackPrototype ), {

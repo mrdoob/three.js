@@ -13,7 +13,7 @@ function ClosedSplineCurve3( points ) {
 	this.type = 'catmullrom';
 	this.closed = true;
 
-};
+}
 
 ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 

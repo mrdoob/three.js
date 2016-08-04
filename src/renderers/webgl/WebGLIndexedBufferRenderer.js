@@ -63,7 +63,7 @@ function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
 	this.render = render;
 	this.renderInstances = renderInstances;
 
-};
+}
 
 
 export { WebGLIndexedBufferRenderer };

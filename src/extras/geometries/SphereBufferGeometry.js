@@ -100,7 +100,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
 SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;

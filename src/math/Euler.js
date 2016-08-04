@@ -16,7 +16,7 @@ function Euler( x, y, z, order ) {
 	this._z = z || 0;
 	this._order = order || Euler.DefaultOrder;
 
-};
+}
 
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 

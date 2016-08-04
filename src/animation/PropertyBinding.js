@@ -19,7 +19,7 @@ function PropertyBinding( rootNode, path, parsedPath ) {
 
 	this.rootNode = rootNode;
 
-};
+}
 
 PropertyBinding.prototype = {
 

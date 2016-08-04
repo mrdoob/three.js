@@ -16,7 +16,7 @@ function AnimationAction() {
 	throw new Error( "THREE.AnimationAction: " +
 			"Use mixer.clipAction for construction." );
 
-};
+}
 
 AnimationAction._new =
 		function AnimationAction( mixer, clip, localRoot ) {

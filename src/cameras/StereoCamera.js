@@ -22,7 +22,7 @@ function StereoCamera() {
 	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
-};
+}
 
 Object.assign( StereoCamera.prototype, {
 

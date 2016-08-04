@@ -26,7 +26,7 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 	this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
 	this.mergeVertices();
 
-};
+}
 
 BoxGeometry.prototype = Object.create( Geometry.prototype );
 BoxGeometry.prototype.constructor = BoxGeometry;

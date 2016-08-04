@@ -30,7 +30,7 @@ function SpriteMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 SpriteMaterial.prototype = Object.create( Material.prototype );
 SpriteMaterial.prototype.constructor = SpriteMaterial;

@@ -35,7 +35,7 @@ function ShadowMaterial() {
 		}
 	} );
 
-};
+}
 
 ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
 ShadowMaterial.prototype.constructor = ShadowMaterial;

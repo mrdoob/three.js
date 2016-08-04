@@ -15,7 +15,7 @@ function Uniform( value ) {
 
 	this.dynamic = false;
 
-};
+}
 
 Uniform.prototype = {
 

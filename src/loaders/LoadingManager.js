@@ -67,7 +67,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 	};
 
-};
+}
 
 DefaultLoadingManager = new LoadingManager();
 

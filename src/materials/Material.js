@@ -58,7 +58,7 @@ function Material() {
 
 	this._needsUpdate = true;
 
-};
+}
 
 Material.prototype = {
 

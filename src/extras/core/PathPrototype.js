@@ -124,6 +124,6 @@ var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 	}
 
-} )
+} );
 
 export { PathPrototype };

@@ -30,7 +30,7 @@ function Mesh( geometry, material ) {
 
 	this.updateMorphTargets();
 
-};
+}
 
 Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

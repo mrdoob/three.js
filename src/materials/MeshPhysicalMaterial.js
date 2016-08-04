@@ -23,7 +23,7 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
 MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;

@@ -9,7 +9,7 @@ function XHRLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( XHRLoader.prototype, {
 

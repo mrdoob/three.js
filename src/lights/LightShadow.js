@@ -17,7 +17,7 @@ function LightShadow( camera ) {
 	this.map = null;
 	this.matrix = new Matrix4();
 
-};
+}
 
 Object.assign( LightShadow.prototype, {
 
@@ -48,9 +48,8 @@ Object.assign( LightShadow.prototype, {
 		if ( this.radius !== 1 ) object.radius = this.radius;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
-		var camera = this.camera.toJSON( false ).object;
-		delete camera.matrix;
-		object.camera = camera;
+		object.camera = this.camera.toJSON( false ).object;
+		delete object.camera.matrix;
 
 		return object;
 

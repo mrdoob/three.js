@@ -12,7 +12,7 @@ function Clock( autoStart ) {
 
 	this.running = false;
 
-};
+}
 
 Clock.prototype = {
 

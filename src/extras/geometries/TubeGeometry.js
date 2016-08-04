@@ -142,7 +142,7 @@ function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
 TubeGeometry.prototype = Object.create( Geometry.prototype );
 TubeGeometry.prototype.constructor = TubeGeometry;

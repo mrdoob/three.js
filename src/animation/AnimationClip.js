@@ -33,7 +33,7 @@ function AnimationClip( name, duration, tracks ) {
 	this.trim();
 	this.optimize();
 
-};
+}
 
 AnimationClip.prototype = {
 

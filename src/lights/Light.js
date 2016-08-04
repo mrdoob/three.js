@@ -17,7 +17,7 @@ function Light( color, intensity ) {
 
 	this.receiveShadow = undefined;
 
-};
+}
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

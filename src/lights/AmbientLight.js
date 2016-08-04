@@ -12,7 +12,7 @@ function AmbientLight( color, intensity ) {
 
 	this.castShadow = undefined;
 
-};
+}
 
 AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 

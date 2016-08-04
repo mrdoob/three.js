@@ -23,7 +23,7 @@ function OctahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
 OctahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 OctahedronGeometry.prototype.constructor = OctahedronGeometry;

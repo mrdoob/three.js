@@ -12,7 +12,7 @@ function MaterialLoader( manager ) {
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.textures = {};
 
-};
+}
 
 Object.assign( MaterialLoader.prototype, {
 

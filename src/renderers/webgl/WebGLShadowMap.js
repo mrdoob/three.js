@@ -455,7 +455,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	}
 
-};
+}
 
 
 export { WebGLShadowMap };
