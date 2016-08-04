@@ -1004,7 +1004,9 @@ THREE.Projector = function () {
 	BSPTree.utils = {
 		createNode: function ( element ) {
 
-			return new ( element.v3 ? BSPTree.TriangleNode : BSPTree.LineNode )( element );
+			if ( element instanceof THREE.RenderableFace ) return new BSPTree.TriangleNode( element );
+			if ( element instanceof THREE.RenderableLine ) return new BSPTree.LineNode( element );
+			throw new Error( 'Current BSP algorithm only supports triangles and lines' );
 
 		},
 		getPointSign: function ( normal, point, pointOnPlane ) {
