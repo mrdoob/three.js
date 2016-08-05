@@ -209,7 +209,7 @@
 				top: 0;
 				right: 0;
 				background: #000;
-				background: rgba(0, 0, 0, 0.8);
+				background: rgba(0, 0, 0, 0.85);
 				color: #FFF;
 			}
 
@@ -220,7 +220,7 @@
 			.modalContainer__inner-content {
 				height: 100%;
 				overflow: auto;
-				padding: 30px 3%;
+				padding: 30px 1%;
 			}
 
 			.modalContainer__close-button {
@@ -246,6 +246,160 @@
 				white-space: -pre-wrap;
 				white-space: -o-pre-wrap;
 				word-wrap: break-word;
+			}
+
+			/* Syntax Highlighting */
+
+			code[class*="language-"],
+			pre[class*="language-"] {
+				color: #f8f8f2;
+				background: none;
+				text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+				font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+				text-align: left;
+				white-space: pre;
+				word-spacing: normal;
+				word-break: normal;
+				word-wrap: normal;
+				line-height: 1.5;
+
+				-moz-tab-size: 4;
+				-o-tab-size: 4;
+				tab-size: 4;
+
+				-webkit-hyphens: none;
+				-moz-hyphens: none;
+				-ms-hyphens: none;
+				hyphens: none;
+			}
+
+			/* Code blocks */
+			pre[class*="language-"] {
+				padding: 1em;
+				margin: .5em 0;
+				overflow: auto;
+				border-radius: 0.3em;
+			}
+
+			/* Inline code */
+			:not(pre) > code[class*="language-"] {
+				padding: .1em;
+				border-radius: .3em;
+				white-space: normal;
+			}
+
+			.token.comment,
+			.token.prolog,
+			.token.doctype,
+			.token.cdata {
+				color: slategray;
+			}
+
+			.token.punctuation {
+				color: #f8f8f2;
+			}
+
+			.namespace {
+				opacity: .7;
+			}
+
+			.token.property,
+			.token.tag,
+			.token.constant,
+			.token.symbol,
+			.token.deleted {
+				color: #f92672;
+			}
+
+			.token.boolean,
+			.token.number {
+				color: #ae81ff;
+			}
+
+			.token.selector,
+			.token.attr-name,
+			.token.string,
+			.token.char,
+			.token.builtin,
+			.token.inserted {
+				color: #a6e22e;
+			}
+
+			.token.operator,
+			.token.entity,
+			.token.url,
+			.language-css .token.string,
+			.style .token.string,
+			.token.variable {
+				color: #f8f8f2;
+			}
+
+			.token.atrule,
+			.token.attr-value,
+			.token.function {
+				color: #e6db74;
+			}
+
+			.token.keyword {
+				color: #66d9ef;
+			}
+
+			.token.regex,
+			.token.important {
+				color: #fd971f;
+			}
+
+			.token.important,
+			.token.bold {
+				font-weight: bold;
+			}
+			.token.italic {
+				font-style: italic;
+			}
+
+			.token.entity {
+				cursor: help;
+			}
+
+			pre.line-numbers {
+				position: relative;
+				padding-left: 3.8em;
+				counter-reset: linenumber;
+			}
+
+			pre.line-numbers > code {
+				position: relative;
+			}
+
+			.line-numbers .line-numbers-rows {
+				position: absolute;
+				pointer-events: none;
+				top: 0;
+				font-size: 100%;
+				left: -3.8em;
+				width: 3em; /* works for line-numbers below 1000 lines */
+				letter-spacing: -1px;
+				border-right: 1px solid #999;
+
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+
+			}
+
+			.line-numbers-rows > span {
+				pointer-events: none;
+				display: block;
+				counter-increment: linenumber;
+			}
+
+			.line-numbers-rows > span:before {
+				content: counter(linenumber);
+				color: #999;
+				display: block;
+				padding-right: 0.8em;
+				text-align: right;
 			}
 
 			@media all and ( max-width: 640px ) {
@@ -314,6 +468,7 @@
 		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+		<script src="js/libs/prism.js"></script>
 
 		<script>
 
@@ -354,6 +509,12 @@
 		var buttonContainer = document.createElement( 'div' );
 		buttonContainer.id = 'buttonContainer';
 		document.body.appendChild( buttonContainer );
+
+		if ( !window.location.hash ) {
+
+			buttonContainer.style.display = 'none';
+
+		}
 
 		var buttonViewSource = document.createElement( 'div' );
 		buttonViewSource.classList.add( 'button', 'button--view-source' );
@@ -435,6 +596,8 @@
 
 			panel.classList.toggle( 'collapsed' );
 
+			if ( window.location.hash ) buttonContainer.style.display = 'block';
+
 			getFileSource( file );
 
 			selected = file;
@@ -491,11 +654,14 @@
 
 			var modalContainerPre = document.createElement( 'pre' );
 			var modalContainerCode = document.createElement( 'code' );
+			modalContainerCode.classList.add('language-html', 'line-numbers');
 			modalContainerCode.textContent = source;
 
 			modalContainerPre.appendChild( modalContainerCode );
 
 			modalInnerContent.appendChild( modalContainerPre );
+
+			Prism.highlightAll();
 
 		}
 
