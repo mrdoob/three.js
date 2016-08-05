@@ -53,7 +53,7 @@ THREE.RenderableFace.prototype.copy = function ( face ) {
 
 	this.color = face.color;
 	this.material = face.material;
-	this.uvs = face.uvs;
+	this.uvs = [ face.uvs[0], face.uvs[1], face.uvs[2] ];
 	this.renderOrder = face.renderOrder;
 
 };
@@ -1027,6 +1027,12 @@ THREE.Projector = function () {
 			}
 
 		},
+		interpolateUVs: function ( uv1, uv2, p1, p2, intersection ) {
+
+			var alpha = p1.distanceTo( intersection ) / p1.distanceTo( p2 );
+			return new THREE.Vector2().lerpVectors( uv1, uv2, alpha );
+
+		},
 		isPointInSegment: function ( point, p1, p2 ) {
 
 			// This function assumes that point lies on the line
@@ -1218,7 +1224,7 @@ THREE.Projector = function () {
 			var newLine = getNextLineInPool();
 			newLine.copy( this.element );
 
-			var vertex = getNextVertexInPool();
+			var vertex = new THREE.RenderableVertex();
 			vertex.position.copy( intersectionPoint );
 			BSPTree.utils.projectVertex( vertex );
 
@@ -1298,9 +1304,7 @@ THREE.Projector = function () {
 
 			// Special case, one split point is a vertex
 			// In this case we split triangle into two
-			var iVertex, iSide;
-
-			var vertex = getNextVertexInPool();
+			var vertex = new THREE.RenderableVertex();
 			var newTriangle = getNextFaceInPool();
 			newTriangle.copy( this.element );
 
@@ -1308,6 +1312,11 @@ THREE.Projector = function () {
 
 				vertex.position = i31;
 				BSPTree.utils.projectVertex( vertex );
+
+				var uv = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[2], p1, p3, i31
+				);
+				this.element.uvs[2] = newTriangle.uvs[0] = uv;
 
 				this.element.v3.copy( vertex );
 				newTriangle.v1 = vertex;
@@ -1317,6 +1326,11 @@ THREE.Projector = function () {
 				vertex.position = i12;
 				BSPTree.utils.projectVertex( vertex );
 
+				var uv = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[1], p1, p2, i12
+				);
+				this.element.uvs[0] = newTriangle.uvs[1] = uv;
+
 				this.element.v1.copy( vertex );
 				newTriangle.v2 = vertex;
 
@@ -1324,6 +1338,11 @@ THREE.Projector = function () {
 
 				vertex.position = i23;
 				BSPTree.utils.projectVertex( vertex );
+
+				var uv = BSPTree.utils.interpolateUVs(
+					this.element.uvs[1], this.element.uvs[2], p2, p3, i23
+				);
+				this.element.uvs[1] = newTriangle.uvs[2] = uv;
 
 				this.element.v2.copy( vertex );
 				newTriangle.v3 = vertex;
@@ -1340,11 +1359,17 @@ THREE.Projector = function () {
 			t1.copy( this.element );
 			t2.copy( this.element );
 
-			var v1 = getNextVertexInPool();
-			var v2 = getNextVertexInPool();
-
 			// Split triangle into three triangles
 			if ( ! i12 ) {
+
+				var uv1 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[2], p1, p3, i31
+				);
+				var uv2 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[1], this.element.uvs[2], p2, p3, i23
+				);
+				this.element.uvs[0] = t1.uvs[2] = uv1;
+				this.element.uvs[1] = t1.uvs[1] = t2.uvs[2] = uv2;
 
 				this.element.v1.position = i31;
 				this.element.v2.position = i23;
@@ -1358,6 +1383,15 @@ THREE.Projector = function () {
 
 			} else if ( ! i23 ) {
 
+				var uv1 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[1], p1, p2, i12
+				);
+				var uv2 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[2], p1, p3, i31
+				);
+				this.element.uvs[1] = t1.uvs[0] = uv1;
+				this.element.uvs[2] = t1.uvs[2] = t2.uvs[0] = uv2;
+
 				this.element.v2.position = i12;
 				this.element.v3.position = i31;
 				BSPTree.utils.projectVertex( this.element.v2 );
@@ -1369,6 +1403,15 @@ THREE.Projector = function () {
 				t2.v1.copy( this.element.v3 );
 
 			} else {
+
+				var uv1 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[0], this.element.uvs[1], p1, p2, i12
+				);
+				var uv2 = BSPTree.utils.interpolateUVs(
+					this.element.uvs[1], this.element.uvs[2], p2, p3, i23
+				);
+				this.element.uvs[0] = t1.uvs[0] = t2.uvs[1] = uv1;
+				this.element.uvs[2] = t1.uvs[1] = uv2;
 
 				this.element.v1.position = i12;
 				this.element.v3.position = i23;

@@ -132,6 +132,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
+	this.useBSP = false;
 
 	this.info = {
 
@@ -327,7 +328,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.setTransform( _viewportWidth / _canvasWidth, 0, 0, - _viewportHeight / _canvasHeight, _viewportX, _canvasHeight - _viewportY );
 		_context.translate( _canvasWidthHalf, _canvasHeightHalf );
 
-		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements, this.useBSP );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 		_camera = camera;
