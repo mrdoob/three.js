@@ -452,6 +452,8 @@ Object.assign( ObjectLoader.prototype, {
 
 		var skeletons = {};
 
+		if ( json === undefined ) return skeletons;
+
 		for ( var i = 0; i < json.length; i ++ ) {
 
 			skeletons[ json[ i ].uuid ] = json[ i ];
