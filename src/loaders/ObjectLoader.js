@@ -353,6 +353,10 @@ Object.assign( ObjectLoader.prototype, {
 
 				scope.manager.itemEnd( url );
 
+			}, undefined, function () {
+
+				scope.manager.itemError( url );
+
 			} );
 
 		}
