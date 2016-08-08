@@ -1,23 +1,36 @@
 /**
  * @author yomboprime https://github.com/yomboprime
  *
- * @fileoverview THREE.ConvexObjectBreaker
+ * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
  *
+ * Usage:
  *
- * @param {int} maxRadialIterations Iterations for radial cuts.
- * @param {int} maxRandomIterations Computation problem size is always 2d: sizeX * sizeY elements.
+ * Use the function prepareBreakableObject to prepare a Mesh object to be broken.
+ *
+ * Then, call the various functions to subdivide the object (subdivideByImpact, cutByPlane)
+ *
+ * Sub-objects that are product of subdivision don't need prepareBreakableObject to be called on them.
+ *
+ * Requisites for the object:
+ *
+ *  - Mesh object must have a Geometry (not BufferGeometry) and a Material
+ *
+ *  - The Geometry must be convex (this is not tested in the library). You can create convex
+ *  Geometries with THREE.ConvexGeometry. The BoxGeometry, SphereGeometry and other convex primitives
+ *  can also be used.
+ *
+ * Note: This lib adds member variables to object's userData member and to its vertices.
+ * (see prepareBreakableObject function)
+ * Use with caution and read the code when using with other libs.
+ *
  * @param {double} minSizeForBreak Min size a debris can have to break.
- * @param {double} minSizeForRadialSubdivision Min size a debris can have to break in radial subdivision.
  * @param {double} smallDelta Max distance to consider that a point belongs to a plane.
  * 
   */
 
-THREE.ConvexObjectBreaker = function( maxRadialIterations, maxRandomIterations, minSizeForBreak, minSizeForRadialSubdivision, smallDelta ) {
+THREE.ConvexObjectBreaker = function( minSizeForBreak, smallDelta ) {
 
-	this.maxRadialIterations = maxRadialIterations || 3;
-	this.maxRandomIterations = maxRandomIterations || 2;
 	this.minSizeForBreak = minSizeForBreak || 1.4;
-	this.minSizeForRadialSubdivision = minSizeForRadialSubdivision || 2.5;
 	this.smallDelta = smallDelta || 0.0001;
 
 	this.tempLine1 = new THREE.Line3();
@@ -26,7 +39,8 @@ THREE.ConvexObjectBreaker = function( maxRadialIterations, maxRandomIterations, 
 	this.tempCM2 = new THREE.Vector3();
 
 	this.segments = [];
-	for ( var i = 0; i < 100 * 100; i++ ) {
+	var n = 100 * 100;
+	for ( var i = 0; i < n; i++ ) {
 		this.segments[ i ] = false;
 	}
 
@@ -36,7 +50,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	constructor: THREE.ConvexObjectBreaker,
 
-	createBreakableObject: function( threeObject, mass, velocity, angularVelocity, breakable ) {
+	prepareBreakableObject: function( threeObject, mass, velocity, angularVelocity, breakable ) {
 
 		// threeObject must have a Geometry, and it must be convex.
 		// Its material property is propagated to its "children"
@@ -63,7 +77,12 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	},
 
-	subdivideByImpact: function( pointOfImpact, segmentedObject ) {
+	/*
+	 * @param {int} maxRadialIterations Iterations for radial cuts.
+	 * @param {int} maxRandomIterations Max random iterations for not-radial cuts
+	 * @param {double} minSizeForRadialSubdivision Min size a debris can have to break in radial subdivision.
+	 */
+	subdivideByImpact: function( pointOfImpact, breakableObject ) {
 
 		var debris = [];
 
@@ -297,7 +316,7 @@ THREE.ConvexObjectBreaker.prototype = {
 			threeObject1.position.copy( this.tempCM1 );
 			threeObject1.quaternion.copy( threeObject.quaternion );
 
-			breakableObject1 = this.createBreakableObject( threeObject1, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius1 > this.minSizeForBreak );
+			breakableObject1 = this.prepareBreakableObject( threeObject1, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius1 > this.minSizeForBreak );
 
 			numObjects++;
 
@@ -309,7 +328,7 @@ THREE.ConvexObjectBreaker.prototype = {
 			threeObject2.position.copy( this.tempCM2 );
 			threeObject2.quaternion.copy( threeObject.quaternion );
 
-			breakableObject2 = this.createBreakableObject( threeObject2, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius2 > this.minSizeForBreak );
+			breakableObject2 = this.prepareBreakableObject( threeObject2, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius2 > this.minSizeForBreak );
 
 			numObjects++;
 
