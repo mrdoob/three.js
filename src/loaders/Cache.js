@@ -1,8 +1,10 @@
+var Cache;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Cache = {
+Cache = {
 
 	enabled: false,
 
@@ -41,3 +43,6 @@ THREE.Cache = {
 	}
 
 };
+
+
+export { Cache };

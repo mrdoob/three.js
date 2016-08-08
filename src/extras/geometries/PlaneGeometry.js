@@ -1,11 +1,14 @@
+import { Geometry } from '../../core/Geometry';
+import { PlaneBufferGeometry } from './PlaneBufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
+function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'PlaneGeometry';
 
@@ -16,9 +19,12 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 		heightSegments: heightSegments
 	};
 
-	this.fromBufferGeometry( new THREE.PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
 
-};
+}
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
+PlaneGeometry.prototype = Object.create( Geometry.prototype );
+PlaneGeometry.prototype.constructor = PlaneGeometry;
+
+
+export { PlaneGeometry };

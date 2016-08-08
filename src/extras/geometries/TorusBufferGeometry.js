@@ -1,10 +1,14 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { BufferAttribute } from '../../core/BufferAttribute';
+import { Vector3 } from '../../math/Vector3';
+
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
+function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'TorusBufferGeometry';
 
@@ -38,9 +42,9 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 	var indexBufferOffset = 0;
 
 	// helper variables
-	var center = new THREE.Vector3();
-	var vertex = new THREE.Vector3();
-	var normal = new THREE.Vector3();
+	var center = new Vector3();
+	var vertex = new Vector3();
+	var normal = new Vector3();
 
 	var j, i;
 
@@ -115,12 +119,15 @@ THREE.TorusBufferGeometry = function ( radius, tube, radialSegments, tubularSegm
 	}
 
 	// build geometry
-	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setIndex( new BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-};
+}
 
-THREE.TorusBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.TorusBufferGeometry.prototype.constructor = THREE.TorusBufferGeometry;
+TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
+
+
+export { TorusBufferGeometry };

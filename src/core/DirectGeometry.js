@@ -1,12 +1,18 @@
+import { Geometry } from './Geometry';
+import { EventDispatcher } from './EventDispatcher';
+import { Vector2 } from '../math/Vector2';
+import { _Math } from '../math/Math';
+import { GeometryIdCount } from './Geometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DirectGeometry = function () {
+function DirectGeometry() {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.name = '';
 	this.type = 'DirectGeometry';
@@ -38,12 +44,12 @@ THREE.DirectGeometry = function () {
 	this.uvsNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
-Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, {
+Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 
-	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
-	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
+	computeBoundingBox: Geometry.prototype.computeBoundingBox,
+	computeBoundingSphere: Geometry.prototype.computeBoundingSphere,
 
 	computeFaceNormals: function () {
 
@@ -207,7 +213,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
 
-					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -225,7 +231,7 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 
 					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
 
-					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -284,3 +290,6 @@ Object.assign( THREE.DirectGeometry.prototype, THREE.EventDispatcher.prototype, 
 	}
 
 } );
+
+
+export { DirectGeometry };

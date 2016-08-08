@@ -1,14 +1,17 @@
+import { XHRLoader } from './XHRLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+function ImageLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-Object.assign( THREE.ImageLoader.prototype, {
+Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -31,9 +34,10 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 		} else {
 
-			var loader = new THREE.XHRLoader();
+			var loader = new XHRLoader();
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
+			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( blob ) {
 
 				image.src = URL.createObjectURL( blob );
@@ -55,6 +59,13 @@ Object.assign( THREE.ImageLoader.prototype, {
 
 	},
 
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
+		return this;
+
+	},
+
 	setPath: function ( value ) {
 
 		this.path = value;
@@ -63,3 +74,6 @@ Object.assign( THREE.ImageLoader.prototype, {
 	}
 
 } );
+
+
+export { ImageLoader };

@@ -1,17 +1,24 @@
+import { Line } from './Line';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LineSegments = function ( geometry, material ) {
+function LineSegments( geometry, material ) {
 
-	THREE.Line.call( this, geometry, material );
+	Line.call( this, geometry, material );
 
 	this.type = 'LineSegments';
 
-};
+}
 
-THREE.LineSegments.prototype = Object.assign( Object.create( THREE.Line.prototype ), {
+LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
-	constructor: THREE.LineSegments
+	constructor: LineSegments,
+
+	isLineSegments: true
 
 } );
+
+
+export { LineSegments };

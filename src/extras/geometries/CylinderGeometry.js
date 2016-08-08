@@ -1,10 +1,13 @@
+import { Geometry } from '../../core/Geometry';
+import { CylinderBufferGeometry } from './CylinderBufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'CylinderGeometry';
 
@@ -19,10 +22,13 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 		thetaLength: thetaLength
 	};
 
-	this.fromBufferGeometry( new THREE.CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
+	this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
 	this.mergeVertices();
 
-};
+}
 
-THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
+CylinderGeometry.prototype = Object.create( Geometry.prototype );
+CylinderGeometry.prototype.constructor = CylinderGeometry;
+
+
+export { CylinderGeometry };

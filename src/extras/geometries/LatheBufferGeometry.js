@@ -1,3 +1,9 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector3 } from '../../math/Vector3';
+import { Vector2 } from '../../math/Vector2';
+import { BufferAttribute } from '../../core/BufferAttribute';
+import { _Math } from '../../math/Math';
+
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
@@ -9,9 +15,9 @@
  // phiLength - the radian (0 to 2PI) range of the lathed section
  //    2PI is a closed lathe, less than 2PI is a portion.
 
-THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
+function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'LatheBufferGeometry';
 
@@ -27,23 +33,22 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 	phiLength = phiLength || Math.PI * 2;
 
 	// clamp phiLength so it's in range of [ 0, 2PI ]
-	phiLength = THREE.Math.clamp( phiLength, 0, Math.PI * 2 );
+	phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
 
 	// these are used to calculate buffer length
 	var vertexCount = ( segments + 1 ) * points.length;
 	var indexCount = segments * points.length * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// helper variables
 	var index = 0, indexOffset = 0, base;
-	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
-	var vertex = new THREE.Vector3();
-	var uv = new THREE.Vector2();
+	var vertex = new Vector3();
+	var uv = new Vector2();
 	var i, j;
 
 	// generate vertices and uvs
@@ -119,9 +124,9 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 	if( phiLength === Math.PI * 2 ) {
 
 		var normals = this.attributes.normal.array;
-		var n1 = new THREE.Vector3();
-		var n2 = new THREE.Vector3();
-		var n = new THREE.Vector3();
+		var n1 = new Vector3();
+		var n2 = new Vector3();
+		var n = new Vector3();
 
 		// this is the buffer offset for the last line of vertices
 		base = segments * points.length * 3;
@@ -150,7 +155,10 @@ THREE.LatheBufferGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	}
 
-};
+}
 
-THREE.LatheBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.LatheBufferGeometry.prototype.constructor = THREE.LatheBufferGeometry;
+LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
+
+
+export { LatheBufferGeometry };

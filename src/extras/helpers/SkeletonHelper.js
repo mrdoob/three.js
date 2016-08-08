@@ -1,3 +1,11 @@
+import { LineSegments } from '../../objects/LineSegments';
+import { Matrix4 } from '../../math/Matrix4';
+import { VertexColors } from '../../constants';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Color } from '../../math/Color';
+import { Vector3 } from '../../math/Vector3';
+import { Geometry } from '../../core/Geometry';
+
 /**
  * @author Sean Griffin / http://twitter.com/sgrif
  * @author Michael Guerrero / http://realitymeltdown.com
@@ -5,22 +13,22 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.SkeletonHelper = function ( object ) {
+function SkeletonHelper( object ) {
 
 	this.bones = this.getBoneList( object );
 
-	var geometry = new THREE.Geometry();
+	var geometry = new Geometry();
 
 	for ( var i = 0; i < this.bones.length; i ++ ) {
 
 		var bone = this.bones[ i ];
 
-		if ( bone.parent instanceof THREE.Bone ) {
+		if ( (bone.parent && bone.parent.isBone) ) {
 
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.colors.push( new THREE.Color( 0, 0, 1 ) );
-			geometry.colors.push( new THREE.Color( 0, 1, 0 ) );
+			geometry.vertices.push( new Vector3() );
+			geometry.vertices.push( new Vector3() );
+			geometry.colors.push( new Color( 0, 0, 1 ) );
+			geometry.colors.push( new Color( 0, 1, 0 ) );
 
 		}
 
@@ -28,9 +36,9 @@ THREE.SkeletonHelper = function ( object ) {
 
 	geometry.dynamic = true;
 
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true } );
+	var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
 
-	THREE.LineSegments.call( this, geometry, material );
+	LineSegments.call( this, geometry, material );
 
 	this.root = object;
 
@@ -39,17 +47,17 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.update();
 
-};
+}
 
 
-THREE.SkeletonHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.SkeletonHelper.prototype.constructor = THREE.SkeletonHelper;
+SkeletonHelper.prototype = Object.create( LineSegments.prototype );
+SkeletonHelper.prototype.constructor = SkeletonHelper;
 
-THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
+SkeletonHelper.prototype.getBoneList = function( object ) {
 
 	var boneList = [];
 
-	if ( object instanceof THREE.Bone ) {
+	if ( (object && object.isBone) ) {
 
 		boneList.push( object );
 
@@ -65,13 +73,13 @@ THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
 
 };
 
-THREE.SkeletonHelper.prototype.update = function () {
+SkeletonHelper.prototype.update = function () {
 
 	var geometry = this.geometry;
 
-	var matrixWorldInv = new THREE.Matrix4().getInverse( this.root.matrixWorld );
+	var matrixWorldInv = new Matrix4().getInverse( this.root.matrixWorld );
 
-	var boneMatrix = new THREE.Matrix4();
+	var boneMatrix = new Matrix4();
 
 	var j = 0;
 
@@ -79,7 +87,7 @@ THREE.SkeletonHelper.prototype.update = function () {
 
 		var bone = this.bones[ i ];
 
-		if ( bone.parent instanceof THREE.Bone ) {
+		if ( (bone.parent && bone.parent.isBone) ) {
 
 			boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
 			geometry.vertices[ j ].setFromMatrixPosition( boneMatrix );
@@ -98,3 +106,6 @@ THREE.SkeletonHelper.prototype.update = function () {
 	geometry.computeBoundingSphere();
 
 };
+
+
+export { SkeletonHelper };

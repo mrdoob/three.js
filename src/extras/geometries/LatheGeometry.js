@@ -1,3 +1,6 @@
+import { Geometry } from '../../core/Geometry';
+import { LatheBufferGeometry } from './LatheBufferGeometry';
+
 /**
  * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
@@ -11,9 +14,9 @@
 // phiLength - the radian (0 to 2PI) range of the lathed section
 //    2PI is a closed lathe, less than 2PI is a portion.
 
-THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
+function LatheGeometry( points, segments, phiStart, phiLength ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'LatheGeometry';
 
@@ -24,10 +27,13 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 		phiLength: phiLength
 	};
 
-	this.fromBufferGeometry( new THREE.LatheBufferGeometry( points, segments, phiStart, phiLength ) );
+	this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
 	this.mergeVertices();
 
-};
+}
 
-THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;
+LatheGeometry.prototype = Object.create( Geometry.prototype );
+LatheGeometry.prototype.constructor = LatheGeometry;
+
+
+export { LatheGeometry };

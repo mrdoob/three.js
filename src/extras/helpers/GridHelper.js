@@ -1,12 +1,19 @@
+import { LineSegments } from '../../objects/LineSegments';
+import { VertexColors } from '../../constants';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Float32Attribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Color } from '../../math/Color';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, divisions, color1, color2 ) {
+function GridHelper( size, divisions, color1, color2 ) {
 
 	divisions = divisions || 1;
-	color1 = new THREE.Color( color1 !== undefined ? color1 : 0x444444 );
-	color2 = new THREE.Color( color2 !== undefined ? color2 : 0x888888 );
+	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
+	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
 	var center = divisions / 2;
 	var step = ( size * 2 ) / divisions;
@@ -26,21 +33,24 @@ THREE.GridHelper = function ( size, divisions, color1, color2 ) {
 
 	}
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+	var geometry = new BufferGeometry();
+	geometry.addAttribute( 'position', new Float32Attribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new Float32Attribute( colors, 3 ) );
 
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+	var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 
-	THREE.LineSegments.call( this, geometry, material );
+	LineSegments.call( this, geometry, material );
 
-};
+}
 
-THREE.GridHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.GridHelper.prototype.constructor = THREE.GridHelper;
+GridHelper.prototype = Object.create( LineSegments.prototype );
+GridHelper.prototype.constructor = GridHelper;
 
-THREE.GridHelper.prototype.setColors = function () {
+GridHelper.prototype.setColors = function () {
 
 	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
 
 };
+
+
+export { GridHelper };

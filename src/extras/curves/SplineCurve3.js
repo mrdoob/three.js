@@ -1,14 +1,18 @@
+import { Vector3 } from '../../math/Vector3';
+import { CurveUtils } from '../CurveUtils';
+import { Curve } from '../core/Curve';
+
 /**************************************************************
  *	Spline 3D curve
  **************************************************************/
 
 
-THREE.SplineCurve3 = THREE.Curve.create(
+var SplineCurve3 = Curve.create(
 
 	function ( points /* array of Vector3 */ ) {
 
 		console.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
-		this.points = ( points == undefined ) ? [] : points;
+		this.points = ( points === undefined ) ? [] : points;
 
 	},
 
@@ -25,9 +29,9 @@ THREE.SplineCurve3 = THREE.Curve.create(
 		var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 		var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-		var interpolate = THREE.CurveUtils.interpolate;
+		var interpolate = CurveUtils.interpolate;
 
-		return new THREE.Vector3(
+		return new Vector3(
 			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
 			interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
 			interpolate( point0.z, point1.z, point2.z, point3.z, weight )
@@ -36,3 +40,6 @@ THREE.SplineCurve3 = THREE.Curve.create(
 	}
 
 );
+
+
+export { SplineCurve3 };

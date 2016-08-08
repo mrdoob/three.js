@@ -1,15 +1,20 @@
+import { Object3D } from '../core/Object3D';
+import { NormalBlending } from '../constants';
+import { Color } from '../math/Color';
+import { Vector3 } from '../math/Vector3';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlare = function ( texture, size, distance, blending, color ) {
+function LensFlare( texture, size, distance, blending, color ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.lensFlares = [];
 
-	this.positionScreen = new THREE.Vector3();
+	this.positionScreen = new Vector3();
 	this.customUpdateCallback = undefined;
 
 	if ( texture !== undefined ) {
@@ -18,15 +23,17 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 
 	}
 
-};
+}
 
-THREE.LensFlare.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+LensFlare.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.LensFlare,
+	constructor: LensFlare,
+
+	isLensFlare: true,
 
 	copy: function ( source ) {
 
-		THREE.Object3D.prototype.copy.call( this, source );
+		Object3D.prototype.copy.call( this, source );
 
 		this.positionScreen.copy( source.positionScreen );
 		this.customUpdateCallback = source.customUpdateCallback;
@@ -46,8 +53,8 @@ THREE.LensFlare.prototype = Object.assign( Object.create( THREE.Object3D.prototy
 		if ( size === undefined ) size = - 1;
 		if ( distance === undefined ) distance = 0;
 		if ( opacity === undefined ) opacity = 1;
-		if ( color === undefined ) color = new THREE.Color( 0xffffff );
-		if ( blending === undefined ) blending = THREE.NormalBlending;
+		if ( color === undefined ) color = new Color( 0xffffff );
+		if ( blending === undefined ) blending = NormalBlending;
 
 		distance = Math.min( distance, Math.max( 0, distance ) );
 
@@ -92,3 +99,6 @@ THREE.LensFlare.prototype = Object.assign( Object.create( THREE.Object3D.prototy
 	}
 
 } );
+
+
+export { LensFlare };

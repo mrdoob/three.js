@@ -1,10 +1,13 @@
+import { Geometry } from '../../core/Geometry';
+import { TorusKnotBufferGeometry } from './TorusKnotBufferGeometry';
+
 /**
  * @author oosmoxiecode
  */
 
-THREE.TorusKnotGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'TorusKnotGeometry';
 
@@ -19,10 +22,13 @@ THREE.TorusKnotGeometry = function ( radius, tube, tubularSegments, radialSegmen
 
 	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
-	this.fromBufferGeometry( new THREE.TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
+	this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
 	this.mergeVertices();
 
-};
+}
 
-THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
+TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
+TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
+
+
+export { TorusKnotGeometry };

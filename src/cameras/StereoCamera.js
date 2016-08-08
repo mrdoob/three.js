@@ -1,31 +1,37 @@
+import { Matrix4 } from '../math/Matrix4';
+import { _Math } from '../math/Math';
+import { PerspectiveCamera } from './PerspectiveCamera';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.StereoCamera = function () {
+function StereoCamera() {
 
 	this.type = 'StereoCamera';
 
 	this.aspect = 1;
 
-	this.cameraL = new THREE.PerspectiveCamera();
+	this.eyeSep = 0.064;
+
+	this.cameraL = new PerspectiveCamera();
 	this.cameraL.layers.enable( 1 );
 	this.cameraL.matrixAutoUpdate = false;
 
-	this.cameraR = new THREE.PerspectiveCamera();
+	this.cameraR = new PerspectiveCamera();
 	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
-};
+}
 
-Object.assign( THREE.StereoCamera.prototype, {
+Object.assign( StereoCamera.prototype, {
 
 	update: ( function () {
 
 		var focus, fov, aspect, near, far;
 
-		var eyeRight = new THREE.Matrix4();
-		var eyeLeft = new THREE.Matrix4();
+		var eyeRight = new Matrix4();
+		var eyeLeft = new Matrix4();
 
 		return function update( camera ) {
 
@@ -45,9 +51,9 @@ Object.assign( THREE.StereoCamera.prototype, {
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				var eyeSep = 0.064 / 2;
+				var eyeSep = this.eyeSep / 2;
 				var eyeSepOnProjection = eyeSep * near / focus;
-				var ymax = near * Math.tan( THREE.Math.DEG2RAD * fov * 0.5 );
+				var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
 				var xmin, xmax;
 
 				// translate xOffset
@@ -85,3 +91,6 @@ Object.assign( THREE.StereoCamera.prototype, {
 	} )()
 
 } );
+
+
+export { StereoCamera };

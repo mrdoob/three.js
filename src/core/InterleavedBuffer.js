@@ -1,10 +1,12 @@
+import { _Math } from '../math/Math';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBuffer = function ( array, stride ) {
+function InterleavedBuffer( array, stride ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.array = array;
 	this.stride = stride;
@@ -14,11 +16,13 @@ THREE.InterleavedBuffer = function ( array, stride ) {
 
 	this.version = 0;
 
-};
+}
 
-THREE.InterleavedBuffer.prototype = {
+InterleavedBuffer.prototype = {
 
-	constructor: THREE.InterleavedBuffer,
+	constructor: InterleavedBuffer,
+
+	isInterleavedBuffer: true,
 
 	get length () {
 
@@ -88,3 +92,6 @@ THREE.InterleavedBuffer.prototype = {
 	}
 
 };
+
+
+export { InterleavedBuffer };

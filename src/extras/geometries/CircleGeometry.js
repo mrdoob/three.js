@@ -1,10 +1,13 @@
+import { Geometry } from '../../core/Geometry';
+import { CircleBufferGeometry } from './CircleBufferGeometry';
+
 /**
  * @author hughes
  */
 
-THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
+function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'CircleGeometry';
 
@@ -15,9 +18,12 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 		thetaLength: thetaLength
 	};
 
-	this.fromBufferGeometry( new THREE.CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
 
-};
+}
 
-THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
+CircleGeometry.prototype = Object.create( Geometry.prototype );
+CircleGeometry.prototype.constructor = CircleGeometry;
+
+
+export { CircleGeometry };

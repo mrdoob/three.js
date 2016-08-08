@@ -1,9 +1,16 @@
+import { Matrix3 } from '../../math/Matrix3';
+import { Vector3 } from '../../math/Vector3';
+import { LineSegments } from '../../objects/LineSegments';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Float32Attribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
+function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	// FaceNormalsHelper only supports THREE.Geometry
 
@@ -21,7 +28,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var objGeometry = this.object.geometry;
 
-	if ( objGeometry instanceof THREE.Geometry ) {
+	if ( (objGeometry && objGeometry.isGeometry) ) {
 
 		nNormals = objGeometry.faces.length;
 
@@ -33,29 +40,29 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	//
 
-	var geometry = new THREE.BufferGeometry();
+	var geometry = new BufferGeometry();
 
-	var positions = new THREE.Float32Attribute( nNormals * 2 * 3, 3 );
+	var positions = new Float32Attribute( nNormals * 2 * 3, 3 );
 
 	geometry.addAttribute( 'position', positions );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 
 	//
 
 	this.matrixAutoUpdate = false;
 	this.update();
 
-};
+}
 
-THREE.FaceNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.FaceNormalsHelper.prototype.constructor = THREE.FaceNormalsHelper;
+FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
+FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
 
-THREE.FaceNormalsHelper.prototype.update = ( function () {
+FaceNormalsHelper.prototype.update = ( function () {
 
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
-	var normalMatrix = new THREE.Matrix3();
+	var v1 = new Vector3();
+	var v2 = new Vector3();
+	var normalMatrix = new Matrix3();
 
 	return function update() {
 
@@ -108,3 +115,6 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 	};
 
 }() );
+
+
+export { FaceNormalsHelper };

@@ -1,3 +1,7 @@
+import { Geometry } from '../../core/Geometry';
+import { Face3 } from '../../core/Face3';
+import { Vector2 } from '../../math/Vector2';
+
 /**
  * @author zz85 / https://github.com/zz85
  * Parametric Surfaces Geometry
@@ -7,9 +11,9 @@
  *
  */
 
-THREE.ParametricGeometry = function ( func, slices, stacks ) {
+function ParametricGeometry( func, slices, stacks ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'ParametricGeometry';
 
@@ -55,15 +59,15 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 			c = ( i + 1 ) * sliceCount + j + 1;
 			d = ( i + 1 ) * sliceCount + j;
 
-			uva = new THREE.Vector2( j / slices, i / stacks );
-			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
+			uva = new Vector2( j / slices, i / stacks );
+			uvb = new Vector2( ( j + 1 ) / slices, i / stacks );
+			uvc = new Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvd = new Vector2( j / slices, ( i + 1 ) / stacks );
 
-			faces.push( new THREE.Face3( a, b, d ) );
+			faces.push( new Face3( a, b, d ) );
 			uvs.push( [ uva, uvb, uvd ] );
 
-			faces.push( new THREE.Face3( b, c, d ) );
+			faces.push( new Face3( b, c, d ) );
 			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
@@ -79,7 +83,10 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
-THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
+ParametricGeometry.prototype = Object.create( Geometry.prototype );
+ParametricGeometry.prototype.constructor = ParametricGeometry;
+
+
+export { ParametricGeometry };

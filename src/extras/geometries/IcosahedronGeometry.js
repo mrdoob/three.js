@@ -1,8 +1,10 @@
+import { PolyhedronGeometry } from './PolyhedronGeometry';
+
 /**
  * @author timothypratley / https://github.com/timothypratley
  */
 
-THREE.IcosahedronGeometry = function ( radius, detail ) {
+function IcosahedronGeometry( radius, detail ) {
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -19,7 +21,7 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 		 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
 	this.type = 'IcosahedronGeometry';
 
@@ -28,7 +30,10 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
-THREE.IcosahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
-THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
+IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
+
+
+export { IcosahedronGeometry };

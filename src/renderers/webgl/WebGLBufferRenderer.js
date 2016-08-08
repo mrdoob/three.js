@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
+function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 	var mode;
 
@@ -37,7 +37,7 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		var count = 0;
 
-		if ( position instanceof THREE.InterleavedBufferAttribute ) {
+		if ( (position && position.isInterleavedBufferAttribute) ) {
 
 			count = position.data.count;
 
@@ -61,4 +61,7 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 	this.render = render;
 	this.renderInstances = renderInstances;
 
-};
+}
+
+
+export { WebGLBufferRenderer };

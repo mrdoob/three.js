@@ -1,22 +1,26 @@
+import { getAudioContext } from '../audio/AudioContext';
+import { XHRLoader } from './XHRLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-THREE.AudioLoader = function ( manager ) {
+function AudioLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-Object.assign( THREE.AudioLoader.prototype, {
+Object.assign( AudioLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new XHRLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
-			var context = THREE.AudioContext;
+			var context = getAudioContext();
 
 			context.decodeAudioData( buffer, function ( audioBuffer ) {
 
@@ -29,3 +33,6 @@ Object.assign( THREE.AudioLoader.prototype, {
 	}
 
 } );
+
+
+export { AudioLoader };

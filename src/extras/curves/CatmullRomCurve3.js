@@ -1,3 +1,8 @@
+import { Vector3 } from '../../math/Vector3';
+import { Curve } from '../core/Curve';
+
+var CatmullRomCurve3;
+
 /**
  * @author zz85 https://github.com/zz85
  *
@@ -9,10 +14,10 @@
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-THREE.CatmullRomCurve3 = ( function() {
+CatmullRomCurve3 = ( function() {
 
 	var
-		tmp = new THREE.Vector3(),
+		tmp = new Vector3(),
 		px = new CubicPoly(),
 		py = new CubicPoly(),
 		pz = new CubicPoly();
@@ -79,7 +84,7 @@ THREE.CatmullRomCurve3 = ( function() {
 	};
 
 	// Subclass Three.js curve
-	return THREE.Curve.create(
+	return Curve.create(
 
 		function ( p /* array of Vector3 */ ) {
 
@@ -167,7 +172,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			}
 
-			var v = new THREE.Vector3(
+			var v = new Vector3(
 				px.calc( weight ),
 				py.calc( weight ),
 				pz.calc( weight )
@@ -180,3 +185,6 @@ THREE.CatmullRomCurve3 = ( function() {
 	);
 
 } )();
+
+
+export { CatmullRomCurve3 };

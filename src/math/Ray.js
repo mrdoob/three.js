@@ -1,17 +1,19 @@
+import { Vector3 } from './Vector3';
+
 /**
  * @author bhouston / http://clara.io
  */
 
-THREE.Ray = function ( origin, direction ) {
+function Ray( origin, direction ) {
 
-	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
-	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();
+	this.origin = ( origin !== undefined ) ? origin : new Vector3();
+	this.direction = ( direction !== undefined ) ? direction : new Vector3();
 
-};
+}
 
-THREE.Ray.prototype = {
+Ray.prototype = {
 
-	constructor: THREE.Ray,
+	constructor: Ray,
 
 	set: function ( origin, direction ) {
 
@@ -39,7 +41,7 @@ THREE.Ray.prototype = {
 
 	at: function ( t, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
@@ -55,7 +57,7 @@ THREE.Ray.prototype = {
 
 	recast: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function recast( t ) {
 
@@ -69,7 +71,7 @@ THREE.Ray.prototype = {
 
 	closestPointToPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		result.subVectors( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
@@ -91,7 +93,7 @@ THREE.Ray.prototype = {
 
 	distanceSqToPoint: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function distanceSqToPoint( point ) {
 
@@ -115,9 +117,9 @@ THREE.Ray.prototype = {
 
 	distanceSqToSegment: function () {
 
-		var segCenter = new THREE.Vector3();
-		var segDir = new THREE.Vector3();
-		var diff = new THREE.Vector3();
+		var segCenter = new Vector3();
+		var segDir = new Vector3();
+		var diff = new Vector3();
 
 		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
@@ -242,7 +244,7 @@ THREE.Ray.prototype = {
 
 	intersectSphere: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
 		return function intersectSphere( sphere, optionalTarget ) {
 
@@ -422,7 +424,7 @@ THREE.Ray.prototype = {
 
 	intersectsBox: ( function () {
 
-		var v = new THREE.Vector3();
+		var v = new Vector3();
 
 		return function intersectsBox( box ) {
 
@@ -435,10 +437,10 @@ THREE.Ray.prototype = {
 	intersectTriangle: function () {
 
 		// Compute the offset origin, edges, and normal.
-		var diff = new THREE.Vector3();
-		var edge1 = new THREE.Vector3();
-		var edge2 = new THREE.Vector3();
-		var normal = new THREE.Vector3();
+		var diff = new Vector3();
+		var edge1 = new Vector3();
+		var edge2 = new Vector3();
+		var normal = new Vector3();
 
 		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 
@@ -533,3 +535,6 @@ THREE.Ray.prototype = {
 	}
 
 };
+
+
+export { Ray };

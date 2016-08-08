@@ -1,10 +1,15 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector2 } from '../../math/Vector2';
+import { Vector3 } from '../../math/Vector3';
+import { BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'RingBufferGeometry';
 
@@ -31,17 +36,17 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 	var indexCount = thetaSegments * phiSegments * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// some helper variables
 	var index = 0, indexOffset = 0, segment;
 	var radius = innerRadius;
 	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-	var vertex = new THREE.Vector3();
-	var uv = new THREE.Vector2();
+	var vertex = new Vector3();
+	var uv = new Vector2();
 	var j, i;
 
 	// generate vertices, normals and uvs
@@ -114,7 +119,10 @@ THREE.RingBufferGeometry = function ( innerRadius, outerRadius, thetaSegments, p
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
 
-};
+}
 
-THREE.RingBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.RingBufferGeometry.prototype.constructor = THREE.RingBufferGeometry;
+RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+RingBufferGeometry.prototype.constructor = RingBufferGeometry;
+
+
+export { RingBufferGeometry };

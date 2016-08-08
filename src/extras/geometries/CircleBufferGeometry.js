@@ -1,10 +1,15 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector3 } from '../../math/Vector3';
+import { Sphere } from '../../math/Sphere';
+import { BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLength ) {
+function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'CircleBufferGeometry';
 
@@ -54,14 +59,17 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 	}
 
-	this.setIndex( new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
-THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
+CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
+
+
+export { CircleBufferGeometry };

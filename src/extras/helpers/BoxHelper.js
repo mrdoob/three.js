@@ -1,19 +1,25 @@
+import { Box3 } from '../../math/Box3';
+import { LineSegments } from '../../objects/LineSegments';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { BufferAttribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object, color ) {
+function BoxHelper( object, color ) {
 
 	if ( color === undefined ) color = 0xffff00;
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 	var positions = new Float32Array( 8 * 3 );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+	var geometry = new BufferGeometry();
+	geometry.setIndex( new BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
 
 	if ( object !== undefined ) {
 
@@ -21,18 +27,18 @@ THREE.BoxHelper = function ( object, color ) {
 
 	}
 
-};
+}
 
-THREE.BoxHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
+BoxHelper.prototype = Object.create( LineSegments.prototype );
+BoxHelper.prototype.constructor = BoxHelper;
 
-THREE.BoxHelper.prototype.update = ( function () {
+BoxHelper.prototype.update = ( function () {
 
-	var box = new THREE.Box3();
+	var box = new Box3();
 
 	return function update( object ) {
 
-		if ( object instanceof THREE.Box3 ) {
+		if ( (object && object.isBox3) ) {
 
 			box.copy( object );
 
@@ -82,3 +88,6 @@ THREE.BoxHelper.prototype.update = ( function () {
 	};
 
 } )();
+
+
+export { BoxHelper };

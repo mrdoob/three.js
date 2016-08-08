@@ -1,19 +1,21 @@
+import { Interpolant } from '../Interpolant';
+
 /**
  * @author tschw
  */
 
-THREE.LinearInterpolant = function(
+function LinearInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	THREE.Interpolant.call(
+	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-};
+}
 
-THREE.LinearInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+LinearInterpolant.prototype =
+		Object.assign( Object.create( Interpolant.prototype ), {
 
-	constructor: THREE.LinearInterpolant,
+	constructor: LinearInterpolant,
 
 	interpolate_: function( i1, t0, t, t1 ) {
 
@@ -40,3 +42,6 @@ THREE.LinearInterpolant.prototype =
 	}
 
 } );
+
+
+export { LinearInterpolant };

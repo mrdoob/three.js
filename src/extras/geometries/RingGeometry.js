@@ -1,10 +1,13 @@
+import { Geometry } from '../../core/Geometry';
+import { RingBufferGeometry } from './RingBufferGeometry';
+
 /**
  * @author Kaleb Murphy
  */
 
-THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'RingGeometry';
 
@@ -17,9 +20,12 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 		thetaLength: thetaLength
 	};
 
-	this.fromBufferGeometry( new THREE.RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
 
-};
+}
 
-THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
+RingGeometry.prototype = Object.create( Geometry.prototype );
+RingGeometry.prototype.constructor = RingGeometry;
+
+
+export { RingGeometry };

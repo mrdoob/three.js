@@ -1,3 +1,8 @@
+import { PathPrototype } from './PathPrototype';
+import { ShapeGeometry } from '../geometries/ShapeGeometry';
+import { ExtrudeGeometry } from '../geometries/ExtrudeGeometry';
+import { Path } from './Path';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Defines a 2d shape plane using paths.
@@ -9,23 +14,23 @@
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-THREE.Shape = function () {
+function Shape() {
 
-	THREE.Path.apply( this, arguments );
+	Path.apply( this, arguments );
 
 	this.holes = [];
 
-};
+}
 
-THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
+Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
-	constructor: THREE.Shape,
+	constructor: Shape,
 
 	// Convenience method to return ExtrudeGeometry
 
 	extrude: function ( options ) {
 
-		return new THREE.ExtrudeGeometry( this, options );
+		return new ExtrudeGeometry( this, options );
 
 	},
 
@@ -33,7 +38,7 @@ THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
 
 	makeGeometry: function ( options ) {
 
-		return new THREE.ShapeGeometry( this, options );
+		return new ShapeGeometry( this, options );
 
 	},
 
@@ -71,3 +76,6 @@ THREE.Shape.prototype = Object.assign( Object.create( THREE.Path.prototype ), {
 	}
 
 } );
+
+
+export { Shape };

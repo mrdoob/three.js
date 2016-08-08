@@ -1,9 +1,13 @@
+import { Box2 } from '../../../math/Box2';
+import { Vector2 } from '../../../math/Vector2';
+import { Vector3 } from '../../../math/Vector3';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlarePlugin = function ( renderer, flares ) {
+function LensFlarePlugin( renderer, flares ) {
 
 	var gl = renderer.context;
 	var state = renderer.state;
@@ -181,19 +185,19 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		if ( flares.length === 0 ) return;
 
-		var tempPosition = new THREE.Vector3();
+		var tempPosition = new Vector3();
 
 		var invAspect = viewport.w / viewport.z,
 			halfViewportWidth = viewport.z * 0.5,
 			halfViewportHeight = viewport.w * 0.5;
 
 		var size = 16 / viewport.w,
-			scale = new THREE.Vector2( size * invAspect, size );
+			scale = new Vector2( size * invAspect, size );
 
-		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
-			screenPositionPixels = new THREE.Vector2( 1, 1 );
+		var screenPosition = new Vector3( 1, 1, 0 ),
+			screenPositionPixels = new Vector2( 1, 1 );
 
-		var validArea = new THREE.Box2();
+		var validArea = new Box2();
 
 		validArea.min.set( 0, 0 );
 		validArea.max.set( viewport.z - 16, viewport.w - 16 );
@@ -355,7 +359,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram( shader ) {
 
 		var program = gl.createProgram();
 
@@ -379,4 +383,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	}
 
-};
+}
+
+
+export { LensFlarePlugin };

@@ -1,10 +1,13 @@
+import { Geometry } from '../../core/Geometry';
+import { SphereBufferGeometry } from './SphereBufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'SphereGeometry';
 
@@ -18,9 +21,12 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 		thetaLength: thetaLength
 	};
 
-	this.fromBufferGeometry( new THREE.SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
 
-};
+}
 
-THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
+SphereGeometry.prototype = Object.create( Geometry.prototype );
+SphereGeometry.prototype.constructor = SphereGeometry;
+
+
+export { SphereGeometry };

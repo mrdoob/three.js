@@ -1,14 +1,17 @@
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.XHRLoader = function ( manager ) {
+function XHRLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-Object.assign( THREE.XHRLoader.prototype, {
+Object.assign( XHRLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -16,7 +19,7 @@ Object.assign( THREE.XHRLoader.prototype, {
 
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -35,14 +38,13 @@ Object.assign( THREE.XHRLoader.prototype, {
 		}
 
 		var request = new XMLHttpRequest();
-		request.overrideMimeType( 'text/plain' );
 		request.open( 'GET', url, true );
 
 		request.addEventListener( 'load', function ( event ) {
 
 			var response = event.target.response;
 
-			THREE.Cache.add( url, response );
+			Cache.add( url, response );
 
 			if ( this.status === 200 ) {
 
@@ -92,6 +94,8 @@ Object.assign( THREE.XHRLoader.prototype, {
 		if ( this.responseType !== undefined ) request.responseType = this.responseType;
 		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
+		if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+
 		request.send( null );
 
 		scope.manager.itemStart( url );
@@ -122,3 +126,6 @@ Object.assign( THREE.XHRLoader.prototype, {
 	}
 
 } );
+
+
+export { XHRLoader };

@@ -1,17 +1,19 @@
+import { Vector2 } from './Vector2';
+
 /**
  * @author bhouston / http://clara.io
  */
 
-THREE.Box2 = function ( min, max ) {
+function Box2( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector2( + Infinity, + Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
+	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
+	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
 
-};
+}
 
-THREE.Box2.prototype = {
+Box2.prototype = {
 
-	constructor: THREE.Box2,
+	constructor: Box2,
 
 	set: function ( min, max ) {
 
@@ -38,7 +40,7 @@ THREE.Box2.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
 		return function setFromCenterAndSize( center, size ) {
 
@@ -86,14 +88,14 @@ THREE.Box2.prototype = {
 
 	center: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.subVectors( this.max, this.min );
 
 	},
@@ -156,7 +158,7 @@ THREE.Box2.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 
 		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -182,14 +184,14 @@ THREE.Box2.prototype = {
 
 	clampPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
 	distanceToPoint: function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
 		return function distanceToPoint( point ) {
 
@@ -234,3 +236,6 @@ THREE.Box2.prototype = {
 	}
 
 };
+
+
+export { Box2 };

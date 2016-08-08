@@ -1,8 +1,10 @@
+import { PolyhedronGeometry } from './PolyhedronGeometry';
+
 /**
  * @author Abe Pazos / https://hamoid.com
  */
 
-THREE.DodecahedronGeometry = function ( radius, detail ) {
+function DodecahedronGeometry( radius, detail ) {
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 	var r = 1 / t;
@@ -43,7 +45,7 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 		 1, 12, 14,      1, 14,  5,      1,  5,  9
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
 	this.type = 'DodecahedronGeometry';
 
@@ -52,7 +54,10 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
-THREE.DodecahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
-THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
+DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
+
+
+export { DodecahedronGeometry };

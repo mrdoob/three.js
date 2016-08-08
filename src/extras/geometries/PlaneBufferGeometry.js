@@ -1,11 +1,14 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'PlaneBufferGeometry';
 
@@ -85,12 +88,15 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	}
 
-	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setIndex( new BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-};
+}
 
-THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
+PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
+
+
+export { PlaneBufferGeometry };

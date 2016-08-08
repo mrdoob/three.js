@@ -1,3 +1,7 @@
+import { Camera } from './Camera';
+import { Object3D } from '../core/Object3D';
+import { _Math } from '../math/Math';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
@@ -5,9 +9,9 @@
  * @author tschw
  */
 
-THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
+function PerspectiveCamera( fov, aspect, near, far ) {
 
-	THREE.Camera.call( this );
+	Camera.call( this );
 
 	this.type = 'PerspectiveCamera';
 
@@ -26,15 +30,17 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
-THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.prototype ), {
+PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
-	constructor: THREE.PerspectiveCamera,
+	constructor: PerspectiveCamera,
+
+	isPerspectiveCamera: true,
 
 	copy: function ( source ) {
 
-		THREE.Camera.prototype.copy.call( this, source );
+		Camera.prototype.copy.call( this, source );
 
 		this.fov = source.fov;
 		this.zoom = source.zoom;
@@ -66,7 +72,7 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 		// see http://www.bobatkins.com/photography/technical/field_of_view.html
 		var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
-		this.fov = THREE.Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
+		this.fov = _Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
 		this.updateProjectionMatrix();
 
 	},
@@ -76,7 +82,7 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 	 */
 	getFocalLength: function () {
 
-		var vExtentSlope = Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov );
+		var vExtentSlope = Math.tan( _Math.DEG2RAD * 0.5 * this.fov );
 
 		return 0.5 * this.getFilmHeight() / vExtentSlope;
 
@@ -84,8 +90,8 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 
 	getEffectiveFOV: function () {
 
-		return THREE.Math.RAD2DEG * 2 * Math.atan(
-				Math.tan( THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+		return _Math.RAD2DEG * 2 * Math.atan(
+				Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 	},
 
@@ -166,7 +172,7 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 
 		var near = this.near,
 			top = near * Math.tan(
-					THREE.Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+					_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 			height = 2 * top,
 			width = this.aspect * height,
 			left = - 0.5 * width,
@@ -194,7 +200,7 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 
 	toJSON: function ( meta ) {
 
-		var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
 		data.object.zoom = this.zoom;
@@ -215,3 +221,6 @@ THREE.PerspectiveCamera.prototype = Object.assign( Object.create( THREE.Camera.p
 	}
 
 } );
+
+
+export { PerspectiveCamera };

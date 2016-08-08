@@ -1,11 +1,19 @@
+import { Vector3 } from '../../math/Vector3';
+import { Object3D } from '../../core/Object3D';
+import { Mesh } from '../../objects/Mesh';
+import { FaceColors } from '../../constants';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { SphereGeometry } from '../geometries/SphereGeometry';
+import { Color } from '../../math/Color';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.HemisphereLightHelper = function ( light, sphereSize ) {
+function HemisphereLightHelper( light, sphereSize ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.light = light;
 	this.light.updateMatrixWorld();
@@ -13,9 +21,9 @@ THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.colors = [ new THREE.Color(), new THREE.Color() ];
+	this.colors = [ new Color(), new Color() ];
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
+	var geometry = new SphereGeometry( sphereSize, 4, 2 );
 	geometry.rotateX( - Math.PI / 2 );
 
 	for ( var i = 0, il = 8; i < il; i ++ ) {
@@ -24,28 +32,28 @@ THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 
 	}
 
-	var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, wireframe: true } );
+	var material = new MeshBasicMaterial( { vertexColors: FaceColors, wireframe: true } );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
+	this.lightSphere = new Mesh( geometry, material );
 	this.add( this.lightSphere );
 
 	this.update();
 
-};
+}
 
-THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype );
-THREE.HemisphereLightHelper.prototype.constructor = THREE.HemisphereLightHelper;
+HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
+HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
 
-THREE.HemisphereLightHelper.prototype.dispose = function () {
+HemisphereLightHelper.prototype.dispose = function () {
 
 	this.lightSphere.geometry.dispose();
 	this.lightSphere.material.dispose();
 
 };
 
-THREE.HemisphereLightHelper.prototype.update = function () {
+HemisphereLightHelper.prototype.update = function () {
 
-	var vector = new THREE.Vector3();
+	var vector = new Vector3();
 
 	return function update() {
 
@@ -58,3 +66,6 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 	};
 
 }();
+
+
+export { HemisphereLightHelper };

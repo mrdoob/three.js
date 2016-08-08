@@ -1,3 +1,6 @@
+import { Material } from './Material';
+import { Color } from '../math/Color';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -13,13 +16,13 @@
  * }
  */
 
-THREE.LineDashedMaterial = function ( parameters ) {
+function LineDashedMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.type = 'LineDashedMaterial';
 
-	this.color = new THREE.Color( 0xffffff );
+	this.color = new Color( 0xffffff );
 
 	this.linewidth = 1;
 
@@ -31,14 +34,16 @@ THREE.LineDashedMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
+LineDashedMaterial.prototype = Object.create( Material.prototype );
+LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
-THREE.LineDashedMaterial.prototype.copy = function ( source ) {
+LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
-	THREE.Material.prototype.copy.call( this, source );
+LineDashedMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 
@@ -51,3 +56,6 @@ THREE.LineDashedMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { LineDashedMaterial };

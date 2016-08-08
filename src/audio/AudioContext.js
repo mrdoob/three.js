@@ -1,25 +1,13 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+var context;
 
-Object.defineProperty( THREE, 'AudioContext', {
+export function getAudioContext() {
 
-	get: ( function () {
+	if ( context === undefined ) {
 
-		var context;
+		context = new ( window.AudioContext || window.webkitAudioContext )();
 
-		return function get() {
+	}
 
-			if ( context === undefined ) {
+	return context;
 
-				context = new ( window.AudioContext || window.webkitAudioContext )();
-
-			}
-
-			return context;
-
-		};
-
-	} )()
-
-} );
+}

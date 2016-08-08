@@ -1,3 +1,8 @@
+import { Curve } from './Curve';
+import { Vector3 } from '../../math/Vector3';
+import { Geometry } from '../../core/Geometry';
+import { LineCurve } from '../curves/LineCurve';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -8,17 +13,17 @@
  *  curves, but retains the api of a curve
  **************************************************************/
 
-THREE.CurvePath = function () {
+function CurvePath() {
 
 	this.curves = [];
 
 	this.autoClose = false; // Automatically closes the path
 
-};
+}
 
-THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype ), {
+CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-	constructor: THREE.CurvePath,
+	constructor: CurvePath,
 
 	add: function ( curve ) {
 
@@ -34,7 +39,7 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 		if ( ! startPoint.equals( endPoint ) ) {
 
-			this.curves.push( new THREE.LineCurve( endPoint, startPoint ) );
+			this.curves.push( new LineCurve( endPoint, startPoint ) );
 
 		}
 
@@ -163,9 +168,9 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var resolution = curve instanceof THREE.EllipseCurve ? divisions * 2
-				: curve instanceof THREE.LineCurve ? 1
-				: curve instanceof THREE.SplineCurve ? divisions * curve.points.length
+			var resolution = (curve && curve.isEllipseCurve) ? divisions * 2
+				: (curve && curve.isLineCurve) ? 1
+				: (curve && curve.isSplineCurve) ? divisions * curve.points.length
 				: divisions;
 
 			var pts = curve.getPoints( resolution );
@@ -217,12 +222,12 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 
 	createGeometry: function ( points ) {
 
-		var geometry = new THREE.Geometry();
+		var geometry = new Geometry();
 
 		for ( var i = 0, l = points.length; i < l; i ++ ) {
 
 			var point = points[ i ];
-			geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z || 0 ) );
+			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
 
 		}
 
@@ -231,3 +236,6 @@ THREE.CurvePath.prototype = Object.assign( Object.create( THREE.Curve.prototype 
 	}
 
 } );
+
+
+export { CurvePath };

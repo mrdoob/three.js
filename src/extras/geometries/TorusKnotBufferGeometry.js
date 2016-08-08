@@ -1,11 +1,16 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector3 } from '../../math/Vector3';
+import { Vector2 } from '../../math/Vector2';
+import { BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *
  * see: http://www.blackpawn.com/texts/pqtorus/
  */
-THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radialSegments, p, q ) {
+function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'TorusKnotBufferGeometry';
 
@@ -30,24 +35,24 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 	var indexCount = radialSegments * tubularSegments * 2 * 3;
 
 	// buffers
-	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
 	// helper variables
 	var i, j, index = 0, indexOffset = 0;
 
-	var vertex = new THREE.Vector3();
-	var normal = new THREE.Vector3();
-	var uv = new THREE.Vector2();
+	var vertex = new Vector3();
+	var normal = new Vector3();
+	var uv = new Vector2();
 
-	var P1 = new THREE.Vector3();
-	var P2 = new THREE.Vector3();
+	var P1 = new Vector3();
+	var P2 = new Vector3();
 
-	var B = new THREE.Vector3();
-	var T = new THREE.Vector3();
-	var N = new THREE.Vector3();
+	var B = new Vector3();
+	var T = new Vector3();
+	var N = new Vector3();
 
 	// generate vertices, normals and uvs
 
@@ -158,7 +163,10 @@ THREE.TorusKnotBufferGeometry = function ( radius, tube, tubularSegments, radial
 
 	}
 
-};
+}
 
-THREE.TorusKnotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.TorusKnotBufferGeometry.prototype.constructor = THREE.TorusKnotBufferGeometry;
+TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
+
+
+export { TorusKnotBufferGeometry };

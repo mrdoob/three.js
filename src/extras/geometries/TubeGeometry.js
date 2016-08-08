@@ -1,3 +1,10 @@
+import { Geometry } from '../../core/Geometry';
+import { _Math } from '../../math/Math';
+import { Vector3 } from '../../math/Vector3';
+import { Matrix4 } from '../../math/Matrix4';
+import { Face3 } from '../../core/Face3';
+import { Vector2 } from '../../math/Vector2';
+
 /**
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
@@ -12,9 +19,9 @@
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, taper ) {
+function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
 
-	THREE.Geometry.call( this );
+	Geometry.call( this );
 
 	this.type = 'TubeGeometry';
 
@@ -31,7 +38,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
-	taper = taper || THREE.TubeGeometry.NoTaper;
+	taper = taper || TubeGeometry.NoTaper;
 
 	var grid = [];
 
@@ -46,13 +53,13 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 		u, v, r,
 
 		cx, cy,
-		pos, pos2 = new THREE.Vector3(),
+		pos, pos2 = new Vector3(),
 		i, j,
 		ip, jp,
 		a, b, c, d,
 		uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
+	var frames = new TubeGeometry.FrenetFrames( path, segments, closed ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -64,7 +71,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 	function vert( x, y, z ) {
 
-		return scope.vertices.push( new THREE.Vector3( x, y, z ) ) - 1;
+		return scope.vertices.push( new Vector3( x, y, z ) ) - 1;
 
 	}
 
@@ -117,15 +124,15 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 			c = grid[ ip ][ jp ];
 			d = grid[ i ][ jp ];
 
-			uva = new THREE.Vector2( i / segments, j / radialSegments );
-			uvb = new THREE.Vector2( ( i + 1 ) / segments, j / radialSegments );
-			uvc = new THREE.Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
-			uvd = new THREE.Vector2( i / segments, ( j + 1 ) / radialSegments );
+			uva = new Vector2( i / segments, j / radialSegments );
+			uvb = new Vector2( ( i + 1 ) / segments, j / radialSegments );
+			uvc = new Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
+			uvd = new Vector2( i / segments, ( j + 1 ) / radialSegments );
 
-			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faces.push( new Face3( a, b, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faces.push( new Face3( b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
@@ -135,34 +142,34 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
-THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
-THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
+TubeGeometry.prototype = Object.create( Geometry.prototype );
+TubeGeometry.prototype.constructor = TubeGeometry;
 
-THREE.TubeGeometry.NoTaper = function ( u ) {
+TubeGeometry.NoTaper = function ( u ) {
 
 	return 1;
 
 };
 
-THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
+TubeGeometry.SinusoidalTaper = function ( u ) {
 
 	return Math.sin( Math.PI * u );
 
 };
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
+TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var	normal = new THREE.Vector3(),
+	var	normal = new Vector3(),
 
 		tangents = [],
 		normals = [],
 		binormals = [],
 
-		vec = new THREE.Vector3(),
-		mat = new THREE.Matrix4(),
+		vec = new Vector3(),
+		mat = new Matrix4(),
 
 		numpoints = segments + 1,
 		theta,
@@ -219,8 +226,8 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		// select an initial normal vector perpendicular to the first tangent vector,
 		// and in the direction of the smallest tangent xyz component
 
-		normals[ 0 ] = new THREE.Vector3();
-		binormals[ 0 ] = new THREE.Vector3();
+		normals[ 0 ] = new Vector3();
+		binormals[ 0 ] = new Vector3();
 		smallest = Number.MAX_VALUE;
 		tx = Math.abs( tangents[ 0 ].x );
 		ty = Math.abs( tangents[ 0 ].y );
@@ -268,7 +275,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -283,7 +290,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
+		theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
 		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
@@ -303,3 +310,6 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 	}
 
 };
+
+
+export { TubeGeometry };

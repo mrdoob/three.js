@@ -1,25 +1,31 @@
+import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D';
+import { SpriteMaterial } from '../materials/SpriteMaterial';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = function ( material ) {
+function Sprite( material ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Sprite';
 
-	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-};
+}
 
-THREE.Sprite.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.Sprite,
+	constructor: Sprite,
+
+	isSprite: true,
 
 	raycast: ( function () {
 
-		var matrixPosition = new THREE.Vector3();
+		var matrixPosition = new Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
@@ -54,3 +60,6 @@ THREE.Sprite.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 	}
 
 } );
+
+
+export { Sprite };

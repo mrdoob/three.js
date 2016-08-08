@@ -1,11 +1,16 @@
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Vector3 } from '../../math/Vector3';
+import { Sphere } from '../../math/Sphere';
+import { Uint16Attribute, Uint32Attribute, BufferAttribute } from '../../core/BufferAttribute';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  * based on THREE.SphereGeometry
  */
 
-THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'SphereBufferGeometry';
 
@@ -34,11 +39,11 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
 
-	var positions = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var positions = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
-	var index = 0, vertices = [], normal = new THREE.Vector3();
+	var index = 0, vertices = [], normal = new Vector3();
 
 	for ( var y = 0; y <= heightSegments; y ++ ) {
 
@@ -88,14 +93,17 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 	}
 
-	this.setIndex( new ( positions.count > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( indices, 1 ) );
+	this.setIndex( new ( positions.count > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
 	this.addAttribute( 'position', positions );
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
 
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
-THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
+SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
+
+
+export { SphereBufferGeometry };

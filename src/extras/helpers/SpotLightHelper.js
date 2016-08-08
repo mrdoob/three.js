@@ -1,12 +1,19 @@
+import { Vector3 } from '../../math/Vector3';
+import { Object3D } from '../../core/Object3D';
+import { LineSegments } from '../../objects/LineSegments';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Float32Attribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.SpotLightHelper = function ( light ) {
+function SpotLightHelper( light ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.light = light;
 	this.light.updateMatrixWorld();
@@ -14,7 +21,7 @@ THREE.SpotLightHelper = function ( light ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	var geometry = new THREE.BufferGeometry();
+	var geometry = new BufferGeometry();
 
 	var positions = [
 		0, 0, 0,   0,   0,   1,
@@ -36,31 +43,31 @@ THREE.SpotLightHelper = function ( light ) {
 
 	}
 
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
+	geometry.addAttribute( 'position', new Float32Attribute( positions, 3 ) );
 
-	var material = new THREE.LineBasicMaterial( { fog: false } );
+	var material = new LineBasicMaterial( { fog: false } );
 
-	this.cone = new THREE.LineSegments( geometry, material );
+	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
 
 	this.update();
 
-};
+}
 
-THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
-THREE.SpotLightHelper.prototype.constructor = THREE.SpotLightHelper;
+SpotLightHelper.prototype = Object.create( Object3D.prototype );
+SpotLightHelper.prototype.constructor = SpotLightHelper;
 
-THREE.SpotLightHelper.prototype.dispose = function () {
+SpotLightHelper.prototype.dispose = function () {
 
 	this.cone.geometry.dispose();
 	this.cone.material.dispose();
 
 };
 
-THREE.SpotLightHelper.prototype.update = function () {
+SpotLightHelper.prototype.update = function () {
 
-	var vector = new THREE.Vector3();
-	var vector2 = new THREE.Vector3();
+	var vector = new Vector3();
+	var vector2 = new Vector3();
 
 	return function update() {
 
@@ -79,3 +86,6 @@ THREE.SpotLightHelper.prototype.update = function () {
 	};
 
 }();
+
+
+export { SpotLightHelper };

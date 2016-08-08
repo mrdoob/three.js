@@ -1,3 +1,7 @@
+import { LineSegments } from '../../objects/LineSegments';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { EdgesGeometry } from '../geometries/EdgesGeometry';
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @param object THREE.Mesh whose geometry will be used
@@ -8,16 +12,19 @@
  * an edge is only rendered if the angle is at least 10 degrees.
  */
 
-THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
+function EdgesHelper( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
-	THREE.LineSegments.call( this, new THREE.EdgesGeometry( object.geometry, thresholdAngle ), new THREE.LineBasicMaterial( { color: color } ) );
+	LineSegments.call( this, new EdgesGeometry( object.geometry, thresholdAngle ), new LineBasicMaterial( { color: color } ) );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-};
+}
 
-THREE.EdgesHelper.prototype = Object.create( THREE.LineSegments.prototype );
-THREE.EdgesHelper.prototype.constructor = THREE.EdgesHelper;
+EdgesHelper.prototype = Object.create( LineSegments.prototype );
+EdgesHelper.prototype.constructor = EdgesHelper;
+
+
+export { EdgesHelper };

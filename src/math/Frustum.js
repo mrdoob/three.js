@@ -1,27 +1,31 @@
+import { Vector3 } from './Vector3';
+import { Sphere } from './Sphere';
+import { Plane } from './Plane';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author bhouston / http://clara.io
  */
 
-THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
+function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 	this.planes = [
 
-		( p0 !== undefined ) ? p0 : new THREE.Plane(),
-		( p1 !== undefined ) ? p1 : new THREE.Plane(),
-		( p2 !== undefined ) ? p2 : new THREE.Plane(),
-		( p3 !== undefined ) ? p3 : new THREE.Plane(),
-		( p4 !== undefined ) ? p4 : new THREE.Plane(),
-		( p5 !== undefined ) ? p5 : new THREE.Plane()
+		( p0 !== undefined ) ? p0 : new Plane(),
+		( p1 !== undefined ) ? p1 : new Plane(),
+		( p2 !== undefined ) ? p2 : new Plane(),
+		( p3 !== undefined ) ? p3 : new Plane(),
+		( p4 !== undefined ) ? p4 : new Plane(),
+		( p5 !== undefined ) ? p5 : new Plane()
 
 	];
 
-};
+}
 
-THREE.Frustum.prototype = {
+Frustum.prototype = {
 
-	constructor: THREE.Frustum,
+	constructor: Frustum,
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -80,7 +84,7 @@ THREE.Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var sphere = new THREE.Sphere();
+		var sphere = new Sphere();
 
 		return function intersectsObject( object ) {
 
@@ -100,7 +104,7 @@ THREE.Frustum.prototype = {
 
 	intersectsSprite: function () {
 
-		var sphere = new THREE.Sphere();
+		var sphere = new Sphere();
 
 		return function intersectsSprite( sprite ) {
 
@@ -138,8 +142,8 @@ THREE.Frustum.prototype = {
 
 	intersectsBox: function () {
 
-		var p1 = new THREE.Vector3(),
-			p2 = new THREE.Vector3();
+		var p1 = new Vector3(),
+			p2 = new Vector3();
 
 		return function intersectsBox( box ) {
 
@@ -195,3 +199,6 @@ THREE.Frustum.prototype = {
 	}
 
 };
+
+
+export { Frustum };
