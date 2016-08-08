@@ -197,11 +197,11 @@
 			var wallhalfExtents = new THREE.Vector3( 5, 3, 0.4 );
 			pos.set( 0, 3.01, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var wallMesh = new THREE.Mesh( new THREE.BoxGeometry( wallhalfExtents.x * 2, wallhalfExtents.y * 2, wallhalfExtents.z * 2 ), createMaterial( 0xA0A0FF ) );
-			wallMesh.position.copy( pos );
-			wallMesh.quaternion.copy( quat );
+			wall = new THREE.Mesh( new THREE.BoxGeometry( wallhalfExtents.x * 2, wallhalfExtents.y * 2, wallhalfExtents.z * 2 ), createMaterial( 0xA0A0FF ) );
+			wall.position.copy( pos );
+			wall.quaternion.copy( quat );
 
-			wall = convexBreaker.prepareBreakableObject( wallMesh, wallMass, new THREE.Vector3(), new THREE.Vector3(), true );
+			convexBreaker.prepareBreakableObject( wall, wallMass, new THREE.Vector3(), new THREE.Vector3(), true );
 
 			createDebrisFromBreakableObject( wall );
 
@@ -315,9 +315,9 @@
 
 			if ( resultObjects.object1 ) {
 
-				var p = resultObjects.object1.threeObject.position;
+				var p = resultObjects.object1.position;
 
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( - 0.3345, 1, -0.1634 ).normalize(), resultObjects.object1.threeObject.position );
+				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( - 0.3345, 1, -0.1634 ).normalize(), resultObjects.object1.position );
 
 				//plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ).normalize(), new THREE.Vector3() );
 
@@ -339,7 +339,7 @@
 			}
 			if ( resultObjects.object2 ) {
 
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 0.273, 1, 0.3637 ).normalize(), resultObjects.object2.threeObject.position );
+				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 0.273, 1, 0.3637 ).normalize(), resultObjects.object2.position );
 
 				var resultObjects2 = {};
 				convexBreaker.cutByPlane( resultObjects.object2, plane, resultObjects2 );
@@ -363,46 +363,40 @@
 
 		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
-			var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			var object = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
-			createRigidBody( threeObject, shape, mass, pos, quat );
+			createRigidBody( object, shape, mass, pos, quat );
 
-			return threeObject;
+			return object;
 
 		}
 
-		function createDebrisFromBreakableObject( breakableObject ) {
+		function createDebrisFromBreakableObject( object ) {
 
-			var threeObject = breakableObject.threeObject;
-			threeObject.castShadow = true;
-			threeObject.receiveShadow = true;
+			object.castShadow = true;
+			object.receiveShadow = true;
 
-			var shape = createConvexHullPhysicsShape( threeObject.geometry.vertices );
+			var shape = createConvexHullPhysicsShape( object.geometry.vertices );
 			shape.setMargin( margin );
 
-			var body = createRigidBody( threeObject, shape, breakableObject.mass, null, null );
+			var body = createRigidBody( object, shape, object.userData.mass, null, null );
 
-			// TODO apply velocity and angular velocity from breakableObject to body.
-
-			threeObject.userData.breakableObject = breakableObject;
-			threeObject.userData.breakable = breakableObject.breakable;
+			// TODO apply velocity and angularVelocity from object.userData to body.
 
 			// Set pointer back to the three object only in the debris objects
 			var btVecUserData = new Ammo.btVector3( 0, 0, 0 );
-			btVecUserData.threeObject = threeObject;
+			btVecUserData.threeObject = object;
 			body.setUserPointer( btVecUserData );
 
 		}
 
-		function removeDebris( breakableObject ) {
+		function removeDebris( object ) {
 
-			var threeObject = breakableObject.threeObject;
+			scene.remove( object );
 
-			scene.remove( threeObject );
-
-			physicsWorld.removeRigidBody( threeObject.userData.physicsBody );
+			physicsWorld.removeRigidBody( object.userData.physicsBody );
 
 		}
 
@@ -421,19 +415,19 @@
 
 		}
 
-		function createRigidBody( threeObject, physicsShape, mass, pos, quat ) {
+		function createRigidBody( object, physicsShape, mass, pos, quat ) {
 
 			if ( pos ) {
-			    threeObject.position.copy( pos );
+			    object.position.copy( pos );
 			}
 			else {
-			    pos = threeObject.position;
+			    pos = object.position;
 			}
 			if ( quat ) {
-			    threeObject.quaternion.copy( quat );
+			    object.quaternion.copy( quat );
 			}
 			else {
-			    quat = threeObject.quaternion;
+			    quat = object.quaternion;
 			}
 
 			var transform = new Ammo.btTransform();
@@ -448,12 +442,12 @@
 			var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
 			var body = new Ammo.btRigidBody( rbInfo );
 
-			threeObject.userData.physicsBody = body;
+			object.userData.physicsBody = body;
 
-			scene.add( threeObject );
+			scene.add( object );
 
 			if ( mass > 0 ) {
-				rigidBodies.push( threeObject );
+				rigidBodies.push( object );
 
 				// Disable deactivation
 				body.setActivationState( 4 );

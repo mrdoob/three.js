@@ -50,30 +50,23 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	constructor: THREE.ConvexObjectBreaker,
 
-	prepareBreakableObject: function( threeObject, mass, velocity, angularVelocity, breakable ) {
+	prepareBreakableObject: function( object, mass, velocity, angularVelocity, breakable ) {
 
-		// threeObject must have a Geometry, and it must be convex.
+		// object is a THREE.Object3d (normally a Mesh), must have a Geometry, and it must be convex.
 		// Its material property is propagated to its "children"
 		// mass must be > 0
 
 		// Create vertices mark
-		var vertices = threeObject.geometry.vertices;
+		var vertices = object.geometry.vertices;
 		for ( var i = 0, il = vertices.length; i < il; i++ ) {
 			vertices[ i ].mark = 0;
 		}
 
-		return {
-
-			threeObject: threeObject,
-
-			mass: mass,
-
-			velocity: velocity.clone(),
-			angularVelocity: angularVelocity.clone(),
-
-			breakable: breakable
-
-		};
+		var userData = object.userData;
+		userData.mass = mass;
+		userData.velocity = velocity.clone();
+		userData.angularVelocity = angularVelocity.clone();
+		userData.breakable = breakable;
 
 	},
 
@@ -82,7 +75,7 @@ THREE.ConvexObjectBreaker.prototype = {
 	 * @param {int} maxRandomIterations Max random iterations for not-radial cuts
 	 * @param {double} minSizeForRadialSubdivision Min size a debris can have to break in radial subdivision.
 	 */
-	subdivideByImpact: function( pointOfImpact, breakableObject ) {
+	subdivideByImpact: function( pointOfImpact, object ) {
 
 		var debris = [];
 
@@ -91,16 +84,14 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	},
 
-	cutByPlane: function( breakableObject, plane, output ) {
+	cutByPlane: function( object, plane, output ) {
 
 		// Returns breakable objects in output.object1 and output.object2 members, the resulting 2 pieces of the cut.
 		// object2 can be null if the plane doesn't cut the object.
 		// object1 can be null only in case of internal error
 		// Returned value is number of pieces, 0 for error.
 
-		var threeObject = breakableObject.threeObject;
-
-		var geometry = threeObject.geometry;
+		var geometry = object.geometry;
 		var points = geometry.vertices;
 		var faces = geometry.faces;
 
@@ -166,8 +157,8 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		// Transform the plane to object local space
 		var localPlane = this.tempPlane;
-		threeObject.updateMatrix();
-		THREE.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, threeObject.matrix, localPlane );
+		object.updateMatrix();
+		THREE.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane );
 
 		// Iterate through the faces adding points to both pieces
 		for ( var i = 0, il = faces.length; i < il; i ++ ) {
@@ -270,7 +261,7 @@ THREE.ConvexObjectBreaker.prototype = {
 		}
 
 		// Calculate debris mass (very fast and imprecise):
-		var newMass = breakableObject.mass * 0.5;
+		var newMass = object.userData.mass * 0.5;
 
 		// Calculate debris Center of Mass (again fast and imprecise)
 		this.tempCM1.set( 0, 0, 0 );
@@ -286,7 +277,7 @@ THREE.ConvexObjectBreaker.prototype = {
 				p.sub( this.tempCM1 );
 				radius1 = Math.max( radius1, p.x, p.y, p.z );
 			}
-			this.tempCM1.add( threeObject.position );
+			this.tempCM1.add( object.position );
 		}
 
 		this.tempCM2.set( 0, 0, 0 );
@@ -302,21 +293,21 @@ THREE.ConvexObjectBreaker.prototype = {
 				p.sub( this.tempCM2 );
 				radius2 = Math.max( radius2, p.x, p.y, p.z );
 			}
-			this.tempCM2.add( threeObject.position );
+			this.tempCM2.add( object.position );
 		}
 
-		var breakableObject1 = null;
-		var breakableObject2 = null;
+		var object1 = null;
+		var object2 = null;
 
 		var numObjects = 0;
 
 		if ( numPoints1 > 0 ) {
 
-			var threeObject1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), threeObject.material );
-			threeObject1.position.copy( this.tempCM1 );
-			threeObject1.quaternion.copy( threeObject.quaternion );
+			object1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), object.material );
+			object1.position.copy( this.tempCM1 );
+			object1.quaternion.copy( object.quaternion );
 
-			breakableObject1 = this.prepareBreakableObject( threeObject1, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius1 > this.minSizeForBreak );
+			this.prepareBreakableObject( object1, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius1 > this.minSizeForBreak );
 
 			numObjects++;
 
@@ -324,19 +315,19 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		if ( numPoints2 > 0 ) {
 
-			var threeObject2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), threeObject.material );
-			threeObject2.position.copy( this.tempCM2 );
-			threeObject2.quaternion.copy( threeObject.quaternion );
+			object2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), object.material );
+			object2.position.copy( this.tempCM2 );
+			object2.quaternion.copy( object.quaternion );
 
-			breakableObject2 = this.prepareBreakableObject( threeObject2, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius2 > this.minSizeForBreak );
+			this.prepareBreakableObject( object2, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius2 > this.minSizeForBreak );
 
 			numObjects++;
 
 		}
 
 
-		output.object1 = breakableObject1;
-		output.object2 = breakableObject2;
+		output.object1 = object1;
+		output.object2 = object2;
 
 		return numObjects;
 
