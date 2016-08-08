@@ -1,13 +1,14 @@
 /**
  * @author yomboprime https://github.com/yomboprime
  *
- * THREE.ConvexObjectBreaker
+ * @fileoverview THREE.ConvexObjectBreaker
  *
  *
  * @param {int} maxRadialIterations Iterations for radial cuts.
  * @param {int} maxRandomIterations Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {double} minSizeForBreak Min size a debris can have to break.
  * @param {double} minSizeForRadialSubdivision Min size a debris can have to break in radial subdivision.
+ * @param {double} smallDelta Max distance to consider that a point belongs to a plane.
  * 
   */
 
@@ -20,8 +21,14 @@ THREE.ConvexObjectBreaker = function( maxRadialIterations, maxRandomIterations, 
 	this.smallDelta = smallDelta || 0.0001;
 
 	this.tempLine1 = new THREE.Line3();
+	this.tempPlane = new THREE.Plane();
 	this.tempCM1 = new THREE.Vector3();
 	this.tempCM2 = new THREE.Vector3();
+
+	this.segments = [];
+	for ( var i = 0; i < 100 * 100; i++ ) {
+		this.segments[ i ] = false;
+	}
 
 };
 
@@ -29,25 +36,23 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	constructor: THREE.ConvexObjectBreaker,
 
-	createSegmentedObject: function( points, segments, mass, pos, quat, velocity, angularVelocity, breakable ) {
+	createBreakableObject: function( threeObject, mass, velocity, angularVelocity, breakable ) {
 
-		// Create points mark
-		for ( var i = 0, il = points.length; i < il; i++ ) {
-			var p = points[ i ];
-			p.mark = 0;
-			p.index0 = -1;
-			p.index1 = -1;
+		// threeObject must have a Geometry, and it must be convex.
+		// Its material property is propagated to its "children"
+		// mass must be > 0
+
+		// Create vertices mark
+		var vertices = threeObject.geometry.vertices;
+		for ( var i = 0, il = vertices.length; i < il; i++ ) {
+			vertices[ i ].mark = 0;
 		}
 
 		return {
 
-			points: points,
-			segments: segments,
+			threeObject: threeObject,
 
 			mass: mass,
-
-			pos: pos.clone(),
-			quat: quat.clone(),
 
 			velocity: velocity.clone(),
 			angularVelocity: angularVelocity.clone(),
@@ -55,48 +60,6 @@ THREE.ConvexObjectBreaker.prototype = {
 			breakable: breakable
 
 		};
-
-	},
-
-	createParalellepipedSegmentedObject: function( halfDimensions, pos, quat, velocity, angularVelocity, mass ) {
-
-		var w = halfDimensions.x;
-		var h = halfDimensions.y;
-		var d = halfDimensions.z;
-
-		var points = [
-
-			new THREE.Vector3( w, h, d ),
-			new THREE.Vector3( w, h, - d ),
-			new THREE.Vector3( w, - h, d ),
-			new THREE.Vector3( w, - h, - d ),
-			new THREE.Vector3( - w, h, d ),
-			new THREE.Vector3( - w, h, - d ),
-			new THREE.Vector3( - w, - h, d ),
-			new THREE.Vector3( - w, - h, - d )
-
-		];
-
-		var segments = [
-
-			0, 4,
-			1, 5,
-			2, 6,
-			3, 7,
-
-			0, 1,
-			4, 5,
-			2, 3,
-			6, 7,
-
-			0, 2,
-			4, 6,
-			1, 3,
-			5, 7
-
-		];
-
-		return this.createSegmentedObject( points, segments, mass, pos, quat, velocity, angularVelocity, true );
 
 	},
 
@@ -109,152 +72,178 @@ THREE.ConvexObjectBreaker.prototype = {
 
 	},
 
-	cutByPlane: function( segmentedObject, plane, output ) {
+	cutByPlane: function( breakableObject, plane, output ) {
 
-		// Returns objects in output.segmentedObject1 and output.segmentedObject2 members, the resulting 2 pieces of the cut.
-		// segmentedObject2 can be null if the plane doesn't cut the object.
-		// segmentedObject1 can be null only in case of internal error
+		// Returns breakable objects in output.object1 and output.object2 members, the resulting 2 pieces of the cut.
+		// object2 can be null if the plane doesn't cut the object.
+		// object1 can be null only in case of internal error
 		// Returned value is number of pieces, 0 for error.
+
+		var threeObject = breakableObject.threeObject;
+
+		var geometry = threeObject.geometry;
+		var points = geometry.vertices;
+		var faces = geometry.faces;
+
+		var numPoints = points.length;
 
 		var points1 = [];
 		var points2 = [];
-		var segments1 = [];
-		var segments2 = [];
-
-		var points = segmentedObject.points;
-		var segments = segmentedObject.segments;
 
 		var delta = this.smallDelta;
 
-		for ( var i = 0, il = segments.length; i < il; i += 2 ) {
+		// Reset vertices mark
+		for ( var i = 0; i < numPoints; i++ ) {
+			points[ i ].mark = 0;
+		}
 
-			var i0 = segments[ i ];
-			var i1 = segments[ i + 1];
-			var p0 = points[ i0 ];
-			var p1 = points[ i1 ];
+		// Reset segments mark
+		var numPointPairs = numPoints * numPoints;
+		for ( var i = 0; i < numPointPairs; i++ ) {
+			this.segments[ i ] = false;
+		}
 
-			if ( p0.mark === 0 ) {
+		// Iterate through the faces to mark edges shared by coplanar faces
+		for ( var i = 0, il = faces.length - 1; i < il; i++ ) {
 
-				var d = plane.distanceToPoint( p0 );
+			var face1 = faces[ i ];
 
-				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
-				if ( d > delta ) {
-					p0.mark = 2;
-					p0.index0 = points2.push( p0 ) - 1;
-				}
-				else if ( d < - delta ) {
-					p0.mark = 1;
-					p0.index0 = points1.push( p0 ) - 1;
-				}
-				else {
-					p0.mark = 3;
-					p0.index0 = points1.push( p0 ) - 1;
-					p0.index1 = points2.push( p0 ).clone() - 1;
-				}
+			for ( var j = i + 1, jl = faces.length; j < jl; j++ ) {
 
-			}
+				var face2 = faces[ j ];
 
-			if ( p1.mark === 0 ) {
+				var coplanar = 1 - face1.normal.dot( face2.normal ) < delta;
 
-				var d = plane.distanceToPoint( p1 );
+				if ( coplanar ) {
 
-				// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
-				if ( d > delta ) {
-					p1.mark = 2;
-					p1.index0 = points2.push( p1 ) - 1;
-				}
-				else if ( d < - delta ) {
-					p1.mark = 1;
-					p1.index0 = points1.push( p1 ) - 1;
-				}
-				else {
-					p1.mark = 3;
-					p1.index0 = points1.push( p1 ) - 1;
-					p1.index1 = points2.push( p1 ).clone() - 1;
-				}
+					var a1 = face1.a;
+					var b1 = face1.b;
+					var c1 = face1.c;
+					var a2 = face2.a;
+					var b2 = face2.b;
+					var c2 = face2.c;
 
-			}
-			
-			var mark0 = p0.mark;
-			var mark1 = p1.mark;
 
-			if ( mark0 === 1 && mark1 === 1 ) {
+					if ( a1 === a2 || a1 === b2 || a1 === c2 ) {
+						if ( b1 === a2 || b1 === b2 || b1 === c2 ) {
+							this.segments[ a1 * numPoints + b1 ] = true;
+							this.segments[ b1 * numPoints + a1 ] = true;
+						}
+						else {
+							this.segments[ c1 * numPoints + a1 ] = true;
+							this.segments[ a1 * numPoints + c1 ] = true;
+						}
+					}
+					else if ( b1 === a2 || b1 === b2 || b1 === c2 ) {
+						this.segments[ c1 * numPoints + b1 ] = true;
+						this.segments[ b1 * numPoints + c1 ] = true;
+					}
 
-				segments1[ segments1.length ] = p0.index0;
-				segments1[ segments1.length ] = p1.index0;
-
-			}
-			else if ( mark0 === 2 && mark1 === 2 ) {
-
-				segments2[ segments2.length ] = p0.index0;
-				segments2[ segments2.length ] = p1.index0;
-
-			}
-			else if ( ( mark0 === 1 && mark1 === 2 ) || ( mark0 === 2 && mark1 === 1 ) ) {
-
-				// Intersection of segment with the plane
-
-				this.tempLine1.start.copy( p0 );
-				this.tempLine1.end.copy( p1 );
-				var intersection = plane.intersectLine( this.tempLine1 );
-				if ( intersection === undefined ) {
-					// Shouldn't happen
-					console.error( "Internal error: segment does not intersect plane." );
-					output.segmentedObject1 = null;
-					output.segmentedObject2 = null;
-					return 0;
-				}
-				
-				var iIntersection0 = points1.push( intersection );
-				var iIntersection1 = points2.push( intersection.clone() );
-
-				if ( mark0 === 1 ) {
-					segments1[ segments1.length ] = p0.index0;
-					segments1[ segments1.length ] = iIntersection0;
-					segments2[ segments2.length ] = p1.index0;
-					segments2[ segments2.length ] = iIntersection1;
-				}
-				else {
-					segments1[ segments1.length ] = p1.index0;
-					segments1[ segments1.length ] = iIntersection0;
-					segments2[ segments2.length ] = p0.index0;
-					segments2[ segments2.length ] = iIntersection1;
 				}
 
 			}
-			else if ( mark1 === 3 ) {
 
-				if ( mark0 === 1 ) {
-					segments1[ segments1.length ] = p0.index0;
-					segments1[ segments1.length ] = p1.index0;
-				}
-				else if ( mark0 === 2 ) {
-					segments2[ segments2.length ] = p0.index0;
-					segments2[ segments2.length ] = p1.index1;
-				}
-				else {
-					segments1[ segments1.length ] = p0.index0;
-					segments1[ segments1.length ] = p1.index0;
-					segments2[ segments2.length ] = p0.index1;
-					segments2[ segments2.length ] = p1.index1;
+		}
+
+		// Transform the plane to object local space
+		var localPlane = this.tempPlane;
+		threeObject.updateMatrix();
+		THREE.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, threeObject.matrix, localPlane );
+
+		// Iterate through the faces adding points to both pieces
+		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+
+			var face = faces[ i ];
+
+			for ( var segment = 0; segment < 3; segment++ ) {
+
+				var i0 = segment === 0 ? face.a : ( segment === 1 ? face.b : face.c );
+				var i1 = segment === 0 ? face.b : ( segment === 1 ? face.c : face.a );
+
+				var segmentState = this.segments[ i0 * numPoints + i1 ];
+
+				if ( segmentState ) {
+					// The segment already has been processed in another face
+					continue;
 				}
 
-			}
-			else if ( mark0 === 3 ) {
+				// Mark segment as processed (also inverted segment)
+				this.segments[ i0 * numPoints + i1 ] = true;
+				this.segments[ i1 * numPoints + i0 ] = true;
 
-				if ( mark1 === 1 ) {
-					segments1[ segments1.length ] = p0.index0;
-					segments1[ segments1.length ] = p1.index0;
+				var p0 = points[ i0 ];
+				var p1 = points[ i1 ];
+
+				if ( p0.mark === 0 ) {
+
+					var d = localPlane.distanceToPoint( p0 );
+
+					// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
+					if ( d > delta ) {
+						p0.mark = 2;
+						points2.push( p0 );
+					}
+					else if ( d < - delta ) {
+						p0.mark = 1;
+						points1.push( p0 );
+					}
+					else {
+						p0.mark = 3;
+						points1.push( p0 );
+						var p0_2 = p0.clone();
+						p0_2.mark = 3;
+						points2.push( p0_2 );
+					}
+
 				}
-				else if ( mark1 === 2 ) {
-					segments2[ segments2.length ] = p0.index1;
-					segments2[ segments2.length ] = p1.index0;
+
+				if ( p1.mark === 0 ) {
+
+					var d = localPlane.distanceToPoint( p1 );
+
+					// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
+					if ( d > delta ) {
+						p1.mark = 2;
+						points2.push( p1 );
+					}
+					else if ( d < - delta ) {
+						p1.mark = 1;
+						points1.push( p1 );
+					}
+					else {
+						p1.mark = 3;
+						points1.push( p1 );
+						var p1_2 = p1.clone();
+						p1_2.mark = 3;
+						points2.push( p1_2 );
+					}
+
 				}
-				else {
-					segments1[ segments1.length ] = p0.index0;
-					segments1[ segments1.length ] = p1.index0;
-					segments2[ segments2.length ] = p0.index1;
-					segments2[ segments2.length ] = p1.index1;
+
+				var mark0 = p0.mark;
+				var mark1 = p1.mark;
+
+				if ( ( mark0 === 1 && mark1 === 2 ) || ( mark0 === 2 && mark1 === 1 ) ) {
+
+					// Intersection of segment with the plane
+
+					this.tempLine1.start.copy( p0 );
+					this.tempLine1.end.copy( p1 );
+					var intersection = localPlane.intersectLine( this.tempLine1 );
+					if ( intersection === undefined ) {
+						// Shouldn't happen
+						console.error( "Internal error: segment does not intersect plane." );
+						output.segmentedObject1 = null;
+						output.segmentedObject2 = null;
+						return 0;
+					}
+
+					intersection.mark = 1;
+					points1.push( intersection );
+					var intersection_2 = intersection.clone();
+					intersection_2.mark = 2;
+					points2.push( intersection_2 );
+
 				}
 
 			}
@@ -262,10 +251,11 @@ THREE.ConvexObjectBreaker.prototype = {
 		}
 
 		// Calculate debris mass (very fast and imprecise):
-		var newMass = segmentedObject.mass * 0.5;
+		var newMass = breakableObject.mass * 0.5;
 
 		// Calculate debris Center of Mass (again fast and imprecise)
 		this.tempCM1.set( 0, 0, 0 );
+		var radius1 = 0;
 		var numPoints1 = points1.length;
 		if ( numPoints1 > 0 ) {
 			for ( var i = 0; i < numPoints1; i++ ) {
@@ -273,12 +263,15 @@ THREE.ConvexObjectBreaker.prototype = {
 			}
 			this.tempCM1.divideScalar( numPoints1 );
 			for ( var i = 0; i < numPoints1; i++ ) {
-				points1[ i ].sub( this.tempCM1 );
+				var p = points1[ i ];
+				p.sub( this.tempCM1 );
+				radius1 = Math.max( radius1, p.x, p.y, p.z );
 			}
-			this.tempCM1.add( segmentedObject.pos );
+			this.tempCM1.add( threeObject.position );
 		}
 
 		this.tempCM2.set( 0, 0, 0 );
+		var radius2 = 0;
 		var numPoints2 = points2.length;
 		if ( numPoints2 > 0 ) {
 			for ( var i = 0; i < numPoints2; i++ ) {
@@ -286,29 +279,121 @@ THREE.ConvexObjectBreaker.prototype = {
 			}
 			this.tempCM2.divideScalar( numPoints2 );
 			for ( var i = 0; i < numPoints2; i++ ) {
-				points2[ i ].sub( this.tempCM2 );
+				var p = points2[ i ];
+				p.sub( this.tempCM2 );
+				radius2 = Math.max( radius2, p.x, p.y, p.z );
 			}
-			this.tempCM2.add( segmentedObject.pos );
+			this.tempCM2.add( threeObject.position );
 		}
 
-		var segmentedObject1 = null;
-		var segmentedObject2 = null;
+		var breakableObject1 = null;
+		var breakableObject2 = null;
+
+		var numObjects = 0;
 
 		if ( numPoints1 > 0 ) {
 
-			segmentedObject1 = this.createSegmentedObject( points1, segments1, newMass, this.tempCM1, segmentedObject.quat, segmentedObject.velocity, segmentedObject.angularVelocity, true );
+			var threeObject1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), threeObject.material );
+			threeObject1.position.copy( this.tempCM1 );
+			threeObject1.quaternion.copy( threeObject.quaternion );
+
+			breakableObject1 = this.createBreakableObject( threeObject1, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius1 > this.minSizeForBreak );
+
+			numObjects++;
 
 		}
 
 		if ( numPoints2 > 0 ) {
 
-			segmentedObject2 = this.createSegmentedObject( points2, segments2, newMass, this.tempCM2, segmentedObject.quat, segmentedObject.velocity, segmentedObject.angularVelocity, true );
+			var threeObject2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), threeObject.material );
+			threeObject2.position.copy( this.tempCM2 );
+			threeObject2.quaternion.copy( threeObject.quaternion );
+
+			breakableObject2 = this.createBreakableObject( threeObject2, newMass, breakableObject.velocity, breakableObject.angularVelocity, 2 * radius2 > this.minSizeForBreak );
+
+			numObjects++;
 
 		}
 
-		output.segmentedObject1 = segmentedObject1;
-		output.segmentedObject2 = segmentedObject2;
+
+		output.object1 = breakableObject1;
+		output.object2 = breakableObject2;
+
+		return numObjects;
 
 	}
 
 };
+
+THREE.ConvexObjectBreaker.transformFreeVector = function( v, m ) {
+
+	// input:
+	// vector interpreted as a free vector
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
+	var x = v.x, y = v.y, z = v.z;
+	var e = m.elements;
+
+	v.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
+	v.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
+	v.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
+
+	return v;
+
+};
+
+THREE.ConvexObjectBreaker.transformFreeVectorInverse = function( v, m ) {
+
+	// input:
+	// vector interpreted as a free vector
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
+	var x = v.x, y = v.y, z = v.z;
+	var e = m.elements;
+
+	v.x = e[ 0 ] * x + e[ 1 ] * y + e[ 2 ]  * z;
+	v.y = e[ 4 ] * x + e[ 5 ] * y + e[ 6 ]  * z;
+	v.z = e[ 8 ] * x + e[ 9 ] * y + e[ 10 ] * z;
+
+	return v;
+
+};
+
+THREE.ConvexObjectBreaker.transformTiedVectorInverse = function( v, m ) {
+
+	// input:
+	// vector interpreted as a tied (ordinary) vector
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
+	var x = v.x, y = v.y, z = v.z;
+	var e = m.elements;
+
+	v.x = e[ 0 ] * x + e[ 1 ] * y + e[ 2 ]  * z - e[ 12 ];
+	v.y = e[ 4 ] * x + e[ 5 ] * y + e[ 6 ]  * z - e[ 13 ];
+	v.z = e[ 8 ] * x + e[ 9 ] * y + e[ 10 ] * z - e[ 14 ];
+
+	return v;
+
+};
+
+THREE.ConvexObjectBreaker.transformPlaneToLocalSpace = function() {
+
+	var v1 = new THREE.Vector3();
+	var m1 = new THREE.Matrix3();
+
+	return function transformPlaneToLocalSpace( plane, m, resultPlane ) {
+
+		resultPlane.normal.copy( plane.normal );
+		resultPlane.constant = plane.constant;
+
+		var referencePoint = THREE.ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( v1 ), m );
+
+		THREE.ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
+
+		// recalculate constant (like in setFromNormalAndCoplanarPoint)
+		resultPlane.constant = - referencePoint.dot( resultPlane.normal );
+
+
+	};
+
+}();

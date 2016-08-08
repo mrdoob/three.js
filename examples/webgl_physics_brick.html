@@ -28,7 +28,7 @@
         </style>
     </head>
     <body>
-	<div id="info">New wall breaking threejs demo where the bricks break in real time</div>
+	<div id="info">Physics threejs demo with convex objects breaking in real time</div>
         <div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="../build/three.js"></script>
@@ -180,7 +180,7 @@
 			// Ground
 			pos.set( 0, - 0.5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+			var ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.receiveShadow = true;
 			textureLoader.load( "textures/grid.png", function( texture ) {
 				texture.wrapS = THREE.RepeatWrapping;
@@ -195,26 +195,89 @@
 			var wallhalfExtents = new THREE.Vector3( 5, 3, 0.4 );
 			pos.set( 0, 3.01, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var wall = convexBreaker.createParalellepipedSegmentedObject( wallhalfExtents, pos, quat, new THREE.Vector3(), new THREE.Vector3(), wallMass );
+			var wallMesh = new THREE.Mesh( new THREE.BoxGeometry( wallhalfExtents.x * 2, wallhalfExtents.y * 2, wallhalfExtents.z * 2 ), createMaterial( 0xA0A0FF ) );
+			wallMesh.position.copy( pos );
+			wallMesh.quaternion.copy( quat );
+
+			var wall = convexBreaker.createBreakableObject( wallMesh, wallMass, new THREE.Vector3(), new THREE.Vector3(), true );
 
 			var plane = new THREE.Plane();
 			plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, - 0.3, 0.1 ).normalize(), new THREE.Vector3( 0, 0, 0 ) );
-			var resultObjects = { segmentedObject1: null, segmentedObject2: null };
+			var resultObjects = {};
 			convexBreaker.cutByPlane( wall, plane, resultObjects );
-			if ( resultObjects.segmentedObject1 ) {
 
-				var wallThreeObject1 = createDebrisFromSegmentedObject( resultObjects.segmentedObject1, createMaterial( 0xFFFFFF ) );
+			/*
+			if ( resultObjects.object1 ) {
+
+				createDebrisFromBreakableObject( resultObjects.object1 );
 
 			}
-			if ( resultObjects.segmentedObject2 ) {
 
-				var wallThreeObject2 = createDebrisFromSegmentedObject( resultObjects.segmentedObject2, createMaterial( 0xA0A0FF ) );
+			if ( resultObjects.object2 ) {
+
+				createDebrisFromBreakableObject( resultObjects.object2 );
+
+			}
+			*/
+
+			if ( resultObjects.object1 ) {
+
+
+				/*var mark = new THREE.Mesh( new THREE.SphereBufferGeometry( 0.5, 12, 16 ), createMaterial( 0xFFA000 ) );
+				mark.position.copy( resultObjects.object1.threeObject.position );
+				scene.add( mark );
+				*/
+
+				var p = resultObjects.object1.threeObject.position;
+
+				console.log( "amem: " + p.x + ", " + p.y + ", " + p.z );
+
+				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( - 0.3345, 1, -0.1634 ).normalize(), resultObjects.object1.threeObject.position );
+
+				//plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ).normalize(), new THREE.Vector3() );
+
+				var resultObjects2 = {};
+				convexBreaker.cutByPlane( resultObjects.object1, plane, resultObjects2 );
+
+				if ( resultObjects2.object1 ) {
+
+					createDebrisFromBreakableObject( resultObjects2.object1 );
+
+				}
+
+				if ( resultObjects2.object2 ) {
+
+					createDebrisFromBreakableObject( resultObjects2.object2 );
+
+				}
+
+
+			}
+			if ( resultObjects.object2 ) {
+
+				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 0.273, 1, 0.3637 ).normalize(), resultObjects.object2.threeObject.position );
+
+				var resultObjects2 = {};
+				convexBreaker.cutByPlane( resultObjects.object2, plane, resultObjects2 );
+
+				if ( resultObjects2.object1 ) {
+
+					createDebrisFromBreakableObject( resultObjects2.object1 );
+
+				}
+
+				if ( resultObjects2.object2 ) {
+
+					createDebrisFromBreakableObject( resultObjects2.object2 );
+
+				}
+
 
 			}
 
 		}
 
-		function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
+		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
 			var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
@@ -226,26 +289,36 @@
 
 		}
 
-		function createDebrisFromSegmentedObject( segmentedObject, material ) {
+		function createDebrisFromBreakableObject( breakableObject ) {
 
-			var threeObject = new THREE.Mesh( new THREE.ConvexGeometry( segmentedObject.points ), material );
+			var threeObject = breakableObject.threeObject;
 			threeObject.castShadow = true;
 			threeObject.receiveShadow = true;
 
-			var shape = createConvexHullPhysicsShape( segmentedObject.points );
+			var shape = createConvexHullPhysicsShape( threeObject.geometry.vertices );
 			shape.setMargin( margin );
 
-			var body = createRigidBody( threeObject, shape, segmentedObject.mass, segmentedObject.pos, segmentedObject.quat );
+			var body = createRigidBody( threeObject, shape, breakableObject.mass, null, null );
 
-			threeObject.userData.segmentedObject = segmentedObject;
-			threeObject.userData.breakable = segmentedObject.breakable;
+			// TODO apply velocity and angular velocity from breakableObject to body.
+
+			threeObject.userData.breakableObject = breakableObject;
+			threeObject.userData.breakable = breakableObject.breakable;
 
 			// Set pointer back to the three object only in the debris objects
 			var btVecUserData = new Ammo.btVector3( 0, 0, 0 );
 			btVecUserData.threeObject = threeObject;
 			body.setUserPointer( btVecUserData );
 
-			return threeObject;
+		}
+
+		function removeDebris( breakableObject ) {
+
+			var threeObject = breakableObject.threeObject;
+
+			scene.remove( threeObject );
+
+			physicsWorld.removeRigidBody( threeObject.userData.physicsBody );
 
 		}
 
@@ -266,8 +339,18 @@
 
 		function createRigidBody( threeObject, physicsShape, mass, pos, quat ) {
 
-			threeObject.position.copy( pos );
-			threeObject.quaternion.copy( quat );
+			if ( pos ) {
+			    threeObject.position.copy( pos );
+			}
+			else {
+			    pos = threeObject.position;
+			}
+			if ( quat ) {
+			    threeObject.quaternion.copy( quat );
+			}
+			else {
+			    quat = threeObject.quaternion;
+			}
 
 			var transform = new Ammo.btTransform();
 			transform.setIdentity();
@@ -340,7 +423,7 @@
 				raycaster.setFromCamera( mouseCoords, camera );
 
 				// Creates a ball and throws it
-				var ballMass = 50;
+				var ballMass = 5;
 				var ballRadius = 0.4;
 
 				var ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 14, 10 ), ballMaterial );
