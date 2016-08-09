@@ -60,7 +60,7 @@
 		var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
 
 		// Physics variables
-		var gravityConstant = -9.8;
+		var gravityConstant = 9.8;
 		var collisionConfiguration;
 		var dispatcher;
 		var broadphase;
@@ -173,7 +173,7 @@
 			broadphase = new Ammo.btDbvtBroadphase();
 			solver = new Ammo.btSequentialImpulseConstraintSolver();
 			physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
-			physicsWorld.setGravity( new Ammo.btVector3( 0, -6, 0 ) );
+			physicsWorld.setGravity( new Ammo.btVector3( 0, - gravityConstant, 0 ) );
 
 		}
 
@@ -211,7 +211,7 @@
 
 			removeDebris( wall );
 
-			var debris = convexBreaker.subdivideByImpact( wall, new THREE.Vector3( -2, 2, 0 ), new THREE.Vector3( 0, 0, 1 ) , 2, 2, 1.5 );
+			var debris = convexBreaker.subdivideByImpact( wall, new THREE.Vector3( -2, 2, 0 ), new THREE.Vector3( 0, 0, 1 ) , 1, 2, 1.5 );
 
 			var numObjects = debris.length;
 			for ( var i = 0; i < numObjects; i++ ) {

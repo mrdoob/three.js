@@ -40,6 +40,7 @@ THREE.ConvexObjectBreaker = function( minSizeForBreak, smallDelta ) {
 	this.tempCM2 = new THREE.Vector3();
 	this.tempVector3 = new THREE.Vector3();
 	this.tempVector3_2 = new THREE.Vector3();
+	this.tempVector3_3 = new THREE.Vector3();
 	this.tempResultObjects = { object1: null, object2: null };
 
 	this.segments = [];
@@ -88,14 +89,16 @@ THREE.ConvexObjectBreaker.prototype = {
 		var tempPlane1 = this.tempPlane1;
 		var tempPlane2 = this.tempPlane2;
 
-		this.tempVector3.addVectors( pointOfImpact, normal )
+		this.tempVector3.addVectors( pointOfImpact, normal );
 		tempPlane1.setFromCoplanarPoints( pointOfImpact, object.position, this.tempVector3 );
+
+		var maxTotalIterations = maxRandomIterations + maxRadialIterations;
 
 		var scope = this;
 
 		function subdivideRadial( subObject, startAngle, endAngle, numIterations ) {
 
-			if ( /*Math.random() < numIterations * 0.05 ||*/ numIterations > maxRadialIterations ) {
+			if ( Math.random() < numIterations * 0.05 || numIterations > maxTotalIterations ) {
 
 				debris.push( subObject );
 
@@ -113,12 +116,25 @@ THREE.ConvexObjectBreaker.prototype = {
 			}
 			else {
 
-				// TODO if numIterations > maxRandomIterations + maxRadialIterations
-				angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle;
+				if ( numIterations <= maxRadialIterations ) {
+					
+					angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle;
 
-				// Rotate tempPlane2 around normal axis by the angle
-				scope.tempVector3_2.copy( object.position ).sub( pointOfImpact ).applyAxisAngle( normal, angle ).add( pointOfImpact );
-				tempPlane2.setFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2 );
+					// Rotate tempPlane2 at impact point around normal axis and the angle
+					scope.tempVector3_2.copy( object.position ).sub( pointOfImpact ).applyAxisAngle( normal, angle ).add( pointOfImpact );
+					tempPlane2.setFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2 );
+
+				}
+				else {
+
+					angle = ( ( 0.5 * ( numIterations & 1 ) ) + 0.2 * ( 2 - Math.random() ) ) * Math.PI;
+
+					// Rotate tempPlane2 at object position around normal axis and the angle
+					scope.tempVector3_2.copy( pointOfImpact ).sub( subObject.position ).applyAxisAngle( normal, angle ).add( subObject.position );
+					scope.tempVector3_3.copy( normal ).add( subObject.position );
+					tempPlane2.setFromCoplanarPoints( subObject.position, scope.tempVector3_3, scope.tempVector3_2 );
+
+				}
 
 			}
 
@@ -365,7 +381,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		var numObjects = 0;
 
-		if ( numPoints1 > 3 ) {
+		if ( numPoints1 > 4 ) {
 
 			object1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), object.material );
 			object1.position.copy( this.tempCM1 );
@@ -377,7 +393,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		}
 
-		if ( numPoints2 > 3 ) {
+		if ( numPoints2 > 4 ) {
 
 			object2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), object.material );
 			object2.position.copy( this.tempCM2 );
