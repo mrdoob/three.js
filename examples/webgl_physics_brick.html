@@ -205,158 +205,17 @@
 
 			createDebrisFromBreakableObject( wall );
 
-/*
-			var plane = new THREE.Plane();
-			plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, - 0.3, 0.1 ).normalize(), new THREE.Vector3( 0, 0, 0 ) );
-			var resultObjects = {};
-			convexBreaker.cutByPlane( wall, plane, resultObjects );
-*/
-
-			/*
-			if ( resultObjects.object1 ) {
-
-				createDebrisFromBreakableObject( resultObjects.object1 );
-
-			}
-
-			if ( resultObjects.object2 ) {
-
-				createDebrisFromBreakableObject( resultObjects.object2 );
-
-			}
-			*/
-			/*
-			if ( resultObjects.object1 ) {
-
-
-				//var mark = new THREE.Mesh( new THREE.SphereBufferGeometry( 0.5, 12, 16 ), createMaterial( 0xFFA000 ) );
-				//mark.position.copy( resultObjects.object1.threeObject.position );
-				//scene.add( mark );
-
-				var p = resultObjects.object1.threeObject.position;
-
-				console.log( "amem: " + p.x + ", " + p.y + ", " + p.z );
-
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( - 0.3345, 1, -0.1634 ).normalize(), resultObjects.object1.threeObject.position );
-
-				//plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ).normalize(), new THREE.Vector3() );
-
-				var resultObjects2 = {};
-				convexBreaker.cutByPlane( resultObjects.object1, plane, resultObjects2 );
-
-				if ( resultObjects2.object1 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object1 );
-
-				}
-
-				if ( resultObjects2.object2 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object2 );
-
-				}
-
-
-			}
-			if ( resultObjects.object2 ) {
-
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 0.273, 1, 0.3637 ).normalize(), resultObjects.object2.threeObject.position );
-
-				var resultObjects2 = {};
-				convexBreaker.cutByPlane( resultObjects.object2, plane, resultObjects2 );
-
-				if ( resultObjects2.object1 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object1 );
-
-				}
-
-				if ( resultObjects2.object2 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object2 );
-
-				}
-
-
-			}
-			*/
-
 		}
 
 		function subdivideWall() {
 
 			removeDebris( wall );
-/*
-			var debris = convexBreaker.subdivideByImpact( new THREE.Vector3( 0, 3, -3 ), wall );
+
+			var debris = convexBreaker.subdivideByImpact( wall, new THREE.Vector3( -2, 2, 0 ), new THREE.Vector3( 0, 0, 1 ) , 2, 2, 1.5 );
 
 			var numObjects = debris.length;
 			for ( var i = 0; i < numObjects; i++ ) {
 			    createDebrisFromBreakableObject( debris[ i ] );
-			}
-*/
-
-			var plane = new THREE.Plane();
-			plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, - 0.3, 0.1 ).normalize(), new THREE.Vector3( 0, 0, 0 ) );
-			var resultObjects = {};
-			convexBreaker.cutByPlane( wall, plane, resultObjects );
-/*
-			if ( resultObjects.object1 ) {
-
-				createDebrisFromBreakableObject( resultObjects.object1 );
-
-			}
-
-			if ( resultObjects.object2 ) {
-
-				createDebrisFromBreakableObject( resultObjects.object2 );
-
-			}
-			*/
-
-			if ( resultObjects.object1 ) {
-
-				var p = resultObjects.object1.position;
-
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( - 0.3345, 1, -0.1634 ).normalize(), resultObjects.object1.position );
-
-				//plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ).normalize(), new THREE.Vector3() );
-
-				var resultObjects2 = {};
-				convexBreaker.cutByPlane( resultObjects.object1, plane, resultObjects2 );
-
-				if ( resultObjects2.object1 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object1 );
-
-				}
-
-				if ( resultObjects2.object2 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object2 );
-
-				}
-
-			}
-			if ( resultObjects.object2 ) {
-
-				plane.setFromNormalAndCoplanarPoint( new THREE.Vector3( 0.273, 1, 0.3637 ).normalize(), resultObjects.object2.position );
-
-				var resultObjects2 = {};
-				convexBreaker.cutByPlane( resultObjects.object2, plane, resultObjects2 );
-
-				if ( resultObjects2.object1 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object1 );
-
-				}
-
-				if ( resultObjects2.object2 ) {
-
-					createDebrisFromBreakableObject( resultObjects2.object2 );
-
-				}
-
-
 			}
 
 		}

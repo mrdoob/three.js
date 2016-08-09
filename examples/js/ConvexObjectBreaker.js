@@ -34,12 +34,16 @@ THREE.ConvexObjectBreaker = function( minSizeForBreak, smallDelta ) {
 	this.smallDelta = smallDelta || 0.0001;
 
 	this.tempLine1 = new THREE.Line3();
-	this.tempPlane = new THREE.Plane();
+	this.tempPlane1 = new THREE.Plane();
+	this.tempPlane2 = new THREE.Plane();
 	this.tempCM1 = new THREE.Vector3();
 	this.tempCM2 = new THREE.Vector3();
+	this.tempVector3 = new THREE.Vector3();
+	this.tempVector3_2 = new THREE.Vector3();
+	this.tempResultObjects = { object1: null, object2: null };
 
 	this.segments = [];
-	var n = 100 * 100;
+	var n = 30 * 30;
 	for ( var i = 0; i < n; i++ ) {
 		this.segments[ i ] = false;
 	}
@@ -53,7 +57,7 @@ THREE.ConvexObjectBreaker.prototype = {
 	prepareBreakableObject: function( object, mass, velocity, angularVelocity, breakable ) {
 
 		// object is a THREE.Object3d (normally a Mesh), must have a Geometry, and it must be convex.
-		// Its material property is propagated to its "children"
+		// Its material property is propagated to its children (sub-pieces)
 		// mass must be > 0
 
 		// Create vertices mark
@@ -74,11 +78,71 @@ THREE.ConvexObjectBreaker.prototype = {
 	 * @param {int} maxRadialIterations Iterations for radial cuts.
 	 * @param {int} maxRandomIterations Max random iterations for not-radial cuts
 	 * @param {double} minSizeForRadialSubdivision Min size a debris can have to break in radial subdivision.
+	 *
+	 * Returns the array of pieces
 	 */
-	subdivideByImpact: function( pointOfImpact, object ) {
+	subdivideByImpact: function( object, pointOfImpact, normal, maxRadialIterations, maxRandomIterations, minSizeForRadialSubdivision ) {
 
 		var debris = [];
 
+		var tempPlane1 = this.tempPlane1;
+		var tempPlane2 = this.tempPlane2;
+
+		this.tempVector3.addVectors( pointOfImpact, normal )
+		tempPlane1.setFromCoplanarPoints( pointOfImpact, object.position, this.tempVector3 );
+
+		var scope = this;
+
+		function subdivideRadial( subObject, startAngle, endAngle, numIterations ) {
+
+			if ( /*Math.random() < numIterations * 0.05 ||*/ numIterations > maxRadialIterations ) {
+
+				debris.push( subObject );
+
+				return;
+				
+			}
+			
+			var angle = Math.PI;
+
+			if ( numIterations === 0 ) {
+
+				tempPlane2.normal.copy( tempPlane1.normal );
+				tempPlane2.constant = tempPlane1.constant;
+
+			}
+			else {
+
+				// TODO if numIterations > maxRandomIterations + maxRadialIterations
+				angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle;
+
+				// Rotate tempPlane2 around normal axis by the angle
+				scope.tempVector3_2.copy( object.position ).sub( pointOfImpact ).applyAxisAngle( normal, angle ).add( pointOfImpact );
+				tempPlane2.setFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2 );
+
+			}
+
+			// Perform the cut
+			scope.cutByPlane( subObject, tempPlane2, scope.tempResultObjects );
+
+			var obj1 = scope.tempResultObjects.object1;
+			var obj2 = scope.tempResultObjects.object2;
+
+			if ( obj1 ) {
+
+				subdivideRadial( obj1, startAngle, angle, numIterations + 1 );
+
+			}
+
+			if ( obj2 ) {
+
+				subdivideRadial( obj2, angle, endAngle, numIterations + 1 );
+
+			}
+
+		}
+
+		subdivideRadial( object, 0, 2 * Math.PI, 0 );
 
 		return debris;
 
@@ -156,7 +220,7 @@ THREE.ConvexObjectBreaker.prototype = {
 		}
 
 		// Transform the plane to object local space
-		var localPlane = this.tempPlane;
+		var localPlane = this.tempPlane1;
 		object.updateMatrix();
 		THREE.ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane );
 
@@ -301,7 +365,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		var numObjects = 0;
 
-		if ( numPoints1 > 0 ) {
+		if ( numPoints1 > 3 ) {
 
 			object1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), object.material );
 			object1.position.copy( this.tempCM1 );
@@ -313,7 +377,7 @@ THREE.ConvexObjectBreaker.prototype = {
 
 		}
 
-		if ( numPoints2 > 0 ) {
+		if ( numPoints2 > 3 ) {
 
 			object2 = new THREE.Mesh( new THREE.ConvexGeometry( points2 ), object.material );
 			object2.position.copy( this.tempCM2 );
