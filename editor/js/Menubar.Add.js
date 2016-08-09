@@ -290,6 +290,88 @@ Menubar.Add = function ( editor ) {
 	options.add( option );
 
 	//
+	
+	
+	// Helix
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Helix' );
+	option.onClick( function() {
+		var material = new THREE.MeshStandardMaterial( { side: THREE.DoubleSide } )
+		var radialSegments = 36;
+		var height = 150; //"magnitude"
+		var helixRadius = height/4; //radius of the helix (overall shape)
+		var tube = helixRadius/5; //radius of the helix's tube
+		var numberLoops = 3.7;
+		var tubularSegments = 30*numberLoops;
+		
+		var customHelixCurve = THREE.Curve.create(
+	    function ( scale ) { //custom curve constructor
+	        this.scale = (scale === undefined) ? 1 : scale;
+	    },
+
+	    function ( t ) { //getPoint: t is between 0-1
+	        var tx = helixRadius * Math.cos(t * numberLoops * 2 * Math.PI);
+							tz = helixRadius * Math.sin(t * numberLoops * 2 * Math.PI);
+							ty = t*height;
+
+	        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+	    }
+		);
+
+		var path = new customHelixCurve( 1 );
+
+		var helixGeometry = new THREE.TubeGeometry(
+	    path,  							//path
+	    tubularSegments,    //tube segments
+	    tube,     					//radius
+	    radialSegments,     //radiusSegments
+	    false  							//closed
+		);
+	
+	
+		// ADD ARROW HEAD:
+		//ArrowHelper(dir, origin, length, hex, headLength, headWidth )
+		//dir -- Vector3 -- direction from origin. Must be a unit vector. 
+		//origin -- Vector3 
+		//length -- scalar 
+		//hex -- hexadecimal value to define color ex:0xffff00
+		//headLength -- The length of the head of the arrow
+		//headWidth -- The length of the width of the arrow
+		
+		
+		var origin = new THREE.Vector3();
+		origin = path.getPoint(1);
+		var prevPathPoint = new THREE.Vector3();
+		prevPathPoint = path.getPoint(0.999);
+		
+		var dir = new THREE.Vector3( );
+		dir.subVectors( origin, prevPathPoint );
+		
+		var hex = 0xffffff;
+		var headLength = tube*4;
+		var headWidth = tube*4;
+		var length = headLength/2;
+		var arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex, headLength, headWidth );
+		arrowHelper.cone.material = material;
+		arrowHelper.cone.geometry = new THREE.CylinderBufferGeometry(0, .5, 1, 20, 1);
+	
+		helixGeometry.parameters.height=height;
+		helixGeometry.parameters.helixRadius=helixRadius;
+		helixGeometry.parameters.numberLoops=numberLoops;
+						
+		var helix = new THREE.Mesh( helixGeometry, material );
+		helix.add( arrowHelper );
+		helix.name = 'Helix ' + ( ++ meshCount );
+
+		editor.execute( new AddObjectCommand( helix ) );
+
+	} );
+	options.add( option );	
+	
+	
+	
 
 	options.add( new UI.HorizontalRule() );
 
