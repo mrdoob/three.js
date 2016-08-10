@@ -21,7 +21,7 @@ FLOAT_PRECISION = 8
 class ThreeJsWriter(object):
     def __init__(self):
         self.componentKeys = ['vertices', 'normals', 'colors', 'uvs', 'faces',
-                'materials', 'diffuseMaps', 'specularMaps', 'bumpMaps', 'copyTextures',
+                'materials', 'colorMaps', 'specularMaps', 'bumpMaps', 'copyTextures',
                 'bones', 'skeletalAnim', 'bakeAnimations', 'prettyOutput']
 
     def write(self, path, optionString, accessMode):
@@ -43,25 +43,27 @@ class ThreeJsWriter(object):
         self.skinIndices = []
         self.skinWeights = []
 
-        if self.options["bakeAnimations"]:
-            print("exporting animations")
-            self._exportAnimations()
-            self._goToFrame(self.options["startFrame"])
+        print("exporting meshes")
+        self._exportMeshes()
         if self.options["materials"]:
             print("exporting materials")
             self._exportMaterials()
-        if self.options["bones"]:
-            print("exporting bones")
-            select(map(lambda m: m.getParent(), ls(type='mesh')))
-            runtime.GoToBindPose()
-            self._exportBones()
-            print("exporting skins")
-            self._exportSkins()
-        print("exporting meshes")
-        self._exportMeshes()
-        if self.options["skeletalAnim"]:
-            print("exporting keyframe animations")
-            self._exportKeyframeAnimations()
+        if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
+			if self.options["bakeAnimations"]:
+				print("exporting animations")
+				self._exportAnimations()
+				self._goToFrame(self.options["startFrame"])
+			if self.options["bones"]:
+				print("exporting bones")
+				select(map(lambda m: m.getParent(), ls(type='mesh')))
+				runtime.GoToBindPose()
+				self._exportBones()
+				print("exporting skins")
+				self._exportSkins()
+			if self.options["skeletalAnim"]:
+				print("exporting keyframe animations")
+				self._exportKeyframeAnimations()
+        
 
         print("writing file")
         output = {
@@ -77,17 +79,18 @@ class ThreeJsWriter(object):
             'materials': self.materials,
         }
 
-        if self.options['bakeAnimations']:
-            output['morphTargets'] = self.morphTargets
+        if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
+			if self.options['bakeAnimations']:
+				output['morphTargets'] = self.morphTargets
 
-        if self.options['bones']:
-            output['bones'] = self.bones
-            output['skinIndices'] = self.skinIndices
-            output['skinWeights'] = self.skinWeights
-            output['influencesPerVertex'] = self.options["influencesPerVertex"]
+			if self.options['bones']:
+				output['bones'] = self.bones
+				output['skinIndices'] = self.skinIndices
+				output['skinWeights'] = self.skinWeights
+				output['influencesPerVertex'] = self.options["influencesPerVertex"]
 
-        if self.options['skeletalAnim']:
-            output['animations'] = self.animations
+			if self.options['skeletalAnim']:
+				output['animations'] = self.animations
 
         with file(path, 'w') as f:
             if self.options['prettyOutput']:
@@ -101,7 +104,7 @@ class ThreeJsWriter(object):
             self.__allMeshes = filter(lambda m: len(m.listConnections()) > 0, ls(type='mesh'))
         else :
             print("### Exporting SELECTED ###")
-            self.__allMeshes = ls(sl=1)
+            self.__allMeshes = ls(selection=True)
         return self.__allMeshes
 
     def _parseOptions(self, optionsString):
@@ -230,7 +233,10 @@ class ThreeJsWriter(object):
         return bitmask
 
     def _exportMaterials(self):
-        for mat in ls(type='lambert'):
+    	hist = listHistory( self._allMeshes(), f=1 )
+    	mats = listConnections( hist, type='lambert' )
+        for mat in mats:
+            print("material: " + mat)
             self.materials.append(self._exportMaterial(mat))
 
     def _exportMaterial(self, mat):
@@ -241,8 +247,8 @@ class ThreeJsWriter(object):
             "depthTest": True,
             "depthWrite": True,
             "shading": mat.__class__.__name__,
-            "opacity": mat.getTransparency().a,
-            "transparent": mat.getTransparency().a != 1.0,
+            "opacity": mat.getTransparency().r,
+            "transparent": mat.getTransparency().r != 1.0,
             "vertexColors": False
         }
         if isinstance(mat, nodetypes.Phong):
@@ -253,8 +259,8 @@ class ThreeJsWriter(object):
                 self._exportSpecularMap(result, mat)
         if self.options["bumpMaps"]:
             self._exportBumpMap(result, mat)
-        if self.options["diffuseMaps"]:
-            self._exportDiffuseMap(result, mat)
+        if self.options["colorMaps"]:
+            self._exportColorMap(result, mat)
 
         return result
 
@@ -264,7 +270,7 @@ class ThreeJsWriter(object):
                 result["mapNormalFactor"] = 1
                 self._exportFile(result, f, "Normal")
 
-    def _exportDiffuseMap(self, result, mat):
+    def _exportColorMap(self, result, mat):
         for f in mat.attr('color').inputs():
             result["colorDiffuse"] = f.attr('defaultColor').get()
             self._exportFile(result, f, "Diffuse")
@@ -286,7 +292,9 @@ class ThreeJsWriter(object):
         result["map" + mapType + "Anisotropy"] = 4
 
     def _exportBones(self):
-        for joint in ls(type='joint'):
+    	hist = listHistory( self._allMeshes(), f=1 )
+    	joints = listConnections( hist, type="joint")
+        for joint in joints:
             if joint.getParent():
                 parentIndex = self._indexOfJoint(joint.getParent().name())
             else:
@@ -314,7 +322,9 @@ class ThreeJsWriter(object):
         hierarchy = []
         i = -1
         frameRate = FramesPerSecond(currentUnit(query=True, time=True)).value()
-        for joint in ls(type='joint'):
+        hist = listHistory( self._allMeshes(), f=1 )
+    	joints = listConnections( hist, type="joint")
+        for joint in joints:
             hierarchy.append({
                 "parent": i,
                 "keys": self._getKeyframes(joint, frameRate)
@@ -361,7 +371,8 @@ class ThreeJsWriter(object):
     def _exportSkins(self):
         for mesh in self._allMeshes():
             print("exporting skins for mesh: " + mesh.name())
-            skins = filter(lambda skin: mesh in skin.getOutputGeometry(), ls(type='skinCluster'))
+            hist = listHistory( mesh, f=1 )
+            skins = listConnections( hist, type='skinCluster')
             if len(skins) > 0:
                 print("mesh has " + str(len(skins)) + " skins")
                 skin = skins[0]
@@ -448,6 +459,13 @@ class FramesPerSecond(object):
             return FramesPerSecond.MAYA_VALUES[self.fpsString]
         else:
             return int(filter(lambda c: c.isdigit(), self.fpsString))
+
+###################################################################
+## The code below was taken from the Blender 3JS Exporter 
+## It's purpose is to fix the JSON output so that it does not
+## put each array value on it's own line, which is ridiculous 
+## for this type of output.
+###################################################################
 
 ROUND = 6
 
