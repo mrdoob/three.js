@@ -1,7 +1,7 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.THREE = global.THREE || {})));
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
 }(this, function (exports) { 'use strict';
 
 	// Polyfills
@@ -490,7 +490,7 @@
 		this.x = x || 0;
 		this.y = y || 0;
 
-	};
+	}
 
 	Vector2.prototype = {
 
@@ -1009,7 +1009,7 @@
 		this.version = 0;
 		this.onUpdate = null;
 
-	};
+	}
 
 	Texture.DEFAULT_IMAGE = undefined;
 	Texture.DEFAULT_MAPPING = UVMapping;
@@ -1275,7 +1275,7 @@
 
 		}
 
-	};
+	}
 
 	Matrix4.prototype = {
 
@@ -1869,7 +1869,11 @@
 
 				var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-				if ( throwOnDegenerate || false ) {} else {
+				if ( throwOnDegenerate === true ) {
+
+					throw new Error( msg );
+
+				} else {
 
 					console.warn( msg );
 
@@ -2229,7 +2233,7 @@
 		this._z = z || 0;
 		this._w = ( w !== undefined ) ? w : 1;
 
-	};
+	}
 
 	Quaternion.prototype = {
 
@@ -2816,7 +2820,7 @@
 		this.y = y || 0;
 		this.z = z || 0;
 
-	};
+	}
 
 	Vector3.prototype = {
 
@@ -3936,7 +3940,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -3947,7 +3951,7 @@
 		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
 
-	};
+	}
 
 	Box2.prototype = {
 
@@ -4556,7 +4560,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -4571,7 +4575,7 @@
 
 		this.flipY = false;
 
-	};
+	}
 
 	CubeTexture.prototype = Object.create( Texture.prototype );
 	CubeTexture.prototype.constructor = CubeTexture;
@@ -5948,7 +5952,7 @@
 		this.setupRenderTarget = setupRenderTarget;
 		this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 
-	};
+	}
 
 	/**
 	 * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -5965,7 +5969,7 @@
 		this.z = z || 0;
 		this.w = ( w !== undefined ) ? w : 1;
 
-	};
+	}
 
 	Vector4.prototype = {
 
@@ -7496,7 +7500,7 @@
 
 		};
 
-	};
+	}
 
 	/**
 	 * @author szimek / https://github.com/szimek/
@@ -7531,7 +7535,7 @@
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
-	};
+	}
 
 	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
@@ -7640,7 +7644,7 @@
 
 		this._needsUpdate = true;
 
-	};
+	}
 
 	Material.prototype = {
 
@@ -7789,6 +7793,11 @@
 
 			if ( this.opacity < 1 ) data.opacity = this.opacity;
 			if ( this.transparent === true ) data.transparent = this.transparent;
+
+			data.depthFunc = this.depthFunc;
+			data.depthTest = this.depthTest;
+			data.depthWrite = this.depthWrite;
+
 			if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 			if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 			if ( this.wireframe === true ) data.wireframe = this.wireframe;
@@ -8056,7 +8065,7 @@
 
 		}
 
-	};
+	}
 
 	ShaderMaterial.prototype = Object.create( Material.prototype );
 	ShaderMaterial.prototype.constructor = ShaderMaterial;
@@ -8437,7 +8446,7 @@
 
 		return this.setRGB( r, g, b );
 
-	};
+	}
 
 	Color.prototype = {
 
@@ -9375,7 +9384,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshDepthMaterial.prototype = Object.create( Material.prototype );
 	MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
@@ -9416,7 +9425,7 @@
 		this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
-	};
+	}
 
 	Box3.prototype = {
 
@@ -9892,7 +9901,7 @@
 		this.center = ( center !== undefined ) ? center : new Vector3();
 		this.radius = ( radius !== undefined ) ? radius : 0;
 
-	};
+	}
 
 	Sphere.prototype = {
 
@@ -10080,7 +10089,7 @@
 
 		}
 
-	};
+	}
 
 	Matrix3.prototype = {
 
@@ -10253,7 +10262,11 @@
 
 				var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-				if ( throwOnDegenerate || false ) {} else {
+				if ( throwOnDegenerate === true ) {
+
+					throw new Error( msg );
+
+				} else {
 
 					console.warn( msg );
 
@@ -10367,7 +10380,7 @@
 		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
 		this.constant = ( constant !== undefined ) ? constant : 0;
 
-	};
+	}
 
 	Plane.prototype = {
 
@@ -10610,7 +10623,7 @@
 
 		];
 
-	};
+	}
 
 	Frustum.prototype = {
 
@@ -11234,7 +11247,7 @@
 
 		}
 
-	};
+	}
 
 	exports.WebGLShader = ( function () {
 
@@ -11316,7 +11329,7 @@
 
 		};
 
-	};
+	}
 
 	exports.WebGLProgram = ( function () {
 
@@ -12256,7 +12269,7 @@
 		// Exposed for resource monitoring & error feedback via renderer.info:
 		this.programs = programs;
 
-	};
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -12649,7 +12662,7 @@
 
 		this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-	};
+	}
 
 	Face3.prototype = {
 
@@ -12703,7 +12716,7 @@
 		this._z = z || 0;
 		this._order = order || Euler.DefaultOrder;
 
-	};
+	}
 
 	Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
@@ -13027,7 +13040,7 @@
 
 		this.mask = 1;
 
-	};
+	}
 
 	Layers.prototype = {
 
@@ -13149,7 +13162,7 @@
 
 		this.userData = {};
 
-	};
+	}
 
 	Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 	Object3D.DefaultMatrixAutoUpdate = true;
@@ -13827,7 +13840,7 @@
 		this.lineDistancesNeedUpdate = false;
 		this.groupsNeedUpdate = false;
 
-	};
+	}
 
 	Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
@@ -15032,7 +15045,7 @@
 		this.uvsNeedUpdate = false;
 		this.groupsNeedUpdate = false;
 
-	};
+	}
 
 	Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 
@@ -15305,7 +15318,7 @@
 
 		this.drawRange = { start: 0, count: Infinity };
 
-	};
+	}
 
 	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
@@ -16446,7 +16459,7 @@
 
 		this.get = get;
 
-	};
+	}
 
 	/**
 	* @author mrdoob / http://mrdoob.com/
@@ -16672,7 +16685,7 @@
 
 		this.update = update;
 
-	};
+	}
 
 	/**
 	* @author mrdoob / http://mrdoob.com/
@@ -16753,7 +16766,7 @@
 
 		};
 
-	};
+	}
 
 	function WebGLCapabilities( gl, extensions, parameters ) {
 
@@ -16844,7 +16857,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	* @author mrdoob / http://mrdoob.com/
@@ -16903,7 +16916,7 @@
 
 		};
 
-	};
+	}
 
 	/**
 	* @author mrdoob / http://mrdoob.com/
@@ -16970,7 +16983,7 @@
 		this.render = render;
 		this.renderInstances = renderInstances;
 
-	};
+	}
 
 	function WebGLClipping() {
 
@@ -17122,7 +17135,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	* @author mrdoob / http://mrdoob.com/
@@ -17187,7 +17200,7 @@
 		this.render = render;
 		this.renderInstances = renderInstances;
 
-	};
+	}
 
 	/**
 	 * @author alteredq / http://alteredqualia.com
@@ -17200,7 +17213,7 @@
 		this.activeCubeFace = 0; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
 		this.activeMipMapLevel = 0;
 
-	};
+	}
 
 	WebGLRenderTargetCube.prototype = Object.create( WebGLRenderTarget.prototype );
 	WebGLRenderTargetCube.prototype.constructor = WebGLRenderTargetCube;
@@ -17397,7 +17410,7 @@
 
 		}
 
-	};
+	}
 
 	BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
@@ -17411,7 +17424,7 @@
 		this.origin = ( origin !== undefined ) ? origin : new Vector3();
 		this.direction = ( direction !== undefined ) ? direction : new Vector3();
 
-	};
+	}
 
 	Ray.prototype = {
 
@@ -17947,7 +17960,7 @@
 		this.start = ( start !== undefined ) ? start : new Vector3();
 		this.end = ( end !== undefined ) ? end : new Vector3();
 
-	};
+	}
 
 	Line3.prototype = {
 
@@ -18076,7 +18089,7 @@
 		this.b = ( b !== undefined ) ? b : new Vector3();
 		this.c = ( c !== undefined ) ? c : new Vector3();
 
-	};
+	}
 
 	Triangle.normal = function () {
 
@@ -18388,7 +18401,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshBasicMaterial.prototype = Object.create( Material.prototype );
 	MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
@@ -18447,7 +18460,7 @@
 
 		this.updateMorphTargets();
 
-	};
+	}
 
 	Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -18874,7 +18887,7 @@
 		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-	};
+	}
 
 	PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;
@@ -18894,7 +18907,7 @@
 		this.matrixWorldInverse = new Matrix4();
 		this.projectionMatrix = new Matrix4();
 
-	};
+	}
 
 	Camera.prototype = Object.create( Object3D.prototype );
 	Camera.prototype.constructor = Camera;
@@ -18978,7 +18991,7 @@
 
 		this.updateProjectionMatrix();
 
-	};
+	}
 
 	PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
@@ -19194,7 +19207,7 @@
 
 		this.updateProjectionMatrix();
 
-	};
+	}
 
 	OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
@@ -22080,7 +22093,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -22220,7 +22233,7 @@
 
 		}
 
-	};
+	}
 
 	LensFlare.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -22326,7 +22339,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	SpriteMaterial.prototype = Object.create( Material.prototype );
 	SpriteMaterial.prototype.constructor = SpriteMaterial;
@@ -22357,7 +22370,7 @@
 
 		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-	};
+	}
 
 	Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -22422,7 +22435,7 @@
 			}
 		} );
 
-	};
+	}
 
 
 	LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -22591,7 +22604,7 @@
 		this.flipY = false;
 		this.generateMipmaps  = false;
 
-	};
+	}
 
 	DataTexture.prototype = Object.create( Texture.prototype );
 	DataTexture.prototype.constructor = DataTexture;
@@ -22673,7 +22686,7 @@
 
 		}
 
-	};
+	}
 
 	Object.assign( Skeleton.prototype, {
 
@@ -22793,7 +22806,7 @@
 
 		this.skin = skin;
 
-	};
+	}
 
 	Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -22878,7 +22891,7 @@
 		this.updateMatrixWorld( true );
 		this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
-	};
+	}
 
 
 	SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
@@ -23025,7 +23038,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	LineBasicMaterial.prototype = Object.create( Material.prototype );
 	LineBasicMaterial.prototype.constructor = LineBasicMaterial;
@@ -23066,7 +23079,7 @@
 		this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 		this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	};
+	}
 
 	Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -23241,7 +23254,7 @@
 
 		this.type = 'LineSegments';
 
-	};
+	}
 
 	LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
@@ -23282,7 +23295,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	PointsMaterial.prototype = Object.create( Material.prototype );
 	PointsMaterial.prototype.constructor = PointsMaterial;
@@ -23317,7 +23330,7 @@
 		this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 		this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
 
-	};
+	}
 
 	Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -23450,7 +23463,7 @@
 
 		this.type = 'Group';
 
-	};
+	}
 
 	Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -23484,7 +23497,7 @@
 
 		update();
 
-	};
+	}
 
 	VideoTexture.prototype = Object.create( Texture.prototype );
 	VideoTexture.prototype.constructor = VideoTexture;
@@ -23510,7 +23523,7 @@
 
 		this.generateMipmaps = false;
 
-	};
+	}
 
 	CompressedTexture.prototype = Object.create( Texture.prototype );
 	CompressedTexture.prototype.constructor = CompressedTexture;
@@ -23527,7 +23540,7 @@
 
 		this.needsUpdate = true;
 
-	};
+	}
 
 	CanvasTexture.prototype = Object.create( Texture.prototype );
 	CanvasTexture.prototype.constructor = CanvasTexture;
@@ -23539,27 +23552,27 @@
 
 	function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 
-	  format = format !== undefined ? format : DepthFormat;
+		format = format !== undefined ? format : DepthFormat;
 
-	  if ( format !== DepthFormat && format !== DepthStencilFormat ) {
+		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
-	    throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
+			throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
 
-	  }
+		}
 
-	  Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-	  this.image = { width: width, height: height };
+		this.image = { width: width, height: height };
 
-	  this.type = type !== undefined ? type : UnsignedShortType;
+		this.type = type !== undefined ? type : UnsignedShortType;
 
-	  this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	  this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-	  this.flipY = false;
-	  this.generateMipmaps  = false;
+		this.flipY = false;
+		this.generateMipmaps	= false;
 
-	};
+	}
 
 	DepthTexture.prototype = Object.create( Texture.prototype );
 	DepthTexture.prototype.constructor = DepthTexture;
@@ -23597,7 +23610,7 @@
 			}
 		} );
 
-	};
+	}
 
 	ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
 	ShadowMaterial.prototype.constructor = ShadowMaterial;
@@ -23614,7 +23627,7 @@
 
 		this.type = 'RawShaderMaterial';
 
-	};
+	}
 
 	RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
 	RawShaderMaterial.prototype.constructor = RawShaderMaterial;
@@ -23635,7 +23648,7 @@
 
 		this.visible = true;
 
-	};
+	}
 
 	MultiMaterial.prototype = {
 
@@ -23798,7 +23811,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshStandardMaterial.prototype = Object.create( Material.prototype );
 	MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
@@ -23884,7 +23897,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
 	MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
@@ -24008,7 +24021,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshPhongMaterial.prototype = Object.create( Material.prototype );
 	MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;
@@ -24093,7 +24106,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshNormalMaterial.prototype = Object.create( Material.prototype );
 	MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
@@ -24189,7 +24202,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	MeshLambertMaterial.prototype = Object.create( Material.prototype );
 	MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
@@ -24269,7 +24282,7 @@
 
 		this.setValues( parameters );
 
-	};
+	}
 
 	LineDashedMaterial.prototype = Object.create( Material.prototype );
 	LineDashedMaterial.prototype.constructor = LineDashedMaterial;
@@ -24403,7 +24416,7 @@
 
 		};
 
-	};
+	}
 
 	exports.DefaultLoadingManager = new LoadingManager();
 
@@ -24415,7 +24428,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( XHRLoader.prototype, {
 
@@ -24444,7 +24457,6 @@
 			}
 
 			var request = new XMLHttpRequest();
-			request.overrideMimeType( 'text/plain' );
 			request.open( 'GET', url, true );
 
 			request.addEventListener( 'load', function ( event ) {
@@ -24501,6 +24513,8 @@
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
+			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+
 			request.send( null );
 
 			scope.manager.itemStart( url );
@@ -24545,7 +24559,7 @@
 		// override in sub classes
 		this._parser = null;
 
-	};
+	}
 
 	Object.assign( CompressedTextureLoader.prototype, {
 
@@ -24680,7 +24694,7 @@
 		// override in sub classes
 		this._parser = null;
 
-	};
+	}
 
 	Object.assign( BinaryTextureLoader.prototype, {
 
@@ -24763,7 +24777,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( ImageLoader.prototype, {
 
@@ -24837,7 +24851,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( CubeTextureLoader.prototype, {
 
@@ -24905,7 +24919,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( TextureLoader.prototype, {
 
@@ -24979,7 +24993,7 @@
 
 		this.receiveShadow = undefined;
 
-	};
+	}
 
 	Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -25012,6 +25026,8 @@
 			if ( this.decay !== undefined ) data.object.decay = this.decay;
 			if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
 
+			if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
+
 			return data;
 
 		}
@@ -25035,7 +25051,7 @@
 
 		this.groundColor = new Color( groundColor );
 
-	};
+	}
 
 	HemisphereLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
@@ -25071,7 +25087,7 @@
 		this.map = null;
 		this.matrix = new Matrix4();
 
-	};
+	}
 
 	Object.assign( LightShadow.prototype, {
 
@@ -25092,6 +25108,21 @@
 
 			return new this.constructor().copy( this );
 
+		},
+
+		toJSON: function () {
+
+			var object = {};
+
+			if ( this.bias !== 0 ) object.bias = this.bias;
+			if ( this.radius !== 1 ) object.radius = this.radius;
+			if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+
+			object.camera = this.camera.toJSON( false ).object;
+			delete object.camera.matrix;
+
+			return object;
+
 		}
 
 	} );
@@ -25104,7 +25135,7 @@
 
 		LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
-	};
+	}
 
 	SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
@@ -25168,7 +25199,7 @@
 
 		this.shadow = new SpotLightShadow();
 
-	};
+	}
 
 	SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
@@ -25225,7 +25256,7 @@
 
 		this.shadow = new LightShadow( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-	};
+	}
 
 	PointLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
@@ -25256,7 +25287,7 @@
 
 		LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
-	};
+	}
 
 	DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
@@ -25282,7 +25313,7 @@
 
 		this.shadow = new DirectionalLightShadow();
 
-	};
+	}
 
 	DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
@@ -25316,7 +25347,7 @@
 
 		this.castShadow = undefined;
 
-	};
+	}
 
 	AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
@@ -25519,7 +25550,7 @@
 		this.sampleValues = sampleValues;
 		this.valueSize = sampleSize;
 
-	};
+	}
 
 	Interpolant.prototype = {
 
@@ -25765,7 +25796,7 @@
 		this._weightNext = -0;
 		this._offsetNext = -0;
 
-	};
+	}
 
 	CubicInterpolant.prototype =
 			Object.assign( Object.create( Interpolant.prototype ), {
@@ -25907,7 +25938,7 @@
 		Interpolant.call(
 				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-	};
+	}
 
 	LinearInterpolant.prototype =
 			Object.assign( Object.create( Interpolant.prototype ), {
@@ -25954,7 +25985,7 @@
 		Interpolant.call(
 				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-	};
+	}
 
 	DiscreteInterpolant.prototype =
 			Object.assign( Object.create( Interpolant.prototype ), {
@@ -26342,7 +26373,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-	};
+	}
 
 	VectorKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26369,7 +26400,7 @@
 		Interpolant.call(
 				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-	};
+	}
 
 	QuaternionLinearInterpolant.prototype =
 			Object.assign( Object.create( Interpolant.prototype ), {
@@ -26412,7 +26443,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-	};
+	}
 
 	QuaternionKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26449,7 +26480,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-	};
+	}
 
 	NumberKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26478,7 +26509,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-	};
+	}
 
 	StringKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26510,7 +26541,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values );
 
-	};
+	}
 
 	BooleanKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26545,7 +26576,7 @@
 
 		KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-	};
+	}
 
 	ColorKeyframeTrack.prototype =
 			Object.assign( Object.create( KeyframeTrackPrototype ), {
@@ -26575,8 +26606,10 @@
 	 */
 
 	function KeyframeTrack( name, times, values, interpolation ) {
+
 		KeyframeTrackConstructor.apply( this, arguments );
-	};
+
+	}
 
 	KeyframeTrack.prototype = KeyframeTrackPrototype;
 	KeyframeTrackPrototype.constructor = KeyframeTrack;
@@ -26734,7 +26767,7 @@
 		this.trim();
 		this.optimize();
 
-	};
+	}
 
 	AnimationClip.prototype = {
 
@@ -27075,7 +27108,7 @@
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 		this.textures = {};
 
-	};
+	}
 
 	Object.assign( MaterialLoader.prototype, {
 
@@ -27229,7 +27262,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( BufferGeometryLoader.prototype, {
 
@@ -27328,7 +27361,7 @@
 		this.onLoadProgress = function () {};
 		this.onLoadComplete = function () {};
 
-	};
+	}
 
 	Loader.prototype = {
 
@@ -27660,7 +27693,7 @@
 
 		this.withCredentials = false;
 
-	};
+	}
 
 	Object.assign( JSONLoader.prototype, {
 
@@ -28507,6 +28540,10 @@
 
 					scope.manager.itemEnd( url );
 
+				}, undefined, function () {
+
+					scope.manager.itemError( url );
+
 				} );
 
 			}
@@ -28639,17 +28676,17 @@
 
 						object = new Scene();
 
-						
+
 						if ( data.fog !== undefined ) {
-							
+
 							if ( data.fog.type === 'FogExp2' ) {
-							
+
 								object.fog = new FogExp2(data.fog.color, data.fog.density);
-								
+
 							} else if ( data.fog.type === 'Fog' ) {
-							
+
 								object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
-								
+
 							}
 						}
 
@@ -28782,6 +28819,15 @@
 
 				if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 				if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
+				if ( data.shadow ) {
+
+					if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+					if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+					if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+					if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+				}
 
 				if ( data.visible !== undefined ) object.visible = data.visible;
 				if ( data.userData !== undefined ) object.userData = data.userData;
@@ -29881,7 +29927,7 @@
 		this.v1 = v1;
 		this.v2 = v2;
 
-	};
+	}
 
 	LineCurve.prototype = Object.create( Curve.prototype );
 	LineCurve.prototype.constructor = LineCurve;
@@ -29935,7 +29981,7 @@
 
 		this.autoClose = false; // Automatically closes the path
 
-	};
+	}
 
 	CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
@@ -30172,7 +30218,7 @@
 
 		this.aRotation = aRotation || 0;
 
-	};
+	}
 
 	EllipseCurve.prototype = Object.create( Curve.prototype );
 	EllipseCurve.prototype.constructor = EllipseCurve;
@@ -30295,9 +30341,9 @@
 
 	function SplineCurve( points /* array of Vector2 */ ) {
 
-		this.points = ( points == undefined ) ? [] : points;
+		this.points = ( points === undefined ) ? [] : points;
 
-	};
+	}
 
 	SplineCurve.prototype = Object.create( Curve.prototype );
 	SplineCurve.prototype.constructor = SplineCurve;
@@ -30337,7 +30383,7 @@
 		this.v2 = v2;
 		this.v3 = v3;
 
-	};
+	}
 
 	CubicBezierCurve.prototype = Object.create( Curve.prototype );
 	CubicBezierCurve.prototype.constructor = CubicBezierCurve;
@@ -30375,7 +30421,7 @@
 		this.v1 = v1;
 		this.v2 = v2;
 
-	};
+	}
 
 	QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
 	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
@@ -30522,7 +30568,7 @@
 
 		}
 
-	} )
+	} );
 
 	/**
 	 * @author WestLangley / https://github.com/WestLangley
@@ -30661,7 +30707,7 @@
 		this.computeFaceNormals();
 		this.computeVertexNormals();
 
-	};
+	}
 
 	TubeGeometry.prototype = Object.create( Geometry.prototype );
 	TubeGeometry.prototype.constructor = TubeGeometry;
@@ -30881,7 +30927,7 @@
 
 		//console.log( "took", ( Date.now() - startTime ) );
 
-	};
+	}
 
 	ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 	ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
@@ -31559,7 +31605,7 @@
 
 		this.computeFaceNormals();
 
-	};
+	}
 
 	ShapeGeometry.prototype = Object.create( Geometry.prototype );
 	ShapeGeometry.prototype.constructor = ShapeGeometry;
@@ -31680,7 +31726,7 @@
 
 		this.holes = [];
 
-	};
+	}
 
 	Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
@@ -31754,7 +31800,7 @@
 
 		}
 
-	};
+	}
 
 	Path.prototype = PathPrototype;
 	PathPrototype.constructor = Path;
@@ -32022,7 +32068,7 @@
 
 		this.data = data;
 
-	};
+	}
 
 	Object.assign( Font.prototype, {
 
@@ -32188,7 +32234,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( FontLoader.prototype, {
 
@@ -32250,7 +32296,7 @@
 
 		this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
 
-	};
+	}
 
 	Object.assign( AudioLoader.prototype, {
 
@@ -32284,6 +32330,8 @@
 
 		this.aspect = 1;
 
+		this.eyeSep = 0.064;
+
 		this.cameraL = new PerspectiveCamera();
 		this.cameraL.layers.enable( 1 );
 		this.cameraL.matrixAutoUpdate = false;
@@ -32292,7 +32340,7 @@
 		this.cameraR.layers.enable( 2 );
 		this.cameraR.matrixAutoUpdate = false;
 
-	};
+	}
 
 	Object.assign( StereoCamera.prototype, {
 
@@ -32321,7 +32369,7 @@
 					// http://paulbourke.net/stereographics/stereorender/
 
 					var projectionMatrix = camera.projectionMatrix.clone();
-					var eyeSep = 0.064 / 2;
+					var eyeSep = this.eyeSep / 2;
 					var eyeSepOnProjection = eyeSep * near / focus;
 					var ymax = near * Math.tan( exports.Math.DEG2RAD * fov * 0.5 );
 					var xmin, xmax;
@@ -32444,7 +32492,7 @@
 
 		};
 
-	};
+	}
 
 	CubeCamera.prototype = Object.create( Object3D.prototype );
 	CubeCamera.prototype.constructor = CubeCamera;
@@ -33014,7 +33062,7 @@
 		this.useCount = 0;
 		this.referenceCount = 0;
 
-	};
+	}
 
 	PropertyMixer.prototype = {
 
@@ -33189,7 +33237,7 @@
 
 		this.rootNode = rootNode;
 
-	};
+	}
 
 	PropertyBinding.prototype = {
 
@@ -33713,7 +33761,7 @@
 		//	  .bone[Armature.DEF_cog].position
 		// created and tested via https://regex101.com/#javascript
 
-		var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
+		var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
 		var matches = re.exec( trackName );
 
 		if ( ! matches ) {
@@ -33722,19 +33770,13 @@
 
 		}
 
-		if ( matches.index === re.lastIndex ) {
-
-			re.lastIndex++;
-
-		}
-
 		var results = {
 			// directoryName: matches[ 1 ], // (tschw) currently unused
-			nodeName: matches[ 3 ], 	// allowed to be null, specified root node.
-			objectName: matches[ 5 ],
-			objectIndex: matches[ 7 ],
-			propertyName: matches[ 9 ],
-			propertyIndex: matches[ 11 ]	// allowed to be null, specifies that the whole property is set.
+			nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+			objectName: matches[ 3 ],
+			objectIndex: matches[ 4 ],
+			propertyName: matches[ 5 ],
+			propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
 		};
 
 		if ( results.propertyName === null || results.propertyName.length === 0 ) {
@@ -33891,7 +33933,7 @@
 
 		};
 
-	};
+	}
 
 	AnimationObjectGroup.prototype = {
 
@@ -34210,7 +34252,7 @@
 		throw new Error( "THREE.AnimationAction: " +
 				"Use mixer.clipAction for construction." );
 
-	};
+	}
 
 	AnimationAction._new =
 			function AnimationAction( mixer, clip, localRoot ) {
@@ -34875,7 +34917,7 @@
 
 		this.timeScale = 1.0;
 
-	};
+	}
 
 	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 
@@ -35610,7 +35652,7 @@
 
 		this.dynamic = false;
 
-	};
+	}
 
 	Uniform.prototype = {
 
@@ -35638,7 +35680,7 @@
 		this.type = 'InstancedBufferGeometry';
 		this.maxInstancedCount = undefined;
 
-	};
+	}
 
 	InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
@@ -35703,7 +35745,7 @@
 
 		this.normalized = normalized === true;
 
-	};
+	}
 
 
 	InterleavedBufferAttribute.prototype = {
@@ -35841,7 +35883,7 @@
 
 		this.version = 0;
 
-	};
+	}
 
 	InterleavedBuffer.prototype = {
 
@@ -35928,7 +35970,7 @@
 
 		this.meshPerAttribute = meshPerAttribute || 1;
 
-	};
+	}
 
 	InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
 	InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
@@ -35955,7 +35997,7 @@
 
 		this.meshPerAttribute = meshPerAttribute || 1;
 
-	};
+	}
 
 	InstancedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 	InstancedBufferAttribute.prototype.constructor = InstancedBufferAttribute;
@@ -36003,7 +36045,7 @@
 			}
 		} );
 
-	};
+	}
 
 	function ascSort( a, b ) {
 
@@ -36118,7 +36160,7 @@
 
 		this.running = false;
 
-	};
+	}
 
 	Clock.prototype = {
 
@@ -36349,7 +36391,7 @@
 
 		}
 
-	};
+	}
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -36369,7 +36411,7 @@
 
 		return this;
 
-	};
+	}
 
 	Spherical.prototype = {
 
@@ -36459,7 +36501,7 @@
 		this.createAnimation( name, startFrame, endFrame, fps );
 		this.setAnimationWeight( name, 1 );
 
-	};
+	}
 
 	MorphBlendMesh.prototype = Object.create( Mesh.prototype );
 	MorphBlendMesh.prototype.constructor = MorphBlendMesh;
@@ -36760,7 +36802,7 @@
 		this.material = material;
 		this.render = function ( renderCallback ) {};
 
-	};
+	}
 
 	ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
 	ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
@@ -36945,7 +36987,7 @@
 
 		}
 
-	};
+	}
 
 	WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
 	WireframeGeometry.prototype.constructor = WireframeGeometry;
@@ -36963,7 +37005,7 @@
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
 
-	};
+	}
 
 	WireframeHelper.prototype = Object.create( LineSegments.prototype );
 	WireframeHelper.prototype.constructor = WireframeHelper;
@@ -37015,7 +37057,7 @@
 
 		this.update();
 
-	};
+	}
 
 	VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
 	VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
@@ -37161,7 +37203,7 @@
 
 		this.update();
 
-	};
+	}
 
 	SpotLightHelper.prototype = Object.create( Object3D.prototype );
 	SpotLightHelper.prototype.constructor = SpotLightHelper;
@@ -37237,7 +37279,7 @@
 
 		this.update();
 
-	};
+	}
 
 
 	SkeletonHelper.prototype = Object.create( LineSegments.prototype );
@@ -37394,7 +37436,7 @@
 
 		this.boundingSphere = new Sphere( new Vector3(), radius );
 
-	};
+	}
 
 	SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
@@ -37440,7 +37482,7 @@
 		this.add( this.lightDistance );
 		*/
 
-	};
+	}
 
 	PointLightHelper.prototype = Object.create( Mesh.prototype );
 	PointLightHelper.prototype.constructor = PointLightHelper;
@@ -37495,7 +37537,7 @@
 
 		this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
 
-	};
+	}
 
 	SphereGeometry.prototype = Object.create( Geometry.prototype );
 	SphereGeometry.prototype.constructor = SphereGeometry;
@@ -37533,7 +37575,7 @@
 
 		this.update();
 
-	};
+	}
 
 	HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
 	HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
@@ -37597,7 +37639,7 @@
 
 		LineSegments.call( this, geometry, material );
 
-	};
+	}
 
 	GridHelper.prototype = Object.create( LineSegments.prototype );
 	GridHelper.prototype.constructor = GridHelper;
@@ -37656,7 +37698,7 @@
 		this.matrixAutoUpdate = false;
 		this.update();
 
-	};
+	}
 
 	FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
 	FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
@@ -37810,7 +37852,7 @@
 
 		this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
 
-	};
+	}
 
 	EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 	EdgesGeometry.prototype.constructor = EdgesGeometry;
@@ -37834,7 +37876,7 @@
 		this.matrix = object.matrixWorld;
 		this.matrixAutoUpdate = false;
 
-	};
+	}
 
 	EdgesHelper.prototype = Object.create( LineSegments.prototype );
 	EdgesHelper.prototype.constructor = EdgesHelper;
@@ -37877,7 +37919,7 @@
 
 		this.update();
 
-	};
+	}
 
 	DirectionalLightHelper.prototype = Object.create( Object3D.prototype );
 	DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;
@@ -38024,7 +38066,7 @@
 
 		this.update();
 
-	};
+	}
 
 	CameraHelper.prototype = Object.create( LineSegments.prototype );
 	CameraHelper.prototype.constructor = CameraHelper;
@@ -38132,7 +38174,7 @@
 		this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
 		this.mergeVertices();
 
-	};
+	}
 
 	BoxGeometry.prototype = Object.create( Geometry.prototype );
 	BoxGeometry.prototype.constructor = BoxGeometry;
@@ -38155,7 +38197,7 @@
 
 		Mesh.call( this, new BoxGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
 
-	};
+	}
 
 	BoundingBoxHelper.prototype = Object.create( Mesh.prototype );
 	BoundingBoxHelper.prototype.constructor = BoundingBoxHelper;
@@ -38193,7 +38235,7 @@
 
 		}
 
-	};
+	}
 
 	BoxHelper.prototype = Object.create( LineSegments.prototype );
 	BoxHelper.prototype.constructor = BoxHelper;
@@ -38574,7 +38616,7 @@
 
 		}
 
-	};
+	}
 
 	CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
@@ -38715,7 +38757,7 @@
 
 		LineSegments.call( this, geometry, material );
 
-	};
+	}
 
 	AxisHelper.prototype = Object.create( LineSegments.prototype );
 	AxisHelper.prototype.constructor = AxisHelper;
@@ -38801,7 +38843,7 @@
 		this.computeFaceNormals();
 		this.computeVertexNormals();
 
-	};
+	}
 
 	ParametricGeometry.prototype = Object.create( Geometry.prototype );
 	ParametricGeometry.prototype.constructor = ParametricGeometry;
@@ -39038,8 +39080,7 @@
 
 		}
 
-
-	};
+	}
 
 	PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
 	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
@@ -39067,7 +39108,7 @@
 			detail: detail
 		};
 
-	};
+	}
 
 	TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 	TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
@@ -39095,7 +39136,7 @@
 			detail: detail
 		};
 
-	};
+	}
 
 	OctahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 	OctahedronGeometry.prototype.constructor = OctahedronGeometry;
@@ -39130,7 +39171,7 @@
 			detail: detail
 		};
 
-	};
+	}
 
 	IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 	IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
@@ -39189,7 +39230,7 @@
 			detail: detail
 		};
 
-	};
+	}
 
 	DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 	DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
@@ -39354,7 +39395,7 @@
 
 		}
 
-	};
+	}
 
 	TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
@@ -39383,7 +39424,7 @@
 		this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
 		this.mergeVertices();
 
-	};
+	}
 
 	TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
 	TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
@@ -39510,7 +39551,7 @@
 		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-	};
+	}
 
 	TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
@@ -39537,7 +39578,7 @@
 
 		this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
 
-	};
+	}
 
 	TorusGeometry.prototype = Object.create( Geometry.prototype );
 	TorusGeometry.prototype.constructor = TorusGeometry;
@@ -39590,7 +39631,7 @@
 
 		this.type = 'TextGeometry';
 
-	};
+	}
 
 	TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
 	TextGeometry.prototype.constructor = TextGeometry;
@@ -39711,7 +39752,7 @@
 		this.addAttribute( 'normal', normals );
 		this.addAttribute( 'uv', uvs );
 
-	};
+	}
 
 	RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	RingBufferGeometry.prototype.constructor = RingBufferGeometry;
@@ -39737,7 +39778,7 @@
 
 		this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
 
-	};
+	}
 
 	RingGeometry.prototype = Object.create( Geometry.prototype );
 	RingGeometry.prototype.constructor = RingGeometry;
@@ -39762,7 +39803,7 @@
 
 		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
 
-	};
+	}
 
 	PlaneGeometry.prototype = Object.create( Geometry.prototype );
 	PlaneGeometry.prototype.constructor = PlaneGeometry;
@@ -39918,7 +39959,7 @@
 
 		}
 
-	};
+	}
 
 	LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
@@ -39952,7 +39993,7 @@
 		this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
 		this.mergeVertices();
 
-	};
+	}
 
 	LatheGeometry.prototype = Object.create( Geometry.prototype );
 	LatheGeometry.prototype.constructor = LatheGeometry;
@@ -39981,7 +40022,7 @@
 		this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
 		this.mergeVertices();
 
-	};
+	}
 
 	CylinderGeometry.prototype = Object.create( Geometry.prototype );
 	CylinderGeometry.prototype.constructor = CylinderGeometry;
@@ -40012,7 +40053,7 @@
 			thetaLength: thetaLength
 		};
 
-	};
+	}
 
 	ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
 	ConeGeometry.prototype.constructor = ConeGeometry;
@@ -40042,7 +40083,7 @@
 			thetaLength: thetaLength
 		};
 
-	};
+	}
 
 	ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
@@ -40110,7 +40151,7 @@
 
 		this.boundingSphere = new Sphere( new Vector3(), radius );
 
-	};
+	}
 
 	CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
@@ -40134,7 +40175,7 @@
 
 		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
 
-	};
+	}
 
 	CircleGeometry.prototype = Object.create( Geometry.prototype );
 	CircleGeometry.prototype.constructor = CircleGeometry;
@@ -40335,7 +40376,7 @@
 		this.type = 'catmullrom';
 		this.closed = true;
 
-	};
+	}
 
 	ClosedSplineCurve3.prototype = Object.create( exports.CatmullRomCurve3.prototype );
 
@@ -40349,7 +40390,7 @@
 		function ( points /* array of Vector3 */ ) {
 
 			console.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
-			this.points = ( points == undefined ) ? [] : points;
+			this.points = ( points === undefined ) ? [] : points;
 
 		},
 
@@ -40476,7 +40517,7 @@
 
 		EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
-	};
+	}
 
 	ArcCurve.prototype = Object.create( EllipseCurve.prototype );
 	ArcCurve.prototype.constructor = ArcCurve;

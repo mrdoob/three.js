@@ -10,7 +10,7 @@ function AudioLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( AudioLoader.prototype, {
 

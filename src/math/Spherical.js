@@ -18,7 +18,7 @@ function Spherical( radius, phi, theta ) {
 
 	return this;
 
-};
+}
 
 Spherical.prototype = {
 

@@ -58,7 +58,7 @@ function Material() {
 
 	this._needsUpdate = true;
 
-};
+}
 
 Material.prototype = {
 
@@ -207,6 +207,11 @@ Material.prototype = {
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
+
+		data.depthFunc = this.depthFunc;
+		data.depthTest = this.depthTest;
+		data.depthWrite = this.depthWrite;
+
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;

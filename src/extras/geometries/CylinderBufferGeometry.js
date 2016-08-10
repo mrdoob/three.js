@@ -322,7 +322,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	}
 
-};
+}
 
 CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;

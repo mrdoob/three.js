@@ -14,7 +14,7 @@ function QuadraticBezierCurve( v0, v1, v2 ) {
 	this.v1 = v1;
 	this.v2 = v2;
 
-};
+}
 
 QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
 QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;

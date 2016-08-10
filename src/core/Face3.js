@@ -20,7 +20,7 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-};
+}
 
 Face3.prototype = {
 

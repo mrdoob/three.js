@@ -19,7 +19,7 @@ function CurvePath() {
 
 	this.autoClose = false; // Automatically closes the path
 
-};
+}
 
 CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 

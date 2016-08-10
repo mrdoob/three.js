@@ -10,7 +10,7 @@ function AnimationLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( AnimationLoader.prototype, {
 

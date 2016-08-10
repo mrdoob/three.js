@@ -17,7 +17,7 @@ function Color( r, g, b ) {
 
 	return this.setRGB( r, g, b );
 
-};
+}
 
 Color.prototype = {
 

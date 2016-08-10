@@ -15,7 +15,7 @@ function VectorKeyframeTrack( name, times, values, interpolation ) {
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
 VectorKeyframeTrack.prototype =
 		Object.assign( Object.create( KeyframeTrackPrototype ), {

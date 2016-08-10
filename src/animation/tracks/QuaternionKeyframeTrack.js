@@ -16,7 +16,7 @@ function QuaternionKeyframeTrack( name, times, values, interpolation ) {
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
 QuaternionKeyframeTrack.prototype =
 		Object.assign( Object.create( KeyframeTrackPrototype ), {

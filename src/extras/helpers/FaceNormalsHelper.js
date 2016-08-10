@@ -53,7 +53,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 	this.matrixAutoUpdate = false;
 	this.update();
 
-};
+}
 
 FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
 FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;

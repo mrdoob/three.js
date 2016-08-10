@@ -34,7 +34,7 @@ function LineDashedMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 LineDashedMaterial.prototype = Object.create( Material.prototype );
 LineDashedMaterial.prototype.constructor = LineDashedMaterial;

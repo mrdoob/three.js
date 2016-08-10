@@ -36,7 +36,7 @@ function BufferGeometry() {
 
 	this.drawRange = { start: 0, count: Infinity };
 
-};
+}
 
 Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 

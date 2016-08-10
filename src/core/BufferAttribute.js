@@ -10,6 +10,12 @@ import { _Math } from '../math/Math';
 
 function BufferAttribute( array, itemSize, normalized ) {
 
+	if ( array.buffer instanceof ArrayBuffer === false ) {
+
+		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+	}
+
 	this.uuid = _Math.generateUUID();
 
 	this.array = array;

@@ -20,7 +20,7 @@ function Shape() {
 
 	this.holes = [];
 
-};
+}
 
 Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 

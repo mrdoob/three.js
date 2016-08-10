@@ -50,7 +50,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 	this.useCount = 0;
 	this.referenceCount = 0;
 
-};
+}
 
 PropertyMixer.prototype = {
 

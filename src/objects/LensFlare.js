@@ -23,7 +23,7 @@ function LensFlare( texture, size, distance, blending, color ) {
 
 	}
 
-};
+}
 
 LensFlare.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

@@ -37,7 +37,7 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 
 	this.shadow = new SpotLightShadow();
 
-};
+}
 
 SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 

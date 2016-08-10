@@ -11,7 +11,7 @@ function TextureLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( TextureLoader.prototype, {
 

@@ -16,7 +16,7 @@ function CompressedTextureLoader( manager ) {
 	// override in sub classes
 	this._parser = null;
 
-};
+}
 
 Object.assign( CompressedTextureLoader.prototype, {
 

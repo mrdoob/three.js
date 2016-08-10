@@ -27,7 +27,7 @@ function Line( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-};
+}
 
 Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

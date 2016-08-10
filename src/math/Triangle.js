@@ -13,7 +13,7 @@ function Triangle( a, b, c ) {
 	this.b = ( b !== undefined ) ? b : new Vector3();
 	this.c = ( c !== undefined ) ? c : new Vector3();
 
-};
+}
 
 Triangle.normal = function () {
 

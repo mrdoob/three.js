@@ -32,7 +32,7 @@ function PointLight( color, intensity, distance, decay ) {
 
 	this.shadow = new LightShadow( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-};
+}
 
 PointLight.prototype = Object.assign( Object.create( Light.prototype ), {
 

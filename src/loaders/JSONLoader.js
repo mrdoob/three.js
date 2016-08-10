@@ -27,7 +27,7 @@ function JSONLoader( manager ) {
 
 	this.withCredentials = false;
 
-};
+}
 
 Object.assign( JSONLoader.prototype, {
 

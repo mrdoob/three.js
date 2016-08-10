@@ -9,7 +9,7 @@ function LineCurve( v1, v2 ) {
 	this.v1 = v1;
 	this.v2 = v2;
 
-};
+}
 
 LineCurve.prototype = Object.create( Curve.prototype );
 LineCurve.prototype.constructor = LineCurve;

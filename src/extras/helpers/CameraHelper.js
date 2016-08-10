@@ -111,7 +111,7 @@ function CameraHelper( camera ) {
 
 	this.update();
 
-};
+}
 
 CameraHelper.prototype = Object.create( LineSegments.prototype );
 CameraHelper.prototype.constructor = CameraHelper;

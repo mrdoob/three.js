@@ -56,7 +56,7 @@ function ExtrudeGeometry( shapes, options ) {
 
 	//console.log( "took", ( Date.now() - startTime ) );
 
-};
+}
 
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;

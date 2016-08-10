@@ -11,7 +11,7 @@ function InstancedBufferGeometry() {
 	this.type = 'InstancedBufferGeometry';
 	this.maxInstancedCount = undefined;
 
-};
+}
 
 InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
