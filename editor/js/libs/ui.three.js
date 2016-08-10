@@ -44,6 +44,11 @@ UI.Texture = function ( mapping ) {
 	name.style.border = '1px solid #ccc';
 	dom.appendChild( name );
 
+	var form = document.createElement( 'form' );
+	form.appendChild( input );
+	form.style.display = 'none';
+	dom.appendChild( form );
+
 	var loadFile = function ( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
@@ -58,6 +63,7 @@ UI.Texture = function ( mapping ) {
 
 					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
+					form.reset();
 
 					scope.setValue( texture );
 
@@ -79,6 +85,7 @@ UI.Texture = function ( mapping ) {
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );
+						form.reset();
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback();
 
