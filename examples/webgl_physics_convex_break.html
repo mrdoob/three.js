@@ -338,6 +338,8 @@
 			var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
 			var body = new Ammo.btRigidBody( rbInfo );
 
+			//body.setFriction( 0.5 );
+
 			object.userData.physicsBody = body;
 			object.userData.collided = false;
 
@@ -406,7 +408,6 @@
 				pos.add( raycaster.ray.origin );
 				quat.set( 0, 0, 0, 1 );
 				var ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
-				ballBody.setFriction( 0.5 );
 
 				pos.copy( raycaster.ray.direction );
 				pos.multiplyScalar( 24 );
