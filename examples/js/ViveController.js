@@ -4,6 +4,10 @@ THREE.ViveController = function ( id ) {
 
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
+	
+	this.ray = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1),
+		new THREE.Vector3(0, 0, 0), 100, 0x000000, 1, 1);
+	this.add(this.ray);		
 
 	var scope = this;
 
