@@ -7,7 +7,7 @@ import { DirectGeometry } from './DirectGeometry';
 import { Object3D } from './Object3D';
 import { Matrix4 } from '../math/Matrix4';
 import { Matrix3 } from '../math/Matrix3';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 import { GeometryIdCount } from './Geometry';
 
 /**
@@ -19,7 +19,7 @@ function BufferGeometry() {
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'BufferGeometry';

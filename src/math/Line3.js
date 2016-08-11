@@ -1,5 +1,5 @@
 import { Vector3 } from './Vector3';
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 
 /**
  * @author bhouston / http://clara.io
@@ -91,7 +91,7 @@ Line3.prototype = {
 
 			if ( clampToLine ) {
 
-				t = _Math.clamp( t, 0, 1 );
+				t = MathUtils.clamp( t, 0, 1 );
 
 			}
 

@@ -1,7 +1,7 @@
 import { Geometry } from './Geometry';
 import { EventDispatcher } from './EventDispatcher';
 import { Vector2 } from '../math/Vector2';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 import { GeometryIdCount } from './Geometry';
 
 /**
@@ -12,7 +12,7 @@ function DirectGeometry() {
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'DirectGeometry';

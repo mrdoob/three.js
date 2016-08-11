@@ -1,6 +1,6 @@
 import { EventDispatcher } from '../core/EventDispatcher';
 import { NoColors, FrontSide, SmoothShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -11,7 +11,7 @@ function Material() {
 
 	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Material';

@@ -2,7 +2,7 @@ import { Vector4 } from '../math/Vector4';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
 import { Color } from '../math/Color';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -16,7 +16,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	}
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.array = array;
 	this.itemSize = itemSize;

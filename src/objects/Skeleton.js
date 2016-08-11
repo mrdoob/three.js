@@ -1,7 +1,7 @@
 import { Matrix4 } from '../math/Matrix4';
 import { FloatType, RGBAFormat } from '../constants';
 import { DataTexture } from '../textures/DataTexture';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -35,7 +35,7 @@ function Skeleton( bones, boneInverses, useVertexTexture ) {
 
 
 		var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-		size = _Math.nextPowerOfTwo( Math.ceil( size ) );
+		size = MathUtils.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
 
 		this.boneTextureWidth = size;

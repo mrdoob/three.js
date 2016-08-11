@@ -1,4 +1,4 @@
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -6,7 +6,7 @@ import { _Math } from '../math/Math';
 
 function InterleavedBuffer( array, stride ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.array = array;
 	this.stride = stride;

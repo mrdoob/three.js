@@ -1,7 +1,7 @@
 import { EventDispatcher } from '../core/EventDispatcher';
 import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
 
 /**
@@ -14,7 +14,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.sourceFile = '';
@@ -176,7 +176,7 @@ Texture.prototype = {
 
 			if ( image.uuid === undefined ) {
 
-				image.uuid = _Math.generateUUID(); // UGH
+				image.uuid = MathUtils.generateUUID(); // UGH
 
 			}
 

@@ -1,4 +1,4 @@
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -6,7 +6,7 @@ import { _Math } from '../math/Math';
 
 function MultiMaterial( materials ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.type = 'MultiMaterial';
 

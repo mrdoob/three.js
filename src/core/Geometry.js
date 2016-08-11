@@ -8,7 +8,7 @@ import { Matrix4 } from '../math/Matrix4';
 import { Vector2 } from '../math/Vector2';
 import { Color } from '../math/Color';
 import { Object3D } from './Object3D';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -23,7 +23,7 @@ function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Geometry';

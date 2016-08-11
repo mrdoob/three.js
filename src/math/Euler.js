@@ -1,7 +1,7 @@
 import { Quaternion } from './Quaternion';
 import { Vector3 } from './Vector3';
 import { Matrix4 } from './Matrix4';
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -114,7 +114,7 @@ Euler.prototype = {
 
 	setFromRotationMatrix: function ( m, order, update ) {
 
-		var clamp = _Math.clamp;
+		var clamp = MathUtils.clamp;
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 

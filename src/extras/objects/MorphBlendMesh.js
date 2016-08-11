@@ -1,5 +1,5 @@
 import { Mesh } from '../../objects/Mesh';
-import { _Math } from '../../math/Math';
+import { MathUtils } from '../../math/Math';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -283,7 +283,7 @@ MorphBlendMesh.prototype.update = function ( delta ) {
 
 		}
 
-		var keyframe = animation.start + _Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
+		var keyframe = animation.start + MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
 		var weight = animation.weight;
 
 		if ( keyframe !== animation.currentFrame ) {

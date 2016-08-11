@@ -5,7 +5,7 @@ import { EventDispatcher } from './EventDispatcher';
 import { Euler } from '../math/Euler';
 import { Layers } from './Layers';
 import { Matrix3 } from '../math/Matrix3';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -19,7 +19,7 @@ function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Object3D';

@@ -2,7 +2,7 @@ import { EventDispatcher } from '../core/EventDispatcher';
 import { Texture } from '../textures/Texture';
 import { LinearFilter } from '../constants';
 import { Vector4 } from '../math/Vector4';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  * @author szimek / https://github.com/szimek/
@@ -17,7 +17,7 @@ import { _Math } from '../math/Math';
 */
 function WebGLRenderTarget( width, height, options ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.width = width;
 	this.height = height;

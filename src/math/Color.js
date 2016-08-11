@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 
 var ColorKeywords;
 
@@ -93,9 +93,9 @@ Color.prototype = {
 		return function setHSL( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
-			h = _Math.euclideanModulo( h, 1 );
-			s = _Math.clamp( s, 0, 1 );
-			l = _Math.clamp( l, 0, 1 );
+			h = MathUtils.euclideanModulo( h, 1 );
+			s = MathUtils.clamp( s, 0, 1 );
+			l = MathUtils.clamp( l, 0, 1 );
 
 			if ( s === 0 ) {
 

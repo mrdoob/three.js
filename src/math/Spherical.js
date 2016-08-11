@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 
 /**
  * @author bhouston / http://clara.io
@@ -72,7 +72,7 @@ Spherical.prototype = {
 		} else {
 
 			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-			this.phi = Math.acos( _Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+			this.phi = Math.acos( MathUtils.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
 
 		}
 

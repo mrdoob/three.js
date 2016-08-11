@@ -1,5 +1,5 @@
 import { Geometry } from '../../core/Geometry';
-import { _Math } from '../../math/Math';
+import { MathUtils } from '../../math/Math';
 import { Vector3 } from '../../math/Vector3';
 import { Matrix4 } from '../../math/Matrix4';
 import { Face3 } from '../../core/Face3';
@@ -275,7 +275,7 @@ TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 			vec.normalize();
 
-			theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -290,7 +290,7 @@ TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
+		theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
 		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {

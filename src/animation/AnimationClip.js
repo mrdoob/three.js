@@ -3,7 +3,7 @@ import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
 import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
 import { AnimationUtils } from './AnimationUtils';
 import { KeyframeTrack } from './KeyframeTrack';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 
 /**
  *
@@ -19,7 +19,7 @@ function AnimationClip( name, duration, tracks ) {
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : -1;
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	// this means it should figure out its duration by scanning the tracks
 	if ( this.duration < 0 ) {

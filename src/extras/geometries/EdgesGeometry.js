@@ -1,7 +1,7 @@
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { BufferAttribute } from '../../core/BufferAttribute';
 import { Geometry } from '../../core/Geometry';
-import { _Math } from '../../math/Math';
+import { MathUtils } from '../../math/Math';
 
 /**
  * @author WestLangley / http://github.com/WestLangley
@@ -13,7 +13,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-	var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
+	var thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
 
 	var edge = [ 0, 0 ], hash = {};
 

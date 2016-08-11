@@ -2,7 +2,7 @@ import { BufferGeometry } from '../../core/BufferGeometry';
 import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
 import { BufferAttribute } from '../../core/BufferAttribute';
-import { _Math } from '../../math/Math';
+import { MathUtils } from '../../math/Math';
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -33,7 +33,7 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 	phiLength = phiLength || Math.PI * 2;
 
 	// clamp phiLength so it's in range of [ 0, 2PI ]
-	phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
+	phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
 
 	// these are used to calculate buffer length
 	var vertexCount = ( segments + 1 ) * points.length;

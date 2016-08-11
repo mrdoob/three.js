@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 import { Matrix4 } from './Matrix4';
 import { Quaternion } from './Quaternion';
 
@@ -647,7 +647,7 @@ Vector3.prototype = {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( _Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
 	},
 

@@ -1,4 +1,4 @@
-import { _Math } from './Math';
+import { MathUtils } from './Math';
 import { Vector3 } from './Vector3';
 
 /**
@@ -890,7 +890,7 @@ Matrix4.prototype = {
 
 	makePerspective: function ( fov, aspect, near, far ) {
 
-		var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
+		var ymax = near * Math.tan( MathUtils.DEG2RAD * fov * 0.5 );
 		var ymin = - ymax;
 		var xmin = ymin * aspect;
 		var xmax = ymax * aspect;

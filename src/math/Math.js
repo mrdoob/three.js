@@ -1,11 +1,11 @@
-var _Math;
+var MathUtils;
 
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-_Math = {
+MathUtils = {
 
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
@@ -127,13 +127,13 @@ _Math = {
 
 	degToRad: function ( degrees ) {
 
-		return degrees * _Math.DEG2RAD;
+		return degrees * MathUtils.DEG2RAD;
 
 	},
 
 	radToDeg: function ( radians ) {
 
-		return radians * _Math.RAD2DEG;
+		return radians * MathUtils.RAD2DEG;
 
 	},
 
@@ -166,4 +166,4 @@ _Math = {
 };
 
 
-export { _Math };
+export { MathUtils };

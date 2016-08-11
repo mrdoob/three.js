@@ -1,5 +1,5 @@
 import { FaceColors, VertexColors, DoubleSide, BackSide, MirroredRepeatWrapping, RepeatWrapping } from '../constants';
-import { _Math } from '../math/Math';
+import { MathUtils } from '../math/Math';
 import { MaterialLoader } from './MaterialLoader';
 import { TextureLoader } from './TextureLoader';
 import { Color } from '../math/Color';
@@ -111,7 +111,7 @@ Loader.prototype = {
 
 				}
 
-				var uuid = _Math.generateUUID();
+				var uuid = MathUtils.generateUUID();
 
 				textures[ uuid ] = texture;
 
@@ -122,7 +122,7 @@ Loader.prototype = {
 			//
 
 			var json = {
-				uuid: _Math.generateUUID(),
+				uuid: MathUtils.generateUUID(),
 				type: 'MeshLambertMaterial'
 			};
 

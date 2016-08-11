@@ -150,7 +150,7 @@ export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
 export { Spline } from './math/Spline.js';
-export { _Math as Math } from './math/Math.js';
+export { MathUtils as Math } from './math/Math.js';
 export { Spherical } from './math/Spherical.js';
 export { Plane } from './math/Plane.js';
 export { Frustum } from './math/Frustum.js';
