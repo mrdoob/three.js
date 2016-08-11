@@ -28,7 +28,7 @@
         </style>
     </head>
     <body>
-	<div id="info">Physics threejs demo with convex objects breaking in real time</div>
+	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
         <div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="../build/three.js"></script>
@@ -372,24 +372,6 @@
 		}
 
 		function initInput() {
-
-			window.addEventListener( 'keydown', function( event ) {
-
-				switch ( event.keyCode ) {
-					// Q
-					case 81:
-					break;
-
-					// A
-					case 65:
-					break;
-				}
-
-			}, false );
-
-			window.addEventListener( 'keyup', function( event ) {
-
-			}, false );
 
 			window.addEventListener( 'mousedown', function( event ) {
 
