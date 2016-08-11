@@ -7802,6 +7802,11 @@
 			if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 			if ( this.wireframe === true ) data.wireframe = this.wireframe;
 			if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
+			if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
+			if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
+
+			data.skinning = this.skinning;
+			data.morphTargets = this.morphTargets;
 
 			// TODO: Copied from Object3D.toJSON
 
@@ -12277,16 +12282,22 @@
 
 	function BufferAttribute( array, itemSize, normalized ) {
 
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
 		this.uuid = exports.Math.generateUUID();
 
 		this.array = array;
 		this.itemSize = itemSize;
+		this.normalized = normalized === true;
 
 		this.dynamic = false;
 		this.updateRange = { offset: 0, count: - 1 };
 
 		this.version = 0;
-		this.normalized = normalized === true;
 
 	}
 
@@ -12320,6 +12331,7 @@
 
 			this.array = new source.array.constructor( source.array );
 			this.itemSize = source.itemSize;
+			this.normalized = source.normalized;
 
 			this.dynamic = source.dynamic;
 
@@ -27173,8 +27185,13 @@
 			if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
 			if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 			if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
+			if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
+			if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
+			if ( json.skinning !== undefined ) material.skinning = json.skinning;
+			if ( json.morphTargets !== undefined ) material.wireframe = json.morphTargets;
 
 			// for PointsMaterial
+
 			if ( json.size !== undefined ) material.size = json.size;
 			if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 
