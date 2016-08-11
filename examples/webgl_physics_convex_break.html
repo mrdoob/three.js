@@ -277,9 +277,7 @@
 			var shape = createConvexHullPhysicsShape( object.geometry.vertices );
 			shape.setMargin( margin );
 
-			var body = createRigidBody( object, shape, object.userData.mass, null, null );
-
-			// TODO apply velocity and angularVelocity from object.userData to body.
+			var body = createRigidBody( object, shape, object.userData.mass, null, null, object.userData.velocity, object.userData.angularVelocity );
 
 			// Set pointer back to the three object only in the debris objects
 			var btVecUserData = new Ammo.btVector3( 0, 0, 0 );
@@ -311,7 +309,7 @@
 
 		}
 
-		function createRigidBody( object, physicsShape, mass, pos, quat ) {
+		function createRigidBody( object, physicsShape, mass, pos, quat, vel, angVel ) {
 
 			if ( pos ) {
 			    object.position.copy( pos );
@@ -338,7 +336,14 @@
 			var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
 			var body = new Ammo.btRigidBody( rbInfo );
 
-			//body.setFriction( 0.5 );
+			body.setFriction( 0.5 );
+
+			if ( vel ) {
+			    body.setLinearVelocity( new Ammo.btVector3( vel.x, vel.y, vel.z ) );
+			}
+			if ( angVel ) {
+			    body.setAngularVelocity( new Ammo.btVector3( angVel.x, angVel.y, angVel.z ) );
+			}
 
 			object.userData.physicsBody = body;
 			object.userData.collided = false;
@@ -452,7 +457,6 @@
 		function updatePhysics( deltaTime ) {
 
 			// Step world
-			// TODO adjust the parameter 10
 			physicsWorld.stepSimulation( deltaTime, 10 );
 
 			// Update rigid bodies
