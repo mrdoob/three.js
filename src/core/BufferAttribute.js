@@ -20,12 +20,12 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+	this.normalized = normalized === true;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
-	this.normalized = normalized === true;
 
 }
 
@@ -59,6 +59,7 @@ BufferAttribute.prototype = {
 
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
+		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
 
