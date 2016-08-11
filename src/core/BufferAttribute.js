@@ -10,7 +10,7 @@ import { _Math } from '../math/Math';
 
 function BufferAttribute( array, itemSize, normalized ) {
 
-	if ( array.buffer instanceof ArrayBuffer === false ) {
+	if ( Array.isArray( array ) ) {
 
 		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
