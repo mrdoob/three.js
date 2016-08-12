@@ -37430,17 +37430,40 @@
 
 		var indices = [];
 
+		var northPoleVertex = vertices[ 0 ][ 0 ];
+		var southPoleVertex = vertices[ heightSegments ][ 0 ];
+		var closedSides = phiLength === 2 * Math.PI;
+		var closedTop = thetaStart === 0;
+		var closedBottom = thetaEnd === Math.PI;
 		for ( var y = 0; y < heightSegments; y ++ ) {
 
 			for ( var x = 0; x < widthSegments; x ++ ) {
 
-				var v1 = vertices[ y ][ x + 1 ];
+				var nextX = closedSides ? ( x + 1 ) % widthSegments : x + 1;
+				var v1 = vertices[ y ][ nextX ];
 				var v2 = vertices[ y ][ x ];
 				var v3 = vertices[ y + 1 ][ x ];
-				var v4 = vertices[ y + 1 ][ x + 1 ];
+				var v4 = vertices[ y + 1 ][ nextX ];
 
-				if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
-				if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
+				if ( ( y === 0 && closedTop )
+					|| ( y === heightSegments - 1 && closedBottom ) ) {
+
+					if ( y === 0 ) {
+
+						indices.push( northPoleVertex, v3, v4 );
+
+					} else {
+
+						indices.push( v1, v2, southPoleVertex );
+
+					}
+
+				} else {
+
+					if ( y !== 0 ) indices.push( v1, v2, v4 );
+					if ( y !== heightSegments - 1 ) indices.push( v2, v3, v4 );
+
+				}
 
 			}
 
