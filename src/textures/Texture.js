@@ -133,9 +133,9 @@ Texture.prototype = {
 				var context = canvas.getContext( '2d' );
 				context.drawImage( image, 0, 0, image.width, image.height );
 
-				var data = context.getImageData( 0, 0, image.width, image.height );
+				var data = context.getImageData( 0, 0, image.width, image.height ).data;
 
-				for( var i = 0; i < data.length; i += 3 ) {
+				for( var i = 0; i < data.length; i += 4 ) {
 
 					if( data[i] !== 255 ) {
 
