@@ -19327,7 +19327,7 @@
 
 	function WebGLRenderer( parameters ) {
 
-		console.log( 'THREE.WebGLRenderer', "80dev" );
+		console.log( 'THREE.WebGLRenderer', REVISION );
 
 		parameters = parameters || {};
 
@@ -22179,7 +22179,7 @@
 	 */
 
 	function Scene () {
-		
+
 		Object3D.call( this );
 
 		this.type = 'Scene';
@@ -22214,12 +22214,8 @@
 	Scene.prototype.toJSON = function ( meta ) {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
-		
-		if ( this.fog != null ) {
-			
-			data.object.fog = this.fog.toJSON();
 
-		}
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
 
@@ -38196,8 +38192,6 @@
 	BoxGeometry.prototype = Object.create( Geometry.prototype );
 	BoxGeometry.prototype.constructor = BoxGeometry;
 
-	exports.CubeGeometry = BoxGeometry;
-
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
@@ -40941,6 +40935,7 @@
  */
 
 Object.assign( THREE, {
+	CubeGeometry: THREE.BoxGeometry,
 	Face4: function ( a, b, c, d, normal, color, materialIndex ) {
 		console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
 		return new THREE.Face3( a, b, c, normal, color, materialIndex );
