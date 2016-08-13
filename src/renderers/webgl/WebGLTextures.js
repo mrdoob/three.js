@@ -800,8 +800,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 				texture = properties.get( renderTarget.attachments[ i ] ).__webglTexture;
 
-				state.bindTexture( target, texture );
-				_gl.generateMipmap( target );
+				if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
+						texture.minFilter !== NearestFilter &&
+						texture.minFilter !== LinearFilter ) {
+
+					state.bindTexture( target, texture );
+					_gl.generateMipmap( target );
+
+				}
 
 			}
 
