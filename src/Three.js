@@ -215,7 +215,7 @@ export { CylinderBufferGeometry } from './extras/geometries/CylinderBufferGeomet
 export { CircleBufferGeometry } from './extras/geometries/CircleBufferGeometry.js';
 export { CircleGeometry } from './extras/geometries/CircleGeometry.js';
 export { BoxBufferGeometry } from './extras/geometries/BoxBufferGeometry.js';
-export { CubeGeometry, BoxGeometry } from './extras/geometries/BoxGeometry.js';
+export { BoxGeometry } from './extras/geometries/BoxGeometry.js';
 export { ClosedSplineCurve3 } from './extras/curves/ClosedSplineCurve3.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 export { SplineCurve3 } from './extras/curves/SplineCurve3.js';
