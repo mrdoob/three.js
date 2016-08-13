@@ -1631,17 +1631,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.fog ) {
+		materialProperties.fog = fog;
 
-			materialProperties.fog = fog;
+		// store the light setup it was created for
 
-		}
+		materialProperties.lightsHash = _lights.hash;
 
 		if ( material.lights ) {
-
-			// store the light setup it was created for
-
-			materialProperties.lightsHash = _lights.hash;
 
 			// wire up the material to this renderer's lighting state
 
@@ -1729,23 +1725,21 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( materialProperties.program === undefined ) {
+		if ( material.needsUpdate === false ) {
 
-			material.needsUpdate = true;
-
-		}
-
-		if ( materialProperties.fog !== undefined &&
-			materialProperties.fog !== fog ) {
+			if ( materialProperties.program === undefined ) {
 
 				material.needsUpdate = true;
 
-		}
+			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-		if ( materialProperties.lightsHash !== undefined &&
-			materialProperties.lightsHash !== _lights.hash ) {
+					material.needsUpdate = true;
 
-			material.needsUpdate = true;
+			} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
+
+				material.needsUpdate = true;
+
+			}
 
 		}
 
