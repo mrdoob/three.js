@@ -5,7 +5,7 @@ import { Object3D } from '../core/Object3D';
  */
 
 function Scene () {
-	
+
 	Object3D.call( this );
 
 	this.type = 'Scene';
@@ -40,15 +40,11 @@ Scene.prototype.copy = function ( source, recursive ) {
 Scene.prototype.toJSON = function ( meta ) {
 
 	var data = Object3D.prototype.toJSON.call( this, meta );
-	
-	if ( this.fog != null ) {
-		
-		data.object.fog = this.fog.toJSON();
 
-	}
+	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 	return data;
 
 };
-	
+
 export { Scene };
