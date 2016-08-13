@@ -87,7 +87,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-};
+}
 
 
 export { WebGLCapabilities };

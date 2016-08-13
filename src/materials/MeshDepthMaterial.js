@@ -51,7 +51,7 @@ function MeshDepthMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshDepthMaterial.prototype = Object.create( Material.prototype );
 MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;

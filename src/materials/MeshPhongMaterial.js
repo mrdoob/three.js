@@ -105,7 +105,7 @@ function MeshPhongMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshPhongMaterial.prototype = Object.create( Material.prototype );
 MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;

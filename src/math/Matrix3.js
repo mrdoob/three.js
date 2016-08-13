@@ -23,7 +23,7 @@ function Matrix3() {
 
 	}
 
-};
+}
 
 Matrix3.prototype = {
 
@@ -196,7 +196,7 @@ Matrix3.prototype = {
 
 			var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnDegenerate || false ) {
+			if ( throwOnDegenerate === true ) {
 
 				throw new Error( msg );
 

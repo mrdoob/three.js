@@ -30,7 +30,7 @@ function IcosahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
 IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;

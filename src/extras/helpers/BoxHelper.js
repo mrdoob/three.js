@@ -27,7 +27,7 @@ function BoxHelper( object, color ) {
 
 	}
 
-};
+}
 
 BoxHelper.prototype = Object.create( LineSegments.prototype );
 BoxHelper.prototype.constructor = BoxHelper;

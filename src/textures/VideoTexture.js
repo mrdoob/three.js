@@ -26,7 +26,7 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	update();
 
-};
+}
 
 VideoTexture.prototype = Object.create( Texture.prototype );
 VideoTexture.prototype.constructor = VideoTexture;

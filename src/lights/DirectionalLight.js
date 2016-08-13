@@ -20,7 +20,7 @@ function DirectionalLight( color, intensity ) {
 
 	this.shadow = new DirectionalLightShadow();
 
-};
+}
 
 DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 

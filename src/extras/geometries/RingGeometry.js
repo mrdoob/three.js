@@ -22,7 +22,7 @@ function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, the
 
 	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
 
-};
+}
 
 RingGeometry.prototype = Object.create( Geometry.prototype );
 RingGeometry.prototype.constructor = RingGeometry;

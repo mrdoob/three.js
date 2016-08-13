@@ -10,7 +10,7 @@ function Font( data ) {
 
 	this.data = data;
 
-};
+}
 
 Object.assign( Font.prototype, {
 

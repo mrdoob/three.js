@@ -21,7 +21,7 @@ function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 
 	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
 
-};
+}
 
 PlaneGeometry.prototype = Object.create( Geometry.prototype );
 PlaneGeometry.prototype.constructor = PlaneGeometry;

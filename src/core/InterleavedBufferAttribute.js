@@ -14,7 +14,7 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 	this.normalized = normalized === true;
 
-};
+}
 
 
 InterleavedBufferAttribute.prototype = {

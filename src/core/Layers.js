@@ -6,7 +6,7 @@ function Layers() {
 
 	this.mask = 1;
 
-};
+}
 
 Layers.prototype = {
 

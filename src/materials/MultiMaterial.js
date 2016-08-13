@@ -14,7 +14,7 @@ function MultiMaterial( materials ) {
 
 	this.visible = true;
 
-};
+}
 
 MultiMaterial.prototype = {
 

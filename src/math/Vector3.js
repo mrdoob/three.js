@@ -17,7 +17,7 @@ function Vector3( x, y, z ) {
 	this.y = y || 0;
 	this.z = z || 0;
 
-};
+}
 
 Vector3.prototype = {
 

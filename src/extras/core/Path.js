@@ -21,7 +21,7 @@ function Path( points ) {
 
 	}
 
-};
+}
 
 Path.prototype = PathPrototype;
 PathPrototype.constructor = Path;

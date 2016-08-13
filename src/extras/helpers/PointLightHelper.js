@@ -43,7 +43,7 @@ function PointLightHelper( light, sphereSize ) {
 	this.add( this.lightDistance );
 	*/
 
-};
+}
 
 PointLightHelper.prototype = Object.create( Mesh.prototype );
 PointLightHelper.prototype.constructor = PointLightHelper;

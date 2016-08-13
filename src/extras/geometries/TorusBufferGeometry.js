@@ -124,7 +124,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-};
+}
 
 TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;

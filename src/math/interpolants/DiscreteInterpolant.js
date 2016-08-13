@@ -14,7 +14,7 @@ function DiscreteInterpolant(
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-};
+}
 
 DiscreteInterpolant.prototype =
 		Object.assign( Object.create( Interpolant.prototype ), {

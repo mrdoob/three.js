@@ -15,7 +15,7 @@ function Sprite( material ) {
 
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-};
+}
 
 Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

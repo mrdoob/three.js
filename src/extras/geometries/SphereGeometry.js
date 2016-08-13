@@ -23,7 +23,7 @@ function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLen
 
 	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
 
-};
+}
 
 SphereGeometry.prototype = Object.create( Geometry.prototype );
 SphereGeometry.prototype.constructor = SphereGeometry;

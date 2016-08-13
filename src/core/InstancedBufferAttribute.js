@@ -10,7 +10,7 @@ function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
-};
+}
 
 InstancedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 InstancedBufferAttribute.prototype.constructor = InstancedBufferAttribute;

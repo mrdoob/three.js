@@ -25,7 +25,7 @@ function OrthographicCamera( left, right, top, bottom, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
 OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 

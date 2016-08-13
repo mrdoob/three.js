@@ -25,7 +25,7 @@ function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q,
 	this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
 	this.mergeVertices();
 
-};
+}
 
 TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
 TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
