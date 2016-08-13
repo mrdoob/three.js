@@ -1631,6 +1631,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.fog ) {
+
+			materialProperties.fog = fog;
+
+		}
+
 		if ( material.lights ) {
 
 			// store the light setup it was created for
@@ -1726,6 +1732,13 @@ function WebGLRenderer( parameters ) {
 		if ( materialProperties.program === undefined ) {
 
 			material.needsUpdate = true;
+
+		}
+
+		if ( materialProperties.fog !== undefined &&
+			materialProperties.fog !== fog ) {
+
+				material.needsUpdate = true;
 
 		}
 
