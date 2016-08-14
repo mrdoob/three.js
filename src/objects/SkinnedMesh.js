@@ -221,7 +221,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			output.metadata = {
 				version: 4.4,
-				type: 'SkinnedMeshObject',
+				type: 'SkinnedMesh',
 				generator: 'SkinnedMesh.toJSON'
 			};
 
