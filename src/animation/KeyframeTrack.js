@@ -19,8 +19,10 @@ import { KeyframeTrackConstructor } from './KeyframeTrackConstructor';
  */
 
 function KeyframeTrack( name, times, values, interpolation ) {
+
 	KeyframeTrackConstructor.apply( this, arguments );
-};
+
+}
 
 KeyframeTrack.prototype = KeyframeTrackPrototype;
 KeyframeTrackPrototype.constructor = KeyframeTrack;

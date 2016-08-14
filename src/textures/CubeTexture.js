@@ -14,7 +14,7 @@ function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.flipY = false;
 
-};
+}
 
 CubeTexture.prototype = Object.create( Texture.prototype );
 CubeTexture.prototype.constructor = CubeTexture;

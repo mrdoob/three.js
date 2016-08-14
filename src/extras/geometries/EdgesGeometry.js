@@ -94,7 +94,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
 
-};
+}
 
 EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 EdgesGeometry.prototype.constructor = EdgesGeometry;

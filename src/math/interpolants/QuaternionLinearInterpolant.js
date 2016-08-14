@@ -13,7 +13,7 @@ function QuaternionLinearInterpolant(
 	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-};
+}
 
 QuaternionLinearInterpolant.prototype =
 		Object.assign( Object.create( Interpolant.prototype ), {

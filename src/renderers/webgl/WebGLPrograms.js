@@ -284,7 +284,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	// Exposed for resource monitoring & error feedback via renderer.info:
 	this.programs = programs;
 
-};
+}
 
 
 export { WebGLPrograms };

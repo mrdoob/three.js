@@ -20,7 +20,7 @@ function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
 
-};
+}
 
 CircleGeometry.prototype = Object.create( Geometry.prototype );
 CircleGeometry.prototype.constructor = CircleGeometry;

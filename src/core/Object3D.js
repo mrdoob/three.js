@@ -91,7 +91,7 @@ function Object3D() {
 
 	this.userData = {};
 
-};
+}
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;

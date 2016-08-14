@@ -1,4 +1,4 @@
-import { MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, BackSide, DoubleSide, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
+import { REVISION, MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, BackSide, DoubleSide, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
 import { Matrix4 } from '../math/Matrix4';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
 import { UniformsUtils } from './shaders/UniformsUtils';
@@ -41,7 +41,7 @@ import { Color } from '../math/Color';
 
 function WebGLRenderer( parameters ) {
 
-	console.log( 'THREE.WebGLRenderer', "80dev" );
+	console.log( 'THREE.WebGLRenderer', REVISION );
 
 	parameters = parameters || {};
 
@@ -829,7 +829,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( object && object.isMesh ) {
+		if ( object.isMesh ) {
 
 			if ( material.wireframe === true ) {
 
@@ -857,7 +857,7 @@ function WebGLRenderer( parameters ) {
 			}
 
 
-		} else if ( object && object.isLine ) {
+		} else if ( object.isLine ) {
 
 			var lineWidth = material.linewidth;
 
@@ -865,7 +865,7 @@ function WebGLRenderer( parameters ) {
 
 			state.setLineWidth( lineWidth * getTargetPixelRatio() );
 
-			if ( object && object.isLineSegments ) {
+			if ( object.isLineSegments ) {
 
 				renderer.setMode( _gl.LINES );
 
@@ -875,7 +875,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-		} else if ( object && object.isPoints ) {
+		} else if ( object.isPoints ) {
 
 			renderer.setMode( _gl.POINTS );
 
@@ -1387,13 +1387,15 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) ) {
+		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
 
-			if ( object && object.isLight ) {
+		if ( visible ) {
+
+			if ( object.isLight ) {
 
 				lights.push( object );
 
-			} else if ( object && object.isSprite ) {
+			} else if ( object.isSprite ) {
 
 				if ( object.frustumCulled === false || isSpriteViewable( object ) === true ) {
 
@@ -1401,11 +1403,11 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-			} else if ( object && object.isLensFlare ) {
+			} else if ( object.isLensFlare ) {
 
 				lensFlares.push( object );
 
-			} else if ( object && object.isImmediateRenderObject ) {
+			} else if ( object.isImmediateRenderObject ) {
 
 				if ( _this.sortObjects === true ) {
 
@@ -1416,9 +1418,9 @@ function WebGLRenderer( parameters ) {
 
 				pushRenderItem( object, null, object.material, _vector3.z, null );
 
-			} else if ( ( object && object.isMesh ) || ( object && object.isLine ) || ( object && object.isPoints ) ) {
+			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( object && object.isSkinnedMesh ) {
+				if ( object.isSkinnedMesh ) {
 
 					object.skeleton.update();
 
@@ -1495,7 +1497,7 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			if ( object && object.isImmediateRenderObject ) {
+			if ( object.isImmediateRenderObject ) {
 
 				setMaterial( material );
 
@@ -1631,11 +1633,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		materialProperties.fog = fog;
+
+		// store the light setup it was created for
+
+		materialProperties.lightsHash = _lights.hash;
+
 		if ( material.lights ) {
-
-			// store the light setup it was created for
-
-			materialProperties.lightsHash = _lights.hash;
 
 			// wire up the material to this renderer's lighting state
 
@@ -1723,16 +1727,21 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( materialProperties.program === undefined ) {
+		if ( material.needsUpdate === false ) {
 
-			material.needsUpdate = true;
+			if ( materialProperties.program === undefined ) {
 
-		}
+				material.needsUpdate = true;
 
-		if ( materialProperties.lightsHash !== undefined &&
-			materialProperties.lightsHash !== _lights.hash ) {
+			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-			material.needsUpdate = true;
+					material.needsUpdate = true;
+
+			} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
+
+				material.needsUpdate = true;
+
+			}
 
 		}
 
@@ -2819,6 +2828,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-};
+}
 
 export { WebGLRenderer };

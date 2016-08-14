@@ -13,7 +13,7 @@ function Vector4( x, y, z, w ) {
 	this.z = z || 0;
 	this.w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
 Vector4.prototype = {
 

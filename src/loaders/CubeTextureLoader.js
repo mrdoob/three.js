@@ -10,7 +10,7 @@ function CubeTextureLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( CubeTextureLoader.prototype, {
 

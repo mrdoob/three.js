@@ -49,7 +49,7 @@ function TextGeometry( text, parameters ) {
 
 	this.type = 'TextGeometry';
 
-};
+}
 
 TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
 TextGeometry.prototype.constructor = TextGeometry;

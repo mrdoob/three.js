@@ -17,7 +17,7 @@ function Light( color, intensity ) {
 
 	this.receiveShadow = undefined;
 
-};
+}
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
@@ -49,6 +49,8 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.angle !== undefined ) data.object.angle = this.angle;
 		if ( this.decay !== undefined ) data.object.decay = this.decay;
 		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
+
+		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
 
 		return data;
 

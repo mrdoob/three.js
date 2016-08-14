@@ -19,7 +19,7 @@ function BoundingBoxHelper( object, hex ) {
 
 	Mesh.call( this, new BoxGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
 
-};
+}
 
 BoundingBoxHelper.prototype = Object.create( Mesh.prototype );
 BoundingBoxHelper.prototype.constructor = BoundingBoxHelper;

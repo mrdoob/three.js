@@ -10,7 +10,7 @@ function FontLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
 Object.assign( FontLoader.prototype, {
 

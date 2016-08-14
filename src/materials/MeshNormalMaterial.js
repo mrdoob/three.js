@@ -26,7 +26,7 @@ function MeshNormalMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshNormalMaterial.prototype = Object.create( Material.prototype );
 MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;

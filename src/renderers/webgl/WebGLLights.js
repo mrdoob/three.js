@@ -81,7 +81,7 @@ function WebGLLights() {
 
 	};
 
-};
+}
 
 
 export { WebGLLights };

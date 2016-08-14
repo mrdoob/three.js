@@ -32,24 +32,24 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="../examples/js/Detector.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
-		<script src="../examples/js/loaders/RGBELoader.js"></script>
-		<script src="../examples/js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="../examples/js/Half.js"></script>
-		<script src="../examples/js/Encodings.js"></script>
-		<script src="../examples/js/pmrem/PMREMGenerator.js"></script>
-		<script src="../examples/js/pmrem/PMREMCubeUVPacker.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+		<script src="js/Half.js"></script>
+		<script src="js/Encodings.js"></script>
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
-		<script src="../examples/js/postprocessing/RenderPass.js"></script>
-		<script src="../examples/js/postprocessing/MaskPass.js"></script>
-		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
-		<script src="../examples/js/shaders/CopyShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 
 		<script>
 
@@ -104,7 +104,7 @@
 				} );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/brick_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/brick_diffuse.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -112,7 +112,7 @@
 					standardMaterial.map = map;
 					standardMaterial.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/brick_bump.jpg", function( map ) {
+				textureLoader.load( "textures/brick_bump.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -120,7 +120,7 @@
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/brick_roughness.jpg", function( map ) {
+				textureLoader.load( "textures/brick_roughness.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -155,7 +155,7 @@
 				scene.add( mesh );
 
 				// Materials
-				var hdrpath = "../examples/textures/cube/pisaHDR/";
+				var hdrpath = "textures/cube/pisaHDR/";
 				var hdrformat = '.hdr';
 				var hdrurls = [
 					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,

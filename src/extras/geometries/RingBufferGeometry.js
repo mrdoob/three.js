@@ -119,7 +119,7 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
 
-};
+}
 
 RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 RingBufferGeometry.prototype.constructor = RingBufferGeometry;

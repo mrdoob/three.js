@@ -32,7 +32,7 @@ function PointsMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 PointsMaterial.prototype = Object.create( Material.prototype );
 PointsMaterial.prototype.constructor = PointsMaterial;

@@ -26,7 +26,7 @@ function ConeGeometry(
 		thetaLength: thetaLength
 	};
 
-};
+}
 
 ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
 ConeGeometry.prototype.constructor = ConeGeometry;

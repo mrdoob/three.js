@@ -81,7 +81,7 @@ function Skeleton( bones, boneInverses, useVertexTexture ) {
 
 	}
 
-};
+}
 
 Object.assign( Skeleton.prototype, {
 

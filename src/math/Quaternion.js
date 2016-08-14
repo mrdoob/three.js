@@ -14,7 +14,7 @@ function Quaternion( x, y, z, w ) {
 	this._z = z || 0;
 	this._w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
 Quaternion.prototype = {
 
