@@ -26,6 +26,8 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
+	this.discard = false;
+	this.discardedLength = 0;
 
 }
 
@@ -37,7 +39,7 @@ BufferAttribute.prototype = {
 
 	get count() {
 
-		return this.array.length / this.itemSize;
+		return ( this.discardedLength > 0 ? this.discardedLength : this.array.length ) / this.itemSize;
 
 	},
 
