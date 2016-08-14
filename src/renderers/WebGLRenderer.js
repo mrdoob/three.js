@@ -1735,7 +1735,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-					material.needsUpdate = true;
+				material.needsUpdate = true;
 
 			} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
 
