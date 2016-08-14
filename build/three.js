@@ -2,7 +2,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(factory((global.THREE = global.THREE || {})));
-}(this, function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
 	// Polyfills
 
@@ -13628,9 +13628,11 @@
 
 			// update children
 
-			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			var children = this.children;
 
-				this.children[ i ].updateMatrixWorld( force );
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( force );
 
 			}
 
@@ -21023,7 +21025,7 @@
 
 				} else if ( material.fog && materialProperties.fog !== fog ) {
 
-						material.needsUpdate = true;
+					material.needsUpdate = true;
 
 				} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
 
@@ -40940,7 +40942,7 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 /**
  * @author mrdoob / http://mrdoob.com/
  */
