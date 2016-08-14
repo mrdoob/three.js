@@ -289,8 +289,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	var clearColor;
-
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
@@ -299,18 +297,14 @@ var Viewport = function ( editor ) {
 				sceneHelpers.remove( grid );
 				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
 				sceneHelpers.add( grid );
-				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
 				sceneHelpers.remove( grid );
 				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
 				sceneHelpers.add( grid );
-				clearColor = 0x333333;
 				break;
 
 		}
-
-		renderer.setClearColor( clearColor );
 
 		render();
 
@@ -346,7 +340,6 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.setClearColor( clearColor );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -490,6 +483,14 @@ var Viewport = function ( editor ) {
 
 	// fog
 
+	signals.sceneBackgroundChanged.add( function ( backgroundColor ) {
+
+		scene.background.setHex( backgroundColor );
+
+		render();
+
+	} );
+
 	var currentFogType = null;
 
 	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
@@ -603,14 +604,12 @@ var Viewport = function ( editor ) {
 			vrControls.update();
 
 			camera.updateMatrixWorld();
-			renderer.clear();
 
 			vrEffect.render( scene, vrCamera );
 			vrEffect.render( sceneHelpers, vrCamera );
 
 		} else {
 
-			renderer.clear();
 			renderer.render( scene, camera );
 
 			if ( renderer instanceof THREE.RaytracingRenderer === false ) {

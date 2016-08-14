@@ -47,6 +47,7 @@ var Editor = function () {
 		spaceChanged: new Signal(),
 		rendererChanged: new Signal(),
 
+		sceneBackgroundChanged: new Signal(),
 		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 
@@ -88,6 +89,7 @@ var Editor = function () {
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
+	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -119,6 +121,7 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
+		if ( scene.background !== null ) this.scene.background = scene.background.clone();
 		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );

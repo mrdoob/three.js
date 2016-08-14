@@ -76,24 +76,22 @@ Sidebar.Scene = function ( editor ) {
 	container.add( outliner );
 	container.add( new UI.Break() );
 
-	/*
 	// background
 
+	function onBackgroundChanged() {
+
+		signals.sceneBackgroundChanged.dispatch( backgroundColor.getHexValue() );
+
+	}
+
 	var backgroundRow = new UI.Row();
-	var background = new UI.Select().setOptions( {
 
-		'None': 'None',
-		'Color': 'Color',
-		'Texture': 'Texture'
-
-	} ).setWidth( '150px' );
-	background.onChange( function () {} );
+	var backgroundColor = new UI.Color().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
 
 	backgroundRow.add( new UI.Text( 'Background' ).setWidth( '90px' ) );
-	backgroundRow.add( background );
+	backgroundRow.add( backgroundColor );
 
 	container.add( backgroundRow );
-	*/
 
 	// fog
 
@@ -188,6 +186,14 @@ Sidebar.Scene = function ( editor ) {
 		if ( editor.selected !== null ) {
 
 			outliner.setValue( editor.selected.id );
+
+		}
+
+		console.log( scene.background );
+
+		if ( scene.background ) {
+
+			backgroundColor.setHexValue( scene.background.getHex() );
 
 		}
 
