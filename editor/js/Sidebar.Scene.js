@@ -189,8 +189,6 @@ Sidebar.Scene = function ( editor ) {
 
 		}
 
-		console.log( scene.background );
-
 		if ( scene.background ) {
 
 			backgroundColor.setHexValue( scene.background.getHex() );
