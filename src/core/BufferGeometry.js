@@ -774,6 +774,18 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setDiscardBuffers () {
+
+		var attributes = this.attributes;
+
+		for ( var key in attributes ) {
+
+			attributes[ key ].discard = true;
+
+		}
+
+	},
+
 	merge: function ( geometry, offset ) {
 
 		if ( (geometry && geometry.isBufferGeometry) === false ) {
