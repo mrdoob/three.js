@@ -492,7 +492,7 @@ var Viewport = function ( editor ) {
 
 	var currentFogType = null;
 
-	signals.fogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
 
 		if ( currentFogType !== fogType ) {
 

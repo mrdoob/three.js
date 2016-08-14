@@ -99,7 +99,7 @@ Sidebar.Scene = function ( editor ) {
 
 	function onFogChanged() {
 
-		signals.fogChanged.dispatch(
+		signals.sceneFogChanged.dispatch(
 			fogType.getValue(),
 			fogColor.getHexValue(),
 			fogNear.getValue(),

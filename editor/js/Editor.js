@@ -47,6 +47,7 @@ var Editor = function () {
 		spaceChanged: new Signal(),
 		rendererChanged: new Signal(),
 
+		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 
 		cameraChanged: new Signal(),
@@ -68,8 +69,6 @@ var Editor = function () {
 		scriptAdded: new Signal(),
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
-
-		fogChanged: new Signal(),
 
 		windowResize: new Signal(),
 
