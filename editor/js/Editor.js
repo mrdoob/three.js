@@ -69,9 +69,8 @@ var Editor = function () {
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
 
-		fogTypeChanged: new Signal(),
-		fogColorChanged: new Signal(),
-		fogParametersChanged: new Signal(),
+		fogChanged: new Signal(),
+
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
@@ -120,6 +119,9 @@ Editor.prototype = {
 
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
+
+		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
 		// avoid render per object

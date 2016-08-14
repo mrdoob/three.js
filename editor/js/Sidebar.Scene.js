@@ -97,13 +97,15 @@ Sidebar.Scene = function ( editor ) {
 
 	// fog
 
-	function updateFogParameters() {
+	function onFogChanged() {
 
-		var near = fogNear.getValue();
-		var far = fogFar.getValue();
-		var density = fogDensity.getValue();
-
-		signals.fogParametersChanged.dispatch( near, far, density );
+		signals.fogChanged.dispatch(
+			fogType.getValue(),
+			fogColor.getHexValue(),
+			fogNear.getValue(),
+			fogFar.getValue(),
+			fogDensity.getValue()
+		);
 
 	}
 
@@ -117,10 +119,7 @@ Sidebar.Scene = function ( editor ) {
 	} ).setWidth( '150px' );
 	fogType.onChange( function () {
 
-		var type = fogType.getValue();
-
-		signals.fogTypeChanged.dispatch( type );
-
+		onFogChanged();
 		refreshFogUI();
 
 	} );
@@ -138,31 +137,27 @@ Sidebar.Scene = function ( editor ) {
 	container.add( fogPropertiesRow );
 
 	var fogColor = new UI.Color().setValue( '#aaaaaa' );
-	fogColor.onChange( function () {
-
-		signals.fogColorChanged.dispatch( fogColor.getHexValue() );
-
-	} );
+	fogColor.onChange( onFogChanged );
 	fogPropertiesRow.add( fogColor );
 
 	// fog near
 
-	var fogNear = new UI.Number( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
+	var fogNear = new UI.Number( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogNear );
 
 	// fog far
 
-	var fogFar = new UI.Number( 100 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
+	var fogFar = new UI.Number( 50 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogFar );
 
 	// fog density
 
-	var fogDensity = new UI.Number( 0.00025 ).setWidth( '40px' ).setRange( 0, 0.1 ).setPrecision( 5 ).onChange( updateFogParameters );
+	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
 
 	//
 
-	var refreshUI = function () {
+	function refreshUI() {
 
 		var camera = editor.camera;
 		var scene = editor.scene;
@@ -221,7 +216,7 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	};
+	}
 
 	function refreshFogUI() {
 
