@@ -11139,7 +11139,7 @@
 
 				}
 
-				var useSkinning = (object && object.isSkinnedMesh) && material.skinning;
+				var useSkinning = object.isSkinnedMesh && material.skinning;
 
 				var variantIndex = 0;
 
@@ -11225,7 +11225,9 @@
 
 			if ( object.visible === false ) return;
 
-			if ( object.layers.test( camera.layers ) && ( (object && object.isMesh) || (object && object.isLine) || (object && object.isPoints) ) ) {
+			var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+
+			if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 				if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
@@ -20115,7 +20117,7 @@
 
 			//
 
-			if ( object && object.isMesh ) {
+			if ( object.isMesh ) {
 
 				if ( material.wireframe === true ) {
 
@@ -20143,7 +20145,7 @@
 				}
 
 
-			} else if ( object && object.isLine ) {
+			} else if ( object.isLine ) {
 
 				var lineWidth = material.linewidth;
 
@@ -20151,7 +20153,7 @@
 
 				state.setLineWidth( lineWidth * getTargetPixelRatio() );
 
-				if ( object && object.isLineSegments ) {
+				if ( object.isLineSegments ) {
 
 					renderer.setMode( _gl.LINES );
 
@@ -20161,7 +20163,7 @@
 
 				}
 
-			} else if ( object && object.isPoints ) {
+			} else if ( object.isPoints ) {
 
 				renderer.setMode( _gl.POINTS );
 
@@ -20673,13 +20675,15 @@
 
 			if ( object.visible === false ) return;
 
-			if ( object.layers.test( camera.layers ) ) {
+			var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
 
-				if ( object && object.isLight ) {
+			if ( visible ) {
+
+				if ( object.isLight ) {
 
 					lights.push( object );
 
-				} else if ( object && object.isSprite ) {
+				} else if ( object.isSprite ) {
 
 					if ( object.frustumCulled === false || isSpriteViewable( object ) === true ) {
 
@@ -20687,11 +20691,11 @@
 
 					}
 
-				} else if ( object && object.isLensFlare ) {
+				} else if ( object.isLensFlare ) {
 
 					lensFlares.push( object );
 
-				} else if ( object && object.isImmediateRenderObject ) {
+				} else if ( object.isImmediateRenderObject ) {
 
 					if ( _this.sortObjects === true ) {
 
@@ -20702,9 +20706,9 @@
 
 					pushRenderItem( object, null, object.material, _vector3.z, null );
 
-				} else if ( ( object && object.isMesh ) || ( object && object.isLine ) || ( object && object.isPoints ) ) {
+				} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-					if ( object && object.isSkinnedMesh ) {
+					if ( object.isSkinnedMesh ) {
 
 						object.skeleton.update();
 
@@ -20781,7 +20785,7 @@
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-				if ( object && object.isImmediateRenderObject ) {
+				if ( object.isImmediateRenderObject ) {
 
 					setMaterial( material );
 
@@ -20917,11 +20921,13 @@
 
 			}
 
+			materialProperties.fog = fog;
+
+			// store the light setup it was created for
+
+			materialProperties.lightsHash = _lights.hash;
+
 			if ( material.lights ) {
-
-				// store the light setup it was created for
-
-				materialProperties.lightsHash = _lights.hash;
 
 				// wire up the material to this renderer's lighting state
 
@@ -21009,16 +21015,21 @@
 
 			}
 
-			if ( materialProperties.program === undefined ) {
+			if ( material.needsUpdate === false ) {
 
-				material.needsUpdate = true;
+				if ( materialProperties.program === undefined ) {
 
-			}
+					material.needsUpdate = true;
 
-			if ( materialProperties.lightsHash !== undefined &&
-				materialProperties.lightsHash !== _lights.hash ) {
+				} else if ( material.fog && materialProperties.fog !== fog ) {
 
-				material.needsUpdate = true;
+						material.needsUpdate = true;
+
+				} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
+
+					material.needsUpdate = true;
+
+				}
 
 			}
 
@@ -35698,7 +35709,7 @@
 	InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
 
-	InstancedBufferGeometry.prototype.isBufferGeometry = true;
+	InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 	InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 
