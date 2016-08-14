@@ -1205,6 +1205,7 @@ function WebGLRenderer( parameters ) {
 		} else if ( background && background.isColor ) {
 
 			glClearColor( background.r, background.g, background.b, 1 );
+			forceClear = true;
 
 		}
 
