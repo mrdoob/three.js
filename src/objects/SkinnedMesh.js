@@ -197,12 +197,20 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
+	// copied from Object3D.toJSON()
 	toJSON: function ( meta ) {
 
+		// meta is '' when called from JSON.stringify
 		var isRootObject = ( meta === undefined || meta === '' );
 
+		var output = {};
+
+		// meta is a hash used to collect geometries, materials.
+		// not providing it implies that this is the root object
+		// being serialized.
 		if ( isRootObject ) {
 
+			// initialize meta obj
 			meta = {
 				geometries: {},
 				materials: {},
@@ -211,34 +219,116 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				skeletons: {}
 			};
 
-		}
-
-		var data = Mesh.prototype.toJSON.call( this, meta );
-
-		if ( isRootObject ) {
-
-			data.metadata = {
+			output.metadata = {
 				version: 4.4,
-				type: 'SkinnedMesh',
+				type: 'SkinnedMeshObject',
 				generator: 'SkinnedMesh.toJSON'
 			};
 
+		}
+
+		// standard Object3D serialization
+
+		var object = {};
+
+		object.uuid = this.uuid;
+		object.type = this.type;
+
+		if ( this.name !== '' ) object.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+		if ( this.castShadow === true ) object.castShadow = true;
+		if ( this.receiveShadow === true ) object.receiveShadow = true;
+		if ( this.visible === false ) object.visible = false;
+
+		object.matrix = this.matrix.toArray();
+
+		// SkinnedMesh specific
+
+		if ( this.bindMode !== undefined ) object.bindMode = this.bindMode;
+		if ( this.bindMatrix !== undefined ) object.bindMatrix = this.bindMatrix.toArray();
+
+		//
+
+		if ( this.geometry !== undefined ) {
+
+			if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
+				meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
+			}
+
+			object.geometry = this.geometry.uuid;
 
 		}
 
-		var object = data.object;
+		if ( this.material !== undefined ) {
 
-		object.bindMode = this.bindMode;
-		object.bindMatrix = this.bindMatrix.toArray();
+			if ( meta.materials[ this.material.uuid ] === undefined ) {
 
-		if ( meta.skeletons[ this.skeleton.uuid ] === undefined ) {
+				meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
 
-			meta.skeletons[ this.skeleton.uuid ] = this.skeleton.toJSON( meta );
+			}
+
+			object.material = this.material.uuid;
+
+		}
+
+		if ( this.skeleton !== undefined ) {
+
+			if ( meta.skeletons[ this.skeleton.uuid ] === undefined ) {
+
+				meta.skeletons[ this.skeleton.uuid ] = this.skeleton.toJSON( meta );
+
+			}
+
 			object.skeleton = this.skeleton.uuid;
 
 		}
 
-		// copied from Object3D
+		//
+
+		object.sockets = [];
+
+		var scope = this;
+
+		function traverse( obj ) {
+
+			for ( var i = 0; i < obj.children.length; i ++ ) {
+
+				var child = obj.children[ i ];
+
+				if ( child instanceof Bone && child.skin === scope ) {
+
+					traverse( child );
+
+				} else {
+
+					var jsonObject = child.toJSON( meta ).object;
+					jsonObject.parentName = obj.name;
+					object.sockets.push( jsonObject );
+
+				}
+
+			}
+
+		}
+
+		for ( var i = 0; i < this.children.length; i ++ ) {
+
+			var child = this.children[ i ];
+
+			if ( child instanceof Bone && child.skin === this ) {
+
+				traverse( child );
+
+			} else {
+
+				object.children.push( child.toJSON( meta ).object );
+
+			}
+
+		}
+
 		if ( isRootObject ) {
 
 			var geometries = extractFromCache( meta.geometries );
@@ -247,18 +337,22 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var images = extractFromCache( meta.images );
 			var skeletons = extractFromCache( meta.skeletons );
 
-			if ( geometries.length > 0 ) data.geometries = geometries;
-			if ( materials.length > 0 ) data.materials = materials;
-			if ( textures.length > 0 ) data.textures = textures;
-			if ( images.length > 0 ) data.images = images;
-			if ( skeletons.length > 0 ) data.skeletons = skeletons;
+			if ( geometries.length > 0 ) output.geometries = geometries;
+			if ( materials.length > 0 ) output.materials = materials;
+			if ( textures.length > 0 ) output.textures = textures;
+			if ( images.length > 0 ) output.images = images;
+			if ( skeletons.length > 0 ) output.skeletons = skeletons;
 
 		}
 
-		return data;
+		output.object = object;
 
-		// copied from Object3D
-		function extractFromCache ( cache ) {
+		return output;
+
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache( cache ) {
 
 			var values = [];
 			for ( var key in cache ) {

@@ -468,7 +468,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		var matrix = new Matrix4();
 
-		return function parseObject( data, geometries, materials, skeletons ) {
+		return function parseObject( data, geometries, materials, skeletons, parent ) {
 
 			var object;
 
@@ -583,35 +583,69 @@ Object.assign( ObjectLoader.prototype, {
 					break;
 
 				case 'Mesh':
-				case 'SkinnedMesh':
 
 					var geometry = getGeometry( data.geometry );
 					var material = getMaterial( data.material );
-					var skeleton = getSkeleton( data.skeleton );
-
-					// override bones if skeleton exists
-					if ( skeleton !== undefined ) {
-
-						geometry.bones = skeleton.bones;
-						geometry.boneInverses = skeleton.boneInverses;
-
-					}
 
 					if ( geometry.bones && geometry.bones.length > 0 ) {
 
-						var useVertexTexture = ( skeleton !== undefined ) ? skeleton.useVertexTexture : undefined;
-
-						object = new SkinnedMesh( geometry, material, useVertexTexture );
-
-						if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
-						if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
-						object.updateMatrixWorld( true );
+						object = new SkinnedMesh( geometry, material );
 
 					} else {
 
 						object = new Mesh( geometry, material );
 
 					}
+
+					break;
+
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+					var skeleton = getSkeleton( data.skeleton );
+
+					var tmpBones, tmpBoneInverses;
+
+					if ( skeleton !== undefined ) {
+
+						if ( geometry.bones !== undefined ) tmpBones = geometry.bones;
+						if ( geometry.boneInverses !== undefined ) tmpBoneInverses = geometry.boneInverses;
+
+						geometry.bones = skeleton.bones;
+						geometry.boneInverses = skeleton.boneInverses;
+
+					}
+
+					var useVertexTexture = ( skeleton !== undefined ) ? skeleton.useVertexTexture : undefined;
+
+					object = new SkinnedMesh( geometry, material, useVertexTexture );
+
+					if ( skeleton !== undefined ) object.skeleton.uuid = skeleton.uuid;
+					if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+					if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+					object.updateMatrixWorld( true );
+
+					if ( tmpBones !== undefined ) geometry.bones = tmpBones;
+					if ( tmpBoneInverses !== undefined ) geometry.boneInverses = tmpBoneInverses;
+
+					break;
+
+				case 'Bone':
+
+					var arg;
+
+					if ( parent instanceof SkinnedMesh ) {
+
+						arg = parent;
+
+					} else if ( parent instanceof Bone ) {
+
+						arg = parent.skin;
+
+					}
+
+					object = new Bone( arg );
 
 					break;
 
@@ -681,73 +715,52 @@ Object.assign( ObjectLoader.prototype, {
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
-			/*
-			 * SkinnedMesh creates Bone instances as its children in the constructor
-			 * so skip Bone instance creation here.
-			 */
-			if ( data.type === 'SkinnedMesh' ) {
+			if ( data.children !== undefined ) {
 
-				var scope = this;
+				for ( var child in data.children ) {
 
-				function traverse ( data ) {
-
-					if ( data.children !== undefined ) {
-
-						for ( var child in data.children ) {
-
-							if ( data.children[ child ].type !== 'Bone' ) {
-
-								var parent;
-
-								if( data.type === 'SkinnedMesh' ) {
-
-									parent = object;
-
-								} else if ( data.type === 'Bone' ) {
-
-									// should make a method THREE.Skeleton.findBoneByName() ?
-									for ( var i = 0, il = object.skeleton.bones.length; i < il; i ++ ) {
-
-										if ( object.skeleton.bones[ i ].name === data.name ) {
-
-											parent = object.skeleton.bones[ i ];
-											break;
-
-										}
-
-									}
-
-								}
-
-								if ( parent ) {
-
-									parent.add( scope.parseObject( data.children[ child ], geometries, materials, skeletons ) );
-
-								}
-
-							} else {
-
-								traverse( data.children[ child ] );
-
-							}
-
-						}
-
-					}
+					object.add( this.parseObject( data.children[ child ], geometries, materials, skeletons, object ) );
 
 				}
 
-				traverse( data );
+			}
 
-			} else {
+			if ( data.type === 'SkinnedMesh' && data.sockets !== undefined ) {
 
-				if ( data.children !== undefined ) {
+				var scope = this;
 
-					for ( var child in data.children ) {
+				function traverse( obj, data ) {
 
-						object.add( this.parseObject( data.children[ child ], geometries, materials, skeletons ) );
+					if ( data.parentName === undefined ) return false;
+
+					for ( var i = 0; i < obj.children.length; i ++ ) {
+
+						var child = obj.children[ i ];
+
+						if ( ! ( child instanceof Bone ) ) {
+
+							return false;
+
+						}
+
+						if ( data.parentName === child.name ) {
+
+							child.add( scope.parseObject( data, geometries, materials, skeletons, child ) );
+							return true;
+
+						}
+
+						if ( traverse( child, data ) ) return true;
 
 					}
+
+					return false;
+
+				}
+
+				for ( var i = 0; i < data.sockets.length; i ++ ) {
+
+					traverse( object, data.sockets[ i ] );
 
 				}
 
