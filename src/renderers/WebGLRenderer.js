@@ -829,7 +829,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( object && object.isMesh ) {
+		if ( object.isMesh ) {
 
 			if ( material.wireframe === true ) {
 
@@ -857,7 +857,7 @@ function WebGLRenderer( parameters ) {
 			}
 
 
-		} else if ( object && object.isLine ) {
+		} else if ( object.isLine ) {
 
 			var lineWidth = material.linewidth;
 
@@ -865,7 +865,7 @@ function WebGLRenderer( parameters ) {
 
 			state.setLineWidth( lineWidth * getTargetPixelRatio() );
 
-			if ( object && object.isLineSegments ) {
+			if ( object.isLineSegments ) {
 
 				renderer.setMode( _gl.LINES );
 
@@ -875,7 +875,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-		} else if ( object && object.isPoints ) {
+		} else if ( object.isPoints ) {
 
 			renderer.setMode( _gl.POINTS );
 
@@ -1387,13 +1387,15 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) ) {
+		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
 
-			if ( object && object.isLight ) {
+		if ( visible ) {
+
+			if ( object.isLight ) {
 
 				lights.push( object );
 
-			} else if ( object && object.isSprite ) {
+			} else if ( object.isSprite ) {
 
 				if ( object.frustumCulled === false || isSpriteViewable( object ) === true ) {
 
@@ -1401,11 +1403,11 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-			} else if ( object && object.isLensFlare ) {
+			} else if ( object.isLensFlare ) {
 
 				lensFlares.push( object );
 
-			} else if ( object && object.isImmediateRenderObject ) {
+			} else if ( object.isImmediateRenderObject ) {
 
 				if ( _this.sortObjects === true ) {
 
@@ -1416,9 +1418,9 @@ function WebGLRenderer( parameters ) {
 
 				pushRenderItem( object, null, object.material, _vector3.z, null );
 
-			} else if ( ( object && object.isMesh ) || ( object && object.isLine ) || ( object && object.isPoints ) ) {
+			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( object && object.isSkinnedMesh ) {
+				if ( object.isSkinnedMesh ) {
 
 					object.skeleton.update();
 
@@ -1495,7 +1497,7 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			if ( object && object.isImmediateRenderObject ) {
+			if ( object.isImmediateRenderObject ) {
 
 				setMaterial( material );
 

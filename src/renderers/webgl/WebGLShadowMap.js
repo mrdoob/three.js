@@ -342,7 +342,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			var useSkinning = (object && object.isSkinnedMesh) && material.skinning;
+			var useSkinning = object.isSkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
 
@@ -428,7 +428,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) && ( (object && object.isMesh) || (object && object.isLine) || (object && object.isPoints) ) ) {
+		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+
+		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
