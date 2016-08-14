@@ -489,6 +489,16 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new Scene();
 
+					if ( data.background !== undefined ) {
+
+						if ( Number.isInteger( data.background ) ) {
+
+							object.background = new THREE.Color( data.background );
+
+						}
+
+					}
+
 					if ( data.fog !== undefined ) {
 
 						if ( data.fog.type === 'Fog' ) {
