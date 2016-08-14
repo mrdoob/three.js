@@ -8920,6 +8920,12 @@
 
 			return array;
 
+		},
+
+		toJSON: function () {
+
+			return this.getHex();
+
 		}
 
 	};
@@ -20495,6 +20501,7 @@
 			} else if ( background && background.isColor ) {
 
 				glClearColor( background.r, background.g, background.b, 1 );
+				forceClear = true;
 
 			}
 
@@ -22228,6 +22235,7 @@
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
@@ -28696,6 +28704,16 @@
 					case 'Scene':
 
 						object = new Scene();
+
+						if ( data.background !== undefined ) {
+
+							if ( Number.isInteger( data.background ) ) {
+
+								object.background = new THREE.Color( data.background );
+
+							}
+
+						}
 
 						if ( data.fog !== undefined ) {
 
