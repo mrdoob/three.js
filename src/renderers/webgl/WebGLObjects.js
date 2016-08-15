@@ -87,47 +87,12 @@ function WebGLObjects( gl, properties, info ) {
 
 		attributeProperties.version = data.version;
 
-		var array = data.array;
+		var oldArray = data.array;
 
 		if ( data.discard ) {
 
-			data.discardedLength = array.length;
-
-			console.warn( "THREE.WebGLObjects: discarding buffer" );
-
-			if ( array instanceof Float32Array ) {
-
-				data.array = new Float32Array( 1 );
-
-			} else if ( array instanceof Float64Array ) {
-
-				console.warn("THREE.WebGLObjects:: Unsupported data buffer format: Float64Array");
-
-			} else if ( array instanceof Uint16Array ) {
-
-				data.array = new Uint16Array( 1 );
-
-			} else if ( array instanceof Int16Array ) {
-
-				data.array = new Int16Array( 1 );
-
-			} else if ( array instanceof Uint32Array ) {
-
-				data.array = new Uint32Array( 1 );
-
-			} else if ( array instanceof Int32Array ) {
-
-				data.array = new Int32Array( 1 );
-
-			} else if ( array instanceof Int8Array ) {
-
-				data.array = new Int8Array( 1 );
-
-			} else if ( array instanceof Uint8Array ) {
-
-				data.array = new Uint8Array( 1 );
-
-			}
+			data.discardedLength = oldArray.length;
+			data.array = new oldArray.constructor( 1 ); // create dummy minimal length TypedArray
 
 		}
 
@@ -137,7 +102,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( data.discard ) {
 
-			console.warm( "THREE.WebGLObjects: attempting to update discarded buffer" );
+			console.warm( "THREE.WebGLObjects: attempting to update discarded attribute array" );
 
 			return;
 
