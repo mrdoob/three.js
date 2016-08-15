@@ -5,9 +5,9 @@ Object.defineProperty( exports, 'AudioContext', {
 	get: function () {
 		return exports.getAudioContext();
 	}
-});`;
+});
 
-var footer = fs.readFileSync( 'src/Three.Legacy.js', 'utf-8' );
+${fs.readFileSync( 'src/Three.Legacy.js', 'utf-8' ).replace( /THREE/g, 'exports' )}`;
 
 function glsl () {
 	return {
@@ -33,6 +33,5 @@ export default {
 		glsl()
 	],
 
-	outro: outro,
-	footer: footer
+	outro: outro
 };
