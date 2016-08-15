@@ -1205,6 +1205,7 @@ function WebGLRenderer( parameters ) {
 		} else if ( background && background.isColor ) {
 
 			glClearColor( background.r, background.g, background.b, 1 );
+			forceClear = true;
 
 		}
 
@@ -1735,7 +1736,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-					material.needsUpdate = true;
+				material.needsUpdate = true;
 
 			} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
 

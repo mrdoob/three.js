@@ -2,7 +2,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(factory((global.THREE = global.THREE || {})));
-}(this, function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
 	// Polyfills
 
@@ -8920,6 +8920,12 @@
 
 			return array;
 
+		},
+
+		toJSON: function () {
+
+			return this.getHex();
+
 		}
 
 	};
@@ -13628,9 +13634,11 @@
 
 			// update children
 
-			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			var children = this.children;
 
-				this.children[ i ].updateMatrixWorld( force );
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				children[ i ].updateMatrixWorld( force );
 
 			}
 
@@ -20493,6 +20501,7 @@
 			} else if ( background && background.isColor ) {
 
 				glClearColor( background.r, background.g, background.b, 1 );
+				forceClear = true;
 
 			}
 
@@ -21023,7 +21032,7 @@
 
 				} else if ( material.fog && materialProperties.fog !== fog ) {
 
-						material.needsUpdate = true;
+					material.needsUpdate = true;
 
 				} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
 
@@ -22226,6 +22235,7 @@
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
@@ -27150,23 +27160,23 @@
 
 		},
 
-		getTexture: function ( name ) {
+		parse: function ( json ) {
 
 			var textures = this.textures;
 
-			if ( textures[ name ] === undefined ) {
+			function getTexture( name ) {
 
-				console.warn( 'THREE.MaterialLoader: Undefined texture', name );
+				if ( textures[ name ] === undefined ) {
+
+					console.warn( 'THREE.MaterialLoader: Undefined texture', name );
+
+				}
+
+				return textures[ name ];
 
 			}
 
-			return textures[ name ];
-
-		},
-
-		parse: function ( json ) {
-
-			var material = new THREE[ json.type ];
+			var material = new THREE[ json.type ]();
 
 			if ( json.uuid !== undefined ) material.uuid = json.uuid;
 			if ( json.name !== undefined ) material.name = json.name;
@@ -27195,7 +27205,7 @@
 			if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 			if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
 			if ( json.skinning !== undefined ) material.skinning = json.skinning;
-			if ( json.morphTargets !== undefined ) material.wireframe = json.morphTargets;
+			if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 
 			// for PointsMaterial
 
@@ -27204,19 +27214,19 @@
 
 			// maps
 
-			if ( json.map !== undefined ) material.map = this.getTexture( json.map );
+			if ( json.map !== undefined ) material.map = getTexture( json.map );
 
 			if ( json.alphaMap !== undefined ) {
 
-				material.alphaMap = this.getTexture( json.alphaMap );
+				material.alphaMap = getTexture( json.alphaMap );
 				material.transparent = true;
 
 			}
 
-			if ( json.bumpMap !== undefined ) material.bumpMap = this.getTexture( json.bumpMap );
+			if ( json.bumpMap !== undefined ) material.bumpMap = getTexture( json.bumpMap );
 			if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
 
-			if ( json.normalMap !== undefined ) material.normalMap = this.getTexture( json.normalMap );
+			if ( json.normalMap !== undefined ) material.normalMap = getTexture( json.normalMap );
 			if ( json.normalScale !== undefined ) {
 
 				var normalScale = json.normalScale;
@@ -27233,31 +27243,26 @@
 
 			}
 
-			if ( json.displacementMap !== undefined ) material.displacementMap = this.getTexture( json.displacementMap );
+			if ( json.displacementMap !== undefined ) material.displacementMap = getTexture( json.displacementMap );
 			if ( json.displacementScale !== undefined ) material.displacementScale = json.displacementScale;
 			if ( json.displacementBias !== undefined ) material.displacementBias = json.displacementBias;
 
-			if ( json.roughnessMap !== undefined ) material.roughnessMap = this.getTexture( json.roughnessMap );
-			if ( json.metalnessMap !== undefined ) material.metalnessMap = this.getTexture( json.metalnessMap );
+			if ( json.roughnessMap !== undefined ) material.roughnessMap = getTexture( json.roughnessMap );
+			if ( json.metalnessMap !== undefined ) material.metalnessMap = getTexture( json.metalnessMap );
 
-			if ( json.emissiveMap !== undefined ) material.emissiveMap = this.getTexture( json.emissiveMap );
+			if ( json.emissiveMap !== undefined ) material.emissiveMap = getTexture( json.emissiveMap );
 			if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;
 
-			if ( json.specularMap !== undefined ) material.specularMap = this.getTexture( json.specularMap );
+			if ( json.specularMap !== undefined ) material.specularMap = getTexture( json.specularMap );
 
-			if ( json.envMap !== undefined ) {
-
-				material.envMap = this.getTexture( json.envMap );
-				material.combine = MultiplyOperation;
-
-			}
+			if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
 
 			if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
 
-			if ( json.lightMap !== undefined ) material.lightMap = this.getTexture( json.lightMap );
+			if ( json.lightMap !== undefined ) material.lightMap = getTexture( json.lightMap );
 			if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
 
-			if ( json.aoMap !== undefined ) material.aoMap = this.getTexture( json.aoMap );
+			if ( json.aoMap !== undefined ) material.aoMap = getTexture( json.aoMap );
 			if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
 			// MultiMaterial
@@ -28700,18 +28705,28 @@
 
 						object = new Scene();
 
+						if ( data.background !== undefined ) {
+
+							if ( Number.isInteger( data.background ) ) {
+
+								object.background = new THREE.Color( data.background );
+
+							}
+
+						}
 
 						if ( data.fog !== undefined ) {
 
-							if ( data.fog.type === 'FogExp2' ) {
+							if ( data.fog.type === 'Fog' ) {
 
-								object.fog = new FogExp2(data.fog.color, data.fog.density);
+								object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
 
-							} else if ( data.fog.type === 'Fog' ) {
+							} else if ( data.fog.type === 'FogExp2' ) {
 
-								object.fog = new Fog(data.fog.color, data.fog.near, data.fog.far);
+								object.fog = new FogExp2( data.fog.color, data.fog.density );
 
 							}
+
 						}
 
 						break;
@@ -40940,7 +40955,7 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 /**
  * @author mrdoob / http://mrdoob.com/
  */
