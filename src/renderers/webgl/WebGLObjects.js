@@ -102,7 +102,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( data.discard ) {
 
-			console.warm( "THREE.WebGLObjects: attempting to update discarded attribute array" );
+			console.warn( "THREE.WebGLObjects: attempting to update discarded attribute array" );
 
 			return;
 
