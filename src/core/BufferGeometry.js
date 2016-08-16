@@ -642,9 +642,49 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	}(),
 
+	/**
+	 * Allows flat shading of faces on non-indexed buffer geometry
+	 */
 	computeFaceNormals: function () {
 
-		// backwards compatibility
+		var pos = this.attributes.position.array;
+		var attrName = 'normal';
+		if ( this.attributes[ attrName ] === undefined ) {
+
+			this.addAttribute( attrName, new THREE.BufferAttribute( new Float32Array( pos.length ), 3 ) );
+
+		}
+		var n = this.attributes[ attrName ].array;
+		var i, v, il;
+		var cb = new THREE.Vector3();
+		var ab = new THREE.Vector3();
+		for ( i = 0, il = pos.length; i < il; i += 9 ) {
+
+			var iA = i;
+			var iB = i + 3;
+			var iC = i + 6;
+
+			cb.set( pos[ iC ] - pos[ iB ],
+			pos[ iC + 1 ] - pos[ iB + 1 ],
+			pos[ iC + 2 ] - pos[ iB + 2 ] );
+			ab.set( pos[ iA ] - pos[ iB ],
+			pos[ iA + 1 ] - pos[ iB + 1 ],
+			pos[ iA + 2 ] - pos[ iB + 2 ] );
+			cb.cross( ab );
+			cb.normalize();
+
+			var face = [ iA, iB, iC ];
+			// For each vertex on the face
+			for ( v = 0; v < 3; v ++ ) {
+
+				var faceAbc = face[ v ];
+				n[ faceAbc ] = cb.x;
+				n[ faceAbc + 1 ] = cb.y;
+				n[ faceAbc + 2 ] = cb.z;
+
+			}
+
+		}
 
 	},
 
@@ -808,6 +848,60 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 		}
 
 		return this;
+
+	},
+
+	/**
+	 * Checks for duplicate vertices with hashmap.
+	 * Faces with duplicate vertices are rewired to point to the first instance.
+	 * Unused vertices are not removed.
+	 * @param  {THREE.BufferGeometry} geom Geometry to merge
+	 */
+	mergeVertices: function( geom ) {
+
+		_ensureIndex( geom );
+
+		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
+		var changes = {};
+		var vx, vy, vz, key;
+		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
+		var precision = Math.pow( 10, precisionPoints );
+		var i, il, j;
+
+		var pos = geom.attributes.position.array;
+		var index = geom.index.array;
+
+		// for each vertex
+		for ( i = 0, il = pos.length; i < il; i += 3 ) {
+
+			vx = pos[ i ];
+			vy = pos[ i + 1 ];
+			vz = pos[ i + 2 ];
+			key = Math.round( vx * precision ) + '_' + Math.round( vy * precision ) + '_' + Math.round( vz * precision );
+			if ( verticesMap[ key ] === undefined ) {
+
+				verticesMap[ key ] = i;
+
+			} else {
+
+				j = verticesMap[ key ];
+				changes[ i ] = j;
+
+			}
+
+		}
+		// Re-index faces to uses the first possible index when points overlap.
+		// Could cause degenerate faces.
+		for ( i = 0, il = index.length; i < il; i ++ ) {
+
+			var idx = index[ i ] * 3;
+			if ( changes[ idx ] != null ) {
+
+				index[ i ] = Math.floor( changes[ idx ] / 3 );
+
+			}
+
+		}
 
 	},
 
@@ -1035,5 +1129,139 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 BufferGeometry.MaxIndex = 65535;
 
+
+/**
+ * Merge a list of buffer geometries into a new one.
+ * The old ones will be disposed, so they can be garbage collected.
+ * @param  {Array.<THREE.Object3D>} geometries  A list of geometries containing geometry to merge
+ * @return {THREE.BufferGeometry}       	The merged result.
+ */
+BufferGeometry.merge = function( geometries ) {
+
+	var i, m, geom2;
+	var geometry = new THREE.BufferGeometry();
+	var geom1 = geometries[ 0 ];
+
+	// Split all indexed geometry so we don't need it anymore
+	for ( m = 0; m < geometries.length; m ++ ) {
+
+		geom2 = geometries[ m ];
+		if ( geom2.index ) {
+
+			geom2 = BufferGeometry.splitVertices( geom2 );
+			geometries[ m ] = geom2;
+
+		}
+		if ( ! geom2.attributes.normal ) {
+
+			// geometries[ m ].geometry = computeNormals( geom2 );
+
+		}
+
+	}
+
+	// for each attribute
+	for ( var key in geom1.attributes ) {
+
+		if ( geom1.attributes[ key ].array.constructor !== Float32Array ) continue;
+
+		var data = [];
+		// for each geometry
+		for ( m = 0; m < geometries.length; m ++ ) {
+
+			geom2 = geometries[ m ];
+			if ( ! geom2.attributes[ key ] ) {
+
+				throw new FluxGeometryError( 'Mismatched geometry attributes: ' + key );
+
+			}
+
+			var attributeArray2 = geom2.attributes[ key ].array;
+			for ( i = 0; i < attributeArray2.length; i ++ ) {
+
+				data.push( attributeArray2[ i ] );
+
+			}
+
+		} // end for each geom
+		geometry.addAttribute( key, new THREE.BufferAttribute( new Float32Array( data ), geom1.attributes[ key ].itemSize ) );
+
+	} // end for each attr
+
+	for ( m = 0; m < geometries.length; m ++ ) {
+
+		geometries[ m ].dispose();
+
+	}
+
+	return geometry;
+
+};
+
+
+/**
+ * Split the faces of an indexed buffer geometry
+ * This creates attribute arrays that are populated per face vertex allowing
+ * it to have sharp changes in attributes and not need an index array.
+ * @param  {THREE.BufferGeometry} geom The indexed geometry to split
+ * @return {THREE.BufferGeometry}      A modified clone or the original geometry
+ */
+BufferGeometry.splitVertices = function( geom ) {
+
+	var geometry = new THREE.BufferGeometry();
+	if ( ! geom.index ) return geom;
+	var i, j, il, idx;
+	var index = geom.index.array;
+	// for each attribute
+	for ( var key in geom.attributes ) {
+
+		if ( geom.attributes[ key ].array.constructor !== Float32Array ) continue;
+		var attr = geom.attributes[ key ].array;
+		var size = geom.attributes[ key ].itemSize
+		var values = new Float32Array( index.length * size );
+
+		for ( j = 0, i = 0, il = index.length; i < il; i ++ ) {
+
+			idx = index[ i ] * size;
+			for ( var k = 0; k < size; k ++ ) {
+
+				values[ i * size + k ] = attr[ idx + k ];
+
+			}
+
+		}
+		geometry.addAttribute( key, new THREE.BufferAttribute( values, size ) );
+
+	}
+	geom.dispose();
+	return geometry;
+
+};
+
+/**
+ * Make sure that the buffer geometry has an index array and it is of the right type
+ * @param  {THREE.BufferGeometry} geom The geometry to check
+ */
+function _ensureIndex( geom ) {
+
+	var i;
+	if ( ! geom.index ) {
+
+		var pos = geom.attributes.position.array;
+		var index = [];
+		for ( i = 0; i < pos.length / 3; i ++ ) {
+
+			index.push( i );
+
+		}
+		geom.setIndex( new THREE.BufferAttribute( new Uint32Array( index ), 1 ) );
+
+	} else if ( ! geom.index.array.constructor instanceof Uint32Array ) {
+
+		geom.index.array = Uint32Array.from( geom.index.array );
+
+	}
+
+}
 
 export { BufferGeometry };
