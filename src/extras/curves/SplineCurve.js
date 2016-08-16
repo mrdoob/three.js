@@ -8,9 +8,9 @@ import { CurveUtils } from '../CurveUtils';
 
 function SplineCurve( points /* array of Vector2 */ ) {
 
-	this.points = ( points == undefined ) ? [] : points;
+	this.points = ( points === undefined ) ? [] : points;
 
-};
+}
 
 SplineCurve.prototype = Object.create( Curve.prototype );
 SplineCurve.prototype.constructor = SplineCurve;

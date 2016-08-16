@@ -155,7 +155,7 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	}
 
-};
+}
 
 LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;

@@ -93,7 +93,7 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-};
+}
 
 PlaneBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 PlaneBufferGeometry.prototype.constructor = PlaneBufferGeometry;

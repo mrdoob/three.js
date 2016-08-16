@@ -76,7 +76,7 @@ function ShaderMaterial( parameters ) {
 
 	}
 
-};
+}
 
 ShaderMaterial.prototype = Object.create( Material.prototype );
 ShaderMaterial.prototype.constructor = ShaderMaterial;

@@ -23,7 +23,7 @@ function TetrahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
 TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;

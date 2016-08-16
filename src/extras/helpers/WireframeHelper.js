@@ -15,7 +15,7 @@ function WireframeHelper( object, hex ) {
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-};
+}
 
 WireframeHelper.prototype = Object.create( LineSegments.prototype );
 WireframeHelper.prototype.constructor = WireframeHelper;

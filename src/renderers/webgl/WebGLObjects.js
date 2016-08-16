@@ -225,7 +225,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	this.update = update;
 
-};
+}
 
 
 export { WebGLObjects };

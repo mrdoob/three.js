@@ -30,7 +30,7 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
 PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 

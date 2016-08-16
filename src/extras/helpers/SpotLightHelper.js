@@ -52,7 +52,7 @@ function SpotLightHelper( light ) {
 
 	this.update();
 
-};
+}
 
 SpotLightHelper.prototype = Object.create( Object3D.prototype );
 SpotLightHelper.prototype.constructor = SpotLightHelper;

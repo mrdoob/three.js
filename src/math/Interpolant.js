@@ -31,7 +31,7 @@ function Interpolant(
 	this.sampleValues = sampleValues;
 	this.valueSize = sampleSize;
 
-};
+}
 
 Interpolant.prototype = {
 

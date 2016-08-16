@@ -25,7 +25,7 @@ function AnimationMixer( root ) {
 
 	this.timeScale = 1.0;
 
-};
+}
 
 Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 

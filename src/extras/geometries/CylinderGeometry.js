@@ -25,7 +25,7 @@ function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heig
 	this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
 	this.mergeVertices();
 
-};
+}
 
 CylinderGeometry.prototype = Object.create( Geometry.prototype );
 CylinderGeometry.prototype.constructor = CylinderGeometry;

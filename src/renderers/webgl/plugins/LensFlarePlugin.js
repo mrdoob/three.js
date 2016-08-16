@@ -383,7 +383,7 @@ function LensFlarePlugin( renderer, flares ) {
 
 	}
 
-};
+}
 
 
 export { LensFlarePlugin };

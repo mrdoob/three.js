@@ -175,7 +175,7 @@ function Spline( points ) {
 
 	}
 
-};
+}
 
 
 export { Spline };

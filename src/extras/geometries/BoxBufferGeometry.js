@@ -192,7 +192,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 	}
 
-};
+}
 
 BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;

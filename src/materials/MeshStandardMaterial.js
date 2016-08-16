@@ -109,7 +109,7 @@ function MeshStandardMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;

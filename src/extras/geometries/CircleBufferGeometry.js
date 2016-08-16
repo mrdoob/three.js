@@ -66,7 +66,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	this.boundingSphere = new Sphere( new Vector3(), radius );
 
-};
+}
 
 CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;

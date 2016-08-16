@@ -31,7 +31,7 @@ function Raycaster( origin, direction, near, far ) {
 		}
 	} );
 
-};
+}
 
 function ascSort( a, b ) {
 

@@ -39,7 +39,7 @@ function HemisphereLightHelper( light, sphereSize ) {
 
 	this.update();
 
-};
+}
 
 HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
 HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;

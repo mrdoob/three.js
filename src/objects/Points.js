@@ -19,7 +19,7 @@ function Points( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
 
-};
+}
 
 Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

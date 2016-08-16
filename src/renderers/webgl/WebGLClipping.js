@@ -151,7 +151,7 @@ function WebGLClipping() {
 
 	}
 
-};
+}
 
 
 

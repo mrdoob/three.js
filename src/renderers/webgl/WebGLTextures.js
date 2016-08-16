@@ -759,7 +759,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 
-};
+}
 
 
 export { WebGLTextures };
