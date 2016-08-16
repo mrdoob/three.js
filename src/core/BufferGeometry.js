@@ -344,9 +344,10 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			var direct = geometry.__directGeometry;
 
-			if ( direct === undefined || geometry.elementsNeedUpdate === true ) {
+			if( direct === undefined || geometry.elementsNeedUpdate ) {
 
-				return this.fromGeometry( geometry );
+				this.fromGeometry( geometry );
+				direct = geometry.__directGeometry;
 
 			}
 
