@@ -11,6 +11,7 @@ import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
+import { BoxGeometry } from './extras/geometries/BoxGeometry.js';
 import { Light } from './lights/Light.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
@@ -35,6 +36,8 @@ import { Sprite } from './objects/Sprite.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
+
+export { BoxGeometry as CubeGeometry };
 
 export function Face4 ( a, b, c, d, normal, color, materialIndex ) {
 	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.' );
