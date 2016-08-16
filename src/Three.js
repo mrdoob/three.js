@@ -237,3 +237,4 @@ export { ShapeUtils } from './extras/ShapeUtils.js';
 export { SceneUtils } from './extras/SceneUtils.js';
 export { CurveUtils } from './extras/CurveUtils.js';
 export * from './constants.js';
+export * from './Three.Legacy.js';
