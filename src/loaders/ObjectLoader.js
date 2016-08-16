@@ -748,42 +748,40 @@ Object.assign( ObjectLoader.prototype, {
 
 			}
 
-			if ( data.type === 'SkinnedMesh' && data.sockets !== undefined ) {
+			if ( data.type === 'SkinnedMesh' ) {
 
-				var scope = this;
+				var skeleton = getSkeleton( data.skeleton );
 
-				function traverse( obj, data ) {
+				if ( skeleton !== undefined && skeleton.sockets !== undefined ) {
 
-					if ( data.parentName === undefined ) return false;
+					for ( var i = 0, il = skeleton.sockets.length; i < il; i ++ ) {
 
-					for ( var i = 0; i < obj.children.length; i ++ ) {
+						var socket = skeleton.sockets[ i ];
 
-						var child = obj.children[ i ];
+						var found = false;
 
-						if ( ! ( child instanceof Bone ) ) {
+						for ( var j = 0, jl = object.skeleton.bones.length; j < jl; j ++ ) {
 
-							return false;
+							var bone = object.skeleton.bones[ j ];
+
+							if ( bone.uuid === socket.parent ) {
+
+								bone.add( this.parseObject( socket, geometries, materials, skeletons, bone ) );
+								found = true;
+
+								break;
+
+							}
 
 						}
 
-						if ( data.parentName === child.name ) {
+						if ( ! found ) {
 
-							child.add( scope.parseObject( data, geometries, materials, skeletons, child ) );
-							return true;
+							console.warn( 'THREE.ObjectLoader: not found bone uuid ' + socket.parent + ' in skeleton' );
 
 						}
-
-						if ( traverse( child, data ) ) return true;
 
 					}
-
-					return false;
-
-				}
-
-				for ( var i = 0; i < data.sockets.length; i ++ ) {
-
-					traverse( object, data.sockets[ i ] );
 
 				}
 

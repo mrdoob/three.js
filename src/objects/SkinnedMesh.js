@@ -43,6 +43,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 			bone.position.fromArray( gbone.pos );
 			bone.quaternion.fromArray( gbone.rotq );
 			if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+			if ( gbone.uuid !== undefined ) bone.uuid = gbone.uuid;
 
 		}
 
@@ -287,41 +288,13 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		//
 
-		object.sockets = [];
-
-		var scope = this;
-
-		function traverse( obj ) {
-
-			for ( var i = 0; i < obj.children.length; i ++ ) {
-
-				var child = obj.children[ i ];
-
-				if ( child instanceof Bone && child.skin === scope ) {
-
-					traverse( child );
-
-				} else {
-
-					var jsonObject = child.toJSON( meta ).object;
-					jsonObject.parentName = obj.name;
-					object.sockets.push( jsonObject );
-
-				}
-
-			}
-
-		}
+		object.children = [];
 
 		for ( var i = 0; i < this.children.length; i ++ ) {
 
 			var child = this.children[ i ];
 
-			if ( child instanceof Bone && child.skin === this ) {
-
-				traverse( child );
-
-			} else {
+			if ( ! ( child instanceof Bone ) /* || child.skin !== this */ ) {
 
 				object.children.push( child.toJSON( meta ).object );
 

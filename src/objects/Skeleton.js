@@ -185,7 +185,7 @@ Object.assign( Skeleton.prototype, {
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
 
 		var data = {};
 
@@ -206,6 +206,7 @@ Object.assign( Skeleton.prototype, {
 		}
 
 		var bones = [];
+		var sockets = [];
 
 		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
@@ -217,9 +218,24 @@ Object.assign( Skeleton.prototype, {
 				parent: getParentIndex( bone ),
 				pos: bone.position.toArray(),
 				rotq: bone.quaternion.toArray(),
-				scl: bone.scale.toArray()
+				scl: bone.scale.toArray(),
+				uuid: bone.uuid
 
 			} );
+
+			for ( var j = 0, jl = bone.children.length; j < jl; j ++ ) {
+
+				var child = bone.children[ j ];
+
+				if ( ! ( child instanceof Bone ) /* || bone.skin !== child.skin */ ) {
+
+					var object = child.toJSON( meta ).object;
+					object.parent = bone.uuid;
+					sockets.push( object );
+
+				}
+
+			}
 
 		}
 
@@ -235,6 +251,7 @@ Object.assign( Skeleton.prototype, {
 		data.bones = bones;
 		data.boneInverses = boneInverses;
 		data.useVertexTexture = this.useVertexTexture;
+		if ( sockets.length > 0 ) data.sockets = sockets;
 
 		return data;
 
