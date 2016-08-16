@@ -594,23 +594,13 @@ THREE.Vector3.prototype = {
 
 	},
 
-	projectOnVector: function () {
+	projectOnVector: function ( vector ) {
 
-		var v1, dot;
-
-		return function projectOnVector( vector ) {
-
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-
-			v1.copy( vector ).normalize();
-
-			dot = this.dot( v1 );
-
-			return this.copy( v1 ).multiplyScalar( dot );
-
-		};
-
-	}(),
+		var scalar = vector.dot( this ) / vector.lengthSq();
+	
+		return this.copy( vector ).multiplyScalar( scalar );
+	
+	},
 
 	projectOnPlane: function () {
 
@@ -666,6 +656,12 @@ THREE.Vector3.prototype = {
 		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
+
+	},
+
+	distanceToManhattan: function ( v ) {
+
+		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
 
 	},
 

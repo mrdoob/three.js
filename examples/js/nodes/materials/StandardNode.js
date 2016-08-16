@@ -169,6 +169,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		var output = [
 				// prevent undeclared normal
+				THREE.ShaderChunk[ "normal_flip" ],
 				THREE.ShaderChunk[ "normal_fragment" ],
 
 				// prevent undeclared material
@@ -301,7 +302,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			output.push(
 				environment.code,
-				"RE_IndirectSpecular(" + environment.result + ", geometry, material, reflectedLight );"
+				"RE_IndirectSpecular_Physical(" + environment.result + ", vec3( 0.0 ), geometry, material, reflectedLight );"
 			);
 
 		}

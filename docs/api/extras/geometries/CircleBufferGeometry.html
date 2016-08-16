@@ -14,9 +14,25 @@
 
 		<div class="desc">This is the [page:BufferGeometry] port of [page:CircleGeometry].</div>
 
-		<h2>Example</h2>
+		<iframe id="scene" src="scenes/geometry-browser.html#CircleBufferGeometry"></iframe>
 
-		<iframe src='scenes/geometry-browser.html#CircleBufferGeometry'></iframe>
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
 
 		<code>
 		var geometry = new THREE.CircleBufferGeometry( 5, 32 );
@@ -24,7 +40,6 @@
 		var circle = new THREE.Mesh( geometry, material );
 		scene.add( circle );
 		</code>
-
 
 		<h2>Constructor</h2>
 
@@ -35,7 +50,6 @@
 		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
 		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
 		</div>
-
 
 		<h2>Source</h2>
 

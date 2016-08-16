@@ -15,10 +15,25 @@
 		<div class="desc">A material for drawing geometries in a simple shaded (flat or wireframe) way.</div>
 		<div class="desc">The default will render as flat polygons. To draw the mesh as wireframe, simply set the 'wireframe' property to true.</div>
 
-		<iframe src='scenes/material-browser.html#MeshBasicMaterial'></iframe>
+		<iframe id="scene" src="scenes/material-browser.html#MeshBasicMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Constructor</h2>
-
 
 		<h3>[name]( [page:Object parameters] )</h3>
 

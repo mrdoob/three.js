@@ -240,7 +240,16 @@
 		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+
 		<script>
+
+		function extractQuery() {
+			var p = window.location.search.indexOf( '?q=' )
+			if( p !== -1 ) {
+				return window.location.search.substr( 3 );
+			}
+			return ''
+		}
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
@@ -255,16 +264,13 @@
 			event.preventDefault();
 		} );
 
-		// iOS8 workaround
+		// iOS iframe auto-resize workaround
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			viewer.addEventListener( 'load', function ( event ) {
-
-				viewer.contentWindow.innerWidth -= 10;
-				viewer.contentWindow.innerHeight -= 2;
-
-			} );
+			viewer.style.width = getComputedStyle( viewer ).width;
+			viewer.style.height = getComputedStyle( viewer ).height;
+			viewer.setAttribute( 'scrolling', 'no' );
 
 		}
 
@@ -276,7 +282,17 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+			try {
+
+				var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
+				window.open( 'view-source:' + url + '/' + selected + '.html' );
+
+			} catch ( e ) {
+
+				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+				console.log( e );
+
+			}
 
 		}, false );
 		button.style.display = 'none';
@@ -371,7 +387,15 @@
 
 		function updateFilter() {
 
-			var exp = new RegExp( filterInput.value, 'gi' );
+			var v = filterInput.value;
+			if( v !== '' ) {
+				window.history.replaceState( {} , '', '?q=' + v );
+			} else {
+				window.history.replaceState( {} , '', window.location.pathname );
+			}
+			if( selected ) window.location.hash = selected
+
+			var exp = new RegExp( v, 'gi' );
 
 			for ( var key in files ) {
 
@@ -458,6 +482,9 @@
 			}
 
 		}
+
+		filterInput.value = extractQuery()
+		updateFilter( )
 
 		</script>
 

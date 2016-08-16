@@ -26,7 +26,7 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:Material material])</h3>
+		<h3>[name]( [page:Material material] )</h3>
 		<div>
                 material — An instance of [page:Material] (optional).
 		</div>
@@ -41,21 +41,15 @@
 		<div>
 		An instance of [page:Material], defining the object's appearance. Default is a [page:SpriteMaterial] which is a white plane.
 		</div>
--
-           	<h2>Methods</h2>
 
-                <h3>[method:Sprite clone]()</h3>
-                <div>
-                This creates a new clone of the sprite.
-                </div>
 
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+ 		<h2>Methods</h2>
+
+		<h3>[method:Sprite clone]()</h3>
 		<div>
-		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned Sprite Object.
+		Returns a clone of this Sprite object and its descendants.
 		</div>
-		<div>
-		Clone a Sprite Object.
-		</div>
+
 
 		<h2>Source</h2>
 

@@ -175,6 +175,30 @@
 		Translates object along z axis by distance.
 		</div>
 
+		<h3>[method:null rotateX]( [page:Float rad] )</h3>
+		<div>
+		rad - the angle to rotate in radians.<br />
+		</div>
+		<div>
+		Rotates the object around x axis in local space.
+		</div>
+
+		<h3>[method:null rotateY]( [page:Float rad] )</h3>
+		<div>
+		rad - the angle to rotate in radians.<br />
+		</div>
+		<div>
+		Rotates the object around y axis in local space.
+		</div>
+
+		<h3>[method:null rotateZ]( [page:Float rad] )</h3>
+		<div>
+		rad - the angle to rotate in radians.<br />
+		</div>
+		<div>
+		Rotates the object around z axis in local space.
+		</div>
+
 		<h3>[method:Vector3 localToWorld]( [page:Vector3 vector] )</h3>
 		<div>
 		vector - A local vector.<br />
@@ -250,9 +274,12 @@
 		Updates global transform of the object and its children.
 		</div>
 
-		<h3>[method:Object3D clone]()</h3>
+		<h3>[method:Object3D clone]( [page:Boolean recursive] )</h3>
 		<div>
-		Creates a new clone of this object and all descendants.
+		recursive -- if true, descendants of the object are also cloned. Default is true.
+		</div>
+		<div>
+		Returns a clone of this object and optionaly all descendants.
 		</div>
 
 

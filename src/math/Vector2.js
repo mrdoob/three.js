@@ -393,6 +393,12 @@ THREE.Vector2.prototype = {
 
 	},
 
+	distanceToManhattan: function ( v ) {
+
+		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
+
+	},
+
 	setLength: function ( length ) {
 
 		return this.multiplyScalar( length / this.length() );

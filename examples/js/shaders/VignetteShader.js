@@ -10,9 +10,9 @@ THREE.VignetteShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"offset":   { type: "f", value: 1.0 },
-		"darkness": { type: "f", value: 1.0 }
+		"tDiffuse": { value: null },
+		"offset":   { value: 1.0 },
+		"darkness": { value: 1.0 }
 
 	},
 

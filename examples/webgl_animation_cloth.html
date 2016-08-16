@@ -182,7 +182,7 @@
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
 				clothGeometry.dynamic = true;
 
-				var uniforms = { texture:  { type: "t", value: clothTexture } };
+				var uniforms = { texture:  { value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShaderDepth' ).textContent;
 

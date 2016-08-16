@@ -14,11 +14,25 @@
 
 		<div class="desc">A class for generating a dodecahedron geometries.</div>
 
-		<iframe src='scenes/geometry-browser.html#DodecahedronGeometry'></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#DodecahedronGeometry"></iframe>
 
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([page:Float radius], [page:Integer detail])</h3>
 		<div>
@@ -26,14 +40,12 @@
 		detail — Default is 0. Setting this to a value greater than 0 adds vertices making it no longer a dodecahedron.
 		</div>
 
-
 		<h2>Properties</h2>
 
 		<h3>[property:Object parameters]</h3>
 		<div>
 		An object with all of the parameters that were used to generate the geometry.
 		</div>
-
 
 		<h2>Source</h2>
 
