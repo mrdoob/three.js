@@ -4427,7 +4427,7 @@ THREE.MMDHelper.prototype = {
 
 				setInvisible = function ( object ) {
 
-					if ( ! object.visible ) return;
+					if ( ! object.visible || ! object.layers.test( camera.layers ) ) return;
 
 					// any types else to skip?
 					if ( object instanceof THREE.Scene ||
@@ -4447,7 +4447,7 @@ THREE.MMDHelper.prototype = {
 
 					}
 
-					object.visible = false;
+					object.layers.mask &= ~ camera.layers.mask;
 					invisibledObjects.push( object );
 
 				};
@@ -4460,7 +4460,7 @@ THREE.MMDHelper.prototype = {
 
 					for ( var i = 0, il = invisibledObjects.length; i < il; i ++ ) {
 
-						invisibledObjects[ i ].visible = true;
+						invisibledObjects[ i ].layers.mask |= camera.layers.mask;
 
 					}
 
