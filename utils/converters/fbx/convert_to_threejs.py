@@ -1505,7 +1505,8 @@ def generate_non_scene_output(scene):
       'normals' : [] if nnormals <= 0 else normal_values,
       'colors' : [] if ncolors <= 0 else color_values,
       'uvs' : uv_values,
-      'faces' : faces
+      'faces' : faces,
+      'textures': {}
     }
 
     if option_pretty_print:
