@@ -47,7 +47,7 @@ Interpolant.prototype = {
 
 		validate_interval: {
 
-			seek: {
+			seek: while(true) {
 
 				var right;
 
@@ -184,7 +184,7 @@ Interpolant.prototype = {
 					return this.afterEnd_( i1 - 1, t0, t );
 
 				}
-
+				break; //Prevent Infinite while
 			} // seek
 
 			this._cachedIndex = i1;
