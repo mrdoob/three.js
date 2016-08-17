@@ -258,7 +258,7 @@ def triangulate_node_hierarchy(node):
            node_attribute.GetAttributeType() == FbxNodeAttribute.eNurbs or \
            node_attribute.GetAttributeType() == FbxNodeAttribute.eNurbsSurface or \
            node_attribute.GetAttributeType() == FbxNodeAttribute.ePatch:
-            converter.TriangulateInPlace(node);
+            converter.Triangulate(node.GetNodeAttribute(), True);
 
         child_count = node.GetChildCount()
         for i in range(child_count):
@@ -1526,7 +1526,7 @@ def generate_mesh_list_from_hierarchy(node, mesh_list):
            attribute_type == FbxNodeAttribute.ePatch:
 
             if attribute_type != FbxNodeAttribute.eMesh:
-                converter.TriangulateInPlace(node);
+                converter.Triangulate(node.GetNodeAttribute(), True);
 
             mesh_list.append(node.GetNodeAttribute())
 
@@ -1555,7 +1555,7 @@ def generate_embed_dict_from_hierarchy(node, embed_dict):
            attribute_type == FbxNodeAttribute.ePatch:
 
             if attribute_type != FbxNodeAttribute.eMesh:
-                converter.TriangulateInPlace(node);
+                converter.Triangulate(node.GetNodeAttribute(), True);
 
             embed_object = generate_scene_output(node)
             embed_name = getPrefixedName(node, 'Embed')
