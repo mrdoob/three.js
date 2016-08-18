@@ -2,6 +2,9 @@ THREE.ViveController = function ( id ) {
 
 	THREE.Object3D.call( this );
 
+	var gamepad;
+
+	this.getGamepad = function () { return gamepad; };
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
 
@@ -11,7 +14,7 @@ THREE.ViveController = function ( id ) {
 
 		requestAnimationFrame( update );
 
-		var gamepad = navigator.getGamepads()[ id ];
+		gamepad = navigator.getGamepads()[ id ];
 
 		if ( gamepad !== undefined && gamepad.pose !== null ) {
 
