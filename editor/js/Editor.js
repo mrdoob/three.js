@@ -422,6 +422,8 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.background.setHex( 0xaaaaaa );
+		this.scene.fog = null;
 
 		var objects = this.scene.children;
 
