@@ -1113,17 +1113,27 @@
 
 			_dragging = false;
 
-			if ( event instanceof TouchEvent ) {
+			try {
 
-				// Force "rollover"
+				if ( event instanceof TouchEvent ) {
 
-				scope.axis = null;
-				scope.update();
-				scope.dispatchEvent( changeEvent );
+					// Force "rollover"
+	
+					scope.axis = null;
+					scope.update();
+					scope.dispatchEvent( changeEvent );
 
-			} else {
+				} else {
 
-				onPointerHover( event );
+					onPointerHover( event );
+
+				}
+ 
+			} catch ( e ) {
+
+				 if ( !( e instanceof ReferenceError ) ) throw e;
+
+				 onPointerHover( event );
 
 			}
 
