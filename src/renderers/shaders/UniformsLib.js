@@ -95,7 +95,7 @@ THREE.UniformsLib = {
 
 			"shadow": { type: "1i" },
 			"shadowBias": { type: "1f" },
-			"shadowRadius": { type: "1f" },
+			"spreadAngle": { type: "1f" },
 			"shadowMapSize": { type: "v2" },
 			"shadowCameraParams": { type: "v3" }
 		} },
