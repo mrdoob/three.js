@@ -2340,7 +2340,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( light.castShadow ) {
 
 					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
+					uniforms.spreadAngle = light.shadow.spreadAngle;
 					uniforms.shadowMapSize = light.shadow.mapSize;
 					uniforms.shadowCameraParams = light.shadow.cameraParams;
 

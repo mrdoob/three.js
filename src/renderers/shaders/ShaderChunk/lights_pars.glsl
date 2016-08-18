@@ -22,7 +22,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		int shadow;
 		float shadowBias;
-		float shadowRadius;
+		float spreadAngle;
 		vec2 shadowMapSize;
 		vec3 shadowCameraParams;
 	};

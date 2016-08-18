@@ -4,8 +4,8 @@
 
 THREE.DirectionalLightShadow = function ( light ) {
 	var frustrumWidth = 300;
-	var spreadAngle = 3.14/4;
-	this.cameraParams = new THREE.Vector4( 2*frustrumWidth, 0.5, 1000 );
+	this.spreadAngle = 0.0;
+	this.cameraParams = new THREE.Vector3( 2*frustrumWidth, 0.5, 1000 );
 	THREE.LightShadow.call( this, new THREE.OrthographicCamera( - frustrumWidth, frustrumWidth, frustrumWidth, - frustrumWidth, this.cameraParams.y, this.cameraParams.z ) );
 };
 
