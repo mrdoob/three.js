@@ -21021,13 +21021,6 @@
 
 				}
 
-				if ( materialProperties.numClippingPlanes !== undefined &&
-					materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
-
-					material.needsUpdate = true;
-
-				}
-
 			}
 
 			if ( material.needsUpdate === false ) {
@@ -21041,6 +21034,11 @@
 					material.needsUpdate = true;
 
 				} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
+
+					material.needsUpdate = true;
+
+				} else if ( materialProperties.numClippingPlanes !== undefined &&
+					materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
 
 					material.needsUpdate = true;
 
