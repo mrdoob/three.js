@@ -10,6 +10,8 @@ UI.Texture = function ( mapping ) {
 
 	var dom = document.createElement( 'span' );
 
+	var form = document.createElement( 'form' );
+
 	var input = document.createElement( 'input' );
 	input.type = 'file';
 	input.addEventListener( 'change', function ( event ) {
@@ -17,6 +19,7 @@ UI.Texture = function ( mapping ) {
 		loadFile( event.target.files[ 0 ] );
 
 	} );
+	form.appendChild( input );
 
 	var canvas = document.createElement( 'canvas' );
 	canvas.width = 32;
@@ -44,12 +47,7 @@ UI.Texture = function ( mapping ) {
 	name.style.border = '1px solid #ccc';
 	dom.appendChild( name );
 
-	var form = document.createElement( 'form' );
-	form.appendChild( input );
-	form.style.display = 'none';
-	dom.appendChild( form );
-
-	var loadFile = function ( file ) {
+	function loadFile( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
 
@@ -63,7 +61,6 @@ UI.Texture = function ( mapping ) {
 
 					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
-					form.reset();
 
 					scope.setValue( texture );
 
@@ -85,7 +82,6 @@ UI.Texture = function ( mapping ) {
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );
-						form.reset();
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -101,7 +97,9 @@ UI.Texture = function ( mapping ) {
 
 		}
 
-	};
+		form.reset();
+
+	}
 
 	this.dom = dom;
 	this.texture = null;
