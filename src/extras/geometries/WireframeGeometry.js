@@ -179,7 +179,7 @@ function WireframeGeometry( geometry ) {
 
 	}
 
-};
+}
 
 WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
 WireframeGeometry.prototype.constructor = WireframeGeometry;

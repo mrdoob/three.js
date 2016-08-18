@@ -69,7 +69,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 	this.updateChildrenMatrixWorld();
 	this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
-};
+}
 
 
 SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {

@@ -27,7 +27,7 @@ function MorphBlendMesh( geometry, material ) {
 	this.createAnimation( name, startFrame, endFrame, fps );
 	this.setAnimationWeight( name, 1 );
 
-};
+}
 
 MorphBlendMesh.prototype = Object.create( Mesh.prototype );
 MorphBlendMesh.prototype.constructor = MorphBlendMesh;

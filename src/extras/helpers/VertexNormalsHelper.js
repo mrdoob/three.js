@@ -52,7 +52,7 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	this.update();
 
-};
+}
 
 VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
 VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;

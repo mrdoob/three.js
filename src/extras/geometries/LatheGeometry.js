@@ -30,7 +30,7 @@ function LatheGeometry( points, segments, phiStart, phiLength ) {
 	this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
 	this.mergeVertices();
 
-};
+}
 
 LatheGeometry.prototype = Object.create( Geometry.prototype );
 LatheGeometry.prototype.constructor = LatheGeometry;

@@ -150,12 +150,11 @@
 
 				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
 				border = document.getElementById( 'renderer_border' );
-				border.addEventListener("mousedown", onBorderMouseDown);
+				border.addEventListener( 'mousedown', onBorderMouseDown );
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousewheel', onMouseWheel, false );
-				window.addEventListener( 'MozMousePixelScroll', onMouseWheel, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'wheel', onMouseWheel, false );
 
 			}
 
@@ -340,7 +339,7 @@
 				mouse[1] = ev.clientY / window.innerHeight;
 			}
 			function onMouseWheel(ev) {
-				var amount = -ev.wheelDeltaY || ev.detail;
+				var amount = ev.deltaY;
 				if ( amount === 0 ) return;
 				var dir = amount / Math.abs(amount);
 				zoomspeed = dir/10;

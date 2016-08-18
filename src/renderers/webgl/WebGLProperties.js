@@ -34,7 +34,7 @@ function WebGLProperties() {
 
 	};
 
-};
+}
 
 
 export { WebGLProperties };

@@ -47,7 +47,7 @@ function SkeletonHelper( object ) {
 
 	this.update();
 
-};
+}
 
 
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );

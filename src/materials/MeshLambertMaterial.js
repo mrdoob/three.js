@@ -80,7 +80,7 @@ function MeshLambertMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshLambertMaterial.prototype = Object.create( Material.prototype );
 MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;

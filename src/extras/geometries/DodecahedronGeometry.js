@@ -54,7 +54,7 @@ function DodecahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-};
+}
 
 DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
 DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;

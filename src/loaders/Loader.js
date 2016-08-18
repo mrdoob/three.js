@@ -14,7 +14,7 @@ function Loader() {
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
-};
+}
 
 Loader.prototype = {
 

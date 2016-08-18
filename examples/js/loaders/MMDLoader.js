@@ -479,10 +479,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 		var parseBone = function () {
 
 			var p = {};
-			// Skinning animation doesn't work when bone name is Japanese Unicode in r73.
-			// So using charcode strings as workaround and keep original strings in .originalName.
-			p.originalName = dv.getSjisStringsAsUnicode( 20 );
-			p.name = helper.toCharcodeStrings( p.originalName );
+			p.name = dv.getSjisStringsAsUnicode( 20 );
 			p.parentIndex = dv.getInt16();
 			p.tailIndex = dv.getInt16();
 			p.type = dv.getUint8();
@@ -1085,10 +1082,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 		var parseBone = function () {
 
 			var p = {};
-			// Skinning animation doesn't work when bone name is Japanese Unicode in r73.
-			// So using charcode strings as workaround and keep original strings in .originalName.
-			p.originalName = dv.getTextBuffer();
-			p.name = helper.toCharcodeStrings( p.originalName );
+			p.name = dv.getTextBuffer();
 			p.englishName = dv.getTextBuffer();
 			p.position = dv.getFloat32Array( 3 );
 			p.parentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
@@ -1428,10 +1422,7 @@ THREE.MMDLoader.prototype.parseVmd = function ( buffer ) {
 		var parseMotion = function () {
 
 			var p = {};
-			// Skinning animation doesn't work when bone name is Japanese Unicode in r73.
-			// So using charcode strings as workaround and keep original strings in .originalName.
-			p.originalBoneName = dv.getSjisStringsAsUnicode( 15 );
-			p.boneName = helper.toCharcodeStrings( p.originalBoneName );
+			p.boneName = dv.getSjisStringsAsUnicode( 15 );
 			p.frameNum = dv.getUint32();
 			p.position = dv.getFloat32Array( 3 );
 			p.rotation = dv.getFloat32Array( 4 );
@@ -1649,8 +1640,7 @@ THREE.MMDLoader.prototype.parseVpd = function ( text ) {
 
 				bones.push( {
 
-					originalName: n,
-					name: helper.toCharcodeStrings( n ),
+					name: n,
 					translation: v,
 					quaternion: q
 
@@ -1808,9 +1798,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 					var link = {};
 					link.index = ik.links[ j ].index;
 
-					// Checking with .originalName, not .name.
-					// See parseBone() for the detail.
-					if ( model.bones[ link.index ].originalName.indexOf( 'ひざ' ) >= 0 ) {
+					if ( model.bones[ link.index ].name.indexOf( 'ひざ' ) >= 0 ) {
 
 						link.limitation = new THREE.Vector3( 1.0, 0.0, 0.0 );
 
@@ -2590,21 +2578,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	};
 
-	function saveOriginalBoneNames ( mesh ) {
-
-		var bones = mesh.skeleton.bones;
-		var bones2 = mesh.geometry.bones;
-
-		for ( var i = 0; i < bones.length; i++ ) {
-
-			var n = model.bones[ i ].originalName;
-			bones[ i ].originalName = n;
-			bones2[ i ].originalName = n;
-
-		}
-
-	};
-
 	this.leftToRightModel( model );
 
 	initVartices();
@@ -2623,8 +2596,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	geometry.mmdFormat = model.metadata.format;
 
 	var mesh = new THREE.SkinnedMesh( geometry, material );
-
-	saveOriginalBoneNames( mesh );
 
 	// console.log( mesh ); // for console debug
 

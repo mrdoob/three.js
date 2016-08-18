@@ -21,7 +21,7 @@ function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS
 
 	this.generateMipmaps = false;
 
-};
+}
 
 CompressedTexture.prototype = Object.create( Texture.prototype );
 CompressedTexture.prototype.constructor = CompressedTexture;

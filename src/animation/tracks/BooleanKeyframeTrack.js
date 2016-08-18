@@ -16,7 +16,7 @@ function BooleanKeyframeTrack( name, times, values ) {
 
 	KeyframeTrackConstructor.call( this, name, times, values );
 
-};
+}
 
 BooleanKeyframeTrack.prototype =
 		Object.assign( Object.create( KeyframeTrackPrototype ), {

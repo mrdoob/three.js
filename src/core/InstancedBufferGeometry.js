@@ -11,12 +11,12 @@ function InstancedBufferGeometry() {
 	this.type = 'InstancedBufferGeometry';
 	this.maxInstancedCount = undefined;
 
-};
+}
 
 InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
 
-InstancedBufferGeometry.prototype.isBufferGeometry = true;
+InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
 

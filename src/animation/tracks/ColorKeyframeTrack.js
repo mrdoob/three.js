@@ -15,7 +15,7 @@ function ColorKeyframeTrack( name, times, values, interpolation ) {
 
 	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
 ColorKeyframeTrack.prototype =
 		Object.assign( Object.create( KeyframeTrackPrototype ), {

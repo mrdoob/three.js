@@ -95,7 +95,7 @@ function Object3D() {
 	this._quaternion = this.quaternion.clone();
 	this._scale = this.scale.clone();
 
-};
+}
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
@@ -583,6 +583,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 	},
 	
 	updateMatrixWorld: function () {
+
 
     	var parent = this.parent; 
 

@@ -86,7 +86,7 @@ function CubeCamera( near, far, cubeResolution ) {
 
 	};
 
-};
+}
 
 CubeCamera.prototype = Object.create( Object3D.prototype );
 CubeCamera.prototype.constructor = CubeCamera;

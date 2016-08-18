@@ -163,7 +163,7 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	}
 
-};
+}
 
 TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;

@@ -4,7 +4,7 @@
  *
  * Some common of Curve methods
  * .getPoint(t), getTangent(t)
- * .getPointAt(u), getTagentAt(u)
+ * .getPointAt(u), getTangentAt(u)
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()

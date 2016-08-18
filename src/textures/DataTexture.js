@@ -17,7 +17,7 @@ function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, 
 	this.flipY = false;
 	this.generateMipmaps  = false;
 
-};
+}
 
 DataTexture.prototype = Object.create( Texture.prototype );
 DataTexture.prototype.constructor = DataTexture;

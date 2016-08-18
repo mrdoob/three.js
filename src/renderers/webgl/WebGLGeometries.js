@@ -142,7 +142,7 @@ function WebGLGeometries( gl, properties, info ) {
 
 	this.get = get;
 
-};
+}
 
 
 export { WebGLGeometries };

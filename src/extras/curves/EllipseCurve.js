@@ -20,7 +20,7 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 	this.aRotation = aRotation || 0;
 
-};
+}
 
 EllipseCurve.prototype = Object.create( Curve.prototype );
 EllipseCurve.prototype.constructor = EllipseCurve;

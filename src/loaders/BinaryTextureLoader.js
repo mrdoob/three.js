@@ -17,7 +17,7 @@ function BinaryTextureLoader( manager ) {
 	// override in sub classes
 	this._parser = null;
 
-};
+}
 
 Object.assign( BinaryTextureLoader.prototype, {
 

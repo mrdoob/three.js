@@ -10,7 +10,7 @@ function Group() {
 
 	this.type = 'Group';
 
-};
+}
 
 Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

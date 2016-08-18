@@ -374,7 +374,7 @@ function SpritePlugin( renderer, sprites ) {
 
 	}
 
-};
+}
 
 
 export { SpritePlugin };

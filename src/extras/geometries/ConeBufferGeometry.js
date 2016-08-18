@@ -26,7 +26,7 @@ function ConeBufferGeometry(
 		thetaLength: thetaLength
 	};
 
-};
+}
 
 ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;

@@ -31,7 +31,7 @@ function LineBasicMaterial( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 LineBasicMaterial.prototype = Object.create( Material.prototype );
 LineBasicMaterial.prototype.constructor = LineBasicMaterial;

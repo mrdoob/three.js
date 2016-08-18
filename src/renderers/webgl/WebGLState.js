@@ -919,7 +919,7 @@ function WebGLStencilBuffer( gl, state ) {
 
 	};
 
-};
+}
 
 
 export { WebGLStencilBuffer, WebGLDepthBuffer, WebGLColorBuffer, WebGLState };
