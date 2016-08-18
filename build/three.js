@@ -40609,9 +40609,9 @@
 		return new Face3( a, b, c, normal, color, materialIndex );
 	}
 
-	const LineStrip = 0;
+	var LineStrip = 0;
 
-	const LinePieces = 1;
+	var LinePieces = 1;
 
 	function PointCloud ( geometry, material ) {
 		console.warn( 'THREE.PointCloud has been renamed to THREE.Points.' );
@@ -41252,7 +41252,7 @@
 
 	//
 
-	const GeometryUtils = {
+	var GeometryUtils = {
 
 		merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
@@ -41282,7 +41282,7 @@
 
 	};
 
-	const ImageUtils = {
+	var ImageUtils = {
 
 		crossOrigin: undefined,
 
