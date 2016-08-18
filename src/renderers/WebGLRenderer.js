@@ -39,6 +39,19 @@ import { Color } from '../math/Color';
  * @author tschw
  */
 
+function RenderList () {
+
+	Array.call( this );
+	this.liveEntries = 0;
+
+}
+
+RenderList.prototype = Object.assign( Object.create( Array.prototype ), {
+
+	constructor: RenderList
+
+} );
+
 function WebGLRenderer( parameters ) {
 
 	console.log( 'THREE.WebGLRenderer', REVISION );
@@ -57,10 +70,8 @@ function WebGLRenderer( parameters ) {
 
 	var lights = [];
 
-	var opaqueObjects = [];
-	var opaqueObjectsLastIndex = - 1;
-	var transparentObjects = [];
-	var transparentObjectsLastIndex = - 1;
+	var opaqueObjects = null;
+	var transparentObjects = null;
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -546,10 +557,8 @@ function WebGLRenderer( parameters ) {
 
 	this.dispose = function() {
 
-		transparentObjects = [];
-		transparentObjectsLastIndex = -1;
-		opaqueObjects = [];
-		opaqueObjectsLastIndex = -1;
+		transparentObjects = null;
+		opaqueObjects = null;
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
@@ -1146,8 +1155,25 @@ function WebGLRenderer( parameters ) {
 
 		lights.length = 0;
 
-		opaqueObjectsLastIndex = - 1;
-		transparentObjectsLastIndex = - 1;
+		if ( scene._opaqueObjects === undefined ) {
+
+			scene._opaqueObjects = new RenderList();
+
+		}
+
+		opaqueObjects = scene._opaqueObjects;
+
+		if ( scene._transparentObjects === undefined ) {
+
+			scene._transparentObjects = new RenderList();
+
+		}
+
+		transparentObjects = scene._transparentObjects;
+
+
+		opaqueObjects.liveEntries = 0;
+		transparentObjects.liveEntries = 0;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -1157,8 +1183,8 @@ function WebGLRenderer( parameters ) {
 
 		projectObject( scene, camera );
 
-		opaqueObjects.length = opaqueObjectsLastIndex + 1;
-		transparentObjects.length = transparentObjectsLastIndex + 1;
+		opaqueObjects.length = opaqueObjects.liveEntries;
+		transparentObjects.length = transparentObjects.liveEntries;
 
 		if ( _this.sortObjects === true ) {
 
@@ -1285,25 +1311,23 @@ function WebGLRenderer( parameters ) {
 
 	function pushRenderItem( object, geometry, material, z, group ) {
 
-		var array, index;
+		var array;
 
 		// allocate the next position in the appropriate array
 
 		if ( material.transparent ) {
 
 			array = transparentObjects;
-			index = ++ transparentObjectsLastIndex;
 
 		} else {
 
 			array = opaqueObjects;
-			index = ++ opaqueObjectsLastIndex;
 
 		}
 
 		// recycle existing render item or grow the array
 
-		var renderItem = array[ index ];
+		var renderItem = array[ array.liveEntries ++ ];
 
 		if ( renderItem !== undefined ) {
 
