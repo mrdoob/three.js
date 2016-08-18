@@ -44,9 +44,9 @@ export function Face4 ( a, b, c, d, normal, color, materialIndex ) {
 	return new Face3( a, b, c, normal, color, materialIndex );
 }
 
-export const LineStrip = 0;
+export var LineStrip = 0;
 
-export const LinePieces = 1;
+export var LinePieces = 1;
 
 export { MultiMaterial as MeshFaceMaterial };
 
@@ -691,7 +691,7 @@ Object.assign( AudioAnalyser.prototype, {
 
 //
 
-export const GeometryUtils = {
+export var GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
@@ -721,7 +721,7 @@ export const GeometryUtils = {
 
 };
 
-export const ImageUtils = {
+export var ImageUtils = {
 
 	crossOrigin: undefined,
 
