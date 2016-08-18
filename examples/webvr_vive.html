@@ -2,363 +2,359 @@
 <html lang="en">
 
 <head>
-    <title>three.js webvr - htc vive</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <style>
-        body {
-            font-family: Monospace;
-            background-color: #101010;
-            color: #fff;
-            margin: 0px;
-            overflow: hidden;
-        }
-        
-        a {
-            color: #f00;
-        }
+	<title>three.js webvr - htc vive</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<style>
+		body {
+			font-family: Monospace;
+			background-color: #101010;
+			color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		}
+		
+		a {
+			color: #f00;
+		}
 
-    </style>
+	</style>
 </head>
 
 <body>
+	<script src="../build/three.js"></script>
+	<script src="js/WebVR.js"></script>
+	<script src="js/effects/VREffect.js"></script>
+	<script src="js/controls/VRControls.js"></script>
+	<script src="js/ViveController.js"></script>
+	<script src="js/loaders/OBJLoader.js"></script>
+	<script>
+		if (WEBVR.isLatestAvailable() === false) {
 
-    <script src="../build/three.js"></script>
+			document.body.appendChild(WEBVR.getMessage());
 
-    <script src="js/WebVR.js"></script>
-    <script src="js/effects/VREffect.js"></script>
-    <script src="js/controls/VRControls.js"></script>
-    <script src="js/ViveController.js"></script>
+		}
 
-    <script src="js/loaders/OBJLoader.js"></script>
+		//
 
-    <script>
-        if (WEBVR.isLatestAvailable() === false) {
+		var clock = new THREE.Clock();
 
-            document.body.appendChild(WEBVR.getMessage());
+		var container;
+		var camera, scene, renderer;
+		var effect, controls;
+		var controller1, controller2, controllerRay;
 
-        }
+		var raycaster;
+		var INTERSECTED;
 
-        //
+		var room;
 
-        var clock = new THREE.Clock();
+		init();
+		animate();
 
-        var container;
-        var camera, scene, renderer;
-        var effect, controls;
-        var controller1, controller2, controllerRay;
+		function init() {
 
-        var raycaster;
-        var INTERSECTED;
+			container = document.createElement('div');
+			document.body.appendChild(container);
 
-        var room;
+			var info = document.createElement('div');
+			info.style.position = 'absolute';
+			info.style.top = '10px';
+			info.style.width = '100%';
+			info.style.textAlign = 'center';
+			info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - htc vive';
+			container.appendChild(info);
 
-        init();
-        animate();
+			scene = new THREE.Scene();
 
-        function init() {
+			camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
+			scene.add(camera);
 
-            container = document.createElement('div');
-            document.body.appendChild(container);
+			room = new THREE.Mesh(
+				new THREE.BoxGeometry(6, 6, 6, 8, 8, 8),
+				new THREE.MeshBasicMaterial({
+					color: 0x404040,
+					wireframe: true
+				})
+			);
+			room.position.y = 3;
+			scene.add(room);
 
-            var info = document.createElement('div');
-            info.style.position = 'absolute';
-            info.style.top = '10px';
-            info.style.width = '100%';
-            info.style.textAlign = 'center';
-            info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - htc vive';
-            container.appendChild(info);
+			scene.add(new THREE.HemisphereLight(0x606060, 0x404040));
 
-            scene = new THREE.Scene();
+			var light = new THREE.DirectionalLight(0xffffff);
+			light.position.set(1, 1, 1).normalize();
+			scene.add(light);
 
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10);
-            scene.add(camera);
+			var geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
 
-            room = new THREE.Mesh(
-                new THREE.BoxGeometry(6, 6, 6, 8, 8, 8),
-                new THREE.MeshBasicMaterial({
-                    color: 0x404040,
-                    wireframe: true
-                })
-            );
-            room.position.y = 3;
-            scene.add(room);
+			for (var i = 0; i < 200; i++) {
 
-            scene.add(new THREE.HemisphereLight(0x606060, 0x404040));
+				var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+					color: Math.random() * 0xffffff
+				}));
 
-            var light = new THREE.DirectionalLight(0xffffff);
-            light.position.set(1, 1, 1).normalize();
-            scene.add(light);
+				object.position.x = Math.random() * 4 - 2;
+				object.position.y = Math.random() * 4 - 2;
+				object.position.z = Math.random() * 4 - 2;
 
-            var geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+				object.rotation.x = Math.random() * 2 * Math.PI;
+				object.rotation.y = Math.random() * 2 * Math.PI;
+				object.rotation.z = Math.random() * 2 * Math.PI;
 
-            for (var i = 0; i < 200; i++) {
+				object.scale.x = Math.random() + 0.5;
+				object.scale.y = Math.random() + 0.5;
+				object.scale.z = Math.random() + 0.5;
 
-                var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-                    color: Math.random() * 0xffffff
-                }));
+				object.userData.velocity = new THREE.Vector3();
+				object.userData.velocity.x = Math.random() * 0.01 - 0.005;
+				object.userData.velocity.y = Math.random() * 0.01 - 0.005;
+				object.userData.velocity.z = Math.random() * 0.01 - 0.005;
 
-                object.position.x = Math.random() * 4 - 2;
-                object.position.y = Math.random() * 4 - 2;
-                object.position.z = Math.random() * 4 - 2;
+				room.add(object);
 
-                object.rotation.x = Math.random() * 2 * Math.PI;
-                object.rotation.y = Math.random() * 2 * Math.PI;
-                object.rotation.z = Math.random() * 2 * Math.PI;
+			}
 
-                object.scale.x = Math.random() + 0.5;
-                object.scale.y = Math.random() + 0.5;
-                object.scale.z = Math.random() + 0.5;
+			raycaster = new THREE.Raycaster();
 
-                object.userData.velocity = new THREE.Vector3();
-                object.userData.velocity.x = Math.random() * 0.01 - 0.005;
-                object.userData.velocity.y = Math.random() * 0.01 - 0.005;
-                object.userData.velocity.z = Math.random() * 0.01 - 0.005;
+			var material = new THREE.MeshStandardMaterial();
 
-                room.add(object);
+			var loader = new THREE.OBJLoader();
+			loader.setPath('models/obj/cerberus/');
+			loader.load('Cerberus.obj', function(group) {
 
-            }
+				// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
-            raycaster = new THREE.Raycaster();
+				var loader = new THREE.TextureLoader();
+				loader.setPath('models/obj/cerberus/');
 
-            var material = new THREE.MeshStandardMaterial();
+				material.roughness = 1;
+				material.metalness = 1;
 
-            var loader = new THREE.OBJLoader();
-            loader.setPath('models/obj/cerberus/');
-            loader.load('Cerberus.obj', function(group) {
+				material.map = loader.load('Cerberus_A.jpg');
+				material.roughnessMap = loader.load('Cerberus_R.jpg');
+				material.metalnessMap = loader.load('Cerberus_M.jpg');
+				material.normalMap = loader.load('Cerberus_N.jpg');
 
-                // var material = new THREE.MeshBasicMaterial( { wireframe: true } );
+				material.map.wrapS = THREE.RepeatWrapping;
+				material.roughnessMap.wrapS = THREE.RepeatWrapping;
+				material.metalnessMap.wrapS = THREE.RepeatWrapping;
+				material.normalMap.wrapS = THREE.RepeatWrapping;
 
-                var loader = new THREE.TextureLoader();
-                loader.setPath('models/obj/cerberus/');
+				group.traverse(function(child) {
 
-                material.roughness = 1;
-                material.metalness = 1;
+					if (child instanceof THREE.Mesh) {
 
-                material.map = loader.load('Cerberus_A.jpg');
-                material.roughnessMap = loader.load('Cerberus_R.jpg');
-                material.metalnessMap = loader.load('Cerberus_M.jpg');
-                material.normalMap = loader.load('Cerberus_N.jpg');
+						child.material = material;
 
-                material.map.wrapS = THREE.RepeatWrapping;
-                material.roughnessMap.wrapS = THREE.RepeatWrapping;
-                material.metalnessMap.wrapS = THREE.RepeatWrapping;
-                material.normalMap.wrapS = THREE.RepeatWrapping;
+					}
 
-                group.traverse(function(child) {
+				});
 
-                    if (child instanceof THREE.Mesh) {
+				group.position.y = -2;
+				group.rotation.y = -Math.PI / 2;
+				room.add(group);
 
-                        child.material = material;
+			});
 
-                    }
+			var loader = new THREE.CubeTextureLoader();
+			loader.setPath('textures/cube/pisa/');
+			material.envMap = loader.load([
+				"px.png", "nx.png",
+				"py.png", "ny.png",
+				"pz.png", "nz.png"
+			]);
 
-                });
+			//
 
-                group.position.y = -2;
-                group.rotation.y = -Math.PI / 2;
-                room.add(group);
+			renderer = new THREE.WebGLRenderer({
+				antialias: true
+			});
+			renderer.setClearColor(0x505050);
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.sortObjects = false;
+			container.appendChild(renderer.domElement);
 
-            });
+			controls = new THREE.VRControls(camera);
+			controls.standing = true;
 
-            var loader = new THREE.CubeTextureLoader();
-            loader.setPath('textures/cube/pisa/');
-            material.envMap = loader.load([
-                "px.png", "nx.png",
-                "py.png", "ny.png",
-                "pz.png", "nz.png"
-            ]);
+			// controllers
 
-            //
+			controller1 = new THREE.ViveController(0);
+			controller1.standingMatrix = controls.getStandingMatrix();
+			scene.add(controller1);
 
-            renderer = new THREE.WebGLRenderer({
-                antialias: true
-            });
-            renderer.setClearColor(0x505050);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.sortObjects = false;
-            container.appendChild(renderer.domElement);
+			controller2 = new THREE.ViveController(1);
+			controller2.standingMatrix = controls.getStandingMatrix();
+			scene.add(controller2);
 
-            controls = new THREE.VRControls(camera);
-            controls.standing = true;
+			var loader = new THREE.OBJLoader();
+			loader.setPath('models/obj/vive-controller/');
+			loader.load('vr_controller_vive_1_5.obj', function(object) {
 
-            // controllers
+				var loader = new THREE.TextureLoader();
+				loader.setPath('models/obj/vive-controller/');
 
-            controller1 = new THREE.ViveController(0);
-            controller1.standingMatrix = controls.getStandingMatrix();
-            scene.add(controller1);
+				var controller = object.children[0];
+				controller.material.map = loader.load('onepointfive_texture.png');
+				controller.material.specularMap = loader.load('onepointfive_spec.png');
 
-            controller2 = new THREE.ViveController(1);
-            controller2.standingMatrix = controls.getStandingMatrix();
-            scene.add(controller2);
+				controller1.add(object.clone());
+				controller2.add(object.clone());
 
-            var loader = new THREE.OBJLoader();
-            loader.setPath('models/obj/vive-controller/');
-            loader.load('vr_controller_vive_1_5.obj', function(object) {
+			});
 
-                var loader = new THREE.TextureLoader();
-                loader.setPath('models/obj/vive-controller/');
+			// controller ray
 
-                var controller = object.children[0];
-                controller.material.map = loader.load('onepointfive_texture.png');
-                controller.material.specularMap = loader.load('onepointfive_spec.png');
+			var dir = new THREE.Vector3(0, 0, -1);
+			var origin = new THREE.Vector3(0, 0, 0);
 
-                controller1.add(object.clone());
-                controller2.add(object.clone());
+			controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
+			controllerRay.direction = dir;
+			controllerRay.visible = true;
+			controller1.add(controllerRay);
 
-            });
+			effect = new THREE.VREffect(renderer);
 
-            // controller ray
+			if (WEBVR.isAvailable() === true) {
 
-            var dir = new THREE.Vector3(0, 0, -1);
-            var origin = new THREE.Vector3(0, 0, 0);
+				document.body.appendChild(WEBVR.getButton(effect));
 
-            controllerRay = new THREE.ArrowHelper(dir, origin, 100, 0x000000, 1, 1);
-            controllerRay.direction = dir;
-            controllerRay.visible = true;
-            controller1.add(controllerRay);
+			}
 
-            effect = new THREE.VREffect(renderer);
+			//
 
-            if (WEBVR.isAvailable() === true) {
+			window.addEventListener('resize', onWindowResize, false);
 
-                document.body.appendChild(WEBVR.getButton(effect));
+		}
 
-            }
+		function onWindowResize() {
 
-            //
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
 
-            window.addEventListener('resize', onWindowResize, false);
+			effect.setSize(window.innerWidth, window.innerHeight);
 
-        }
+		}
 
-        function onWindowResize() {
+		//
 
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+		function animate() {
 
-            effect.setSize(window.innerWidth, window.innerHeight);
+			effect.requestAnimationFrame(animate);
+			updateControllerRay();
+			render();
 
-        }
+		}
 
-        //
+		function updateControllerRay() {
 
-        function animate() {
+			if (controllerRay.visible) {
 
-            effect.requestAnimationFrame(animate);
-            updateControllerRay();
-            render();
+				// raycasting
 
-        }
+				var matrix = new THREE.Matrix4();
+				matrix.extractRotation(controller1.matrix);
 
-        function updateControllerRay() {
+				var direction = new THREE.Vector3(0, 0, 1);
+				direction.applyMatrix4(matrix);
+				direction.multiplyScalar(-1);
 
-            if (controllerRay.visible) {
+				var globalControllerPos = new THREE.Vector3();
+				globalControllerPos.setFromMatrixPosition(controller1.matrixWorld);
 
-                // raycasting
+				raycaster.set(globalControllerPos, direction);
 
-                var matrix = new THREE.Matrix4();
-                matrix.extractRotation(controller1.matrix);
+				var intersections = raycaster.intersectObjects(scene.children, true);
 
-                var direction = new THREE.Vector3(0, 0, 1);
-                direction.applyMatrix4(matrix);
-                direction.multiplyScalar(-1);
+				var filteredIntersections = null;
+				var intersectedObj = null;
 
-                var globalControllerPos = new THREE.Vector3();
-                globalControllerPos.setFromMatrixPosition(controller1.matrixWorld);
+				if (intersections.length > 0) {
 
-                raycaster.set(globalControllerPos, direction);
+					filteredIntersections = intersections
+						.filter(function(obj) {
+							return obj.object.type == 'Mesh';
+						});
 
-                var intersections = raycaster.intersectObjects(scene.children, true);
+					var intersectedObj = filteredIntersections[0] != null ? filteredIntersections[0] : null;
 
-                var filteredIntersections = null;
-                var intersectedObj = null;
+					//                        var intersectedObj = intersections[1] != null ? intersections[1] : null; 
 
-                if (intersections.length > 0) {
+				}
 
-                    filteredIntersections = intersections
-                        .filter(function(obj) {
-                            return obj.object.type == 'Mesh';
-                        });
 
-                    var intersectedObj = filteredIntersections[0] != null ? filteredIntersections[0] : null;
+				if (intersectedObj) {
 
-                    //                        var intersectedObj = intersections[1] != null ? intersections[1] : null; 
+					if (INTERSECTED != null) {
 
-                }
+						INTERSECTED.material.color.set(INTERSECTED.oldColor);
 
+					}
 
-                if (intersectedObj) {
+					INTERSECTED = intersectedObj.object;
+					INTERSECTED.oldColor = new THREE.Color();
+					INTERSECTED.oldColor.copy(INTERSECTED.material.color);
 
-                    if (INTERSECTED != null) {
+					INTERSECTED.material.color = new THREE.Color(1, 0, 0);
 
-                        INTERSECTED.material.color.set(INTERSECTED.oldColor);
+				} else {
+					if (INTERSECTED != null) {
 
-                    }
+						INTERSECTED.material.color.set(INTERSECTED.oldColor);
 
-                    INTERSECTED = intersectedObj.object;
-                    INTERSECTED.oldColor = new THREE.Color();
-                    INTERSECTED.oldColor.copy(INTERSECTED.material.color);
+					}
 
-                    INTERSECTED.material.color = new THREE.Color(1, 0, 0);
+					INTERSECTED = null;
+				}
+			}
+		}
 
-                } else {
-                    if (INTERSECTED != null) {
+		function render() {
 
-                        INTERSECTED.material.color.set(INTERSECTED.oldColor);
+			var delta = clock.getDelta() * 60;
 
-                    }
+			controls.update();
 
-                    INTERSECTED = null;
-                }
-            }
-        }
+			for (var i = 0; i < room.children.length; i++) {
 
-        function render() {
+				var cube = room.children[i];
 
-            var delta = clock.getDelta() * 60;
+				if (cube.geometry instanceof THREE.BoxGeometry === false) continue;
 
-            controls.update();
+				// cube.position.add( cube.userData.velocity );
 
-            for (var i = 0; i < room.children.length; i++) {
+				if (cube.position.x < -3 || cube.position.x > 3) {
 
-                var cube = room.children[i];
+					cube.position.x = THREE.Math.clamp(cube.position.x, -3, 3);
+					cube.userData.velocity.x = -cube.userData.velocity.x;
 
-                if (cube.geometry instanceof THREE.BoxGeometry === false) continue;
+				}
 
-                // cube.position.add( cube.userData.velocity );
+				if (cube.position.y < -3 || cube.position.y > 3) {
 
-                if (cube.position.x < -3 || cube.position.x > 3) {
+					cube.position.y = THREE.Math.clamp(cube.position.y, -3, 3);
+					cube.userData.velocity.y = -cube.userData.velocity.y;
 
-                    cube.position.x = THREE.Math.clamp(cube.position.x, -3, 3);
-                    cube.userData.velocity.x = -cube.userData.velocity.x;
+				}
 
-                }
+				if (cube.position.z < -3 || cube.position.z > 3) {
 
-                if (cube.position.y < -3 || cube.position.y > 3) {
+					cube.position.z = THREE.Math.clamp(cube.position.z, -3, 3);
+					cube.userData.velocity.z = -cube.userData.velocity.z;
 
-                    cube.position.y = THREE.Math.clamp(cube.position.y, -3, 3);
-                    cube.userData.velocity.y = -cube.userData.velocity.y;
+				}
 
-                }
+				cube.rotation.x += 0.01 * delta;
 
-                if (cube.position.z < -3 || cube.position.z > 3) {
+			}
 
-                    cube.position.z = THREE.Math.clamp(cube.position.z, -3, 3);
-                    cube.userData.velocity.z = -cube.userData.velocity.z;
+			effect.render(scene, camera);
 
-                }
+		}
 
-                cube.rotation.x += 0.01 * delta;
-
-            }
-
-            effect.render(scene, camera);
-
-        }
-
-    </script>
+	</script>
 </body>
 
 </html>
