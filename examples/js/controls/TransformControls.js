@@ -1112,7 +1112,7 @@
 			}
 
 			_dragging = false;
-			
+
 			if ( 'TouchEvent' in window && event instanceof TouchEvent ) {
 
 				// Force "rollover"
@@ -1126,7 +1126,7 @@
 				onPointerHover( event );
 
 			}
-				
+
 		}
 
 		function intersectObjects( pointer, objects ) {
