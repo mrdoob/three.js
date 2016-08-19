@@ -1,9 +1,9 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { BufferAttribute } from '../../core/BufferAttribute';
 import { WebGLGeometries } from './WebGLGeometries';
-
-/**
-* @author mrdoob / http://mrdoob.com/
-*/
 
 function WebGLObjects( gl, properties, info ) {
 

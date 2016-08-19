@@ -1,6 +1,6 @@
 /**
-* @author fordacious / fordacious.github.io
-*/
+ * @author fordacious / fordacious.github.io
+ */
 
 function WebGLProperties() {
 
