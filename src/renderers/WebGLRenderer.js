@@ -73,6 +73,9 @@ function WebGLRenderer( parameters ) {
 	var opaqueObjects = null;
 	var transparentObjects = null;
 
+	var opaqueRenderLists = [];
+	var transparentRenderLists = [];
+
 	var morphInfluences = new Float32Array( 8 );
 
 	var sprites = [];
@@ -557,8 +560,11 @@ function WebGLRenderer( parameters ) {
 
 	this.dispose = function() {
 
-		transparentObjects = null;
 		opaqueObjects = null;
+		transparentObjects = null;
+
+		opaqueRenderLists = [];
+		transparentRenderLists = [];
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
@@ -1155,21 +1161,22 @@ function WebGLRenderer( parameters ) {
 
 		lights.length = 0;
 
-		if ( scene._opaqueObjects === undefined ) {
+		if ( opaqueRenderLists[ scene.id ] === undefined ) {
 
-			scene._opaqueObjects = new RenderList();
-
-		}
-
-		opaqueObjects = scene._opaqueObjects;
-
-		if ( scene._transparentObjects === undefined ) {
-
-			scene._transparentObjects = new RenderList();
+			opaqueRenderLists[ scene.id ] = new RenderList();
 
 		}
 
-		transparentObjects = scene._transparentObjects;
+		opaqueObjects = opaqueRenderLists[ scene.id ];
+
+
+		if ( transparentRenderLists[ scene.id ] === undefined ) {
+
+			transparentRenderLists[ scene.id ] = new RenderList();
+
+		}
+
+		transparentObjects = transparentRenderLists[ scene.id ];
 
 
 		opaqueObjects.liveEntries = 0;
