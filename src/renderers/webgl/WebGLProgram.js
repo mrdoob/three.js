@@ -287,7 +287,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 	var prefixVertex, prefixFragment;
 
-	if ( (material && material.isRawShaderMaterial) ) {
+	if ( material.isRawShaderMaterial ) {
 
 		prefixVertex = [
 
@@ -300,7 +300,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 		prefixFragment = [
 
 			customExtensions,
-
 			customDefines,
 
 			'\n'
@@ -492,7 +491,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 	fragmentShader = parseIncludes( fragmentShader, parameters );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 
-	if ( (material && material.isShaderMaterial) === false ) {
+	if ( ! material.isShaderMaterial ) {
 
 		vertexShader = unrollLoops( vertexShader );
 		fragmentShader = unrollLoops( fragmentShader );
