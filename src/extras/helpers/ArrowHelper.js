@@ -8,8 +8,6 @@ import { Mesh } from '../../objects/Mesh';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
 import { Line } from '../../objects/Line';
 
-var ArrowHelper;
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / http://github.com/zz85
@@ -26,41 +24,37 @@ var ArrowHelper;
  *  headWidth - Number
  */
 
-ArrowHelper = ( function () {
+var lineGeometry = new BufferGeometry();
+lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-	var lineGeometry = new BufferGeometry();
-	lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+coneGeometry.translate( 0, - 0.5, 0 );
 
-	var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-	coneGeometry.translate( 0, - 0.5, 0 );
+function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
-	return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
+	// dir is assumed to be normalized
 
-		// dir is assumed to be normalized
+	Object3D.call( this );
 
-		Object3D.call( this );
+	if ( color === undefined ) color = 0xffff00;
+	if ( length === undefined ) length = 1;
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-		if ( color === undefined ) color = 0xffff00;
-		if ( length === undefined ) length = 1;
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+	this.position.copy( origin );
 
-		this.position.copy( origin );
+	this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line.matrixAutoUpdate = false;
+	this.add( this.line );
 
-		this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
-		this.line.matrixAutoUpdate = false;
-		this.add( this.line );
+	this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone.matrixAutoUpdate = false;
+	this.add( this.cone );
 
-		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
-		this.cone.matrixAutoUpdate = false;
-		this.add( this.cone );
+	this.setDirection( dir );
+	this.setLength( length, headLength, headWidth );
 
-		this.setDirection( dir );
-		this.setLength( length, headLength, headWidth );
-
-	};
-
-}() );
+}
 
 ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
