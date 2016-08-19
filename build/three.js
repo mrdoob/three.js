@@ -7194,11 +7194,11 @@
 			locked = false;
 
 			currentColorMask = null;
-			currentColorClear = new Vector4();
+			currentColorClear.set( 0, 0, 0, 1 );
 
 		};
 
-	};
+	}
 
 	function WebGLDepthBuffer( gl, state ) {
 
