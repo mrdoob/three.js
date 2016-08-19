@@ -291,13 +291,19 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 		prefixVertex = [
 
-			customDefines
+			customDefines,
+
+			'\n'
 
 		].filter( filterEmptyLine ).join( '\n' );
 
 		prefixFragment = [
 
-			customDefines
+			customExtensions,
+
+			customDefines,
+
+			'\n'
 
 		].filter( filterEmptyLine ).join( '\n' );
 
