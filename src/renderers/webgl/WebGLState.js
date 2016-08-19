@@ -683,11 +683,11 @@ function WebGLColorBuffer( gl, state ) {
 		locked = false;
 
 		currentColorMask = null;
-		currentColorClear.set(0, 0, 0, 1);
+		currentColorClear.set( 0, 0, 0, 1 );
 
 	};
 
-};
+}
 
 function WebGLDepthBuffer( gl, state ) {
 
