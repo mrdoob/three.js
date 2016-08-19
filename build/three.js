@@ -11239,31 +11239,35 @@
 
 		var properties = {};
 
-		this.get = function ( object ) {
+		return {
 
-			var uuid = object.uuid;
-			var map = properties[ uuid ];
+			get: function ( object ) {
 
-			if ( map === undefined ) {
+				var uuid = object.uuid;
+				var map = properties[ uuid ];
 
-				map = {};
-				properties[ uuid ] = map;
+				if ( map === undefined ) {
+
+					map = {};
+					properties[ uuid ] = map;
+
+				}
+
+				return map;
+
+			},
+
+			delete: function ( object ) {
+
+				delete properties[ object.uuid ];
+
+			},
+
+			clear: function () {
+
+				properties = {};
 
 			}
-
-			return map;
-
-		};
-
-		this.delete = function ( object ) {
-
-			delete properties[ object.uuid ];
-
-		};
-
-		this.clear = function () {
-
-			properties = {};
 
 		};
 
