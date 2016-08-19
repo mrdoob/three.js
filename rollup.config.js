@@ -30,6 +30,5 @@ export default {
 	plugins: [
 		glsl()
 	],
-	banner: '// threejs.org/license \n',
 	outro: outro
 };

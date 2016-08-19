@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "build-min": "rollup -c && uglifyjs build/three.js -cm --comments /threejs.org\\\/license/ > build/three.min.js",
+    "build-min": "rollup -c && uglifyjs build/three.js -cm --preamble \"\/\/ threejs.org\/license\" > build/three.min.js",
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
