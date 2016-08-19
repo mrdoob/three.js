@@ -196,11 +196,26 @@
 
 				effect = new THREE.VREffect( renderer );
 
-				if ( WEBVR.isAvailable() === true ) {
+				//this is dispatched when no WebVR displays are available. In Windows browsers this will be empty unless a headset is attatched.
+				effect.addEventListener("hmdnotavailable",function(event) {
+					console.log("HMD Not Available");
+				});
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
+				//HMD display availability here
+				effect.addEventListener("hmdavailable", function(event) {
 
-				}
+					if ( WEBVR.isAvailable() === true ) {
+
+						document.body.appendChild( WEBVR.getButton( effect ) );
+
+					}
+
+				});
+
+				//if the WebVR display is not presentable do WebVR fallbacks here or hide WebVR button.
+				effect.addEventListener("hmdpresentdisabled", function(event) {
+					console.log("HMD Display Can't Present");
+				});
 
 				//
 

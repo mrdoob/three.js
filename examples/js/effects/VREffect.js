@@ -9,7 +9,7 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function ( renderer ) {
 
 	var isWebVR1 = true;
 
@@ -18,6 +18,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
+	var scope = this;
 
 	function gotVRDisplays( displays ) {
 
@@ -25,8 +26,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		for ( var i = 0; i < displays.length; i ++ ) {
 
-			if ( 'VRDisplay' in window && displays[ i ] instanceof VRDisplay ) {
-
+			if ( 'VRDisplay' in window && displays[ i ] instanceof VRDisplay) {
 				vrDisplay = displays[ i ];
 				isWebVR1 = true;
 				break; // We keep the first we encounter
@@ -42,9 +42,11 @@ THREE.VREffect = function ( renderer, onError ) {
 		}
 
 		if ( vrDisplay === undefined ) {
-
-			if ( onError ) onError( 'HMD not available' );
-
+			scope.dispatchEvent( { type: "hmdnotavailable", message: 'HMD not available' } );
+		} else if (isWebVR1 && !vrDisplay.capabilities.canPresent) {
+			scope.dispatchEvent( { type: "hmdpresentdisabled", message: 'HMD cannot present', displays: vrDisplays, display: vrDisplay, webvr1: isWebVR1 } );
+		} else {
+			scope.dispatchEvent( { type: "hmdavailable", displays: vrDisplays, display: vrDisplay, webvr1: isWebVR1 } );
 		}
 
 	}
@@ -69,6 +71,12 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	var rendererSize = renderer.getSize();
 	var rendererPixelRatio = renderer.getPixelRatio();
+
+	this.hasWebVR1 = function () {
+
+		return isWebVR1;
+
+	};
 
 	this.getVRDisplay = function () {
 
@@ -526,3 +534,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	}
 
 };
+
+
+THREE.VREffect.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.VREffect.prototype.constructor = THREE.VREffect;
