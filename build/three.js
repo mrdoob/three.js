@@ -19848,7 +19848,9 @@
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
-				if ( material.type !== 'MeshPhongMaterial' && material.type !== 'MeshStandardMaterial' && material.type !== 'MeshPhysicalMaterial' && material.shading === FlatShading ) {
+				if ( ! material.isMeshPhongMaterial &&
+				     ! material.isMeshStandardMaterial &&
+				       material.shading === FlatShading ) {
 
 					for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
 
@@ -20658,7 +20660,7 @@
 
 							var geometry = objects.update( object );
 
-							if ( material && material.isMultiMaterial ) {
+							if ( material.isMultiMaterial ) {
 
 								var groups = geometry.groups;
 								var materials = material.materials;
@@ -20841,9 +20843,9 @@
 
 			var uniforms = materialProperties.__webglShader.uniforms;
 
-			if ( ! ( material && material.isShaderMaterial ) &&
-					! ( material && material.isRawShaderMaterial ) ||
-					material.clipping === true ) {
+			if ( ! material.isShaderMaterial &&
+			     ! material.isRawShaderMaterial |
+			       material.clipping === true ) {
 
 				materialProperties.numClippingPlanes = _clipping.numPlanes;
 				uniforms.clippingPlanes = _clipping.uniform;
@@ -21022,10 +21024,10 @@
 				// load material specific uniforms
 				// (shader material also gets them for the sake of genericity)
 
-				if ( ( material && material.isShaderMaterial ) ||
-					 ( material && material.isMeshPhongMaterial ) ||
-					 ( material && material.isMeshStandardMaterial ) ||
-					 material.envMap ) {
+				if ( material.isShaderMaterial ||
+				     material.isMeshPhongMaterial ||
+				     material.isMeshStandardMaterial ||
+				     material.envMap ) {
 
 					var uCamPos = p_uniforms.map.cameraPosition;
 
@@ -21038,12 +21040,12 @@
 
 				}
 
-				if ( ( material && material.isMeshPhongMaterial ) ||
-					 ( material && material.isMeshLambertMaterial ) ||
-					 ( material && material.isMeshBasicMaterial ) ||
-					 ( material && material.isMeshStandardMaterial ) ||
-					 ( material && material.isShaderMaterial ) ||
-					 material.skinning ) {
+				if ( material.isMeshPhongMaterial ||
+				     material.isMeshLambertMaterial ||
+				     material.isMeshBasicMaterial ||
+				     material.isMeshStandardMaterial ||
+				     material.isShaderMaterial ||
+				     material.skinning ) {
 
 					p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -21108,11 +21110,11 @@
 
 				}
 
-				if ( ( material && material.isMeshBasicMaterial ) ||
-					 ( material && material.isMeshLambertMaterial ) ||
-					 ( material && material.isMeshPhongMaterial ) ||
-					 ( material && material.isMeshStandardMaterial ) ||
-					 ( material && material.isMeshDepthMaterial ) ) {
+				if ( material.isMeshBasicMaterial ||
+				     material.isMeshLambertMaterial ||
+				     material.isMeshPhongMaterial ||
+				     material.isMeshStandardMaterial ||
+				     material.isMeshDepthMaterial ) {
 
 					refreshUniformsCommon( m_uniforms, material );
 
@@ -21120,36 +21122,36 @@
 
 				// refresh single material specific uniforms
 
-				if ( material && material.isLineBasicMaterial ) {
+				if ( material.isLineBasicMaterial ) {
 
 					refreshUniformsLine( m_uniforms, material );
 
-				} else if ( material && material.isLineDashedMaterial ) {
+				} else if ( material.isLineDashedMaterial ) {
 
 					refreshUniformsLine( m_uniforms, material );
 					refreshUniformsDash( m_uniforms, material );
 
-				} else if ( material && material.isPointsMaterial ) {
+				} else if ( material.isPointsMaterial ) {
 
 					refreshUniformsPoints( m_uniforms, material );
 
-				} else if ( material && material.isMeshLambertMaterial ) {
+				} else if ( material.isMeshLambertMaterial ) {
 
 					refreshUniformsLambert( m_uniforms, material );
 
-				} else if ( material && material.isMeshPhongMaterial ) {
+				} else if ( material.isMeshPhongMaterial ) {
 
 					refreshUniformsPhong( m_uniforms, material );
 
-				} else if ( material && material.isMeshPhysicalMaterial ) {
+				} else if ( material.isMeshPhysicalMaterial ) {
 
 					refreshUniformsPhysical( m_uniforms, material );
 
-				} else if ( material && material.isMeshStandardMaterial ) {
+				} else if ( material.isMeshStandardMaterial ) {
 
 					refreshUniformsStandard( m_uniforms, material );
 
-				} else if ( material && material.isMeshDepthMaterial ) {
+				} else if ( material.isMeshDepthMaterial ) {
 
 					if ( material.displacementMap ) {
 
@@ -21159,7 +21161,7 @@
 
 					}
 
-				} else if ( material && material.isMeshNormalMaterial ) {
+				} else if ( material.isMeshNormalMaterial ) {
 
 					m_uniforms.opacity.value = material.opacity;
 
@@ -21271,7 +21273,7 @@
 			if ( uvScaleMap !== undefined ) {
 
 				// backwards compatibility
-				if ( (uvScaleMap && uvScaleMap.isWebGLRenderTarget) ) {
+				if ( uvScaleMap.isWebGLRenderTarget ) {
 
 					uvScaleMap = uvScaleMap.texture;
 
@@ -21336,12 +21338,12 @@
 
 			uniforms.fogColor.value = fog.color;
 
-			if ( fog && fog.isFog ) {
+			if ( fog.isFog ) {
 
 				uniforms.fogNear.value = fog.near;
 				uniforms.fogFar.value = fog.far;
 
-			} else if ( fog && fog.isFogExp2 ) {
+			} else if ( fog.isFogExp2 ) {
 
 				uniforms.fogDensity.value = fog.density;
 
@@ -21539,13 +21541,13 @@
 
 				shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
-				if ( light && light.isAmbientLight ) {
+				if ( light.isAmbientLight ) {
 
 					r += color.r * intensity;
 					g += color.g * intensity;
 					b += color.b * intensity;
 
-				} else if ( light && light.isDirectionalLight ) {
+				} else if ( light.isDirectionalLight ) {
 
 					var uniforms = lightCache.get( light );
 
@@ -21569,7 +21571,7 @@
 					_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 					_lights.directional[ directionalLength ++ ] = uniforms;
 
-				} else if ( light && light.isSpotLight ) {
+				} else if ( light.isSpotLight ) {
 
 					var uniforms = lightCache.get( light );
 
@@ -21602,7 +21604,7 @@
 					_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 					_lights.spot[ spotLength ++ ] = uniforms;
 
-				} else if ( light && light.isPointLight ) {
+				} else if ( light.isPointLight ) {
 
 					var uniforms = lightCache.get( light );
 
@@ -21638,7 +21640,7 @@
 
 					_lights.point[ pointLength ++ ] = uniforms;
 
-				} else if ( light && light.isHemisphereLight ) {
+				} else if ( light.isHemisphereLight ) {
 
 					var uniforms = lightCache.get( light );
 
