@@ -2675,7 +2675,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( texture.type !== UnsignedByteType &&
 				     paramThreeToGL( texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) &&
-				     ! ( texture.type === FloatType && extensions.get( 'WEBGL_color_buffer_float' ) ) &&
+				     ! ( texture.type === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get('WEBGL_color_buffer_float') ) ) &&
 				     ! ( texture.type === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
 					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
