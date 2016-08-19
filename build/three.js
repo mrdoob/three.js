@@ -11549,17 +11549,22 @@
 
 		var prefixVertex, prefixFragment;
 
-		if ( (material && material.isRawShaderMaterial) ) {
+		if ( material.isRawShaderMaterial ) {
 
 			prefixVertex = [
 
-				customDefines
+				customDefines,
+
+				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
 			prefixFragment = [
 
-				customDefines
+				customExtensions,
+				customDefines,
+
+				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
@@ -11748,7 +11753,7 @@
 		fragmentShader = parseIncludes( fragmentShader, parameters );
 		fragmentShader = replaceLightNums( fragmentShader, parameters );
 
-		if ( (material && material.isShaderMaterial) === false ) {
+		if ( ! material.isShaderMaterial ) {
 
 			vertexShader = unrollLoops( vertexShader );
 			fragmentShader = unrollLoops( fragmentShader );
