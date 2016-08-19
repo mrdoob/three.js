@@ -21881,18 +21881,19 @@
 				try {
 
 					var texture = renderTarget.texture;
+					var textureFormat = texture.format;
+					var textureType = texture.type;
 
-					if ( texture.format !== RGBAFormat && paramThreeToGL( texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+					if ( textureFormat !== RGBAFormat && paramThreeToGL( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
-					if ( texture.type !== UnsignedByteType &&
-					     paramThreeToGL( texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) &&
-					     ! ( texture.type === FloatType && extensions.get( 'WEBGL_color_buffer_float' ) ) &&
-					     ! ( texture.type === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
+					if ( textureType !== UnsignedByteType && paramThreeToGL( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // IE11, Edge and Chrome Mac < 52 (#9513)
+					     ! ( textureType === FloatType && ( extensions.get( 'OES_texture_float' ) || extensions.get( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+					     ! ( textureType === HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
@@ -21905,7 +21906,7 @@
 
 						if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-							_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
+							_gl.readPixels( x, y, width, height, paramThreeToGL( textureFormat ), paramThreeToGL( textureType ), buffer );
 
 						}
 
@@ -38576,62 +38577,42 @@
 	CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author zz85 / http://github.com/zz85
-	 * @author bhouston / http://clara.io
-	 *
-	 * Creates an arrow for visualizing directions
-	 *
-	 * Parameters:
-	 *  dir - Vector3
-	 *  origin - Vector3
-	 *  length - Number
-	 *  color - color in hex value
-	 *  headLength - Number
-	 *  headWidth - Number
-	 */
+	var lineGeometry = new BufferGeometry();
+	lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-	exports.ArrowHelper = ( function () {
+	var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+	coneGeometry.translate( 0, - 0.5, 0 );
 
-		var lineGeometry = new BufferGeometry();
-		lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+	function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
-		var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-		coneGeometry.translate( 0, - 0.5, 0 );
+		// dir is assumed to be normalized
 
-		return function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
+		Object3D.call( this );
 
-			// dir is assumed to be normalized
+		if ( color === undefined ) color = 0xffff00;
+		if ( length === undefined ) length = 1;
+		if ( headLength === undefined ) headLength = 0.2 * length;
+		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-			Object3D.call( this );
+		this.position.copy( origin );
 
-			if ( color === undefined ) color = 0xffff00;
-			if ( length === undefined ) length = 1;
-			if ( headLength === undefined ) headLength = 0.2 * length;
-			if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+		this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+		this.line.matrixAutoUpdate = false;
+		this.add( this.line );
 
-			this.position.copy( origin );
+		this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
+		this.cone.matrixAutoUpdate = false;
+		this.add( this.cone );
 
-			this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
-			this.line.matrixAutoUpdate = false;
-			this.add( this.line );
+		this.setDirection( dir );
+		this.setLength( length, headLength, headWidth );
 
-			this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
-			this.cone.matrixAutoUpdate = false;
-			this.add( this.cone );
+	}
 
-			this.setDirection( dir );
-			this.setLength( length, headLength, headWidth );
+	ArrowHelper.prototype = Object.create( Object3D.prototype );
+	ArrowHelper.prototype.constructor = ArrowHelper;
 
-		};
-
-	}() );
-
-	exports.ArrowHelper.prototype = Object.create( Object3D.prototype );
-	exports.ArrowHelper.prototype.constructor = exports.ArrowHelper;
-
-	exports.ArrowHelper.prototype.setDirection = ( function () {
+	ArrowHelper.prototype.setDirection = ( function () {
 
 		var axis = new Vector3();
 		var radians;
@@ -38662,7 +38643,7 @@
 
 	}() );
 
-	exports.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
+	ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
 		if ( headLength === undefined ) headLength = 0.2 * length;
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
@@ -38676,7 +38657,7 @@
 
 	};
 
-	exports.ArrowHelper.prototype.setColor = function ( color ) {
+	ArrowHelper.prototype.setColor = function ( color ) {
 
 		this.line.material.color.copy( color );
 		this.cone.material.color.copy( color );
@@ -41469,6 +41450,7 @@
 	exports.CameraHelper = CameraHelper;
 	exports.BoundingBoxHelper = BoundingBoxHelper;
 	exports.BoxHelper = BoxHelper;
+	exports.ArrowHelper = ArrowHelper;
 	exports.AxisHelper = AxisHelper;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
