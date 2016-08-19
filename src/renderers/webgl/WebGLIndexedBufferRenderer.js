@@ -1,6 +1,6 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
 function WebGLIndexedBufferRenderer( _gl, extensions, _infoRender ) {
 

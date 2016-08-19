@@ -41,6 +41,7 @@ Scene.prototype.toJSON = function ( meta ) {
 
 	var data = Object3D.prototype.toJSON.call( this, meta );
 
+	if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
 	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 	return data;

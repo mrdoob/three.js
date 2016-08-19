@@ -1,10 +1,10 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { Color } from '../../math/Color';
 import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
-
-/**
-* @author mrdoob / http://mrdoob.com/
-*/
 
 function WebGLLights() {
 

@@ -486,6 +486,12 @@ Color.prototype = {
 
 		return array;
 
+	},
+
+	toJSON: function () {
+
+		return this.getHex();
+
 	}
 
 };

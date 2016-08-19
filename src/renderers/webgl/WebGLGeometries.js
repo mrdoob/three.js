@@ -1,8 +1,8 @@
-import { BufferGeometry } from '../../core/BufferGeometry';
-
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+import { BufferGeometry } from '../../core/BufferGeometry';
 
 function WebGLGeometries( gl, properties, info ) {
 

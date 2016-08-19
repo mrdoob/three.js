@@ -696,11 +696,11 @@ THREE.OBJLoader.prototype = {
 				}
 
 				var multiMaterial = new THREE.MultiMaterial( createdMaterials );
-				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, multiMaterial ) : new THREE.Line( buffergeometry, multiMaterial ) );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, multiMaterial ) : new THREE.LineSegments( buffergeometry, multiMaterial ) );
 
 			} else {
 
-				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.Line( buffergeometry, createdMaterials[ 0 ] ) );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] ) );
 			}
 
 			mesh.name = object.name;

@@ -1,6 +1,6 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
 function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
@@ -18,6 +18,7 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 		_infoRender.calls ++;
 		_infoRender.vertices += count;
+
 		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
 
 	}
