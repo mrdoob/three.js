@@ -8889,323 +8889,320 @@
 	 * Uniforms library for shared webgl shaders
 	 */
 
-	exports.UniformsLib = {
+	var UniformsLib = {
 
 		common: {
 
-			"diffuse": { value: new Color( 0xeeeeee ) },
-			"opacity": { value: 1.0 },
+			diffuse: { value: new Color( 0xeeeeee ) },
+			opacity: { value: 1.0 },
 
-			"map": { value: null },
-			"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) },
+			map: { value: null },
+			offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
 
-			"specularMap": { value: null },
-			"alphaMap": { value: null },
+			specularMap: { value: null },
+			alphaMap: { value: null },
 
-			"envMap": { value: null },
-			"flipEnvMap": { value: - 1 },
-			"reflectivity": { value: 1.0 },
-			"refractionRatio": { value: 0.98 }
+			envMap: { value: null },
+			flipEnvMap: { value: - 1 },
+			reflectivity: { value: 1.0 },
+			refractionRatio: { value: 0.98 }
 
 		},
 
 		aomap: {
 
-			"aoMap": { value: null },
-			"aoMapIntensity": { value: 1 }
+			aoMap: { value: null },
+			aoMapIntensity: { value: 1 }
 
 		},
 
 		lightmap: {
 
-			"lightMap": { value: null },
-			"lightMapIntensity": { value: 1 }
+			lightMap: { value: null },
+			lightMapIntensity: { value: 1 }
 
 		},
 
 		emissivemap: {
 
-			"emissiveMap": { value: null }
+			emissiveMap: { value: null }
 
 		},
 
 		bumpmap: {
 
-			"bumpMap": { value: null },
-			"bumpScale": { value: 1 }
+			bumpMap: { value: null },
+			bumpScale: { value: 1 }
 
 		},
 
 		normalmap: {
 
-			"normalMap": { value: null },
-			"normalScale": { value: new Vector2( 1, 1 ) }
+			normalMap: { value: null },
+			normalScale: { value: new Vector2( 1, 1 ) }
 
 		},
 
 		displacementmap: {
 
-			"displacementMap": { value: null },
-			"displacementScale": { value: 1 },
-			"displacementBias": { value: 0 }
+			displacementMap: { value: null },
+			displacementScale: { value: 1 },
+			displacementBias: { value: 0 }
 
 		},
 
 		roughnessmap: {
 
-			"roughnessMap": { value: null }
+			roughnessMap: { value: null }
 
 		},
 
 		metalnessmap: {
 
-			"metalnessMap": { value: null }
+			metalnessMap: { value: null }
 
 		},
 
 		fog: {
 
-			"fogDensity": { value: 0.00025 },
-			"fogNear": { value: 1 },
-			"fogFar": { value: 2000 },
-			"fogColor": { value: new Color( 0xffffff ) }
+			fogDensity: { value: 0.00025 },
+			fogNear: { value: 1 },
+			fogFar: { value: 2000 },
+			fogColor: { value: new Color( 0xffffff ) }
 
 		},
 
 		lights: {
 
-			"ambientLightColor": { value: [] },
+			ambientLightColor: { value: [] },
 
-			"directionalLights": { value: [], properties: {
-				"direction": {},
-				"color": {},
+			directionalLights: { value: [], properties: {
+				direction: {},
+				color: {},
 
-				"shadow": {},
-				"shadowBias": {},
-				"shadowRadius": {},
-				"shadowMapSize": {}
+				shadow: {},
+				shadowBias: {},
+				shadowRadius: {},
+				shadowMapSize: {}
 			} },
 
-			"directionalShadowMap": { value: [] },
-			"directionalShadowMatrix": { value: [] },
+			directionalShadowMap: { value: [] },
+			directionalShadowMatrix: { value: [] },
 
-			"spotLights": { value: [], properties: {
-				"color": {},
-				"position": {},
-				"direction": {},
-				"distance": {},
-				"coneCos": {},
-				"penumbraCos": {},
-				"decay": {},
+			spotLights: { value: [], properties: {
+				color: {},
+				position: {},
+				direction: {},
+				distance: {},
+				coneCos: {},
+				penumbraCos: {},
+				decay: {},
 
-				"shadow": {},
-				"shadowBias": {},
-				"shadowRadius": {},
-				"shadowMapSize": {}
+				shadow: {},
+				shadowBias: {},
+				shadowRadius: {},
+				shadowMapSize: {}
 			} },
 
-			"spotShadowMap": { value: [] },
-			"spotShadowMatrix": { value: [] },
+			spotShadowMap: { value: [] },
+			spotShadowMatrix: { value: [] },
 
-			"pointLights": { value: [], properties: {
-				"color": {},
-				"position": {},
-				"decay": {},
-				"distance": {},
+			pointLights: { value: [], properties: {
+				color: {},
+				position: {},
+				decay: {},
+				distance: {},
 
-				"shadow": {},
-				"shadowBias": {},
-				"shadowRadius": {},
-				"shadowMapSize": {}
+				shadow: {},
+				shadowBias: {},
+				shadowRadius: {},
+				shadowMapSize: {}
 			} },
 
-			"pointShadowMap": { value: [] },
-			"pointShadowMatrix": { value: [] },
+			pointShadowMap: { value: [] },
+			pointShadowMatrix: { value: [] },
 
-			"hemisphereLights": { value: [], properties: {
-				"direction": {},
-				"skyColor": {},
-				"groundColor": {}
+			hemisphereLights: { value: [], properties: {
+				direction: {},
+				skyColor: {},
+				groundColor: {}
 			} }
 
 		},
 
 		points: {
 
-			"diffuse": { value: new Color( 0xeeeeee ) },
-			"opacity": { value: 1.0 },
-			"size": { value: 1.0 },
-			"scale": { value: 1.0 },
-			"map": { value: null },
-			"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) }
+			diffuse: { value: new Color( 0xeeeeee ) },
+			opacity: { value: 1.0 },
+			size: { value: 1.0 },
+			scale: { value: 1.0 },
+			map: { value: null },
+			offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) }
 
 		}
 
 	};
 
 	/**
-	 * Webgl Shader Library for three.js
-	 *
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author mikael emtinger / http://gomo.se/
 	 */
 
+	var ShaderLib = {
 
-	exports.ShaderLib = {
-
-		'basic': {
+		basic: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'aomap' ],
-				exports.UniformsLib[ 'fog' ]
+				UniformsLib.common,
+				UniformsLib.aomap,
+				UniformsLib.fog
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'meshbasic_vert' ],
-			fragmentShader: ShaderChunk[ 'meshbasic_frag' ]
+			vertexShader: ShaderChunk.meshbasic_vert,
+			fragmentShader: ShaderChunk.meshbasic_frag
 
 		},
 
-		'lambert': {
+		lambert: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'aomap' ],
-				exports.UniformsLib[ 'lightmap' ],
-				exports.UniformsLib[ 'emissivemap' ],
-				exports.UniformsLib[ 'fog' ],
-				exports.UniformsLib[ 'lights' ],
+				UniformsLib.common,
+				UniformsLib.aomap,
+				UniformsLib.lightmap,
+				UniformsLib.emissivemap,
+				UniformsLib.fog,
+				UniformsLib.lights,
 
 				{
-					"emissive" : { value: new Color( 0x000000 ) }
+					emissive : { value: new Color( 0x000000 ) }
 				}
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'meshlambert_vert' ],
-			fragmentShader: ShaderChunk[ 'meshlambert_frag' ]
+			vertexShader: ShaderChunk.meshlambert_vert,
+			fragmentShader: ShaderChunk.meshlambert_frag
 
 		},
 
-		'phong': {
+		phong: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'aomap' ],
-				exports.UniformsLib[ 'lightmap' ],
-				exports.UniformsLib[ 'emissivemap' ],
-				exports.UniformsLib[ 'bumpmap' ],
-				exports.UniformsLib[ 'normalmap' ],
-				exports.UniformsLib[ 'displacementmap' ],
-				exports.UniformsLib[ 'fog' ],
-				exports.UniformsLib[ 'lights' ],
+				UniformsLib.common,
+				UniformsLib.aomap,
+				UniformsLib.lightmap,
+				UniformsLib.emissivemap,
+				UniformsLib.bumpmap,
+				UniformsLib.normalmap,
+				UniformsLib.displacementmap,
+				UniformsLib.fog,
+				UniformsLib.lights,
 
 				{
-					"emissive" : { value: new Color( 0x000000 ) },
-					"specular" : { value: new Color( 0x111111 ) },
-					"shininess": { value: 30 }
+					emissive : { value: new Color( 0x000000 ) },
+					specular : { value: new Color( 0x111111 ) },
+					shininess: { value: 30 }
 				}
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'meshphong_vert' ],
-			fragmentShader: ShaderChunk[ 'meshphong_frag' ]
+			vertexShader: ShaderChunk.meshphong_vert,
+			fragmentShader: ShaderChunk.meshphong_frag
 
 		},
 
-		'standard': {
+		standard: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'aomap' ],
-				exports.UniformsLib[ 'lightmap' ],
-				exports.UniformsLib[ 'emissivemap' ],
-				exports.UniformsLib[ 'bumpmap' ],
-				exports.UniformsLib[ 'normalmap' ],
-				exports.UniformsLib[ 'displacementmap' ],
-				exports.UniformsLib[ 'roughnessmap' ],
-				exports.UniformsLib[ 'metalnessmap' ],
-				exports.UniformsLib[ 'fog' ],
-				exports.UniformsLib[ 'lights' ],
+				UniformsLib.common,
+				UniformsLib.aomap,
+				UniformsLib.lightmap,
+				UniformsLib.emissivemap,
+				UniformsLib.bumpmap,
+				UniformsLib.normalmap,
+				UniformsLib.displacementmap,
+				UniformsLib.roughnessmap,
+				UniformsLib.metalnessmap,
+				UniformsLib.fog,
+				UniformsLib.lights,
 
 				{
-					"emissive" : { value: new Color( 0x000000 ) },
-					"roughness": { value: 0.5 },
-					"metalness": { value: 0 },
-					"envMapIntensity" : { value: 1 }, // temporary
+					emissive : { value: new Color( 0x000000 ) },
+					roughness: { value: 0.5 },
+					metalness: { value: 0 },
+					envMapIntensity : { value: 1 }, // temporary
 				}
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'meshphysical_vert' ],
-			fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
+			vertexShader: ShaderChunk.meshphysical_vert,
+			fragmentShader: ShaderChunk.meshphysical_frag
 
 		},
 
-		'points': {
+		points: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'points' ],
-				exports.UniformsLib[ 'fog' ]
+				UniformsLib.points,
+				UniformsLib.fog
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'points_vert' ],
-			fragmentShader: ShaderChunk[ 'points_frag' ]
+			vertexShader: ShaderChunk.points_vert,
+			fragmentShader: ShaderChunk.points_frag
 
 		},
 
-		'dashed': {
+		dashed: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'fog' ],
+				UniformsLib.common,
+				UniformsLib.fog,
 
 				{
-					"scale"    : { value: 1 },
-					"dashSize" : { value: 1 },
-					"totalSize": { value: 2 }
+					scale    : { value: 1 },
+					dashSize : { value: 1 },
+					totalSize: { value: 2 }
 				}
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'linedashed_vert' ],
-			fragmentShader: ShaderChunk[ 'linedashed_frag' ]
+			vertexShader: ShaderChunk.linedashed_vert,
+			fragmentShader: ShaderChunk.linedashed_frag
 
 		},
 
-		'depth': {
+		depth: {
 
 			uniforms: exports.UniformsUtils.merge( [
 
-				exports.UniformsLib[ 'common' ],
-				exports.UniformsLib[ 'displacementmap' ]
+				UniformsLib.common,
+				UniformsLib.displacementmap
 
 			] ),
 
-			vertexShader: ShaderChunk[ 'depth_vert' ],
-			fragmentShader: ShaderChunk[ 'depth_frag' ]
+			vertexShader: ShaderChunk.depth_vert,
+			fragmentShader: ShaderChunk.depth_frag
 
 		},
 
-		'normal': {
+		normal: {
 
 			uniforms: {
 
-				"opacity" : { value: 1.0 }
+				opacity : { value: 1.0 }
 
 			},
 
-			vertexShader: ShaderChunk[ 'normal_vert' ],
-			fragmentShader: ShaderChunk[ 'normal_frag' ]
+			vertexShader: ShaderChunk.normal_vert,
+			fragmentShader: ShaderChunk.normal_frag
 
 		},
 
@@ -9213,16 +9210,16 @@
 		//	Cube map shader
 		 ------------------------------------------------------------------------- */
 
-		'cube': {
+		cube: {
 
 			uniforms: {
-				"tCube": { value: null },
-				"tFlip": { value: - 1 },
-				"opacity": { value: 1.0 }
+				tCube: { value: null },
+				tFlip: { value: - 1 },
+				opacity: { value: 1.0 }
 			},
 
-			vertexShader: ShaderChunk[ 'cube_vert' ],
-			fragmentShader: ShaderChunk[ 'cube_frag' ]
+			vertexShader: ShaderChunk.cube_vert,
+			fragmentShader: ShaderChunk.cube_frag
 
 		},
 
@@ -9230,48 +9227,48 @@
 		//	Cube map shader
 		 ------------------------------------------------------------------------- */
 
-		'equirect': {
+		equirect: {
 
 			uniforms: {
-				"tEquirect": { value: null },
-				"tFlip": { value: - 1 }
+				tEquirect: { value: null },
+				tFlip: { value: - 1 }
 			},
 
-			vertexShader: ShaderChunk[ 'equirect_vert' ],
-			fragmentShader: ShaderChunk[ 'equirect_frag' ]
+			vertexShader: ShaderChunk.equirect_vert,
+			fragmentShader: ShaderChunk.equirect_frag
 
 		},
 
-		'distanceRGBA': {
+		distanceRGBA: {
 
 			uniforms: {
 
-				"lightPos": { value: new Vector3() }
+				lightPos: { value: new Vector3() }
 
 			},
 
-			vertexShader: ShaderChunk[ 'distanceRGBA_vert' ],
-			fragmentShader: ShaderChunk[ 'distanceRGBA_frag' ]
+			vertexShader: ShaderChunk.distanceRGBA_vert,
+			fragmentShader: ShaderChunk.distanceRGBA_frag
 
 		}
 
 	};
 
-	exports.ShaderLib[ 'physical' ] = {
+	ShaderLib.physical = {
 
 		uniforms: exports.UniformsUtils.merge( [
 
-			exports.ShaderLib[ 'standard' ].uniforms,
+			ShaderLib.standard.uniforms,
 
 			{
-				"clearCoat": { value: 0 },
-				"clearCoatRoughness": { value: 0 }
+				clearCoat: { value: 0 },
+				clearCoatRoughness: { value: 0 }
 			}
 
 		] ),
 
-		vertexShader: ShaderChunk[ 'meshphysical_vert' ],
-		fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
+		vertexShader: ShaderChunk.meshphysical_vert,
+		fragmentShader: ShaderChunk.meshphysical_frag
 
 	};
 
@@ -10791,7 +10788,7 @@
 		depthMaterialTemplate.depthPacking = RGBADepthPacking;
 		depthMaterialTemplate.clipping = true;
 
-		var distanceShader = exports.ShaderLib[ "distanceRGBA" ];
+		var distanceShader = ShaderLib[ "distanceRGBA" ];
 		var distanceUniforms = exports.UniformsUtils.clone( distanceShader.uniforms );
 
 		for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
@@ -19525,7 +19522,7 @@
 			new PlaneBufferGeometry( 2, 2 ),
 			new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
 		);
-		var backgroundBoxShader = exports.ShaderLib[ 'cube' ];
+		var backgroundBoxShader = ShaderLib[ 'cube' ];
 		var backgroundBoxMesh = new Mesh(
 			new BoxBufferGeometry( 5, 5, 5 ),
 			new ShaderMaterial( {
@@ -20787,7 +20784,7 @@
 
 				if ( parameters.shaderID ) {
 
-					var shader = exports.ShaderLib[ parameters.shaderID ];
+					var shader = ShaderLib[ parameters.shaderID ];
 
 					materialProperties.__webglShader = {
 						name: material.type,
@@ -23545,7 +23542,7 @@
 
 		ShaderMaterial.call( this, {
 			uniforms: exports.UniformsUtils.merge( [
-				exports.UniformsLib[ "lights" ],
+				UniformsLib[ "lights" ],
 				{
 					opacity: { value: 1.0 }
 				}
@@ -41308,6 +41305,8 @@
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
 	exports.WebGLRenderer = WebGLRenderer;
+	exports.ShaderLib = ShaderLib;
+	exports.UniformsLib = UniformsLib;
 	exports.ShaderChunk = ShaderChunk;
 	exports.FogExp2 = FogExp2;
 	exports.Fog = Fog;
