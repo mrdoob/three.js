@@ -1,13 +1,3 @@
-import { Vector3 } from '../../math/Vector3';
-import { Object3D } from '../../core/Object3D';
-import { CylinderBufferGeometry } from '../geometries/CylinderBufferGeometry';
-import { Float32Attribute } from '../../core/BufferAttribute';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { Mesh } from '../../objects/Mesh';
-import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Line } from '../../objects/Line';
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / http://github.com/zz85
@@ -23,6 +13,16 @@ import { Line } from '../../objects/Line';
  *  headLength - Number
  *  headWidth - Number
  */
+
+import { Vector3 } from '../../math/Vector3';
+import { Object3D } from '../../core/Object3D';
+import { CylinderBufferGeometry } from '../geometries/CylinderBufferGeometry';
+import { Float32Attribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { Mesh } from '../../objects/Mesh';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Line } from '../../objects/Line';
 
 var lineGeometry = new BufferGeometry();
 lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
