@@ -41,7 +41,7 @@
 
 	#else
 
-		vec4 envColor = vec4( 1.0 );
+		vec4 envColor = vec4( 0.0 );
 
 	#endif
 
