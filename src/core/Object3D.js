@@ -17,7 +17,7 @@ import { _Math } from '../math/Math';
 
 function Object3D() {
 
-	Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
+	Object.defineProperty( this, 'id', { value: Object3D.IdCount ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -724,8 +724,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 } );
 
-var count = 0;
-function Object3DIdCount() { return count++; };
+Object3D.IdCount = 0;
 
 
-export { Object3DIdCount, Object3D };
+export { Object3D };

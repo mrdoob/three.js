@@ -2,7 +2,7 @@ import { Geometry } from './Geometry';
 import { EventDispatcher } from './EventDispatcher';
 import { Vector2 } from '../math/Vector2';
 import { _Math } from '../math/Math';
-import { GeometryIdCount } from './Geometry';
+import { Geometry } from './Geometry';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -10,7 +10,7 @@ import { GeometryIdCount } from './Geometry';
 
 function DirectGeometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: Geometry.IdCount ++ } );
 
 	this.uuid = _Math.generateUUID();
 

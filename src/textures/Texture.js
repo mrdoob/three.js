@@ -12,7 +12,7 @@ import { Vector2 } from '../math/Vector2';
 
 function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
+	Object.defineProperty( this, 'id', { value: Texture.IdCount ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -286,8 +286,7 @@ Texture.prototype = {
 
 Object.assign( Texture.prototype, EventDispatcher.prototype );
 
-var count = 0;
-function TextureIdCount() { return count++; };
+Texture.IdCount = 0;
 
 
-export { TextureIdCount, Texture };
+export { Texture };
