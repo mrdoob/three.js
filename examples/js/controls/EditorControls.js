@@ -177,23 +177,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		// if ( scope.enabled === false ) return;
 
-		var delta = 0;
-
-		if ( event.wheelDelta ) {
-
-			// WebKit / Opera / Explorer 9
-
-			delta = - event.wheelDelta;
-
-		} else if ( event.detail ) {
-
-			// Firefox
-
-			delta = event.detail * 10;
-
-		}
-
-		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
 
 	}
 
@@ -207,8 +191,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
-		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
 		domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		domElement.removeEventListener( 'mouseup', onMouseUp, false );
@@ -218,12 +201,11 @@ THREE.EditorControls = function ( object, domElement ) {
 		domElement.removeEventListener( 'touchstart', touchStart, false );
 		domElement.removeEventListener( 'touchmove', touchMove, false );
 
-	}
+	};
 
 	domElement.addEventListener( 'contextmenu', contextmenu, false );
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
-	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+	domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	// touch
 

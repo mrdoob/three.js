@@ -93,7 +93,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -164,7 +164,7 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				camera.fov -= event.wheelDeltaY * 0.05;
+				camera.fov += event.deltaY * 0.05;
 				camera.updateProjectionMatrix();
 
 			}

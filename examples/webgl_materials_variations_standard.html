@@ -40,7 +40,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, objects = [];
+			var camera, scene, renderer, controls;
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
@@ -87,29 +87,25 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				var localReflectionCube;
+				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-					var roughness = 1.0 - alpha;
-
-					if( alphaIndex % 2 === 0 ) {
-						localReflectionCube = null;
-					}
-					else {
-						localReflectionCube = reflectionCube;
-					}
-
-					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
-
-						var metalness = beta;
-
-						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color( gamma, 0, 0 ).multiplyScalar( 1 - 0.08 );
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
 
-							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, metalness: metalness, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshStandardMaterial( {
+								map: imgTexture,
+								bumpMap: imgTexture,
+								bumpScale: bumpScale,
+								color: diffuseColor,
+								metalness: beta,
+								roughness: 1.0 - alpha,
+								shading: THREE.SmoothShading,
+								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
+							} )
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -117,14 +113,16 @@
 							mesh.position.y = beta * 400 - 200;
 							mesh.position.z = gamma * 400 - 200;
 
-							objects.push( mesh );
-
 							scene.add( mesh );
+
 						}
+
 					}
+
 				}
 
 				function addLabel( name, location ) {
+
 					var textGeo = new THREE.TextGeometry( name, {
 
 						font: font,
@@ -139,6 +137,7 @@
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
+
 				}
 
 				addLabel( "+roughness", new THREE.Vector3( -350, 0, 0 ) );
@@ -215,14 +214,6 @@
 				//camera.position.z = Math.sin( timer ) * 800;
 
 				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-
-					object.rotation.y += 0.005;
-
-				}
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

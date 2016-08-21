@@ -1,9 +1,9 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
-
-/**
-* @author mrdoob / http://mrdoob.com/
-*/
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
 

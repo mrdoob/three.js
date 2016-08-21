@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "build-min": "rollup -c && uglifyjs build/three.js -cm > build/three.min.js",
+    "build-min": "rollup -c && uglifyjs build/three.js -cm --preamble \"\/\/ threejs.org\/license\" > build/three.min.js",
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -45,7 +45,7 @@
     "argparse": "^1.0.3",
     "chokidar-cli": "1.2.0",
     "jscs": "^1.13.1",
-    "rollup": "^0.33.1",
+    "rollup": "^0.34.8",
     "uglify-js": "^2.6.0"
   }
 }
