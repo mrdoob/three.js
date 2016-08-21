@@ -39,19 +39,6 @@ import { Color } from '../math/Color';
  * @author tschw
  */
 
-function RenderList () {
-
-	Array.call( this );
-	this.liveEntries = 0;
-
-}
-
-RenderList.prototype = Object.assign( Object.create( Array.prototype ), {
-
-	constructor: RenderList
-
-} );
-
 function WebGLRenderer( parameters ) {
 
 	console.log( 'THREE.WebGLRenderer', REVISION );
@@ -72,9 +59,6 @@ function WebGLRenderer( parameters ) {
 
 	var opaqueObjects = null;
 	var transparentObjects = null;
-
-	var opaqueRenderLists = [];
-	var transparentRenderLists = [];
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -563,9 +547,6 @@ function WebGLRenderer( parameters ) {
 		opaqueObjects = null;
 		transparentObjects = null;
 
-		opaqueRenderLists = [];
-		transparentRenderLists = [];
-
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
 	};
@@ -615,6 +596,16 @@ function WebGLRenderer( parameters ) {
 			programCache.releaseProgram( programInfo );
 
 		}
+
+	}
+
+	function onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', onSceneDispose );
+
+		properties.delete( scene );
 
 	}
 
@@ -1163,23 +1154,19 @@ function WebGLRenderer( parameters ) {
 
 		lights.length = 0;
 
-		if ( opaqueRenderLists[ scene.id ] === undefined ) {
+		var sceneProperties = properties.get( scene );
 
-			opaqueRenderLists[ scene.id ] = new RenderList();
+		if ( sceneProperties.opaqueRenderList === undefined ) {
 
-		}
+			sceneProperties.opaqueRenderList = [];
+			sceneProperties.transparentRenderList = [];
 
-		opaqueObjects = opaqueRenderLists[ scene.id ];
-
-
-		if ( transparentRenderLists[ scene.id ] === undefined ) {
-
-			transparentRenderLists[ scene.id ] = new RenderList();
+			scene.addEventListener( 'dispose', onSceneDispose );
 
 		}
 
-		transparentObjects = transparentRenderLists[ scene.id ];
-
+		opaqueObjects = sceneProperties.opaqueRenderList;
+		transparentObjects = sceneProperties.transparentRenderList;
 
 		opaqueObjects.liveEntries = 0;
 		transparentObjects.liveEntries = 0;
