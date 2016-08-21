@@ -4,12 +4,7 @@ export { SpritePlugin } from './renderers/webgl/plugins/SpritePlugin.js';
 export { LensFlarePlugin } from './renderers/webgl/plugins/LensFlarePlugin.js';
 export { WebGLUniforms } from './renderers/webgl/WebGLUniforms.js';
 export { WebGLTextures } from './renderers/webgl/WebGLTextures.js';
-export {
-  WebGLStencilBuffer,
-  WebGLDepthBuffer,
-  WebGLColorBuffer,
-  WebGLState
-} from './renderers/webgl/WebGLState.js';
+export { WebGLState } from './renderers/webgl/WebGLState.js';
 export { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 export { WebGLShader } from './renderers/webgl/WebGLShader.js';
 export { WebGLProperties } from './renderers/webgl/WebGLProperties.js';

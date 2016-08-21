@@ -1673,22 +1673,15 @@ function WebGLRenderer( parameters ) {
 
 	function setMaterial( material ) {
 
-		if ( material.side !== DoubleSide )
-			state.enable( _gl.CULL_FACE );
-		else
-			state.disable( _gl.CULL_FACE );
+		material.side === DoubleSide
+			? state.disable( _gl.CULL_FACE )
+			: state.enable( _gl.CULL_FACE );
 
 		state.setFlipSided( material.side === BackSide );
 
-		if ( material.transparent === true ) {
-
-			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
-
-		} else {
-
-			state.setBlending( NoBlending );
-
-		}
+		material.transparent === true
+			? state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
+			: state.setBlending( NoBlending );
 
 		state.setDepthFunc( material.depthFunc );
 		state.setDepthTest( material.depthTest );
