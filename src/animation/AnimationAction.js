@@ -11,15 +11,7 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction() {
-
-	throw new Error( "THREE.AnimationAction: " +
-			"Use mixer.clipAction for construction." );
-
-}
-
-AnimationAction._new =
-		function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
@@ -84,9 +76,9 @@ AnimationAction._new =
 
 };
 
-AnimationAction._new.prototype = {
+AnimationAction.prototype = {
 
-	constructor: AnimationAction._new,
+	constructor: AnimationAction,
 
 	// State & Scheduling
 
@@ -660,7 +652,6 @@ AnimationAction._new.prototype = {
 	}
 
 };
-
 
 
 export { AnimationAction };

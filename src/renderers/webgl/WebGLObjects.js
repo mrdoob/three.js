@@ -17,7 +17,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( (object.geometry && object.geometry.isGeometry) ) {
+		if ( object.geometry.isGeometry ) {
 
 			geometry.updateFromObject( object );
 
@@ -60,7 +60,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	function updateAttribute( attribute, bufferType ) {
 
-		var data = ( (attribute && attribute.isInterleavedBufferAttribute) ) ? attribute.data : attribute;
+		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
 
 		var attributeProperties = properties.get( data );
 
@@ -118,7 +118,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
+		if ( attribute.isInterleavedBufferAttribute ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
@@ -220,10 +220,14 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	this.getAttributeBuffer = getAttributeBuffer;
-	this.getWireframeAttribute = getWireframeAttribute;
+	return {
 
-	this.update = update;
+		getAttributeBuffer: getAttributeBuffer,
+		getWireframeAttribute: getWireframeAttribute,
+
+		update: update
+
+	};
 
 }
 

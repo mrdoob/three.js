@@ -56,40 +56,41 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	this.getMaxAnisotropy = getMaxAnisotropy;
-	this.getMaxPrecision = getMaxPrecision;
+	var precision = parameters.precision !== undefined ? parameters.precision : 'highp';
+	var maxPrecision = getMaxPrecision( precision );
 
-	this.precision = parameters.precision !== undefined ? parameters.precision : 'highp';
-	this.logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false;
+	if ( maxPrecision !== precision ) {
 
-	this.maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
-	this.maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
-	this.maxTextureSize = gl.getParameter( gl.MAX_TEXTURE_SIZE );
-	this.maxCubemapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE );
-
-	this.maxAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
-	this.maxVertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
-	this.maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
-	this.maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
-
-	this.vertexTextures = this.maxVertexTextures > 0;
-	this.floatFragmentTextures = !! extensions.get( 'OES_texture_float' );
-	this.floatVertexTextures = this.vertexTextures && this.floatFragmentTextures;
-
-	var _maxPrecision = getMaxPrecision( this.precision );
-
-	if ( _maxPrecision !== this.precision ) {
-
-		console.warn( 'THREE.WebGLRenderer:', this.precision, 'not supported, using', _maxPrecision, 'instead.' );
-		this.precision = _maxPrecision;
+		console.warn( 'THREE.WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
+		precision = maxPrecision;
 
 	}
 
-	if ( this.logarithmicDepthBuffer ) {
+	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && !! extensions.get( 'EXT_frag_depth' );
 
-		this.logarithmicDepthBuffer = !! extensions.get( 'EXT_frag_depth' );
+	return {
 
-	}
+		getMaxAnisotropy: getMaxAnisotropy,
+		getMaxPrecision: getMaxPrecision,
+
+		precision: precision,
+		logarithmicDepthBuffer: logarithmicDepthBuffer,
+
+		maxTextures: gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS ),
+		maxVertexTextures: gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
+		maxTextureSize: gl.getParameter( gl.MAX_TEXTURE_SIZE ),
+		maxCubemapSize: gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE ),
+
+		maxAttributes: gl.getParameter( gl.MAX_VERTEX_ATTRIBS ),
+		maxVertexUniforms: gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS ),
+		maxVaryings: gl.getParameter( gl.MAX_VARYING_VECTORS ),
+		maxFragmentUniforms: gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS ),
+
+		vertexTextures: this.maxVertexTextures > 0,
+		floatFragmentTextures: !! extensions.get( 'OES_texture_float' ),
+		floatVertexTextures: this.vertexTextures && this.floatFragmentTextures
+
+	};
 
 }
 

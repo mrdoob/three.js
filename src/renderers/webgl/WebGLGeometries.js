@@ -8,44 +8,6 @@ function WebGLGeometries( gl, properties, info ) {
 
 	var geometries = {};
 
-	function get( object ) {
-
-		var geometry = object.geometry;
-
-		if ( geometries[ geometry.id ] !== undefined ) {
-
-			return geometries[ geometry.id ];
-
-		}
-
-		geometry.addEventListener( 'dispose', onGeometryDispose );
-
-		var buffergeometry;
-
-		if ( (geometry && geometry.isBufferGeometry) ) {
-
-			buffergeometry = geometry;
-
-		} else if ( (geometry && geometry.isGeometry) ) {
-
-			if ( geometry._bufferGeometry === undefined ) {
-
-				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-			}
-
-			buffergeometry = geometry._bufferGeometry;
-
-		}
-
-		geometries[ geometry.id ] = buffergeometry;
-
-		info.memory.geometries ++;
-
-		return buffergeometry;
-
-	}
-
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
@@ -93,7 +55,7 @@ function WebGLGeometries( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
+		if ( attribute.isInterleavedBufferAttribute ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
@@ -128,7 +90,7 @@ function WebGLGeometries( gl, properties, info ) {
 
 	function removeAttributeBuffer( attribute ) {
 
-		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
+		if ( attribute.isInterleavedBufferAttribute ) {
 
 			properties.delete( attribute.data );
 
@@ -140,7 +102,47 @@ function WebGLGeometries( gl, properties, info ) {
 
 	}
 
-	this.get = get;
+	return {
+
+		get: function ( object ) {
+
+			var geometry = object.geometry;
+
+			if ( geometries[ geometry.id ] !== undefined ) {
+
+				return geometries[ geometry.id ];
+
+			}
+
+			geometry.addEventListener( 'dispose', onGeometryDispose );
+
+			var buffergeometry;
+
+			if ( geometry.isBufferGeometry ) {
+
+				buffergeometry = geometry;
+
+			} else if ( geometry.isGeometry ) {
+
+				if ( geometry._bufferGeometry === undefined ) {
+
+					geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
+
+				}
+
+				buffergeometry = geometry._bufferGeometry;
+
+			}
+
+			geometries[ geometry.id ] = buffergeometry;
+
+			info.memory.geometries ++;
+
+			return buffergeometry;
+
+		}
+
+	};
 
 }
 

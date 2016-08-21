@@ -4,12 +4,7 @@ export { SpritePlugin } from './renderers/webgl/plugins/SpritePlugin.js';
 export { LensFlarePlugin } from './renderers/webgl/plugins/LensFlarePlugin.js';
 export { WebGLUniforms } from './renderers/webgl/WebGLUniforms.js';
 export { WebGLTextures } from './renderers/webgl/WebGLTextures.js';
-export {
-  WebGLStencilBuffer,
-  WebGLDepthBuffer,
-  WebGLColorBuffer,
-  WebGLState
-} from './renderers/webgl/WebGLState.js';
+export { WebGLState } from './renderers/webgl/WebGLState.js';
 export { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 export { WebGLShader } from './renderers/webgl/WebGLShader.js';
 export { WebGLProperties } from './renderers/webgl/WebGLProperties.js';
@@ -114,7 +109,6 @@ export { AnimationUtils } from './animation/AnimationUtils.js';
 export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
 export { AnimationMixer } from './animation/AnimationMixer.js';
 export { AnimationClip } from './animation/AnimationClip.js';
-export { AnimationAction } from './animation/AnimationAction.js';
 export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';

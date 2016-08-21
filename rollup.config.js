@@ -30,6 +30,5 @@ export default {
 	plugins: [
 		glsl()
 	],
-
 	outro: outro
 };
