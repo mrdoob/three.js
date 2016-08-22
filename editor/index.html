@@ -143,6 +143,7 @@
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+
 		<script src="js/Command.js"></script>
 		<script src="js/commands/AddObjectCommand.js"></script>
 		<script src="js/commands/RemoveObjectCommand.js"></script>
@@ -267,6 +268,8 @@
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
+				signals.sceneBackgroundChanged.add( saveState );
+				signals.sceneFogChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 				signals.historyChanged.add( saveState );
