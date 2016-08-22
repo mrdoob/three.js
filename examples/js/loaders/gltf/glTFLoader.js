@@ -826,7 +826,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									var opacity =  USE_A_ONE ? value : (1.0 - value);
 									uvalue = opacity;
 									params.transparent = true;
-								} else if (value) {
+								} else {
 									uvalue = value;
 								}
 								break;
