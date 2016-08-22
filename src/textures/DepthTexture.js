@@ -1,29 +1,37 @@
 import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, DepthFormat } from '../constants';
+import { NearestFilter, UnsignedShortType, DepthFormat, DepthStencilFormat } from '../constants';
 
 /**
  * @author Matt DesLauriers / @mattdesl
+ * @author atix / arthursilber.de
  */
 
-function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 
-  Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, DepthFormat, type, anisotropy );
+	format = format !== undefined ? format : DepthFormat;
 
-  this.image = { width: width, height: height };
+	if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 
-  this.type = type !== undefined ? type : UnsignedShortType;
+		throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' )
 
-  this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-  this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+	}
 
-  this.flipY = false;
-  this.generateMipmaps  = false;
+	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
-};
+	this.image = { width: width, height: height };
+
+	this.type = type !== undefined ? type : UnsignedShortType;
+
+	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+
+	this.flipY = false;
+	this.generateMipmaps	= false;
+
+}
 
 DepthTexture.prototype = Object.create( Texture.prototype );
 DepthTexture.prototype.constructor = DepthTexture;
-
 DepthTexture.prototype.isDepthTexture = true;
 
 export { DepthTexture };

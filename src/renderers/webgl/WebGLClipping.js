@@ -1,3 +1,7 @@
+/**
+ * @author tschw
+ */
+
 import { Matrix3 } from '../../math/Matrix3';
 import { Plane } from '../../math/Plane';
 
@@ -151,8 +155,6 @@ function WebGLClipping() {
 
 	}
 
-};
-
-
+}
 
 export { WebGLClipping };

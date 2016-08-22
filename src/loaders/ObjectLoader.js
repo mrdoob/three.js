@@ -4,9 +4,12 @@ import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
+import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
 import { SkinnedMesh } from '../objects/SkinnedMesh';
+import { Fog } from '../scenes/Fog';
+import { FogExp2 } from '../scenes/FogExp2';
 import { HemisphereLight } from '../lights/HemisphereLight';
 import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
@@ -28,12 +31,12 @@ import { XHRLoader } from './XHRLoader';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader( manager ) {
+function ObjectLoader ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';
 
-};
+}
 
 Object.assign( ObjectLoader.prototype, {
 
@@ -350,6 +353,10 @@ Object.assign( ObjectLoader.prototype, {
 
 				scope.manager.itemEnd( url );
 
+			}, undefined, function () {
+
+				scope.manager.itemError( url );
+
 			} );
 
 		}
@@ -482,6 +489,30 @@ Object.assign( ObjectLoader.prototype, {
 
 					object = new Scene();
 
+					if ( data.background !== undefined ) {
+
+						if ( Number.isInteger( data.background ) ) {
+
+							object.background = new THREE.Color( data.background );
+
+						}
+
+					}
+
+					if ( data.fog !== undefined ) {
+
+						if ( data.fog.type === 'Fog' ) {
+
+							object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
+
+						} else if ( data.fog.type === 'FogExp2' ) {
+
+							object.fog = new FogExp2( data.fog.color, data.fog.density );
+
+						}
+
+					}
+
 					break;
 
 				case 'PerspectiveCamera':
@@ -563,7 +594,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				case 'LineSegments':
 
-					object = new THREE.LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 
@@ -611,6 +642,15 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
+			if ( data.shadow ) {
+
+				if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+				if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+				if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+				if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+
+			}
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;

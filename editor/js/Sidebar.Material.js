@@ -893,6 +893,8 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			refreshUI();
+
 		}
 
 		if ( textureWarning ) {

@@ -100,8 +100,8 @@
 				//
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'MozMousePixelScroll', onDocumentMouseWheel, false);
+				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+
 				window.addEventListener( 'resize', onWindowResized, false );
 
 				onWindowResized( null );
@@ -145,25 +145,7 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				// WebKit
-
-				if ( event.wheelDeltaY ) {
-
-					fov -= event.wheelDeltaY * 0.05;
-
-				// Opera / Explorer 9
-
-				} else if ( event.wheelDelta ) {
-
-					fov -= event.wheelDelta * 0.05;
-
-				// Firefox
-
-				} else if ( event.detail ) {
-
-					fov += event.detail * 1.0;
-
-				}
+				fov += event.deltaY * 0.05;
 
 				camera.projectionMatrix.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
 

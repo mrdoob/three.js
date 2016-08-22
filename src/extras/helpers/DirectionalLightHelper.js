@@ -43,7 +43,7 @@ function DirectionalLightHelper( light, size ) {
 
 	this.update();
 
-};
+}
 
 DirectionalLightHelper.prototype = Object.create( Object3D.prototype );
 DirectionalLightHelper.prototype.constructor = DirectionalLightHelper;

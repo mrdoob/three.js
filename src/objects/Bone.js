@@ -14,7 +14,7 @@ function Bone( skin ) {
 
 	this.skin = skin;
 
-};
+}
 
 Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

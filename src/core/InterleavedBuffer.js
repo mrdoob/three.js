@@ -16,7 +16,7 @@ function InterleavedBuffer( array, stride ) {
 
 	this.version = 0;
 
-};
+}
 
 InterleavedBuffer.prototype = {
 

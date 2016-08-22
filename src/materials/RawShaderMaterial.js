@@ -10,7 +10,7 @@ function RawShaderMaterial( parameters ) {
 
 	this.type = 'RawShaderMaterial';
 
-};
+}
 
 RawShaderMaterial.prototype = Object.create( ShaderMaterial.prototype );
 RawShaderMaterial.prototype.constructor = RawShaderMaterial;

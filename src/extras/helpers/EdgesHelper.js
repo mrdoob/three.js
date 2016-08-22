@@ -21,7 +21,7 @@ function EdgesHelper( object, hex, thresholdAngle ) {
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-};
+}
 
 EdgesHelper.prototype = Object.create( LineSegments.prototype );
 EdgesHelper.prototype.constructor = EdgesHelper;

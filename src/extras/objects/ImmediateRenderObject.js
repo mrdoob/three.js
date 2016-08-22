@@ -11,7 +11,7 @@ function ImmediateRenderObject( material ) {
 	this.material = material;
 	this.render = function ( renderCallback ) {};
 
-};
+}
 
 ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
 ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;

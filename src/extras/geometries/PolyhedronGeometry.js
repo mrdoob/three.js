@@ -236,8 +236,7 @@ function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
 	}
 
-
-};
+}
 
 PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
 PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;

@@ -5,7 +5,7 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Fog( color, near, far ) {
+function Fog ( color, near, far ) {
 
 	this.name = '';
 
@@ -14,7 +14,7 @@ function Fog( color, near, far ) {
 	this.near = ( near !== undefined ) ? near : 1;
 	this.far = ( far !== undefined ) ? far : 1000;
 
-};
+}
 
 Fog.prototype.isFog = true;
 
@@ -24,5 +24,15 @@ Fog.prototype.clone = function () {
 
 };
 
+Fog.prototype.toJSON = function ( meta ) {
+
+	return {
+		type: 'Fog',
+		color: this.color.getHex(),
+		near: this.near,
+		far: this.far
+	};
+
+};
 
 export { Fog };

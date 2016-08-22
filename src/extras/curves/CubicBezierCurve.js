@@ -14,7 +14,7 @@ function CubicBezierCurve( v0, v1, v2, v3 ) {
 	this.v2 = v2;
 	this.v3 = v3;
 
-};
+}
 
 CubicBezierCurve.prototype = Object.create( Curve.prototype );
 CubicBezierCurve.prototype.constructor = CubicBezierCurve;

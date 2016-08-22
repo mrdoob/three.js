@@ -212,8 +212,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
 		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
-		scope.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		scope.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		scope.domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
 		scope.domElement.removeEventListener( 'touchstart', onTouchStart, false );
 		scope.domElement.removeEventListener( 'touchend', onTouchEnd, false );
@@ -500,27 +499,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleMouseWheel' );
 
-		var delta = 0;
-
-		if ( event.wheelDelta !== undefined ) {
-
-			// WebKit / Opera / Explorer 9
-
-			delta = event.wheelDelta;
-
-		} else if ( event.detail !== undefined ) {
-
-			// Firefox
-
-			delta = - event.detail;
-
-		}
-
-		if ( delta > 0 ) {
+		if ( event.deltaY < 0 ) {
 
 			dollyOut( getZoomScale() );
 
-		} else if ( delta < 0 ) {
+		} else if ( event.deltaY > 0 ) {
 
 			dollyIn( getZoomScale() );
 
@@ -890,8 +873,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
 	scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	scope.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	scope.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+	scope.domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );

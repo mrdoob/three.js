@@ -47,6 +47,8 @@ var Editor = function () {
 		spaceChanged: new Signal(),
 		rendererChanged: new Signal(),
 
+		sceneBackgroundChanged: new Signal(),
+		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 
 		cameraChanged: new Signal(),
@@ -69,9 +71,6 @@ var Editor = function () {
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
 
-		fogTypeChanged: new Signal(),
-		fogColorChanged: new Signal(),
-		fogParametersChanged: new Signal(),
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
@@ -90,6 +89,7 @@ var Editor = function () {
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
+	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -120,6 +120,10 @@ Editor.prototype = {
 
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
+
+		if ( scene.background !== null ) this.scene.background = scene.background.clone();
+		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
 		// avoid render per object
@@ -418,6 +422,8 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.background.setHex( 0xaaaaaa );
+		this.scene.fog = null;
 
 		var objects = this.scene.children;
 

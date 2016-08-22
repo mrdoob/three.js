@@ -54,7 +54,7 @@ function Geometry() {
 	this.lineDistancesNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
 Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 

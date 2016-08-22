@@ -23,7 +23,7 @@ function CubicInterpolant(
 	this._weightNext = -0;
 	this._offsetNext = -0;
 
-};
+}
 
 CubicInterpolant.prototype =
 		Object.assign( Object.create( Interpolant.prototype ), {

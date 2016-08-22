@@ -19,7 +19,7 @@ function HemisphereLight( skyColor, groundColor, intensity ) {
 
 	this.groundColor = new Color( groundColor );
 
-};
+}
 
 HemisphereLight.prototype = Object.assign( Object.create( Light.prototype ), {
 

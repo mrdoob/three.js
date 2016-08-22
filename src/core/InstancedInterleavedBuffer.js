@@ -10,7 +10,7 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
-};
+}
 
 InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
 InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;

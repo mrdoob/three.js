@@ -190,14 +190,14 @@
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
 					texturePass.map = map;
 				});
 
 				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
-				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 					cubeTexturePassP.envMap = ldrCubeMap;
 					console.log( "loaded envmap");

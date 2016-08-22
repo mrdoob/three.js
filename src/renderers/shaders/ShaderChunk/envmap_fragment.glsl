@@ -39,6 +39,10 @@
 		vec3 reflectView = flipNormal * normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 
+	#else
+
+		vec4 envColor = vec4( 0.0 );
+
 	#endif
 
 	envColor = envMapTexelToLinear( envColor );

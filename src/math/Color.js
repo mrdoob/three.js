@@ -17,7 +17,7 @@ function Color( r, g, b ) {
 
 	return this.setRGB( r, g, b );
 
-};
+}
 
 Color.prototype = {
 
@@ -485,6 +485,12 @@ Color.prototype = {
 		array[ offset + 2 ] = this.b;
 
 		return array;
+
+	},
+
+	toJSON: function () {
+
+		return this.getHex();
 
 	}
 

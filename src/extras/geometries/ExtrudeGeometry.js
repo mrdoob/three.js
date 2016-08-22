@@ -56,7 +56,7 @@ function ExtrudeGeometry( shapes, options ) {
 
 	//console.log( "took", ( Date.now() - startTime ) );
 
-};
+}
 
 ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
 ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
@@ -361,11 +361,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		//for ( b = bevelSegments; b > 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * ( 1 - t );
-
-		//z = bevelThickness * t;
-		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ); // curved
-		//bs = bevelSize * t; // linear
+		z = bevelThickness * Math.cos( t * Math.PI / 2 );
+		bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
 		// contract shape
 
@@ -462,9 +459,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * ( 1 - t );
-		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
-		bs = bevelSize * Math.sin ( t * Math.PI / 2 );
+		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
+		bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
 		// contract shape
 

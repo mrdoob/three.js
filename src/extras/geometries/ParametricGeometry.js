@@ -83,7 +83,7 @@ function ParametricGeometry( func, slices, stacks ) {
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
-};
+}
 
 ParametricGeometry.prototype = Object.create( Geometry.prototype );
 ParametricGeometry.prototype.constructor = ParametricGeometry;

@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { WebGLProgram } from './WebGLProgram';
 import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 
@@ -284,7 +288,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	// Exposed for resource monitoring & error feedback via renderer.info:
 	this.programs = programs;
 
-};
+}
 
 
 export { WebGLPrograms };

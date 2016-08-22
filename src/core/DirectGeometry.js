@@ -44,7 +44,7 @@ function DirectGeometry() {
 	this.uvsNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
 Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 

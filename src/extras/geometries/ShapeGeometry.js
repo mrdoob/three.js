@@ -32,7 +32,7 @@ function ShapeGeometry( shapes, options ) {
 
 	this.computeFaceNormals();
 
-};
+}
 
 ShapeGeometry.prototype = Object.create( Geometry.prototype );
 ShapeGeometry.prototype.constructor = ShapeGeometry;

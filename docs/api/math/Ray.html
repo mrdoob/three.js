@@ -121,7 +121,7 @@
 		Return whether this and the other [page:Ray] have equal offsets and directions.
 		</div>
 
-		<h3>[method:Vector3 intersectBox]( [page:Box3 box], [page:Vector3 optionalTarget] = null ) [page:Vector3]?</h3>
+		<h3>[method:Vector3 intersectBox]( [page:Box3 box], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
 		<div>
 		box  -- [page:Box3] The [page:Box3] to intersect with.<br />
 		optionalTarget -- [page:Vector3] The [page:Vector3] to store the result in, or *null* to create a new [page:Vector3].
@@ -130,7 +130,7 @@
 		Intersect this [page:Ray] with a [page:Box3], returning the intersection point or *null* if there is no intersection.
 		</div>
 
-		<h3>[method:Vector3 intersectPlane]( [page:Plane plane], [page:Vector3 optionalTarget] = null ) [page:Vector3]?</h3>
+		<h3>[method:Vector3 intersectPlane]( [page:Plane plane], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
 		<div>
 		plane -- [page:Plane] The [page:Plane] to intersect with.<br />
 		optionalTarget -- [page:Vector3] The [page:Vector3] to store the result in, or *null* to create a new [page:Vector3].
@@ -138,9 +138,17 @@
 		<div>
 		Intersect this [page:Ray] with a [page:Plane], returning the intersection point or *null* if there is no intersection.
 		</div>
-		function ( a, b, c, backfaceCulling, optionalTarget )
 
-		<h3>[method:Vector3 intersectTriangle]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c], [page:Boolean backfaceCulling], [page:Vector3 optionalTarget] = null ) [page:Vector3]?</h3>
+		<h3>[method:Vector3 intersectSphere]( [page:Sphere sphere], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
+		<div>
+		sphere -- [page:Sphere] The [page:Sphere] to intersect with.<br />
+		optionalTarget -- [page:Vector3] The [page:Vector3] to store the result in, or *null* to create a new [page:Vector3].
+		</div>
+		<div>
+		Intersect this [page:Ray] with a [page:Sphere], returning the intersection point or *null* if there is no intersection.
+		</div>
+
+		<h3>[method:Vector3 intersectTriangle]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c], [page:Boolean backfaceCulling], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
 		<div>
 		a, b, c -- [page:Vector3] The [page:Vector3] points on the triangle.<br />
 		backfaceCulling -- [page:Boolean] Whether to use backface culling.<br />
