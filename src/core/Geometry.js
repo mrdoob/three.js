@@ -33,6 +33,9 @@ function Geometry() {
 	this.faces = [];
 	this.faceVertexUvs = [ [] ];
 
+	this.primaryUvsIndex = 0;
+	this.secondaryUvsIndex = 1;
+
 	this.morphTargets = [];
 	this.morphNormals = [];
 
@@ -234,7 +237,18 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
 
-		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( uvs !== undefined ) {
+
+			this.primaryUvsIndex = 0;
+
+		}
+
+		if ( uvs2 !== undefined ) {
+
+			this.faceVertexUvs[ 1 ] = [];
+			this.secondaryUvsIndex = 1;
+
+		}
 
 		var tempNormals = [];
 		var tempUVs = [];
@@ -365,7 +379,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 	},
 
 	normalize: function () {
-
 		this.computeBoundingSphere();
 
 		var center = this.boundingSphere.center;
@@ -929,6 +942,16 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
 		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
 
+	},
+
+	setPrincipalUvsIndices: function( primaryUvsIndex, secondaryUvsIndex ) {
+
+		var uvsNeedUpdate = ( this.primaryUvsIndex !== primaryUvsIndex ) || ( this.secondaryUvsIndex !== secondaryUvsIndex);
+
+		this.primaryUvsIndex = primaryUvsIndex;
+		this.secondaryUvsIndex = secondaryUvsIndex;
+
+		this.uvsNeedUpdate = uvsNeedUpdate;
 	},
 
 	toJSON: function () {

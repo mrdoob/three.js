@@ -89,6 +89,26 @@ test( "normalize", function() {
 	ok( distances[2] === Math.sqrt( 0.5 * 0.5 + 1 ) + distances[1], "distance from the 1st to the 3nd is sqrt(3rd - 2nd) + distance - 1" );
 });
 
+test ( "setPrincipalUvsIndices", function() {
+	var geometry = getGeometry();
+
+	var faceVertexUvs = geometry.faceVertexUvs;
+
+	geometry.uvsNeedUpdate = false;
+
+	geometry.setPrincipalUvsIndices(2, 0);
+
+	ok( geometry.uvsNeedUpdate, "Changed Uvs need update" );
+
+	var directGeometry = new THREE.DirectGeometry().fromGeometry(geometry);
+
+	uv = directGeometry.uvs[0];
+	ok( uv.x ===  2 && uv.y === 0, "DirectGeometry uvs received Geometry.primaryUvsIndex");
+
+	uv = directGeometry.uvs2[0];
+	ok( uv.x ===  0 && uv.y === 0, "DirectGeometry uvs2 received Geometry.secondaryUvsIndex");
+});
+
 function getGeometryByParams( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
 	var geometry = new THREE.Geometry();
 
@@ -98,6 +118,26 @@ function getGeometryByParams( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
 		new THREE.Vector3( x2, y2, z2 ),
 		new THREE.Vector3( x3, y3, z3 )
 	];
+
+	geometry.faceVertexUvs = [
+		[
+			[new THREE.Vector2( 0, 0 ),
+			 new THREE.Vector2( 0, 1 ),
+			 new THREE.Vector2( 0, 2 )]
+		],
+		[
+			[new THREE.Vector2( 1, 0 ),
+			 new THREE.Vector2( 1, 1 ),
+			 new THREE.Vector2( 1, 2 )]
+		],
+		[
+			[new THREE.Vector2( 2, 0 ),
+			 new THREE.Vector2( 2, 1 ),
+			 new THREE.Vector2( 2, 2 )]
+		],
+	]
+
+	geometry.faces.push( new THREE.Face3( 0, 1, 2 ));
 
 	return geometry;
 }

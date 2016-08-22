@@ -114,8 +114,11 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 		var vertices = geometry.vertices;
 		var faceVertexUvs = geometry.faceVertexUvs;
 
-		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
-		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+		var primaryUvsIndex = geometry.primaryUvsIndex;
+		var secondaryUvsIndex = geometry.secondaryUvsIndex;
+
+		var hasFaceVertexUv = faceVertexUvs[ primaryUvsIndex ] && faceVertexUvs[ primaryUvsIndex ].length > 0;
+		var hasFaceVertexUv2 = faceVertexUvs[ secondaryUvsIndex ] && faceVertexUvs[ secondaryUvsIndex ].length > 0;
 
 		// morphs
 
@@ -203,7 +206,7 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 
 			if ( hasFaceVertexUv === true ) {
 
-				var vertexUvs = faceVertexUvs[ 0 ][ i ];
+				var vertexUvs = faceVertexUvs[ primaryUvsIndex ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -221,7 +224,7 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var vertexUvs = faceVertexUvs[ 1 ][ i ];
+				var vertexUvs = faceVertexUvs[ secondaryUvsIndex ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
