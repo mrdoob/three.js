@@ -952,6 +952,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		this.secondaryUvsIndex = secondaryUvsIndex;
 
 		this.uvsNeedUpdate = uvsNeedUpdate;
+		this.elementsNeedUpdate = uvsNeedUpdate;
 	},
 
 	toJSON: function () {
