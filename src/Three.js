@@ -1,23 +1,5 @@
 import './polyfills.js';
 
-export { SpritePlugin } from './renderers/webgl/plugins/SpritePlugin.js';
-export { LensFlarePlugin } from './renderers/webgl/plugins/LensFlarePlugin.js';
-export { WebGLUniforms } from './renderers/webgl/WebGLUniforms.js';
-export { WebGLTextures } from './renderers/webgl/WebGLTextures.js';
-export { WebGLState } from './renderers/webgl/WebGLState.js';
-export { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
-export { WebGLShader } from './renderers/webgl/WebGLShader.js';
-export { WebGLProperties } from './renderers/webgl/WebGLProperties.js';
-export { WebGLPrograms } from './renderers/webgl/WebGLPrograms.js';
-export { WebGLProgram } from './renderers/webgl/WebGLProgram.js';
-export { WebGLObjects } from './renderers/webgl/WebGLObjects.js';
-export { WebGLLights } from './renderers/webgl/WebGLLights.js';
-export { WebGLGeometries } from './renderers/webgl/WebGLGeometries.js';
-export { WebGLCapabilities } from './renderers/webgl/WebGLCapabilities.js';
-export { WebGLExtensions } from './renderers/webgl/WebGLExtensions.js';
-export { WebGLIndexedBufferRenderer } from './renderers/webgl/WebGLIndexedBufferRenderer.js';
-export { WebGLClipping } from './renderers/webgl/WebGLClipping.js';
-export { WebGLBufferRenderer } from './renderers/webgl/WebGLBufferRenderer.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
