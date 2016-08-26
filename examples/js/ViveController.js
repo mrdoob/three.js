@@ -1,14 +1,17 @@
+/**
+ * @author mrdoob / http://mrdoob.com
+ */
+
 THREE.ViveController = function ( id ) {
 
 	THREE.Object3D.call( this );
 
+	var scope = this;
 	var gamepad;
 
 	this.getGamepad = function () { return gamepad; };
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
-
-	var scope = this;
 
 	function update() {
 
