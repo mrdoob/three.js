@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - htc vive</title>
+		<title>three.js webvr - htc vive - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -47,9 +47,6 @@
 			var blob, vector;
 
 			var points = [];
-			var hasChanged = true;
-
-			var room;
 
 			init();
 			initBlob();
@@ -74,13 +71,6 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				scene.add( camera );
 
-				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 4, 4, 4, 8, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
-				);
-				room.position.y = 2;
-				// scene.add( room );
-
 				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( { color: 0x444444, roughness: 1.0, metalness: 0.0 } );
 				var table = new THREE.Mesh( geometry, material );
@@ -89,15 +79,6 @@
 				table.castShadow = true;
 				table.receiveShadow = true;
 				scene.add( table );
-
-				/*
-				var table = new THREE.Mesh( geometry, material );
-				table.position.y = 0.35;
-				table.position.z = -0.85;
-				table.castShadow = true;
-				table.receiveShadow = true;
-				scene.add( table );
-				*/
 
 				var geometry = new THREE.PlaneGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( { color: 0x222222, roughness: 1.0, metalness: 0.0 } );
@@ -162,7 +143,6 @@
 					controller.castShadow = true;
 					controller.receiveShadow = true;
 
-					// var pivot = new THREE.Group();
 					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
 					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
@@ -195,6 +175,7 @@
 
 			function initBlob() {
 
+				/*
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
@@ -204,6 +185,7 @@
 				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				*/
 
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
