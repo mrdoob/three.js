@@ -1628,7 +1628,7 @@ function WebGLRenderer( parameters ) {
 		var uniforms = materialProperties.__webglShader.uniforms;
 
 		if ( ! material.isShaderMaterial &&
-		     ! material.isRawShaderMaterial |
+		     ! material.isRawShaderMaterial ||
 		       material.clipping === true ) {
 
 			materialProperties.numClippingPlanes = _clipping.numPlanes;
