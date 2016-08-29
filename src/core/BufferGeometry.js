@@ -774,7 +774,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	setDiscardBuffers () {
+	setDiscardBuffers: function () {
 
 		var attributes = this.attributes;
 
