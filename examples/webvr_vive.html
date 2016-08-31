@@ -230,6 +230,9 @@
 
 				var delta = clock.getDelta() * 60;
 
+				controller1.update();
+				controller2.update();
+
 				controls.update();
 
 				for ( var i = 0; i < room.children.length; i ++ ) {

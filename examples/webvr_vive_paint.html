@@ -369,11 +369,13 @@
 
 			function handleController( controller, id ) {
 
-				var gamepad = controller.getGamepad();
+				controller.update();
 
-				if ( gamepad ) {
+				var pivot = controller.getObjectByName( 'pivot' );
 
-					var matrix = controller.getObjectByName( 'pivot' ).matrixWorld;
+				if ( pivot ) {
+
+					var matrix = pivot.matrixWorld;
 
 					var point1 = controller.userData.points[ 0 ];
 					var point2 = controller.userData.points[ 1 ];
@@ -384,13 +386,13 @@
 					point1.setFromMatrixPosition( matrix );
 					matrix1.lookAt( point2, point1, up );
 
-					if ( gamepad.buttons[ 0 ].pressed ) {
+					if ( controller.getButtonState( 'thumbpad' ) ) {
 
 						color.setHex( Math.random() * 0xffffff );
 
 					}
 
-					if ( gamepad.buttons[ 1 ].pressed ) {
+					if ( controller.getButtonState( 'trigger ') ) {
 
 						if ( line.parent === null ) scene.add( line );
 

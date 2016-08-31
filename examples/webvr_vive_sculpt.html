@@ -239,22 +239,24 @@
 
 			function handleController( controller, id ) {
 
-				var gamepad = controller.getGamepad();
+				controller.update();
+
 				var pivot = controller.getObjectByName( 'pivot' );
 
-				if ( gamepad && pivot ) {
+				if ( pivot ) {
 
 					var matrix = pivot.matrixWorld;
+
 					points[ id ].position.setFromMatrixPosition( matrix );
 					transformPoint( points[ id ].position );
 
-					if ( gamepad.buttons[ 0 ].pressed ) {
+					if ( controller.getButtonState( 'thumbpad' ) ) {
 
 						blob.material.color.setHex( Math.random() * 0xffffff );
 
 					}
 
-					if ( gamepad.buttons[ 1 ].pressed ) {
+					if ( controller.getButtonState( 'trigger' ) ) {
 
 						var strength = points[ id ].strength / 2;
 
@@ -266,7 +268,7 @@
 
 					}
 
-					if ( gamepad.buttons[ 2 ].pressed && id === 0 ) {
+					if ( id === 0 && controller.getButtonState( 'grips' ) ) {
 
 						if ( points.length > 2 ) {
 
@@ -288,7 +290,7 @@
 
 					}
 
-					if ( gamepad.buttons[ 2 ].pressed && id === 1 ) {
+					if ( id === 1 && controller.getButtonState( 'grips' ) ) {
 
 						points[ id ].strength = ( Math.sin( performance.now() / 1000 ) + 1.5 ) / 20.0;
 
