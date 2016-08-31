@@ -16,6 +16,29 @@ THREE.ViveController = function ( id ) {
 	var gripsArePressed = false;
 	var menuIsPressed = false;
 
+	function findGamepad( id ) {
+
+		// Iterate across gamepads as Vive Controllers may not be
+		// in position 0 and 1.
+
+		var gamepads = navigator.getGamepads();
+
+		for ( var i = 0, j = 0; i < 4; i ++ ) {
+
+			var gamepad = gamepads[ i ];
+
+			if ( gamepad && gamepad.id === 'OpenVR Gamepad' ) {
+
+				if ( j === id ) return gamepad;
+
+				j ++;
+
+			}
+
+		}
+
+	}
+
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
 
@@ -36,7 +59,7 @@ THREE.ViveController = function ( id ) {
 
 	this.update = function () {
 
-		gamepad = navigator.getGamepads()[ id ];
+		gamepad = findGamepad( id );
 
 		if ( gamepad !== undefined && gamepad.pose !== null ) {
 
