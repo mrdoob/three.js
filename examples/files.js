@@ -265,6 +265,7 @@ var files = {
 		"webvr_shadow",
 		"webvr_video",
 		"webvr_vive",
+		"webvr_vive_dragging",
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
