@@ -955,6 +955,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			this.uvsNeedUpdate = uvsNeedUpdate;
 			this.elementsNeedUpdate = uvsNeedUpdate;
+
 		}
 		
 	},
