@@ -27,7 +27,10 @@ THREE.ViveController = function ( id ) {
 
 	this.getButtonState = function ( button ) {
 
-		return scope[ button + ( button === 'grips' ? 'ArePressed' : 'IsPressed' ) ];
+		if ( button === 'thumbpad' ) return thumbpadIsPressed;
+		if ( button === 'trigger' ) return triggerIsPressed;
+		if ( button === 'grips' ) return gripsArePressed;
+		if ( button === 'menu' ) return menuIsPressed;
 
 	};
 
