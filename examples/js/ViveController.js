@@ -3,54 +3,44 @@
  * @author stewdio / http://stewd.io
  */
 
-THREE.ViveController = function( id ) {
+THREE.ViveController = function ( id ) {
 
 	THREE.Object3D.call( this );
 
-	var
-	scope = this,
-	gamepad,
-	axes = [ 0, 0 ],
-	thumbpadIsPressed = false,
-	triggerIsPressed = false,
-	gripsArePressed = false,
-	menuIsPressed = false;
+	var scope = this;
+	var gamepad;
 
-	function dispatchViveControllerEvent( name, custom ) {
-
-		var data = {};
-
-		data.id = id;
-		data.gamepad = gamepad;
-		data.instance = scope;
-		if ( custom !== undefined ) Object.assign( data, custom );
-		window.dispatchEvent( new CustomEvent( 'viveController' + name, { detail: data } ) );
-
-	}
+	var axes = [ 0, 0 ];
+	var thumbpadIsPressed = false;
+	var triggerIsPressed = false;
+	var gripsArePressed = false;
+	var menuIsPressed = false;
 
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
-	this.getGamepad = function() {
+
+	this.getGamepad = function () {
 
 		return gamepad;
 
-	}
-	this.getButtonState = function( button ) {
+	};
+
+	this.getButtonState = function ( button ) {
 
 		return scope[ button + ( button === 'grips' ? 'ArePressed' : 'IsPressed' ) ];
 
-	}
-	this.update = function() {
+	};
 
-		var pose;
+	this.update = function () {
 
 		gamepad = navigator.getGamepads()[ id ];
-		if ( gamepad !== undefined && gamepad.pose !== null ) {
 
+		if ( gamepad !== undefined && gamepad.pose !== null ) {
 
 			//  Position and orientation.
 
-			pose = gamepad.pose;
+			var pose = gamepad.pose;
+
 			scope.position.fromArray( pose.position );
 			scope.quaternion.fromArray( pose.orientation );
 			scope.matrix.compose( scope.position, scope.quaternion, scope.scale );
@@ -58,47 +48,53 @@ THREE.ViveController = function( id ) {
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
 
-
 			//  Thumbpad and Buttons.
 
-			if ( axes[ 0 ] !== gamepad.axes[ 0 ] ||
-				axes[ 1 ] !== gamepad.axes[ 1 ] ) {
+			if ( axes[ 0 ] !== gamepad.axes[ 0 ] || axes[ 1 ] !== gamepad.axes[ 1 ] ) {
 
-				axes[ 0 ] = gamepad.axes[ 0 ];//  X axis: -1 = Left, +1 = Right.
-				axes[ 1 ] = gamepad.axes[ 1 ];//  Y axis: -1 = Bottom, +1 = Top.
-				dispatchViveControllerEvent( 'AxisChanged', { axes: axes } );
+				axes[ 0 ] = gamepad.axes[ 0 ]; //  X axis: -1 = Left, +1 = Right.
+				axes[ 1 ] = gamepad.axes[ 1 ]; //  Y axis: -1 = Bottom, +1 = Top.
+				scope.dispatchEvent( { type: 'axischanged', axes: axes } );
 
 			}
+
 			if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
 
 				thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				dispatchViveControllerEvent( thumbpadIsPressed ? 'ThumbpadPressed' : 'ThumbpadReleased' );
+				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
 
 			}
+
 			if ( triggerIsPressed !== gamepad.buttons[ 1 ].pressed ) {
 
 				triggerIsPressed = gamepad.buttons[ 1 ].pressed;
-				dispatchViveControllerEvent( triggerIsPressed ? 'TriggerPressed' : 'TriggerReleased' );
+				scope.dispatchEvent( { type: triggerIsPressed ? 'triggerdown' : 'triggerup' } );
 
 			}
+
 			if ( gripsArePressed !== gamepad.buttons[ 2 ].pressed ) {
 
 				gripsArePressed = gamepad.buttons[ 2 ].pressed;
-				dispatchViveControllerEvent( gripsArePressed ? 'GripsPressed' : 'GripsReleased' );
+				scope.dispatchEvent( { type: gripsArePressed ? 'gripsdown' : 'gripsup' } );
 
 			}
+
 			if ( menuIsPressed !== gamepad.buttons[ 3 ].pressed ) {
 
 				menuIsPressed = gamepad.buttons[ 3 ].pressed;
-				dispatchViveControllerEvent( menuIsPressed ? 'MenuPressed' : 'MenuReleased' );
+				scope.dispatchEvent( { type: menuIsPressed ? 'menudown' : 'menuup' } );
 
 			}
 
+		} else {
+
+			scope.visible = false;
+
 		}
-		else scope.visible = false;
 
-	}
+	};
 
-}
+};
+
 THREE.ViveController.prototype = Object.create( THREE.Object3D.prototype );
 THREE.ViveController.prototype.constructor = THREE.ViveController;
