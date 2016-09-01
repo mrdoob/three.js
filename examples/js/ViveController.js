@@ -10,6 +10,7 @@ THREE.ViveController = function ( id ) {
 	var scope = this;
 	var gamepad;
 
+	var isTracking = false;
 	var axes = [ 0, 0 ];
 	var thumbpadIsPressed = false;
 	var triggerIsPressed = false;
@@ -39,6 +40,17 @@ THREE.ViveController = function ( id ) {
 
 	}
 
+	function checkTracking() {
+
+		isTracking = (
+			gamepad !== undefined &&
+			gamepad.pose !== null &&
+			gamepad.pose.position !== null &&
+			gamepad.pose.orientation !== null
+		);
+
+	}
+
 	this.matrixAutoUpdate = false;
 	this.standingMatrix = new THREE.Matrix4();
 
@@ -57,22 +69,46 @@ THREE.ViveController = function ( id ) {
 
 	};
 
+	this.isTracking = function () {
+
+		return isTracking;
+
+	};
+
 	this.update = function () {
 
 		gamepad = findGamepad( id );
 
-		if ( gamepad !== undefined && gamepad.pose !== null ) {
+		var oldTracking = isTracking;
+		checkTracking();
+
+		if (isTracking !== oldTracking) {
+
+			scope.dispatchEvent( { type: 'trackingchanged' } );
+			scope.dispatchEvent( { type: isTracking ? 'trackingstart' : 'trackingend' } );
+
+		}
+
+		if ( isTracking ) {
 
 			//  Position and orientation.
 
 			var pose = gamepad.pose;
 
-			if ( pose.position !== null ) scope.position.fromArray( pose.position );
-			if ( pose.orientation !== null ) scope.quaternion.fromArray( pose.orientation );
+			scope.position.fromArray( pose.position );
+			scope.quaternion.fromArray( pose.orientation );
 			scope.matrix.compose( scope.position, scope.quaternion, scope.scale );
 			scope.matrix.multiplyMatrices( scope.standingMatrix, scope.matrix );
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
+
+		} else {
+
+			scope.visible = false;
+
+		}
+
+		if ( gamepad ) {
 
 			//  Thumbpad and Buttons.
 
@@ -111,10 +147,6 @@ THREE.ViveController = function ( id ) {
 				scope.dispatchEvent( { type: menuIsPressed ? 'menudown' : 'menuup' } );
 
 			}
-
-		} else {
-
-			scope.visible = false;
 
 		}
 
