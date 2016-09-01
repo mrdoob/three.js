@@ -38,8 +38,6 @@
 
 			//
 
-			var clock = new THREE.Clock();
-
 			var container;
 			var camera, scene, renderer;
 			var effect, controls;
@@ -286,8 +284,6 @@
 			}
 
 			function render() {
-
-				var delta = clock.getDelta() * 60;
 
 				controller1.update();
 				controller2.update();
