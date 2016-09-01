@@ -936,7 +936,7 @@ Matrix4.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;	
+		if ( offset === undefined ) offset = 0;
 
 		for( var i = 0; i < 16; i ++ ) {
 
