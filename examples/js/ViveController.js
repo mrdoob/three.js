@@ -84,7 +84,6 @@ THREE.ViveController = function ( id ) {
 
 		if (isTracking !== oldTracking) {
 
-			scope.dispatchEvent( { type: 'trackingchanged' } );
 			scope.dispatchEvent( { type: isTracking ? 'trackingstart' : 'trackingend' } );
 
 		}
