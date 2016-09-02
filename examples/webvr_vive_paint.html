@@ -83,7 +83,11 @@
 				scene.add( camera );
 
 				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x444444, roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x444444,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
 				var table = new THREE.Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
@@ -101,7 +105,11 @@
 				*/
 
 				var geometry = new THREE.PlaneGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x222222, roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x222222,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
 				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
@@ -119,7 +127,6 @@
 				light.shadow.camera.right = 2;
 				light.shadow.camera.left = -2;
 				light.shadow.mapSize.set( 4096, 4096 );
-
 				scene.add( light );
 
 				// scene.add( new THREE.DirectionalLightHelper( light ) );
