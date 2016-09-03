@@ -6,16 +6,13 @@ function read(filename) {
 }
 
 const flags = {
+	// externs: [{src: read('utils/build/externs.js')}],
 	jsCode: [{src: read('build/three.js')}],
 	warningLevel: 'VERBOSE',
-	languageIn: 'ECMASCRIPT5_STRICT',
+	languageIn: 'ECMASCRIPT5',
 	languageOut: 'ECMASCRIPT5',
-	compilationLevel: 'ADVANCED',
-	externs: [{src: read('utils/build/externs.js')}]
+	compilationLevel: 'ADVANCED'
 };
 
-console.time('compile');
 const out = compile(flags);
-console.timeEnd('compile');
-
 fs.writeFileSync('build/three.min.js', out.compiledCode);
