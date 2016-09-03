@@ -266,7 +266,9 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			output.push(
 				ao.code,
-				"reflectedLight.indirectDiffuse *= " + ao.result + ";"
+				"reflectedLight.indirectDiffuse *= " + ao.result + ";",
+				"float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );",
+				"reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, " + ao.result + ", material.specularRoughness );"
 			);
 
 		}
@@ -310,11 +312,6 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
 
-		output.push(
-			THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ]
-		);
-
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -325,6 +322,13 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
 
 		}
+		
+		output.push(
+			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
+			THREE.ShaderChunk[ "tonemapping_fragment" ],
+			THREE.ShaderChunk[ "encodings_fragment" ],
+			THREE.ShaderChunk[ "fog_fragment" ]
+		);
 
 		code = output.join( "\n" );
 
