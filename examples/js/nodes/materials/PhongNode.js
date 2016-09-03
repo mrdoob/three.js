@@ -275,7 +275,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 				output.push(
 					environmentAlpha.code,
-					"outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentAlpha.result + ");"
+					"outgoingLight = mix( outgoingLight, " + environment.result + ", " + environmentAlpha.result + " );"
 				);
 
 			}
@@ -287,11 +287,6 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		}
 
-		output.push(
-			THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ]
-		);
-
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -302,7 +297,14 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
 
 		}
-
+		
+		output.push(
+			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
+			THREE.ShaderChunk[ "tonemapping_fragment" ],
+			THREE.ShaderChunk[ "encodings_fragment" ],
+			THREE.ShaderChunk[ "fog_fragment" ]
+		);
+		
 		code = output.join( "\n" );
 
 	}
