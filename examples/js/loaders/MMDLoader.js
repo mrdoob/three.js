@@ -4034,6 +4034,12 @@ THREE.MMDHelper.prototype = {
 
 	add: function ( mesh ) {
 
+		if ( ! ( mesh instanceof THREE.SkinnedMesh ) ) {
+
+			throw new Error( 'THREE.MMDHelper.add() accepts only THREE.SkinnedMesh instance.' );
+
+		}
+
 		mesh.mixer = null;
 		mesh.ikSolver = null;
 		mesh.grantSolver = null;
@@ -4378,17 +4384,78 @@ THREE.MMDHelper.prototype = {
 
 	},
 
-	renderOutline: function ( scene, camera ) {
+	renderOutline: function () {
 
-		var tmpEnabled = this.renderer.shadowMap.enabled;
-		this.renderer.shadowMap.enabled = false;
+		var invisibledObjects = [];
+		var setInvisible;
+		var restoreVisible;
 
-		this.setupOutlineRendering();
-		this.callRender( scene, camera );
+		return function renderOutline( scene, camera ) {
 
-		this.renderer.shadowMap.enabled = tmpEnabled;
+			var self = this;
 
-	},
+			if ( setInvisible === undefined ) {
+
+				setInvisible = function ( object ) {
+
+					if ( ! object.visible || ! object.layers.test( camera.layers ) ) return;
+
+					// any types else to skip?
+					if ( object instanceof THREE.Scene ||
+					     object instanceof THREE.Bone ||
+					     object instanceof THREE.Light ||
+					     object instanceof THREE.Camera ||
+					     object instanceof THREE.Audio ||
+					     object instanceof THREE.AudioListener ) return;
+
+					if ( object instanceof THREE.SkinnedMesh ) {
+
+						for ( var i = 0, il = self.meshes.length; i < il; i ++ ) {
+
+							if ( self.meshes[ i ] === object ) return;
+
+						}
+
+					}
+
+					object.layers.mask &= ~ camera.layers.mask;
+					invisibledObjects.push( object );
+
+				};
+
+			}
+
+			if ( restoreVisible === undefined ) {
+
+				restoreVisible = function () {
+
+					for ( var i = 0, il = invisibledObjects.length; i < il; i ++ ) {
+
+						invisibledObjects[ i ].layers.mask |= camera.layers.mask;
+
+					}
+
+					invisibledObjects.length = 0;
+
+				};
+
+			}
+
+			scene.traverse( setInvisible );
+
+			var tmpEnabled = this.renderer.shadowMap.enabled;
+			this.renderer.shadowMap.enabled = false;
+
+			this.setupOutlineRendering();
+			this.callRender( scene, camera );
+
+			this.renderer.shadowMap.enabled = tmpEnabled;
+
+			restoreVisible();
+
+		};
+
+	}(),
 
 	callRender: function ( scene, camera ) {
 

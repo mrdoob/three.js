@@ -1,8 +1,6 @@
 import { Geometry } from '../../core/Geometry';
 import { BoxBufferGeometry } from './BoxBufferGeometry';
 
-var CubeGeometry;
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
@@ -31,7 +29,5 @@ function BoxGeometry( width, height, depth, widthSegments, heightSegments, depth
 BoxGeometry.prototype = Object.create( Geometry.prototype );
 BoxGeometry.prototype.constructor = BoxGeometry;
 
-CubeGeometry = BoxGeometry;
 
-
-export { CubeGeometry, BoxGeometry };
+export { BoxGeometry };

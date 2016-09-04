@@ -2,161 +2,159 @@ import { Vector4 } from '../../math/Vector4';
 import { Color } from '../../math/Color';
 import { Vector2 } from '../../math/Vector2';
 
-var UniformsLib;
-
 /**
  * Uniforms library for shared webgl shaders
  */
 
-UniformsLib = {
+var UniformsLib = {
 
 	common: {
 
-		"diffuse": { value: new Color( 0xeeeeee ) },
-		"opacity": { value: 1.0 },
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
 
-		"map": { value: null },
-		"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) },
+		map: { value: null },
+		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
 
-		"specularMap": { value: null },
-		"alphaMap": { value: null },
+		specularMap: { value: null },
+		alphaMap: { value: null },
 
-		"envMap": { value: null },
-		"flipEnvMap": { value: - 1 },
-		"reflectivity": { value: 1.0 },
-		"refractionRatio": { value: 0.98 }
+		envMap: { value: null },
+		flipEnvMap: { value: - 1 },
+		reflectivity: { value: 1.0 },
+		refractionRatio: { value: 0.98 }
 
 	},
 
 	aomap: {
 
-		"aoMap": { value: null },
-		"aoMapIntensity": { value: 1 }
+		aoMap: { value: null },
+		aoMapIntensity: { value: 1 }
 
 	},
 
 	lightmap: {
 
-		"lightMap": { value: null },
-		"lightMapIntensity": { value: 1 }
+		lightMap: { value: null },
+		lightMapIntensity: { value: 1 }
 
 	},
 
 	emissivemap: {
 
-		"emissiveMap": { value: null }
+		emissiveMap: { value: null }
 
 	},
 
 	bumpmap: {
 
-		"bumpMap": { value: null },
-		"bumpScale": { value: 1 }
+		bumpMap: { value: null },
+		bumpScale: { value: 1 }
 
 	},
 
 	normalmap: {
 
-		"normalMap": { value: null },
-		"normalScale": { value: new Vector2( 1, 1 ) }
+		normalMap: { value: null },
+		normalScale: { value: new Vector2( 1, 1 ) }
 
 	},
 
 	displacementmap: {
 
-		"displacementMap": { value: null },
-		"displacementScale": { value: 1 },
-		"displacementBias": { value: 0 }
+		displacementMap: { value: null },
+		displacementScale: { value: 1 },
+		displacementBias: { value: 0 }
 
 	},
 
 	roughnessmap: {
 
-		"roughnessMap": { value: null }
+		roughnessMap: { value: null }
 
 	},
 
 	metalnessmap: {
 
-		"metalnessMap": { value: null }
+		metalnessMap: { value: null }
 
 	},
 
 	fog: {
 
-		"fogDensity": { value: 0.00025 },
-		"fogNear": { value: 1 },
-		"fogFar": { value: 2000 },
-		"fogColor": { value: new Color( 0xffffff ) }
+		fogDensity: { value: 0.00025 },
+		fogNear: { value: 1 },
+		fogFar: { value: 2000 },
+		fogColor: { value: new Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor": { value: [] },
+		ambientLightColor: { value: [] },
 
-		"directionalLights": { value: [], properties: {
-			"direction": {},
-			"color": {},
+		directionalLights: { value: [], properties: {
+			direction: {},
+			color: {},
 
-			"shadow": {},
-			"shadowBias": {},
-			"shadowRadius": {},
-			"shadowMapSize": {}
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"directionalShadowMap": { value: [] },
-		"directionalShadowMatrix": { value: [] },
+		directionalShadowMap: { value: [] },
+		directionalShadowMatrix: { value: [] },
 
-		"spotLights": { value: [], properties: {
-			"color": {},
-			"position": {},
-			"direction": {},
-			"distance": {},
-			"coneCos": {},
-			"penumbraCos": {},
-			"decay": {},
+		spotLights: { value: [], properties: {
+			color: {},
+			position: {},
+			direction: {},
+			distance: {},
+			coneCos: {},
+			penumbraCos: {},
+			decay: {},
 
-			"shadow": {},
-			"shadowBias": {},
-			"shadowRadius": {},
-			"shadowMapSize": {}
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"spotShadowMap": { value: [] },
-		"spotShadowMatrix": { value: [] },
+		spotShadowMap: { value: [] },
+		spotShadowMatrix: { value: [] },
 
-		"pointLights": { value: [], properties: {
-			"color": {},
-			"position": {},
-			"decay": {},
-			"distance": {},
+		pointLights: { value: [], properties: {
+			color: {},
+			position: {},
+			decay: {},
+			distance: {},
 
-			"shadow": {},
-			"shadowBias": {},
-			"shadowRadius": {},
-			"shadowMapSize": {}
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"pointShadowMap": { value: [] },
-		"pointShadowMatrix": { value: [] },
+		pointShadowMap: { value: [] },
+		pointShadowMatrix: { value: [] },
 
-		"hemisphereLights": { value: [], properties: {
-			"direction": {},
-			"skyColor": {},
-			"groundColor": {}
+		hemisphereLights: { value: [], properties: {
+			direction: {},
+			skyColor: {},
+			groundColor: {}
 		} }
 
 	},
 
 	points: {
 
-		"diffuse": { value: new Color( 0xeeeeee ) },
-		"opacity": { value: 1.0 },
-		"size": { value: 1.0 },
-		"scale": { value: 1.0 },
-		"map": { value: null },
-		"offsetRepeat": { value: new Vector4( 0, 0, 1, 1 ) }
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
+		size: { value: 1.0 },
+		scale: { value: 1.0 },
+		map: { value: null },
+		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) }
 
 	}
 

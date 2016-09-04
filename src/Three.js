@@ -1,28 +1,5 @@
 import './polyfills.js';
 
-export { SpritePlugin } from './renderers/webgl/plugins/SpritePlugin.js';
-export { LensFlarePlugin } from './renderers/webgl/plugins/LensFlarePlugin.js';
-export { WebGLUniforms } from './renderers/webgl/WebGLUniforms.js';
-export { WebGLTextures } from './renderers/webgl/WebGLTextures.js';
-export {
-  WebGLStencilBuffer,
-  WebGLDepthBuffer,
-  WebGLColorBuffer,
-  WebGLState
-} from './renderers/webgl/WebGLState.js';
-export { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
-export { WebGLShader } from './renderers/webgl/WebGLShader.js';
-export { WebGLProperties } from './renderers/webgl/WebGLProperties.js';
-export { WebGLPrograms } from './renderers/webgl/WebGLPrograms.js';
-export { WebGLProgram } from './renderers/webgl/WebGLProgram.js';
-export { WebGLObjects } from './renderers/webgl/WebGLObjects.js';
-export { WebGLLights } from './renderers/webgl/WebGLLights.js';
-export { WebGLGeometries } from './renderers/webgl/WebGLGeometries.js';
-export { WebGLCapabilities } from './renderers/webgl/WebGLCapabilities.js';
-export { WebGLExtensions } from './renderers/webgl/WebGLExtensions.js';
-export { WebGLIndexedBufferRenderer } from './renderers/webgl/WebGLIndexedBufferRenderer.js';
-export { WebGLClipping } from './renderers/webgl/WebGLClipping.js';
-export { WebGLBufferRenderer } from './renderers/webgl/WebGLBufferRenderer.js';
 export { WebGLMultiRenderTarget } from './renderers/WebGLMultiRenderTarget.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
@@ -115,7 +92,6 @@ export { AnimationUtils } from './animation/AnimationUtils.js';
 export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
 export { AnimationMixer } from './animation/AnimationMixer.js';
 export { AnimationClip } from './animation/AnimationClip.js';
-export { AnimationAction } from './animation/AnimationAction.js';
 export { Uniform } from './core/Uniform.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
@@ -216,7 +192,7 @@ export { CylinderBufferGeometry } from './extras/geometries/CylinderBufferGeomet
 export { CircleBufferGeometry } from './extras/geometries/CircleBufferGeometry.js';
 export { CircleGeometry } from './extras/geometries/CircleGeometry.js';
 export { BoxBufferGeometry } from './extras/geometries/BoxBufferGeometry.js';
-export { CubeGeometry, BoxGeometry } from './extras/geometries/BoxGeometry.js';
+export { BoxGeometry } from './extras/geometries/BoxGeometry.js';
 export { ClosedSplineCurve3 } from './extras/curves/ClosedSplineCurve3.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 export { SplineCurve3 } from './extras/curves/SplineCurve3.js';
@@ -238,3 +214,4 @@ export { ShapeUtils } from './extras/ShapeUtils.js';
 export { SceneUtils } from './extras/SceneUtils.js';
 export { CurveUtils } from './extras/CurveUtils.js';
 export * from './constants.js';
+export * from './Three.Legacy.js';

@@ -20,6 +20,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	var material = builder.material;
 	var code;
 
+	material.define( 'STANDARD' );
 	material.define( 'PHYSICAL' );
 	material.define( 'ALPHATEST', '0.0' );
 

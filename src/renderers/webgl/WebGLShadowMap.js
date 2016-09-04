@@ -1,3 +1,8 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
 import { WebGLRenderTarget } from '../WebGLRenderTarget';
 import { ShaderMaterial } from '../../materials/ShaderMaterial';
@@ -9,11 +14,6 @@ import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
 import { Matrix4 } from '../../math/Matrix4';
 import { Frustum } from '../../math/Frustum';
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
 
 function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
@@ -342,7 +342,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			var useSkinning = (object && object.isSkinnedMesh) && material.skinning;
+			var useSkinning = object.isSkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
 
@@ -428,7 +428,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) && ( (object && object.isMesh) || (object && object.isLine) || (object && object.isPoints) ) ) {
+		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+
+		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
