@@ -56,7 +56,7 @@ IncidentLight directLight;
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, spotLight.shadowCameraParams, vSpotShadowCoord[ i ], 1 ) : 1.0;
+		directLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, 0.0, spotLight.shadowCameraParams, vSpotShadowCoord[ i ], 1 ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );
@@ -76,7 +76,7 @@ IncidentLight directLight;
 		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 
 		#ifdef USE_SHADOWMAP
-		directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.spreadAngle, directionalLight.shadowCameraParams, vDirectionalShadowCoord[ i ], 0 ) : 1.0;
+		directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, 0.0, directionalLight.spreadAngle, directionalLight.shadowCameraParams, vDirectionalShadowCoord[ i ], 0 ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );

@@ -55,12 +55,12 @@
 			return (zReceiverLightSpace - zBlockerLightSpace) / zBlockerLightSpace;
 		}
 
-		float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiverClipSpace, const in float zReceiverLightSpace, const in float shadowRadius, const in vec3 shadowCameraParams, const in vec2 randomSeed, const int lightType ) {
+		float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiverClipSpace, const in float zReceiverLightSpace, const in float shadowRadius, const in float spreadAngle, const in vec3 shadowCameraParams, const in vec2 randomSeed, const int lightType ) {
 			// This uses similar triangles to compute what
 			// area of the shadow map we should search
 			float lightFrustrumWidth = 2.0 * shadowCameraParams.y * tan(shadowCameraParams.x * 0.5);
 			float searchRadius = 0.0;
-			searchRadius = ( lightType == 0) ? zReceiverLightSpace * shadowRadius/shadowCameraParams.x : ( shadowRadius / lightFrustrumWidth ) * ( zReceiverLightSpace - shadowCameraParams.y ) / zReceiverLightSpace;
+			searchRadius = ( lightType == 0) ? zReceiverLightSpace * spreadAngle/shadowCameraParams.x : ( shadowRadius / lightFrustrumWidth ) * ( zReceiverLightSpace - shadowCameraParams.y ) / zReceiverLightSpace;
 			float blockerDepthSum = 0.0;
 			int numBlockers = 0;
 
@@ -111,7 +111,7 @@
 			return sum / ( 2.0 * float( PCSS_NUM_POISSON_SAMPLES ) );
 		}
 
-		float percentCloserSoftShadow( sampler2D shadowMap, const in float shadowRadius, const in vec3 shadowCameraParams, const in vec4 coords, const int lightType ) {
+		float percentCloserSoftShadow( sampler2D shadowMap, const in float shadowRadius, const in float spreadAngle, const in vec3 shadowCameraParams, const in vec4 coords, const int lightType ) {
 
 			vec2 uv = coords.xy;
 			float zReceiverClipSpace = coords.z;
@@ -122,7 +122,7 @@
 				zReceiverLightSpace = -perspectiveDepthToViewZ( zReceiverClipSpace, shadowCameraParams.y, shadowCameraParams.z );
 
 			// STEP 1: blocker search
-			float avgBlockerDepthClipSpace = findBlocker( shadowMap, uv, zReceiverClipSpace, zReceiverLightSpace, shadowRadius, shadowCameraParams, uv, lightType );
+			float avgBlockerDepthClipSpace = findBlocker( shadowMap, uv, zReceiverClipSpace, zReceiverLightSpace, shadowRadius, spreadAngle, shadowCameraParams, uv, lightType );
 
 			//There are no occluders so early out (this saves filtering)
 			if( avgBlockerDepthClipSpace == -1.0 ) return 1.0;
@@ -133,7 +133,7 @@
 			// STEP 2: penumbra size
 			if(lightType == 0) {
 				avgBlockerDepthLightSpace = -OrthoDepthToViewZ( avgBlockerDepthClipSpace, shadowCameraParams.y, shadowCameraParams.z );
-				filterRadius = (zReceiverLightSpace - avgBlockerDepthLightSpace) * shadowRadius/shadowCameraParams.x;
+				filterRadius = (zReceiverLightSpace - avgBlockerDepthLightSpace) * spreadAngle/shadowCameraParams.x;
 			}
 			else {
 				avgBlockerDepthLightSpace = -perspectiveDepthToViewZ( avgBlockerDepthClipSpace, shadowCameraParams.y, shadowCameraParams.z );
@@ -185,7 +185,7 @@
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec3 shadowCameraParams, vec4 shadowCoord, const int lightType ) {
+	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, float spreadAngle, vec3 shadowCameraParams, vec4 shadowCoord, const int lightType ) {
 
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
@@ -246,7 +246,7 @@
 
 		#elif defined( SHADOWMAP_TYPE_PCSS )
 
-		  return percentCloserSoftShadow( shadowMap, shadowRadius, shadowCameraParams, shadowCoord, lightType );
+		  return percentCloserSoftShadow( shadowMap, shadowRadius, spreadAngle, shadowCameraParams, shadowCoord, lightType );
 
 		#else // no percentage-closer filtering:
 
