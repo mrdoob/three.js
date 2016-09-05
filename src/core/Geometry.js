@@ -1159,12 +1159,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		this.vertices = [];
 		this.faces = [];
 		this.faceVertexUvs = [ [] ];
+		this.colors = [];
 
 		var vertices = source.vertices;
 
 		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 			this.vertices.push( vertices[ i ].clone() );
+
+		}
+
+		var colors = source.colors;
+
+		for ( var i = 0, il = colors.length; i < il; i ++ ) {
+
+			this.colors.push( colors[ i ].clone() );
 
 		}
 
