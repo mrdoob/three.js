@@ -683,8 +683,8 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		faces1 = this.faces,
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ];
-		colors1 = this.colors;
+		uvs2 = geometry.faceVertexUvs[ 0 ],
+		colors1 = this.colors,
 		colors2 = geometry.colors;
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
