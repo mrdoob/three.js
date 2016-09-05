@@ -28,9 +28,6 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	// maybe only do these on demand, as doing them here could potentially slow down loading
-	// but leaving these here during development as this ensures a lot of testing of these functions
-	this.trim();
 	this.optimize();
 
 }

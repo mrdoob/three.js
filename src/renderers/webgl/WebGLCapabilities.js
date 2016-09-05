@@ -68,6 +68,20 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	var logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && !! extensions.get( 'EXT_frag_depth' );
 
+	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+	var maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
+	var maxTextureSize = gl.getParameter( gl.MAX_TEXTURE_SIZE );
+	var maxCubemapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE );
+
+	var maxAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
+	var maxVertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
+	var maxVaryings = gl.getParameter( gl.MAX_VARYING_VECTORS );
+	var maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
+
+	var vertexTextures = maxVertexTextures > 0;
+	var floatFragmentTextures = !! extensions.get( 'OES_texture_float' );
+	var floatVertexTextures = vertexTextures && floatFragmentTextures;
+
 	return {
 
 		getMaxAnisotropy: getMaxAnisotropy,
@@ -76,19 +90,19 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
 
-		maxTextures: gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS ),
-		maxVertexTextures: gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
-		maxTextureSize: gl.getParameter( gl.MAX_TEXTURE_SIZE ),
-		maxCubemapSize: gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE ),
+		maxTextures: maxTextures,
+		maxVertexTextures: maxVertexTextures,
+		maxTextureSize: maxTextureSize,
+		maxCubemapSize: maxCubemapSize,
 
-		maxAttributes: gl.getParameter( gl.MAX_VERTEX_ATTRIBS ),
-		maxVertexUniforms: gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS ),
-		maxVaryings: gl.getParameter( gl.MAX_VARYING_VECTORS ),
-		maxFragmentUniforms: gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS ),
+		maxAttributes: maxAttributes,
+		maxVertexUniforms: maxVertexUniforms,
+		maxVaryings: maxVaryings,
+		maxFragmentUniforms: maxFragmentUniforms,
 
-		vertexTextures: this.maxVertexTextures > 0,
-		floatFragmentTextures: !! extensions.get( 'OES_texture_float' ),
-		floatVertexTextures: this.vertexTextures && this.floatFragmentTextures
+		vertexTextures: vertexTextures,
+		floatFragmentTextures: floatFragmentTextures,
+		floatVertexTextures: floatVertexTextures
 
 	};
 

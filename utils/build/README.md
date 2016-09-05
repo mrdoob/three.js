@@ -7,4 +7,4 @@ The build system now makes use of Node and npm.
 
 ## Building
 
-- Execute 'npm run build-min' 
+- Execute 'npm run build-closure' 
