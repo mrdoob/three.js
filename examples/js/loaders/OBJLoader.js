@@ -412,7 +412,7 @@ THREE.OBJLoader.prototype = {
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
 			// This is faster than String.split with regex that splits on both
-			text = text.replace( '\r\n', '\n' );
+			text = text.replace( /\r\n/g, '\n' );
 
 		}
 
