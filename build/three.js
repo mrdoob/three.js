@@ -4259,9 +4259,15 @@
 
 		},
 
-		fromArray: function ( array ) {
+		fromArray: function ( array, offset ) {
 
-			this.elements.set( array );
+			if ( offset === undefined ) offset = 0;
+
+			for( var i = 0; i < 16; i ++ ) {
+
+				this.elements[ i ] = array[ i + offset ];
+
+			}
 
 			return this;
 
@@ -8622,9 +8628,15 @@
 
 		},
 
-		fromArray: function ( array ) {
+		fromArray: function ( array, offset ) {
 
-			this.elements.set( array );
+			if ( offset === undefined ) offset = 0;
+
+			for( var i = 0; i < 9; i ++ ) {
+
+				this.elements[ i ] = array[ i + offset ];
+
+			}
 
 			return this;
 
@@ -11737,7 +11749,9 @@
 			faces1 = this.faces,
 			faces2 = geometry.faces,
 			uvs1 = this.faceVertexUvs[ 0 ],
-			uvs2 = geometry.faceVertexUvs[ 0 ];
+			uvs2 = geometry.faceVertexUvs[ 0 ],
+			colors1 = this.colors,
+			colors2 = geometry.colors;
 
 			if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
@@ -11758,6 +11772,14 @@
 				if ( matrix !== undefined ) vertexCopy.applyMatrix4( matrix );
 
 				vertices1.push( vertexCopy );
+
+			}
+
+			// colors
+
+			for ( var i = 0, il = colors2.length; i < il; i ++ ) {
+
+				colors1.push( colors2[ i ].clone() );
 
 			}
 
@@ -12213,12 +12235,21 @@
 			this.vertices = [];
 			this.faces = [];
 			this.faceVertexUvs = [ [] ];
+			this.colors = [];
 
 			var vertices = source.vertices;
 
 			for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 				this.vertices.push( vertices[ i ].clone() );
+
+			}
+
+			var colors = source.colors;
+
+			for ( var i = 0, il = colors.length; i < il; i ++ ) {
+
+				this.colors.push( colors[ i ].clone() );
 
 			}
 
@@ -20130,7 +20161,7 @@
 			//
 
 			var dataStart = 0;
-			var dataCount = Infinity;
+			var dataCount = 0;
 
 			if ( index !== null ) {
 
@@ -20152,6 +20183,8 @@
 			var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 			var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+			if ( drawCount === 0 ) return;
 
 			//
 
@@ -26827,9 +26860,6 @@
 
 		}
 
-		// maybe only do these on demand, as doing them here could potentially slow down loading
-		// but leaving these here during development as this ensures a lot of testing of these functions
-		this.trim();
 		this.optimize();
 
 	}
