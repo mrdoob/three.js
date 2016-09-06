@@ -32,7 +32,7 @@ var list = {
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
-            [ "Uniform", "api/core/Uniform"]
+			[ "Uniform", "api/core/Uniform"]
 		],
 
 		"Lights": [
