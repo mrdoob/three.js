@@ -272,7 +272,7 @@ Matrix3.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
