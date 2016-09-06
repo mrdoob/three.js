@@ -143,12 +143,14 @@
         [page:Vector3 point] – point of intersection, in world coordinates<br />
         [page:Face3 face] – intersected face<br />
         [page:Integer faceIndex] – index of the intersected face<br />
-        [page:Array indices] – indices of vertices comprising the intersected face<br />
+        [page:Array indices] or [page:Integer index] – indices of vertices comprising the intersected face, or a single vertex index (when intersecting [page:Points])<br />
         [page:Object3D object] – the intersected object<br />
         [page:Vector2 uv] - U,V coordinates at point of intersection
     	</p>
         <p>
         When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
+        <p>
+        When intersecting a [page:Points] object, *faceIndex* and *face* will be *undefined*, and a single *index* will be set instead of *indices*. 
         </p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
