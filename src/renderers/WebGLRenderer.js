@@ -806,7 +806,7 @@ function WebGLRenderer( parameters ) {
 		//
 
 		var dataStart = 0;
-		var dataCount = Infinity;
+		var dataCount = 0;
 
 		if ( index !== null ) {
 
@@ -828,6 +828,8 @@ function WebGLRenderer( parameters ) {
 		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+		if ( drawCount === 0 ) return;
 
 		//
 
