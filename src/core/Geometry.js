@@ -21,7 +21,7 @@ import { _Math } from '../math/Math';
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+	Object.defineProperty( this, 'id', { value: Geometry.IdCount ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -1235,8 +1235,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 } );
 
-var count = 0;
-function GeometryIdCount() { return count++; };
+Geometry.IdCount = 0;
 
 
-export { GeometryIdCount, Geometry };
+export { Geometry };
