@@ -9,7 +9,7 @@
     "LICENSE",
     "README.md",
     "build/three.js",
-    "build/three.jsnext.js",
+    "build/three.next.js",
     "build/three.min.js",
     "src",
     "examples/js",
