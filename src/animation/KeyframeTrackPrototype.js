@@ -269,9 +269,12 @@ KeyframeTrackPrototype = {
 			values = this.values,
 			stride = this.getValueSize(),
 
-			writeIndex = 1;
+			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
 
-		for( var i = 1, n = times.length - 1; i <= n; ++ i ) {
+			writeIndex = 1,
+			lastIndex = times.length - 1;
+
+		for( var i = 1; i < lastIndex; ++ i ) {
 
 			var keep = false;
 
@@ -282,24 +285,29 @@ KeyframeTrackPrototype = {
 
 			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
 
-				// remove unnecessary keyframes same as their neighbors
-				var offset = i * stride,
-					offsetP = offset - stride,
-					offsetN = offset + stride;
+				if ( ! smoothInterpolation ) {
 
-				for ( var j = 0; j !== stride; ++ j ) {
+					// remove unnecessary keyframes same as their neighbors
 
-					var value = values[ offset + j ];
+					var offset = i * stride,
+						offsetP = offset - stride,
+						offsetN = offset + stride;
 
-					if ( value !== values[ offsetP + j ] ||
-							value !== values[ offsetN + j ] ) {
+					for ( var j = 0; j !== stride; ++ j ) {
 
-						keep = true;
-						break;
+						var value = values[ offset + j ];
+
+						if ( value !== values[ offsetP + j ] ||
+								value !== values[ offsetN + j ] ) {
+
+							keep = true;
+							break;
+
+						}
 
 					}
 
-				}
+				} else keep = true;
 
 			}
 
@@ -314,12 +322,9 @@ KeyframeTrackPrototype = {
 					var readOffset = i * stride,
 						writeOffset = writeIndex * stride;
 
-					for ( var j = 0; j !== stride; ++ j ) {
+					for ( var j = 0; j !== stride; ++ j )
 
 						values[ writeOffset + j ] = values[ readOffset + j ];
-
-					}
-
 
 				}
 
@@ -328,6 +333,15 @@ KeyframeTrackPrototype = {
 			}
 
 		}
+
+		// flush last keyframe (compaction looks ahead)
+
+		times[ writeIndex ++ ] = times[ lastIndex ];
+
+		for ( var readOffset = lastIndex * stride, j = 0; j !== stride; ++ j )
+
+			values[ writeOffset + j ] = values[ readOffset + j ];
+
 
 		if ( writeIndex !== times.length ) {
 

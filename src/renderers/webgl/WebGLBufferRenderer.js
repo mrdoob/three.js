@@ -1,8 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
+function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
 
@@ -14,11 +14,12 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 	function render( start, count ) {
 
-		_gl.drawArrays( mode, start, count );
+		gl.drawArrays( mode, start, count );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
 
 	}
 
@@ -51,15 +52,18 @@ function WebGLBufferRenderer( _gl, extensions, _infoRender ) {
 
 		}
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count * geometry.maxInstancedCount;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
 
 	}
 
-	this.setMode = setMode;
-	this.render = render;
-	this.renderInstances = renderInstances;
+	return {
+		setMode: setMode,
+		render: render,
+		renderInstances: renderInstances
+	};
 
 }
 

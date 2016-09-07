@@ -70,7 +70,7 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new AnimationMixer._Action( this, clipObject, optionalRoot );
+		var newAction = new AnimationAction( this, clipObject, optionalRoot );
 
 		this._bindAction( newAction, prototypeAction );
 
@@ -275,8 +275,6 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 
 } );
 
-AnimationMixer._Action = AnimationAction._new;
-
 // Implementation details:
 
 Object.assign( AnimationMixer.prototype, {
@@ -426,8 +424,8 @@ Object.assign( AnimationMixer.prototype, {
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< _Action >	- used as prototypes
-		// 		actionByRoot: _Action			- lookup
+		// 		knownActions: Array< AnimationAction >	- used as prototypes
+		// 		actionByRoot: AnimationAction			- lookup
 		// }
 
 
@@ -461,7 +459,7 @@ Object.assign( AnimationMixer.prototype, {
 
 	},
 
-	// Memory management for _Action objects
+	// Memory management for AnimationAction objects
 
 	_isActiveAction: function( action ) {
 
