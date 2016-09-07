@@ -4894,14 +4894,14 @@
 
     };
 
-    WebGLUniforms.evalDynamic = function( seq, values, object, camera ) {
+    WebGLUniforms.evalDynamic = function( seq, values, object, material, camera ) {
 
     	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
     		var v = values[ seq[ i ].id ],
     			f = v.onUpdateCallback;
 
-    		if ( f !== undefined ) f.call( v, object, camera );
+    		if ( f !== undefined ) f.call( v, object, material, camera );
 
     	}
 
@@ -21344,9 +21344,7 @@
 
     		if ( dynUniforms !== null ) {
 
-    			WebGLUniforms.evalDynamic(
-    					dynUniforms, m_uniforms, object, camera );
-
+    			WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
     			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
 
     		}
