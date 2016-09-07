@@ -760,6 +760,12 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
+
+				morphInfluences[ i ] = 0.0;
+
+			}
+
 			program.getUniforms().setValue(
 					_gl, 'morphTargetInfluences', morphInfluences );
 
