@@ -3,7 +3,7 @@
   "version": "0.80.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
-  "jsnext:main": "build/three.jsnext.js",
+  "jsnext:main": "build/three.next.js",
   "files": [
     "package.json",
     "LICENSE",
