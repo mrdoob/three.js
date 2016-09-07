@@ -47,7 +47,8 @@
 		<script src="js/nodes/ConstNode.js"></script>
 		<script src="js/nodes/FunctionNode.js"></script>
 		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/BuilderNode.js"></script>
+		<script src="js/nodes/AttributeNode.js"></script>
+		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
@@ -68,6 +69,7 @@
 		<script src="js/nodes/inputs/Vector2Node.js"></script>
 		<script src="js/nodes/inputs/Vector3Node.js"></script>
 		<script src="js/nodes/inputs/Vector4Node.js"></script>
+		<script src="js/nodes/inputs/TextureBaseNode.js"></script>
 		<script src="js/nodes/inputs/TextureNode.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 
@@ -205,10 +207,12 @@
 				'adv / camera-depth': 'camera-depth',
 				'adv / soft-body': 'soft-body',
 				'adv / wave': 'wave',
+				'adv / triangle-blur' : 'triangle-blur',
 				'adv / sss' : 'sss',
 				'adv / translucent' : 'translucent',
 				'misc / smoke' : 'smoke',
-				'misc / firefly' : 'firefly'
+				'misc / firefly' : 'firefly',
+				'misc / custom-attribute' : 'custom-attribute',
 			} ).onFinishChange( function() {
 
 				updateMaterial();
@@ -1579,6 +1583,85 @@
 
 					break;
 
+				case 'custom-attribute':
+					
+					// GEOMETRY
+					
+					// add "position" buffer to "custom" attribute
+					teapot.attributes['custom'] = teapot.attributes['position'];
+					
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+					
+					mtl.color = new THREE.AttributeNode( "custom", "vec3" );
+				
+					break;
+					
+				case 'triangle-blur':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var tex = new THREE.TextureNode( brick );
+					var delta = new THREE.Vector2Node( .5, .25 );
+					var alpha = new THREE.FloatNode( 1 );
+
+					var blurtexture = new THREE.FunctionNode( [
+					// Reference: TriangleBlurShader.js
+					"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta, vec2 delta2) {",
+					"	vec4 color = vec4( 0.0 );",
+					"	float total = 0.0;",
+					// randomize the lookup values to hide the fixed number of samples
+					"	float offset = rand( uv );",
+					"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
+					"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
+					"		float weight = 1.0 - abs( percent );",
+					"		color += texture2D( texture, uv + delta * percent ) * weight;",
+					"		total += weight;",
+					"	}",
+					"	return color / total;",
+					"}"
+					].join( "\n" ), [ new THREE.ConstNode( "float BLUR_ITERATIONS = 10.0" ) ] );
+
+					var blurredTexture = new THREE.FunctionCallNode( blurtexture );
+					blurredTexture.inputs.texture = new THREE.TextureBaseNode( brick );
+					blurredTexture.inputs.delta = delta;
+					blurredTexture.inputs.uv = new THREE.UVNode();
+					blurredTexture.inputs.delta2 = new THREE.ConstNode( "float BLUR_ITERATIONS = 10.0" );
+
+					var color = new THREE.Math3Node(
+						new THREE.TextureNode( brick ),
+						blurredTexture,
+						alpha,
+						THREE.Math3Node.MIX
+					);
+					
+					mtl.color = color;					
+
+					// GUI
+
+					addGui( 'alpha', alpha.number, function( val ) {
+
+						alpha.number = val;
+
+					}, false, 0, 1 );
+					
+					addGui( 'deltaX', delta.x, function( val ) {
+
+						delta.x = val;
+
+					}, false, 0, 1 );
+					
+					addGui( 'deltaY', delta.x, function( val ) {
+
+						delta.y = val;
+
+					}, false, 0, 1 );
+
+					break;
+					
 				case 'firefly':
 
 					// MATERIAL
