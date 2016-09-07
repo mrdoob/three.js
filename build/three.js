@@ -24409,7 +24409,7 @@
 
 
 
-    var Material$1 = Object.freeze({
+    var Materials = Object.freeze({
     	ShadowMaterial: ShadowMaterial,
     	SpriteMaterial: SpriteMaterial,
     	RawShaderMaterial: RawShaderMaterial,
@@ -27281,7 +27281,7 @@
 
     		}
 
-    		var material = new Material$1[ json.type ]();
+    		var material = new Materials[ json.type ]();
 
     		if ( json.uuid !== undefined ) material.uuid = json.uuid;
     		if ( json.name !== undefined ) material.name = json.name;
@@ -32433,7 +32433,7 @@
 
 
 
-    var Geometry$1 = Object.freeze({
+    var Geometries = Object.freeze({
     	WireframeGeometry: WireframeGeometry,
     	ParametricGeometry: ParametricGeometry,
     	TetrahedronGeometry: TetrahedronGeometry,
@@ -32562,7 +32562,7 @@
     					case 'PlaneGeometry':
     					case 'PlaneBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.width,
     							data.height,
     							data.widthSegments,
@@ -32575,7 +32575,7 @@
     					case 'BoxBufferGeometry':
     					case 'CubeGeometry': // backwards compatible
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.width,
     							data.height,
     							data.depth,
@@ -32589,7 +32589,7 @@
     					case 'CircleGeometry':
     					case 'CircleBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.segments,
     							data.thetaStart,
@@ -32601,7 +32601,7 @@
     					case 'CylinderGeometry':
     					case 'CylinderBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radiusTop,
     							data.radiusBottom,
     							data.height,
@@ -32617,7 +32617,7 @@
     					case 'ConeGeometry':
     					case 'ConeBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.height,
     							data.radialSegments,
@@ -32632,7 +32632,7 @@
     					case 'SphereGeometry':
     					case 'SphereBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.widthSegments,
     							data.heightSegments,
@@ -32649,7 +32649,7 @@
     					case 'OctahedronGeometry':
     					case 'TetrahedronGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.detail
     						);
@@ -32659,7 +32659,7 @@
     					case 'RingGeometry':
     					case 'RingBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.innerRadius,
     							data.outerRadius,
     							data.thetaSegments,
@@ -32673,7 +32673,7 @@
     					case 'TorusGeometry':
     					case 'TorusBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.tube,
     							data.radialSegments,
@@ -32686,7 +32686,7 @@
     					case 'TorusKnotGeometry':
     					case 'TorusKnotBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.radius,
     							data.tube,
     							data.tubularSegments,
@@ -32700,7 +32700,7 @@
     					case 'LatheGeometry':
     					case 'LatheBufferGeometry':
 
-    						geometry = new Geometry$1[ data.type ](
+    						geometry = new Geometries[ data.type ](
     							data.points,
     							data.segments,
     							data.phiStart,
