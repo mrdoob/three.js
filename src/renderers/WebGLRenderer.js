@@ -1971,9 +1971,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( dynUniforms !== null ) {
 
-			WebGLUniforms.evalDynamic(
-					dynUniforms, m_uniforms, object, camera );
-
+			WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
 			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
 
 		}
