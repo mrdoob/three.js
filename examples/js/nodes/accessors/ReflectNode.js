@@ -20,7 +20,7 @@ THREE.ReflectNode.prototype.constructor = THREE.ReflectNode;
 THREE.ReflectNode.prototype.getType = function( builder ) {
 
 	switch ( this.scope ) {
-		case THREE.CameraNode.SPHERE:
+		case THREE.ReflectNode.SPHERE:
 			return 'v2';
 	}
 
