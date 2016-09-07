@@ -792,6 +792,18 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setBuffersOnUpload: function ( callback ) {
+
+		var attributes = this.attributes;
+
+		for ( var key in attributes ) {
+
+			attributes[ key ].onUploadCallback = callback;
+
+		}
+
+	},
+
 	merge: function ( geometry, offset ) {
 
 		if ( (geometry && geometry.isBufferGeometry) === false ) {

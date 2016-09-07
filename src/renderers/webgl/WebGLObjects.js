@@ -96,6 +96,12 @@ function WebGLObjects( gl, properties, info ) {
 
 		}
 
+		if ( data.onUploadCallback ) {
+
+			data.onUploadCallback.call( data, "boo" );
+
+		}
+
 	}
 
 	function updateBuffer( attributeProperties, data, bufferType ) {

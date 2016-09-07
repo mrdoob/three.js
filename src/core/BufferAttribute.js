@@ -28,6 +28,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.version = 0;
 	this.discard = false;
 	this.discardedLength = 0;
+	this.onUploadCallback = null;
 
 }
 
