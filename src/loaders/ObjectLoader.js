@@ -28,16 +28,11 @@ import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
 import { XHRLoader } from './XHRLoader';
-import * as CoreGeometry from '../core/Geometries';
-import * as ExtraGeometry from '../extras/geometries/Geometries';
+import * as Geometry from '../extras/geometries/Geometries';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-
-function resolveGeometryType ( type ) {
-	return CoreGeometry[ type ] || ExtraGeometry[ type ];
-}
 
 function ObjectLoader ( manager ) {
 
@@ -129,7 +124,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'PlaneGeometry':
 					case 'PlaneBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.width,
 							data.height,
 							data.widthSegments,
@@ -142,7 +137,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'BoxBufferGeometry':
 					case 'CubeGeometry': // backwards compatible
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.width,
 							data.height,
 							data.depth,
@@ -156,7 +151,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'CircleGeometry':
 					case 'CircleBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.segments,
 							data.thetaStart,
@@ -168,7 +163,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'CylinderGeometry':
 					case 'CylinderBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
 							data.height,
@@ -184,7 +179,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'ConeGeometry':
 					case 'ConeBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.height,
 							data.radialSegments,
@@ -199,7 +194,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'SphereGeometry':
 					case 'SphereBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.widthSegments,
 							data.heightSegments,
@@ -216,7 +211,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'OctahedronGeometry':
 					case 'TetrahedronGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.detail
 						);
@@ -226,7 +221,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'RingGeometry':
 					case 'RingBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.innerRadius,
 							data.outerRadius,
 							data.thetaSegments,
@@ -240,7 +235,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'TorusGeometry':
 					case 'TorusBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.tube,
 							data.radialSegments,
@@ -253,7 +248,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'TorusKnotGeometry':
 					case 'TorusKnotBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.radius,
 							data.tube,
 							data.tubularSegments,
@@ -267,7 +262,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'LatheGeometry':
 					case 'LatheBufferGeometry':
 
-						geometry = new (resolveGeometryType( data.type ))(
+						geometry = new Geometry[ data.type ](
 							data.points,
 							data.segments,
 							data.phiStart,
