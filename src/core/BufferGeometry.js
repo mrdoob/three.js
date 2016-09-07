@@ -332,6 +332,12 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
+		if ( geometry.onUploadCallback ) {
+
+			this.onUploadBuffers ( geometry.onUploadCallback );
+
+		}
+
 		return this;
 
 	},
