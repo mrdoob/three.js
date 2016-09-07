@@ -780,19 +780,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	setDiscardBuffers: function () {
-
-		var attributes = this.attributes;
-
-		for ( var key in attributes ) {
-
-			attributes[ key ].discard = true;
-
-		}
-
-	},
-
-	setBuffersOnUpload: function ( callback ) {
+	onUploadBuffers: function ( callback ) {
 
 		var attributes = this.attributes;
 

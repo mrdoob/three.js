@@ -34,7 +34,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		for ( var name in attributes ) {
 
-			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
+			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER, name );
 
 		}
 
@@ -58,7 +58,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	function updateAttribute( attribute, bufferType ) {
+	function updateAttribute( attribute, bufferType, name ) {
 
 		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -66,7 +66,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( attributeProperties.__webglBuffer === undefined ) {
 
-			createBuffer( attributeProperties, data, bufferType );
+			createBuffer( attributeProperties, data, bufferType, name );
 
 		} else if ( attributeProperties.version !== data.version ) {
 
@@ -76,7 +76,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	function createBuffer( attributeProperties, data, bufferType ) {
+	function createBuffer( attributeProperties, data, bufferType, name ) {
 
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
@@ -87,18 +87,9 @@ function WebGLObjects( gl, properties, info ) {
 
 		attributeProperties.version = data.version;
 
-		var oldArray = data.array;
-
-		if ( data.discard ) {
-
-			data.discardedLength = oldArray.length;
-			data.array = new oldArray.constructor( 1 ); // create dummy minimal length TypedArray
-
-		}
-
 		if ( data.onUploadCallback ) {
 
-			data.onUploadCallback.call( data, "boo" );
+			data.onUploadCallback.call( data, name );
 
 		}
 
@@ -106,7 +97,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	function updateBuffer( attributeProperties, data, bufferType ) {
 
-		if ( data.discard ) {
+		if ( data.discardedLength > 0 ) {
 
 			console.warn( "THREE.WebGLObjects: attempting to update discarded attribute array" );
 
