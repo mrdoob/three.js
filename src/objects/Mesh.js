@@ -58,7 +58,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
-			this.morphTargetBase = - 1;
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 
@@ -70,20 +69,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	getMorphTargetIndexByName: function ( name ) {
-
-		if ( this.morphTargetDictionary[ name ] !== undefined ) {
-
-			return this.morphTargetDictionary[ name ];
-
-		}
-
-		console.warn( 'THREE.Mesh.getMorphTargetIndexByName: morph target ' + name + ' does not exist. Returning 0.' );
-
-		return 0;
 
 	},
 
