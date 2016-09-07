@@ -4,23 +4,16 @@
 
 THREE.TextureNode = function( value, coord, bias, project ) {
 
-	THREE.InputNode.call( this, 'v4' );
+	THREE.TextureBaseNode.call( this, value, 'v4' );
 
-	this.value = value;
 	this.coord = coord || new THREE.UVNode();
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
 };
 
-THREE.TextureNode.prototype = Object.create( THREE.InputNode.prototype );
+THREE.TextureNode.prototype = Object.create( THREE.TextureBaseNode.prototype );
 THREE.TextureNode.prototype.constructor = THREE.TextureNode;
-
-THREE.TextureNode.prototype.getTexture = function( builder, output ) {
-
-	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
-
-};
 
 THREE.TextureNode.prototype.generate = function( builder, output ) {
 

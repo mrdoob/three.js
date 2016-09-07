@@ -30,7 +30,7 @@ THREE.NodeLib = {
 //	Luma
 //
 
-THREE.NodeLib.add( new THREE.ConstNode( "vec3 LUMA = vec3(0.2125, 0.7154, 0.0721);" ) );
+THREE.NodeLib.add( new THREE.ConstNode( "vec3 LUMA = vec3(0.2125, 0.7154, 0.0721)" ) );
 
 //
 //	DepthColor

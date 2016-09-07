@@ -39,9 +39,7 @@ THREE.FunctionCallNode.prototype.generate = function( builder, output ) {
 	var type = this.getType( builder );
 	var func = this.value;
 
-	builder.include( func );
-
-	var code = func.name + '(';
+	var code = func.build( builder ) + '(';
 	var params = [];
 
 	for ( var i = 0; i < func.inputs.length; i ++ ) {

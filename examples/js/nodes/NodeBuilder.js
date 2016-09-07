@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.BuilderNode = function( material ) {
+THREE.NodeBuilder = function( material ) {
 
 	this.material = material;
 
@@ -15,8 +15,31 @@ THREE.BuilderNode = function( material ) {
 
 };
 
-THREE.BuilderNode.prototype = {
-	constructor: THREE.BuilderNode,
+THREE.NodeBuilder.type = {
+	'float' : 'fv1',
+	vec2 : 'v2',
+	vec3 : 'v3',
+	vec4 : 'v4',
+	mat4 : 'v4',
+	'sampler2D' : 't'
+};
+
+THREE.NodeBuilder.constructors = [
+	'',
+	'vec2',
+	'vec3',
+	'vec4'
+];
+
+THREE.NodeBuilder.elements = [
+	'x',
+	'y',
+	'z',
+	'w'
+];
+
+THREE.NodeBuilder.prototype = {
+	constructor: THREE.NodeBuilder,
 
 	addCache : function( name, requires ) {
 
@@ -70,9 +93,9 @@ THREE.BuilderNode.prototype = {
 
 	},
 
-	include : function( func ) {
+	include : function( node, dependency ) {
 
-		this.material.include( this.shader, func );
+		this.material.include( this, node, dependency );
 
 		return this;
 
@@ -86,7 +109,7 @@ THREE.BuilderNode.prototype = {
 
 	getFormatConstructor : function( len ) {
 
-		return THREE.BuilderNode.constructors[ len - 1 ];
+		return THREE.NodeBuilder.constructors[ len - 1 ];
 
 	},
 
@@ -144,7 +167,7 @@ THREE.BuilderNode.prototype = {
 
 	getTypeByFormat : function( format ) {
 
-		return THREE.BuilderNode.type[ format ];
+		return THREE.NodeBuilder.type[ format ];
 
 	},
 
@@ -160,13 +183,13 @@ THREE.BuilderNode.prototype = {
 
 	getElementByIndex : function( index ) {
 
-		return THREE.BuilderNode.elements[ index ];
+		return THREE.NodeBuilder.elements[ index ];
 
 	},
 
 	getIndexByElement : function( elm ) {
 
-		return THREE.BuilderNode.elements.indexOf( elm );
+		return THREE.NodeBuilder.elements.indexOf( elm );
 
 	},
 
@@ -184,25 +207,3 @@ THREE.BuilderNode.prototype = {
 
 	}
 };
-
-THREE.BuilderNode.type = {
-	'float' : 'fv1',
-	vec2 : 'v2',
-	vec3 : 'v3',
-	vec4 : 'v4',
-	mat4 : 'v4'
-};
-
-THREE.BuilderNode.constructors = [
-	'',
-	'vec2',
-	'vec3',
-	'vec4'
-];
-
-THREE.BuilderNode.elements = [
-	'x',
-	'y',
-	'z',
-	'w'
-];

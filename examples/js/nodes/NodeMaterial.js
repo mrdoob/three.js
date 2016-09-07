@@ -80,6 +80,7 @@ THREE.NodeMaterial.prototype.build = function() {
 
 	this.defines = {};
 	this.uniforms = {};
+	this.attributes = {};
 
 	this.nodeData = {};
 
@@ -130,7 +131,7 @@ THREE.NodeMaterial.prototype.build = function() {
 	"#endif"
 	].join( "\n" );
 
-	var builder = new THREE.BuilderNode( this );
+	var builder = new THREE.NodeBuilder( this );
 
 	vertex = this.vertex.build( builder.setShader( 'vertex' ), 'v4' );
 	fragment = this.fragment.build( builder.setShader( 'fragment' ), 'v4' );
@@ -318,10 +319,33 @@ THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
 
 };
 
-THREE.NodeMaterial.prototype.getIncludes = function( incs ) {
+THREE.NodeMaterial.prototype.getAttribute = function( name, type ) {
+	
+	if (!this.attributes[ name ]) {
+		
+		var varName = 'nV' + name;
+		
+		this.addVertexPars( 'varying ' + type + ' ' + varName + ';' );
+		this.addFragmentPars( 'varying ' + type + ' ' + varName + ';' );
+		
+		this.addVertexPars( 'attribute ' + type + ' ' + name + ';' );
+		
+		this.addVertexCode( varName + ' = ' + name + ';' );
+		
+		this.attributes[ name ] = { varName : varName, name : name, type : type };
+		
+	}
+	
+	return this.attributes[ name ];
+	
+};
+
+THREE.NodeMaterial.prototype.getIncludes = function() {
 
 	function sortByPosition( a, b ) {
 
+		if (b.deps == a.deps) return b.index - a.index;
+			
 		return b.deps - a.deps;
 
 	}
@@ -330,12 +354,11 @@ THREE.NodeMaterial.prototype.getIncludes = function( incs ) {
 
 		if ( ! incs ) return '';
 
-		var code = '';
-		var incs = incs.sort( sortByPosition );
-
+		var code = '', incs = incs.sort( sortByPosition );
+		
 		for ( var i = 0; i < incs.length; i ++ ) {
 
-			code += incs[ i ].node.src + '\n';
+			if (incs[ i ].src) code += incs[ i ].src + '\n';
 
 		}
 
@@ -459,7 +482,7 @@ THREE.NodeMaterial.prototype.getDataNode = function( uuid ) {
 
 };
 
-THREE.NodeMaterial.prototype.include = function( shader, node ) {
+THREE.NodeMaterial.prototype.include = function( builder, node, dependency ) {
 
 	var includes;
 
@@ -467,37 +490,30 @@ THREE.NodeMaterial.prototype.include = function( shader, node ) {
 
 	if ( node instanceof THREE.FunctionNode ) {
 
-		for ( var i = 0; i < node.includes.length; i ++ ) {
+		includes = this.functions[ builder.shader ] = this.functions[ builder.shader ] || [];
 
-			this.include( shader, node.includes[ i ] );
+	} else if ( node instanceof THREE.ConstNode ) {
 
-		}
-
-		includes = this.functions[ shader ] = this.functions[ shader ] || [];
+		includes = this.consts[ builder.shader ] = this.consts[ builder.shader ] || [];
 
 	}
-	else if ( node instanceof THREE.ConstNode ) {
+	
+	if ( !includes[ node.name ] ) {
 
-		includes = this.consts[ shader ] = this.consts[ shader ] || [];
-
-	}
-
-	if ( includes[ node.name ] === undefined ) {
-
-		for ( var ext in node.extensions ) {
-
-			this.extensions[ ext ] = true;
-
-		}
-
-		includes[ node.name ] = {
+		var included = includes[ node.name ] = {
+			index : includes.length,
 			node : node,
-			deps : 1
+			deps : 0
 		};
 
-		includes.push( includes[ node.name ] );
+		includes.push( included );
+		
+		included.src = node.build( builder, 'shader' );
 
+	} else if (dependency) {
+		
+		++ includes[ node.name ].deps;
+		
 	}
-	else ++ includes[ node.name ].deps;
 
 };
