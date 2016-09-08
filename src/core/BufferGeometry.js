@@ -1148,13 +1148,8 @@ BufferGeometry.merge = function( geometries ) {
 		geom2 = geometries[ m ];
 		if ( geom2.index ) {
 
-			geom2 = BufferGeometry.splitVertices( geom2 );
+			geom2 = geom2.toNonIndexed();
 			geometries[ m ] = geom2;
-
-		}
-		if ( ! geom2.attributes.normal ) {
-
-			// geometries[ m ].geometry = computeNormals( geom2 );
 
 		}
 
@@ -1194,46 +1189,6 @@ BufferGeometry.merge = function( geometries ) {
 
 	}
 
-	return geometry;
-
-};
-
-
-/**
- * Split the faces of an indexed buffer geometry
- * This creates attribute arrays that are populated per face vertex allowing
- * it to have sharp changes in attributes and not need an index array.
- * @param  {THREE.BufferGeometry} geom The indexed geometry to split
- * @return {THREE.BufferGeometry}      A modified clone or the original geometry
- */
-BufferGeometry.splitVertices = function( geom ) {
-
-	var geometry = new THREE.BufferGeometry();
-	if ( ! geom.index ) return geom;
-	var i, j, il, idx;
-	var index = geom.index.array;
-	// for each attribute
-	for ( var key in geom.attributes ) {
-
-		if ( geom.attributes[ key ].array.constructor !== Float32Array ) continue;
-		var attr = geom.attributes[ key ].array;
-		var size = geom.attributes[ key ].itemSize
-		var values = new Float32Array( index.length * size );
-
-		for ( j = 0, i = 0, il = index.length; i < il; i ++ ) {
-
-			idx = index[ i ] * size;
-			for ( var k = 0; k < size; k ++ ) {
-
-				values[ i * size + k ] = attr[ idx + k ];
-
-			}
-
-		}
-		geometry.addAttribute( key, new THREE.BufferAttribute( values, size ) );
-
-	}
-	geom.dispose();
 	return geometry;
 
 };
