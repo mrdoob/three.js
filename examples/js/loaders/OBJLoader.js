@@ -430,6 +430,13 @@ THREE.OBJLoader.prototype = {
 			text = text.replace( /\r\n/g, '\n' );
 
 		}
+		
+		if ( text.indexOf( '\\\n' ) !== - 1) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\n/g, '' );
+
+		}
 
 		var lines = text.split( '\n' );
 		var line = '', lineFirstChar = '', lineSecondChar = '';
