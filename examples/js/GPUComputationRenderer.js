@@ -103,8 +103,6 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	this.currentTextureIndex = 0;
 
-	this.defaultTextureType = THREE.FloatType;
-
 	var scene = new THREE.Scene();
 
 	var camera = new THREE.Camera();
@@ -159,15 +157,6 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
 			return "No support for vertex shader textures.";
-
-		}
-
-		// Check for THREE.FloatType in render targets. If not found, switch to THREE.HalfFloatType
-		if ( ! this.testFloatRenderTarget() ) {
-
-			console.log( "FloatType not supported for render targets, switching to HalfFloatType." );
-
-			this.defaultTextureType = THREE.HalfFloatType;
 
 		}
 
@@ -291,7 +280,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 	};
 	this.createShaderMaterial = createShaderMaterial;
 
-	this.createRenderTarget = function( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter, textureType ) {
+	this.createRenderTarget = function( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
 
 		sizeXTexture = sizeXTexture || sizeX;
 		sizeYTexture = sizeYTexture || sizeY;
@@ -302,15 +291,13 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		minFilter = minFilter || THREE.NearestFilter;
 		magFilter = magFilter || THREE.NearestFilter;
 
-		textureType = textureType || this.defaultTextureType;
-
 		var renderTarget = new THREE.WebGLRenderTarget( sizeXTexture, sizeYTexture, {
 			wrapS: wrapS,
 			wrapT: wrapT,
 			minFilter: minFilter,
 			magFilter: magFilter,
 			format: THREE.RGBAFormat,
-			type: textureType,
+			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? THREE.HalfFloatType : THREE.FloatType,
 			stencilBuffer: false
 		} );
 
@@ -351,25 +338,6 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 		mesh.material = material;
 		renderer.render( scene, camera, output );
 		mesh.material = passThruShader;
-
-	};
-
-	this.testFloatRenderTarget = function() {
-
-		// Tests if rendering to float render targets is available
-
-		var renderTarget = this.createRenderTarget( 16, 16, undefined, undefined, undefined, undefined, THREE.FloatType );
-		this.renderTexture( null, renderTarget );
-		var gl = renderer.context;
-		var status = gl.checkFramebufferStatus( gl.FRAMEBUFFER );
-		renderTarget.dispose();
-		if ( status !== gl.FRAMEBUFFER_COMPLETE ) {
-
-			return false;
-
-		}
-
-		return true;
 
 	};
 
