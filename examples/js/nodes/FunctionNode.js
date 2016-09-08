@@ -3,20 +3,24 @@
  * @thanks bhouston / https://clara.io/
  */
 
-THREE.FunctionNode = function( src, includes, extensions ) {
+THREE.FunctionNode = function( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions ) {
 
-	THREE.GLNode.call( this );
+	src = src || '';
 
-	this.useReservedNames = true;
+	this.isMethod = typeof includesOrType !== "string";
+	this.useKeywords = true;
+
+	THREE.TempNode.call( this, this.isMethod ? null : includesOrType );
 	
-	this.parse( src || '', includes, extensions );
+	if (this.isMethod) this.eval( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions );
+	else this.eval( src, extensionsOrIncludes, keywordsOrExtensions );
 
 };
 
 THREE.FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\((.*?)\)/i;
 THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
 
-THREE.FunctionNode.prototype = Object.create( THREE.GLNode.prototype );
+THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
 
 THREE.FunctionNode.prototype.getType = function( builder ) {
@@ -51,133 +55,141 @@ THREE.FunctionNode.prototype.getIncludeByName = function( name ) {
 
 };
 
-THREE.FunctionNode.prototype.buildReference = function( builder, name ) {
-
-	switch ( name ) {
-		case 'uv': return new THREE.UVNode().build( builder );
-		case 'uv2': return new THREE.UVNode( 1 ).build( builder );
-		case 'position': return new THREE.PositionNode().build( builder );
-		case 'worldPosition': return new THREE.PositionNode( THREE.PositionNode.WORLD ).build( builder );
-		case 'normal': return new THREE.NormalNode().build( builder );
-		case 'normalPosition': return new THREE.NormalNode( THREE.NormalNode.WORLD ).build( builder );
-		case 'viewPosition': return new THREE.PositionNode( THREE.NormalNode.VIEW ).build( builder );
-		case 'viewNormal': return new THREE.NormalNode( THREE.NormalNode.VIEW ).build( builder );
-	}
-
-	return name;
-
-};
-
 THREE.FunctionNode.prototype.build = function( builder, output ) {
 
-	if (output == 'shader') {
+	var match, offset = 0, src = this.value;
+
+	while ( match = THREE.FunctionNode.rProperties.exec( this.value ) ) {
+
+		var prop = match[ 0 ], isGlobal = this.isMethod ? !this.getInputByName( prop ) : true;
+		var reference = prop;
+
+		if (this.keywords[ prop ] || (this.useKeywords && isGlobal && THREE.NodeLib.containsKeyword( prop ))) {
+
+			var node = this.keywords[ prop ];
 		
-		if (this.value) {
-			
-			var match, offset = 0, src = this.value;
-
-			for ( var i = 0; i < this.includes.length; i ++ ) {
-
-				builder.include( this.includes[ i ], true );
-
+			if (!node) {
+				
+				var keyword = THREE.NodeLib.getKeywordData( prop );
+				
+				if (keyword.cache) node = builder.keywords[ prop ];
+				
+				node = node || THREE.NodeLib.getKeyword( prop, builder );
+				
+				if (keyword.cache) builder.keywords[ prop ] = node;
+				
 			}
 			
-			for ( var ext in this.extensions ) {
+			reference = node.build( builder );
 
-				builder.material.extensions[ ext ] = true;
-
-			}
-			
-			while ( match = THREE.FunctionNode.rProperties.exec( src ) ) {
-
-				var prop = match[ 0 ];
-				var reference = !this.useReservedNames || this.getInputByName( prop ) ? prop : this.buildReference( builder, prop );
-
-				if ( prop != reference ) {
-
-					src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
-
-					offset += reference.length - prop.length;
-
-				}
-
-				if ( this.getIncludeByName( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
-
-					builder.include( THREE.NodeLib.get( reference ) );
-
-				}
-
-			}
-			
-			return src;
-			
 		}
-		
+
+		if ( prop != reference ) {
+
+			src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
+
+			offset += reference.length - prop.length;
+
+		}
+
+		if ( this.getIncludeByName( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
+
+			builder.include( THREE.NodeLib.get( reference ) );
+
+		}
+
+	}
+	
+	if (output === 'source') {
+
+		for ( var i = 0; i < this.includes.length; i ++ ) {
+
+			builder.include( this.includes[ i ], this );
+
+		}
+
+		for ( var ext in this.extensions ) {
+
+			builder.material.extensions[ ext ] = true;
+
+		}
+	
+		return src;
+
+	} else if (this.isMethod) {
+
+		builder.include( this, false, src );
+
+		return this.name;
+
 	} else {
 
-		builder.include( this );
-	
-		return builder.format( this.name, this.getType( builder ), output );
-		
+		return builder.format( "(" + src + ")", this.getType( builder ), output );
+
 	}
 
 };
 
-THREE.FunctionNode.prototype.parse = function( src, includes, extensions ) {
+THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keywords ) {
 
 	this.includes = includes || [];
 	this.extensions = extensions || {};
+	this.keywords = keywords || {};
 
-	var match = src.match( THREE.FunctionNode.rDeclaration );
+	if (this.isMethod) {
+	
+		var match = src.match( THREE.FunctionNode.rDeclaration );
 
-	this.inputs = [];
+		this.inputs = [];
 
-	if ( match && match.length == 4 ) {
+		if ( match && match.length == 4 ) {
 
-		this.type = match[ 1 ];
-		this.name = match[ 2 ];
+			this.type = match[ 1 ];
+			this.name = match[ 2 ];
 
-		var inputs = match[ 3 ].match( THREE.FunctionNode.rProperties );
+			var inputs = match[ 3 ].match( THREE.FunctionNode.rProperties );
 
-		if ( inputs ) {
+			if ( inputs ) {
 
-			var i = 0;
+				var i = 0;
 
-			while ( i < inputs.length ) {
+				while ( i < inputs.length ) {
 
-				var qualifier = inputs[ i ++ ];
-				var type, name;
+					var qualifier = inputs[ i ++ ];
+					var type, name;
 
-				if ( qualifier == 'in' || qualifier == 'out' || qualifier == 'inout' ) {
+					if ( qualifier == 'in' || qualifier == 'out' || qualifier == 'inout' ) {
 
-					type = inputs[ i ++ ];
+						type = inputs[ i ++ ];
 
-				} else {
+					} else {
 
-					type = qualifier;
-					qualifier = '';
+						type = qualifier;
+						qualifier = '';
+
+					}
+
+					name = inputs[ i ++ ];
+
+					this.inputs.push( {
+						name : name,
+						type : type,
+						qualifier : qualifier
+					} );
 
 				}
 
-				name = inputs[ i ++ ];
-
-				this.inputs.push( {
-					name : name,
-					type : type,
-					qualifier : qualifier
-				} );
-
 			}
 
+		} else {
+
+			this.type = '';
+			this.name = '';
+
 		}
-
-		this.value = src;
-
-	} else {
-
-		this.type = '';
-		this.name = '';
-
+		
 	}
+
+	this.value = src;
 
 };

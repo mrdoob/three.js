@@ -19,6 +19,8 @@ THREE.TempNode.prototype.constructor = THREE.TempNode;
 
 THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
+	output = output || this.getType( builder );
+
 	var material = builder.material;
 
 	if ( this.isShared() ) {

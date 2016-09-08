@@ -6,7 +6,7 @@ THREE.ConstNode = function( src, useDefine ) {
 
 	THREE.TempNode.call( this );
 
-	this.parse( src || THREE.ConstNode.PI, useDefine );
+	this.eval( src || THREE.ConstNode.PI, useDefine );
 
 };
 
@@ -26,11 +26,11 @@ THREE.ConstNode.prototype.getType = function( builder ) {
 
 };
 
-THREE.ConstNode.prototype.parse = function( src, useDefine ) {
+THREE.ConstNode.prototype.eval = function( src, useDefine ) {
 
 	var name, type, value;
 	
-	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=\s?(.*?)(\;|$)/i;
+	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 	var match = src.match( rDeclaration );
 
 	this.useDefine = useDefine;
@@ -56,7 +56,7 @@ THREE.ConstNode.prototype.parse = function( src, useDefine ) {
 
 THREE.ConstNode.prototype.build = function( builder, output ) {
 
-	if (output == 'shader') {
+	if (output === 'source') {
 
 		if (this.value) {
 			

@@ -7,6 +7,7 @@ THREE.NodeBuilder = function( material ) {
 	this.material = material;
 
 	this.caches = [];
+	this.keywords = {};
 
 	this.parsing = false;
 	this.optimize = true;
@@ -25,7 +26,7 @@ THREE.NodeBuilder.type = {
 };
 
 THREE.NodeBuilder.constructors = [
-	'',
+	'float',
 	'vec2',
 	'vec3',
 	'vec4'
@@ -39,6 +40,7 @@ THREE.NodeBuilder.elements = [
 ];
 
 THREE.NodeBuilder.prototype = {
+
 	constructor: THREE.NodeBuilder,
 
 	addCache : function( name, requires ) {
@@ -48,7 +50,7 @@ THREE.NodeBuilder.prototype = {
 			requires : requires || {}
 		} );
 
-		return this.updateCache();
+		return this.update();
 
 	},
 
@@ -56,7 +58,7 @@ THREE.NodeBuilder.prototype = {
 
 		this.caches.pop();
 
-		return this.updateCache();
+		return this.update();
 
 	},
 
@@ -74,7 +76,7 @@ THREE.NodeBuilder.prototype = {
 
 	},
 
-	updateCache : function() {
+	update : function() {
 
 		var cache = this.caches[ this.caches.length - 1 ];
 
@@ -93,9 +95,9 @@ THREE.NodeBuilder.prototype = {
 
 	},
 
-	include : function( node, dependency ) {
+	include : function( node, parent, source ) {
 
-		this.material.include( this, node, dependency );
+		this.material.include( this, node, parent, source );
 
 		return this;
 
@@ -107,7 +109,7 @@ THREE.NodeBuilder.prototype = {
 
 	},
 
-	getFormatConstructor : function( len ) {
+	getConstructorFromLength : function( len ) {
 
 		return THREE.NodeBuilder.constructors[ len - 1 ];
 
@@ -131,7 +133,7 @@ THREE.NodeBuilder.prototype = {
 
 	},
 
-	getFormatByLength : function( len ) {
+	getFormatFromLength : function( len ) {
 
 		if ( len == 1 ) return 'fv1';
 
@@ -144,6 +146,7 @@ THREE.NodeBuilder.prototype = {
 		var format = this.getFormatName( from + '=' + to );
 
 		switch ( format ) {
+			
 			case 'v1=v2': return 'vec2(' + code + ')';
 			case 'v1=v3': return 'vec3(' + code + ')';
 			case 'v1=v4': return 'vec4(' + code + ')';
@@ -159,6 +162,7 @@ THREE.NodeBuilder.prototype = {
 			case 'v4=v1': return code + '.x';
 			case 'v4=v2': return code + '.xy';
 			case 'v4=v3': return code + '.xyz';
+
 		}
 
 		return code;

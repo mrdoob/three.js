@@ -13,13 +13,15 @@ THREE.GLNode = function( type ) {
 
 };
 
-THREE.GLNode.prototype.parse = function( builder, cache, requires ) {
+THREE.GLNode.prototype.parse = function( builder, context ) {
+
+	context = context || {};
 
 	builder.parsing = true;
 
 	var material = builder.material;
 
-	this.build( builder.addCache( cache, requires ), 'v4' );
+	this.build( builder.addCache( context.cache, context.requires ), 'v4' );
 
 	material.clearVertexNode();
 	material.clearFragmentNode();
@@ -30,19 +32,23 @@ THREE.GLNode.prototype.parse = function( builder, cache, requires ) {
 
 };
 
-THREE.GLNode.prototype.parseAndBuildCode = function( builder, output, cache, requires ) {
+THREE.GLNode.prototype.parseAndBuildCode = function( builder, output, context ) {
 
-	this.parse( builder, cache, requires );
+	context = context || {};
 
-	return this.buildCode( builder, output, cache, requires );
+	this.parse( builder, context );
+
+	return this.buildCode( builder, output, context );
 
 };
 
-THREE.GLNode.prototype.buildCode = function( builder, output, cache, requires ) {
+THREE.GLNode.prototype.buildCode = function( builder, output, context ) {
+
+	context = context || {};
 
 	var material = builder.material;
 
-	var data = { result : this.build( builder.addCache( cache, requires ), output ) };
+	var data = { result : this.build( builder.addCache( context.cache, context.requires ), output ) };
 
 	if ( builder.isShader( 'vertex' ) ) data.code = material.clearVertexNode();
 	else data.code = material.clearFragmentNode();
@@ -54,6 +60,8 @@ THREE.GLNode.prototype.buildCode = function( builder, output, cache, requires ) 
 };
 
 THREE.GLNode.prototype.build = function( builder, output, uuid ) {
+
+	output = output || this.getType( builder );
 
 	var material = builder.material;
 	var data = material.getDataNode( uuid || this.uuid );

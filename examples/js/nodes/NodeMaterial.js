@@ -344,9 +344,7 @@ THREE.NodeMaterial.prototype.getIncludes = function() {
 
 	function sortByPosition( a, b ) {
 
-		if (b.deps == a.deps) return b.index - a.index;
-			
-		return b.deps - a.deps;
+		return a.deps.length - b.deps.length;
 
 	}
 
@@ -400,9 +398,9 @@ THREE.NodeMaterial.prototype.addVertexNode = function( code ) {
 
 THREE.NodeMaterial.prototype.clearVertexNode = function() {
 
-	var code = this.fragmentNode;
+	var code = this.vertexNode;
 
-	this.fragmentNode = '';
+	this.vertexNode = '';
 
 	return code;
 
@@ -482,7 +480,7 @@ THREE.NodeMaterial.prototype.getDataNode = function( uuid ) {
 
 };
 
-THREE.NodeMaterial.prototype.include = function( builder, node, dependency ) {
+THREE.NodeMaterial.prototype.include = function( builder, node, parent, source ) {
 
 	var includes;
 
@@ -498,21 +496,42 @@ THREE.NodeMaterial.prototype.include = function( builder, node, dependency ) {
 
 	}
 	
-	if ( !includes[ node.name ] ) {
+	var included = includes[ node.name ];
+	
+	if ( !included ) {
 
-		var included = includes[ node.name ] = {
-			index : includes.length,
+		included = includes[ node.name ] = {
 			node : node,
-			deps : 0
+			deps : []
 		};
 
 		includes.push( included );
-		
-		included.src = node.build( builder, 'shader' );
 
-	} else if (dependency) {
+		included.src = node.build( builder, 'source' );
+
+	}
+
+	if ( node instanceof THREE.FunctionNode && parent && includes[ parent.name ].deps.indexOf( node ) == -1 ) {
+
+		includes[ parent.name ].deps.push( node );
 		
-		++ includes[ node.name ].deps;
+		if (node.includes && node.includes.length) {
+			
+			var i = 0;
+			
+			do {
+
+				this.include( builder, node.includes[i++], parent );
+
+			} while( i < node.includes.length );
+			
+		}
+
+	}
+	
+	if ( source ) {
+		
+		included.src = source;
 		
 	}
 

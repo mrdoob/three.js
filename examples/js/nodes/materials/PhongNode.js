@@ -27,7 +27,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', 'transform' ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -104,7 +104,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		if ( this.alpha ) this.alpha.parse( builder );
 
-		if ( this.light ) this.light.parse( builder, 'light' );
+		if ( this.light ) this.light.parse( builder, { cache : 'light' } );
 
 		if ( this.ao ) this.ao.parse( builder );
 		if ( this.ambient ) this.ambient.parse( builder );
@@ -125,7 +125,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
 
-		var light = this.light ? this.light.buildCode( builder, 'v3', 'light' ) : undefined;
+		var light = this.light ? this.light.buildCode( builder, 'v3', { cache : 'light' } ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
