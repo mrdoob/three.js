@@ -36,7 +36,7 @@ THREE.ReflectNode.prototype.generate = function( builder, output ) {
 
 		case THREE.ReflectNode.VECTOR:
 
-			builder.material.addFragmentNode( 'vec3 reflectVec = inverseTransformDirection( reflect( -geometry.viewDir, geometry.normal ), viewMatrix );' );
+			builder.material.addFragmentNode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
 
 			result = 'reflectVec';
 
