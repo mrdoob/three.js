@@ -76,9 +76,10 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						distance: distance,
 						distanceToRay: Math.sqrt( rayPointDistanceSq ),
 						point: intersectPoint.clone(),
-						index: index,
+						indices: [ index ],
 						face: null,
-						object: object
+						object: object,
+                        faceIndex: null,
 
 					} );
 

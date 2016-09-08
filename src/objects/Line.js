@@ -100,10 +100,11 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						intersects.push( {
 
 							distance: distance,
+                            distanceToRay: Math.sqrt( distSq ),
 							// What do we want? intersection point on the ray or on the segment??
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-							index: i,
+							indices: [ i ],
 							face: null,
 							faceIndex: null,
 							object: this
@@ -166,10 +167,11 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					intersects.push( {
 
 						distance: distance,
+                        distanceToRay: Math.sqrt( distSq ),
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
 						point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-						index: i,
+						indices: [ i ],
 						face: null,
 						faceIndex: null,
 						object: this
