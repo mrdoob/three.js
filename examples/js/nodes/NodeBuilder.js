@@ -17,12 +17,13 @@ THREE.NodeBuilder = function( material ) {
 };
 
 THREE.NodeBuilder.type = {
-	'float' : 'fv1',
+	float : 'fv1',
 	vec2 : 'v2',
 	vec3 : 'v3',
 	vec4 : 'v4',
 	mat4 : 'v4',
-	'sampler2D' : 't'
+	int : 'iv1',
+	sampler2D : 't'
 };
 
 THREE.NodeBuilder.constructors = [
@@ -117,7 +118,7 @@ THREE.NodeBuilder.prototype = {
 
 	getFormatName : function( format ) {
 
-		return format.replace( /c/g, 'v3' ).replace( /fv1|iv1/g, 'v1' );
+		return format.replace( /c/g, 'v3' ).replace( /fv1/g, 'v1' ).replace( /iv1/g, 'i' );
 
 	},
 
@@ -143,25 +144,34 @@ THREE.NodeBuilder.prototype = {
 
 	format : function( code, from, to ) {
 
-		var format = this.getFormatName( from + '=' + to );
+		var format = this.getFormatName( to + '=' + from );
 
 		switch ( format ) {
 			
-			case 'v1=v2': return 'vec2(' + code + ')';
-			case 'v1=v3': return 'vec3(' + code + ')';
-			case 'v1=v4': return 'vec4(' + code + ')';
+			case 'v1=v2': return code + '.x';
+			case 'v1=v3': return code + '.x';
+			case 'v1=v4': return code + '.x';
+			case 'v1=i': return 'float(' + code + ')';
+			
+			case 'v2=v1': return 'vec2(' + code + ')';
+			case 'v2=v3': return code + '.xy';
+			case 'v2=v4': return code + '.xy';
+			case 'v2=i': return 'vec2(float(' + code + '))';
+			
+			case 'v3=v1': return 'vec3(' + code + ')';
+			case 'v3=v2': return 'vec3(' + code + ',0.0)';
+			case 'v3=v4': return code + '.xyz';
+			case 'v3=i': return 'vec2(float(' + code + '))';
+			
+			case 'v4=v1': return 'vec4(' + code + ')';
+			case 'v4=v2': return 'vec4(' + code + ',0.0,1.0)';
+			case 'v4=v3': return 'vec4(' + code + ',1.0)';
+			case 'v4=i': return 'vec4(float(' + code + '))';
 
-			case 'v2=v1': return code + '.x';
-			case 'v2=v3': return 'vec3(' + code + ',0.0)';
-			case 'v2=v4': return 'vec4(' + code + ',0.0,1.0)';
-
-			case 'v3=v1': return code + '.x';
-			case 'v3=v2': return code + '.xy';
-			case 'v3=v4': return 'vec4(' + code + ',1.0)';
-
-			case 'v4=v1': return code + '.x';
-			case 'v4=v2': return code + '.xy';
-			case 'v4=v3': return code + '.xyz';
+			case 'i=v1': return 'int(' + code + ')';
+			case 'i=v2': return 'int(' + code + '.x)';
+			case 'i=v3': return 'int(' + code + '.x)';
+			case 'i=v4': return 'int(' + code + '.x)';
 
 		}
 
