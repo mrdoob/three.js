@@ -132,6 +132,8 @@ THREE.FunctionNode.prototype.build = function( builder, output ) {
 
 THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keywords ) {
 
+	src = ( src || '' ).trim();
+
 	this.includes = includes || [];
 	this.extensions = extensions || {};
 	this.keywords = keywords || {};

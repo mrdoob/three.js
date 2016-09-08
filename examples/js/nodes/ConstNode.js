@@ -28,6 +28,8 @@ THREE.ConstNode.prototype.getType = function( builder ) {
 
 THREE.ConstNode.prototype.eval = function( src, useDefine ) {
 
+	src = ( src || '' ).trim();
+
 	var name, type, value;
 	
 	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
