@@ -246,7 +246,7 @@
 				line.frustumCulled = false;
 				line.castShadow = true;
 				line.receiveShadow = true;
-				// scene.add( line );
+				scene.add( line );
 
 				// Shapes
 
@@ -400,8 +400,6 @@
 					}
 
 					if ( controller.getButtonState( 'trigger' ) ) {
-
-						if ( line.parent === null ) scene.add( line );
 
 						stroke( point1, point2, matrix1, matrix2 );
 
