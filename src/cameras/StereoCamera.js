@@ -53,7 +53,7 @@ Object.assign( StereoCamera.prototype, {
 				var projectionMatrix = camera.projectionMatrix.clone();
 				var eyeSep = this.eyeSep / 2;
 				var eyeSepOnProjection = eyeSep * near / focus;
-				var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
+				var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) / camera.zoom;
 				var xmin, xmax;
 
 				// translate xOffset
