@@ -123,6 +123,21 @@ THREE.NodeLib.add( new THREE.FunctionNode( [
 ].join( "\n" ), null, { derivatives: true } ) );
 
 //
+//	BumpToNormalMap
+//
+
+THREE.NodeLib.add( new THREE.FunctionNode( [
+"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, vec2 scale ) {",
+"	vec2 dSTdx = dFdx( uv );",
+"	vec2 dSTdy = dFdy( uv );",
+"	float Hll = texture2D( bumpMap, uv ).x;",
+"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
+"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
+"	return vec3( .5 + ( dBx * scale.x ), .5 + ( dBy * scale.y ), 1.0 );",
+"}"
+].join( "\n" ), null, { derivatives: true } ) );
+
+//
 //	Noise
 //
 
