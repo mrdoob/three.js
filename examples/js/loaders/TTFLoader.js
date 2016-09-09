@@ -35,7 +35,7 @@ THREE.TTFLoader.prototype.parse = function(arraybuffer)
 
 THREE.TTFLoader.convert = function(font, reversed)
 {
-	if(typeof opentype === undefined)
+	if(opentype === undefined)
 	{
 		throw new Error("TTFLoader requires opentype.js Make sure it\'s included before using the loader");
 		return;
