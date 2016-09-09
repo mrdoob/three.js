@@ -12,6 +12,7 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var isWebVR1 = true;
+	var isWebVR11 = true;
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
@@ -29,12 +30,16 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				vrDisplay = displays[ i ];
 				isWebVR1 = true;
+				if ( 'VRFrameData' in window ) {
+					isWebVR11 = true;
+				}
 				break; // We keep the first we encounter
 
 			} else if ( 'HMDVRDevice' in window && displays[ i ] instanceof HMDVRDevice ) {
 
 				vrDisplay = displays[ i ];
 				isWebVR1 = false;
+				isWebVR11 = false;
 				break; // We keep the first we encounter
 
 			}
@@ -307,6 +312,11 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
+	var frameData = null;
+	if ( 'VRFrameData' in window ) {
+		frameData = new VRFrameData;
+	}
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( vrDisplay && scope.isPresenting ) {
@@ -320,23 +330,26 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
-			var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
+			if ( !isWebVR11 ) {
 
-			if ( isWebVR1 ) {
+				var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
+				var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
-				eyeTranslationL.fromArray( eyeParamsL.offset );
-				eyeTranslationR.fromArray( eyeParamsR.offset );
-				eyeFOVL = eyeParamsL.fieldOfView;
-				eyeFOVR = eyeParamsR.fieldOfView;
+				if ( isWebVR1 ) {
 
-			} else {
+					eyeTranslationL.fromArray( eyeParamsL.offset );
+					eyeTranslationR.fromArray( eyeParamsR.offset );
+					eyeFOVL = eyeParamsL.fieldOfView;
+					eyeFOVR = eyeParamsR.fieldOfView;
 
-				eyeTranslationL.copy( eyeParamsL.eyeTranslation );
-				eyeTranslationR.copy( eyeParamsR.eyeTranslation );
-				eyeFOVL = eyeParamsL.recommendedFieldOfView;
-				eyeFOVR = eyeParamsR.recommendedFieldOfView;
+				} else {
 
+					eyeTranslationL.copy( eyeParamsL.eyeTranslation );
+					eyeTranslationR.copy( eyeParamsR.eyeTranslation );
+					eyeFOVL = eyeParamsL.recommendedFieldOfView;
+					eyeFOVR = eyeParamsR.recommendedFieldOfView;
+
+				}
 			}
 
 			if ( Array.isArray( scene ) ) {
@@ -370,15 +383,29 @@ THREE.VREffect = function ( renderer, onError ) {
 			} else  {
 
 				renderer.setScissorTest( true );
-			
+
 			}
 
 			if ( renderer.autoClear || forceClear ) renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
-			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
+			if ( isWebVR11 ) {
+
+				vrDisplay.depthNear = camera.near;
+				vrDisplay.depthFar = camera.far;
+
+				vrDisplay.getFrameData(frameData);
+
+				cameraL.projectionMatrix.elements = frameData.leftProjectionMatrix;
+				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
+
+			} else {
+
+				cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
+				cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
+
+			}
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
 			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
@@ -424,11 +451,11 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setRenderTarget( null );
 
 			} else {
-				
+
 				renderer.setScissorTest( false );
 
 			}
-			
+
 			if ( autoUpdate ) {
 
 				scene.autoUpdate = true;

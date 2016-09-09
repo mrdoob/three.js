@@ -11,6 +11,11 @@ THREE.VRControls = function ( object, onError ) {
 
 	var standingMatrix = new THREE.Matrix4();
 
+	var frameData = null;
+	if ( 'VRFrameData' in window ) {
+		frameData = new VRFrameData();
+	}
+
 	function gotVRDisplays( displays ) {
 
 		vrDisplays = displays;
@@ -82,9 +87,20 @@ THREE.VRControls = function ( object, onError ) {
 
 		if ( vrDisplay ) {
 
-			if ( vrDisplay.getPose ) {
+			var pose = null;
 
-				var pose = vrDisplay.getPose();
+			if ( vrDisplay.getFrameData ) {
+
+				vrDisplay.getFrameData( frameData );
+				pose = frameData.pose;
+
+			} else if ( vrDisplay.getPose ) {
+
+				pose = vrDisplay.getPose();
+
+			}
+
+			if ( pose ) {
 
 				if ( pose.orientation !== null ) {
 
