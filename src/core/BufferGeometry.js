@@ -643,51 +643,20 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 	}(),
 
 	/**
-	 * Allows flat shading of faces on non-indexed buffer geometry
+	 * Deprecated. The type of normals (face or vertex) now depends on whether
+	 * the buffer geometry is indexed or not.
 	 */
 	computeFaceNormals: function () {
 
-		var pos = this.attributes.position.array;
-		var attrName = 'normal';
-		if ( this.attributes[ attrName ] === undefined ) {
-
-			this.addAttribute( attrName, new THREE.BufferAttribute( new Float32Array( pos.length ), 3 ) );
-
-		}
-		var n = this.attributes[ attrName ].array;
-		var i, v, il;
-		var cb = new THREE.Vector3();
-		var ab = new THREE.Vector3();
-		for ( i = 0, il = pos.length; i < il; i += 9 ) {
-
-			var iA = i;
-			var iB = i + 3;
-			var iC = i + 6;
-
-			cb.set( pos[ iC ] - pos[ iB ],
-			pos[ iC + 1 ] - pos[ iB + 1 ],
-			pos[ iC + 2 ] - pos[ iB + 2 ] );
-			ab.set( pos[ iA ] - pos[ iB ],
-			pos[ iA + 1 ] - pos[ iB + 1 ],
-			pos[ iA + 2 ] - pos[ iB + 2 ] );
-			cb.cross( ab );
-			cb.normalize();
-
-			var face = [ iA, iB, iC ];
-			// For each vertex on the face
-			for ( v = 0; v < 3; v ++ ) {
-
-				var faceAbc = face[ v ];
-				n[ faceAbc ] = cb.x;
-				n[ faceAbc + 1 ] = cb.y;
-				n[ faceAbc + 2 ] = cb.z;
-
-			}
-
-		}
+		// backwards compatibility
+		this.computeVertexNormals();
 
 	},
 
+	/**
+	 * Computes normals with smooth shading for connected indexed buffer
+	 * geometry or flat shading of faces on non-indexed buffer geometry.
+	 */
 	computeVertexNormals: function () {
 
 		var index = this.index;
@@ -848,60 +817,6 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 		}
 
 		return this;
-
-	},
-
-	/**
-	 * Checks for duplicate vertices with hashmap.
-	 * Faces with duplicate vertices are rewired to point to the first instance.
-	 * Unused vertices are not removed.
-	 * @param  {THREE.BufferGeometry} geom Geometry to merge
-	 */
-	mergeVertices: function( geom ) {
-
-		_ensureIndex( geom );
-
-		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
-		var changes = {};
-		var vx, vy, vz, key;
-		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
-		var precision = Math.pow( 10, precisionPoints );
-		var i, il, j;
-
-		var pos = geom.attributes.position.array;
-		var index = geom.index.array;
-
-		// for each vertex
-		for ( i = 0, il = pos.length; i < il; i += 3 ) {
-
-			vx = pos[ i ];
-			vy = pos[ i + 1 ];
-			vz = pos[ i + 2 ];
-			key = Math.round( vx * precision ) + '_' + Math.round( vy * precision ) + '_' + Math.round( vz * precision );
-			if ( verticesMap[ key ] === undefined ) {
-
-				verticesMap[ key ] = i;
-
-			} else {
-
-				j = verticesMap[ key ];
-				changes[ i ] = j;
-
-			}
-
-		}
-		// Re-index faces to uses the first possible index when points overlap.
-		// Could cause degenerate faces.
-		for ( i = 0, il = index.length; i < il; i ++ ) {
-
-			var idx = index[ i ] * 3;
-			if ( changes[ idx ] != null ) {
-
-				index[ i ] = Math.floor( changes[ idx ] / 3 );
-
-			}
-
-		}
 
 	},
 
@@ -1192,31 +1107,5 @@ BufferGeometry.merge = function( geometries ) {
 	return geometry;
 
 };
-
-/**
- * Make sure that the buffer geometry has an index array and it is of the right type
- * @param  {THREE.BufferGeometry} geom The geometry to check
- */
-function _ensureIndex( geom ) {
-
-	var i;
-	if ( ! geom.index ) {
-
-		var pos = geom.attributes.position.array;
-		var index = [];
-		for ( i = 0; i < pos.length / 3; i ++ ) {
-
-			index.push( i );
-
-		}
-		geom.setIndex( new THREE.BufferAttribute( new Uint32Array( index ), 1 ) );
-
-	} else if ( ! geom.index.array.constructor instanceof Uint32Array ) {
-
-		geom.index.array = Uint32Array.from( geom.index.array );
-
-	}
-
-}
 
 export { BufferGeometry };
