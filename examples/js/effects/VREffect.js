@@ -11,42 +11,28 @@
 
 THREE.VREffect = function ( renderer, onError ) {
 
-	var isWebVR1 = true;
-	var isWebVR11 = true;
-
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
 	var eyeFOVL, eyeFOVR;
 
+	var frameData = null;
+	if ( 'VRFrameData' in window ) {
+
+		frameData = new VRFrameData();
+
+	}
+
 	function gotVRDisplays( displays ) {
 
 		vrDisplays = displays;
 
-		for ( var i = 0; i < displays.length; i ++ ) {
+		if ( displays.length > 0 ) {
 
-			if ( 'VRDisplay' in window && displays[ i ] instanceof VRDisplay ) {
+			vrDisplay = displays[ 0 ];
 
-				vrDisplay = displays[ i ];
-				isWebVR1 = true;
-				if ( 'VRFrameData' in window ) {
-					isWebVR11 = true;
-				}
-				break; // We keep the first we encounter
-
-			} else if ( 'HMDVRDevice' in window && displays[ i ] instanceof HMDVRDevice ) {
-
-				vrDisplay = displays[ i ];
-				isWebVR1 = false;
-				isWebVR11 = false;
-				break; // We keep the first we encounter
-
-			}
-
-		}
-
-		if ( vrDisplay === undefined ) {
+		} else {
 
 			if ( onError ) onError( 'HMD not available' );
 
@@ -57,11 +43,6 @@ THREE.VREffect = function ( renderer, onError ) {
 	if ( navigator.getVRDisplays ) {
 
 		navigator.getVRDisplays().then( gotVRDisplays );
-
-	} else if ( navigator.getVRDevices ) {
-
-		// Deprecated API.
-		navigator.getVRDevices().then( gotVRDisplays );
 
 	}
 
@@ -95,16 +76,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			renderer.setPixelRatio( 1 );
-
-			if ( isWebVR1 ) {
-
-				renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
-
-			} else {
-
-				renderer.setSize( eyeParamsL.renderRect.width * 2, eyeParamsL.renderRect.height, false );
-
-			}
+			renderer.setSize( eyeParamsL.renderWidth * 2, eyeParamsL.renderHeight, false );
 
 		} else {
 
@@ -127,34 +99,19 @@ THREE.VREffect = function ( renderer, onError ) {
 	function onFullscreenChange() {
 
 		var wasPresenting = scope.isPresenting;
-		scope.isPresenting = vrDisplay !== undefined && ( vrDisplay.isPresenting || ( ! isWebVR1 && document[ fullscreenElement ] instanceof window.HTMLElement ) );
+		scope.isPresenting = vrDisplay !== undefined && vrDisplay.isPresenting;
 
 		if ( scope.isPresenting ) {
 
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
-			var eyeWidth, eyeHeight;
+			var eyeWidth = eyeParamsL.renderWidth;
+			var eyeHeight = eyeParamsL.renderHeight;
 
-			if ( isWebVR1 ) {
+			var layers = vrDisplay.getLayers();
+			if ( layers.length ) {
 
-				eyeWidth = eyeParamsL.renderWidth;
-				eyeHeight = eyeParamsL.renderHeight;
-
-				if ( vrDisplay.getLayers ) {
-
-					var layers = vrDisplay.getLayers();
-					if ( layers.length ) {
-
-						leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
-						rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
-
-					}
-
-				}
-
-			} else {
-
-				eyeWidth = eyeParamsL.renderRect.width;
-				eyeHeight = eyeParamsL.renderRect.height;
+				leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
+				rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
 
 			}
 
@@ -174,29 +131,6 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.setSize( rendererSize.width, rendererSize.height );
 
 		}
-
-	}
-
-	if ( canvas.requestFullscreen ) {
-
-		requestFullscreen = 'requestFullscreen';
-		fullscreenElement = 'fullscreenElement';
-		exitFullscreen = 'exitFullscreen';
-		document.addEventListener( 'fullscreenchange', onFullscreenChange, false );
-
-	} else if ( canvas.mozRequestFullScreen ) {
-
-		requestFullscreen = 'mozRequestFullScreen';
-		fullscreenElement = 'mozFullScreenElement';
-		exitFullscreen = 'mozCancelFullScreen';
-		document.addEventListener( 'mozfullscreenchange', onFullscreenChange, false );
-
-	} else {
-
-		requestFullscreen = 'webkitRequestFullscreen';
-		fullscreenElement = 'webkitFullscreenElement';
-		exitFullscreen = 'webkitExitFullscreen';
-		document.addEventListener( 'webkitfullscreenchange', onFullscreenChange, false );
 
 	}
 
@@ -220,31 +154,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( isWebVR1 ) {
+			if ( boolean ) {
 
-				if ( boolean ) {
-
-					resolve( vrDisplay.requestPresent( [ { source: canvas } ] ) );
-
-				} else {
-
-					resolve( vrDisplay.exitPresent() );
-
-				}
+				resolve( vrDisplay.requestPresent( [ { source: canvas } ] ) );
 
 			} else {
 
-				if ( canvas[ requestFullscreen ] ) {
-
-					canvas[ boolean ? requestFullscreen : exitFullscreen ]( { vrDisplay: vrDisplay } );
-					resolve();
-
-				} else {
-
-					console.error( 'No compatible requestFullscreen method found.' );
-					reject( new Error( 'No compatible requestFullscreen method found.' ) );
-
-				}
+				resolve( vrDisplay.exitPresent() );
 
 			}
 
@@ -266,7 +182,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.requestAnimationFrame = function ( f ) {
 
-		if ( isWebVR1 && vrDisplay !== undefined ) {
+		if ( vrDisplay !== undefined ) {
 
 			return vrDisplay.requestAnimationFrame( f );
 
@@ -280,7 +196,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.cancelAnimationFrame = function ( h ) {
 
-		if ( isWebVR1 && vrDisplay !== undefined ) {
+		if ( vrDisplay !== undefined ) {
 
 			vrDisplay.cancelAnimationFrame( h );
 
@@ -294,7 +210,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	this.submitFrame = function () {
 
-		if ( isWebVR1 && vrDisplay !== undefined && scope.isPresenting ) {
+		if ( vrDisplay !== undefined && scope.isPresenting ) {
 
 			vrDisplay.submitFrame();
 
@@ -312,11 +228,6 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
-	var frameData = null;
-	if ( 'VRFrameData' in window ) {
-		frameData = new VRFrameData;
-	}
-
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( vrDisplay && scope.isPresenting ) {
@@ -330,26 +241,16 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !isWebVR11 ) {
+			if ( !vrDisplay.getFrameData ) {
 
 				var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 				var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
-				if ( isWebVR1 ) {
+				eyeTranslationL.fromArray( eyeParamsL.offset );
+				eyeTranslationR.fromArray( eyeParamsR.offset );
+				eyeFOVL = eyeParamsL.fieldOfView;
+				eyeFOVR = eyeParamsR.fieldOfView;
 
-					eyeTranslationL.fromArray( eyeParamsL.offset );
-					eyeTranslationR.fromArray( eyeParamsR.offset );
-					eyeFOVL = eyeParamsL.fieldOfView;
-					eyeFOVR = eyeParamsR.fieldOfView;
-
-				} else {
-
-					eyeTranslationL.copy( eyeParamsL.eyeTranslation );
-					eyeTranslationR.copy( eyeParamsR.eyeTranslation );
-					eyeFOVL = eyeParamsL.recommendedFieldOfView;
-					eyeFOVR = eyeParamsR.recommendedFieldOfView;
-
-				}
 			}
 
 			if ( Array.isArray( scene ) ) {
@@ -390,7 +291,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
-			if ( isWebVR11 ) {
+			if ( vrDisplay.getFrameData ) {
 
 				vrDisplay.depthNear = camera.near;
 				vrDisplay.depthFar = camera.far;

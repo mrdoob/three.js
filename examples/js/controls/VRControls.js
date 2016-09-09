@@ -20,19 +20,11 @@ THREE.VRControls = function ( object, onError ) {
 
 		vrDisplays = displays;
 
-		for ( var i = 0; i < displays.length; i ++ ) {
+		if ( displays.length > 0 ) {
 
-			if ( ( 'VRDisplay' in window && displays[ i ] instanceof VRDisplay ) ||
-				 ( 'PositionSensorVRDevice' in window && displays[ i ] instanceof PositionSensorVRDevice ) ) {
+			vrDisplay = displays[ 0 ];
 
-				vrDisplay = displays[ i ];
-				break;  // We keep the first we encounter
-
-			}
-
-		}
-
-		if ( vrDisplay === undefined ) {
+		} else {
 
 			if ( onError ) onError( 'VR input not available.' );
 
@@ -43,11 +35,6 @@ THREE.VRControls = function ( object, onError ) {
 	if ( navigator.getVRDisplays ) {
 
 		navigator.getVRDisplays().then( gotVRDisplays );
-
-	} else if ( navigator.getVRDevices ) {
-
-		// Deprecated API.
-		navigator.getVRDevices().then( gotVRDisplays );
 
 	}
 
@@ -118,27 +105,6 @@ THREE.VRControls = function ( object, onError ) {
 
 				}
 
-			} else {
-
-				// Deprecated API.
-				var state = vrDisplay.getState();
-
-				if ( state.orientation !== null ) {
-
-					object.quaternion.copy( state.orientation );
-
-				}
-
-				if ( state.position !== null ) {
-
-					object.position.copy( state.position );
-
-				} else {
-
-					object.position.set( 0, 0, 0 );
-
-				}
-
 			}
 
 			if ( this.standing ) {
@@ -168,21 +134,7 @@ THREE.VRControls = function ( object, onError ) {
 
 		if ( vrDisplay ) {
 
-			if ( vrDisplay.resetPose !== undefined ) {
-
-				vrDisplay.resetPose();
-
-			} else if ( vrDisplay.resetSensor !== undefined ) {
-
-				// Deprecated API.
-				vrDisplay.resetSensor();
-
-			} else if ( vrDisplay.zeroSensor !== undefined ) {
-
-				// Really deprecated API.
-				vrDisplay.zeroSensor();
-
-			}
+			vrDisplay.resetPose();
 
 		}
 
