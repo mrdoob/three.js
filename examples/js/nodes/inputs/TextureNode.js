@@ -35,6 +35,20 @@ THREE.TextureNode.prototype.generate = function( builder, output ) {
 	if ( bias ) code = method + '(' + tex + ',' + coord + ',' + bias + ')';
 	else code = method + '(' + tex + ',' + coord + ')';
 
+	if (builder.isSlot('color')) {
+			
+		code = 'mapTexelToLinear(' + code + ')';
+		
+	} else if (builder.isSlot('emissive')) {
+		
+		code = 'emissiveMapTexelToLinear(' + code + ')';
+		
+	} else if (builder.isSlot('environment')) {
+		
+		code = 'envMapTexelToLinear(' + code + ')';
+		
+	}
+	
 	return builder.format( code, this.type, output );
 
 };

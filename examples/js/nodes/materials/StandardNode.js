@@ -107,7 +107,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder );
+		this.color.parse( builder, { slot : 'color' } );
 		this.roughness.parse( builder );
 		this.metalness.parse( builder );
 
@@ -118,16 +118,16 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		if ( this.ao ) this.ao.parse( builder );
 		if ( this.ambient ) this.ambient.parse( builder );
 		if ( this.shadow ) this.shadow.parse( builder );
-		if ( this.emissive ) this.emissive.parse( builder );
+		if ( this.emissive ) this.emissive.parse( builder, { slot : 'emissive' } );
 
 		if ( this.normal ) this.normal.parse( builder );
 		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
-		if ( this.environment ) this.environment.parse( builder, { cache : 'env', requires : requires } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) this.environment.parse( builder, { cache : 'env', requires : requires, slot : 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c' );
+		var color = this.color.buildCode( builder, 'c', { slot : 'color' } );
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
@@ -140,12 +140,12 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c' ) : undefined;
+		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot : 'emissive' } ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache : 'env', requires : requires } ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache : 'env', requires : requires, slot : 'environment' } ) : undefined;
 
 		material.requestAttrib.transparent = alpha != undefined;
 

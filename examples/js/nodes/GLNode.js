@@ -18,15 +18,15 @@ THREE.GLNode.prototype.parse = function( builder, context ) {
 	context = context || {};
 
 	builder.parsing = true;
-
+	
 	var material = builder.material;
 
-	this.build( builder.addCache( context.cache, context.requires ), 'v4' );
+	this.build( builder.addCache( context.cache, context.requires ).addSlot( context.slot ), 'v4' );
 
 	material.clearVertexNode();
 	material.clearFragmentNode();
 
-	builder.removeCache();
+	builder.removeCache().removeSlot();
 
 	builder.parsing = false;
 
@@ -48,12 +48,12 @@ THREE.GLNode.prototype.buildCode = function( builder, output, context ) {
 
 	var material = builder.material;
 
-	var data = { result : this.build( builder.addCache( context.cache, context.requires ), output ) };
+	var data = { result : this.build( builder.addCache( context.cache, context.requires ).addSlot( context.slot ), output ) };
 
 	if ( builder.isShader( 'vertex' ) ) data.code = material.clearVertexNode();
 	else data.code = material.clearFragmentNode();
 
-	builder.removeCache();
+	builder.removeCache().removeSlot();
 
 	return data;
 
