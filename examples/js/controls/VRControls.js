@@ -74,7 +74,7 @@ THREE.VRControls = function ( object, onError ) {
 
 		if ( vrDisplay ) {
 
-			var pose = null;
+			var pose;
 
 			if ( vrDisplay.getFrameData ) {
 
@@ -87,23 +87,19 @@ THREE.VRControls = function ( object, onError ) {
 
 			}
 
-			if ( pose ) {
+			if ( pose.orientation !== null ) {
 
-				if ( pose.orientation !== null ) {
+				object.quaternion.fromArray( pose.orientation );
 
-					object.quaternion.fromArray( pose.orientation );
+			}
 
-				}
+			if ( pose.position !== null ) {
 
-				if ( pose.position !== null ) {
+				object.position.fromArray( pose.position );
 
-					object.position.fromArray( pose.position );
+			} else {
 
-				} else {
-
-					object.position.set( 0, 0, 0 );
-
-				}
+				object.position.set( 0, 0, 0 );
 
 			}
 

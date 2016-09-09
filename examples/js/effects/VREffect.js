@@ -5,7 +5,7 @@
  * WebVR Spec: http://mozvr.github.io/webvr-spec/webvr.html
  *
  * Firefox: http://mozvr.com/downloads/
- * Chromium: https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
+ * Chromium: https://webvr.info/get-chrome
  *
  */
 
@@ -15,7 +15,9 @@ THREE.VREffect = function ( renderer, onError ) {
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
-	var eyeFOVL, eyeFOVR;
+	var headMatrix = new THREE.Matrix4();
+	var headToEyeMatrixL = new THREE.Matrix4();
+	var headToEyeMatrixR = new THREE.Matrix4();
 
 	var frameData = null;
 	if ( 'VRFrameData' in window ) {
@@ -241,17 +243,11 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			}
 
-			if ( !vrDisplay.getFrameData ) {
+			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
+			var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
 
-				var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
-				var eyeParamsR = vrDisplay.getEyeParameters( 'right' );
-
-				eyeTranslationL.fromArray( eyeParamsL.offset );
-				eyeTranslationR.fromArray( eyeParamsR.offset );
-				eyeFOVL = eyeParamsL.fieldOfView;
-				eyeFOVR = eyeParamsR.fieldOfView;
-
-			}
+			eyeTranslationL.fromArray( eyeParamsL.offset );
+			eyeTranslationR.fromArray( eyeParamsR.offset );
 
 			if ( Array.isArray( scene ) ) {
 
@@ -291,30 +287,37 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
+			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
+			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
+
 			if ( vrDisplay.getFrameData ) {
 
 				vrDisplay.depthNear = camera.near;
 				vrDisplay.depthFar = camera.far;
 
-				vrDisplay.getFrameData(frameData);
+				vrDisplay.getFrameData( frameData );
 
 				cameraL.projectionMatrix.elements = frameData.leftProjectionMatrix;
 				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
 
+				getHeadToEyeMatrices( frameData );
+
+				cameraL.updateMatrix();
+				cameraL.applyMatrix( headToEyeMatrixL );
+
+				cameraR.updateMatrix();
+				cameraR.applyMatrix( headToEyeMatrixR );
+
 			} else {
 
-				cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
-				cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
+				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
+				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
+
+				var scale = this.scale;
+				cameraL.translateOnAxis( eyeTranslationL, scale );
+				cameraR.translateOnAxis( eyeTranslationR, scale );
 
 			}
-
-			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
-			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
-
-			var scale = this.scale;
-			cameraL.translateOnAxis( eyeTranslationL, scale );
-			cameraR.translateOnAxis( eyeTranslationR, scale );
-
 
 			// render left eye
 			if ( renderTarget ) {
@@ -380,6 +383,42 @@ THREE.VREffect = function ( renderer, onError ) {
 	};
 
 	//
+
+	var poseOrientation = new THREE.Quaternion();
+	var posePosition = new THREE.Vector3();
+
+	function getHeadToEyeMatrices( frameData ) {
+
+		// Compute the matrix for the position of the head based on the pose
+		if ( frameData.pose.orientation ) {
+
+			poseOrientation.fromArray( frameData.pose.orientation );
+			headMatrix.makeRotationFromQuaternion( poseOrientation );
+
+		}	else {
+
+			headMatrix.identity();
+
+		}
+
+		if ( frameData.pose.position ) {
+
+			posePosition.fromArray( frameData.pose.position );
+			headMatrix.setPosition( posePosition );
+
+		}
+
+		// Take the view matricies and multiply them by the head matrix, which
+		// leaves only the head-to-eye transform.
+		headToEyeMatrixL.fromArray( frameData.leftViewMatrix );
+		headToEyeMatrixL.premultiply( headMatrix );
+		headToEyeMatrixL.getInverse( headToEyeMatrixL );
+
+		headToEyeMatrixR.fromArray( frameData.rightViewMatrix );
+		headToEyeMatrixR.premultiply( headMatrix );
+		headToEyeMatrixR.getInverse( headToEyeMatrixR );
+
+	}
 
 	function fovToNDCScaleOffset( fov ) {
 
