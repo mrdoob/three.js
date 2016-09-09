@@ -22,11 +22,11 @@ function StereoCamera() {
 	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
-    this.camFocus = null;
-    this.camFov = null;
-    this.camAspect = null;
-    this.camNear = null;
-    this.camFar = null;
+	this.camFocus = null;
+	this.camFov = null;
+	this.camAspect = null;
+	this.camNear = null;
+	this.camFar = null;
 
 }
 
