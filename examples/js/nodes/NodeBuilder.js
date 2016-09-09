@@ -7,12 +7,14 @@ THREE.NodeBuilder = function( material ) {
 	this.material = material;
 
 	this.caches = [];
+	this.slots = [];
+
 	this.keywords = {};
 
 	this.parsing = false;
 	this.optimize = true;
 
-	this.addCache();
+	this.update();
 
 };
 
@@ -23,7 +25,8 @@ THREE.NodeBuilder.type = {
 	vec4 : 'v4',
 	mat4 : 'v4',
 	int : 'iv1',
-	sampler2D : 't'
+	sampler2D : 't',
+	samplerCube : 't'
 };
 
 THREE.NodeBuilder.constructors = [
@@ -62,6 +65,24 @@ THREE.NodeBuilder.prototype = {
 		return this.update();
 
 	},
+	
+	addSlot : function( name ) {
+
+		this.slots.push( {
+			name : name || '',
+		} );
+
+		return this.update();
+
+	},
+
+	removeSlot : function() {
+
+		this.slots.pop();
+
+		return this.update();
+
+	},
 
 	isCache : function( name ) {
 
@@ -76,13 +97,29 @@ THREE.NodeBuilder.prototype = {
 		return false;
 
 	},
+	
+	isSlot : function( name ) {
+
+		var i = this.slots.length;
+
+		while ( i -- ) {
+
+			if ( this.slots[ i ].name == name ) return true;
+
+		}
+
+		return false;
+
+	},
 
 	update : function() {
 
 		var cache = this.caches[ this.caches.length - 1 ];
+		var slot = this.slots[ this.slots.length - 1 ];
 
-		this.cache = cache.name;
-		this.requires = cache.requires;
+		this.slot = slot ? slot.name : '';
+		this.cache = cache ? cache.name : '';
+		this.requires = cache ? cache.requires : {};
 
 		return this;
 
