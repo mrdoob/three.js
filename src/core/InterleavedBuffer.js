@@ -10,6 +10,7 @@ function InterleavedBuffer( array, stride ) {
 
 	this.array = array;
 	this.stride = stride;
+	this.itemCount = array.length / stride;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
@@ -32,7 +33,7 @@ InterleavedBuffer.prototype = {
 
 	get count () {
 
-		return this.array.length / this.stride;
+		return this.itemCount;
 
 	},
 
@@ -53,6 +54,7 @@ InterleavedBuffer.prototype = {
 	copy: function ( source ) {
 
 		this.array = new source.array.constructor( source.array );
+		this.itemCount = source.itemCount;
 		this.stride = source.stride;
 		this.dynamic = source.dynamic;
 
