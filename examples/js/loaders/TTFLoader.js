@@ -35,6 +35,12 @@ THREE.TTFLoader.prototype.parse = function(arraybuffer)
 
 THREE.TTFLoader.convert = function(font, reversed)
 {
+	if(typeof opentype === undefined)
+	{
+		throw new Error("TTFLoader requires opentype.js Make sure it\'s included before using the loader");
+		return;
+	}
+
 	var scale = (1000 * 100) / ((font.unitsPerEm || 2048) * 72);
 	var result = {};
 	result.glyphs = {};
