@@ -43,7 +43,6 @@ function Geometry() {
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
-	this.onUploadCallback = null;
 
 	// update flags
 
@@ -665,12 +664,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		}
 
 		this.boundingSphere.setFromPoints( this.vertices );
-
-	},
-
-	onUploadBuffers: function ( callback ) {
-
-		this.onUploadCallback = callback;
 
 	},
 

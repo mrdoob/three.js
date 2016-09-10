@@ -332,14 +332,6 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( geometry.onUploadCallback ) {
-
-			this.onUploadBuffers ( geometry.onUploadCallback );
-
-		}
-
-		return this;
-
 	},
 
 	updateFromObject: function ( object ) {
@@ -781,18 +773,6 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 			this.normalizeNormals();
 
 			attributes.normal.needsUpdate = true;
-
-		}
-
-	},
-
-	onUploadBuffers: function ( callback ) {
-
-		var attributes = this.attributes;
-
-		for ( var key in attributes ) {
-
-			attributes[ key ].onUploadCallback = callback;
 
 		}
 
