@@ -126,7 +126,7 @@
 
 			if ( ! texture ) {
 
-				texture = new THREE.TextureLoader().load( textures[ name ].url );
+				texture = textures[ name ].texture = new THREE.TextureLoader().load( textures[ name ].url );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			}
