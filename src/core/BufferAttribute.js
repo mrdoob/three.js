@@ -20,13 +20,13 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+	this.count = array.length / itemSize;
 	this.normalized = normalized === true;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
-	this.discardedLength = 0;
 	this.onUploadCallback = null;
 
 }
@@ -36,12 +36,6 @@ BufferAttribute.prototype = {
 	constructor: BufferAttribute,
 
 	isBufferAttribute: true,
-
-	get count() {
-
-		return ( this.discardedLength > 0 ? this.discardedLength : this.array.length ) / this.itemSize;
-
-	},
 
 	set needsUpdate( value ) {
 
@@ -61,6 +55,7 @@ BufferAttribute.prototype = {
 
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
+		this.count = source.count;
 		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
@@ -322,7 +317,6 @@ BufferAttribute.prototype = {
 
 		var oldArray = this.array;
 
-		this.discardedLength = oldArray.length;
 		this.array = new oldArray.constructor( 1 ); // create dummy minimal length TypedArray
 
 	}

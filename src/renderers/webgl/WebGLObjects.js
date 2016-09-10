@@ -97,14 +97,6 @@ function WebGLObjects( gl, properties, info ) {
 
 	function updateBuffer( attributeProperties, data, bufferType ) {
 
-		if ( data.discardedLength > 0 ) {
-
-			console.warn( "THREE.WebGLObjects: attempting to update discarded attribute array" );
-
-			return;
-
-		}
-
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
 		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
