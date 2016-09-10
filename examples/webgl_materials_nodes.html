@@ -1710,7 +1710,7 @@
 					mtl.transform = new THREE.FunctionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
 					mtl.transform.keywords[ "speed" ] = speed;
 
-					// add global keyword ( dynamic or const )
+					// add global keyword ( variable or const )
 					THREE.NodeLib.addKeyword( 'myCustomUv', function( builder ) {
 
 						return new THREE.ReflectNode();
