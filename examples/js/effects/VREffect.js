@@ -56,6 +56,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var scope = this;
 
 	var rendererSize = renderer.getSize();
+	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
 	this.getVRDisplay = function () {
@@ -70,9 +71,10 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setSize = function ( width, height, updateStyle ) {
 
 		rendererSize = { width: width, height: height };
+		rendererUpdateStyle = updateStyle;
 
 		if ( scope.isPresenting ) {
 
@@ -83,7 +85,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		} else {
 
 			renderer.setPixelRatio( rendererPixelRatio );
-			renderer.setSize( width, height );
+			renderer.setSize( width, height, updateStyle );
 
 		}
 
@@ -130,7 +132,7 @@ THREE.VREffect = function ( renderer, onError ) {
 		} else if ( wasPresenting ) {
 
 			renderer.setPixelRatio( rendererPixelRatio );
-			renderer.setSize( rendererSize.width, rendererSize.height );
+			renderer.setSize( rendererSize.width, rendererSize.height, rendererUpdateStyle );
 
 		}
 
