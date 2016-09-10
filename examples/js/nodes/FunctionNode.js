@@ -23,6 +23,12 @@ THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
 THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
 
+THREE.FunctionNode.prototype.isShared = function( builder, output ) {
+
+	return ! this.isMethod;
+
+};
+
 THREE.FunctionNode.prototype.getType = function( builder ) {
 
 	return builder.getTypeByFormat( this.type );
@@ -55,7 +61,7 @@ THREE.FunctionNode.prototype.getIncludeByName = function( name ) {
 
 };
 
-THREE.FunctionNode.prototype.build = function( builder, output ) {
+THREE.FunctionNode.prototype.generate = function( builder, output ) {
 
 	var match, offset = 0, src = this.value;
 
