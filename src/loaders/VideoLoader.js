@@ -1,12 +1,12 @@
 import { XHRLoader } from './XHRLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
-function ImageLoader(manager)
+function VideoLoader(manager)
 {
 	this.manager = (manager !== undefined) ? manager : DefaultLoadingManager;
 }
 
-ImageLoader.prototype.load = function(url, onLoad, onProgress, onError)
+VideoLoader.prototype.load = function(url, onLoad, onProgress, onError)
 {
 	var scope = this;
 	var loader = new XHRLoader(this.manager);
@@ -16,15 +16,15 @@ ImageLoader.prototype.load = function(url, onLoad, onProgress, onError)
 	}, onProgress, onError);
 }
 
-ImageLoader.prototype.parse = function(json, onLoad)
+VideoLoader.prototype.parse = function(json, onLoad)
 {
-	var image = new Image();
+	var video = new Video();
 	
-	image.name = json.name;
-	image.uuid = json.uuid;
-	image.format = json.format;
-	image.encoding = json.encoding;
-	image.data = json.data;
+	video.name = json.name;
+	video.uuid = json.uuid;
+	video.format = json.format;
+	video.encoding = json.encoding;
+	video.data = json.data;
 	
-	return image;
+	return video;
 }

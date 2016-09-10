@@ -2,53 +2,36 @@ import { Font } from '../extras/core/Font';
 import { XHRLoader } from './XHRLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-function FontLoader( manager ) {
-
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-
+function FontLoader(manager)
+{
+	this.manager = (manager !== undefined) ? manager : DefaultLoadingManager;
 }
 
-Object.assign( FontLoader.prototype, {
+FontLoader.prototype.load = function(url, onLoad, onProgress, onError)
+{
+	var loader = new XHRLoader(this.manager);
+	loader.load(url, function(text)
+	{
+		onLoad(new Font(JSON.parse(text)));
+	}, onProgress, onError);
+}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+FontLoader.prototype.parse = function(json)
+{
+	if(json.data !== undefined)
+	{
+		var font = new Font();
 
-		var scope = this;
+		font.name = json.name;
+		font.uuid = json.uuid;
+		font.format = json.format;
+		font.encoding = json.encoding;
+		font.data = json.data;
 
-		var loader = new XHRLoader( this.manager );
-		loader.load( url, function ( text ) {
-
-			var json;
-
-			try {
-
-				json = JSON.parse( text );
-
-			} catch ( e ) {
-
-				console.warn( 'THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.' );
-				json = JSON.parse( text.substring( 65, text.length - 2 ) );
-
-			}
-
-			var font = scope.parse( json );
-
-			if ( onLoad ) onLoad( font );
-
-		}, onProgress, onError );
-
-	},
-
-	parse: function ( json ) {
-
-		return new Font( json );
-
+		return font;
 	}
-
-} );
-
-
-export { FontLoader };
+	else
+	{
+		return new Font(json);
+	}
+}

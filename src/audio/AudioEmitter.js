@@ -4,12 +4,24 @@
  */
 
 import { Object3D } from '../core/Object3D';
+import { Audio } from '../resouces/Audio';
 
-function Audio( listener ) {
+function AudioEmitter( listener , audio ) {
 
 	Object3D.call( this );
 
 	this.type = 'Audio';
+	this.audio = (audio !== undefined) ? audio : null;
+
+	var scope = this;
+	
+	if(this.audio !== null)
+	{
+		AudioContext.decodeAudioData(this.audio.data, function(buffer)
+		{
+			scope.setBuffer(buffer);
+		});
+	}
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
@@ -30,9 +42,9 @@ function Audio( listener ) {
 
 }
 
-Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
+AudioEmitter.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: Audio,
+	constructor: AudioEmitter,
 
 	getOutput: function () {
 
@@ -66,14 +78,14 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			console.warn( 'THREE.Audio: Audio is already playing.' );
+			console.warn( 'THREE.AudioEmitter: Audio is already playing.' );
 			return;
 
 		}
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return;
 
 		}
@@ -98,7 +110,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return;
 
 		}
@@ -115,7 +127,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return;
 
 		}
@@ -218,7 +230,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return;
 
 		}
@@ -251,7 +263,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return false;
 
 		}
@@ -264,7 +276,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.hasPlaybackControl === false ) {
 
-			console.warn( 'THREE.Audio: this Audio has no playback control.' );
+			console.warn( 'THREE.AudioEmitter: this Audio has no playback control.' );
 			return;
 
 		}
