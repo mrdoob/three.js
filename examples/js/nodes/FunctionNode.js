@@ -11,8 +11,8 @@ THREE.FunctionNode = function( src, includesOrType, extensionsOrIncludes, keywor
 	this.useKeywords = true;
 
 	THREE.TempNode.call( this, this.isMethod ? null : includesOrType );
-	
-	if (this.isMethod) this.eval( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions );
+
+	if ( this.isMethod ) this.eval( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions );
 	else this.eval( src, extensionsOrIncludes, keywordsOrExtensions );
 
 };
@@ -25,7 +25,7 @@ THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
 
 THREE.FunctionNode.prototype.getType = function( builder ) {
 
-	return builder.getTypeByFormat( this.type ) || this.type;
+	return builder.getTypeByFormat( this.type );
 
 };
 
@@ -61,25 +61,25 @@ THREE.FunctionNode.prototype.build = function( builder, output ) {
 
 	while ( match = THREE.FunctionNode.rProperties.exec( this.value ) ) {
 
-		var prop = match[ 0 ], isGlobal = this.isMethod ? !this.getInputByName( prop ) : true;
+		var prop = match[ 0 ], isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true;
 		var reference = prop;
 
-		if (this.keywords[ prop ] || (this.useKeywords && isGlobal && THREE.NodeLib.containsKeyword( prop ))) {
+		if ( this.keywords[ prop ] || ( this.useKeywords && isGlobal && THREE.NodeLib.containsKeyword( prop ) ) ) {
 
 			var node = this.keywords[ prop ];
-		
-			if (!node) {
-				
+
+			if ( ! node ) {
+
 				var keyword = THREE.NodeLib.getKeywordData( prop );
-				
-				if (keyword.cache) node = builder.keywords[ prop ];
-				
+
+				if ( keyword.cache ) node = builder.keywords[ prop ];
+
 				node = node || THREE.NodeLib.getKeyword( prop, builder );
-				
-				if (keyword.cache) builder.keywords[ prop ] = node;
-				
+
+				if ( keyword.cache ) builder.keywords[ prop ] = node;
+
 			}
-			
+
 			reference = node.build( builder );
 
 		}
@@ -99,8 +99,8 @@ THREE.FunctionNode.prototype.build = function( builder, output ) {
 		}
 
 	}
-	
-	if (output === 'source') {
+
+	if ( output === 'source' ) {
 
 		for ( var i = 0; i < this.includes.length; i ++ ) {
 
@@ -113,10 +113,10 @@ THREE.FunctionNode.prototype.build = function( builder, output ) {
 			builder.material.extensions[ ext ] = true;
 
 		}
-	
+
 		return src;
 
-	} else if (this.isMethod) {
+	} else if ( this.isMethod ) {
 
 		builder.include( this, false, src );
 
@@ -138,8 +138,8 @@ THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keyword
 	this.extensions = extensions || {};
 	this.keywords = keywords || {};
 
-	if (this.isMethod) {
-	
+	if ( this.isMethod ) {
+
 		var match = src.match( THREE.FunctionNode.rDeclaration );
 
 		this.inputs = [];
@@ -189,7 +189,7 @@ THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keyword
 			this.name = '';
 
 		}
-		
+
 	}
 
 	this.value = src;

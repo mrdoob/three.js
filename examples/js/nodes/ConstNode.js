@@ -22,7 +22,7 @@ THREE.ConstNode.prototype.constructor = THREE.ConstNode;
 
 THREE.ConstNode.prototype.getType = function( builder ) {
 
-	return builder.getTypeByFormat( this.type ) || this.type;
+	return builder.getTypeByFormat( this.type );
 
 };
 
@@ -31,12 +31,12 @@ THREE.ConstNode.prototype.eval = function( src, useDefine ) {
 	src = ( src || '' ).trim();
 
 	var name, type, value;
-	
+
 	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 	var match = src.match( rDeclaration );
 
 	this.useDefine = useDefine;
-	
+
 	if ( match && match.length > 1 ) {
 
 		type = match[ 1 ];
@@ -58,10 +58,10 @@ THREE.ConstNode.prototype.eval = function( src, useDefine ) {
 
 THREE.ConstNode.prototype.build = function( builder, output ) {
 
-	if (output === 'source') {
+	if ( output === 'source' ) {
 
-		if (this.value) {
-			
+		if ( this.value ) {
+
 			if ( this.useDefine ) {
 
 				return '#define ' + this.name + ' ' + this.value;
@@ -69,7 +69,7 @@ THREE.ConstNode.prototype.build = function( builder, output ) {
 			}
 
 			return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
-			
+
 		}
 
 	} else {
@@ -77,7 +77,7 @@ THREE.ConstNode.prototype.build = function( builder, output ) {
 		builder.include( this );
 
 		return builder.format( this.name, this.getType( builder ), output );
-		
+
 	}
 
 };

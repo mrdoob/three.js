@@ -6,7 +6,7 @@ THREE.GLNode = function( type ) {
 
 	this.uuid = THREE.Math.generateUUID();
 
-	this.allow = {};
+	this.allows = {};
 	this.requestUpdate = false;
 
 	this.type = type;
@@ -18,7 +18,7 @@ THREE.GLNode.prototype.parse = function( builder, context ) {
 	context = context || {};
 
 	builder.parsing = true;
-	
+
 	var material = builder.material;
 
 	this.build( builder.addCache( context.cache, context.requires ).addSlot( context.slot ), 'v4' );
@@ -61,23 +61,21 @@ THREE.GLNode.prototype.buildCode = function( builder, output, context ) {
 
 THREE.GLNode.prototype.build = function( builder, output, uuid ) {
 
-	output = output || this.getType( builder );
+	output = output || this.getType( builder, output );
 
-	var material = builder.material;
-	var data = material.getDataNode( uuid || this.uuid );
+	var material = builder.material, data = material.getDataNode( uuid || this.uuid );
 
 	if ( builder.parsing ) this.appendDepsNode( builder, data, output );
 
-	if ( this.allow[ builder.shader ] === false ) {
+	if ( this.allows[ builder.shader ] === false ) {
 
 		throw new Error( 'Shader ' + shader + ' is not compatible with this node.' );
 
 	}
 
-	if ( this.requestUpdate && ! data.requestUpdate ) {
+	if ( this.requestUpdate && material.requestUpdate.indexOf( this ) === - 1 ) {
 
 		material.requestUpdate.push( this );
-		data.requestUpdate = true;
 
 	}
 
@@ -91,7 +89,7 @@ THREE.GLNode.prototype.appendDepsNode = function( builder, data, output ) {
 
 	var outputLen = builder.getFormatLength( output );
 
-	if ( outputLen > ( data.outputMax || 0 ) || this.getType( builder ) ) {
+	if ( outputLen > ( data.outputMax || 0 ) || this.getType( builder, output ) ) {
 
 		data.outputMax = outputLen;
 		data.output = output;
@@ -100,8 +98,8 @@ THREE.GLNode.prototype.appendDepsNode = function( builder, data, output ) {
 
 };
 
-THREE.GLNode.prototype.getType = function( builder ) {
+THREE.GLNode.prototype.getType = function( builder, output ) {
 
-	return this.type;
+	return output === 'sampler2D' || output === 'samplerCube' ? output : this.type;
 
 };

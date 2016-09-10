@@ -12,21 +12,21 @@ THREE.NodeLib = {
 		this.nodes[ node.name ] = node;
 
 	},
-	
+
 	addKeyword: function( name, callback, cache ) {
 
 		cache = cache !== undefined ? cache : true;
-	
-		this.keywords[ name ] =  { callback : callback, cache : cache };
+
+		this.keywords[ name ] = { callback : callback, cache : cache };
 
 	},
-	
+
 	remove: function( node ) {
 
 		delete this.nodes[ node.name ];
 
 	},
-	
+
 	removeKeyword: function( name ) {
 
 		delete this.keywords[ node ];
@@ -38,13 +38,13 @@ THREE.NodeLib = {
 		return this.nodes[ name ];
 
 	},
-	
+
 	getKeyword: function( name, material ) {
 
 		return this.keywords[ name ].callback.call( this, material );
 
 	},
-	
+
 	getKeywordData: function( name ) {
 
 		return this.keywords[ name ];
@@ -56,7 +56,7 @@ THREE.NodeLib = {
 		return this.nodes[ name ] != undefined;
 
 	},
-	
+
 	containsKeyword: function( name ) {
 
 		return this.keywords[ name ] != undefined;
@@ -69,15 +69,59 @@ THREE.NodeLib = {
 //	Keywords
 //
 
-THREE.NodeLib.addKeyword( 'uv', function() { return new THREE.UVNode(); } );
-THREE.NodeLib.addKeyword( 'uv2', function() { return new THREE.UVNode( 1 ); } );
-THREE.NodeLib.addKeyword( 'position', function() { return new THREE.PositionNode(); } );
-THREE.NodeLib.addKeyword( 'worldPosition', function() { return new THREE.PositionNode( THREE.PositionNode.WORLD ); } );
-THREE.NodeLib.addKeyword( 'normal', function() { return new THREE.NormalNode(); } );
-THREE.NodeLib.addKeyword( 'worldNormal', function() { return new THREE.NormalNode( THREE.NormalNode.WORLD ); } );
-THREE.NodeLib.addKeyword( 'viewPosition', function() { return new THREE.PositionNode( THREE.NormalNode.VIEW ); } );
-THREE.NodeLib.addKeyword( 'viewNormal', function() { return new THREE.NormalNode( THREE.NormalNode.VIEW ); } );
-THREE.NodeLib.addKeyword( 'time', function() { return new THREE.TimerNode(); } );
+THREE.NodeLib.addKeyword( 'uv', function() {
+
+	return new THREE.UVNode();
+
+} );
+
+THREE.NodeLib.addKeyword( 'uv2', function() {
+
+	return new THREE.UVNode( 1 );
+
+} );
+
+THREE.NodeLib.addKeyword( 'position', function() {
+
+	return new THREE.PositionNode();
+
+} );
+
+THREE.NodeLib.addKeyword( 'worldPosition', function() {
+
+	return new THREE.PositionNode( THREE.PositionNode.WORLD );
+
+} );
+
+THREE.NodeLib.addKeyword( 'normal', function() {
+
+	return new THREE.NormalNode();
+
+} );
+
+THREE.NodeLib.addKeyword( 'worldNormal', function() {
+
+	return new THREE.NormalNode( THREE.NormalNode.WORLD );
+
+} );
+
+THREE.NodeLib.addKeyword( 'viewPosition', function() {
+
+	return new THREE.PositionNode( THREE.NormalNode.VIEW );
+
+} );
+
+THREE.NodeLib.addKeyword( 'viewNormal', function() {
+
+	return new THREE.NormalNode( THREE.NormalNode.VIEW );
+
+} );
+
+THREE.NodeLib.addKeyword( 'time', function() {
+
+	return new THREE.TimerNode();
+
+} );
 
 //
 //	Luma

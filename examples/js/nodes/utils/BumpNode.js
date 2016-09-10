@@ -2,17 +2,17 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.BumpMapNode = function( value, uv, scale ) {
+THREE.BumpNode = function( value, coord, scale ) {
 
 	THREE.TempNode.call( this, 'v3' );
 
 	this.value = value;
-	this.uv = uv || new THREE.UVNode();
+	this.coord = coord || new THREE.UVNode();
 	this.scale = scale || new THREE.Vector2Node( 1, 1 );
 
 };
 
-THREE.BumpMapNode.fBumpToNormal = new THREE.FunctionNode( [
+THREE.BumpNode.fBumpToNormal = new THREE.FunctionNode( [
 "vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, vec2 scale ) {",
 "	vec2 dSTdx = dFdx( uv );",
 "	vec2 dSTdy = dFdy( uv );",
@@ -23,24 +23,24 @@ THREE.BumpMapNode.fBumpToNormal = new THREE.FunctionNode( [
 "}"
 ].join( "\n" ), null, { derivatives: true } );
 
-THREE.BumpMapNode.prototype = Object.create( THREE.TempNode.prototype );
-THREE.BumpMapNode.prototype.constructor = THREE.BumpMapNode;
+THREE.BumpNode.prototype = Object.create( THREE.TempNode.prototype );
+THREE.BumpNode.prototype.constructor = THREE.BumpNode;
 
-THREE.BumpMapNode.prototype.generate = function( builder, output ) {
+THREE.BumpNode.prototype.generate = function( builder, output ) {
 
-	var material = builder.material, func = THREE.BumpMapNode.fBumpToNormal;
+	var material = builder.material, func = THREE.BumpNode.fBumpToNormal;
 
 	builder.include( func );
 
 	if ( builder.isShader( 'fragment' ) ) {
 
 		return builder.format( func.name + '(' + this.value.build( builder, 'sampler2D' ) + ',' +
-			this.uv.build( builder, 'v2' ) + ',' +
+			this.coord.build( builder, 'v2' ) + ',' +
 			this.scale.build( builder, 'v2' ) + ')', this.getType( builder ), output );
 
 	} else {
 
-		console.warn( "THREE.BumpMapNode is not compatible with " + builder.shader + " shader." );
+		console.warn( "THREE.BumpNode is not compatible with " + builder.shader + " shader." );
 
 		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 

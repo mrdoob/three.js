@@ -114,7 +114,7 @@ THREE.CameraNode.prototype.generate = function( builder, output ) {
 		case THREE.CameraNode.DEPTH:
 
 			var func = THREE.CameraNode.fDepthColor;
-			
+
 			builder.include( func );
 
 			result = func.name + '(' + this.near.build( builder, 'fv1' ) + ',' + this.far.build( builder, 'fv1' ) + ')';
@@ -133,7 +133,7 @@ THREE.CameraNode.prototype.generate = function( builder, output ) {
 
 };
 
-THREE.CameraNode.prototype.updateAnimation = function( delta ) {
+THREE.CameraNode.prototype.updateFrame = function( delta ) {
 
 	switch ( this.scope ) {
 

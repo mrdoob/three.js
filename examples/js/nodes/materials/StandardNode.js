@@ -24,7 +24,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	material.define( 'PHYSICAL' );
 	material.define( 'ALPHATEST', '0.0' );
 
-	material.requestAttrib.light = true;
+	material.requestAttribs.light = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
@@ -147,7 +147,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache : 'env', requires : requires, slot : 'environment' } ) : undefined;
 
-		material.requestAttrib.transparent = alpha != undefined;
+		material.requestAttribs.transparent = alpha != undefined;
 
 		material.addFragmentPars( [
 
@@ -322,7 +322,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
 
 		}
-		
+
 		output.push(
 			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
 			THREE.ShaderChunk[ "tonemapping_fragment" ],

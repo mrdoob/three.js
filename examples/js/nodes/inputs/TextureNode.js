@@ -4,18 +4,31 @@
 
 THREE.TextureNode = function( value, coord, bias, project ) {
 
-	THREE.TextureBaseNode.call( this, value, 'v4' );
+	THREE.InputNode.call( this, 'v4', { shared : true } );
 
+	this.value = value;
 	this.coord = coord || new THREE.UVNode();
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
 };
 
-THREE.TextureNode.prototype = Object.create( THREE.TextureBaseNode.prototype );
+THREE.TextureNode.prototype = Object.create( THREE.InputNode.prototype );
 THREE.TextureNode.prototype.constructor = THREE.TextureNode;
 
+THREE.TextureNode.prototype.getTexture = function( builder, output ) {
+
+	return THREE.InputNode.prototype.generate.call( this, builder, output, this.value.uuid, 't' );
+
+};
+
 THREE.TextureNode.prototype.generate = function( builder, output ) {
+
+	if ( output === 'sampler2D' ) {
+
+		return this.getTexture( builder, output );
+
+	}
 
 	var tex = this.getTexture( builder, output );
 	var coord = this.coord.build( builder, this.project ? 'v4' : 'v2' );
@@ -35,20 +48,20 @@ THREE.TextureNode.prototype.generate = function( builder, output ) {
 	if ( bias ) code = method + '(' + tex + ',' + coord + ',' + bias + ')';
 	else code = method + '(' + tex + ',' + coord + ')';
 
-	if (builder.isSlot('color')) {
-			
+	if ( builder.isSlot( 'color' ) ) {
+
 		code = 'mapTexelToLinear(' + code + ')';
-		
-	} else if (builder.isSlot('emissive')) {
-		
+
+	} else if ( builder.isSlot( 'emissive' ) ) {
+
 		code = 'emissiveMapTexelToLinear(' + code + ')';
-		
-	} else if (builder.isSlot('environment')) {
-		
+
+	} else if ( builder.isSlot( 'environment' ) ) {
+
 		code = 'envMapTexelToLinear(' + code + ')';
-		
+
 	}
-	
+
 	return builder.format( code, this.type, output );
 
 };

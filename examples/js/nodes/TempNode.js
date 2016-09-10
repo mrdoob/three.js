@@ -23,9 +23,9 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 	var material = builder.material;
 
-	if ( this.isShared() ) {
+	if ( this.isShared( builder, output ) ) {
 
-		var isUnique = this.isUnique();
+		var isUnique = this.isUnique( builder, output );
 
 		if ( isUnique && this.constructor.uuid === undefined ) {
 
@@ -49,8 +49,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
-		}
-		else if ( ! builder.optimize || data.deps == 1 ) {
+		} else if ( ! builder.optimize || data.deps == 1 ) {
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
@@ -65,8 +64,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 			return builder.format( name, type, output );
 
-		}
-		else {
+		} else {
 
 			name = THREE.TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
 
@@ -80,21 +78,18 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 		}
 
 	}
-	else {
 
-		return builder.format( this.generate( builder, this.getType( builder ), uuid ), this.getType( builder ), output );
-
-	}
+	return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 };
 
-THREE.TempNode.prototype.isShared = function() {
+THREE.TempNode.prototype.isShared = function( builder, output ) {
 
-	return this.shared;
+	return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
 
 };
 
-THREE.TempNode.prototype.isUnique = function() {
+THREE.TempNode.prototype.isUnique = function( builder, output ) {
 
 	return this.unique;
 
@@ -123,7 +118,7 @@ THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
 
 THREE.TempNode.prototype.generate = function( builder, output, uuid, type, ns ) {
 
-	if ( ! this.isShared() ) console.error( "THREE.TempNode is not shared!" );
+	if ( ! this.isShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
 
 	uuid = uuid || this.uuid;
 

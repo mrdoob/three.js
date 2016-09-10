@@ -23,7 +23,7 @@ THREE.AttributeNode.prototype.getType = function( builder ) {
 
 	var type = this.getAttributeType( builder );
 
-	return builder.getTypeByFormat( type ) || type;
+	return builder.getTypeByFormat( type );
 
 };
 

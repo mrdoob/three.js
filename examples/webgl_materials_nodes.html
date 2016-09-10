@@ -69,9 +69,7 @@
 		<script src="js/nodes/inputs/Vector2Node.js"></script>
 		<script src="js/nodes/inputs/Vector3Node.js"></script>
 		<script src="js/nodes/inputs/Vector4Node.js"></script>
-		<script src="js/nodes/inputs/TextureBaseNode.js"></script>
 		<script src="js/nodes/inputs/TextureNode.js"></script>
-		<script src="js/nodes/inputs/CubeTextureBaseNode.js"></script>
 		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
 
 		<!-- Math -->
@@ -90,7 +88,8 @@
 		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
 		<script src="js/nodes/utils/NoiseNode.js"></script>
 		<script src="js/nodes/utils/ResolutionNode.js"></script>
-		<script src="js/nodes/utils/BumpMapNode.js"></script>
+		<script src="js/nodes/utils/BumpNode.js"></script>
+		<script src="js/nodes/utils/BlurNode.js"></script>
 
 		<!-- Phong Material -->
 		<script src="js/nodes/materials/PhongNode.js"></script>
@@ -121,21 +120,21 @@
 
 		var param = { example: 'standard' };
 
-		function getTexture(name) {
-		
-			var texture = textures[name].texture;
-		
-			if (!texture) {
-			
-				texture = new THREE.TextureLoader().load( textures[name].url );
+		function getTexture( name ) {
+
+			var texture = textures[ name ].texture;
+
+			if ( ! texture ) {
+
+				texture = new THREE.TextureLoader().load( textures[ name ].url );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-			
+
 			}
-			
+
 			return texture;
-		
+
 		}
-		
+
 		var cubemap = function() {
 
 			var path = "textures/cube/Park2/";
@@ -211,6 +210,7 @@
 				'basic / rim': 'rim',
 				'basic / color-adjustment': 'color-adjustment',
 				'basic / bump': 'bump',
+				'basic / blur': 'blur',
 				'basic / spherical-reflection': 'spherical-reflection',
 				'adv / fresnel': 'fresnel',
 				'adv / saturation': 'saturation',
@@ -691,53 +691,81 @@
 					}, false, 0, 2 );
 
 					break;
-					
+
 				case 'bump':
-					
+
 					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
 					var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
-					
-					var bump = new THREE.BumpMapNode( new THREE.TextureBaseNode( getTexture( "brick" ) ) );
-					bump.scale = new THREE.Vector2Node( -1.5, -1.5 );
-					
-					mtl.color = diffuse;	
+
+					var bump = new THREE.BumpNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+					bump.scale = new THREE.Vector2Node( - 1.5, - 1.5 );
+
+					mtl.color = diffuse;
 					mtl.normal = bump;
-					
+
 					// GUI
 
 					addGui( 'scaleX', bump.scale.x, function( val ) {
 
 						bump.scale.x = val;
 
-					}, false, -2, 2 );
+					}, false, - 2, 2 );
 
 					addGui( 'scaleY', bump.scale.y, function( val ) {
 
 						bump.scale.y = val;
 
-					}, false, -2, 2 );
-					
+					}, false, - 2, 2 );
+
 					addGui( 'color', true, function( val ) {
 
-						mtl.color = val ? diffuse : new THREE.ColorNode(0xEEEEEE);
+						mtl.color = val ? diffuse : new THREE.ColorNode( 0xEEEEEE );
 
 						mtl.build();
 
 					} );
 
 					break;
-					
+
+				case 'blur':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var blur = new THREE.BlurNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+
+					mtl.color = blur;
+
+					// GUI
+
+					addGui( 'radiusX', blur.radius.x, function( val ) {
+
+						blur.radius.x = val;
+
+					}, false, 0, 15 );
+
+					addGui( 'radiusY', blur.radius.y, function( val ) {
+
+						blur.radius.y = val;
+
+					}, false, 0, 15 );
+
+					break;
+
 				case 'spherical-reflection':
-					
+
 					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
 					mtl.environment = new THREE.TextureNode( getTexture( "spherical" ), new THREE.ReflectNode( THREE.ReflectNode.SPHERE ) );
-					
+
 					break;
 
 				case 'fresnel':
@@ -1495,8 +1523,7 @@
 						mtl.roughness = new THREE.FloatNode( .5 );
 						mtl.environment = new THREE.CubeTextureNode( cubemap );
 
-					}
-					else {
+					} else {
 
 						// PhongNodeMaterial
 
@@ -1651,24 +1678,24 @@
 					break;
 
 				case 'custom-attribute':
-					
+
 					// GEOMETRY
-					
+
 					// add "position" buffer to "custom" attribute
-					teapot.attributes['custom'] = teapot.attributes['position'];
-					
+					teapot.attributes[ 'custom' ] = teapot.attributes[ 'position' ];
+
 					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
-					
+
 					mtl.color = new THREE.AttributeNode( "custom", 3 );
-					
+
 					// or
-					
+
 					//mtl.color = new THREE.AttributeNode( "custom", "vec3" );
-				
+
 					break;
-				
+
 				case 'expression':
 
 					// MATERIAL
@@ -1678,18 +1705,18 @@
 					var speed = new THREE.FloatNode( .5 );
 
 					mtl.color = new THREE.FunctionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
-					mtl.color.keywords["speed"] = speed;
+					mtl.color.keywords[ "speed" ] = speed;
 
 					mtl.transform = new THREE.FunctionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
-					mtl.transform.keywords["speed"] = speed;
+					mtl.transform.keywords[ "speed" ] = speed;
 
 					// add global keyword ( dynamic or const )
-					THREE.NodeLib.addKeyword('myCustomUv', function( builder ) {
+					THREE.NodeLib.addKeyword( 'myCustomUv', function( builder ) {
 
 						return new THREE.ReflectNode();
 
 					} );
-					
+
 					// GUI
 
 					addGui( 'speed', speed.number, function( val ) {
@@ -1699,43 +1726,43 @@
 					}, false, 0, 1 );
 
 					break;
-				
+
 				case 'reserved-keywords':
-					
+
 					// MATERIAL
 
 					mtl = new THREE.PhongNodeMaterial();
 
 					var keywordsexample = new THREE.FunctionNode( [
 					// use "uv" reserved keyword
-					"vec4 keywordsexample( sampler2D texture ) {", 
+					"vec4 keywordsexample( sampler2D texture ) {",
 					"	return texture2D( texture, myUV ) + vec4( position * myAlpha, 0.0 );",
 					"}"
 					].join( "\n" ) );
-					
+
 					// add local keyword ( const only )
-					keywordsexample.keywords["myAlpha"] = new THREE.ConstNode("float myAlpha .05");
+					keywordsexample.keywords[ "myAlpha" ] = new THREE.ConstNode( "float myAlpha .05" );
 
 					// add global keyword ( const only )
-					THREE.NodeLib.addKeyword('myUV', function( builder ) {
+					THREE.NodeLib.addKeyword( 'myUV', function( builder ) {
 
 						return new THREE.UVNode();
 
 					} );
-					
+
 					// add global const or function
 					//THREE.NodeLib.add( new THREE.ConstNode("float MY_CONST .05") )
 
 					// reserved keywords
 					console.log( THREE.NodeLib.keywords );
 
-					// keywords conflit? use this to disable: 
+					// keywords conflit? use this to disable:
 					//blurtexture.useKeywords = false; // ( true is default )
 
-					mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureBaseNode( getTexture( "brick" ) ) ] );
+					mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
 
 					break;
-					
+
 				case 'triangle-blur':
 
 					// MATERIAL
@@ -1763,7 +1790,7 @@
 					].join( "\n" ), [ new THREE.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
 
 					var blurredTexture = new THREE.FunctionCallNode( blurtexture, {
-						texture : new THREE.TextureBaseNode( getTexture( "brick" ) ),
+						texture : new THREE.TextureNode( getTexture( "brick" ) ),
 						delta : delta,
 						uv : new THREE.UVNode()
 					} );
@@ -1774,8 +1801,8 @@
 						alpha,
 						THREE.Math3Node.MIX
 					);
-					
-					mtl.color = color;					
+
+					mtl.color = color;
 
 					// GUI
 
@@ -1784,13 +1811,13 @@
 						alpha.number = val;
 
 					}, false, 0, 1 );
-					
+
 					addGui( 'deltaX', delta.x, function( val ) {
 
 						delta.x = val;
 
 					}, false, 0, 1 );
-					
+
 					addGui( 'deltaY', delta.x, function( val ) {
 
 						delta.y = val;
@@ -1798,7 +1825,7 @@
 					}, false, 0, 1 );
 
 					break;
-					
+
 				case 'firefly':
 
 					// MATERIAL
@@ -1947,8 +1974,7 @@
 						mtl.light = light;
 						mtl.environment = color;
 
-					}
-					else {
+					} else {
 
 						frontColor = new THREE.ColorNode( 0xd04327 );
 						backColor = new THREE.ColorNode( 0x1a0e14 );
@@ -2040,7 +2066,7 @@
 			//mesh.rotation.z += .01;
 
 			// update material animation and/or gpu calcs (pre-renderer)
-			mesh.material.updateAnimation( delta );
+			mesh.material.updateFrame( delta );
 
 			// render to texture for sss/translucent material only
 			if ( rtTexture ) {
