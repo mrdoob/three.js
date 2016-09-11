@@ -4,6 +4,9 @@
 
 THREE.InputNode = function( type, params ) {
 
+	params = params || {};
+	params.shared = params.shared !== undefined ? params.shared : false;
+
 	THREE.TempNode.call( this, type, params );
 
 };
