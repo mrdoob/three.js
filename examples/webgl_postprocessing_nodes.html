@@ -49,7 +49,7 @@
 		<script src="js/nodes/ConstNode.js"></script>
 		<script src="js/nodes/FunctionNode.js"></script>
 		<script src="js/nodes/FunctionCallNode.js"></script>
-		<script src="js/nodes/BuilderNode.js"></script>
+		<script src="js/nodes/NodeBuilder.js"></script>
 		<script src="js/nodes/NodeLib.js"></script>
 		<script src="js/nodes/NodeMaterial.js"></script>
 
@@ -81,6 +81,7 @@
 		<script src="js/nodes/utils/JoinNode.js"></script>
 		<script src="js/nodes/utils/TimerNode.js"></script>
 		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
+		<script src="js/nodes/utils/BlurNode.js"></script>
 
 		<!-- Post-Processing -->
 		<script src="js/nodes/postprocessing/NodePass.js"></script>
@@ -90,6 +91,7 @@
 			var camera, scene, renderer, composer;
 			var object, light, nodepass;
 			var gui, guiElements = [];
+			var clock = new THREE.Clock();
 
 			var param = { example: 'color-adjustment' };
 
@@ -117,7 +119,8 @@
 					'basic / invert': 'invert',
 					'adv / saturation': 'saturation',
 					'adv / refraction': 'refraction',
-					'adv / mosaic': 'mosaic'
+					'adv / mosaic': 'mosaic',
+					'adv / blur': 'blur'
 				} ).onFinishChange( function() {
 
 					updateMaterial();
@@ -464,6 +467,33 @@
 						} );
 
 						break;
+						
+					case 'blur':
+
+						// PASS
+
+						var size = renderer.getSize();
+
+						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
+						blurScreen.size = new THREE.Vector2( size.width, size.height );
+
+						nodepass.value = blurScreen;
+
+						// GUI
+
+						addGui( 'blurX', blurScreen.radius.x, function( val ) {
+
+							blurScreen.radius.x = val;
+
+						}, false, 0, 15 );
+
+						addGui( 'blurY', blurScreen.radius.y, function( val ) {
+
+							blurScreen.radius.y = val;
+
+						}, false, 0, 15 );
+
+						break;
 
 				}
 
@@ -541,8 +571,12 @@
 
 				requestAnimationFrame( animate );
 
+				var delta = clock.getDelta();
+
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
+
+				nodepass.node.updateFrame( delta );
 
 				composer.render();
 

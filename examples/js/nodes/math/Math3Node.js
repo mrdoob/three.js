@@ -30,7 +30,7 @@ THREE.Math3Node.prototype.getType = function( builder ) {
 
 	if ( a > b && a > c ) return this.a.getType( builder );
 	else if ( b > c ) return this.b.getType( builder );
-	
+
 	return this.c.getType( builder );
 
 };
