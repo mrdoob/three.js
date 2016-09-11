@@ -1995,7 +1995,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		var textures = [];
 		var textureLoader = new THREE.TextureLoader( this.manager );
 		var tgaLoader = new THREE.TGALoader( this.manager );
-		var materialLoader = new THREE.MaterialLoader( this.manager );
 		var color = new THREE.Color();
 		var offset = 0;
 		var materialParams = [];
@@ -2037,6 +2036,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				}
 
+				delete texture.readyCallbacks;
+
 			} );
 
 			texture.readyCallbacks = [];
@@ -2049,6 +2050,18 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		};
 
+		function getTexture( name, textures ) {
+
+			if ( textures[ name ] === undefined ) {
+
+				console.warn( 'THREE.MMDLoader: Undefined texture', name );
+
+			}
+
+			return textures[ name ];
+
+		};
+
 		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
 
 			geometry.faceVertexUvs.push( [] );
@@ -2058,12 +2071,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
 
 			var m = model.materials[ i ];
-			var params = {
-
-				uuid: THREE.Math.generateUUID(),
-				type: 'MMDMaterial'
-
-			};
+			var params = {};
 
 			params.faceOffset = offset;
 			params.faceNum = m.faceCount;
@@ -2088,9 +2096,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			}
 
 			params.name = m.name;
-			params.color = color.fromArray( [ m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] ] ).getHex();
+			params.color = color.fromArray( [ m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] ] ).clone();
 			params.opacity = m.diffuse[ 3 ];
-			params.specular = color.fromArray( [ m.specular[ 0 ], m.specular[ 1 ], m.specular[ 2 ] ] ).getHex();
+			params.specular = color.fromArray( [ m.specular[ 0 ], m.specular[ 1 ], m.specular[ 2 ] ] ).clone();
 			params.shininess = m.shininess;
 
 			if ( params.opacity === 1.0 ) {
@@ -2185,33 +2193,37 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			// TODO: check if this logic is right
 			if ( params.map === undefined /* && params.envMap === undefined */ ) {
 
-				params.emissive = color.fromArray( [ m.emissive[ 0 ], m.emissive[ 1 ], m.emissive[ 2 ] ] ).getHex();
+				params.emissive = color.fromArray( [ m.emissive[ 0 ], m.emissive[ 1 ], m.emissive[ 2 ] ] ).clone();
 
 			}
-
-			var shader = THREE.ShaderLib[ 'mmd' ];
-			params.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-			params.vertexShader = shader.vertexShader;
-			params.fragmentShader = shader.fragmentShader;
 
 			materialParams.push( params );
 
 		}
 
-		materialLoader.setTextures( textures );
+		var shader = THREE.ShaderLib[ 'mmd' ];
 
 		for ( var i = 0; i < materialParams.length; i++ ) {
 
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
-			var m = materialLoader.parse( p );
+			var m = new THREE.ShaderMaterial( {
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			} );
 
 			m.faceOffset = p.faceOffset;
 			m.faceNum = p.faceNum;
 
+			if ( p.name !== undefined ) m.name = p.name;
+
 			m.skinning = geometry.bones.length > 0 ? true : false;
 			m.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			m.lights = true;
+			m.side = p.side;
+			m.transparent = p.transparent;
+			m.fog = true;
 
 			m.blending = THREE.CustomBlending;
 			m.blendSrc = THREE.SrcAlphaFactor;
@@ -2219,7 +2231,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			m.blendSrcAlpha = THREE.SrcAlphaFactor;
 			m.blendDstAlpha = THREE.DstAlphaFactor;
 
-			if ( m.map !== null ) {
+			if ( p.map !== undefined ) {
 
 				// Check if this part of the texture image the material uses requires transparency
 				function checkTextureTransparency ( m ) {
@@ -2326,45 +2338,45 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 						m.textureTransparency = detectTextureTransparency( imageData, uvs );
 
+						delete m.faceOffset;
+						delete m.faceNum;
+
 					} );
 
 				}
 
+				m.map = getTexture( p.map, textures );
+				m.uniforms.map.value = m.map;
 				checkTextureTransparency( m );
 
 			}
 
-			if ( m.envMap !== null ) {
+			if ( p.envMap !== undefined ) {
+
+				m.envMap = getTexture( p.envMap, textures );
+				m.uniforms.envMap.value = m.envMap;
+				m.combine = p.envMapType;
 
 				// TODO: WebGLRenderer should automatically update?
-				function updateMaterialWhenTextureIsReady ( m ) {
+				m.envMap.readyCallbacks.push( function ( t ) {
 
-					m.envMap.readyCallbacks.push( function ( t ) {
+					m.needsUpdate = true;
 
-						m.needsUpdate = true;
-
-					} );
-
-				}
-
-				m.combine = p.envMapType;
-				updateMaterialWhenTextureIsReady( m );
+				} );
 
 			}
 
-			m.uniforms.opacity.value = m.opacity;
-			m.uniforms.diffuse.value = m.color;
+			m.uniforms.opacity.value = p.opacity;
+			m.uniforms.diffuse.value.copy( p.color );
 
-			if ( m.emissive ) {
+			if ( p.emissive !== undefined ) {
 
-				m.uniforms.emissive.value = m.emissive;
+				m.uniforms.emissive.value.copy( p.emissive );
 
 			}
 
-			m.uniforms.map.value = m.map;
-			m.uniforms.envMap.value = m.envMap;
-			m.uniforms.specular.value = m.specular;
-			m.uniforms.shininess.value = Math.max( m.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+			m.uniforms.specular.value.copy( p.specular );
+			m.uniforms.shininess.value = Math.max( p.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
 			if ( model.metadata.format === 'pmd' ) {
 
@@ -2458,7 +2470,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var m = material.materials[ e.index ];
 
-					if ( m.opacity !== e.diffuse[ 3 ] ) {
+					if ( m.uniforms.opacity.value !== e.diffuse[ 3 ] ) {
 
 						m.morphTransparency = true;
 
@@ -3539,79 +3551,6 @@ THREE.MMDLoader.DataView.prototype = {
 };
 
 /*
- * MMD custom shaders based on MeshPhongMaterial.
- * This class extends ShaderMaterial while shaders are based on MeshPhongMaterial.
- * Keep this class updated on MeshPhongMaterial.
- */
-THREE.MMDMaterial = function ( parameters ) {
-
-	THREE.ShaderMaterial.call( this, parameters );
-
-//	this.type = 'MMDMaterial';
-
-	this.faceOffset = null;
-	this.faceNum = null;
-	this.textureTransparency = false;
-	this.morphTransparency = false;
-
-	// the followings are copied from MeshPhongMaterial
-	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.emissive = new THREE.Color( 0x000000 );
-	this.specular = new THREE.Color( 0x111111 );
-	this.shininess = 30;
-
-	this.map = null;
-
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
-
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
-
-	this.emissiveMap = null;
-
-	this.bumpMap = null;
-	this.bumpScale = 1;
-
-	this.normalMap = null;
-	this.normalScale = new THREE.Vector2( 1, 1 );
-
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
-
-	this.specularMap = null;
-
-	this.alphaMap = null;
-
-	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
-
-	this.fog = true;
-
-	this.shading = THREE.SmoothShading;
-
-	this.wireframe = false;
-	this.wireframeLinewidth = 1;
-	this.wireframeLinecap = 'round';
-	this.wireframeLinejoin = 'round';
-
-	this.vertexColors = THREE.NoColors;
-
-	this.skinning = false;
-	this.morphTargets = false;
-	this.morphNormals = false;
-
-	this.setValues( parameters );
-
-};
-
-THREE.MMDMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
-THREE.MMDMaterial.prototype.constructor = THREE.MMDMaterial;
-
-/*
  * Shaders are copied from MeshPhongMaterial and then MMD spcific codes are inserted.
  * Keep shaders updated on MeshPhongMaterial.
  */
@@ -4489,7 +4428,7 @@ THREE.MMDHelper.prototype = {
 			m.uniforms.outlineDrawing.value = 0;
 			m.visible = true;
 
-			if ( m.opacity === 1.0 ) {
+			if ( m.uniforms.opacity.value === 1.0 ) {
 
 				m.side = THREE.FrontSide;
 				m.transparent = false;
