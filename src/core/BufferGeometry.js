@@ -1082,7 +1082,8 @@ BufferGeometry.merge = function( geometries ) {
 			geom2 = geometries[ m ];
 			if ( ! geom2.attributes[ key ] ) {
 
-				throw new FluxGeometryError( 'Mismatched geometry attributes: ' + key );
+				console.warn( 'Mismatched geometry attributes: ' + key );
+				continue;
 
 			}
 
