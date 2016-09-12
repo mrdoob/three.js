@@ -22,38 +22,42 @@ function StereoCamera() {
 	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
+	this.camFocus = null;
+	this.camFov = null;
+	this.camAspect = null;
+	this.camNear = null;
+	this.camFar = null;
+
 }
 
 Object.assign( StereoCamera.prototype, {
 
 	update: ( function () {
 
-		var focus, fov, aspect, near, far;
-
 		var eyeRight = new Matrix4();
 		var eyeLeft = new Matrix4();
 
 		return function update( camera ) {
 
-			var needsUpdate = focus !== camera.focus || fov !== camera.fov ||
-												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-												far !== camera.far;
+			var needsUpdate = this.camFocus !== camera.fPocus || this.camFov !== camera.fov ||
+												this.camAspect !== camera.aspect * this.aspect || this.camNear !== camera.near ||
+												this.camFar !== camera.far;
 
 			if ( needsUpdate ) {
 
-				focus = camera.focus;
-				fov = camera.fov;
-				aspect = camera.aspect * this.aspect;
-				near = camera.near;
-				far = camera.far;
+				this.camFocus = camera.focus;
+				this.camFov = camera.fov;
+				this.camAspect = camera.aspect * this.aspect;
+				this.camNear = camera.near;
+				this.camFar = camera.far;
 
 				// Off-axis stereoscopic effect based on
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
 				var eyeSep = this.eyeSep / 2;
-				var eyeSepOnProjection = eyeSep * near / focus;
-				var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
+				var eyeSepOnProjection = eyeSep * this.camNear / this.camFocus;
+				var ymax = this.camNear * Math.tan( _Math.DEG2RAD * this.camFov * 0.5 );
 				var xmin, xmax;
 
 				// translate xOffset
@@ -63,20 +67,20 @@ Object.assign( StereoCamera.prototype, {
 
 				// for left eye
 
-				xmin = - ymax * aspect + eyeSepOnProjection;
-				xmax = ymax * aspect + eyeSepOnProjection;
+				xmin = - ymax * this.camAspect + eyeSepOnProjection;
+				xmax = ymax * this.camAspect + eyeSepOnProjection;
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+				projectionMatrix.elements[ 0 ] = 2 * this.camNear / ( xmax - xmin );
 				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 				this.cameraL.projectionMatrix.copy( projectionMatrix );
 
 				// for right eye
 
-				xmin = - ymax * aspect - eyeSepOnProjection;
-				xmax = ymax * aspect - eyeSepOnProjection;
+				xmin = - ymax * this.camAspect - eyeSepOnProjection;
+				xmax = ymax * this.camAspect - eyeSepOnProjection;
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
+				projectionMatrix.elements[ 0 ] = 2 * this.camNear / ( xmax - xmin );
 				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 				this.cameraR.projectionMatrix.copy( projectionMatrix );
