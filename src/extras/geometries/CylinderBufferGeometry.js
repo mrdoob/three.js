@@ -153,7 +153,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 				// handle special case if radiusTop/radiusBottom is zero
 
-				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
+				if ( ( radiusTop < Number.EPSILON && y === 0 ) || ( radiusBottom < Number.EPSILON && y === heightSegments ) ) {
 
 					normal.x = Math.sin( u * thetaLength + thetaStart );
 					normal.z = Math.cos( u * thetaLength + thetaStart );
