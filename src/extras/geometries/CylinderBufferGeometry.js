@@ -149,18 +149,10 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 				// normal
-				normal.copy( vertex );
-
-				// handle special case if radiusTop/radiusBottom is zero
-
-				if ( ( radiusTop < Number.EPSILON && y === 0 ) || ( radiusBottom < Number.EPSILON && y === heightSegments ) ) {
-
-					normal.x = Math.sin( u * thetaLength + thetaStart );
-					normal.z = Math.cos( u * thetaLength + thetaStart );
-
-				}
-
-				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normal.x = Math.sin( u * thetaLength + thetaStart );
+				normal.z = Math.cos( u * thetaLength + thetaStart );
+				normal.y = Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta;
+				normal.normalize();
 				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
 				// uv
