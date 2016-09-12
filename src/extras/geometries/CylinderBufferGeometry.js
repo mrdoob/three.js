@@ -142,17 +142,19 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 				var u = x / radialSegments;
 
+				var theta = u * thetaLength + thetaStart;
+
+				var sinTheta = Math.sin( theta );
+				var cosTheta = Math.cos( theta );
+
 				// vertex
-				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.x = radius * sinTheta;
 				vertex.y = - v * height + halfHeight;
-				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertex.z = radius * cosTheta;
 				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 				// normal
-				normal.x = Math.sin( u * thetaLength + thetaStart );
-				normal.z = Math.cos( u * thetaLength + thetaStart );
-				normal.y = Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta;
-				normal.normalize();
+				normal.set( sinTheta, tanTheta, cosTheta ).normalize();
 				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
 				// uv
