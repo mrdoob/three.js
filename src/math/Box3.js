@@ -204,7 +204,7 @@ Box3.prototype = {
 	center: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
-		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
