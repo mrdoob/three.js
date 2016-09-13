@@ -585,7 +585,7 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[ 0 ].substr( 1 ).trim();
+				var name = (" " + result[ 0 ].substr( 1 ).trim()).substr(1);
 				state.startObject( name );
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {
