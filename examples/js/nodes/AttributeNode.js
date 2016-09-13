@@ -4,13 +4,13 @@
 
 THREE.AttributeNode = function( name, type ) {
 
-	THREE.InputNode.call( this, type, { shared: false } );
+	THREE.GLNode.call( this, type );
 
 	this.name = name;
 
 };
 
-THREE.AttributeNode.prototype = Object.create( THREE.InputNode.prototype );
+THREE.AttributeNode.prototype = Object.create( THREE.GLNode.prototype );
 THREE.AttributeNode.prototype.constructor = THREE.AttributeNode;
 
 THREE.AttributeNode.prototype.getAttributeType = function( builder ) {
@@ -33,6 +33,6 @@ THREE.AttributeNode.prototype.generate = function( builder, output ) {
 
 	var attribute = builder.material.getAttribute( this.name, type );
 
-	return builder.format( attribute.varName, this.getType( builder ), output );
+	return builder.format( builder.isShader( 'vertex' ) ? this.name : attribute.varying.name, this.getType( builder ), output );
 
 };

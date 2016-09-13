@@ -87,6 +87,7 @@ THREE.NodeMaterial.prototype.build = function() {
 	this.vertexUniform = [];
 	this.fragmentUniform = [];
 
+	this.vars = [];
 	this.vertexTemps = [];
 	this.fragmentTemps = [];
 
@@ -287,35 +288,64 @@ THREE.NodeMaterial.prototype.createUniform = function( type, value, ns, needsUpd
 
 THREE.NodeMaterial.prototype.getVertexTemp = function( uuid, type, ns ) {
 
-	if ( ! this.vertexTemps[ uuid ] ) {
+	var data = this.vertexTemps[ uuid ];
+
+	if ( ! data ) {
 
 		var index = this.vertexTemps.length,
-			name = ns ? ns : 'nVt' + index,
-			data = { name : name, type : type };
+			name = ns ? ns : 'nVt' + index;
+
+		data = { name : name, type : type };
 
 		this.vertexTemps.push( data );
 		this.vertexTemps[ uuid ] = data;
 
 	}
 
-	return this.vertexTemps[ uuid ];
+	return data;
 
 };
 
 THREE.NodeMaterial.prototype.getFragmentTemp = function( uuid, type, ns ) {
 
-	if ( ! this.fragmentTemps[ uuid ] ) {
+	var data = this.fragmentTemps[ uuid ];
+
+	if ( ! data ) {
 
 		var index = this.fragmentTemps.length,
-			name = ns ? ns : 'nVt' + index,
-			data = { name : name, type : type };
+			name = ns ? ns : 'nVt' + index;
+
+		data = { name : name, type : type };
 
 		this.fragmentTemps.push( data );
 		this.fragmentTemps[ uuid ] = data;
 
 	}
 
-	return this.fragmentTemps[ uuid ];
+	return data;
+
+};
+
+THREE.NodeMaterial.prototype.getVar = function( uuid, type, ns ) {
+
+	var data = this.vars[ uuid ];
+
+	if ( ! data ) {
+
+		var index = this.vars.length,
+			name = ns ? ns : 'nVv' + index;
+
+		data = { name : name, type : type }
+
+		this.vars.push( data );
+		this.vars[ uuid ] = data;
+
+		this.addVertexPars( 'varying ' + type + ' ' + name + ';' );
+		this.addFragmentPars( 'varying ' + type + ' ' + name + ';' );
+
+	}
+
+	return data;
 
 };
 
@@ -323,16 +353,12 @@ THREE.NodeMaterial.prototype.getAttribute = function( name, type ) {
 
 	if ( ! this.attributes[ name ] ) {
 
-		var varName = 'nV' + name;
-
-		this.addVertexPars( 'varying ' + type + ' ' + varName + ';' );
-		this.addFragmentPars( 'varying ' + type + ' ' + varName + ';' );
+		var varying = this.getVar( name, type );
 
 		this.addVertexPars( 'attribute ' + type + ' ' + name + ';' );
+		this.addVertexCode( varying.name + ' = ' + name + ';' );
 
-		this.addVertexCode( varName + ' = ' + name + ';' );
-
-		this.attributes[ name ] = { varName : varName, name : name, type : type };
+		this.attributes[ name ] = { varying : varying, name : name, type : type };
 
 	}
 
@@ -511,7 +537,7 @@ THREE.NodeMaterial.prototype.include = function( builder, node, parent, source )
 
 	}
 
-	if ( node instanceof THREE.FunctionNode && parent && includes[ parent.name ].deps.indexOf( node ) == - 1 ) {
+	if ( node instanceof THREE.FunctionNode && parent && includes[ parent.name ] && includes[ parent.name ].deps.indexOf( node ) == - 1 ) {
 
 		includes[ parent.name ].deps.push( node );
 

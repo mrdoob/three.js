@@ -45,6 +45,7 @@
 		<script src="js/nodes/TempNode.js"></script>
 		<script src="js/nodes/InputNode.js"></script>
 		<script src="js/nodes/ConstNode.js"></script>
+		<script src="js/nodes/VarNode.js"></script>
 		<script src="js/nodes/FunctionNode.js"></script>
 		<script src="js/nodes/FunctionCallNode.js"></script>
 		<script src="js/nodes/AttributeNode.js"></script>
@@ -231,6 +232,7 @@
 				'misc / smoke' : 'smoke',
 				'misc / firefly' : 'firefly',
 				'misc / reserved-keywords' : 'reserved-keywords',
+				'misc / varying' : 'varying',
 				'misc / custom-attribute' : 'custom-attribute'
 			} ).onFinishChange( function() {
 
@@ -256,8 +258,7 @@
 
 				} );
 
-			}
-			else if ( typeof value == 'object' ) {
+			} else if ( typeof value == 'object' ) {
 
 				node = gui.add( param, name, value ).onChange( function() {
 
@@ -265,8 +266,7 @@
 
 				} );
 
-			}
-			else {
+			} else {
 
 				node = gui.add( param, name, min, max ).onChange( function() {
 
@@ -1760,6 +1760,35 @@
 					//blurtexture.useKeywords = false; // ( true is default )
 
 					mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
+
+					break;
+
+				case 'varying':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var varying = new THREE.VarNode( "vec3" );
+
+					var setMyVar = new THREE.FunctionNode( [
+					"float setMyVar( vec3 pos ) {",
+					// set "myVar" in vertex shader in this example, 
+					// can be used in fragment shader too or in rest of the current shader
+					"	myVar = pos;",
+					// it is not accept "void" functions for now!
+					"	return 0.;",
+					"}"
+					].join( "\n" ) );
+
+					// add keyword
+					setMyVar.keywords[ "myVar" ] = varying;
+
+					var transform = new THREE.FunctionNode( "setMyVar( position * .1 ) + position", "vec3", [ setMyVar ] );
+					transform.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
+
+					mtl.transform = transform;
+					mtl.color = varying;
 
 					break;
 
