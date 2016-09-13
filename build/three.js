@@ -34706,20 +34706,20 @@
 
     	update: ( function () {
 
-    		var id, focus, fov, aspect, near, far, zoom;
+    		var instance, focus, fov, aspect, near, far, zoom;
 
     		var eyeRight = new Matrix4();
     		var eyeLeft = new Matrix4();
 
     		return function update( camera ) {
 
-    			var needsUpdate = id !== camera.id || focus !== camera.focus || fov !== camera.fov ||
+    			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
     												aspect !== camera.aspect * this.aspect || near !== camera.near ||
     												far !== camera.far || zoom !== camera.zoom;
 
     			if ( needsUpdate ) {
 
-    				id = camera.id;
+    				instance = this;
     				focus = camera.focus;
     				fov = camera.fov;
     				aspect = camera.aspect * this.aspect;
