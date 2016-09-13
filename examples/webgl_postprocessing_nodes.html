@@ -117,10 +117,10 @@
 					'basic / blends': 'blends',
 					'basic / fade': 'fade',
 					'basic / invert': 'invert',
+					'basic / blur': 'blur',
 					'adv / saturation': 'saturation',
 					'adv / refraction': 'refraction',
-					'adv / mosaic': 'mosaic',
-					'adv / blur': 'blur'
+					'adv / mosaic': 'mosaic'
 				} ).onFinishChange( function() {
 
 					updateMaterial();
@@ -145,8 +145,7 @@
 
 					} );
 
-				}
-				else if ( typeof value == 'object' ) {
+				} else if ( typeof value == 'object' ) {
 
 					node = gui.add( param, name, value ).onChange( function() {
 
@@ -154,8 +153,7 @@
 
 					} );
 
-				}
-				else {
+				} else {
 
 					node = gui.add( param, name, min, max ).onChange( function() {
 
