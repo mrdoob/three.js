@@ -125,7 +125,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		var groupCount = 0;
 
 		// this will be used to calculate the normal
-		var tanTheta = ( radiusBottom - radiusTop ) / height;
+		var slope = ( radiusBottom - radiusTop ) / height;
 
 		// generate vertices, normals and uvs
 
@@ -142,25 +142,19 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 				var u = x / radialSegments;
 
+				var theta = u * thetaLength + thetaStart;
+
+				var sinTheta = Math.sin( theta );
+				var cosTheta = Math.cos( theta );
+
 				// vertex
-				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.x = radius * sinTheta;
 				vertex.y = - v * height + halfHeight;
-				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertex.z = radius * cosTheta;
 				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 				// normal
-				normal.copy( vertex );
-
-				// handle special case if radiusTop/radiusBottom is zero
-
-				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
-
-					normal.x = Math.sin( u * thetaLength + thetaStart );
-					normal.z = Math.cos( u * thetaLength + thetaStart );
-
-				}
-
-				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normal.set( sinTheta, slope, cosTheta ).normalize();
 				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
 				// uv
