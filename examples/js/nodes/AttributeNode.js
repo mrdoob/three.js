@@ -4,7 +4,7 @@
 
 THREE.AttributeNode = function( name, type ) {
 
-	THREE.InputNode.call( this, type, { shared: false } );
+	THREE.InputNode.call( this, type );
 
 	this.name = name;
 
@@ -33,6 +33,6 @@ THREE.AttributeNode.prototype.generate = function( builder, output ) {
 
 	var attribute = builder.material.getAttribute( this.name, type );
 
-	return builder.format( attribute.varName, this.getType( builder ), output );
+	return builder.format( builder.isShader( 'vertex' ) ? this.name : attribute.varName, this.getType( builder ), output );
 
 };
