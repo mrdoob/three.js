@@ -65,6 +65,18 @@ THREE.FunctionNode.prototype.generate = function( builder, output ) {
 
 	var match, offset = 0, src = this.value;
 
+	for ( var i = 0; i < this.includes.length; i ++ ) {
+
+		builder.include( this.includes[ i ], this );
+
+	}
+
+	for ( var ext in this.extensions ) {
+
+		builder.material.extensions[ ext ] = true;
+
+	}
+
 	while ( match = THREE.FunctionNode.rProperties.exec( this.value ) ) {
 
 		var prop = match[ 0 ], isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true;
@@ -107,18 +119,6 @@ THREE.FunctionNode.prototype.generate = function( builder, output ) {
 	}
 
 	if ( output === 'source' ) {
-
-		for ( var i = 0; i < this.includes.length; i ++ ) {
-
-			builder.include( this.includes[ i ], this );
-
-		}
-
-		for ( var ext in this.extensions ) {
-
-			builder.material.extensions[ ext ] = true;
-
-		}
 
 		return src;
 
