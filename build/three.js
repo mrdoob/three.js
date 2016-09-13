@@ -7939,7 +7939,7 @@
     	center: function ( optionalTarget ) {
 
     		var result = optionalTarget || new Vector3();
-    		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+    		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
     	},
 
@@ -24915,6 +24915,8 @@
     		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
     		image.onload = function () {
 
+    			image.onload = null;
+
     			URL.revokeObjectURL( image.src );
 
     			if ( onLoad ) onLoad( image );
@@ -26458,12 +26460,13 @@
 
     		// flush last keyframe (compaction looks ahead)
 
-    		times[ writeIndex ++ ] = times[ lastIndex ];
+    		times[ writeIndex ] = times[ lastIndex ];
 
-    		for ( var readOffset = lastIndex * stride, j = 0; j !== stride; ++ j )
+    		for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
 
     			values[ writeOffset + j ] = values[ readOffset + j ];
 
+    		++ writeIndex;
 
     		if ( writeIndex !== times.length ) {
 
@@ -32023,7 +32026,7 @@
     		var groupCount = 0;
 
     		// this will be used to calculate the normal
-    		var tanTheta = ( radiusBottom - radiusTop ) / height;
+    		var slope = ( radiusBottom - radiusTop ) / height;
 
     		// generate vertices, normals and uvs
 
@@ -32040,25 +32043,19 @@
 
     				var u = x / radialSegments;
 
+    				var theta = u * thetaLength + thetaStart;
+
+    				var sinTheta = Math.sin( theta );
+    				var cosTheta = Math.cos( theta );
+
     				// vertex
-    				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+    				vertex.x = radius * sinTheta;
     				vertex.y = - v * height + halfHeight;
-    				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+    				vertex.z = radius * cosTheta;
     				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
     				// normal
-    				normal.copy( vertex );
-
-    				// handle special case if radiusTop/radiusBottom is zero
-
-    				if ( ( radiusTop === 0 && y === 0 ) || ( radiusBottom === 0 && y === heightSegments ) ) {
-
-    					normal.x = Math.sin( u * thetaLength + thetaStart );
-    					normal.z = Math.cos( u * thetaLength + thetaStart );
-
-    				}
-
-    				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+    				normal.set( sinTheta, slope, cosTheta ).normalize();
     				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
     				// uv
@@ -34709,7 +34706,7 @@
 
     	update: ( function () {
 
-    		var focus, fov, aspect, near, far;
+    		var focus, fov, aspect, near, far, zoom;
 
     		var eyeRight = new Matrix4();
     		var eyeLeft = new Matrix4();
@@ -34718,7 +34715,7 @@
 
     			var needsUpdate = focus !== camera.focus || fov !== camera.fov ||
     												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-    												far !== camera.far;
+    												far !== camera.far || zoom !== camera.zoom;
 
     			if ( needsUpdate ) {
 
@@ -34727,6 +34724,7 @@
     				aspect = camera.aspect * this.aspect;
     				near = camera.near;
     				far = camera.far;
+    				zoom = camera.zoom;
 
     				// Off-axis stereoscopic effect based on
     				// http://paulbourke.net/stereographics/stereorender/
@@ -34734,7 +34732,7 @@
     				var projectionMatrix = camera.projectionMatrix.clone();
     				var eyeSep = this.eyeSep / 2;
     				var eyeSepOnProjection = eyeSep * near / focus;
-    				var ymax = near * Math.tan( exports.Math.DEG2RAD * fov * 0.5 );
+    				var ymax = ( near * Math.tan( exports.Math.DEG2RAD * fov * 0.5 ) ) / zoom;
     				var xmin, xmax;
 
     				// translate xOffset
