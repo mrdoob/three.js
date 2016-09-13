@@ -33,8 +33,7 @@ THREE.InputNode.prototype.generate = function( builder, output, uuid, type, ns, 
 
 		return builder.format( data.vertex.name, type, output );
 
-	}
-	else {
+	} else {
 
 		if ( ! data.fragment ) {
 
