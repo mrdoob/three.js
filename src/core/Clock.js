@@ -30,6 +30,7 @@ Clock.prototype = {
 	stop: function () {
 
 		this.getElapsedTime();
+		this.elapsedTime = 0;
 		this.running = false;
 
 	},
