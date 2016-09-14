@@ -22,12 +22,20 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Scene } from '../scenes/Scene';
 import { Texture } from '../textures/Texture';
 import { ImageLoader } from './ImageLoader';
+import { FontLoader } from './FontLoader';
+import { VideoLoader } from './VideoLoader';
+import { TextureLoader } from './TextureLoader';
+import { AudioLoader } from './AudioLoader';
 import { LoadingManager, DefaultLoadingManager } from './LoadingManager';
 import { AnimationClip } from '../animation/AnimationClip';
 import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
 import { XHRLoader } from './XHRLoader';
+import { Audio } from '../resouces/Audio';
+import { Font } from '../resouces/Font';
+import { Video } from '../resouces/Video';
+import { Image } from '../resouces/Image';
 import * as Geometries from '../extras/geometries/Geometries';
 
 /**
@@ -76,18 +84,14 @@ Object.assign( ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 
-		var geometries = this.parseGeometries( json.geometries );
-
-		var images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
-
-		var textures  = this.parseTextures( json.textures, images );
-		var materials = this.parseMaterials( json.materials, textures );
-
-		var object = this.parseObject( json.object, geometries, materials );
+		var geometries = this.parseGeometries(json.geometries);
+		var images = this.parseImages(json.images);
+		var videos = this.parseVideos(json.videos);
+		var audio = this.parseAudio(json.audio);
+		var fonts = this.parseFonts(json.fonts);
+		var textures = this.parseTextures(json.textures, images, videos);
+		var materials = this.parseMaterials(json.materials, textures);
+		var object = this.parseObject(json.object, geometries, materials, textures, audio, fonts);
 
 		if ( json.animations ) {
 
@@ -343,148 +347,142 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parseImages: function ( json, onLoad ) {
+	parseImages: function(json)
+	{
+		var loader = new ImageLoader();
+		var images = [];
 
-		var scope = this;
-		var images = {};
-
-		function loadImage( url ) {
-
-			scope.manager.itemStart( url );
-
-			return loader.load( url, function () {
-
-				scope.manager.itemEnd( url );
-
-			}, undefined, function () {
-
-				scope.manager.itemError( url );
-
-			} );
-
-		}
-
-		if ( json !== undefined && json.length > 0 ) {
-
-			var manager = new LoadingManager( onLoad );
-
-			var loader = new ImageLoader( manager );
-			loader.setCrossOrigin( this.crossOrigin );
-
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
-
-				var image = json[ i ];
-				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
-
-				images[ image.uuid ] = loadImage( path );
-
+		if(json !== undefined)
+		{
+			for(var i = 0, l = json.length; i < l; i++)
+			{
+				images[json[i].uuid] = loader.parse(json[i]);
 			}
-
 		}
 
 		return images;
-
 	},
 
-	parseTextures: function ( json, images ) {
+	parseVideos: function(json)
+	{
+		var loader = new VideoLoader();
+		var videos = [];
 
-		function parseConstant( value, type ) {
-
-			if ( typeof( value ) === 'number' ) return value;
-
-			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
-
-			return type[ value ];
-
-		}
-
-		var textures = {};
-
-		if ( json !== undefined ) {
-
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
-
-				var data = json[ i ];
-
-				if ( data.image === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
-
-				}
-
-				if ( images[ data.image ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
-
-				}
-
-				var texture = new Texture( images[ data.image ] );
-				texture.needsUpdate = true;
-
-				texture.uuid = data.uuid;
-
-				if ( data.name !== undefined ) texture.name = data.name;
-
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TextureMapping );
-
-				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
-				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
-				if ( data.wrap !== undefined ) {
-
-					texture.wrapS = parseConstant( data.wrap[ 0 ], TextureWrapping );
-					texture.wrapT = parseConstant( data.wrap[ 1 ], TextureWrapping );
-
-				}
-
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TextureFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TextureFilter );
-				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
-
-				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
-
-				textures[ data.uuid ] = texture;
-
+		if(json !== undefined)
+		{
+			for(var i = 0, l = json.length; i < l; i++)
+			{
+				videos[json[i].uuid] = loader.parse(json[i]);
 			}
-
 		}
 
-		return textures;
+		return videos;
+	},
 
+	parseAudio: function(json)
+	{
+		var loader = new AudioLoader();
+		var audio = [];
+
+		if(json !== undefined)
+		{
+			for(var i = 0, l = json.length; i < l; i++)
+			{
+				audio[json[i].uuid] = loader.parse(json[i]);
+			}
+		}
+
+		return audio;
+	},
+
+	parseFonts: function(json)
+	{
+		var loader = new FontLoader();
+		var fonts = [];
+
+		if(json !== undefined)
+		{
+			for(var i = 0, l = json.length; i < l; i++)
+			{
+				fonts[json[i].uuid] = loader.parse(json[i]);
+			}
+		}
+
+		return fonts;
+	},
+
+	parseTextures: function(json, images, videos)
+	{
+		var loader = new TextureLoader();
+		loader.setImages(images);
+		loader.setVideos(videos);
+
+		var textures = [];
+
+		if(json !== undefined)
+		{
+			for(var i = 0, l = json.length; i < l; i++)
+			{
+				var texture = loader.parse(json[i]);
+				textures[texture.uuid] = texture;
+			}
+		}
+		
+		return textures;
 	},
 
 	parseObject: function () {
 
 		var matrix = new Matrix4();
 
-		return function parseObject( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials, textures, audio, fonts ) {
 
 			var object;
 
-			function getGeometry( name ) {
-
-				if ( geometries[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
-
-				}
-
-				return geometries[ name ];
-
+		function getTexture(uuid)
+		{
+			if(textures[uuid] === undefined)
+			{
+				console.warn("ObjectLoader: Undefined texture", uuid);
 			}
+			return textures[uuid];
+		}
 
-			function getMaterial( name ) {
-
-				if ( name === undefined ) return undefined;
-
-				if ( materials[ name ] === undefined ) {
-
-					console.warn( 'THREE.ObjectLoader: Undefined material', name );
-
-				}
-
-				return materials[ name ];
-
+		function getGeometry(uuid)
+		{
+			if(geometries[uuid] === undefined)
+			{
+				console.warn("ObjectLoader: Undefined geometry", uuid);
 			}
+			return geometries[uuid];
+		}
+
+		function getMaterial(uuid)
+		{
+			if(materials[uuid] === undefined)
+			{
+				console.warn("ObjectLoader: Undefined material", uuid);
+			}
+			return materials[uuid];
+		}
+
+		function getFont(uuid)
+		{
+			if(fonts[uuid] === undefined)
+			{
+				console.warn("ObjectLoader: Undefined font", uuid);
+			}
+			return fonts[uuid];
+		}
+
+		function getAudio(uuid)
+		{
+			if(audio[uuid] === undefined)
+			{
+				console.warn("ObjectLoader: Undefined audio", uuid);
+			}
+			return audio[uuid];
+		}
 
 			switch ( data.type ) {
 
@@ -662,7 +660,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials , textures, audio, fonts ) );
 
 				}
 

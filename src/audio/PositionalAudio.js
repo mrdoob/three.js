@@ -5,10 +5,11 @@
 import { Vector3 } from '../math/Vector3';
 import { Audio } from './Audio';
 import { Object3D } from '../core/Object3D';
+import { Audio } from '../resouces/AudioEmitter';
 
-function PositionalAudio( listener ) {
+function PositionalAudio( listener , audio ) {
 
-	Audio.call( this, listener );
+	Audio.call( this, listener , audio );
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
