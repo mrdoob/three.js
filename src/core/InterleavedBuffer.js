@@ -25,12 +25,6 @@ InterleavedBuffer.prototype = {
 
 	isInterleavedBuffer: true,
 
-	get length () {
-
-		return this.array.length;
-
-	},
-
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
