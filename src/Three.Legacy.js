@@ -126,6 +126,13 @@ Object.assign( Box3.prototype, {
 	}
 } );
 
+Object.assign( Line3.prototype, {
+	center: function ( optionalTarget ) {
+		console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
+		return this.getCenter( optionalTarget );
+	}
+} );
+
 Object.assign( Matrix3.prototype, {
 	multiplyVector3: function ( vector ) {
 		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
