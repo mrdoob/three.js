@@ -6286,17 +6286,17 @@
 
     	},
 
-    	center: function ( optionalTarget ) {
+    	getCenter: function ( optionalTarget ) {
 
     		var result = optionalTarget || new Vector2();
-    		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+    		return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
     	},
 
-    	size: function ( optionalTarget ) {
+    	getSize: function ( optionalTarget ) {
 
     		var result = optionalTarget || new Vector2();
-    		return result.subVectors( this.max, this.min );
+    		return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
 
     	},
 
@@ -7936,17 +7936,17 @@
 
     	},
 
-    	center: function ( optionalTarget ) {
+    	getCenter: function ( optionalTarget ) {
 
     		var result = optionalTarget || new Vector3();
     		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
     	},
 
-    	size: function ( optionalTarget ) {
+    	getSize: function ( optionalTarget ) {
 
     		var result = optionalTarget || new Vector3();
-    		return result.subVectors( this.max, this.min );
+    		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
 
     	},
 
@@ -8129,7 +8129,7 @@
 
     			var result = optionalTarget || new Sphere();
 
-    			result.center = this.center();
+    			result.center = this.getCenter();
     			result.radius = this.size( v1 ).length() * 0.5;
 
     			return result;
@@ -8251,7 +8251,7 @@
 
     			} else {
 
-    				box.setFromPoints( points ).center( center );
+    				box.setFromPoints( points ).getCenter( center );
 
     			}
 
@@ -11453,7 +11453,7 @@
 
     		this.computeBoundingBox();
 
-    		var offset = this.boundingBox.center().negate();
+    		var offset = this.boundingBox.getCenter().negate();
 
     		this.translate( offset.x, offset.y, offset.z );
 
@@ -12892,7 +12892,7 @@
 
     		this.computeBoundingBox();
 
-    		var offset = this.boundingBox.center().negate();
+    		var offset = this.boundingBox.getCenter().negate();
 
     		this.translate( offset.x, offset.y, offset.z );
 
@@ -13232,7 +13232,7 @@
     				var center = this.boundingSphere.center;
 
     				box.setFromArray( array );
-    				box.center( center );
+    				box.getCenter( center );
 
     				// hoping to find a boundingSphere with a radius smaller than the
     				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
@@ -26460,13 +26460,17 @@
 
     		// flush last keyframe (compaction looks ahead)
 
-    		times[ writeIndex ] = times[ lastIndex ];
+    		if ( lastIndex > 0 ) {
 
-    		for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
+    			times[ writeIndex ] = times[ lastIndex ];
 
-    			values[ writeOffset + j ] = values[ readOffset + j ];
+    			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
 
-    		++ writeIndex;
+    				values[ writeOffset + j ] = values[ readOffset + j ];
+
+    			++ writeIndex;
+
+    		}
 
     		if ( writeIndex !== times.length ) {
 
@@ -40122,7 +40126,7 @@
 
     	this.box.size( this.scale );
 
-    	this.box.center( this.position );
+    	this.box.getCenter( this.position );
 
     };
 
@@ -40757,6 +40761,10 @@
     //
 
     Object.assign( Box2.prototype, {
+    	center: function ( optionalTarget ) {
+    		console.warn( 'THREE.Box2: .center() has been renamed to .getCenter().' );
+    		return this.getCenter( optionalTarget );
+    	},
     	empty: function () {
     		console.warn( 'THREE.Box2: .empty() has been renamed to .isEmpty().' );
     		return this.isEmpty();
@@ -40764,10 +40772,18 @@
     	isIntersectionBox: function ( box ) {
     		console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
     		return this.intersectsBox( box );
+    	},
+    	size: function ( optionalTarget ) {
+    		console.warn( 'THREE.Box2: .size() has been renamed to .getSize().' );
+    		return this.getSize( optionalTarget );
     	}
     } );
 
     Object.assign( Box3.prototype, {
+    	center: function ( optionalTarget ) {
+    		console.warn( 'THREE.Box3: .center() has been renamed to .getCenter().' );
+    		return this.getCenter( optionalTarget );
+    	},
     	empty: function () {
     		console.warn( 'THREE.Box3: .empty() has been renamed to .isEmpty().' );
     		return this.isEmpty();
@@ -40779,6 +40795,10 @@
     	isIntersectionSphere: function ( sphere ) {
     		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
     		return this.intersectsSphere( sphere );
+    	},
+    	size: function ( optionalTarget ) {
+    		console.warn( 'THREE.Box3: .size() has been renamed to .getSize().' );
+    		return this.getSize( optionalTarget );
     	}
     } );
 
