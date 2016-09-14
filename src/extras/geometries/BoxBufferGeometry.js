@@ -21,6 +21,9 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 		depthSegments: depthSegments
 	};
 
+	height = height || width;
+	depth = depth || width;
+
 	var scope = this;
 
 	// segments

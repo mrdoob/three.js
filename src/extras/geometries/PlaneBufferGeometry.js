@@ -19,6 +19,8 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 		heightSegments: heightSegments
 	};
 
+	height = height || width;
+
 	var width_half = width / 2;
 	var height_half = height / 2;
 
