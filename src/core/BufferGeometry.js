@@ -280,7 +280,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		this.computeBoundingBox();
 
-		var offset = this.boundingBox.center().negate();
+		var offset = this.boundingBox.getCenter().negate();
 
 		this.translate( offset.x, offset.y, offset.z );
 
@@ -620,7 +620,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 				var center = this.boundingSphere.center;
 
 				box.setFromArray( array );
-				box.center( center );
+				box.getCenter( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
 				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case

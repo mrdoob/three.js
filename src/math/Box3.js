@@ -201,14 +201,14 @@ Box3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
 		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function ( optionalTarget ) {
+	getSize: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
 		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
@@ -394,7 +394,7 @@ Box3.prototype = {
 
 			var result = optionalTarget || new Sphere();
 
-			result.center = this.center();
+			result.center = this.getCenter();
 			result.radius = this.size( v1 ).length() * 0.5;
 
 			return result;

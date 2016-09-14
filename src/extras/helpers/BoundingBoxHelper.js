@@ -30,7 +30,7 @@ BoundingBoxHelper.prototype.update = function () {
 
 	this.box.size( this.scale );
 
-	this.box.center( this.position );
+	this.box.getCenter( this.position );
 
 };
 
