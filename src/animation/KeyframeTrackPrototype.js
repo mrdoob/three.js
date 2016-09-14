@@ -336,13 +336,17 @@ KeyframeTrackPrototype = {
 
 		// flush last keyframe (compaction looks ahead)
 
-		times[ writeIndex ] = times[ lastIndex ];
+		if ( lastIndex > 0 ) {
 
-		for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
+			times[ writeIndex ] = times[ lastIndex ];
 
-			values[ writeOffset + j ] = values[ readOffset + j ];
+			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
 
-		++ writeIndex;
+				values[ writeOffset + j ] = values[ readOffset + j ];
+
+			++ writeIndex;
+
+		}
 
 		if ( writeIndex !== times.length ) {
 
