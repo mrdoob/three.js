@@ -211,7 +211,7 @@ Box3.prototype = {
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
-		return result.subVectors( this.max, this.min );
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
 
 	},
 

@@ -89,14 +89,14 @@ Box2.prototype = {
 	center: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector2();
-		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector2();
-		return result.subVectors( this.max, this.min );
+		return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
 
 	},
 
