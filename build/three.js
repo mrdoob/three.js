@@ -8129,7 +8129,8 @@
 
     			var result = optionalTarget || new Sphere();
 
-    			result.center = this.getCenter();
+    			this.getCenter( result.center );
+
     			result.radius = this.size( v1 ).length() * 0.5;
 
     			return result;
@@ -9589,6 +9590,7 @@
 
     	this.array = array;
     	this.itemSize = itemSize;
+    	this.count = array.length / itemSize;
     	this.normalized = normalized === true;
 
     	this.dynamic = false;
@@ -9603,12 +9605,6 @@
     	constructor: BufferAttribute,
 
     	isBufferAttribute: true,
-
-    	get count() {
-
-    		return this.array.length / this.itemSize;
-
-    	},
 
     	set needsUpdate( value ) {
 
@@ -9628,6 +9624,7 @@
 
     		this.array = new source.array.constructor( source.array );
     		this.itemSize = source.itemSize;
+    		this.count = source.count;
     		this.normalized = source.normalized;
 
     		this.dynamic = source.dynamic;
@@ -27117,7 +27114,7 @@
     	},
 
     	// parse the animation.hierarchy format
-    	parseAnimation: function( animation, bones, nodeName ) {
+    	parseAnimation: function( animation, bones ) {
 
     		if ( ! animation ) {
 
@@ -38110,13 +38107,6 @@
 
     	isInterleavedBufferAttribute: true,
 
-    	get length() {
-
-    		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-    		return this.array.length;
-
-    	},
-
     	get count() {
 
     		return this.data.count;
@@ -38233,6 +38223,7 @@
 
     	this.array = array;
     	this.stride = stride;
+    	this.count = array.length / stride;
 
     	this.dynamic = false;
     	this.updateRange = { offset: 0, count: - 1 };
@@ -38246,18 +38237,6 @@
     	constructor: InterleavedBuffer,
 
     	isInterleavedBuffer: true,
-
-    	get length () {
-
-    		return this.array.length;
-
-    	},
-
-    	get count () {
-
-    		return this.array.length / this.stride;
-
-    	},
 
     	set needsUpdate( value ) {
 
@@ -38276,6 +38255,7 @@
     	copy: function ( source ) {
 
     		this.array = new source.array.constructor( source.array );
+    		this.count = source.count;
     		this.stride = source.stride;
     		this.dynamic = source.dynamic;
 
