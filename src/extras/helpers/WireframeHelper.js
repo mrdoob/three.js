@@ -1,6 +1,6 @@
 import { LineSegments } from '../../objects/LineSegments';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { WireframeGeometry } from '../geometries/WireframeGeometry';
+import { WireframeGeometry } from '../../geometries/WireframeGeometry';
 
 /**
  * @author mrdoob / http://mrdoob.com/

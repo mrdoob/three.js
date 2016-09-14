@@ -28,7 +28,7 @@ import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
 import { XHRLoader } from './XHRLoader';
-import * as Geometries from '../extras/geometries/Geometries';
+import * as Geometries from '../geometries/Geometries';
 
 /**
  * @author mrdoob / http://mrdoob.com/

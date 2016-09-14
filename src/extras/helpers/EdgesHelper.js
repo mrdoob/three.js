@@ -1,6 +1,6 @@
 import { LineSegments } from '../../objects/LineSegments';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { EdgesGeometry } from '../geometries/EdgesGeometry';
+import { EdgesGeometry } from '../../geometries/EdgesGeometry';
 
 /**
  * @author WestLangley / http://github.com/WestLangley

@@ -1,6 +1,6 @@
 import { Mesh } from '../../objects/Mesh';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { BoxGeometry } from '../geometries/BoxGeometry';
+import { BoxGeometry } from '../../geometries/BoxGeometry';
 import { Box3 } from '../../math/Box3';
 
 /**
