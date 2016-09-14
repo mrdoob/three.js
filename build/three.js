@@ -9575,302 +9575,24 @@
     }
 
     /**
-     * @author mrdoob / http://mrdoob.com/
+     * @author bhouston / http://clara.io
      */
 
-    function BufferAttribute( array, itemSize, normalized ) {
+    function Ray( origin, direction ) {
 
-    	if ( Array.isArray( array ) ) {
-
-    		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-    	}
-
-    	this.uuid = exports.Math.generateUUID();
-
-    	this.array = array;
-    	this.itemSize = itemSize;
-    	this.count = array.length / itemSize;
-    	this.normalized = normalized === true;
-
-    	this.dynamic = false;
-    	this.updateRange = { offset: 0, count: - 1 };
-
-    	this.version = 0;
+    	this.origin = ( origin !== undefined ) ? origin : new Vector3();
+    	this.direction = ( direction !== undefined ) ? direction : new Vector3();
 
     }
 
-    BufferAttribute.prototype = {
+    Ray.prototype = {
 
-    	constructor: BufferAttribute,
+    	constructor: Ray,
 
-    	isBufferAttribute: true,
+    	set: function ( origin, direction ) {
 
-    	set needsUpdate( value ) {
-
-    		if ( value === true ) this.version ++;
-
-    	},
-
-    	setDynamic: function ( value ) {
-
-    		this.dynamic = value;
-
-    		return this;
-
-    	},
-
-    	copy: function ( source ) {
-
-    		this.array = new source.array.constructor( source.array );
-    		this.itemSize = source.itemSize;
-    		this.count = source.count;
-    		this.normalized = source.normalized;
-
-    		this.dynamic = source.dynamic;
-
-    		return this;
-
-    	},
-
-    	copyAt: function ( index1, attribute, index2 ) {
-
-    		index1 *= this.itemSize;
-    		index2 *= attribute.itemSize;
-
-    		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
-
-    			this.array[ index1 + i ] = attribute.array[ index2 + i ];
-
-    		}
-
-    		return this;
-
-    	},
-
-    	copyArray: function ( array ) {
-
-    		this.array.set( array );
-
-    		return this;
-
-    	},
-
-    	copyColorsArray: function ( colors ) {
-
-    		var array = this.array, offset = 0;
-
-    		for ( var i = 0, l = colors.length; i < l; i ++ ) {
-
-    			var color = colors[ i ];
-
-    			if ( color === undefined ) {
-
-    				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
-    				color = new Color();
-
-    			}
-
-    			array[ offset ++ ] = color.r;
-    			array[ offset ++ ] = color.g;
-    			array[ offset ++ ] = color.b;
-
-    		}
-
-    		return this;
-
-    	},
-
-    	copyIndicesArray: function ( indices ) {
-
-    		var array = this.array, offset = 0;
-
-    		for ( var i = 0, l = indices.length; i < l; i ++ ) {
-
-    			var index = indices[ i ];
-
-    			array[ offset ++ ] = index.a;
-    			array[ offset ++ ] = index.b;
-    			array[ offset ++ ] = index.c;
-
-    		}
-
-    		return this;
-
-    	},
-
-    	copyVector2sArray: function ( vectors ) {
-
-    		var array = this.array, offset = 0;
-
-    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
-
-    			var vector = vectors[ i ];
-
-    			if ( vector === undefined ) {
-
-    				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
-    				vector = new Vector2();
-
-    			}
-
-    			array[ offset ++ ] = vector.x;
-    			array[ offset ++ ] = vector.y;
-
-    		}
-
-    		return this;
-
-    	},
-
-    	copyVector3sArray: function ( vectors ) {
-
-    		var array = this.array, offset = 0;
-
-    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
-
-    			var vector = vectors[ i ];
-
-    			if ( vector === undefined ) {
-
-    				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
-    				vector = new Vector3();
-
-    			}
-
-    			array[ offset ++ ] = vector.x;
-    			array[ offset ++ ] = vector.y;
-    			array[ offset ++ ] = vector.z;
-
-    		}
-
-    		return this;
-
-    	},
-
-    	copyVector4sArray: function ( vectors ) {
-
-    		var array = this.array, offset = 0;
-
-    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
-
-    			var vector = vectors[ i ];
-
-    			if ( vector === undefined ) {
-
-    				console.warn( 'THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i );
-    				vector = new Vector4();
-
-    			}
-
-    			array[ offset ++ ] = vector.x;
-    			array[ offset ++ ] = vector.y;
-    			array[ offset ++ ] = vector.z;
-    			array[ offset ++ ] = vector.w;
-
-    		}
-
-    		return this;
-
-    	},
-
-    	set: function ( value, offset ) {
-
-    		if ( offset === undefined ) offset = 0;
-
-    		this.array.set( value, offset );
-
-    		return this;
-
-    	},
-
-    	getX: function ( index ) {
-
-    		return this.array[ index * this.itemSize ];
-
-    	},
-
-    	setX: function ( index, x ) {
-
-    		this.array[ index * this.itemSize ] = x;
-
-    		return this;
-
-    	},
-
-    	getY: function ( index ) {
-
-    		return this.array[ index * this.itemSize + 1 ];
-
-    	},
-
-    	setY: function ( index, y ) {
-
-    		this.array[ index * this.itemSize + 1 ] = y;
-
-    		return this;
-
-    	},
-
-    	getZ: function ( index ) {
-
-    		return this.array[ index * this.itemSize + 2 ];
-
-    	},
-
-    	setZ: function ( index, z ) {
-
-    		this.array[ index * this.itemSize + 2 ] = z;
-
-    		return this;
-
-    	},
-
-    	getW: function ( index ) {
-
-    		return this.array[ index * this.itemSize + 3 ];
-
-    	},
-
-    	setW: function ( index, w ) {
-
-    		this.array[ index * this.itemSize + 3 ] = w;
-
-    		return this;
-
-    	},
-
-    	setXY: function ( index, x, y ) {
-
-    		index *= this.itemSize;
-
-    		this.array[ index + 0 ] = x;
-    		this.array[ index + 1 ] = y;
-
-    		return this;
-
-    	},
-
-    	setXYZ: function ( index, x, y, z ) {
-
-    		index *= this.itemSize;
-
-    		this.array[ index + 0 ] = x;
-    		this.array[ index + 1 ] = y;
-    		this.array[ index + 2 ] = z;
-
-    		return this;
-
-    	},
-
-    	setXYZW: function ( index, x, y, z, w ) {
-
-    		index *= this.itemSize;
-
-    		this.array[ index + 0 ] = x;
-    		this.array[ index + 1 ] = y;
-    		this.array[ index + 2 ] = z;
-    		this.array[ index + 3 ] = w;
+    		this.origin.copy( origin );
+    		this.direction.copy( direction );
 
     		return this;
 
@@ -9880,130 +9602,509 @@
 
     		return new this.constructor().copy( this );
 
-    	}
+    	},
 
-    };
+    	copy: function ( ray ) {
 
-    //
+    		this.origin.copy( ray.origin );
+    		this.direction.copy( ray.direction );
 
-    function Int8Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Int8Array( array ), itemSize );
-
-    }
-
-    function Uint8Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Uint8Array( array ), itemSize );
-
-    }
-
-    function Uint8ClampedAttribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
-
-    }
-
-    function Int16Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Int16Array( array ), itemSize );
-
-    }
-
-    function Uint16Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Uint16Array( array ), itemSize );
-
-    }
-
-    function Int32Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Int32Array( array ), itemSize );
-
-    }
-
-    function Uint32Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Uint32Array( array ), itemSize );
-
-    }
-
-    function Float32Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Float32Array( array ), itemSize );
-
-    }
-
-    function Float64Attribute( array, itemSize ) {
-
-    	return new BufferAttribute( new Float64Array( array ), itemSize );
-
-    }
-
-    // Deprecated
-
-    function DynamicBufferAttribute( array, itemSize ) {
-
-    	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-    	return new BufferAttribute( array, itemSize ).setDynamic( true );
-
-    }
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     * @author alteredq / http://alteredqualia.com/
-     */
-
-    function Face3( a, b, c, normal, color, materialIndex ) {
-
-    	this.a = a;
-    	this.b = b;
-    	this.c = c;
-
-    	this.normal = (normal && normal.isVector3) ? normal : new Vector3();
-    	this.vertexNormals = Array.isArray( normal ) ? normal : [];
-
-    	this.color = (color && color.isColor) ? color : new Color();
-    	this.vertexColors = Array.isArray( color ) ? color : [];
-
-    	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
-
-    }
-
-    Face3.prototype = {
-
-    	constructor: Face3,
-
-    	clone: function () {
-
-    		return new this.constructor().copy( this );
+    		return this;
 
     	},
 
-    	copy: function ( source ) {
+    	at: function ( t, optionalTarget ) {
 
-    		this.a = source.a;
-    		this.b = source.b;
-    		this.c = source.c;
+    		var result = optionalTarget || new Vector3();
 
-    		this.normal.copy( source.normal );
-    		this.color.copy( source.color );
+    		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
-    		this.materialIndex = source.materialIndex;
+    	},
 
-    		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+    	lookAt: function ( v ) {
 
-    			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
-
-    		}
-
-    		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
-
-    			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
-
-    		}
+    		this.direction.copy( v ).sub( this.origin ).normalize();
 
     		return this;
+
+    	},
+
+    	recast: function () {
+
+    		var v1 = new Vector3();
+
+    		return function recast( t ) {
+
+    			this.origin.copy( this.at( t, v1 ) );
+
+    			return this;
+
+    		};
+
+    	}(),
+
+    	closestPointToPoint: function ( point, optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+    		result.subVectors( point, this.origin );
+    		var directionDistance = result.dot( this.direction );
+
+    		if ( directionDistance < 0 ) {
+
+    			return result.copy( this.origin );
+
+    		}
+
+    		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+
+    	},
+
+    	distanceToPoint: function ( point ) {
+
+    		return Math.sqrt( this.distanceSqToPoint( point ) );
+
+    	},
+
+    	distanceSqToPoint: function () {
+
+    		var v1 = new Vector3();
+
+    		return function distanceSqToPoint( point ) {
+
+    			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
+
+    			// point behind the ray
+
+    			if ( directionDistance < 0 ) {
+
+    				return this.origin.distanceToSquared( point );
+
+    			}
+
+    			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+
+    			return v1.distanceToSquared( point );
+
+    		};
+
+    	}(),
+
+    	distanceSqToSegment: function () {
+
+    		var segCenter = new Vector3();
+    		var segDir = new Vector3();
+    		var diff = new Vector3();
+
+    		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+
+    			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+    			// It returns the min distance between the ray and the segment
+    			// defined by v0 and v1
+    			// It can also set two optional targets :
+    			// - The closest point on the ray
+    			// - The closest point on the segment
+
+    			segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
+    			segDir.copy( v1 ).sub( v0 ).normalize();
+    			diff.copy( this.origin ).sub( segCenter );
+
+    			var segExtent = v0.distanceTo( v1 ) * 0.5;
+    			var a01 = - this.direction.dot( segDir );
+    			var b0 = diff.dot( this.direction );
+    			var b1 = - diff.dot( segDir );
+    			var c = diff.lengthSq();
+    			var det = Math.abs( 1 - a01 * a01 );
+    			var s0, s1, sqrDist, extDet;
+
+    			if ( det > 0 ) {
+
+    				// The ray and segment are not parallel.
+
+    				s0 = a01 * b1 - b0;
+    				s1 = a01 * b0 - b1;
+    				extDet = segExtent * det;
+
+    				if ( s0 >= 0 ) {
+
+    					if ( s1 >= - extDet ) {
+
+    						if ( s1 <= extDet ) {
+
+    							// region 0
+    							// Minimum at interior points of ray and segment.
+
+    							var invDet = 1 / det;
+    							s0 *= invDet;
+    							s1 *= invDet;
+    							sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
+
+    						} else {
+
+    							// region 1
+
+    							s1 = segExtent;
+    							s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+    							sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+    						}
+
+    					} else {
+
+    						// region 5
+
+    						s1 = - segExtent;
+    						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+    					}
+
+    				} else {
+
+    					if ( s1 <= - extDet ) {
+
+    						// region 4
+
+    						s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+    						s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+    					} else if ( s1 <= extDet ) {
+
+    						// region 3
+
+    						s0 = 0;
+    						s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+    						sqrDist = s1 * ( s1 + 2 * b1 ) + c;
+
+    					} else {
+
+    						// region 2
+
+    						s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+    						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+    					}
+
+    				}
+
+    			} else {
+
+    				// Ray and segment are parallel.
+
+    				s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+    				s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+    				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+    			}
+
+    			if ( optionalPointOnRay ) {
+
+    				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+
+    			}
+
+    			if ( optionalPointOnSegment ) {
+
+    				optionalPointOnSegment.copy( segDir ).multiplyScalar( s1 ).add( segCenter );
+
+    			}
+
+    			return sqrDist;
+
+    		};
+
+    	}(),
+
+    	intersectSphere: function () {
+
+    		var v1 = new Vector3();
+
+    		return function intersectSphere( sphere, optionalTarget ) {
+
+    			v1.subVectors( sphere.center, this.origin );
+    			var tca = v1.dot( this.direction );
+    			var d2 = v1.dot( v1 ) - tca * tca;
+    			var radius2 = sphere.radius * sphere.radius;
+
+    			if ( d2 > radius2 ) return null;
+
+    			var thc = Math.sqrt( radius2 - d2 );
+
+    			// t0 = first intersect point - entrance on front of sphere
+    			var t0 = tca - thc;
+
+    			// t1 = second intersect point - exit point on back of sphere
+    			var t1 = tca + thc;
+
+    			// test to see if both t0 and t1 are behind the ray - if so, return null
+    			if ( t0 < 0 && t1 < 0 ) return null;
+
+    			// test to see if t0 is behind the ray:
+    			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+    			// in order to always return an intersect point that is in front of the ray.
+    			if ( t0 < 0 ) return this.at( t1, optionalTarget );
+
+    			// else t0 is in front of the ray, so return the first collision point scaled by t0
+    			return this.at( t0, optionalTarget );
+
+    		};
+
+    	}(),
+
+    	intersectsSphere: function ( sphere ) {
+
+    		return this.distanceToPoint( sphere.center ) <= sphere.radius;
+
+    	},
+
+    	distanceToPlane: function ( plane ) {
+
+    		var denominator = plane.normal.dot( this.direction );
+
+    		if ( denominator === 0 ) {
+
+    			// line is coplanar, return origin
+    			if ( plane.distanceToPoint( this.origin ) === 0 ) {
+
+    				return 0;
+
+    			}
+
+    			// Null is preferable to undefined since undefined means.... it is undefined
+
+    			return null;
+
+    		}
+
+    		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+
+    		// Return if the ray never intersects the plane
+
+    		return t >= 0 ? t :  null;
+
+    	},
+
+    	intersectPlane: function ( plane, optionalTarget ) {
+
+    		var t = this.distanceToPlane( plane );
+
+    		if ( t === null ) {
+
+    			return null;
+
+    		}
+
+    		return this.at( t, optionalTarget );
+
+    	},
+
+
+
+    	intersectsPlane: function ( plane ) {
+
+    		// check if the ray lies on the plane first
+
+    		var distToPoint = plane.distanceToPoint( this.origin );
+
+    		if ( distToPoint === 0 ) {
+
+    			return true;
+
+    		}
+
+    		var denominator = plane.normal.dot( this.direction );
+
+    		if ( denominator * distToPoint < 0 ) {
+
+    			return true;
+
+    		}
+
+    		// ray origin is behind the plane (and is pointing behind it)
+
+    		return false;
+
+    	},
+
+    	intersectBox: function ( box, optionalTarget ) {
+
+    		var tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+    		var invdirx = 1 / this.direction.x,
+    			invdiry = 1 / this.direction.y,
+    			invdirz = 1 / this.direction.z;
+
+    		var origin = this.origin;
+
+    		if ( invdirx >= 0 ) {
+
+    			tmin = ( box.min.x - origin.x ) * invdirx;
+    			tmax = ( box.max.x - origin.x ) * invdirx;
+
+    		} else {
+
+    			tmin = ( box.max.x - origin.x ) * invdirx;
+    			tmax = ( box.min.x - origin.x ) * invdirx;
+
+    		}
+
+    		if ( invdiry >= 0 ) {
+
+    			tymin = ( box.min.y - origin.y ) * invdiry;
+    			tymax = ( box.max.y - origin.y ) * invdiry;
+
+    		} else {
+
+    			tymin = ( box.max.y - origin.y ) * invdiry;
+    			tymax = ( box.min.y - origin.y ) * invdiry;
+
+    		}
+
+    		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+
+    		// These lines also handle the case where tmin or tmax is NaN
+    		// (result of 0 * Infinity). x !== x returns true if x is NaN
+
+    		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
+
+    		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+
+    		if ( invdirz >= 0 ) {
+
+    			tzmin = ( box.min.z - origin.z ) * invdirz;
+    			tzmax = ( box.max.z - origin.z ) * invdirz;
+
+    		} else {
+
+    			tzmin = ( box.max.z - origin.z ) * invdirz;
+    			tzmax = ( box.min.z - origin.z ) * invdirz;
+
+    		}
+
+    		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+
+    		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+
+    		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+
+    		//return point closest to the ray (positive side)
+
+    		if ( tmax < 0 ) return null;
+
+    		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+
+    	},
+
+    	intersectsBox: ( function () {
+
+    		var v = new Vector3();
+
+    		return function intersectsBox( box ) {
+
+    			return this.intersectBox( box, v ) !== null;
+
+    		};
+
+    	} )(),
+
+    	intersectTriangle: function () {
+
+    		// Compute the offset origin, edges, and normal.
+    		var diff = new Vector3();
+    		var edge1 = new Vector3();
+    		var edge2 = new Vector3();
+    		var normal = new Vector3();
+
+    		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
+
+    			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+
+    			edge1.subVectors( b, a );
+    			edge2.subVectors( c, a );
+    			normal.crossVectors( edge1, edge2 );
+
+    			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+    			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+    			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+    			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+    			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+    			var DdN = this.direction.dot( normal );
+    			var sign;
+
+    			if ( DdN > 0 ) {
+
+    				if ( backfaceCulling ) return null;
+    				sign = 1;
+
+    			} else if ( DdN < 0 ) {
+
+    				sign = - 1;
+    				DdN = - DdN;
+
+    			} else {
+
+    				return null;
+
+    			}
+
+    			diff.subVectors( this.origin, a );
+    			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+
+    			// b1 < 0, no intersection
+    			if ( DdQxE2 < 0 ) {
+
+    				return null;
+
+    			}
+
+    			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
+    			// b2 < 0, no intersection
+    			if ( DdE1xQ < 0 ) {
+
+    				return null;
+
+    			}
+
+    			// b1+b2 > 1, no intersection
+    			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+    				return null;
+
+    			}
+
+    			// Line intersects triangle, check if ray does.
+    			var QdN = - sign * diff.dot( normal );
+
+    			// t < 0, no intersection
+    			if ( QdN < 0 ) {
+
+    				return null;
+
+    			}
+
+    			// Ray intersects triangle.
+    			return this.at( QdN / DdN, optionalTarget );
+
+    		};
+
+    	}(),
+
+    	applyMatrix4: function ( matrix4 ) {
+
+    		this.direction.add( this.origin ).applyMatrix4( matrix4 );
+    		this.origin.applyMatrix4( matrix4 );
+    		this.direction.sub( this.origin );
+    		this.direction.normalize();
+
+    		return this;
+
+    	},
+
+    	equals: function ( ray ) {
+
+    		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
 
     	}
 
@@ -11101,8 +11202,932 @@
 
     } );
 
-    var count$3 = 0;
-    function Object3DIdCount() { return count$3++; };
+    var count$2 = 0;
+    function Object3DIdCount() { return count$2++; };
+
+    /**
+     * @author bhouston / http://clara.io
+     */
+
+    function Line3( start, end ) {
+
+    	this.start = ( start !== undefined ) ? start : new Vector3();
+    	this.end = ( end !== undefined ) ? end : new Vector3();
+
+    }
+
+    Line3.prototype = {
+
+    	constructor: Line3,
+
+    	set: function ( start, end ) {
+
+    		this.start.copy( start );
+    		this.end.copy( end );
+
+    		return this;
+
+    	},
+
+    	clone: function () {
+
+    		return new this.constructor().copy( this );
+
+    	},
+
+    	copy: function ( line ) {
+
+    		this.start.copy( line.start );
+    		this.end.copy( line.end );
+
+    		return this;
+
+    	},
+
+    	getCenter: function ( optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+    		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
+
+    	},
+
+    	delta: function ( optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+    		return result.subVectors( this.end, this.start );
+
+    	},
+
+    	distanceSq: function () {
+
+    		return this.start.distanceToSquared( this.end );
+
+    	},
+
+    	distance: function () {
+
+    		return this.start.distanceTo( this.end );
+
+    	},
+
+    	at: function ( t, optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+
+    		return this.delta( result ).multiplyScalar( t ).add( this.start );
+
+    	},
+
+    	closestPointToPointParameter: function () {
+
+    		var startP = new Vector3();
+    		var startEnd = new Vector3();
+
+    		return function closestPointToPointParameter( point, clampToLine ) {
+
+    			startP.subVectors( point, this.start );
+    			startEnd.subVectors( this.end, this.start );
+
+    			var startEnd2 = startEnd.dot( startEnd );
+    			var startEnd_startP = startEnd.dot( startP );
+
+    			var t = startEnd_startP / startEnd2;
+
+    			if ( clampToLine ) {
+
+    				t = exports.Math.clamp( t, 0, 1 );
+
+    			}
+
+    			return t;
+
+    		};
+
+    	}(),
+
+    	closestPointToPoint: function ( point, clampToLine, optionalTarget ) {
+
+    		var t = this.closestPointToPointParameter( point, clampToLine );
+
+    		var result = optionalTarget || new Vector3();
+
+    		return this.delta( result ).multiplyScalar( t ).add( this.start );
+
+    	},
+
+    	applyMatrix4: function ( matrix ) {
+
+    		this.start.applyMatrix4( matrix );
+    		this.end.applyMatrix4( matrix );
+
+    		return this;
+
+    	},
+
+    	equals: function ( line ) {
+
+    		return line.start.equals( this.start ) && line.end.equals( this.end );
+
+    	}
+
+    };
+
+    /**
+     * @author bhouston / http://clara.io
+     * @author mrdoob / http://mrdoob.com/
+     */
+
+    function Triangle( a, b, c ) {
+
+    	this.a = ( a !== undefined ) ? a : new Vector3();
+    	this.b = ( b !== undefined ) ? b : new Vector3();
+    	this.c = ( c !== undefined ) ? c : new Vector3();
+
+    }
+
+    Triangle.normal = function () {
+
+    	var v0 = new Vector3();
+
+    	return function normal( a, b, c, optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+
+    		result.subVectors( c, b );
+    		v0.subVectors( a, b );
+    		result.cross( v0 );
+
+    		var resultLengthSq = result.lengthSq();
+    		if ( resultLengthSq > 0 ) {
+
+    			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+
+    		}
+
+    		return result.set( 0, 0, 0 );
+
+    	};
+
+    }();
+
+    // static/instance method to calculate barycentric coordinates
+    // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+    Triangle.barycoordFromPoint = function () {
+
+    	var v0 = new Vector3();
+    	var v1 = new Vector3();
+    	var v2 = new Vector3();
+
+    	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+
+    		v0.subVectors( c, a );
+    		v1.subVectors( b, a );
+    		v2.subVectors( point, a );
+
+    		var dot00 = v0.dot( v0 );
+    		var dot01 = v0.dot( v1 );
+    		var dot02 = v0.dot( v2 );
+    		var dot11 = v1.dot( v1 );
+    		var dot12 = v1.dot( v2 );
+
+    		var denom = ( dot00 * dot11 - dot01 * dot01 );
+
+    		var result = optionalTarget || new Vector3();
+
+    		// collinear or singular triangle
+    		if ( denom === 0 ) {
+
+    			// arbitrary location outside of triangle?
+    			// not sure if this is the best idea, maybe should be returning undefined
+    			return result.set( - 2, - 1, - 1 );
+
+    		}
+
+    		var invDenom = 1 / denom;
+    		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+    		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+    		// barycentric coordinates must always sum to 1
+    		return result.set( 1 - u - v, v, u );
+
+    	};
+
+    }();
+
+    Triangle.containsPoint = function () {
+
+    	var v1 = new Vector3();
+
+    	return function containsPoint( point, a, b, c ) {
+
+    		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
+
+    		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+
+    	};
+
+    }();
+
+    Triangle.prototype = {
+
+    	constructor: Triangle,
+
+    	set: function ( a, b, c ) {
+
+    		this.a.copy( a );
+    		this.b.copy( b );
+    		this.c.copy( c );
+
+    		return this;
+
+    	},
+
+    	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
+
+    		this.a.copy( points[ i0 ] );
+    		this.b.copy( points[ i1 ] );
+    		this.c.copy( points[ i2 ] );
+
+    		return this;
+
+    	},
+
+    	clone: function () {
+
+    		return new this.constructor().copy( this );
+
+    	},
+
+    	copy: function ( triangle ) {
+
+    		this.a.copy( triangle.a );
+    		this.b.copy( triangle.b );
+    		this.c.copy( triangle.c );
+
+    		return this;
+
+    	},
+
+    	area: function () {
+
+    		var v0 = new Vector3();
+    		var v1 = new Vector3();
+
+    		return function area() {
+
+    			v0.subVectors( this.c, this.b );
+    			v1.subVectors( this.a, this.b );
+
+    			return v0.cross( v1 ).length() * 0.5;
+
+    		};
+
+    	}(),
+
+    	midpoint: function ( optionalTarget ) {
+
+    		var result = optionalTarget || new Vector3();
+    		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
+
+    	},
+
+    	normal: function ( optionalTarget ) {
+
+    		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
+
+    	},
+
+    	plane: function ( optionalTarget ) {
+
+    		var result = optionalTarget || new Plane();
+
+    		return result.setFromCoplanarPoints( this.a, this.b, this.c );
+
+    	},
+
+    	barycoordFromPoint: function ( point, optionalTarget ) {
+
+    		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+
+    	},
+
+    	containsPoint: function ( point ) {
+
+    		return Triangle.containsPoint( point, this.a, this.b, this.c );
+
+    	},
+
+    	closestPointToPoint: function () {
+
+    		var plane, edgeList, projectedPoint, closestPoint;
+
+    		return function closestPointToPoint( point, optionalTarget ) {
+
+    			if ( plane === undefined ) {
+
+    				plane = new Plane();
+    				edgeList = [ new Line3(), new Line3(), new Line3() ];
+    				projectedPoint = new Vector3();
+    				closestPoint = new Vector3();
+
+    			}
+
+    			var result = optionalTarget || new Vector3();
+    			var minDistance = Infinity;
+
+    			// project the point onto the plane of the triangle
+
+    			plane.setFromCoplanarPoints( this.a, this.b, this.c );
+    			plane.projectPoint( point, projectedPoint );
+
+    			// check if the projection lies within the triangle
+
+    			if( this.containsPoint( projectedPoint ) === true ) {
+
+    				// if so, this is the closest point
+
+    				result.copy( projectedPoint );
+
+    			} else {
+
+    				// if not, the point falls outside the triangle. the result is the closest point to the triangle's edges or vertices
+
+    				edgeList[ 0 ].set( this.a, this.b );
+    				edgeList[ 1 ].set( this.b, this.c );
+    				edgeList[ 2 ].set( this.c, this.a );
+
+    				for( var i = 0; i < edgeList.length; i ++ ) {
+
+    					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
+
+    					var distance = projectedPoint.distanceToSquared( closestPoint );
+
+    					if( distance < minDistance ) {
+
+    						minDistance = distance;
+
+    						result.copy( closestPoint );
+
+    					}
+
+    				}
+
+    			}
+
+    			return result;
+
+    		};
+
+    	}(),
+
+    	equals: function ( triangle ) {
+
+    		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
+
+    	}
+
+    };
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     * @author alteredq / http://alteredqualia.com/
+     */
+
+    function Face3( a, b, c, normal, color, materialIndex ) {
+
+    	this.a = a;
+    	this.b = b;
+    	this.c = c;
+
+    	this.normal = (normal && normal.isVector3) ? normal : new Vector3();
+    	this.vertexNormals = Array.isArray( normal ) ? normal : [];
+
+    	this.color = (color && color.isColor) ? color : new Color();
+    	this.vertexColors = Array.isArray( color ) ? color : [];
+
+    	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
+
+    }
+
+    Face3.prototype = {
+
+    	constructor: Face3,
+
+    	clone: function () {
+
+    		return new this.constructor().copy( this );
+
+    	},
+
+    	copy: function ( source ) {
+
+    		this.a = source.a;
+    		this.b = source.b;
+    		this.c = source.c;
+
+    		this.normal.copy( source.normal );
+    		this.color.copy( source.color );
+
+    		this.materialIndex = source.materialIndex;
+
+    		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+
+    			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
+
+    		}
+
+    		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+
+    			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
+
+    		}
+
+    		return this;
+
+    	}
+
+    };
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     * @author alteredq / http://alteredqualia.com/
+     *
+     * parameters = {
+     *  color: <hex>,
+     *  opacity: <float>,
+     *  map: new THREE.Texture( <Image> ),
+     *
+     *  aoMap: new THREE.Texture( <Image> ),
+     *  aoMapIntensity: <float>
+     *
+     *  specularMap: new THREE.Texture( <Image> ),
+     *
+     *  alphaMap: new THREE.Texture( <Image> ),
+     *
+     *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
+     *  combine: THREE.Multiply,
+     *  reflectivity: <float>,
+     *  refractionRatio: <float>,
+     *
+     *  shading: THREE.SmoothShading,
+     *  depthTest: <bool>,
+     *  depthWrite: <bool>,
+     *
+     *  wireframe: <boolean>,
+     *  wireframeLinewidth: <float>,
+     *
+     *  skinning: <bool>,
+     *  morphTargets: <bool>
+     * }
+     */
+
+    function MeshBasicMaterial( parameters ) {
+
+    	Material.call( this );
+
+    	this.type = 'MeshBasicMaterial';
+
+    	this.color = new Color( 0xffffff ); // emissive
+
+    	this.map = null;
+
+    	this.aoMap = null;
+    	this.aoMapIntensity = 1.0;
+
+    	this.specularMap = null;
+
+    	this.alphaMap = null;
+
+    	this.envMap = null;
+    	this.combine = MultiplyOperation;
+    	this.reflectivity = 1;
+    	this.refractionRatio = 0.98;
+
+    	this.wireframe = false;
+    	this.wireframeLinewidth = 1;
+    	this.wireframeLinecap = 'round';
+    	this.wireframeLinejoin = 'round';
+
+    	this.skinning = false;
+    	this.morphTargets = false;
+
+    	this.lights = false;
+
+    	this.setValues( parameters );
+
+    }
+
+    MeshBasicMaterial.prototype = Object.create( Material.prototype );
+    MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
+
+    MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
+
+    MeshBasicMaterial.prototype.copy = function ( source ) {
+
+    	Material.prototype.copy.call( this, source );
+
+    	this.color.copy( source.color );
+
+    	this.map = source.map;
+
+    	this.aoMap = source.aoMap;
+    	this.aoMapIntensity = source.aoMapIntensity;
+
+    	this.specularMap = source.specularMap;
+
+    	this.alphaMap = source.alphaMap;
+
+    	this.envMap = source.envMap;
+    	this.combine = source.combine;
+    	this.reflectivity = source.reflectivity;
+    	this.refractionRatio = source.refractionRatio;
+
+    	this.wireframe = source.wireframe;
+    	this.wireframeLinewidth = source.wireframeLinewidth;
+    	this.wireframeLinecap = source.wireframeLinecap;
+    	this.wireframeLinejoin = source.wireframeLinejoin;
+
+    	this.skinning = source.skinning;
+    	this.morphTargets = source.morphTargets;
+
+    	return this;
+
+    };
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     */
+
+    function BufferAttribute( array, itemSize, normalized ) {
+
+    	if ( Array.isArray( array ) ) {
+
+    		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+    	}
+
+    	this.uuid = exports.Math.generateUUID();
+
+    	this.array = array;
+    	this.itemSize = itemSize;
+    	this.count = array.length / itemSize;
+    	this.normalized = normalized === true;
+
+    	this.dynamic = false;
+    	this.updateRange = { offset: 0, count: - 1 };
+
+    	this.version = 0;
+
+    }
+
+    BufferAttribute.prototype = {
+
+    	constructor: BufferAttribute,
+
+    	isBufferAttribute: true,
+
+    	set needsUpdate( value ) {
+
+    		if ( value === true ) this.version ++;
+
+    	},
+
+    	setDynamic: function ( value ) {
+
+    		this.dynamic = value;
+
+    		return this;
+
+    	},
+
+    	copy: function ( source ) {
+
+    		this.array = new source.array.constructor( source.array );
+    		this.itemSize = source.itemSize;
+    		this.count = source.count;
+    		this.normalized = source.normalized;
+
+    		this.dynamic = source.dynamic;
+
+    		return this;
+
+    	},
+
+    	copyAt: function ( index1, attribute, index2 ) {
+
+    		index1 *= this.itemSize;
+    		index2 *= attribute.itemSize;
+
+    		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
+
+    			this.array[ index1 + i ] = attribute.array[ index2 + i ];
+
+    		}
+
+    		return this;
+
+    	},
+
+    	copyArray: function ( array ) {
+
+    		this.array.set( array );
+
+    		return this;
+
+    	},
+
+    	copyColorsArray: function ( colors ) {
+
+    		var array = this.array, offset = 0;
+
+    		for ( var i = 0, l = colors.length; i < l; i ++ ) {
+
+    			var color = colors[ i ];
+
+    			if ( color === undefined ) {
+
+    				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
+    				color = new Color();
+
+    			}
+
+    			array[ offset ++ ] = color.r;
+    			array[ offset ++ ] = color.g;
+    			array[ offset ++ ] = color.b;
+
+    		}
+
+    		return this;
+
+    	},
+
+    	copyIndicesArray: function ( indices ) {
+
+    		var array = this.array, offset = 0;
+
+    		for ( var i = 0, l = indices.length; i < l; i ++ ) {
+
+    			var index = indices[ i ];
+
+    			array[ offset ++ ] = index.a;
+    			array[ offset ++ ] = index.b;
+    			array[ offset ++ ] = index.c;
+
+    		}
+
+    		return this;
+
+    	},
+
+    	copyVector2sArray: function ( vectors ) {
+
+    		var array = this.array, offset = 0;
+
+    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+    			var vector = vectors[ i ];
+
+    			if ( vector === undefined ) {
+
+    				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
+    				vector = new Vector2();
+
+    			}
+
+    			array[ offset ++ ] = vector.x;
+    			array[ offset ++ ] = vector.y;
+
+    		}
+
+    		return this;
+
+    	},
+
+    	copyVector3sArray: function ( vectors ) {
+
+    		var array = this.array, offset = 0;
+
+    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+    			var vector = vectors[ i ];
+
+    			if ( vector === undefined ) {
+
+    				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
+    				vector = new Vector3();
+
+    			}
+
+    			array[ offset ++ ] = vector.x;
+    			array[ offset ++ ] = vector.y;
+    			array[ offset ++ ] = vector.z;
+
+    		}
+
+    		return this;
+
+    	},
+
+    	copyVector4sArray: function ( vectors ) {
+
+    		var array = this.array, offset = 0;
+
+    		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+    			var vector = vectors[ i ];
+
+    			if ( vector === undefined ) {
+
+    				console.warn( 'THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i );
+    				vector = new Vector4();
+
+    			}
+
+    			array[ offset ++ ] = vector.x;
+    			array[ offset ++ ] = vector.y;
+    			array[ offset ++ ] = vector.z;
+    			array[ offset ++ ] = vector.w;
+
+    		}
+
+    		return this;
+
+    	},
+
+    	set: function ( value, offset ) {
+
+    		if ( offset === undefined ) offset = 0;
+
+    		this.array.set( value, offset );
+
+    		return this;
+
+    	},
+
+    	getX: function ( index ) {
+
+    		return this.array[ index * this.itemSize ];
+
+    	},
+
+    	setX: function ( index, x ) {
+
+    		this.array[ index * this.itemSize ] = x;
+
+    		return this;
+
+    	},
+
+    	getY: function ( index ) {
+
+    		return this.array[ index * this.itemSize + 1 ];
+
+    	},
+
+    	setY: function ( index, y ) {
+
+    		this.array[ index * this.itemSize + 1 ] = y;
+
+    		return this;
+
+    	},
+
+    	getZ: function ( index ) {
+
+    		return this.array[ index * this.itemSize + 2 ];
+
+    	},
+
+    	setZ: function ( index, z ) {
+
+    		this.array[ index * this.itemSize + 2 ] = z;
+
+    		return this;
+
+    	},
+
+    	getW: function ( index ) {
+
+    		return this.array[ index * this.itemSize + 3 ];
+
+    	},
+
+    	setW: function ( index, w ) {
+
+    		this.array[ index * this.itemSize + 3 ] = w;
+
+    		return this;
+
+    	},
+
+    	setXY: function ( index, x, y ) {
+
+    		index *= this.itemSize;
+
+    		this.array[ index + 0 ] = x;
+    		this.array[ index + 1 ] = y;
+
+    		return this;
+
+    	},
+
+    	setXYZ: function ( index, x, y, z ) {
+
+    		index *= this.itemSize;
+
+    		this.array[ index + 0 ] = x;
+    		this.array[ index + 1 ] = y;
+    		this.array[ index + 2 ] = z;
+
+    		return this;
+
+    	},
+
+    	setXYZW: function ( index, x, y, z, w ) {
+
+    		index *= this.itemSize;
+
+    		this.array[ index + 0 ] = x;
+    		this.array[ index + 1 ] = y;
+    		this.array[ index + 2 ] = z;
+    		this.array[ index + 3 ] = w;
+
+    		return this;
+
+    	},
+
+    	clone: function () {
+
+    		return new this.constructor().copy( this );
+
+    	}
+
+    };
+
+    //
+
+    function Int8Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Int8Array( array ), itemSize );
+
+    }
+
+    function Uint8Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Uint8Array( array ), itemSize );
+
+    }
+
+    function Uint8ClampedAttribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
+
+    }
+
+    function Int16Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Int16Array( array ), itemSize );
+
+    }
+
+    function Uint16Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Uint16Array( array ), itemSize );
+
+    }
+
+    function Int32Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Int32Array( array ), itemSize );
+
+    }
+
+    function Uint32Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Uint32Array( array ), itemSize );
+
+    }
+
+    function Float32Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Float32Array( array ), itemSize );
+
+    }
+
+    function Float64Attribute( array, itemSize ) {
+
+    	return new BufferAttribute( new Float64Array( array ), itemSize );
+
+    }
+
+    // Deprecated
+
+    function DynamicBufferAttribute( array, itemSize ) {
+
+    	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
+    	return new BufferAttribute( array, itemSize ).setDynamic( true );
+
+    }
 
     /**
      * @author mrdoob / http://mrdoob.com/
@@ -12329,8 +13354,8 @@
 
     } );
 
-    var count$2 = 0;
-    function GeometryIdCount() { return count$2++; };
+    var count$3 = 0;
+    function GeometryIdCount() { return count$3++; };
 
     /**
      * @author mrdoob / http://mrdoob.com/
@@ -13651,1226 +14676,6 @@
     BufferGeometry.MaxIndex = 65535;
 
     /**
-     * @author Mugen87 / https://github.com/Mugen87
-     */
-
-    function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'BoxBufferGeometry';
-
-    	this.parameters = {
-    		width: width,
-    		height: height,
-    		depth: depth,
-    		widthSegments: widthSegments,
-    		heightSegments: heightSegments,
-    		depthSegments: depthSegments
-    	};
-
-    	var scope = this;
-
-    	// segments
-    	widthSegments = Math.floor( widthSegments ) || 1;
-    	heightSegments = Math.floor( heightSegments ) || 1;
-    	depthSegments = Math.floor( depthSegments ) || 1;
-
-    	// these are used to calculate buffer length
-    	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
-    	var indexCount = calculateIndexCount( widthSegments, heightSegments, depthSegments );
-
-    	// buffers
-    	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
-    	var vertices = new Float32Array( vertexCount * 3 );
-    	var normals = new Float32Array( vertexCount * 3 );
-    	var uvs = new Float32Array( vertexCount * 2 );
-
-    	// offset variables
-    	var vertexBufferOffset = 0;
-    	var uvBufferOffset = 0;
-    	var indexBufferOffset = 0;
-    	var numberOfVertices = 0;
-
-    	// group variables
-    	var groupStart = 0;
-
-    	// build each side of the box geometry
-    	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
-    	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
-    	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
-    	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
-    	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
-    	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
-
-    	// build geometry
-    	this.setIndex( new BufferAttribute( indices, 1 ) );
-    	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
-
-    	// helper functions
-
-    	function calculateVertexCount( w, h, d ) {
-
-    		var vertices = 0;
-
-    		// calculate the amount of vertices for each side (plane)
-    		vertices += (w + 1) * (h + 1) * 2; // xy
-    		vertices += (w + 1) * (d + 1) * 2; // xz
-    		vertices += (d + 1) * (h + 1) * 2; // zy
-
-    		return vertices;
-
-    	}
-
-    	function calculateIndexCount( w, h, d ) {
-
-    		var index = 0;
-
-    		// calculate the amount of squares for each side
-    		index += w * h * 2; // xy
-    		index += w * d * 2; // xz
-    		index += d * h * 2; // zy
-
-    		return index * 6; // two triangles per square => six vertices per square
-
-    	}
-
-    	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
-
-    		var segmentWidth	= width / gridX;
-    		var segmentHeight = height / gridY;
-
-    		var widthHalf = width / 2;
-    		var heightHalf = height / 2;
-    		var depthHalf = depth / 2;
-
-    		var gridX1 = gridX + 1;
-    		var gridY1 = gridY + 1;
-
-    		var vertexCounter = 0;
-    		var groupCount = 0;
-
-    		var vector = new Vector3();
-
-    		// generate vertices, normals and uvs
-
-    		for ( var iy = 0; iy < gridY1; iy ++ ) {
-
-    			var y = iy * segmentHeight - heightHalf;
-
-    			for ( var ix = 0; ix < gridX1; ix ++ ) {
-
-    				var x = ix * segmentWidth - widthHalf;
-
-    				// set values to correct vector component
-    				vector[ u ] = x * udir;
-    				vector[ v ] = y * vdir;
-    				vector[ w ] = depthHalf;
-
-    				// now apply vector to vertex buffer
-    				vertices[ vertexBufferOffset ] = vector.x;
-    				vertices[ vertexBufferOffset + 1 ] = vector.y;
-    				vertices[ vertexBufferOffset + 2 ] = vector.z;
-
-    				// set values to correct vector component
-    				vector[ u ] = 0;
-    				vector[ v ] = 0;
-    				vector[ w ] = depth > 0 ? 1 : - 1;
-
-    				// now apply vector to normal buffer
-    				normals[ vertexBufferOffset ] = vector.x;
-    				normals[ vertexBufferOffset + 1 ] = vector.y;
-    				normals[ vertexBufferOffset + 2 ] = vector.z;
-
-    				// uvs
-    				uvs[ uvBufferOffset ] = ix / gridX;
-    				uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
-
-    				// update offsets and counters
-    				vertexBufferOffset += 3;
-    				uvBufferOffset += 2;
-    				vertexCounter += 1;
-
-    			}
-
-    		}
-
-    		// 1. you need three indices to draw a single face
-    		// 2. a single segment consists of two faces
-    		// 3. so we need to generate six (2*3) indices per segment
-
-    		for ( iy = 0; iy < gridY; iy ++ ) {
-
-    			for ( ix = 0; ix < gridX; ix ++ ) {
-
-    				// indices
-    				var a = numberOfVertices + ix + gridX1 * iy;
-    				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
-    				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-    				var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
-
-    				// face one
-    				indices[ indexBufferOffset ] = a;
-    				indices[ indexBufferOffset + 1 ] = b;
-    				indices[ indexBufferOffset + 2 ] = d;
-
-    				// face two
-    				indices[ indexBufferOffset + 3 ] = b;
-    				indices[ indexBufferOffset + 4 ] = c;
-    				indices[ indexBufferOffset + 5 ] = d;
-
-    				// update offsets and counters
-    				indexBufferOffset += 6;
-    				groupCount += 6;
-
-    			}
-
-    		}
-
-    		// add a group to the geometry. this will ensure multi material support
-    		scope.addGroup( groupStart, groupCount, materialIndex );
-
-    		// calculate new start value for groups
-    		groupStart += groupCount;
-
-    		// update total number of vertices
-    		numberOfVertices += vertexCounter;
-
-    	}
-
-    }
-
-    BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
-
-    /**
-     * @author bhouston / http://clara.io
-     */
-
-    function Ray( origin, direction ) {
-
-    	this.origin = ( origin !== undefined ) ? origin : new Vector3();
-    	this.direction = ( direction !== undefined ) ? direction : new Vector3();
-
-    }
-
-    Ray.prototype = {
-
-    	constructor: Ray,
-
-    	set: function ( origin, direction ) {
-
-    		this.origin.copy( origin );
-    		this.direction.copy( direction );
-
-    		return this;
-
-    	},
-
-    	clone: function () {
-
-    		return new this.constructor().copy( this );
-
-    	},
-
-    	copy: function ( ray ) {
-
-    		this.origin.copy( ray.origin );
-    		this.direction.copy( ray.direction );
-
-    		return this;
-
-    	},
-
-    	at: function ( t, optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-
-    		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
-
-    	},
-
-    	lookAt: function ( v ) {
-
-    		this.direction.copy( v ).sub( this.origin ).normalize();
-
-    		return this;
-
-    	},
-
-    	recast: function () {
-
-    		var v1 = new Vector3();
-
-    		return function recast( t ) {
-
-    			this.origin.copy( this.at( t, v1 ) );
-
-    			return this;
-
-    		};
-
-    	}(),
-
-    	closestPointToPoint: function ( point, optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-    		result.subVectors( point, this.origin );
-    		var directionDistance = result.dot( this.direction );
-
-    		if ( directionDistance < 0 ) {
-
-    			return result.copy( this.origin );
-
-    		}
-
-    		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
-
-    	},
-
-    	distanceToPoint: function ( point ) {
-
-    		return Math.sqrt( this.distanceSqToPoint( point ) );
-
-    	},
-
-    	distanceSqToPoint: function () {
-
-    		var v1 = new Vector3();
-
-    		return function distanceSqToPoint( point ) {
-
-    			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
-
-    			// point behind the ray
-
-    			if ( directionDistance < 0 ) {
-
-    				return this.origin.distanceToSquared( point );
-
-    			}
-
-    			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
-
-    			return v1.distanceToSquared( point );
-
-    		};
-
-    	}(),
-
-    	distanceSqToSegment: function () {
-
-    		var segCenter = new Vector3();
-    		var segDir = new Vector3();
-    		var diff = new Vector3();
-
-    		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
-
-    			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
-    			// It returns the min distance between the ray and the segment
-    			// defined by v0 and v1
-    			// It can also set two optional targets :
-    			// - The closest point on the ray
-    			// - The closest point on the segment
-
-    			segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
-    			segDir.copy( v1 ).sub( v0 ).normalize();
-    			diff.copy( this.origin ).sub( segCenter );
-
-    			var segExtent = v0.distanceTo( v1 ) * 0.5;
-    			var a01 = - this.direction.dot( segDir );
-    			var b0 = diff.dot( this.direction );
-    			var b1 = - diff.dot( segDir );
-    			var c = diff.lengthSq();
-    			var det = Math.abs( 1 - a01 * a01 );
-    			var s0, s1, sqrDist, extDet;
-
-    			if ( det > 0 ) {
-
-    				// The ray and segment are not parallel.
-
-    				s0 = a01 * b1 - b0;
-    				s1 = a01 * b0 - b1;
-    				extDet = segExtent * det;
-
-    				if ( s0 >= 0 ) {
-
-    					if ( s1 >= - extDet ) {
-
-    						if ( s1 <= extDet ) {
-
-    							// region 0
-    							// Minimum at interior points of ray and segment.
-
-    							var invDet = 1 / det;
-    							s0 *= invDet;
-    							s1 *= invDet;
-    							sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-
-    						} else {
-
-    							// region 1
-
-    							s1 = segExtent;
-    							s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-    							sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-    						}
-
-    					} else {
-
-    						// region 5
-
-    						s1 = - segExtent;
-    						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-    					}
-
-    				} else {
-
-    					if ( s1 <= - extDet ) {
-
-    						// region 4
-
-    						s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
-    						s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-    					} else if ( s1 <= extDet ) {
-
-    						// region 3
-
-    						s0 = 0;
-    						s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
-    						sqrDist = s1 * ( s1 + 2 * b1 ) + c;
-
-    					} else {
-
-    						// region 2
-
-    						s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
-    						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-    						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-    					}
-
-    				}
-
-    			} else {
-
-    				// Ray and segment are parallel.
-
-    				s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-    				s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-    				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-    			}
-
-    			if ( optionalPointOnRay ) {
-
-    				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
-
-    			}
-
-    			if ( optionalPointOnSegment ) {
-
-    				optionalPointOnSegment.copy( segDir ).multiplyScalar( s1 ).add( segCenter );
-
-    			}
-
-    			return sqrDist;
-
-    		};
-
-    	}(),
-
-    	intersectSphere: function () {
-
-    		var v1 = new Vector3();
-
-    		return function intersectSphere( sphere, optionalTarget ) {
-
-    			v1.subVectors( sphere.center, this.origin );
-    			var tca = v1.dot( this.direction );
-    			var d2 = v1.dot( v1 ) - tca * tca;
-    			var radius2 = sphere.radius * sphere.radius;
-
-    			if ( d2 > radius2 ) return null;
-
-    			var thc = Math.sqrt( radius2 - d2 );
-
-    			// t0 = first intersect point - entrance on front of sphere
-    			var t0 = tca - thc;
-
-    			// t1 = second intersect point - exit point on back of sphere
-    			var t1 = tca + thc;
-
-    			// test to see if both t0 and t1 are behind the ray - if so, return null
-    			if ( t0 < 0 && t1 < 0 ) return null;
-
-    			// test to see if t0 is behind the ray:
-    			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
-    			// in order to always return an intersect point that is in front of the ray.
-    			if ( t0 < 0 ) return this.at( t1, optionalTarget );
-
-    			// else t0 is in front of the ray, so return the first collision point scaled by t0
-    			return this.at( t0, optionalTarget );
-
-    		};
-
-    	}(),
-
-    	intersectsSphere: function ( sphere ) {
-
-    		return this.distanceToPoint( sphere.center ) <= sphere.radius;
-
-    	},
-
-    	distanceToPlane: function ( plane ) {
-
-    		var denominator = plane.normal.dot( this.direction );
-
-    		if ( denominator === 0 ) {
-
-    			// line is coplanar, return origin
-    			if ( plane.distanceToPoint( this.origin ) === 0 ) {
-
-    				return 0;
-
-    			}
-
-    			// Null is preferable to undefined since undefined means.... it is undefined
-
-    			return null;
-
-    		}
-
-    		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
-
-    		// Return if the ray never intersects the plane
-
-    		return t >= 0 ? t :  null;
-
-    	},
-
-    	intersectPlane: function ( plane, optionalTarget ) {
-
-    		var t = this.distanceToPlane( plane );
-
-    		if ( t === null ) {
-
-    			return null;
-
-    		}
-
-    		return this.at( t, optionalTarget );
-
-    	},
-
-
-
-    	intersectsPlane: function ( plane ) {
-
-    		// check if the ray lies on the plane first
-
-    		var distToPoint = plane.distanceToPoint( this.origin );
-
-    		if ( distToPoint === 0 ) {
-
-    			return true;
-
-    		}
-
-    		var denominator = plane.normal.dot( this.direction );
-
-    		if ( denominator * distToPoint < 0 ) {
-
-    			return true;
-
-    		}
-
-    		// ray origin is behind the plane (and is pointing behind it)
-
-    		return false;
-
-    	},
-
-    	intersectBox: function ( box, optionalTarget ) {
-
-    		var tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-    		var invdirx = 1 / this.direction.x,
-    			invdiry = 1 / this.direction.y,
-    			invdirz = 1 / this.direction.z;
-
-    		var origin = this.origin;
-
-    		if ( invdirx >= 0 ) {
-
-    			tmin = ( box.min.x - origin.x ) * invdirx;
-    			tmax = ( box.max.x - origin.x ) * invdirx;
-
-    		} else {
-
-    			tmin = ( box.max.x - origin.x ) * invdirx;
-    			tmax = ( box.min.x - origin.x ) * invdirx;
-
-    		}
-
-    		if ( invdiry >= 0 ) {
-
-    			tymin = ( box.min.y - origin.y ) * invdiry;
-    			tymax = ( box.max.y - origin.y ) * invdiry;
-
-    		} else {
-
-    			tymin = ( box.max.y - origin.y ) * invdiry;
-    			tymax = ( box.min.y - origin.y ) * invdiry;
-
-    		}
-
-    		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
-
-    		// These lines also handle the case where tmin or tmax is NaN
-    		// (result of 0 * Infinity). x !== x returns true if x is NaN
-
-    		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
-
-    		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
-
-    		if ( invdirz >= 0 ) {
-
-    			tzmin = ( box.min.z - origin.z ) * invdirz;
-    			tzmax = ( box.max.z - origin.z ) * invdirz;
-
-    		} else {
-
-    			tzmin = ( box.max.z - origin.z ) * invdirz;
-    			tzmax = ( box.min.z - origin.z ) * invdirz;
-
-    		}
-
-    		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
-
-    		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
-
-    		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
-
-    		//return point closest to the ray (positive side)
-
-    		if ( tmax < 0 ) return null;
-
-    		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
-
-    	},
-
-    	intersectsBox: ( function () {
-
-    		var v = new Vector3();
-
-    		return function intersectsBox( box ) {
-
-    			return this.intersectBox( box, v ) !== null;
-
-    		};
-
-    	} )(),
-
-    	intersectTriangle: function () {
-
-    		// Compute the offset origin, edges, and normal.
-    		var diff = new Vector3();
-    		var edge1 = new Vector3();
-    		var edge2 = new Vector3();
-    		var normal = new Vector3();
-
-    		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
-
-    			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
-
-    			edge1.subVectors( b, a );
-    			edge2.subVectors( c, a );
-    			normal.crossVectors( edge1, edge2 );
-
-    			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
-    			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
-    			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-    			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-    			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-    			var DdN = this.direction.dot( normal );
-    			var sign;
-
-    			if ( DdN > 0 ) {
-
-    				if ( backfaceCulling ) return null;
-    				sign = 1;
-
-    			} else if ( DdN < 0 ) {
-
-    				sign = - 1;
-    				DdN = - DdN;
-
-    			} else {
-
-    				return null;
-
-    			}
-
-    			diff.subVectors( this.origin, a );
-    			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
-
-    			// b1 < 0, no intersection
-    			if ( DdQxE2 < 0 ) {
-
-    				return null;
-
-    			}
-
-    			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
-
-    			// b2 < 0, no intersection
-    			if ( DdE1xQ < 0 ) {
-
-    				return null;
-
-    			}
-
-    			// b1+b2 > 1, no intersection
-    			if ( DdQxE2 + DdE1xQ > DdN ) {
-
-    				return null;
-
-    			}
-
-    			// Line intersects triangle, check if ray does.
-    			var QdN = - sign * diff.dot( normal );
-
-    			// t < 0, no intersection
-    			if ( QdN < 0 ) {
-
-    				return null;
-
-    			}
-
-    			// Ray intersects triangle.
-    			return this.at( QdN / DdN, optionalTarget );
-
-    		};
-
-    	}(),
-
-    	applyMatrix4: function ( matrix4 ) {
-
-    		this.direction.add( this.origin ).applyMatrix4( matrix4 );
-    		this.origin.applyMatrix4( matrix4 );
-    		this.direction.sub( this.origin );
-    		this.direction.normalize();
-
-    		return this;
-
-    	},
-
-    	equals: function ( ray ) {
-
-    		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
-
-    	}
-
-    };
-
-    /**
-     * @author bhouston / http://clara.io
-     */
-
-    function Line3( start, end ) {
-
-    	this.start = ( start !== undefined ) ? start : new Vector3();
-    	this.end = ( end !== undefined ) ? end : new Vector3();
-
-    }
-
-    Line3.prototype = {
-
-    	constructor: Line3,
-
-    	set: function ( start, end ) {
-
-    		this.start.copy( start );
-    		this.end.copy( end );
-
-    		return this;
-
-    	},
-
-    	clone: function () {
-
-    		return new this.constructor().copy( this );
-
-    	},
-
-    	copy: function ( line ) {
-
-    		this.start.copy( line.start );
-    		this.end.copy( line.end );
-
-    		return this;
-
-    	},
-
-    	center: function ( optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-    		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
-
-    	},
-
-    	delta: function ( optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-    		return result.subVectors( this.end, this.start );
-
-    	},
-
-    	distanceSq: function () {
-
-    		return this.start.distanceToSquared( this.end );
-
-    	},
-
-    	distance: function () {
-
-    		return this.start.distanceTo( this.end );
-
-    	},
-
-    	at: function ( t, optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-
-    		return this.delta( result ).multiplyScalar( t ).add( this.start );
-
-    	},
-
-    	closestPointToPointParameter: function () {
-
-    		var startP = new Vector3();
-    		var startEnd = new Vector3();
-
-    		return function closestPointToPointParameter( point, clampToLine ) {
-
-    			startP.subVectors( point, this.start );
-    			startEnd.subVectors( this.end, this.start );
-
-    			var startEnd2 = startEnd.dot( startEnd );
-    			var startEnd_startP = startEnd.dot( startP );
-
-    			var t = startEnd_startP / startEnd2;
-
-    			if ( clampToLine ) {
-
-    				t = exports.Math.clamp( t, 0, 1 );
-
-    			}
-
-    			return t;
-
-    		};
-
-    	}(),
-
-    	closestPointToPoint: function ( point, clampToLine, optionalTarget ) {
-
-    		var t = this.closestPointToPointParameter( point, clampToLine );
-
-    		var result = optionalTarget || new Vector3();
-
-    		return this.delta( result ).multiplyScalar( t ).add( this.start );
-
-    	},
-
-    	applyMatrix4: function ( matrix ) {
-
-    		this.start.applyMatrix4( matrix );
-    		this.end.applyMatrix4( matrix );
-
-    		return this;
-
-    	},
-
-    	equals: function ( line ) {
-
-    		return line.start.equals( this.start ) && line.end.equals( this.end );
-
-    	}
-
-    };
-
-    /**
-     * @author bhouston / http://clara.io
-     * @author mrdoob / http://mrdoob.com/
-     */
-
-    function Triangle( a, b, c ) {
-
-    	this.a = ( a !== undefined ) ? a : new Vector3();
-    	this.b = ( b !== undefined ) ? b : new Vector3();
-    	this.c = ( c !== undefined ) ? c : new Vector3();
-
-    }
-
-    Triangle.normal = function () {
-
-    	var v0 = new Vector3();
-
-    	return function normal( a, b, c, optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-
-    		result.subVectors( c, b );
-    		v0.subVectors( a, b );
-    		result.cross( v0 );
-
-    		var resultLengthSq = result.lengthSq();
-    		if ( resultLengthSq > 0 ) {
-
-    			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
-
-    		}
-
-    		return result.set( 0, 0, 0 );
-
-    	};
-
-    }();
-
-    // static/instance method to calculate barycentric coordinates
-    // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-    Triangle.barycoordFromPoint = function () {
-
-    	var v0 = new Vector3();
-    	var v1 = new Vector3();
-    	var v2 = new Vector3();
-
-    	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
-
-    		v0.subVectors( c, a );
-    		v1.subVectors( b, a );
-    		v2.subVectors( point, a );
-
-    		var dot00 = v0.dot( v0 );
-    		var dot01 = v0.dot( v1 );
-    		var dot02 = v0.dot( v2 );
-    		var dot11 = v1.dot( v1 );
-    		var dot12 = v1.dot( v2 );
-
-    		var denom = ( dot00 * dot11 - dot01 * dot01 );
-
-    		var result = optionalTarget || new Vector3();
-
-    		// collinear or singular triangle
-    		if ( denom === 0 ) {
-
-    			// arbitrary location outside of triangle?
-    			// not sure if this is the best idea, maybe should be returning undefined
-    			return result.set( - 2, - 1, - 1 );
-
-    		}
-
-    		var invDenom = 1 / denom;
-    		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-    		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-    		// barycentric coordinates must always sum to 1
-    		return result.set( 1 - u - v, v, u );
-
-    	};
-
-    }();
-
-    Triangle.containsPoint = function () {
-
-    	var v1 = new Vector3();
-
-    	return function containsPoint( point, a, b, c ) {
-
-    		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
-
-    		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
-
-    	};
-
-    }();
-
-    Triangle.prototype = {
-
-    	constructor: Triangle,
-
-    	set: function ( a, b, c ) {
-
-    		this.a.copy( a );
-    		this.b.copy( b );
-    		this.c.copy( c );
-
-    		return this;
-
-    	},
-
-    	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
-
-    		this.a.copy( points[ i0 ] );
-    		this.b.copy( points[ i1 ] );
-    		this.c.copy( points[ i2 ] );
-
-    		return this;
-
-    	},
-
-    	clone: function () {
-
-    		return new this.constructor().copy( this );
-
-    	},
-
-    	copy: function ( triangle ) {
-
-    		this.a.copy( triangle.a );
-    		this.b.copy( triangle.b );
-    		this.c.copy( triangle.c );
-
-    		return this;
-
-    	},
-
-    	area: function () {
-
-    		var v0 = new Vector3();
-    		var v1 = new Vector3();
-
-    		return function area() {
-
-    			v0.subVectors( this.c, this.b );
-    			v1.subVectors( this.a, this.b );
-
-    			return v0.cross( v1 ).length() * 0.5;
-
-    		};
-
-    	}(),
-
-    	midpoint: function ( optionalTarget ) {
-
-    		var result = optionalTarget || new Vector3();
-    		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
-
-    	},
-
-    	normal: function ( optionalTarget ) {
-
-    		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
-
-    	},
-
-    	plane: function ( optionalTarget ) {
-
-    		var result = optionalTarget || new Plane();
-
-    		return result.setFromCoplanarPoints( this.a, this.b, this.c );
-
-    	},
-
-    	barycoordFromPoint: function ( point, optionalTarget ) {
-
-    		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
-
-    	},
-
-    	containsPoint: function ( point ) {
-
-    		return Triangle.containsPoint( point, this.a, this.b, this.c );
-
-    	},
-
-    	closestPointToPoint: function () {
-
-    		var plane, edgeList, projectedPoint, closestPoint;
-
-    		return function closestPointToPoint( point, optionalTarget ) {
-
-    			if ( plane === undefined ) {
-
-    				plane = new Plane();
-    				edgeList = [ new Line3(), new Line3(), new Line3() ];
-    				projectedPoint = new Vector3();
-    				closestPoint = new Vector3();
-
-    			}
-
-    			var result = optionalTarget || new Vector3();
-    			var minDistance = Infinity;
-
-    			// project the point onto the plane of the triangle
-
-    			plane.setFromCoplanarPoints( this.a, this.b, this.c );
-    			plane.projectPoint( point, projectedPoint );
-
-    			// check if the projection lies within the triangle
-
-    			if( this.containsPoint( projectedPoint ) === true ) {
-
-    				// if so, this is the closest point
-
-    				result.copy( projectedPoint );
-
-    			} else {
-
-    				// if not, the point falls outside the triangle. the result is the closest point to the triangle's edges or vertices
-
-    				edgeList[ 0 ].set( this.a, this.b );
-    				edgeList[ 1 ].set( this.b, this.c );
-    				edgeList[ 2 ].set( this.c, this.a );
-
-    				for( var i = 0; i < edgeList.length; i ++ ) {
-
-    					edgeList[ i ].closestPointToPoint( projectedPoint, true, closestPoint );
-
-    					var distance = projectedPoint.distanceToSquared( closestPoint );
-
-    					if( distance < minDistance ) {
-
-    						minDistance = distance;
-
-    						result.copy( closestPoint );
-
-    					}
-
-    				}
-
-    			}
-
-    			return result;
-
-    		};
-
-    	}(),
-
-    	equals: function ( triangle ) {
-
-    		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
-
-    	}
-
-    };
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     * @author alteredq / http://alteredqualia.com/
-     *
-     * parameters = {
-     *  color: <hex>,
-     *  opacity: <float>,
-     *  map: new THREE.Texture( <Image> ),
-     *
-     *  aoMap: new THREE.Texture( <Image> ),
-     *  aoMapIntensity: <float>
-     *
-     *  specularMap: new THREE.Texture( <Image> ),
-     *
-     *  alphaMap: new THREE.Texture( <Image> ),
-     *
-     *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
-     *  combine: THREE.Multiply,
-     *  reflectivity: <float>,
-     *  refractionRatio: <float>,
-     *
-     *  shading: THREE.SmoothShading,
-     *  depthTest: <bool>,
-     *  depthWrite: <bool>,
-     *
-     *  wireframe: <boolean>,
-     *  wireframeLinewidth: <float>,
-     *
-     *  skinning: <bool>,
-     *  morphTargets: <bool>
-     * }
-     */
-
-    function MeshBasicMaterial( parameters ) {
-
-    	Material.call( this );
-
-    	this.type = 'MeshBasicMaterial';
-
-    	this.color = new Color( 0xffffff ); // emissive
-
-    	this.map = null;
-
-    	this.aoMap = null;
-    	this.aoMapIntensity = 1.0;
-
-    	this.specularMap = null;
-
-    	this.alphaMap = null;
-
-    	this.envMap = null;
-    	this.combine = MultiplyOperation;
-    	this.reflectivity = 1;
-    	this.refractionRatio = 0.98;
-
-    	this.wireframe = false;
-    	this.wireframeLinewidth = 1;
-    	this.wireframeLinecap = 'round';
-    	this.wireframeLinejoin = 'round';
-
-    	this.skinning = false;
-    	this.morphTargets = false;
-
-    	this.lights = false;
-
-    	this.setValues( parameters );
-
-    }
-
-    MeshBasicMaterial.prototype = Object.create( Material.prototype );
-    MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
-
-    MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
-
-    MeshBasicMaterial.prototype.copy = function ( source ) {
-
-    	Material.prototype.copy.call( this, source );
-
-    	this.color.copy( source.color );
-
-    	this.map = source.map;
-
-    	this.aoMap = source.aoMap;
-    	this.aoMapIntensity = source.aoMapIntensity;
-
-    	this.specularMap = source.specularMap;
-
-    	this.alphaMap = source.alphaMap;
-
-    	this.envMap = source.envMap;
-    	this.combine = source.combine;
-    	this.reflectivity = source.reflectivity;
-    	this.refractionRatio = source.refractionRatio;
-
-    	this.wireframe = source.wireframe;
-    	this.wireframeLinewidth = source.wireframeLinewidth;
-    	this.wireframeLinecap = source.wireframeLinecap;
-    	this.wireframeLinejoin = source.wireframeLinejoin;
-
-    	this.skinning = source.skinning;
-    	this.morphTargets = source.morphTargets;
-
-    	return this;
-
-    };
-
-    /**
      * @author mrdoob / http://mrdoob.com/
      * @author alteredq / http://alteredqualia.com/
      * @author mikael emtinger / http://gomo.se/
@@ -15211,6 +15016,201 @@
     	}
 
     } );
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     */
+
+    function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'BoxBufferGeometry';
+
+    	this.parameters = {
+    		width: width,
+    		height: height,
+    		depth: depth,
+    		widthSegments: widthSegments,
+    		heightSegments: heightSegments,
+    		depthSegments: depthSegments
+    	};
+
+    	var scope = this;
+
+    	// segments
+    	widthSegments = Math.floor( widthSegments ) || 1;
+    	heightSegments = Math.floor( heightSegments ) || 1;
+    	depthSegments = Math.floor( depthSegments ) || 1;
+
+    	// these are used to calculate buffer length
+    	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
+    	var indexCount = calculateIndexCount( widthSegments, heightSegments, depthSegments );
+
+    	// buffers
+    	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+    	var vertices = new Float32Array( vertexCount * 3 );
+    	var normals = new Float32Array( vertexCount * 3 );
+    	var uvs = new Float32Array( vertexCount * 2 );
+
+    	// offset variables
+    	var vertexBufferOffset = 0;
+    	var uvBufferOffset = 0;
+    	var indexBufferOffset = 0;
+    	var numberOfVertices = 0;
+
+    	// group variables
+    	var groupStart = 0;
+
+    	// build each side of the box geometry
+    	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+    	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+    	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
+    	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
+    	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+    	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
+
+    	// build geometry
+    	this.setIndex( new BufferAttribute( indices, 1 ) );
+    	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+
+    	// helper functions
+
+    	function calculateVertexCount( w, h, d ) {
+
+    		var vertices = 0;
+
+    		// calculate the amount of vertices for each side (plane)
+    		vertices += (w + 1) * (h + 1) * 2; // xy
+    		vertices += (w + 1) * (d + 1) * 2; // xz
+    		vertices += (d + 1) * (h + 1) * 2; // zy
+
+    		return vertices;
+
+    	}
+
+    	function calculateIndexCount( w, h, d ) {
+
+    		var index = 0;
+
+    		// calculate the amount of squares for each side
+    		index += w * h * 2; // xy
+    		index += w * d * 2; // xz
+    		index += d * h * 2; // zy
+
+    		return index * 6; // two triangles per square => six vertices per square
+
+    	}
+
+    	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+
+    		var segmentWidth	= width / gridX;
+    		var segmentHeight = height / gridY;
+
+    		var widthHalf = width / 2;
+    		var heightHalf = height / 2;
+    		var depthHalf = depth / 2;
+
+    		var gridX1 = gridX + 1;
+    		var gridY1 = gridY + 1;
+
+    		var vertexCounter = 0;
+    		var groupCount = 0;
+
+    		var vector = new Vector3();
+
+    		// generate vertices, normals and uvs
+
+    		for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+    			var y = iy * segmentHeight - heightHalf;
+
+    			for ( var ix = 0; ix < gridX1; ix ++ ) {
+
+    				var x = ix * segmentWidth - widthHalf;
+
+    				// set values to correct vector component
+    				vector[ u ] = x * udir;
+    				vector[ v ] = y * vdir;
+    				vector[ w ] = depthHalf;
+
+    				// now apply vector to vertex buffer
+    				vertices[ vertexBufferOffset ] = vector.x;
+    				vertices[ vertexBufferOffset + 1 ] = vector.y;
+    				vertices[ vertexBufferOffset + 2 ] = vector.z;
+
+    				// set values to correct vector component
+    				vector[ u ] = 0;
+    				vector[ v ] = 0;
+    				vector[ w ] = depth > 0 ? 1 : - 1;
+
+    				// now apply vector to normal buffer
+    				normals[ vertexBufferOffset ] = vector.x;
+    				normals[ vertexBufferOffset + 1 ] = vector.y;
+    				normals[ vertexBufferOffset + 2 ] = vector.z;
+
+    				// uvs
+    				uvs[ uvBufferOffset ] = ix / gridX;
+    				uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
+
+    				// update offsets and counters
+    				vertexBufferOffset += 3;
+    				uvBufferOffset += 2;
+    				vertexCounter += 1;
+
+    			}
+
+    		}
+
+    		// 1. you need three indices to draw a single face
+    		// 2. a single segment consists of two faces
+    		// 3. so we need to generate six (2*3) indices per segment
+
+    		for ( iy = 0; iy < gridY; iy ++ ) {
+
+    			for ( ix = 0; ix < gridX; ix ++ ) {
+
+    				// indices
+    				var a = numberOfVertices + ix + gridX1 * iy;
+    				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+    				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+    				var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+
+    				// face one
+    				indices[ indexBufferOffset ] = a;
+    				indices[ indexBufferOffset + 1 ] = b;
+    				indices[ indexBufferOffset + 2 ] = d;
+
+    				// face two
+    				indices[ indexBufferOffset + 3 ] = b;
+    				indices[ indexBufferOffset + 4 ] = c;
+    				indices[ indexBufferOffset + 5 ] = d;
+
+    				// update offsets and counters
+    				indexBufferOffset += 6;
+    				groupCount += 6;
+
+    			}
+
+    		}
+
+    		// add a group to the geometry. this will ensure multi material support
+    		scope.addGroup( groupStart, groupCount, materialIndex );
+
+    		// calculate new start value for groups
+    		groupStart += groupCount;
+
+    		// update total number of vertices
+    		numberOfVertices += vertexCounter;
+
+    	}
+
+    }
+
+    BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
 
     /**
      * @author mrdoob / http://mrdoob.com/
@@ -23685,6 +23685,4120 @@
      * @author mrdoob / http://mrdoob.com/
      */
 
+    function WireframeGeometry( geometry ) {
+
+    	BufferGeometry.call( this );
+
+    	var edge = [ 0, 0 ], hash = {};
+
+    	function sortFunction( a, b ) {
+
+    		return a - b;
+
+    	}
+
+    	var keys = [ 'a', 'b', 'c' ];
+
+    	if ( (geometry && geometry.isGeometry) ) {
+
+    		var vertices = geometry.vertices;
+    		var faces = geometry.faces;
+    		var numEdges = 0;
+
+    		// allocate maximal size
+    		var edges = new Uint32Array( 6 * faces.length );
+
+    		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+    			var face = faces[ i ];
+
+    			for ( var j = 0; j < 3; j ++ ) {
+
+    				edge[ 0 ] = face[ keys[ j ] ];
+    				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
+    				edge.sort( sortFunction );
+
+    				var key = edge.toString();
+
+    				if ( hash[ key ] === undefined ) {
+
+    					edges[ 2 * numEdges ] = edge[ 0 ];
+    					edges[ 2 * numEdges + 1 ] = edge[ 1 ];
+    					hash[ key ] = true;
+    					numEdges ++;
+
+    				}
+
+    			}
+
+    		}
+
+    		var coords = new Float32Array( numEdges * 2 * 3 );
+
+    		for ( var i = 0, l = numEdges; i < l; i ++ ) {
+
+    			for ( var j = 0; j < 2; j ++ ) {
+
+    				var vertex = vertices[ edges [ 2 * i + j ] ];
+
+    				var index = 6 * i + 3 * j;
+    				coords[ index + 0 ] = vertex.x;
+    				coords[ index + 1 ] = vertex.y;
+    				coords[ index + 2 ] = vertex.z;
+
+    			}
+
+    		}
+
+    		this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
+
+    	} else if ( (geometry && geometry.isBufferGeometry) ) {
+
+    		if ( geometry.index !== null ) {
+
+    			// Indexed BufferGeometry
+
+    			var indices = geometry.index.array;
+    			var vertices = geometry.attributes.position;
+    			var groups = geometry.groups;
+    			var numEdges = 0;
+
+    			if ( groups.length === 0 ) {
+
+    				geometry.addGroup( 0, indices.length );
+
+    			}
+
+    			// allocate maximal size
+    			var edges = new Uint32Array( 2 * indices.length );
+
+    			for ( var o = 0, ol = groups.length; o < ol; ++ o ) {
+
+    				var group = groups[ o ];
+
+    				var start = group.start;
+    				var count = group.count;
+
+    				for ( var i = start, il = start + count; i < il; i += 3 ) {
+
+    					for ( var j = 0; j < 3; j ++ ) {
+
+    						edge[ 0 ] = indices[ i + j ];
+    						edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
+    						edge.sort( sortFunction );
+
+    						var key = edge.toString();
+
+    						if ( hash[ key ] === undefined ) {
+
+    							edges[ 2 * numEdges ] = edge[ 0 ];
+    							edges[ 2 * numEdges + 1 ] = edge[ 1 ];
+    							hash[ key ] = true;
+    							numEdges ++;
+
+    						}
+
+    					}
+
+    				}
+
+    			}
+
+    			var coords = new Float32Array( numEdges * 2 * 3 );
+
+    			for ( var i = 0, l = numEdges; i < l; i ++ ) {
+
+    				for ( var j = 0; j < 2; j ++ ) {
+
+    					var index = 6 * i + 3 * j;
+    					var index2 = edges[ 2 * i + j ];
+
+    					coords[ index + 0 ] = vertices.getX( index2 );
+    					coords[ index + 1 ] = vertices.getY( index2 );
+    					coords[ index + 2 ] = vertices.getZ( index2 );
+
+    				}
+
+    			}
+
+    			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
+
+    		} else {
+
+    			// non-indexed BufferGeometry
+
+    			var vertices = geometry.attributes.position.array;
+    			var numEdges = vertices.length / 3;
+    			var numTris = numEdges / 3;
+
+    			var coords = new Float32Array( numEdges * 2 * 3 );
+
+    			for ( var i = 0, l = numTris; i < l; i ++ ) {
+
+    				for ( var j = 0; j < 3; j ++ ) {
+
+    					var index = 18 * i + 6 * j;
+
+    					var index1 = 9 * i + 3 * j;
+    					coords[ index + 0 ] = vertices[ index1 ];
+    					coords[ index + 1 ] = vertices[ index1 + 1 ];
+    					coords[ index + 2 ] = vertices[ index1 + 2 ];
+
+    					var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
+    					coords[ index + 3 ] = vertices[ index2 ];
+    					coords[ index + 4 ] = vertices[ index2 + 1 ];
+    					coords[ index + 5 ] = vertices[ index2 + 2 ];
+
+    				}
+
+    			}
+
+    			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
+
+    		}
+
+    	}
+
+    }
+
+    WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
+    WireframeGeometry.prototype.constructor = WireframeGeometry;
+
+    /**
+     * @author zz85 / https://github.com/zz85
+     * Parametric Surfaces Geometry
+     * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
+     *
+     * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements );
+     *
+     */
+
+    function ParametricGeometry( func, slices, stacks ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'ParametricGeometry';
+
+    	this.parameters = {
+    		func: func,
+    		slices: slices,
+    		stacks: stacks
+    	};
+
+    	var verts = this.vertices;
+    	var faces = this.faces;
+    	var uvs = this.faceVertexUvs[ 0 ];
+
+    	var i, j, p;
+    	var u, v;
+
+    	var sliceCount = slices + 1;
+
+    	for ( i = 0; i <= stacks; i ++ ) {
+
+    		v = i / stacks;
+
+    		for ( j = 0; j <= slices; j ++ ) {
+
+    			u = j / slices;
+
+    			p = func( u, v );
+    			verts.push( p );
+
+    		}
+
+    	}
+
+    	var a, b, c, d;
+    	var uva, uvb, uvc, uvd;
+
+    	for ( i = 0; i < stacks; i ++ ) {
+
+    		for ( j = 0; j < slices; j ++ ) {
+
+    			a = i * sliceCount + j;
+    			b = i * sliceCount + j + 1;
+    			c = ( i + 1 ) * sliceCount + j + 1;
+    			d = ( i + 1 ) * sliceCount + j;
+
+    			uva = new Vector2( j / slices, i / stacks );
+    			uvb = new Vector2( ( j + 1 ) / slices, i / stacks );
+    			uvc = new Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+    			uvd = new Vector2( j / slices, ( i + 1 ) / stacks );
+
+    			faces.push( new Face3( a, b, d ) );
+    			uvs.push( [ uva, uvb, uvd ] );
+
+    			faces.push( new Face3( b, c, d ) );
+    			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
+
+    		}
+
+    	}
+
+    	// console.log(this);
+
+    	// magic bullet
+    	// var diff = this.mergeVertices();
+    	// console.log('removed ', diff, ' vertices by merging');
+
+    	this.computeFaceNormals();
+    	this.computeVertexNormals();
+
+    }
+
+    ParametricGeometry.prototype = Object.create( Geometry.prototype );
+    ParametricGeometry.prototype.constructor = ParametricGeometry;
+
+    /**
+     * @author clockworkgeek / https://github.com/clockworkgeek
+     * @author timothypratley / https://github.com/timothypratley
+     * @author WestLangley / http://github.com/WestLangley
+    */
+
+    function PolyhedronGeometry( vertices, indices, radius, detail ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'PolyhedronGeometry';
+
+    	this.parameters = {
+    		vertices: vertices,
+    		indices: indices,
+    		radius: radius,
+    		detail: detail
+    	};
+
+    	radius = radius || 1;
+    	detail = detail || 0;
+
+    	var that = this;
+
+    	for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
+
+    		prepare( new Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
+
+    	}
+
+    	var p = this.vertices;
+
+    	var faces = [];
+
+    	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
+
+    		var v1 = p[ indices[ i ] ];
+    		var v2 = p[ indices[ i + 1 ] ];
+    		var v3 = p[ indices[ i + 2 ] ];
+
+    		faces[ j ] = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+
+    	}
+
+    	var centroid = new Vector3();
+
+    	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+    		subdivide( faces[ i ], detail );
+
+    	}
+
+
+    	// Handle case when face straddles the seam
+
+    	for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+
+    		var uvs = this.faceVertexUvs[ 0 ][ i ];
+
+    		var x0 = uvs[ 0 ].x;
+    		var x1 = uvs[ 1 ].x;
+    		var x2 = uvs[ 2 ].x;
+
+    		var max = Math.max( x0, x1, x2 );
+    		var min = Math.min( x0, x1, x2 );
+
+    		if ( max > 0.9 && min < 0.1 ) {
+
+    			// 0.9 is somewhat arbitrary
+
+    			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
+    			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
+    			if ( x2 < 0.2 ) uvs[ 2 ].x += 1;
+
+    		}
+
+    	}
+
+
+    	// Apply radius
+
+    	for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
+
+    		this.vertices[ i ].multiplyScalar( radius );
+
+    	}
+
+
+    	// Merge vertices
+
+    	this.mergeVertices();
+
+    	this.computeFaceNormals();
+
+    	this.boundingSphere = new Sphere( new Vector3(), radius );
+
+
+    	// Project vector onto sphere's surface
+
+    	function prepare( vector ) {
+
+    		var vertex = vector.normalize().clone();
+    		vertex.index = that.vertices.push( vertex ) - 1;
+
+    		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
+
+    		var u = azimuth( vector ) / 2 / Math.PI + 0.5;
+    		var v = inclination( vector ) / Math.PI + 0.5;
+    		vertex.uv = new Vector2( u, 1 - v );
+
+    		return vertex;
+
+    	}
+
+
+    	// Approximate a curved face with recursively sub-divided triangles.
+
+    	function make( v1, v2, v3 ) {
+
+    		var face = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+    		that.faces.push( face );
+
+    		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+
+    		var azi = azimuth( centroid );
+
+    		that.faceVertexUvs[ 0 ].push( [
+    			correctUV( v1.uv, v1, azi ),
+    			correctUV( v2.uv, v2, azi ),
+    			correctUV( v3.uv, v3, azi )
+    		] );
+
+    	}
+
+
+    	// Analytically subdivide a face to the required detail level.
+
+    	function subdivide( face, detail ) {
+
+    		var cols = Math.pow( 2, detail );
+    		var a = prepare( that.vertices[ face.a ] );
+    		var b = prepare( that.vertices[ face.b ] );
+    		var c = prepare( that.vertices[ face.c ] );
+    		var v = [];
+
+    		// Construct all of the vertices for this subdivision.
+
+    		for ( var i = 0 ; i <= cols; i ++ ) {
+
+    			v[ i ] = [];
+
+    			var aj = prepare( a.clone().lerp( c, i / cols ) );
+    			var bj = prepare( b.clone().lerp( c, i / cols ) );
+    			var rows = cols - i;
+
+    			for ( var j = 0; j <= rows; j ++ ) {
+
+    				if ( j === 0 && i === cols ) {
+
+    					v[ i ][ j ] = aj;
+
+    				} else {
+
+    					v[ i ][ j ] = prepare( aj.clone().lerp( bj, j / rows ) );
+
+    				}
+
+    			}
+
+    		}
+
+    		// Construct all of the faces.
+
+    		for ( var i = 0; i < cols ; i ++ ) {
+
+    			for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
+
+    				var k = Math.floor( j / 2 );
+
+    				if ( j % 2 === 0 ) {
+
+    					make(
+    						v[ i ][ k + 1 ],
+    						v[ i + 1 ][ k ],
+    						v[ i ][ k ]
+    					);
+
+    				} else {
+
+    					make(
+    						v[ i ][ k + 1 ],
+    						v[ i + 1 ][ k + 1 ],
+    						v[ i + 1 ][ k ]
+    					);
+
+    				}
+
+    			}
+
+    		}
+
+    	}
+
+
+    	// Angle around the Y axis, counter-clockwise when looking from above.
+
+    	function azimuth( vector ) {
+
+    		return Math.atan2( vector.z, - vector.x );
+
+    	}
+
+
+    	// Angle above the XZ plane.
+
+    	function inclination( vector ) {
+
+    		return Math.atan2( - vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
+
+    	}
+
+
+    	// Texture fixing helper. Spheres have some odd behaviours.
+
+    	function correctUV( uv, vector, azimuth ) {
+
+    		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new Vector2( uv.x - 1, uv.y );
+    		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
+    		return uv.clone();
+
+    	}
+
+    }
+
+    PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
+    PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
+
+    /**
+     * @author timothypratley / https://github.com/timothypratley
+     */
+
+    function TetrahedronGeometry( radius, detail ) {
+
+    	var vertices = [
+    		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
+    	];
+
+    	var indices = [
+    		 2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
+    	];
+
+    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+    	this.type = 'TetrahedronGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		detail: detail
+    	};
+
+    }
+
+    TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+    TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+
+    /**
+     * @author timothypratley / https://github.com/timothypratley
+     */
+
+    function OctahedronGeometry( radius, detail ) {
+
+    	var vertices = [
+    		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
+    	];
+
+    	var indices = [
+    		0, 2, 4,    0, 4, 3,    0, 3, 5,    0, 5, 2,    1, 2, 5,    1, 5, 3,    1, 3, 4,    1, 4, 2
+    	];
+
+    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+    	this.type = 'OctahedronGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		detail: detail
+    	};
+
+    }
+
+    OctahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+    OctahedronGeometry.prototype.constructor = OctahedronGeometry;
+
+    /**
+     * @author timothypratley / https://github.com/timothypratley
+     */
+
+    function IcosahedronGeometry( radius, detail ) {
+
+    	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
+
+    	var vertices = [
+    		- 1,  t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,
+    		 0, - 1,  t,    0,  1,  t,    0, - 1, - t,    0,  1, - t,
+    		 t,  0, - 1,    t,  0,  1,   - t,  0, - 1,   - t,  0,  1
+    	];
+
+    	var indices = [
+    		 0, 11,  5,    0,  5,  1,    0,  1,  7,    0,  7, 10,    0, 10, 11,
+    		 1,  5,  9,    5, 11,  4,   11, 10,  2,   10,  7,  6,    7,  1,  8,
+    		 3,  9,  4,    3,  4,  2,    3,  2,  6,    3,  6,  8,    3,  8,  9,
+    		 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
+    	];
+
+    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+    	this.type = 'IcosahedronGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		detail: detail
+    	};
+
+    }
+
+    IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+    IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
+
+    /**
+     * @author Abe Pazos / https://hamoid.com
+     */
+
+    function DodecahedronGeometry( radius, detail ) {
+
+    	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
+    	var r = 1 / t;
+
+    	var vertices = [
+
+    		// (±1, ±1, ±1)
+    		- 1, - 1, - 1,    - 1, - 1,  1,
+    		- 1,  1, - 1,    - 1,  1,  1,
+    		 1, - 1, - 1,     1, - 1,  1,
+    		 1,  1, - 1,     1,  1,  1,
+
+    		// (0, ±1/φ, ±φ)
+    		 0, - r, - t,     0, - r,  t,
+    		 0,  r, - t,     0,  r,  t,
+
+    		// (±1/φ, ±φ, 0)
+    		- r, - t,  0,    - r,  t,  0,
+    		 r, - t,  0,     r,  t,  0,
+
+    		// (±φ, 0, ±1/φ)
+    		- t,  0, - r,     t,  0, - r,
+    		- t,  0,  r,     t,  0,  r
+    	];
+
+    	var indices = [
+    		 3, 11,  7,      3,  7, 15,      3, 15, 13,
+    		 7, 19, 17,      7, 17,  6,      7,  6, 15,
+    		17,  4,  8,     17,  8, 10,     17, 10,  6,
+    		 8,  0, 16,      8, 16,  2,      8,  2, 10,
+    		 0, 12,  1,      0,  1, 18,      0, 18, 16,
+    		 6, 10,  2,      6,  2, 13,      6, 13, 15,
+    		 2, 16, 18,      2, 18,  3,      2,  3, 13,
+    		18,  1,  9,     18,  9, 11,     18, 11,  3,
+    		 4, 14, 12,      4, 12,  0,      4,  0,  8,
+    		11,  9,  5,     11,  5, 19,     11, 19,  7,
+    		19,  5, 14,     19, 14,  4,     19,  4, 17,
+    		 1, 12, 14,      1, 14,  5,      1,  5,  9
+    	];
+
+    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+    	this.type = 'DodecahedronGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		detail: detail
+    	};
+
+    }
+
+    DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+    DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
+
+    /**
+     * @author WestLangley / https://github.com/WestLangley
+     * @author zz85 / https://github.com/zz85
+     * @author miningold / https://github.com/miningold
+     * @author jonobr1 / https://github.com/jonobr1
+     *
+     * Modified from the TorusKnotGeometry by @oosmoxiecode
+     *
+     * Creates a tube which extrudes along a 3d spline
+     *
+     * Uses parallel transport frames as described in
+     * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
+     */
+
+    function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'TubeGeometry';
+
+    	this.parameters = {
+    		path: path,
+    		segments: segments,
+    		radius: radius,
+    		radialSegments: radialSegments,
+    		closed: closed,
+    		taper: taper
+    	};
+
+    	segments = segments || 64;
+    	radius = radius || 1;
+    	radialSegments = radialSegments || 8;
+    	closed = closed || false;
+    	taper = taper || TubeGeometry.NoTaper;
+
+    	var grid = [];
+
+    	var scope = this,
+
+    		tangent,
+    		normal,
+    		binormal,
+
+    		numpoints = segments + 1,
+
+    		u, v, r,
+
+    		cx, cy,
+    		pos, pos2 = new Vector3(),
+    		i, j,
+    		ip, jp,
+    		a, b, c, d,
+    		uva, uvb, uvc, uvd;
+
+    	var frames = new TubeGeometry.FrenetFrames( path, segments, closed ),
+    		tangents = frames.tangents,
+    		normals = frames.normals,
+    		binormals = frames.binormals;
+
+    	// proxy internals
+    	this.tangents = tangents;
+    	this.normals = normals;
+    	this.binormals = binormals;
+
+    	function vert( x, y, z ) {
+
+    		return scope.vertices.push( new Vector3( x, y, z ) ) - 1;
+
+    	}
+
+    	// construct the grid
+
+    	for ( i = 0; i < numpoints; i ++ ) {
+
+    		grid[ i ] = [];
+
+    		u = i / ( numpoints - 1 );
+
+    		pos = path.getPointAt( u );
+
+    		tangent = tangents[ i ];
+    		normal = normals[ i ];
+    		binormal = binormals[ i ];
+
+    		r = radius * taper( u );
+
+    		for ( j = 0; j < radialSegments; j ++ ) {
+
+    			v = j / radialSegments * 2 * Math.PI;
+
+    			cx = - r * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+    			cy = r * Math.sin( v );
+
+    			pos2.copy( pos );
+    			pos2.x += cx * normal.x + cy * binormal.x;
+    			pos2.y += cx * normal.y + cy * binormal.y;
+    			pos2.z += cx * normal.z + cy * binormal.z;
+
+    			grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
+
+    		}
+
+    	}
+
+
+    	// construct the mesh
+
+    	for ( i = 0; i < segments; i ++ ) {
+
+    		for ( j = 0; j < radialSegments; j ++ ) {
+
+    			ip = ( closed ) ? ( i + 1 ) % segments : i + 1;
+    			jp = ( j + 1 ) % radialSegments;
+
+    			a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
+    			b = grid[ ip ][ j ];
+    			c = grid[ ip ][ jp ];
+    			d = grid[ i ][ jp ];
+
+    			uva = new Vector2( i / segments, j / radialSegments );
+    			uvb = new Vector2( ( i + 1 ) / segments, j / radialSegments );
+    			uvc = new Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
+    			uvd = new Vector2( i / segments, ( j + 1 ) / radialSegments );
+
+    			this.faces.push( new Face3( a, b, d ) );
+    			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+    			this.faces.push( new Face3( b, c, d ) );
+    			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+
+    		}
+
+    	}
+
+    	this.computeFaceNormals();
+    	this.computeVertexNormals();
+
+    }
+
+    TubeGeometry.prototype = Object.create( Geometry.prototype );
+    TubeGeometry.prototype.constructor = TubeGeometry;
+
+    TubeGeometry.NoTaper = function ( u ) {
+
+    	return 1;
+
+    };
+
+    TubeGeometry.SinusoidalTaper = function ( u ) {
+
+    	return Math.sin( Math.PI * u );
+
+    };
+
+    // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
+    TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
+
+    	var	normal = new Vector3(),
+
+    		tangents = [],
+    		normals = [],
+    		binormals = [],
+
+    		vec = new Vector3(),
+    		mat = new Matrix4(),
+
+    		numpoints = segments + 1,
+    		theta,
+    		smallest,
+
+    		tx, ty, tz,
+    		i, u;
+
+
+    	// expose internals
+    	this.tangents = tangents;
+    	this.normals = normals;
+    	this.binormals = binormals;
+
+    	// compute the tangent vectors for each segment on the path
+
+    	for ( i = 0; i < numpoints; i ++ ) {
+
+    		u = i / ( numpoints - 1 );
+
+    		tangents[ i ] = path.getTangentAt( u );
+    		tangents[ i ].normalize();
+
+    	}
+
+    	initialNormal3();
+
+    	/*
+    	function initialNormal1(lastBinormal) {
+    		// fixed start binormal. Has dangers of 0 vectors
+    		normals[ 0 ] = new THREE.Vector3();
+    		binormals[ 0 ] = new THREE.Vector3();
+    		if (lastBinormal===undefined) lastBinormal = new THREE.Vector3( 0, 0, 1 );
+    		normals[ 0 ].crossVectors( lastBinormal, tangents[ 0 ] ).normalize();
+    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
+    	}
+
+    	function initialNormal2() {
+
+    		// This uses the Frenet-Serret formula for deriving binormal
+    		var t2 = path.getTangentAt( epsilon );
+
+    		normals[ 0 ] = new THREE.Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
+    		binormals[ 0 ] = new THREE.Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
+
+    		normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
+    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
+
+    	}
+    	*/
+
+    	function initialNormal3() {
+
+    		// select an initial normal vector perpendicular to the first tangent vector,
+    		// and in the direction of the smallest tangent xyz component
+
+    		normals[ 0 ] = new Vector3();
+    		binormals[ 0 ] = new Vector3();
+    		smallest = Number.MAX_VALUE;
+    		tx = Math.abs( tangents[ 0 ].x );
+    		ty = Math.abs( tangents[ 0 ].y );
+    		tz = Math.abs( tangents[ 0 ].z );
+
+    		if ( tx <= smallest ) {
+
+    			smallest = tx;
+    			normal.set( 1, 0, 0 );
+
+    		}
+
+    		if ( ty <= smallest ) {
+
+    			smallest = ty;
+    			normal.set( 0, 1, 0 );
+
+    		}
+
+    		if ( tz <= smallest ) {
+
+    			normal.set( 0, 0, 1 );
+
+    		}
+
+    		vec.crossVectors( tangents[ 0 ], normal ).normalize();
+
+    		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
+    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+
+    	}
+
+
+    	// compute the slowly-varying normal and binormal vectors for each segment on the path
+
+    	for ( i = 1; i < numpoints; i ++ ) {
+
+    		normals[ i ] = normals[ i - 1 ].clone();
+
+    		binormals[ i ] = binormals[ i - 1 ].clone();
+
+    		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
+
+    		if ( vec.length() > Number.EPSILON ) {
+
+    			vec.normalize();
+
+    			theta = Math.acos( exports.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+
+    			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
+
+    		}
+
+    		binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+
+    	}
+
+
+    	// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
+
+    	if ( closed ) {
+
+    		theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
+    		theta /= ( numpoints - 1 );
+
+    		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
+
+    			theta = - theta;
+
+    		}
+
+    		for ( i = 1; i < numpoints; i ++ ) {
+
+    			// twist a little...
+    			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+    			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+
+    		}
+
+    	}
+
+    };
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     *
+     * see: http://www.blackpawn.com/texts/pqtorus/
+     */
+    function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'TorusKnotBufferGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		tube: tube,
+    		tubularSegments: tubularSegments,
+    		radialSegments: radialSegments,
+    		p: p,
+    		q: q
+    	};
+
+    	radius = radius || 100;
+    	tube = tube || 40;
+    	tubularSegments = Math.floor( tubularSegments ) || 64;
+    	radialSegments = Math.floor( radialSegments ) || 8;
+    	p = p || 2;
+    	q = q || 3;
+
+    	// used to calculate buffer length
+    	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
+    	var indexCount = radialSegments * tubularSegments * 2 * 3;
+
+    	// buffers
+    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+    	// helper variables
+    	var i, j, index = 0, indexOffset = 0;
+
+    	var vertex = new Vector3();
+    	var normal = new Vector3();
+    	var uv = new Vector2();
+
+    	var P1 = new Vector3();
+    	var P2 = new Vector3();
+
+    	var B = new Vector3();
+    	var T = new Vector3();
+    	var N = new Vector3();
+
+    	// generate vertices, normals and uvs
+
+    	for ( i = 0; i <= tubularSegments; ++ i ) {
+
+    		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
+
+    		var u = i / tubularSegments * p * Math.PI * 2;
+
+    		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
+    		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
+
+    		calculatePositionOnCurve( u, p, q, radius, P1 );
+    		calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
+
+    		// calculate orthonormal basis
+
+    		T.subVectors( P2, P1 );
+    		N.addVectors( P2, P1 );
+    		B.crossVectors( T, N );
+    		N.crossVectors( B, T );
+
+    		// normalize B, N. T can be ignored, we don't use it
+
+    		B.normalize();
+    		N.normalize();
+
+    		for ( j = 0; j <= radialSegments; ++ j ) {
+
+    			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
+    			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
+
+    			var v = j / radialSegments * Math.PI * 2;
+    			var cx = - tube * Math.cos( v );
+    			var cy = tube * Math.sin( v );
+
+    			// now calculate the final vertex position.
+    			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
+
+    			vertex.x = P1.x + ( cx * N.x + cy * B.x );
+    			vertex.y = P1.y + ( cx * N.y + cy * B.y );
+    			vertex.z = P1.z + ( cx * N.z + cy * B.z );
+
+    			// vertex
+    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+    			// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
+    			normal.subVectors( vertex, P1 ).normalize();
+    			normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+    			// uv
+    			uv.x = i / tubularSegments;
+    			uv.y = j / radialSegments;
+    			uvs.setXY( index, uv.x, uv.y );
+
+    			// increase index
+    			index ++;
+
+    		}
+
+    	}
+
+    	// generate indices
+
+    	for ( j = 1; j <= tubularSegments; j ++ ) {
+
+    		for ( i = 1; i <= radialSegments; i ++ ) {
+
+    			// indices
+    			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+    			var b = ( radialSegments + 1 ) * j + ( i - 1 );
+    			var c = ( radialSegments + 1 ) * j + i;
+    			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+
+    			// face one
+    			indices.setX( indexOffset, a ); indexOffset++;
+    			indices.setX( indexOffset, b ); indexOffset++;
+    			indices.setX( indexOffset, d ); indexOffset++;
+
+    			// face two
+    			indices.setX( indexOffset, b ); indexOffset++;
+    			indices.setX( indexOffset, c ); indexOffset++;
+    			indices.setX( indexOffset, d ); indexOffset++;
+
+    		}
+
+    	}
+
+    	// build geometry
+
+    	this.setIndex( indices );
+    	this.addAttribute( 'position', vertices );
+    	this.addAttribute( 'normal', normals );
+    	this.addAttribute( 'uv', uvs );
+
+    	// this function calculates the current position on the torus curve
+
+    	function calculatePositionOnCurve( u, p, q, radius, position ) {
+
+    		var cu = Math.cos( u );
+    		var su = Math.sin( u );
+    		var quOverP = q / p * u;
+    		var cs = Math.cos( quOverP );
+
+    		position.x = radius * ( 2 + cs ) * 0.5 * cu;
+    		position.y = radius * ( 2 + cs ) * su * 0.5;
+    		position.z = radius * Math.sin( quOverP ) * 0.5;
+
+    	}
+
+    }
+
+    TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
+
+    /**
+     * @author oosmoxiecode
+     */
+
+    function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'TorusKnotGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		tube: tube,
+    		tubularSegments: tubularSegments,
+    		radialSegments: radialSegments,
+    		p: p,
+    		q: q
+    	};
+
+    	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
+
+    	this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
+    	this.mergeVertices();
+
+    }
+
+    TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
+    TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     */
+
+    function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'TorusBufferGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		tube: tube,
+    		radialSegments: radialSegments,
+    		tubularSegments: tubularSegments,
+    		arc: arc
+    	};
+
+    	radius = radius || 100;
+    	tube = tube || 40;
+    	radialSegments = Math.floor( radialSegments ) || 8;
+    	tubularSegments = Math.floor( tubularSegments ) || 6;
+    	arc = arc || Math.PI * 2;
+
+    	// used to calculate buffer length
+    	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
+    	var indexCount = radialSegments * tubularSegments * 2 * 3;
+
+    	// buffers
+    	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+    	var vertices = new Float32Array( vertexCount * 3 );
+    	var normals = new Float32Array( vertexCount * 3 );
+    	var uvs = new Float32Array( vertexCount * 2 );
+
+    	// offset variables
+    	var vertexBufferOffset = 0;
+    	var uvBufferOffset = 0;
+    	var indexBufferOffset = 0;
+
+    	// helper variables
+    	var center = new Vector3();
+    	var vertex = new Vector3();
+    	var normal = new Vector3();
+
+    	var j, i;
+
+    	// generate vertices, normals and uvs
+
+    	for ( j = 0; j <= radialSegments; j ++ ) {
+
+    		for ( i = 0; i <= tubularSegments; i ++ ) {
+
+    			var u = i / tubularSegments * arc;
+    			var v = j / radialSegments * Math.PI * 2;
+
+    			// vertex
+    			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+    			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+    			vertex.z = tube * Math.sin( v );
+
+    			vertices[ vertexBufferOffset ] = vertex.x;
+    			vertices[ vertexBufferOffset + 1 ] = vertex.y;
+    			vertices[ vertexBufferOffset + 2 ] = vertex.z;
+
+    			// this vector is used to calculate the normal
+    			center.x = radius * Math.cos( u );
+    			center.y = radius * Math.sin( u );
+
+    			// normal
+    			normal.subVectors( vertex, center ).normalize();
+
+    			normals[ vertexBufferOffset ] = normal.x;
+    			normals[ vertexBufferOffset + 1 ] = normal.y;
+    			normals[ vertexBufferOffset + 2 ] = normal.z;
+
+    			// uv
+    			uvs[ uvBufferOffset ] = i / tubularSegments;
+    			uvs[ uvBufferOffset + 1 ] = j / radialSegments;
+
+    			// update offsets
+    			vertexBufferOffset += 3;
+    			uvBufferOffset += 2;
+
+    		}
+
+    	}
+
+    	// generate indices
+
+    	for ( j = 1; j <= radialSegments; j ++ ) {
+
+    		for ( i = 1; i <= tubularSegments; i ++ ) {
+
+    			// indices
+    			var a = ( tubularSegments + 1 ) * j + i - 1;
+    			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+    			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+    			var d = ( tubularSegments + 1 ) * j + i;
+
+    			// face one
+    			indices[ indexBufferOffset ] = a;
+    			indices[ indexBufferOffset + 1 ] = b;
+    			indices[ indexBufferOffset + 2 ] = d;
+
+    			// face two
+    			indices[ indexBufferOffset + 3 ] = b;
+    			indices[ indexBufferOffset + 4 ] = c;
+    			indices[ indexBufferOffset + 5 ] = d;
+
+    			// update offset
+    			indexBufferOffset += 6;
+
+    		}
+
+    	}
+
+    	// build geometry
+    	this.setIndex( new BufferAttribute( indices, 1 ) );
+    	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+
+    }
+
+    TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
+
+    /**
+     * @author oosmoxiecode
+     * @author mrdoob / http://mrdoob.com/
+     * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
+     */
+
+    function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'TorusGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		tube: tube,
+    		radialSegments: radialSegments,
+    		tubularSegments: tubularSegments,
+    		arc: arc
+    	};
+
+    	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
+
+    }
+
+    TorusGeometry.prototype = Object.create( Geometry.prototype );
+    TorusGeometry.prototype.constructor = TorusGeometry;
+
+    /**
+     * @author zz85 / http://www.lab4games.net/zz85/blog
+     */
+
+    exports.ShapeUtils = {
+
+    	// calculate area of the contour polygon
+
+    	area: function ( contour ) {
+
+    		var n = contour.length;
+    		var a = 0.0;
+
+    		for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
+
+    			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
+
+    		}
+
+    		return a * 0.5;
+
+    	},
+
+    	triangulate: ( function () {
+
+    		/**
+    		 * This code is a quick port of code written in C++ which was submitted to
+    		 * flipcode.com by John W. Ratcliff  // July 22, 2000
+    		 * See original code and more information here:
+    		 * http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
+    		 *
+    		 * ported to actionscript by Zevan Rosser
+    		 * www.actionsnippet.com
+    		 *
+    		 * ported to javascript by Joshua Koo
+    		 * http://www.lab4games.net/zz85/blog
+    		 *
+    		 */
+
+    		function snip( contour, u, v, w, n, verts ) {
+
+    			var p;
+    			var ax, ay, bx, by;
+    			var cx, cy, px, py;
+
+    			ax = contour[ verts[ u ] ].x;
+    			ay = contour[ verts[ u ] ].y;
+
+    			bx = contour[ verts[ v ] ].x;
+    			by = contour[ verts[ v ] ].y;
+
+    			cx = contour[ verts[ w ] ].x;
+    			cy = contour[ verts[ w ] ].y;
+
+    			if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+
+    			var aX, aY, bX, bY, cX, cY;
+    			var apx, apy, bpx, bpy, cpx, cpy;
+    			var cCROSSap, bCROSScp, aCROSSbp;
+
+    			aX = cx - bx;  aY = cy - by;
+    			bX = ax - cx;  bY = ay - cy;
+    			cX = bx - ax;  cY = by - ay;
+
+    			for ( p = 0; p < n; p ++ ) {
+
+    				px = contour[ verts[ p ] ].x;
+    				py = contour[ verts[ p ] ].y;
+
+    				if ( ( ( px === ax ) && ( py === ay ) ) ||
+    					 ( ( px === bx ) && ( py === by ) ) ||
+    					 ( ( px === cx ) && ( py === cy ) ) )	continue;
+
+    				apx = px - ax;  apy = py - ay;
+    				bpx = px - bx;  bpy = py - by;
+    				cpx = px - cx;  cpy = py - cy;
+
+    				// see if p is inside triangle abc
+
+    				aCROSSbp = aX * bpy - aY * bpx;
+    				cCROSSap = cX * apy - cY * apx;
+    				bCROSScp = bX * cpy - bY * cpx;
+
+    				if ( ( aCROSSbp >= - Number.EPSILON ) && ( bCROSScp >= - Number.EPSILON ) && ( cCROSSap >= - Number.EPSILON ) ) return false;
+
+    			}
+
+    			return true;
+
+    		}
+
+    		// takes in an contour array and returns
+
+    		return function triangulate( contour, indices ) {
+
+    			var n = contour.length;
+
+    			if ( n < 3 ) return null;
+
+    			var result = [],
+    				verts = [],
+    				vertIndices = [];
+
+    			/* we want a counter-clockwise polygon in verts */
+
+    			var u, v, w;
+
+    			if ( exports.ShapeUtils.area( contour ) > 0.0 ) {
+
+    				for ( v = 0; v < n; v ++ ) verts[ v ] = v;
+
+    			} else {
+
+    				for ( v = 0; v < n; v ++ ) verts[ v ] = ( n - 1 ) - v;
+
+    			}
+
+    			var nv = n;
+
+    			/*  remove nv - 2 vertices, creating 1 triangle every time */
+
+    			var count = 2 * nv;   /* error detection */
+
+    			for ( v = nv - 1; nv > 2; ) {
+
+    				/* if we loop, it is probably a non-simple polygon */
+
+    				if ( ( count -- ) <= 0 ) {
+
+    					//** Triangulate: ERROR - probable bad polygon!
+
+    					//throw ( "Warning, unable to triangulate polygon!" );
+    					//return null;
+    					// Sometimes warning is fine, especially polygons are triangulated in reverse.
+    					console.warn( 'THREE.ShapeUtils: Unable to triangulate polygon! in triangulate()' );
+
+    					if ( indices ) return vertIndices;
+    					return result;
+
+    				}
+
+    				/* three consecutive vertices in current polygon, <u,v,w> */
+
+    				u = v; 	 	if ( nv <= u ) u = 0;     /* previous */
+    				v = u + 1;  if ( nv <= v ) v = 0;     /* new v    */
+    				w = v + 1;  if ( nv <= w ) w = 0;     /* next     */
+
+    				if ( snip( contour, u, v, w, nv, verts ) ) {
+
+    					var a, b, c, s, t;
+
+    					/* true names of the vertices */
+
+    					a = verts[ u ];
+    					b = verts[ v ];
+    					c = verts[ w ];
+
+    					/* output Triangle */
+
+    					result.push( [ contour[ a ],
+    						contour[ b ],
+    						contour[ c ] ] );
+
+
+    					vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
+
+    					/* remove v from the remaining polygon */
+
+    					for ( s = v, t = v + 1; t < nv; s ++, t ++ ) {
+
+    						verts[ s ] = verts[ t ];
+
+    					}
+
+    					nv --;
+
+    					/* reset error detection counter */
+
+    					count = 2 * nv;
+
+    				}
+
+    			}
+
+    			if ( indices ) return vertIndices;
+    			return result;
+
+    		}
+
+    	} )(),
+
+    	triangulateShape: function ( contour, holes ) {
+
+    		function removeDupEndPts(points) {
+
+    			var l = points.length;
+
+    			if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+
+    				points.pop();
+
+    			}
+
+    		}
+
+    		removeDupEndPts( contour );
+    		holes.forEach( removeDupEndPts );
+
+    		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
+
+    			// inOtherPt needs to be collinear to the inSegment
+    			if ( inSegPt1.x !== inSegPt2.x ) {
+
+    				if ( inSegPt1.x < inSegPt2.x ) {
+
+    					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
+
+    				} else {
+
+    					return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
+
+    				}
+
+    			} else {
+
+    				if ( inSegPt1.y < inSegPt2.y ) {
+
+    					return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
+
+    				} else {
+
+    					return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
+
+    				}
+
+    			}
+
+    		}
+
+    		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
+
+    			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
+    			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
+
+    			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
+    			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
+
+    			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
+    			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
+
+    			if ( Math.abs( limit ) > Number.EPSILON ) {
+
+    				// not parallel
+
+    				var perpSeg2;
+    				if ( limit > 0 ) {
+
+    					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
+    					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+    					if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
+
+    				} else {
+
+    					if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
+    					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
+    					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
+
+    				}
+
+    				// i.e. to reduce rounding errors
+    				// intersection at endpoint of segment#1?
+    				if ( perpSeg2 === 0 ) {
+
+    					if ( ( inExcludeAdjacentSegs ) &&
+    						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+    					return [ inSeg1Pt1 ];
+
+    				}
+    				if ( perpSeg2 === limit ) {
+
+    					if ( ( inExcludeAdjacentSegs ) &&
+    						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+    					return [ inSeg1Pt2 ];
+
+    				}
+    				// intersection at endpoint of segment#2?
+    				if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
+    				if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
+
+    				// return real intersection point
+    				var factorSeg1 = perpSeg2 / limit;
+    				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
+    							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
+
+    			} else {
+
+    				// parallel or collinear
+    				if ( ( perpSeg1 !== 0 ) ||
+    					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
+
+    				// they are collinear or degenerate
+    				var seg1Pt = ( ( seg1dx === 0 ) && ( seg1dy === 0 ) );	// segment1 is just a point?
+    				var seg2Pt = ( ( seg2dx === 0 ) && ( seg2dy === 0 ) );	// segment2 is just a point?
+    				// both segments are points
+    				if ( seg1Pt && seg2Pt ) {
+
+    					if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
+    						 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
+    					return [ inSeg1Pt1 ];                 						// they are the same point
+
+    				}
+    				// segment#1  is a single point
+    				if ( seg1Pt ) {
+
+    					if ( ! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
+    					return [ inSeg1Pt1 ];
+
+    				}
+    				// segment#2  is a single point
+    				if ( seg2Pt ) {
+
+    					if ( ! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
+    					return [ inSeg2Pt1 ];
+
+    				}
+
+    				// they are collinear segments, which might overlap
+    				var seg1min, seg1max, seg1minVal, seg1maxVal;
+    				var seg2min, seg2max, seg2minVal, seg2maxVal;
+    				if ( seg1dx !== 0 ) {
+
+    					// the segments are NOT on a vertical line
+    					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
+
+    						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
+    						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
+
+    					} else {
+
+    						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
+    						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
+
+    					}
+    					if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
+
+    						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
+    						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
+
+    					} else {
+
+    						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
+    						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
+
+    					}
+
+    				} else {
+
+    					// the segments are on a vertical line
+    					if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
+
+    						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
+    						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
+
+    					} else {
+
+    						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
+    						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
+
+    					}
+    					if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
+
+    						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
+    						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
+
+    					} else {
+
+    						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
+    						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
+
+    					}
+
+    				}
+    				if ( seg1minVal <= seg2minVal ) {
+
+    					if ( seg1maxVal <  seg2minVal )	return [];
+    					if ( seg1maxVal === seg2minVal )	{
+
+    						if ( inExcludeAdjacentSegs )		return [];
+    						return [ seg2min ];
+
+    					}
+    					if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
+    					return	[ seg2min, seg2max ];
+
+    				} else {
+
+    					if ( seg1minVal >  seg2maxVal )	return [];
+    					if ( seg1minVal === seg2maxVal )	{
+
+    						if ( inExcludeAdjacentSegs )		return [];
+    						return [ seg1min ];
+
+    					}
+    					if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
+    					return	[ seg1min, seg2max ];
+
+    				}
+
+    			}
+
+    		}
+
+    		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
+
+    			// The order of legs is important
+
+    			// translation of all points, so that Vertex is at (0,0)
+    			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
+    			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
+    			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
+
+    			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
+    			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
+    			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
+
+    			if ( Math.abs( from2toAngle ) > Number.EPSILON ) {
+
+    				// angle != 180 deg.
+
+    				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
+    				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
+
+    				if ( from2toAngle > 0 ) {
+
+    					// main angle < 180 deg.
+    					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
+
+    				} else {
+
+    					// main angle > 180 deg.
+    					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
+
+    				}
+
+    			} else {
+
+    				// angle == 180 deg.
+    				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
+    				return	( from2otherAngle > 0 );
+
+    			}
+
+    		}
+
+
+    		function removeHoles( contour, holes ) {
+
+    			var shape = contour.concat(); // work on this shape
+    			var hole;
+
+    			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
+
+    				// Check if hole point lies within angle around shape point
+    				var lastShapeIdx = shape.length - 1;
+
+    				var prevShapeIdx = inShapeIdx - 1;
+    				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
+
+    				var nextShapeIdx = inShapeIdx + 1;
+    				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
+
+    				var insideAngle = isPointInsideAngle( shape[ inShapeIdx ], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[ inHoleIdx ] );
+    				if ( ! insideAngle ) {
+
+    					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
+    					return	false;
+
+    				}
+
+    				// Check if shape point lies within angle around hole point
+    				var lastHoleIdx = hole.length - 1;
+
+    				var prevHoleIdx = inHoleIdx - 1;
+    				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
+
+    				var nextHoleIdx = inHoleIdx + 1;
+    				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
+
+    				insideAngle = isPointInsideAngle( hole[ inHoleIdx ], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[ inShapeIdx ] );
+    				if ( ! insideAngle ) {
+
+    					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
+    					return	false;
+
+    				}
+
+    				return	true;
+
+    			}
+
+    			function intersectsShapeEdge( inShapePt, inHolePt ) {
+
+    				// checks for intersections with shape edges
+    				var sIdx, nextIdx, intersection;
+    				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
+
+    					nextIdx = sIdx + 1; nextIdx %= shape.length;
+    					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[ sIdx ], shape[ nextIdx ], true );
+    					if ( intersection.length > 0 )		return	true;
+
+    				}
+
+    				return	false;
+
+    			}
+
+    			var indepHoles = [];
+
+    			function intersectsHoleEdge( inShapePt, inHolePt ) {
+
+    				// checks for intersections with hole edges
+    				var ihIdx, chkHole,
+    					hIdx, nextIdx, intersection;
+    				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
+
+    					chkHole = holes[ indepHoles[ ihIdx ]];
+    					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
+
+    						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
+    						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[ hIdx ], chkHole[ nextIdx ], true );
+    						if ( intersection.length > 0 )		return	true;
+
+    					}
+
+    				}
+    				return	false;
+
+    			}
+
+    			var holeIndex, shapeIndex,
+    				shapePt, holePt,
+    				holeIdx, cutKey, failedCuts = [],
+    				tmpShape1, tmpShape2,
+    				tmpHole1, tmpHole2;
+
+    			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    				indepHoles.push( h );
+
+    			}
+
+    			var minShapeIndex = 0;
+    			var counter = indepHoles.length * 2;
+    			while ( indepHoles.length > 0 ) {
+
+    				counter --;
+    				if ( counter < 0 ) {
+
+    					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
+    					break;
+
+    				}
+
+    				// search for shape-vertex and hole-vertex,
+    				// which can be connected without intersections
+    				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex ++ ) {
+
+    					shapePt = shape[ shapeIndex ];
+    					holeIndex	= - 1;
+
+    					// search for hole which can be reached without intersections
+    					for ( var h = 0; h < indepHoles.length; h ++ ) {
+
+    						holeIdx = indepHoles[ h ];
+
+    						// prevent multiple checks
+    						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
+    						if ( failedCuts[ cutKey ] !== undefined )			continue;
+
+    						hole = holes[ holeIdx ];
+    						for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
+
+    							holePt = hole[ h2 ];
+    							if ( ! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
+    							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
+    							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
+
+    							holeIndex = h2;
+    							indepHoles.splice( h, 1 );
+
+    							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
+    							tmpShape2 = shape.slice( shapeIndex );
+    							tmpHole1 = hole.slice( holeIndex );
+    							tmpHole2 = hole.slice( 0, holeIndex + 1 );
+
+    							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+
+    							minShapeIndex = shapeIndex;
+
+    							// Debug only, to show the selected cuts
+    							// glob_CutLines.push( [ shapePt, holePt ] );
+
+    							break;
+
+    						}
+    						if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+    						failedCuts[ cutKey ] = true;			// remember failure
+
+    					}
+    					if ( holeIndex >= 0 )	break;		// hole-vertex found
+
+    				}
+
+    			}
+
+    			return shape; 			/* shape with no holes */
+
+    		}
+
+
+    		var i, il, f, face,
+    			key, index,
+    			allPointsMap = {};
+
+    		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
+
+    		var allpoints = contour.concat();
+
+    		for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    			Array.prototype.push.apply( allpoints, holes[ h ] );
+
+    		}
+
+    		//console.log( "allpoints",allpoints, allpoints.length );
+
+    		// prepare all points map
+
+    		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
+
+    			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
+
+    			if ( allPointsMap[ key ] !== undefined ) {
+
+    				console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
+
+    			}
+
+    			allPointsMap[ key ] = i;
+
+    		}
+
+    		// remove holes by cutting paths to holes and adding them to the shape
+    		var shapeWithoutHoles = removeHoles( contour, holes );
+
+    		var triangles = exports.ShapeUtils.triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
+    		//console.log( "triangles",triangles, triangles.length );
+
+    		// check all face vertices against all points map
+
+    		for ( i = 0, il = triangles.length; i < il; i ++ ) {
+
+    			face = triangles[ i ];
+
+    			for ( f = 0; f < 3; f ++ ) {
+
+    				key = face[ f ].x + ":" + face[ f ].y;
+
+    				index = allPointsMap[ key ];
+
+    				if ( index !== undefined ) {
+
+    					face[ f ] = index;
+
+    				}
+
+    			}
+
+    		}
+
+    		return triangles.concat();
+
+    	},
+
+    	isClockWise: function ( pts ) {
+
+    		return exports.ShapeUtils.area( pts ) < 0;
+
+    	},
+
+    	// Bezier Curves formulas obtained from
+    	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
+
+    	// Quad Bezier Functions
+
+    	b2: ( function () {
+
+    		function b2p0( t, p ) {
+
+    			var k = 1 - t;
+    			return k * k * p;
+
+    		}
+
+    		function b2p1( t, p ) {
+
+    			return 2 * ( 1 - t ) * t * p;
+
+    		}
+
+    		function b2p2( t, p ) {
+
+    			return t * t * p;
+
+    		}
+
+    		return function b2( t, p0, p1, p2 ) {
+
+    			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
+
+    		};
+
+    	} )(),
+
+    	// Cubic Bezier Functions
+
+    	b3: ( function () {
+
+    		function b3p0( t, p ) {
+
+    			var k = 1 - t;
+    			return k * k * k * p;
+
+    		}
+
+    		function b3p1( t, p ) {
+
+    			var k = 1 - t;
+    			return 3 * k * k * t * p;
+
+    		}
+
+    		function b3p2( t, p ) {
+
+    			var k = 1 - t;
+    			return 3 * k * t * t * p;
+
+    		}
+
+    		function b3p3( t, p ) {
+
+    			return t * t * t * p;
+
+    		}
+
+    		return function b3( t, p0, p1, p2, p3 ) {
+
+    			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
+
+    		};
+
+    	} )()
+
+    };
+
+    /**
+     * @author zz85 / http://www.lab4games.net/zz85/blog
+     *
+     * Creates extruded geometry from a path shape.
+     *
+     * parameters = {
+     *
+     *  curveSegments: <int>, // number of points on the curves
+     *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
+     *  amount: <int>, // Depth to extrude the shape
+     *
+     *  bevelEnabled: <bool>, // turn on bevel
+     *  bevelThickness: <float>, // how deep into the original shape bevel goes
+     *  bevelSize: <float>, // how far from shape outline is bevel
+     *  bevelSegments: <int>, // number of bevel layers
+     *
+     *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+     *  frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
+     *
+     *  uvGenerator: <Object> // object that provides UV generator functions
+     *
+     * }
+     **/
+
+    function ExtrudeGeometry( shapes, options ) {
+
+    	if ( typeof( shapes ) === "undefined" ) {
+
+    		shapes = [];
+    		return;
+
+    	}
+
+    	Geometry.call( this );
+
+    	this.type = 'ExtrudeGeometry';
+
+    	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
+
+    	this.addShapeList( shapes, options );
+
+    	this.computeFaceNormals();
+
+    	// can't really use automatic vertex normals
+    	// as then front and back sides get smoothed too
+    	// should do separate smoothing just for sides
+
+    	//this.computeVertexNormals();
+
+    	//console.log( "took", ( Date.now() - startTime ) );
+
+    }
+
+    ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
+    ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+
+    ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+
+    	var sl = shapes.length;
+
+    	for ( var s = 0; s < sl; s ++ ) {
+
+    		var shape = shapes[ s ];
+    		this.addShape( shape, options );
+
+    	}
+
+    };
+
+    ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
+
+    	var amount = options.amount !== undefined ? options.amount : 100;
+
+    	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
+    	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
+    	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+
+    	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
+
+    	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+
+    	var steps = options.steps !== undefined ? options.steps : 1;
+
+    	var extrudePath = options.extrudePath;
+    	var extrudePts, extrudeByPath = false;
+
+    	// Use default WorldUVGenerator if no UV generators are specified.
+    	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
+
+    	var splineTube, binormal, normal, position2;
+    	if ( extrudePath ) {
+
+    		extrudePts = extrudePath.getSpacedPoints( steps );
+
+    		extrudeByPath = true;
+    		bevelEnabled = false; // bevels not supported for path extrusion
+
+    		// SETUP TNB variables
+
+    		// Reuse TNB from TubeGeomtry for now.
+    		// TODO1 - have a .isClosed in spline?
+
+    		splineTube = options.frames !== undefined ? options.frames : new TubeGeometry.FrenetFrames( extrudePath, steps, false );
+
+    		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
+
+    		binormal = new Vector3();
+    		normal = new Vector3();
+    		position2 = new Vector3();
+
+    	}
+
+    	// Safeguards if bevels are not enabled
+
+    	if ( ! bevelEnabled ) {
+
+    		bevelSegments = 0;
+    		bevelThickness = 0;
+    		bevelSize = 0;
+
+    	}
+
+    	// Variables initialization
+
+    	var ahole, h, hl; // looping of holes
+    	var scope = this;
+
+    	var shapesOffset = this.vertices.length;
+
+    	var shapePoints = shape.extractPoints( curveSegments );
+
+    	var vertices = shapePoints.shape;
+    	var holes = shapePoints.holes;
+
+    	var reverse = ! exports.ShapeUtils.isClockWise( vertices );
+
+    	if ( reverse ) {
+
+    		vertices = vertices.reverse();
+
+    		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
+
+    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    			ahole = holes[ h ];
+
+    			if ( exports.ShapeUtils.isClockWise( ahole ) ) {
+
+    				holes[ h ] = ahole.reverse();
+
+    			}
+
+    		}
+
+    		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
+
+    	}
+
+
+    	var faces = exports.ShapeUtils.triangulateShape( vertices, holes );
+
+    	/* Vertices */
+
+    	var contour = vertices; // vertices has all points but contour has only points of circumference
+
+    	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    		ahole = holes[ h ];
+
+    		vertices = vertices.concat( ahole );
+
+    	}
+
+
+    	function scalePt2( pt, vec, size ) {
+
+    		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+
+    		return vec.clone().multiplyScalar( size ).add( pt );
+
+    	}
+
+    	var b, bs, t, z,
+    		vert, vlen = vertices.length,
+    		face, flen = faces.length;
+
+
+    	// Find directions for point movement
+
+
+    	function getBevelVec( inPt, inPrev, inNext ) {
+
+    		// computes for inPt the corresponding point inPt' on a new contour
+    		//   shifted by 1 unit (length of normalized vector) to the left
+    		// if we walk along contour clockwise, this new contour is outside the old one
+    		//
+    		// inPt' is the intersection of the two lines parallel to the two
+    		//  adjacent edges of inPt at a distance of 1 unit on the left side.
+
+    		var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
+
+    		// good reading for geometry algorithms (here: line-line intersection)
+    		// http://geomalgorithms.com/a05-_intersect-1.html
+
+    		var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
+    		var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
+
+    		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
+
+    		// check for collinear edges
+    		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+
+    		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
+
+    			// not collinear
+
+    			// length of vectors for normalizing
+
+    			var v_prev_len = Math.sqrt( v_prev_lensq );
+    			var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
+
+    			// shift adjacent points by unit vectors to the left
+
+    			var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
+    			var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
+
+    			var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
+    			var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
+
+    			// scaling factor for v_prev to intersection point
+
+    			var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+    						( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
+    					  ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+
+    			// vector from inPt to intersection point
+
+    			v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
+    			v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
+
+    			// Don't normalize!, otherwise sharp corners become ugly
+    			//  but prevent crazy spikes
+    			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
+    			if ( v_trans_lensq <= 2 ) {
+
+    				return	new Vector2( v_trans_x, v_trans_y );
+
+    			} else {
+
+    				shrink_by = Math.sqrt( v_trans_lensq / 2 );
+
+    			}
+
+    		} else {
+
+    			// handle special case of collinear edges
+
+    			var direction_eq = false;		// assumes: opposite
+    			if ( v_prev_x > Number.EPSILON ) {
+
+    				if ( v_next_x > Number.EPSILON ) {
+
+    					direction_eq = true;
+
+    				}
+
+    			} else {
+
+    				if ( v_prev_x < - Number.EPSILON ) {
+
+    					if ( v_next_x < - Number.EPSILON ) {
+
+    						direction_eq = true;
+
+    					}
+
+    				} else {
+
+    					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
+
+    						direction_eq = true;
+
+    					}
+
+    				}
+
+    			}
+
+    			if ( direction_eq ) {
+
+    				// console.log("Warning: lines are a straight sequence");
+    				v_trans_x = - v_prev_y;
+    				v_trans_y =  v_prev_x;
+    				shrink_by = Math.sqrt( v_prev_lensq );
+
+    			} else {
+
+    				// console.log("Warning: lines are a straight spike");
+    				v_trans_x = v_prev_x;
+    				v_trans_y = v_prev_y;
+    				shrink_by = Math.sqrt( v_prev_lensq / 2 );
+
+    			}
+
+    		}
+
+    		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+
+    	}
+
+
+    	var contourMovements = [];
+
+    	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+
+    		if ( j === il ) j = 0;
+    		if ( k === il ) k = 0;
+
+    		//  (j)---(i)---(k)
+    		// console.log('i,j,k', i, j , k)
+
+    		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
+
+    	}
+
+    	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
+
+    	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    		ahole = holes[ h ];
+
+    		oneHoleMovements = [];
+
+    		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+
+    			if ( j === il ) j = 0;
+    			if ( k === il ) k = 0;
+
+    			//  (j)---(i)---(k)
+    			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+
+    		}
+
+    		holesMovements.push( oneHoleMovements );
+    		verticesMovements = verticesMovements.concat( oneHoleMovements );
+
+    	}
+
+
+    	// Loop bevelSegments, 1 for the front, 1 for the back
+
+    	for ( b = 0; b < bevelSegments; b ++ ) {
+
+    		//for ( b = bevelSegments; b > 0; b -- ) {
+
+    		t = b / bevelSegments;
+    		z = bevelThickness * Math.cos( t * Math.PI / 2 );
+    		bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+    		// contract shape
+
+    		for ( i = 0, il = contour.length; i < il; i ++ ) {
+
+    			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+
+    			v( vert.x, vert.y,  - z );
+
+    		}
+
+    		// expand holes
+
+    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    			ahole = holes[ h ];
+    			oneHoleMovements = holesMovements[ h ];
+
+    			for ( i = 0, il = ahole.length; i < il; i ++ ) {
+
+    				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+
+    				v( vert.x, vert.y,  - z );
+
+    			}
+
+    		}
+
+    	}
+
+    	bs = bevelSize;
+
+    	// Back facing vertices
+
+    	for ( i = 0; i < vlen; i ++ ) {
+
+    		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
+
+    		if ( ! extrudeByPath ) {
+
+    			v( vert.x, vert.y, 0 );
+
+    		} else {
+
+    			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
+
+    			normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
+    			binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
+
+    			position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
+
+    			v( position2.x, position2.y, position2.z );
+
+    		}
+
+    	}
+
+    	// Add stepped vertices...
+    	// Including front facing vertices
+
+    	var s;
+
+    	for ( s = 1; s <= steps; s ++ ) {
+
+    		for ( i = 0; i < vlen; i ++ ) {
+
+    			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
+
+    			if ( ! extrudeByPath ) {
+
+    				v( vert.x, vert.y, amount / steps * s );
+
+    			} else {
+
+    				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+
+    				normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
+    				binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
+
+    				position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
+
+    				v( position2.x, position2.y, position2.z );
+
+    			}
+
+    		}
+
+    	}
+
+
+    	// Add bevel segments planes
+
+    	//for ( b = 1; b <= bevelSegments; b ++ ) {
+    	for ( b = bevelSegments - 1; b >= 0; b -- ) {
+
+    		t = b / bevelSegments;
+    		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
+    		bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+    		// contract shape
+
+    		for ( i = 0, il = contour.length; i < il; i ++ ) {
+
+    			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+    			v( vert.x, vert.y,  amount + z );
+
+    		}
+
+    		// expand holes
+
+    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    			ahole = holes[ h ];
+    			oneHoleMovements = holesMovements[ h ];
+
+    			for ( i = 0, il = ahole.length; i < il; i ++ ) {
+
+    				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+
+    				if ( ! extrudeByPath ) {
+
+    					v( vert.x, vert.y,  amount + z );
+
+    				} else {
+
+    					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
+
+    				}
+
+    			}
+
+    		}
+
+    	}
+
+    	/* Faces */
+
+    	// Top and bottom faces
+
+    	buildLidFaces();
+
+    	// Sides faces
+
+    	buildSideFaces();
+
+
+    	/////  Internal functions
+
+    	function buildLidFaces() {
+
+    		if ( bevelEnabled ) {
+
+    			var layer = 0; // steps + 1
+    			var offset = vlen * layer;
+
+    			// Bottom faces
+
+    			for ( i = 0; i < flen; i ++ ) {
+
+    				face = faces[ i ];
+    				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+
+    			}
+
+    			layer = steps + bevelSegments * 2;
+    			offset = vlen * layer;
+
+    			// Top faces
+
+    			for ( i = 0; i < flen; i ++ ) {
+
+    				face = faces[ i ];
+    				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+
+    			}
+
+    		} else {
+
+    			// Bottom faces
+
+    			for ( i = 0; i < flen; i ++ ) {
+
+    				face = faces[ i ];
+    				f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+
+    			}
+
+    			// Top faces
+
+    			for ( i = 0; i < flen; i ++ ) {
+
+    				face = faces[ i ];
+    				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+
+    			}
+
+    		}
+
+    	}
+
+    	// Create faces for the z-sides of the shape
+
+    	function buildSideFaces() {
+
+    		var layeroffset = 0;
+    		sidewalls( contour, layeroffset );
+    		layeroffset += contour.length;
+
+    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
+    			ahole = holes[ h ];
+    			sidewalls( ahole, layeroffset );
+
+    			//, true
+    			layeroffset += ahole.length;
+
+    		}
+
+    	}
+
+    	function sidewalls( contour, layeroffset ) {
+
+    		var j, k;
+    		i = contour.length;
+
+    		while ( -- i >= 0 ) {
+
+    			j = i;
+    			k = i - 1;
+    			if ( k < 0 ) k = contour.length - 1;
+
+    			//console.log('b', i,j, i-1, k,vertices.length);
+
+    			var s = 0, sl = steps  + bevelSegments * 2;
+
+    			for ( s = 0; s < sl; s ++ ) {
+
+    				var slen1 = vlen * s;
+    				var slen2 = vlen * ( s + 1 );
+
+    				var a = layeroffset + j + slen1,
+    					b = layeroffset + k + slen1,
+    					c = layeroffset + k + slen2,
+    					d = layeroffset + j + slen2;
+
+    				f4( a, b, c, d, contour, s, sl, j, k );
+
+    			}
+
+    		}
+
+    	}
+
+
+    	function v( x, y, z ) {
+
+    		scope.vertices.push( new Vector3( x, y, z ) );
+
+    	}
+
+    	function f3( a, b, c ) {
+
+    		a += shapesOffset;
+    		b += shapesOffset;
+    		c += shapesOffset;
+
+    		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
+
+    		var uvs = uvgen.generateTopUV( scope, a, b, c );
+
+    		scope.faceVertexUvs[ 0 ].push( uvs );
+
+    	}
+
+    	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+
+    		a += shapesOffset;
+    		b += shapesOffset;
+    		c += shapesOffset;
+    		d += shapesOffset;
+
+    		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
+    		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
+
+    		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
+
+    		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+    		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+
+    	}
+
+    };
+
+    ExtrudeGeometry.WorldUVGenerator = {
+
+    	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
+
+    		var vertices = geometry.vertices;
+
+    		var a = vertices[ indexA ];
+    		var b = vertices[ indexB ];
+    		var c = vertices[ indexC ];
+
+    		return [
+    			new Vector2( a.x, a.y ),
+    			new Vector2( b.x, b.y ),
+    			new Vector2( c.x, c.y )
+    		];
+
+    	},
+
+    	generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
+
+    		var vertices = geometry.vertices;
+
+    		var a = vertices[ indexA ];
+    		var b = vertices[ indexB ];
+    		var c = vertices[ indexC ];
+    		var d = vertices[ indexD ];
+
+    		if ( Math.abs( a.y - b.y ) < 0.01 ) {
+
+    			return [
+    				new Vector2( a.x, 1 - a.z ),
+    				new Vector2( b.x, 1 - b.z ),
+    				new Vector2( c.x, 1 - c.z ),
+    				new Vector2( d.x, 1 - d.z )
+    			];
+
+    		} else {
+
+    			return [
+    				new Vector2( a.y, 1 - a.z ),
+    				new Vector2( b.y, 1 - b.z ),
+    				new Vector2( c.y, 1 - c.z ),
+    				new Vector2( d.y, 1 - d.z )
+    			];
+
+    		}
+
+    	}
+    };
+
+    /**
+     * @author zz85 / http://www.lab4games.net/zz85/blog
+     * @author alteredq / http://alteredqualia.com/
+     *
+     * Text = 3D Text
+     *
+     * parameters = {
+     *  font: <THREE.Font>, // font
+     *
+     *  size: <float>, // size of the text
+     *  height: <float>, // thickness to extrude text
+     *  curveSegments: <int>, // number of points on the curves
+     *
+     *  bevelEnabled: <bool>, // turn on bevel
+     *  bevelThickness: <float>, // how deep into text bevel goes
+     *  bevelSize: <float> // how far from text outline is bevel
+     * }
+     */
+
+    function TextGeometry( text, parameters ) {
+
+    	parameters = parameters || {};
+
+    	var font = parameters.font;
+
+    	if ( (font && font.isFont) === false ) {
+
+    		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
+    		return new Geometry();
+
+    	}
+
+    	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
+
+    	// translate parameters to ExtrudeGeometry API
+
+    	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+
+    	// defaults
+
+    	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+    	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+    	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+    	ExtrudeGeometry.call( this, shapes, parameters );
+
+    	this.type = 'TextGeometry';
+
+    }
+
+    TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
+    TextGeometry.prototype.constructor = TextGeometry;
+
+    /**
+     * @author benaadams / https://twitter.com/ben_a_adams
+     * based on THREE.SphereGeometry
+     */
+
+    function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'SphereBufferGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		widthSegments: widthSegments,
+    		heightSegments: heightSegments,
+    		phiStart: phiStart,
+    		phiLength: phiLength,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	radius = radius || 50;
+
+    	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
+    	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
+
+    	phiStart = phiStart !== undefined ? phiStart : 0;
+    	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+
+    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+
+    	var thetaEnd = thetaStart + thetaLength;
+
+    	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
+
+    	var positions = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+    	var index = 0, vertices = [], normal = new Vector3();
+
+    	for ( var y = 0; y <= heightSegments; y ++ ) {
+
+    		var verticesRow = [];
+
+    		var v = y / heightSegments;
+
+    		for ( var x = 0; x <= widthSegments; x ++ ) {
+
+    			var u = x / widthSegments;
+
+    			var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+    			var py = radius * Math.cos( thetaStart + v * thetaLength );
+    			var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+
+    			normal.set( px, py, pz ).normalize();
+
+    			positions.setXYZ( index, px, py, pz );
+    			normals.setXYZ( index, normal.x, normal.y, normal.z );
+    			uvs.setXY( index, u, 1 - v );
+
+    			verticesRow.push( index );
+
+    			index ++;
+
+    		}
+
+    		vertices.push( verticesRow );
+
+    	}
+
+    	var indices = [];
+
+    	for ( var y = 0; y < heightSegments; y ++ ) {
+
+    		for ( var x = 0; x < widthSegments; x ++ ) {
+
+    			var v1 = vertices[ y ][ x + 1 ];
+    			var v2 = vertices[ y ][ x ];
+    			var v3 = vertices[ y + 1 ][ x ];
+    			var v4 = vertices[ y + 1 ][ x + 1 ];
+
+    			if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
+    			if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
+
+    		}
+
+    	}
+
+    	this.setIndex( new ( positions.count > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+    	this.addAttribute( 'position', positions );
+    	this.addAttribute( 'normal', normals );
+    	this.addAttribute( 'uv', uvs );
+
+    	this.boundingSphere = new Sphere( new Vector3(), radius );
+
+    }
+
+    SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     */
+
+    function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'SphereGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		widthSegments: widthSegments,
+    		heightSegments: heightSegments,
+    		phiStart: phiStart,
+    		phiLength: phiLength,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+
+    }
+
+    SphereGeometry.prototype = Object.create( Geometry.prototype );
+    SphereGeometry.prototype.constructor = SphereGeometry;
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     */
+
+    function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'RingBufferGeometry';
+
+    	this.parameters = {
+    		innerRadius: innerRadius,
+    		outerRadius: outerRadius,
+    		thetaSegments: thetaSegments,
+    		phiSegments: phiSegments,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	innerRadius = innerRadius || 20;
+    	outerRadius = outerRadius || 50;
+
+    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+    	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
+    	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
+
+    	// these are used to calculate buffer length
+    	var vertexCount = ( thetaSegments + 1 ) * ( phiSegments + 1 );
+    	var indexCount = thetaSegments * phiSegments * 2 * 3;
+
+    	// buffers
+    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+    	// some helper variables
+    	var index = 0, indexOffset = 0, segment;
+    	var radius = innerRadius;
+    	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+    	var vertex = new Vector3();
+    	var uv = new Vector2();
+    	var j, i;
+
+    	// generate vertices, normals and uvs
+
+    	// values are generate from the inside of the ring to the outside
+
+    	for ( j = 0; j <= phiSegments; j ++ ) {
+
+    		for ( i = 0; i <= thetaSegments; i ++ ) {
+
+    			segment = thetaStart + i / thetaSegments * thetaLength;
+
+    			// vertex
+    			vertex.x = radius * Math.cos( segment );
+    			vertex.y = radius * Math.sin( segment );
+    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+    			// normal
+    			normals.setXYZ( index, 0, 0, 1 );
+
+    			// uv
+    			uv.x = ( vertex.x / outerRadius + 1 ) / 2;
+    			uv.y = ( vertex.y / outerRadius + 1 ) / 2;
+    			uvs.setXY( index, uv.x, uv.y );
+
+    			// increase index
+    			index++;
+
+    		}
+
+    		// increase the radius for next row of vertices
+    		radius += radiusStep;
+
+    	}
+
+    	// generate indices
+
+    	for ( j = 0; j < phiSegments; j ++ ) {
+
+    		var thetaSegmentLevel = j * ( thetaSegments + 1 );
+
+    		for ( i = 0; i < thetaSegments; i ++ ) {
+
+    			segment = i + thetaSegmentLevel;
+
+    			// indices
+    			var a = segment;
+    			var b = segment + thetaSegments + 1;
+    			var c = segment + thetaSegments + 2;
+    			var d = segment + 1;
+
+    			// face one
+    			indices.setX( indexOffset, a ); indexOffset++;
+    			indices.setX( indexOffset, b ); indexOffset++;
+    			indices.setX( indexOffset, c ); indexOffset++;
+
+    			// face two
+    			indices.setX( indexOffset, a ); indexOffset++;
+    			indices.setX( indexOffset, c ); indexOffset++;
+    			indices.setX( indexOffset, d ); indexOffset++;
+
+    		}
+
+    	}
+
+    	// build geometry
+
+    	this.setIndex( indices );
+    	this.addAttribute( 'position', vertices );
+    	this.addAttribute( 'normal', normals );
+    	this.addAttribute( 'uv', uvs );
+
+    }
+
+    RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    RingBufferGeometry.prototype.constructor = RingBufferGeometry;
+
+    /**
+     * @author Kaleb Murphy
+     */
+
+    function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'RingGeometry';
+
+    	this.parameters = {
+    		innerRadius: innerRadius,
+    		outerRadius: outerRadius,
+    		thetaSegments: thetaSegments,
+    		phiSegments: phiSegments,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+
+    }
+
+    RingGeometry.prototype = Object.create( Geometry.prototype );
+    RingGeometry.prototype.constructor = RingGeometry;
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
+     */
+
+    function PlaneGeometry( width, height, widthSegments, heightSegments ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'PlaneGeometry';
+
+    	this.parameters = {
+    		width: width,
+    		height: height,
+    		widthSegments: widthSegments,
+    		heightSegments: heightSegments
+    	};
+
+    	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+
+    }
+
+    PlaneGeometry.prototype = Object.create( Geometry.prototype );
+    PlaneGeometry.prototype.constructor = PlaneGeometry;
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     */
+
+     // points - to create a closed torus, one must use a set of points
+     //    like so: [ a, b, c, d, a ], see first is the same as last.
+     // segments - the number of circumference segments to create
+     // phiStart - the starting radian
+     // phiLength - the radian (0 to 2PI) range of the lathed section
+     //    2PI is a closed lathe, less than 2PI is a portion.
+
+    function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'LatheBufferGeometry';
+
+    	this.parameters = {
+    		points: points,
+    		segments: segments,
+    		phiStart: phiStart,
+    		phiLength: phiLength
+    	};
+
+    	segments = Math.floor( segments ) || 12;
+    	phiStart = phiStart || 0;
+    	phiLength = phiLength || Math.PI * 2;
+
+    	// clamp phiLength so it's in range of [ 0, 2PI ]
+    	phiLength = exports.Math.clamp( phiLength, 0, Math.PI * 2 );
+
+    	// these are used to calculate buffer length
+    	var vertexCount = ( segments + 1 ) * points.length;
+    	var indexCount = segments * points.length * 2 * 3;
+
+    	// buffers
+    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+    	// helper variables
+    	var index = 0, indexOffset = 0, base;
+    	var inverseSegments = 1.0 / segments;
+    	var vertex = new Vector3();
+    	var uv = new Vector2();
+    	var i, j;
+
+    	// generate vertices and uvs
+
+    	for ( i = 0; i <= segments; i ++ ) {
+
+    		var phi = phiStart + i * inverseSegments * phiLength;
+
+    		var sin = Math.sin( phi );
+    		var cos = Math.cos( phi );
+
+    		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
+
+    			// vertex
+    			vertex.x = points[ j ].x * sin;
+    			vertex.y = points[ j ].y;
+    			vertex.z = points[ j ].x * cos;
+    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+    			// uv
+    			uv.x = i / segments;
+    			uv.y = j / ( points.length - 1 );
+    			uvs.setXY( index, uv.x, uv.y );
+
+    			// increase index
+    			index ++;
+
+    		}
+
+    	}
+
+    	// generate indices
+
+    	for ( i = 0; i < segments; i ++ ) {
+
+    		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
+
+    			base = j + i * points.length;
+
+    			// indices
+    			var a = base;
+    			var b = base + points.length;
+    			var c = base + points.length + 1;
+    			var d = base + 1;
+
+    			// face one
+    			indices.setX( indexOffset, a ); indexOffset++;
+    			indices.setX( indexOffset, b ); indexOffset++;
+    			indices.setX( indexOffset, d ); indexOffset++;
+
+    			// face two
+    			indices.setX( indexOffset, b ); indexOffset++;
+    			indices.setX( indexOffset, c ); indexOffset++;
+    			indices.setX( indexOffset, d ); indexOffset++;
+
+    		}
+
+    	}
+
+    	// build geometry
+
+    	this.setIndex( indices );
+    	this.addAttribute( 'position', vertices );
+    	this.addAttribute( 'uv', uvs );
+
+    	// generate normals
+
+    	this.computeVertexNormals();
+
+    	// if the geometry is closed, we need to average the normals along the seam.
+    	// because the corresponding vertices are identical (but still have different UVs).
+
+    	if( phiLength === Math.PI * 2 ) {
+
+    		var normals = this.attributes.normal.array;
+    		var n1 = new Vector3();
+    		var n2 = new Vector3();
+    		var n = new Vector3();
+
+    		// this is the buffer offset for the last line of vertices
+    		base = segments * points.length * 3;
+
+    		for( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+
+    			// select the normal of the vertex in the first line
+    			n1.x = normals[ j + 0 ];
+    			n1.y = normals[ j + 1 ];
+    			n1.z = normals[ j + 2 ];
+
+    			// select the normal of the vertex in the last line
+    			n2.x = normals[ base + j + 0 ];
+    			n2.y = normals[ base + j + 1 ];
+    			n2.z = normals[ base + j + 2 ];
+
+    			// average normals
+    			n.addVectors( n1, n2 ).normalize();
+
+    			// assign the new values to both normals
+    			normals[ j + 0 ] = normals[ base + j + 0 ] = n.x;
+    			normals[ j + 1 ] = normals[ base + j + 1 ] = n.y;
+    			normals[ j + 2 ] = normals[ base + j + 2 ] = n.z;
+
+    		} // next row
+
+    	}
+
+    }
+
+    LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
+
+    /**
+     * @author astrodud / http://astrodud.isgreat.org/
+     * @author zz85 / https://github.com/zz85
+     * @author bhouston / http://clara.io
+     */
+
+    // points - to create a closed torus, one must use a set of points
+    //    like so: [ a, b, c, d, a ], see first is the same as last.
+    // segments - the number of circumference segments to create
+    // phiStart - the starting radian
+    // phiLength - the radian (0 to 2PI) range of the lathed section
+    //    2PI is a closed lathe, less than 2PI is a portion.
+
+    function LatheGeometry( points, segments, phiStart, phiLength ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'LatheGeometry';
+
+    	this.parameters = {
+    		points: points,
+    		segments: segments,
+    		phiStart: phiStart,
+    		phiLength: phiLength
+    	};
+
+    	this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
+    	this.mergeVertices();
+
+    }
+
+    LatheGeometry.prototype = Object.create( Geometry.prototype );
+    LatheGeometry.prototype.constructor = LatheGeometry;
+
+    /**
+     * @author jonobr1 / http://jonobr1.com
+     *
+     * Creates a one-sided polygonal geometry from a path shape. Similar to
+     * ExtrudeGeometry.
+     *
+     * parameters = {
+     *
+     *	curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
+     *
+     *	material: <int> // material index for front and back faces
+     *	uvGenerator: <Object> // object that provides UV generator functions
+     *
+     * }
+     **/
+
+    function ShapeGeometry( shapes, options ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'ShapeGeometry';
+
+    	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
+
+    	this.addShapeList( shapes, options );
+
+    	this.computeFaceNormals();
+
+    }
+
+    ShapeGeometry.prototype = Object.create( Geometry.prototype );
+    ShapeGeometry.prototype.constructor = ShapeGeometry;
+
+    /**
+     * Add an array of shapes to THREE.ShapeGeometry.
+     */
+    ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
+
+    	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+
+    		this.addShape( shapes[ i ], options );
+
+    	}
+
+    	return this;
+
+    };
+
+    /**
+     * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
+     */
+    ShapeGeometry.prototype.addShape = function ( shape, options ) {
+
+    	if ( options === undefined ) options = {};
+    	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+
+    	var material = options.material;
+    	var uvgen = options.UVGenerator === undefined ? ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
+
+    	//
+
+    	var i, l, hole;
+
+    	var shapesOffset = this.vertices.length;
+    	var shapePoints = shape.extractPoints( curveSegments );
+
+    	var vertices = shapePoints.shape;
+    	var holes = shapePoints.holes;
+
+    	var reverse = ! exports.ShapeUtils.isClockWise( vertices );
+
+    	if ( reverse ) {
+
+    		vertices = vertices.reverse();
+
+    		// Maybe we should also check if holes are in the opposite direction, just to be safe...
+
+    		for ( i = 0, l = holes.length; i < l; i ++ ) {
+
+    			hole = holes[ i ];
+
+    			if ( exports.ShapeUtils.isClockWise( hole ) ) {
+
+    				holes[ i ] = hole.reverse();
+
+    			}
+
+    		}
+
+    		reverse = false;
+
+    	}
+
+    	var faces = exports.ShapeUtils.triangulateShape( vertices, holes );
+
+    	// Vertices
+
+    	for ( i = 0, l = holes.length; i < l; i ++ ) {
+
+    		hole = holes[ i ];
+    		vertices = vertices.concat( hole );
+
+    	}
+
+    	//
+
+    	var vert, vlen = vertices.length;
+    	var face, flen = faces.length;
+
+    	for ( i = 0; i < vlen; i ++ ) {
+
+    		vert = vertices[ i ];
+
+    		this.vertices.push( new Vector3( vert.x, vert.y, 0 ) );
+
+    	}
+
+    	for ( i = 0; i < flen; i ++ ) {
+
+    		face = faces[ i ];
+
+    		var a = face[ 0 ] + shapesOffset;
+    		var b = face[ 1 ] + shapesOffset;
+    		var c = face[ 2 ] + shapesOffset;
+
+    		this.faces.push( new Face3( a, b, c, null, null, material ) );
+    		this.faceVertexUvs[ 0 ].push( uvgen.generateTopUV( this, a, b, c ) );
+
+    	}
+
+    };
+
+    /**
+     * @author WestLangley / http://github.com/WestLangley
+     */
+
+    function EdgesGeometry( geometry, thresholdAngle ) {
+
+    	BufferGeometry.call( this );
+
+    	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
+
+    	var thresholdDot = Math.cos( exports.Math.DEG2RAD * thresholdAngle );
+
+    	var edge = [ 0, 0 ], hash = {};
+
+    	function sortFunction( a, b ) {
+
+    		return a - b;
+
+    	}
+
+    	var keys = [ 'a', 'b', 'c' ];
+
+    	var geometry2;
+
+    	if ( (geometry && geometry.isBufferGeometry) ) {
+
+    		geometry2 = new Geometry();
+    		geometry2.fromBufferGeometry( geometry );
+
+    	} else {
+
+    		geometry2 = geometry.clone();
+
+    	}
+
+    	geometry2.mergeVertices();
+    	geometry2.computeFaceNormals();
+
+    	var vertices = geometry2.vertices;
+    	var faces = geometry2.faces;
+
+    	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+    		var face = faces[ i ];
+
+    		for ( var j = 0; j < 3; j ++ ) {
+
+    			edge[ 0 ] = face[ keys[ j ] ];
+    			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
+    			edge.sort( sortFunction );
+
+    			var key = edge.toString();
+
+    			if ( hash[ key ] === undefined ) {
+
+    				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
+
+    			} else {
+
+    				hash[ key ].face2 = i;
+
+    			}
+
+    		}
+
+    	}
+
+    	var coords = [];
+
+    	for ( var key in hash ) {
+
+    		var h = hash[ key ];
+
+    		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
+
+    			var vertex = vertices[ h.vert1 ];
+    			coords.push( vertex.x );
+    			coords.push( vertex.y );
+    			coords.push( vertex.z );
+
+    			vertex = vertices[ h.vert2 ];
+    			coords.push( vertex.x );
+    			coords.push( vertex.y );
+    			coords.push( vertex.z );
+
+    		}
+
+    	}
+
+    	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
+
+    }
+
+    EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
+    EdgesGeometry.prototype.constructor = EdgesGeometry;
+
+    /**
+     * @author Mugen87 / https://github.com/Mugen87
+     */
+
+    function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'CylinderBufferGeometry';
+
+    	this.parameters = {
+    		radiusTop: radiusTop,
+    		radiusBottom: radiusBottom,
+    		height: height,
+    		radialSegments: radialSegments,
+    		heightSegments: heightSegments,
+    		openEnded: openEnded,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	var scope = this;
+
+    	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+    	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+    	height = height !== undefined ? height : 100;
+
+    	radialSegments = Math.floor( radialSegments ) || 8;
+    	heightSegments = Math.floor( heightSegments ) || 1;
+
+    	openEnded = openEnded !== undefined ? openEnded : false;
+    	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
+    	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
+
+    	// used to calculate buffer length
+
+    	var nbCap = 0;
+
+    	if ( openEnded === false ) {
+
+    		if ( radiusTop > 0 ) nbCap ++;
+    		if ( radiusBottom > 0 ) nbCap ++;
+
+    	}
+
+    	var vertexCount = calculateVertexCount();
+    	var indexCount = calculateIndexCount();
+
+    	// buffers
+
+    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
+    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+    	// helper variables
+
+    	var index = 0,
+    	    indexOffset = 0,
+    	    indexArray = [],
+    	    halfHeight = height / 2;
+
+    	// group variables
+    	var groupStart = 0;
+
+    	// generate geometry
+
+    	generateTorso();
+
+    	if ( openEnded === false ) {
+
+    		if ( radiusTop > 0 ) generateCap( true );
+    		if ( radiusBottom > 0 ) generateCap( false );
+
+    	}
+
+    	// build geometry
+
+    	this.setIndex( indices );
+    	this.addAttribute( 'position', vertices );
+    	this.addAttribute( 'normal', normals );
+    	this.addAttribute( 'uv', uvs );
+
+    	// helper functions
+
+    	function calculateVertexCount() {
+
+    		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
+
+    		if ( openEnded === false ) {
+
+    			count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
+
+    		}
+
+    		return count;
+
+    	}
+
+    	function calculateIndexCount() {
+
+    		var count = radialSegments * heightSegments * 2 * 3;
+
+    		if ( openEnded === false ) {
+
+    			count += radialSegments * nbCap * 3;
+
+    		}
+
+    		return count;
+
+    	}
+
+    	function generateTorso() {
+
+    		var x, y;
+    		var normal = new Vector3();
+    		var vertex = new Vector3();
+
+    		var groupCount = 0;
+
+    		// this will be used to calculate the normal
+    		var slope = ( radiusBottom - radiusTop ) / height;
+
+    		// generate vertices, normals and uvs
+
+    		for ( y = 0; y <= heightSegments; y ++ ) {
+
+    			var indexRow = [];
+
+    			var v = y / heightSegments;
+
+    			// calculate the radius of the current row
+    			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+
+    			for ( x = 0; x <= radialSegments; x ++ ) {
+
+    				var u = x / radialSegments;
+
+    				var theta = u * thetaLength + thetaStart;
+
+    				var sinTheta = Math.sin( theta );
+    				var cosTheta = Math.cos( theta );
+
+    				// vertex
+    				vertex.x = radius * sinTheta;
+    				vertex.y = - v * height + halfHeight;
+    				vertex.z = radius * cosTheta;
+    				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+    				// normal
+    				normal.set( sinTheta, slope, cosTheta ).normalize();
+    				normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+    				// uv
+    				uvs.setXY( index, u, 1 - v );
+
+    				// save index of vertex in respective row
+    				indexRow.push( index );
+
+    				// increase index
+    				index ++;
+
+    			}
+
+    			// now save vertices of the row in our index array
+    			indexArray.push( indexRow );
+
+    		}
+
+    		// generate indices
+
+    		for ( x = 0; x < radialSegments; x ++ ) {
+
+    			for ( y = 0; y < heightSegments; y ++ ) {
+
+    				// we use the index array to access the correct indices
+    				var i1 = indexArray[ y ][ x ];
+    				var i2 = indexArray[ y + 1 ][ x ];
+    				var i3 = indexArray[ y + 1 ][ x + 1 ];
+    				var i4 = indexArray[ y ][ x + 1 ];
+
+    				// face one
+    				indices.setX( indexOffset, i1 ); indexOffset ++;
+    				indices.setX( indexOffset, i2 ); indexOffset ++;
+    				indices.setX( indexOffset, i4 ); indexOffset ++;
+
+    				// face two
+    				indices.setX( indexOffset, i2 ); indexOffset ++;
+    				indices.setX( indexOffset, i3 ); indexOffset ++;
+    				indices.setX( indexOffset, i4 ); indexOffset ++;
+
+    				// update counters
+    				groupCount += 6;
+
+    			}
+
+    		}
+
+    		// add a group to the geometry. this will ensure multi material support
+    		scope.addGroup( groupStart, groupCount, 0 );
+
+    		// calculate new start value for groups
+    		groupStart += groupCount;
+
+    	}
+
+    	function generateCap( top ) {
+
+    		var x, centerIndexStart, centerIndexEnd;
+
+    		var uv = new Vector2();
+    		var vertex = new Vector3();
+
+    		var groupCount = 0;
+
+    		var radius = ( top === true ) ? radiusTop : radiusBottom;
+    		var sign = ( top === true ) ? 1 : - 1;
+
+    		// save the index of the first center vertex
+    		centerIndexStart = index;
+
+    		// first we generate the center vertex data of the cap.
+    		// because the geometry needs one set of uvs per face,
+    		// we must generate a center vertex per face/segment
+
+    		for ( x = 1; x <= radialSegments; x ++ ) {
+
+    			// vertex
+    			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+    			// normal
+    			normals.setXYZ( index, 0, sign, 0 );
+
+    			// uv
+    			uv.x = 0.5;
+    			uv.y = 0.5;
+
+    			uvs.setXY( index, uv.x, uv.y );
+
+    			// increase index
+    			index ++;
+
+    		}
+
+    		// save the index of the last center vertex
+    		centerIndexEnd = index;
+
+    		// now we generate the surrounding vertices, normals and uvs
+
+    		for ( x = 0; x <= radialSegments; x ++ ) {
+
+    			var u = x / radialSegments;
+    			var theta = u * thetaLength + thetaStart;
+
+    			var cosTheta = Math.cos( theta );
+    			var sinTheta = Math.sin( theta );
+
+    			// vertex
+    			vertex.x = radius * sinTheta;
+    			vertex.y = halfHeight * sign;
+    			vertex.z = radius * cosTheta;
+    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+    			// normal
+    			normals.setXYZ( index, 0, sign, 0 );
+
+    			// uv
+    			uv.x = ( cosTheta * 0.5 ) + 0.5;
+    			uv.y = ( sinTheta * 0.5 * sign ) + 0.5;
+    			uvs.setXY( index, uv.x, uv.y );
+
+    			// increase index
+    			index ++;
+
+    		}
+
+    		// generate indices
+
+    		for ( x = 0; x < radialSegments; x ++ ) {
+
+    			var c = centerIndexStart + x;
+    			var i = centerIndexEnd + x;
+
+    			if ( top === true ) {
+
+    				// face top
+    				indices.setX( indexOffset, i ); indexOffset ++;
+    				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+    				indices.setX( indexOffset, c ); indexOffset ++;
+
+    			} else {
+
+    				// face bottom
+    				indices.setX( indexOffset, i + 1 ); indexOffset ++;
+    				indices.setX( indexOffset, i ); indexOffset ++;
+    				indices.setX( indexOffset, c ); indexOffset ++;
+
+    			}
+
+    			// update counters
+    			groupCount += 3;
+
+    		}
+
+    		// add a group to the geometry. this will ensure multi material support
+    		scope.addGroup( groupStart, groupCount, top === true ? 1 : 2 );
+
+    		// calculate new start value for groups
+    		groupStart += groupCount;
+
+    	}
+
+    }
+
+    CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     */
+
+    function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'CylinderGeometry';
+
+    	this.parameters = {
+    		radiusTop: radiusTop,
+    		radiusBottom: radiusBottom,
+    		height: height,
+    		radialSegments: radialSegments,
+    		heightSegments: heightSegments,
+    		openEnded: openEnded,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
+    	this.mergeVertices();
+
+    }
+
+    CylinderGeometry.prototype = Object.create( Geometry.prototype );
+    CylinderGeometry.prototype.constructor = CylinderGeometry;
+
+    /**
+     * @author abelnation / http://github.com/abelnation
+     */
+
+    function ConeGeometry(
+    	radius, height,
+    	radialSegments, heightSegments,
+    	openEnded, thetaStart, thetaLength ) {
+
+    	CylinderGeometry.call( this,
+    		0, radius, height,
+    		radialSegments, heightSegments,
+    		openEnded, thetaStart, thetaLength );
+
+    	this.type = 'ConeGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		height: height,
+    		radialSegments: radialSegments,
+    		heightSegments: heightSegments,
+    		openEnded: openEnded,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    }
+
+    ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
+    ConeGeometry.prototype.constructor = ConeGeometry;
+
+    /*
+     * @author: abelnation / http://github.com/abelnation
+     */
+
+    function ConeBufferGeometry(
+    	radius, height,
+    	radialSegments, heightSegments,
+    	openEnded, thetaStart, thetaLength ) {
+
+    	CylinderBufferGeometry.call( this,
+    		0, radius, height,
+    		radialSegments, heightSegments,
+    		openEnded, thetaStart, thetaLength );
+
+    	this.type = 'ConeBufferGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		height: height,
+    		radialSegments: radialSegments,
+    		heightSegments: heightSegments,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    }
+
+    ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
+
+    /**
+     * @author benaadams / https://twitter.com/ben_a_adams
+     */
+
+    function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
+
+    	BufferGeometry.call( this );
+
+    	this.type = 'CircleBufferGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		segments: segments,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	radius = radius || 50;
+    	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+
+    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+    	var vertices = segments + 2;
+
+    	var positions = new Float32Array( vertices * 3 );
+    	var normals = new Float32Array( vertices * 3 );
+    	var uvs = new Float32Array( vertices * 2 );
+
+    	// center data is already zero, but need to set a few extras
+    	normals[ 2 ] = 1.0;
+    	uvs[ 0 ] = 0.5;
+    	uvs[ 1 ] = 0.5;
+
+    	for ( var s = 0, i = 3, ii = 2 ; s <= segments; s ++, i += 3, ii += 2 ) {
+
+    		var segment = thetaStart + s / segments * thetaLength;
+
+    		positions[ i ] = radius * Math.cos( segment );
+    		positions[ i + 1 ] = radius * Math.sin( segment );
+
+    		normals[ i + 2 ] = 1; // normal z
+
+    		uvs[ ii ] = ( positions[ i ] / radius + 1 ) / 2;
+    		uvs[ ii + 1 ] = ( positions[ i + 1 ] / radius + 1 ) / 2;
+
+    	}
+
+    	var indices = [];
+
+    	for ( var i = 1; i <= segments; i ++ ) {
+
+    		indices.push( i, i + 1, 0 );
+
+    	}
+
+    	this.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+    	this.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+
+    	this.boundingSphere = new Sphere( new Vector3(), radius );
+
+    }
+
+    CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+    CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
+
+    /**
+     * @author hughes
+     */
+
+    function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'CircleGeometry';
+
+    	this.parameters = {
+    		radius: radius,
+    		segments: segments,
+    		thetaStart: thetaStart,
+    		thetaLength: thetaLength
+    	};
+
+    	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+
+    }
+
+    CircleGeometry.prototype = Object.create( Geometry.prototype );
+    CircleGeometry.prototype.constructor = CircleGeometry;
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
+     */
+
+    function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+    	Geometry.call( this );
+
+    	this.type = 'BoxGeometry';
+
+    	this.parameters = {
+    		width: width,
+    		height: height,
+    		depth: depth,
+    		widthSegments: widthSegments,
+    		heightSegments: heightSegments,
+    		depthSegments: depthSegments
+    	};
+
+    	this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
+    	this.mergeVertices();
+
+    }
+
+    BoxGeometry.prototype = Object.create( Geometry.prototype );
+    BoxGeometry.prototype.constructor = BoxGeometry;
+
+
+
+    var Geometries = Object.freeze({
+    	WireframeGeometry: WireframeGeometry,
+    	ParametricGeometry: ParametricGeometry,
+    	TetrahedronGeometry: TetrahedronGeometry,
+    	OctahedronGeometry: OctahedronGeometry,
+    	IcosahedronGeometry: IcosahedronGeometry,
+    	DodecahedronGeometry: DodecahedronGeometry,
+    	PolyhedronGeometry: PolyhedronGeometry,
+    	TubeGeometry: TubeGeometry,
+    	TorusKnotGeometry: TorusKnotGeometry,
+    	TorusKnotBufferGeometry: TorusKnotBufferGeometry,
+    	TorusGeometry: TorusGeometry,
+    	TorusBufferGeometry: TorusBufferGeometry,
+    	TextGeometry: TextGeometry,
+    	SphereBufferGeometry: SphereBufferGeometry,
+    	SphereGeometry: SphereGeometry,
+    	RingGeometry: RingGeometry,
+    	RingBufferGeometry: RingBufferGeometry,
+    	PlaneBufferGeometry: PlaneBufferGeometry,
+    	PlaneGeometry: PlaneGeometry,
+    	LatheGeometry: LatheGeometry,
+    	LatheBufferGeometry: LatheBufferGeometry,
+    	ShapeGeometry: ShapeGeometry,
+    	ExtrudeGeometry: ExtrudeGeometry,
+    	EdgesGeometry: EdgesGeometry,
+    	ConeGeometry: ConeGeometry,
+    	ConeBufferGeometry: ConeBufferGeometry,
+    	CylinderGeometry: CylinderGeometry,
+    	CylinderBufferGeometry: CylinderBufferGeometry,
+    	CircleBufferGeometry: CircleBufferGeometry,
+    	CircleGeometry: CircleGeometry,
+    	BoxBufferGeometry: BoxBufferGeometry,
+    	BoxGeometry: BoxGeometry
+    });
+
+    /**
+     * @author mrdoob / http://mrdoob.com/
+     */
+
     function ShadowMaterial() {
 
     	ShaderMaterial.call( this, {
@@ -28360,4120 +32474,6 @@
      * @author mrdoob / http://mrdoob.com/
      */
 
-    function WireframeGeometry( geometry ) {
-
-    	BufferGeometry.call( this );
-
-    	var edge = [ 0, 0 ], hash = {};
-
-    	function sortFunction( a, b ) {
-
-    		return a - b;
-
-    	}
-
-    	var keys = [ 'a', 'b', 'c' ];
-
-    	if ( (geometry && geometry.isGeometry) ) {
-
-    		var vertices = geometry.vertices;
-    		var faces = geometry.faces;
-    		var numEdges = 0;
-
-    		// allocate maximal size
-    		var edges = new Uint32Array( 6 * faces.length );
-
-    		for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-    			var face = faces[ i ];
-
-    			for ( var j = 0; j < 3; j ++ ) {
-
-    				edge[ 0 ] = face[ keys[ j ] ];
-    				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-    				edge.sort( sortFunction );
-
-    				var key = edge.toString();
-
-    				if ( hash[ key ] === undefined ) {
-
-    					edges[ 2 * numEdges ] = edge[ 0 ];
-    					edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-    					hash[ key ] = true;
-    					numEdges ++;
-
-    				}
-
-    			}
-
-    		}
-
-    		var coords = new Float32Array( numEdges * 2 * 3 );
-
-    		for ( var i = 0, l = numEdges; i < l; i ++ ) {
-
-    			for ( var j = 0; j < 2; j ++ ) {
-
-    				var vertex = vertices[ edges [ 2 * i + j ] ];
-
-    				var index = 6 * i + 3 * j;
-    				coords[ index + 0 ] = vertex.x;
-    				coords[ index + 1 ] = vertex.y;
-    				coords[ index + 2 ] = vertex.z;
-
-    			}
-
-    		}
-
-    		this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
-    	} else if ( (geometry && geometry.isBufferGeometry) ) {
-
-    		if ( geometry.index !== null ) {
-
-    			// Indexed BufferGeometry
-
-    			var indices = geometry.index.array;
-    			var vertices = geometry.attributes.position;
-    			var groups = geometry.groups;
-    			var numEdges = 0;
-
-    			if ( groups.length === 0 ) {
-
-    				geometry.addGroup( 0, indices.length );
-
-    			}
-
-    			// allocate maximal size
-    			var edges = new Uint32Array( 2 * indices.length );
-
-    			for ( var o = 0, ol = groups.length; o < ol; ++ o ) {
-
-    				var group = groups[ o ];
-
-    				var start = group.start;
-    				var count = group.count;
-
-    				for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-    					for ( var j = 0; j < 3; j ++ ) {
-
-    						edge[ 0 ] = indices[ i + j ];
-    						edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
-    						edge.sort( sortFunction );
-
-    						var key = edge.toString();
-
-    						if ( hash[ key ] === undefined ) {
-
-    							edges[ 2 * numEdges ] = edge[ 0 ];
-    							edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-    							hash[ key ] = true;
-    							numEdges ++;
-
-    						}
-
-    					}
-
-    				}
-
-    			}
-
-    			var coords = new Float32Array( numEdges * 2 * 3 );
-
-    			for ( var i = 0, l = numEdges; i < l; i ++ ) {
-
-    				for ( var j = 0; j < 2; j ++ ) {
-
-    					var index = 6 * i + 3 * j;
-    					var index2 = edges[ 2 * i + j ];
-
-    					coords[ index + 0 ] = vertices.getX( index2 );
-    					coords[ index + 1 ] = vertices.getY( index2 );
-    					coords[ index + 2 ] = vertices.getZ( index2 );
-
-    				}
-
-    			}
-
-    			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
-    		} else {
-
-    			// non-indexed BufferGeometry
-
-    			var vertices = geometry.attributes.position.array;
-    			var numEdges = vertices.length / 3;
-    			var numTris = numEdges / 3;
-
-    			var coords = new Float32Array( numEdges * 2 * 3 );
-
-    			for ( var i = 0, l = numTris; i < l; i ++ ) {
-
-    				for ( var j = 0; j < 3; j ++ ) {
-
-    					var index = 18 * i + 6 * j;
-
-    					var index1 = 9 * i + 3 * j;
-    					coords[ index + 0 ] = vertices[ index1 ];
-    					coords[ index + 1 ] = vertices[ index1 + 1 ];
-    					coords[ index + 2 ] = vertices[ index1 + 2 ];
-
-    					var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
-    					coords[ index + 3 ] = vertices[ index2 ];
-    					coords[ index + 4 ] = vertices[ index2 + 1 ];
-    					coords[ index + 5 ] = vertices[ index2 + 2 ];
-
-    				}
-
-    			}
-
-    			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
-    		}
-
-    	}
-
-    }
-
-    WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
-    WireframeGeometry.prototype.constructor = WireframeGeometry;
-
-    /**
-     * @author zz85 / https://github.com/zz85
-     * Parametric Surfaces Geometry
-     * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
-     *
-     * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements );
-     *
-     */
-
-    function ParametricGeometry( func, slices, stacks ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'ParametricGeometry';
-
-    	this.parameters = {
-    		func: func,
-    		slices: slices,
-    		stacks: stacks
-    	};
-
-    	var verts = this.vertices;
-    	var faces = this.faces;
-    	var uvs = this.faceVertexUvs[ 0 ];
-
-    	var i, j, p;
-    	var u, v;
-
-    	var sliceCount = slices + 1;
-
-    	for ( i = 0; i <= stacks; i ++ ) {
-
-    		v = i / stacks;
-
-    		for ( j = 0; j <= slices; j ++ ) {
-
-    			u = j / slices;
-
-    			p = func( u, v );
-    			verts.push( p );
-
-    		}
-
-    	}
-
-    	var a, b, c, d;
-    	var uva, uvb, uvc, uvd;
-
-    	for ( i = 0; i < stacks; i ++ ) {
-
-    		for ( j = 0; j < slices; j ++ ) {
-
-    			a = i * sliceCount + j;
-    			b = i * sliceCount + j + 1;
-    			c = ( i + 1 ) * sliceCount + j + 1;
-    			d = ( i + 1 ) * sliceCount + j;
-
-    			uva = new Vector2( j / slices, i / stacks );
-    			uvb = new Vector2( ( j + 1 ) / slices, i / stacks );
-    			uvc = new Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
-    			uvd = new Vector2( j / slices, ( i + 1 ) / stacks );
-
-    			faces.push( new Face3( a, b, d ) );
-    			uvs.push( [ uva, uvb, uvd ] );
-
-    			faces.push( new Face3( b, c, d ) );
-    			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-    		}
-
-    	}
-
-    	// console.log(this);
-
-    	// magic bullet
-    	// var diff = this.mergeVertices();
-    	// console.log('removed ', diff, ' vertices by merging');
-
-    	this.computeFaceNormals();
-    	this.computeVertexNormals();
-
-    }
-
-    ParametricGeometry.prototype = Object.create( Geometry.prototype );
-    ParametricGeometry.prototype.constructor = ParametricGeometry;
-
-    /**
-     * @author clockworkgeek / https://github.com/clockworkgeek
-     * @author timothypratley / https://github.com/timothypratley
-     * @author WestLangley / http://github.com/WestLangley
-    */
-
-    function PolyhedronGeometry( vertices, indices, radius, detail ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'PolyhedronGeometry';
-
-    	this.parameters = {
-    		vertices: vertices,
-    		indices: indices,
-    		radius: radius,
-    		detail: detail
-    	};
-
-    	radius = radius || 1;
-    	detail = detail || 0;
-
-    	var that = this;
-
-    	for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
-
-    		prepare( new Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
-
-    	}
-
-    	var p = this.vertices;
-
-    	var faces = [];
-
-    	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
-
-    		var v1 = p[ indices[ i ] ];
-    		var v2 = p[ indices[ i + 1 ] ];
-    		var v3 = p[ indices[ i + 2 ] ];
-
-    		faces[ j ] = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-
-    	}
-
-    	var centroid = new Vector3();
-
-    	for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-    		subdivide( faces[ i ], detail );
-
-    	}
-
-
-    	// Handle case when face straddles the seam
-
-    	for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
-
-    		var uvs = this.faceVertexUvs[ 0 ][ i ];
-
-    		var x0 = uvs[ 0 ].x;
-    		var x1 = uvs[ 1 ].x;
-    		var x2 = uvs[ 2 ].x;
-
-    		var max = Math.max( x0, x1, x2 );
-    		var min = Math.min( x0, x1, x2 );
-
-    		if ( max > 0.9 && min < 0.1 ) {
-
-    			// 0.9 is somewhat arbitrary
-
-    			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
-    			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
-    			if ( x2 < 0.2 ) uvs[ 2 ].x += 1;
-
-    		}
-
-    	}
-
-
-    	// Apply radius
-
-    	for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-    		this.vertices[ i ].multiplyScalar( radius );
-
-    	}
-
-
-    	// Merge vertices
-
-    	this.mergeVertices();
-
-    	this.computeFaceNormals();
-
-    	this.boundingSphere = new Sphere( new Vector3(), radius );
-
-
-    	// Project vector onto sphere's surface
-
-    	function prepare( vector ) {
-
-    		var vertex = vector.normalize().clone();
-    		vertex.index = that.vertices.push( vertex ) - 1;
-
-    		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
-
-    		var u = azimuth( vector ) / 2 / Math.PI + 0.5;
-    		var v = inclination( vector ) / Math.PI + 0.5;
-    		vertex.uv = new Vector2( u, 1 - v );
-
-    		return vertex;
-
-    	}
-
-
-    	// Approximate a curved face with recursively sub-divided triangles.
-
-    	function make( v1, v2, v3 ) {
-
-    		var face = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-    		that.faces.push( face );
-
-    		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
-
-    		var azi = azimuth( centroid );
-
-    		that.faceVertexUvs[ 0 ].push( [
-    			correctUV( v1.uv, v1, azi ),
-    			correctUV( v2.uv, v2, azi ),
-    			correctUV( v3.uv, v3, azi )
-    		] );
-
-    	}
-
-
-    	// Analytically subdivide a face to the required detail level.
-
-    	function subdivide( face, detail ) {
-
-    		var cols = Math.pow( 2, detail );
-    		var a = prepare( that.vertices[ face.a ] );
-    		var b = prepare( that.vertices[ face.b ] );
-    		var c = prepare( that.vertices[ face.c ] );
-    		var v = [];
-
-    		// Construct all of the vertices for this subdivision.
-
-    		for ( var i = 0 ; i <= cols; i ++ ) {
-
-    			v[ i ] = [];
-
-    			var aj = prepare( a.clone().lerp( c, i / cols ) );
-    			var bj = prepare( b.clone().lerp( c, i / cols ) );
-    			var rows = cols - i;
-
-    			for ( var j = 0; j <= rows; j ++ ) {
-
-    				if ( j === 0 && i === cols ) {
-
-    					v[ i ][ j ] = aj;
-
-    				} else {
-
-    					v[ i ][ j ] = prepare( aj.clone().lerp( bj, j / rows ) );
-
-    				}
-
-    			}
-
-    		}
-
-    		// Construct all of the faces.
-
-    		for ( var i = 0; i < cols ; i ++ ) {
-
-    			for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
-
-    				var k = Math.floor( j / 2 );
-
-    				if ( j % 2 === 0 ) {
-
-    					make(
-    						v[ i ][ k + 1 ],
-    						v[ i + 1 ][ k ],
-    						v[ i ][ k ]
-    					);
-
-    				} else {
-
-    					make(
-    						v[ i ][ k + 1 ],
-    						v[ i + 1 ][ k + 1 ],
-    						v[ i + 1 ][ k ]
-    					);
-
-    				}
-
-    			}
-
-    		}
-
-    	}
-
-
-    	// Angle around the Y axis, counter-clockwise when looking from above.
-
-    	function azimuth( vector ) {
-
-    		return Math.atan2( vector.z, - vector.x );
-
-    	}
-
-
-    	// Angle above the XZ plane.
-
-    	function inclination( vector ) {
-
-    		return Math.atan2( - vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
-
-    	}
-
-
-    	// Texture fixing helper. Spheres have some odd behaviours.
-
-    	function correctUV( uv, vector, azimuth ) {
-
-    		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new Vector2( uv.x - 1, uv.y );
-    		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
-    		return uv.clone();
-
-    	}
-
-    }
-
-    PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
-    PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
-
-    /**
-     * @author timothypratley / https://github.com/timothypratley
-     */
-
-    function TetrahedronGeometry( radius, detail ) {
-
-    	var vertices = [
-    		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
-    	];
-
-    	var indices = [
-    		 2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
-    	];
-
-    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
-
-    	this.type = 'TetrahedronGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		detail: detail
-    	};
-
-    }
-
-    TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-    TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
-
-    /**
-     * @author timothypratley / https://github.com/timothypratley
-     */
-
-    function OctahedronGeometry( radius, detail ) {
-
-    	var vertices = [
-    		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
-    	];
-
-    	var indices = [
-    		0, 2, 4,    0, 4, 3,    0, 3, 5,    0, 5, 2,    1, 2, 5,    1, 5, 3,    1, 3, 4,    1, 4, 2
-    	];
-
-    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
-
-    	this.type = 'OctahedronGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		detail: detail
-    	};
-
-    }
-
-    OctahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-    OctahedronGeometry.prototype.constructor = OctahedronGeometry;
-
-    /**
-     * @author timothypratley / https://github.com/timothypratley
-     */
-
-    function IcosahedronGeometry( radius, detail ) {
-
-    	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
-
-    	var vertices = [
-    		- 1,  t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,
-    		 0, - 1,  t,    0,  1,  t,    0, - 1, - t,    0,  1, - t,
-    		 t,  0, - 1,    t,  0,  1,   - t,  0, - 1,   - t,  0,  1
-    	];
-
-    	var indices = [
-    		 0, 11,  5,    0,  5,  1,    0,  1,  7,    0,  7, 10,    0, 10, 11,
-    		 1,  5,  9,    5, 11,  4,   11, 10,  2,   10,  7,  6,    7,  1,  8,
-    		 3,  9,  4,    3,  4,  2,    3,  2,  6,    3,  6,  8,    3,  8,  9,
-    		 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
-    	];
-
-    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
-
-    	this.type = 'IcosahedronGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		detail: detail
-    	};
-
-    }
-
-    IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-    IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
-
-    /**
-     * @author Abe Pazos / https://hamoid.com
-     */
-
-    function DodecahedronGeometry( radius, detail ) {
-
-    	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
-    	var r = 1 / t;
-
-    	var vertices = [
-
-    		// (±1, ±1, ±1)
-    		- 1, - 1, - 1,    - 1, - 1,  1,
-    		- 1,  1, - 1,    - 1,  1,  1,
-    		 1, - 1, - 1,     1, - 1,  1,
-    		 1,  1, - 1,     1,  1,  1,
-
-    		// (0, ±1/φ, ±φ)
-    		 0, - r, - t,     0, - r,  t,
-    		 0,  r, - t,     0,  r,  t,
-
-    		// (±1/φ, ±φ, 0)
-    		- r, - t,  0,    - r,  t,  0,
-    		 r, - t,  0,     r,  t,  0,
-
-    		// (±φ, 0, ±1/φ)
-    		- t,  0, - r,     t,  0, - r,
-    		- t,  0,  r,     t,  0,  r
-    	];
-
-    	var indices = [
-    		 3, 11,  7,      3,  7, 15,      3, 15, 13,
-    		 7, 19, 17,      7, 17,  6,      7,  6, 15,
-    		17,  4,  8,     17,  8, 10,     17, 10,  6,
-    		 8,  0, 16,      8, 16,  2,      8,  2, 10,
-    		 0, 12,  1,      0,  1, 18,      0, 18, 16,
-    		 6, 10,  2,      6,  2, 13,      6, 13, 15,
-    		 2, 16, 18,      2, 18,  3,      2,  3, 13,
-    		18,  1,  9,     18,  9, 11,     18, 11,  3,
-    		 4, 14, 12,      4, 12,  0,      4,  0,  8,
-    		11,  9,  5,     11,  5, 19,     11, 19,  7,
-    		19,  5, 14,     19, 14,  4,     19,  4, 17,
-    		 1, 12, 14,      1, 14,  5,      1,  5,  9
-    	];
-
-    	PolyhedronGeometry.call( this, vertices, indices, radius, detail );
-
-    	this.type = 'DodecahedronGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		detail: detail
-    	};
-
-    }
-
-    DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-    DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
-
-    /**
-     * @author WestLangley / https://github.com/WestLangley
-     * @author zz85 / https://github.com/zz85
-     * @author miningold / https://github.com/miningold
-     * @author jonobr1 / https://github.com/jonobr1
-     *
-     * Modified from the TorusKnotGeometry by @oosmoxiecode
-     *
-     * Creates a tube which extrudes along a 3d spline
-     *
-     * Uses parallel transport frames as described in
-     * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
-     */
-
-    function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'TubeGeometry';
-
-    	this.parameters = {
-    		path: path,
-    		segments: segments,
-    		radius: radius,
-    		radialSegments: radialSegments,
-    		closed: closed,
-    		taper: taper
-    	};
-
-    	segments = segments || 64;
-    	radius = radius || 1;
-    	radialSegments = radialSegments || 8;
-    	closed = closed || false;
-    	taper = taper || TubeGeometry.NoTaper;
-
-    	var grid = [];
-
-    	var scope = this,
-
-    		tangent,
-    		normal,
-    		binormal,
-
-    		numpoints = segments + 1,
-
-    		u, v, r,
-
-    		cx, cy,
-    		pos, pos2 = new Vector3(),
-    		i, j,
-    		ip, jp,
-    		a, b, c, d,
-    		uva, uvb, uvc, uvd;
-
-    	var frames = new TubeGeometry.FrenetFrames( path, segments, closed ),
-    		tangents = frames.tangents,
-    		normals = frames.normals,
-    		binormals = frames.binormals;
-
-    	// proxy internals
-    	this.tangents = tangents;
-    	this.normals = normals;
-    	this.binormals = binormals;
-
-    	function vert( x, y, z ) {
-
-    		return scope.vertices.push( new Vector3( x, y, z ) ) - 1;
-
-    	}
-
-    	// construct the grid
-
-    	for ( i = 0; i < numpoints; i ++ ) {
-
-    		grid[ i ] = [];
-
-    		u = i / ( numpoints - 1 );
-
-    		pos = path.getPointAt( u );
-
-    		tangent = tangents[ i ];
-    		normal = normals[ i ];
-    		binormal = binormals[ i ];
-
-    		r = radius * taper( u );
-
-    		for ( j = 0; j < radialSegments; j ++ ) {
-
-    			v = j / radialSegments * 2 * Math.PI;
-
-    			cx = - r * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-    			cy = r * Math.sin( v );
-
-    			pos2.copy( pos );
-    			pos2.x += cx * normal.x + cy * binormal.x;
-    			pos2.y += cx * normal.y + cy * binormal.y;
-    			pos2.z += cx * normal.z + cy * binormal.z;
-
-    			grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
-
-    		}
-
-    	}
-
-
-    	// construct the mesh
-
-    	for ( i = 0; i < segments; i ++ ) {
-
-    		for ( j = 0; j < radialSegments; j ++ ) {
-
-    			ip = ( closed ) ? ( i + 1 ) % segments : i + 1;
-    			jp = ( j + 1 ) % radialSegments;
-
-    			a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
-    			b = grid[ ip ][ j ];
-    			c = grid[ ip ][ jp ];
-    			d = grid[ i ][ jp ];
-
-    			uva = new Vector2( i / segments, j / radialSegments );
-    			uvb = new Vector2( ( i + 1 ) / segments, j / radialSegments );
-    			uvc = new Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
-    			uvd = new Vector2( i / segments, ( j + 1 ) / radialSegments );
-
-    			this.faces.push( new Face3( a, b, d ) );
-    			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-    			this.faces.push( new Face3( b, c, d ) );
-    			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-    		}
-
-    	}
-
-    	this.computeFaceNormals();
-    	this.computeVertexNormals();
-
-    }
-
-    TubeGeometry.prototype = Object.create( Geometry.prototype );
-    TubeGeometry.prototype.constructor = TubeGeometry;
-
-    TubeGeometry.NoTaper = function ( u ) {
-
-    	return 1;
-
-    };
-
-    TubeGeometry.SinusoidalTaper = function ( u ) {
-
-    	return Math.sin( Math.PI * u );
-
-    };
-
-    // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-    TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
-
-    	var	normal = new Vector3(),
-
-    		tangents = [],
-    		normals = [],
-    		binormals = [],
-
-    		vec = new Vector3(),
-    		mat = new Matrix4(),
-
-    		numpoints = segments + 1,
-    		theta,
-    		smallest,
-
-    		tx, ty, tz,
-    		i, u;
-
-
-    	// expose internals
-    	this.tangents = tangents;
-    	this.normals = normals;
-    	this.binormals = binormals;
-
-    	// compute the tangent vectors for each segment on the path
-
-    	for ( i = 0; i < numpoints; i ++ ) {
-
-    		u = i / ( numpoints - 1 );
-
-    		tangents[ i ] = path.getTangentAt( u );
-    		tangents[ i ].normalize();
-
-    	}
-
-    	initialNormal3();
-
-    	/*
-    	function initialNormal1(lastBinormal) {
-    		// fixed start binormal. Has dangers of 0 vectors
-    		normals[ 0 ] = new THREE.Vector3();
-    		binormals[ 0 ] = new THREE.Vector3();
-    		if (lastBinormal===undefined) lastBinormal = new THREE.Vector3( 0, 0, 1 );
-    		normals[ 0 ].crossVectors( lastBinormal, tangents[ 0 ] ).normalize();
-    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
-    	}
-
-    	function initialNormal2() {
-
-    		// This uses the Frenet-Serret formula for deriving binormal
-    		var t2 = path.getTangentAt( epsilon );
-
-    		normals[ 0 ] = new THREE.Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
-    		binormals[ 0 ] = new THREE.Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
-
-    		normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
-    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
-
-    	}
-    	*/
-
-    	function initialNormal3() {
-
-    		// select an initial normal vector perpendicular to the first tangent vector,
-    		// and in the direction of the smallest tangent xyz component
-
-    		normals[ 0 ] = new Vector3();
-    		binormals[ 0 ] = new Vector3();
-    		smallest = Number.MAX_VALUE;
-    		tx = Math.abs( tangents[ 0 ].x );
-    		ty = Math.abs( tangents[ 0 ].y );
-    		tz = Math.abs( tangents[ 0 ].z );
-
-    		if ( tx <= smallest ) {
-
-    			smallest = tx;
-    			normal.set( 1, 0, 0 );
-
-    		}
-
-    		if ( ty <= smallest ) {
-
-    			smallest = ty;
-    			normal.set( 0, 1, 0 );
-
-    		}
-
-    		if ( tz <= smallest ) {
-
-    			normal.set( 0, 0, 1 );
-
-    		}
-
-    		vec.crossVectors( tangents[ 0 ], normal ).normalize();
-
-    		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
-    		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
-
-    	}
-
-
-    	// compute the slowly-varying normal and binormal vectors for each segment on the path
-
-    	for ( i = 1; i < numpoints; i ++ ) {
-
-    		normals[ i ] = normals[ i - 1 ].clone();
-
-    		binormals[ i ] = binormals[ i - 1 ].clone();
-
-    		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
-
-    		if ( vec.length() > Number.EPSILON ) {
-
-    			vec.normalize();
-
-    			theta = Math.acos( exports.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
-
-    			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
-
-    		}
-
-    		binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
-
-    	}
-
-
-    	// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
-
-    	if ( closed ) {
-
-    		theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
-    		theta /= ( numpoints - 1 );
-
-    		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
-
-    			theta = - theta;
-
-    		}
-
-    		for ( i = 1; i < numpoints; i ++ ) {
-
-    			// twist a little...
-    			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
-    			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
-
-    		}
-
-    	}
-
-    };
-
-    /**
-     * @author Mugen87 / https://github.com/Mugen87
-     *
-     * see: http://www.blackpawn.com/texts/pqtorus/
-     */
-    function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'TorusKnotBufferGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		tube: tube,
-    		tubularSegments: tubularSegments,
-    		radialSegments: radialSegments,
-    		p: p,
-    		q: q
-    	};
-
-    	radius = radius || 100;
-    	tube = tube || 40;
-    	tubularSegments = Math.floor( tubularSegments ) || 64;
-    	radialSegments = Math.floor( radialSegments ) || 8;
-    	p = p || 2;
-    	q = q || 3;
-
-    	// used to calculate buffer length
-    	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-    	var indexCount = radialSegments * tubularSegments * 2 * 3;
-
-    	// buffers
-    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
-
-    	// helper variables
-    	var i, j, index = 0, indexOffset = 0;
-
-    	var vertex = new Vector3();
-    	var normal = new Vector3();
-    	var uv = new Vector2();
-
-    	var P1 = new Vector3();
-    	var P2 = new Vector3();
-
-    	var B = new Vector3();
-    	var T = new Vector3();
-    	var N = new Vector3();
-
-    	// generate vertices, normals and uvs
-
-    	for ( i = 0; i <= tubularSegments; ++ i ) {
-
-    		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
-
-    		var u = i / tubularSegments * p * Math.PI * 2;
-
-    		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
-    		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
-
-    		calculatePositionOnCurve( u, p, q, radius, P1 );
-    		calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
-
-    		// calculate orthonormal basis
-
-    		T.subVectors( P2, P1 );
-    		N.addVectors( P2, P1 );
-    		B.crossVectors( T, N );
-    		N.crossVectors( B, T );
-
-    		// normalize B, N. T can be ignored, we don't use it
-
-    		B.normalize();
-    		N.normalize();
-
-    		for ( j = 0; j <= radialSegments; ++ j ) {
-
-    			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
-    			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
-
-    			var v = j / radialSegments * Math.PI * 2;
-    			var cx = - tube * Math.cos( v );
-    			var cy = tube * Math.sin( v );
-
-    			// now calculate the final vertex position.
-    			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
-
-    			vertex.x = P1.x + ( cx * N.x + cy * B.x );
-    			vertex.y = P1.y + ( cx * N.y + cy * B.y );
-    			vertex.z = P1.z + ( cx * N.z + cy * B.z );
-
-    			// vertex
-    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
-
-    			// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
-    			normal.subVectors( vertex, P1 ).normalize();
-    			normals.setXYZ( index, normal.x, normal.y, normal.z );
-
-    			// uv
-    			uv.x = i / tubularSegments;
-    			uv.y = j / radialSegments;
-    			uvs.setXY( index, uv.x, uv.y );
-
-    			// increase index
-    			index ++;
-
-    		}
-
-    	}
-
-    	// generate indices
-
-    	for ( j = 1; j <= tubularSegments; j ++ ) {
-
-    		for ( i = 1; i <= radialSegments; i ++ ) {
-
-    			// indices
-    			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-    			var b = ( radialSegments + 1 ) * j + ( i - 1 );
-    			var c = ( radialSegments + 1 ) * j + i;
-    			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
-
-    			// face one
-    			indices.setX( indexOffset, a ); indexOffset++;
-    			indices.setX( indexOffset, b ); indexOffset++;
-    			indices.setX( indexOffset, d ); indexOffset++;
-
-    			// face two
-    			indices.setX( indexOffset, b ); indexOffset++;
-    			indices.setX( indexOffset, c ); indexOffset++;
-    			indices.setX( indexOffset, d ); indexOffset++;
-
-    		}
-
-    	}
-
-    	// build geometry
-
-    	this.setIndex( indices );
-    	this.addAttribute( 'position', vertices );
-    	this.addAttribute( 'normal', normals );
-    	this.addAttribute( 'uv', uvs );
-
-    	// this function calculates the current position on the torus curve
-
-    	function calculatePositionOnCurve( u, p, q, radius, position ) {
-
-    		var cu = Math.cos( u );
-    		var su = Math.sin( u );
-    		var quOverP = q / p * u;
-    		var cs = Math.cos( quOverP );
-
-    		position.x = radius * ( 2 + cs ) * 0.5 * cu;
-    		position.y = radius * ( 2 + cs ) * su * 0.5;
-    		position.z = radius * Math.sin( quOverP ) * 0.5;
-
-    	}
-
-    }
-
-    TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
-
-    /**
-     * @author oosmoxiecode
-     */
-
-    function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'TorusKnotGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		tube: tube,
-    		tubularSegments: tubularSegments,
-    		radialSegments: radialSegments,
-    		p: p,
-    		q: q
-    	};
-
-    	if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
-
-    	this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
-    	this.mergeVertices();
-
-    }
-
-    TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
-    TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
-
-    /**
-     * @author Mugen87 / https://github.com/Mugen87
-     */
-
-    function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'TorusBufferGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		tube: tube,
-    		radialSegments: radialSegments,
-    		tubularSegments: tubularSegments,
-    		arc: arc
-    	};
-
-    	radius = radius || 100;
-    	tube = tube || 40;
-    	radialSegments = Math.floor( radialSegments ) || 8;
-    	tubularSegments = Math.floor( tubularSegments ) || 6;
-    	arc = arc || Math.PI * 2;
-
-    	// used to calculate buffer length
-    	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-    	var indexCount = radialSegments * tubularSegments * 2 * 3;
-
-    	// buffers
-    	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
-    	var vertices = new Float32Array( vertexCount * 3 );
-    	var normals = new Float32Array( vertexCount * 3 );
-    	var uvs = new Float32Array( vertexCount * 2 );
-
-    	// offset variables
-    	var vertexBufferOffset = 0;
-    	var uvBufferOffset = 0;
-    	var indexBufferOffset = 0;
-
-    	// helper variables
-    	var center = new Vector3();
-    	var vertex = new Vector3();
-    	var normal = new Vector3();
-
-    	var j, i;
-
-    	// generate vertices, normals and uvs
-
-    	for ( j = 0; j <= radialSegments; j ++ ) {
-
-    		for ( i = 0; i <= tubularSegments; i ++ ) {
-
-    			var u = i / tubularSegments * arc;
-    			var v = j / radialSegments * Math.PI * 2;
-
-    			// vertex
-    			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
-    			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
-    			vertex.z = tube * Math.sin( v );
-
-    			vertices[ vertexBufferOffset ] = vertex.x;
-    			vertices[ vertexBufferOffset + 1 ] = vertex.y;
-    			vertices[ vertexBufferOffset + 2 ] = vertex.z;
-
-    			// this vector is used to calculate the normal
-    			center.x = radius * Math.cos( u );
-    			center.y = radius * Math.sin( u );
-
-    			// normal
-    			normal.subVectors( vertex, center ).normalize();
-
-    			normals[ vertexBufferOffset ] = normal.x;
-    			normals[ vertexBufferOffset + 1 ] = normal.y;
-    			normals[ vertexBufferOffset + 2 ] = normal.z;
-
-    			// uv
-    			uvs[ uvBufferOffset ] = i / tubularSegments;
-    			uvs[ uvBufferOffset + 1 ] = j / radialSegments;
-
-    			// update offsets
-    			vertexBufferOffset += 3;
-    			uvBufferOffset += 2;
-
-    		}
-
-    	}
-
-    	// generate indices
-
-    	for ( j = 1; j <= radialSegments; j ++ ) {
-
-    		for ( i = 1; i <= tubularSegments; i ++ ) {
-
-    			// indices
-    			var a = ( tubularSegments + 1 ) * j + i - 1;
-    			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-    			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-    			var d = ( tubularSegments + 1 ) * j + i;
-
-    			// face one
-    			indices[ indexBufferOffset ] = a;
-    			indices[ indexBufferOffset + 1 ] = b;
-    			indices[ indexBufferOffset + 2 ] = d;
-
-    			// face two
-    			indices[ indexBufferOffset + 3 ] = b;
-    			indices[ indexBufferOffset + 4 ] = c;
-    			indices[ indexBufferOffset + 5 ] = d;
-
-    			// update offset
-    			indexBufferOffset += 6;
-
-    		}
-
-    	}
-
-    	// build geometry
-    	this.setIndex( new BufferAttribute( indices, 1 ) );
-    	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
-
-    }
-
-    TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
-
-    /**
-     * @author oosmoxiecode
-     * @author mrdoob / http://mrdoob.com/
-     * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
-     */
-
-    function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'TorusGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		tube: tube,
-    		radialSegments: radialSegments,
-    		tubularSegments: tubularSegments,
-    		arc: arc
-    	};
-
-    	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
-
-    }
-
-    TorusGeometry.prototype = Object.create( Geometry.prototype );
-    TorusGeometry.prototype.constructor = TorusGeometry;
-
-    /**
-     * @author zz85 / http://www.lab4games.net/zz85/blog
-     */
-
-    exports.ShapeUtils = {
-
-    	// calculate area of the contour polygon
-
-    	area: function ( contour ) {
-
-    		var n = contour.length;
-    		var a = 0.0;
-
-    		for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
-
-    			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
-
-    		}
-
-    		return a * 0.5;
-
-    	},
-
-    	triangulate: ( function () {
-
-    		/**
-    		 * This code is a quick port of code written in C++ which was submitted to
-    		 * flipcode.com by John W. Ratcliff  // July 22, 2000
-    		 * See original code and more information here:
-    		 * http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
-    		 *
-    		 * ported to actionscript by Zevan Rosser
-    		 * www.actionsnippet.com
-    		 *
-    		 * ported to javascript by Joshua Koo
-    		 * http://www.lab4games.net/zz85/blog
-    		 *
-    		 */
-
-    		function snip( contour, u, v, w, n, verts ) {
-
-    			var p;
-    			var ax, ay, bx, by;
-    			var cx, cy, px, py;
-
-    			ax = contour[ verts[ u ] ].x;
-    			ay = contour[ verts[ u ] ].y;
-
-    			bx = contour[ verts[ v ] ].x;
-    			by = contour[ verts[ v ] ].y;
-
-    			cx = contour[ verts[ w ] ].x;
-    			cy = contour[ verts[ w ] ].y;
-
-    			if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
-
-    			var aX, aY, bX, bY, cX, cY;
-    			var apx, apy, bpx, bpy, cpx, cpy;
-    			var cCROSSap, bCROSScp, aCROSSbp;
-
-    			aX = cx - bx;  aY = cy - by;
-    			bX = ax - cx;  bY = ay - cy;
-    			cX = bx - ax;  cY = by - ay;
-
-    			for ( p = 0; p < n; p ++ ) {
-
-    				px = contour[ verts[ p ] ].x;
-    				py = contour[ verts[ p ] ].y;
-
-    				if ( ( ( px === ax ) && ( py === ay ) ) ||
-    					 ( ( px === bx ) && ( py === by ) ) ||
-    					 ( ( px === cx ) && ( py === cy ) ) )	continue;
-
-    				apx = px - ax;  apy = py - ay;
-    				bpx = px - bx;  bpy = py - by;
-    				cpx = px - cx;  cpy = py - cy;
-
-    				// see if p is inside triangle abc
-
-    				aCROSSbp = aX * bpy - aY * bpx;
-    				cCROSSap = cX * apy - cY * apx;
-    				bCROSScp = bX * cpy - bY * cpx;
-
-    				if ( ( aCROSSbp >= - Number.EPSILON ) && ( bCROSScp >= - Number.EPSILON ) && ( cCROSSap >= - Number.EPSILON ) ) return false;
-
-    			}
-
-    			return true;
-
-    		}
-
-    		// takes in an contour array and returns
-
-    		return function triangulate( contour, indices ) {
-
-    			var n = contour.length;
-
-    			if ( n < 3 ) return null;
-
-    			var result = [],
-    				verts = [],
-    				vertIndices = [];
-
-    			/* we want a counter-clockwise polygon in verts */
-
-    			var u, v, w;
-
-    			if ( exports.ShapeUtils.area( contour ) > 0.0 ) {
-
-    				for ( v = 0; v < n; v ++ ) verts[ v ] = v;
-
-    			} else {
-
-    				for ( v = 0; v < n; v ++ ) verts[ v ] = ( n - 1 ) - v;
-
-    			}
-
-    			var nv = n;
-
-    			/*  remove nv - 2 vertices, creating 1 triangle every time */
-
-    			var count = 2 * nv;   /* error detection */
-
-    			for ( v = nv - 1; nv > 2; ) {
-
-    				/* if we loop, it is probably a non-simple polygon */
-
-    				if ( ( count -- ) <= 0 ) {
-
-    					//** Triangulate: ERROR - probable bad polygon!
-
-    					//throw ( "Warning, unable to triangulate polygon!" );
-    					//return null;
-    					// Sometimes warning is fine, especially polygons are triangulated in reverse.
-    					console.warn( 'THREE.ShapeUtils: Unable to triangulate polygon! in triangulate()' );
-
-    					if ( indices ) return vertIndices;
-    					return result;
-
-    				}
-
-    				/* three consecutive vertices in current polygon, <u,v,w> */
-
-    				u = v; 	 	if ( nv <= u ) u = 0;     /* previous */
-    				v = u + 1;  if ( nv <= v ) v = 0;     /* new v    */
-    				w = v + 1;  if ( nv <= w ) w = 0;     /* next     */
-
-    				if ( snip( contour, u, v, w, nv, verts ) ) {
-
-    					var a, b, c, s, t;
-
-    					/* true names of the vertices */
-
-    					a = verts[ u ];
-    					b = verts[ v ];
-    					c = verts[ w ];
-
-    					/* output Triangle */
-
-    					result.push( [ contour[ a ],
-    						contour[ b ],
-    						contour[ c ] ] );
-
-
-    					vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
-
-    					/* remove v from the remaining polygon */
-
-    					for ( s = v, t = v + 1; t < nv; s ++, t ++ ) {
-
-    						verts[ s ] = verts[ t ];
-
-    					}
-
-    					nv --;
-
-    					/* reset error detection counter */
-
-    					count = 2 * nv;
-
-    				}
-
-    			}
-
-    			if ( indices ) return vertIndices;
-    			return result;
-
-    		}
-
-    	} )(),
-
-    	triangulateShape: function ( contour, holes ) {
-
-    		function removeDupEndPts(points) {
-
-    			var l = points.length;
-
-    			if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
-
-    				points.pop();
-
-    			}
-
-    		}
-
-    		removeDupEndPts( contour );
-    		holes.forEach( removeDupEndPts );
-
-    		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
-
-    			// inOtherPt needs to be collinear to the inSegment
-    			if ( inSegPt1.x !== inSegPt2.x ) {
-
-    				if ( inSegPt1.x < inSegPt2.x ) {
-
-    					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
-
-    				} else {
-
-    					return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
-
-    				}
-
-    			} else {
-
-    				if ( inSegPt1.y < inSegPt2.y ) {
-
-    					return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
-
-    				} else {
-
-    					return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
-
-    				}
-
-    			}
-
-    		}
-
-    		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
-
-    			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
-    			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
-
-    			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
-    			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
-
-    			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
-    			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
-
-    			if ( Math.abs( limit ) > Number.EPSILON ) {
-
-    				// not parallel
-
-    				var perpSeg2;
-    				if ( limit > 0 ) {
-
-    					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
-    					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-    					if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
-
-    				} else {
-
-    					if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
-    					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-    					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
-
-    				}
-
-    				// i.e. to reduce rounding errors
-    				// intersection at endpoint of segment#1?
-    				if ( perpSeg2 === 0 ) {
-
-    					if ( ( inExcludeAdjacentSegs ) &&
-    						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
-    					return [ inSeg1Pt1 ];
-
-    				}
-    				if ( perpSeg2 === limit ) {
-
-    					if ( ( inExcludeAdjacentSegs ) &&
-    						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
-    					return [ inSeg1Pt2 ];
-
-    				}
-    				// intersection at endpoint of segment#2?
-    				if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
-    				if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
-
-    				// return real intersection point
-    				var factorSeg1 = perpSeg2 / limit;
-    				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
-    							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
-
-    			} else {
-
-    				// parallel or collinear
-    				if ( ( perpSeg1 !== 0 ) ||
-    					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
-
-    				// they are collinear or degenerate
-    				var seg1Pt = ( ( seg1dx === 0 ) && ( seg1dy === 0 ) );	// segment1 is just a point?
-    				var seg2Pt = ( ( seg2dx === 0 ) && ( seg2dy === 0 ) );	// segment2 is just a point?
-    				// both segments are points
-    				if ( seg1Pt && seg2Pt ) {
-
-    					if ( ( inSeg1Pt1.x !== inSeg2Pt1.x ) ||
-    						 ( inSeg1Pt1.y !== inSeg2Pt1.y ) )		return [];	// they are distinct  points
-    					return [ inSeg1Pt1 ];                 						// they are the same point
-
-    				}
-    				// segment#1  is a single point
-    				if ( seg1Pt ) {
-
-    					if ( ! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
-    					return [ inSeg1Pt1 ];
-
-    				}
-    				// segment#2  is a single point
-    				if ( seg2Pt ) {
-
-    					if ( ! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
-    					return [ inSeg2Pt1 ];
-
-    				}
-
-    				// they are collinear segments, which might overlap
-    				var seg1min, seg1max, seg1minVal, seg1maxVal;
-    				var seg2min, seg2max, seg2minVal, seg2maxVal;
-    				if ( seg1dx !== 0 ) {
-
-    					// the segments are NOT on a vertical line
-    					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
-
-    						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
-    						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
-
-    					} else {
-
-    						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
-    						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
-
-    					}
-    					if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
-
-    						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
-    						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
-
-    					} else {
-
-    						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
-    						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
-
-    					}
-
-    				} else {
-
-    					// the segments are on a vertical line
-    					if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
-
-    						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
-    						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
-
-    					} else {
-
-    						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
-    						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
-
-    					}
-    					if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
-
-    						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
-    						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
-
-    					} else {
-
-    						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
-    						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
-
-    					}
-
-    				}
-    				if ( seg1minVal <= seg2minVal ) {
-
-    					if ( seg1maxVal <  seg2minVal )	return [];
-    					if ( seg1maxVal === seg2minVal )	{
-
-    						if ( inExcludeAdjacentSegs )		return [];
-    						return [ seg2min ];
-
-    					}
-    					if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
-    					return	[ seg2min, seg2max ];
-
-    				} else {
-
-    					if ( seg1minVal >  seg2maxVal )	return [];
-    					if ( seg1minVal === seg2maxVal )	{
-
-    						if ( inExcludeAdjacentSegs )		return [];
-    						return [ seg1min ];
-
-    					}
-    					if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
-    					return	[ seg1min, seg2max ];
-
-    				}
-
-    			}
-
-    		}
-
-    		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
-
-    			// The order of legs is important
-
-    			// translation of all points, so that Vertex is at (0,0)
-    			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
-    			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
-    			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
-
-    			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
-    			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
-    			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
-
-    			if ( Math.abs( from2toAngle ) > Number.EPSILON ) {
-
-    				// angle != 180 deg.
-
-    				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
-    				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
-
-    				if ( from2toAngle > 0 ) {
-
-    					// main angle < 180 deg.
-    					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
-
-    				} else {
-
-    					// main angle > 180 deg.
-    					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
-
-    				}
-
-    			} else {
-
-    				// angle == 180 deg.
-    				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
-    				return	( from2otherAngle > 0 );
-
-    			}
-
-    		}
-
-
-    		function removeHoles( contour, holes ) {
-
-    			var shape = contour.concat(); // work on this shape
-    			var hole;
-
-    			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
-
-    				// Check if hole point lies within angle around shape point
-    				var lastShapeIdx = shape.length - 1;
-
-    				var prevShapeIdx = inShapeIdx - 1;
-    				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
-
-    				var nextShapeIdx = inShapeIdx + 1;
-    				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
-
-    				var insideAngle = isPointInsideAngle( shape[ inShapeIdx ], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[ inHoleIdx ] );
-    				if ( ! insideAngle ) {
-
-    					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
-    					return	false;
-
-    				}
-
-    				// Check if shape point lies within angle around hole point
-    				var lastHoleIdx = hole.length - 1;
-
-    				var prevHoleIdx = inHoleIdx - 1;
-    				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
-
-    				var nextHoleIdx = inHoleIdx + 1;
-    				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
-
-    				insideAngle = isPointInsideAngle( hole[ inHoleIdx ], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[ inShapeIdx ] );
-    				if ( ! insideAngle ) {
-
-    					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
-    					return	false;
-
-    				}
-
-    				return	true;
-
-    			}
-
-    			function intersectsShapeEdge( inShapePt, inHolePt ) {
-
-    				// checks for intersections with shape edges
-    				var sIdx, nextIdx, intersection;
-    				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
-
-    					nextIdx = sIdx + 1; nextIdx %= shape.length;
-    					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[ sIdx ], shape[ nextIdx ], true );
-    					if ( intersection.length > 0 )		return	true;
-
-    				}
-
-    				return	false;
-
-    			}
-
-    			var indepHoles = [];
-
-    			function intersectsHoleEdge( inShapePt, inHolePt ) {
-
-    				// checks for intersections with hole edges
-    				var ihIdx, chkHole,
-    					hIdx, nextIdx, intersection;
-    				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
-
-    					chkHole = holes[ indepHoles[ ihIdx ]];
-    					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
-
-    						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
-    						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[ hIdx ], chkHole[ nextIdx ], true );
-    						if ( intersection.length > 0 )		return	true;
-
-    					}
-
-    				}
-    				return	false;
-
-    			}
-
-    			var holeIndex, shapeIndex,
-    				shapePt, holePt,
-    				holeIdx, cutKey, failedCuts = [],
-    				tmpShape1, tmpShape2,
-    				tmpHole1, tmpHole2;
-
-    			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    				indepHoles.push( h );
-
-    			}
-
-    			var minShapeIndex = 0;
-    			var counter = indepHoles.length * 2;
-    			while ( indepHoles.length > 0 ) {
-
-    				counter --;
-    				if ( counter < 0 ) {
-
-    					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
-    					break;
-
-    				}
-
-    				// search for shape-vertex and hole-vertex,
-    				// which can be connected without intersections
-    				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex ++ ) {
-
-    					shapePt = shape[ shapeIndex ];
-    					holeIndex	= - 1;
-
-    					// search for hole which can be reached without intersections
-    					for ( var h = 0; h < indepHoles.length; h ++ ) {
-
-    						holeIdx = indepHoles[ h ];
-
-    						// prevent multiple checks
-    						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
-    						if ( failedCuts[ cutKey ] !== undefined )			continue;
-
-    						hole = holes[ holeIdx ];
-    						for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
-
-    							holePt = hole[ h2 ];
-    							if ( ! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
-    							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
-    							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
-
-    							holeIndex = h2;
-    							indepHoles.splice( h, 1 );
-
-    							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
-    							tmpShape2 = shape.slice( shapeIndex );
-    							tmpHole1 = hole.slice( holeIndex );
-    							tmpHole2 = hole.slice( 0, holeIndex + 1 );
-
-    							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-
-    							minShapeIndex = shapeIndex;
-
-    							// Debug only, to show the selected cuts
-    							// glob_CutLines.push( [ shapePt, holePt ] );
-
-    							break;
-
-    						}
-    						if ( holeIndex >= 0 )	break;		// hole-vertex found
-
-    						failedCuts[ cutKey ] = true;			// remember failure
-
-    					}
-    					if ( holeIndex >= 0 )	break;		// hole-vertex found
-
-    				}
-
-    			}
-
-    			return shape; 			/* shape with no holes */
-
-    		}
-
-
-    		var i, il, f, face,
-    			key, index,
-    			allPointsMap = {};
-
-    		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
-
-    		var allpoints = contour.concat();
-
-    		for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    			Array.prototype.push.apply( allpoints, holes[ h ] );
-
-    		}
-
-    		//console.log( "allpoints",allpoints, allpoints.length );
-
-    		// prepare all points map
-
-    		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
-
-    			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
-
-    			if ( allPointsMap[ key ] !== undefined ) {
-
-    				console.warn( "THREE.ShapeUtils: Duplicate point", key, i );
-
-    			}
-
-    			allPointsMap[ key ] = i;
-
-    		}
-
-    		// remove holes by cutting paths to holes and adding them to the shape
-    		var shapeWithoutHoles = removeHoles( contour, holes );
-
-    		var triangles = exports.ShapeUtils.triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
-    		//console.log( "triangles",triangles, triangles.length );
-
-    		// check all face vertices against all points map
-
-    		for ( i = 0, il = triangles.length; i < il; i ++ ) {
-
-    			face = triangles[ i ];
-
-    			for ( f = 0; f < 3; f ++ ) {
-
-    				key = face[ f ].x + ":" + face[ f ].y;
-
-    				index = allPointsMap[ key ];
-
-    				if ( index !== undefined ) {
-
-    					face[ f ] = index;
-
-    				}
-
-    			}
-
-    		}
-
-    		return triangles.concat();
-
-    	},
-
-    	isClockWise: function ( pts ) {
-
-    		return exports.ShapeUtils.area( pts ) < 0;
-
-    	},
-
-    	// Bezier Curves formulas obtained from
-    	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-    	// Quad Bezier Functions
-
-    	b2: ( function () {
-
-    		function b2p0( t, p ) {
-
-    			var k = 1 - t;
-    			return k * k * p;
-
-    		}
-
-    		function b2p1( t, p ) {
-
-    			return 2 * ( 1 - t ) * t * p;
-
-    		}
-
-    		function b2p2( t, p ) {
-
-    			return t * t * p;
-
-    		}
-
-    		return function b2( t, p0, p1, p2 ) {
-
-    			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
-
-    		};
-
-    	} )(),
-
-    	// Cubic Bezier Functions
-
-    	b3: ( function () {
-
-    		function b3p0( t, p ) {
-
-    			var k = 1 - t;
-    			return k * k * k * p;
-
-    		}
-
-    		function b3p1( t, p ) {
-
-    			var k = 1 - t;
-    			return 3 * k * k * t * p;
-
-    		}
-
-    		function b3p2( t, p ) {
-
-    			var k = 1 - t;
-    			return 3 * k * t * t * p;
-
-    		}
-
-    		function b3p3( t, p ) {
-
-    			return t * t * t * p;
-
-    		}
-
-    		return function b3( t, p0, p1, p2, p3 ) {
-
-    			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
-
-    		};
-
-    	} )()
-
-    };
-
-    /**
-     * @author zz85 / http://www.lab4games.net/zz85/blog
-     *
-     * Creates extruded geometry from a path shape.
-     *
-     * parameters = {
-     *
-     *  curveSegments: <int>, // number of points on the curves
-     *  steps: <int>, // number of points for z-side extrusions / used for subdividing segments of extrude spline too
-     *  amount: <int>, // Depth to extrude the shape
-     *
-     *  bevelEnabled: <bool>, // turn on bevel
-     *  bevelThickness: <float>, // how deep into the original shape bevel goes
-     *  bevelSize: <float>, // how far from shape outline is bevel
-     *  bevelSegments: <int>, // number of bevel layers
-     *
-     *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
-     *  frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
-     *
-     *  uvGenerator: <Object> // object that provides UV generator functions
-     *
-     * }
-     **/
-
-    function ExtrudeGeometry( shapes, options ) {
-
-    	if ( typeof( shapes ) === "undefined" ) {
-
-    		shapes = [];
-    		return;
-
-    	}
-
-    	Geometry.call( this );
-
-    	this.type = 'ExtrudeGeometry';
-
-    	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
-
-    	this.addShapeList( shapes, options );
-
-    	this.computeFaceNormals();
-
-    	// can't really use automatic vertex normals
-    	// as then front and back sides get smoothed too
-    	// should do separate smoothing just for sides
-
-    	//this.computeVertexNormals();
-
-    	//console.log( "took", ( Date.now() - startTime ) );
-
-    }
-
-    ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
-    ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
-
-    ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
-
-    	var sl = shapes.length;
-
-    	for ( var s = 0; s < sl; s ++ ) {
-
-    		var shape = shapes[ s ];
-    		this.addShape( shape, options );
-
-    	}
-
-    };
-
-    ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
-
-    	var amount = options.amount !== undefined ? options.amount : 100;
-
-    	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
-    	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
-    	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
-
-    	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
-
-    	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
-
-    	var steps = options.steps !== undefined ? options.steps : 1;
-
-    	var extrudePath = options.extrudePath;
-    	var extrudePts, extrudeByPath = false;
-
-    	// Use default WorldUVGenerator if no UV generators are specified.
-    	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
-
-    	var splineTube, binormal, normal, position2;
-    	if ( extrudePath ) {
-
-    		extrudePts = extrudePath.getSpacedPoints( steps );
-
-    		extrudeByPath = true;
-    		bevelEnabled = false; // bevels not supported for path extrusion
-
-    		// SETUP TNB variables
-
-    		// Reuse TNB from TubeGeomtry for now.
-    		// TODO1 - have a .isClosed in spline?
-
-    		splineTube = options.frames !== undefined ? options.frames : new TubeGeometry.FrenetFrames( extrudePath, steps, false );
-
-    		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
-
-    		binormal = new Vector3();
-    		normal = new Vector3();
-    		position2 = new Vector3();
-
-    	}
-
-    	// Safeguards if bevels are not enabled
-
-    	if ( ! bevelEnabled ) {
-
-    		bevelSegments = 0;
-    		bevelThickness = 0;
-    		bevelSize = 0;
-
-    	}
-
-    	// Variables initialization
-
-    	var ahole, h, hl; // looping of holes
-    	var scope = this;
-
-    	var shapesOffset = this.vertices.length;
-
-    	var shapePoints = shape.extractPoints( curveSegments );
-
-    	var vertices = shapePoints.shape;
-    	var holes = shapePoints.holes;
-
-    	var reverse = ! exports.ShapeUtils.isClockWise( vertices );
-
-    	if ( reverse ) {
-
-    		vertices = vertices.reverse();
-
-    		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
-
-    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    			ahole = holes[ h ];
-
-    			if ( exports.ShapeUtils.isClockWise( ahole ) ) {
-
-    				holes[ h ] = ahole.reverse();
-
-    			}
-
-    		}
-
-    		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
-
-    	}
-
-
-    	var faces = exports.ShapeUtils.triangulateShape( vertices, holes );
-
-    	/* Vertices */
-
-    	var contour = vertices; // vertices has all points but contour has only points of circumference
-
-    	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    		ahole = holes[ h ];
-
-    		vertices = vertices.concat( ahole );
-
-    	}
-
-
-    	function scalePt2( pt, vec, size ) {
-
-    		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
-
-    		return vec.clone().multiplyScalar( size ).add( pt );
-
-    	}
-
-    	var b, bs, t, z,
-    		vert, vlen = vertices.length,
-    		face, flen = faces.length;
-
-
-    	// Find directions for point movement
-
-
-    	function getBevelVec( inPt, inPrev, inNext ) {
-
-    		// computes for inPt the corresponding point inPt' on a new contour
-    		//   shifted by 1 unit (length of normalized vector) to the left
-    		// if we walk along contour clockwise, this new contour is outside the old one
-    		//
-    		// inPt' is the intersection of the two lines parallel to the two
-    		//  adjacent edges of inPt at a distance of 1 unit on the left side.
-
-    		var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
-
-    		// good reading for geometry algorithms (here: line-line intersection)
-    		// http://geomalgorithms.com/a05-_intersect-1.html
-
-    		var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
-    		var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
-
-    		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
-
-    		// check for collinear edges
-    		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
-
-    		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
-
-    			// not collinear
-
-    			// length of vectors for normalizing
-
-    			var v_prev_len = Math.sqrt( v_prev_lensq );
-    			var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
-
-    			// shift adjacent points by unit vectors to the left
-
-    			var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
-    			var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
-
-    			var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
-    			var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
-
-    			// scaling factor for v_prev to intersection point
-
-    			var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
-    						( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
-    					  ( v_prev_x * v_next_y - v_prev_y * v_next_x );
-
-    			// vector from inPt to intersection point
-
-    			v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
-    			v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
-
-    			// Don't normalize!, otherwise sharp corners become ugly
-    			//  but prevent crazy spikes
-    			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
-    			if ( v_trans_lensq <= 2 ) {
-
-    				return	new Vector2( v_trans_x, v_trans_y );
-
-    			} else {
-
-    				shrink_by = Math.sqrt( v_trans_lensq / 2 );
-
-    			}
-
-    		} else {
-
-    			// handle special case of collinear edges
-
-    			var direction_eq = false;		// assumes: opposite
-    			if ( v_prev_x > Number.EPSILON ) {
-
-    				if ( v_next_x > Number.EPSILON ) {
-
-    					direction_eq = true;
-
-    				}
-
-    			} else {
-
-    				if ( v_prev_x < - Number.EPSILON ) {
-
-    					if ( v_next_x < - Number.EPSILON ) {
-
-    						direction_eq = true;
-
-    					}
-
-    				} else {
-
-    					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
-
-    						direction_eq = true;
-
-    					}
-
-    				}
-
-    			}
-
-    			if ( direction_eq ) {
-
-    				// console.log("Warning: lines are a straight sequence");
-    				v_trans_x = - v_prev_y;
-    				v_trans_y =  v_prev_x;
-    				shrink_by = Math.sqrt( v_prev_lensq );
-
-    			} else {
-
-    				// console.log("Warning: lines are a straight spike");
-    				v_trans_x = v_prev_x;
-    				v_trans_y = v_prev_y;
-    				shrink_by = Math.sqrt( v_prev_lensq / 2 );
-
-    			}
-
-    		}
-
-    		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
-
-    	}
-
-
-    	var contourMovements = [];
-
-    	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
-
-    		if ( j === il ) j = 0;
-    		if ( k === il ) k = 0;
-
-    		//  (j)---(i)---(k)
-    		// console.log('i,j,k', i, j , k)
-
-    		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
-
-    	}
-
-    	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
-
-    	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    		ahole = holes[ h ];
-
-    		oneHoleMovements = [];
-
-    		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
-
-    			if ( j === il ) j = 0;
-    			if ( k === il ) k = 0;
-
-    			//  (j)---(i)---(k)
-    			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
-
-    		}
-
-    		holesMovements.push( oneHoleMovements );
-    		verticesMovements = verticesMovements.concat( oneHoleMovements );
-
-    	}
-
-
-    	// Loop bevelSegments, 1 for the front, 1 for the back
-
-    	for ( b = 0; b < bevelSegments; b ++ ) {
-
-    		//for ( b = bevelSegments; b > 0; b -- ) {
-
-    		t = b / bevelSegments;
-    		z = bevelThickness * Math.cos( t * Math.PI / 2 );
-    		bs = bevelSize * Math.sin( t * Math.PI / 2 );
-
-    		// contract shape
-
-    		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-    			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-
-    			v( vert.x, vert.y,  - z );
-
-    		}
-
-    		// expand holes
-
-    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    			ahole = holes[ h ];
-    			oneHoleMovements = holesMovements[ h ];
-
-    			for ( i = 0, il = ahole.length; i < il; i ++ ) {
-
-    				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-
-    				v( vert.x, vert.y,  - z );
-
-    			}
-
-    		}
-
-    	}
-
-    	bs = bevelSize;
-
-    	// Back facing vertices
-
-    	for ( i = 0; i < vlen; i ++ ) {
-
-    		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
-
-    		if ( ! extrudeByPath ) {
-
-    			v( vert.x, vert.y, 0 );
-
-    		} else {
-
-    			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
-
-    			normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
-    			binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
-
-    			position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
-
-    			v( position2.x, position2.y, position2.z );
-
-    		}
-
-    	}
-
-    	// Add stepped vertices...
-    	// Including front facing vertices
-
-    	var s;
-
-    	for ( s = 1; s <= steps; s ++ ) {
-
-    		for ( i = 0; i < vlen; i ++ ) {
-
-    			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
-
-    			if ( ! extrudeByPath ) {
-
-    				v( vert.x, vert.y, amount / steps * s );
-
-    			} else {
-
-    				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
-
-    				normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
-    				binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
-
-    				position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
-
-    				v( position2.x, position2.y, position2.z );
-
-    			}
-
-    		}
-
-    	}
-
-
-    	// Add bevel segments planes
-
-    	//for ( b = 1; b <= bevelSegments; b ++ ) {
-    	for ( b = bevelSegments - 1; b >= 0; b -- ) {
-
-    		t = b / bevelSegments;
-    		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
-    		bs = bevelSize * Math.sin( t * Math.PI / 2 );
-
-    		// contract shape
-
-    		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-    			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-    			v( vert.x, vert.y,  amount + z );
-
-    		}
-
-    		// expand holes
-
-    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    			ahole = holes[ h ];
-    			oneHoleMovements = holesMovements[ h ];
-
-    			for ( i = 0, il = ahole.length; i < il; i ++ ) {
-
-    				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-
-    				if ( ! extrudeByPath ) {
-
-    					v( vert.x, vert.y,  amount + z );
-
-    				} else {
-
-    					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
-
-    				}
-
-    			}
-
-    		}
-
-    	}
-
-    	/* Faces */
-
-    	// Top and bottom faces
-
-    	buildLidFaces();
-
-    	// Sides faces
-
-    	buildSideFaces();
-
-
-    	/////  Internal functions
-
-    	function buildLidFaces() {
-
-    		if ( bevelEnabled ) {
-
-    			var layer = 0; // steps + 1
-    			var offset = vlen * layer;
-
-    			// Bottom faces
-
-    			for ( i = 0; i < flen; i ++ ) {
-
-    				face = faces[ i ];
-    				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
-
-    			}
-
-    			layer = steps + bevelSegments * 2;
-    			offset = vlen * layer;
-
-    			// Top faces
-
-    			for ( i = 0; i < flen; i ++ ) {
-
-    				face = faces[ i ];
-    				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
-
-    			}
-
-    		} else {
-
-    			// Bottom faces
-
-    			for ( i = 0; i < flen; i ++ ) {
-
-    				face = faces[ i ];
-    				f3( face[ 2 ], face[ 1 ], face[ 0 ] );
-
-    			}
-
-    			// Top faces
-
-    			for ( i = 0; i < flen; i ++ ) {
-
-    				face = faces[ i ];
-    				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
-
-    			}
-
-    		}
-
-    	}
-
-    	// Create faces for the z-sides of the shape
-
-    	function buildSideFaces() {
-
-    		var layeroffset = 0;
-    		sidewalls( contour, layeroffset );
-    		layeroffset += contour.length;
-
-    		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-    			ahole = holes[ h ];
-    			sidewalls( ahole, layeroffset );
-
-    			//, true
-    			layeroffset += ahole.length;
-
-    		}
-
-    	}
-
-    	function sidewalls( contour, layeroffset ) {
-
-    		var j, k;
-    		i = contour.length;
-
-    		while ( -- i >= 0 ) {
-
-    			j = i;
-    			k = i - 1;
-    			if ( k < 0 ) k = contour.length - 1;
-
-    			//console.log('b', i,j, i-1, k,vertices.length);
-
-    			var s = 0, sl = steps  + bevelSegments * 2;
-
-    			for ( s = 0; s < sl; s ++ ) {
-
-    				var slen1 = vlen * s;
-    				var slen2 = vlen * ( s + 1 );
-
-    				var a = layeroffset + j + slen1,
-    					b = layeroffset + k + slen1,
-    					c = layeroffset + k + slen2,
-    					d = layeroffset + j + slen2;
-
-    				f4( a, b, c, d, contour, s, sl, j, k );
-
-    			}
-
-    		}
-
-    	}
-
-
-    	function v( x, y, z ) {
-
-    		scope.vertices.push( new Vector3( x, y, z ) );
-
-    	}
-
-    	function f3( a, b, c ) {
-
-    		a += shapesOffset;
-    		b += shapesOffset;
-    		c += shapesOffset;
-
-    		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
-
-    		var uvs = uvgen.generateTopUV( scope, a, b, c );
-
-    		scope.faceVertexUvs[ 0 ].push( uvs );
-
-    	}
-
-    	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
-
-    		a += shapesOffset;
-    		b += shapesOffset;
-    		c += shapesOffset;
-    		d += shapesOffset;
-
-    		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
-    		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
-
-    		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
-
-    		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
-    		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
-
-    	}
-
-    };
-
-    ExtrudeGeometry.WorldUVGenerator = {
-
-    	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
-
-    		var vertices = geometry.vertices;
-
-    		var a = vertices[ indexA ];
-    		var b = vertices[ indexB ];
-    		var c = vertices[ indexC ];
-
-    		return [
-    			new Vector2( a.x, a.y ),
-    			new Vector2( b.x, b.y ),
-    			new Vector2( c.x, c.y )
-    		];
-
-    	},
-
-    	generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
-
-    		var vertices = geometry.vertices;
-
-    		var a = vertices[ indexA ];
-    		var b = vertices[ indexB ];
-    		var c = vertices[ indexC ];
-    		var d = vertices[ indexD ];
-
-    		if ( Math.abs( a.y - b.y ) < 0.01 ) {
-
-    			return [
-    				new Vector2( a.x, 1 - a.z ),
-    				new Vector2( b.x, 1 - b.z ),
-    				new Vector2( c.x, 1 - c.z ),
-    				new Vector2( d.x, 1 - d.z )
-    			];
-
-    		} else {
-
-    			return [
-    				new Vector2( a.y, 1 - a.z ),
-    				new Vector2( b.y, 1 - b.z ),
-    				new Vector2( c.y, 1 - c.z ),
-    				new Vector2( d.y, 1 - d.z )
-    			];
-
-    		}
-
-    	}
-    };
-
-    /**
-     * @author zz85 / http://www.lab4games.net/zz85/blog
-     * @author alteredq / http://alteredqualia.com/
-     *
-     * Text = 3D Text
-     *
-     * parameters = {
-     *  font: <THREE.Font>, // font
-     *
-     *  size: <float>, // size of the text
-     *  height: <float>, // thickness to extrude text
-     *  curveSegments: <int>, // number of points on the curves
-     *
-     *  bevelEnabled: <bool>, // turn on bevel
-     *  bevelThickness: <float>, // how deep into text bevel goes
-     *  bevelSize: <float> // how far from text outline is bevel
-     * }
-     */
-
-    function TextGeometry( text, parameters ) {
-
-    	parameters = parameters || {};
-
-    	var font = parameters.font;
-
-    	if ( (font && font.isFont) === false ) {
-
-    		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
-    		return new Geometry();
-
-    	}
-
-    	var shapes = font.generateShapes( text, parameters.size, parameters.curveSegments );
-
-    	// translate parameters to ExtrudeGeometry API
-
-    	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
-
-    	// defaults
-
-    	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-    	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-    	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-
-    	ExtrudeGeometry.call( this, shapes, parameters );
-
-    	this.type = 'TextGeometry';
-
-    }
-
-    TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
-    TextGeometry.prototype.constructor = TextGeometry;
-
-    /**
-     * @author benaadams / https://twitter.com/ben_a_adams
-     * based on THREE.SphereGeometry
-     */
-
-    function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'SphereBufferGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		widthSegments: widthSegments,
-    		heightSegments: heightSegments,
-    		phiStart: phiStart,
-    		phiLength: phiLength,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	radius = radius || 50;
-
-    	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-    	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
-
-    	phiStart = phiStart !== undefined ? phiStart : 0;
-    	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-
-    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
-
-    	var thetaEnd = thetaStart + thetaLength;
-
-    	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
-
-    	var positions = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
-
-    	var index = 0, vertices = [], normal = new Vector3();
-
-    	for ( var y = 0; y <= heightSegments; y ++ ) {
-
-    		var verticesRow = [];
-
-    		var v = y / heightSegments;
-
-    		for ( var x = 0; x <= widthSegments; x ++ ) {
-
-    			var u = x / widthSegments;
-
-    			var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-    			var py = radius * Math.cos( thetaStart + v * thetaLength );
-    			var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-
-    			normal.set( px, py, pz ).normalize();
-
-    			positions.setXYZ( index, px, py, pz );
-    			normals.setXYZ( index, normal.x, normal.y, normal.z );
-    			uvs.setXY( index, u, 1 - v );
-
-    			verticesRow.push( index );
-
-    			index ++;
-
-    		}
-
-    		vertices.push( verticesRow );
-
-    	}
-
-    	var indices = [];
-
-    	for ( var y = 0; y < heightSegments; y ++ ) {
-
-    		for ( var x = 0; x < widthSegments; x ++ ) {
-
-    			var v1 = vertices[ y ][ x + 1 ];
-    			var v2 = vertices[ y ][ x ];
-    			var v3 = vertices[ y + 1 ][ x ];
-    			var v4 = vertices[ y + 1 ][ x + 1 ];
-
-    			if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
-    			if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
-
-    		}
-
-    	}
-
-    	this.setIndex( new ( positions.count > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
-    	this.addAttribute( 'position', positions );
-    	this.addAttribute( 'normal', normals );
-    	this.addAttribute( 'uv', uvs );
-
-    	this.boundingSphere = new Sphere( new Vector3(), radius );
-
-    }
-
-    SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     */
-
-    function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'SphereGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		widthSegments: widthSegments,
-    		heightSegments: heightSegments,
-    		phiStart: phiStart,
-    		phiLength: phiLength,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
-
-    }
-
-    SphereGeometry.prototype = Object.create( Geometry.prototype );
-    SphereGeometry.prototype.constructor = SphereGeometry;
-
-    /**
-     * @author Mugen87 / https://github.com/Mugen87
-     */
-
-    function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'RingBufferGeometry';
-
-    	this.parameters = {
-    		innerRadius: innerRadius,
-    		outerRadius: outerRadius,
-    		thetaSegments: thetaSegments,
-    		phiSegments: phiSegments,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	innerRadius = innerRadius || 20;
-    	outerRadius = outerRadius || 50;
-
-    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-    	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-    	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
-
-    	// these are used to calculate buffer length
-    	var vertexCount = ( thetaSegments + 1 ) * ( phiSegments + 1 );
-    	var indexCount = thetaSegments * phiSegments * 2 * 3;
-
-    	// buffers
-    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
-
-    	// some helper variables
-    	var index = 0, indexOffset = 0, segment;
-    	var radius = innerRadius;
-    	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-    	var vertex = new Vector3();
-    	var uv = new Vector2();
-    	var j, i;
-
-    	// generate vertices, normals and uvs
-
-    	// values are generate from the inside of the ring to the outside
-
-    	for ( j = 0; j <= phiSegments; j ++ ) {
-
-    		for ( i = 0; i <= thetaSegments; i ++ ) {
-
-    			segment = thetaStart + i / thetaSegments * thetaLength;
-
-    			// vertex
-    			vertex.x = radius * Math.cos( segment );
-    			vertex.y = radius * Math.sin( segment );
-    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
-
-    			// normal
-    			normals.setXYZ( index, 0, 0, 1 );
-
-    			// uv
-    			uv.x = ( vertex.x / outerRadius + 1 ) / 2;
-    			uv.y = ( vertex.y / outerRadius + 1 ) / 2;
-    			uvs.setXY( index, uv.x, uv.y );
-
-    			// increase index
-    			index++;
-
-    		}
-
-    		// increase the radius for next row of vertices
-    		radius += radiusStep;
-
-    	}
-
-    	// generate indices
-
-    	for ( j = 0; j < phiSegments; j ++ ) {
-
-    		var thetaSegmentLevel = j * ( thetaSegments + 1 );
-
-    		for ( i = 0; i < thetaSegments; i ++ ) {
-
-    			segment = i + thetaSegmentLevel;
-
-    			// indices
-    			var a = segment;
-    			var b = segment + thetaSegments + 1;
-    			var c = segment + thetaSegments + 2;
-    			var d = segment + 1;
-
-    			// face one
-    			indices.setX( indexOffset, a ); indexOffset++;
-    			indices.setX( indexOffset, b ); indexOffset++;
-    			indices.setX( indexOffset, c ); indexOffset++;
-
-    			// face two
-    			indices.setX( indexOffset, a ); indexOffset++;
-    			indices.setX( indexOffset, c ); indexOffset++;
-    			indices.setX( indexOffset, d ); indexOffset++;
-
-    		}
-
-    	}
-
-    	// build geometry
-
-    	this.setIndex( indices );
-    	this.addAttribute( 'position', vertices );
-    	this.addAttribute( 'normal', normals );
-    	this.addAttribute( 'uv', uvs );
-
-    }
-
-    RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    RingBufferGeometry.prototype.constructor = RingBufferGeometry;
-
-    /**
-     * @author Kaleb Murphy
-     */
-
-    function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'RingGeometry';
-
-    	this.parameters = {
-    		innerRadius: innerRadius,
-    		outerRadius: outerRadius,
-    		thetaSegments: thetaSegments,
-    		phiSegments: phiSegments,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
-
-    }
-
-    RingGeometry.prototype = Object.create( Geometry.prototype );
-    RingGeometry.prototype.constructor = RingGeometry;
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
-     */
-
-    function PlaneGeometry( width, height, widthSegments, heightSegments ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'PlaneGeometry';
-
-    	this.parameters = {
-    		width: width,
-    		height: height,
-    		widthSegments: widthSegments,
-    		heightSegments: heightSegments
-    	};
-
-    	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
-
-    }
-
-    PlaneGeometry.prototype = Object.create( Geometry.prototype );
-    PlaneGeometry.prototype.constructor = PlaneGeometry;
-
-    /**
-     * @author Mugen87 / https://github.com/Mugen87
-     */
-
-     // points - to create a closed torus, one must use a set of points
-     //    like so: [ a, b, c, d, a ], see first is the same as last.
-     // segments - the number of circumference segments to create
-     // phiStart - the starting radian
-     // phiLength - the radian (0 to 2PI) range of the lathed section
-     //    2PI is a closed lathe, less than 2PI is a portion.
-
-    function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'LatheBufferGeometry';
-
-    	this.parameters = {
-    		points: points,
-    		segments: segments,
-    		phiStart: phiStart,
-    		phiLength: phiLength
-    	};
-
-    	segments = Math.floor( segments ) || 12;
-    	phiStart = phiStart || 0;
-    	phiLength = phiLength || Math.PI * 2;
-
-    	// clamp phiLength so it's in range of [ 0, 2PI ]
-    	phiLength = exports.Math.clamp( phiLength, 0, Math.PI * 2 );
-
-    	// these are used to calculate buffer length
-    	var vertexCount = ( segments + 1 ) * points.length;
-    	var indexCount = segments * points.length * 2 * 3;
-
-    	// buffers
-    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
-
-    	// helper variables
-    	var index = 0, indexOffset = 0, base;
-    	var inverseSegments = 1.0 / segments;
-    	var vertex = new Vector3();
-    	var uv = new Vector2();
-    	var i, j;
-
-    	// generate vertices and uvs
-
-    	for ( i = 0; i <= segments; i ++ ) {
-
-    		var phi = phiStart + i * inverseSegments * phiLength;
-
-    		var sin = Math.sin( phi );
-    		var cos = Math.cos( phi );
-
-    		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
-
-    			// vertex
-    			vertex.x = points[ j ].x * sin;
-    			vertex.y = points[ j ].y;
-    			vertex.z = points[ j ].x * cos;
-    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
-
-    			// uv
-    			uv.x = i / segments;
-    			uv.y = j / ( points.length - 1 );
-    			uvs.setXY( index, uv.x, uv.y );
-
-    			// increase index
-    			index ++;
-
-    		}
-
-    	}
-
-    	// generate indices
-
-    	for ( i = 0; i < segments; i ++ ) {
-
-    		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
-
-    			base = j + i * points.length;
-
-    			// indices
-    			var a = base;
-    			var b = base + points.length;
-    			var c = base + points.length + 1;
-    			var d = base + 1;
-
-    			// face one
-    			indices.setX( indexOffset, a ); indexOffset++;
-    			indices.setX( indexOffset, b ); indexOffset++;
-    			indices.setX( indexOffset, d ); indexOffset++;
-
-    			// face two
-    			indices.setX( indexOffset, b ); indexOffset++;
-    			indices.setX( indexOffset, c ); indexOffset++;
-    			indices.setX( indexOffset, d ); indexOffset++;
-
-    		}
-
-    	}
-
-    	// build geometry
-
-    	this.setIndex( indices );
-    	this.addAttribute( 'position', vertices );
-    	this.addAttribute( 'uv', uvs );
-
-    	// generate normals
-
-    	this.computeVertexNormals();
-
-    	// if the geometry is closed, we need to average the normals along the seam.
-    	// because the corresponding vertices are identical (but still have different UVs).
-
-    	if( phiLength === Math.PI * 2 ) {
-
-    		var normals = this.attributes.normal.array;
-    		var n1 = new Vector3();
-    		var n2 = new Vector3();
-    		var n = new Vector3();
-
-    		// this is the buffer offset for the last line of vertices
-    		base = segments * points.length * 3;
-
-    		for( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
-
-    			// select the normal of the vertex in the first line
-    			n1.x = normals[ j + 0 ];
-    			n1.y = normals[ j + 1 ];
-    			n1.z = normals[ j + 2 ];
-
-    			// select the normal of the vertex in the last line
-    			n2.x = normals[ base + j + 0 ];
-    			n2.y = normals[ base + j + 1 ];
-    			n2.z = normals[ base + j + 2 ];
-
-    			// average normals
-    			n.addVectors( n1, n2 ).normalize();
-
-    			// assign the new values to both normals
-    			normals[ j + 0 ] = normals[ base + j + 0 ] = n.x;
-    			normals[ j + 1 ] = normals[ base + j + 1 ] = n.y;
-    			normals[ j + 2 ] = normals[ base + j + 2 ] = n.z;
-
-    		} // next row
-
-    	}
-
-    }
-
-    LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
-
-    /**
-     * @author astrodud / http://astrodud.isgreat.org/
-     * @author zz85 / https://github.com/zz85
-     * @author bhouston / http://clara.io
-     */
-
-    // points - to create a closed torus, one must use a set of points
-    //    like so: [ a, b, c, d, a ], see first is the same as last.
-    // segments - the number of circumference segments to create
-    // phiStart - the starting radian
-    // phiLength - the radian (0 to 2PI) range of the lathed section
-    //    2PI is a closed lathe, less than 2PI is a portion.
-
-    function LatheGeometry( points, segments, phiStart, phiLength ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'LatheGeometry';
-
-    	this.parameters = {
-    		points: points,
-    		segments: segments,
-    		phiStart: phiStart,
-    		phiLength: phiLength
-    	};
-
-    	this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
-    	this.mergeVertices();
-
-    }
-
-    LatheGeometry.prototype = Object.create( Geometry.prototype );
-    LatheGeometry.prototype.constructor = LatheGeometry;
-
-    /**
-     * @author jonobr1 / http://jonobr1.com
-     *
-     * Creates a one-sided polygonal geometry from a path shape. Similar to
-     * ExtrudeGeometry.
-     *
-     * parameters = {
-     *
-     *	curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
-     *
-     *	material: <int> // material index for front and back faces
-     *	uvGenerator: <Object> // object that provides UV generator functions
-     *
-     * }
-     **/
-
-    function ShapeGeometry( shapes, options ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'ShapeGeometry';
-
-    	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
-
-    	this.addShapeList( shapes, options );
-
-    	this.computeFaceNormals();
-
-    }
-
-    ShapeGeometry.prototype = Object.create( Geometry.prototype );
-    ShapeGeometry.prototype.constructor = ShapeGeometry;
-
-    /**
-     * Add an array of shapes to THREE.ShapeGeometry.
-     */
-    ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
-
-    	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
-
-    		this.addShape( shapes[ i ], options );
-
-    	}
-
-    	return this;
-
-    };
-
-    /**
-     * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
-     */
-    ShapeGeometry.prototype.addShape = function ( shape, options ) {
-
-    	if ( options === undefined ) options = {};
-    	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
-
-    	var material = options.material;
-    	var uvgen = options.UVGenerator === undefined ? ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
-
-    	//
-
-    	var i, l, hole;
-
-    	var shapesOffset = this.vertices.length;
-    	var shapePoints = shape.extractPoints( curveSegments );
-
-    	var vertices = shapePoints.shape;
-    	var holes = shapePoints.holes;
-
-    	var reverse = ! exports.ShapeUtils.isClockWise( vertices );
-
-    	if ( reverse ) {
-
-    		vertices = vertices.reverse();
-
-    		// Maybe we should also check if holes are in the opposite direction, just to be safe...
-
-    		for ( i = 0, l = holes.length; i < l; i ++ ) {
-
-    			hole = holes[ i ];
-
-    			if ( exports.ShapeUtils.isClockWise( hole ) ) {
-
-    				holes[ i ] = hole.reverse();
-
-    			}
-
-    		}
-
-    		reverse = false;
-
-    	}
-
-    	var faces = exports.ShapeUtils.triangulateShape( vertices, holes );
-
-    	// Vertices
-
-    	for ( i = 0, l = holes.length; i < l; i ++ ) {
-
-    		hole = holes[ i ];
-    		vertices = vertices.concat( hole );
-
-    	}
-
-    	//
-
-    	var vert, vlen = vertices.length;
-    	var face, flen = faces.length;
-
-    	for ( i = 0; i < vlen; i ++ ) {
-
-    		vert = vertices[ i ];
-
-    		this.vertices.push( new Vector3( vert.x, vert.y, 0 ) );
-
-    	}
-
-    	for ( i = 0; i < flen; i ++ ) {
-
-    		face = faces[ i ];
-
-    		var a = face[ 0 ] + shapesOffset;
-    		var b = face[ 1 ] + shapesOffset;
-    		var c = face[ 2 ] + shapesOffset;
-
-    		this.faces.push( new Face3( a, b, c, null, null, material ) );
-    		this.faceVertexUvs[ 0 ].push( uvgen.generateTopUV( this, a, b, c ) );
-
-    	}
-
-    };
-
-    /**
-     * @author WestLangley / http://github.com/WestLangley
-     */
-
-    function EdgesGeometry( geometry, thresholdAngle ) {
-
-    	BufferGeometry.call( this );
-
-    	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
-
-    	var thresholdDot = Math.cos( exports.Math.DEG2RAD * thresholdAngle );
-
-    	var edge = [ 0, 0 ], hash = {};
-
-    	function sortFunction( a, b ) {
-
-    		return a - b;
-
-    	}
-
-    	var keys = [ 'a', 'b', 'c' ];
-
-    	var geometry2;
-
-    	if ( (geometry && geometry.isBufferGeometry) ) {
-
-    		geometry2 = new Geometry();
-    		geometry2.fromBufferGeometry( geometry );
-
-    	} else {
-
-    		geometry2 = geometry.clone();
-
-    	}
-
-    	geometry2.mergeVertices();
-    	geometry2.computeFaceNormals();
-
-    	var vertices = geometry2.vertices;
-    	var faces = geometry2.faces;
-
-    	for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-    		var face = faces[ i ];
-
-    		for ( var j = 0; j < 3; j ++ ) {
-
-    			edge[ 0 ] = face[ keys[ j ] ];
-    			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-    			edge.sort( sortFunction );
-
-    			var key = edge.toString();
-
-    			if ( hash[ key ] === undefined ) {
-
-    				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
-
-    			} else {
-
-    				hash[ key ].face2 = i;
-
-    			}
-
-    		}
-
-    	}
-
-    	var coords = [];
-
-    	for ( var key in hash ) {
-
-    		var h = hash[ key ];
-
-    		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
-
-    			var vertex = vertices[ h.vert1 ];
-    			coords.push( vertex.x );
-    			coords.push( vertex.y );
-    			coords.push( vertex.z );
-
-    			vertex = vertices[ h.vert2 ];
-    			coords.push( vertex.x );
-    			coords.push( vertex.y );
-    			coords.push( vertex.z );
-
-    		}
-
-    	}
-
-    	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
-
-    }
-
-    EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
-    EdgesGeometry.prototype.constructor = EdgesGeometry;
-
-    /**
-     * @author Mugen87 / https://github.com/Mugen87
-     */
-
-    function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'CylinderBufferGeometry';
-
-    	this.parameters = {
-    		radiusTop: radiusTop,
-    		radiusBottom: radiusBottom,
-    		height: height,
-    		radialSegments: radialSegments,
-    		heightSegments: heightSegments,
-    		openEnded: openEnded,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	var scope = this;
-
-    	radiusTop = radiusTop !== undefined ? radiusTop : 20;
-    	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-    	height = height !== undefined ? height : 100;
-
-    	radialSegments = Math.floor( radialSegments ) || 8;
-    	heightSegments = Math.floor( heightSegments ) || 1;
-
-    	openEnded = openEnded !== undefined ? openEnded : false;
-    	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
-    	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
-
-    	// used to calculate buffer length
-
-    	var nbCap = 0;
-
-    	if ( openEnded === false ) {
-
-    		if ( radiusTop > 0 ) nbCap ++;
-    		if ( radiusBottom > 0 ) nbCap ++;
-
-    	}
-
-    	var vertexCount = calculateVertexCount();
-    	var indexCount = calculateIndexCount();
-
-    	// buffers
-
-    	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-    	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-    	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
-
-    	// helper variables
-
-    	var index = 0,
-    	    indexOffset = 0,
-    	    indexArray = [],
-    	    halfHeight = height / 2;
-
-    	// group variables
-    	var groupStart = 0;
-
-    	// generate geometry
-
-    	generateTorso();
-
-    	if ( openEnded === false ) {
-
-    		if ( radiusTop > 0 ) generateCap( true );
-    		if ( radiusBottom > 0 ) generateCap( false );
-
-    	}
-
-    	// build geometry
-
-    	this.setIndex( indices );
-    	this.addAttribute( 'position', vertices );
-    	this.addAttribute( 'normal', normals );
-    	this.addAttribute( 'uv', uvs );
-
-    	// helper functions
-
-    	function calculateVertexCount() {
-
-    		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
-
-    		if ( openEnded === false ) {
-
-    			count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
-
-    		}
-
-    		return count;
-
-    	}
-
-    	function calculateIndexCount() {
-
-    		var count = radialSegments * heightSegments * 2 * 3;
-
-    		if ( openEnded === false ) {
-
-    			count += radialSegments * nbCap * 3;
-
-    		}
-
-    		return count;
-
-    	}
-
-    	function generateTorso() {
-
-    		var x, y;
-    		var normal = new Vector3();
-    		var vertex = new Vector3();
-
-    		var groupCount = 0;
-
-    		// this will be used to calculate the normal
-    		var slope = ( radiusBottom - radiusTop ) / height;
-
-    		// generate vertices, normals and uvs
-
-    		for ( y = 0; y <= heightSegments; y ++ ) {
-
-    			var indexRow = [];
-
-    			var v = y / heightSegments;
-
-    			// calculate the radius of the current row
-    			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
-
-    			for ( x = 0; x <= radialSegments; x ++ ) {
-
-    				var u = x / radialSegments;
-
-    				var theta = u * thetaLength + thetaStart;
-
-    				var sinTheta = Math.sin( theta );
-    				var cosTheta = Math.cos( theta );
-
-    				// vertex
-    				vertex.x = radius * sinTheta;
-    				vertex.y = - v * height + halfHeight;
-    				vertex.z = radius * cosTheta;
-    				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
-
-    				// normal
-    				normal.set( sinTheta, slope, cosTheta ).normalize();
-    				normals.setXYZ( index, normal.x, normal.y, normal.z );
-
-    				// uv
-    				uvs.setXY( index, u, 1 - v );
-
-    				// save index of vertex in respective row
-    				indexRow.push( index );
-
-    				// increase index
-    				index ++;
-
-    			}
-
-    			// now save vertices of the row in our index array
-    			indexArray.push( indexRow );
-
-    		}
-
-    		// generate indices
-
-    		for ( x = 0; x < radialSegments; x ++ ) {
-
-    			for ( y = 0; y < heightSegments; y ++ ) {
-
-    				// we use the index array to access the correct indices
-    				var i1 = indexArray[ y ][ x ];
-    				var i2 = indexArray[ y + 1 ][ x ];
-    				var i3 = indexArray[ y + 1 ][ x + 1 ];
-    				var i4 = indexArray[ y ][ x + 1 ];
-
-    				// face one
-    				indices.setX( indexOffset, i1 ); indexOffset ++;
-    				indices.setX( indexOffset, i2 ); indexOffset ++;
-    				indices.setX( indexOffset, i4 ); indexOffset ++;
-
-    				// face two
-    				indices.setX( indexOffset, i2 ); indexOffset ++;
-    				indices.setX( indexOffset, i3 ); indexOffset ++;
-    				indices.setX( indexOffset, i4 ); indexOffset ++;
-
-    				// update counters
-    				groupCount += 6;
-
-    			}
-
-    		}
-
-    		// add a group to the geometry. this will ensure multi material support
-    		scope.addGroup( groupStart, groupCount, 0 );
-
-    		// calculate new start value for groups
-    		groupStart += groupCount;
-
-    	}
-
-    	function generateCap( top ) {
-
-    		var x, centerIndexStart, centerIndexEnd;
-
-    		var uv = new Vector2();
-    		var vertex = new Vector3();
-
-    		var groupCount = 0;
-
-    		var radius = ( top === true ) ? radiusTop : radiusBottom;
-    		var sign = ( top === true ) ? 1 : - 1;
-
-    		// save the index of the first center vertex
-    		centerIndexStart = index;
-
-    		// first we generate the center vertex data of the cap.
-    		// because the geometry needs one set of uvs per face,
-    		// we must generate a center vertex per face/segment
-
-    		for ( x = 1; x <= radialSegments; x ++ ) {
-
-    			// vertex
-    			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
-
-    			// normal
-    			normals.setXYZ( index, 0, sign, 0 );
-
-    			// uv
-    			uv.x = 0.5;
-    			uv.y = 0.5;
-
-    			uvs.setXY( index, uv.x, uv.y );
-
-    			// increase index
-    			index ++;
-
-    		}
-
-    		// save the index of the last center vertex
-    		centerIndexEnd = index;
-
-    		// now we generate the surrounding vertices, normals and uvs
-
-    		for ( x = 0; x <= radialSegments; x ++ ) {
-
-    			var u = x / radialSegments;
-    			var theta = u * thetaLength + thetaStart;
-
-    			var cosTheta = Math.cos( theta );
-    			var sinTheta = Math.sin( theta );
-
-    			// vertex
-    			vertex.x = radius * sinTheta;
-    			vertex.y = halfHeight * sign;
-    			vertex.z = radius * cosTheta;
-    			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
-
-    			// normal
-    			normals.setXYZ( index, 0, sign, 0 );
-
-    			// uv
-    			uv.x = ( cosTheta * 0.5 ) + 0.5;
-    			uv.y = ( sinTheta * 0.5 * sign ) + 0.5;
-    			uvs.setXY( index, uv.x, uv.y );
-
-    			// increase index
-    			index ++;
-
-    		}
-
-    		// generate indices
-
-    		for ( x = 0; x < radialSegments; x ++ ) {
-
-    			var c = centerIndexStart + x;
-    			var i = centerIndexEnd + x;
-
-    			if ( top === true ) {
-
-    				// face top
-    				indices.setX( indexOffset, i ); indexOffset ++;
-    				indices.setX( indexOffset, i + 1 ); indexOffset ++;
-    				indices.setX( indexOffset, c ); indexOffset ++;
-
-    			} else {
-
-    				// face bottom
-    				indices.setX( indexOffset, i + 1 ); indexOffset ++;
-    				indices.setX( indexOffset, i ); indexOffset ++;
-    				indices.setX( indexOffset, c ); indexOffset ++;
-
-    			}
-
-    			// update counters
-    			groupCount += 3;
-
-    		}
-
-    		// add a group to the geometry. this will ensure multi material support
-    		scope.addGroup( groupStart, groupCount, top === true ? 1 : 2 );
-
-    		// calculate new start value for groups
-    		groupStart += groupCount;
-
-    	}
-
-    }
-
-    CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     */
-
-    function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'CylinderGeometry';
-
-    	this.parameters = {
-    		radiusTop: radiusTop,
-    		radiusBottom: radiusBottom,
-    		height: height,
-    		radialSegments: radialSegments,
-    		heightSegments: heightSegments,
-    		openEnded: openEnded,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
-    	this.mergeVertices();
-
-    }
-
-    CylinderGeometry.prototype = Object.create( Geometry.prototype );
-    CylinderGeometry.prototype.constructor = CylinderGeometry;
-
-    /**
-     * @author abelnation / http://github.com/abelnation
-     */
-
-    function ConeGeometry(
-    	radius, height,
-    	radialSegments, heightSegments,
-    	openEnded, thetaStart, thetaLength ) {
-
-    	CylinderGeometry.call( this,
-    		0, radius, height,
-    		radialSegments, heightSegments,
-    		openEnded, thetaStart, thetaLength );
-
-    	this.type = 'ConeGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		height: height,
-    		radialSegments: radialSegments,
-    		heightSegments: heightSegments,
-    		openEnded: openEnded,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    }
-
-    ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
-    ConeGeometry.prototype.constructor = ConeGeometry;
-
-    /*
-     * @author: abelnation / http://github.com/abelnation
-     */
-
-    function ConeBufferGeometry(
-    	radius, height,
-    	radialSegments, heightSegments,
-    	openEnded, thetaStart, thetaLength ) {
-
-    	CylinderBufferGeometry.call( this,
-    		0, radius, height,
-    		radialSegments, heightSegments,
-    		openEnded, thetaStart, thetaLength );
-
-    	this.type = 'ConeBufferGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		height: height,
-    		radialSegments: radialSegments,
-    		heightSegments: heightSegments,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    }
-
-    ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
-
-    /**
-     * @author benaadams / https://twitter.com/ben_a_adams
-     */
-
-    function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
-
-    	BufferGeometry.call( this );
-
-    	this.type = 'CircleBufferGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		segments: segments,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	radius = radius || 50;
-    	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-
-    	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-    	var vertices = segments + 2;
-
-    	var positions = new Float32Array( vertices * 3 );
-    	var normals = new Float32Array( vertices * 3 );
-    	var uvs = new Float32Array( vertices * 2 );
-
-    	// center data is already zero, but need to set a few extras
-    	normals[ 2 ] = 1.0;
-    	uvs[ 0 ] = 0.5;
-    	uvs[ 1 ] = 0.5;
-
-    	for ( var s = 0, i = 3, ii = 2 ; s <= segments; s ++, i += 3, ii += 2 ) {
-
-    		var segment = thetaStart + s / segments * thetaLength;
-
-    		positions[ i ] = radius * Math.cos( segment );
-    		positions[ i + 1 ] = radius * Math.sin( segment );
-
-    		normals[ i + 2 ] = 1; // normal z
-
-    		uvs[ ii ] = ( positions[ i ] / radius + 1 ) / 2;
-    		uvs[ ii + 1 ] = ( positions[ i + 1 ] / radius + 1 ) / 2;
-
-    	}
-
-    	var indices = [];
-
-    	for ( var i = 1; i <= segments; i ++ ) {
-
-    		indices.push( i, i + 1, 0 );
-
-    	}
-
-    	this.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
-    	this.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-    	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-    	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
-
-    	this.boundingSphere = new Sphere( new Vector3(), radius );
-
-    }
-
-    CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-    CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
-
-    /**
-     * @author hughes
-     */
-
-    function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'CircleGeometry';
-
-    	this.parameters = {
-    		radius: radius,
-    		segments: segments,
-    		thetaStart: thetaStart,
-    		thetaLength: thetaLength
-    	};
-
-    	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
-
-    }
-
-    CircleGeometry.prototype = Object.create( Geometry.prototype );
-    CircleGeometry.prototype.constructor = CircleGeometry;
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
-     */
-
-    function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-    	Geometry.call( this );
-
-    	this.type = 'BoxGeometry';
-
-    	this.parameters = {
-    		width: width,
-    		height: height,
-    		depth: depth,
-    		widthSegments: widthSegments,
-    		heightSegments: heightSegments,
-    		depthSegments: depthSegments
-    	};
-
-    	this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
-    	this.mergeVertices();
-
-    }
-
-    BoxGeometry.prototype = Object.create( Geometry.prototype );
-    BoxGeometry.prototype.constructor = BoxGeometry;
-
-
-
-    var Geometries = Object.freeze({
-    	WireframeGeometry: WireframeGeometry,
-    	ParametricGeometry: ParametricGeometry,
-    	TetrahedronGeometry: TetrahedronGeometry,
-    	OctahedronGeometry: OctahedronGeometry,
-    	IcosahedronGeometry: IcosahedronGeometry,
-    	DodecahedronGeometry: DodecahedronGeometry,
-    	PolyhedronGeometry: PolyhedronGeometry,
-    	TubeGeometry: TubeGeometry,
-    	TorusKnotGeometry: TorusKnotGeometry,
-    	TorusKnotBufferGeometry: TorusKnotBufferGeometry,
-    	TorusGeometry: TorusGeometry,
-    	TorusBufferGeometry: TorusBufferGeometry,
-    	TextGeometry: TextGeometry,
-    	SphereBufferGeometry: SphereBufferGeometry,
-    	SphereGeometry: SphereGeometry,
-    	RingGeometry: RingGeometry,
-    	RingBufferGeometry: RingBufferGeometry,
-    	PlaneBufferGeometry: PlaneBufferGeometry,
-    	PlaneGeometry: PlaneGeometry,
-    	LatheGeometry: LatheGeometry,
-    	LatheBufferGeometry: LatheBufferGeometry,
-    	ShapeGeometry: ShapeGeometry,
-    	ExtrudeGeometry: ExtrudeGeometry,
-    	EdgesGeometry: EdgesGeometry,
-    	ConeGeometry: ConeGeometry,
-    	ConeBufferGeometry: ConeBufferGeometry,
-    	CylinderGeometry: CylinderGeometry,
-    	CylinderBufferGeometry: CylinderBufferGeometry,
-    	CircleBufferGeometry: CircleBufferGeometry,
-    	CircleGeometry: CircleGeometry,
-    	BoxBufferGeometry: BoxBufferGeometry,
-    	BoxGeometry: BoxGeometry
-    });
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
-     */
-
     function ObjectLoader ( manager ) {
 
     	this.manager = ( manager !== undefined ) ? manager : exports.DefaultLoadingManager;
@@ -34092,22 +34092,6 @@
     Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
     	constructor: Shape,
-
-    	// Convenience method to return ExtrudeGeometry
-
-    	extrude: function ( options ) {
-
-    		return new ExtrudeGeometry( this, options );
-
-    	},
-
-    	// Convenience method to return ShapeGeometry
-
-    	makeGeometry: function ( options ) {
-
-    		return new ShapeGeometry( this, options );
-
-    	},
 
     	getPointsHoles: function ( divisions ) {
 
@@ -40782,6 +40766,13 @@
     	}
     } );
 
+    Object.assign( Line3.prototype, {
+    	center: function ( optionalTarget ) {
+    		console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
+    		return this.getCenter( optionalTarget );
+    	}
+    } );
+
     Object.assign( Matrix3.prototype, {
     	multiplyVector3: function ( vector ) {
     		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
@@ -40865,6 +40856,17 @@
     	isIntersectionSphere: function ( sphere ) {
     		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
     		return this.intersectsSphere( sphere );
+    	}
+    } );
+
+    Object.assign( Shape.prototype, {
+    	extrude: function ( options ) {
+    		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
+    		return new ExtrudeGeometry( this, options );
+    	},
+    	makeGeometry: function ( options ) {
+    		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.' );
+    		return new ShapeGeometry( this, options );
     	}
     } );
 
@@ -41646,22 +41648,6 @@
     exports.Font = Font;
     exports.CurvePath = CurvePath;
     exports.Curve = Curve;
-    exports.ShadowMaterial = ShadowMaterial;
-    exports.SpriteMaterial = SpriteMaterial;
-    exports.RawShaderMaterial = RawShaderMaterial;
-    exports.ShaderMaterial = ShaderMaterial;
-    exports.PointsMaterial = PointsMaterial;
-    exports.MultiMaterial = MultiMaterial;
-    exports.MeshPhysicalMaterial = MeshPhysicalMaterial;
-    exports.MeshStandardMaterial = MeshStandardMaterial;
-    exports.MeshPhongMaterial = MeshPhongMaterial;
-    exports.MeshNormalMaterial = MeshNormalMaterial;
-    exports.MeshLambertMaterial = MeshLambertMaterial;
-    exports.MeshDepthMaterial = MeshDepthMaterial;
-    exports.MeshBasicMaterial = MeshBasicMaterial;
-    exports.LineDashedMaterial = LineDashedMaterial;
-    exports.LineBasicMaterial = LineBasicMaterial;
-    exports.Material = Material;
     exports.WireframeGeometry = WireframeGeometry;
     exports.ParametricGeometry = ParametricGeometry;
     exports.TetrahedronGeometry = TetrahedronGeometry;
@@ -41694,6 +41680,22 @@
     exports.CircleGeometry = CircleGeometry;
     exports.BoxBufferGeometry = BoxBufferGeometry;
     exports.BoxGeometry = BoxGeometry;
+    exports.ShadowMaterial = ShadowMaterial;
+    exports.SpriteMaterial = SpriteMaterial;
+    exports.RawShaderMaterial = RawShaderMaterial;
+    exports.ShaderMaterial = ShaderMaterial;
+    exports.PointsMaterial = PointsMaterial;
+    exports.MultiMaterial = MultiMaterial;
+    exports.MeshPhysicalMaterial = MeshPhysicalMaterial;
+    exports.MeshStandardMaterial = MeshStandardMaterial;
+    exports.MeshPhongMaterial = MeshPhongMaterial;
+    exports.MeshNormalMaterial = MeshNormalMaterial;
+    exports.MeshLambertMaterial = MeshLambertMaterial;
+    exports.MeshDepthMaterial = MeshDepthMaterial;
+    exports.MeshBasicMaterial = MeshBasicMaterial;
+    exports.LineDashedMaterial = LineDashedMaterial;
+    exports.LineBasicMaterial = LineBasicMaterial;
+    exports.Material = Material;
     exports.REVISION = REVISION;
     exports.MOUSE = MOUSE;
     exports.CullFaceNone = CullFaceNone;
