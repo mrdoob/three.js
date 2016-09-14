@@ -83,6 +83,9 @@ test( "size", function() {
 
 	a = new THREE.Box3( zero3.clone(), one3.clone() );
 	ok( a.size().equals( one3 ), "Passed!" );
+
+	a = new THREE.Box3();
+	ok( a.size().equals( zero3 ), "The size of a newly created Box3 should be (0, 0, 0)" );
 });
 
 test( "expandByPoint", function() {

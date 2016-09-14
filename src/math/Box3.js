@@ -211,6 +211,12 @@ Box3.prototype = {
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
+		// If the Box3 has been set to 'empty', a subtraction will result in a wrong
+		// result: (-Infinity, -Infinity, -Infinity) instead of the correct (0, 0, 0)
+		if( equals(this.min, Infinity) && equals(this.max, -Infinity) ) {
+			return new Vector3();
+		}
+
 		return result.subVectors( this.max, this.min );
 
 	},
@@ -477,5 +483,11 @@ Box3.prototype = {
 
 };
 
+
+function equals(vec, value) {
+
+	return (vec.x === value) && (vec.y === value) && (vec.z === value);
+
+}
 
 export { Box3 };
