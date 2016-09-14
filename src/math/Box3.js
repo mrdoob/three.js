@@ -394,7 +394,8 @@ Box3.prototype = {
 
 			var result = optionalTarget || new Sphere();
 
-			result.center = this.getCenter();
+			this.getCenter( result.center );
+
 			result.radius = this.size( v1 ).length() * 0.5;
 
 			return result;
