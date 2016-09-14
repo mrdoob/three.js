@@ -780,7 +780,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	merge: function ( geometry, offset ) {
+	merge: function( geometry ) {
 
 		if ( (geometry && geometry.isBufferGeometry) === false ) {
 
@@ -789,27 +789,54 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		var i, il, key, attributes = [],
 
-		var attributes = this.attributes;
+			indexed = this.index !== null;
 
-		for ( var key in attributes ) {
+		for ( key in this.attributes ) {
 
-			if ( geometry.attributes[ key ] === undefined ) continue;
+			attributes.push( key );
 
-			var attribute1 = attributes[ key ];
-			var attributeArray1 = attribute1.array;
+		}
 
-			var attribute2 = geometry.attributes[ key ];
-			var attributeArray2 = attribute2.array;
 
-			var attributeSize = attribute2.itemSize;
+		for ( key in geometry.attributes ) {
 
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
+			if ( attributes.indexOf( key ) === - 1 ) {
 
-				attributeArray1[ j ] = attributeArray2[ i ];
+				console.error( 'THREE.BufferGeometry.merge(): ' + key + ' attribute mismatch' );
 
 			}
+
+		}
+
+		if ( indexed === ( geometry.index !== null ) ) {
+
+			if ( indexed ) {
+
+				var indices = geometry.index.array, offset = this.attributes[ 'position' ].count;
+
+				for ( i = 0, il = indices.length; i < il; i ++ ) {
+
+					indices[ i ] = offset + indices[ i ];
+
+				}
+
+				this.index.merge( geometry.index );
+
+			}
+
+		} else {
+
+			console.error( 'THREE.BufferGeometry: unable to merge non indexed with indexed geometries' );
+
+		}
+
+		for ( i = 0, il = attributes.length; i < il; i ++ ) {
+
+			key = attributes[ i ];
+
+			this.attributes[ key ].merge( geometry.attributes[ key ] );
 
 		}
 
