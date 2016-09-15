@@ -1524,6 +1524,8 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
+				if ( object.onBeforeRender !== null ) object.onBeforeRender();
+
 				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
 
 			}
