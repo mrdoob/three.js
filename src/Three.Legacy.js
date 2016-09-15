@@ -11,12 +11,17 @@ import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
-import { BoxGeometry } from './extras/geometries/BoxGeometry.js';
+import { BoxGeometry } from './geometries/BoxGeometry.js';
+import { EdgesGeometry } from './geometries/EdgesGeometry.js';
+import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
+import { ShapeGeometry } from './geometries/ShapeGeometry.js';
+import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
+import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
 import { MeshPhongMaterial } from './materials/MeshPhongMaterial.js';
 import { MultiMaterial } from './materials/MultiMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
@@ -24,18 +29,21 @@ import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
 import { Color } from './math/Color.js';
+import { Line3 } from './math/Line3.js';
 import { Matrix3 } from './math/Matrix3.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Ray } from './math/Ray.js';
 import { Vector3 } from './math/Vector3.js';
+import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
+import { Shape } from './extras/core/Shape.js';
 
 export { BoxGeometry as CubeGeometry };
 
@@ -84,7 +92,23 @@ export function Vertex ( x, y, z ) {
 
 //
 
+export function EdgesHelper( object, hex ) {
+	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
+	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+}
+
+export function WireframeHelper( object, hex ) {
+	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
+	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+}
+
+//
+
 Object.assign( Box2.prototype, {
+	center: function ( optionalTarget ) {
+		console.warn( 'THREE.Box2: .center() has been renamed to .getCenter().' );
+		return this.getCenter( optionalTarget );
+	},
 	empty: function () {
 		console.warn( 'THREE.Box2: .empty() has been renamed to .isEmpty().' );
 		return this.isEmpty();
@@ -92,10 +116,18 @@ Object.assign( Box2.prototype, {
 	isIntersectionBox: function ( box ) {
 		console.warn( 'THREE.Box2: .isIntersectionBox() has been renamed to .intersectsBox().' );
 		return this.intersectsBox( box );
+	},
+	size: function ( optionalTarget ) {
+		console.warn( 'THREE.Box2: .size() has been renamed to .getSize().' );
+		return this.getSize( optionalTarget );
 	}
 } );
 
 Object.assign( Box3.prototype, {
+	center: function ( optionalTarget ) {
+		console.warn( 'THREE.Box3: .center() has been renamed to .getCenter().' );
+		return this.getCenter( optionalTarget );
+	},
 	empty: function () {
 		console.warn( 'THREE.Box3: .empty() has been renamed to .isEmpty().' );
 		return this.isEmpty();
@@ -107,6 +139,17 @@ Object.assign( Box3.prototype, {
 	isIntersectionSphere: function ( sphere ) {
 		console.warn( 'THREE.Box3: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 		return this.intersectsSphere( sphere );
+	},
+	size: function ( optionalTarget ) {
+		console.warn( 'THREE.Box3: .size() has been renamed to .getSize().' );
+		return this.getSize( optionalTarget );
+	}
+} );
+
+Object.assign( Line3.prototype, {
+	center: function ( optionalTarget ) {
+		console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
+		return this.getCenter( optionalTarget );
 	}
 } );
 
@@ -193,6 +236,17 @@ Object.assign( Ray.prototype, {
 	isIntersectionSphere: function ( sphere ) {
 		console.warn( 'THREE.Ray: .isIntersectionSphere() has been renamed to .intersectsSphere().' );
 		return this.intersectsSphere( sphere );
+	}
+} );
+
+Object.assign( Shape.prototype, {
+	extrude: function ( options ) {
+		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
+		return new ExtrudeGeometry( this, options );
+	},
+	makeGeometry: function ( options ) {
+		console.warn( 'THREE.Shape: .makeGeometry() has been removed. Use ShapeGeometry() instead.' );
+		return new ShapeGeometry( this, options );
 	}
 } );
 

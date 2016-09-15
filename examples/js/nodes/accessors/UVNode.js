@@ -21,7 +21,7 @@ THREE.UVNode.prototype.generate = function( builder, output ) {
 	var material = builder.material;
 	var result;
 
-	material.requestAttrib.uv[ this.index ] = true;
+	material.requestAttribs.uv[ this.index ] = true;
 
 	if ( builder.isShader( 'vertex' ) ) result = THREE.UVNode.vertexDict[ this.index ];
 	else result = THREE.UVNode.fragmentDict[ this.index ];

@@ -20,7 +20,11 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+<<<<<<< HEAD
 	this.count = array.length / itemSize;
+=======
+	this.count = array !== undefined ? array.length / itemSize : 0;
+>>>>>>> dev
 	this.normalized = normalized === true;
 
 	this.dynamic = false;

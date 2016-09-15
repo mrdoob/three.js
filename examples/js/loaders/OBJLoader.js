@@ -89,13 +89,13 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
+
 				if ( this.object && typeof this.object._finalize === 'function' ) {
 
-					this.object._finalize();
+					this.object._finalize( true );
 
 				}
-
-				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
 
 				this.object = {
 					name : name || '',
@@ -132,16 +132,18 @@ THREE.OBJLoader.prototype = {
 							inherited  : false,
 
 							clone : function( index ) {
-								return {
+								var cloned = {
 									index      : ( typeof index === 'number' ? index : this.index ),
 									name       : this.name,
 									mtllib     : this.mtllib,
 									smooth     : this.smooth,
-									groupStart : this.groupEnd,
+									groupStart : 0,
 									groupEnd   : -1,
 									groupCount : -1,
 									inherited  : false
 								};
+								cloned.clone = this.clone.bind(cloned);
+								return cloned;
 							}
 						};
 
@@ -172,12 +174,25 @@ THREE.OBJLoader.prototype = {
 
 						}
 
+						// Ignore objects tail materials if no face declarations followed them before a new o/g started.
+						if ( end && this.materials.length > 1 ) {
+
+							for ( var mi = this.materials.length - 1; mi >= 0; mi-- ) {
+								if ( this.materials[mi].groupCount <= 0 ) {
+									this.materials.splice( mi, 1 );
+								}
+							}
+
+						}
+
 						// Guarantee at least one empty material, this makes the creation later more straight forward.
-						if ( end !== false && this.materials.length === 0 ) {
+						if ( end && this.materials.length === 0 ) {
+
 							this.materials.push({
 								name   : '',
 								smooth : this.smooth
 							});
+
 						}
 
 						return lastMultiMaterial;
@@ -207,7 +222,7 @@ THREE.OBJLoader.prototype = {
 
 				if ( this.object && typeof this.object._finalize === 'function' ) {
 
-					this.object._finalize();
+					this.object._finalize( true );
 
 				}
 
@@ -412,7 +427,14 @@ THREE.OBJLoader.prototype = {
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
 			// This is faster than String.split with regex that splits on both
-			text = text.replace( '\r\n', '\n' );
+			text = text.replace( /\r\n/g, '\n' );
+
+		}
+
+		if ( text.indexOf( '\\\n' ) !== - 1) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\n/g, '' );
 
 		}
 
@@ -563,7 +585,10 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[ 0 ].substr( 1 ).trim();
+				// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
+				// var name = result[ 0 ].substr( 1 ).trim();
+				var name = ( " " + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
+
 				state.startObject( name );
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {

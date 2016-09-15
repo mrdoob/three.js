@@ -40,7 +40,7 @@ Line3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );

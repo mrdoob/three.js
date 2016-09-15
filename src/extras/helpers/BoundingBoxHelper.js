@@ -1,6 +1,6 @@
 import { Mesh } from '../../objects/Mesh';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { BoxGeometry } from '../geometries/BoxGeometry';
+import { BoxGeometry } from '../../geometries/BoxGeometry';
 import { Box3 } from '../../math/Box3';
 
 /**
@@ -30,7 +30,7 @@ BoundingBoxHelper.prototype.update = function () {
 
 	this.box.size( this.scale );
 
-	this.box.center( this.position );
+	this.box.getCenter( this.position );
 
 };
 

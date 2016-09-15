@@ -40,7 +40,7 @@ Sphere.prototype = {
 
 			} else {
 
-				box.setFromPoints( points ).center( center );
+				box.setFromPoints( points ).getCenter( center );
 
 			}
 
