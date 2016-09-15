@@ -12,13 +12,16 @@ import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
+import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
+import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
+import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
 import { MeshPhongMaterial } from './materials/MeshPhongMaterial.js';
 import { MultiMaterial } from './materials/MultiMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
@@ -33,6 +36,7 @@ import { Plane } from './math/Plane.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Ray } from './math/Ray.js';
 import { Vector3 } from './math/Vector3.js';
+import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
 import { Sprite } from './objects/Sprite.js';
@@ -84,6 +88,18 @@ export function ParticleSystemMaterial ( parameters ) {
 export function Vertex ( x, y, z ) {
 	console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
 	return new Vector3( x, y, z );
+}
+
+//
+
+export function EdgesHelper( object, hex ) {
+	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
+	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+}
+
+export function WireframeHelper( object, hex ) {
+	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
+	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
 }
 
 //
