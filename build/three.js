@@ -41539,7 +41539,6 @@
     exports.Uniform = Uniform;
     exports.InstancedBufferGeometry = InstancedBufferGeometry;
     exports.BufferGeometry = BufferGeometry;
-    exports.DirectGeometry = DirectGeometry;
     exports.GeometryIdCount = GeometryIdCount;
     exports.Geometry = Geometry;
     exports.InterleavedBufferAttribute = InterleavedBufferAttribute;
