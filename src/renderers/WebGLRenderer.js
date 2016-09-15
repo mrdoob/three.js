@@ -7,10 +7,10 @@ import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
 import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
-import { BoxBufferGeometry } from '../extras/geometries/BoxBufferGeometry';
 import { Mesh } from '../objects/Mesh';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { PlaneBufferGeometry } from '../extras/geometries/PlaneBufferGeometry';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
@@ -1130,7 +1130,7 @@ function WebGLRenderer( parameters ) {
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		if ( ( camera && camera.isCamera ) === false ) {
+		if ( camera !== undefined && camera.isCamera !== true ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;

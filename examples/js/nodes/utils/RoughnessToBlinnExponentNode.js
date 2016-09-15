@@ -37,8 +37,7 @@ THREE.RoughnessToBlinnExponentNode.prototype.generate = function( builder, outpu
 
 			return builder.format( 'getSpecularMIPLevel( Material_BlinnShininessExponent( material ), 8 )', this.type, output );
 
-		}
-		else {
+		} else {
 
 			console.warn( "THREE.RoughnessToBlinnExponentNode is only compatible with PhysicalMaterial." );
 
@@ -46,8 +45,7 @@ THREE.RoughnessToBlinnExponentNode.prototype.generate = function( builder, outpu
 
 		}
 
-	}
-	else {
+	} else {
 
 		console.warn( "THREE.RoughnessToBlinnExponentNode is not compatible with " + builder.shader + " shader." );
 

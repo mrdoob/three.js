@@ -27,12 +27,15 @@ THREE.MirrorNode.prototype.generate = function( builder, output ) {
 		this.coordResult.a = this.offset;
 		this.texture.coord = this.offset ? this.coordResult : this.coord;
 
-		var coord = this.texture.build( builder, this.type );
+		if ( output === 'sampler2D' ) {
 
-		return builder.format( coord, this.type, output );
+			return this.texture.build( builder, output );
 
-	}
-	else {
+		}
+
+		return builder.format( this.texture.build( builder, this.type ), this.type, output );
+
+	} else {
 
 		console.warn( "THREE.MirrorNode is not compatible with " + builder.shader + " shader." );
 

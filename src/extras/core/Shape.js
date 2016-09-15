@@ -1,6 +1,4 @@
 import { PathPrototype } from './PathPrototype';
-import { ShapeGeometry } from '../geometries/ShapeGeometry';
-import { ExtrudeGeometry } from '../geometries/ExtrudeGeometry';
 import { Path } from './Path';
 
 /**
@@ -25,22 +23,6 @@ function Shape() {
 Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
 	constructor: Shape,
-
-	// Convenience method to return ExtrudeGeometry
-
-	extrude: function ( options ) {
-
-		return new ExtrudeGeometry( this, options );
-
-	},
-
-	// Convenience method to return ShapeGeometry
-
-	makeGeometry: function ( options ) {
-
-		return new ShapeGeometry( this, options );
-
-	},
 
 	getPointsHoles: function ( divisions ) {
 

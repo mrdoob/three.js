@@ -356,7 +356,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		this.computeBoundingBox();
 
-		var offset = this.boundingBox.center().negate();
+		var offset = this.boundingBox.getCenter().negate();
 
 		this.translate( offset.x, offset.y, offset.z );
 

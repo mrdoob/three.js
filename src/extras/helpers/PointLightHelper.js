@@ -1,6 +1,6 @@
 import { Mesh } from '../../objects/Mesh';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry';
+import { SphereBufferGeometry } from '../../geometries/SphereBufferGeometry';
 
 /**
  * @author alteredq / http://alteredqualia.com/

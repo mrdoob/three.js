@@ -228,14 +228,6 @@
 		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</div>
 
-		<h3>[method:null computeOffsets] ( [page:Integer size] )</h3>
-		<div>
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
-		</div>
-
 		<h3>[method:null merge]( [page:BufferGeometry bufferGeometry], [page:Integer offset] )</h3>
 		<div>
 		Merge in another BufferGeometry with an optional offset of where to start merging in.
