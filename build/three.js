@@ -39131,24 +39131,6 @@
 
     /**
      * @author mrdoob / http://mrdoob.com/
-     */
-
-    function WireframeHelper( object, hex ) {
-
-    	var color = ( hex !== undefined ) ? hex : 0xffffff;
-
-    	LineSegments.call( this, new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: color } ) );
-
-    	this.matrix = object.matrixWorld;
-    	this.matrixAutoUpdate = false;
-
-    }
-
-    WireframeHelper.prototype = Object.create( LineSegments.prototype );
-    WireframeHelper.prototype.constructor = WireframeHelper;
-
-    /**
-     * @author mrdoob / http://mrdoob.com/
      * @author WestLangley / http://github.com/WestLangley
     */
 
@@ -39768,30 +39750,6 @@
     	};
 
     }() );
-
-    /**
-     * @author WestLangley / http://github.com/WestLangley
-     * @param object THREE.Mesh whose geometry will be used
-     * @param hex line color
-     * @param thresholdAngle the minimum angle (in degrees),
-     * between the face normals of adjacent faces,
-     * that is required to render an edge. A value of 10 means
-     * an edge is only rendered if the angle is at least 10 degrees.
-     */
-
-    function EdgesHelper( object, hex, thresholdAngle ) {
-
-    	var color = ( hex !== undefined ) ? hex : 0xffffff;
-
-    	LineSegments.call( this, new EdgesGeometry( object.geometry, thresholdAngle ), new LineBasicMaterial( { color: color } ) );
-
-    	this.matrix = object.matrixWorld;
-    	this.matrixAutoUpdate = false;
-
-    }
-
-    EdgesHelper.prototype = Object.create( LineSegments.prototype );
-    EdgesHelper.prototype.constructor = EdgesHelper;
 
     /**
      * @author alteredq / http://alteredqualia.com/
@@ -40724,6 +40682,18 @@
 
     //
 
+    function EdgesHelper( object, hex ) {
+    	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
+    	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+    }
+
+    function WireframeHelper( object, hex ) {
+    	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
+    	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+    }
+
+    //
+
     Object.assign( Box2.prototype, {
     	center: function ( optionalTarget ) {
     		console.warn( 'THREE.Box2: .center() has been renamed to .getCenter().' );
@@ -41619,7 +41589,6 @@
     exports.Color = Color;
     exports.MorphBlendMesh = MorphBlendMesh;
     exports.ImmediateRenderObject = ImmediateRenderObject;
-    exports.WireframeHelper = WireframeHelper;
     exports.VertexNormalsHelper = VertexNormalsHelper;
     exports.SpotLightHelper = SpotLightHelper;
     exports.SkeletonHelper = SkeletonHelper;
@@ -41627,7 +41596,6 @@
     exports.HemisphereLightHelper = HemisphereLightHelper;
     exports.GridHelper = GridHelper;
     exports.FaceNormalsHelper = FaceNormalsHelper;
-    exports.EdgesHelper = EdgesHelper;
     exports.DirectionalLightHelper = DirectionalLightHelper;
     exports.CameraHelper = CameraHelper;
     exports.BoundingBoxHelper = BoundingBoxHelper;
@@ -41837,6 +41805,8 @@
     exports.ParticleBasicMaterial = ParticleBasicMaterial;
     exports.ParticleSystemMaterial = ParticleSystemMaterial;
     exports.Vertex = Vertex;
+    exports.EdgesHelper = EdgesHelper;
+    exports.WireframeHelper = WireframeHelper;
     exports.GeometryUtils = GeometryUtils;
     exports.ImageUtils = ImageUtils;
     exports.Projector = Projector;
