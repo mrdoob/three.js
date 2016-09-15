@@ -4,7 +4,7 @@
 
 THREE.IntNode = function( value ) {
 
-	THREE.InputNode.call( this, 'fv1', { share: false } );
+	THREE.InputNode.call( this, 'iv1' );
 
 	this.value = [ Math.floor( value || 0 ) ];
 

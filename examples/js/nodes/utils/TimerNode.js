@@ -15,7 +15,7 @@ THREE.TimerNode = function( value, scale ) {
 THREE.TimerNode.prototype = Object.create( THREE.FloatNode.prototype );
 THREE.TimerNode.prototype.constructor = THREE.TimerNode;
 
-THREE.TimerNode.prototype.updateAnimation = function( delta ) {
+THREE.TimerNode.prototype.updateFrame = function( delta ) {
 
 	this.number += delta * this.scale;
 

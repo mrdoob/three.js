@@ -20,6 +20,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+	this.count = array !== undefined ? array.length / itemSize : 0;
 	this.normalized = normalized === true;
 
 	this.dynamic = false;
@@ -34,12 +35,6 @@ BufferAttribute.prototype = {
 	constructor: BufferAttribute,
 
 	isBufferAttribute: true,
-
-	get count() {
-
-		return this.array.length / this.itemSize;
-
-	},
 
 	set needsUpdate( value ) {
 
@@ -59,6 +54,7 @@ BufferAttribute.prototype = {
 
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
+		this.count = source.count;
 		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;

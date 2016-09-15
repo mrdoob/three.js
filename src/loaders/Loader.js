@@ -1,4 +1,4 @@
-import { FaceColors, VertexColors, DoubleSide, BackSide, MirroredRepeatWrapping, RepeatWrapping } from '../constants';
+import { FaceColors, VertexColors, DoubleSide, BackSide, MirroredRepeatWrapping, RepeatWrapping, BlendingMode } from '../constants';
 import { _Math } from '../math/Math';
 import { MaterialLoader } from './MaterialLoader';
 import { TextureLoader } from './TextureLoader';
@@ -140,7 +140,7 @@ Loader.prototype = {
 						json.name = value;
 						break;
 					case 'blending':
-						json.blending = THREE[ value ];
+						json.blending = BlendingMode[ value ];
 						break;
 					case 'colorAmbient':
 					case 'mapAmbient':

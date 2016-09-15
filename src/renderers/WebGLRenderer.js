@@ -7,10 +7,10 @@ import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
 import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
-import { BoxBufferGeometry } from '../extras/geometries/BoxBufferGeometry';
 import { Mesh } from '../objects/Mesh';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { PlaneBufferGeometry } from '../extras/geometries/PlaneBufferGeometry';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
@@ -760,6 +760,12 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
+
+				morphInfluences[ i ] = 0.0;
+
+			}
+
 			program.getUniforms().setValue(
 					_gl, 'morphTargetInfluences', morphInfluences );
 
@@ -806,7 +812,7 @@ function WebGLRenderer( parameters ) {
 		//
 
 		var dataStart = 0;
-		var dataCount = Infinity;
+		var dataCount = 0;
 
 		if ( index !== null ) {
 
@@ -828,6 +834,8 @@ function WebGLRenderer( parameters ) {
 		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+		if ( drawCount === 0 ) return;
 
 		//
 
@@ -1118,7 +1126,7 @@ function WebGLRenderer( parameters ) {
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		if ( ( camera && camera.isCamera ) === false ) {
+		if ( camera !== undefined && camera.isCamera !== true ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
@@ -1963,9 +1971,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( dynUniforms !== null ) {
 
-			WebGLUniforms.evalDynamic(
-					dynUniforms, m_uniforms, object, camera );
-
+			WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
 			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
 
 		}

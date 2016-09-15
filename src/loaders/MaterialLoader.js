@@ -1,6 +1,7 @@
 import { Vector2 } from '../math/Vector2';
 import { XHRLoader } from './XHRLoader';
 import { DefaultLoadingManager } from './LoadingManager';
+import * as Materials from '../materials/Materials';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -50,7 +51,7 @@ Object.assign( MaterialLoader.prototype, {
 
 		}
 
-		var material = new THREE[ json.type ]();
+		var material = new Materials[ json.type ]();
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;

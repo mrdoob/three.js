@@ -23,13 +23,6 @@ InterleavedBufferAttribute.prototype = {
 
 	isInterleavedBufferAttribute: true,
 
-	get length() {
-
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-		return this.array.length;
-
-	},
-
 	get count() {
 
 		return this.data.count;

@@ -45,8 +45,9 @@
 		[page:String text] — The textual <em>obj</em> structure to parse.
 		</div>
 		<div>
-		Parse an <em>obj</em> text structure and return an [page:Object3D].<br />
-		Found objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].
+		Returns an [page:Object3D]. It contains the parsed meshes as [page:Mesh] and lines as [page:LineSegments].<br />
+		All geometry is created as [page:BufferGeometry]. Default materials are created as [page:MeshPhongMaterial].<br />
+		If an <em>obj</em> object or group uses multiple materials while declaring faces geometry groups and an [page:MultiMaterial] is used.
 		</div>
 
 		<h2>Example</h2>
@@ -58,7 +59,7 @@
 		// load a resource
 		loader.load(
 			// resource URL
-			'models/skinned/UCS_config.json',
+			'models/monster.obj',
 			// Function when resource is loaded
 			function ( object ) {
 				scene.add( object );

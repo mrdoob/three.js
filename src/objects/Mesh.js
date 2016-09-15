@@ -56,34 +56,21 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	updateMorphTargets: function () {
 
-		if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
+		var morphTargets = this.geometry.morphTargets;
 
-			this.morphTargetBase = - 1;
+		if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 
-			for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+			for ( var m = 0, ml = morphTargets.length; m < ml; m ++ ) {
 
 				this.morphTargetInfluences.push( 0 );
-				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+				this.morphTargetDictionary[ morphTargets[ m ].name ] = m;
 
 			}
 
 		}
-
-	},
-
-	getMorphTargetIndexByName: function ( name ) {
-
-		if ( this.morphTargetDictionary[ name ] !== undefined ) {
-
-			return this.morphTargetDictionary[ name ];
-
-		}
-
-		console.warn( 'THREE.Mesh.getMorphTargetIndexByName: morph target ' + name + ' does not exist. Returning 0.' );
-
-		return 0;
 
 	},
 
