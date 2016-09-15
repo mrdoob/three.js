@@ -332,6 +332,8 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
+		return this;
+
 	},
 
 	updateFromObject: function ( object ) {
