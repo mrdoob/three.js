@@ -231,14 +231,12 @@ var list = {
 			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "EdgesHelper", "api/extras/helpers/EdgesHelper" ],
 			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ],
-			[ "WireframeHelper", "api/extras/helpers/WireframeHelper" ]
+			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
 		],
 
 		"Extras / Objects": [
