@@ -187,7 +187,7 @@
 
     } );
 
-    var REVISION = '81dev';
+    var REVISION = '81';
     var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
     var CullFaceNone = 0;
     var CullFaceBack = 1;
@@ -10569,6 +10569,8 @@
 
     	this.userData = {};
 
+    	this.onBeforeRender = null;
+
     }
 
     Object3D.DefaultUp = new Vector3( 0, 1, 0 );
@@ -17225,9 +17227,7 @@
     				var b = array[ i + 1 ];
     				var c = array[ i + 2 ];
 
-    				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
-    				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
-    				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+    				indices.push( a, b, b, c, c, a );
 
     			}
 
@@ -17257,34 +17257,6 @@
     		property.wireframe = attribute;
 
     		return attribute;
-
-    	}
-
-    	function checkEdge( edges, a, b ) {
-
-    		if ( a > b ) {
-
-    			var tmp = a;
-    			a = b;
-    			b = tmp;
-
-    		}
-
-    		var list = edges[ a ];
-
-    		if ( list === undefined ) {
-
-    			edges[ a ] = [ b ];
-    			return true;
-
-    		} else if ( list.indexOf( b ) === -1 ) {
-
-    			list.push( b );
-    			return true;
-
-    		}
-
-    		return false;
 
     	}
 
@@ -20147,10 +20119,12 @@
 
     		var index = geometry.index;
     		var position = geometry.attributes.position;
+    		var rangeFactor = 1;
 
     		if ( material.wireframe === true ) {
 
     			index = objects.getWireframeAttribute( geometry );
+    			rangeFactor = 2;
 
     		}
 
@@ -20181,7 +20155,6 @@
 
     		//
 
-    		var dataStart = 0;
     		var dataCount = 0;
 
     		if ( index !== null ) {
@@ -20194,14 +20167,14 @@
 
     		}
 
-    		var rangeStart = geometry.drawRange.start;
-    		var rangeCount = geometry.drawRange.count;
+    		var rangeStart = geometry.drawRange.start * rangeFactor;
+    		var rangeCount = geometry.drawRange.count * rangeFactor;
 
-    		var groupStart = group !== null ? group.start : 0;
-    		var groupCount = group !== null ? group.count : Infinity;
+    		var groupStart = group !== null ? group.start * rangeFactor : 0;
+    		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
 
-    		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-    		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+    		var drawStart = Math.max( rangeStart, groupStart );
+    		var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
     		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
@@ -20893,6 +20866,8 @@
     				} );
 
     			} else {
+
+    				if ( object.onBeforeRender !== null ) object.onBeforeRender();
 
     				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
 
@@ -36105,10 +36080,11 @@
     	//    uuid.objectName[objectIndex].propertyName[propertyIndex]
     	//    parentName/nodeName.property
     	//    parentName/parentName/nodeName.property[index]
-    	//	  .bone[Armature.DEF_cog].position
+    	//    .bone[Armature.DEF_cog].position
+    	//    scene:helium_balloon_model:helium_balloon_model.position
     	// created and tested via https://regex101.com/#javascript
 
-    	var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
+    	var re = /^((?:\w+[\/:])*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
     	var matches = re.exec( trackName );
 
     	if ( ! matches ) {
