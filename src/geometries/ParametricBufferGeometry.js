@@ -41,7 +41,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 			p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
 
-			uvs.push( j / slices, i / stacks );
+			uvs.push( u, v );
 
 		}
 
