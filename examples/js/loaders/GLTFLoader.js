@@ -203,6 +203,12 @@ THREE.GLTFLoader.prototype = {
 
 			}
 
+			if ( typeof( values.bump ) === 'string' ) {
+
+					_material.bumpMap = library.textures[ values.bump ];
+
+			}
+
 			if ( Array.isArray( values.emission ) ) _material.emissive.fromArray( values.emission );
 			if ( Array.isArray( values.specular ) ) _material.specular.fromArray( values.specular );
 
