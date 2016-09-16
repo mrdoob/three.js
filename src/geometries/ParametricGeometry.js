@@ -20,8 +20,8 @@ function ParametricGeometry( func, slices, stacks ) {
 		stacks: stacks
 	};
 
-this.fromBufferGeometry( new ParametricBufferGeometry( func, slices, stacks ) );
-this.mergeVertices();
+	this.fromBufferGeometry( new ParametricBufferGeometry( func, slices, stacks ) );
+	this.mergeVertices();
 
 }
 
