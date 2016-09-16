@@ -43,7 +43,7 @@
 		<h3>[property:Material material]</h3>
 
 		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour.</div>
-		
+
 		<h3>[property:Array morphTargetInfluences]</h3>
 
 		<div>
@@ -58,29 +58,12 @@
 		Undefined by default, but rebuilt [page:Mesh.updateMorphTargets updateMorphTargets].
 		</div>
 
-		<h3>[property:Integer morphTargetBase]</h3>
-
-		<div>
-		Specify the index of the morph that should be used as the base morph. Replaces the positions.
-		Undefined by default, but reset to -1 (non set) by [page:Mesh.updateMorphTargets updateMorphTargets].
-		</div>
-
 
 		<h2>Methods</h2>
-
-		<h3>[method:Integer getMorphTargetIndexByName]( [page:String name] )</h3>
-		<div>
-		name — a morph target name<br />
-		</div>
-		<div>
-		Returns the index of a morph target defined by name.
-		</div>
-
 
 		<h3>[method:null updateMorphTargets]()</h3>
 		<div>
 		Updates the morphtargets to have no influence on the object. Resets the
-		[page:Mesh.morphTargetForcedOrder morphTargetForcedOrder],
 		[page:Mesh.morphTargetInfluences morphTargetInfluences],
 		[page:Mesh.morphTargetDictionary morphTargetDictionary], and
 		[page:Mesh.morphTargetBase morphTargetBase] properties.
