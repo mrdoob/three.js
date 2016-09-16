@@ -89,7 +89,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( data.onUploadCallback ) {
 
-			data.onUploadCallback.call( data, name );
+			data.onUploadCallback( name );
 
 		}
 
