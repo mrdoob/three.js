@@ -28,4 +28,5 @@ this.mergeVertices();
 ParametricGeometry.prototype = Object.create( Geometry.prototype );
 ParametricGeometry.prototype.constructor = ParametricGeometry;
 
+
 export { ParametricGeometry };
