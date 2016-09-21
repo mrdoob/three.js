@@ -27,9 +27,6 @@
  * the features those classes offer while not requiring some_huge_number to be allocated.
  * It should be moved into it's own file honestly, then included before the BufferSubdivisionModifier - maybe in three's core?
  *
- *
- * EX: new TypedArrayHelper(initial_size_in_elements, 3, THREE.Vector3, Float32Array, 3, ['x', 'y', 'z']); (the x,y,z comes from THREE.Vector3. It would be abc if it were a face3. etc etc)
- *
  */
 
 THREE.Face3.prototype.set = function( a, b, c ) {
@@ -70,13 +67,13 @@ TypedArrayHelper.prototype = {
 
 		if ( register >= this.available_registers ) {
 
-			throw( 'Nope nope nope, not enough registers!' );
+			throw new Error( 'THREE.BufferSubdivisionModifier: Not enough registers in TypedArrayHelper.' );
 
 		}
 
 		if ( index > this.length ) {
 
-			throw( 'Nope nope nope, index is out of range' );
+			throw new Error( 'THREE.BufferSubdivisionModifier: Index is out of range in TypedArrayHelper.' );
 
 		}
 
@@ -162,48 +159,6 @@ TypedArrayHelper.prototype = {
 
 		}
 
-	},
-
-	each: function( function_pointer, xtra ) {
-
-		if ( typeof this.loop_register === 'undefined' ) {
-
-			this.loop_register = new this.register_type();
-
-		}
-
-		for ( var i = 0; i < this.length; i++ ) {
-
-			for ( var j = 0; j < this.unit_size; j++ ) {
-
-				this.loop_register[ this.accessors[ j ] ] = this.buffer[ i * this.unit_size + j ];
-
-			}
-
-			function_pointer( this.loop_register, i, xtra );
-
-		}
-
-	},
-
-	push_array: function ( vector ) {
-
-		if ( this.length + 1 > this.real_length ) {
-
-			this.resize( this.real_length * 2 );
-
-		}
-
-		var bpos = this.length * this.unit_size;
-
-		for ( var i = 0; i < this.unit_size; i++ ) {
-
-			this.buffer[ bpos + i ] = vector[ i ];
-
-		}
-
-		this.length++;
-
 	}
 
 };
@@ -249,62 +204,6 @@ function convertGeometryToIndexedBuffer( geometry ) {
 	BGeom.addAttribute( 'uv', new THREE.BufferAttribute( uvArray.buffer, 2 ) );
 
 	return BGeom;
-
-}
-
-function addNormal( old, newn ) {
-
-	if ( old.x === 0 ) {
-
-		old.x = newn.x;
-
-	}  else {
-
-		old.x = ( old.x + newn.x ) / 2;
-
-	}
-
-	if ( old.y === 0) {
-
-		old.y = newn.y;
-
-	} else {
-
-		old.y = ( old.y + newn.y ) / 2;
-
-	}
-
-	if ( old.z === 0 ) {
-
-		old.z = newn.z;
-
-	} else {
-
-		old.z = (old.z + newn.z) / 2;
-
-	}
-
-}
-
-function findArea( a, b, c ) {
-
-	return Math.abs( ( ( a.x * ( b.y - c.y ) ) + ( b.x * ( c.y - a.y ) ) + ( c.x * ( a.y - b.y ) ) ) / 2.0 );
-
-}
-
-function find_angle3d( A, B, C ) {
-
-	var AB = Math.sqrt( Math.pow( B.x - A.x, 2 ) + Math.pow( B.y - A.y, 2 ) );
-	var BC = Math.sqrt( Math.pow( B.x - C.x, 2 ) + Math.pow( B.y - C.y, 2 ) );
-	var AC = Math.sqrt( Math.pow( C.x - A.x, 2 ) + Math.pow( C.y - A.y, 2 ) );
-
-	return Math.acos( ( BC * BC + AB * AB - AC * AC ) / ( 2 * BC * AB ) );
-
-}
-
-function find_angle2d( p1, p2 ) {
-
-	return Math.atan2( p2.y - p1.y, p2.x - p1.x );
 
 }
 
@@ -401,7 +300,6 @@ function unIndexIndexedGeometry( geometry ) {
 	var XYZ = [ 'x', 'y', 'z' ];
 	var XY = [ 'x', 'y' ];
 
-
 	var oldVertices = new TypedArrayHelper( 0, 3, THREE.Vector3, Float32Array, 3, XYZ );
 	var oldFaces = new TypedArrayHelper( 0, 3, THREE.Face3, Uint32Array, 3, ABC );
 	var oldUvs = new TypedArrayHelper( 0, 3, THREE.Vector2, Float32Array, 2, XY );
@@ -494,19 +392,19 @@ THREE.BufferSubdivisionModifier.prototype.modify = function( geometry ) {
 
 	} else if ( !( geometry instanceof THREE.BufferGeometry ) ) {
 
-		console.log( 'Geometry is not an instance of THREE.BufferGeometry or THREE.Geometry' );
+		console.error( 'THREE.BufferSubdivisionModifier: Geometry is not an instance of THREE.BufferGeometry or THREE.Geometry' );
 
 	}
 
 	var repeats = this.subdivisions;
 
-	while ( repeats-- > 0 ) {
+	while ( repeats -- > 0 ) {
 
 		this.smooth( geometry );
 
 	}
 
-	return unIndexIndexedGeometry( geometry ); // it doesn't change what geometry points to in the function that calls this.. >_<. how annoying.
+	return unIndexIndexedGeometry( geometry );
 
 };
 
@@ -783,8 +681,7 @@ var edge_type = function ( a, b ) {
 		/******************************************************
 		*
 		*	Step 3.
-		*	Generate Faces between source vertecies
-		*	and edge vertices.
+		*	Generate faces between source vertices and edge vertices.
 		*
 		*******************************************************/
 
@@ -814,9 +711,9 @@ var edge_type = function ( a, b ) {
 			newFace( newFaces, tFace );
 			tFace.set( face.a + edgeLength, edge1, edge3 );
 			newFace( newFaces, tFace );
-			tFace.set( face.b + edgeLength,edge2,edge1 );
+			tFace.set( face.b + edgeLength, edge2, edge1 );
 			newFace( newFaces, tFace );
-			tFace.set( face.c + edgeLength,edge3,edge2 );
+			tFace.set( face.c + edgeLength, edge3, edge2 );
 			newFace( newFaces, tFace );
 
 
@@ -892,6 +789,5 @@ var edge_type = function ( a, b ) {
 		geometry.addAttribute( 'uv', new THREE.BufferAttribute( newUVs.buffer, 2 ) );
 
 	};
-
 
 } ) ();
