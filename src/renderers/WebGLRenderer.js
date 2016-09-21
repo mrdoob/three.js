@@ -781,10 +781,12 @@ function WebGLRenderer( parameters ) {
 
 		var index = geometry.index;
 		var position = geometry.attributes.position;
+		var rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
 
 			index = objects.getWireframeAttribute( geometry );
+			rangeFactor = 2;
 
 		}
 
@@ -815,7 +817,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataStart = 0;
 		var dataCount = 0;
 
 		if ( index !== null ) {
@@ -828,14 +829,14 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var rangeStart = geometry.drawRange.start;
-		var rangeCount = geometry.drawRange.count;
+		var rangeStart = geometry.drawRange.start * rangeFactor;
+		var rangeCount = geometry.drawRange.count * rangeFactor;
 
-		var groupStart = group !== null ? group.start : 0;
-		var groupCount = group !== null ? group.count : Infinity;
+		var groupStart = group !== null ? group.start * rangeFactor : 0;
+		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
 
-		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+		var drawStart = Math.max( rangeStart, groupStart );
+		var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
@@ -1527,6 +1528,8 @@ function WebGLRenderer( parameters ) {
 				} );
 
 			} else {
+
+				if ( object.onBeforeRender !== null ) object.onBeforeRender();
 
 				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
 

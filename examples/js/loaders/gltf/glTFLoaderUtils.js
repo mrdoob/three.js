@@ -5,18 +5,34 @@
 THREE.GLTFLoaderUtils = Object.create(Object, {
 
     // errors
-    MISSING_DESCRIPTION: { value: "MISSING_DESCRIPTION" },
-    INVALID_PATH: { value: "INVALID_PATH" },
-    INVALID_TYPE: { value: "INVALID_TYPE" },
+    INVALID_PATH_ERROR: { value: "INVALID_PATH" },
+    INVALID_TYPE_ERROR: { value: "INVALID_TYPE" },
     XMLHTTPREQUEST_STATUS_ERROR: { value: "XMLHTTPREQUEST_STATUS_ERROR" },
-    NOT_FOUND: { value: "NOT_FOUND" },
     // misc constants
     ARRAY_BUFFER: { value: "ArrayBuffer" },
+    // webgl constants (from https://www.opengl.org/registry/api/GL/glcorearb.h)
+    WEBGL_CONSTANTS: {
+        value: {
+            FLOAT: 5126,
+            FLOAT_MAT2: 35674,
+            FLOAT_MAT3: 35675,
+            FLOAT_MAT4: 35676,
+            FLOAT_VEC2: 35664,
+            FLOAT_VEC3: 35665,
+            FLOAT_VEC4: 35666,
+            LINEAR: 9729,
+            REPEAT: 10497,
+            SAMPLER_2D: 35678,
+            TRIANGLES: 4,
+            UNSIGNED_BYTE: 5121,
+            UNSIGNED_SHORT: 5123
+        }
+    },
 
     _streams : { value:{}, writable: true },
 
     _streamsStatus: { value: {}, writable: true },
-    
+
     _resources: { value: {}, writable: true },
 
     _resourcesStatus: { value: {}, writable: true },
@@ -123,18 +139,18 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             var self = this;
 
             if (!type) {
-                delegate.handleError(THREE.GLTFLoaderUtils.INVALID_TYPE, null);
+                delegate.handleError(THREE.GLTFLoaderUtils.INVALID_TYPE_ERROR, null);
                 return;
             }
 
             if (!path) {
-                delegate.handleError(THREE.GLTFLoaderUtils.INVALID_PATH);
+                delegate.handleError(THREE.GLTFLoaderUtils.INVALID_PATH_ERROR);
                 return;
             }
 
             var xhr = new XMLHttpRequest();
             xhr.open('GET', path, true);
-            xhr.responseType = (type === this.ARRAY_BUFFER) ? "arraybuffer" : "text";
+            xhr.responseType = (type === THREE.GLTFLoaderUtils.ARRAY_BUFFER) ? "arraybuffer" : "text";
 
             //if this is not specified, 1 "big blob" scenes fails to load.
             xhr.setRequestHeader("If-Modified-Since", "Sat, 01 Jan 1970 00:00:00 GMT");
@@ -165,16 +181,16 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             {
             	this._resourcesStatus[request.id] = 1;
             }
-            
+
             var streamStatus = this._streamsStatus[request.uri];
             if (streamStatus && streamStatus.status === "loading" )
             {
             	streamStatus.requests.push(request);
                 return;
             }
-            
+
             this._streamsStatus[request.uri] = { status : "loading", requests : [request] };
-    		
+
             var self = this;
             var processResourceDelegate = {};
 
@@ -189,7 +205,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
                     --self._resourcesStatus[req_.id];
 
                 }, this);
-            	
+
                 delete self._streamsStatus[path];
 
             };
@@ -205,9 +221,9 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
 
     _elementSizeForGLType: {
         value: function(componentType, type) {
-    	
+
     		var nElements = 0;
-    		switch(type) {    		
+    		switch(type) {
 	            case "SCALAR" :
 	                nElements = 1;
 	                break;
@@ -233,13 +249,13 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
 	            	debugger;
 	            	break;
     		}
-    		
+
             switch (componentType) {
-                case WebGLRenderingContext.FLOAT :
+                case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT :
                     return Float32Array.BYTES_PER_ELEMENT * nElements;
-                case WebGLRenderingContext.UNSIGNED_BYTE :
+                case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.UNSIGNED_BYTE :
                     return Uint8Array.BYTES_PER_ELEMENT * nElements;
-                case WebGLRenderingContext.UNSIGNED_SHORT :
+                case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.UNSIGNED_SHORT :
                     return Uint16Array.BYTES_PER_ELEMENT * nElements;
                 default :
                 	debugger;
@@ -263,9 +279,9 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
                                     "ctx" : ctx }, null);
         }
     },
-    
+
     getBuffer: {
-    	
+
             value: function(wrappedBufferView, delegate, ctx) {
 
             var savedBuffer = this._getResource(wrappedBufferView.id);
@@ -280,7 +296,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
     },
 
     getFile: {
-    	
+
         value: function(request, delegate, ctx) {
 
     		request.delegate = delegate;
@@ -292,8 +308,8 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
                 "type" : "text",
                 "delegate" : delegate,
                 "ctx" : ctx }, null);
-    	
+
             return null;
 	    }
-	},    
+	},
 });

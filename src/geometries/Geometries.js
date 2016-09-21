@@ -1,5 +1,6 @@
 export { WireframeGeometry } from './WireframeGeometry.js';
 export { ParametricGeometry } from './ParametricGeometry.js';
+export { ParametricBufferGeometry } from './ParametricBufferGeometry.js';
 export { TetrahedronGeometry } from './TetrahedronGeometry.js';
 export { OctahedronGeometry } from './OctahedronGeometry.js';
 export { IcosahedronGeometry } from './IcosahedronGeometry.js';

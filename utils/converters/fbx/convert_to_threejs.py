@@ -179,10 +179,10 @@ def hasUniqueName(o, class_id):
     object_name = o.GetName()
     object_id = o.GetUniqueID()
 
-    object_count = scene.GetSrcObjectCount(class_id)
+    object_count = scene.GetSrcObjectCount(FbxCriteria.ObjectType(class_id))
 
     for i in range(object_count):
-        other = scene.GetSrcObject(class_id, i)
+        other = scene.GetSrcObject(FbxCriteria.ObjectType(class_id), i)
         other_id = other.GetUniqueID()
         other_name = other.GetName()
 
@@ -297,21 +297,21 @@ def generate_texture_bindings(material_property, material_params):
 
     if material_property.IsValid():
         #Here we have to check if it's layeredtextures, or just textures:
-        layered_texture_count = material_property.GetSrcObjectCount(FbxLayeredTexture.ClassId)
+        layered_texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
         if layered_texture_count > 0:
             for j in range(layered_texture_count):
-                layered_texture = material_property.GetSrcObject(FbxLayeredTexture.ClassId, j)
-                texture_count = layered_texture.GetSrcObjectCount(FbxTexture.ClassId)
+                layered_texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), j)
+                texture_count = layered_texture.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
                 for k in range(texture_count):
-                    texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
+                    texture = layered_texture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),k)
                     if texture:
                         texture_id = getTextureName(texture, True)
                         material_params[binding_types[str(material_property.GetName())]] = texture_id
         else:
             # no layered texture simply get on the property
-            texture_count = material_property.GetSrcObjectCount(FbxTexture.ClassId)
+            texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
             for j in range(texture_count):
-                texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
+                texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),j)
                 if texture:
                     texture_id = getTextureName(texture, True)
                     material_params[binding_types[str(material_property.GetName())]] = texture_id
@@ -481,9 +481,9 @@ def generate_material_dict(scene):
     material_dict = {}
 
     # generate all materials for this scene
-    material_count = scene.GetSrcObjectCount(FbxSurfaceMaterial.ClassId)
+    material_count = scene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId))
     for i in range(material_count):
-        material = scene.GetSrcObject(FbxSurfaceMaterial.ClassId, i)
+        material = scene.GetSrcObject(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId), i)
         material_object = generate_material_object(material)
         material_name = getMaterialName(material)
         material_dict[material_name] = material_object
@@ -565,22 +565,22 @@ def replace_OutFolder2inFolder(url):
 def extract_material_textures(material_property, texture_dict):
     if material_property.IsValid():
         #Here we have to check if it's layeredtextures, or just textures:
-        layered_texture_count = material_property.GetSrcObjectCount(FbxLayeredTexture.ClassId)
+        layered_texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
         if layered_texture_count > 0:
             for j in range(layered_texture_count):
-                layered_texture = material_property.GetSrcObject(FbxLayeredTexture.ClassId, j)
-                texture_count = layered_texture.GetSrcObjectCount(FbxTexture.ClassId)
+                layered_texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), j)
+                texture_count = layered_texture.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
                 for k in range(texture_count):
-                    texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
+                    texture = layered_texture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),k)
                     if texture:
                         texture_object = generate_texture_object(texture)
                         texture_name = getTextureName( texture, True )
                         texture_dict[texture_name] = texture_object
         else:
             # no layered texture simply get on the property
-            texture_count = material_property.GetSrcObjectCount(FbxTexture.ClassId)
+            texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
             for j in range(texture_count):
-                texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
+                texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),j)
                 if texture:
                     texture_object = generate_texture_object(texture)
                     texture_name = getTextureName( texture, True )
@@ -591,9 +591,9 @@ def extract_textures_from_node(node, texture_dict):
     mesh = node.GetNodeAttribute()
 
     #for all materials attached to this mesh
-    material_count = mesh.GetNode().GetSrcObjectCount(FbxSurfaceMaterial.ClassId)
+    material_count = mesh.GetNode().GetSrcObjectCount(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId))
     for material_index in range(material_count):
-        material = mesh.GetNode().GetSrcObject(FbxSurfaceMaterial.ClassId, material_index)
+        material = mesh.GetNode().GetSrcObject(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId), material_index)
 
         #go through all the possible textures types
         if material:
