@@ -982,12 +982,35 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					}
 
 				}
-				else {
-					var technique = material.technique ?
-						this.resources.getEntry(material.technique) :
-						null;
+				else if (material.technique === undefined) {
 
-					values = material.values;
+					materialType = THREE.MeshPhongMaterial;
+
+					if (material.doubleSided)
+					{
+						params.side = THREE.DoubleSide;
+					}
+
+					if (material.transparent)
+					{
+						params.transparent = true;
+					}
+
+					values = {};
+					for (var prop in material.values) {
+						values[prop] = material.values[prop];
+					}
+
+				}
+				else {
+
+					var technique = this.resources.getEntry(material.technique);
+
+					values = {};
+					for (var prop in material.values) {
+						values[prop] = material.values[prop];
+					}
+
 					var description = technique.description;
 
 					if (++description.refCount > 1) {
@@ -1002,6 +1025,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					if (loadshaders) {
 						materialType = Material;
 					}
+
 				}
 
 				if (values.diffuse && typeof(values.diffuse) == 'string') {
@@ -1870,16 +1894,16 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	var self = this;
 
-	var loader = Object.create(ThreeGLTFLoader);
-	loader.initWithPath(url);
-	loader.load(new Context(rootObj,
+	this.callback = callback;
+	this.rootObj = rootObj;
+
+	this.loader = Object.create(ThreeGLTFLoader);
+	this.loader.initWithPath(url);
+	this.loader.load(new Context(rootObj,
 						function(obj) {
 						}),
 				null);
 
-	this.loader = loader;
-	this.callback = callback;
-	this.rootObj = rootObj;
 	return rootObj;
 }
 
