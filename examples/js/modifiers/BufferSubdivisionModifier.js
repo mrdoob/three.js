@@ -318,14 +318,14 @@ function compute_vertex_normals( geometry ) {
 	var oldFaces = new TypedArrayHelper( 0, 3, THREE.Face3, Uint32Array, 3, ABC );
 	oldVertices.from_existing( geometry.getAttribute( 'position' ).array );
 	var newNormals = new TypedArrayHelper( oldVertices.length * 3, 4, THREE.Vector3, Float32Array, 3, XYZ );
-	var newNormalFaces = new TypedArrayHelper( oldVertices.length, 1, function () { this.x = 0; }, Float32Array, 1, ['x'] );
+	var newNormalFaces = new TypedArrayHelper( oldVertices.length, 1, function () { this.x = 0; }, Float32Array, 1, [ 'x' ] );
 
 	newNormals.length = oldVertices.length;
-	oldFaces.from_existing(geometry.index.array);
+	oldFaces.from_existing( geometry.index.array );
 	var a, b, c;
 	var i, j, jl;
 	var my_weight;
-	var full_weights = [0.0,0.0,0.0];
+	var full_weights = [ 0.0, 0.0, 0.0 ];
 
 	for ( i = 0, il = oldFaces.length; i < il; i++ ) {
 
@@ -349,7 +349,7 @@ function compute_vertex_normals( geometry ) {
 	var tmpx, tmpy, tmpz;
 	var t_len;
 
-	for ( i = 0, il = oldFaces.length; i < il; i++) {
+	for ( i = 0, il = oldFaces.length; i < il; i++ ) {
 
 		oldFaces.index_to_register( i, 0 );
 		oldVertices.index_to_register( oldFaces.register[ 0 ].a, 0 );
