@@ -268,7 +268,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 			return texture;
 		}
 
-		return new THREE.TextureLoader().load(src);
+		var textureLoader = THREE.Loader.Handlers.get(src);
+		if ( textureLoader === null ) {
+			textureLoader = new THREE.TextureLoader();
+		}
+		textureLoader.crossOrigin = true;
+
+		return textureLoader.load(src);
 	}
 
 	function CreateTexture(resources, resource) {
