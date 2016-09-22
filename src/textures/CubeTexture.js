@@ -37,5 +37,31 @@ Object.defineProperty( CubeTexture.prototype, 'images', {
 
 } );
 
+CubeTexture.prototype.fromEquirectangular = function( renderer, source, size ) {
+
+	var scene = new THREE.Scene();
+
+	var gl = renderer.getContext();
+	var maxSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE )
+
+	var camera = new THREE.CubeCamera( 1, 100000, Math.min( size, maxSize ) );
+
+	var material = new THREE.MeshBasicMaterial( {
+		map: source,
+		side: THREE.BackSide
+	} );
+
+	var mesh = new THREE.Mesh(
+		new THREE.IcosahedronGeometry( 100, 4 ),
+		material
+	);
+
+	scene.add( mesh );
+
+	camera.updateCubeMap( renderer, scene );
+
+	return camera.renderTarget.texture;
+
+}
 
 export { CubeTexture };
