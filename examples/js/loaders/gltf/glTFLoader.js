@@ -3,7 +3,9 @@
  */
 
 
-THREE.glTFLoader = function () {
+THREE.glTFLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.meshesRequested = 0;
 	this.meshesLoaded = 0;
@@ -22,8 +24,34 @@ THREE.glTFLoader = function () {
 THREE.glTFLoader.prototype = new THREE.Loader();
 THREE.glTFLoader.prototype.constructor = THREE.glTFLoader;
 
-THREE.glTFLoader.prototype.load = function( url, callback ) {
+THREE.glTFLoader.prototype.load = function( url, onLoad, onProgress, onError ) {
 
+	var scope = this;
+
+	var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : THREE.Loader.prototype.extractUrlBase( url );
+
+	var loader = new THREE.XHRLoader( this.manager );
+	loader.load( url, function ( text ) {
+
+		var json = JSON.parse( text );
+		scope.parse( json, onLoad, texturePath );
+
+	}, onProgress, onError );
+};
+
+THREE.glTFLoader.prototype.setTexturePath = function ( value ) {
+
+	this.texturePath = value;
+
+};
+
+THREE.glTFLoader.prototype.setCrossOrigin = function ( value ) {
+
+	this.crossOrigin = value;
+
+};
+
+THREE.glTFLoader.prototype.parse = function( json, callback, texturePath ) {
 	var theLoader = this;
 	// Utilities
 
@@ -40,6 +68,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	}
 
 	function componentsPerElementForGLType(type) {
+		var nElements;
 		switch(type) {
 			case "SCALAR" :
 				nElements = 1;
@@ -152,7 +181,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		// clone most uniforms but then clobber textures, we want them to
 		// be reused
 		var uniforms = THREE.UniformsUtils.clone(material.params.uniforms);
-		for (uniform in material.params.uniforms) {
+		for (var uniform in material.params.uniforms) {
 			var src = material.params.uniforms[uniform];
 			var dst = uniforms[uniform];
 			if (dst.type == "t") {
@@ -272,7 +301,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		if ( textureLoader === null ) {
 			textureLoader = new THREE.TextureLoader();
 		}
-		textureLoader.crossOrigin = true;
+		if ( textureLoader.setCrossOrigin ) textureLoader.setCrossOrigin( theLoader.crossOrigin );
 
 		return textureLoader.load(src);
 	}
@@ -429,7 +458,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 			nComponents = componentsPerElementForGLType(attribute.type);
 			floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
 			// N.B.: flip Y value... should we just set texture.flipY everywhere?
-			for (i = 0; i < floatArray.length / 2; i++) {
+			for (var i = 0; i < floatArray.length / 2; i++) {
 				floatArray[i*2+1] = 1.0 - floatArray[i*2+1];
 			}
 			geom.geometry.addAttribute( 'uv', new THREE.BufferAttribute( floatArray, nComponents ) );
@@ -700,12 +729,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		this._entries = {};
 	};
 
-	LoadDelegate = function() {
-	}
+	var LoadDelegate = function() {
+	};
 
 	LoadDelegate.prototype.loadCompleted = function(callback, obj) {
 		callback.call(Window, obj);
-	}
+	};
 
 	// Loader
 
@@ -954,7 +983,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 				var values;
 
 				if (khr_material) {
-
 					switch (khr_material.technique)
 					{
 						case 'BLINN' :
@@ -983,10 +1011,9 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					}
 
 					values = {};
-					for (prop in khr_material.values) {
+					for (var prop in khr_material.values) {
 						values[prop] = khr_material.values[prop];
 					}
-
 				}
 				else if (material.technique === undefined) {
 
@@ -1332,7 +1359,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 		handleNode: {
 			value: function(entryID, description, userInfo) {
-
 				var threeNode = null;
 				if (description.jointName) {
 					threeNode = new THREE.Bone();
@@ -1388,7 +1414,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					}
 
 					description.meshes.forEach( function(meshID) {
-						meshEntry = this.resources.getEntry(meshID);
+						var meshEntry = this.resources.getEntry(meshID);
 						theLoader.meshesRequested++;
 						meshEntry.object.onComplete(function(mesh) {
 							self.addPendingMesh(mesh, threeNode);
@@ -1478,7 +1504,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 							var dobones = true;
 
-							for (meshID in glTF.meshInstances) {
+							for (var meshID in glTF.meshInstances) {
 								var mesh = glTF.meshInstances[meshID];
 								var threeMesh = null;
 								mesh.primitives.forEach(function(primitive) {
@@ -1547,8 +1573,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 											boneInverses, false ), skin.bindShapeMatrix );
 
 										//threeMesh.bindMode = "detached";
-										//threeMesh.normalizeSkinWeights();
-										//threeMesh.pose();
+										threeMesh.normalizeSkinWeights();
+										threeMesh.pose();
 									}
 
 									if (threeMesh) {
@@ -1577,7 +1603,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 		buildSkins: {
 			value: function(node) {
-
 				if (node.glTF && node.glTF.instanceSkin)
 					this.buildSkin(node);
 
@@ -1642,9 +1667,9 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 			value : function() {
 				for (var name in this.nodeAnimationChannels) {
 					var nodeAnimationChannels = this.nodeAnimationChannels[name];
-					var i, len = nodeAnimationChannels.length;
+					var len = nodeAnimationChannels.length;
 					//console.log(" animation channels for node " + name);
-					//for (i = 0; i < len; i++) {
+					//for (var i = 0; i < len; i++) {
 					//  console.log(nodeAnimationChannels[i]);
 					//}
 					var anim = new THREE.glTFAnimation(nodeAnimationChannels);
@@ -1866,7 +1891,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 		handleError: {
 			value: function(msg) {
-
 				throw new Error(msg);
 				return true;
 			}
@@ -1898,17 +1922,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	var rootObj = new THREE.Object3D();
 
-	var self = this;
-
-	this.callback = callback;
 	this.rootObj = rootObj;
+	this.callback = callback;
 
 	this.loader = Object.create(ThreeGLTFLoader);
-	this.loader.initWithPath(url);
-	this.loader.load(new Context(rootObj,
-						function(obj) {
-						}),
-				null);
+	this.loader.initWithJSON(json, texturePath || theLoader.texturePath);
+	this.loader.load(new Context(rootObj, function(obj) {}));
 
 	return rootObj;
 }

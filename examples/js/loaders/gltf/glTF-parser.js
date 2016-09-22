@@ -102,7 +102,7 @@ var global = window;
 				if (isDataUriRegex.test(path)) {
 					return path;
 				}
-				
+
 				return this.baseURL + path;
 			}
 		},
@@ -273,11 +273,8 @@ var global = window;
 				var self = this;
 				//FIXME: handle error
 				if (!this._json)  {
-					var jsonPath = this._path;
-					var i = jsonPath.lastIndexOf("/");
-					this.baseURL = (i !== 0) ? jsonPath.substring(0, i + 1) : '';
 					var jsonfile = new XMLHttpRequest();
-					jsonfile.open("GET", jsonPath, true);
+					jsonfile.open("GET", this._path, true);
 					jsonfile.onreadystatechange = function() {
 						if (jsonfile.readyState == 4) {
 							if (jsonfile.status == 200) {
@@ -378,8 +375,8 @@ var global = window;
 
 		initWithJSON: {
 			value: function(json, baseURL) {
-				this.json = json;
 				this.baseURL = baseURL;
+				this.json = json;
 				if (!baseURL) {
 					console.log("WARNING: no base URL passed to Reader:initWithJSON");
 				}
