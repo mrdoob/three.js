@@ -2116,7 +2116,7 @@
 
 			if ( (euler && euler.isEuler) === false ) {
 
-				throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+				throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 			}
 
@@ -4859,51 +4859,6 @@
 		}
 
 		return r;
-
-	};
-
-	WebGLUniforms.splitDynamic = function( seq, values ) {
-
-		var r = null,
-			n = seq.length,
-			w = 0;
-
-		for ( var i = 0; i !== n; ++ i ) {
-
-			var u = seq[ i ],
-				v = values[ u.id ];
-
-			if ( v && v.dynamic === true ) {
-
-				if ( r === null ) r = [];
-				r.push( u );
-
-			} else {
-
-				// in-place compact 'seq', removing the matches
-				if ( w < i ) seq[ w ] = u;
-				++ w;
-
-			}
-
-		}
-
-		if ( w < n ) seq.length = w;
-
-		return r;
-
-	};
-
-	WebGLUniforms.evalDynamic = function( seq, values, object, material, camera ) {
-
-		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
-
-			var v = values[ seq[ i ].id ],
-				f = v.onUpdateCallback;
-
-			if ( f !== undefined ) f.call( v, object, material, camera );
-
-		}
 
 	};
 
@@ -8131,7 +8086,7 @@
 
 				this.getCenter( result.center );
 
-				result.radius = this.size( v1 ).length() * 0.5;
+				result.radius = this.getSize( v1 ).length() * 0.5;
 
 				return result;
 
@@ -21019,8 +20974,6 @@
 						WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 			materialProperties.uniformsList = uniformsList;
-			materialProperties.dynamicUniforms =
-					WebGLUniforms.splitDynamic( uniformsList, uniforms );
 
 		}
 
@@ -21308,18 +21261,6 @@
 			p_uniforms.set( _gl, object, 'modelViewMatrix' );
 			p_uniforms.set( _gl, object, 'normalMatrix' );
 			p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
-
-			// dynamic uniforms
-
-			var dynUniforms = materialProperties.dynamicUniforms;
-
-			if ( dynUniforms !== null ) {
-
-				WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
-				WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
-
-			}
 
 			return program;
 
@@ -37989,24 +37930,7 @@
 
 		this.value = value;
 
-		this.dynamic = false;
-
 	}
-
-	Uniform.prototype = {
-
-		constructor: Uniform,
-
-		onUpdate: function ( callback ) {
-
-			this.dynamic = true;
-			this.onUpdateCallback = callback;
-
-			return this;
-
-		}
-
-	};
 
 	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
@@ -40048,7 +39972,7 @@
 
 		this.box.setFromObject( this.object );
 
-		this.box.size( this.scale );
+		this.box.getSize( this.scale );
 
 		this.box.getCenter( this.position );
 
@@ -41113,6 +41037,22 @@
 		}
 
 	} ), EventDispatcher.prototype );
+
+	//
+
+	Object.defineProperties( Uniform.prototype, {
+		dynamic: {
+			set: function ( value ) {
+				console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
+			}
+		},
+		onUpdate: {
+			value: function () {
+				console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
+				return this;
+			}
+		}
+	} );
 
 	//
 
