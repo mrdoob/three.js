@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A continuous line.</div>
+
+
+		<h2>Example</h2>
+
+		<code>var material = new THREE.LineBasicMaterial({
+			color: 0x0000ff
+		});
+
+		var geometry = new THREE.Geometry();
+		geometry.vertices.push(
+			new THREE.Vector3( -10, 0, 0 ),
+			new THREE.Vector3( 0, 10, 0 ),
+			new THREE.Vector3( 10, 0, 0 )
+		);
+
+		var line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+
+		<div>
+		geometry — Vertices representing the line segment(s).<br />
+		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
+		</div>
+
+		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Geometry geometry]</h3>
+		<div>
+		Vertices representing the line segment(s).
+		</div>
+
+		<h3>[property:Material material]</h3>
+		<div>
+		Material for the line.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
+		<div>
+		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
+		</div>
+		
+		<h3>[method:Line clone]()</h3>
+		<div>
+		Returns a clone of this Line object and its descendants.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

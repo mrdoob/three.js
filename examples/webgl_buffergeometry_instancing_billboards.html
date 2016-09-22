@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instanced particles - billboards - colors</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+
+		#oldie a {
+			color: #da0;
+		}
+
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - instanced circle billboards - colors
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+	</div>
+
+	<script src="../build/three.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script id="vshader" type="x-shader/x-vertex">
+		precision highp float;
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+		uniform float time;
+
+		attribute vec3 position;
+		attribute vec2 uv;
+		attribute vec3 translate;
+
+		varying vec2 vUv;
+		varying float vScale;
+
+		void main() {
+
+			vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
+			vec3 trTime = vec3(translate.x + time,translate.y + time,translate.z + time);
+			float scale =  sin( trTime.x * 2.1 ) + sin( trTime.y * 3.2 ) + sin( trTime.z * 4.3 );
+			vScale = scale;
+			scale = scale * 10.0 + 10.0;
+			mvPosition.xyz += position * scale;
+			vUv = uv;
+			gl_Position = projectionMatrix * mvPosition;
+
+		}
+	</script>
+	<script id="fshader" type="x-shader/x-fragment">
+		precision highp float;
+
+		uniform sampler2D map;
+
+		varying vec2 vUv;
+		varying float vScale;
+
+		// HSL to RGB Convertion helpers
+		vec3 HUEtoRGB(float H){
+			H = mod(H,1.0);
+			float R = abs(H * 6.0 - 3.0) - 1.0;
+			float G = 2.0 - abs(H * 6.0 - 2.0);
+			float B = 2.0 - abs(H * 6.0 - 4.0);
+			return clamp(vec3(R,G,B),0.0,1.0);
+		}
+
+		vec3 HSLtoRGB(vec3 HSL){
+			vec3 RGB = HUEtoRGB(HSL.x);
+			float C = (1.0 - abs(2.0 * HSL.z - 1.0)) * HSL.y;
+			return (RGB - 0.5) * C + HSL.z;
+		}
+
+		void main() {
+			vec4 diffuseColor = texture2D( map, vUv );
+			gl_FragColor = vec4( diffuseColor.xyz * HSLtoRGB(vec3(vScale/5.0, 1.0, 0.5)), diffuseColor.w );
+
+			if ( diffuseColor.w < 0.5 ) discard;
+		}
+	</script>
+
+	<script>
+		var container, stats;
+
+		var camera, scene, renderer;
+		var geometry, material, mesh;
+
+		function init() {
+
+			if ( !Detector.webgl ) {
+
+				Detector.addGetWebGLMessage();
+				return false;
+
+			}
+
+			renderer = new THREE.WebGLRenderer();
+
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+				document.getElementById( "notSupported" ).style.display = "";
+				return false;
+			}
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+			camera.position.z = 1400;
+
+			scene = new THREE.Scene();
+
+			geometry = new THREE.InstancedBufferGeometry();
+			geometry.copy( new THREE.CircleBufferGeometry( 1, 6 ) );
+
+			var particleCount = 75000;
+
+			var translateArray = new Float32Array( particleCount * 3 );
+
+			for ( var i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
+
+				translateArray[ i3 + 0 ] = Math.random() * 2 - 1;
+				translateArray[ i3 + 1 ] = Math.random() * 2 - 1;
+				translateArray[ i3 + 2 ] = Math.random() * 2 - 1;
+
+			}
+
+			geometry.addAttribute( "translate", new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+
+			material = new THREE.RawShaderMaterial( {
+				uniforms: {
+					map: { value: new THREE.TextureLoader().load( "textures/sprites/circle.png" ) },
+					time: { value: 0.0 }
+				},
+				vertexShader: document.getElementById( 'vshader' ).textContent,
+				fragmentShader: document.getElementById( 'fshader' ).textContent,
+				depthTest: true,
+				depthWrite: true
+			} );
+
+			mesh = new THREE.Mesh( geometry, material );
+			mesh.scale.set( 500, 500, 500 );
+			scene.add( mesh );
+
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			return true;
+
+		}
+
+		function onWindowResize( event ) {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			var time = performance.now() * 0.0005;
+
+			material.uniforms.time.value = time;
+
+			mesh.rotation.x = time * 0.2;
+			mesh.rotation.y = time * 0.4;
+
+			renderer.render( scene, camera );
+
+		}
+
+		if ( init() ) {
+
+			animate();
+
+		}
+	</script>
+
+</body>
+</html>

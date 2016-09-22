@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - webgl</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+			}
+
+		</style>
+	</head>
+
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script>
+
+			var container;
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 200;
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+			}
+
+			function createImage() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
+
+				var context = canvas.getContext( '2d' );
+				context.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
+				context.fillRect( 0, 0, 256, 256 );
+
+				return canvas;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var geometry = new THREE.SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
+
+				var texture = new THREE.CanvasTexture( createImage() );
+
+				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+
+				scene.add( mesh );
+
+				renderer.render( scene, camera );
+
+				scene.remove( mesh );
+
+				// clean up
+
+				geometry.dispose();
+				material.dispose();
+				texture.dispose();
+
+			}
+
+		</script>
+
+	</body>
+</html>

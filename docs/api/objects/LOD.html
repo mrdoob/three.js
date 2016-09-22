@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Level of Detail - Show meshes with more or less geometry based on distance.</div>
+
+		<h2>Example</h2>
+		
+		<div>
+		[example:webgl_lod LOD]
+		</div>
+		
+		<code>
+		var lod = new THREE.LOD();
+		
+		//Create 5 levels of spheres
+		for( var i = 0; i < 5; i++ ) {
+			
+			var geometry = new THREE.IcosahedronGeometry( 10, 5 - i )
+			
+			new THREE.Mesh( geometry, material );
+			
+			lod.addLevel( mesh, i * 50 );
+			
+		}
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:array levels]</h3>
+		<div>
+		An array of [page:object level] objects
+		</div>
+		<div>
+		level is an object with two properties.
+		</div>
+		<div>
+		distance -- The distance at which to display this level of detail<br />
+		object -- The Object3D which will be displayed
+		</div>
+
+		<h2>Methods</h2>
+
+
+
+		<h3>[method:null addLevel]( [page:Object3D mesh], [page:Float distance] )</h3>
+		<div>
+		mesh -- The Object3D to display <br />
+		distance -- The distance at which to display this level of detail
+		</div>
+		<div>
+		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
+		the lower the detail on the mesh.
+		</div>
+
+		<h3>[method:Object3D getObjectForDistance]( [page:Float distance] )</h3>
+		<div>
+		Get a reference to the first [page:Object3D] (mesh) that is greater than supplied distance.
+		</div>
+
+		<h3>[method:null update]( [page:Camera camera] )</h3>
+		<div>
+		camera -- The current camera
+		</div>
+		<div>
+		Update the visiblility of the level of detail based on the distance from the camera.
+		</div>
+		
+		<h3>[method:LOD clone]()</h3>
+		<div>
+		Returns a clone of this LOD object and its associated distance specific objects.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

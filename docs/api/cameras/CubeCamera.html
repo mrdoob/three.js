@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</div>
+
+		<h2>Examples</h2>
+
+		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
+		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
+		<div>[example:webgl_shading_physical shading / physical ]</div>
+
+		<code>//Create cube camera
+		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
+		scene.add( cubeCamera );
+
+		//Create car
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
+		var car = new Mesh( carGeometry, chromeMaterial );
+		scene.add( car );
+
+		//Update the render target cube
+		car.setVisible( false );
+		cubeCamera.position.copy( car.position );
+		cubeCamera.updateCubeMap( renderer, scene );
+
+		//Render the scene
+		car.setVisible( true );
+		renderer.render( scene, camera );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:number near], [page:number far], [page:number cubeResolution] )</h3>
+		<div>
+		near -- The near clipping distance. <br />
+		far -- The far clipping distance <br />
+		cubeResolution -- Sets the width of the cube.
+		</div>
+		<div>
+		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that then
+		render to a [page:WebGLRenderTargetCube]
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
+		<div>
+		The cube texture that gets generated.
+		</div>
+
+		<h2>Methods</h2>
+
+
+
+		<h3>[method:null updateCubeMap]( [page:WebGLRenderer renderer], [page:Scene scene] )</h3>
+		<div>
+		renderer -- The current WebGL renderer <br />
+		scene -- The current scene
+		</div>
+		<div>
+		Call this to update the renderTarget.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

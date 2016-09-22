@@ -1,0 +1,150 @@
+HEADER    MOLECULE
+COMPND    "123" YBa2Cu3O7 SUPERCONDUCTOR
+AUTHOR    A. W. MAVERICK
+ATOM      1  Y     UNK   1       0.000  -4.290   0.000  1.00  0.00 
+ATOM      2 BA     UNK   1       0.000  -0.602   0.000  1.00  0.00 
+ATOM      3 BA     UNK   1       0.000   3.703   0.000  1.00  0.00 
+ATOM      4 CU     UNK   1      -1.912  -5.976   1.943  1.00  0.00 
+ATOM      5 CU     UNK   1      -1.912  -5.976  -1.943  1.00  0.00 
+ATOM      6 CU     UNK   1       1.911  -5.976   1.943  1.00  0.00 
+ATOM      7 CU     UNK   1       1.911  -5.976  -1.943  1.00  0.00 
+ATOM      8 CU     UNK   1      -1.912  -2.603   1.943  1.00  0.00 
+ATOM      9 CU     UNK   1      -1.912  -2.603  -1.943  1.00  0.00 
+ATOM     10 CU     UNK   1       1.911  -2.603   1.943  1.00  0.00 
+ATOM     11 CU     UNK   1       1.911  -2.603  -1.943  1.00  0.00 
+ATOM     12 CU     UNK   1      -1.912   1.551   1.943  1.00  0.00 
+ATOM     13 CU     UNK   1      -1.912   1.551  -1.943  1.00  0.00 
+ATOM     14 CU     UNK   1       1.911   1.551   1.943  1.00  0.00 
+ATOM     15 CU     UNK   1       1.911   1.551  -1.943  1.00  0.00 
+ATOM     16 CU     UNK   1      -1.912   5.704   1.943  1.00  0.00 
+ATOM     17 CU     UNK   1      -1.912   5.704  -1.943  1.00  0.00 
+ATOM     18 CU     UNK   1       1.911   5.704   1.943  1.00  0.00 
+ATOM     19 CU     UNK   1       1.911   5.704  -1.943  1.00  0.00 
+ATOM     20  O     UNK   1      -3.823  -5.723   1.943  1.00  0.00 
+ATOM     21  O     UNK   1      -3.823  -5.723  -1.943  1.00  0.00 
+ATOM     22  O     UNK   1       0.000  -5.723   1.943  1.00  0.00 
+ATOM     23  O     UNK   1       0.000  -5.723  -1.943  1.00  0.00 
+ATOM     24  O     UNK   1       3.823  -5.723   1.943  1.00  0.00 
+ATOM     25  O     UNK   1       3.823  -5.723  -1.943  1.00  0.00 
+ATOM     26  O     UNK   1      -1.912  -5.704   3.886  1.00  0.00 
+ATOM     27  O     UNK   1      -1.912  -5.704   0.000  1.00  0.00 
+ATOM     28  O     UNK   1      -1.912  -5.704  -3.886  1.00  0.00 
+ATOM     29  O     UNK   1       1.911  -5.704   3.886  1.00  0.00 
+ATOM     30  O     UNK   1       1.911  -5.704   0.000  1.00  0.00 
+ATOM     31  O     UNK   1       1.911  -5.704  -3.886  1.00  0.00 
+ATOM     32  O     UNK   1      -1.912  -2.875   3.886  1.00  0.00 
+ATOM     33  O     UNK   1      -1.912  -2.875   0.000  1.00  0.00 
+ATOM     34  O     UNK   1      -1.912  -2.875  -3.886  1.00  0.00 
+ATOM     35  O     UNK   1       1.911  -2.875   3.886  1.00  0.00 
+ATOM     36  O     UNK   1       1.911  -2.875   0.000  1.00  0.00 
+ATOM     37  O     UNK   1       1.911  -2.875  -3.886  1.00  0.00 
+ATOM     38  O     UNK   1      -3.823  -2.857   1.943  1.00  0.00 
+ATOM     39  O     UNK   1      -3.823  -2.857  -1.943  1.00  0.00 
+ATOM     40  O     UNK   1       0.000  -2.857   1.943  1.00  0.00 
+ATOM     41  O     UNK   1       0.000  -2.857  -1.943  1.00  0.00 
+ATOM     42  O     UNK   1       3.823  -2.857   1.943  1.00  0.00 
+ATOM     43  O     UNK   1       3.823  -2.857  -1.943  1.00  0.00 
+ATOM     44  O     UNK   1      -1.912  -0.300   1.943  1.00  0.00 
+ATOM     45  O     UNK   1      -1.912  -0.300  -1.943  1.00  0.00 
+ATOM     46  O     UNK   1       1.911  -0.300   1.943  1.00  0.00 
+ATOM     47  O     UNK   1       1.911  -0.300  -1.943  1.00  0.00 
+ATOM     48  O     UNK   1      -1.912   1.551   3.886  1.00  0.00 
+ATOM     49  O     UNK   1      -1.912   1.551   0.000  1.00  0.00 
+ATOM     50  O     UNK   1      -1.912   1.551  -3.886  1.00  0.00 
+ATOM     51  O     UNK   1       1.911   1.551   3.886  1.00  0.00 
+ATOM     52  O     UNK   1       1.911   1.551   0.000  1.00  0.00 
+ATOM     53  O     UNK   1       1.911   1.551  -3.886  1.00  0.00 
+ATOM     54  O     UNK   1      -1.912   3.401   1.943  1.00  0.00 
+ATOM     55  O     UNK   1      -1.912   3.401  -1.943  1.00  0.00 
+ATOM     56  O     UNK   1       1.911   3.401   1.943  1.00  0.00 
+ATOM     57  O     UNK   1       1.911   3.401  -1.943  1.00  0.00 
+ATOM     58  O     UNK   1      -3.823   5.958   1.943  1.00  0.00 
+ATOM     59  O     UNK   1      -3.823   5.958  -1.943  1.00  0.00 
+ATOM     60  O     UNK   1       0.000   5.958   1.943  1.00  0.00 
+ATOM     61  O     UNK   1       0.000   5.958  -1.943  1.00  0.00 
+ATOM     62  O     UNK   1       3.823   5.958   1.943  1.00  0.00 
+ATOM     63  O     UNK   1       3.823   5.958  -1.943  1.00  0.00 
+ATOM     64  O     UNK   1      -1.912   5.976   3.886  1.00  0.00 
+ATOM     65  O     UNK   1      -1.912   5.976   0.000  1.00  0.00 
+ATOM     66  O     UNK   1      -1.912   5.976  -3.886  1.00  0.00 
+ATOM     67  O     UNK   1       1.911   5.976   3.886  1.00  0.00 
+ATOM     68  O     UNK   1       1.911   5.976   0.000  1.00  0.00 
+ATOM     69  O     UNK   1       1.911   5.976  -3.886  1.00  0.00 
+CONECT    1   22   23   27   30
+CONECT    1   33   36   40   41
+CONECT    4   20   22   26   27
+CONECT    5   21   23   27   28
+CONECT    6   22   24   29   30
+CONECT    7   23   25   30   31
+CONECT    8   32   33   38   40
+CONECT    8   44
+CONECT    9   33   34   39   41
+CONECT    9   45
+CONECT   10   35   36   40   42
+CONECT   10   46
+CONECT   11   36   37   41   43
+CONECT   11   47
+CONECT   12   44   48   49   54
+CONECT   13   45   49   50   55
+CONECT   14   46   51   52   56
+CONECT   15   47   52   53   57
+CONECT   16   54   58   60   64
+CONECT   16   65
+CONECT   17   55   59   61   65
+CONECT   17   66
+CONECT   18   56   60   62   67
+CONECT   18   68
+CONECT   19   57   61   63   68
+CONECT   19   69
+CONECT   20    4
+CONECT   21    5
+CONECT   22    1    4    6
+CONECT   23    1    5    7
+CONECT   24    6
+CONECT   25    7
+CONECT   26    4
+CONECT   27    1    4    5
+CONECT   28    5
+CONECT   29    6
+CONECT   30    1    6    7
+CONECT   31    7
+CONECT   32    8
+CONECT   33    1    8    9
+CONECT   34    9
+CONECT   35   10
+CONECT   36    1   10   11
+CONECT   37   11
+CONECT   38    8
+CONECT   39    9
+CONECT   40    1    8   10
+CONECT   41    1    9   11
+CONECT   42   10
+CONECT   43   11
+CONECT   44    8   12
+CONECT   45    9   13
+CONECT   46   10   14
+CONECT   47   11   15
+CONECT   48   12
+CONECT   49   12   13
+CONECT   50   13
+CONECT   51   14
+CONECT   52   14   15
+CONECT   53   15
+CONECT   54   12   16
+CONECT   55   13   17
+CONECT   56   14   18
+CONECT   57   15   19
+CONECT   58   16
+CONECT   59   17
+CONECT   60   16   18
+CONECT   61   17   19
+CONECT   62   18
+CONECT   63   19
+CONECT   64   16
+CONECT   65   16   17
+CONECT   66   17
+CONECT   67   18
+CONECT   68   18   19
+CONECT   69   19
+MASTER        0    0    0    0    0    0    0    0   69    0   69    0
+END

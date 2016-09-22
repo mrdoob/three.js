@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Create a smooth 3d spline curve from a series of points</div>
+
+		<h2>Example</h2>
+
+<code>
+//Create a closed bent a sine-like wave
+var curve = new THREE.SplineCurve3( [
+	new THREE.Vector3( -10, 0, 10 ),
+	new THREE.Vector3( -5, 5, 5 ),
+	new THREE.Vector3( 0, 0, 0 ),
+	new THREE.Vector3( 5, -5, 5 ),
+	new THREE.Vector3( 10, 0, 10 )
+] );
+
+var geometry = new THREE.Geometry();
+geometry.vertices = curve.getPoints( 50 );
+
+var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+//Create the final Object3d to add to the scene
+var splineObject = new THREE.Line( geometry, material );
+</code>
+
+		<h3>[example:webgl_geometry_extrude_splines geometry / extrude / splines ] (choose PipeSpline)</h3>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Array points] )</h3>
+		<div>points – An array of [page:Vector3] points</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array points]</h3>
+
+		<h2>Methods</h2>
+
+		<h3>See [page:Curve] for inherited methods</h3>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

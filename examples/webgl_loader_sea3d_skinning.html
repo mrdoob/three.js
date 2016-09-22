@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sea3d / skin</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<br/>BoneObject: Object3D attached in a Bone
+			<br/>Left Click to hidden/show the hat - Right click to run
+			<br/><div id="playercount"></div>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
+
+		<script src="js/loaders/sea3d/SEA3D.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, composer, controls, player, hat;
+
+			var loader;
+
+			// Initialize Three.JS
+
+			init();
+
+			//
+			// SEA3D Loader
+			//
+
+			loader = new THREE.SEA3D( {
+
+				autoPlay : true, // Auto play animations
+				container : scene, // Container to add models
+				multiplier : .6 // Light multiplier
+
+			} );
+
+			loader.onComplete = function( e ) {
+
+				// Get the first camera from SEA3D Studio
+				// use loader.get... to get others objects
+
+				var cam = loader.cameras[0];
+				camera.position.copy( cam.position );
+				camera.rotation.copy( cam.rotation );
+
+				controls = new THREE.OrbitControls( camera );
+
+				// get meshes
+				player = loader.getMesh("Player");
+				hat = loader.getMesh("Hat");
+
+				// events
+
+				// on animation complete example
+				player.animationsData['pass#1'].onComplete = function() {
+
+					console.log("Animation completed!");
+
+				}
+
+				window.addEventListener( 'click', onMouseClick, false );
+				window.addEventListener( 'contextmenu', onRightClick, false );
+
+				animate();
+
+				updatePlayerCountDescription( 1 );
+
+			};
+
+			loader.load( './models/sea3d/skin.tjs.sea' );
+
+			//
+
+			function updatePlayerCountDescription( count ) {
+
+				document.getElementById("playercount").innerText = "Numbers of players " + count + " | Middle click to clone";
+
+			}
+
+			var cloneAsset = function() {
+
+				var count = 2, size = 25;
+
+				return function() {
+
+					updatePlayerCountDescription( count );
+
+					var PHI = Math.PI * 2 * (Math.sqrt(5) + 1) / 2;  // golden ratio
+					var angle = PHI * count++;
+
+					var container = new THREE.Object3D();
+					container.position.z = ( size * count ) * Math.cos( angle );
+					container.position.x = ( size * count ) * Math.sin( angle );
+
+					scene.add( container );
+					
+					var domain = loader.clone( { 
+						autoPlay : true, 
+						container : container, 
+						lights : false 
+					});
+
+				}
+
+			}();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 1000, - 300, 1000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x333333, 1 );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				// post-processing
+
+				composer = new THREE.EffectComposer( renderer );
+
+				var renderPass = new THREE.RenderPass( scene, camera );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				composer.addPass( renderPass );
+
+				var vh = 1.4, vl = 1.2;
+
+				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
+				composer.addPass( colorCorrectionPass );
+
+				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				vignettePass.uniforms[ "darkness" ].value = 1.0;
+				composer.addPass( vignettePass );
+
+				composer.addPass( copyPass );
+				copyPass.renderToScreen = true;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onRightClick( e ) {
+
+				// play character animation
+				if (player.currentAnimation.name == "idle")
+					player.play("run", .5);// play "pass#1" to caller .onComplete animation example
+				else
+					player.play("idle", .5);
+
+				e.preventDefault();
+
+			}
+
+			function onMouseClick( e ) {
+
+				if (e.button === 0) {
+
+					hat.visible = !hat.visible;
+
+				} else if (e.button === 1) {
+
+					cloneAsset();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				composer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			var clock = new THREE.Clock();
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
+
+				render( delta );
+
+				stats.update();
+
+			}
+
+			function render( dlt ) {
+
+				//renderer.render( scene, camera );
+				composer.render( dlt );
+
+			}
+
+		</script>
+	</body>
+</html>

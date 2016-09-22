@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - indexed instancing (single box), dynamic updates</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #ffffff;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #ffffff;
+		}
+
+		#oldie a {
+			color: #da0;
+		}
+
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - indexed instancing (single box), dynamic updates
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+	</div>
+
+	<script src="../build/three.js"></script>
+
+	<script src="js/Detector.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+
+	<script id="vertexShader" type="x-shader/x-vertex">
+		precision highp float;
+
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+		attribute vec3 position;
+		attribute vec3 offset;
+		attribute vec2 uv;
+		attribute vec4 orientation;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec3 vPosition = position;
+			vec3 vcV = cross(orientation.xyz, vPosition);
+			vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+
+			vUv = uv;
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( offset + vPosition, 1.0 );
+
+		}
+
+	</script>
+
+	<script id="fragmentShader" type="x-shader/x-fragment">
+		precision highp float;
+
+		uniform sampler2D map;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			gl_FragColor = texture2D(map, vUv);
+
+		}
+
+	</script>
+
+	<script>
+
+		if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var container, stats;
+
+		var camera, scene, renderer;
+		var orientations;
+
+
+		function init() {
+
+			container = document.getElementById( 'container' );
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+			//camera.position.z = 20;
+
+			renderer = new THREE.WebGLRenderer();
+			scene = new THREE.Scene();
+
+			// geometry
+
+			var instances = 5000;
+
+			var geometry = new THREE.InstancedBufferGeometry();
+
+			// per mesh data
+			var vertices = new THREE.BufferAttribute( new Float32Array( [
+				// Front
+				-1, 1, 1,
+				1, 1, 1,
+				-1, -1, 1,
+				1, -1, 1,
+				// Back
+				1, 1, -1,
+				-1, 1, -1,
+				1, -1, -1,
+				-1, -1, -1,
+				// Left
+				-1, 1, -1,
+				-1, 1, 1,
+				-1, -1, -1,
+				-1, -1, 1,
+				// Right
+				1, 1, 1,
+				1, 1, -1,
+				1, -1, 1,
+				1, -1, -1,
+				// Top
+				-1, 1, 1,
+				1, 1, 1,
+				-1, 1, -1,
+				1, 1, -1,
+				// Bottom
+				1, -1, 1,
+				-1, -1, 1,
+				1, -1, -1,
+				-1, -1, -1
+			] ), 3 );
+
+			geometry.addAttribute( 'position', vertices );
+
+			var uvs = new THREE.BufferAttribute( new Float32Array( [
+						//x	y	z
+						// Front
+						0, 0,
+						1, 0,
+						0, 1,
+						1, 1,
+						// Back
+						1, 0,
+						0, 0,
+						1, 1,
+						0, 1,
+						// Left
+						1, 1,
+						1, 0,
+						0, 1,
+						0, 0,
+						// Right
+						1, 0,
+						1, 1,
+						0, 0,
+						0, 1,
+						// Top
+						0, 0,
+						1, 0,
+						0, 1,
+						1, 1,
+						// Bottom
+						1, 0,
+						0, 0,
+						1, 1,
+						0, 1
+			] ), 2 );
+
+			geometry.addAttribute( 'uv', uvs );
+
+			var indices = new Uint16Array( [
+				0, 1, 2,
+				2, 1, 3,
+				4, 5, 6,
+				6, 5, 7,
+				8, 9, 10,
+				10, 9, 11,
+				12, 13, 14,
+				14, 13, 15,
+				16, 17, 18,
+				18, 17, 19,
+				20, 21, 22,
+				22, 21, 23
+			] );
+
+			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+			// per instance data
+			var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
+
+			var vector = new THREE.Vector4();
+			for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
+				var x = Math.random() * 100 - 50;
+				var y = Math.random() * 100 - 50;
+				var z = Math.random() * 100 - 50;
+				vector.set( x, y, z, 0 ).normalize();
+				// move out at least 5 units from center in current direction
+				offsets.setXYZ( i, x + vector.x * 5, y + vector.y * 5, z + vector.z * 5 );
+
+			}
+
+			geometry.addAttribute( 'offset', offsets ); // per mesh translation
+
+
+			orientations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 ).setDynamic( true );
+
+			for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
+
+				vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+				vector.normalize();
+
+				orientations.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+
+			}
+
+			geometry.addAttribute( 'orientation', orientations ); // per mesh orientation
+
+			// material
+			var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+			texture.anisotropy = renderer.getMaxAnisotropy();
+
+			var material = new THREE.RawShaderMaterial( {
+
+				uniforms: {
+					map: { value: texture }
+				},
+				vertexShader: document.getElementById( 'vertexShader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+				side: THREE.DoubleSide,
+				transparent: false
+
+			} );
+
+			var mesh = new THREE.Mesh( geometry, material );
+			scene.add( mesh );
+
+
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+				document.getElementById( "notSupported" ).style.display = "";
+				return;
+			}
+
+			renderer.setClearColor( 0x101010 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize( event ) {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		var lastTime = 0;
+
+		var moveQ = ( new THREE.Quaternion( .5, .5, .5, 0.0 ) ).normalize();
+		var tmpQ = new THREE.Quaternion();
+		var currentQ = new THREE.Quaternion();
+		function render() {
+
+			var time = performance.now();
+
+			var object = scene.children[0];
+
+			object.rotation.y = time * 0.00005;
+
+			renderer.render( scene, camera );
+
+			var delta = ( time - lastTime ) / 5000;
+			tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
+
+			for ( var i = 0, ul = orientations.count; i < ul; i++ ) {
+				var index = i * 4;
+				currentQ.set( orientations.array[index], orientations.array[index + 1], orientations.array[index + 2], orientations.array[index + 3] );
+				currentQ.multiply( tmpQ );
+
+				orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
+
+			}
+			orientations.needsUpdate = true;
+			lastTime = time;
+		}
+
+		init();
+		animate();
+	</script>
+
+</body>
+
+
+
+</html>

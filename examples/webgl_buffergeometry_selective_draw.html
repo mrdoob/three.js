@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>three.js - BufferGeometry selectively drawn using attributes and a shader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			background-color: #000;
+			font-family: Monospace;
+			margin: 0;
+			color: #000;
+			overflow: hidden;
+		}
+		a {
+			color:#ff0;
+		}
+		#title {
+			position: absolute;
+			width: 100%;
+			top: 0;
+			height: 20px;
+			padding: 0;
+			text-align: center;
+			font-size: 1.1em;
+			background-color: rgba(64,96,64,0.7);
+			color: #fff;
+		}
+        #ui {
+        	position:absolute;
+        	left:0;
+        	top: 20px;
+        	padding: 0;
+        	text-align: center;
+        	width:100%;
+        	height:20px;
+        	color: #fff;
+        	background-color: rgba(64,96,64,0.6);
+		}
+	</style>
+	<script type="text/javascript" src="../build/three.js"></script>
+	<script type="text/javascript" src="js/Detector.js"></script>
+	<script type="text/javascript" src="js/libs/stats.min.js"></script>
+
+	<script type="x-shader/x-vertex" id="vertexshader">
+		attribute float visible;
+		varying float vVisible;
+		attribute vec3 vertColor;
+		varying vec3 vColor;
+
+		void main() {
+			vColor = vertColor;
+			vVisible = visible;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+		}
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		varying float vVisible;
+		varying vec3 vColor;
+
+		void main() {
+			if ( vVisible > 0.0 ) {
+				gl_FragColor = vec4( vColor, 1.0 );
+			} else {
+				discard;
+			}
+		}
+	</script>
+	</head>
+	<body onload="app()">
+		<div id="title"></div>
+		<div id="ui"><a href="#" onclick="hideLines();">CULL SOME LINES</a> - <a href="#" onclick="showAllLines();">SHOW ALL LINES</a></div>
+		<script>
+		var camera, scene, renderer, stats;
+		var geometry, mesh;
+		var numLat = 100;
+		var numLng = 200;
+		var numLinesCulled = 0;
+
+		function app() {
+
+			if ( ! Detector.webgl ) {
+
+				Detector.addGetWebGLMessage();
+
+			}
+
+			init();
+			animate();
+
+		}
+
+		function init() {
+
+			renderer = new THREE.WebGLRenderer( {
+				antialias: true
+			} );
+			renderer.setClearColor( 0x000000, 0.0 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			document.body.appendChild( renderer.domElement );
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
+			camera.position.z = 3.5;
+
+			scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			addLines( 1.0 );
+
+		}
+
+		function addLines( radius ) {
+
+			geometry = new THREE.BufferGeometry();
+			var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
+			var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
+			var visible = new Float32Array( numLat * numLng * 2 );
+
+			for ( var i = 0; i < numLat; ++ i ) {
+
+				for ( var j = 0; j < numLng; ++ j ) {
+
+					var lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
+					var lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
+
+					var index = i * numLng + j;
+
+					linePositions[ index * 6 + 0 ] = 0;
+					linePositions[ index * 6 + 1 ] = 0;
+					linePositions[ index * 6 + 2 ] = 0;
+					linePositions[ index * 6 + 3 ] = radius * Math.sin( lat ) * Math.cos( lng );
+					linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
+					linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
+
+					var color = new THREE.Color( 0xffffff );
+
+					color.setHSL( lat / Math.PI, 1.0, 0.2 );
+					lineColors[ index * 6 + 0 ] = color.r;
+					lineColors[ index * 6 + 1 ] = color.g;
+					lineColors[ index * 6 + 2 ] = color.b;
+
+					color.setHSL( lat / Math.PI, 1.0, 0.7 );
+					lineColors[ index * 6 + 3 ] = color.r;
+					lineColors[ index * 6 + 4 ] = color.g;
+					lineColors[ index * 6 + 5 ] = color.b;
+
+					// non-0 is visible
+					visible[ index * 2 + 0 ] = 1.0;
+					visible[ index * 2 + 1 ] = 1.0;
+
+				}
+
+			}
+
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+			geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+			geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+
+			geometry.computeBoundingSphere();
+
+			var shaderMaterial = new THREE.ShaderMaterial( {
+
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+			} );
+
+			mesh = new THREE.LineSegments( geometry, shaderMaterial );
+			scene.add( mesh );
+
+			updateCount();
+
+		}
+
+		function updateCount() {
+
+			var str = 'BufferGeometry selective drawing: 1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
+			document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
+		}
+
+		function hideLines() {
+
+			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
+
+				if ( Math.random() > 0.75 ) {
+
+					if ( geometry.attributes.visible.array[ i + 0 ] ) {
+
+						++ numLinesCulled;
+
+					}
+
+					geometry.attributes.visible.array[ i + 0 ] = 0;
+					geometry.attributes.visible.array[ i + 1 ] = 0;
+
+				}
+
+			}
+			geometry.attributes.visible.needsUpdate = true;
+
+			updateCount();
+
+		}
+
+		function showAllLines() {
+
+			numLinesCulled = 0;
+
+			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
+
+				geometry.attributes.visible.array[ i + 0 ] = 1;
+				geometry.attributes.visible.array[ i + 1 ] = 1;
+
+			}
+
+			geometry.attributes.visible.needsUpdate = true;
+
+			updateCount();
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate( time ) {
+
+			requestAnimationFrame( animate );
+
+			var time = Date.now() * 0.001;
+
+			mesh.rotation.x = time * 0.25;
+			mesh.rotation.y = time * 0.5;
+
+			stats.update();
+			renderer.render( scene, camera );
+
+		}
+
+		</script>
+	</body>
+</html>

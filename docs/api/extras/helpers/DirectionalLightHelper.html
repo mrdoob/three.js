@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Visualize a [page:DirectionalLight]'s effect on the scene</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:DirectionalLight light], [page:Number size])</h3>
+		<div>
+		light -- [page:DirectionalLight] -- Light to visualize <br />
+		size -- dimensions of the plane
+		</div>
+		<div>
+		Creates a line and plane to visualize the light's position and direction
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:Line lightPlane]</h3>
+		<div>
+		Contains the line mesh showing the location of the directional light.
+		</div>
+
+		<h3>[property:DirectionalLight light]</h3>
+		<div>
+		Contains the directionalLight.
+		</div>
+
+		<h3>[property:Line targetLine]</h3>
+		<div>
+		Contains the line mesh that shows the direction of the light.
+		</div>
+
+		<h2>Methods</h2>
+
+
+		<h3>.[method:null update]()</h3>
+		<div>
+		Updates the helper to match the position and direction of the [page:.light].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

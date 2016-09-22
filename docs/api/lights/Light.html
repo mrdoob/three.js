@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Abstract base class for lights.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Integer color], [page:float intensity] )</h3>
+		<div>
+		[page:Integer color] — Numeric value of the RGB component of the color.<br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity.
+		</div>
+		<div>
+		This creates a light with color and intensity.<br />
+		</div>
+
+		<h2>Properties</h2>
+
+		See the base [page:Object3D Object3D] class for common properties.
+
+		<h3>[property:Color color]</h3>
+		<div>
+			Color of the light.<br />
+		</div>
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			In "physically correct" mode, the product of color * intensity is interpreted as luminous intensity measured in candela.<br/>
+			Default — *1.0*.
+		</div>
+
+		<h2>Methods</h2>
+
+		See the base [page:Object3D Object3D] class for common methods.
+
+		<h3>[method:Light copy]( [page:Light source] )</h3>
+		<div>
+		<br />
+		Copies value of *source* to this Light object.
+		</div>
+
+		<h3>[method:JSON toJSON]( [page:String meta] )</h3>
+		<div>
+		Return Light data in JSON format.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Object for keeping track of time.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Boolean autoStart] )</h3>
+		<div>
+		autoStart — Automatically start the clock. Default is true.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean autoStart]</h3>
+		<div>
+		If set, starts the clock automatically when the first update is called.
+		</div>
+
+		<h3>[property:Float startTime]</h3>
+		<div>
+		When the clock is running, It holds the start time of the clock. <br />
+		This counted from the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
+ 		</div>
+
+
+		<h3>[property:Float oldTime]</h3>
+		<div>
+		When the clock is running, It holds the previous time from a update.<br />
+		This counted from the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
+ 		</div>
+
+		<h3>[property:Float elapsedTime]</h3>
+		<div>
+		When the clock is running, It holds the time elapsed between the start of the clock to the previous update.<br />
+		This counted from the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC.
+ 		</div>
+
+		<h3>[property:Boolean running]</h3>
+		<div>
+		This property keeps track whether the clock is running or not.
+ 		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null start]()</h3>
+		<div>
+		Starts clock.
+		</div>
+
+		<h3>[method:null stop]()</h3>
+		<div>
+		Stops clock.
+		</div>
+
+		<h3>[method:Float getElapsedTime]()</h3>
+		<div>
+		Get the seconds passed since the clock started.
+		</div>
+
+		<h3>[method:Float getDelta]()</h3>
+		<div>
+		Get the seconds passed since the last call to this method.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

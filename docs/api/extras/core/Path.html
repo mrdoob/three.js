@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:CurvePath] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A 2d path representation, comprising of points, lines, and cubes, similar to the html5 2d canvas api.
+		It extends [page:CurvePath].
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Array points] )</h3>
+		<div>
+		points -- array of Vector2
+		</div>
+		<div>
+		Creates a Path from the points. The first vector defines the offset. After that the lines get defined.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:array actions]</h3>
+		<div>
+		The possible actions that define the path.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null fromPoints]( [page:Array vector2s] )</h3>
+		<div>
+		Adds to the Path from the points. The first vector defines the offset. After that the lines get defined.
+		</div>
+
+		<h3>[method:null moveTo]( [page:Float x], [page:Float y] )</h3>
+		<div>This moves the offset to x and y</div>
+
+		<h3>[method:null lineTo]( [page:Float x], [page:Float y] )</h3>
+		<div>This creates a line from the offset to X and Y and updates the offset to X and Y.</div>
+
+		<h3>[method:null quadraticCurveTo]( [page:Float cpX], [page:Float cpY], [page:Float x], [page:Float y] )</h3>
+		<div>This creates a quadratic curve from the offset to x and y with cpX and cpY as control point and updates the offset to x and y.</div>
+
+		<h3>[method:null bezierCurveTo]( [page:Float cp1X], [page:Float cp1Y], [page:Float cp2X], [page:Float cp2Y], [page:Float x], [page:Float y] )</h3>
+		<div>This creates a bezier curve from the last offset to x and y with cp1X, cp1Y and cp1X, cp1Y as control points and updates the offset to x and y.</div>
+
+		<h3>[method:null splineThru] ( [page:Array points] ) </h3>
+		<div>points - An array of [page:Vector2]s</div>
+		<div>Connects a new [page:SplineCurve] onto the path.</div>
+
+		<h3>[method:null arc]( [page:Float x], [page:Float y], [page:Float radius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
+		<div>
+		x, y -- The center of the arc offset from the last call
+		radius -- The radius of the arc
+		startAngle -- The start angle in radians
+		endAngle -- The end angle in radians
+		clockwise -- Sweep the arc clockwise. Defaults to false
+		</div>
+		<div>Draw an arc offset from the last call</div>
+
+		<h3>[method:null absarc]( [page:Float x], [page:Float y], [page:Float radius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise] )</h3>
+		<div>
+		x, y -- The absolute center of the arc
+		radius -- The radius of the arc
+		startAngle -- The start angle in radians
+		endAngle -- The end angle in radians
+		clockwise -- Sweep the arc clockwise. Defaults to false
+		</div>
+		<div>Draw an arc absolutely positioned</div>
+
+		<h3>[method:null ellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
+		<div>
+		x, y -- The center of the ellipse offset from the last call
+		xRadius -- The radius of the ellipse in the x axis
+		yRadius -- The radius of the ellipse in the y axis
+		startAngle -- The start angle in radians
+		endAngle -- The end angle in radians
+		clockwise -- Sweep the ellipse clockwise. Defaults to false
+		rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to 0
+		</div>
+		<div>Draw an ellipse offset from the last call</div>
+
+		<h3>[method:null absellipse]( [page:Float x], [page:Float y], [page:Float xRadius], [page:Float yRadius], [page:Float startAngle], [page:Float endAngle], [page:Float clockwise], [page:Float rotation] )</h3>
+		<div>
+		x, y -- The absolute center of the ellipse
+		xRadius -- The radius of the ellipse in the x axis
+		yRadius -- The radius of the ellipse in the y axis
+		startAngle -- The start angle in radians
+		endAngle -- The end angle in radians
+		clockwise -- Sweep the ellipse clockwise. Defaults to false
+		rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to 0
+		</div>
+		<div>Draw an ellipse absolutely positioned</div>
+
+		<h3>[method:Array toShapes]( [page:Boolean isCCW], [page:Boolean noHoles] )</h3>
+		<div>
+		isCCW -- Changes how solids and holes are generated<br/>
+		noHoles -- Whether or not to generate holes
+		</div>
+		<div>
+		Converts the Path into an array of Shapes. By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If isCCW is set to true,
+		then those are flipped. If the paramater noHoles is set to true then all paths are set as solid shapes and isCCW is ignored.
+		<br/>
+
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

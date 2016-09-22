@@ -1,0 +1,1109 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Alex Pletzer
+ */
+
+THREE.VTKLoader = function( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var loader = new THREE.XHRLoader( scope.manager );
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function( text ) {
+
+			onLoad( scope.parse( text ) );
+
+		}, onProgress, onError );
+
+	},
+
+	parse: function ( data ) {
+
+		function parseASCII( data ) {
+
+			// connectivity of the triangles
+			var indices = [];
+
+			// triangles vertices
+			var positions = [];
+
+			// red, green, blue colors in the range 0 to 1
+			var colors = [];
+
+			// normal vector, one per vertex
+			var normals = [];
+
+			var result;
+
+			// pattern for reading vertices, 3 floats or integers
+			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
+
+			// pattern for connectivity, an integer followed by any number of ints
+			// the first integer is the number of polygon nodes
+			var patConnectivity = /^(\d+)\s+([\s\d]*)/;
+
+			// indicates start of vertex data section
+			var patPOINTS = /^POINTS /;
+
+			// indicates start of polygon connectivity section
+			var patPOLYGONS = /^POLYGONS /;
+
+			// indicates start of triangle strips section
+			var patTRIANGLE_STRIPS = /^TRIANGLE_STRIPS /;
+
+			// POINT_DATA number_of_values
+			var patPOINT_DATA = /^POINT_DATA[ ]+(\d+)/;
+
+			// CELL_DATA number_of_polys
+			var patCELL_DATA = /^CELL_DATA[ ]+(\d+)/;
+
+			// Start of color section
+			var patCOLOR_SCALARS = /^COLOR_SCALARS[ ]+(\w+)[ ]+3/;
+
+			// NORMALS Normals float
+			var patNORMALS = /^NORMALS[ ]+(\w+)[ ]+(\w+)/;
+
+			var inPointsSection = false;
+			var inPolygonsSection = false;
+			var inTriangleStripSection = false;
+			var inPointDataSection = false;
+			var inCellDataSection = false;
+			var inColorSection = false;
+			var inNormalsSection = false;
+
+			var lines = data.split( '\n' );
+
+			for ( var i in lines ) {
+
+				var line = lines[ i ];
+
+				if ( inPointsSection ) {
+
+					// get the vertices
+					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						var x = parseFloat( result[ 1 ] );
+						var y = parseFloat( result[ 2 ] );
+						var z = parseFloat( result[ 3 ] );
+						positions.push( x, y, z );
+
+					}
+
+				} else if ( inPolygonsSection ) {
+
+					if ( ( result = patConnectivity.exec( line ) ) !== null ) {
+
+						// numVertices i0 i1 i2 ...
+						var numVertices = parseInt( result[ 1 ] );
+						var inds = result[ 2 ].split( /\s+/ );
+
+						if ( numVertices >= 3 ) {
+
+							var i0 = parseInt( inds[ 0 ] );
+							var i1, i2;
+							var k = 1;
+							// split the polygon in numVertices - 2 triangles
+							for ( var j = 0; j < numVertices - 2; ++ j ) {
+
+								i1 = parseInt( inds[ k ] );
+								i2 = parseInt( inds[ k + 1 ] );
+								indices.push( i0, i1, i2 );
+								k ++;
+
+							}
+
+						}
+
+					}
+
+				} else if ( inTriangleStripSection ) {
+
+					if ( ( result = patConnectivity.exec( line ) ) !== null ) {
+
+						// numVertices i0 i1 i2 ...
+						var numVertices = parseInt( result[ 1 ] );
+						var inds = result[ 2 ].split( /\s+/ );
+
+						if ( numVertices >= 3 ) {
+
+							var i0, i1, i2;
+							// split the polygon in numVertices - 2 triangles
+							for ( var j = 0; j < numVertices - 2; j ++ ) {
+
+								if ( j % 2 === 1 ) {
+
+									i0 = parseInt( inds[ j ] );
+									i1 = parseInt( inds[ j + 2 ] );
+									i2 = parseInt( inds[ j + 1 ] );
+									indices.push( i0, i1, i2 );
+
+								} else {
+
+									i0 = parseInt( inds[ j ] );
+									i1 = parseInt( inds[ j + 1 ] );
+									i2 = parseInt( inds[ j + 2 ] );
+									indices.push( i0, i1, i2 );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				} else if ( inPointDataSection || inCellDataSection ) {
+
+					if ( inColorSection ) {
+
+						// Get the colors
+
+						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							var r = parseFloat( result[ 1 ] );
+							var g = parseFloat( result[ 2 ] );
+							var b = parseFloat( result[ 3 ] );
+							colors.push( r, g, b );
+
+						}
+
+					} else if ( inNormalsSection ) {
+
+						// Get the normal vectors
+
+						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							var nx = parseFloat( result[ 1 ] );
+							var ny = parseFloat( result[ 2 ] );
+							var nz = parseFloat( result[ 3 ] );
+							normals.push( nx, ny, nz );
+
+						}
+
+					}
+
+				}
+
+				if ( patPOLYGONS.exec( line ) !== null ) {
+
+					inPolygonsSection = true;
+					inPointsSection = false;
+					inTriangleStripSection = false;
+
+				} else if ( patPOINTS.exec( line ) !== null ) {
+
+					inPolygonsSection = false;
+					inPointsSection = true;
+					inTriangleStripSection = false;
+
+				} else if ( patTRIANGLE_STRIPS.exec( line ) !== null ) {
+
+					inPolygonsSection = false;
+					inPointsSection = false;
+					inTriangleStripSection = true;
+
+				} else if ( patPOINT_DATA.exec( line ) !== null ) {
+
+					inPointDataSection = true;
+					inPointsSection = false;
+					inPolygonsSection = false;
+					inTriangleStripSection = false;
+
+				} else if ( patCELL_DATA.exec( line ) !== null ) {
+
+					inCellDataSection = true;
+					inPointsSection = false;
+					inPolygonsSection = false;
+					inTriangleStripSection = false;
+
+				} else if ( patCOLOR_SCALARS.exec( line ) !== null ) {
+
+					inColorSection = true;
+					inNormalsSection = false;
+					inPointsSection = false;
+					inPolygonsSection = false;
+					inTriangleStripSection = false;
+
+				} else if ( patNORMALS.exec( line ) !== null ) {
+
+					inNormalsSection = true;
+					inColorSection = false;
+					inPointsSection = false;
+					inPolygonsSection = false;
+					inTriangleStripSection = false;
+
+				}
+
+			}
+
+			var geometry;
+			var stagger = 'point';
+
+			if ( colors.length == indices.length ) {
+
+				stagger = 'cell';
+
+			}
+
+			if ( stagger == 'point' ) {
+
+				// Nodal. Use BufferGeometry
+				geometry = new THREE.BufferGeometry();
+				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( indices ), 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+
+				if ( colors.length == positions.length ) {
+
+					geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+
+				}
+
+				if ( normals.length == positions.length ) {
+
+					geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
+
+				}
+
+			} else {
+
+				// Cell centered colors. The only way to attach a solid color to each triangle
+				// is to use Geometry, which is less efficient than BufferGeometry
+				geometry = new THREE.Geometry();
+
+				var numTriangles = indices.length / 3;
+				var numPoints = positions.length / 3;
+				var va, vb, vc;
+				var face;
+				var ia, ib, ic;
+				var x, y, z;
+				var r, g, b;
+
+				for ( var j = 0; j < numPoints; ++ j ) {
+
+					x = positions[ 3 * j + 0 ];
+					y = positions[ 3 * j + 1 ];
+					z = positions[ 3 * j + 2 ];
+					geometry.vertices.push( new THREE.Vector3( x, y, z ) );
+
+				}
+
+				for ( var i = 0; i < numTriangles; ++ i ) {
+
+					ia = indices[ 3 * i + 0 ];
+					ib = indices[ 3 * i + 1 ];
+					ic = indices[ 3 * i + 2 ];
+					geometry.faces.push( new THREE.Face3( ia, ib, ic ) );
+
+				}
+
+				if ( colors.length == numTriangles * 3 ) {
+
+					for ( var i = 0; i < numTriangles; ++ i ) {
+
+						face = geometry.faces[ i ];
+						r = colors[ 3 * i + 0 ];
+						g = colors[ 3 * i + 1 ];
+						b = colors[ 3 * i + 2 ];
+						face.color = new THREE.Color().setRGB( r, g, b );
+
+					}
+
+				}
+
+			}
+
+			return geometry;
+
+		}
+
+		function parseBinary( data ) {
+
+			var count, pointIndex, i, numberOfPoints, pt, s;
+			var buffer = new Uint8Array ( data );
+			var dataView = new DataView ( data );
+
+			// Points and normals, by default, are empty
+			var points = [];
+			var normals = [];
+			var indices = [];
+
+			// Going to make a big array of strings
+			var vtk = [];
+			var index = 0;
+
+			function findString( buffer, start ) {
+
+				var index = start;
+				var c = buffer[ index ];
+				var s = [];
+				while ( c != 10 ) {
+
+					s.push ( String.fromCharCode ( c ) );
+					index ++;
+					c = buffer[ index ];
+
+				}
+
+				return { start: start,
+						end: index,
+						next: index + 1,
+						parsedString: s.join( '' ) };
+
+			}
+
+			var state, line;
+
+			while ( true ) {
+
+				// Get a string
+				state = findString ( buffer, index );
+				line = state.parsedString;
+
+				if ( line.indexOf ( 'POINTS' ) === 0 ) {
+
+					vtk.push ( line );
+					// Add the points
+					numberOfPoints = parseInt ( line.split( ' ' )[ 1 ], 10 );
+
+					// Each point is 3 4-byte floats
+					count = numberOfPoints * 4 * 3;
+
+					points = new Float32Array( numberOfPoints * 3 );
+
+					pointIndex = state.next;
+					for ( i = 0; i < numberOfPoints; i ++ ) {
+
+						points[ 3 * i ] = dataView.getFloat32( pointIndex, false );
+						points[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
+						points[ 3 * i + 2 ] = dataView.getFloat32( pointIndex + 8, false );
+						pointIndex = pointIndex + 12;
+
+					}
+					// increment our next pointer
+					state.next = state.next + count + 1;
+
+				} else if ( line.indexOf ( 'TRIANGLE_STRIPS' ) === 0 ) {
+
+					var numberOfStrips = parseInt ( line.split( ' ' )[ 1 ], 10 );
+					var size = parseInt ( line.split ( ' ' )[ 2 ], 10 );
+					// 4 byte integers
+					count = size * 4;
+
+					indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+					var indicesIndex = 0;
+
+					pointIndex = state.next;
+					for ( i = 0; i < numberOfStrips; i ++ ) {
+
+						// For each strip, read the first value, then record that many more points
+						var indexCount = dataView.getInt32( pointIndex, false );
+						var strip = [];
+						pointIndex += 4;
+						for ( s = 0; s < indexCount; s ++ ) {
+
+							strip.push ( dataView.getInt32( pointIndex, false ) );
+							pointIndex += 4;
+
+						}
+
+						// retrieves the n-2 triangles from the triangle strip
+						for ( var j = 0; j < indexCount - 2; j ++ ) {
+
+							if ( j % 2 ) {
+
+								indices[ indicesIndex ++ ] = strip[ j ];
+								indices[ indicesIndex ++ ] = strip[ j + 2 ];
+								indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+							} else {
+
+
+								indices[ indicesIndex ++ ] = strip[ j ];
+								indices[ indicesIndex ++ ] = strip[ j + 1 ];
+								indices[ indicesIndex ++ ] = strip[ j + 2 ];
+
+							}
+
+						}
+
+					}
+					// increment our next pointer
+					state.next = state.next + count + 1;
+
+				} else if ( line.indexOf ( 'POLYGONS' ) === 0 ) {
+
+					var numberOfStrips = parseInt ( line.split( ' ' )[ 1 ], 10 );
+					var size = parseInt ( line.split ( ' ' )[ 2 ], 10 );
+					// 4 byte integers
+					count = size * 4;
+
+					indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+					var indicesIndex = 0;
+
+					pointIndex = state.next;
+					for ( i = 0; i < numberOfStrips; i ++ ) {
+
+						// For each strip, read the first value, then record that many more points
+						var indexCount = dataView.getInt32( pointIndex, false );
+						var strip = [];
+						pointIndex += 4;
+						for ( s = 0; s < indexCount; s ++ ) {
+
+							strip.push ( dataView.getInt32( pointIndex, false ) );
+							pointIndex += 4;
+
+						}
+						var i0 = strip[ 0 ];
+						// divide the polygon in n-2 triangle
+						for ( var j = 1; j < indexCount - 1; j ++ ) {
+
+							indices[ indicesIndex ++ ] = strip[ 0 ];
+							indices[ indicesIndex ++ ] = strip[ j ];
+							indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+						}
+
+					}
+					// increment our next pointer
+					state.next = state.next + count + 1;
+
+				} else if ( line.indexOf ( 'POINT_DATA' ) === 0 ) {
+
+					numberOfPoints = parseInt ( line.split( ' ' )[ 1 ], 10 );
+
+					// Grab the next line
+					state = findString ( buffer, state.next );
+
+					// Now grab the binary data
+					count = numberOfPoints * 4 * 3;
+
+					normals = new Float32Array( numberOfPoints * 3 );
+					pointIndex = state.next;
+					for ( i = 0; i < numberOfPoints; i ++ ) {
+
+						normals[ 3 * i ] = dataView.getFloat32( pointIndex, false );
+						normals[ 3 * i + 1 ] = dataView.getFloat32( pointIndex + 4, false );
+						normals[ 3 * i + 2 ] = dataView.getFloat32( pointIndex + 8, false );
+						pointIndex += 12;
+
+					}
+
+					// Increment past our data
+					state.next = state.next + count;
+
+				}
+
+				// Increment index
+				index = state.next;
+
+				if ( index >= buffer.byteLength ) {
+
+					break;
+
+				}
+
+			}
+
+			var geometry = new THREE.BufferGeometry();
+			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+
+			if ( normals.length == points.length ) {
+
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+			}
+
+			return geometry;
+
+		}
+
+		function parseXML( stringFile ) {
+
+			// Changes XML to JSON, based on https://davidwalsh.name/convert-xml-json
+
+			function xmlToJson( xml ) {
+
+				// Create the return object
+				var obj = {};
+
+				if ( xml.nodeType == 1 ) { // element
+
+					// do attributes
+
+					if ( xml.attributes ) {
+
+						if ( xml.attributes.length > 0 ) {
+
+							obj[ 'attributes' ] = {};
+
+							for ( var j = 0; j < xml.attributes.length; j ++ ) {
+
+								var attribute = xml.attributes.item( j );
+								obj[ 'attributes' ][ attribute.nodeName ] = attribute.nodeValue.trim();
+
+							}
+
+						}
+
+					}
+
+				} else if ( xml.nodeType == 3 ) { // text
+
+					obj = xml.nodeValue.trim();
+
+				}
+
+				// do children
+				if ( xml.hasChildNodes() ) {
+
+					for ( var i = 0; i < xml.childNodes.length; i ++ ) {
+
+						var item = xml.childNodes.item( i );
+						var nodeName = item.nodeName;
+
+						if ( typeof( obj[ nodeName ] ) === 'undefined' ) {
+
+							var tmp = xmlToJson( item );
+
+							if ( tmp !== '' ) obj[ nodeName ] = tmp;
+
+						} else {
+
+							if ( typeof( obj[ nodeName ].push ) === 'undefined' ) {
+
+								var old = obj[ nodeName ];
+								obj[ nodeName ] = [ old ];
+
+							}
+
+							var tmp = xmlToJson( item );
+
+							if ( tmp !== '' ) obj[ nodeName ].push( tmp );
+
+						}
+
+					}
+
+				}
+
+				return obj;
+
+			}
+
+			// Taken from Base64-js
+			function Base64toByteArray( b64 ) {
+
+				var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
+				var i;
+				var lookup = [];
+				var revLookup = [];
+				var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+				var len = code.length;
+
+				for ( i = 0; i < len; i ++ ) {
+
+					lookup[ i ] = code[ i ];
+
+				}
+
+				for ( i = 0; i < len; ++ i ) {
+
+					revLookup[ code.charCodeAt( i ) ] = i;
+
+				}
+
+				revLookup[ '-'.charCodeAt( 0 ) ] = 62;
+				revLookup[ '_'.charCodeAt( 0 ) ] = 63;
+
+				var j, l, tmp, placeHolders, arr;
+				var len = b64.length;
+
+				if ( len % 4 > 0 ) {
+
+					throw new Error( 'Invalid string. Length must be a multiple of 4' );
+
+				}
+
+				placeHolders = b64[ len - 2 ] === '=' ? 2 : b64[ len - 1 ] === '=' ? 1 : 0;
+				arr = new Arr( len * 3 / 4 - placeHolders );
+				l = placeHolders > 0 ? len - 4 : len;
+
+				var L = 0;
+
+				for ( i = 0, j = 0; i < l; i += 4, j += 3 ) {
+
+					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 18 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 12 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] << 6 ) | revLookup[ b64.charCodeAt( i + 3 ) ];
+					arr[ L ++ ] = ( tmp & 0xFF0000 ) >> 16;
+					arr[ L ++ ] = ( tmp & 0xFF00 ) >> 8;
+					arr[ L ++ ] = tmp & 0xFF;
+
+				}
+
+				if ( placeHolders === 2 ) {
+
+					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 2 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] >> 4 );
+					arr[ L ++ ] = tmp & 0xFF;
+
+				} else if ( placeHolders === 1 ) {
+
+					tmp = ( revLookup[ b64.charCodeAt( i ) ] << 10 ) | ( revLookup[ b64.charCodeAt( i + 1 ) ] << 4 ) | ( revLookup[ b64.charCodeAt( i + 2 ) ] >> 2 );
+					arr[ L ++ ] = ( tmp >> 8 ) & 0xFF;
+					arr[ L ++ ] = tmp & 0xFF;
+
+				}
+
+				return arr;
+
+			}
+
+			function parseDataArray( ele, compressed ) {
+
+				// Check the format
+
+				if ( ele.attributes.format == 'binary' ) {
+
+					if ( compressed ) {
+
+						// Split the blob_header and compressed Data
+						if ( ele[ '#text' ].indexOf( '==' ) != - 1 ) {
+
+							var data = ele[ '#text' ].split( '==' );
+
+							// console.log( data );
+
+							if ( data.length == 2 ) {
+
+								var blob = data.shift();
+								var content = data.shift();
+
+								if ( content === '' ) {
+
+									content = blob + '==';
+
+								}
+
+							} else if ( data.length > 2 ) {
+
+								var blob = data.shift();
+								var content = data.shift();
+								content = content + '==';
+
+							} else if ( data.length < 2 ) {
+
+								var content = data.shift();
+								content = content + '==';
+
+							}
+
+							// Convert to bytearray
+							var arr = Base64toByteArray( content );
+
+							// decompress
+							var inflate = new Zlib.Inflate( arr, { resize: true, verify: true } );
+							var content = inflate.decompress();
+
+						} else {
+
+							var content = Base64toByteArray( ele[ '#text' ] );
+
+						}
+
+					} else {
+
+						var content = Base64toByteArray( ele[ '#text' ] );
+
+					}
+
+					var content = content.buffer;
+
+				} else {
+
+					if ( ele[ '#text' ] ) {
+
+						var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el, idx, arr ) {
+
+							if ( el !== '' ) return el;
+
+						} );
+
+					} else {
+
+						var content = new Int32Array( 0 ).buffer;
+
+					}
+
+				}
+
+				delete ele[ '#text' ];
+
+				// Get the content and optimize it
+
+				if ( ele.attributes.type == 'Float32' ) {
+
+					var txt = new Float32Array( content );
+
+					if ( ele.attributes.format == 'binary' ) {
+
+						if ( ! compressed ) {
+
+							txt = txt.filter( function( el, idx, arr ) {
+
+								if ( idx !== 0 ) return true;
+
+							} );
+
+						}
+
+					}
+
+				} else if ( ele.attributes.type === 'Int64' ) {
+
+					var txt = new Int32Array( content );
+
+					if ( ele.attributes.format == 'binary' ) {
+
+						if ( ! compressed ) {
+
+							txt = txt.filter( function ( el, idx, arr ) {
+
+								if ( idx !== 0 ) return true;
+
+							} );
+
+						}
+
+						txt = txt.filter( function ( el, idx, arr ) {
+
+							if ( idx % 2 !== 1 ) return true;
+
+						} );
+
+					}
+
+				}
+
+				// console.log( txt );
+
+				return txt;
+
+			}
+
+			// Main part
+			// Get Dom
+			var dom = null;
+
+			if ( window.DOMParser ) {
+
+				try {
+
+					dom = ( new DOMParser() ).parseFromString( stringFile, 'text/xml' );
+
+				} catch ( e ) {
+
+					dom = null;
+
+				}
+
+			} else if ( window.ActiveXObject ) {
+
+				try {
+
+					dom = new ActiveXObject( 'Microsoft.XMLDOM' );
+					dom.async = false;
+
+					if ( ! dom.loadXML( xml ) ) {
+
+						throw new Error( dom.parseError.reason + dom.parseError.srcText );
+
+					}
+
+				} catch ( e ) {
+
+					dom = null;
+
+				}
+
+			} else {
+
+				throw new Error( 'Cannot parse xml string!' );
+
+			}
+
+			// Get the doc
+			var doc = dom.documentElement;
+			// Convert to json
+			var json = xmlToJson( doc );
+			var points = [];
+			var normals = [];
+			var indices = [];
+
+			if ( json.PolyData ) {
+
+				var piece = json.PolyData.Piece;
+				var compressed = json.attributes.hasOwnProperty( 'compressor' );
+
+				// Can be optimized
+				// Loop through the sections
+				var sections = [ 'PointData', 'Points', 'Strips', 'Polys' ];// +['CellData', 'Verts', 'Lines'];
+				var sectionIndex = 0, numberOfSections = sections.length;
+
+				while ( sectionIndex < numberOfSections ) {
+
+					var section = piece[ sections[ sectionIndex ] ];
+
+					// If it has a DataArray in it
+
+					if ( section.DataArray ) {
+
+						// Depending on the number of DataArrays
+
+						if ( Object.prototype.toString.call( section.DataArray ) === '[object Array]' ) {
+
+							var arr = section.DataArray;
+
+						} else {
+
+							var arr = [ section.DataArray ];
+
+						}
+
+						var dataArrayIndex = 0, numberOfDataArrays = arr.length;
+
+						while ( dataArrayIndex < numberOfDataArrays ) {
+
+							// Parse the DataArray
+							arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
+							dataArrayIndex ++;
+
+						}
+
+						switch ( sections[ sectionIndex ] ) {
+
+							// if iti is point data
+							case 'PointData':
+
+								var numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+								var normalsName = section.attributes.Normals;
+
+								if ( numberOfPoints > 0 ) {
+
+									for ( var i = 0, len = arr.length; i < len; i ++ ) {
+
+										if ( normalsName == arr[ i ].attributes.Name ) {
+
+											var components = arr[ i ].attributes.NumberOfComponents;
+											normals = new Float32Array( numberOfPoints * components );
+											normals.set( arr[ i ].text, 0 );
+
+										}
+
+									}
+
+								}
+
+								// console.log('Normals', normals);
+
+								break;
+
+							// if it is points
+							case 'Points':
+
+								var numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+
+								if ( numberOfPoints > 0 ) {
+
+									var components = section.DataArray.attributes.NumberOfComponents;
+									points = new Float32Array( numberOfPoints * components );
+									points.set( section.DataArray.text, 0 );
+
+								}
+
+								// console.log('Points', points);
+
+								break;
+
+							// if it is strips
+							case 'Strips':
+
+								var numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
+
+								if ( numberOfStrips > 0 ) {
+
+									var connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+									var offset = new Int32Array( section.DataArray[ 1 ].text.length );
+									connectivity.set( section.DataArray[ 0 ].text, 0 );
+									offset.set( section.DataArray[ 1 ].text, 0 );
+
+									var size = numberOfStrips + connectivity.length;
+									indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+
+									var indicesIndex = 0;
+
+									for ( var i = 0,len = numberOfStrips; i < len; i ++ ) {
+
+										var strip = [];
+
+										for ( var s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
+
+											strip.push ( connectivity[ s ] );
+
+											if ( i > 0 ) len0 = offset[ i - 1 ];
+
+										}
+
+										for ( var j = 0, len1 = offset[ i ], len0 = 0; j < len1 - len0 - 2; j ++ ) {
+
+											if ( j % 2 ) {
+
+												indices[ indicesIndex ++ ] = strip[ j ];
+												indices[ indicesIndex ++ ] = strip[ j + 2 ];
+												indices[ indicesIndex ++ ] = strip[ j + 1 ];
+
+											} else {
+
+												indices[ indicesIndex ++ ] = strip[ j ];
+												indices[ indicesIndex ++ ] = strip[ j + 1 ];
+												indices[ indicesIndex ++ ] = strip[ j + 2 ];
+
+											}
+
+											if ( i > 0 ) len0 = offset[ i - 1 ];
+
+										}
+
+									}
+
+								}
+
+								//console.log('Strips', indices);
+
+								break;
+
+							// if it is polys
+							case 'Polys':
+
+								var numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
+
+								if ( numberOfPolys > 0 ) {
+
+									var connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+									var offset = new Int32Array( section.DataArray[ 1 ].text.length );
+									connectivity.set( section.DataArray[ 0 ].text, 0 );
+									offset.set( section.DataArray[ 1 ].text, 0 );
+
+									var size = numberOfPolys + connectivity.length;
+									indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
+									var indicesIndex = 0, connectivityIndex = 0;
+									var i = 0,len = numberOfPolys, len0 = 0;
+
+									while ( i < len ) {
+
+										var poly = [];
+										var s = 0, len1 = offset[ i ];
+
+										while ( s < len1 - len0 ) {
+
+											poly.push( connectivity[ connectivityIndex ++ ] );
+											s ++;
+
+										}
+
+										var j = 1;
+
+										while ( j < len1 - len0 - 1 ) {
+
+											indices[ indicesIndex ++ ] = poly[ 0 ];
+											indices[ indicesIndex ++ ] = poly[ j ];
+											indices[ indicesIndex ++ ] = poly[ j + 1 ];
+											j ++;
+
+										}
+
+										i ++;
+										len0 = offset[ i - 1 ];
+
+									}
+
+								}
+								//console.log('Polys', indices);
+								break;
+
+							default:
+								break;
+
+						}
+
+					}
+
+					sectionIndex ++;
+
+				}
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+
+				if ( normals.length == points.length ) {
+
+					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+				}
+
+				// console.log( json );
+
+				return geometry;
+
+			} else {
+
+				// TODO for vtu,vti,and other xml formats
+
+			}
+
+		}
+
+		function getStringFile( data ) {
+
+			var stringFile = '';
+			var charArray = new Uint8Array( data );
+			var i = 0;
+			var len = charArray.length;
+
+			while ( len -- ) {
+
+				stringFile += String.fromCharCode( charArray[ i ++ ] );
+
+			}
+
+			return stringFile;
+
+		}
+
+		// get the 5 first lines of the files to check if there is the key word binary
+		var meta = String.fromCharCode.apply( null, new Uint8Array( data, 0, 250 ) ).split( '\n' );
+
+		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
+
+			return parseXML( getStringFile( data ) );
+
+		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
+
+			return parseASCII( getStringFile( data ) );
+
+		} else {
+
+			return parseBinary( data );
+
+		}
+
+	}
+
+} );

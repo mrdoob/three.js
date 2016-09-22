@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A material for non-shiny (Lambertian) surfaces, evaluated per vertex.</div>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshLambertMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object parameters] )</h3>
+		<div>
+		parameters -- parameters is an object with one or more properties defining the material's appearance.
+		</div>
+		<div>
+		color — Line color in hexadecimal. Default is 0xffffff.<br />
+		map — Sets the texture map. Default is null <br />
+		lightMap — Set light map. Default is null.<br />
+		lightMapIntensity — Set light map intensity. Default is 1.<br />
+		aoMap — Set ao map. Default is null.<br />
+		aoMapIntensity — Set ao map intensity. Default is 1.<br />
+		emissive - Set emissive color. Default is 0x000000.<br />
+		emissiveMap — Set emissive map. Default is null.<br />
+		emissiveIntensity — Set emissive map intensity. Default is 1.<br />
+		specularMap — Set specular map. Default is null.<br />
+		alphaMap — Set alpha map. Default is null.<br />
+		envMap — Set env map. Default is null.<br />
+		combine — Set combine operation. Default is THREE.MultiplyOperation.<br />
+		reflectivity — Set reflectivity. Default is 1.<br />
+		refractionRatio — Set refraction ratio. Default is 0.98.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is false.<br />
+		wireframe — Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
+		wireframeLinewidth — Controls wireframe thickness. Default is 1.<br/>
+		wireframeLinecap — Define appearance of line ends. Default is 'round'.<br />
+		wireframeLinejoin — Define appearance of line joints. Default is 'round'.<br />
+		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
+		skinning — Define whether the material uses skinning. Default is false.<br />
+		morphTargets — Define whether the material uses morphTargets. Default is false.<br />
+		morphNormals — Define whether the material uses morphNormals. Default is false.
+		</div>
+
+
+		<h2>Properties</h2>
+		<div>See the base [page:Material] class for common properties.</div>
+
+		<h3>[property:Color color]</h3>
+		<div>
+		Diffuse color of the material. Default is white.<br />
+		</div>
+
+		<h3>[property:Texture map]</h3>
+		<div>Set color texture map. Default is null.</div>
+
+		<h3>[property:Texture lightMap]</h3>
+		<div>Set light map. Default is null. The lightMap requires a second set of UVs.</div>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<div>TODO</div>
+
+		<h3>[property:Texture aoMap]</h3>
+		<div>Set ambient occlusion map. Default is null. The aoMap requires a second set of UVs.</div>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<div>TODO</div>
+
+		<h3>[property:Color emissive]</h3>
+		<div>
+		Emissive (light) color of the material, essentially a solid color unaffected by other lighting. Default is black.<br />
+		</div>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<div>Set emisssive (glow) map. Default is null. The emissive map color is modulated by the emissive color and the emissive intensity. If you have an emissive map, be sure to set the emissive color to something other than black.</div>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<div>Intensity of the emissive light. Modulates the emissive color. Default is 1.</div>
+
+		<h3>[property:Texture specularMap]</h3>
+		<div>Since this material does not have a specular component, the specular value affects only how much of the environment map affects the surface. Default is null.</div>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<div>The alpha map is a grayscale texture that controls the opacity across the surface (black: fully transparent; white: fully opaque). Default is null.</div>
+		<div>Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.</div>
+
+		<h3>[property:TextureCube envMap]</h3>
+		<div>Set env map. Default is null.</div>
+
+		<h3>[property:Integer combine]</h3>
+		<div>How to combine the result of the surface's color with the environment map, if any.</div>
+
+		<div>Options are [page:Textures THREE.Multiply] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
+
+		<h3>[property:Float reflectivity]</h3>
+		<div>How much the environment map affects the surface; also see "combine".</div>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<div>The index of refraction for an environment map using [page:Textures THREE.CubeRefractionMapping]. Default is *0.98*.</div>
+
+		<h3>[property:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings. Default is *true*.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<div>Whether the triangles' edges are displayed instead of surfaces. Default is *false*.</div>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<div>Line thickness for wireframe mode. Default is *1.0*.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<div>Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<div>Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+
+		<h3>[property:Integer vertexColors]</h3>
+		<div>Define how the vertices gets colored. Possible values are THREE.NoColors, THREE.FaceColors and THREE.VertexColors. Default is THREE.NoColors.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		<h3>[property:Boolean skinning]</h3>
+		<div>Define whether the material uses skinning. Default is *false*.</div>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<div>Define whether the material uses morphTargets. Default is *false*.</div>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<div>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

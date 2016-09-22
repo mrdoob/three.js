@@ -1,0 +1,378 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js raycast - texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			#controls {
+				position: absolute;
+				text-align:left;
+				top: 40px;
+				left: 5px;
+				padding: 5px;
+			}
+
+			.control {
+				margin-bottom: 3px;
+			}
+
+			input {
+				width: 50px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - raycast texture<br>Left to right: buffer geometry - geometry - indexed buffer geometry</div>
+		<fieldset id="controls">
+			<legend>Circle</legend>
+			<div class="control">
+				WrapS : <select onchange="setwrapS(this)">
+					<option value="ClampToEdgeWrapping">ClampToEdgeWrapping</option>
+					<option value="RepeatWrapping" selected>RepeatWrapping</option>
+					<option value="MirroredRepeatWrapping">MirroredRepeatWrapping</option>
+				</select>
+			</div>
+			<div class="control">
+				WrapT : <select onchange="setwrapT(this)">
+					<option value="ClampToEdgeWrapping">ClampToEdgeWrapping</option>
+					<option value="RepeatWrapping" selected>RepeatWrapping</option>
+					<option value="MirroredRepeatWrapping">MirroredRepeatWrapping</option>
+				</select>
+			</div>
+			<div class="control">
+				Offset : X <input type="number" value="0" step="0.05" onchange="setOffsetU(this)" />
+				Y <input type="number" value="0" step="0.05" onchange="setOffsetV(this)" /><br />
+			</div>
+			<div class="control">
+				Repeat : X <input type="number" value="1" step="0.1" onchange="setRepeatU(this)" />
+				Y <input type="number" value="1" step="0.1" onchange="setRepeatV(this)" />
+			</div>
+		</fieldset>
+		<script src="../build/three.js"></script>
+		<script>
+
+			CanvasTexture = function ( parentTexture ) {
+
+				this._canvas = document.createElement( "canvas" );
+				this._canvas.width = this._canvas.height = 1024;
+				this._context2D = this._canvas.getContext( "2d" );
+
+				if ( parentTexture ) {
+
+					this._parentTexture.push( parentTexture );
+					parentTexture.image = this._canvas;
+
+				}
+
+				var that = this;
+				this._background = document.createElement( "img" );
+				this._background.addEventListener( "load", function ( event ) {
+
+					that._canvas.width = that._background.naturalWidth;
+					that._canvas.height = that._background.naturalHeight;
+
+					that._crossRadius = Math.ceil( Math.min( that._canvas.width, that._canvas.height / 30 ) );
+					that._crossMax = Math.ceil( 0.70710678 * that._crossRadius );
+					that._crossMin = Math.ceil( that._crossMax / 10 );
+					that._crossThickness = Math.ceil( that._crossMax / 10 );
+
+					that._draw();
+
+				}, false );
+				this._background.crossOrigin = '';
+				this._background.src = "textures/UV_Grid_Sm.jpg";
+
+				this._draw();
+
+			}
+
+
+			CanvasTexture.prototype = {
+
+				constructor: CanvasTexture,
+
+				_canvas: null,
+				_context2D: null,
+				_xCross: 0,
+				_yCross: 0,
+
+				_crossRadius: 57,
+				_crossMax: 40,
+				_crossMin: 4,
+				_crossThickness: 4,
+
+				_parentTexture: [],
+
+				addParent: function ( parentTexture ) {
+
+					if ( this._parentTexture.indexOf( parentTexture ) === - 1 ) {
+
+						this._parentTexture.push( parentTexture );
+						parentTexture.image = this._canvas;
+
+					}
+
+				},
+
+				setCrossPosition: function ( x, y ) {
+
+					this._xCross = x * this._canvas.width;
+					this._yCross = y * this._canvas.height;
+
+					this._draw();
+
+				},
+
+				_draw: function () {
+
+					if ( ! this._context2D ) return;
+
+					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height )
+
+					// Background.
+					this._context2D.drawImage( this._background, 0, 0 );
+
+					// Yellow cross.
+					this._context2D.lineWidth = this._crossThickness * 3;
+					this._context2D.strokeStyle = "#FFFF00";
+
+					this._context2D.beginPath();
+					this._context2D.moveTo( this._xCross - this._crossMax - 2, this._yCross - this._crossMax - 2 );
+					this._context2D.lineTo( this._xCross - this._crossMin, this._yCross - this._crossMin );
+
+					this._context2D.moveTo( this._xCross + this._crossMin, this._yCross + this._crossMin );
+					this._context2D.lineTo( this._xCross + this._crossMax + 2, this._yCross + this._crossMax + 2 );
+
+					this._context2D.moveTo( this._xCross - this._crossMax - 2, this._yCross + this._crossMax + 2 );
+					this._context2D.lineTo( this._xCross - this._crossMin, this._yCross + this._crossMin );
+
+					this._context2D.moveTo( this._xCross + this._crossMin, this._yCross - this._crossMin );
+					this._context2D.lineTo( this._xCross + this._crossMax + 2, this._yCross - this._crossMax - 2 );
+
+					this._context2D.stroke();
+
+					for ( var i = 0; i < this._parentTexture.length; i ++ ) {
+
+						this._parentTexture[ i ].needsUpdate = true;
+
+					}
+
+				}
+
+			}
+
+		</script>
+		<script>
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+
+			var canvas;
+			var planeTexture, cubeTexture, circleTexture;
+
+			var container;
+
+			var camera, scene, renderer;
+
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
+			var onClickPosition = new THREE.Vector2();
+
+			init();
+			render();
+
+			function init() {
+
+				container = document.getElementById( "container" );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+				camera.position.x = - 30;
+				camera.position.y = 40;
+				camera.position.z = 50;
+				camera.lookAt( scene.position );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( new THREE.Color( 0xEEEEEE, 1.0 ) );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+				container.appendChild( renderer.domElement );
+
+				// A cube, in the middle.
+				cubeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				canvas = new CanvasTexture( cubeTexture );
+				var cubeMaterial = new THREE.MeshBasicMaterial( { map: cubeTexture } );
+				var cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
+				// Set a specific texture mapping.
+				var uvs;
+				for ( var i = 0; i < cubeGeometry.faceVertexUvs[ 0 ].length; i ++ ) {
+
+					uvs = cubeGeometry.faceVertexUvs[ 0 ][ i ];
+					for ( var j = 0; j < 3; j ++ ) {
+
+						if ( uvs[ j ].x < 0.1 ) uvs[ j ].x = - 1;
+						if ( uvs[ j ].y < 0.1 ) uvs[ j ].y = - 1;
+
+					}
+
+				}
+				var cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+				cube.position.x = 4;
+				cube.position.y = - 5;
+				cube.position.z = 0;
+				scene.add( cube );
+
+				// A plane on the left.
+				planeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.MirroredRepeatWrapping, THREE.MirroredRepeatWrapping );
+				canvas.addParent( planeTexture );
+				var planeMaterial = new THREE.MeshBasicMaterial( { map: planeTexture } );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 25, 25, 1, 1 );
+				var uvs = planeGeometry.attributes.uv.array;
+				// Set a specific texture mapping.
+				for ( var i = 0; i < uvs.length; i ++ ) {
+
+					uvs[ i ] *= 2;
+
+				}
+				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.position.x = - 16;
+				plane.position.y = - 5;
+				plane.position.z = 0;
+				scene.add( plane );
+
+				// A circle on the right.
+				circleTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				canvas.addParent( circleTexture );
+				var circleMaterial = new THREE.MeshBasicMaterial( { map: circleTexture } );
+				var circleGeometry = new THREE.CircleBufferGeometry( 25, 40, 0, Math.PI * 2 );
+				var uvs = circleGeometry.attributes.uv.array;
+				// Set a specific texture mapping.
+				for ( var i = 0; i < uvs.length; i ++ ) {
+
+					uvs[ i ] = ( uvs[ i ] - 0.25 ) * 2;
+
+				}
+				var circle = new THREE.Mesh( circleGeometry, circleMaterial );
+				circle.position.x = 24;
+				circle.position.y = - 5;
+				circle.position.z = 0;
+				scene.add( circle );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				container.addEventListener( 'mousemove', onMouseMove, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			};
+
+			function onMouseMove( evt ) {
+
+				evt.preventDefault();
+
+				var array = getMousePosition( container, evt.clientX, evt.clientY );
+				onClickPosition.fromArray( array );
+
+				var intersects = getIntersects( onClickPosition, scene.children );
+
+				if ( intersects.length > 0 && intersects[ 0 ].uv ) {
+
+					var uv = intersects[ 0 ].uv;
+					intersects[ 0 ].object.material.map.transformUv( uv );
+					canvas.setCrossPosition( uv.x, uv.y );
+
+				}
+
+			};
+
+			var getMousePosition = function ( dom, x, y ) {
+
+				var rect = dom.getBoundingClientRect();
+				return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+			};
+
+			var getIntersects = function ( point, objects ) {
+
+				mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+				raycaster.setFromCamera( mouse, camera );
+
+				return raycaster.intersectObjects( objects );
+
+			};
+
+			function render() {
+
+				requestAnimationFrame( render );
+				renderer.render( scene, camera );
+
+			};
+
+			function setwrapS( that ) {
+
+				circleTexture.wrapS = THREE[ that.value ];
+				circleTexture.needsUpdate = true;
+
+			};
+
+			function setwrapT( that ) {
+
+				circleTexture.wrapT = THREE[ that.value ];
+				circleTexture.needsUpdate = true;
+
+			};
+
+			function setOffsetU( that ) {
+
+				circleTexture.offset.x = parseFloat( that.value );
+
+			};
+
+			function setOffsetV( that ) {
+
+				circleTexture.offset.y = parseFloat( that.value );
+
+			};
+
+			function setRepeatU( that ) {
+
+				circleTexture.repeat.x = parseFloat( that.value );
+
+			};
+
+			function setRepeatV( that ) {
+
+				circleTexture.repeat.y = parseFloat( that.value );
+
+			};
+
+		</script>
+	</body>
+</html>

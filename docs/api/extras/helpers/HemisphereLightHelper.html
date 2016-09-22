@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Creates a visual aid for a [page:HemisphereLight HemisphereLight].</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([page:HemisphereLight light], [page:Number sphereSize])</h3>
+		<div>
+		light -- The HemisphereLight. <br />
+		sphereSize -- The size of the sphere that shows the location.
+		</div>
+		<div>
+		Creates an helper for the hemispherelight.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Mesh lightSphere]</h3>
+		<div>
+		The sphere mesh that shows the location of the hemispherelight.
+		</div>
+
+		<h3>[property:HemisphereLight light]</h3>
+		<div>
+		Contains the HemisphereLight.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null update]()</h3>
+		<div>
+		Updates the helper to match the position and direction of the [page:.light].
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A bone which is part of a [page:Skeleton]. The skeleton in turn is used by the [page:SkinnedMesh].
+		Bones are almost identical to a blank [page:Object3D].
+		</div>
+		
+		<h3>Example</h3>
+		
+		<code>
+		var root = new THREE.Bone();
+		var child = new THREE.Bone();
+		
+		root.add( child );
+		child.position.y = 5;
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:SkinnedMesh skin] )</h3>
+		<div>
+		skin — (optional) The [page:SkinnedMesh] to which the bone belongs.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:SkinnedMesh skin]</h3>
+		<div>
+		An optional reference to the [page:SkinnedMesh].
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Bone clone]()</h3>
+		<div>
+		Returns a clone of this Bone object and its descendants.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

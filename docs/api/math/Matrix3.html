@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A 3x3 matrix.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+		Creates and initializes the 3x3 matrix to the identity matrix.
+		</div>
+
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float32Array elements]</h3>
+		<div>
+		A column-major list of matrix values.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Matrix3 set]( [page:Float n11], [page:Float n12], [page:Float n13], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n31], [page:Float n32], [page:Float n33] ) [page:Matrix3 this]</h3>
+		<div>
+		n11 -- [page:Float] <br />
+		n12 -- [page:Float] <br />
+		n13 -- [page:Float] <br />
+		n21 -- [page:Float] <br />
+		n22 -- [page:Float] <br />
+		n23 -- [page:Float] <br />
+		n31 -- [page:Float] <br />
+		n32 -- [page:Float] <br />
+		n33 -- [page:Float]
+		</div>
+		<div>
+		Sets the 3x3 matrix values to the given row-major sequence of values.
+		</div>
+
+		<h3>[method:Matrix3 copy]( [page:Matrix3 m] ) [page:Matrix3 this]</h3>
+		<div>
+		m -- [page:Matrix4]
+		</div>
+		<div>
+		Copies the values of matrix *m* into this matrix.
+		</div>
+
+		<h3>[method:Matrix3 fromArray]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<div>
+		array -- [page:Array] The array to read the elements from.
+		</div>
+		<div>
+		Sets the elements of this matrix based on an array in column-major format.
+		</div>
+
+		<h3>[method:Matrix3 transpose]() [page:Matrix3 this]</h3>
+		<div>
+		Transposes this matrix in place.
+		</div>
+
+		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<div>
+		array -- [page:Array] <br />
+		</div>
+		<div>
+		Transposes this matrix into the supplied array, and returns itself unchanged.
+		</div>
+
+		<h3>[method:Float determinant]() [page:Matrix3 this]</h3>
+		<div>
+		Computes and returns the determinant of this matrix.
+		</div>
+
+		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] ) [page:Matrix3 this]</h3>
+		<div>
+		scalar -- [page:Float]
+		</div>
+		<div>
+		Multiplies every component of the matrix by the scalar value *s*.
+		</div>
+
+		<h3>[method:Array applyToVector3Array]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<div>
+		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
+		</div>
+		<div>
+		Multiplies (applies) this matrix to every vector3 in the array.
+		</div>
+
+		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] ) [page:Matrix3 this]</h3>
+		<div>
+		m -- [page:Matrix4]
+		</div>
+		<div>
+		Sets this matrix as the normal matrix (upper left 3x3)of the passed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix *m*.
+		</div>
+
+		<h3>[method:Matrix3 getInverse]( [page:Matrix4 m], [page:Boolean throwOnDegenerate] ) [page:Matrix3 this]</h3>
+		<div>
+		m -- [page:Matrix4]<br />
+		throwOnDegenerate -- [Page:Boolean] If true, throw an error if the matrix is degenerate (not invertible).
+		</div>
+		<div>
+		Set this matrix to the inverse of the passed matrix.
+		</div>
+
+		<h3>[method:Matrix3 identity]() [page:Matrix3 this]</h3>
+		<div>
+		Resets this matrix to identity.<br/><br/>
+
+		1, 0, 0<br/>
+		0, 1, 0<br/>
+		0, 0, 1<br/>
+		</div>
+
+		<h3>[method:Matrix3 clone]() [page:Matrix3 this]</h3>
+		<div>
+		Creates a copy of this matrix.
+		</div>
+
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Matrix3 this]</h3>
+		<div>
+		array -- [page:Array] optional array to store the vector <br />
+		offset -- [page:Integer] optional offset into the array
+		</div>
+		<div>
+		Writes the elements of this matrix to an array in column-major format.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

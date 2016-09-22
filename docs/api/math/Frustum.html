@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc"><a href="http://en.wikipedia.org/wiki/Frustum">Frustums</a> are used to determine what is inside the camera's field of view. They help speed up the rendering process.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5])</h3>
+		<div>
+		p0 -- [page:Plane] <br />
+		p1 -- [page:Plane] <br />
+		p2 -- [page:Plane] <br />
+		p3 -- [page:Plane] <br />
+		p4 -- [page:Plane] <br />
+		p5 -- [page:Plane]
+		</div>
+		<div>
+		Creates a frustum from the designated planes.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array planes]</h3>
+		<div>
+		Array of 6 [page:Plane planes].
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Frustum setFromMatrix]( [page:Matrix4 matrix] )</h3>
+
+		<h3>[method:Boolean intersectsObject]( [page:Object3D object] )</h3>
+		<div>
+		Checks whether the object's bounding sphere is intersecting the Frustum.
+		</div>
+
+		<h3>[method:Frustum clone]()</h3>
+		<div>
+		Return a copy of this Frustum
+		</div>
+
+		<h3>[method:Frustum set]( [page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5] )</h3>
+		<div>
+		p0 -- [page:Plane] <br />
+		p1 -- [page:Plane] <br />
+		p2 -- [page:Plane] <br />
+		p3 -- [page:Plane] <br />
+		p4 -- [page:Plane] <br />
+		p5 -- [page:Plane]
+		</div>
+		<div>
+		Sets the current frustum from the passed planes. No plane order is implicitely implied.
+		</div>
+
+		<h3>[method:Frustum copy]( [page:Frustum frustum] ) [page:Frustum this]</h3>
+		<div>
+		frustum -- The frustum to copy
+		</div>
+		<div>
+		Copies the values of the passed frustum.
+		</div>
+
+		<h3>[method:Boolean containsPoint]( [page:Vector3 point] )</h3>
+		<div>
+		point -- [page:Vector3] to test
+		</div>
+		<div>
+		Checks to see if the frustum contains the point.
+		</div>
+
+		<h3>[method:Boolean intersectsBox]( [page:Box3 box] )</h3>
+		<div>
+		box -- [page:Box3]
+		</div>
+		<div>
+		Check to see if the box intersects with the frustum.
+		</div>
+
+		<h3>[method:Boolean intersectsSphere]( [page:Sphere sphere] )</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Check to see if the sphere intersects with the frustum.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

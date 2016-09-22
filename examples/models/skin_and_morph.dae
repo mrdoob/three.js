@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+ <asset>
+   <contributor>
+     <author>gcorson</author>
+     <authoring_tool>Maya8.5 | ColladaMaya v3.03</authoring_tool>
+     <comments>Collada Maya Export Options:
+bakeTransforms=0;exportPolygonMeshes=1;bakeLighting=0;isSampling=0;
+curveConstrainSampling=0;removeStaticCurves=1;exportCameraAsLookat=0;
+exportLights=1;exportCameras=1;exportJointsAndSkin=1;
+exportAnimations=1;exportTriangles=0;exportInvisibleNodes=0;
+exportNormals=1;exportTexCoords=1;
+exportVertexColors=1;exportVertexColorsAnimation=0;exportTangents=0;
+exportTexTangents=0;exportConstraints=1;exportPhysics=1;exportXRefs=1;
+dereferenceXRefs=0;cameraXFov=0;cameraYFov=1</comments>
+     <source_data>
+file:///C:/Documents%20and%20Settings/gcorson/Desktop/Crystal%20Content/AmandaCrush/untitled
+     </source_data>
+   </contributor>
+   <created>2007-04-04T23:08:51Z</created>
+   <modified>2007-06-21T18:50:45Z</modified>
+   <unit meter="0.01" name="centimeter"/>
+   <up_axis>Y_UP</up_axis>
+ </asset>
+ <library_materials>
+   <material id="lambert1" name="lambert2">
+     <instance_effect url="#lambert1-fx"/>
+   </material>
+ </library_materials>
+ <library_effects>
+   <effect id="lambert1-fx">
+     <profile_COMMON>
+       <technique sid="common">
+         <lambert>
+           <emission>
+             <color>0 0 0 1</color>
+           </emission>
+           <ambient>
+             <color>0 0 0 1</color>
+           </ambient>
+           <diffuse>
+             <color>0.9 0.5 0.5 1</color>
+           </diffuse>
+           <transparent opaque="RGB_ZERO">
+             <color>0 0 0 1</color>
+           </transparent>
+           <transparency>
+             <float>1</float>
+           </transparency>
+           <index_of_refraction>
+             <float>1</float>
+           </index_of_refraction>
+         </lambert>
+       </technique>
+     </profile_COMMON>
+   </effect>
+ </library_effects>
+ <library_geometries>
+   <!-- 
+*******************************************************************************************
+This is a pretty standard mesh for the same as used in the skinning example.  It's a 6 
+sided cylinder divided into 6 sections with a total of 42 vertices.  It is used as the
+base mesh (source) in the morph controller.
+******************************************************************************************* 
+    -->   
+   <geometry id="pCylinderShape1" name="pCylinderShape1">
+     <mesh>
+       <source id="pCylinderShape1-positions" name="position">
+         <float_array id="pCylinderShape1-positions-array" count="126">20 -90 -34.641
+-20 -90 -34.641 -40 -90 -0.000005 -20 -90 34.641 20 -90 34.641 40 -90 0 20 -60 -34.641
+-20 -60 -34.641 -40 -60 -0.000005 -20 -60 34.641 20 -60 34.641 40 -60 0 20 -30 -34.641
+-20 -30 -34.641 -40 -30 -0.000005 -20 -30 34.641 20 -30 34.641 40 -30 0 20 0 -34.641
+-20 0 -34.641 -40 0 -0.000005 -20 0 34.641 20 0 34.641 40 0 0 20 30 -34.641 -20 30 -34.641
+-40 30 -0.000005 -20 30 34.641 20 30 34.641 40 30 0 20 60 -34.641 -20 60 -34.641
+-40 60 -0.000005 -20 60 34.641 20 60 34.641 40 60 0 20 90 -34.641 -20 90 -34.641
+-40 90 -0.000005 -20 90 34.641 20 90 34.641 40 90 0</float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-positions-array" count="42" stride="3">
+             <param name="X" type="float"/>
+             <param name="Y" type="float"/>
+             <param name="Z" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <source id="pCylinderShape1-normals" name="normal">
+         <float_array id="pCylinderShape1-normals-array" count="468">0 0 -1 0 0 -1
+0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1
+0 0 1 0 0 1 0.866026 0 0.5 0.866026 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0
+0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026
+0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025
+0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026
+0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025
+0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026
+0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866025
+0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026
+0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866025
+0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1
+0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0
+0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 0.5 0.866026
+0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0
+-1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0</float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-normals-array" count="156" stride="3">
+             <param name="X" type="float"/>
+             <param name="Y" type="float"/>
+             <param name="Z" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <source id="pCylinderShape1-map1" name="map1">
+         <float_array id="pCylinderShape1-map1-array" count="122">0.578125 0.020933
+0.421875 0.020933 0.34375 0.15625 0.421875 0.291566 0.578125 0.291566 0.65625 0.15625
+0.375 0.3125 0.416667 0.3125 0.458333 0.3125 0.5 0.3125 0.541667 0.3125 0.583333
+0.3125 0.625 0.3125 0.375 0.375157 0.416667 0.375157 0.458333 0.375157 0.5 0.375157
+0.541667 0.375157 0.583333 0.375157 0.625 0.375157 0.375 0.437813 0.416667 0.437813
+0.458333 0.437813 0.5 0.437813 0.541667 0.437813 0.583333 0.437813 0.625 0.437813
+0.375 0.50047 0.416667 0.50047 0.458333 0.50047 0.5 0.50047 0.541667 0.50047 0.583333
+0.50047 0.625 0.50047 0.375 0.563127 0.416667 0.563127 0.458333 0.563127 0.5 0.563127
+0.541667 0.563127 0.583333 0.563127 0.625 0.563127 0.375 0.625783 0.416667 0.625783
+0.458333 0.625783 0.5 0.625783 0.541667 0.625783 0.583333 0.625783 0.625 0.625783
+0.375 0.68844 0.416667 0.68844 0.458333 0.68844 0.5 0.68844 0.541667 0.68844 0.583333
+0.68844 0.625 0.68844 0.578125 0.708434 0.421875 0.708434 0.34375 0.84375 0.421875
+0.979066 0.578125 0.979066 0.65625 0.84375</float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-map1-array" count="61" stride="2">
+             <param name="S" type="float"/>
+             <param name="T" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <vertices id="pCylinderShape1-vertices">
+         <input semantic="POSITION" source="#pCylinderShape1-positions"/>
+       </vertices>
+       <polylist material="lambert2SG" count="38">
+         <input semantic="VERTEX" source="#pCylinderShape1-vertices" offset="0"/>
+         <input semantic="NORMAL" source="#pCylinderShape1-normals" offset="1"/>
+         <input semantic="TEXCOORD" source="#pCylinderShape1-map1" offset="2" set="0"/>
+         <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 6 6</vcount>
+         <p>0 0 6 1 1 7 7 2 14 6 3 13 1 4 7 2 5 8 8 6 15 7 7 14 2 8 8 3 9 9 9 10
+ 16 8 11 15 3 12 9 4 13 10 10 14 17 9 15 16 4 16 10 5 17 11 11 18 18 10 19 17 5
+ 20 11 0 21 12 6 22 19 11 23 18 6 24 13 7 25 14 13 26 21 12 27 20 7 28 14 8 29 15 14
+ 30 22 13 31 21 8 32 15 9 33 16 15 34 23 14 35 22 9 36 16 10 37 17 16 38 24 15
+ 39 23 10 40 17 11 41 18 17 42 25 16 43 24 11 44 18 6 45 19 12 46 26 17 47 25 12
+ 48 20 13 49 21 19 50 28 18 51 27 13 52 21 14 53 22 20 54 29 19 55 28 14 56 22 15
+ 57 23 21 58 30 20 59 29 15 60 23 16 61 24 22 62 31 21 63 30 16 64 24 17 65 25 23
+ 66 32 22 67 31 17 68 25 12 69 26 18 70 33 23 71 32 18 72 27 19 73 28 25 74 35 24
+ 75 34 19 76 28 20 77 29 26 78 36 25 79 35 20 80 29 21 81 30 27 82 37 26 83 36 21
+ 84 30 22 85 31 28 86 38 27 87 37 22 88 31 23 89 32 29 90 39 28 91 38 23 92 32 18
+ 93 33 24 94 40 29 95 39 24 96 34 25 97 35 31 98 42 30 99 41 25 100 35 26 101 36 32
+ 102 43 31 103 42 26 104 36 27 105 37 33 106 44 32 107 43 27 108 37 28 109 38 34
+ 110 45 33 111 44 28 112 38 29 113 39 35 114 46 34 115 45 29 116 39 24 117 40 30
+ 118 47 35 119 46 30 120 41 31 121 42 37 122 49 36 123 48 31 124 42 32 125 43 38
+ 126 50 37 127 49 32 128 43 33 129 44 39 130 51 38 131 50 33 132 44 34 133 45 40
+ 134 52 39 135 51 34 136 45 35 137 46 41 138 53 40 139 52 35 140 46 30 141 47 36
+ 142 54 41 143 53 0 144 0 5 145 5 4 146 4 3 147 3 2 148 2 1 149 1 36 150 59 37
+ 151 58 38 152 57 39 153 56 40 154 55 41 155 60</p>
+       </polylist>
+     </mesh>
+   </geometry>
+   <!-- 
+*******************************************************************************************
+This mesh is the same as the one above, but one of the rings of verticies has been moved 
+outwards to create a bulge in the middle of the cylinder.  This geometry is used as the
+morph target (aka deformer or blend shape) in the morph controller.
+
+A morph can operate on ANY or ALL of the sources so you could morph positions, UVs and 
+normals all at the same time.  The sources to be morphed have to be referenced by <input>
+tags inside the <vertices> tag in both the morph target and the base mesh.  In this example
+only the positions are referenced by the <vertices> tag so they are all this morph will effect.
+
+Since only the positions are being morphed, everything but the target__pCylinderShape1-positions
+source and the <vertices> tag could be deleted from this <geometry> and it the morph
+should still work.  The DCC tool should get all the other information from the base mesh, so
+there is no need to duplicate it here.
+
+This extra information may still be exported by some DCC tools for a variety of reasons.
+The only time it is actually REQUIRED is if the morph target geometry is also instantiated in
+the scene by having an <instance_geometry> tag point directly to it's geometry tag.
+
+Due to a bug in the ColladaMaya Maya expects the polylist information to be present in the 
+morph target or the morph will not be instantiated.
+******************************************************************************************* 
+    -->   
+   <geometry id="target__pCylinderShape1" name="target__pCylinderShape1">
+     <mesh>
+       <source id="target__pCylinderShape1-positions" name="position">
+         <float_array id="target__pCylinderShape1-positions-array" count="126">20 -90 -34.641
+-20 -90 -34.641 -40 -90 -0.000005 -20 -90 34.641 20 -90 34.641 40 -90 0 20 -60 -34.641
+-20 -60 -34.641 -40 -60 -0.000005 -20 -60 34.641 20 -60 34.641 40 -60 0 20 -30 -34.641
+-20 -30 -34.641 -40 -30 -0.000005 -20 -30 34.641 20 -30 34.641 40 -30 0 20 0 -34.641
+-20 0 -34.641 -40 0 -0.000005 -20 0 34.641 20 0 34.641 40 0 0 32.6396 30 -69.7557
+-32.6396 30 -69.7557 -65.2792 30 -0.00001 -32.6396 30 69.7557 32.6396 30 69.7557
+65.2792 30 0 20 60 -34.641 -20 60 -34.641 -40 60 -0.000005 -20 60 34.641 20 60 34.641
+40 60 0 20 90 -34.641 -20 90 -34.641 -40 90 -0.000005 -20 90 34.641 20 90 34.641
+40 90 0</float_array>
+         <technique_common>
+           <accessor source="#target__pCylinderShape1-positions-array" count="42" stride="3">
+             <param name="X" type="float"/>
+             <param name="Y" type="float"/>
+             <param name="Z" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <source id="target__pCylinderShape1-normals" name="normal">
+         <float_array id="target__pCylinderShape1-normals-array" count="468">0 0 -1
+0 0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1
+0 0 1 0 0 1 0.866026 0 0.5 0.866026 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1
+-0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026
+0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1
+0.866025 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026
+0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025
+0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026
+0 0.5 -0.866026 0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866025
+0 0.5 0.866025 0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026
+0 -0.5 0 0 -1 0 0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866025 0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026
+0 0.5 0 0 1 0 0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866025 0 0.5 0.866025
+0 0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 0 -1 0
+0 -1 0 0 -1 0 0 -1 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025 0 -0.5 -0.866025
+0 -0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 -0.866026 0 0.5 0 0 1 0
+0 1 0 0 1 0 0 1 0.866025 0 0.5 0.866025 0 0.5 0.866026 0 0.5 0.866026 0 0.5 0.866026
+0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0.866026 0 -0.5 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0
+-1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0</float_array>
+         <technique_common>
+           <accessor source="#target__pCylinderShape1-normals-array" count="156" stride="3">
+             <param name="X" type="float"/>
+             <param name="Y" type="float"/>
+             <param name="Z" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <source id="target__pCylinderShape1-map1" name="map1">
+         <float_array id="target__pCylinderShape1-map1-array" count="122">0.578125 0.020933
+0.421875 0.020933 0.34375 0.15625 0.421875 0.291566 0.578125 0.291566 0.65625 0.15625 0.375
+0.3125 0.416667 0.3125 0.458333 0.3125 0.5 0.3125 0.541667 0.3125 0.583333 0.3125 0.625
+0.3125 0.375 0.375157 0.416667 0.375157 0.458333 0.375157 0.5 0.375157 0.541667 0.375157
+0.583333 0.375157 0.625 0.375157 0.375 0.437813 0.416667 0.437813 0.458333 0.437813 0.5
+0.437813 0.541667 0.437813 0.583333 0.437813 0.625 0.437813 0.375 0.50047 0.416667 0.50047
+0.458333 0.50047 0.5 0.50047 0.541667 0.50047 0.583333 0.50047 0.625 0.50047 0.375
+0.563127 0.416667 0.563127 0.458333 0.563127 0.5 0.563127 0.541667 0.563127 0.583333
+0.563127 0.625 0.563127 0.375 0.625783 0.416667 0.625783 0.458333 0.625783 0.5 0.625783
+0.541667 0.625783 0.583333 0.625783 0.625 0.625783 0.375 0.68844 0.416667 0.68844
+0.458333 0.68844 0.5 0.68844 0.541667 0.68844 0.583333 0.68844 0.625 0.68844 0.578125
+0.708434 0.421875 0.708434 0.34375 0.84375 0.421875 0.979066 0.578125 0.979066 0.65625
+0.84375</float_array>
+         <technique_common>
+           <accessor source="#target__pCylinderShape1-map1-array" count="61" stride="2">
+             <param name="S" type="float"/>
+             <param name="T" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <vertices id="target__pCylinderShape1-vertices">
+         <input semantic="POSITION" source="#target__pCylinderShape1-positions"/>
+       </vertices>
+       <polylist material="target__lambert2SG" count="38">
+         <input semantic="VERTEX" source="#target__pCylinderShape1-vertices" offset="0"/>
+         <input semantic="NORMAL" source="#target__pCylinderShape1-normals" offset="1"/>
+         <input semantic="TEXCOORD" source="#target__pCylinderShape1-map1" offset="2" set="0"/>
+         <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 6 6</vcount>
+         <p>0 0 6 1 1 7 7 2 14 6 3 13 1 4 7 2 5 8 8 6 15 7 7 14 2 8 8 3 9 9 9 10 16 8 11
+ 15 3 12 9 4 13 10 10 14 17 9 15 16 4 16 10 5 17 11 11 18 18 10 19 17 5 20 11 0 21 12 6
+ 22 19 11 23 18 6 24 13 7 25 14 13 26 21 12 27 20 7 28 14 8 29 15 14 30 22 13 31 21 8
+ 32 15 9 33 16 15 34 23 14 35 22 9 36 16 10 37 17 16 38 24 15 39 23 10 40 17 11 41 18 17
+ 42 25 16 43 24 11 44 18 6 45 19 12 46 26 17 47 25 12 48 20 13 49 21 19 50 28 18
+ 51 27 13 52 21 14 53 22 20 54 29 19 55 28 14 56 22 15 57 23 21 58 30 20 59 29 15
+ 60 23 16 61 24 22 62 31 21 63 30 16 64 24 17 65 25 23 66 32 22 67 31 17 68 25 12
+ 69 26 18 70 33 23 71 32 18 72 27 19 73 28 25 74 35 24 75 34 19 76 28 20 77 29 26
+ 78 36 25 79 35 20 80 29 21 81 30 27 82 37 26 83 36 21 84 30 22 85 31 28 86 38 27
+ 87 37 22 88 31 23 89 32 29 90 39 28 91 38 23 92 32 18 93 33 24 94 40 29 95 39 24
+ 96 34 25 97 35 31 98 42 30 99 41 25 100 35 26 101 36 32 102 43 31 103 42 26 104 36 27
+ 105 37 33 106 44 32 107 43 27 108 37 28 109 38 34 110 45 33 111 44 28 112 38 29
+ 113 39 35 114 46 34 115 45 29 116 39 24 117 40 30 118 47 35 119 46 30 120 41 31
+ 121 42 37 122 49 36 123 48 31 124 42 32 125 43 38 126 50 37 127 49 32 128 43 33
+ 129 44 39 130 51 38 131 50 33 132 44 34 133 45 40 134 52 39 135 51 34 136 45 35
+ 137 46 41 138 53 40 139 52 35 140 46 30 141 47 36 142 54 41 143 53 0 144 0 5
+ 145 5 4 146 4 3 147 3 2 148 2 1 149 1 36 150 59 37 151 58 38 152 57 39 153 56 40
+ 154 55 41 155 60</p>
+       </polylist>
+     </mesh>
+   </geometry>
+ </library_geometries>
+ <library_controllers>
+    <!--
+*******************************************************************************************
+This controller defines a morph with pCylinderShape1 as the source and 
+target_pCylinderShape1 as the morph target (deformer)
+*******************************************************************************************
+    -->
+  <controller id="pCylinderShape1-morph" name="blendShape1">
+     <morph method="NORMALIZED" source="#pCylinderShape1">
+    <!--
+*******************************************************************************************
+This source lists all the morph targets that will be used by this controller.  In this
+case there is just one, but there could be as many as you like.  Multiple targets are 
+commonly used to apply facial expressions to characters.  There would a "happy" morph,
+a "sad" one, an excited one...etc. Which could be mixed so you could make an expression
+that was half sad, half excited...etc.
+*******************************************************************************************
+    -->
+       <source id="pCylinderShape1-morph-targets">
+         <IDREF_array id="pCylinderShape1-morph-targets-array" count="1">target__pCylinderShape1</IDREF_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-morph-targets-array" count="1" stride="1">
+             <param name="MORPH_TARGET" type="IDREF"/>
+           </accessor>
+         </technique_common>
+       </source>
+    <!--
+*******************************************************************************************
+This source contains the weights to be applied to each morph target (in this case just one)
+A weight of 1 means the morph is fully applied.  This can be animated.
+*******************************************************************************************
+    -->
+       <source id="pCylinderShape1-morph-morph_weights">
+         <float_array id="pCylinderShape1-morph-morph_weights-array" count="1">1</float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-morph-morph_weights-array" count="1" stride="1">
+             <param name="MORPH_WEIGHT" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <!--
+*******************************************************************************************
+The inputs in the targets tag point to the sources containing the list of morph targets and
+the list of corrisponding weights.
+*******************************************************************************************
+        -->
+       <targets>
+         <input semantic="MORPH_TARGET" source="#pCylinderShape1-morph-targets"/>
+         <input semantic="MORPH_WEIGHT" source="#pCylinderShape1-morph-morph_weights"/>
+       </targets>
+     </morph>
+   </controller>
+   <!--
+*******************************************************************************************
+This controller defines how to skin the geometry that comes out of the morph controller.
+*******************************************************************************************
+    -->
+   <controller id="pCylinderShape1-morph-skin" name="skinCluster1">
+   	<!--
+*******************************************************************************************
+A regular skin controller would point at a geometry we wanted to skin.  In this case we are 
+taking the output of a morph controller (which is geometry) and skinning that.
+*******************************************************************************************
+    	-->
+     <skin source="#pCylinderShape1">
+       <!--
+*******************************************************************************************
+The bind shape matrix describes how to transform the pCylinderShape1-morph geometry into the
+right coordinate system for use with the joints.  In this case we do an +90 Y transform because
+the geometry was initially a 180 unit long cylinder with 0,0,0 at it's center.
+This moves it so 0,0,0 is at the base of the cylinder.
+*******************************************************************************************
+        -->
+       <bind_shape_matrix>
+         1 0 0 0
+         0 1 0 90 
+         0 0 1 0 
+         0 0 0 1
+       </bind_shape_matrix>
+       <!--
+*******************************************************************************************
+This source contains a list of the SIDs of the 7 joints that will influence the skin.  You
+can also use an IDREF_Array here but use of SIDs is prefered because they allow a controller
+to be used several times with different skeletons.  Applications MUST be able to import either
+IDREF_Array or Name_array tags.  And MUST search the correct namespace for the ID or SID
+*******************************************************************************************
+        -->
+       <source id="pCylinderShape1-morph-skin-joints">
+         <Name_array id="pCylinderShape1-morph-skin-joints-array" count="7">
+joint1 joint2 joint3 joint4 joint5 joint6 joint7</Name_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-morph-skin-joints-array" count="7" stride="1">
+             <param name="JOINT" type="Name"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <!--
+*******************************************************************************************
+This source defines the inverse bind matrix for each joint, these are used to bring 
+coordinates being skinned into the same space as each joint.  Note that in this case the
+joints begin at 0,0,0 and move up 30 units for each joint, so the inverse bind matrices
+are the opposite of that.
+*******************************************************************************************
+        -->
+       <source id="pCylinderShape1-morph-skin-bind_poses">
+         <float_array id="pCylinderShape1-morph-skin-bind_poses-array" count="112">
+           1 0 0 0
+           0 1 0 0 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -30 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -60 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -90 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -120 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -150 
+           0 0 1 0 
+           0 0 0 1 
+
+           1 0 0 0 
+           0 1 0 -180 
+           0 0 1 0 
+           0 0 0 1
+         </float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-morph-skin-bind_poses-array" count="7" stride="16">
+             <param name="TRANSFORM" type="float4x4"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <!--
+*******************************************************************************************
+This source defines a weight for each vertex and each joint.  The weight defines how much
+a particular joint will contribute to moving a particular vertex's position.  This allows
+several joints to influence vertices by different amounts, giving a nice smooth bend.
+
+Since there are 42 vertices and 7 joints there should be at most 294 weights.  In this case
+the skinning algorithm was told that each vertex should be effected by the 5 nearest joints
+so we have 5 weights per vertex giving a total of 210.  Maya has thrown in an extra weight
+of 1 at the beginning giving us a total of 211.
+
+Weights 1-6 will be applied to the first vertex, you can see how they work.  The first weight
+represents the closest joint to the vertex and has the largest value, the remaining 4 weights
+get smaller and smaller as the associated joint gets farther from the vertex.
+*******************************************************************************************
+        -->
+       <source id="pCylinderShape1-morph-skin-weights">
+         <float_array id="pCylinderShape1-morph-skin-weights-array" count="211">
+1 0.648726 0.265718 0.061417 0.01765 0.006487 0.648726 0.265718 0.061417 0.01765 0.006487
+0.648726 0.265718 0.061417 0.01765 0.006487 0.648726 0.265718 0.061417 0.01765 0.006487
+0.648726 0.265718 0.061417 0.01765 0.006487 0.648726 0.265718 0.061417 0.01765 0.006487
+0.395025 0.395025 0.161802 0.037398 0.010747 0.395025 0.395025 0.161802 0.037398 0.010747
+0.395025 0.395025 0.161802 0.037398 0.010747 0.395025 0.395025 0.161802 0.037398 0.010747
+0.395025 0.395025 0.161802 0.037398 0.010747 0.395025 0.395025 0.161802 0.037398 0.010747
+0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569 0.032491
+0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569 0.032491
+0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569 0.032491
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569 0.032491
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.032491 0.140569 0.343186 0.343186 0.140569 0.032491 0.140569 0.343186 0.343186 0.140569
+0.010747 0.037398 0.161802 0.395025 0.395025 0.010747 0.037398 0.161802 0.395025 0.395025
+0.010747 0.037398 0.161802 0.395025 0.395025 0.010747 0.037398 0.161802 0.395025 0.395025
+0.010747 0.037398 0.161802 0.395025 0.395025 0.010747 0.037398 0.161802 0.395025 0.395025</float_array>
+         <technique_common>
+           <accessor source="#pCylinderShape1-morph-skin-weights-array" count="211" stride="1">
+             <param name="WEIGHT" type="float"/>
+           </accessor>
+         </technique_common>
+       </source>
+       <!--
+*******************************************************************************************
+The joints tag connects the source containing the name of each joint with the source 
+containing the inverse bind matrices for each joint.
+*******************************************************************************************
+        -->
+       <joints>
+         <input semantic="JOINT" source="#pCylinderShape1-morph-skin-joints"/>
+         <input semantic="INV_BIND_MATRIX" source="#pCylinderShape1-morph-skin-bind_poses"/>
+       </joints>
+       <!--
+*******************************************************************************************
+The vertex_weights tag associates the weights and joints from the previously defined
+sources with the vertices in the geometry being skinned.  Each entry in this list matches
+a vertex in the original geometry, so the count here should be the same as the count
+in the geometry being skinned.
+
+Each weight/joint pair is referred to as an "influence", a vertex can have any number of
+influences applied to it.  The <vcount> value for a vertex defines the number of influences 
+on that vertex.  In this case every vertex has 5 influences.  The values in the <v> array
+are the indices of the joint and weight that make up that influence.
+*******************************************************************************************
+       -->
+      <vertex_weights count="42">
+         <input semantic="JOINT" source="#pCylinderShape1-morph-skin-joints" offset="0"/>
+         <input semantic="WEIGHT" source="#pCylinderShape1-morph-skin-weights" offset="1"/>
+         <vcount>5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 </vcount>
+         <v>0 1 1 2 2 3 3 4 4 5 0 6 1 7 2 8 3 9 4 10 0 11 1 12 2 13 3 14 4 15 0 16 1
+17 2 18 3 19 4 20 0 21 1 22 2 23 3 24 4 25 0 26 1 27 2 28 3 29 4 30 0 31 1 32 2 33 3
+34 4 35 0 36 1 37 2 38 3 39 4 40 0 41 1 42 2 43 3 44 4 45 0 46 1 47 2 48 3 49 4 50 0
+51 1 52 2 53 3 54 4 55 0 56 1 57 2 58 3 59 4 60 0 61 1 62 2 63 3 64 4 65 0 66 1 67 2
+68 3 69 4 70 0 71 1 72 2 73 3 74 4 75 0 76 1 77 2 78 3 79 4 80 0 81 1 82 2 83 3 84 4
+85 0 86 1 87 2 88 3 89 4 90 0 91 1 92 2 93 3 94 4 95 0 96 1 97 2 98 3 99 4 100 0 101 1
+102 2 103 3 104 4 105 0 106 1 107 2 108 3 109 4 110 0 111 1 112 2 113 3 114 4 115 0
+116 1 117 2 118 3 119 4 120 2 121 3 122 4 123 5 124 6 125 2 126 3 127 4 128 5 129 6
+130 1 131 2 132 3 133 4 134 5 135 1 136 2 137 3 138 4 139 5 140 1 141 2 142 3 143 4
+144 5 145 1 146 2 147 3 148 4 149 5 150 2 151 3 152 4 153 5 154 6 155 2 156 3 157 4
+158 5 159 6 160 2 161 3 162 4 163 5 164 6 165 2 166 3 167 4 168 5 169 6 170 2 171 3
+172 4 173 5 174 6 175 2 176 3 177 4 178 5 179 6 180 2 181 3 182 4 183 5 184 6 185 2
+186 3 187 4 188 5 189 6 190 2 191 3 192 4 193 5 194 6 195 2 196 3 197 4 198 5 199 6
+200 2 201 3 202 4 203 5 204 6 205 2 206 3 207 4 208 5 209 6 210</v>
+       </vertex_weights>
+     </skin>
+   </controller>
+ </library_controllers>
+ <library_visual_scenes>
+   <visual_scene id="VisualSceneNode" name="untitled">
+     <!--
+*******************************************************************************************
+This is the node hierarchy that represents the skeleton of the skinned object.
+The first node has an ID to act as a starting point for SID searches, the rest
+of the nodes in the hierarchy only need SIDs.  It is preferable to use SIDs to
+identify the joints of the skeleton because it allows the skin controller to be
+used several times with different skeletons.  For example we could have a second
+joint hierarchy using the same SIDs but with a different id (like skeleton2_root)
+on the first node and different transforms.  
+
+In this example the root joint of the skeleton is 20 units above the ground.  
+All the other joints are 30 units apart in the Y direction.  A Z rotation has been
+added to some of the joints to cause the skinned/morphed cylinder to gradually bend so
+you can see the skinning effect.
+*******************************************************************************************
+      -->   
+     <node id="skeleton_root" name="joint1" sid="joint1" type="JOINT">
+       <translate sid="translate">0 20 0</translate>
+       <!-- 
+*******************************************************************************************
+Some people try to put the instance_controller here.  This will not work correctly for
+a skin because the skinning process has already transformed all the vertices using the
+full transform in the joints that the skin controller references. This means the data
+coming out of the instance_controller is effectively in world space.  If we put the 
+instance_controller here, the geometry coming out of it would be transformed (again) by 
+this node, moving it up an additional 20 units. 
+*******************************************************************************************
+        -->   
+       <node name="joint2" sid="joint2" type="JOINT">
+         <translate>0 30 0</translate>
+         <node name="joint3" sid="joint3" type="JOINT">
+           <translate>0 30 0</translate>
+           <rotate>0 0 1 17.972</rotate>
+           <node name="joint4" sid="joint4" type="JOINT">
+             <translate>0 30 0</translate>
+             <rotate>0 0 1 16.4036</rotate>
+             <node name="joint5" sid="joint5" type="JOINT">
+               <translate>0 30 0</translate>
+               <rotate>0 0 1 21.1126</rotate>
+               <node name="joint6" sid="joint6" type="JOINT">
+                 <translate>0 30 0</translate>
+                 <rotate>0 0 1 16.007</rotate>
+                 <node name="joint7" sid="joint7" type="JOINT">
+                   <translate>0 30 0</translate>
+                 </node>
+               </node>
+             </node>
+           </node>
+         </node>
+       </node>
+     </node>
+     <!--
+*******************************************************************************************
+This node is where the skinned/morphed geometry is instantiated.  The geometry that comes out
+of a skin controller has already been transformed by the joints referenced in the skin
+which puts the geometry in world space.  This is why we are instantiating the skin at
+the root of the hierarchy rather than up in the "skeleton_root" node
+*******************************************************************************************
+       --> 
+    <node id="pCylinder1" name="pCylinder1" type="NODE">
+       <instance_controller url="#pCylinderShape1-morph-skin">
+         <!--
+*******************************************************************************************
+The skeleton tag tells the controller where it should start searching for any SIDs found
+in the skin.  This allows the same controller to be re-used with different joint hierarchies.
+If the controller uses an IDREF_Array then the skeleton tag is not required because IDs are 
+global.
+*******************************************************************************************
+          -->
+         <skeleton>#skeleton_root</skeleton>
+         <bind_material>
+           <technique_common>
+             <instance_material symbol="lambert2SG" target="#lambert1"/>
+           </technique_common>
+         </bind_material>
+       </instance_controller>
+     </node>
+   </visual_scene>
+ </library_visual_scenes>
+ <scene>
+   <instance_visual_scene url="#VisualSceneNode"/>
+ </scene>
+</COLLADA>

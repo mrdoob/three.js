@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">This displays a helper object for a [page:PointLight] </div>
+
+
+		<h2>Example</h2>
+
+		<code>var pointLight = new THREE.PointLight( 0xff0000, 1, 100 );
+		pointLight.position.set( 10, 10, 10 );
+		scene.add( pointLight );
+
+		var sphereSize = 1;
+		var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+		scene.add( pointLightHelper );
+		</code>
+		[example:webgl_helpers Example using various helpers]
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([page:PointLight light], [page:Float sphereSize])</h3>
+		<div>
+		light -- The [page:PointLight] to display. <br />
+		sphereSize -- The size of the sphere helper
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:PointLight light]</h3>
+		<div>
+		The [page:PointLight] that is being represented.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null update]()</h3>
+		<div>
+		Updates the light helper.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A loader for loading a <em>.gltf</em> resource in <em>JSON</em> format.
+		<br /><br />
+		The <a href="https://www.khronos.org/gltf">glTF file format</a> is a JSON file format to enable rapid delivery and loading of 3D content.
+		</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( )</h3>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Object3D load]( [page:String url], [page:Function callback] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function callback] — Will be called when load completes. The argument will be an [page:Object] containing the loaded .[page:Object3D scene],  .[page:Array cameras] and .[page:Array animations].<br />
+		</div>
+		<div>
+		Begin loading from url and call the callback function with the parsed response content.
+		</div>
+
+
+		<h2>Notes</h2>
+
+		<div>
+		This class is often used with [page:glTFAnimator THREE.glTFAnimator] to animate parsed animations.
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.glTFLoader();
+
+		// load a glTF resource
+		loader.load(
+			// resource URL
+			'models/gltf/duck/duck.json',
+			// Function when resource is loaded
+			function ( object ) {
+				scene.add( object.scene );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_gltf]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/gltf/glTFLoader.js examples/js/loaders/gltf/glTFLoader.js]
+	</body>
+</html>

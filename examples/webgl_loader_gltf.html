@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - glTF</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #222222;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #808080;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+
+			#container {
+				position: absolute;
+				top: 0px;
+				width:100%;
+				height:100%;
+				z-index: -1;
+			}
+
+			#controls {
+				position:absolute;
+				width:250px;
+				bottom:0%;
+				right:0%;
+				height:132px;
+				background-color:White;
+				opacity:.9;
+				font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+			}
+
+			#status {
+				position:absolute;
+				width:25%;
+				left:2%;
+				top:95%;
+				height:5%;
+				opacity:.9;
+				font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+			}
+
+			.control {
+				position:absolute;
+				margin-left:12px;
+				width:100%;
+				font-weight:bold;
+			}
+
+			.controlValue {
+				position:absolute;
+				left:36%;
+				top:0%;
+			}
+
+			#scenes_control {
+				position:absolute;
+				top:8px;
+			}
+
+			#cameras_control {
+				position:absolute;
+				top:40px;
+			}
+
+			#animations_control {
+				position:absolute;
+				top:72px;
+			}
+
+			#materials_extension_control {
+				position:absolute;
+				top:104px;
+			}
+
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> -
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader -
+		<br></br>
+		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
+		COLLADA duck by Sony - other models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		</div>
+	<div id="container">
+	</div>
+	<div id="status">
+	</div>
+	<div id="controls">
+		<div class="control" id="scenes_control">
+		Model
+		<select class="controlValue" id="scenes_list" size="1" onchange="selectScene();" ondblclick="selectScene();">
+		</select>
+		</div>
+
+		<div class="control" id="cameras_control">
+		Camera
+		<select class="controlValue" id="cameras_list" size="1" onchange="selectCamera();" ondblclick="selectCamera();">
+		</select>
+		</div>
+		<div class="control" id="animations_control">
+		Animations
+		<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
+		</div>
+		<div class="control" id="materials_extension_control">
+			Shaders
+			<div class="controlValue">
+			<input type="checkbox" id="materials_extension_checkbox" checked onclick="toggleMaterialsExtension();">Use built-in</input>
+			</div>
+		</div>
+
+	</div>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/gltf/glTF-parser.js"></script>
+		<script src="js/loaders/gltf/glTFLoader.js"></script>
+		<script src="js/loaders/gltf/glTFLoaderUtils.js"></script>
+		<script src="js/loaders/gltf/glTFAnimation.js"></script>
+		<script src="js/loaders/gltf/glTFShaders.js"></script>
+
+		<script>
+			var orbitControls = null;
+			var container, camera, scene, renderer, loader;
+
+			var cameraIndex = 0;
+			var cameras = [];
+			var cameraNames = [];
+			var defaultCamera = null;
+			var gltf = null;
+
+			function onload() {
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', function(e) { onKeyDown(e); }, false );
+
+				buildSceneList();
+				switchScene(0);
+				animate();
+
+			}
+
+			function initScene(index) {
+
+				container = document.getElementById( 'container' );
+
+				scene = new THREE.Scene();
+
+				defaultCamera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 20000 );
+
+				//defaultCamera.up = new THREE.Vector3( 0, 1, 0 );
+				scene.add( defaultCamera );
+				camera = defaultCamera;
+
+				var sceneInfo = sceneList[index];
+
+				var spot1 = null;
+
+				if (sceneInfo.addLights) {
+
+					var ambient = new THREE.AmbientLight( 0x222222 );
+					scene.add( ambient );
+
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd );
+					directionalLight.position.set( 0, 0, 1 ).normalize();
+					scene.add( directionalLight );
+
+					spot1   = new THREE.SpotLight( 0xffffff, 1 );
+					spot1.position.set( 10, 20, 10 );
+					spot1.angle = 0.25;
+					spot1.distance = 1024;
+					spot1.penumbra = 0.75;
+
+					if ( sceneInfo.shadows ) {
+
+						spot1.castShadow = true;
+						spot1.shadow.bias = 0.0001;
+						spot1.shadow.mapSize.width = 2048;
+						spot1.shadow.mapSize.height = 2048;
+
+					}
+
+					scene.add( spot1 );
+
+				}
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer({antialias:true});
+				renderer.setClearColor( 0x222222 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				if (sceneInfo.shadows) {
+					renderer.shadowMap.enabled = true;
+					renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				}
+
+				container.appendChild( renderer.domElement );
+
+				var ground = null;
+
+				if (sceneInfo.addGround) {
+					var groundMaterial = new THREE.MeshPhongMaterial({
+							color: 0xFFFFFF,
+							shading: THREE.SmoothShading,
+						});
+					ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
+
+					if (sceneInfo.shadows) {
+						ground.receiveShadow = true;
+					}
+
+					if (sceneInfo.groundPos) {
+						ground.position.copy(sceneInfo.groundPos);
+					} else {
+						ground.position.z = -70;
+					}
+
+					ground.rotation.x = -Math.PI / 2;
+
+					scene.add(ground);
+				}
+
+				loader = new THREE.glTFLoader;
+				var loadStartTime = Date.now();
+				var status = document.getElementById("status");
+				status.innerHTML = "Loading...";
+				var url = sceneInfo.url;
+				var r = eval("/" + '\%s' + "/g");
+				var dir = useMaterialsExtension ? 'glTF-MaterialsCommon' :  'glTF';
+				url = url.replace(r, dir);
+
+				var loadStartTime = Date.now();
+				var status = document.getElementById("status");
+				status.innerHTML = "Loading...";
+				loader.load( url, function(data) {
+
+					gltf = data;
+
+					var object = gltf.scene;
+
+					var loadEndTime = Date.now();
+
+					var loadTime = (loadEndTime - loadStartTime) / 1000;
+
+					status.innerHTML = "Load time: " + loadTime.toFixed(2) + " seconds.";
+
+					if (sceneInfo.cameraPos)
+						defaultCamera.position.copy(sceneInfo.cameraPos);
+
+					if (sceneInfo.center) {
+						orbitControls.target.copy(sceneInfo.center);
+					}
+
+					if (sceneInfo.objectPosition) {
+						object.position.copy(sceneInfo.objectPosition);
+
+						if (spot1) {
+							spot1.position.set(sceneInfo.objectPosition.x - 100, sceneInfo.objectPosition.y + 200, sceneInfo.objectPosition.z - 100 );
+							spot1.target.position.copy(sceneInfo.objectPosition);
+						}
+					}
+
+					if (sceneInfo.objectRotation)
+						object.rotation.copy(sceneInfo.objectRotation);
+
+					if (sceneInfo.objectScale)
+						object.scale.copy(sceneInfo.objectScale);
+
+					cameraIndex = 0;
+					cameras = [];
+					cameraNames = [];
+
+					if (gltf.cameras && gltf.cameras.length) {
+
+						var i, len = gltf.cameras.length;
+
+						for (i = 0; i < len; i++) {
+
+							var addCamera = true;
+							var cameraName = gltf.cameras[i].parent.name;
+
+							if (sceneInfo.cameras && !(cameraName in sceneInfo.cameras)) {
+									addCamera = false;
+							}
+
+							if (addCamera) {
+								cameraNames.push(cameraName);
+								cameras.push(gltf.cameras[i]);
+							}
+
+						}
+
+						updateCamerasList();
+						switchCamera(1);
+
+					} else {
+
+						updateCamerasList();
+						switchCamera(0);
+
+					}
+
+					if (gltf.animations && gltf.animations.length) {
+
+						var i, len = gltf.animations.length;
+						for (i = 0; i < len; i++) {
+							var animation = gltf.animations[i];
+							animation.loop = true;
+							// There's .3333 seconds junk at the tail of the Monster animation that
+							// keeps it from looping cleanly. Clip it at 3 seconds
+							if (sceneInfo.animationTime)
+								animation.duration = sceneInfo.animationTime;
+							animation.play();
+						}
+					}
+
+					scene.add( object );
+					onWindowResize();
+
+				});
+
+			orbitControls = new THREE.OrbitControls(defaultCamera, renderer.domElement);
+
+			}
+
+			function onWindowResize() {
+
+				defaultCamera.aspect = container.offsetWidth / container.offsetHeight;
+				defaultCamera.updateProjectionMatrix();
+
+				var i, len = cameras.length;
+
+				for (i = 0; i < len; i++) { // just do it for default
+					cameras[i].aspect = container.offsetWidth / container.offsetHeight;
+					cameras[i].updateProjectionMatrix();
+				}
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				THREE.glTFAnimator.update();
+				THREE.glTFShaders.update(scene, camera);
+				if (cameraIndex == 0)
+					orbitControls.update();
+				render();
+			}
+
+			function render() {
+				renderer.render( scene, camera );
+			}
+
+			function onKeyDown(event) {
+
+				var chr = String.fromCharCode(event.keyCode);
+
+				if (chr == ' ') {
+
+					index = cameraIndex + 1;
+					if (index > cameras.length)
+					index = 0;
+					switchCamera(index);
+
+				} else {
+
+					var index = parseInt(chr);
+					if (!isNaN(index)	&& (index <= cameras.length)) {
+						switchCamera(index);
+					}
+
+				}
+
+			}
+
+			var sceneList = [
+				{
+					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
+					cameraPos: new THREE.Vector3(30, 10, 70),
+					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
+					objectPosition: new THREE.Vector3(2, 6, 0),
+					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
+					animationTime: 3,
+					addLights:true,
+					shadows:true,
+					addGround:true
+				},
+				{
+					name : "Duck", url : "./models/gltf/duck/%s/duck.gltf",
+					cameraPos: new THREE.Vector3(0, 3, 5),
+					addLights:true,
+					addGround:true,
+					shadows:true
+				},
+				{
+					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/Cesium_Man.gltf",
+					 cameraPos: new THREE.Vector3(0, 3, 10),
+					 objectRotation: new THREE.Euler(0, 0, 0),
+					 addLights:true,
+					 addGround:true,
+					 shadows:true
+				},
+				{
+					name : "Cesium Milk Truck",
+					url : "./models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf",
+					cameraPos: new THREE.Vector3(0, 3, 10),
+					addLights:true,
+					addGround:true,
+					shadows:true
+				},
+
+			];
+
+			function buildSceneList() {
+
+				var elt = document.getElementById('scenes_list');
+
+				while( elt.hasChildNodes() ){
+					elt.removeChild(elt.lastChild);
+				}
+
+				var i, len = sceneList.length;
+
+				for (i = 0; i < len; i++) {
+					option = document.createElement("option");
+					option.text=sceneList[i].name;
+					elt.add(option);
+				}
+
+			}
+
+			function switchScene(index) {
+
+				cleanup();
+				initScene(index);
+				var elt = document.getElementById('scenes_list');
+				elt.selectedIndex = index;
+
+			}
+
+			function selectScene() {
+
+				var select = document.getElementById("scenes_list");
+				var index = select.selectedIndex;
+
+				if (index >= 0) {
+					switchScene(index);
+				}
+
+			}
+
+			function switchCamera(index) {
+
+				cameraIndex = index;
+
+				if (cameraIndex == 0) {
+					camera = defaultCamera;
+				}
+
+				if (cameraIndex >= 1 && cameraIndex <= cameras.length) {
+					camera = cameras[cameraIndex - 1];
+				}
+
+				var elt = document.getElementById('cameras_list');
+				elt.selectedIndex = cameraIndex;
+
+			}
+
+			function updateCamerasList() {
+
+				var elt = document.getElementById('cameras_list');
+
+				while( elt.hasChildNodes() ){
+					elt.removeChild(elt.lastChild);
+				}
+
+				option = document.createElement("option");
+				option.text="[default]";
+				elt.add(option);
+
+				var i, len = cameraNames.length;
+
+				for (i = 0; i < len; i++) {
+					option = document.createElement("option");
+					option.text=cameraNames[i];
+					elt.add(option);
+				}
+
+			}
+
+			function selectCamera() {
+
+				var select = document.getElementById("cameras_list");
+				var index = select.selectedIndex;
+
+				if (index >= 0) {
+					switchCamera(index);
+				}
+
+			}
+
+			function toggleAnimations() {
+
+				var i, len = gltf.animations.length;
+
+				for (i = 0; i < len; i++) {
+
+					var animation = gltf.animations[i];
+
+					if (animation.running) {
+						animation.stop();
+					} else {
+						animation.play();
+					}
+
+				}
+
+			}
+
+			var useextmaterials = document.getElementById("materials_extension_checkbox");
+			var useMaterialsExtension = useextmaterials.hasAttribute("checked");
+			function toggleMaterialsExtension()
+			{
+				useMaterialsExtension = !useMaterialsExtension;
+				selectScene();
+			}
+
+
+			function cleanup() {
+
+				if (container && renderer) {
+					container.removeChild(renderer.domElement);
+				}
+
+				cameraIndex = 0;
+				cameras = [];
+				cameraNames = [];
+				defaultCamera = null;
+
+				if (!loader || !gltf.animations)
+					return;
+
+				var i, len = gltf.animations.length;
+
+				for (i = 0; i < len; i++) {
+					var animation = gltf.animations[i];
+					if (animation.running) {
+						animation.stop();
+					}
+				}
+
+			}
+
+			onload();
+		</script>
+
+	</body>
+</html>

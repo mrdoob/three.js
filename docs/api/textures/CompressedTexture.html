@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Creates a texture based on data in compressed form.
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Array mipmaps], [page:Number width], [page:Number height], [page:Number format], [page:Number type], [page:Number mapping], [page:Number wrapS], [page:Number wrapT], [page:Number magFilter], [page:Number minFilter], [page:Number anisotropy] )</h3>
+		<div>
+		mipmaps -- The mipmaps array should contains objects with data, width and height. The mipmaps should be from of the correct format and type. <br />
+		width -- The width of the biggest mipmap<br />
+		height -- The height of the biggest mipmap <br />
+		format -- The format used in the mipmaps <br />
+		type -- The type used in the mipmaps <br />
+		mapping --  How the image is applied to the object. An object type of THREE.UVMapping is the default, where the U,V coordinates are used to apply the map, and a single texture is expected. The other types are THREE.CubeReflectionMapping, for cube maps used as a reflection map; THREE.CubeRefractionMapping, refraction mapping; and THREE.SphericalReflectionMapping, a spherical reflection map projection.<br />
+		wrapS -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
+		wrapT -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
+		magFilter -- How the texture is sampled when a texel covers more than one pixel. The default is THREE.LinearFilter, which takes the four closest texels and bilinearly interpolates among them. The other option is THREE.NearestFilter, which uses the value of the closest texels.<br />
+		minFilter -- How the texture is sampled when a texel covers less than one pixel. The default is THREE.LinearMipMapLinearFilter, which uses mipmapping and a trilinear filter. Other choices are THREE.NearestFilter, THREE.NearestMipMapNearestFilter, THREE.NearestMipMapLinearFilter, THREE.LinearFilter, and THREE.LinearMipMapNearestFilter. These vary whether the nearest texel or nearest four texels are retrieved on the nearest mipmap or nearest two mipmaps. Interpolation occurs among the samples retrieved.<br />
+		anisotropy -- The number of samples taken along the axis through the pixel that has the highest density of texels. By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used. Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.</div>
+		<div>
+		This creates a texture from compressed data. This is mostly used in ImageUtils.loadCompressedTexture.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:boolean flipY]</h3>
+		
+		<div>
+			False by default. Flipping textures does not work for compressed textures.
+		</div>
+
+		<h3>[property:boolean generateMipmaps]</h3>
+		
+		<div>
+			False by default. Mipmaps can't be generated for compressed textures
+		</div>
+
+
+		<h2>Methods</h2>
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
