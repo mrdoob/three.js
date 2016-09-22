@@ -9,7 +9,7 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function ( renderer, onError, onReady ) {
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
@@ -34,6 +34,10 @@ THREE.VREffect = function ( renderer, onError ) {
 		} else {
 
 			if ( onError ) onError( 'HMD not available' );
+
+		} else {
+
+			if ( onReady ) onReady( vrDisplay );
 
 		}
 
@@ -352,6 +356,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			} else {
 
 				renderer.setScissorTest( false );
+				renderer.setViewport( 0, 0, size.width, size.height );
 
 			}
 
