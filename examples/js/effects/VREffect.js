@@ -111,8 +111,10 @@ THREE.VREffect = function ( renderer, onError ) {
 			var layers = vrDisplay.getLayers();
 			if ( layers.length ) {
 
-				leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
-				rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
+				var layer = layers[0];
+
+				leftBounds = layer.leftBounds !== null && layer.leftBounds.length === 4 ? leftBounds : [ 0.0, 0.0, 0.5, 1.0 ];
+				rightBounds = layer.rightBounds !== null && layer.rightBounds.length === 4 ? rightBounds : [ 0.5, 0.0, 0.5, 1.0 ];
 
 			}
 
