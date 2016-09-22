@@ -1677,8 +1677,6 @@ function WebGLRenderer( parameters ) {
 					WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
-		materialProperties.dynamicUniforms =
-				WebGLUniforms.splitDynamic( uniformsList, uniforms );
 
 	}
 
@@ -1966,18 +1964,6 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.set( _gl, object, 'modelViewMatrix' );
 		p_uniforms.set( _gl, object, 'normalMatrix' );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
-
-		// dynamic uniforms
-
-		var dynUniforms = materialProperties.dynamicUniforms;
-
-		if ( dynUniforms !== null ) {
-
-			WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
-			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
-
-		}
 
 		return program;
 
