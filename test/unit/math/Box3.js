@@ -66,59 +66,60 @@ test( "empty/makeEmpty", function() {
 	ok( a.isEmpty(), "Passed!" );
 });
 
-test( "center", function() {
+test( "getCenter", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
-	ok( a.center().equals( zero3 ), "Passed!" );
+	ok( a.getCenter().equals( zero3 ), "Passed!" );
 
 	a = new THREE.Box3( zero3.clone(), one3.clone() );
 	var midpoint = one3.clone().multiplyScalar( 0.5 );
-	ok( a.center().equals( midpoint ), "Passed!" );
+	ok( a.getCenter().equals( midpoint ), "Passed!" );
 });
 
-test( "size", function() {
+test( "getSize", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
-	ok( a.size().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( zero3 ), "Passed!" );
 
 	a = new THREE.Box3( zero3.clone(), one3.clone() );
-	ok( a.size().equals( one3 ), "Passed!" );
+	ok( a.getSize().equals( one3 ), "Passed!" );
 });
+
 
 test( "expandByPoint", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
 	a.expandByPoint( zero3 );
-	ok( a.size().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( zero3 ), "Passed!" );
 
 	a.expandByPoint( one3 );
-	ok( a.size().equals( one3 ), "Passed!" );
+	ok( a.getSize().equals( one3 ), "Passed!" );
 
 	a.expandByPoint( one3.clone().negate() );
-	ok( a.size().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-	ok( a.center().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+	ok( a.getCenter().equals( zero3 ), "Passed!" );
 });
 
 test( "expandByVector", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
 	a.expandByVector( zero3 );
-	ok( a.size().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( zero3 ), "Passed!" );
 
 	a.expandByVector( one3 );
-	ok( a.size().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-	ok( a.center().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+	ok( a.getCenter().equals( zero3 ), "Passed!" );
 });
 
 test( "expandByScalar", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
 	a.expandByScalar( 0 );
-	ok( a.size().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( zero3 ), "Passed!" );
 
 	a.expandByScalar( 1 );
-	ok( a.size().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
-	ok( a.center().equals( zero3 ), "Passed!" );
+	ok( a.getSize().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
+	ok( a.getCenter().equals( zero3 ), "Passed!" );
 });
 
 test( "containsPoint", function() {
