@@ -1525,13 +1525,13 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				if ( object.onBeforeRender !== null ) object.onBeforeRender( _this , _gl camera, fog, geometry, material, object, group );
+				object.onBeforeRender( _this , _gl , camera, fog, geometry, material, object, group );
 
 				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
 
 			}
 
-			if ( object.onAfterRender !== null ) object.onAfterRender( _this , _gl camera, fog, geometry, material, object, group );
+			object.onAfterRender( _this , _gl , camera, fog, geometry, material, object, group );
 
 
 		}
