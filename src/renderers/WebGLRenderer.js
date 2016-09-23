@@ -2091,7 +2091,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * _pixelRatio;
-		uniforms.scale.value = _canvas.clientHeight * 0.5;
+		uniforms.scale.value = _height * 0.5;
 
 		uniforms.map.value = material.map;
 
