@@ -61,7 +61,9 @@ THREE.ViveController = function ( id ) {
 
 		gamepad = findGamepad( id );
 
-		if ( gamepad !== undefined && gamepad.pose !== null ) {
+		if ( gamepad !== undefined && gamepad.pose !== undefined ) {
+
+			if ( gamepad.pose === null ) return; // No user action yet
 
 			//  Position and orientation.
 
