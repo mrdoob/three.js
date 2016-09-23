@@ -13,8 +13,14 @@
 				font-style: normal;
 			}
 
-			* {
+			*,
+			*:before,
+			*:after {
+				-moz-box-sizing: border-box;
 				box-sizing: border-box;
+				-webkit-font-smoothing: antialiased;
+				font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
 			}
 
 			html {
@@ -87,14 +93,30 @@
 				overflow: auto;
 			}
 
-			#button {
+			#buttonContainer {
 				position: fixed;
 				bottom: 20px;
 				right: 20px;
+				z-index: 100;
+			}
+
+			.button {
+				display: inline-block;
+				margin-right: 5px;
 				padding: 8px;
 				color: #fff;
 				background-color: #555;
 				opacity: 0.7;
+				cursor: pointer;
+			}
+
+			.button--active {
+				background-color: #FFF;
+				color: #000;
+			}
+
+			.button:last-child {
+				margin-right: 0;
 			}
 
 			#button:hover {
@@ -179,12 +201,213 @@
 				top: 22px;
 			}
 
+			#modalContainer {
+				display: none;
+				width: calc(100% - 310px);
+				height: 100vh;
+				position: fixed;
+				top: 0;
+				right: 0;
+				background: #000;
+				background: rgba(0, 0, 0, 0.85);
+				color: #FFF;
+			}
+
+			#modalContainer.modalContainer--active {
+				display: block;
+			}
+
+			.modalContainer__inner-content {
+				height: 100%;
+				overflow: auto;
+				padding: 30px 1%;
+			}
+
+			.modalContainer__close-button {
+				width: 40px;
+				height: 40px;
+				position: absolute;
+				top: 10px;
+				right: 25px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+				font-size: 1.6em;
+				text-align: center;
+				line-height: 40px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			#modalContainer pre {
+				margin: 0;
+				white-space: pre-wrap;
+				white-space: -moz-pre-wrap !important;
+				white-space: -pre-wrap;
+				white-space: -o-pre-wrap;
+				word-wrap: break-word;
+			}
+
+			/* Syntax Highlighting */
+
+			code[class*="language-"],
+			pre[class*="language-"] {
+				color: #f8f8f2;
+				background: none;
+				text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+				font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+				text-align: left;
+				white-space: pre;
+				word-spacing: normal;
+				word-break: normal;
+				word-wrap: normal;
+				line-height: 1.5;
+
+				-moz-tab-size: 4;
+				-o-tab-size: 4;
+				tab-size: 4;
+
+				-webkit-hyphens: none;
+				-moz-hyphens: none;
+				-ms-hyphens: none;
+				hyphens: none;
+			}
+
+			/* Code blocks */
+			pre[class*="language-"] {
+				padding: 1em;
+				margin: .5em 0;
+				overflow: auto;
+				border-radius: 0.3em;
+			}
+
+			/* Inline code */
+			:not(pre) > code[class*="language-"] {
+				padding: .1em;
+				border-radius: .3em;
+				white-space: normal;
+			}
+
+			.token.comment,
+			.token.prolog,
+			.token.doctype,
+			.token.cdata {
+				color: slategray;
+			}
+
+			.token.punctuation {
+				color: #f8f8f2;
+			}
+
+			.namespace {
+				opacity: .7;
+			}
+
+			.token.property,
+			.token.tag,
+			.token.constant,
+			.token.symbol,
+			.token.deleted {
+				color: #f92672;
+			}
+
+			.token.boolean,
+			.token.number {
+				color: #ae81ff;
+			}
+
+			.token.selector,
+			.token.attr-name,
+			.token.string,
+			.token.char,
+			.token.builtin,
+			.token.inserted {
+				color: #a6e22e;
+			}
+
+			.token.operator,
+			.token.entity,
+			.token.url,
+			.language-css .token.string,
+			.style .token.string,
+			.token.variable {
+				color: #f8f8f2;
+			}
+
+			.token.atrule,
+			.token.attr-value,
+			.token.function {
+				color: #e6db74;
+			}
+
+			.token.keyword {
+				color: #66d9ef;
+			}
+
+			.token.regex,
+			.token.important {
+				color: #fd971f;
+			}
+
+			.token.important,
+			.token.bold {
+				font-weight: bold;
+			}
+			.token.italic {
+				font-style: italic;
+			}
+
+			.token.entity {
+				cursor: help;
+			}
+
+			pre.line-numbers {
+				position: relative;
+				padding-left: 3.8em;
+				counter-reset: linenumber;
+			}
+
+			pre.line-numbers > code {
+				position: relative;
+			}
+
+			.line-numbers .line-numbers-rows {
+				position: absolute;
+				pointer-events: none;
+				top: 0;
+				font-size: 100%;
+				left: -3.8em;
+				width: 3em; /* works for line-numbers below 1000 lines */
+				letter-spacing: -1px;
+				border-right: 1px solid #999;
+
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+
+			}
+
+			.line-numbers-rows > span {
+				pointer-events: none;
+				display: block;
+				counter-increment: linenumber;
+			}
+
+			.line-numbers-rows > span:before {
+				content: counter(linenumber);
+				color: #999;
+				display: block;
+				padding-right: 0.8em;
+				text-align: right;
+			}
+
 			@media all and ( max-width: 640px ) {
-				h1{
+				h1 {
 					margin-top: 20px;
 					margin-bottom: 20px;
 				}
-				#panel{
+				#panel {
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -195,7 +418,7 @@
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
 				}
-				#content{
+				#content {
 					position: absolute;
 					left: 0;
 					top: 90px;
@@ -205,18 +428,23 @@
 					line-height: 22px;
 					overflow: auto;
 				}
-				#viewer{
+				#viewer {
 					position: absolute;
 					left: 0;
 					top: 56px;
 					width: 100%;
 					height: calc(100% - 56px);
 				}
-				#expandButton{
+				#expandButton {
 					display: block;
 				}
-				#panel.collapsed{
+				#panel.collapsed {
 					height: 56px;
+				}
+				#modalContainer {
+					width: 100%;
+					height: calc(100vh - 56px);
+					top: 56px;
 				}
 			}
 
@@ -240,6 +468,7 @@
 		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+		<script src="js/libs/prism.js"></script>
 
 		<script>
 
@@ -277,26 +506,35 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var button = document.createElement( 'div' );
-		button.id = 'button';
-		button.textContent = 'View source';
-		button.addEventListener( 'click', function ( event ) {
+		var buttonContainer = document.createElement( 'div' );
+		buttonContainer.id = 'buttonContainer';
+		document.body.appendChild( buttonContainer );
 
-			try {
+		if ( !window.location.hash ) {
 
-				var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-				window.open( 'view-source:' + url + '/' + selected + '.html' );
+			buttonContainer.style.display = 'none';
 
-			} catch ( e ) {
+		}
 
-				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
-				console.log( e );
+		var buttonViewSource = document.createElement( 'div' );
+		buttonViewSource.classList.add( 'button', 'button--view-source' );
+		buttonViewSource.textContent = 'View source';
+		buttonViewSource.addEventListener( 'click', function ( event ) {
 
-			}
+			toggleModal();
 
 		}, false );
-		button.style.display = 'none';
-		document.body.appendChild( button );
+		buttonContainer.appendChild( buttonViewSource );
+
+		var buttonGithub = document.createElement( 'div' );
+		buttonGithub.classList.add( 'button' , 'button--view-github' );
+		buttonGithub.textContent = 'View on Github';
+		buttonGithub.addEventListener( 'click', function ( event ) {
+
+			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
+
+		}, false );
+		buttonContainer.appendChild( buttonGithub );
 
 		var links = {};
 		var selected = null;
@@ -356,10 +594,74 @@
 			window.location.hash = file;
 			viewer.focus();
 
-			button.style.display = '';
 			panel.classList.toggle( 'collapsed' );
 
+			if ( window.location.hash ) buttonContainer.style.display = 'block';
+
+			getFileSource( file );
+
 			selected = file;
+
+		}
+
+		// Get Raw Source
+
+		function getFileSource( file ) {
+
+			var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
+			var sourceFile = url + '/' + file + '.html';
+
+			var request = new XMLHttpRequest();
+			request.open('GET', sourceFile, true);
+			request.send(null);
+			request.onreadystatechange = function() {
+
+				if ( request.readyState === 4 ) {
+					setModal( request.responseText );
+				}
+
+			}
+
+		}
+
+		// Modal
+
+		var modalContainer = document.createElement( 'div' );
+		modalContainer.id = 'modalContainer';
+
+		var modalInnerContent = document.createElement( 'div' );
+		modalInnerContent.classList.add( 'modalContainer__inner-content' );
+		modalContainer.appendChild( modalInnerContent );
+
+		var modalCloseButton = document.createElement( 'div' );
+		modalCloseButton.classList.add( 'modalContainer__close-button' );
+		modalCloseButton.textContent = 'X';
+		modalCloseButton.addEventListener( 'click', toggleModal );
+		modalContainer.appendChild( modalCloseButton );
+
+		document.body.appendChild( modalContainer );
+
+		function toggleModal() {
+
+			modalContainer.classList.toggle('modalContainer--active');
+			buttonViewSource.classList.toggle('button--active');
+
+		}
+
+		function setModal( source ) {
+
+			modalInnerContent.innerHTML = '';
+
+			var modalContainerPre = document.createElement( 'pre' );
+			var modalContainerCode = document.createElement( 'code' );
+			modalContainerCode.classList.add('language-html', 'line-numbers');
+			modalContainerCode.textContent = source;
+
+			modalContainerPre.appendChild( modalContainerCode );
+
+			modalInnerContent.appendChild( modalContainerPre );
+
+			Prism.highlightAll();
 
 		}
 
