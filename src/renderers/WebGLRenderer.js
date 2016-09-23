@@ -1509,7 +1509,7 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			object.onBeforeRender( _this , _gl , camera, fog, geometry, material, object, group );
+			object.onBeforeRender( _this, camera, geometry, material, group );
 
 			if ( object.isImmediateRenderObject ) {
 
@@ -1531,7 +1531,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			object.onAfterRender( _this , _gl , camera, fog, geometry, material, object, group );
+			object.onAfterRender( _this, camera, geometry, material, group );
 
 
 		}
