@@ -8,13 +8,12 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
-		
+		[page:PolyhedronBufferGeometry] &rarr;
 		<h1>[name]</h1>
 
-		<div class="desc">A class for generating an octahedron geometry.</div>
+		<div class="desc">A class for generating an icosahedron geometry.</div>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#OctahedronGeometry"></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#IcosahedronBufferGeometry"></iframe>
 
 		<script>
 
@@ -36,8 +35,8 @@
 
 		<h3>[name]([page:Float radius], [page:Integer detail])</h3>
 		<div>
-		radius — Radius of the octahedron. Default is 1.<br />
-		detail — Default is 0.  Setting this to a value greater than zero add vertices making it no longer an octahedron.
+		radius — Default is 1. <br />
+		detail — Default is 0.  Setting this to a value greater than 0 adds more vertices making it no longer an icosahedron.  When detail is greater than 1, it's effectively a sphere.
 		</div>
 
 		<h2>Properties</h2>
