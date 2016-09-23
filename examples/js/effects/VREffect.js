@@ -311,7 +311,7 @@ THREE.VREffect = function ( renderer, onError ) {
 				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
 				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
 
-				
+
 			}
 
 			// render left eye
@@ -351,6 +351,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
+				renderer.setViewport( 0, 0, size.width, size.height );
 				renderer.setScissorTest( false );
 
 			}
