@@ -25,7 +25,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-	this.shouldCopyFullBuffer = false;
+	this.needsFullBuffer = false;
 
 	this.version = 0;
 
@@ -40,6 +40,19 @@ BufferAttribute.prototype = {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	},
+
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		this.array = array;
 
 	},
 
@@ -59,7 +72,7 @@ BufferAttribute.prototype = {
 		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
-		this.shouldCopyFullBuffer = source.shouldCopyFullBuffer;
+		this.needsFullBuffer = source.needsFullBuffer;
 
 		return this;
 

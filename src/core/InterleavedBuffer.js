@@ -14,6 +14,7 @@ function InterleavedBuffer( array, stride ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
+	this.needsFullBuffer = false;
 
 	this.version = 0;
 
@@ -31,6 +32,19 @@ InterleavedBuffer.prototype = {
 
 	},
 
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
+
+	},
+
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
@@ -45,6 +59,7 @@ InterleavedBuffer.prototype = {
 		this.count = source.count;
 		this.stride = source.stride;
 		this.dynamic = source.dynamic;
+		this.needsFullBuffer = source.needsFullBuffer;
 
 		return this;
 

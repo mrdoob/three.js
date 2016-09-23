@@ -93,7 +93,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.shouldCopyFullBuffer === true ) {
+		if ( data.needsFullBuffer === true ) {
 
 			// User wishes to force a copy of full buffer instead of sub range
 
