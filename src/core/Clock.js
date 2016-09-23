@@ -23,6 +23,7 @@ Clock.prototype = {
 		this.startTime = ( performance || Date ).now();
 
 		this.oldTime = this.startTime;
+		this.elapsedTime = 0;
 		this.running = true;
 
 	},
@@ -30,7 +31,6 @@ Clock.prototype = {
 	stop: function () {
 
 		this.getElapsedTime();
-		this.elapsedTime = 0;
 		this.running = false;
 
 	},
