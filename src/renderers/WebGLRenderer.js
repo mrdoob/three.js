@@ -7,10 +7,10 @@ import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
 import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
-import { BoxBufferGeometry } from '../extras/geometries/BoxBufferGeometry';
 import { Mesh } from '../objects/Mesh';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { PlaneBufferGeometry } from '../extras/geometries/PlaneBufferGeometry';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
@@ -760,6 +760,12 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			for ( var i = activeInfluences.length, il = morphInfluences.length; i < il; i ++ ) {
+
+				morphInfluences[ i ] = 0.0;
+
+			}
+
 			program.getUniforms().setValue(
 					_gl, 'morphTargetInfluences', morphInfluences );
 
@@ -771,10 +777,12 @@ function WebGLRenderer( parameters ) {
 
 		var index = geometry.index;
 		var position = geometry.attributes.position;
+		var rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
 
 			index = objects.getWireframeAttribute( geometry );
+			rangeFactor = 2;
 
 		}
 
@@ -805,8 +813,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataStart = 0;
-		var dataCount = Infinity;
+		var dataCount = 0;
 
 		if ( index !== null ) {
 
@@ -818,16 +825,18 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var rangeStart = geometry.drawRange.start;
-		var rangeCount = geometry.drawRange.count;
+		var rangeStart = geometry.drawRange.start * rangeFactor;
+		var rangeCount = geometry.drawRange.count * rangeFactor;
 
-		var groupStart = group !== null ? group.start : 0;
-		var groupCount = group !== null ? group.count : Infinity;
+		var groupStart = group !== null ? group.start * rangeFactor : 0;
+		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
 
-		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+		var drawStart = Math.max( rangeStart, groupStart );
+		var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+		if ( drawCount === 0 ) return;
 
 		//
 
@@ -1118,7 +1127,7 @@ function WebGLRenderer( parameters ) {
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		if ( ( camera && camera.isCamera ) === false ) {
+		if ( camera !== undefined && camera.isCamera !== true ) {
 
 			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
@@ -1516,6 +1525,8 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
+				if ( object.onBeforeRender !== null ) object.onBeforeRender();
+
 				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
 
 			}
@@ -1666,8 +1677,6 @@ function WebGLRenderer( parameters ) {
 					WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
-		materialProperties.dynamicUniforms =
-				WebGLUniforms.splitDynamic( uniformsList, uniforms );
 
 	}
 
@@ -1955,20 +1964,6 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.set( _gl, object, 'modelViewMatrix' );
 		p_uniforms.set( _gl, object, 'normalMatrix' );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
-
-		// dynamic uniforms
-
-		var dynUniforms = materialProperties.dynamicUniforms;
-
-		if ( dynUniforms !== null ) {
-
-			WebGLUniforms.evalDynamic(
-					dynUniforms, m_uniforms, object, camera );
-
-			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
-
-		}
 
 		return program;
 

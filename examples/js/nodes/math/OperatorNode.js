@@ -24,14 +24,14 @@ THREE.OperatorNode.prototype.getType = function( builder ) {
 
 	var a = this.a.getType( builder );
 	var b = this.b.getType( builder );
-	
+
 	if ( builder.isFormatMatrix( a ) ) {
-	
+
 		return 'v4';
-		
-	}
-	// use the greater length vector
-	else if ( builder.getFormatLength( b ) > builder.getFormatLength( a ) ) {
+
+	} else if ( builder.getFormatLength( b ) > builder.getFormatLength( a ) ) {
+
+		// use the greater length vector
 
 		return b;
 
@@ -43,11 +43,11 @@ THREE.OperatorNode.prototype.getType = function( builder ) {
 
 THREE.OperatorNode.prototype.generate = function( builder, output ) {
 
-	var material = builder.material, 
+	var material = builder.material,
 		data = material.getDataNode( this.uuid );
 
 	var type = this.getType( builder );
-	
+
 	var a = this.a.build( builder, type );
 	var b = this.b.build( builder, type );
 

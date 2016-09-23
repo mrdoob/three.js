@@ -16,7 +16,7 @@
 
 import { Vector3 } from '../../math/Vector3';
 import { Object3D } from '../../core/Object3D';
-import { CylinderBufferGeometry } from '../geometries/CylinderBufferGeometry';
+import { CylinderBufferGeometry } from '../../geometries/CylinderBufferGeometry';
 import { Float32Attribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';

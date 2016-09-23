@@ -235,7 +235,7 @@ Object.assign( AnimationClip, {
 	},
 
 	// parse the animation.hierarchy format
-	parseAnimation: function( animation, bones, nodeName ) {
+	parseAnimation: function( animation, bones ) {
 
 		if ( ! animation ) {
 

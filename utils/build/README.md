@@ -1,10 +1,8 @@
-The build system now makes use of Node and npm.
+## Setup
 
-## Necessities
+- Install [Node.js](https://nodejs.org/)
+- Execute `npm install`
 
-- To build Three.js, install [Node.js](https://nodejs.org/)
-- Execute 'npm install'
+## Build
 
-## Building
-
-- Execute 'npm run build-closure' 
+- Execute `npm run build` (`npm run build-closure` or `npm run build-uglify` for minifying)
