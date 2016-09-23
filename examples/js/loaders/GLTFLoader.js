@@ -16,10 +16,12 @@ THREE.GLTFLoader.prototype = {
 
 		var scope = this;
 
+		var baseUrl = this.baseUrl && ( typeof this.baseUrl === "string" ) ? this.baseUrl : THREE.Loader.prototype.extractUrlBase( url );
+
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			scope.parse( JSON.parse( text ), onLoad, baseUrl );
 
 		}, onProgress, onError );
 
@@ -31,11 +33,19 @@ THREE.GLTFLoader.prototype = {
 
 	},
 
-	parse: function ( json ) {
+	setBaseUrl: function ( value ) {
 
-		function stringToArrayBuffer( string ) {
+		this.baseUrl = value;
 
-			var bytes = atob( string );
+	},
+
+	parse: function ( json, callback, baseUrl ) {
+
+		baseUrl = baseUrl || this.baseUrl || "";
+
+		function stringToArrayBuffer( string, isBase64 ) {
+
+			var bytes = isBase64 ? atob( string ) : string;
 			var buffer = new ArrayBuffer( bytes.length );
 			var bufferView = new Uint8Array( buffer );
 
@@ -46,6 +56,43 @@ THREE.GLTFLoader.prototype = {
 			}
 
 			return buffer;
+
+		}
+
+		var resolveURL = function ( url ) {
+
+			if ( typeof url !== 'string' || url === '' )
+				return '';
+
+			// Absolute URL
+			if ( /^https?:\/\//i.test( url ) ) {
+				return url;
+			}
+
+			// Data URI
+			if ( /^data:.*,.*$/i.test( url ) ) {
+				return url;
+			}
+
+			return baseUrl + url;
+		};
+
+		function waitForPromises() {
+
+			var promisedProperties = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+
+				var objectKeys = Object.keys( arguments[ i ] );
+				for (var j = 0; j < objectKeys.length; j++) {
+
+					promisedProperties.push( arguments[ i ][ objectKeys[ j ] ] );
+
+				}
+
+			}
+
+			return Promise.all( promisedProperties );
 
 		}
 
@@ -62,6 +109,28 @@ THREE.GLTFLoader.prototype = {
 			scenes: {}
 		};
 
+		var promises = ( function( libraryItems ) {
+
+			var resolvers = {};
+
+			for( var resolver in libraryItems ) {
+
+				let resolve;
+
+				resolvers[ resolver ] = new Promise( function( r ) {
+
+					resolve = r;
+
+				});
+
+				resolvers[ resolver ].resolve = resolve;
+
+			}
+
+			return resolvers;
+
+		})( library );
+
 		// buffers
 
 		var buffers = json.buffers;
@@ -72,11 +141,26 @@ THREE.GLTFLoader.prototype = {
 
 			if ( buffer.type === 'arraybuffer' ) {
 
-				var header = 'data:application/octet-stream;base64,';
+				var dataUriRegex = /^data:([^;,]*)?(;base64)?,(.*)$/;
+				var dataUri = buffer.uri.match( dataUriRegex );
 
-				if ( buffer.uri.indexOf( header ) === 0 ) {
+				if ( dataUri ) {
 
-					library.buffers[ bufferId ] = stringToArrayBuffer( buffer.uri.substr( header.length ) );
+					library.buffers[ bufferId ] = stringToArrayBuffer( dataUri[3] , !!dataUri[2] );
+
+				} else {
+
+					library.buffers[ bufferId ] = new Promise( function( resolve ) {
+
+						var loader = new THREE.XHRLoader();
+						loader.responseType = 'arraybuffer';
+						loader.load( resolveURL( buffer.uri ), function( buffer ) {
+
+							resolve( buffer );
+
+						});
+
+					});
 
 				}
 
@@ -86,48 +170,69 @@ THREE.GLTFLoader.prototype = {
 
 		// buffer views
 
-		var bufferViews = json.bufferViews;
+		waitForPromises( library.buffers ).then( function(values) {
 
-		for ( var bufferViewId in bufferViews ) {
+			var count = 0;
+			for ( var bufferName in library.buffers ) {
 
-			var bufferView = bufferViews[ bufferViewId ];
-			var arraybuffer = library.buffers[ bufferView.buffer ];
+				library.buffers[ bufferName ] = values[ count++ ];
 
-			library.bufferViews[ bufferViewId ] = arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+			}
 
-		}
+			promises.buffers.resolve();
+
+			var bufferViews = json.bufferViews;
+
+			for ( var bufferViewId in bufferViews ) {
+
+				var bufferView = bufferViews[ bufferViewId ];
+				var arraybuffer = library.buffers[ bufferView.buffer ];
+
+				library.bufferViews[ bufferViewId ] = arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+
+			}
+
+			promises.bufferViews.resolve();
+
+		});
 
 		// accessors
 
-		var COMPONENT_TYPES = {
-			5120: Int8Array,
-			5121: Uint8Array,
-			5122: Int16Array,
-			5123: Uint16Array,
-			5125: Uint32Array,
-			5126: Float32Array,
-		};
+		promises.bufferViews.then( function() {
 
-		var TYPE_SIZES = {
-			'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4,
-			'MAT2': 4, 'MAT3': 9, 'MAT4': 16
-		};
+			var COMPONENT_TYPES = {
+				5120: Int8Array,
+				5121: Uint8Array,
+				5122: Int16Array,
+				5123: Uint16Array,
+				5125: Uint32Array,
+				5126: Float32Array,
+			};
 
-		var accessors = json.accessors;
+			var TYPE_SIZES = {
+				'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4,
+				'MAT2': 4, 'MAT3': 9, 'MAT4': 16
+			};
 
-		for ( var accessorId in accessors ) {
+			var accessors = json.accessors;
 
-			var accessor = accessors[ accessorId ];
+			for ( var accessorId in accessors ) {
 
-			var arraybuffer = library.bufferViews[ accessor.bufferView ];
-			var itemSize = TYPE_SIZES[ accessor.type ];
-			var TypedArray = COMPONENT_TYPES[ accessor.componentType ];
+				var accessor = accessors[ accessorId ];
 
-			var array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
+				var arraybuffer = library.bufferViews[ accessor.bufferView ];
+				var itemSize = TYPE_SIZES[ accessor.type ];
+				var TypedArray = COMPONENT_TYPES[ accessor.componentType ];
 
-			library.accessors[ accessorId ] = new THREE.BufferAttribute( array, itemSize );
+				var array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
 
-		}
+				library.accessors[ accessorId ] = new THREE.BufferAttribute( array, itemSize );
+
+			}
+
+			promises.accessors.resolve();
+
+		});
 
 		// textures
 
@@ -160,7 +265,7 @@ THREE.GLTFLoader.prototype = {
 				var source = json.images[ texture.source ];
 
 				_texture.image = new Image();
-				_texture.image.src = source.uri;
+				_texture.image.src = resolveURL( source.uri );
 				_texture.needsUpdate = true;
 
 			}
@@ -180,200 +285,255 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
+		promises.textures.resolve();
+
 		// materials
 
-		var materials = json.materials;
+		promises.textures.then( function() {
 
-		for ( var materialId in materials ) {
+			var materials = json.materials;
 
-			var material = materials[ materialId ];
+			for ( var materialId in materials ) {
 
-			var _material = new THREE.MeshPhongMaterial();
-			_material.name = material.name;
+				var material = materials[ materialId ];
 
-			var values = material.values;
+				var _material = new THREE.MeshPhongMaterial();
+				_material.name = material.name;
 
-			if ( Array.isArray( values.diffuse ) ) {
+				var values = material.values;
 
-					_material.color.fromArray( values.diffuse );
+				if ( Array.isArray( values.diffuse ) ) {
 
-			} else if ( typeof( values.diffuse ) === 'string' ) {
+						_material.color.fromArray( values.diffuse );
 
-					_material.map = library.textures[ values.diffuse ];
+				} else if ( typeof( values.diffuse ) === 'string' ) {
 
-			}
-
-			if ( typeof( values.bump ) === 'string' ) {
-
-					_material.bumpMap = library.textures[ values.bump ];
-
-			}
-
-			if ( Array.isArray( values.emission ) ) _material.emissive.fromArray( values.emission );
-			if ( Array.isArray( values.specular ) ) _material.specular.fromArray( values.specular );
-
-			if ( values.shininess !== undefined ) _material.shininess = values.shininess;
-
-
-			library.materials[ materialId ] = _material;
-
-		}
-
-		// meshes
-
-		var meshes = json.meshes;
-
-		for ( var meshId in meshes ) {
-
-			var mesh = meshes[ meshId ];
-
-			var group = new THREE.Group();
-			group.name = mesh.name;
-
-			var primitives = mesh.primitives;
-
-			for ( var i = 0; i < primitives.length; i ++ ) {
-
-				var primitive = primitives[ i ];
-				var attributes = primitive.attributes;
-
-				var geometry = new THREE.BufferGeometry();
-
-				if ( primitive.indices ) {
-
-					geometry.setIndex( library.accessors[ primitive.indices ] );
+						_material.map = library.textures[ values.diffuse ];
 
 				}
 
-				for ( var attributeId in attributes ) {
+				if ( typeof( values.bump ) === 'string' ) {
 
-					var attribute = attributes[ attributeId ];
-					var bufferAttribute = library.accessors[ attribute ];
+						_material.bumpMap = library.textures[ values.bump ];
 
-					switch ( attributeId ) {
+				}
 
-						case 'POSITION':
-							geometry.addAttribute( 'position', bufferAttribute );
-							break;
+				if ( Array.isArray( values.emission ) ) _material.emissive.fromArray( values.emission );
+				if ( Array.isArray( values.specular ) ) _material.specular.fromArray( values.specular );
 
-						case 'NORMAL':
-							geometry.addAttribute( 'normal', bufferAttribute );
-							break;
+				if ( values.shininess !== undefined ) _material.shininess = values.shininess;
 
-						case 'TEXCOORD_0':
-							geometry.addAttribute( 'uv', bufferAttribute );
-							break;
+
+				library.materials[ materialId ] = _material;
+
+			}
+
+			promises.materials.resolve();
+
+		});
+
+		// meshes
+
+		waitForPromises({
+			accessors: promises.accessors,
+			materials: promises.materials
+		}).then( function() {
+
+			var meshes = json.meshes;
+
+			for ( var meshId in meshes ) {
+
+				var mesh = meshes[ meshId ];
+
+				var group = new THREE.Group();
+				group.name = mesh.name;
+
+				var primitives = mesh.primitives;
+
+				for ( var i = 0; i < primitives.length; i ++ ) {
+
+					var primitive = primitives[ i ];
+					var attributes = primitive.attributes;
+
+					var geometry = new THREE.BufferGeometry();
+
+					if ( primitive.indices ) {
+
+						geometry.setIndex( library.accessors[ primitive.indices ] );
+
+					}
+
+					for ( var attributeId in attributes ) {
+
+						var attribute = attributes[ attributeId ];
+						var bufferAttribute = library.accessors[ attribute ];
+
+						switch ( attributeId ) {
+
+							case 'POSITION':
+								geometry.addAttribute( 'position', bufferAttribute );
+								break;
+
+							case 'NORMAL':
+								geometry.addAttribute( 'normal', bufferAttribute );
+								break;
+
+							case 'TEXCOORD_0':
+								geometry.addAttribute( 'uv', bufferAttribute );
+								break;
+
+						}
+
+					}
+
+					var material = library.materials[ primitive.material ];
+
+					group.add( new THREE.Mesh( geometry, material ) );
+
+				}
+
+				library.meshes[ meshId ] = group;
+
+			}
+
+			promises.meshes.resolve();
+
+		});
+
+		// nodes
+
+		promises.meshes.then( function() {
+
+			var nodes = json.nodes;
+			var matrix = new THREE.Matrix4();
+
+			for ( var nodeId in nodes ) {
+
+				var node = nodes[ nodeId ];
+
+				var object = new THREE.Group();
+				object.name = node.name;
+
+				if ( node.translation !== undefined ) {
+
+					object.position.fromArray( node.translation );
+
+				}
+
+				if ( node.rotation !== undefined ) {
+
+					object.quaternion.fromArray( node.rotation );
+
+				}
+
+				if ( node.scale !== undefined ) {
+
+					object.scale.fromArray( node.scale );
+
+				}
+
+				if ( node.matrix !== undefined ) {
+
+					matrix.fromArray( node.matrix );
+					matrix.decompose( object.position, object.quaternion, object.scale );
+
+				}
+
+				if ( node.meshes !== undefined ) {
+
+					for ( var i = 0; i < node.meshes.length; i ++ ) {
+
+						var meshId = node.meshes[ i ];
+						var group = library.meshes[ meshId ];
+
+						object.add( group.clone() );
 
 					}
 
 				}
 
-				var material = library.materials[ primitive.material ];
-
-				group.add( new THREE.Mesh( geometry, material ) );
+				library.nodes[ nodeId ] = object;
 
 			}
 
-			library.meshes[ meshId ] = group;
+			for ( var nodeId in nodes ) {
 
-		}
+				var node = nodes[ nodeId ];
 
-		// nodes
+				for ( var i = 0; i < node.children.length; i ++ ) {
 
-		var nodes = json.nodes;
-		var matrix = new THREE.Matrix4();
+					var child = node.children[ i ];
 
-		for ( var nodeId in nodes ) {
-
-			var node = nodes[ nodeId ];
-
-			var object = new THREE.Group();
-			object.name = node.name;
-
-			if ( node.translation !== undefined ) {
-
-				object.position.fromArray( node.translation );
-
-			}
-
-			if ( node.rotation !== undefined ) {
-
-				object.quaternion.fromArray( node.rotation );
-
-			}
-
-			if ( node.scale !== undefined ) {
-
-				object.scale.fromArray( node.scale );
-
-			}
-
-			if ( node.matrix !== undefined ) {
-
-				matrix.fromArray( node.matrix );
-				matrix.decompose( object.position, object.quaternion, object.scale );
-
-			}
-
-			if ( node.meshes !== undefined ) {
-
-				for ( var i = 0; i < node.meshes.length; i ++ ) {
-
-					var meshId = node.meshes[ i ];
-					var group = library.meshes[ meshId ];
-
-					object.add( group.clone() );
+					library.nodes[ nodeId ].add( library.nodes[ child ] );
 
 				}
 
 			}
 
-			library.nodes[ nodeId ] = object;
+			promises.nodes.resolve();
 
-		}
-
-		for ( var nodeId in nodes ) {
-
-			var node = nodes[ nodeId ];
-
-			for ( var i = 0; i < node.children.length; i ++ ) {
-
-				var child = node.children[ i ];
-
-				library.nodes[ nodeId ].add( library.nodes[ child ] );
-
-			}
-
-		}
+		});
 
 		// scenes
 
-		var scenes = json.scenes;
+		promises.nodes.then( function() {
 
-		for ( var sceneId in scenes ) {
+			var scenes = json.scenes;
 
-			var scene = scenes[ sceneId ];
-			var container = new THREE.Scene();
+			for ( var sceneId in scenes ) {
 
-			for ( var i = 0; i < scene.nodes.length; i ++ ) {
+				var scene = scenes[ sceneId ];
+				var container = new THREE.Scene();
 
-				var node = scene.nodes[ i ];
-				container.add( library.nodes[ node ] );
+				for ( var i = 0; i < scene.nodes.length; i ++ ) {
+
+					var node = scene.nodes[ i ];
+					container.add( library.nodes[ node ] );
+
+				}
+
+				library.scenes[ sceneId ] = container;
 
 			}
 
-			library.scenes[ sceneId ] = container;
+			promises.scenes.resolve();
 
-		}
+		});
 
-		console.timeEnd( 'GLTFLoader' );
+		// Wait for all library components to be run before invoking callback
+		waitForPromises( promises )
+			.then( function() {
 
+				console.timeEnd( 'GLTFLoader' );
+
+				var glTF = {
+
+					scene: library.scenes[ json.scene ]
+
+				};
+
+				callback( glTF );
+
+			});
+
+		// Developers should use `callback` argument for async notification on
+		// completion to prevent side effects.
+		// Function return is kept only for backward-compatability purposes.
 		return {
+		  get scene() {
 
-			scene: library.scenes[ json.scene ]
+				console.warn( "synchronous glTF object access is deprecated. " +
+						"Instead use 'callback' argument in function call " +
+						"to access asynchronous glTF object." );
+		    return library.scenes[ json.scene ];
 
+		  },
+			set scene( value ) {
+
+				library.scenes[ json.scene ] = value;
+
+			}
 		};
-
 	}
 
 };
