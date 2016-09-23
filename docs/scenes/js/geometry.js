@@ -426,6 +426,32 @@ var guis = {
 
 	},
 
+	DodecahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.DodecahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.DodecahedronBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	IcosahedronGeometry : function() {
 
 		var data = {
@@ -444,6 +470,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.IcosahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	IcosahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.IcosahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.IcosahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -542,6 +594,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.OctahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	OctahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.OctahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.OctahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -768,6 +846,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.TetrahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	TetrahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TetrahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TetrahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
