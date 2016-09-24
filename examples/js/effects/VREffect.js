@@ -35,13 +35,13 @@ THREE.VREffect = function ( renderer ) {
 	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
-	this.setVRDisplay = function ( display ) {
+	this.setDisplay = function ( display ) {
 
 		vrDisplay = display;
 
 	};
 
-	this.getVRDisplay = function () {
+	this.getDisplay = function () {
 
 		return vrDisplay;
 

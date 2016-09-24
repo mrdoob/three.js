@@ -131,8 +131,8 @@
 				effect = new THREE.VREffect( renderer );
 
 				WEBVR.listDisplays().then( function( displays ) {
-					effect.setVRDisplay( displays[ 0 ] );
-					controls.setVRDisplay( displays[ 0 ] );
+					effect.setDisplay( displays[ 0 ] );
+					controls.setDisplay( displays[ 0 ] );
 					document.body.appendChild( WEBVR.getButton( effect ) );
 				} );
 
