@@ -44,7 +44,7 @@ Object.defineProperty( CubeTexture.prototype, 'images', {
 
 } );
 
-CubeTexture.prototype.fromEquirectangular = function( renderer, source, size ) {
+CubeTexture.prototype.fromEquirectangular = function( renderer, source, size, detail ) {
 
 	var scene = new Scene();
 
@@ -61,7 +61,7 @@ CubeTexture.prototype.fromEquirectangular = function( renderer, source, size ) {
 	} );
 
 	var mesh = new Mesh(
-		new IcosahedronGeometry( 100, 4 ),
+		new IcosahedronGeometry( 100, detail || 3 ),
 		material
 	);
 
