@@ -4,7 +4,7 @@ import { CubeReflectionMapping } from '../constants';
 import { Scene } from '../scenes/Scene';
 import { CubeCamera } from '../cameras/CubeCamera'
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial'
-import { BackSide } from '../constants'
+import { BackSide, RepeatWrapping } from '../constants'
 import { Mesh } from '../objects/Mesh'
 import { IcosahedronGeometry } from '../geometries/IcosahedronGeometry'
 
@@ -52,6 +52,8 @@ CubeTexture.prototype.fromEquirectangular = function( renderer, source, size ) {
 	var maxSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE )
 
 	var camera = new CubeCamera( 1, 100000, Math.min( size, maxSize ) );
+
+	source.wrapS = source.wrapT = RepeatWrapping;
 
 	var material = new MeshBasicMaterial( {
 		map: source,
