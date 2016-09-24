@@ -27886,6 +27886,7 @@
 	var Geometries = Object.freeze({
 		WireframeGeometry: WireframeGeometry,
 		ParametricGeometry: ParametricGeometry,
+		ParametricBufferGeometry: ParametricBufferGeometry,
 		TetrahedronGeometry: TetrahedronGeometry,
 		TetrahedronBufferGeometry: TetrahedronBufferGeometry,
 		OctahedronGeometry: OctahedronGeometry,
@@ -41746,6 +41747,7 @@
 	exports.Curve = Curve;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
+	exports.ParametricBufferGeometry = ParametricBufferGeometry;
 	exports.TetrahedronGeometry = TetrahedronGeometry;
 	exports.TetrahedronBufferGeometry = TetrahedronBufferGeometry;
 	exports.OctahedronGeometry = OctahedronGeometry;
