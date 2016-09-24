@@ -353,7 +353,7 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				//THREE.GLTFAnimator.update();
-				//THREE.GLTFShaders.update(scene, camera);
+				THREE.GLTFShaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
