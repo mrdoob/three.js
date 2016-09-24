@@ -5,8 +5,6 @@
 
 var WEBVR = {
 
-	displays: [],
-
 	isLatestAvailable: function () {
 
 		return navigator.getVRDisplays !== undefined;
@@ -104,25 +102,9 @@ var WEBVR = {
 
 	},
 
-	listDisplays: function() {
-
-		return new Promise( function( resolve, reject ) {
-
-			navigator.getVRDisplays()
-			.then( function( res ) {
-				displays = res;
-				resolve( res );
-			} ).catch( function( e ) {
-				reject( e )
-			} );
-
-		} );
-
-	},
-
 	getDisplays: function() {
 
-		return displays;
+		return navigator.getVRDisplays();
 
 	}
 
