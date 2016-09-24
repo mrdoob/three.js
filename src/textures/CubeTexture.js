@@ -1,6 +1,13 @@
 import { Texture } from './Texture';
 import { CubeReflectionMapping } from '../constants';
 
+import { Scene } from '../scenes/Scene';
+import { CubeCamera } from '../cameras/CubeCamera'
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial'
+import { BackSide } from '../constants'
+import { Mesh } from '../objects/Mesh'
+import { IcosahedronGeometry } from '../geometries/IcosahedronGeometry'
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -39,20 +46,20 @@ Object.defineProperty( CubeTexture.prototype, 'images', {
 
 CubeTexture.prototype.fromEquirectangular = function( renderer, source, size ) {
 
-	var scene = new THREE.Scene();
+	var scene = new Scene();
 
 	var gl = renderer.getContext();
 	var maxSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE )
 
-	var camera = new THREE.CubeCamera( 1, 100000, Math.min( size, maxSize ) );
+	var camera = new CubeCamera( 1, 100000, Math.min( size, maxSize ) );
 
-	var material = new THREE.MeshBasicMaterial( {
+	var material = new MeshBasicMaterial( {
 		map: source,
-		side: THREE.BackSide
+		side: BackSide
 	} );
 
-	var mesh = new THREE.Mesh(
-		new THREE.IcosahedronGeometry( 100, 4 ),
+	var mesh = new Mesh(
+		new IcosahedronGeometry( 100, 4 ),
 		material
 	);
 
