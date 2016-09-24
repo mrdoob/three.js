@@ -1078,6 +1078,54 @@ var guis = {
 
 		generateGeometry();
 
+	},
+
+	ParametricBufferGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricBufferGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ParametricGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
 	}
 
 };

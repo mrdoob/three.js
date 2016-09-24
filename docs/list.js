@@ -53,6 +53,7 @@ var list = {
 			[ "LatheGeometry", "api/geometries/LatheGeometry" ],
 			[ "OctahedronBufferGeometry", "api/geometries/OctahedronBufferGeometry" ],
 			[ "OctahedronGeometry", "api/geometries/OctahedronGeometry" ],
+			[ "ParametricBufferGeometry", "api/geometries/ParametricBufferGeometry" ],
 			[ "ParametricGeometry", "api/geometries/ParametricGeometry" ],
 			[ "PlaneBufferGeometry", "api/geometries/PlaneBufferGeometry" ],
 			[ "PlaneGeometry", "api/geometries/PlaneGeometry" ],
