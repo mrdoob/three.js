@@ -249,6 +249,15 @@
 
 					var object = gltf.scene;
 
+					object.traverse( function ( child ) {
+						//console.log(child);
+						if ( child instanceof THREE.Mesh ) {
+							var helper = new THREE.WireframeHelper( child );
+							helper.material.color.set( 0x0000ff );
+							scene.add( helper );
+						}
+					});
+
 					var loadEndTime = Date.now();
 
 					var loadTime = (loadEndTime - loadStartTime) / 1000;
@@ -403,7 +412,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
-				}/*,
+				},
 				{
 					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/Cesium_Man.gltf",
 					 cameraPos: new THREE.Vector3(0, 3, 10),
@@ -419,7 +428,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
-				},*/
+				}
 
 			];
 

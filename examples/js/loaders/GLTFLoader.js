@@ -84,6 +84,81 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
+		// Three.js seems too dependent on attribute names so globally
+		// replace those in the shader code
+		var replaceShaderDefinitions = function(shaderText, technique) {
+			// Expected technique attributes
+			var attributes = {};
+
+			for (var attributeId in technique.attributes) {
+
+				var pname = technique.attributes[ attributeId ];
+				var param = technique.parameters[ pname ];
+				var atype = param.type;
+				var semantic = param.semantic;
+
+				attributes[ attributeId ] = {
+					type : atype,
+					semantic : semantic
+				};
+
+			}
+
+			// Figure out which attributes to change in technique
+
+			var shaderParams = technique.parameters;
+			var shaderAttributes = technique.attributes;
+			var params = {};
+
+			for (var attribute in attributes) {
+				var pname = shaderAttributes[attribute];
+				var shaderParam = shaderParams[pname];
+				var semantic = shaderParam.semantic;
+				if (semantic) {
+					params[attribute] = shaderParam;
+				}
+			}
+
+			for (var pname in params) {
+				var param = params[pname];
+				var semantic = param.semantic;
+
+				var regEx = eval("/" + pname + "/g");
+
+				switch (semantic) {
+
+					case "POSITION":
+
+						shaderText = shaderText.replace(regEx, 'position');
+						break;
+
+					case "NORMAL":
+
+						shaderText = shaderText.replace(regEx, 'normal');
+						break;
+
+					case "TEXCOORD_0":
+
+						shaderText = shaderText.replace(regEx, 'uv');
+						break;
+
+				   case "WEIGHT":
+
+						shaderText = shaderText.replace(regEx, 'skinWeight');
+						break;
+
+					case "JOINT":
+
+						shaderText = shaderText.replace(regEx, 'skinIndex');
+						break;
+
+				}
+
+			}
+
+			return shaderText;
+		};
+
 		console.time( 'GLTFLoader' );
 
 		var library = {
@@ -367,33 +442,38 @@ THREE.GLTFLoader.prototype = {
 
 			var texture = textures[ textureId ];
 
-			var _texture = new THREE.Texture();
-			_texture.flipY = false;
-
 			if ( texture.source ) {
+
+				function onLoad(_texture) {
+
+					// UV buffer attributes are also flipped which makes
+					// shadows render correctly
+					_texture.flipY = true;
+
+					if ( texture.sampler ) {
+
+						var sampler = json.samplers[ texture.sampler ];
+
+						_texture.magFilter = FILTERS[ sampler.magFilter ];
+						_texture.minFilter = FILTERS[ sampler.minFilter ];
+						_texture.wrapS = WRAPPINGS[ sampler.wrapS ];
+						_texture.wrapT = WRAPPINGS[ sampler.wrapT ];
+
+					}
+
+				}
 
 				var source = json.images[ texture.source ];
 
-				_texture.image = new Image();
-				_texture.image.onload = function() {
-					_texture.needsUpdate = true;
-				};
-				_texture.image.src = resolveURL( source.uri );
+				var textureLoader = THREE.Loader.Handlers.get( source.uri );
+				if ( textureLoader === null ) {
+					textureLoader = new THREE.TextureLoader();
+				}
+				textureLoader.crossOrigin = true;
+
+				library.textures[ textureId ] = textureLoader.load( resolveURL( source.uri ), onLoad );
 
 			}
-
-			if ( texture.sampler ) {
-
-				var sampler = json.samplers[ texture.sampler ];
-
-				_texture.magFilter = FILTERS[ sampler.magFilter ];
-				_texture.minFilter = FILTERS[ sampler.minFilter ];
-				_texture.wrapS = WRAPPINGS[ sampler.wrapS ];
-				_texture.wrapT = WRAPPINGS[ sampler.wrapT ];
-
-			}
-
-			library.textures[ textureId ] = _texture;
 
 		}
 
@@ -408,7 +488,8 @@ THREE.GLTFLoader.prototype = {
 				fragmentShader: params.fragmentShader,
 				vertexShader: params.vertexShader,
 				uniforms: params.uniforms,
-				transparent: params.transparent
+				transparent: params.transparent,
+				map: params.map
 			};
 
 			this.technique = params.technique;
@@ -485,17 +566,12 @@ THREE.GLTFLoader.prototype = {
 
 				} else {
 
-					for (var prop in material.values) {
-						materialValues[prop] = material.values[prop];
-					}
-
 					materialType = THREE.RawShaderMaterial;
 
 					materialParams.side = THREE.DoubleSide;
 
 					var technique = json.techniques[ material.technique ];
 
-					//materialParams.technique = technique;
 					materialParams.uniforms = {};
 
 					var program = json.programs[ technique.program ];
@@ -505,16 +581,19 @@ THREE.GLTFLoader.prototype = {
 						materialParams.fragmentShader = library.shaders[ program.fragmentShader ];
 
 						if (!materialParams.fragmentShader) {
-							console.warn("ERROR: Missing fragment shader definition:", materialParams.fragmentShader);
+							console.warn("ERROR: Missing fragment shader definition:", program.fragmentShader);
 							materialType = THREE.MeshPhongMaterial;
 						}
 
-						materialParams.vertexShader = library.shaders[ program.vertexShader ];
+						var vertexShader = library.shaders[ program.vertexShader ];
 
-						if (!materialParams.vertexShader) {
-							console.warn("ERROR: Missing vertex shader definition:", materialParams.vertexShader);
+						if (!vertexShader) {
+							console.warn("ERROR: Missing vertex shader definition:", program.vertexShader);
 							materialType = THREE.MeshPhongMaterial;
 						}
+
+						// IMPORTANT: FIX VERTEX SHADER ATTRIBUTE DEFINITIONS
+						materialParams.vertexShader = replaceShaderDefinitions( vertexShader, technique );
 
 						var uniforms = technique.uniforms;
 
@@ -528,7 +607,7 @@ THREE.GLTFLoader.prototype = {
 							if ( WEBGL_MAP[ ptype ] ) {
 
 								var pcount = shaderParam.count;
-								var value = materialValues[ pname ];
+								var value = material.values[ pname ];
 
 								var utype = WEBGL_MAP[ ptype ].utype;
 								var uvalue = new WEBGL_MAP[ ptype ].class();
@@ -626,8 +705,8 @@ THREE.GLTFLoader.prototype = {
 
 								}
 
-								materialParams.uniforms[ pname ] = {
-									type: utype,
+								materialParams.uniforms[ uniformId ] = {
+									//type: utype,
 									value: uvalue,
 									//length: ulength,
 									semantic: usemantic
@@ -674,14 +753,6 @@ THREE.GLTFLoader.prototype = {
 
 				var _material = new materialType( materialParams );
 				_material.name = material.name;
-				//_material.technique = materialParams.technique;
-
-				// https://github.com/mrdoob/three.js/issues/4364
-				if (_material.isRawShaderMaterial) {
-
-					//_material.index0AttributeName = "position";
-
-				}
 
 				library.materials[ materialId ] = _material;
 
@@ -713,7 +784,7 @@ THREE.GLTFLoader.prototype = {
 
 					var primitive = primitives[ i ];
 
-					//if (primitive.mode === WEBGL_CONSTANTS.TRIANGLES) {
+					if (primitive.mode === WEBGL_CONSTANTS.TRIANGLES) {
 
 						var geometry = new THREE.BufferGeometry();
 
@@ -721,13 +792,15 @@ THREE.GLTFLoader.prototype = {
 
 							var indexArray = library.accessors[ primitive.indices ];
 
-							geometry.setIndex( indexArray );
+							geometry.setIndex( indexArray, 1 );
 
-							/*geometry.offsets = [{
-								start: 0,
-								index: 0,
-								count: indexArray.count
-							}];*/
+							var offset = {
+									start: 0,
+									index: 0,
+									count: indexArray.count
+								};
+
+							geometry.groups.push( offset );
 
 							geometry.computeBoundingSphere();
 
@@ -756,22 +829,30 @@ THREE.GLTFLoader.prototype = {
 									break;
 
 								case 'TEXCOORD_0':
+								case 'TEXCOORD':
+									// Flip Y value for UVs
+									var floatArray = bufferAttribute.array;
+									for (i = 0; i < floatArray.length / 2; i++) {
+										floatArray[i*2+1] = 1.0 - floatArray[i*2+1];
+									}
+									bufferAttribute.array = floatArray;
+
 									geometry.addAttribute( 'uv', bufferAttribute );
 									break;
 
-								/*case 'WEIGHT':
+								case 'WEIGHT':
 									geometry.addAttribute( 'skinWeight', bufferAttribute );
 									break;
 
 								case 'JOINTS':
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
-									break;*/
+									break;
 
 							}
 
 						}
 
-					//}
+					}
 
 					var material = library.materials[ primitive.material ];
 
