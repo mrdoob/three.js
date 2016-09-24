@@ -1226,7 +1226,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( background && background.isCubeTexture ) {
+		if ( background && ( background.isCubeTexture || background.isRenderTargetCubeTexture ) ) {
 
 			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
 
