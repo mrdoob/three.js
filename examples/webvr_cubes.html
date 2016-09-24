@@ -132,6 +132,7 @@
 
 				WEBVR.listDisplays().then( function( displays ) {
 					effect.setVRDisplay( displays[ 0 ] );
+					controls.setVRDisplay( displays[ 0 ] );
 					document.body.appendChild( WEBVR.getButton( effect ) );
 				} );
 
