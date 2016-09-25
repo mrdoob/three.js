@@ -1146,9 +1146,9 @@ var guis = {
 
 			function ( t ) {
 
-				var tx = t * 3 - 1.5,
-						ty = Math.sin( 2 * Math.PI * t ),
-						tz = 0;
+				var tx = t * 3 - 1.5;
+				var ty = Math.sin( 2 * Math.PI * t );
+				var tz = 0;
 
 				return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
