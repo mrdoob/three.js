@@ -8,13 +8,13 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
 		<div class="desc">Generate geometry representing a parametric surface.</div>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#ParametricGeometry"></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#ParametricBufferGeometry"></iframe>
 
 		<script>
 
@@ -35,7 +35,7 @@
 		<h2>Example</h2>
 
 		<code>
-		var geometry = new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, 25, 25 );
+		var geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 25, 25 );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );

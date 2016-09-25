@@ -330,6 +330,7 @@ THREE.VREffect = function ( renderer ) {
 
 			} else {
 
+				renderer.setViewport( 0, 0, size.width, size.height );
 				renderer.setScissorTest( false );
 
 			}

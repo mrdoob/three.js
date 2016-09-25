@@ -426,6 +426,32 @@ var guis = {
 
 	},
 
+	DodecahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.DodecahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.DodecahedronBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	IcosahedronGeometry : function() {
 
 		var data = {
@@ -444,6 +470,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.IcosahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	IcosahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.IcosahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.IcosahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -542,6 +594,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.OctahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	OctahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.OctahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.OctahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -776,6 +854,32 @@ var guis = {
 
 	},
 
+	TetrahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TetrahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TetrahedronBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TextGeometry : function( mesh ) {
 
 		var data = {
@@ -971,6 +1075,54 @@ var guis = {
 		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ParametricBufferGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricBufferGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ParametricGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

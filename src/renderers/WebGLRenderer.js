@@ -1134,8 +1134,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var fog = scene.fog;
-
 		// reset caching for this frame
 
 		_currentGeometryProgram = '';
@@ -1256,19 +1254,19 @@ function WebGLRenderer( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			renderObjects( opaqueObjects, camera, fog, overrideMaterial );
-			renderObjects( transparentObjects, camera, fog, overrideMaterial );
+			renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+			renderObjects( transparentObjects, scene, camera, overrideMaterial );
 
 		} else {
 
 			// opaque pass (front-to-back order)
 
 			state.setBlending( NoBlending );
-			renderObjects( opaqueObjects, camera, fog );
+			renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, fog );
+			renderObjects( transparentObjects, scene, camera );
 
 		}
 
@@ -1495,7 +1493,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function renderObjects( renderList, camera, fog, overrideMaterial ) {
+	function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1509,11 +1507,13 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
+			object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 			if ( object.isImmediateRenderObject ) {
 
 				setMaterial( material );
 
-				var program = setProgram( camera, fog, material, object );
+				var program = setProgram( camera, scene.fog, material, object );
 
 				_currentGeometryProgram = '';
 
@@ -1525,11 +1525,12 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				if ( object.onBeforeRender !== null ) object.onBeforeRender();
-
-				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
+				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 			}
+
+			object.onAfterRender( _this, scene, camera, geometry, material, group );
+
 
 		}
 
@@ -2091,7 +2092,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * _pixelRatio;
-		uniforms.scale.value = _canvas.clientHeight * 0.5;
+		uniforms.scale.value = _height * 0.5;
 
 		uniforms.map.value = material.map;
 
