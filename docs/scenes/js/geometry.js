@@ -1126,6 +1126,119 @@ var guis = {
 
 		generateGeometry();
 
+	},
+
+	TubeGeometry : function( mesh ) {
+
+		var data = {
+			segments : 20,
+			radius : 2,
+			radiusSegments: 8
+		};
+
+		var CustomSinCurve = THREE.Curve.create(
+
+			function ( scale ) {
+
+				this.scale = ( scale === undefined ) ? 1 : scale;
+
+			},
+
+			function ( t ) {
+
+				var tx = t * 3 - 1.5;
+				var ty = Math.sin( 2 * Math.PI * t );
+				var tz = 0;
+
+				return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
+
+		);
+
+		var path = new CustomSinCurve( 10 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TubeGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TubeGeometry' );
+
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ShapeGeometry: function( mesh ) {
+
+		var length = 16, width = 12;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ShapeGeometry( shape )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ShapeGeometry' );
+
+		generateGeometry();
+
+	},
+
+	ExtrudeGeometry: function( mesh ) {
+
+		var data = {
+			steps: 2,
+			amount: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ExtrudeGeometry( shape, data )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
+
+		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
 	}
 
 };
