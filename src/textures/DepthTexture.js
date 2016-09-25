@@ -1,5 +1,5 @@
 import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, DepthFormat, DepthStencilFormat } from '../constants';
+import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants';
 
 /**
  * @author Matt DesLauriers / @mattdesl
@@ -20,7 +20,33 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 	this.image = { width: width, height: height };
 
-	this.type = type !== undefined ? type : UnsignedShortType;
+	if ( this.format === DepthFormat ) {
+
+		this.type = type !== undefined ? type : UnsignedShortType;
+
+	} else {
+
+		this.type = type !== undefined ? type : UnsignedInt248Type;
+
+	}
+
+	if ( this.format === DepthFormat ) {
+
+		if ( this.type !== UnsignedShortType && this.type !== UnsignedIntType ) {
+
+			console.warn( 'THREE.DepthTexture: DepthFormat requires UnsignedShortType or UnsignedIntType.' );
+
+		}
+
+	} else {
+
+		if ( this.type !== UnsignedInt248Type ) {
+
+			console.warn( 'THREE.DepthTexture: DepthStencilFormat requires UnsignedInt248Type.' );
+
+		}
+
+	}
 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
