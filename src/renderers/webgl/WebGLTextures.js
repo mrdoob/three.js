@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
+import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, FloatType, HalfFloatType, UnsignedByteType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
@@ -410,6 +410,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+
+		if ( texture.isDataTexture && texture.unpackAlignment !== 1 &&
+			_Math.isPowerOfTwo( texture.image.width ) === false &&
+			texture.format === RGBFormat &&
+			texture.type === UnsignedByteType ) {
+
+			console.warn( 'THREE.WebGLRenderer: Changed unpackAlignment to 1. See #9566.', texture );
+			texture.unpackAlignment = 1;
+
+		}
+
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 		var image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
