@@ -414,6 +414,14 @@
 
 		},
 
+		// https://en.wikipedia.org/wiki/Linear_interpolation
+
+		lerp: function ( x, y, t ) {
+
+			return ( 1 - t ) * x + t * y;
+
+		},
+
 		// http://en.wikipedia.org/wiki/Smoothstep
 
 		smoothstep: function ( x, min, max ) {
@@ -17632,6 +17640,17 @@
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+
+			if ( texture.isDataTexture && texture.unpackAlignment !== 1 &&
+				exports.Math.isPowerOfTwo( texture.image.width ) === false &&
+				texture.format === RGBFormat &&
+				texture.type === UnsignedByteType ) {
+
+				console.warn( 'THREE.WebGLRenderer: Changed unpackAlignment to 1. See #9566.', texture );
+				texture.unpackAlignment = 1;
+
+			}
+
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
