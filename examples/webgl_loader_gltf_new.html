@@ -249,14 +249,13 @@
 
 					var object = gltf.scene;
 
-					object.traverse( function ( child ) {
-						//console.log(child);
+					/*object.traverse( function ( child ) {
 						if ( child instanceof THREE.Mesh ) {
-							var helper = new THREE.WireframeHelper( child );
+							var helper = new THREE.LineSegments( new THREE.WireframeGeometry( child.geometry ) );
 							helper.material.color.set( 0x0000ff );
 							scene.add( helper );
 						}
-					});
+					});*/
 
 					var loadEndTime = Date.now();
 
@@ -398,8 +397,8 @@
 				{
 					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
 					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-					objectPosition: new THREE.Vector3(2, 6, 0),
+					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
+					objectPosition: new THREE.Vector3(2, 1, 0),
 					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
 					animationTime: 3,
 					addLights:true,
