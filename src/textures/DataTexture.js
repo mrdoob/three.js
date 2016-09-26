@@ -16,6 +16,7 @@ function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, 
 
 	this.flipY = false;
 	this.generateMipmaps  = false;
+	this.unpackAlignment = 1;
 
 }
 
