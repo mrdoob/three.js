@@ -17640,17 +17640,6 @@
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-
-			if ( texture.isDataTexture && texture.unpackAlignment !== 1 &&
-				exports.Math.isPowerOfTwo( texture.image.width ) === false &&
-				texture.format === RGBFormat &&
-				texture.type === UnsignedByteType ) {
-
-				console.warn( 'THREE.WebGLRenderer: Changed unpackAlignment to 1. See #9566.', texture );
-				texture.unpackAlignment = 1;
-
-			}
-
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = clampToMaxSize( texture.image, capabilities.maxTextureSize );
@@ -22641,8 +22630,9 @@
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-		this.flipY = false;
 		this.generateMipmaps  = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
 
 	}
 
