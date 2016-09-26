@@ -70,11 +70,12 @@ _Math = {
 
 	},
 
-	//https://en.wikipedia.org/wiki/Linear_interpolation
-	
-	lerp: function( x, y, t ){
+	// https://en.wikipedia.org/wiki/Linear_interpolation
+
+	lerp: function ( x, y, t ) {
 
 		return ( 1 - t ) * x + t * y;
+
 	},
 
 	// http://en.wikipedia.org/wiki/Smoothstep
