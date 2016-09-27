@@ -6,7 +6,7 @@ import { CubeCamera } from '../cameras/CubeCamera'
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial'
 import { BackSide, RepeatWrapping } from '../constants'
 import { Mesh } from '../objects/Mesh'
-import { IcosahedronGeometry } from '../geometries/IcosahedronGeometry'
+import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry'
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -61,7 +61,7 @@ CubeTexture.prototype.fromEquirectangular = function( renderer, source, size, de
 	} );
 
 	var mesh = new Mesh(
-		new IcosahedronGeometry( 100, detail || 3 ),
+		new SphereBufferGeometry( 100, 10 * ( detail || 3 ), 10 * ( detail || 3 ) ),
 		material
 	);
 
