@@ -1573,8 +1573,8 @@ THREE.glTFLoader.prototype.parse = function( json, callback, texturePath ) {
 											boneInverses, false ), skin.bindShapeMatrix );
 
 										//threeMesh.bindMode = "detached";
-										threeMesh.normalizeSkinWeights();
-										threeMesh.pose();
+										//threeMesh.normalizeSkinWeights();
+										//threeMesh.pose();
 									}
 
 									if (threeMesh) {
@@ -1667,7 +1667,7 @@ THREE.glTFLoader.prototype.parse = function( json, callback, texturePath ) {
 			value : function() {
 				for (var name in this.nodeAnimationChannels) {
 					var nodeAnimationChannels = this.nodeAnimationChannels[name];
-					var len = nodeAnimationChannels.length;
+					//var len = nodeAnimationChannels.length;
 					//console.log(" animation channels for node " + name);
 					//for (var i = 0; i < len; i++) {
 					//  console.log(nodeAnimationChannels[i]);
