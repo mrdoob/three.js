@@ -7,13 +7,20 @@ var WEBVR = {
 
 	isLatestAvailable: function () {
 
-		return navigator.getVRDisplays !== undefined;
+		console.warn( 'WEBVR: isLatestAvailable() is being deprecated. Use .isAvailable() instead.' );
+		return this.isAvailable();
 
 	},
 
 	isAvailable: function () {
 
-		return navigator.getVRDisplays !== undefined || navigator.getVRDevices !== undefined;
+		return navigator.getVRDisplays !== undefined;
+
+	},
+
+	getDisplays: function () {
+
+		return navigator.getVRDisplays();
 
 	},
 
@@ -28,10 +35,6 @@ var WEBVR = {
 				if ( displays.length === 0 ) message = 'WebVR supported, but no VRDisplays found.';
 
 			} );
-
-		} else if ( navigator.getVRDevices ) {
-
-			message = 'Your browser supports WebVR but not the latest version. See <a href="http://webvr.info">webvr.info</a> for more info.';
 
 		} else {
 
@@ -99,12 +102,6 @@ var WEBVR = {
 		}, false );
 
 		return button;
-
-	},
-
-	getDisplays: function() {
-
-		return navigator.getVRDisplays();
 
 	}
 
