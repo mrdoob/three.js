@@ -231,6 +231,7 @@
 					scene.add(ground);
 				}
 
+				THREE.GLTFShaders.removeAll(); // remove all previous shaders
 				loader = new THREE.GLTFLoader;
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
@@ -419,15 +420,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
-				},
-				{
-					name : "Gearbox", url : "./models/gltf/GearboxAssy/%s/GearboxAssy.gltf",
-					cameraPos: new THREE.Vector3(0, 3, 5),
-					addLights:true,
-					addGround:true,
-					shadows:true
-				},
-
+				}
 			];
 
 			function buildSceneList() {

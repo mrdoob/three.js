@@ -130,6 +130,12 @@ var GLTFRegistry = function() {
 
 		},
 
+		removeAll: function() {
+
+			objects = []
+
+		},
+
 		update : function( scene, camera ) {
 
 			_each( objects, function( object ) {
@@ -148,9 +154,32 @@ THREE.GLTFShaders = new GLTFRegistry();
 
 /* GLTFSHADER */
 
-var GLTFShader = function( object3D ) {
+var GLTFShader = function( targetNode, allNodes ) {
 
-	this.object = object3D;
+	this.boundUniforms = {};
+
+	// bind each uniform to its source node
+	_each(targetNode.material.uniforms, function(uniform, uniformId) {
+
+		if (uniform.semantic) {
+
+			var sourceNodeRef = uniform.node;
+
+			var sourceNode = targetNode;
+			if ( sourceNodeRef ) {
+				sourceNode = allNodes[ sourceNodeRef ];
+			}
+
+			this.boundUniforms[ uniformId ] = {
+				semantic: uniform.semantic,
+				sourceNode: sourceNode,
+				targetNode: targetNode,
+				uniform: uniform
+			};
+
+		}
+
+	}.bind( this ));
 
 	this._m4 = new THREE.Matrix4();
 
@@ -168,70 +197,54 @@ GLTFShader.prototype.update = function( scene, camera ) {
 	camera.updateMatrixWorld();
 	camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-	var uniforms = this.object && this.object.material && this.object.material.uniforms ? this.object.material.uniforms : {};
+	_each( this.boundUniforms, function( boundUniform ) {
 
-	_each(uniforms, function(uniform, uniformId) {
+		switch (boundUniform.semantic) {
 
-		var uniform = uniforms[ uniformId ];
+			case "MODELVIEW":
 
-		if ( uniform.semantic ) {
+				var m4 = boundUniform.uniform.value;
+				m4.multiplyMatrices(camera.matrixWorldInverse,
+				boundUniform.sourceNode.matrixWorld);
+				break;
 
-			switch ( uniform.semantic ) {
+			case "MODELVIEWINVERSETRANSPOSE":
 
-				case "MODELVIEW":
+				var m3 = boundUniform.uniform.value;
+				this._m4.multiplyMatrices(camera.matrixWorldInverse,
+				boundUniform.sourceNode.matrixWorld);
+				m3.getNormalMatrix(this._m4);
+				break;
 
-					var m4 = uniform.value;
-					m4.multiplyMatrices( camera.matrixWorldInverse,
-					this.object.matrixWorld );
+			case "PROJECTION":
 
-					break;
+				var m4 = boundUniform.uniform.value;
+				m4.copy(camera.projectionMatrix);
+				break;
 
-				case "MODELVIEWINVERSETRANSPOSE":
+			case "JOINTMATRIX":
 
-					var m3 = uniform.value;
-					this._m4.multiplyMatrices( camera.matrixWorldInverse,
-					this.object.matrixWorld );
-					m3.getNormalMatrix( this._m4 );
+				var m4v = boundUniform.uniform.value;
+				for (var mi = 0; mi < m4v.length; mi++) {
+					// So it goes like this:
+					// SkinnedMesh world matrix is already baked into MODELVIEW;
+					// ransform joints to local space,
+					// then transform using joint's inverse
+					m4v[mi]
+						.getInverse(boundUniform.sourceNode.matrixWorld)
+						.multiply(boundUniform.targetNode.skeleton.bones[ mi ].matrixWorld)
+						.multiply(boundUniform.targetNode.skeleton.boneInverses[mi]);
+				}
+				break;
 
-					break;
+			default :
 
-				case "PROJECTION":
-
-					var m4 = uniform.value;
-					m4.copy( camera.projectionMatrix );
-
-					break;
-
-				case "JOINTMATRIX":
-
-					var m4v = uniform.value;
-					_each( m4v, function( _, mi ) {
-
-						// TODO: fix this!
-
-						// So it goes like this:
-						// SkinnedMesh world matrix is already baked into MODELVIEW;
-						// transform joints to local space,
-						// then transform using joint's inverse
-						m4v[ mi ]
-							.getInverse( this.object.matrixWorld )
-							.multiply( this.object.skeleton.bones[ mi ].matrixWorld )
-							.multiply( this.object.skeleton.boneInverses[ mi ] );
-
-					}.bind( this ));
-
-					break;
-
-				default:
-
-					console.warn( "Unhandled shader semantic: '" + semantic + "'" );
-					break;
-
-			}
+				console.warn("Unhandled shader semantic: " + boundUniform.semantic);
+				break;
 
 		}
 
-	}.bind( this ));
+	}.bind(this));
 
 };
 
@@ -515,14 +528,14 @@ var WEBGL_CONSTANTS = {
 };
 
 var WEBGL_TYPE = {
-	5126: Object, // no special type
-	//35674: Object,
+	5126: Number,
+	//35674: THREE.Matrix2,
 	35675: THREE.Matrix3,
 	35676: THREE.Matrix4,
 	35664: THREE.Vector2,
 	35665: THREE.Vector3,
 	35666: THREE.Vector4,
-	35678: Object // no special type
+	35678: THREE.Texture
 };
 
 var WEBGL_COMPONENT_TYPES = {
@@ -685,7 +698,9 @@ var replaceTHREEShaderAttributes = function( shaderText, technique ) {
 				shaderText = shaderText.replace( regEx, 'normal' );
 				break;
 
-			case "TEXCOORD_0":
+			case 'TEXCOORD_0':
+			case 'TEXCOORD0':
+			case 'TEXCOORD':
 
 				shaderText = shaderText.replace( regEx, 'uv' );
 				break;
@@ -730,11 +745,14 @@ DeferredShaderMaterial.prototype.create = function() {
 
 		}
 
+		uniforms[ uniformId ].semantic = originalUniform.semantic;
+		uniforms[ uniformId ].node = originalUniform.node;
+
 	});
 
 	this.params.uniforms = uniforms;
 
-	return new THREE.RawShaderMaterial( this.params )
+	return new THREE.RawShaderMaterial( this.params );
 
 };
 
@@ -1124,8 +1142,47 @@ GLTFParser.prototype.loadMaterials = function() {
 
 							var uvalue = new WEBGL_TYPE[ ptype ]();
 							var usemantic = shaderParam.semantic;
+							var unode = shaderParam.node;
 
 							switch ( ptype ) {
+
+								case WEBGL_CONSTANTS.FLOAT:
+
+									uvalue = shaderParam.value;
+
+									if ( pname == "transparency" ) {
+
+										uvalue = value;
+										materialParams.transparent = true;
+
+									}
+
+									break;
+
+								case WEBGL_CONSTANTS.FLOAT_VEC2:
+								case WEBGL_CONSTANTS.FLOAT_VEC3:
+								case WEBGL_CONSTANTS.FLOAT_VEC4:
+								case WEBGL_CONSTANTS.FLOAT_MAT3:
+
+									if ( shaderParam && shaderParam.value ) {
+
+										uvalue.fromArray( shaderParam.value );
+
+									}
+
+									if ( value ) {
+
+										uvalue.fromArray( value );
+
+									}
+
+									break;
+
+								case WEBGL_CONSTANTS.FLOAT_MAT2:
+
+									// what to do?
+									console.warn("FLOAT_MAT2 is not a supported uniform type");
+									break;
 
 								case WEBGL_CONSTANTS.FLOAT_MAT4:
 
@@ -1177,44 +1234,12 @@ GLTFParser.prototype.loadMaterials = function() {
 
 									break;
 
-								case WEBGL_CONSTANTS.FLOAT:
-
-									if ( shaderParam && shaderParam.value ) {
-
-										uvalue = shaderParam.value;
-
-									}
-
-									if ( pname == "transparency" ) {
-
-										uvalue = value;
-										materialParams.transparent = true;
-
-									}
-
-									break;
-
-								default: // everything else is a straight copy
-
-									if ( shaderParam && shaderParam.value ) {
-
-										uvalue.fromArray( shaderParam.value );
-
-									}
-
-									if ( value ) {
-
-										uvalue.fromArray( value );
-
-									}
-
-									break;
-
 							}
 
 							materialParams.uniforms[ uniformId ] = {
 								value: uvalue,
-								semantic: usemantic
+								semantic: usemantic,
+								node: unode
 							};
 
 						} else {
@@ -1289,22 +1314,6 @@ GLTFParser.prototype.loadMeshes = function() {
 
 					var geometry = new THREE.BufferGeometry();
 
-					if ( primitive.indices ) {
-
-						var indexArray = library.accessors[ primitive.indices ];
-
-						geometry.setIndex( indexArray, 1 );
-
-						var offset = {
-							start: 0,
-							index: 0,
-							count: indexArray.count
-						};
-
-						geometry.groups.push( offset );
-
-					}
-
 					var attributes = primitive.attributes;
 
 					_each( attributes, function( attributeEntry, attributeId ) {
@@ -1328,6 +1337,8 @@ GLTFParser.prototype.loadMeshes = function() {
 								break;
 
 							case 'TEXCOORD_0':
+							case 'TEXCOORD0':
+							case 'TEXCOORD':
 								// Flip Y value for UVs
 								var floatArray = bufferAttribute.array;
 								for ( i = 0; i < floatArray.length / 2; i ++ ) {
@@ -1345,7 +1356,6 @@ GLTFParser.prototype.loadMeshes = function() {
 								break;
 
 							case 'JOINT':
-
 								geometry.addAttribute( 'skinIndex', bufferAttribute );
 								break;
 
@@ -1353,15 +1363,35 @@ GLTFParser.prototype.loadMeshes = function() {
 
 					});
 
-					geometry.computeBoundingSphere();
+					if ( primitive.indices ) {
+
+						var indexArray = library.accessors[ primitive.indices ];
+
+						geometry.setIndex( indexArray );
+
+						var offset = {
+								start: 0,
+								index: 0,
+								count: indexArray.count
+							};
+
+						geometry.groups.push( offset );
+
+						geometry.computeBoundingSphere();
+
+					}
+
 
 					var material = library.materials[ primitive.material ];
-
 
 					var meshNode = new THREE.Mesh( geometry, material );
 					meshNode.castShadow = true;
 
 					group.add( meshNode );
+
+				} else {
+
+					console.warn("Non-triangular primitives are not supported");
 
 				}
 
@@ -1569,8 +1599,7 @@ GLTFParser.prototype.loadNodes = function() {
 						// clone node to add to object
 
 						var originalMaterial = mesh.material;
-
-						var geometry = mesh.geometry;
+						var originalGeometry = mesh.geometry;
 
 						var material;
 						if(originalMaterial.isDeferredShaderMaterial) {
@@ -1579,13 +1608,13 @@ GLTFParser.prototype.loadNodes = function() {
 							material = originalMaterial;
 						}
 
-						mesh = new THREE.Mesh( geometry, material );
+						mesh = new THREE.Mesh( originalGeometry, material );
 						mesh.castShadow = true;
 
 						// Replace Mesh with SkinnedMesh in library
 						if (skinEntry) {
 
-							var geometry = mesh.geometry;
+							var geometry = originalGeometry;
 							var material = originalMaterial;
 							material.skinning = true;
 
@@ -1776,7 +1805,7 @@ GLTFParser.prototype.loadScenes = function() {
 
 				// Register raw material meshes with GLTFShaders
 				if (child.material && child.material.isRawShaderMaterial) {
-					var xshader = new GLTFShader( child );
+					var xshader = new GLTFShader( child, library.nodes );
 					THREE.GLTFShaders.add( xshader );
 				}
 
