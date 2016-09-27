@@ -249,14 +249,6 @@
 
 					var object = gltf.scene;
 
-					/*object.traverse( function ( child ) {
-						if ( child instanceof THREE.Mesh ) {
-							var helper = new THREE.LineSegments( new THREE.WireframeGeometry( child.geometry ) );
-							helper.material.color.set( 0x0000ff );
-							scene.add( helper );
-						}
-					});*/
-
 					var loadEndTime = Date.now();
 
 					var loadTime = (loadEndTime - loadStartTime) / 1000;
@@ -360,7 +352,7 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				//THREE.GLTFAnimator.update();
+				THREE.GLTFAnimator.update();
 				THREE.GLTFShaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
@@ -427,7 +419,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
-				}
+				},
 
 			];
 
@@ -521,23 +513,19 @@
 
 			function toggleAnimations() {
 
-        if(gltf && gltf.animations) {
+				var i, len = gltf.animations.length;
 
-  				var i, len = gltf.animations.length;
+				for (i = 0; i < len; i++) {
 
-  				for (i = 0; i < len; i++) {
+					var animation = gltf.animations[i];
 
-  					var animation = gltf.animations[i];
+					if (animation.running) {
+						animation.stop();
+					} else {
+						animation.play();
+					}
 
-  					if (animation.running) {
-  						animation.stop();
-  					} else {
-  						animation.play();
-  					}
-
-  				}
-
-        }
+				}
 
 			}
 
@@ -561,21 +549,17 @@
 				cameraNames = [];
 				defaultCamera = null;
 
-				if (!loader || (gltf && !gltf.animations))
+				if (!loader || !gltf.animations)
 					return;
 
-        if(gltf && gltf.animations) {
+				var i, len = gltf.animations.length;
 
-          var i, len = gltf.animations.length;
-
-  				for (i = 0; i < len; i++) {
-  					var animation = gltf.animations[i];
-  					if (animation.running) {
-  						animation.stop();
-  					}
-  				}
-
-        }
+				for (i = 0; i < len; i++) {
+					var animation = gltf.animations[i];
+					if (animation.running) {
+						animation.stop();
+					}
+				}
 
 			}
 

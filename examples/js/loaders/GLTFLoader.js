@@ -1,6 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author richt / http://richt.me
+ * @author mrdoob / http://mrdoob.com/
+ * @author Tony Parisi / http://www.tonyparisi.com/
+ */
 
 THREE.GLTFLoader = function( manager ) {
 
@@ -151,7 +153,7 @@ THREE.GLTFLoader.prototype = {
 						shaderText = shaderText.replace( regEx, 'uv' );
 						break;
 
-					/*case "WEIGHT":
+					case "WEIGHT":
 
 						shaderText = shaderText.replace(regEx, 'skinWeight');
 						break;
@@ -159,7 +161,7 @@ THREE.GLTFLoader.prototype = {
 					case "JOINT":
 
 						shaderText = shaderText.replace(regEx, 'skinIndex');
-						break;*/
+						break;
 
 				}
 
@@ -179,8 +181,13 @@ THREE.GLTFLoader.prototype = {
 			materials: {},
 			meshes: {},
 			cameras: {},
+			skins: {},
+			animations: {},
+			nodes: {},
 			scenes: {},
-			shaders: {}
+			shaders: {},
+			lights: {},
+			extensions: {}
 		};
 
 		var promises = ( function( libraryItems ) {
@@ -224,79 +231,31 @@ THREE.GLTFLoader.prototype = {
 			FRAGMENT_SHADER: 35632
 		};
 
-		var WEBGL_MAP = ( function( webGLConstants ) {
+		var WEBGL_TYPE = {
+			5126: Object, // no special type
+			//35674: Object,
+			35675: THREE.Matrix3,
+			35676: THREE.Matrix4,
+			35664: THREE.Vector2,
+			35665: THREE.Vector3,
+			35666: THREE.Vector4,
+			35678: Object // no special type
+		};
 
-			var map = {};
+		var WEBGL_FILTERS = {
+			9728: THREE.NearestFilter,
+			9729: THREE.LinearFilter,
+			9984: THREE.NearestMipMapNearestFilter,
+			9985: THREE.LinearMipMapNearestFilter,
+			9986: THREE.NearestMipMapLinearFilter,
+			9987: THREE.LinearMipMapLinearFilter
+		};
 
-			for ( var webGLConstant in webGLConstants ) {
-
-				switch ( webGLConstants[ webGLConstant ] ) {
-
-					case WEBGL_CONSTANTS.FLOAT:
-
-						map[ WEBGL_CONSTANTS.FLOAT ] = {
-							utype: 'f',
-							class: Object // no special class
-						};
-						break;
-
-					//WEBGL_CONSTANTS.FLOAT_MAT2 {},
-
-					case WEBGL_CONSTANTS.FLOAT_MAT3:
-
-						map[ WEBGL_CONSTANTS.FLOAT_MAT3 ] = {
-							utype: 'm3',
-							class: THREE.Matrix3
-						};
-						break;
-
-					case WEBGL_CONSTANTS.FLOAT_MAT4:
-
-						map[ WEBGL_CONSTANTS.FLOAT_MAT4 ] = {
-							utype: 'm4',
-							class: THREE.Matrix4
-						};
-						break;
-
-					case WEBGL_CONSTANTS.FLOAT_VEC2:
-
-						map[ WEBGL_CONSTANTS.FLOAT_VEC2 ] = {
-							utype: 'v2',
-							class: THREE.Vector2
-						};
-						break;
-
-					case WEBGL_CONSTANTS.FLOAT_VEC3:
-
-						map[ WEBGL_CONSTANTS.FLOAT_VEC3 ] = {
-							utype: 'v3',
-							class: THREE.Vector3
-						};
-						break;
-
-					case WEBGL_CONSTANTS.FLOAT_VEC4:
-
-						map[ WEBGL_CONSTANTS.FLOAT_VEC4 ] = {
-							utype: 'v4',
-							class: THREE.Vector4
-						};
-						break;
-
-					case WEBGL_CONSTANTS.SAMPLER_2D:
-
-						map[ WEBGL_CONSTANTS.SAMPLER_2D ] = {
-							utype: 't',
-							class: Object // no special class
-						};
-						break;
-
-				}
-
-			}
-
-			return map;
-
-		} )( WEBGL_CONSTANTS );
+		var WEBGL_WRAPPINGS = {
+			33071: THREE.ClampToEdgeWrapping,
+			33648: THREE.MirroredRepeatWrapping,
+			10497: THREE.RepeatWrapping
+		};
 
 		// shaders
 
@@ -320,7 +279,9 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
-		waitForPromises( library.shaders ).then( function( values ) {
+		waitForPromises(
+			library.shaders
+		).then( function( values ) {
 
 			var count = 0;
 			for ( var shaderId in library.shaders ) {
@@ -359,7 +320,9 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
-		waitForPromises( library.buffers ).then( function( values ) {
+		waitForPromises(
+			library.buffers
+		).then( function( values ) {
 
 			var count = 0;
 			for ( var bufferId in library.buffers ) {
@@ -374,7 +337,9 @@ THREE.GLTFLoader.prototype = {
 
 		// buffer views
 
-		promises.buffers.then( function() {
+		waitForPromises([
+			promises.buffers
+		]).then( function() {
 
 			var bufferViews = json.bufferViews;
 
@@ -393,7 +358,9 @@ THREE.GLTFLoader.prototype = {
 
 		// accessors
 
-		promises.bufferViews.then( function() {
+		waitForPromises([
+			promises.bufferViews
+		]).then( function() {
 
 			var COMPONENT_TYPES = {
 				5120: Int8Array,
@@ -431,21 +398,6 @@ THREE.GLTFLoader.prototype = {
 
 		// textures
 
-		var FILTERS = {
-			9728: THREE.NearestFilter,
-			9729: THREE.LinearFilter,
-			9984: THREE.NearestMipMapNearestFilter,
-			9985: THREE.LinearMipMapNearestFilter,
-			9986: THREE.NearestMipMapLinearFilter,
-			9987: THREE.LinearMipMapLinearFilter
-		};
-
-		var WRAPPINGS = {
-			33071: THREE.ClampToEdgeWrapping,
-			33648: THREE.MirroredRepeatWrapping,
-			10497: THREE.RepeatWrapping
-		};
-
 		var textures = json.textures;
 
 		for ( let textureId in textures ) {
@@ -462,7 +414,7 @@ THREE.GLTFLoader.prototype = {
 					textureLoader = new THREE.TextureLoader();
 
 				}
-				textureLoader.crossOrigin = true;
+				textureLoader.crossOrigin = this.crossOrigin;
 
 				library.textures[ textureId ] = new Promise( function( resolve ) {
 
@@ -475,10 +427,10 @@ THREE.GLTFLoader.prototype = {
 
 							var sampler = json.samplers[ texture.sampler ];
 
-							_texture.magFilter = FILTERS[ sampler.magFilter ];
-							_texture.minFilter = FILTERS[ sampler.minFilter ];
-							_texture.wrapS = WRAPPINGS[ sampler.wrapS ];
-							_texture.wrapT = WRAPPINGS[ sampler.wrapT ];
+							_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
+							_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
+							_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
+							_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
 
 						}
 
@@ -492,7 +444,9 @@ THREE.GLTFLoader.prototype = {
 
 		}
 
-		waitForPromises( library.textures ).then( function( values ) {
+		waitForPromises(
+			library.textures
+		).then( function( values ) {
 
 			var count = 0;
 			for ( var textureId in library.textures ) {
@@ -516,7 +470,7 @@ THREE.GLTFLoader.prototype = {
 
 		};
 
-		DeferredShaderMaterial.prototype.create = function() {
+		DeferredShaderMaterial.prototype.clone = function() {
 
 			var uniforms = THREE.UniformsUtils.clone( this.params.uniforms );
 
@@ -536,10 +490,10 @@ THREE.GLTFLoader.prototype = {
 
 		};
 
-		waitForPromises( {
-			textures: promises.textures,
-			shaders: promises.shaders
-		} ).then( function() {
+		waitForPromises([
+			promises.textures,
+			promises.shaders
+		]).then( function() {
 
 		var materials = json.materials;
 
@@ -582,6 +536,12 @@ THREE.GLTFLoader.prototype = {
 						break;
 				}
 
+				for ( prop in khr_material.values ) {
+
+					materialValues[ prop ] = khr_material.values[ prop ];
+
+				}
+
 				if ( khr_material.doubleSided )
 				{
 
@@ -596,15 +556,11 @@ THREE.GLTFLoader.prototype = {
 
 				}
 
-				for ( prop in khr_material.values ) {
-
-					materialValues[ prop ] = khr_material.values[ prop ];
-
-				}
-
 			} else if ( material.technique === undefined ) {
 
 				materialType = THREE.MeshPhongMaterial;
+
+				materialParams.side = THREE.DoubleSide;
 
 				for ( var prop in material.values ) {
 
@@ -656,14 +612,12 @@ THREE.GLTFLoader.prototype = {
 
 						var ptype = shaderParam.type;
 
-						if ( WEBGL_MAP[ ptype ] ) {
+						if ( WEBGL_TYPE[ ptype ] ) {
 
 							var pcount = shaderParam.count;
 							var value = material.values[ pname ];
 
-							var utype = WEBGL_MAP[ ptype ].utype;
-							var uvalue = new WEBGL_MAP[ ptype ].class();
-							var ulength;
+							var uvalue = new WEBGL_TYPE[ ptype ]();
 							var usemantic = shaderParam.semantic;
 
 							switch ( ptype ) {
@@ -672,17 +626,13 @@ THREE.GLTFLoader.prototype = {
 
 									if ( pcount ) {
 
-										utype = "m4v"; // override utype
-
 										uvalue = new Array( pcount );
 
 										for ( var mi = 0; mi < pcount; mi ++ ) {
 
-											uvalue[ mi ] = new WEBGL_MAP[ ptype ].class();
+											uvalue[ mi ] = new WEBGL_TYPE[ ptype ]();
 
 										}
-
-										ulength = pcount;
 
 										if ( shaderParam && shaderParam.value ) {
 
@@ -758,9 +708,7 @@ THREE.GLTFLoader.prototype = {
 							}
 
 							materialParams.uniforms[ uniformId ] = {
-								//type: utype,
 								value: uvalue,
-								//length: ulength,
 								semantic: usemantic
 							};
 
@@ -816,10 +764,10 @@ THREE.GLTFLoader.prototype = {
 
 		// meshes
 
-		waitForPromises( {
-			accessors: promises.accessors,
-			materials: promises.materials
-		} ).then( function() {
+		waitForPromises([
+			promises.accessors,
+			promises.materials
+		]).then( function() {
 
 		var meshes = json.meshes;
 
@@ -881,7 +829,6 @@ THREE.GLTFLoader.prototype = {
 								break;
 
 							case 'TEXCOORD_0':
-							case 'TEXCOORD':
 								// Flip Y value for UVs
 								var floatArray = bufferAttribute.array;
 								for ( i = 0; i < floatArray.length / 2; i ++ ) {
@@ -894,13 +841,14 @@ THREE.GLTFLoader.prototype = {
 								geometry.addAttribute( 'uv', bufferAttribute );
 								break;
 
-							/*case 'WEIGHT':
+							case 'WEIGHT':
 								geometry.addAttribute( 'skinWeight', bufferAttribute );
 								break;
 
-							case 'JOINTS':
+							case 'JOINT':
+
 								geometry.addAttribute( 'skinIndex', bufferAttribute );
-								break;*/
+								break;
 
 						}
 
@@ -965,96 +913,12 @@ THREE.GLTFLoader.prototype = {
 
 		// scene node hierachy builder
 
-		var buildNodeHirerachy = function( nodeId, parentObject ) {
+		var buildNodeHierachy = function( nodeId, parentObject ) {
+
+			var _node = library.nodes[ nodeId ];
+			parentObject.add( _node );
 
 			var node = json.nodes[ nodeId ];
-			var matrix = new THREE.Matrix4();
-
-			// build THREE.js node here!
-			var object = new THREE.Object3D();
-
-			object.name = node.name;
-
-			object.matrixAutoUpdate = false;
-
-			if ( node.matrix !== undefined ) {
-
-				matrix.fromArray( node.matrix );
-				object.applyMatrix( matrix );
-
-			} else {
-
-				if ( node.translation !== undefined ) {
-
-					object.position.fromArray( node.translation );
-
-				}
-
-				if ( node.rotation !== undefined ) {
-
-					object.quaternion.fromArray( node.rotation );
-
-				}
-
-				if ( node.scale !== undefined ) {
-
-					object.scale.fromArray( node.scale );
-
-				}
-
-				object.updateMatrix();
-
-			}
-
-			if ( node.meshes !== undefined ) {
-
-				for ( var i = 0; i < node.meshes.length; i ++ ) {
-
-					var meshId = node.meshes[ i ];
-
-					var group = library.meshes[ meshId ];
-					var clonedGroup = new THREE.Group();
-
-					for ( var j = 0; j < group.children.length; j ++ ) {
-
-						var child = group.children[ j ];
-
-						// Set up deferred shader meshes differently
-						// https://github.com/mrdoob/three.js/issues/2534
-						if ( child.material.isDeferredShaderMaterial ) {
-
-							var geometry = child.geometry.clone();
-							var material = child.material.create();
-							var clonedMesh = new THREE.Mesh( geometry, material );
-							clonedMesh.castShadow = true;
-
-							object.add( clonedMesh );
-
-							// Register raw material mesh with GLTFShaders
-							var xshader = new THREE.GLTFShader( clonedMesh );
-							THREE.GLTFShaders.add( xshader );
-
-						} else {
-
-							object.add( child.clone() );
-
-						}
-
-					}
-
-				}
-
-			}
-
-			if ( node.camera !== undefined ) {
-
-				var camera = library.cameras[ node.camera ];
-
-				object.add( camera );
-
-			}
-
-			parentObject.add( object );
 
 			if ( node.children ) {
 
@@ -1062,23 +926,356 @@ THREE.GLTFLoader.prototype = {
 
 					var childId = node.children[ i ];
 
-					buildNodeHirerachy( childId, object );
+					buildNodeHierachy( childId, _node );
 
 				}
 
 			}
 
-			return object;
-
 		};
+
+		// skins
+
+		waitForPromises([
+			promises.accessors,
+			promises.buffers,
+			promises.bufferViews
+		]).then( function() {
+
+			var skins = json.skins;
+
+			for ( var skinId in skins ) {
+
+				var skin = skins[ skinId ];
+
+				var skinEntry = {
+					bindShapeMatrix: new THREE.Matrix4().fromArray( skin.bindShapeMatrix ),
+					jointNames: skin.jointNames,
+					inverseBindMatrices: library.accessors[ skin.inverseBindMatrices ]
+				};
+
+				library.skins[ skinId ] = skinEntry;
+
+			}
+
+			promises.skins.resolve();
+
+		});
+
+		// animations
+
+		waitForPromises([
+			promises.buffers,
+			promises.bufferViews,
+			promises.nodes
+		]).then( function() {
+
+			var animations = json.animations;
+			var nodeAnimationChannels = {};
+
+			for ( var animationId in animations ) {
+
+				var animation = animations[ animationId ];
+
+				var interps = [];
+
+				for ( var i = 0; i < animation.channels.length; i ++ ) {
+
+					var channel = animation.channels[ i ];
+					var sampler = animation.samplers[ channel.sampler ];
+
+					if (sampler && animation.parameters) {
+
+							var target = channel.target;
+							var name = target.id;
+							var input = animation.parameters[sampler.input];
+							var output = animation.parameters[sampler.output];
+
+							var inputAccessor = library.accessors[ input ];
+							var outputAccessor = library.accessors[ output ];
+
+							var node = library.nodes[ name ];
+
+							if ( node ) {
+
+								var interp = {
+									keys : inputAccessor.array,
+									values : outputAccessor.array,
+									count : inputAccessor.count,
+									target : node,
+									path : target.path,
+									type : sampler.interpolation
+								};
+
+								if ( !nodeAnimationChannels[ name ] ) {
+
+									nodeAnimationChannels[ name ] = [];
+
+								}
+
+								nodeAnimationChannels[ name ].push( interp );
+								interps.push( interp );
+
+							}
+
+					}
+
+				}
+
+				library.animations[ animationId ] = new THREE.GLTFAnimation(interps);
+				library.animations[ animationId ].name = "animation_" + animationId;
+
+			}
+
+			promises.animations.resolve();
+
+		});
+
+		// nodes
+
+		waitForPromises([
+			promises.meshes,
+			promises.skins,
+			promises.lights
+		]).then( function() {
+
+			var nodes = json.nodes;
+
+			for ( var nodeId in nodes ) {
+
+				var node = json.nodes[ nodeId ];
+				var matrix = new THREE.Matrix4();
+
+				var object;
+
+				if ( node.jointName ) {
+
+					object = new THREE.Bone();
+					object.jointName = node.jointName;
+
+				} else {
+
+					object = new THREE.Object3D()
+
+				}
+
+				object.name = node.name;
+
+				object.matrixAutoUpdate = false;
+
+				if ( node.matrix !== undefined ) {
+
+					matrix.fromArray( node.matrix );
+					object.applyMatrix( matrix );
+
+				} else {
+
+					if ( node.translation !== undefined ) {
+
+						object.position.fromArray( node.translation );
+
+					}
+
+					if ( node.rotation !== undefined ) {
+
+						object.quaternion.fromArray( node.rotation );
+
+					}
+
+					if ( node.scale !== undefined ) {
+
+						object.scale.fromArray( node.scale );
+
+					}
+
+				}
+
+				if ( node.meshes !== undefined ) {
+
+					var skinEntry;
+					if ( node.skin ) {
+
+						skinEntry = library.skins[ node.skin ];
+
+					}
+
+					for ( var i = 0; i < node.meshes.length; i ++ ) {
+
+						var meshId = node.meshes[ i ];
+
+						var group = library.meshes[ meshId ];
+
+						for ( var j = 0; j < group.children.length; j ++ ) {
+
+							let mesh = group.children[ j ];
+
+							// clone node to add to object
+
+							var originalMaterial = mesh.material;
+
+							var geometry = mesh.geometry.clone();
+							var material = originalMaterial.clone();
+
+							mesh = new THREE.Mesh( geometry, material );
+							mesh.castShadow = true;
+
+							// Replace Mesh with SkinnedMesh in library
+							if (skinEntry) {
+
+								var geometry = mesh.geometry.clone();
+								var material = originalMaterial.clone();
+								material.skinning = true;
+
+								mesh = new THREE.SkinnedMesh( geometry, material, false );
+								mesh.castShadow = true;
+
+								// Wait for nodes to be processed before requesting further
+								// nodes
+								promises.nodes.then( function() {
+
+									var bones = [];
+									var boneInverses = [];
+
+									for ( var i = 0; i < skinEntry.jointNames.length; i ++ ) {
+
+										var jointId = skinEntry.jointNames[i];
+										var jointNode = library.nodes[ jointId ];
+
+										if ( jointNode ) {
+
+											jointNode.skin = mesh;
+											bones.push(jointNode);
+
+											var m = skinEntry.inverseBindMatrices.array;
+											var mat = new THREE.Matrix4().set(
+													m[i * 16 + 0], m[i * 16 + 4], m[i * 16 + 8], m[i * 16 + 12],
+													m[i * 16 + 1], m[i * 16 + 5], m[i * 16 + 9], m[i * 16 + 13],
+													m[i * 16 + 2], m[i * 16 + 6], m[i * 16 + 10], m[i * 16 + 14],
+													m[i * 16 + 3], m[i * 16 + 7], m[i * 16 + 11], m[i * 16 + 15]
+												);
+											boneInverses.push(mat);
+
+										} else {
+											console.warn( "WARNING: joint: ''" + jointId + "' could not be found" );
+										}
+
+									}
+
+									mesh.bind( new THREE.Skeleton( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
+
+								});
+
+
+							}
+
+							object.add( mesh );
+
+						}
+
+					}
+
+				}
+
+				if ( node.camera !== undefined ) {
+
+					var camera = library.cameras[ node.camera ];
+
+					object.add( camera );
+
+				}
+
+				if (node.extensions && node.extensions.KHR_materials_common
+						&& node.extensions.KHR_materials_common.light) {
+
+					var light = library.lights[ node.extensions.KHR_materials_common.light ];
+
+					object.add(light);
+
+				}
+
+				library.nodes[ nodeId ] = object;
+
+			}
+
+			promises.nodes.resolve();
+
+		});
+
+		// extensions
+
+		for ( var extensionId in json.extensions ) {
+
+			var extension = json.extensions[ extensionId ];
+
+			switch ( extensionId ) {
+
+				case "KHR_materials_common":
+
+					var extensionNode = new THREE.Object3D();
+
+					var lights = extension.lights;
+
+					for ( var lightID in lights ) {
+
+						var light = lights[ lightID ];
+						var lightNode;
+
+						var lightParams = light[light.type];
+						var color = new THREE.Color().fromArray( lightParams.color );
+
+						switch ( light.type ) {
+
+							case "directional":
+								lightNode = new THREE.DirectionalLight( color );
+								lightNode.position.set( 0, 0, 1 );
+							break;
+
+							case "point":
+								lightNode = new THREE.PointLight( color );
+							break;
+
+							case "spot ":
+								lightNode = new THREE.SpotLight( color );
+								lightNode.position.set( 0, 0, 1 );
+							break;
+
+							case "ambient":
+								lightNode = new THREE.AmbientLight( color );
+							break;
+
+						}
+
+						if ( lightNode ) {
+
+							library.lights[ lightID ] = lightNode;
+
+							extensionNode.add( lightNode );
+
+						}
+
+					}
+
+					library.extensions[ extensionId ] = extensionNode;
+
+					break;
+
+			}
+
+		}
+
+		promises.lights.resolve();
+		promises.extensions.resolve();
 
 		// scenes
 
-		waitForPromises( {
-			textures: promises.textures,
-			meshes: promises.meshes,
-			cameras: promises.cameras
-		} ).then( function() {
+		waitForPromises([
+			promises.textures,
+			promises.meshes,
+			promises.cameras,
+			promises.skins,
+			promises.nodes,
+			promises.extensions
+		]).then( function() {
 
 			var scenes = json.scenes;
 
@@ -1092,7 +1289,25 @@ THREE.GLTFLoader.prototype = {
 
 					var nodeId = scene.nodes[ i ];
 
-					buildNodeHirerachy( nodeId, container );
+					buildNodeHierachy( nodeId, container );
+
+				}
+
+				container.traverse( function( child ) {
+
+					// Register raw material meshes with GLTFShaders
+					if (child.material && child.material.isRawShaderMaterial) {
+						var xshader = new THREE.GLTFShader( child );
+						THREE.GLTFShaders.add( xshader );
+					}
+
+				});
+
+				for ( var extensionId in library.extensions ) {
+
+					var extension = library.extensions[ extensionId ];
+
+					container.add( extension );
 
 				}
 
@@ -1116,10 +1331,18 @@ THREE.GLTFLoader.prototype = {
 
 			}
 
+			var animations = [];
+			for ( var animationId in library.animations ) {
+
+				animations.push( library.animations[ animationId ] );
+
+			}
+
 			var glTF = {
 
-				scene : library.scenes[ json.scene ],
-				cameras	: cameras
+				scene		:	library.scenes[ json.scene ],
+				cameras		:	cameras,
+				animations	:	animations
 
 			};
 
@@ -1150,49 +1373,46 @@ THREE.GLTFLoader.prototype = {
 
 };
 
-/* GLTFSHADERS */
+/* GLTFREGISTRY */
 
-THREE.GLTFShaders = ( function() {
+var GLTFRegistry = function() {
 
-	var shaders = [];
+var objects = [];
 
 	return	{
+		add : function( object ) {
 
-		add : function( shader ) {
-
-			shaders.push( shader );
-
-		},
-
-		remove: function( shader ) {
-
-			var i = shaders.indexOf( shader );
-
-			if ( i !== - 1 ) shaders.splice( i, 1 );
+			objects.push( object );
 
 		},
 
-		removeAll: function( shader ) {
+		remove: function( object ) {
 
-			// probably want to clean up the shaders, too, but not for now
-			shaders = [];
+			var i = objects.indexOf( object );
+
+			if ( i !== - 1 ) {
+
+				objects.splice( i, 1 );
+
+			}
 
 		},
 
 		update : function( scene, camera ) {
 
-			for ( i = 0; i < shaders.length; i ++ ) {
+			for ( i = 0; i < objects.length; i ++ ) {
 
-				shaders[ i ].update( scene, camera );
+				objects[ i ].update( scene, camera );
 
 			}
 
 		}
-
 	};
+};
 
-} )();
+/* GLTFSHADERS */
 
+THREE.GLTFShaders = new GLTFRegistry();
 
 /* GLTFSHADER */
 
@@ -1255,14 +1475,16 @@ THREE.GLTFShader.prototype.update = function( scene, camera ) {
 					var m4v = uniform.value;
 					for ( var mi = 0; mi < m4v.length; mi ++ ) {
 
+						// TODO: fix this!
+
 						// So it goes like this:
 						// SkinnedMesh world matrix is already baked into MODELVIEW;
-						// ransform joints to local space,
+						// transform joints to local space,
 						// then transform using joint's inverse
-						//m4v[ mi ]
-						//.getInverse( this.object.matrixWorld )
-						//.multiply( this.joints[ mi ].matrixWorld )
-						//.multiply( this.object.skeleton.boneInverses[ mi ] );
+						m4v[ mi ]
+							.getInverse( this.object.matrixWorld )
+							.multiply( this.object.skeleton.bones[ mi ].matrixWorld )
+							.multiply( this.object.skeleton.boneInverses[ mi ] );
 
 					}
 
@@ -1270,10 +1492,264 @@ THREE.GLTFShader.prototype.update = function( scene, camera ) {
 
 				default:
 
-					throw new Error( "Unhandled shader semantic" + semantic );
+					console.warn( "Unhandled shader semantic: '" + semantic + "'" );
 					break;
 
 			}
+
+		}
+
+	}
+
+};
+
+
+/* GLTFANIMATION */
+
+THREE.GLTFAnimator = new GLTFRegistry();
+
+// Construction/initialization
+THREE.GLTFAnimation = function( interps ) {
+
+	this.running = false;
+	this.loop = false;
+	this.duration = 0;
+	this.startTime = 0;
+	this.interps = [];
+
+	if ( interps ) {
+
+		this.createInterpolators( interps );
+
+	}
+
+};
+
+THREE.GLTFAnimation.prototype.createInterpolators = function( interps ) {
+
+	var i, len = interps.length;
+	for ( i = 0; i < len; i ++ )
+	{
+
+		var interp = new THREE.GLTFInterpolator( interps[ i ] );
+		this.interps.push( interp );
+		this.duration = Math.max( this.duration, interp.duration );
+
+	}
+
+}
+
+// Start/stop
+THREE.GLTFAnimation.prototype.play = function() {
+
+	if ( this.running )
+		return;
+
+	this.startTime = Date.now();
+	this.running = true;
+	THREE.GLTFAnimator.add( this );
+
+};
+
+THREE.GLTFAnimation.prototype.stop = function() {
+
+	this.running = false;
+	THREE.GLTFAnimator.remove( this );
+
+};
+
+// Update - drive key frame evaluation
+THREE.GLTFAnimation.prototype.update = function() {
+
+	if ( !this.running )
+		return;
+
+	var now = Date.now();
+	var deltat = ( now - this.startTime ) / 1000;
+	var t = deltat % this.duration;
+	var nCycles = Math.floor( deltat / this.duration );
+
+	if ( nCycles >= 1 && ! this.loop ) {
+
+		this.running = false;
+		for ( var i = 0; i < this.interps.length; i ++ ) {
+
+			this.interps[ i ].interp( this.duration );
+
+		}
+		this.stop();
+		return;
+
+	} else {
+
+		for ( var i = 0; i < this.interps.length; i ++ ) {
+
+			this.interps[ i ].interp( t );
+
+		}
+
+	}
+
+};
+
+/* GLTFINTERPOLATOR */
+
+THREE.GLTFInterpolator = function( param ) {
+
+	this.keys = param.keys;
+	this.values = param.values;
+	this.count = param.count;
+	this.type = param.type;
+	this.path = param.path;
+	this.isRot = false;
+
+	var node = param.target;
+	node.updateMatrix();
+	node.matrixAutoUpdate = true;
+	this.targetNode = node;
+
+	switch ( param.path ) {
+
+		case "translation" :
+
+			this.target = node.position;
+			this.originalValue = node.position.clone();
+			break;
+
+		case "rotation" :
+
+			this.target = node.quaternion;
+			this.originalValue = node.quaternion.clone();
+			this.isRot = true;
+			break;
+
+		case "scale" :
+
+			this.target = node.scale;
+			this.originalValue = node.scale.clone();
+			break;
+
+	}
+
+	this.duration = this.keys[ this.count - 1 ];
+
+	this.vec1 = new THREE.Vector3();
+	this.vec2 = new THREE.Vector3();
+	this.vec3 = new THREE.Vector3();
+	this.quat1 = new THREE.Quaternion();
+	this.quat2 = new THREE.Quaternion();
+	this.quat3 = new THREE.Quaternion();
+
+};
+
+//Interpolation and tweening methods
+THREE.GLTFInterpolator.prototype.interp = function( t ) {
+
+	if ( t == this.keys[ 0 ] ) {
+
+		if ( this.isRot ) {
+
+			this.quat3.set( this.values[ 0 ], this.values[ 1 ], this.values[ 2 ], this.values[ 3 ] );
+
+		} else {
+
+			this.vec3.set( this.values[ 0 ], this.values[ 1 ], this.values[ 2 ] );
+
+		}
+
+	} else if ( t < this.keys[ 0 ] ) {
+
+		if ( this.isRot ) {
+
+			this.quat1.set( this.originalValue.x,
+					this.originalValue.y,
+					this.originalValue.z,
+					this.originalValue.w );
+			this.quat2.set( this.values[ 0 ],
+					this.values[ 1 ],
+					this.values[ 2 ],
+					this.values[ 3 ] );
+			THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, t / this.keys[ 0 ] );
+
+		} else {
+
+			this.vec3.set( this.originalValue.x,
+					this.originalValue.y,
+					this.originalValue.z );
+			this.vec2.set( this.values[ 0 ],
+					this.values[ 1 ],
+					this.values[ 2 ] );
+
+			this.vec3.lerp( this.vec2, t / this.keys[ 0 ] );
+
+		}
+
+	} else if ( t >= this.keys[ this.count - 1 ] ) {
+
+		if ( this.isRot ) {
+
+			this.quat3.set( this.values[ ( this.count - 1 ) * 4 ],
+					this.values[ ( this.count - 1 ) * 4 + 1 ],
+					this.values[ ( this.count - 1 ) * 4 + 2 ],
+					this.values[ ( this.count - 1 ) * 4 + 3 ] );
+
+		} else {
+
+			this.vec3.set( this.values[ ( this.count - 1 ) * 3 ],
+					this.values[ ( this.count - 1 ) * 3 + 1 ],
+					this.values[ ( this.count - 1 ) * 3 + 2 ] );
+
+		}
+
+	} else {
+
+		for ( var i = 0; i < this.count - 1; i ++ ) {
+
+			var key1 = this.keys[ i ];
+			var key2 = this.keys[ i + 1 ];
+
+			if ( t >= key1 && t <= key2 ) {
+
+				if ( this.isRot ) {
+
+					this.quat1.set( this.values[ i * 4 ],
+							this.values[ i * 4 + 1 ],
+							this.values[ i * 4 + 2 ],
+							this.values[ i * 4 + 3 ] );
+					this.quat2.set( this.values[ ( i + 1 ) * 4 ],
+							this.values[ ( i + 1 ) * 4 + 1 ],
+							this.values[ ( i + 1 ) * 4 + 2 ],
+							this.values[ ( i + 1 ) * 4 + 3 ] );
+					THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, ( t - key1 ) / ( key2 - key1 ) );
+
+				} else {
+
+					this.vec3.set( this.values[ i * 3 ],
+							this.values[ i * 3 + 1 ],
+							this.values[ i * 3 + 2 ] );
+					this.vec2.set( this.values[ ( i + 1 ) * 3 ],
+							this.values[ ( i + 1 ) * 3 + 1 ],
+							this.values[ ( i + 1 ) * 3 + 2 ] );
+
+					this.vec3.lerp( this.vec2, ( t - key1 ) / ( key2 - key1 ) );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	if ( this.target ) {
+
+		if ( this.isRot ) {
+
+			this.target.copy( this.quat3 );
+
+		} else {
+
+			this.target.copy( this.vec3 );
 
 		}
 
