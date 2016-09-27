@@ -262,8 +262,10 @@ THREE.VREffect = function ( renderer, onError ) {
 				rightBounds = layer.rightBounds !== null && layer.rightBounds.length === 4 ? layer.rightBounds : defaultRightBounds;
 
 			} else {
+
 				leftBounds = defaultLeftBounds;
 				rightBounds = defaultRightBounds;
+
 			}
 
 
@@ -271,13 +273,13 @@ THREE.VREffect = function ( renderer, onError ) {
 				x: Math.round( size.width * leftBounds[ 0 ] ),
 				y: Math.round( size.height * leftBounds[ 1 ] ),
 				width: Math.round( size.width * leftBounds[ 2 ] ),
-				height:  Math.round(size.height * leftBounds[ 3 ] )
+				height: Math.round(size.height * leftBounds[ 3 ] )
 			};
 			renderRectR = {
 				x: Math.round( size.width * rightBounds[ 0 ] ),
 				y: Math.round( size.height * rightBounds[ 1 ] ),
 				width: Math.round( size.width * rightBounds[ 2 ] ),
-				height:  Math.round(size.height * rightBounds[ 3 ] )
+				height: Math.round(size.height * rightBounds[ 3 ] )
 			};
 
 			if ( renderTarget ) {
@@ -285,7 +287,7 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setRenderTarget( renderTarget );
 				renderTarget.scissorTest = true;
 
-			} else  {
+			} else {
 
 				renderer.setRenderTarget( null );
 				renderer.setScissorTest( true );
