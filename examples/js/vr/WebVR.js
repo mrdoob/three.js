@@ -18,12 +18,6 @@ var WEBVR = {
 
 	},
 
-	getDisplays: function () {
-
-		return navigator.getVRDisplays();
-
-	},
-
 	getMessage: function () {
 
 		var message;
