@@ -130,11 +130,15 @@
 				controls = new THREE.VRControls( camera );
 				effect = new THREE.VREffect( renderer );
 
-				if ( WEBVR.isAvailable() === true ) {
-
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
+				WEBVR.getDisplays()
+					.then( function( displays ) {
+						effect.setDisplay( displays[ 0 ] );
+						controls.setDisplay( displays[ 0 ] );
+						document.body.appendChild( WEBVR.getButton( effect ) );
+					} )
+					.catch( function() {
+						// no displays
+					} );
 
 				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );

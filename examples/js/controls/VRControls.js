@@ -7,35 +7,13 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrDisplay, vrDisplays;
+	var vrDisplay;
 
 	var standingMatrix = new THREE.Matrix4();
 
 	var frameData = null;
 	if ( 'VRFrameData' in window ) {
 		frameData = new VRFrameData();
-	}
-
-	function gotVRDisplays( displays ) {
-
-		vrDisplays = displays;
-
-		if ( displays.length > 0 ) {
-
-			vrDisplay = displays[ 0 ];
-
-		} else {
-
-			if ( onError ) onError( 'VR input not available.' );
-
-		}
-
-	}
-
-	if ( navigator.getVRDisplays ) {
-
-		navigator.getVRDisplays().then( gotVRDisplays );
-
 	}
 
 	// the Rift SDK returns the position in meters
@@ -52,15 +30,15 @@ THREE.VRControls = function ( object, onError ) {
 	// standing=true but the VRDisplay doesn't provide stageParameters.
 	this.userHeight = 1.6;
 
-	this.getVRDisplay = function () {
+	this.setDisplay = function ( display ) {
 
-		return vrDisplay;
+		vrDisplay = display;
 
 	};
 
-	this.getVRDisplays = function () {
+	this.getDisplay = function () {
 
-		return vrDisplays;
+		return vrDisplay;
 
 	};
 

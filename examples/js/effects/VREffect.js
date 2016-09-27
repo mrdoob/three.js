@@ -9,9 +9,10 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function ( renderer ) {
 
-	var vrDisplay, vrDisplays;
+	var vrDisplay;
+
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
@@ -20,28 +21,6 @@ THREE.VREffect = function ( renderer, onError ) {
 	if ( 'VRFrameData' in window ) {
 
 		frameData = new VRFrameData();
-
-	}
-
-	function gotVRDisplays( displays ) {
-
-		vrDisplays = displays;
-
-		if ( displays.length > 0 ) {
-
-			vrDisplay = displays[ 0 ];
-
-		} else {
-
-			if ( onError ) onError( 'HMD not available' );
-
-		}
-
-	}
-
-	if ( navigator.getVRDisplays ) {
-
-		navigator.getVRDisplays().then( gotVRDisplays );
 
 	}
 
@@ -56,15 +35,15 @@ THREE.VREffect = function ( renderer, onError ) {
 	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
-	this.getVRDisplay = function () {
+	this.setDisplay = function ( display ) {
 
-		return vrDisplay;
+		vrDisplay = display;
 
 	};
 
-	this.getVRDisplays = function () {
+	this.getDisplay = function () {
 
-		return vrDisplays;
+		return vrDisplay;
 
 	};
 

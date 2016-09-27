@@ -100,6 +100,12 @@ var WEBVR = {
 
 		return button;
 
+	},
+
+	getDisplays: function() {
+
+		return navigator.getVRDisplays();
+
 	}
 
 };
