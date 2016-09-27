@@ -22041,11 +22041,11 @@
 			if ( p === UnsignedIntType ) return _gl.UNSIGNED_INT;
 			if ( p === FloatType ) return _gl.FLOAT;
 
-			extension = extensions.get( 'OES_texture_half_float' );
+			if ( p === HalfFloatType ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'OES_texture_half_float' );
 
-				if ( p === HalfFloatType ) return extension.HALF_FLOAT_OES;
+				if ( extension !== null ) return extension.HALF_FLOAT_OES;
 
 			}
 
@@ -22074,50 +22074,64 @@
 			if ( p === OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
 			if ( p === SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
-			extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
+				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
-				if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-				if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				if ( extension !== null ) {
 
-			}
+					if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+					if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
-			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-			if ( extension !== null ) {
-
-				if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-				if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-				if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-				if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+				}
 
 			}
 
-			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+			if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
+				 p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
-				if ( p === RGB_ETC1_Format ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+				if ( extension !== null ) {
+
+					if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+					if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+					if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+					if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+				}
 
 			}
 
-			extension = extensions.get( 'EXT_blend_minmax' );
+			if ( p === RGB_ETC1_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-				if ( p === MinEquation ) return extension.MIN_EXT;
-				if ( p === MaxEquation ) return extension.MAX_EXT;
+				if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
 
 			}
 
-			extension = extensions.get( 'WEBGL_depth_texture' );
+			if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( extension !== null ){
+				extension = extensions.get( 'EXT_blend_minmax' );
 
-				if ( p === UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
+				if ( extension !== null ) {
+
+					if ( p === MinEquation ) return extension.MIN_EXT;
+					if ( p === MaxEquation ) return extension.MAX_EXT;
+
+				}
+
+			}
+
+			if ( p === UnsignedInt248Type ) {
+
+				extension = extensions.get( 'WEBGL_depth_texture' );
+
+				if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 			}
 
