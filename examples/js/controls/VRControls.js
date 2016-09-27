@@ -7,13 +7,35 @@ THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	var vrDisplay;
+	var vrDisplay, vrDisplays;
 
 	var standingMatrix = new THREE.Matrix4();
 
 	var frameData = null;
 	if ( 'VRFrameData' in window ) {
 		frameData = new VRFrameData();
+	}
+
+	function gotVRDisplays( displays ) {
+
+		vrDisplays = displays;
+
+		if ( displays.length > 0 ) {
+
+			vrDisplay = displays[ 0 ];
+
+		} else {
+
+			if ( onError ) onError( 'VR input not available.' );
+
+		}
+
+	}
+
+	if ( navigator.getVRDisplays ) {
+
+		navigator.getVRDisplays().then( gotVRDisplays );
+
 	}
 
 	// the Rift SDK returns the position in meters
