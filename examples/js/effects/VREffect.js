@@ -17,6 +17,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var renderRectL, renderRectR;
 
 	var frameData = null;
+
 	if ( 'VRFrameData' in window ) {
 
 		frameData = new VRFrameData();
@@ -56,15 +57,22 @@ THREE.VREffect = function ( renderer, onError ) {
 	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
-	this.setDisplay = function ( display ) {
+	this.getVRDisplay = function () {
 
-		vrDisplay = display;
+		return vrDisplay;
 
 	};
 
-	this.getDisplay = function () {
+	this.setVRDisplay = function ( value ) {
 
-		return vrDisplay;
+		vrDisplay = value;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		console.warn( 'THREE.VREffect: getVRDisplays() is being deprecated.' );
+		return vrDisplays;
 
 	};
 

@@ -12,8 +12,11 @@ THREE.VRControls = function ( object, onError ) {
 	var standingMatrix = new THREE.Matrix4();
 
 	var frameData = null;
+
 	if ( 'VRFrameData' in window ) {
+
 		frameData = new VRFrameData();
+
 	}
 
 	function gotVRDisplays( displays ) {
@@ -52,15 +55,22 @@ THREE.VRControls = function ( object, onError ) {
 	// standing=true but the VRDisplay doesn't provide stageParameters.
 	this.userHeight = 1.6;
 
-	this.setDisplay = function ( display ) {
+	this.getVRDisplay = function () {
 
-		vrDisplay = display;
+		return vrDisplay;
 
 	};
 
-	this.getDisplay = function () {
+	this.setVRDisplay = function ( value ) {
 
-		return vrDisplay;
+		vrDisplay = value;
+
+	};
+
+	this.getVRDisplays = function () {
+
+		console.warn( 'THREE.VRControls: getVRDisplays() is being deprecated.' );
+		return vrDisplays;
 
 	};
 
