@@ -92,9 +92,9 @@
 				var loader = new THREE.PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
-					geometry.computeFaceNormals();
+					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.25;
