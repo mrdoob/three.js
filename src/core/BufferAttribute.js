@@ -313,7 +313,7 @@ BufferAttribute.prototype = {
 
 	},
 
-	discard: function () {
+	disposeArray: function () {
 
 		var oldArray = this.array;
 
