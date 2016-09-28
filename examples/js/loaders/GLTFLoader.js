@@ -47,7 +47,10 @@ THREE.GLTFLoader.prototype = {
 
 		console.time( 'GLTFLoader' );
 
-		var glTFParser = new GLTFParser( json, baseUrl || this.baseUrl || "" );
+		var glTFParser = new GLTFParser( json, {
+			baseUrl: baseUrl || this.baseUrl,
+			crossOrigin: !!this.crossOrigin
+		});
 
 		glTFParser.parse( function( library ) {
 
@@ -273,7 +276,7 @@ THREE.GLTFAnimation = function( interps ) {
 THREE.GLTFAnimation.prototype.createInterpolators = function( interps ) {
 
 	var i, len = interps.length;
-	for ( i = 0; i < len; i ++ ) {
+	for ( var i = 0; i < len; i ++ ) {
 
 		var interp = new GLTFInterpolator( interps[ i ] );
 		this.interps.push( interp );
@@ -572,28 +575,63 @@ var WEBGL_TYPE_SIZES = {
 	'MAT4': 16
 };
 
+/* VARIABLES */
+
+var json, baseUrl, crossOrigin;
+var library, loaders = {};
+
 /* UTILITY FUNCTIONS */
 
 var _each = function( object, callback, thisObj ) {
 
-	if ( !object ) return;
+	if ( !object ) {
+		return Promise.resolve();
+	}
+
+	var results;
+	var fns = [];
 
 	if ( Object.prototype.toString.call( object ) === '[object Array]' ) {
 
+		results = [];
+
 		var length = object.length;
-		for ( var idx = 0, l = object.length; idx < l; idx ++ ) {
-			callback.call( thisObj || this, object[ idx ], idx );
+		for ( let idx = 0; idx < length; idx ++ ) {
+			let value = callback.call( thisObj || this, object[ idx ], idx );
+			fns.push( value );
+			if ( value && value instanceof Promise ) {
+				value.then( function( value ) {
+					results[ idx ] = value;
+				});
+			} else {
+				results[ idx ] = value;
+			}
+
 		}
 
 	} else {
 
-		for ( var key in object ) {
+		results = {};
+
+		for ( let key in object ) {
 			if ( object.hasOwnProperty( key ) ) {
-				callback.call( thisObj || this, object[ key ], key );
+				let value = callback.call( thisObj || this, object[ key ], key );
+				fns.push( value );
+				if ( value && value instanceof Promise ) {
+					value.then( function( value ) {
+						results[ key ] = value;
+					});
+				} else {
+					results[ key ] = value;
+				}
 			}
 		}
 
 	}
+
+	return Promise.all( fns ).then( function() {
+		return results;
+	});
 
 };
 
@@ -622,24 +660,15 @@ var resolveURL = function( url, baseUrl ) {
 
 };
 
-var waitForPromises = function() {
+var waitForDependencies = function(dependencies) {
 
-	var promisedProperties = [];
+	return _each( dependencies, function( dependency ) {
 
-	_each( arguments, function( argument ) {
-
-		var objectKeys = Object.keys( argument );
-		_each( objectKeys, function( objectKey ) {
-
-			promisedProperties.push( argument[ objectKey ] );
-
-		});
+		return loaders[dependency];
 
 	});
 
-	return Promise.all( promisedProperties );
-
-}
+};
 
 // Three.js seems too dependent on attribute names so globally
 // replace those in the shader code
@@ -758,22 +787,20 @@ DeferredShaderMaterial.prototype.create = function() {
 
 /* GLTF PARSER */
 
-var library, promises, json, baseUrl;
+var GLTFParser = function(json, options) {
 
-var GLTFParser = function(json, baseUrl) {
-
-	this.json = json;
-	this.baseUrl = baseUrl;
+	this.json = json || {};
+	this.options = options || {};
 
 };
 
 GLTFParser.prototype.parse = function( callback ) {
 
 	json = this.json;
-	baseUrl = this.baseUrl;
+	baseUrl = this.options.baseUrl || "";
+	crossOrigin = this.options.crossOrigin || false;
 
 	library = {
-
 		buffers: {},
 		bufferViews: {},
 		accessors: {},
@@ -790,27 +817,25 @@ GLTFParser.prototype.parse = function( callback ) {
 		extensions: {}
 	};
 
-	promises = ( function( libraryItems ) {
+	loaders = ( function() {
 
-		var resolvers = {};
+		var _loaders = {};
 
-		_each( libraryItems, function( _, libraryItem ) {
+		for ( var libraryItemId in library ) {
 
-			var resolve;
-
-			resolvers[ libraryItem ] = new Promise( function( r ) {
-
-				resolve = r;
-
+			var ready;
+			var loader = new Promise( function( resolve ) {
+				ready = resolve;
 			});
+			loader.ready = ready;
 
-			resolvers[ libraryItem ].resolve = resolve;
+			_loaders[ libraryItemId ] = loader;
 
-		});
+		}
 
-		return resolvers;
+		return _loaders;
 
-	} )( library );
+	})();
 
 	// Parse glTF JSON
 
@@ -828,12 +853,15 @@ GLTFParser.prototype.parse = function( callback ) {
 	this.loadScenes();
 	this.loadExtensions();
 
-	waitForPromises( promises ).then(function() {
+	waitForDependencies([
+		"scenes"
+	]).then(function() {
 
 		callback( library );
 
 		// Clean up scoped globals
-		json = baseUrl = library = promises = undefined;
+		json = baseUrl = library = undefined;
+		loaders = {};
 
 	});
 
@@ -843,7 +871,7 @@ GLTFParser.prototype.loadShaders = function() {
 
 	_each( json.shaders, function( shader, shaderId ) {
 
-		library.shaders[ shaderId ] = new Promise( function( resolve ) {
+		return new Promise( function( resolve ) {
 
 			var loader = new THREE.XHRLoader();
 			loader.responseType = 'text';
@@ -855,20 +883,10 @@ GLTFParser.prototype.loadShaders = function() {
 
 		});
 
-	});
+	}).then( function( shaders ) {
 
-	waitForPromises(
-		library.shaders
-	).then( function( values ) {
-
-		var count = 0;
-		_each( library.shaders, function( _, shaderId ) {
-
-			library.shaders[ shaderId ] = values[ count ++ ];
-
-		});
-
-		promises.shaders.resolve();
+		library.shaders = shaders;
+		loaders.shaders.ready();
 
 	});
 
@@ -880,7 +898,7 @@ GLTFParser.prototype.loadBuffers = function() {
 
 		if ( buffer.type === 'arraybuffer' ) {
 
-			library.buffers[ bufferId ] = new Promise( function( resolve ) {
+			return new Promise( function( resolve ) {
 
 				var loader = new THREE.XHRLoader();
 				loader.responseType = 'arraybuffer';
@@ -890,24 +908,14 @@ GLTFParser.prototype.loadBuffers = function() {
 
 				} );
 
-			} );
+			});
 
 		}
 
-	});
+	}).then( function( buffers ) {
 
-	waitForPromises(
-		library.buffers
-	).then( function( values ) {
-
-		var count = 0;
-		_each( library.buffers, function( _, bufferId ) {
-
-			library.buffers[ bufferId ] = values[ count ++ ];
-
-		} );
-
-		promises.buffers.resolve();
+		library.buffers = buffers;
+		loaders.buffers.ready();
 
 	});
 
@@ -915,21 +923,22 @@ GLTFParser.prototype.loadBuffers = function() {
 
 GLTFParser.prototype.loadBufferViews = function() {
 
-	// buffer views
-
-	waitForPromises([
-		promises.buffers
+	waitForDependencies([
+		"buffers"
 	]).then( function() {
 
 		_each( json.bufferViews, function( bufferView, bufferViewId ) {
 
 			var arraybuffer = library.buffers[ bufferView.buffer ];
 
-			library.bufferViews[ bufferViewId ] = arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+			return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+
+		}).then( function(  bufferViews ) {
+
+			library.bufferViews = bufferViews;
+			loaders.bufferViews.ready();
 
 		});
-
-		promises.bufferViews.resolve();
 
 	});
 
@@ -937,8 +946,8 @@ GLTFParser.prototype.loadBufferViews = function() {
 
 GLTFParser.prototype.loadAccessors = function() {
 
-	waitForPromises([
-		promises.bufferViews
+	waitForDependencies([
+		"bufferViews"
 	]).then( function() {
 
 		_each( json.accessors, function( accessor, accessorId ) {
@@ -949,33 +958,38 @@ GLTFParser.prototype.loadAccessors = function() {
 
 			var array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
 
-			library.accessors[ accessorId ] = new THREE.BufferAttribute( array, itemSize );
+			return new THREE.BufferAttribute( array, itemSize );
+
+		}).then( function(  accessors ) {
+
+			library.accessors = accessors;
+			loaders.accessors.ready();
 
 		});
 
-		promises.accessors.resolve();
-
-	} );
+	});
 
 };
 
 GLTFParser.prototype.loadTextures = function() {
 
+	var self = this;
+
 	_each( json.textures, function( texture, textureId ) {
 
 		if ( texture.source ) {
 
-			var source = json.images[ texture.source ];
+			return new Promise( function( resolve ) {
 
-			var textureLoader = THREE.Loader.Handlers.get( source.uri );
-			if ( textureLoader === null ) {
+				var source = json.images[ texture.source ];
 
-				textureLoader = new THREE.TextureLoader();
+				var textureLoader = THREE.Loader.Handlers.get( source.uri );
+				if ( textureLoader === null ) {
 
-			}
-			textureLoader.crossOrigin = this.crossOrigin;
+					textureLoader = new THREE.TextureLoader();
 
-			library.textures[ textureId ] = new Promise( function( resolve ) {
+				}
+				textureLoader.crossOrigin = self.crossOrigin;
 
 				textureLoader.load( resolveURL( source.uri, baseUrl ), function( _texture ) {
 
@@ -995,36 +1009,26 @@ GLTFParser.prototype.loadTextures = function() {
 
 					resolve( _texture );
 
-				} );
+				});
 
-			} );
+			});
 
 		}
 
+	}).then( function( textures ) {
+
+		library.textures = textures;
+		loaders.textures.ready();
+
 	});
-
-	waitForPromises(
-		library.textures
-	).then( function( values ) {
-
-		var count = 0;
-		_each( library.textures, function( _, textureId ) {
-
-			library.textures[ textureId ] = values[ count ++ ];
-
-		});
-
-		promises.textures.resolve();
-
-	} );
 
 };
 
 GLTFParser.prototype.loadMaterials = function() {
 
-	waitForPromises([
-		promises.textures,
-		promises.shaders
+	waitForDependencies([
+		"textures",
+		"shaders"
 	]).then( function() {
 
 		_each( json.materials, function( material, materialId ) {
@@ -1284,11 +1288,14 @@ GLTFParser.prototype.loadMaterials = function() {
 			var _material = new materialType( materialParams );
 			_material.name = material.name;
 
-			library.materials[ materialId ] = _material;
+			return _material;
+
+		}).then( function( materials ) {
+
+			library.materials = materials;
+			loaders.materials.ready();
 
 		});
-
-		promises.materials.resolve();
 
 	});
 
@@ -1296,9 +1303,9 @@ GLTFParser.prototype.loadMaterials = function() {
 
 GLTFParser.prototype.loadMeshes = function() {
 
-	waitForPromises([
-		promises.accessors,
-		promises.materials
+	waitForDependencies([
+		"accessors",
+		"materials"
 	]).then( function() {
 
 		_each( json.meshes, function( mesh, meshId ) {
@@ -1341,7 +1348,7 @@ GLTFParser.prototype.loadMeshes = function() {
 							case 'TEXCOORD':
 								// Flip Y value for UVs
 								var floatArray = bufferAttribute.array;
-								for ( i = 0; i < floatArray.length / 2; i ++ ) {
+								for ( var i = 0; i < floatArray.length / 2; i ++ ) {
 
 									floatArray[ i * 2 + 1 ] = 1.0 - floatArray[ i * 2 + 1 ];
 
@@ -1397,11 +1404,14 @@ GLTFParser.prototype.loadMeshes = function() {
 
 			});
 
-			library.meshes[ meshId ] = group;
+			return group;
+
+		}).then( function( meshes ) {
+
+			library.meshes = meshes;
+			loaders.meshes.ready();
 
 		});
-
-		promises.meshes.resolve();
 
 	});
 
@@ -1425,43 +1435,51 @@ GLTFParser.prototype.loadCameras = function() {
 			// aspect_ratio = xfov / yfov
 			// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
 
-			library.cameras[ cameraId ] = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
-			library.cameras[ cameraId ].name = camera.name;
+			var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+			_camera.name = camera.name;
+
+			return _camera;
 
 		} else if ( camera.type == "orthographic" && camera.orthographic ) {
 
-			library.cameras[ cameraId ] = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
-			library.cameras[ cameraId ].name = camera.name;
+			var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
+			_camera.name = camera.name;
+
+			return _camera;
 
 		}
 
-	});
+	}).then( function( cameras ) {
 
-	promises.cameras.resolve();
+		library.cameras = cameras;
+		loaders.cameras.ready();
+
+	});
 
 };
 
 GLTFParser.prototype.loadSkins = function() {
 
-	waitForPromises([
-		promises.accessors,
-		promises.buffers,
-		promises.bufferViews
+	waitForDependencies([
+		"accessors"
 	]).then( function() {
 
 		_each( json.skins, function( skin, skinId ) {
 
-			var skinEntry = {
+			var _skin = {
 				bindShapeMatrix: new THREE.Matrix4().fromArray( skin.bindShapeMatrix ),
 				jointNames: skin.jointNames,
 				inverseBindMatrices: library.accessors[ skin.inverseBindMatrices ]
 			};
 
-			library.skins[ skinId ] = skinEntry;
+			return _skin;
+
+		}).then( function( skins ) {
+
+			library.skins = skins;
+			loaders.skins.ready();
 
 		});
-
-		promises.skins.resolve();
 
 	});
 
@@ -1469,10 +1487,9 @@ GLTFParser.prototype.loadSkins = function() {
 
 GLTFParser.prototype.loadAnimations = function() {
 
-	waitForPromises([
-		promises.buffers,
-		promises.bufferViews,
-		promises.nodes
+	waitForDependencies([
+		"accessors",
+		"nodes"
 	]).then( function() {
 
 		_each( json.animations, function( animation, animationId ) {
@@ -1514,12 +1531,17 @@ GLTFParser.prototype.loadAnimations = function() {
 
 			});
 
-			library.animations[ animationId ] = new THREE.GLTFAnimation(interps);
-			library.animations[ animationId ].name = "animation_" + animationId;
+			var _animation = new THREE.GLTFAnimation(interps);
+			_animation.name = "animation_" + animationId;
+
+			return _animation;
+
+		}).then( function( animations ) {
+
+			library.animations = animations;
+			loaders.animations.ready();
 
 		});
-
-		promises.animations.resolve();
 
 	});
 
@@ -1527,55 +1549,56 @@ GLTFParser.prototype.loadAnimations = function() {
 
 GLTFParser.prototype.loadNodes = function() {
 
-	waitForPromises([
-		promises.meshes,
-		promises.skins,
-		promises.lights
+	waitForDependencies([
+		"meshes",
+		"skins",
+		"cameras",
+		"lights"
 	]).then( function() {
 
 		_each( json.nodes, function( node, nodeId ) {
 
 			var matrix = new THREE.Matrix4();
 
-			var object;
+			var _node;
 
 			if ( node.jointName ) {
 
-				object = new THREE.Bone();
-				object.jointName = node.jointName;
+				_node = new THREE.Bone();
+				_node.jointName = node.jointName;
 
 			} else {
 
-				object = new THREE.Object3D()
+				_node = new THREE.Object3D()
 
 			}
 
-			object.name = node.name;
+			_node.name = node.name;
 
-			object.matrixAutoUpdate = false;
+			_node.matrixAutoUpdate = false;
 
 			if ( node.matrix !== undefined ) {
 
 				matrix.fromArray( node.matrix );
-				object.applyMatrix( matrix );
+				_node.applyMatrix( matrix );
 
 			} else {
 
 				if ( node.translation !== undefined ) {
 
-					object.position.fromArray( node.translation );
+					_node.position.fromArray( node.translation );
 
 				}
 
 				if ( node.rotation !== undefined ) {
 
-					object.quaternion.fromArray( node.rotation );
+					_node.quaternion.fromArray( node.rotation );
 
 				}
 
 				if ( node.scale !== undefined ) {
 
-					object.scale.fromArray( node.scale );
+					_node.scale.fromArray( node.scale );
 
 				}
 
@@ -1596,7 +1619,7 @@ GLTFParser.prototype.loadNodes = function() {
 
 					_each( group.children, function( mesh ) {
 
-						// clone node to add to object
+						// clone Mesh to add to _node
 
 						var originalMaterial = mesh.material;
 						var originalGeometry = mesh.geometry;
@@ -1623,7 +1646,7 @@ GLTFParser.prototype.loadNodes = function() {
 
 							// Wait for nodes to be processed before requesting further
 							// nodes
-							promises.nodes.then( function() {
+							loaders.nodes.then( function() {
 
 								var bones = [];
 								var boneInverses = [];
@@ -1659,7 +1682,7 @@ GLTFParser.prototype.loadNodes = function() {
 
 						}
 
-						object.add( mesh );
+						_node.add( mesh );
 
 					});
 
@@ -1671,7 +1694,7 @@ GLTFParser.prototype.loadNodes = function() {
 
 				var camera = library.cameras[ node.camera ];
 
-				object.add( camera );
+				_node.add( camera );
 
 			}
 
@@ -1680,15 +1703,18 @@ GLTFParser.prototype.loadNodes = function() {
 
 				var light = library.lights[ node.extensions.KHR_materials_common.light ];
 
-				object.add(light);
+				_node.add(light);
 
 			}
 
-			library.nodes[ nodeId ] = object;
+			return _node;
+
+		}).then( function( nodes ) {
+
+			library.nodes = nodes;
+			loaders.nodes.ready();
 
 		});
-
-		promises.nodes.resolve();
 
 	});
 
@@ -1745,16 +1771,19 @@ GLTFParser.prototype.loadExtensions = function() {
 
 				});
 
-				library.extensions[ extensionId ] = extensionNode;
+				return extensionNode;
 
 				break;
 
 		}
 
-	});
+	}).then( function( extensions ) {
 
-	promises.lights.resolve();
-	promises.extensions.resolve();
+		library.extensions = extensions;
+		loaders.lights.ready();
+		loaders.extensions.ready();
+
+	});
 
 };
 
@@ -1762,9 +1791,9 @@ GLTFParser.prototype.loadScenes = function() {
 
 	// scene node hierachy builder
 
-	var buildNodeHierachy = function( nodeId, parentObject ) {
+	var buildNodeHierachy = function( nodeId, parentObject, allNodes ) {
 
-		var _node = library.nodes[ nodeId ];
+		var _node = allNodes[ nodeId ];
 		parentObject.add( _node );
 
 		var node = json.nodes[ nodeId ];
@@ -1773,7 +1802,7 @@ GLTFParser.prototype.loadScenes = function() {
 
 			_each( node.children, function( child ) {
 
-				buildNodeHierachy( child, _node );
+				buildNodeHierachy( child, _node, allNodes );
 
 			});
 
@@ -1781,27 +1810,22 @@ GLTFParser.prototype.loadScenes = function() {
 
 	};
 
-	waitForPromises([
-		promises.textures,
-		promises.meshes,
-		promises.cameras,
-		promises.skins,
-		promises.nodes,
-		promises.extensions
+	waitForDependencies([
+		"nodes"
 	]).then( function() {
 
 		_each( json.scenes, function( scene, sceneId ) {
 
-			var container = new THREE.Scene();
-			container.name = scene.name;
+			var _scene = new THREE.Scene();
+			_scene.name = scene.name;
 
 			_each( scene.nodes, function( nodeId ) {
 
-				buildNodeHierachy( nodeId, container );
+				buildNodeHierachy( nodeId, _scene, library.nodes );
 
 			});
 
-			container.traverse( function( child ) {
+			_scene.traverse( function( child ) {
 
 				// Register raw material meshes with GLTFShaders
 				if (child.material && child.material.isRawShaderMaterial) {
@@ -1811,11 +1835,14 @@ GLTFParser.prototype.loadScenes = function() {
 
 			});
 
-			library.scenes[ sceneId ] = container;
+			return _scene;
+
+		}).then( function( scenes ) {
+
+			library.scenes = scenes;
+			loaders.scenes.ready();
 
 		});
-
-		promises.scenes.resolve();
 
 	} );
 
