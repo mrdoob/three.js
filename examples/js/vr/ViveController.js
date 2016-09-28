@@ -61,7 +61,15 @@ THREE.ViveController = function ( id ) {
 
 		gamepad = findGamepad( id );
 
-		if ( gamepad !== undefined && gamepad.pose !== undefined ) {
+		if ( gamepad === undefined ) {
+
+			scope.visible = false;
+
+			return;
+
+		}
+
+		if ( gamepad.pose !== undefined ) {
 
 			if ( gamepad.pose === null ) return; // No user action yet
 
@@ -76,47 +84,47 @@ THREE.ViveController = function ( id ) {
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
 
-			//  Thumbpad and Buttons.
-
-			if ( axes[ 0 ] !== gamepad.axes[ 0 ] || axes[ 1 ] !== gamepad.axes[ 1 ] ) {
-
-				axes[ 0 ] = gamepad.axes[ 0 ]; //  X axis: -1 = Left, +1 = Right.
-				axes[ 1 ] = gamepad.axes[ 1 ]; //  Y axis: -1 = Bottom, +1 = Top.
-				scope.dispatchEvent( { type: 'axischanged', axes: axes } );
-
-			}
-
-			if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
-
-				thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
-
-			}
-
-			if ( triggerIsPressed !== gamepad.buttons[ 1 ].pressed ) {
-
-				triggerIsPressed = gamepad.buttons[ 1 ].pressed;
-				scope.dispatchEvent( { type: triggerIsPressed ? 'triggerdown' : 'triggerup' } );
-
-			}
-
-			if ( gripsArePressed !== gamepad.buttons[ 2 ].pressed ) {
-
-				gripsArePressed = gamepad.buttons[ 2 ].pressed;
-				scope.dispatchEvent( { type: gripsArePressed ? 'gripsdown' : 'gripsup' } );
-
-			}
-
-			if ( menuIsPressed !== gamepad.buttons[ 3 ].pressed ) {
-
-				menuIsPressed = gamepad.buttons[ 3 ].pressed;
-				scope.dispatchEvent( { type: menuIsPressed ? 'menudown' : 'menuup' } );
-
-			}
-
 		} else {
 
 			scope.visible = false;
+
+		}
+
+		//  Thumbpad and Buttons.
+
+		if ( axes[ 0 ] !== gamepad.axes[ 0 ] || axes[ 1 ] !== gamepad.axes[ 1 ] ) {
+
+			axes[ 0 ] = gamepad.axes[ 0 ]; //  X axis: -1 = Left, +1 = Right.
+			axes[ 1 ] = gamepad.axes[ 1 ]; //  Y axis: -1 = Bottom, +1 = Top.
+			scope.dispatchEvent( { type: 'axischanged', axes: axes } );
+
+		}
+
+		if ( thumbpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
+
+			thumbpadIsPressed = gamepad.buttons[ 0 ].pressed;
+			scope.dispatchEvent( { type: thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup' } );
+
+		}
+
+		if ( triggerIsPressed !== gamepad.buttons[ 1 ].pressed ) {
+
+			triggerIsPressed = gamepad.buttons[ 1 ].pressed;
+			scope.dispatchEvent( { type: triggerIsPressed ? 'triggerdown' : 'triggerup' } );
+
+		}
+
+		if ( gripsArePressed !== gamepad.buttons[ 2 ].pressed ) {
+
+			gripsArePressed = gamepad.buttons[ 2 ].pressed;
+			scope.dispatchEvent( { type: gripsArePressed ? 'gripsdown' : 'gripsup' } );
+
+		}
+
+		if ( menuIsPressed !== gamepad.buttons[ 3 ].pressed ) {
+
+			menuIsPressed = gamepad.buttons[ 3 ].pressed;
+			scope.dispatchEvent( { type: menuIsPressed ? 'menudown' : 'menuup' } );
 
 		}
 
