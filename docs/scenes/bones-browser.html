@@ -40,7 +40,7 @@
 
 		<script>
 
-			var gui, scene, camera, renderer, orbit, ambientLight, lights, mesh, bones, skeletonHelper;
+			var gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
 
 			var state = {
 
@@ -64,9 +64,6 @@
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );
 				orbit.enableZoom = false;
-
-				ambientLight = new THREE.AmbientLight( 0x000000 );
-				scene.add( ambientLight );
 
 				lights = [];
 				lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
