@@ -336,6 +336,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 		this.uvs = null;
 		this.indexArray = null;
+		this.hasIndex = false
 	};
 
 	ClassicGeometry.prototype.constructor = ClassicGeometry;
@@ -343,7 +344,9 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	ClassicGeometry.prototype.buildBufferGeometry = function() {
 		// Build indexed mesh
 		var geometry = this.geometry;
-		geometry.setIndex(new THREE.BufferAttribute( this.indexArray, 1 ) );
+		if(this.hasIndex) {
+			geometry.setIndex( new THREE.BufferAttribute( this.indexArray, 1 ) );
+		}
 
 		var offset = {
 				start: 0,
@@ -357,7 +360,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	}
 
 	ClassicGeometry.prototype.checkFinished = function() {
-		if(this.indexArray && this.loadedAttributes === this.totalAttributes) {
+		if((!this.hasIndex || this.indexArray) && this.loadedAttributes === this.totalAttributes) {
 
 			this.buildBufferGeometry();
 
@@ -448,7 +451,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	}
 
 	VertexAttributeDelegate.prototype.resourceAvailable = function(glResource, ctx) {
-
 		this.bufferResourceAvailable(glResource, ctx);
 
 		var geom = ctx.geometry;
@@ -1137,35 +1139,37 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 						}, this);
 
 						var indices = this.resources.getEntry(primitiveDescription.indices);
-						var bufferEntry = this.resources.getEntry(indices.description.bufferView);
-						var indicesObject = {
-								bufferView : bufferEntry,
-								byteOffset : indices.description.byteOffset,
-								count : indices.description.count,
-								id : indices.entryID,
-								componentType : indices.description.componentType,
-								type : indices.description.type
-						};
+						if(indices) {
+							geometry.hasIndex = true
+							var bufferEntry = this.resources.getEntry(indices.description.bufferView);
+							var indicesObject = {
+									bufferView : bufferEntry,
+									byteOffset : indices.description.byteOffset,
+									count : indices.description.count,
+									id : indices.entryID,
+									componentType : indices.description.componentType,
+									type : indices.description.type
+							};
 
-						var indicesContext = new IndicesContext(indicesObject, geometry);
-						var loaddata = {
-							indicesObject : indicesObject,
-							indicesDelegate : indicesDelegate,
-							indicesContext : indicesContext
-						};
+							var indicesContext = new IndicesContext(indicesObject, geometry);
+							var loaddata = {
+								indicesObject : indicesObject,
+								indicesDelegate : indicesDelegate,
+								indicesContext : indicesContext
+							};
 
-						theLoader.scheduleLoad(function(data) {
-							var alreadyProcessedIndices =
-								THREE.GLTFLoaderUtils.getBuffer(data.indicesObject,
-									data.indicesDelegate, data.indicesContext);
+							theLoader.scheduleLoad(function(data) {
+								var alreadyProcessedIndices =
+									THREE.GLTFLoaderUtils.getBuffer(data.indicesObject,
+										data.indicesDelegate, data.indicesContext);
 
-							if (alreadyProcessedIndices) {
-								data.indicesDelegate.resourceAvailable(
-									alreadyProcessedIndices, data.indicesContext);
-							}
+								if (alreadyProcessedIndices) {
+									data.indicesDelegate.resourceAvailable(
+										alreadyProcessedIndices, data.indicesContext);
+								}
 
-						}, loaddata);
-
+							}, loaddata);
+						}
 						// Load Vertex Attributes
 						allAttributes.forEach( function(semantic) {
 
