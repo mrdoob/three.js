@@ -1317,7 +1317,7 @@ GLTFParser.prototype.loadMeshes = function() {
 
 			_each( primitives, function( primitive ) {
 
-				if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES ) {
+				if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
 					var geometry = new THREE.BufferGeometry();
 
