@@ -29,6 +29,7 @@ Object.assign( ImageLoader.prototype, {
 			scope.manager.itemEnd( url );
 
 		};
+		image.onerror = onError; //Catch error in createElementNS
 
 		if ( url.indexOf( 'data:' ) === 0 ) {
 
