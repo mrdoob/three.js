@@ -225,6 +225,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 			for (var i = 0; i < byteString.length; i++) {
 				view[i] = byteString.charCodeAt(i);
 			}
+
 			return buffer;
 		}
 
@@ -1121,7 +1122,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 				for (var i = 0 ; i < primitivesDescription.length ; i++) {
 					var primitiveDescription = primitivesDescription[i];
 
-					if (primitiveDescription.mode === THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.TRIANGLES) {
+					if (primitiveDescription.mode === THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.TRIANGLES || primitiveDescription.mode === undefined) {
 
 						var geometry = new ClassicGeometry();
 						var materialEntry = this.resources.getEntry(primitiveDescription.material);
