@@ -87,6 +87,8 @@ function WebGLObjects( gl, properties, info ) {
 
 		attributeProperties.version = data.version;
 
+		data.addEventListener( 'dispose', onAttributeDispose );
+
 	}
 
 	function updateBuffer( attributeProperties, data, bufferType ) {
@@ -187,6 +189,18 @@ function WebGLObjects( gl, properties, info ) {
 		property.wireframe = attribute;
 
 		return attribute;
+
+	}
+
+	function onAttributeDispose() {
+
+		var buffer = properties.get( this ).__webglBuffer;
+
+		gl.deleteBuffer( buffer );
+
+		properties.delete( this );
+
+		this.removeEventListener( 'dispose', onAttributeDispose );
 
 	}
 
