@@ -3,6 +3,7 @@ import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
 import { Color } from '../math/Color';
 import { _Math } from '../math/Math';
+import { EventDispatcher } from './EventDispatcher';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -30,7 +31,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-BufferAttribute.prototype = {
+Object.assign( BufferAttribute.prototype, EventDispatcher.prototype, {
 
 	constructor: BufferAttribute,
 
@@ -310,9 +311,15 @@ BufferAttribute.prototype = {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
-};
+} );
 
 //
 
