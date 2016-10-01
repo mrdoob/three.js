@@ -91,6 +91,9 @@ function Object3D() {
 
 	this.userData = {};
 
+	this.onBeforeRender = function(){}; 
+	this.onAfterRender = function(){};
+
 }
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );

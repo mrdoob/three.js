@@ -268,7 +268,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 			return texture;
 		}
 
-		return new THREE.TextureLoader().load(src);
+		var textureLoader = THREE.Loader.Handlers.get(src);
+		if ( textureLoader === null ) {
+			textureLoader = new THREE.TextureLoader();
+		}
+		textureLoader.crossOrigin = true;
+
+		return textureLoader.load(src);
 	}
 
 	function CreateTexture(resources, resource) {
@@ -299,13 +305,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		var texture = LoadTexture(texturePath);
 		if (texture && textureParams) {
 
-			if (textureParams.wrapS == WebGLRenderingContext.REPEAT)
+			if (textureParams.wrapS == THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.REPEAT)
 				texture.wrapS = THREE.RepeatWrapping;
 
-			if (textureParams.wrapT == WebGLRenderingContext.REPEAT)
+			if (textureParams.wrapT == THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.REPEAT)
 				texture.wrapT = THREE.RepeatWrapping;
 
-			if (textureParams.magFilter == WebGLRenderingContext.LINEAR)
+			if (textureParams.magFilter == THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.LINEAR)
 				texture.magFilter = THREE.LinearFilter;
 
 //                  if (textureParams.minFilter == "LINEAR")
@@ -818,7 +824,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 
 						switch (ptype) {
-							case WebGLRenderingContext.FLOAT :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT :
 								utype = "f";
 								uvalue = shaderParam.value;
 								if (pname == "transparency") {
@@ -828,7 +834,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									params.transparent = true;
 								}
 								break;
-							case WebGLRenderingContext.FLOAT_VEC2 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_VEC2 :
 								utype = "v2";
 								uvalue = new THREE.Vector2;
 								if (shaderParam && shaderParam.value) {
@@ -839,7 +845,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									uvalue.fromArray(value);
 								}
 								break;
-							case WebGLRenderingContext.FLOAT_VEC3 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_VEC3 :
 								utype = "v3";
 								uvalue = new THREE.Vector3;
 								if (shaderParam && shaderParam.value) {
@@ -850,7 +856,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									uvalue.fromArray(value);
 								}
 								break;
-							case WebGLRenderingContext.FLOAT_VEC4 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_VEC4 :
 								utype = "v4";
 								uvalue = new THREE.Vector4;
 								if (shaderParam && shaderParam.value) {
@@ -861,11 +867,11 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									uvalue.fromArray(value);
 								}
 								break;
-							case WebGLRenderingContext.FLOAT_MAT2 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_MAT2 :
 								// what to do?
 								console.log("Warning: FLOAT_MAT2");
 								break;
-							case WebGLRenderingContext.FLOAT_MAT3 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_MAT3 :
 								utype = "m3";
 								uvalue = new THREE.Matrix3;
 								if (shaderParam && shaderParam.value) {
@@ -876,7 +882,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									uvalue.fromArray(value);
 								}
 								break;
-							case WebGLRenderingContext.FLOAT_MAT4 :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.FLOAT_MAT4 :
 								if (pcount !== undefined) {
 									utype = "m4v";
 									uvalue = new Array(pcount);
@@ -908,7 +914,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									}
 								}
 								break;
-							case WebGLRenderingContext.SAMPLER_2D :
+							case THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.SAMPLER_2D :
 								utype = "t";
 								uvalue = value ? CreateTexture(this.resources, value) : null;
 								break;
@@ -982,12 +988,35 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					}
 
 				}
-				else {
-					var technique = material.technique ?
-						this.resources.getEntry(material.technique) :
-						null;
+				else if (material.technique === undefined) {
 
-					values = material.values;
+					materialType = THREE.MeshPhongMaterial;
+
+					if (material.doubleSided)
+					{
+						params.side = THREE.DoubleSide;
+					}
+
+					if (material.transparent)
+					{
+						params.transparent = true;
+					}
+
+					values = {};
+					for (var prop in material.values) {
+						values[prop] = material.values[prop];
+					}
+
+				}
+				else {
+
+					var technique = this.resources.getEntry(material.technique);
+
+					values = {};
+					for (var prop in material.values) {
+						values[prop] = material.values[prop];
+					}
+
 					var description = technique.description;
 
 					if (++description.refCount > 1) {
@@ -1002,6 +1031,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 					if (loadshaders) {
 						materialType = Material;
 					}
+
 				}
 
 				if (values.diffuse && typeof(values.diffuse) == 'string') {
@@ -1091,7 +1121,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 				for (var i = 0 ; i < primitivesDescription.length ; i++) {
 					var primitiveDescription = primitivesDescription[i];
 
-					if (primitiveDescription.mode === WebGLRenderingContext.TRIANGLES) {
+					if (primitiveDescription.mode === THREE.GLTFLoaderUtils.WEBGL_CONSTANTS.TRIANGLES) {
 
 						var geometry = new ClassicGeometry();
 						var materialEntry = this.resources.getEntry(primitiveDescription.material);
@@ -1870,16 +1900,16 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	var self = this;
 
-	var loader = Object.create(ThreeGLTFLoader);
-	loader.initWithPath(url);
-	loader.load(new Context(rootObj,
+	this.callback = callback;
+	this.rootObj = rootObj;
+
+	this.loader = Object.create(ThreeGLTFLoader);
+	this.loader.initWithPath(url);
+	this.loader.load(new Context(rootObj,
 						function(obj) {
 						}),
 				null);
 
-	this.loader = loader;
-	this.callback = callback;
-	this.rootObj = rootObj;
 	return rootObj;
 }
 

@@ -15,11 +15,9 @@ THREE.VREffect = function ( renderer, onError ) {
 	var eyeTranslationL = new THREE.Vector3();
 	var eyeTranslationR = new THREE.Vector3();
 	var renderRectL, renderRectR;
-	var headMatrix = new THREE.Matrix4();
-	var headToEyeMatrixL = new THREE.Matrix4();
-	var headToEyeMatrixR = new THREE.Matrix4();
 
 	var frameData = null;
+
 	if ( 'VRFrameData' in window ) {
 
 		frameData = new VRFrameData();
@@ -65,8 +63,15 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	this.setVRDisplay = function ( value ) {
+
+		vrDisplay = value;
+
+	};
+
 	this.getVRDisplays = function () {
 
+		console.warn( 'THREE.VREffect: getVRDisplays() is being deprecated.' );
 		return vrDisplays;
 
 	};
@@ -97,10 +102,10 @@ THREE.VREffect = function ( renderer, onError ) {
 	var requestFullscreen;
 	var exitFullscreen;
 	var fullscreenElement;
-	var leftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
-	var rightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
+	var defaultLeftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
+	var defaultRightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
-	function onFullscreenChange() {
+	function onVRDisplayPresentChange() {
 
 		var wasPresenting = scope.isPresenting;
 		scope.isPresenting = vrDisplay !== undefined && vrDisplay.isPresenting;
@@ -110,14 +115,6 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeParamsL = vrDisplay.getEyeParameters( 'left' );
 			var eyeWidth = eyeParamsL.renderWidth;
 			var eyeHeight = eyeParamsL.renderHeight;
-
-			var layers = vrDisplay.getLayers();
-			if ( layers.length ) {
-
-				leftBounds = layers[0].leftBounds || [ 0.0, 0.0, 0.5, 1.0 ];
-				rightBounds = layers[0].rightBounds || [ 0.5, 0.0, 0.5, 1.0 ];
-
-			}
 
 			if ( !wasPresenting ) {
 
@@ -138,7 +135,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	}
 
-	window.addEventListener( 'vrdisplaypresentchange', onFullscreenChange, false );
+	window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
 	this.setFullScreen = function ( boolean ) {
 
@@ -261,17 +258,35 @@ THREE.VREffect = function ( renderer, onError ) {
 			// When rendering we don't care what the recommended size is, only what the actual size
 			// of the backbuffer is.
 			var size = renderer.getSize();
+			var layers = vrDisplay.getLayers();
+			var leftBounds;
+			var rightBounds;
+
+			if ( layers.length ) {
+
+				var layer = layers[ 0 ];
+
+				leftBounds = layer.leftBounds !== null && layer.leftBounds.length === 4 ? layer.leftBounds : defaultLeftBounds;
+				rightBounds = layer.rightBounds !== null && layer.rightBounds.length === 4 ? layer.rightBounds : defaultRightBounds;
+
+			} else {
+
+				leftBounds = defaultLeftBounds;
+				rightBounds = defaultRightBounds;
+
+			}
+
 			renderRectL = {
 				x: Math.round( size.width * leftBounds[ 0 ] ),
 				y: Math.round( size.height * leftBounds[ 1 ] ),
 				width: Math.round( size.width * leftBounds[ 2 ] ),
-				height:  Math.round(size.height * leftBounds[ 3 ] )
+				height: Math.round(size.height * leftBounds[ 3 ] )
 			};
 			renderRectR = {
 				x: Math.round( size.width * rightBounds[ 0 ] ),
 				y: Math.round( size.height * rightBounds[ 1 ] ),
 				width: Math.round( size.width * rightBounds[ 2 ] ),
-				height:  Math.round(size.height * rightBounds[ 3 ] )
+				height: Math.round(size.height * rightBounds[ 3 ] )
 			};
 
 			if ( renderTarget ) {
@@ -279,8 +294,9 @@ THREE.VREffect = function ( renderer, onError ) {
 				renderer.setRenderTarget( renderTarget );
 				renderTarget.scissorTest = true;
 
-			} else  {
+			} else {
 
+				renderer.setRenderTarget( null );
 				renderer.setScissorTest( true );
 
 			}
@@ -292,6 +308,10 @@ THREE.VREffect = function ( renderer, onError ) {
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
 			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
 
+			var scale = this.scale;
+			cameraL.translateOnAxis( eyeTranslationL, scale );
+			cameraR.translateOnAxis( eyeTranslationR, scale );
+
 			if ( vrDisplay.getFrameData ) {
 
 				vrDisplay.depthNear = camera.near;
@@ -302,22 +322,10 @@ THREE.VREffect = function ( renderer, onError ) {
 				cameraL.projectionMatrix.elements = frameData.leftProjectionMatrix;
 				cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
 
-				getHeadToEyeMatrices( frameData );
-
-				cameraL.updateMatrix();
-				cameraL.applyMatrix( headToEyeMatrixL );
-
-				cameraR.updateMatrix();
-				cameraR.applyMatrix( headToEyeMatrixR );
-
 			} else {
 
 				cameraL.projectionMatrix = fovToProjection( eyeParamsL.fieldOfView, true, camera.near, camera.far );
 				cameraR.projectionMatrix = fovToProjection( eyeParamsR.fieldOfView, true, camera.near, camera.far );
-
-				var scale = this.scale;
-				cameraL.translateOnAxis( eyeTranslationL, scale );
-				cameraR.translateOnAxis( eyeTranslationR, scale );
 
 			}
 
@@ -358,6 +366,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			} else {
 
+				renderer.setViewport( 0, 0, size.width, size.height );
 				renderer.setScissorTest( false );
 
 			}
@@ -384,43 +393,13 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
+	this.dispose = function () {
+
+		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
+
+	};
+
 	//
-
-	var poseOrientation = new THREE.Quaternion();
-	var posePosition = new THREE.Vector3();
-
-	function getHeadToEyeMatrices( frameData ) {
-
-		// Compute the matrix for the position of the head based on the pose
-		if ( frameData.pose.orientation ) {
-
-			poseOrientation.fromArray( frameData.pose.orientation );
-			headMatrix.makeRotationFromQuaternion( poseOrientation );
-
-		}	else {
-
-			headMatrix.identity();
-
-		}
-
-		if ( frameData.pose.position ) {
-
-			posePosition.fromArray( frameData.pose.position );
-			headMatrix.setPosition( posePosition );
-
-		}
-
-		// Take the view matricies and multiply them by the head matrix, which
-		// leaves only the head-to-eye transform.
-		headToEyeMatrixL.fromArray( frameData.leftViewMatrix );
-		headToEyeMatrixL.premultiply( headMatrix );
-		headToEyeMatrixL.getInverse( headToEyeMatrixL );
-
-		headToEyeMatrixR.fromArray( frameData.rightViewMatrix );
-		headToEyeMatrixR.premultiply( headMatrix );
-		headToEyeMatrixR.getInverse( headToEyeMatrixR );
-
-	}
 
 	function fovToNDCScaleOffset( fov ) {
 

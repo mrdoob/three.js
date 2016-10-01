@@ -777,10 +777,12 @@ function WebGLRenderer( parameters ) {
 
 		var index = geometry.index;
 		var position = geometry.attributes.position;
+		var rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
 
 			index = objects.getWireframeAttribute( geometry );
+			rangeFactor = 2;
 
 		}
 
@@ -811,7 +813,6 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataStart = 0;
 		var dataCount = 0;
 
 		if ( index !== null ) {
@@ -824,14 +825,14 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var rangeStart = geometry.drawRange.start;
-		var rangeCount = geometry.drawRange.count;
+		var rangeStart = geometry.drawRange.start * rangeFactor;
+		var rangeCount = geometry.drawRange.count * rangeFactor;
 
-		var groupStart = group !== null ? group.start : 0;
-		var groupCount = group !== null ? group.count : Infinity;
+		var groupStart = group !== null ? group.start * rangeFactor : 0;
+		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
 
-		var drawStart = Math.max( dataStart, rangeStart, groupStart );
-		var drawEnd = Math.min( dataStart + dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+		var drawStart = Math.max( rangeStart, groupStart );
+		var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
@@ -1133,8 +1134,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var fog = scene.fog;
-
 		// reset caching for this frame
 
 		_currentGeometryProgram = '';
@@ -1255,19 +1254,19 @@ function WebGLRenderer( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			renderObjects( opaqueObjects, camera, fog, overrideMaterial );
-			renderObjects( transparentObjects, camera, fog, overrideMaterial );
+			renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+			renderObjects( transparentObjects, scene, camera, overrideMaterial );
 
 		} else {
 
 			// opaque pass (front-to-back order)
 
 			state.setBlending( NoBlending );
-			renderObjects( opaqueObjects, camera, fog );
+			renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, fog );
+			renderObjects( transparentObjects, scene, camera );
 
 		}
 
@@ -1494,7 +1493,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function renderObjects( renderList, camera, fog, overrideMaterial ) {
+	function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1508,11 +1507,13 @@ function WebGLRenderer( parameters ) {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
+			object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 			if ( object.isImmediateRenderObject ) {
 
 				setMaterial( material );
 
-				var program = setProgram( camera, fog, material, object );
+				var program = setProgram( camera, scene.fog, material, object );
 
 				_currentGeometryProgram = '';
 
@@ -1524,9 +1525,12 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				_this.renderBufferDirect( camera, fog, geometry, material, object, group );
+				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 			}
+
+			object.onAfterRender( _this, scene, camera, geometry, material, group );
+
 
 		}
 
@@ -1674,8 +1678,6 @@ function WebGLRenderer( parameters ) {
 					WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
-		materialProperties.dynamicUniforms =
-				WebGLUniforms.splitDynamic( uniformsList, uniforms );
 
 	}
 
@@ -1964,18 +1966,6 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.set( _gl, object, 'normalMatrix' );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
-
-		// dynamic uniforms
-
-		var dynUniforms = materialProperties.dynamicUniforms;
-
-		if ( dynUniforms !== null ) {
-
-			WebGLUniforms.evalDynamic( dynUniforms, m_uniforms, object, material, camera );
-			WebGLUniforms.upload( _gl, dynUniforms, m_uniforms, _this );
-
-		}
-
 		return program;
 
 	}
@@ -2102,7 +2092,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * _pixelRatio;
-		uniforms.scale.value = _canvas.clientHeight * 0.5;
+		uniforms.scale.value = _height * 0.5;
 
 		uniforms.map.value = material.map;
 
@@ -2745,11 +2735,11 @@ function WebGLRenderer( parameters ) {
 		if ( p === UnsignedIntType ) return _gl.UNSIGNED_INT;
 		if ( p === FloatType ) return _gl.FLOAT;
 
-		extension = extensions.get( 'OES_texture_half_float' );
+		if ( p === HalfFloatType ) {
 
-		if ( extension !== null ) {
+			extension = extensions.get( 'OES_texture_half_float' );
 
-			if ( p === HalfFloatType ) return extension.HALF_FLOAT_OES;
+			if ( extension !== null ) return extension.HALF_FLOAT_OES;
 
 		}
 
@@ -2778,50 +2768,64 @@ function WebGLRenderer( parameters ) {
 		if ( p === OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
 		if ( p === SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
-		extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+		if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
+			p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-		if ( extension !== null ) {
+			extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
-			if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
-			if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-			if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-			if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+			if ( extension !== null ) {
 
-		}
+				if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+				if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+				if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+				if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
-		extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-		if ( extension !== null ) {
-
-			if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-			if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-			if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-			if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+			}
 
 		}
 
-		extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
+			 p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
-		if ( extension !== null ) {
+			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
-			if ( p === RGB_ETC1_Format ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+			if ( extension !== null ) {
+
+				if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+				if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+				if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+				if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+			}
 
 		}
 
-		extension = extensions.get( 'EXT_blend_minmax' );
+		if ( p === RGB_ETC1_Format ) {
 
-		if ( extension !== null ) {
+			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-			if ( p === MinEquation ) return extension.MIN_EXT;
-			if ( p === MaxEquation ) return extension.MAX_EXT;
+			if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
 
 		}
 
-		extension = extensions.get( 'WEBGL_depth_texture' );
+		if ( p === MinEquation || p === MaxEquation ) {
 
-		if ( extension !== null ){
+			extension = extensions.get( 'EXT_blend_minmax' );
 
-			if ( p === UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
+			if ( extension !== null ) {
+
+				if ( p === MinEquation ) return extension.MIN_EXT;
+				if ( p === MaxEquation ) return extension.MAX_EXT;
+
+			}
+
+		}
+
+		if ( p === UnsignedInt248Type ) {
+
+			extension = extensions.get( 'WEBGL_depth_texture' );
+
+			if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 		}
 
