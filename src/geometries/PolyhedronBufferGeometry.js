@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Uint16Attribute, Uint32Attribute, Float32Attribute } from '../core/BufferAttribute';
+import { Float32Attribute } from '../core/BufferAttribute';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
 import { Sphere } from '../math/Sphere';
