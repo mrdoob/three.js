@@ -1047,17 +1047,16 @@ GLTFParser.prototype.loadMaterials = function() {
 
 				});
 
-				if ( khr_material.doubleSided )
-				{
+				if ( khr_material.doubleSided ) {
 
 					materialParams.side = THREE.DoubleSide;
 
 				}
 
-				if ( khr_material.transparent )
-				{
+				if ( khr_material.transparent ) {
 
 					materialParams.transparent = true;
+					materialParams.opacity = ( materialValues.transparency !== undefined ) ? materialValues.transparency : 1;
 
 				}
 
@@ -1246,7 +1245,9 @@ GLTFParser.prototype.loadMaterials = function() {
 
 			}
 
-			if ( typeof( materialValues.reflective ) == 'string' ) {
+			delete materialParams.diffuse;
+
+			if ( typeof( materialValues.reflective ) === 'string' ) {
 
 				materialParams.envMap = library.textures[ materialValues.reflective ];
 
@@ -1258,10 +1259,29 @@ GLTFParser.prototype.loadMaterials = function() {
 
 			}
 
-			if ( Array.isArray( materialValues.emission ) ) materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
-			if ( Array.isArray( materialValues.specular ) ) materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
+			if ( Array.isArray( materialValues.ambient ) ) {
 
-			if ( materialValues.shininess !== undefined ) materialParams.shininess = materialValues.shininess;
+				materialParams.ambient = new THREE.Color().fromArray( materialValues.ambient );
+
+			}
+
+			if ( Array.isArray( materialValues.emission ) ) {
+
+				materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+
+			}
+
+			if ( Array.isArray( materialValues.specular ) ) {
+
+				materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
+
+			}
+
+			if ( materialValues.shininess !== undefined ) {
+
+				materialParams.shininess = materialValues.shininess;
+
+			}
 
 			var _material = new materialType( materialParams );
 			_material.name = material.name;
