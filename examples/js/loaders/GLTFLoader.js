@@ -1259,12 +1259,6 @@ GLTFParser.prototype.loadMaterials = function() {
 
 			}
 
-			if ( Array.isArray( materialValues.ambient ) ) {
-
-				materialParams.ambient = new THREE.Color().fromArray( materialValues.ambient );
-
-			}
-
 			if ( Array.isArray( materialValues.emission ) ) {
 
 				materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
