@@ -20,12 +20,12 @@ THREE.GLTFLoader.prototype = {
 
 		var scope = this;
 
-		var baseUrl = this.baseUrl && ( typeof this.baseUrl === "string" ) ? this.baseUrl : THREE.Loader.prototype.extractUrlBase( url );
+		var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.load( url, function( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad, baseUrl );
+			scope.parse( JSON.parse( text ), onLoad, path );
 
 		}, onProgress, onError );
 
@@ -37,18 +37,18 @@ THREE.GLTFLoader.prototype = {
 
 	},
 
-	setBaseUrl: function( value ) {
+	setPath: function( value ) {
 
-		this.baseUrl = value;
+		this.path = value;
 
 	},
 
-	parse: function( json, callback, baseUrl ) {
+	parse: function( json, callback, path ) {
 
 		console.time( 'GLTFLoader' );
 
 		var glTFParser = new GLTFParser( json, {
-			baseUrl: baseUrl || this.baseUrl,
+			path: path || this.path,
 			crossOrigin: !!this.crossOrigin
 		});
 
@@ -153,7 +153,7 @@ var GLTFRegistry = function() {
 
 /* GLTFSHADERS */
 
-THREE.GLTFShaders = new GLTFRegistry();
+THREE.GLTFLoader.Shaders = new GLTFRegistry();
 
 /* GLTFSHADER */
 
@@ -254,10 +254,10 @@ GLTFShader.prototype.update = function( scene, camera ) {
 
 /* GLTFANIMATION */
 
-THREE.GLTFAnimator = new GLTFRegistry();
+THREE.GLTFLoader.Animations = new GLTFRegistry();
 
 // Construction/initialization
-THREE.GLTFAnimation = function( interps ) {
+var GLTFAnimation = function( interps ) {
 
 	this.running = false;
 	this.loop = false;
@@ -273,7 +273,7 @@ THREE.GLTFAnimation = function( interps ) {
 
 };
 
-THREE.GLTFAnimation.prototype.createInterpolators = function( interps ) {
+GLTFAnimation.prototype.createInterpolators = function( interps ) {
 
 	var i, len = interps.length;
 	for ( var i = 0; i < len; i ++ ) {
@@ -287,26 +287,26 @@ THREE.GLTFAnimation.prototype.createInterpolators = function( interps ) {
 }
 
 // Start/stop
-THREE.GLTFAnimation.prototype.play = function() {
+GLTFAnimation.prototype.play = function() {
 
 	if ( this.running )
 		return;
 
 	this.startTime = Date.now();
 	this.running = true;
-	THREE.GLTFAnimator.add( this );
+	THREE.GLTFLoader.Animations.add( this );
 
 };
 
-THREE.GLTFAnimation.prototype.stop = function() {
+GLTFAnimation.prototype.stop = function() {
 
 	this.running = false;
-	THREE.GLTFAnimator.remove( this );
+	THREE.GLTFLoader.Animations.remove( this );
 
 };
 
 // Update - drive key frame evaluation
-THREE.GLTFAnimation.prototype.update = function() {
+GLTFAnimation.prototype.update = function() {
 
 	if ( !this.running )
 		return;
@@ -396,11 +396,11 @@ GLTFInterpolator.prototype.interp = function( t ) {
 
 		if ( this.isRot ) {
 
-			this.quat3.set( this.values[ 0 ], this.values[ 1 ], this.values[ 2 ], this.values[ 3 ] );
+			this.quat3.fromArray( this.values );
 
 		} else {
 
-			this.vec3.set( this.values[ 0 ], this.values[ 1 ], this.values[ 2 ] );
+			this.vec3.fromArray( this.values );
 
 		}
 
@@ -408,25 +408,14 @@ GLTFInterpolator.prototype.interp = function( t ) {
 
 		if ( this.isRot ) {
 
-			this.quat1.set( this.originalValue.x,
-					this.originalValue.y,
-					this.originalValue.z,
-					this.originalValue.w );
-			this.quat2.set( this.values[ 0 ],
-					this.values[ 1 ],
-					this.values[ 2 ],
-					this.values[ 3 ] );
+			this.quat1.copy( this.originalValue );
+			this.quat2.fromArray( this.values );
 			THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, t / this.keys[ 0 ] );
 
 		} else {
 
-			this.vec3.set( this.originalValue.x,
-					this.originalValue.y,
-					this.originalValue.z );
-			this.vec2.set( this.values[ 0 ],
-					this.values[ 1 ],
-					this.values[ 2 ] );
-
+			this.vec3.copy( this.originalValue );
+			this.vec2.fromArray( this.values );
 			this.vec3.lerp( this.vec2, t / this.keys[ 0 ] );
 
 		}
@@ -435,16 +424,11 @@ GLTFInterpolator.prototype.interp = function( t ) {
 
 		if ( this.isRot ) {
 
-			this.quat3.set( this.values[ ( this.count - 1 ) * 4 ],
-					this.values[ ( this.count - 1 ) * 4 + 1 ],
-					this.values[ ( this.count - 1 ) * 4 + 2 ],
-					this.values[ ( this.count - 1 ) * 4 + 3 ] );
+			this.quat3.fromArray( this.values, ( this.count - 1 ) * 4 );
 
 		} else {
 
-			this.vec3.set( this.values[ ( this.count - 1 ) * 3 ],
-					this.values[ ( this.count - 1 ) * 3 + 1 ],
-					this.values[ ( this.count - 1 ) * 3 + 2 ] );
+			this.vec3.fromArray( this.values, ( this.count - 1 ) * 3 );
 
 		}
 
@@ -459,25 +443,14 @@ GLTFInterpolator.prototype.interp = function( t ) {
 
 				if ( this.isRot ) {
 
-					this.quat1.set( this.values[ i * 4 ],
-							this.values[ i * 4 + 1 ],
-							this.values[ i * 4 + 2 ],
-							this.values[ i * 4 + 3 ] );
-					this.quat2.set( this.values[ ( i + 1 ) * 4 ],
-							this.values[ ( i + 1 ) * 4 + 1 ],
-							this.values[ ( i + 1 ) * 4 + 2 ],
-							this.values[ ( i + 1 ) * 4 + 3 ] );
+					this.quat1.fromArray( this.values, i * 4 );
+					this.quat2.fromArray( this.values, ( i + 1 ) * 4 );
 					THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, ( t - key1 ) / ( key2 - key1 ) );
 
 				} else {
 
-					this.vec3.set( this.values[ i * 3 ],
-							this.values[ i * 3 + 1 ],
-							this.values[ i * 3 + 2 ] );
-					this.vec2.set( this.values[ ( i + 1 ) * 3 ],
-							this.values[ ( i + 1 ) * 3 + 1 ],
-							this.values[ ( i + 1 ) * 3 + 2 ] );
-
+					this.vec3.fromArray( this.values, i * 3 );
+					this.vec2.fromArray( this.values, ( i + 1 ) * 3 );
 					this.vec3.lerp( this.vec2, ( t - key1 ) / ( key2 - key1 ) );
 
 				}
@@ -577,7 +550,7 @@ var WEBGL_TYPE_SIZES = {
 
 /* VARIABLES */
 
-var json, baseUrl, crossOrigin;
+var json, path, crossOrigin;
 var library, loaders = {};
 
 /* UTILITY FUNCTIONS */
@@ -635,7 +608,7 @@ var _each = function( object, callback, thisObj ) {
 
 };
 
-var resolveURL = function( url, baseUrl ) {
+var resolveURL = function( url, path ) {
 
 	// Invalid URL
 	if ( typeof url !== 'string' || url === '' )
@@ -656,7 +629,7 @@ var resolveURL = function( url, baseUrl ) {
 	}
 
 	// Relative URL
-	return baseUrl + url;
+	return path + url;
 
 };
 
@@ -797,7 +770,7 @@ var GLTFParser = function(json, options) {
 GLTFParser.prototype.parse = function( callback ) {
 
 	json = this.json;
-	baseUrl = this.options.baseUrl || "";
+	path = this.options.path || "";
 	crossOrigin = this.options.crossOrigin || false;
 
 	library = {
@@ -860,7 +833,7 @@ GLTFParser.prototype.parse = function( callback ) {
 		callback( library );
 
 		// Clean up scoped globals
-		json = baseUrl = library = undefined;
+		json = path = library = undefined;
 		loaders = {};
 
 	});
@@ -875,7 +848,7 @@ GLTFParser.prototype.loadShaders = function() {
 
 			var loader = new THREE.XHRLoader();
 			loader.responseType = 'text';
-			loader.load( resolveURL( shader.uri, baseUrl ), function( shaderText ) {
+			loader.load( resolveURL( shader.uri, path ), function( shaderText ) {
 
 				resolve( shaderText );
 
@@ -902,7 +875,7 @@ GLTFParser.prototype.loadBuffers = function() {
 
 				var loader = new THREE.XHRLoader();
 				loader.responseType = 'arraybuffer';
-				loader.load( resolveURL( buffer.uri, baseUrl ), function( buffer ) {
+				loader.load( resolveURL( buffer.uri, path ), function( buffer ) {
 
 					resolve( buffer );
 
@@ -991,7 +964,7 @@ GLTFParser.prototype.loadTextures = function() {
 				}
 				textureLoader.crossOrigin = self.crossOrigin;
 
-				textureLoader.load( resolveURL( source.uri, baseUrl ), function( _texture ) {
+				textureLoader.load( resolveURL( source.uri, path ), function( _texture ) {
 
 					// UV buffer attributes are also flipped
 					_texture.flipY = true;
@@ -1531,7 +1504,7 @@ GLTFParser.prototype.loadAnimations = function() {
 
 			});
 
-			var _animation = new THREE.GLTFAnimation(interps);
+			var _animation = new GLTFAnimation(interps);
 			_animation.name = "animation_" + animationId;
 
 			return _animation;
@@ -1661,12 +1634,7 @@ GLTFParser.prototype.loadNodes = function() {
 										bones.push(jointNode);
 
 										var m = skinEntry.inverseBindMatrices.array;
-										var mat = new THREE.Matrix4().set(
-												m[i * 16 + 0], m[i * 16 + 4], m[i * 16 + 8], m[i * 16 + 12],
-												m[i * 16 + 1], m[i * 16 + 5], m[i * 16 + 9], m[i * 16 + 13],
-												m[i * 16 + 2], m[i * 16 + 6], m[i * 16 + 10], m[i * 16 + 14],
-												m[i * 16 + 3], m[i * 16 + 7], m[i * 16 + 11], m[i * 16 + 15]
-											);
+										var mat = new THREE.Matrix4().fromArray( m, i * 16 );
 										boneInverses.push(mat);
 
 									} else {
@@ -1827,10 +1795,10 @@ GLTFParser.prototype.loadScenes = function() {
 
 			_scene.traverse( function( child ) {
 
-				// Register raw material meshes with GLTFShaders
+				// Register raw material meshes with GLTFLoader.Shaders
 				if (child.material && child.material.isRawShaderMaterial) {
 					var xshader = new GLTFShader( child, library.nodes );
-					THREE.GLTFShaders.add( xshader );
+					THREE.GLTFLoader.Shaders.add( xshader );
 				}
 
 			});

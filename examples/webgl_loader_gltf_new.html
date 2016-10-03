@@ -231,7 +231,7 @@
 					scene.add(ground);
 				}
 
-				THREE.GLTFShaders.removeAll(); // remove all previous shaders
+				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
 				loader = new THREE.GLTFLoader;
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
@@ -353,8 +353,8 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.GLTFAnimator.update();
-				THREE.GLTFShaders.update(scene, camera);
+				THREE.GLTFLoader.Animations.update();
+				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
