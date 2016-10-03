@@ -1132,6 +1132,10 @@ GLTFParser.prototype.loadMaterials = function() {
 										uvalue = value;
 										materialParams.transparent = true;
 
+									} else {
+
+										uvalue = value;
+
 									}
 
 									break;
