@@ -945,9 +945,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					var array = geometryAttribute.array;
 					var normalized = geometryAttribute.normalized;
-
 					var size = geometryAttribute.itemSize;
 
 					var attributeProperties = objects.getAttributeProperties( geometryAttribute );
