@@ -1047,13 +1047,13 @@ GLTFParser.prototype.loadMaterials = function() {
 
 				});
 
-				if ( khr_material.doubleSided ) {
+				if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
 					materialParams.side = THREE.DoubleSide;
 
 				}
 
-				if ( khr_material.transparent ) {
+				if ( khr_material.transparent || materialValues.transparent ) {
 
 					materialParams.transparent = true;
 					materialParams.opacity = ( materialValues.transparency !== undefined ) ? materialValues.transparency : 1;
