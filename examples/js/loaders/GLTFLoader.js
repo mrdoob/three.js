@@ -966,8 +966,7 @@ GLTFParser.prototype.loadTextures = function() {
 
 				textureLoader.load( resolveURL( source.uri, path ), function( _texture ) {
 
-					// UV buffer attributes are also flipped
-					_texture.flipY = true;
+					_texture.flipY = false;
 
 					if ( texture.sampler ) {
 
@@ -1338,15 +1337,6 @@ GLTFParser.prototype.loadMeshes = function() {
 							case 'TEXCOORD_0':
 							case 'TEXCOORD0':
 							case 'TEXCOORD':
-								// Flip Y value for UVs
-								var floatArray = bufferAttribute.array;
-								for ( var i = 0; i < floatArray.length / 2; i ++ ) {
-
-									floatArray[ i * 2 + 1 ] = 1.0 - floatArray[ i * 2 + 1 ];
-
-								}
-								bufferAttribute.array = floatArray;
-
 								geometry.addAttribute( 'uv', bufferAttribute );
 								break;
 
