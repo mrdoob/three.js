@@ -237,7 +237,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( autoUpdate ) {
 
-				scene.updateMatrixWorld();
+				scene.updateChildrenMatrixWorld();
 				scene.autoUpdate = false;
 
 			}
@@ -303,7 +303,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			if ( renderer.autoClear || forceClear ) renderer.clear();
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( camera.parent === null ) camera.updateChildrenMatrixWorld();
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
 			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );

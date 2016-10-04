@@ -197,7 +197,7 @@ var APP = {
 
 			if ( isVR === true ) {
 
-				camera.updateMatrixWorld();
+				camera.updateChildrenMatrixWorld();
 
 				controls.update();
 				effect.render( scene, cameraVR );

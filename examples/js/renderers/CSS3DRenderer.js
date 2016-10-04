@@ -225,9 +225,9 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		scene.updateMatrixWorld();
+		scene.updateChildrenMatrixWorld();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateChildrenMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

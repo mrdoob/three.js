@@ -66,7 +66,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 
 	this.normalizeSkinWeights();
 
-	this.updateMatrixWorld( true );
+	this.updateChildrenMatrixWorld();
 	this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 }
@@ -84,7 +84,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		if ( bindMatrix === undefined ) {
 
-			this.updateMatrixWorld( true );
+			this.updateChildrenMatrixWorld();
 
 			this.skeleton.calculateInverses();
 
@@ -158,9 +158,9 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	updateMatrixWorld: function( force ) {
+	_updateMatrixWorld: function() {
 
-		Mesh.prototype.updateMatrixWorld.call( this, true );
+		Mesh.prototype._updateMatrixWorld.call( this );
 
 		if ( this.bindMode === "attached" ) {
 

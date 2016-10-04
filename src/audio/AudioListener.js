@@ -82,7 +82,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	_updateMatrixWorld: ( function () {
 
 		var position = new Vector3();
 		var quaternion = new Quaternion();
@@ -90,9 +90,9 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var orientation = new Vector3();
 
-		return function updateMatrixWorld( force ) {
+		return function _updateMatrixWorld() {
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+			Object3D.prototype._updateMatrixWorld.call( this );
 
 			var listener = this.context.listener;
 			var up = this.up;

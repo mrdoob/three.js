@@ -719,7 +719,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 		}
 
-		this.bone.updateMatrixWorld( true );
+		this.bone.updateMatrixWorld();
 
 	},
 
@@ -790,7 +790,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 	updateBoneRotation: function () {
 
-		this.bone.updateMatrixWorld( true );
+		this.bone.updateMatrixWorld();
 
 		var helper = this.helper;
 

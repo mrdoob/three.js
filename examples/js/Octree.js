@@ -460,7 +460,7 @@
 			
 			if ( typeof parentUpdate !== 'undefined' ) {
 				
-				parentUpdate.updateMatrixWorld();
+				parentUpdate.updateChildrenMatrixWorld();
 				
 			}
 			

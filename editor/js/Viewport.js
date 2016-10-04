@@ -596,14 +596,15 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
-		scene.updateMatrixWorld();
+		sceneHelpers.updateChildrenMatrixWorld();
+		scene.updateChildrenMatrixWorld();
 
 		if ( vrEffect && vrEffect.isPresenting ) {
 
 			vrControls.update();
 
-			camera.updateMatrixWorld();
+			camera.updateChildrenMatrixWorld();
+			renderer.clear();
 
 			vrEffect.render( scene, vrCamera );
 			vrEffect.render( sceneHelpers, vrCamera );

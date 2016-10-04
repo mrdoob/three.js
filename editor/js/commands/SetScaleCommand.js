@@ -40,7 +40,7 @@ SetScaleCommand.prototype = {
 	execute: function () {
 
 		this.object.scale.copy( this.newScale );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},
@@ -48,7 +48,7 @@ SetScaleCommand.prototype = {
 	undo: function () {
 
 		this.object.scale.copy( this.oldScale );
-		this.object.updateMatrixWorld( true );
+		this.object.updateChildrenMatrixWorld();
 		this.editor.signals.objectChanged.dispatch( this.object );
 
 	},

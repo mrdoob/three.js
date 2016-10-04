@@ -101,7 +101,7 @@ Box3.prototype = {
 
 			var scope = this;
 
-			object.updateMatrixWorld( true );
+			object.updateChildrenMatrixWorld();
 
 			this.makeEmpty();
 

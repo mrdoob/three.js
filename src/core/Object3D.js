@@ -90,6 +90,10 @@ function Object3D() {
 	this.renderOrder = 0;
 
 	this.userData = {};
+	
+	this._position = this.position.clone();
+	this._quaternion = this.quaternion.clone();
+	this._scale = this.scale.clone();
 
 	this.onBeforeRender = function(){}; 
 	this.onAfterRender = function(){};
@@ -392,7 +396,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		var result = optionalTarget || new Vector3();
 
-		this.updateMatrixWorld( true );
+		this.updateMatrixWorld();
 
 		return result.setFromMatrixPosition( this.matrixWorld );
 
@@ -407,7 +411,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			var result = optionalTarget || new Quaternion();
 
-			this.updateMatrixWorld( true );
+			this.updateMatrixWorld();
 
 			this.matrixWorld.decompose( position, result, scale );
 
@@ -442,7 +446,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			var result = optionalTarget || new Vector3();
 
-			this.updateMatrixWorld( true );
+			this.updateMatrixWorld();
 
 			this.matrixWorld.decompose( position, quaternion, result );
 
@@ -514,19 +518,56 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	},
 
-	updateMatrix: function () {
+	_setmatrixWorldNeedsUpdateRecursive: ( function () {
+		
+		function updateMatrixWorldNeedsUpdate( o ) {
+			
+			o.matrixWorldNeedsUpdate = true;
+			
+		}
+		
+		return function() {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+			this.traverse( updateMatrixWorldNeedsUpdate );
+  		  
+		};
 
-		this.matrixWorldNeedsUpdate = true;
+	} ()),
+	
+	updateMatrix: function() {
 
+		var position = this.position;
+		var quaternion = this.quaternion;
+		var scale = this.scale;
+		var _position = this._position;
+		var _quaternion = this._quaternion;
+		var _scale = this._scale;
+		
+		if ( ! _position.equals( position ) || ! _quaternion.equals( quaternion ) || ! _scale.equals( scale )  ) {
+
+			this.matrix.compose( position, quaternion, scale );
+			this._setmatrixWorldNeedsUpdateRecursive();
+			_position.copy( position );
+			_quaternion.copy( quaternion );
+			_scale.copy( scale );
+		}
+		return this.matrix;
+  		  
 	},
 
-	updateMatrixWorld: function ( force ) {
+	_updateMatrixWorld: function() {
+			
+		if ( this.matrixAutoUpdate === true ) {
+			
+			this.updateMatrix();
+			
+		} else if ( this.matrixWorldNeedsUpdate === true) {
+			
+			this._setmatrixWorldNeedsUpdateRecursive();
+			
+		}
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
-
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate === true ) {
 
 			if ( this.parent === null ) {
 
@@ -540,21 +581,58 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			this.matrixWorldNeedsUpdate = false;
 
-			force = true;
-
-		}
-
-		// update children
-
-		var children = this.children;
-
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-			children[ i ].updateMatrixWorld( force );
-
 		}
 
 	},
+	
+	updateMatrixWorld: function () {
+
+
+    	var parent = this.parent; 
+
+    	if ( parent !== null ) {
+
+        	parent.updateMatrixWorld();
+
+    	}
+
+    	this._updateMatrixWorld();
+
+    	return this.matrixWorld;
+
+	},
+
+    _updateChildrenMatrixWorld: function () {
+
+        this._updateMatrixWorld();
+
+        var children = this.children;
+
+        for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+            children[ i ]._updateChildrenMatrixWorld();
+
+        }
+
+        return this.matrixWorld;
+
+    },
+
+    updateChildrenMatrixWorld: function () {
+
+        var parent = this.parent; 
+
+        if ( parent !== null ) {
+        	
+            parent.updateMatrixWorld();
+            
+        }
+
+        this._updateChildrenMatrixWorld();
+
+        return this.matrixWorld;
+
+    },
 
 	toJSON: function ( meta ) {
 

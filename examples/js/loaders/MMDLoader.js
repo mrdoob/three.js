@@ -3918,7 +3918,7 @@ THREE.MMDGrantSolver.prototype = {
 						q.set( 0, 0, 0, 1 );
 						q.slerp( pb.quaternion, g.ratio );
 						b.quaternion.multiply( q );
-						b.updateMatrixWorld( true );
+						b.updateMatrixWorld();
 
 					}
 
@@ -4524,7 +4524,7 @@ THREE.MMDHelper.prototype = {
 			b2.position.add( thV );
 			b2.quaternion.multiply( thQ );
 
-			b2.updateMatrixWorld( true );
+			b2.updateMatrixWorld();
 
 		}
 

@@ -269,9 +269,14 @@
 		Updates local transform.
 		</div>
 
-		<h3>[method:null updateMatrixWorld]( [page:Boolean force] )</h3>
+		<h3>[method:null updateMatrixWorld]()</h3>
 		<div>
-		Updates global transform of the object and its children.
+		Updates the global transform of the object. This also updates the global transform all its ancestors.
+		</div>
+
+		<h3>[method:null updateChildrenMatrixWorld]()</h3>
+		<div>
+		Updates global transform of the object and its descendants. This also updates the global transform all its ancestors.
 		</div>
 
 		<h3>[method:Object3D clone]( [page:Boolean recursive] )</h3>

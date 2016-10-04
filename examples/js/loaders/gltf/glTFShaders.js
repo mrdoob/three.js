@@ -92,10 +92,10 @@ THREE.glTFShader.prototype.update = function(scene, camera) {
 
 	// update scene graph
 
-	scene.updateMatrixWorld();
+	scene.updateChildrenMatrixWorld();
 
 	// update camera matrices and frustum
-	camera.updateMatrixWorld();
+	camera.updateChildrenMatrixWorld();
 	camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 	for (var sname in this.semantics) {
