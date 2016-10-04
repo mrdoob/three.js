@@ -39,6 +39,7 @@ function Material() {
 	this.depthWrite = true;
 
 	this.clippingPlanes = null;
+	this.clipIntersection = false;
 	this.clipShadows = false;
 
 	this.colorWrite = true;
