@@ -247,7 +247,7 @@ GLTFShader.prototype.update = function( scene, camera ) {
 
 		}
 
-	}.bind(this));
+	}.bind( this ));
 
 };
 
@@ -569,33 +569,38 @@ var _each = function( object, callback, thisObj ) {
 		results = [];
 
 		var length = object.length;
-		for ( let idx = 0; idx < length; idx ++ ) {
-			let value = callback.call( thisObj || this, object[ idx ], idx );
-			fns.push( value );
-			if ( value && value instanceof Promise ) {
-				value.then( function( value ) {
+		for ( var idx = 0; idx < length; idx ++ ) {
+			var value = callback.call( thisObj || this, object[ idx ], idx );
+			if ( value ) {
+				fns.push( value );
+				if ( value instanceof Promise ) {
+					value.then( function( key, value ) {
+						results[ idx ] = value;
+					}.bind( this, key ));
+				} else {
 					results[ idx ] = value;
-				});
-			} else {
-				results[ idx ] = value;
+				}
 			}
 
 		}
 
 	} else {
 
+
 		results = {};
 
-		for ( let key in object ) {
+		for ( var key in object ) {
 			if ( object.hasOwnProperty( key ) ) {
-				let value = callback.call( thisObj || this, object[ key ], key );
-				fns.push( value );
-				if ( value && value instanceof Promise ) {
-					value.then( function( value ) {
+				var value = callback.call( thisObj || this, object[ key ], key );
+				if ( value ) {
+					fns.push( value );
+					if ( value instanceof Promise ) {
+						value.then( function( key, value ) {
+							results[ key ] = value;
+						}.bind( this, key ));
+					} else {
 						results[ key ] = value;
-					});
-				} else {
-					results[ key ] = value;
+					}
 				}
 			}
 		}
