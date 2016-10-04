@@ -156,11 +156,9 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             xhr.setRequestHeader("If-Modified-Since", "Sat, 01 Jan 1970 00:00:00 GMT");
             xhr.onload = function(e) {
                 if ((xhr.status == 200) || (xhr.status == 206)) {
-
                     delegate.streamAvailable(path, xhr.response);
-
                 } else {
-                    delegate.handleError(THREE.GLTFLoaderUtils.XMLHTTPREQUEST_STATUS_ERROR, this.status);
+                    delegate.handleError(THREE.GLTFLoaderUtils.XMLHTTPREQUEST_STATUS_ERROR, xhr.status);
                 }
             };
             xhr.send(null);
@@ -221,7 +219,6 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
 
     _elementSizeForGLType: {
         value: function(componentType, type) {
-
     		var nElements = 0;
     		switch(type) {
 	            case "SCALAR" :
@@ -270,7 +267,6 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             var buffer = bufferView.buffer;
             var byteOffset = wrappedBufferView.byteOffset + bufferView.description.byteOffset;
             var range = [byteOffset , (this._elementSizeForGLType(wrappedBufferView.componentType, wrappedBufferView.type) * wrappedBufferView.count) + byteOffset];
-
             this._handleRequest({   "id" : wrappedBufferView.id,
                                     "range" : range,
                                     "type" : buffer.description.type,
