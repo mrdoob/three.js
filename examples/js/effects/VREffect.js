@@ -140,6 +140,10 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', onFullscreenChange, false );
 
+	this.dispose = function () {
+		window.removeEventListener( 'vrdisplaypresentchange', onFullscreenChange, false );
+	};
+
 	this.setFullScreen = function ( boolean ) {
 
 		return new Promise( function ( resolve, reject ) {
