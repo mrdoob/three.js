@@ -516,8 +516,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 			if (!that.skin) {
 				// console.log ("New mesh")
-
-													console.log(primitive.geometry.geometry, material);
 				var threeMesh = new THREE.Mesh(primitive.geometry.geometry, material);
 				threeMesh.castShadow = true;
 				threeNode.add(threeMesh);
@@ -1470,7 +1468,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 				var glTF = node.glTF;
 				var skin = glTF.instanceSkin;
 				var skeletons = glTF.skeletons;
-
 				if (skin) {
 					skeletons.forEach(function(skeleton) {
 						var nodeEntry = this.resources.getEntry(skeleton);
