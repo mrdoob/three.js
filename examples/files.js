@@ -10,7 +10,6 @@ var files = {
 		"webgl_clipping",
 		"webgl_clipping_advanced",
 		"webgl_decals",
-		"webgl_deferred_animation",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
 		"webgl_effects_parallaxbarrier",
@@ -257,6 +256,9 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
 		"webgl_raymarching_reflect"
+	],
+	"webgl deferred": [
+		"webgldeferred_animation"
 	],
 	"webvr": [
 		"webvr_cubes",
