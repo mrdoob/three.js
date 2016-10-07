@@ -93,7 +93,7 @@ var list = {
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
-			[ "glTFLoader", "api/loaders/glTFLoader" ],
+			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
