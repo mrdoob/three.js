@@ -1570,8 +1570,9 @@ GLTFParser.prototype.loadNodes = function() {
 										jointNode.skin = mesh;
 										bones.push(jointNode);
 
-										var m = skinEntry.inverseBindMatrices.array;
-										var mat = new THREE.Matrix4().fromArray( m, i * 16 );
+										var matrixOffset = i * 16;
+										var m = skinEntry.inverseBindMatrices.array.slice( matrixOffset, matrixOffset + 16 );
+										var mat = new THREE.Matrix4().fromArray( m );
 										boneInverses.push(mat);
 
 									} else {
