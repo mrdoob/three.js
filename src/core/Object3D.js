@@ -484,6 +484,20 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	},
 
+	traverseReverse: function ( callback ) {
+
+		var children = this.children;
+
+		for ( var i = children.length; i -- ; ) {
+
+			children[ i ].traverseReverse( callback );
+
+		}
+
+		callback( this );
+
+	},
+
 	traverseVisible: function ( callback ) {
 
 		if ( this.visible === false ) return;
