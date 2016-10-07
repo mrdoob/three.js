@@ -30,7 +30,6 @@ var files = {
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_hierarchy",
 		"webgl_geometry_hierarchy2",
-		"webgl_geometry_large_mesh",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_minecraft_ao",
 		"webgl_geometry_normals",
