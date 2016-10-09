@@ -39,11 +39,32 @@ Object.assign( ImageLoader.prototype, {
 
 			var loader = new XHRLoader();
 			loader.setPath( this.path );
-			loader.setResponseType( 'blob' );
+			loader.setResponseType( undefined !== this.responseType ? this.responseType : 'blob' );
 			loader.setWithCredentials( this.withCredentials );
-			loader.load( url, function ( blob ) {
+			loader.load( url, function ( response ) {
 
-				image.src = URL.createObjectURL( blob );
+				if (loader.responseType == THREE.ResponseType.Blob) {
+				
+					image.src = URL.createObjectURL( response );
+					
+				} else if (loader.responseType == THREE.ResponseType.ArrayBuffer) {
+				
+					var bytes = new Uint8Array(response);
+					var binary = '';
+					var len = bytes.byteLength;
+					var chunkSize = 32768;
+					for (var i = 0; i < len; i += chunkSize) {
+						binary += String.fromCharCode.apply( bytes.subarray( i, i + chunkSize) );
+					}
+					var b64 = btoa(binary);
+					var dataURL = "data:image/png;base64," + b64;
+					image.src = dataURL;
+					
+				} else {
+				
+					console.error("Unsupported XHR response type '" + this.responseType + "' specified.");
+					
+				}
 
 			}, onProgress, onError );
 
@@ -74,7 +95,13 @@ Object.assign( ImageLoader.prototype, {
 		this.path = value;
 		return this;
 
-	}
+	},
+	
+	setResponseType: function ( value ) {
+		
+		this.responseType = value;
+		return this;
+	}			
 
 } );
 
