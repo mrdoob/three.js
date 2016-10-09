@@ -7,8 +7,7 @@
  * One is Classic Deferred Rendering and the other one is
  * Light Pre-Pass (Deferred Lighting).
  * Classic Deferred Rendering is default. You can use Light Pre-Pass
- * by passing { lightPrePass: true } parameter to constructor or
- * calling .enableLightPrePass( true ) method.
+ * by calling .enableLightPrePass( true ) method.
  *
  * Dependencies
  *  - THREE.CopyShader
@@ -87,8 +86,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize().width;
 		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize().height;
 
-		var lightPrePass = parameters.lightPrePass !== undefined ? parameters.lightPrePass : false;
-
 		var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
 		initDepthTexture();
@@ -101,7 +98,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_this.setSize( _width, _height );
 		_this.setAntialias( antialias );
-		_this.enableLightPrePass( lightPrePass );
+		_this.enableLightPrePass( false );
 
 	};
 
