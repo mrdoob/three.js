@@ -16,37 +16,12 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 	}
 
+	if ( type === undefined && format === DepthFormat ) type = UnsignedShortType;
+	if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.image = { width: width, height: height };
-
-	if ( this.format === DepthFormat ) {
-
-		this.type = type !== undefined ? type : UnsignedShortType;
-
-	} else {
-
-		this.type = type !== undefined ? type : UnsignedInt248Type;
-
-	}
-
-	if ( this.format === DepthFormat ) {
-
-		if ( this.type !== UnsignedShortType && this.type !== UnsignedIntType ) {
-
-			console.warn( 'THREE.DepthTexture: DepthFormat requires UnsignedShortType or UnsignedIntType.' );
-
-		}
-
-	} else {
-
-		if ( this.type !== UnsignedInt248Type ) {
-
-			console.warn( 'THREE.DepthTexture: DepthStencilFormat requires UnsignedInt248Type.' );
-
-		}
-
-	}
 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
