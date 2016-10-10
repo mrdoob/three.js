@@ -29,7 +29,6 @@ var files = {
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_hierarchy",
 		"webgl_geometry_hierarchy2",
-		"webgl_geometry_large_mesh",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_minecraft_ao",
 		"webgl_geometry_normals",
@@ -257,6 +256,9 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
 		"webgl_raymarching_reflect"
+	],
+	"webgl deferred": [
+		"webgldeferred_animation"
 	],
 	"webvr": [
 		"webvr_cubes",

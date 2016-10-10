@@ -37,6 +37,7 @@
 		<script src="../../build/three.min.js"></script>
 		<script src='../../examples/js/libs/dat.gui.min.js'></script>
 		<script src="../../examples/js/controls/OrbitControls.js"></script>
+		<script src="../../examples/js/ParametricGeometries.js"></script>
 
 		<script src='js/geometry.js'></script>
 
@@ -57,9 +58,6 @@
 
 			var orbit = new THREE.OrbitControls( camera, renderer.domElement );
 			orbit.enableZoom = false;
-
-			var ambientLight = new THREE.AmbientLight( 0x000000 );
-			scene.add( ambientLight );
 
 			var lights = [];
 			lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
