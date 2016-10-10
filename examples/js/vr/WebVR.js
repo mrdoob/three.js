@@ -95,6 +95,12 @@ var WEBVR = {
 
 		}, false );
 
+		window.addEventListener( 'beforeunload', function ( event ) {
+
+			if (effect.isPresenting) effect.exitPresent();
+
+		});
+
 		return button;
 
 	}
