@@ -1,4 +1,4 @@
-#define PHONG
+#define PHONG  
 
 uniform vec3 diffuse;
 uniform vec3 emissive;
