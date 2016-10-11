@@ -510,16 +510,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 			disable( gl.BLEND );
 
-			currentBlending = blending; // no blending, that is
-			currentBlendEquation = null;
-			currentBlendSrc = null;
-			currentBlendDst = null;
-			currentBlendEquationAlpha = null;
-			currentBlendSrcAlpha = null;
-			currentBlendDstAlpha = null;
-
-			return;
-
 		}
 
 		if ( blending !== currentBlending || premultipliedAlpha !== currentPremultipledAlpha ) {
