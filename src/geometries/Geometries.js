@@ -12,6 +12,7 @@ export { DodecahedronBufferGeometry } from './DodecahedronBufferGeometry.js';
 export { PolyhedronGeometry } from './PolyhedronGeometry.js';
 export { PolyhedronBufferGeometry } from './PolyhedronBufferGeometry.js';
 export { TubeGeometry } from './TubeGeometry.js';
+export { TubeBufferGeometry } from './TubeBufferGeometry.js';
 export { TorusKnotGeometry } from './TorusKnotGeometry.js';
 export { TorusKnotBufferGeometry } from './TorusKnotBufferGeometry.js';
 export { TorusGeometry } from './TorusGeometry.js';

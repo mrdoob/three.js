@@ -71,7 +71,8 @@ var list = {
 			[ "TorusGeometry", "api/geometries/TorusGeometry" ],
 			[ "TorusKnotBufferGeometry", "api/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/geometries/TorusKnotGeometry" ],
-			[ "TubeGeometry", "api/geometries/TubeGeometry" ]
+			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
+			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ]
 		],
 
 		"Lights": [
