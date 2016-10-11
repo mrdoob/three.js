@@ -45,7 +45,5 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 TubeGeometry.prototype = Object.create( Geometry.prototype );
 TubeGeometry.prototype.constructor = TubeGeometry;
 
-TubeGeometry.FrenetFrames = TubeBufferGeometry.FrenetFrames;
-
 
 export { TubeGeometry };

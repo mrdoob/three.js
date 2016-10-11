@@ -34,7 +34,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
 
-	var frames = new TubeBufferGeometry.FrenetFrames( path, tubularSegments, closed );
+	var frames = frenetFrames( path, tubularSegments, closed );
 
 	// expose internals
 
@@ -183,7 +183,7 @@ TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 
-TubeBufferGeometry.FrenetFrames = function ( path, segments, closed ) {
+function frenetFrames( path, segments, closed ) {
 
 	var	normal = new Vector3();
 
@@ -195,12 +195,6 @@ TubeBufferGeometry.FrenetFrames = function ( path, segments, closed ) {
 	var mat = new Matrix4();
 
 	var i, u, theta;
-
-	// expose internals
-
-	this.tangents = tangents;
-	this.normals = normals;
-	this.binormals = binormals;
 
 	// compute the tangent vectors for each segment on the path
 
@@ -296,6 +290,12 @@ TubeBufferGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	}
 
-};
+	return {
+		tangents: tangents,
+		normals: normals,
+		binormals: binormals
+	};
+
+}
 
 export { TubeBufferGeometry };
