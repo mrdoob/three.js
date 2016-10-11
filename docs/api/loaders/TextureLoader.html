@@ -46,9 +46,9 @@
 		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
 		</div>
 
-		<h3>[method:null setResponseType]( [page:Enum value] )</h3>
+		<h3>[method:null setResponseType]( [page:String value] )</h3>
 		<div>
-		[page:Enum value] — The response type of the XHR request. Can be THREE.ResponseType.Blob (default) or THREE.ResponseType.ArrayBuffer.
+		[page:String value] — The response type of the XHR request. Can be a string "blob" (default) or "arraybuffer".
 		</div>
 		<div>
 		When loading texture images from a web server to a local script, the default "blob" response type may be restricted for security reasons.

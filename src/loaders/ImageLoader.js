@@ -43,18 +43,18 @@ Object.assign( ImageLoader.prototype, {
 			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( response ) {
 
-				if (loader.responseType == THREE.ResponseType.Blob) {
+				if (loader.responseType == 'blob') {
 				
 					image.src = URL.createObjectURL( response );
 					
-				} else if (loader.responseType == THREE.ResponseType.ArrayBuffer) {
+				} else if (loader.responseType == 'arraybuffer') {
 				
 					var bytes = new Uint8Array(response);
 					var binary = '';
 					var len = bytes.byteLength;
-					var chunkSize = 32768;
+					var chunkSize = Math.min(len, 32768);
 					for (var i = 0; i < len; i += chunkSize) {
-						binary += String.fromCharCode.apply( bytes.subarray( i, i + chunkSize) );
+						binary += String.fromCharCode.apply( null, bytes.subarray( i, i + chunkSize) );
 					}
 					var b64 = btoa(binary);
 					var dataURL = "data:image/png;base64," + b64;
