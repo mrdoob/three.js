@@ -8,13 +8,13 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
 		<div class="desc">Creates a tube that extrudes along a 3d curve.</div>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#TubeBufferGeometry"></iframe>
 
 		<script>
 
@@ -56,7 +56,7 @@
 		);
 
 		var path = new CustomSinCurve( 10 );
-		var geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+		var geometry = new THREE.TubeBufferGeometry( path, 20, 2, 8, false );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
@@ -101,15 +101,15 @@
 		<h2>Methods</h2>
 
 
-		<h3>THREE.TubeGeometry.FrenetFrames([page:Curve path], [page:Integer segments], [page:Boolean closed])</h3>
+		<h3>THREE.TubeBufferGeometry.FrenetFrames([page:Curve path], [page:Integer segments], [page:Boolean closed])</h3>
 		<div>
 		path — A path that inherits from the [page:Curve] base class <br />
 		segments — The number of segments that make up the tube <br />
 		closed — Is the tube open or closed
 		</div>
 		<div>
-		A static method that generates the Frenet Frames. This is internally run on any new TubeGeometry and then the
-		generated tangents, normals, and binormals are exposed as properties on the TubeGeometry object.
+		A static method that generates the Frenet Frames. This is internally run on any new TubeBufferGeometry and then the
+		generated tangents, normals, and binormals are exposed as properties on the TubeBufferGeometry object.
 		</div>
 
 		<h2>Source</h2>
