@@ -2544,8 +2544,8 @@
       "!doc": "A low level class for loading resources with XmlHttpRequest, used internaly by most loaders.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "glTFLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/glTFLoader",
+    "GLTFLoader": {
+      "!url": "http://threejs.org/docs/#Reference/loaders/GLTFLoader",
       "prototype": {
         "!proto": "THREE.Loader.prototype",
         "load": {

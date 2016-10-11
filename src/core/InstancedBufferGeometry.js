@@ -18,13 +18,13 @@ InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
 
 InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
-InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
+InstancedBufferGeometry.prototype.addGroup = function ( start, count, materialIndex ) {
 
 	this.groups.push( {
 
 		start: start,
 		count: count,
-		instances: instances
+		materialIndex: materialIndex
 
 	} );
 
@@ -54,7 +54,7 @@ InstancedBufferGeometry.prototype.copy = function ( source ) {
 	for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 		var group = groups[ i ];
-		this.addGroup( group.start, group.count, group.instances );
+		this.addGroup( group.start, group.count, group.materialIndex );
 
 	}
 

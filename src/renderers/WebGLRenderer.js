@@ -986,7 +986,7 @@ function WebGLRenderer( parameters ) {
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
-					if ( geometryAttribute && geometryAttribute.isInterleavedBufferAttribute ) {
+					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						var data = geometryAttribute.data;
 						var stride = data.stride;
@@ -1013,7 +1013,7 @@ function WebGLRenderer( parameters ) {
 
 					} else {
 
-						if ( geometryAttribute && geometryAttribute.isInstancedBufferAttribute ) {
+						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
 							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
 
