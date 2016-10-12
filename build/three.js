@@ -606,6 +606,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -1372,6 +1374,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -2679,6 +2683,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -24482,264 +24488,252 @@
 	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
 
 	/**
-	 * @author WestLangley / https://github.com/WestLangley
-	 * @author zz85 / https://github.com/zz85
-	 * @author miningold / https://github.com/miningold
-	 * @author jonobr1 / https://github.com/jonobr1
+	 * @author Mugen87 / https://github.com/Mugen87
 	 *
-	 * Modified from the TorusKnotGeometry by @oosmoxiecode
+	 * Creates a tube which extrudes along a 3d spline.
 	 *
-	 * Creates a tube which extrudes along a 3d spline
+	 * Uses parallel transport frames as described in:
 	 *
-	 * Uses parallel transport frames as described in
 	 * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 	 */
 
-	function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
+	function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
 
-		Geometry.call( this );
+		BufferGeometry.call( this );
 
-		this.type = 'TubeGeometry';
+		this.type = 'TubeBufferGeometry';
 
 		this.parameters = {
 			path: path,
-			segments: segments,
+			tubularSegments: tubularSegments,
 			radius: radius,
 			radialSegments: radialSegments,
-			closed: closed,
-			taper: taper
+			closed: closed
 		};
 
-		segments = segments || 64;
+		tubularSegments = tubularSegments || 64;
 		radius = radius || 1;
 		radialSegments = radialSegments || 8;
-		closed = closed || false;
-		taper = taper || TubeGeometry.NoTaper;
+		closed = closed || false;
 
-		var grid = [];
+		var frames = new FrenetFrames( path, tubularSegments, closed );
 
-		var scope = this,
+		// expose internals
 
-			tangent,
-			normal,
-			binormal,
+		this.tangents = frames.tangents;
+		this.normals = frames.normals;
+		this.binormals = frames.binormals;
 
-			numpoints = segments + 1,
+		// helper variables
 
-			u, v, r,
+		var vertex = new Vector3();
+		var normal = new Vector3();
+		var uv = new Vector2();
 
-			cx, cy,
-			pos, pos2 = new Vector3(),
-			i, j,
-			ip, jp,
-			a, b, c, d,
-			uva, uvb, uvc, uvd;
+		var i, j;
 
-		var frames = new TubeGeometry.FrenetFrames( path, segments, closed ),
-			tangents = frames.tangents,
-			normals = frames.normals,
-			binormals = frames.binormals;
+		// buffer
 
-		// proxy internals
-		this.tangents = tangents;
-		this.normals = normals;
-		this.binormals = binormals;
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+		var indices = [];
 
-		function vert( x, y, z ) {
+		// create buffer data
 
-			return scope.vertices.push( new Vector3( x, y, z ) ) - 1;
+		generateBufferData();
+
+		// build geometry
+
+		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
+		this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
+		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+
+		// functions
+
+		function generateBufferData() {
+
+			for ( i = 0; i < tubularSegments; i ++ ) {
+
+				generateSegment( i );
+
+			}
+
+			// if the geometry is not closed, generate the last row of vertices and normals
+			// at the regular position on the given path
+			//
+			// if the geometry is closed, duplicate the first row of vertices and normals (uvs will differ)
+
+			generateSegment( ( closed === false ) ? tubularSegments : 0 );
+
+			// uvs are generated in a separate function.
+			// this makes it easy compute correct values for closed geometries
+
+			generateUVs();
+
+			// finally create faces
+
+			generateIndices();
 
 		}
 
-		// construct the grid
+		function generateSegment( i ) {
 
-		for ( i = 0; i < numpoints; i ++ ) {
+			// we use getPointAt to sample evenly distributed points from the given path
 
-			grid[ i ] = [];
+			var P = path.getPointAt( i / tubularSegments );
 
-			u = i / ( numpoints - 1 );
+			// retrieve corresponding normal and binormal
 
-			pos = path.getPointAt( u );
+			var N = frames.normals[ i ];
+			var B = frames.binormals[ i ];
 
-			tangent = tangents[ i ];
-			normal = normals[ i ];
-			binormal = binormals[ i ];
+			// generate normals and vertices for the current segment
 
-			r = radius * taper( u );
+			for ( j = 0; j <= radialSegments; j ++ ) {
 
-			for ( j = 0; j < radialSegments; j ++ ) {
+				var v = j / radialSegments * Math.PI * 2;
 
-				v = j / radialSegments * 2 * Math.PI;
+				var sin =   Math.sin( v );
+				var cos = - Math.cos( v );
 
-				cx = - r * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-				cy = r * Math.sin( v );
+				// normal
 
-				pos2.copy( pos );
-				pos2.x += cx * normal.x + cy * binormal.x;
-				pos2.y += cx * normal.y + cy * binormal.y;
-				pos2.z += cx * normal.z + cy * binormal.z;
+				normal.x = ( cos * N.x + sin * B.x );
+				normal.y = ( cos * N.y + sin * B.y );
+				normal.z = ( cos * N.z + sin * B.z );
+				normal.normalize();
 
-				grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
+				normals.push( normal.x, normal.y, normal.z );
+
+				// vertex
+
+				vertex.x = P.x + radius * normal.x;
+				vertex.y = P.y + radius * normal.y;
+				vertex.z = P.z + radius * normal.z;
+
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 			}
 
 		}
 
+		function generateIndices() {
 
-		// construct the mesh
+			for ( j = 1; j <= tubularSegments; j ++ ) {
 
-		for ( i = 0; i < segments; i ++ ) {
+				for ( i = 1; i <= radialSegments; i ++ ) {
 
-			for ( j = 0; j < radialSegments; j ++ ) {
+					var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+					var b = ( radialSegments + 1 ) * j + ( i - 1 );
+					var c = ( radialSegments + 1 ) * j + i;
+					var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
-				ip = ( closed ) ? ( i + 1 ) % segments : i + 1;
-				jp = ( j + 1 ) % radialSegments;
+					// faces
 
-				a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
-				b = grid[ ip ][ j ];
-				c = grid[ ip ][ jp ];
-				d = grid[ i ][ jp ];
+					indices.push( a, b, d );
+					indices.push( b, c, d );
 
-				uva = new Vector2( i / segments, j / radialSegments );
-				uvb = new Vector2( ( i + 1 ) / segments, j / radialSegments );
-				uvc = new Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
-				uvd = new Vector2( i / segments, ( j + 1 ) / radialSegments );
-
-				this.faces.push( new Face3( a, b, d ) );
-				this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-				this.faces.push( new Face3( b, c, d ) );
-				this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+				}
 
 			}
 
 		}
 
-		this.computeFaceNormals();
-		this.computeVertexNormals();
+		function generateUVs() {
+
+			for ( i = 0; i <= tubularSegments; i ++ ) {
+
+				for ( j = 0; j <= radialSegments; j ++ ) {
+
+					uv.x = i / tubularSegments;
+					uv.y = j / radialSegments;
+
+					uvs.push( uv.x, uv.y );
+
+				}
+
+			}
+
+		}
 
 	}
 
-	TubeGeometry.prototype = Object.create( Geometry.prototype );
-	TubeGeometry.prototype.constructor = TubeGeometry;
-
-	TubeGeometry.NoTaper = function ( u ) {
-
-		return 1;
-
-	};
-
-	TubeGeometry.SinusoidalTaper = function ( u ) {
-
-		return Math.sin( Math.PI * u );
-
-	};
+	TubeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+	TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
 
 	// For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-	TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-		var	normal = new Vector3(),
+	function FrenetFrames( path, segments, closed ) {
 
-			tangents = [],
-			normals = [],
-			binormals = [],
+		var	normal = new Vector3();
 
-			vec = new Vector3(),
-			mat = new Matrix4(),
+		var tangents = [];
+		var normals = [];
+		var binormals = [];
 
-			numpoints = segments + 1,
-			theta,
-			smallest,
+		var vec = new Vector3();
+		var mat = new Matrix4();
 
-			tx, ty, tz,
-			i, u;
-
+		var i, u, theta;
 
 		// expose internals
+
 		this.tangents = tangents;
 		this.normals = normals;
 		this.binormals = binormals;
 
 		// compute the tangent vectors for each segment on the path
 
-		for ( i = 0; i < numpoints; i ++ ) {
+		for ( i = 0; i <= segments; i ++ ) {
 
-			u = i / ( numpoints - 1 );
+			u = i / segments;
 
 			tangents[ i ] = path.getTangentAt( u );
 			tangents[ i ].normalize();
 
 		}
 
-		initialNormal3();
+		// select an initial normal vector perpendicular to the first tangent vector,
+		// and in the direction of the minimum tangent xyz component
 
-		/*
-		function initialNormal1(lastBinormal) {
-			// fixed start binormal. Has dangers of 0 vectors
-			normals[ 0 ] = new THREE.Vector3();
-			binormals[ 0 ] = new THREE.Vector3();
-			if (lastBinormal===undefined) lastBinormal = new THREE.Vector3( 0, 0, 1 );
-			normals[ 0 ].crossVectors( lastBinormal, tangents[ 0 ] ).normalize();
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
-		}
+		normals[ 0 ] = new Vector3();
+		binormals[ 0 ] = new Vector3();
+		var min = Number.MAX_VALUE;
+		var tx = Math.abs( tangents[ 0 ].x );
+		var ty = Math.abs( tangents[ 0 ].y );
+		var tz = Math.abs( tangents[ 0 ].z );
 
-		function initialNormal2() {
+		if ( tx <= min ) {
 
-			// This uses the Frenet-Serret formula for deriving binormal
-			var t2 = path.getTangentAt( epsilon );
-
-			normals[ 0 ] = new THREE.Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
-			binormals[ 0 ] = new THREE.Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
-
-			normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
+			min = tx;
+			normal.set( 1, 0, 0 );
 
 		}
-		*/
 
-		function initialNormal3() {
+		if ( ty <= min ) {
 
-			// select an initial normal vector perpendicular to the first tangent vector,
-			// and in the direction of the smallest tangent xyz component
-
-			normals[ 0 ] = new Vector3();
-			binormals[ 0 ] = new Vector3();
-			smallest = Number.MAX_VALUE;
-			tx = Math.abs( tangents[ 0 ].x );
-			ty = Math.abs( tangents[ 0 ].y );
-			tz = Math.abs( tangents[ 0 ].z );
-
-			if ( tx <= smallest ) {
-
-				smallest = tx;
-				normal.set( 1, 0, 0 );
-
-			}
-
-			if ( ty <= smallest ) {
-
-				smallest = ty;
-				normal.set( 0, 1, 0 );
-
-			}
-
-			if ( tz <= smallest ) {
-
-				normal.set( 0, 0, 1 );
-
-			}
-
-			vec.crossVectors( tangents[ 0 ], normal ).normalize();
-
-			normals[ 0 ].crossVectors( tangents[ 0 ], vec );
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+			min = ty;
+			normal.set( 0, 1, 0 );
 
 		}
+
+		if ( tz <= min ) {
+
+			normal.set( 0, 0, 1 );
+
+		}
+
+		vec.crossVectors( tangents[ 0 ], normal ).normalize();
+
+		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
+		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
 
 
 		// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-		for ( i = 1; i < numpoints; i ++ ) {
+		for ( i = 1; i <= segments; i ++ ) {
 
 			normals[ i ] = normals[ i - 1 ].clone();
 
@@ -24761,21 +24755,20 @@
 
 		}
 
-
 		// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
 
 		if ( closed ) {
 
-			theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
-			theta /= ( numpoints - 1 );
+			theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+			theta /= segments;
 
-			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
+			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
 
 				theta = - theta;
 
 			}
 
-			for ( i = 1; i < numpoints; i ++ ) {
+			for ( i = 1; i <= segments; i ++ ) {
 
 				// twist a little...
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
@@ -24785,7 +24778,51 @@
 
 		}
 
-	};
+	}
+
+	/**
+	 * @author oosmoxiecode / https://github.com/oosmoxiecode
+	 * @author WestLangley / https://github.com/WestLangley
+	 * @author zz85 / https://github.com/zz85
+	 * @author miningold / https://github.com/miningold
+	 * @author jonobr1 / https://github.com/jonobr1
+	 *
+	 * Creates a tube which extrudes along a 3d spline.
+	 */
+
+	function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
+
+		Geometry.call( this );
+
+		this.type = 'TubeGeometry';
+
+		this.parameters = {
+			path: path,
+			tubularSegments: tubularSegments,
+			radius: radius,
+			radialSegments: radialSegments,
+			closed: closed
+		};
+
+		if( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
+
+		var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+
+		// expose internals
+
+		this.tangents = bufferGeometry.tangents;
+		this.normals = bufferGeometry.normals;
+		this.binormals = bufferGeometry.binormals;
+
+		// create geometry
+
+		this.fromBufferGeometry( bufferGeometry );
+		this.mergeVertices();
+
+	}
+
+	TubeGeometry.prototype = Object.create( Geometry.prototype );
+	TubeGeometry.prototype.constructor = TubeGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -25189,7 +25226,7 @@
 				cx = contour[ verts[ w ] ].x;
 				cy = contour[ verts[ w ] ].y;
 
-				if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+				if ( ( bx - ax ) * ( cy - ay ) - ( by - ay ) * ( cx - ax ) <= 0 ) return false;
 
 				var aX, aY, bX, bY, cX, cY;
 				var apx, apy, bpx, bpy, cpx, cpy;
@@ -27919,6 +27956,7 @@
 		PolyhedronGeometry: PolyhedronGeometry,
 		PolyhedronBufferGeometry: PolyhedronBufferGeometry,
 		TubeGeometry: TubeGeometry,
+		TubeBufferGeometry: TubeBufferGeometry,
 		TorusKnotGeometry: TorusKnotGeometry,
 		TorusKnotBufferGeometry: TorusKnotBufferGeometry,
 		TorusGeometry: TorusGeometry,
@@ -41873,6 +41911,7 @@
 	exports.PolyhedronGeometry = PolyhedronGeometry;
 	exports.PolyhedronBufferGeometry = PolyhedronBufferGeometry;
 	exports.TubeGeometry = TubeGeometry;
+	exports.TubeBufferGeometry = TubeBufferGeometry;
 	exports.TorusKnotGeometry = TorusKnotGeometry;
 	exports.TorusKnotBufferGeometry = TorusKnotBufferGeometry;
 	exports.TorusGeometry = TorusGeometry;
