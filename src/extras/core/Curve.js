@@ -269,7 +269,7 @@ Curve.prototype = {
 
 		// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 
-		var	normal = new Vector3();
+		var normal = new Vector3();
 
 		var tangents = [];
 		var normals = [];
@@ -353,7 +353,7 @@ Curve.prototype = {
 
 		// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
 
-		if ( closed ) {
+		if ( closed === true ) {
 
 			theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
 			theta /= segments;
