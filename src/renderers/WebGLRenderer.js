@@ -1382,29 +1382,14 @@ function WebGLRenderer( parameters ) {
 			negRad = - sphere.radius,
 			i = 0;
 
-		/*if ( _clipping.clipIntersection ) {
+		do {
 
-			do {
+			// out when deeper than radius in the negative halfspace
+			if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
 
-				// out when deeper than radius in the negative halfspace
-				if ( planes[ i ].distanceToPoint( center ) > negRad ) return true;
+		} while ( ++ i !== numPlanes );
 
-			} while ( ++ i !== numPlanes );
-
-			return false;
-
-		} else { */
-
-			do {
-
-				// out when deeper than radius in the negative halfspace
-				if ( planes[ i ].distanceToPoint( center ) < negRad ) return false;
-
-			} while ( ++ i !== numPlanes );
-
-			return true;
-
-	//	}
+		return true;
 
 	}
 
