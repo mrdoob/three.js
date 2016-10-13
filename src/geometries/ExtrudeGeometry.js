@@ -22,7 +22,7 @@ import { TubeGeometry } from './TubeGeometry';
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
- *  frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
+ *  frames: <Object> // containing arrays of tangents, normals, binormals
  *
  *  uvGenerator: <Object> // object that provides UV generator functions
  *
@@ -104,10 +104,9 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		// SETUP TNB variables
 
-		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
 
-		splineTube = options.frames !== undefined ? options.frames : new TubeGeometry.FrenetFrames( extrudePath, steps, false );
+		splineTube = options.frames !== undefined ? options.frames : extrudePath.computeFrenetFrames( steps, false );
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
