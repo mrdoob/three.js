@@ -91,6 +91,26 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
+var CustomSinCurve = THREE.Curve.create(
+
+	function ( scale ) {
+
+		this.scale = ( scale === undefined ) ? 1 : scale;
+
+	},
+
+	function ( t ) {
+
+		var tx = t * 3 - 1.5;
+		var ty = Math.sin( 2 * Math.PI * t );
+		var tz = 0;
+
+		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+	}
+
+);
+
 var guis = {
 
 	BoxBufferGeometry : function( mesh ) {
@@ -1136,26 +1156,6 @@ var guis = {
 			radiusSegments: 8
 		};
 
-		var CustomSinCurve = THREE.Curve.create(
-
-			function ( scale ) {
-
-				this.scale = ( scale === undefined ) ? 1 : scale;
-
-			},
-
-			function ( t ) {
-
-				var tx = t * 3 - 1.5;
-				var ty = Math.sin( 2 * Math.PI * t );
-				var tz = 0;
-
-				return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
-
-			}
-
-		);
-
 		var path = new CustomSinCurve( 10 );
 
 		function generateGeometry() {
@@ -1167,6 +1167,34 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.TubeGeometry' );
+
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	TubeBufferGeometry : function( mesh ) {
+
+		var data = {
+			segments : 20,
+			radius : 2,
+			radiusSegments: 8
+		};
+
+		var path = new CustomSinCurve( 10 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TubeBufferGeometry' );
 
 		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
