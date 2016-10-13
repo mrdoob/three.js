@@ -22,6 +22,7 @@ export { SphereBufferGeometry } from './SphereBufferGeometry.js';
 export { SphereGeometry } from './SphereGeometry.js';
 export { RingGeometry } from './RingGeometry.js';
 export { RingBufferGeometry } from './RingBufferGeometry.js';
+export { RoundedBoxGeometry } from './RoundedBoxGeometry.js';
 export { PlaneBufferGeometry } from './PlaneBufferGeometry.js';
 export { PlaneGeometry } from './PlaneGeometry.js';
 export { LatheGeometry } from './LatheGeometry.js';

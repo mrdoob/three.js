@@ -1,8 +1,12 @@
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Vector3 } from '../math/Vector3';
+import { BufferAttribute } from '../core/BufferAttribute';
+
 /**
  * @author pailhead / http://dusanbosnjak.com
  */
 
-THREE.RoundedBoxGeometry = function ( 
+function RoundedBoxGeometry ( 
 	width , 
 	height , 
 	depth , 
@@ -10,7 +14,7 @@ THREE.RoundedBoxGeometry = function (
 	radiusSegments
 ) {
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	this.type = 'RoundedBoxGeometry';
 
@@ -52,9 +56,9 @@ THREE.RoundedBoxGeometry = function (
 
 	//make buffers ======================================
 
-	var positions = 	new THREE.BufferAttribute( new Float32Array( totalVertexCount * 3 ), 3 );
+	var positions = 	new BufferAttribute( new Float32Array( totalVertexCount * 3 ), 3 );
 	
-	var normals = 		new THREE.BufferAttribute( new Float32Array( totalVertexCount * 3 ), 3 );
+	var normals = 		new BufferAttribute( new Float32Array( totalVertexCount * 3 ), 3 );
 	
 
 	//some vars =========================================
@@ -62,8 +66,8 @@ THREE.RoundedBoxGeometry = function (
 	var 
 		cornerVerts = [], 
 		cornerNormals = [],
-		normal = new THREE.Vector3(),
-		vertex = new THREE.Vector3(),
+		normal = new Vector3(),
+		vertex = new Vector3(),
 		vertexPool = [],
 		normalPool = [],
 		indices = []
@@ -87,14 +91,14 @@ THREE.RoundedBoxGeometry = function (
 
 		//corner offsets
 		var cornerLayout = [
-			new THREE.Vector3(  1 ,  1 ,  1 ),
-			new THREE.Vector3(  1 ,  1 , -1 ),
-			new THREE.Vector3( -1 ,  1 , -1 ),
-			new THREE.Vector3( -1 ,  1 ,  1 ),
-			new THREE.Vector3(  1 , -1 ,  1 ),
-			new THREE.Vector3(  1 , -1 , -1 ),
-			new THREE.Vector3( -1 , -1 , -1 ),
-			new THREE.Vector3( -1 , -1 ,  1 )
+			new Vector3(  1 ,  1 ,  1 ),
+			new Vector3(  1 ,  1 , -1 ),
+			new Vector3( -1 ,  1 , -1 ),
+			new Vector3( -1 ,  1 ,  1 ),
+			new Vector3(  1 , -1 ,  1 ),
+			new Vector3(  1 , -1 , -1 ),
+			new Vector3( -1 , -1 , -1 ),
+			new Vector3( -1 , -1 ,  1 )
 		];
 
 		//corner holder 
@@ -109,7 +113,7 @@ THREE.RoundedBoxGeometry = function (
 
 		var PIhalf = Math.PI / 2;
 
-		var cornerOffset = new THREE.Vector3( edgeHalfWidth , edgeHalfHeight , edgeHalfDepth );
+		var cornerOffset = new Vector3( edgeHalfWidth , edgeHalfHeight , edgeHalfDepth );
 
 		for ( var y = 0; y <= radiusSegments; y ++ ) {
 
@@ -537,7 +541,7 @@ THREE.RoundedBoxGeometry = function (
 
 	}
 
-	this.setIndex( new THREE.BufferAttribute( new Uint16Array( indices ) , 1 ) );
+	this.setIndex( new BufferAttribute( new Uint16Array( indices ) , 1 ) );
 	
 	this.addAttribute( 'position', positions );
 	
@@ -545,5 +549,8 @@ THREE.RoundedBoxGeometry = function (
 	
 };
 
-THREE.RoundedBoxGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.RoundedBoxGeometry.constructor = THREE.RoundedBoxGeometry;
+RoundedBoxGeometry.prototype = Object.create( BufferGeometry.prototype );
+RoundedBoxGeometry.constructor = RoundedBoxGeometry;
+
+
+export { RoundedBoxGeometry };

@@ -61,6 +61,7 @@ var list = {
 			[ "PolyhedronGeometry", "api/geometries/PolyhedronGeometry" ],
 			[ "RingBufferGeometry", "api/geometries/RingBufferGeometry" ],
 			[ "RingGeometry", "api/geometries/RingGeometry" ],
+			[ "RoundedBoxGeometry", "api/geometries/RoundedBoxGeometry" ],
 			[ "ShapeGeometry", "api/geometries/ShapeGeometry" ],
 			[ "SphereBufferGeometry", "api/geometries/SphereBufferGeometry" ],
 			[ "SphereGeometry", "api/geometries/SphereGeometry" ],
