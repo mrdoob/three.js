@@ -1382,7 +1382,7 @@ function WebGLRenderer( parameters ) {
 			negRad = - sphere.radius,
 			i = 0;
 
-		if ( _clipping.clipIntersection ) {
+		/*if ( _clipping.clipIntersection ) {
 
 			do {
 
@@ -1393,7 +1393,7 @@ function WebGLRenderer( parameters ) {
 
 			return false;
 
-		} else {
+		} else { */
 
 			do {
 
@@ -1404,7 +1404,7 @@ function WebGLRenderer( parameters ) {
 
 			return true;
 
-		}
+	//	}
 
 	}
 
@@ -1556,7 +1556,7 @@ function WebGLRenderer( parameters ) {
 		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters(
-				material, _lights, fog, _clipping.numPlanes, _clipping.clipIntersection, object );
+				material, _lights, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1659,7 +1659,7 @@ function WebGLRenderer( parameters ) {
 		       material.clipping === true ) {
 
 			materialProperties.numClippingPlanes = _clipping.numPlanes;
-			materialProperties.clipIntersection = _clipping.clipIntersection;
+			materialProperties.numIntersection = _clipping.numIntersection;
 			uniforms.clippingPlanes = _clipping.uniform;
 
 		}
@@ -1758,7 +1758,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes || 
- 				  materialProperties.clipIntersection  !== _clipping.clipIntersection ) ) {
+ 				  materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 

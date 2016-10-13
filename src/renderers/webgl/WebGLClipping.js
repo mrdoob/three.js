@@ -56,7 +56,7 @@ function WebGLClipping() {
 
 	};
 
-	this.setState = function( planes, nIntersection, clipShadows, camera, cache, fromCache ) {
+	this.setState = function( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
 
 		if ( ! localClippingEnabled ||
 				planes === null || planes.length === 0 ||
@@ -91,8 +91,8 @@ function WebGLClipping() {
 			}
 
 			cache.clippingState = dstArray;
+			this.numIntersection = clipIntersection ? this.numPlanes : 0;
 			this.numPlanes += nGlobal;
-			this.numIntersection = nIntersection;
 
 		}
 
