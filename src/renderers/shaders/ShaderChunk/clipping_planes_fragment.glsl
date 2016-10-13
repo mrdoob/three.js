@@ -1,6 +1,13 @@
 #if NUM_CLIPPING_PLANES > 0
 
-	#if CLIP_INTERSECTION
+	for ( int i = 0; i < NUM_CLIPPING_PLANES; ++ i ) {
+
+		vec4 plane = clippingPlanes[ i ];
+		if ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;
+
+	}
+		
+	#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES
 
 		bool clipped = true;
 		for ( int i = 0; i < NUM_CLIPPING_PLANES; ++ i ) {
@@ -9,16 +16,7 @@
 		}
 
 		if ( clipped ) discard;
-
-	#else
-
-		for ( int i = 0; i < NUM_CLIPPING_PLANES; ++ i ) {
-
-			vec4 plane = clippingPlanes[ i ];
-			if ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;
-
-		}
-		
+	
 	#endif
 
 #endif

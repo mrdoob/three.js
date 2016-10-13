@@ -303,6 +303,7 @@ Material.prototype = {
 
 		this.visible = source.visible;
 		this.clipShadows = source.clipShadows;
+		this.clipIntersection = source.clipIntersection;
 
 		var srcPlanes = source.clippingPlanes,
 			dstPlanes = null;
