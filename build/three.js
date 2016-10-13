@@ -414,6 +414,14 @@
 
 		},
 
+		// https://en.wikipedia.org/wiki/Linear_interpolation
+
+		lerp: function ( x, y, t ) {
+
+			return ( 1 - t ) * x + t * y;
+
+		},
+
 		// http://en.wikipedia.org/wiki/Smoothstep
 
 		smoothstep: function ( x, min, max ) {
@@ -598,6 +606,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -1364,6 +1374,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -2671,6 +2683,8 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
+			
+			return this;
 
 		},
 
@@ -10524,7 +10538,8 @@
 
 		this.userData = {};
 
-		this.onBeforeRender = null;
+		this.onBeforeRender = function(){}; 
+		this.onAfterRender = function(){};
 
 	}
 
@@ -18528,8 +18543,6 @@
 			} else {
 
 				disable( gl.BLEND );
-				currentBlending = blending; // no blending, that is
-				return;
 
 			}
 
@@ -20283,7 +20296,7 @@
 						var size = geometryAttribute.itemSize;
 						var buffer = objects.getAttributeBuffer( geometryAttribute );
 
-						if ( geometryAttribute && geometryAttribute.isInterleavedBufferAttribute ) {
+						if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 							var data = geometryAttribute.data;
 							var stride = data.stride;
@@ -20310,7 +20323,7 @@
 
 						} else {
 
-							if ( geometryAttribute && geometryAttribute.isInstancedBufferAttribute ) {
+							if ( geometryAttribute.isInstancedBufferAttribute ) {
 
 								state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
 
@@ -20430,8 +20443,6 @@
 				return;
 
 			}
-
-			var fog = scene.fog;
 
 			// reset caching for this frame
 
@@ -20553,19 +20564,19 @@
 
 				var overrideMaterial = scene.overrideMaterial;
 
-				renderObjects( opaqueObjects, camera, fog, overrideMaterial );
-				renderObjects( transparentObjects, camera, fog, overrideMaterial );
+				renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+				renderObjects( transparentObjects, scene, camera, overrideMaterial );
 
 			} else {
 
 				// opaque pass (front-to-back order)
 
 				state.setBlending( NoBlending );
-				renderObjects( opaqueObjects, camera, fog );
+				renderObjects( opaqueObjects, scene, camera );
 
 				// transparent pass (back-to-front order)
 
-				renderObjects( transparentObjects, camera, fog );
+				renderObjects( transparentObjects, scene, camera );
 
 			}
 
@@ -20792,7 +20803,7 @@
 
 		}
 
-		function renderObjects( renderList, camera, fog, overrideMaterial ) {
+		function renderObjects( renderList, scene, camera, overrideMaterial ) {
 
 			for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -20806,11 +20817,13 @@
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
+				object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 				if ( object.isImmediateRenderObject ) {
 
 					setMaterial( material );
 
-					var program = setProgram( camera, fog, material, object );
+					var program = setProgram( camera, scene.fog, material, object );
 
 					_currentGeometryProgram = '';
 
@@ -20822,11 +20835,12 @@
 
 				} else {
 
-					if ( object.onBeforeRender !== null ) object.onBeforeRender();
-
-					_this.renderBufferDirect( camera, fog, geometry, material, object, group );
+					_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 				}
+
+				object.onAfterRender( _this, scene, camera, geometry, material, group );
+
 
 			}
 
@@ -21388,7 +21402,7 @@
 			uniforms.diffuse.value = material.color;
 			uniforms.opacity.value = material.opacity;
 			uniforms.size.value = material.size * _pixelRatio;
-			uniforms.scale.value = _canvas.clientHeight * 0.5;
+			uniforms.scale.value = _height * 0.5;
 
 			uniforms.map.value = material.map;
 
@@ -22031,11 +22045,11 @@
 			if ( p === UnsignedIntType ) return _gl.UNSIGNED_INT;
 			if ( p === FloatType ) return _gl.FLOAT;
 
-			extension = extensions.get( 'OES_texture_half_float' );
+			if ( p === HalfFloatType ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'OES_texture_half_float' );
 
-				if ( p === HalfFloatType ) return extension.HALF_FLOAT_OES;
+				if ( extension !== null ) return extension.HALF_FLOAT_OES;
 
 			}
 
@@ -22064,50 +22078,64 @@
 			if ( p === OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
 			if ( p === SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
-			extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
+				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
-				if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-				if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-				if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				if ( extension !== null ) {
 
-			}
+					if ( p === RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+					if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+					if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
-			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
-
-			if ( extension !== null ) {
-
-				if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-				if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-				if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-				if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+				}
 
 			}
 
-			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+			if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
+				 p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
-				if ( p === RGB_ETC1_Format ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+				if ( extension !== null ) {
+
+					if ( p === RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+					if ( p === RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+					if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+					if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+				}
 
 			}
 
-			extension = extensions.get( 'EXT_blend_minmax' );
+			if ( p === RGB_ETC1_Format ) {
 
-			if ( extension !== null ) {
+				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-				if ( p === MinEquation ) return extension.MIN_EXT;
-				if ( p === MaxEquation ) return extension.MAX_EXT;
+				if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
 
 			}
 
-			extension = extensions.get( 'WEBGL_depth_texture' );
+			if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( extension !== null ){
+				extension = extensions.get( 'EXT_blend_minmax' );
 
-				if ( p === UnsignedInt248Type ) return extension.UNSIGNED_INT_24_8_WEBGL;
+				if ( extension !== null ) {
+
+					if ( p === MinEquation ) return extension.MIN_EXT;
+					if ( p === MaxEquation ) return extension.MAX_EXT;
+
+				}
+
+			}
+
+			if ( p === UnsignedInt248Type ) {
+
+				extension = extensions.get( 'WEBGL_depth_texture' );
+
+				if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
 
 			}
 
@@ -22620,8 +22648,9 @@
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-		this.flipY = false;
 		this.generateMipmaps  = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
 
 	}
 
@@ -23851,7 +23880,7 @@
 
 		// build geometry
 
-		this.setIndex( Uint16Attribute( indices, 1 ) );
+		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
 		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
 		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
 
@@ -23892,16 +23921,14 @@
 	ParametricGeometry.prototype.constructor = ParametricGeometry;
 
 	/**
-	 * @author clockworkgeek / https://github.com/clockworkgeek
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author WestLangley / http://github.com/WestLangley
-	*/
+	 * @author Mugen87 / https://github.com/Mugen87
+	 */
 
-	function PolyhedronGeometry( vertices, indices, radius, detail ) {
+	function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
-		Geometry.call( this );
+		BufferGeometry.call( this );
 
-		this.type = 'PolyhedronGeometry';
+		this.type = 'PolyhedronBufferGeometry';
 
 		this.parameters = {
 			vertices: vertices,
@@ -23913,140 +23940,80 @@
 		radius = radius || 1;
 		detail = detail || 0;
 
-		var that = this;
+		// default buffer data
 
-		for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
+		var vertexBuffer = [];
+		var uvBuffer = [];
 
-			prepare( new Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
+		// the subdivision creates the vertex buffer data
 
-		}
+		subdivide( detail );
 
-		var p = this.vertices;
+		// all vertices should lie on a conceptual sphere with a given radius
 
-		var faces = [];
+		appplyRadius( radius );
 
-		for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
+		// finally, create the uv data
 
-			var v1 = p[ indices[ i ] ];
-			var v2 = p[ indices[ i + 1 ] ];
-			var v3 = p[ indices[ i + 2 ] ];
+		generateUVs();
 
-			faces[ j ] = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+		// build non-indexed geometry
 
-		}
+		this.addAttribute( 'position', Float32Attribute( vertexBuffer, 3 ) );
+		this.addAttribute( 'normal', Float32Attribute( vertexBuffer.slice(), 3 ) );
+		this.addAttribute( 'uv', Float32Attribute( uvBuffer, 2 ) );
+		this.normalizeNormals();
 
-		var centroid = new Vector3();
+		this.boundingSphere = new Sphere( new Vector3(), radius );
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		// helper functions
 
-			subdivide( faces[ i ], detail );
+		function subdivide( detail ) {
 
-		}
+			var a = new Vector3();
+			var b = new Vector3();
+			var c = new Vector3();
 
+			// iterate over all faces and apply a subdivison with the given detail value
 
-		// Handle case when face straddles the seam
+			for ( var i = 0; i < indices.length; i += 3 ) {
 
-		for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+				// get the vertices of the face
 
-			var uvs = this.faceVertexUvs[ 0 ][ i ];
+				getVertexByIndex( indices[ i + 0 ], a );
+				getVertexByIndex( indices[ i + 1 ], b );
+				getVertexByIndex( indices[ i + 2 ], c );
 
-			var x0 = uvs[ 0 ].x;
-			var x1 = uvs[ 1 ].x;
-			var x2 = uvs[ 2 ].x;
+				// perform subdivision
 
-			var max = Math.max( x0, x1, x2 );
-			var min = Math.min( x0, x1, x2 );
-
-			if ( max > 0.9 && min < 0.1 ) {
-
-				// 0.9 is somewhat arbitrary
-
-				if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
-				if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
-				if ( x2 < 0.2 ) uvs[ 2 ].x += 1;
+				subdivideFace( a, b, c, detail );
 
 			}
 
 		}
 
-
-		// Apply radius
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			this.vertices[ i ].multiplyScalar( radius );
-
-		}
-
-
-		// Merge vertices
-
-		this.mergeVertices();
-
-		this.computeFaceNormals();
-
-		this.boundingSphere = new Sphere( new Vector3(), radius );
-
-
-		// Project vector onto sphere's surface
-
-		function prepare( vector ) {
-
-			var vertex = vector.normalize().clone();
-			vertex.index = that.vertices.push( vertex ) - 1;
-
-			// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
-
-			var u = azimuth( vector ) / 2 / Math.PI + 0.5;
-			var v = inclination( vector ) / Math.PI + 0.5;
-			vertex.uv = new Vector2( u, 1 - v );
-
-			return vertex;
-
-		}
-
-
-		// Approximate a curved face with recursively sub-divided triangles.
-
-		function make( v1, v2, v3 ) {
-
-			var face = new Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-			that.faces.push( face );
-
-			centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
-
-			var azi = azimuth( centroid );
-
-			that.faceVertexUvs[ 0 ].push( [
-				correctUV( v1.uv, v1, azi ),
-				correctUV( v2.uv, v2, azi ),
-				correctUV( v3.uv, v3, azi )
-			] );
-
-		}
-
-
-		// Analytically subdivide a face to the required detail level.
-
-		function subdivide( face, detail ) {
+		function subdivideFace( a, b, c, detail ) {
 
 			var cols = Math.pow( 2, detail );
-			var a = prepare( that.vertices[ face.a ] );
-			var b = prepare( that.vertices[ face.b ] );
-			var c = prepare( that.vertices[ face.c ] );
+
+			// we use this multidimensional array as a data structure for creating the subdivision
+
 			var v = [];
 
-			// Construct all of the vertices for this subdivision.
+			var i, j;
 
-			for ( var i = 0 ; i <= cols; i ++ ) {
+			// construct all of the vertices for this subdivision
+
+			for ( i = 0 ; i <= cols; i ++ ) {
 
 				v[ i ] = [];
 
-				var aj = prepare( a.clone().lerp( c, i / cols ) );
-				var bj = prepare( b.clone().lerp( c, i / cols ) );
+				var aj = a.clone().lerp( c, i / cols );
+				var bj = b.clone().lerp( c, i / cols );
+
 				var rows = cols - i;
 
-				for ( var j = 0; j <= rows; j ++ ) {
+				for ( j = 0; j <= rows; j ++ ) {
 
 					if ( j === 0 && i === cols ) {
 
@@ -24054,7 +24021,7 @@
 
 					} else {
 
-						v[ i ][ j ] = prepare( aj.clone().lerp( bj, j / rows ) );
+						v[ i ][ j ] = aj.clone().lerp( bj, j / rows );
 
 					}
 
@@ -24062,29 +24029,25 @@
 
 			}
 
-			// Construct all of the faces.
+			// construct all of the faces
 
-			for ( var i = 0; i < cols ; i ++ ) {
+			for ( i = 0; i < cols ; i ++ ) {
 
-				for ( var j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
+				for ( j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
 					var k = Math.floor( j / 2 );
 
 					if ( j % 2 === 0 ) {
 
-						make(
-							v[ i ][ k + 1 ],
-							v[ i + 1 ][ k ],
-							v[ i ][ k ]
-						);
+						pushVertex( v[ i ][ k + 1 ] );
+						pushVertex( v[ i + 1 ][ k ] );
+						pushVertex( v[ i ][ k ] );
 
 					} else {
 
-						make(
-							v[ i ][ k + 1 ],
-							v[ i + 1 ][ k + 1 ],
-							v[ i + 1 ][ k ]
-						);
+						pushVertex( v[ i ][ k + 1 ] );
+						pushVertex( v[ i + 1 ][ k + 1 ] );
+						pushVertex( v[ i + 1 ][ k ] );
 
 					}
 
@@ -24094,6 +24057,144 @@
 
 		}
 
+		function appplyRadius( radius ) {
+
+			var vertex = new Vector3();
+
+			// iterate over the entire buffer and apply the radius to each vertex
+
+			for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+
+				vertex.x = vertexBuffer[ i + 0 ];
+				vertex.y = vertexBuffer[ i + 1 ];
+				vertex.z = vertexBuffer[ i + 2 ];
+
+				vertex.normalize().multiplyScalar( radius );
+
+				vertexBuffer[ i + 0 ] = vertex.x;
+				vertexBuffer[ i + 1 ] = vertex.y;
+				vertexBuffer[ i + 2 ] = vertex.z;
+
+			}
+
+		}
+
+		function generateUVs() {
+
+			var vertex = new Vector3();
+
+			for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+
+				vertex.x = vertexBuffer[ i + 0 ];
+				vertex.y = vertexBuffer[ i + 1 ];
+				vertex.z = vertexBuffer[ i + 2 ];
+
+				var u = azimuth( vertex ) / 2 / Math.PI + 0.5;
+				var v = inclination( vertex ) / Math.PI + 0.5;
+				uvBuffer.push( u, 1 - v );
+
+			}
+
+			correctUVs();
+
+			correctSeam();
+
+		}
+
+		function correctSeam() {
+
+			// handle case when face straddles the seam, see #3269
+
+			for ( var i = 0; i < uvBuffer.length; i += 6 ) {
+
+				// uv data of a single face
+
+				var x0 = uvBuffer[ i + 0 ];
+				var x1 = uvBuffer[ i + 2 ];
+				var x2 = uvBuffer[ i + 4 ];
+
+				var max = Math.max( x0, x1, x2 );
+				var min = Math.min( x0, x1, x2 );
+
+				// 0.9 is somewhat arbitrary
+
+				if ( max > 0.9 && min < 0.1 ) {
+
+					if ( x0 < 0.2 ) uvBuffer[ i + 0 ] += 1;
+					if ( x1 < 0.2 ) uvBuffer[ i + 2 ] += 1;
+					if ( x2 < 0.2 ) uvBuffer[ i + 4 ] += 1;
+
+				}
+
+			}
+
+		}
+
+		function pushVertex( vertex ) {
+
+			vertexBuffer.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		function getVertexByIndex( index, vertex ) {
+
+			var stride = index * 3;
+
+			vertex.x = vertices[ stride + 0 ];
+			vertex.y = vertices[ stride + 1 ];
+			vertex.z = vertices[ stride + 2 ];
+
+		}
+
+		function correctUVs() {
+
+			var a = new Vector3();
+			var b = new Vector3();
+			var c = new Vector3();
+
+			var centroid = new Vector3();
+
+			var uvA = new Vector2();
+			var uvB = new Vector2();
+			var uvC = new Vector2();
+
+			for ( var i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
+
+				a.set( vertexBuffer[ i + 0 ], vertexBuffer[ i + 1 ], vertexBuffer[ i + 2 ] );
+				b.set( vertexBuffer[ i + 3 ], vertexBuffer[ i + 4 ], vertexBuffer[ i + 5 ] );
+				c.set( vertexBuffer[ i + 6 ], vertexBuffer[ i + 7 ], vertexBuffer[ i + 8 ] );
+
+				uvA.set( uvBuffer[ j + 0 ], uvBuffer[ j + 1 ] );
+				uvB.set( uvBuffer[ j + 2 ], uvBuffer[ j + 3 ] );
+				uvC.set( uvBuffer[ j + 4 ], uvBuffer[ j + 5 ] );
+
+				centroid.copy( a ).add( b ).add( c ).divideScalar( 3 );
+
+				var azi = azimuth( centroid );
+
+				correctUV( uvA, j + 0, a, azi );
+				correctUV( uvB, j + 2, b, azi );
+				correctUV( uvC, j + 4, c, azi );
+
+			}
+
+		}
+
+		function correctUV( uv, stride, vector, azimuth  ) {
+
+			if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) {
+
+				uvBuffer[ stride ] =  uv.x - 1;
+
+			}
+
+			if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) {
+
+				uvBuffer[ stride ] = azimuth / 2 / Math.PI + 0.5;
+
+			}
+
+		}
 
 		// Angle around the Y axis, counter-clockwise when looking from above.
 
@@ -24112,39 +24213,28 @@
 
 		}
 
-
-		// Texture fixing helper. Spheres have some odd behaviours.
-
-		function correctUV( uv, vector, azimuth ) {
-
-			if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new Vector2( uv.x - 1, uv.y );
-			if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
-			return uv.clone();
-
-		}
-
 	}
 
-	PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
-	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
+	PolyhedronBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+	PolyhedronBufferGeometry.prototype.constructor = PolyhedronBufferGeometry;
 
 	/**
-	 * @author timothypratley / https://github.com/timothypratley
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	function TetrahedronGeometry( radius, detail ) {
+	function TetrahedronBufferGeometry( radius, detail ) {
 
 		var vertices = [
-			 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
+			1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
 		];
 
 		var indices = [
-			 2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
+			2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
 		];
 
-		PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+		PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
 
-		this.type = 'TetrahedronGeometry';
+		this.type = 'TetrahedronBufferGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -24153,14 +24243,37 @@
 
 	}
 
-	TetrahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-	TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+	TetrahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
+	TetrahedronBufferGeometry.prototype.constructor = TetrahedronBufferGeometry;
 
 	/**
 	 * @author timothypratley / https://github.com/timothypratley
 	 */
 
-	function OctahedronGeometry( radius, detail ) {
+	function TetrahedronGeometry( radius, detail ) {
+
+		Geometry.call( this );
+
+		this.type = 'TetrahedronGeometry';
+
+		this.parameters = {
+			radius: radius,
+			detail: detail
+		};
+
+		this.fromBufferGeometry( new THREE.TetrahedronBufferGeometry( radius, detail ) );
+		this.mergeVertices();
+
+	}
+
+	TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
+	TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+
+	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 */
+
+	function OctahedronBufferGeometry( radius,detail ) {
 
 		var vertices = [
 			1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
@@ -24170,9 +24283,9 @@
 			0, 2, 4,    0, 4, 3,    0, 3, 5,    0, 5, 2,    1, 2, 5,    1, 5, 3,    1, 3, 4,    1, 4, 2
 		];
 
-		PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+		PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
 
-		this.type = 'OctahedronGeometry';
+		this.type = 'OctahedronBufferGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -24181,14 +24294,37 @@
 
 	}
 
-	OctahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-	OctahedronGeometry.prototype.constructor = OctahedronGeometry;
+	OctahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
+	OctahedronBufferGeometry.prototype.constructor = OctahedronBufferGeometry;
 
 	/**
 	 * @author timothypratley / https://github.com/timothypratley
 	 */
 
-	function IcosahedronGeometry( radius, detail ) {
+	function OctahedronGeometry( radius, detail ) {
+
+		Geometry.call( this );
+
+		this.type = 'OctahedronGeometry';
+
+		this.parameters = {
+			radius: radius,
+			detail: detail
+		};
+
+		this.fromBufferGeometry( new THREE.OctahedronBufferGeometry( radius, detail ) );
+		this.mergeVertices();
+
+	}
+
+	OctahedronGeometry.prototype = Object.create( Geometry.prototype );
+	OctahedronGeometry.prototype.constructor = OctahedronGeometry;
+
+	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 */
+
+	function IcosahedronBufferGeometry( radius, detail ) {
 
 		var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -24205,9 +24341,9 @@
 			 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
 		];
 
-		PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+		PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
 
-		this.type = 'IcosahedronGeometry';
+		this.type = 'IcosahedronBufferGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -24216,14 +24352,37 @@
 
 	}
 
-	IcosahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
+	IcosahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
+	IcosahedronBufferGeometry.prototype.constructor = IcosahedronBufferGeometry;
+
+	/**
+	 * @author timothypratley / https://github.com/timothypratley
+	 */
+
+	function IcosahedronGeometry( radius, detail ) {
+
+	 	Geometry.call( this );
+
+		this.type = 'IcosahedronGeometry';
+
+		this.parameters = {
+			radius: radius,
+			detail: detail
+		};
+
+		this.fromBufferGeometry( new THREE.IcosahedronBufferGeometry( radius, detail ) );
+		this.mergeVertices();
+
+	}
+
+	IcosahedronGeometry.prototype = Object.create( Geometry.prototype );
 	IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
 
 	/**
-	 * @author Abe Pazos / https://hamoid.com
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	function DodecahedronGeometry( radius, detail ) {
+	function DodecahedronBufferGeometry( radius, detail ) {
 
 		var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 		var r = 1 / t;
@@ -24264,9 +24423,9 @@
 			 1, 12, 14,      1, 14,  5,      1,  5,  9
 		];
 
-		PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+		PolyhedronBufferGeometry.call( this, vertices, indices, radius, detail );
 
-		this.type = 'DodecahedronGeometry';
+		this.type = 'DodecahedronBufferGeometry';
 
 		this.parameters = {
 			radius: radius,
@@ -24275,268 +24434,306 @@
 
 	}
 
-	DodecahedronGeometry.prototype = Object.create( PolyhedronGeometry.prototype );
-	DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
+	DodecahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
+	DodecahedronBufferGeometry.prototype.constructor = DodecahedronBufferGeometry;
 
 	/**
-	 * @author WestLangley / https://github.com/WestLangley
-	 * @author zz85 / https://github.com/zz85
-	 * @author miningold / https://github.com/miningold
-	 * @author jonobr1 / https://github.com/jonobr1
-	 *
-	 * Modified from the TorusKnotGeometry by @oosmoxiecode
-	 *
-	 * Creates a tube which extrudes along a 3d spline
-	 *
-	 * Uses parallel transport frames as described in
-	 * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
+	 * @author Abe Pazos / https://hamoid.com
 	 */
 
-	function TubeGeometry( path, segments, radius, radialSegments, closed, taper ) {
+	function DodecahedronGeometry( radius, detail ) {
 
 		Geometry.call( this );
 
-		this.type = 'TubeGeometry';
+		this.type = 'DodecahedronGeometry';
 
 		this.parameters = {
-			path: path,
-			segments: segments,
 			radius: radius,
-			radialSegments: radialSegments,
-			closed: closed,
-			taper: taper
+			detail: detail
 		};
 
-		segments = segments || 64;
-		radius = radius || 1;
-		radialSegments = radialSegments || 8;
-		closed = closed || false;
-		taper = taper || TubeGeometry.NoTaper;
-
-		var grid = [];
-
-		var scope = this,
-
-			tangent,
-			normal,
-			binormal,
-
-			numpoints = segments + 1,
-
-			u, v, r,
-
-			cx, cy,
-			pos, pos2 = new Vector3(),
-			i, j,
-			ip, jp,
-			a, b, c, d,
-			uva, uvb, uvc, uvd;
-
-		var frames = new TubeGeometry.FrenetFrames( path, segments, closed ),
-			tangents = frames.tangents,
-			normals = frames.normals,
-			binormals = frames.binormals;
-
-		// proxy internals
-		this.tangents = tangents;
-		this.normals = normals;
-		this.binormals = binormals;
-
-		function vert( x, y, z ) {
-
-			return scope.vertices.push( new Vector3( x, y, z ) ) - 1;
-
-		}
-
-		// construct the grid
-
-		for ( i = 0; i < numpoints; i ++ ) {
-
-			grid[ i ] = [];
-
-			u = i / ( numpoints - 1 );
-
-			pos = path.getPointAt( u );
-
-			tangent = tangents[ i ];
-			normal = normals[ i ];
-			binormal = binormals[ i ];
-
-			r = radius * taper( u );
-
-			for ( j = 0; j < radialSegments; j ++ ) {
-
-				v = j / radialSegments * 2 * Math.PI;
-
-				cx = - r * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-				cy = r * Math.sin( v );
-
-				pos2.copy( pos );
-				pos2.x += cx * normal.x + cy * binormal.x;
-				pos2.y += cx * normal.y + cy * binormal.y;
-				pos2.z += cx * normal.z + cy * binormal.z;
-
-				grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
-
-			}
-
-		}
-
-
-		// construct the mesh
-
-		for ( i = 0; i < segments; i ++ ) {
-
-			for ( j = 0; j < radialSegments; j ++ ) {
-
-				ip = ( closed ) ? ( i + 1 ) % segments : i + 1;
-				jp = ( j + 1 ) % radialSegments;
-
-				a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
-				b = grid[ ip ][ j ];
-				c = grid[ ip ][ jp ];
-				d = grid[ i ][ jp ];
-
-				uva = new Vector2( i / segments, j / radialSegments );
-				uvb = new Vector2( ( i + 1 ) / segments, j / radialSegments );
-				uvc = new Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
-				uvd = new Vector2( i / segments, ( j + 1 ) / radialSegments );
-
-				this.faces.push( new Face3( a, b, d ) );
-				this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-				this.faces.push( new Face3( b, c, d ) );
-				this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-			}
-
-		}
-
-		this.computeFaceNormals();
-		this.computeVertexNormals();
+		this.fromBufferGeometry( new THREE.DodecahedronBufferGeometry( radius, detail ) );
+		this.mergeVertices();
 
 	}
 
-	TubeGeometry.prototype = Object.create( Geometry.prototype );
-	TubeGeometry.prototype.constructor = TubeGeometry;
+	DodecahedronGeometry.prototype = Object.create( Geometry.prototype );
+	DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
 
-	TubeGeometry.NoTaper = function ( u ) {
+	/**
+	 * @author clockworkgeek / https://github.com/clockworkgeek
+	 * @author timothypratley / https://github.com/timothypratley
+	 * @author WestLangley / http://github.com/WestLangley
+	*/
 
-		return 1;
+	function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
-	};
+		Geometry.call( this );
 
-	TubeGeometry.SinusoidalTaper = function ( u ) {
+		this.type = 'PolyhedronGeometry';
 
-		return Math.sin( Math.PI * u );
+		this.parameters = {
+			vertices: vertices,
+			indices: indices,
+			radius: radius,
+			detail: detail
+		};
 
-	};
+		this.fromBufferGeometry( new PolyhedronBufferGeometry( vertices, indices, radius, detail ) );
+		this.mergeVertices();
 
-	// For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-	TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
+	}
 
-		var	normal = new Vector3(),
+	PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
+	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
 
-			tangents = [],
-			normals = [],
-			binormals = [],
+	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 *
+	 * Creates a tube which extrudes along a 3d spline.
+	 *
+	 * Uses parallel transport frames as described in:
+	 *
+	 * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
+	 */
 
-			vec = new Vector3(),
-			mat = new Matrix4(),
+	function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
 
-			numpoints = segments + 1,
-			theta,
-			smallest,
+		BufferGeometry.call( this );
 
-			tx, ty, tz,
-			i, u;
+		this.type = 'TubeBufferGeometry';
 
+		this.parameters = {
+			path: path,
+			tubularSegments: tubularSegments,
+			radius: radius,
+			radialSegments: radialSegments,
+			closed: closed
+		};
+
+		tubularSegments = tubularSegments || 64;
+		radius = radius || 1;
+		radialSegments = radialSegments || 8;
+		closed = closed || false;
+
+		var frames = new FrenetFrames( path, tubularSegments, closed );
 
 		// expose internals
+
+		this.tangents = frames.tangents;
+		this.normals = frames.normals;
+		this.binormals = frames.binormals;
+
+		// helper variables
+
+		var vertex = new Vector3();
+		var normal = new Vector3();
+		var uv = new Vector2();
+
+		var i, j;
+
+		// buffer
+
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+		var indices = [];
+
+		// create buffer data
+
+		generateBufferData();
+
+		// build geometry
+
+		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
+		this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
+		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+
+		// functions
+
+		function generateBufferData() {
+
+			for ( i = 0; i < tubularSegments; i ++ ) {
+
+				generateSegment( i );
+
+			}
+
+			// if the geometry is not closed, generate the last row of vertices and normals
+			// at the regular position on the given path
+			//
+			// if the geometry is closed, duplicate the first row of vertices and normals (uvs will differ)
+
+			generateSegment( ( closed === false ) ? tubularSegments : 0 );
+
+			// uvs are generated in a separate function.
+			// this makes it easy compute correct values for closed geometries
+
+			generateUVs();
+
+			// finally create faces
+
+			generateIndices();
+
+		}
+
+		function generateSegment( i ) {
+
+			// we use getPointAt to sample evenly distributed points from the given path
+
+			var P = path.getPointAt( i / tubularSegments );
+
+			// retrieve corresponding normal and binormal
+
+			var N = frames.normals[ i ];
+			var B = frames.binormals[ i ];
+
+			// generate normals and vertices for the current segment
+
+			for ( j = 0; j <= radialSegments; j ++ ) {
+
+				var v = j / radialSegments * Math.PI * 2;
+
+				var sin =   Math.sin( v );
+				var cos = - Math.cos( v );
+
+				// normal
+
+				normal.x = ( cos * N.x + sin * B.x );
+				normal.y = ( cos * N.y + sin * B.y );
+				normal.z = ( cos * N.z + sin * B.z );
+				normal.normalize();
+
+				normals.push( normal.x, normal.y, normal.z );
+
+				// vertex
+
+				vertex.x = P.x + radius * normal.x;
+				vertex.y = P.y + radius * normal.y;
+				vertex.z = P.z + radius * normal.z;
+
+				vertices.push( vertex.x, vertex.y, vertex.z );
+
+			}
+
+		}
+
+		function generateIndices() {
+
+			for ( j = 1; j <= tubularSegments; j ++ ) {
+
+				for ( i = 1; i <= radialSegments; i ++ ) {
+
+					var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+					var b = ( radialSegments + 1 ) * j + ( i - 1 );
+					var c = ( radialSegments + 1 ) * j + i;
+					var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+
+					// faces
+
+					indices.push( a, b, d );
+					indices.push( b, c, d );
+
+				}
+
+			}
+
+		}
+
+		function generateUVs() {
+
+			for ( i = 0; i <= tubularSegments; i ++ ) {
+
+				for ( j = 0; j <= radialSegments; j ++ ) {
+
+					uv.x = i / tubularSegments;
+					uv.y = j / radialSegments;
+
+					uvs.push( uv.x, uv.y );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	TubeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+	TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
+
+	// For computing of Frenet frames, exposing the tangents, normals and binormals the spline
+
+	function FrenetFrames( path, segments, closed ) {
+
+		var	normal = new Vector3();
+
+		var tangents = [];
+		var normals = [];
+		var binormals = [];
+
+		var vec = new Vector3();
+		var mat = new Matrix4();
+
+		var i, u, theta;
+
+		// expose internals
+
 		this.tangents = tangents;
 		this.normals = normals;
 		this.binormals = binormals;
 
 		// compute the tangent vectors for each segment on the path
 
-		for ( i = 0; i < numpoints; i ++ ) {
+		for ( i = 0; i <= segments; i ++ ) {
 
-			u = i / ( numpoints - 1 );
+			u = i / segments;
 
 			tangents[ i ] = path.getTangentAt( u );
 			tangents[ i ].normalize();
 
 		}
 
-		initialNormal3();
+		// select an initial normal vector perpendicular to the first tangent vector,
+		// and in the direction of the minimum tangent xyz component
 
-		/*
-		function initialNormal1(lastBinormal) {
-			// fixed start binormal. Has dangers of 0 vectors
-			normals[ 0 ] = new THREE.Vector3();
-			binormals[ 0 ] = new THREE.Vector3();
-			if (lastBinormal===undefined) lastBinormal = new THREE.Vector3( 0, 0, 1 );
-			normals[ 0 ].crossVectors( lastBinormal, tangents[ 0 ] ).normalize();
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
-		}
+		normals[ 0 ] = new Vector3();
+		binormals[ 0 ] = new Vector3();
+		var min = Number.MAX_VALUE;
+		var tx = Math.abs( tangents[ 0 ].x );
+		var ty = Math.abs( tangents[ 0 ].y );
+		var tz = Math.abs( tangents[ 0 ].z );
 
-		function initialNormal2() {
+		if ( tx <= min ) {
 
-			// This uses the Frenet-Serret formula for deriving binormal
-			var t2 = path.getTangentAt( epsilon );
-
-			normals[ 0 ] = new THREE.Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
-			binormals[ 0 ] = new THREE.Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
-
-			normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
+			min = tx;
+			normal.set( 1, 0, 0 );
 
 		}
-		*/
 
-		function initialNormal3() {
+		if ( ty <= min ) {
 
-			// select an initial normal vector perpendicular to the first tangent vector,
-			// and in the direction of the smallest tangent xyz component
-
-			normals[ 0 ] = new Vector3();
-			binormals[ 0 ] = new Vector3();
-			smallest = Number.MAX_VALUE;
-			tx = Math.abs( tangents[ 0 ].x );
-			ty = Math.abs( tangents[ 0 ].y );
-			tz = Math.abs( tangents[ 0 ].z );
-
-			if ( tx <= smallest ) {
-
-				smallest = tx;
-				normal.set( 1, 0, 0 );
-
-			}
-
-			if ( ty <= smallest ) {
-
-				smallest = ty;
-				normal.set( 0, 1, 0 );
-
-			}
-
-			if ( tz <= smallest ) {
-
-				normal.set( 0, 0, 1 );
-
-			}
-
-			vec.crossVectors( tangents[ 0 ], normal ).normalize();
-
-			normals[ 0 ].crossVectors( tangents[ 0 ], vec );
-			binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+			min = ty;
+			normal.set( 0, 1, 0 );
 
 		}
+
+		if ( tz <= min ) {
+
+			normal.set( 0, 0, 1 );
+
+		}
+
+		vec.crossVectors( tangents[ 0 ], normal ).normalize();
+
+		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
+		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
 
 
 		// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-		for ( i = 1; i < numpoints; i ++ ) {
+		for ( i = 1; i <= segments; i ++ ) {
 
 			normals[ i ] = normals[ i - 1 ].clone();
 
@@ -24558,21 +24755,20 @@
 
 		}
 
-
 		// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
 
 		if ( closed ) {
 
-			theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
-			theta /= ( numpoints - 1 );
+			theta = Math.acos( exports.Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+			theta /= segments;
 
-			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
+			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
 
 				theta = - theta;
 
 			}
 
-			for ( i = 1; i < numpoints; i ++ ) {
+			for ( i = 1; i <= segments; i ++ ) {
 
 				// twist a little...
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
@@ -24582,7 +24778,51 @@
 
 		}
 
-	};
+	}
+
+	/**
+	 * @author oosmoxiecode / https://github.com/oosmoxiecode
+	 * @author WestLangley / https://github.com/WestLangley
+	 * @author zz85 / https://github.com/zz85
+	 * @author miningold / https://github.com/miningold
+	 * @author jonobr1 / https://github.com/jonobr1
+	 *
+	 * Creates a tube which extrudes along a 3d spline.
+	 */
+
+	function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
+
+		Geometry.call( this );
+
+		this.type = 'TubeGeometry';
+
+		this.parameters = {
+			path: path,
+			tubularSegments: tubularSegments,
+			radius: radius,
+			radialSegments: radialSegments,
+			closed: closed
+		};
+
+		if( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
+
+		var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+
+		// expose internals
+
+		this.tangents = bufferGeometry.tangents;
+		this.normals = bufferGeometry.normals;
+		this.binormals = bufferGeometry.binormals;
+
+		// create geometry
+
+		this.fromBufferGeometry( bufferGeometry );
+		this.mergeVertices();
+
+	}
+
+	TubeGeometry.prototype = Object.create( Geometry.prototype );
+	TubeGeometry.prototype.constructor = TubeGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -24986,7 +25226,7 @@
 				cx = contour[ verts[ w ] ].x;
 				cy = contour[ verts[ w ] ].y;
 
-				if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+				if ( ( bx - ax ) * ( cy - ay ) - ( by - ay ) * ( cx - ax ) <= 0 ) return false;
 
 				var aX, aY, bX, bY, cX, cY;
 				var apx, apy, bpx, bpy, cpx, cpy;
@@ -27706,11 +27946,17 @@
 		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
 		TetrahedronGeometry: TetrahedronGeometry,
+		TetrahedronBufferGeometry: TetrahedronBufferGeometry,
 		OctahedronGeometry: OctahedronGeometry,
+		OctahedronBufferGeometry: OctahedronBufferGeometry,
 		IcosahedronGeometry: IcosahedronGeometry,
+		IcosahedronBufferGeometry: IcosahedronBufferGeometry,
 		DodecahedronGeometry: DodecahedronGeometry,
+		DodecahedronBufferGeometry: DodecahedronBufferGeometry,
 		PolyhedronGeometry: PolyhedronGeometry,
+		PolyhedronBufferGeometry: PolyhedronBufferGeometry,
 		TubeGeometry: TubeGeometry,
+		TubeBufferGeometry: TubeBufferGeometry,
 		TorusKnotGeometry: TorusKnotGeometry,
 		TorusKnotBufferGeometry: TorusKnotBufferGeometry,
 		TorusGeometry: TorusGeometry,
@@ -28614,6 +28860,8 @@
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
+			if ( url === undefined ) url = '';
+
 			if ( this.path !== undefined ) url = this.path + url;
 
 			var scope = this;
@@ -28636,66 +28884,156 @@
 
 			}
 
-			var request = new XMLHttpRequest();
-			request.open( 'GET', url, true );
+			// Check for data: URI
+			var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
+			var dataUriRegexResult = url.match( dataUriRegex );
 
-			request.addEventListener( 'load', function ( event ) {
+			// Safari can not handle Data URIs through XMLHttpRequest so process manually
+			if ( dataUriRegexResult ) {
 
-				var response = event.target.response;
+				var mimeType = dataUriRegexResult[1];
+				var isBase64 = !!dataUriRegexResult[2];
+				var data = dataUriRegexResult[3];
 
-				exports.Cache.add( url, response );
+				data = window.decodeURIComponent(data);
 
-				if ( this.status === 200 ) {
+				if( isBase64 ) {
+					data = window.atob(data);
+				}
 
-					if ( onLoad ) onLoad( response );
+				try {
 
-					scope.manager.itemEnd( url );
+					var response;
+					var responseType = ( this.responseType || '' ).toLowerCase();
 
-				} else if ( this.status === 0 ) {
+					switch ( responseType ) {
 
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
+						case 'arraybuffer':
+						case 'blob':
 
-					console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
+						 	response = new ArrayBuffer( data.length );
+							var view = new Uint8Array( response );
+							for ( var i = 0; i < data.length; i ++ ) {
 
-					if ( onLoad ) onLoad( response );
+									view[ i ] = data.charCodeAt( i );
 
-					scope.manager.itemEnd( url );
+							}
 
-				} else {
+							if ( responseType === 'blob' ) {
+
+								response = new Blob( [ response ], { "type" : mimeType } );
+
+							}
+
+							break;
+
+						case 'document':
+
+							var parser = new DOMParser();
+							response = parser.parseFromString( data, mimeType );
+
+							break;
+
+						case 'json':
+
+							response = JSON.parse( data );
+
+							break;
+
+						default: // 'text' or other
+
+							response = data;
+
+							break;
+
+					}
+
+					// Wait for next browser tick
+					window.setTimeout( function() {
+
+						if ( onLoad ) onLoad( response );
+
+						scope.manager.itemEnd( url );
+
+					}, 0);
+
+				} catch ( error ) {
+
+					// Wait for next browser tick
+					window.setTimeout( function() {
+
+						if ( onError ) onError( error );
+
+						scope.manager.itemError( url );
+
+					}, 0);
+
+				}
+
+			} else {
+
+				var request = new XMLHttpRequest();
+				request.open( 'GET', url, true );
+
+				request.addEventListener( 'load', function ( event ) {
+
+					var response = event.target.response;
+
+					exports.Cache.add( url, response );
+
+					if ( this.status === 200 ) {
+
+						if ( onLoad ) onLoad( response );
+
+						scope.manager.itemEnd( url );
+
+					} else if ( this.status === 0 ) {
+
+						// Some browsers return HTTP Status 0 when using non-http protocol
+						// e.g. 'file://' or 'data://'. Handle as success.
+
+						console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
+
+						if ( onLoad ) onLoad( response );
+
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onError ) onError( event );
+
+						scope.manager.itemError( url );
+
+					}
+
+				}, false );
+
+				if ( onProgress !== undefined ) {
+
+					request.addEventListener( 'progress', function ( event ) {
+
+						onProgress( event );
+
+					}, false );
+
+				}
+
+				request.addEventListener( 'error', function ( event ) {
 
 					if ( onError ) onError( event );
 
 					scope.manager.itemError( url );
 
-				}
-
-			}, false );
-
-			if ( onProgress !== undefined ) {
-
-				request.addEventListener( 'progress', function ( event ) {
-
-					onProgress( event );
-
 				}, false );
 
+				if ( this.responseType !== undefined ) request.responseType = this.responseType;
+				if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+
+				if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+
+				request.send( null );
+
 			}
-
-			request.addEventListener( 'error', function ( event ) {
-
-				if ( onError ) onError( event );
-
-				scope.manager.itemError( url );
-
-			}, false );
-
-			if ( this.responseType !== undefined ) request.responseType = this.responseType;
-			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
-
-			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
-
-			request.send( null );
 
 			scope.manager.itemStart( url );
 
@@ -28977,6 +29315,7 @@
 				scope.manager.itemEnd( url );
 
 			};
+			image.onerror = onError;
 
 			if ( url.indexOf( 'data:' ) === 0 ) {
 
@@ -37950,13 +38289,13 @@
 
 	InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
-	InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
+	InstancedBufferGeometry.prototype.addGroup = function ( start, count, materialIndex ) {
 
 		this.groups.push( {
 
 			start: start,
 			count: count,
-			instances: instances
+			materialIndex: materialIndex
 
 		} );
 
@@ -37986,7 +38325,7 @@
 		for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 			var group = groups[ i ];
-			this.addGroup( group.start, group.count, group.instances );
+			this.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 
@@ -38417,6 +38756,7 @@
 			this.startTime = ( performance || Date ).now();
 
 			this.oldTime = this.startTime;
+			this.elapsedTime = 0;
 			this.running = true;
 
 		},
@@ -41561,11 +41901,17 @@
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.ParametricBufferGeometry = ParametricBufferGeometry;
 	exports.TetrahedronGeometry = TetrahedronGeometry;
+	exports.TetrahedronBufferGeometry = TetrahedronBufferGeometry;
 	exports.OctahedronGeometry = OctahedronGeometry;
+	exports.OctahedronBufferGeometry = OctahedronBufferGeometry;
 	exports.IcosahedronGeometry = IcosahedronGeometry;
+	exports.IcosahedronBufferGeometry = IcosahedronBufferGeometry;
 	exports.DodecahedronGeometry = DodecahedronGeometry;
+	exports.DodecahedronBufferGeometry = DodecahedronBufferGeometry;
 	exports.PolyhedronGeometry = PolyhedronGeometry;
+	exports.PolyhedronBufferGeometry = PolyhedronBufferGeometry;
 	exports.TubeGeometry = TubeGeometry;
+	exports.TubeBufferGeometry = TubeBufferGeometry;
 	exports.TorusKnotGeometry = TorusKnotGeometry;
 	exports.TorusKnotBufferGeometry = TorusKnotBufferGeometry;
 	exports.TorusGeometry = TorusGeometry;

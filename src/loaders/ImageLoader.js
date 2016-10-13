@@ -29,6 +29,7 @@ Object.assign( ImageLoader.prototype, {
 			scope.manager.itemEnd( url );
 
 		};
+		image.onerror = onError;
 
 		if ( url.indexOf( 'data:' ) === 0 ) {
 

@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32Attribute, Uint16Attribute } from '../core/BufferAttribute';
+import { Float32Attribute, Uint16Attribute, Uint32Attribute } from '../core/BufferAttribute';
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -72,7 +72,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// build geometry
 
-	this.setIndex( Uint16Attribute( indices, 1 ) );
+	this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
 	this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
 	this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
 

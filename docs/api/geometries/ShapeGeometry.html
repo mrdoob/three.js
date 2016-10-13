@@ -12,25 +12,44 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a one-sided polygonal geometry from one or more path shapes. Similar to [page:ExtrudeGeometry]</div>
+		<div class="desc">Creates a one-sided polygonal geometry from one or more path shapes. Similar to [page:ExtrudeGeometry].</div>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ShapeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
 
 		<h2>Example</h2>
 
 
 		<code>
-var rectLength = 120, rectWidth = 40;
+		var length = 16, width = 12;
 
-var rectShape = new THREE.Shape();
-rectShape.moveTo( 0,0 );
-rectShape.lineTo( 0, rectWidth );
-rectShape.lineTo( rectLength, rectWidth );
-rectShape.lineTo( rectLength, 0 );
-rectShape.lineTo( 0, 0 );
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
 
-var rectGeom = new THREE.ShapeGeometry( rectShape );
-var rectMesh = new THREE.Mesh( rectGeom, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ) ;
-
-scene.add( rectMesh );
+		var geometry = new THREE.ShapeGeometry( shape );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
 		</code>
 
 		<h2>Constructor</h2>

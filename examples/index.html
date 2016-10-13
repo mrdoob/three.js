@@ -237,7 +237,7 @@
 			</div>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
 
@@ -282,17 +282,7 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			try {
-
-				var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-				window.open( 'view-source:' + url + '/' + selected + '.html' );
-
-			} catch ( e ) {
-
-				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
-				console.log( e );
-
-			}
+			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';

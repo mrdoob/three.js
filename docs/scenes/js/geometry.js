@@ -91,6 +91,26 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
+var CustomSinCurve = THREE.Curve.create(
+
+	function ( scale ) {
+
+		this.scale = ( scale === undefined ) ? 1 : scale;
+
+	},
+
+	function ( t ) {
+
+		var tx = t * 3 - 1.5;
+		var ty = Math.sin( 2 * Math.PI * t );
+		var tz = 0;
+
+		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+	}
+
+);
+
 var guis = {
 
 	BoxBufferGeometry : function( mesh ) {
@@ -426,6 +446,32 @@ var guis = {
 
 	},
 
+	DodecahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.DodecahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.DodecahedronBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	IcosahedronGeometry : function() {
 
 		var data = {
@@ -444,6 +490,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.IcosahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	IcosahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.IcosahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.IcosahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -542,6 +614,32 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.OctahedronGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	OctahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.OctahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.OctahedronBufferGeometry' );
 
 		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
 		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
@@ -776,6 +874,32 @@ var guis = {
 
 	},
 
+	TetrahedronBufferGeometry : function() {
+
+		var data = {
+			radius : 10,
+			detail : 0,
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TetrahedronBufferGeometry(
+					data.radius, data.detail
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TetrahedronBufferGeometry' );
+
+		folder.add( data, 'radius', 1, 20 ).onChange( generateGeometry );
+		folder.add( data, 'detail', 0, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
 	TextGeometry : function( mesh ) {
 
 		var data = {
@@ -971,6 +1095,175 @@ var guis = {
 		folder.add( data, 'radialSegments', 3, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'p', 1, 20 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'q', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ParametricBufferGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricBufferGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ParametricGeometry : function( mesh ) {
+
+		var data = {
+			slices : 25,
+			stacks : 25
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, data.slices, data.stacks )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ParametricGeometry' );
+
+		folder.add( data, 'slices', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'stacks', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	TubeGeometry : function( mesh ) {
+
+		var data = {
+			segments : 20,
+			radius : 2,
+			radiusSegments: 8
+		};
+
+		var path = new CustomSinCurve( 10 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TubeGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TubeGeometry' );
+
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	TubeBufferGeometry : function( mesh ) {
+
+		var data = {
+			segments : 20,
+			radius : 2,
+			radiusSegments: 8
+		};
+
+		var path = new CustomSinCurve( 10 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TubeBufferGeometry' );
+
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ShapeGeometry: function( mesh ) {
+
+		var length = 16, width = 12;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ShapeGeometry( shape )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ShapeGeometry' );
+
+		generateGeometry();
+
+	},
+
+	ExtrudeGeometry: function( mesh ) {
+
+		var data = {
+			steps: 2,
+			amount: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ExtrudeGeometry( shape, data )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
+
+		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 
