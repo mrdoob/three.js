@@ -336,6 +336,8 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 
+	var lineWidthAvailable = parseFloat(gl.getParameter(gl.VERSION).split(' ')[1]) >= 1.0;
+
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
 
@@ -724,7 +726,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	function setLineWidth( width ) {
 
-		if ( width !== currentLineWidth ) {
+		if ( lineWidthAvailable && width !== currentLineWidth ) {
 
 			gl.lineWidth( width );
 
