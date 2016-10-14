@@ -1541,7 +1541,7 @@ function WebGLRenderer( parameters ) {
 		var materialProperties = properties.get( material );
 
 		var parameters = programCache.getParameters(
-				material, _lights, fog, _clipping.numPlanes, object );
+				material, _lights, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1644,6 +1644,7 @@ function WebGLRenderer( parameters ) {
 		       material.clipping === true ) {
 
 			materialProperties.numClippingPlanes = _clipping.numPlanes;
+			materialProperties.numIntersection = _clipping.numIntersection;
 			uniforms.clippingPlanes = _clipping.uniform;
 
 		}
@@ -1719,7 +1720,7 @@ function WebGLRenderer( parameters ) {
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
 				_clipping.setState(
-						material.clippingPlanes, material.clipShadows,
+						material.clippingPlanes, material.clipIntersection, material.clipShadows,
 						camera, materialProperties, useCache );
 
 			}
@@ -1741,7 +1742,8 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
+				( materialProperties.numClippingPlanes !== _clipping.numPlanes || 
+ 				  materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
