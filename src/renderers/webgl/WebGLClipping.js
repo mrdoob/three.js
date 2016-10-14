@@ -154,7 +154,7 @@ function WebGLClipping() {
 		}
 
 		scope.numPlanes = nPlanes;
-		// Add clipIntersection
+		
 		return dstArray;
 
 	}
