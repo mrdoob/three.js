@@ -4962,7 +4962,7 @@
 
 	var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vUv );\n\t\tvec2 dSTdy = dFdy( vUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\t\tvec3 vSigmaX = dFdx( surf_pos );\n\t\tvec3 vSigmaY = dFdy( surf_pos );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 );\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif\n";
 
-	var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tfor ( int i = 0; i < NUM_CLIPPING_PLANES; ++ i ) {\n\t\tvec4 plane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n#endif\n";
+	var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; ++ i ) {\n\t\tvec4 plane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t\t\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; ++ i ) {\n\t\t\tvec4 plane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\tif ( clipped ) discard;\n\t\n\t#endif\n#endif\n";
 
 	var clipping_planes_pars_fragment = "#if NUM_CLIPPING_PLANES > 0\n\t#if ! defined( PHYSICAL ) && ! defined( PHONG )\n\t\tvarying vec3 vViewPosition;\n\t#endif\n\tuniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];\n#endif\n";
 
@@ -7200,6 +7200,7 @@
 		this.depthWrite = true;
 
 		this.clippingPlanes = null;
+		this.clipIntersection = false;
 		this.clipShadows = false;
 
 		this.colorWrite = true;
@@ -7463,6 +7464,7 @@
 
 			this.visible = source.visible;
 			this.clipShadows = source.clipShadows;
+			this.clipIntersection = source.clipIntersection;
 
 			var srcPlanes = source.clippingPlanes,
 				dstPlanes = null;
@@ -16406,6 +16408,7 @@
 				parameters.flipSided ? '#define FLIP_SIDED' : '',
 
 				'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
+				'#define UNION_CLIPPING_PLANES ' + (parameters.numClippingPlanes - parameters.numClipIntersection),
 
 				parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 				parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
@@ -16645,7 +16648,7 @@
 			"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 			"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 			"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-			"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
+			"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking"
 		];
 
 
@@ -16717,7 +16720,7 @@
 
 		}
 
-		this.getParameters = function ( material, lights, fog, nClipPlanes, object ) {
+		this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
 
 			var shaderID = shaderIDs[ material.type ];
 
@@ -16794,6 +16797,7 @@
 				numHemiLights: lights.hemi.length,
 
 				numClippingPlanes: nClipPlanes,
+				numClipIntersection: nClipIntersection,
 
 				shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 				shadowMapType: renderer.shadowMap.type,
@@ -19205,6 +19209,7 @@
 
 		this.uniform = uniform;
 		this.numPlanes = 0;
+		this.numIntersection = 0;
 
 		this.init = function( planes, enableLocalClipping, camera ) {
 
@@ -19239,7 +19244,7 @@
 
 		};
 
-		this.setState = function( planes, clipShadows, camera, cache, fromCache ) {
+		this.setState = function( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
 
 			if ( ! localClippingEnabled ||
 					planes === null || planes.length === 0 ||
@@ -19274,6 +19279,7 @@
 				}
 
 				cache.clippingState = dstArray;
+				this.numIntersection = clipIntersection ? this.numPlanes : 0;
 				this.numPlanes += nGlobal;
 
 			}
@@ -19291,6 +19297,7 @@
 			}
 
 			scope.numPlanes = numGlobalPlanes;
+			scope.numIntersection = 0;
 
 		}
 
@@ -19335,6 +19342,7 @@
 			}
 
 			scope.numPlanes = nPlanes;
+			
 			return dstArray;
 
 		}
@@ -20851,7 +20859,7 @@
 			var materialProperties = properties.get( material );
 
 			var parameters = programCache.getParameters(
-					material, _lights, fog, _clipping.numPlanes, object );
+					material, _lights, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
 			var code = programCache.getProgramCode( material, parameters );
 
@@ -20954,6 +20962,7 @@
 			       material.clipping === true ) {
 
 				materialProperties.numClippingPlanes = _clipping.numPlanes;
+				materialProperties.numIntersection = _clipping.numIntersection;
 				uniforms.clippingPlanes = _clipping.uniform;
 
 			}
@@ -21029,7 +21038,7 @@
 					// object instead of the material, once it becomes feasible
 					// (#8465, #8379)
 					_clipping.setState(
-							material.clippingPlanes, material.clipShadows,
+							material.clippingPlanes, material.clipIntersection, material.clipShadows,
 							camera, materialProperties, useCache );
 
 				}
@@ -21051,7 +21060,8 @@
 					material.needsUpdate = true;
 
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
-					materialProperties.numClippingPlanes !== _clipping.numPlanes ) {
+					( materialProperties.numClippingPlanes !== _clipping.numPlanes || 
+	 				  materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 					material.needsUpdate = true;
 
