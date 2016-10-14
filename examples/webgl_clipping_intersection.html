@@ -21,12 +21,15 @@
 
 		<script>
 
-			
+			var camera, scene, renderer;
+			var group;
+
+			init();
+			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera(
-						40, window.innerWidth / window.innerHeight, 1, 800 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 800 );
 
 				camera.position.set( -20, 10, 50 );
 				camera.lookAt( new THREE.Vector3( 0, 0, 0) );
@@ -38,26 +41,33 @@
 				var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 				scene.add( light );
 
-				var clipPlanes = [ new THREE.Plane( new THREE.Vector3( 1,  0,  0 ), 0 ), 
-								   new THREE.Plane( new THREE.Vector3( 0, -1,  0 ), 0 ), 
-								   new THREE.Plane( new THREE.Vector3( 0,  0, -1 ), 0 ) ]
+				var clipPlanes = [
+					new THREE.Plane( new THREE.Vector3( 1,  0,  0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0, -1,  0 ), 0 ),
+					new THREE.Plane( new THREE.Vector3( 0,  0, -1 ), 0 )
+				];
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				balls = new THREE.Object3D();
+				group = new THREE.Object3D();
 
-				for ( var i = 1; i < 25; i++ ) {
-					balls.add( new THREE.Mesh( 
-						new THREE.SphereBufferGeometry( i / 2, 48, 48), 
-						new THREE.MeshStandardMaterial( { color: new THREE.Color( Math.sin( i * 0.5 ) * 0.5 + 0.5, 
-																				  Math.cos( i * 1.5 ) * 0.5 + 0.5, 
-																				  Math.sin( i * 4.5 + 0 ) * 0.5 + 0.5 ),
-														  			roughness: 0.95, metalness: 0.0, side: THREE.DoubleSide, clippingPlanes: clipPlanes, clipIntersection: true } )
-						) );
-				}  
+				for ( var i = 1; i < 25; i ++ ) {
 
-				scene.add( balls );
-					
+					var geometry = new THREE.SphereBufferGeometry( i / 2, 48, 48 );
+					var material = new THREE.MeshStandardMaterial( {
+						color: new THREE.Color( Math.sin( i * 0.5 ) * 0.5 + 0.5, Math.cos( i * 1.5 ) * 0.5 + 0.5, Math.sin( i * 4.5 + 0 ) * 0.5 + 0.5 ),
+						roughness: 0.95,
+						metalness: 0.0,
+						side: THREE.DoubleSide,
+						clippingPlanes: clipPlanes,
+						clipIntersection: true
+					} );
+					group.add( new THREE.Mesh( geometry, material ) );
+
+				}
+
+				scene.add( group );
+
 				// Renderer
 
 				var container = document.body;
@@ -72,7 +82,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				container.appendChild( renderer.domElement );
 
-
 				// Stats
 
 				stats = new Stats();
@@ -84,7 +93,6 @@
 				mode.clipIntersection = true;
 				mode.clipPosition = 0;
 				var gui = new dat.GUI();
-				gui.width = 800;
 				gui.add( mode, 'clipIntersection' ).onChange( function() {
 					for (var i = 0; i < balls.children.length; i++) {
 						balls.children[i].material.clipIntersection = !balls.children[i].material.clipIntersection;
@@ -119,27 +127,28 @@
 
 			function animate() {
 
-
 				requestAnimationFrame( animate );
 
+				var children = group.children;
 
-				for ( var obj = 0; obj < balls.children.length; obj++ ) {
-					var current = balls.children[ obj ].material;
-					for ( var i = 0; i < current.clippingPlanes.length; i++ ) {
-						var plane = current.clippingPlanes[ i ];
+				for ( var i = 0; i < children.length; i ++ ) {
+
+					var current = children[ i ].material;
+
+					for ( var j = 0; j < current.clippingPlanes.length; j ++ ) {
+
+						var plane = current.clippingPlanes[ j ];
 						plane.constant = ( 49 * plane.constant + mode.clipPosition ) / 50;
-					}
-				}
 
+					}
+
+				}
 
 				stats.begin();
 				renderer.render( scene, camera );
 				stats.end();
 
 			}
-
-			init();
-			animate();
 
 		</script>
 

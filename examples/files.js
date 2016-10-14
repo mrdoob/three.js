@@ -9,6 +9,7 @@ var files = {
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_clipping",
 		"webgl_clipping_advanced",
+		"webgl_clipping_intersection",
 		"webgl_decals",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
