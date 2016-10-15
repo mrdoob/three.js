@@ -100,6 +100,8 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
+			// Not using update ranges
+
 			gl.bufferSubData( bufferType, 0, data.array );
 
 		} else if ( data.updateRange.count === 0 ) {
