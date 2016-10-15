@@ -13,7 +13,6 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 	this.offset = offset;
 
 	this.normalized = normalized === true;
-	this.shouldCopyFullBuffer = false;
 
 }
 
