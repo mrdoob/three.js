@@ -64,7 +64,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		var attributeProperties = properties.get( data );
 
-		if ( attributeProperties.__webglBuffer === undefined ) {
+		if ( attributeProperties.__webglBuffer === undefined || data.version === 0 ) {
 
 			createBuffer( attributeProperties, data, bufferType );
 
@@ -78,7 +78,12 @@ function WebGLObjects( gl, properties, info ) {
 
 	function createBuffer( attributeProperties, data, bufferType ) {
 
-		attributeProperties.__webglBuffer = gl.createBuffer();
+		if ( attributeProperties.__webglBuffer === undefined ) {
+
+			attributeProperties.__webglBuffer = gl.createBuffer();
+
+		}
+
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
 		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
@@ -93,17 +98,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.needsFullBuffer === true ) {
-
-			// User wishes to force a copy of full buffer instead of sub range
-
-			var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
-
-			gl.bufferData( bufferType, data.array, usage );
-
-		} else if ( data.dynamic === false || data.updateRange.count === - 1 ) {
-
-			// Not using update ranges
+		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
 
 			gl.bufferSubData( bufferType, 0, data.array );
 

@@ -25,7 +25,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
-	this.needsFullBuffer = false;
 
 	this.version = 0;
 
@@ -53,6 +52,7 @@ BufferAttribute.prototype = {
 
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
+		this.version = 0; // will copy entire buffer
 
 	},
 
@@ -72,7 +72,6 @@ BufferAttribute.prototype = {
 		this.normalized = source.normalized;
 
 		this.dynamic = source.dynamic;
-		this.needsFullBuffer = source.needsFullBuffer;
 
 		return this;
 
