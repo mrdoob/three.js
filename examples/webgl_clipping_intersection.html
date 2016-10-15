@@ -92,16 +92,21 @@
 				mode = {};
 				mode.clipIntersection = true;
 				mode.clipPosition = 0;
+
 				var gui = new dat.GUI();
-				gui.add( mode, 'clipIntersection' ).onChange( function() {
-					for (var i = 0; i < balls.children.length; i++) {
-						balls.children[i].material.clipIntersection = !balls.children[i].material.clipIntersection;
+				gui.add( mode, 'clipIntersection' ).onChange( function () {
+
+					var children = group.children;
+
+					for ( var i = 0; i < children.length; i ++ ) {
+
+						var child = children[ i ];
+						child.material.clipIntersection = ! child.material.clipIntersection;
+
 					}
-				} );
-
-				gui.add( mode, 'clipPosition', -16, 16 ).onChange( function( value ) {
 
 				} );
+				gui.add( mode, 'clipPosition', -16, 16 );
 
 				// Controls
 
