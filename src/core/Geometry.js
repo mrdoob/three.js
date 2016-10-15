@@ -453,6 +453,8 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		} else {
 
+			this.computeFaceNormals();
+
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
@@ -488,6 +490,42 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 				vertexNormals[ 0 ] = vertices[ face.a ].clone();
 				vertexNormals[ 1 ] = vertices[ face.b ].clone();
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeFlatVertexNormals: function () {
+
+		var f, fl, face;
+
+		this.computeFaceNormals();
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( face.normal );
+				vertexNormals[ 1 ].copy( face.normal );
+				vertexNormals[ 2 ].copy( face.normal );
+
+			} else {
+
+				vertexNormals[ 0 ] = face.normal.clone();
+				vertexNormals[ 1 ] = face.normal.clone();
+				vertexNormals[ 2 ] = face.normal.clone();
 
 			}
 
