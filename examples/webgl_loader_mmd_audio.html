@@ -40,6 +40,13 @@
 
 		<script src="js/libs/charsetencoder.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/BackFaceCullingOutlinePass.js"></script>
+
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
@@ -188,7 +195,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				helper.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
