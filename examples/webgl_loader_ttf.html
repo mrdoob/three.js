@@ -5,14 +5,16 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
+			body
+			{
 				font-family: Monospace;
 				background-color: #000;
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
-			#info {
+			#info
+			{
 				position: absolute;
 				top: 10px;
 				width: 100%;
@@ -20,25 +22,30 @@
 				z-index: 100;
 				display:block;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			#info a, .button
+			{
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
 		</style>
 	</head>
 	<body>
-
+		<script src="../build/three.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/loaders/TTFLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - TTFLoader using opentype by gero3
-		<br/>type to enter new text, drag to spin the text
-		<br/><span class="button" id="color">change color</span>,
+			<a href="http://threejs.org" target="_blank">three.js</a> - TTFLoader using opentype by gero3
+			<br/>type to enter new text, drag to spin the text
+			<br/><span class="button" id="color">change color</span>,
 			<span class="button" id="weight">change weight</span>,
 			<span class="button" id="bevel">change bevel</span>
 		</div>
 
-
-		<script src="../build/three.js"></script>
-		<script src="js/utils/GeometryUtils.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -55,22 +62,18 @@
 			var firstLetter = true;
 
 			var text = "three.js",
-
 				height = 20,
 				size = 70,
 				hover = 30,
-
 				curveSegments = 4,
-
 				bevelThickness = 2,
 				bevelSize = 1.5,
 				bevelSegments = 3,
-				bevelEnabled = true,
+				bevelEnabled = true;
 
-				font = undefined;
+			var font = null;
 
 			var mirror = true;
-
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -80,8 +83,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-			var fontIndex = 1;
 
 			init();
 			animate();
@@ -160,7 +161,13 @@
 
 				scene.add( group );
 
-				loadFont();
+				var loader = new THREE.TTFLoader();
+
+				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
+					font = new THREE.Font(json);
+					//scene.add( font );
+					createText();
+				} );
 
 				var plane = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 10000, 10000 ),
@@ -198,34 +205,7 @@
 
 				}, false );
 
-				document.getElementById( "font" ).addEventListener( 'click', function() {
-
-					fontIndex ++;
-
-					fontName = reverseFontMap[ fontIndex % reverseFontMap.length ];
-
-					loadFont();
-
-				}, false );
-
-
-				document.getElementById( "weight" ).addEventListener( 'click', function() {
-
-					if ( fontWeight === "bold" ) {
-
-						fontWeight = "regular";
-
-					} else {
-
-						fontWeight = "bold";
-
-					}
-
-					loadFont();
-
-				}, false );
-
-				document.getElementById( "bevel" ).addEventListener( 'click', function() {
+				document.getElementById( "bevel" ).addEventListener( 'click', function(){
 
 					bevelEnabled = !bevelEnabled;
 
@@ -233,10 +213,8 @@
 
 				}, false );
 
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
 			function onWindowResize() {
@@ -250,8 +228,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			//
 
 			function boolToNum( b ) {
 
@@ -303,19 +279,6 @@
 					refreshText();
 
 				}
-
-			}
-
-			function loadFont() {
-
-				var loader = new THREE.FontLoader();
-				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
-
-					font = response;
-
-					refreshText();
-
-				} );
 
 			}
 
@@ -487,15 +450,12 @@
 
 			}
 
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
 				render();
 				stats.update();
-
 			}
 
 			function render() {

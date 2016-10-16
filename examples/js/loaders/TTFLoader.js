@@ -20,7 +20,7 @@ THREE.TTFLoader.prototype.load = function(url, onLoad, onProgress, onError)
 	loader.setResponseType("arraybuffer");
 	loader.load(url, function(buffer)
 	{
-		var json = scope.parse( buffer );
+		var json = self.parse( buffer );
 		if(onLoad !== undefined)
 		{
 			onLoad(json);
@@ -30,24 +30,26 @@ THREE.TTFLoader.prototype.load = function(url, onLoad, onProgress, onError)
 
 THREE.TTFLoader.prototype.parse = function(arraybuffer)
 {
+	if(typeof opentype === "undefined")
+	{
+		console.warn("TTFLoader requires opentype.js Make sure it\'s included before using the loader");
+		return null;
+	}
+
 	var font = opentype.parse(arraybuffer);
 	return THREE.TTFLoader.convert(font, this.reversed);
 }
 
 THREE.TTFLoader.convert = function(font, reversed)
 {
-	if(opentype === undefined)
-	{
-		throw new Error("TTFLoader requires opentype.js Make sure it\'s included before using the loader");
-		return;
-	}
-
 	var scale = (100000) / ((font.unitsPerEm || 2048) * 72);
 	var result = {};
 	result.glyphs = {};
 
-	font.glyphs.forEach(function(glyph)
+	for(var i = 0; i < font.glyphs.length; i++)
 	{
+		var glyph = font.glyphs.glyphs[i];
+
 		if(glyph.unicode !== undefined)
 		{
 			var token = {};
@@ -58,7 +60,7 @@ THREE.TTFLoader.convert = function(font, reversed)
 			
 			if(reversed)
 			{
-				glyph.path.commands = THREE.TTFLoader.reverseCommands(glyph.path.commands);
+				glyph.path.commands = TTFLoader.reverseCommands(glyph.path.commands);
 			}
 
 			glyph.path.commands.forEach(function(command, i)
@@ -94,7 +96,7 @@ THREE.TTFLoader.convert = function(font, reversed)
 			});
 			result.glyphs[String.fromCharCode(glyph.unicode)] = token;
 		}
-	});
+	}
 
 	result.familyName = font.familyName;
 	result.ascender = Math.round(font.ascender * scale);
@@ -111,23 +113,6 @@ THREE.TTFLoader.convert = function(font, reversed)
 
 	result.resolution = 1000;
 	result.original_font_information = font.tables.name;
-	if(font.styleName.toLowerCase().indexOf("bold") > -1)
-	{
-		result.cssFontWeight = "bold";
-	}
-	else
-	{
-		result.cssFontWeight = "normal";
-	}
-
-	if(font.styleName.toLowerCase().indexOf("italic") > -1)
-	{
-		result.cssFontStyle = "italic";
-	}
-	else
-	{
-		result.cssFontStyle = "normal";
-	}
 
 	return result;
 }
