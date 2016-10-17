@@ -10,6 +10,7 @@ var list = {
 	"Reference": {
 		"Constants": [
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
+			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "GLState", "api/constants/GLState" ],
 			[ "Materials", "api/constants/Materials" ],
 			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
