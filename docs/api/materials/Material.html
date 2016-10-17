@@ -119,6 +119,10 @@
 		User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply to the objects this material is attached to. Points in space whose dot product with the plane is negative are cut away. Default is null.
 		</div>
 
+		<h3>[property:Boolean clipIntersection]</h3>
+
+		<div>Changes the behavior of clipping planes so that only their intersection is clipped, rather than their union. Default is false. See <a href="http://threejs.org/examples/#webgl_clipping_intersection">example</a> </div>
+
 		<h3>[property:Boolean clipShadows]</h3>
 		<div>
 		Defines whether to clip shadows according to the clipping planes specified on this material. Default is false.

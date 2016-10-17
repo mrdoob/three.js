@@ -126,11 +126,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/gltf/glTF-parser.js"></script>
-		<script src="js/loaders/gltf/glTFLoader.js"></script>
-		<script src="js/loaders/gltf/glTFLoaderUtils.js"></script>
-		<script src="js/loaders/gltf/glTFAnimation.js"></script>
-		<script src="js/loaders/gltf/glTFShaders.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -235,7 +231,8 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.glTFLoader;
+				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
+				loader = new THREE.GLTFLoader;
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
 				status.innerHTML = "Loading...";
@@ -356,8 +353,8 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.glTFAnimator.update();
-				THREE.glTFShaders.update(scene, camera);
+				THREE.GLTFLoader.Animations.update();
+				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
@@ -393,8 +390,8 @@
 				{
 					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
 					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-					objectPosition: new THREE.Vector3(2, 6, 0),
+					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
+					objectPosition: new THREE.Vector3(2, 1, 0),
 					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
 					animationTime: 3,
 					addLights:true,
@@ -423,8 +420,7 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
-				},
-
+				}
 			];
 
 			function buildSceneList() {

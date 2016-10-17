@@ -25,8 +25,6 @@
 
 		<script>
 
-			/* Testing the new Parametric Surfaces Geometries*/
-
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
@@ -73,26 +71,11 @@
 				var sphere2 = new THREE.ParametricGeometries.SphereGeometry( 75, 20, 10 );
 				var tube2 = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
 
-				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q );
-				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
-				// var tube = new THREE.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
-
-
-				// var benchmarkCopies = 1000;
-				// var benchmarkObject = tube;
-				// var rand = function() { return (Math.random() - 0.5 ) * 600; };
-				// for (var b=0;b<benchmarkCopies;b++) {
-				//    object = THREE.SceneUtils.createMultiMaterialObject( benchmarkObject, materials );
-				//   object.position.set( rand(), rand(), rand() );
-				//   scene.add( object );
-				// }
-
-				console.log(THREE.ParametricGeometries);
 				var geo;
 
 				// Klein Bottle
 
-				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, 20, 20 );
+				geo = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				object.scale.multiplyScalar( 10 );
@@ -100,55 +83,33 @@
 
 				// Mobius Strip
 
-				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
+				geo = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 10, 0, 0 );
 				object.scale.multiplyScalar( 100 );
 				scene.add( object );
 
-				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
+				// Plane
+
+				geo = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
-
-				// object = THREE.SceneUtils.createMultiMaterialObject( torus, materials );
-				// object.position.set( 0, 0, 0 );
-				// scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( torus2, materials );
 				object.position.set( 0, 100, 0 );
 				scene.add( object );
 
-
-
-
-				//  object = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
-				//  object.position.set( 500, 0, 0 );
-				//  scene.add( object );
-
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
-
-				// object = THREE.SceneUtils.createMultiMaterialObject( tube, materials );
-				// object.position.set( 0, 0, 0 );
-				// scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( tube2, materials );
 				object.position.set( 100, 0, 0 );
 				scene.add( object );
 
-
-				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 400, 400, 4, 4 ), materials );
-				// object.position.set( -200, 100, 0 );
-				// scene.add( object );
-
 				object = new THREE.AxisHelper( 50 );
 				object.position.set( 200, 0, -200 );
-				scene.add( object );
-
-				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
-				object.position.set( 200, 0, 400 );
 				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -158,8 +119,6 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -173,8 +132,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			//
 
 			function animate() {
 

@@ -12,43 +12,63 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a tube that extrudes along a 3d curve</div>
+		<div class="desc">Creates a tube that extrudes along a 3d curve.</div>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
 
 		<h2>Example</h2>
 
-<code>
-var CustomSinCurve = THREE.Curve.create(
-    function ( scale ) { //custom curve constructor
-        this.scale = (scale === undefined) ? 1 : scale;
-    },
+		<code>
+		var CustomSinCurve = THREE.Curve.create(
 
-    function ( t ) { //getPoint: t is between 0-1
-        var tx = t * 3 - 1.5,
-            ty = Math.sin( 2 * Math.PI * t ),
-            tz = 0;
+			function ( scale ) { //custom curve constructor
 
-        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
-    }
-);
+				this.scale = ( scale === undefined ) ? 1 : scale;
 
-var path = new CustomSinCurve( 10 );
+			},
 
-var geometry = new THREE.TubeGeometry(
-    path,  //path
-    20,    //segments
-    2,     //radius
-    8,     //radiusSegments
-    false  //closed
-);
-</code>
+			function ( t ) { //getPoint: t is between 0-1
+
+				var tx = t * 3 - 1.5;
+				var ty = Math.sin( 2 * Math.PI * t );
+				var tz = 0;
+
+				return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
+
+		);
+
+		var path = new CustomSinCurve( 10 );
+		var geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Curve path], [page:Integer segments], [page:Float radius], [page:Integer radiusSegments], [page:Boolean closed])</h3>
+		<h3>[name]([page:Curve path], [page:Integer tubularSegments], [page:Float radius], [page:Integer radiusSegments], [page:Boolean closed])</h3>
 		<div>
 		path — [page:Curve] - A path that inherits from the [page:Curve] base class<br />
-		segments — [page:Integer] - The number of segments that make up the tube, default is 64<br />
+		tubularSegments — [page:Integer] - The number of segments that make up the tube, default is 64<br />
 		radius — [page:Float] - The radius of the tube, default is 1<br />
 		radiusSegments — [page:Integer] - The number of segments that make up the cross-section, default is 8 <br />
 		closed — [page:Boolean] Is the tube open or closed, default is false <br />
@@ -75,21 +95,6 @@ var geometry = new THREE.TubeGeometry(
 		<h3>[property:Array binormals]</h3>
 		<div>
 		An array of [page:Vector3] binormals
-		</div>
-
-
-		<h2>Methods</h2>
-
-
-		<h3>THREE.TubeGeometry.FrenetFrames([page:Curve path], [page:Integer segments], [page:Boolean closed])</h3>
-		<div>
-		path — A path that inherits from the [page:Curve] base class <br />
-		segments — The number of segments that make up the tube <br />
-		closed — Is the tube open or closed
-		</div>
-		<div>
-		A static method that generates the Frenet Frames. This is internally run on any new TubeGeometry and then the
-		generated tangents, normals, and binormals are exposed as properties on the TubeGeometry object.
 		</div>
 
 		<h2>Source</h2>

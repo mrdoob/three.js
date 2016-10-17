@@ -11,6 +11,7 @@ import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Object3D } from './core/Object3D.js';
+import { Uniform } from './core/Uniform';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
@@ -521,6 +522,22 @@ EventDispatcher.prototype = Object.assign( Object.create( {
 	}
 
 } ), EventDispatcher.prototype );
+
+//
+
+Object.defineProperties( Uniform.prototype, {
+	dynamic: {
+		set: function ( value ) {
+			console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
+		}
+	},
+	onUpdate: {
+		value: function () {
+			console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
+			return this;
+		}
+	}
+} );
 
 //
 

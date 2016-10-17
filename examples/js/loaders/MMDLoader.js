@@ -4243,9 +4243,12 @@ THREE.MMDHelper.prototype = {
 
 		if ( mixer !== null && this.doAnimation === true ) {
 
+			// restore/backupBones are workaround
+			// until I make IK, Grant, and Physics Animation plugin
+			this.restoreBones( mesh );
+
 			mixer.update( delta );
 
-			// workaround until I make IK, Grant, and Physics Animation plugin
 			this.backupBones( mesh );
 
 		}
@@ -4304,13 +4307,6 @@ THREE.MMDHelper.prototype = {
 		if ( this.doOutlineDrawing ) {
 
 			this.renderOutline( scene, camera );
-
-		}
-
-		// workaround until I make IK and Physics Animation plugin
-		for ( var i = 0; i < this.meshes.length; i++ ) {
-
-			this.restoreBones( this.meshes[ i ] );
 
 		}
 

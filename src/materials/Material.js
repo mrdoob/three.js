@@ -39,6 +39,7 @@ function Material() {
 	this.depthWrite = true;
 
 	this.clippingPlanes = null;
+	this.clipIntersection = false;
 	this.clipShadows = false;
 
 	this.colorWrite = true;
@@ -302,6 +303,7 @@ Material.prototype = {
 
 		this.visible = source.visible;
 		this.clipShadows = source.clipShadows;
+		this.clipIntersection = source.clipIntersection;
 
 		var srcPlanes = source.clippingPlanes,
 			dstPlanes = null;

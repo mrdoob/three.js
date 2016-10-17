@@ -30,10 +30,6 @@
  *
  * 		filters 'seq' entries with corresponding entry in values
  *
- * .splitDynamic( seq, values ) : filteredSeq
- *
- * 		filters 'seq' entries with dynamic entry and removes them from 'seq'
- *
  *
  * Methods of the top-level container (renderer factorizations):
  *
@@ -540,51 +536,6 @@ WebGLUniforms.seqWithValue = function( seq, values ) {
 	}
 
 	return r;
-
-};
-
-WebGLUniforms.splitDynamic = function( seq, values ) {
-
-	var r = null,
-		n = seq.length,
-		w = 0;
-
-	for ( var i = 0; i !== n; ++ i ) {
-
-		var u = seq[ i ],
-			v = values[ u.id ];
-
-		if ( v && v.dynamic === true ) {
-
-			if ( r === null ) r = [];
-			r.push( u );
-
-		} else {
-
-			// in-place compact 'seq', removing the matches
-			if ( w < i ) seq[ w ] = u;
-			++ w;
-
-		}
-
-	}
-
-	if ( w < n ) seq.length = w;
-
-	return r;
-
-};
-
-WebGLUniforms.evalDynamic = function( seq, values, object, material, camera ) {
-
-	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
-
-		var v = values[ seq[ i ].id ],
-			f = v.onUpdateCallback;
-
-		if ( f !== undefined ) f.call( v, object, material, camera );
-
-	}
 
 };
 
