@@ -101,6 +101,7 @@ var files = {
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
+		"webgl_loader_ttf",
 		"webgl_loader_sea3d",
 		"webgl_loader_sea3d_hierarchy",
 		"webgl_loader_sea3d_keyframe",
