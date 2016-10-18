@@ -6,12 +6,8 @@
  *  - ammo.js https://github.com/kripken/ammo.js
  *  - THREE.TGALoader
  *  - THREE.MMDPhysics
- *  - THREE.CCDIKSolver.js
- *  - THREE.CopyShader
- *  - THREE.EffectComposer
- *  - THREE.RenderPass.js
- *  - THREE.ShaderPass.js
- *  - THREE.BackFaceCullingOutlinePass.js
+ *  - THREE.CCDIKSolver
+ *  - THREE.OutlineEffect
  *
  *
  * This loader loads and parses PMD/PMX and VMD binary files
@@ -3785,16 +3781,14 @@ THREE.MMDGrantSolver.prototype = {
 THREE.MMDHelper = function ( renderer ) {
 
 	this.renderer = renderer;
+
+	this.outlineEffect = null;
+
 	this.effect = null;
 
-	this.composer = null;
-	this.renderPass = null;
-	this.outlinePass = null;
-	this.copyPass = null;
+	this.autoClear = true;
 
 	this.meshes = [];
-
-	this.autoClear = true;
 
 	this.doAnimation = true;
 	this.doIk = true;
@@ -3816,17 +3810,7 @@ THREE.MMDHelper.prototype = {
 
 	init: function () {
 
-		this.composer = new THREE.EffectComposer( this.renderer );
-
-		this.renderPass = new THREE.RenderPass();
-		this.composer.addPass( this.renderPass );
-
-		this.outlinePass = new THREE.BackFaceCullingOutlinePass();
-		this.composer.addPass( this.outlinePass );
-
-		this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
-		this.copyPass.renderToScreen = true;
-		this.composer.addPass( this.copyPass );
+		this.outlineEffect = new THREE.OutlineEffect( this.renderer );
 
 		var size = this.renderer.getSize();
 		this.setSize( size.width, size.height );
@@ -3854,8 +3838,7 @@ THREE.MMDHelper.prototype = {
 
 	setSize: function ( width, height ) {
 
-		this.renderer.setSize( width, height );
-		this.composer.setSize( width, height );
+		this.outlineEffect.setSize( width, height );
 
 	},
 
@@ -4169,16 +4152,19 @@ THREE.MMDHelper.prototype = {
 
 		if ( this.effect === null ) {
 
-			this.renderPass.clear = this.autoClear;
-			this.outlinePass.enabled = this.doOutlineDrawing;
+			if ( this.doOutlineDrawing ) {
 
-			this.renderPass.scene = scene;
-			this.renderPass.camera = camera;
+				this.outlineEffect.autoClear = this.autoClear;
+				this.outlineEffect.render( scene, camera );
 
-			this.outlinePass.scene = scene;
-			this.outlinePass.camera = camera;
+			} else {
 
-			this.composer.render();
+				var tmpAutoClear = this.renderer.autoClear;
+				this.renderer.autoClear = this.autoClear;
+				this.renderer.render( scene, camera );
+				this.renderer.autoClear = tmpAutoClear;
+
+			}
 
 		} else {
 
@@ -4202,17 +4188,17 @@ THREE.MMDHelper.prototype = {
 	},
 
 	/*
-	 * Currently(r82 dev) there's no way to let Effect run with EffectCompoer
+	 * Currently(r82 dev) there's no way to render with two Effects
 	 * then attempt to get them to coordinately run by myself.
 	 *
 	 * What this method does
-	 * 1. let OutlinePass make outline materials (only once)
+	 * 1. let OutlineEffect make outline materials (only once)
 	 * 2. render normally with effect
 	 * 3. set outline materials
 	 * 4. render outline with effect
 	 * 5. restore original materials
 	 */
-	renderWithEffectAndOutline: function () {
+	renderWithEffectAndOutline: function ( scene, camera ) {
 
 		var hasOutlineMaterial = false;
 
@@ -4250,27 +4236,15 @@ THREE.MMDHelper.prototype = {
 
 			hasOutlineMaterial = false;
 
+			var forceClear = false;
+
 			scene.traverse( checkIfObjectHasOutlineMaterial );
 
 			if ( ! hasOutlineMaterial ) {
 
-				var tmpRenderPassEnabled = this.renderPass.enabled;
-				var tmpOutlinePassEnabled = this.outlinePass.enabled;
-				var tmpCopyPassEnabled = this.copyPass.enabled;
+				this.outlineEffect.render( scene, camera );
 
-				this.renderPass.enabled = false;
-
-				this.outlinePass.enabled = true;
-				this.outlinePass.scene = scene;
-				this.outlinePass.camera = camera;
-
-				this.copyPass.enabled = false;
-
-				this.composer.render();
-
-				this.renderPass.enabled = tmpRenderPassEnabled;
-				this.outlinePass.enabled = tmpOutlinePassEnabled;
-				this.copyPass.enabled = tmpCopyPassEnabled;
+				forceClear = true;
 
 				scene.traverse( checkIfObjectHasOutlineMaterial );
 
@@ -4278,7 +4252,7 @@ THREE.MMDHelper.prototype = {
 
 			if ( hasOutlineMaterial ) {
 
-				this.renderer.autoClear = this.autoClear;
+				this.renderer.autoClear = this.autoClear || forceClear;
 
 				this.effect.render( scene, camera );
 
@@ -4297,7 +4271,8 @@ THREE.MMDHelper.prototype = {
 
 			} else {
 
-				this.effect.render( scene, camera );
+				this.outlineEffect.autoClear = this.autoClear || forceClear;
+				this.outlineEffect.render( scene, camera );
 
 			}
 
