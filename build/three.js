@@ -6603,8 +6603,8 @@
 
 			var validArea = new Box2();
 
-			validArea.min.set( 0, 0 );
-			validArea.max.set( viewport.z - 16, viewport.w - 16 );
+			validArea.min.set( viewport.x, viewport.y );
+			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
 
 			if ( program === undefined ) {
 
