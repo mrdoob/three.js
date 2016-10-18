@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">TODO</div>
+		<div class="desc">The shadow of the light, a camera for the shadow map.</div>
 
 		<h2>Constructor</h2>
 
@@ -36,7 +36,7 @@
 
 		<h3>[property:Float radius]</h3>
 		<div>
-			TODO<br />
+			For percentage-closer filtering shadows, how many texels radius to sample from the location on the shadow map.<br />
 			Default - *0*.
 		</div>
 
@@ -53,7 +53,7 @@
 
 		<h3>[property:Matrix4 matrix]</h3>
 		<div>
-			Model to shadow camera space, to compute location and depth in shadow map. Stored in a [page:Matrix4 Matrix4]. Computed internally during rendering.
+			Model to shadow camera space matrix, to compute location and depth in the shadow map. Stored in a [page:Matrix4 Matrix4]. Computed internally during rendering.
 		</div>
 
 
@@ -65,7 +65,7 @@
 
 		<h3>[method:LightShadow clone]()</h3>
 		<div>
-		It returns a clone of LightShadow.
+		Returns a clone of LightShadow.
 		</div>
 
 		<h2>Source</h2>
