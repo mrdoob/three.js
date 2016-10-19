@@ -29,8 +29,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	parameters = parameters || {};
 
-	this.renderer = renderer;
-
 	this.autoClear = parameters.autoClear !== undefined ? parameters.autoClear : true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
@@ -261,35 +259,35 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		this.renderer.setSize( width, height );
+		renderer.setSize( width, height );
 
 	};
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		var tmpAutoClear = this.renderer.autoClear;
-		this.renderer.autoClear = this.autoClear;
+		var tmpAutoClear = renderer.autoClear;
+		renderer.autoClear = this.autoClear;
 
 		// 1. render normally
-		this.renderer.render( scene, camera, renderTarget, forceClear );
+		renderer.render( scene, camera, renderTarget, forceClear );
 
 		// 2. render outline
 		var tmpSceneAutoUpdate = scene.autoUpdate;
-		var tmpShadowMapEnabled = this.renderer.shadowMap.enabled;
+		var tmpShadowMapEnabled = renderer.shadowMap.enabled;
 
 		scene.autoUpdate = false;
-		this.renderer.autoClear = false;
-		this.renderer.shadowMap.enabled = false;
+		renderer.autoClear = false;
+		renderer.shadowMap.enabled = false;
 
 		scene.traverse( setOutlineMaterial );
 
-		this.renderer.render( scene, camera, renderTarget );
+		renderer.render( scene, camera, renderTarget );
 
 		scene.traverse( restoreOriginalMaterial );
 
 		scene.autoUpdate = tmpSceneAutoUpdate;
-		this.renderer.autoClear = tmpAutoClear;
-		this.renderer.shadowMap.enabled = tmpShadowMapEnabled;
+		renderer.autoClear = tmpAutoClear;
+		renderer.shadowMap.enabled = tmpShadowMapEnabled;
 
 	};
 
