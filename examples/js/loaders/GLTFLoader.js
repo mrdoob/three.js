@@ -677,7 +677,7 @@ var replaceTHREEShaderAttributes = function( shaderText, technique ) {
 		var attrName = attributeBySemantic[semantic];
 
 		if ( attrName ) {
-			var regEx = new RegExp( "([^\\w]|^)" + pname, + "([^\\w]|$)", "g" );
+			var regEx = new RegExp( "([^\\w]|^)" + pname + "([^\\w]|$)", "g" );
 			shaderText = shaderText.replace( regEx, "$1" + attrName + "$2" );
 		}
 
