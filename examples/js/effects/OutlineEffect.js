@@ -265,15 +265,15 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-		var tmpAutoClear = renderer.autoClear;
+		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
 
 		// 1. render normally
 		renderer.render( scene, camera, renderTarget, forceClear );
 
 		// 2. render outline
-		var tmpSceneAutoUpdate = scene.autoUpdate;
-		var tmpShadowMapEnabled = renderer.shadowMap.enabled;
+		var currentSceneAutoUpdate = scene.autoUpdate;
+		var currentShadowMapEnabled = renderer.shadowMap.enabled;
 
 		scene.autoUpdate = false;
 		renderer.autoClear = false;
@@ -285,9 +285,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		scene.traverse( restoreOriginalMaterial );
 
-		scene.autoUpdate = tmpSceneAutoUpdate;
-		renderer.autoClear = tmpAutoClear;
-		renderer.shadowMap.enabled = tmpShadowMapEnabled;
+		scene.autoUpdate = currentSceneAutoUpdate;
+		renderer.autoClear = currentAutoClear;
+		renderer.shadowMap.enabled = currentShadowMapEnabled;
 
 	};
 

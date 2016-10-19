@@ -4159,16 +4159,16 @@ THREE.MMDHelper.prototype = {
 
 			} else {
 
-				var tmpAutoClear = this.renderer.autoClear;
+				var currentAutoClear = this.renderer.autoClear;
 				this.renderer.autoClear = this.autoClear;
 				this.renderer.render( scene, camera );
-				this.renderer.autoClear = tmpAutoClear;
+				this.renderer.autoClear = currentAutoClear;
 
 			}
 
 		} else {
 
-			var tmpAutoClear = this.renderer.autoClear;
+			var currentAutoClear = this.renderer.autoClear;
 			this.renderer.autoClear = this.autoClear;
 
 			if ( this.doOutlineDrawing ) {
@@ -4181,7 +4181,7 @@ THREE.MMDHelper.prototype = {
 
 			}
 
-			this.renderer.autoClear = tmpAutoClear;
+			this.renderer.autoClear = currentAutoClear;
 
 		}
 
@@ -4258,14 +4258,14 @@ THREE.MMDHelper.prototype = {
 
 				scene.traverse( setOutlineMaterial );
 
-				var tmpShadowMapEnabled = this.renderer.shadowMap.enabled;
+				var currentShadowMapEnabled = this.renderer.shadowMap.enabled;
 
 				this.renderer.autoClear = false;
 				this.renderer.shadowMap.enabled = false;
 
 				this.effect.render( scene, camera );
 
-				this.renderer.shadowMap.enabled = tmpShadowMapEnabled;
+				this.renderer.shadowMap.enabled = currentShadowMapEnabled;
 
 				scene.traverse( restoreOriginalMaterial );
 
