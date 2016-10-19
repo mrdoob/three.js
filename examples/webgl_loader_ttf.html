@@ -36,13 +36,11 @@
 		<script src="js/utils/GeometryUtils.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/loaders/TTFLoader.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - TTFLoader using opentype by gero3
 			<br/>type to enter new text, drag to spin the text
 			<br/><span class="button" id="color">change color</span>,
-			<span class="button" id="weight">change weight</span>,
 			<span class="button" id="bevel">change bevel</span>
 		</div>
 
@@ -53,7 +51,7 @@
 
 			THREE.Cache.enabled = true;
 
-			var container, stats,  hex, color;
+			var container, hex, color;
 
 			var camera, cameraTarget, scene, renderer;
 
@@ -151,10 +149,7 @@
 
 				}
 
-				material = new THREE.MultiMaterial( [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
-				] );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 
 				group = new THREE.Group();
 				group.position.y = 100;
@@ -184,11 +179,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				// STATS
-
-				stats = new Stats();
-				//container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -226,12 +216,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function boolToNum( b ) {
-
-				return b ? 1 : 0;
 
 			}
 
@@ -454,17 +438,10 @@
 
 				requestAnimationFrame( animate );
 
-				render();
-				stats.update();
-			}
-
-			function render() {
-
 				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 
 				camera.lookAt( cameraTarget );
 
-				renderer.clear();
 				renderer.render( scene, camera );
 
 			}
