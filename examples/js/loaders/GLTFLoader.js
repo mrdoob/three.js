@@ -660,41 +660,25 @@ var replaceTHREEShaderAttributes = function( shaderText, technique ) {
 
 	});
 
+	// Map semantic to Three.js attribute name
+	var attributeBySemantic = {
+		"POSITION": "position",
+		"NORMAL": "normal",
+		"WEIGHT": "skinWeight",
+		"JOINT": "skinIndex",
+		"TEXCOORD_0": "uv",
+		"TEXCOORD0": "uv",
+		"TEXCOORD": "uv",
+	};
+
 	_each( params, function( param, pname ) {
 
 		var semantic = param.semantic;
+		var attrName = attributeBySemantic[semantic];
 
-		var regEx = new RegExp( pname, "g" );
-
-		switch ( semantic ) {
-
-			case "POSITION":
-
-				shaderText = shaderText.replace( regEx, 'position' );
-				break;
-
-			case "NORMAL":
-
-				shaderText = shaderText.replace( regEx, 'normal' );
-				break;
-
-			case 'TEXCOORD_0':
-			case 'TEXCOORD0':
-			case 'TEXCOORD':
-
-				shaderText = shaderText.replace( regEx, 'uv' );
-				break;
-
-			case "WEIGHT":
-
-				shaderText = shaderText.replace(regEx, 'skinWeight');
-				break;
-
-			case "JOINT":
-
-				shaderText = shaderText.replace(regEx, 'skinIndex');
-				break;
-
+		if ( attrName ) {
+			var regEx = new RegExp( "([^\\w]|^)" + pname, + "([^\\w]|$)", "g" );
+			shaderText = shaderText.replace( regEx, "$1" + attrName + "$2" );
 		}
 
 	});
