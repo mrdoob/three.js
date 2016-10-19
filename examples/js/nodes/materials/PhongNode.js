@@ -23,11 +23,11 @@ THREE.PhongNode.prototype.build = function( builder ) {
 	material.define( 'PHONG' );
 	material.define( 'ALPHATEST', '0.0' );
 
-	material.requestAttrib.light = true;
+	material.requestAttribs.light = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', 'transform' ) : undefined;
+		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
 
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -98,47 +98,47 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		// parse all nodes to reuse generate codes
 
-		this.color.parse( builder );
+		this.color.parse( builder, { slot : 'color' } );
 		this.specular.parse( builder );
 		this.shininess.parse( builder );
 
 		if ( this.alpha ) this.alpha.parse( builder );
 
-		if ( this.light ) this.light.parse( builder, 'light' );
+		if ( this.light ) this.light.parse( builder, { cache : 'light' } );
 
 		if ( this.ao ) this.ao.parse( builder );
 		if ( this.ambient ) this.ambient.parse( builder );
 		if ( this.shadow ) this.shadow.parse( builder );
-		if ( this.emissive ) this.emissive.parse( builder );
+		if ( this.emissive ) this.emissive.parse( builder, { slot : 'emissive' } );
 
 		if ( this.normal ) this.normal.parse( builder );
 		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
-		if ( this.environment ) this.environment.parse( builder );
+		if ( this.environment ) this.environment.parse( builder, { slot : 'environment' } );
 		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.parse( builder );
 
 		// build code
 
-		var color = this.color.buildCode( builder, 'c' );
+		var color = this.color.buildCode( builder, 'c', { slot : 'color' } );
 		var specular = this.specular.buildCode( builder, 'c' );
 		var shininess = this.shininess.buildCode( builder, 'fv1' );
 
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
 
-		var light = this.light ? this.light.buildCode( builder, 'v3', 'light' ) : undefined;
+		var light = this.light ? this.light.buildCode( builder, 'v3', { cache : 'light' } ) : undefined;
 
 		var ao = this.ao ? this.ao.buildCode( builder, 'fv1' ) : undefined;
 		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c' ) : undefined;
+		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot : 'emissive' } ) : undefined;
 
 		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
 		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c' ) : undefined;
+		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot : 'environment' } ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'fv1' ) : undefined;
 
-		material.requestAttrib.transparent = alpha != undefined;
+		material.requestAttribs.transparent = alpha != undefined;
 
 		material.addFragmentPars( [
 			THREE.ShaderChunk[ "common" ],
@@ -275,7 +275,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 				output.push(
 					environmentAlpha.code,
-					"outgoingLight = mix(" + 'outgoingLight' + "," + environment.result + "," + environmentAlpha.result + ");"
+					"outgoingLight = mix( outgoingLight, " + environment.result + ", " + environmentAlpha.result + " );"
 				);
 
 			}
@@ -287,11 +287,6 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		}
 
-		output.push(
-			THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ]
-		);
-
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -302,6 +297,13 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
 
 		}
+
+		output.push(
+			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
+			THREE.ShaderChunk[ "tonemapping_fragment" ],
+			THREE.ShaderChunk[ "encodings_fragment" ],
+			THREE.ShaderChunk[ "fog_fragment" ]
+		);
 
 		code = output.join( "\n" );
 

@@ -32,7 +32,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "depthPacking"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking"
 	];
 
 
@@ -104,7 +104,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	}
 
-	this.getParameters = function ( material, lights, fog, nClipPlanes, object ) {
+	this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
 
@@ -181,6 +181,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			numHemiLights: lights.hemi.length,
 
 			numClippingPlanes: nClipPlanes,
+			numClipIntersection: nClipIntersection,
 
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,

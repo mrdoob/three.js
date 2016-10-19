@@ -53,6 +53,8 @@ Color.prototype = {
 		this.g = scalar;
 		this.b = scalar;
 
+		return this;
+
 	},
 
 	setHex: function ( hex ) {

@@ -10,6 +10,7 @@ var list = {
 	"Reference": {
 		"Constants": [
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
+			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "GLState", "api/constants/GLState" ],
 			[ "Materials", "api/constants/Materials" ],
 			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
@@ -31,7 +32,48 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Raycaster", "api/core/Raycaster" ]
+			[ "Raycaster", "api/core/Raycaster" ],
+			[ "Uniform", "api/core/Uniform"]
+		],
+
+		"Geometries": [
+			[ "BoxBufferGeometry", "api/geometries/BoxBufferGeometry" ],
+			[ "BoxGeometry", "api/geometries/BoxGeometry" ],
+			[ "CircleBufferGeometry", "api/geometries/CircleBufferGeometry" ],
+			[ "CircleGeometry", "api/geometries/CircleGeometry" ],
+			[ "ConeBufferGeometry", "api/geometries/ConeBufferGeometry" ],
+			[ "ConeGeometry", "api/geometries/ConeGeometry" ],
+			[ "CylinderBufferGeometry", "api/geometries/CylinderBufferGeometry" ],
+			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
+			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
+			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
+			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
+			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
+			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
+			[ "LatheBufferGeometry", "api/geometries/LatheBufferGeometry" ],
+			[ "LatheGeometry", "api/geometries/LatheGeometry" ],
+			[ "OctahedronBufferGeometry", "api/geometries/OctahedronBufferGeometry" ],
+			[ "OctahedronGeometry", "api/geometries/OctahedronGeometry" ],
+			[ "ParametricBufferGeometry", "api/geometries/ParametricBufferGeometry" ],
+			[ "ParametricGeometry", "api/geometries/ParametricGeometry" ],
+			[ "PlaneBufferGeometry", "api/geometries/PlaneBufferGeometry" ],
+			[ "PlaneGeometry", "api/geometries/PlaneGeometry" ],
+			[ "PolyhedronBufferGeometry", "api/geometries/PolyhedronBufferGeometry" ],
+			[ "PolyhedronGeometry", "api/geometries/PolyhedronGeometry" ],
+			[ "RingBufferGeometry", "api/geometries/RingBufferGeometry" ],
+			[ "RingGeometry", "api/geometries/RingGeometry" ],
+			[ "ShapeGeometry", "api/geometries/ShapeGeometry" ],
+			[ "SphereBufferGeometry", "api/geometries/SphereBufferGeometry" ],
+			[ "SphereGeometry", "api/geometries/SphereGeometry" ],
+			[ "TetrahedronBufferGeometry", "api/geometries/TetrahedronBufferGeometry" ],
+			[ "TetrahedronGeometry", "api/geometries/TetrahedronGeometry" ],
+			[ "TextGeometry", "api/geometries/TextGeometry" ],
+			[ "TorusBufferGeometry", "api/geometries/TorusBufferGeometry" ],
+			[ "TorusGeometry", "api/geometries/TorusGeometry" ],
+			[ "TorusKnotBufferGeometry", "api/geometries/TorusKnotBufferGeometry" ],
+			[ "TorusKnotGeometry", "api/geometries/TorusKnotGeometry" ],
+			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
+			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ]
 		],
 
 		"Lights": [
@@ -53,7 +95,7 @@ var list = {
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
-			[ "glTFLoader", "api/loaders/glTFLoader" ],
+			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
@@ -190,39 +232,6 @@ var list = {
 			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
 		],
 
-		"Extras / Geometries": [
-			[ "BoxBufferGeometry", "api/extras/geometries/BoxBufferGeometry" ],
-			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
-			[ "CircleBufferGeometry", "api/extras/geometries/CircleBufferGeometry" ],
-			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
-			[ "ConeBufferGeometry", "api/extras/geometries/ConeBufferGeometry" ],
-			[ "ConeGeometry", "api/extras/geometries/ConeGeometry" ],
-			[ "CylinderBufferGeometry", "api/extras/geometries/CylinderBufferGeometry" ],
-			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
-			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
-			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
-			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
-			[ "LatheBufferGeometry", "api/extras/geometries/LatheBufferGeometry" ],
-			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
-			[ "OctahedronGeometry", "api/extras/geometries/OctahedronGeometry" ],
-			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
-			[ "PlaneBufferGeometry", "api/extras/geometries/PlaneBufferGeometry" ],
-			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
-			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
-			[ "RingBufferGeometry", "api/extras/geometries/RingBufferGeometry" ],
-			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
-			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
-			[ "SphereBufferGeometry", "api/extras/geometries/SphereBufferGeometry" ],
-			[ "SphereGeometry", "api/extras/geometries/SphereGeometry" ],
-			[ "TetrahedronGeometry", "api/extras/geometries/TetrahedronGeometry" ],
-			[ "TextGeometry", "api/extras/geometries/TextGeometry" ],
-			[ "TorusBufferGeometry", "api/extras/geometries/TorusBufferGeometry" ],
-			[ "TorusGeometry", "api/extras/geometries/TorusGeometry" ],
-			[ "TorusKnotBufferGeometry", "api/extras/geometries/TorusKnotBufferGeometry" ],
-			[ "TorusKnotGeometry", "api/extras/geometries/TorusKnotGeometry" ],
-			[ "TubeGeometry", "api/extras/geometries/TubeGeometry" ]
-		],
-
 		"Extras / Helpers": [
 			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
@@ -230,14 +239,12 @@ var list = {
 			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "EdgesHelper", "api/extras/helpers/EdgesHelper" ],
 			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ],
-			[ "WireframeHelper", "api/extras/helpers/WireframeHelper" ]
+			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
 		],
 
 		"Extras / Objects": [

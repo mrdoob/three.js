@@ -934,9 +934,15 @@ Matrix4.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.elements.set( array );
+		if ( offset === undefined ) offset = 0;
+
+		for( var i = 0; i < 16; i ++ ) {
+
+			this.elements[ i ] = array[ i + offset ];
+
+		}
 
 		return this;
 

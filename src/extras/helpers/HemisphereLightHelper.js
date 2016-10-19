@@ -3,7 +3,7 @@ import { Object3D } from '../../core/Object3D';
 import { Mesh } from '../../objects/Mesh';
 import { FaceColors } from '../../constants';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { SphereGeometry } from '../geometries/SphereGeometry';
+import { SphereGeometry } from '../../geometries/SphereGeometry';
 import { Color } from '../../math/Color';
 
 /**

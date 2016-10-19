@@ -157,9 +157,7 @@ function WebGLObjects( gl, properties, info ) {
 				var b = array[ i + 1 ];
 				var c = array[ i + 2 ];
 
-				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
-				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
-				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+				indices.push( a, b, b, c, c, a );
 
 			}
 
@@ -189,34 +187,6 @@ function WebGLObjects( gl, properties, info ) {
 		property.wireframe = attribute;
 
 		return attribute;
-
-	}
-
-	function checkEdge( edges, a, b ) {
-
-		if ( a > b ) {
-
-			var tmp = a;
-			a = b;
-			b = tmp;
-
-		}
-
-		var list = edges[ a ];
-
-		if ( list === undefined ) {
-
-			edges[ a ] = [ b ];
-			return true;
-
-		} else if ( list.indexOf( b ) === -1 ) {
-
-			list.push( b );
-			return true;
-
-		}
-
-		return false;
 
 	}
 

@@ -20,6 +20,8 @@ Object.assign( ImageLoader.prototype, {
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
+			image.onload = null;
+
 			URL.revokeObjectURL( image.src );
 
 			if ( onLoad ) onLoad( image );
@@ -27,6 +29,7 @@ Object.assign( ImageLoader.prototype, {
 			scope.manager.itemEnd( url );
 
 		};
+		image.onerror = onError;
 
 		if ( url.indexOf( 'data:' ) === 0 ) {
 

@@ -509,8 +509,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		} else {
 
 			disable( gl.BLEND );
-			currentBlending = blending; // no blending, that is
-			return;
 
 		}
 
