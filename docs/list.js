@@ -31,6 +31,7 @@ var list = {
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
+			[ "Layers", "api/core/Layers" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 			[ "Uniform", "api/core/Uniform"]
