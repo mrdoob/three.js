@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 
 var outro = `
 Object.defineProperty( exports, 'AudioContext', {
@@ -28,11 +27,19 @@ function glsl () {
 
 export default {
 	entry: 'src/Three.js',
-	dest: 'build/three.js',
-	moduleName: 'THREE',
-	format: 'umd',
 	plugins: [
 		glsl()
+	],
+	targets: [
+		{
+			format: 'umd',
+			moduleName: 'THREE',
+			dest: 'build/three.js'
+		},
+		{
+			format: 'es',
+			dest: 'build/three.modules.js'
+		}
 	],
 	outro: outro
 };

@@ -3,12 +3,14 @@
   "version": "0.81.2",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "jsnext:main": "build/three.modules.js",
   "files": [
     "package.json",
     "LICENSE",
     "README.md",
     "build/three.js",
     "build/three.min.js",
+    "build/three.modules.js",
     "src",
     "examples/js",
     "examples/fonts",
@@ -45,7 +47,7 @@
   "devDependencies": {
     "argparse": "^1.0.3",
     "jscs": "^1.13.1",
-    "rollup": "^0.34.8",
+    "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
   }
