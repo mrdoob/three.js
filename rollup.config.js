@@ -38,7 +38,7 @@ export default {
 		},
 		{
 			format: 'es',
-			dest: 'build/three.next.js'
+			dest: 'build/three.modules.js'
 		}
 	],
 	outro: outro
