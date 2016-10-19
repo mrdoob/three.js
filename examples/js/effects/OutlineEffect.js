@@ -4,7 +4,7 @@
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
  * // How to set default outline parameters
- * new THREE.BackFaceCullingOutlinePass( scene, camera, {
+ * new THREE.OutlineEffect( renderer, {
  * 	defaultThickNess: 0.01,
  * 	defaultColor: new THREE.Color( 0x888888 ),
  * 	defaultAlpha: 0.8
