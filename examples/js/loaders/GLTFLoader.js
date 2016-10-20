@@ -664,7 +664,7 @@ var replaceTHREEShaderAttributes = function( shaderText, technique ) {
 
 		var semantic = param.semantic;
 
-		var regEx = new RegExp( pname, "g" );
+		var regEx = new RegExp( "\\b" + pname + "\\b", "g" );
 
 		switch ( semantic ) {
 
