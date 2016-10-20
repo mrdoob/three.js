@@ -59,7 +59,7 @@ Object.assign( ObjectLoader.prototype, {
 
 				json = JSON.parse( text );
 
-                        } catch(error) {
+                        } catch( error ) {
 
 				console.log(err.message);
 				onError(loader);
