@@ -198,6 +198,13 @@ Material.prototype = {
 
 		}
 
+		if ( this.toonMap && this.toonMap.isTexture ) {
+
+			data.toonMap = this.toonMap.toJSON( meta ).uuid;
+			data.toonMapDirectionY = this.toonMapDirectionY;
+
+		}
+
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
 

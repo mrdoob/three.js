@@ -80,6 +80,12 @@ var UniformsLib = {
 
 	},
 
+	toonmap: {
+
+		toonMap: { value: null }
+
+	},
+
 	fog: {
 
 		fogDensity: { value: 0.00025 },

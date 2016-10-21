@@ -51,6 +51,7 @@ THREE.MMDLoader.prototype.constructor = THREE.MMDLoader;
 THREE.MMDLoader.prototype.setDefaultTexturePath = function ( path ) {
 
 	this.defaultTexturePath = path;
+	if ( this.defaultTexturePath.lastIndexOf( '/' ) !== this.defaultTexturePath.length - 1 ) this.defaultTexturePath += '/';
 
 };
 
@@ -2003,7 +2004,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		var offset = 0;
 		var materialParams = [];
 
-		function loadTexture ( filePath, params ) {
+		function loadTexture( filePath, params ) {
 
 			if ( params === undefined ) {
 
@@ -2024,7 +2025,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var texture = loader.load( fullPath, function ( t ) {
 
-				t.flipY = false;
+				t.flipY = ( params.isToonTexture === true ) ? true : false;
 				t.wrapS = THREE.RepeatWrapping;
 				t.wrapT = THREE.RepeatWrapping;
 
@@ -2205,17 +2206,11 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		}
 
-		var shader = THREE.ShaderLib[ 'mmd' ];
-
 		for ( var i = 0; i < materialParams.length; i++ ) {
 
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
-			var m = new THREE.ShaderMaterial( {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			} );
+			var m = new THREE.MeshPhongMaterial();
 
 			m.faceOffset = p.faceOffset;
 			m.faceNum = p.faceNum;
@@ -2350,7 +2345,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				}
 
 				m.map = getTexture( p.map, textures );
-				m.uniforms.map.value = m.map;
 				checkTextureTransparency( m );
 
 			}
@@ -2358,7 +2352,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			if ( p.envMap !== undefined ) {
 
 				m.envMap = getTexture( p.envMap, textures );
-				m.uniforms.envMap.value = m.envMap;
 				m.combine = p.envMapType;
 
 				// TODO: WebGLRenderer should automatically update?
@@ -2370,17 +2363,17 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			m.uniforms.opacity.value = p.opacity;
-			m.uniforms.diffuse.value.copy( p.color );
+			m.opacity = p.opacity;
+			m.color = p.color;
 
 			if ( p.emissive !== undefined ) {
 
-				m.uniforms.emissive.value.copy( p.emissive );
+				m.emissive = p.emissive;
 
 			}
 
-			m.uniforms.specular.value.copy( p.specular );
-			m.uniforms.shininess.value = Math.max( p.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+			m.specular = p.specular;
+			m.shininess = Math.max( p.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
 			if ( model.metadata.format === 'pmd' ) {
 
@@ -2404,21 +2397,10 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
-				m.uniforms.toonMap.value = textures[ p2.toonIndex ];
-				m.uniforms.celShading.value = 1;
-
-				if ( p2.toonIndex === -1 ) {
-
-					m.uniforms.hasToonTexture.value = 0;
-
-				} else {
-
-					var n = model.toonTextures[ p2.toonIndex ].fileName;
-					var uuid = loadTexture( n, { defaultTexturePath: isDefaultToonTexture( n ) } );
-					m.uniforms.toonMap.value = textures[ uuid ];
-					m.uniforms.hasToonTexture.value = 1;
-
-				}
+				var toonFileName = ( p2.toonIndex === -1 ) ? 'toon00.bmp' : model.toonTextures[ p2.toonIndex ].fileName;
+				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToonTexture( toonFileName ) } );
+				m.toonMap = getTexture( uuid, textures );
+				m.toonMapDirectionY = true;
 
 			} else {
 
@@ -2430,32 +2412,24 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
-				m.uniforms.celShading.value = 1;
+				var toonFileName, isDefaultToon;
 
-				if ( p2.toonIndex === -1 ) {
+				if ( p2.toonIndex === -1 || p2.toonFlag !== 0 ) {
 
-					m.uniforms.hasToonTexture.value = 0;
+					var num = p2.toonIndex + 1;
+					toonFileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
+					isDefaultToon = true;
 
 				} else {
 
-					if ( p2.toonFlag === 0 ) {
-
-						var n = model.textures[ p2.toonIndex ];
-						var uuid = loadTexture( n );
-						m.uniforms.toonMap.value = textures[ uuid ];
-
-					} else {
-
-						var num = p2.toonIndex + 1;
-						var fileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
-						var uuid = loadTexture( fileName, { defaultTexturePath: true } );
-						m.uniforms.toonMap.value = textures[ uuid ];
-
-					}
-
-					m.uniforms.hasToonTexture.value = 1;
+					toonFileName = model.textures[ p2.toonIndex ];
+					isDefaultToon = false;
 
 				}
+
+				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToon } );
+				m.toonMap = getTexture( uuid, textures );
+				m.toonMapDirectionY = true;
 
 			}
 
@@ -2485,7 +2459,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var m = material.materials[ e.index ];
 
-					if ( m.uniforms.opacity.value !== e.diffuse[ 3 ] ) {
+					if ( m.opacity !== e.diffuse[ 3 ] ) {
 
 						m.transparent = true;
 
@@ -3565,73 +3539,6 @@ THREE.MMDLoader.DataView.prototype = {
 
 };
 
-/*
- * Shaders are copied from MeshPhongMaterial and then MMD spcific codes are inserted.
- * Keep shaders updated on MeshPhongMaterial.
- */
-THREE.ShaderLib[ 'mmd' ] = {
-
-	uniforms: THREE.UniformsUtils.merge( [
-
-		THREE.ShaderLib[ 'phong' ].uniforms,
-
-		// MMD specific for toon mapping
-		{
-			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null },
-			"hasToonTexture"  : { type: "i", value: 0 }
-		}
-
-	] ),
-
-	vertexShader: THREE.ShaderLib[ 'phong' ].vertexShader,
-
-	// put toon mapping logic right before "void main() {...}"
-	fragmentShader: THREE.ShaderLib[ 'phong' ].fragmentShader.replace( /void\s+main\s*\(\s*\)/, [
-
-		"	uniform bool celShading;",
-		"	uniform sampler2D toonMap;",
-		"	uniform bool hasToonTexture;",
-
-		"	vec3 toon ( vec3 lightDirection, vec3 norm ) {",
-		"		if ( ! hasToonTexture ) {",
-		"			return vec3( 1.0 );",
-		"		}",
-		"		vec2 coord = vec2( 0.0, 0.5 * ( 1.0 - dot( lightDirection, norm ) ) );",
-		"		return texture2D( toonMap, coord ).rgb;",
-		"	}",
-
-		// redefine for MMD
-		"#undef RE_Direct",
-		"void RE_Direct_BlinnMMD( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {",
-		"	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );",
-		"	vec3 irradiance = dotNL * directLight.color;",
-
-		"	#ifndef PHYSICALLY_CORRECT_LIGHTS",
-
-		"		irradiance *= PI; // punctual light",
-
-		"	#endif",
-
-		// ---- MMD specific for toon mapping
-		"	if ( celShading ) {",
-		"		reflectedLight.directDiffuse += material.diffuseColor * directLight.color * toon( directLight.direction, geometry.normal );",
-		"	} else {",
-		"		reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );",
-		"	}",
-		// ---- MMD specific for toon mapping
-
-		"	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;",
-		"}",
-		// ---- MMD specific for toon mapping
-		"#define RE_Direct	RE_Direct_BlinnMMD",
-		// ---- MMD specific for toon mapping
-
-		"void main()",
-
-	].join( "\n" ) )
-
-};
 
 THREE.MMDAudioManager = function ( audio, listener, p ) {
 

@@ -72,6 +72,7 @@ import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl';
+import toonmap_pars_fragment from './ShaderChunk/toonmap_pars_fragment.glsl';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl';
@@ -180,6 +181,7 @@ export var ShaderChunk = {
 	specularmap_pars_fragment: specularmap_pars_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
+	toonmap_pars_fragment: toonmap_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,

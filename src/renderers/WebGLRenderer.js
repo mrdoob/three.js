@@ -2183,6 +2183,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.toonMap ) {
+
+			uniforms.toonMap.value = material.toonMap;
+
+		}
+
 	}
 
 	function refreshUniformsStandard( uniforms, material ) {
