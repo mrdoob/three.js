@@ -41,7 +41,6 @@ InterleavedBuffer.prototype = {
 
 		this.count = array !== undefined ? array.length / this.stride : 0;
 		this.array = array;
-		this.version = 0; // will copy entire buffer
 
 	},
 

@@ -64,7 +64,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		var attributeProperties = properties.get( data );
 
-		if ( attributeProperties.__webglBuffer === undefined || data.version === 0 ) {
+		if ( attributeProperties.__webglBuffer === undefined ) {
 
 			createBuffer( attributeProperties, data, bufferType );
 
@@ -78,11 +78,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	function createBuffer( attributeProperties, data, bufferType ) {
 
-		if ( attributeProperties.__webglBuffer === undefined ) {
-
-			attributeProperties.__webglBuffer = gl.createBuffer();
-
-		}
+		attributeProperties.__webglBuffer = gl.createBuffer();
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
@@ -98,7 +94,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false ) {
+
+			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+
+		} else if ( data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 

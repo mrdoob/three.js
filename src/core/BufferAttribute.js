@@ -52,7 +52,6 @@ BufferAttribute.prototype = {
 
 		this.count = array !== undefined ? array.length / this.itemSize : 0;
 		this.array = array;
-		this.version = 0; // will copy entire buffer
 
 	},
 
