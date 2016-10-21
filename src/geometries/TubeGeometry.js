@@ -25,7 +25,7 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 		closed: closed
 	};
 
-	if( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
+	if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
 
 	var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
 

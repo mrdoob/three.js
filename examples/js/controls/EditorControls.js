@@ -60,7 +60,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * this.panSpeed );
+		delta.multiplyScalar( distance * scope.panSpeed );
 		delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
 
 		object.position.add( delta );
@@ -74,7 +74,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * this.zoomSpeed );
+		delta.multiplyScalar( distance * scope.zoomSpeed );
 
 		if ( delta.length() > distance ) return;
 
@@ -147,7 +147,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * this.rotationSpeed, - movementY * this.rotationSpeed, 0 ) );
+			scope.rotate( new THREE.Vector3( - movementX * scope.rotationSpeed, - movementY * scope.rotationSpeed, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
@@ -270,7 +270,7 @@ THREE.EditorControls = function ( object, domElement ) {
 			case 1:
 				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
 				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - this.rotationSpeed ) );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - scope.rotationSpeed ) );
 				break;
 
 			case 2:

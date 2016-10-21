@@ -3,7 +3,11 @@
  *
  * Dependencies
  *  - charset-encoder-js https://github.com/takahirox/charset-encoder-js
+ *  - ammo.js https://github.com/kripken/ammo.js
  *  - THREE.TGALoader
+ *  - THREE.MMDPhysics
+ *  - THREE.CCDIKSolver
+ *  - THREE.OutlineEffect
  *
  *
  * This loader loads and parses PMD/PMX and VMD binary files
@@ -2336,7 +2340,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
 						var uvs = geometry.faceVertexUvs[ 0 ].slice( m.faceOffset, m.faceOffset + m.faceNum );
 
-						m.textureTransparency = detectTextureTransparency( imageData, uvs );
+						if ( detectTextureTransparency( imageData, uvs ) ) m.transparent = true;
 
 						delete m.faceOffset;
 						delete m.faceNum;
@@ -2392,9 +2396,14 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				};
 
-				m.uniforms.outlineThickness.value = p2.edgeFlag === 1 ? 0.003 : 0.0;
-				m.uniforms.outlineColor.value = new THREE.Color( 0.0, 0.0, 0.0 );
-				m.uniforms.outlineAlpha.value = 1.0;
+				m.outlineParameters = {
+					thickness: p2.edgeFlag === 1 ? 0.003 : 0.0,
+					color: new THREE.Color( 0.0, 0.0, 0.0 ),
+					alpha: 1.0
+				};
+
+				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
+
 				m.uniforms.toonMap.value = textures[ p2.toonIndex ];
 				m.uniforms.celShading.value = 1;
 
@@ -2408,13 +2417,19 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 					var uuid = loadTexture( n, { defaultTexturePath: isDefaultToonTexture( n ) } );
 					m.uniforms.toonMap.value = textures[ uuid ];
 					m.uniforms.hasToonTexture.value = 1;
+
 				}
 
 			} else {
 
-				m.uniforms.outlineThickness.value = p2.edgeSize / 300;
-				m.uniforms.outlineColor.value = new THREE.Color( p2.edgeColor[ 0 ], p2.edgeColor[ 1 ], p2.edgeColor[ 2 ] );
-				m.uniforms.outlineAlpha.value = p2.edgeColor[ 3 ];
+				m.outlineParameters = {
+					thickness: p2.edgeSize / 300,
+					color: new THREE.Color( p2.edgeColor[ 0 ], p2.edgeColor[ 1 ], p2.edgeColor[ 2 ] ),
+					alpha: p2.edgeColor[ 3 ]
+				};
+
+				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
+
 				m.uniforms.celShading.value = 1;
 
 				if ( p2.toonIndex === -1 ) {
@@ -2472,7 +2487,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					if ( m.uniforms.opacity.value !== e.diffuse[ 3 ] ) {
 
-						m.morphTransparency = true;
+						m.transparent = true;
 
 					}
 
@@ -3558,148 +3573,22 @@ THREE.ShaderLib[ 'mmd' ] = {
 
 	uniforms: THREE.UniformsUtils.merge( [
 
-		THREE.UniformsLib[ "common" ],
-		THREE.UniformsLib[ "aomap" ],
-		THREE.UniformsLib[ "lightmap" ],
-		THREE.UniformsLib[ "emissivemap" ],
-		THREE.UniformsLib[ "bumpmap" ],
-		THREE.UniformsLib[ "normalmap" ],
-		THREE.UniformsLib[ "displacementmap" ],
-		THREE.UniformsLib[ "fog" ],
-		THREE.UniformsLib[ "lights" ],
+		THREE.ShaderLib[ 'phong' ].uniforms,
 
+		// MMD specific for toon mapping
 		{
-			"emissive" : { value: new THREE.Color( 0x000000 ) },
-			"specular" : { value: new THREE.Color( 0x111111 ) },
-			"shininess": { value: 30 }
-		},
-
-		// ---- MMD specific for cel shading(outline drawing and toon mapping)
-		{
-			"outlineDrawing"  : { value: 0 },
-			"outlineThickness": { value: 0.0 },
-			"outlineColor"    : { value: new THREE.Color( 0x000000 ) },
-			"outlineAlpha"    : { value: 1.0 },
-			"celShading"      : { value: 0 },
-			"toonMap"         : { value: null },
-			"hasToonTexture"  : { value: 0 }
+			"celShading"      : { type: "i", value: 0 },
+			"toonMap"         : { type: "t", value: null },
+			"hasToonTexture"  : { type: "i", value: 0 }
 		}
-		// ---- MMD specific for cel shading(outline drawing and toon mapping)
 
 	] ),
 
-	vertexShader: [
+	vertexShader: THREE.ShaderLib[ 'phong' ].vertexShader,
 
-		"#define PHONG",
+	// put toon mapping logic right before "void main() {...}"
+	fragmentShader: THREE.ShaderLib[ 'phong' ].fragmentShader.replace( /void\s+main\s*\(\s*\)/, [
 
-		"varying vec3 vViewPosition;",
-
-		"#ifndef FLAT_SHADED",
-
-		"	varying vec3 vNormal;",
-
-		"#endif",
-
-		THREE.ShaderChunk[ "common" ],
-		THREE.ShaderChunk[ "uv_pars_vertex" ],
-		THREE.ShaderChunk[ "uv2_pars_vertex" ],
-		THREE.ShaderChunk[ "displacementmap_pars_vertex" ],
-		THREE.ShaderChunk[ "envmap_pars_vertex" ],
-		THREE.ShaderChunk[ "color_pars_vertex" ],
-		THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-		THREE.ShaderChunk[ "skinning_pars_vertex" ],
-		THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-		THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-		THREE.ShaderChunk[ "clipping_planes_pars_vertex" ],
-
-		// ---- MMD specific for outline drawing
-		"	uniform bool outlineDrawing;",
-		"	uniform float outlineThickness;",
-		// ---- MMD specific for outline drawing
-
-		"void main() {",
-
-			THREE.ShaderChunk[ "uv_vertex" ],
-			THREE.ShaderChunk[ "uv2_vertex" ],
-			THREE.ShaderChunk[ "color_vertex" ],
-
-			THREE.ShaderChunk[ "beginnormal_vertex" ],
-			THREE.ShaderChunk[ "morphnormal_vertex" ],
-			THREE.ShaderChunk[ "skinbase_vertex" ],
-			THREE.ShaderChunk[ "skinnormal_vertex" ],
-			THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-		"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-		"	vNormal = normalize( transformedNormal );",
-
-		"#endif",
-
-			THREE.ShaderChunk[ "begin_vertex" ],
-			THREE.ShaderChunk[ "displacementmap_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_vertex" ],
-			THREE.ShaderChunk[ "skinning_vertex" ],
-			THREE.ShaderChunk[ "project_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-			THREE.ShaderChunk[ "clipping_planes_vertex" ],
-
-		"	vViewPosition = - mvPosition.xyz;",
-
-			THREE.ShaderChunk[ "worldpos_vertex" ],
-			THREE.ShaderChunk[ "envmap_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-		// ---- MMD specific for outline drawing
-		"	if ( outlineDrawing ) {",
-		"		float thickness = outlineThickness;",
-		"		float ratio = 1.0;", // TODO: support outline size ratio for each vertex
-		"		vec4 epos = projectionMatrix * modelViewMatrix * skinned;",
-		"		vec4 epos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + objectNormal, 1.0 );",
-		"		vec4 enorm = normalize( epos2 - epos );",
-		"		gl_Position = epos + enorm * thickness * epos.w * ratio;",
-		"	}",
-		// ---- MMD specific for outline drawing
-
-		"}"
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		"#define PHONG",
-
-		"uniform vec3 diffuse;",
-		"uniform vec3 emissive;",
-		"uniform vec3 specular;",
-		"uniform float shininess;",
-		"uniform float opacity;",
-
-		THREE.ShaderChunk[ "common" ],
-		THREE.ShaderChunk[ "packing" ],
-		THREE.ShaderChunk[ "color_pars_fragment" ],
-		THREE.ShaderChunk[ "uv_pars_fragment" ],
-		THREE.ShaderChunk[ "uv2_pars_fragment" ],
-		THREE.ShaderChunk[ "map_pars_fragment" ],
-		THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-		THREE.ShaderChunk[ "aomap_pars_fragment" ],
-		THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-		THREE.ShaderChunk[ "emissivemap_pars_fragment" ],
-		THREE.ShaderChunk[ "envmap_pars_fragment" ],
-		THREE.ShaderChunk[ "fog_pars_fragment" ],
-		THREE.ShaderChunk[ "bsdfs" ],
-		THREE.ShaderChunk[ "lights_pars" ],
-		THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
-		THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-		THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
-		THREE.ShaderChunk[ "normalmap_pars_fragment" ],
-		THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-		THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-		THREE.ShaderChunk[ "clipping_planes_pars_fragment" ],
-
-		// ---- MMD specific for cel shading
-		"	uniform bool outlineDrawing;",
-		"	uniform vec3 outlineColor;",
-		"	uniform float outlineAlpha;",
 		"	uniform bool celShading;",
 		"	uniform sampler2D toonMap;",
 		"	uniform bool hasToonTexture;",
@@ -3738,52 +3627,9 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"#define RE_Direct	RE_Direct_BlinnMMD",
 		// ---- MMD specific for toon mapping
 
-		"void main() {",
+		"void main()",
 
-		// ---- MMD specific for outline drawing
-		"	if ( outlineDrawing ) {",
-		"		gl_FragColor = vec4( outlineColor, outlineAlpha );",
-		"		return;",
-		"	}",
-		// ---- MMD specific for outline drawing
-
-			THREE.ShaderChunk[ "clipping_planes_fragment" ],
-
-		"	vec4 diffuseColor = vec4( diffuse, opacity );",
-		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-		"	vec3 totalEmissiveRadiance = emissive;",
-
-			THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-			THREE.ShaderChunk[ "map_fragment" ],
-			THREE.ShaderChunk[ "color_fragment" ],
-			THREE.ShaderChunk[ "alphamap_fragment" ],
-			THREE.ShaderChunk[ "alphatest_fragment" ],
-			THREE.ShaderChunk[ "specularmap_fragment" ],
-			THREE.ShaderChunk[ "normal_flip" ],
-			THREE.ShaderChunk[ "normal_fragment" ],
-			THREE.ShaderChunk[ "emissivemap_fragment" ],
-
-			// accumulation
-			THREE.ShaderChunk[ "lights_phong_fragment" ],
-			THREE.ShaderChunk[ "lights_template" ],
-
-			// modulation
-			THREE.ShaderChunk[ "aomap_fragment" ],
-
-			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
-
-			THREE.ShaderChunk[ "envmap_fragment" ],
-
-		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-
-			THREE.ShaderChunk[ "premultiplied_alpha_fragment" ],
-			THREE.ShaderChunk[ "tonemapping_fragment" ],
-			THREE.ShaderChunk[ "encodings_fragment" ],
-			THREE.ShaderChunk[ "fog_fragment" ],
-
-		"}"
-
-	].join( "\n" )
+	].join( "\n" ) )
 
 };
 
@@ -3935,7 +3781,12 @@ THREE.MMDGrantSolver.prototype = {
 THREE.MMDHelper = function ( renderer ) {
 
 	this.renderer = renderer;
+
+	this.outlineEffect = null;
+
 	this.effect = null;
+
+	this.autoClear = true;
 
 	this.meshes = [];
 
@@ -3959,15 +3810,10 @@ THREE.MMDHelper.prototype = {
 
 	init: function () {
 
-		this.initRender();
+		this.outlineEffect = new THREE.OutlineEffect( this.renderer );
 
-	},
-
-	initRender: function () {
-
-		this.renderer.autoClear = false;
-		this.renderer.autoClearColor = false;
-		this.renderer.autoClearDepth = false;
+		var size = this.renderer.getSize();
+		this.setSize( size.width, size.height );
 
 	},
 
@@ -3987,6 +3833,12 @@ THREE.MMDHelper.prototype = {
 
 		// workaround until I make IK and Physics Animation plugin
 		this.initBackupBones( mesh );
+
+	},
+
+	setSize: function ( width, height ) {
+
+		this.outlineEffect.setSize( width, height );
 
 	},
 
@@ -4106,7 +3958,7 @@ THREE.MMDHelper.prototype = {
 	},
 
 	/*
-	 * detect the longest duration among model, camera, and audio animation and then
+	 * detect the longest duration among model, camera, and audio animations and then
 	 * set it to them to sync.
 	 * TODO: touching private properties ( ._actions and ._clip ) so consider better way
 	 *       to access them for safe and modularity.
@@ -4298,187 +4150,135 @@ THREE.MMDHelper.prototype = {
 
 	render: function ( scene, camera ) {
 
-		this.renderer.clearColor();
-		this.renderer.clearDepth();
-		this.renderer.clear( true, true );
-
-		this.renderMain( scene, camera );
-
-		if ( this.doOutlineDrawing ) {
-
-			this.renderOutline( scene, camera );
-
-		}
-
-	},
-
-	renderMain: function ( scene, camera ) {
-
-		this.setupMainRendering();
-		this.callRender( scene, camera );
-
-	},
-
-	renderOutline: function () {
-
-		var invisibledObjects = [];
-		var setInvisible;
-		var restoreVisible;
-
-		return function renderOutline( scene, camera ) {
-
-			var self = this;
-
-			if ( setInvisible === undefined ) {
-
-				setInvisible = function ( object ) {
-
-					if ( ! object.visible || ! object.layers.test( camera.layers ) ) return;
-
-					// any types else to skip?
-					if ( object instanceof THREE.Scene ||
-					     object instanceof THREE.Bone ||
-					     object instanceof THREE.Light ||
-					     object instanceof THREE.Camera ||
-					     object instanceof THREE.Audio ||
-					     object instanceof THREE.AudioListener ) return;
-
-					if ( object instanceof THREE.SkinnedMesh ) {
-
-						for ( var i = 0, il = self.meshes.length; i < il; i ++ ) {
-
-							if ( self.meshes[ i ] === object ) return;
-
-						}
-
-					}
-
-					object.layers.mask &= ~ camera.layers.mask;
-					invisibledObjects.push( object );
-
-				};
-
-			}
-
-			if ( restoreVisible === undefined ) {
-
-				restoreVisible = function () {
-
-					for ( var i = 0, il = invisibledObjects.length; i < il; i ++ ) {
-
-						invisibledObjects[ i ].layers.mask |= camera.layers.mask;
-
-					}
-
-					invisibledObjects.length = 0;
-
-				};
-
-			}
-
-			scene.traverse( setInvisible );
-
-			var tmpEnabled = this.renderer.shadowMap.enabled;
-			this.renderer.shadowMap.enabled = false;
-
-			this.setupOutlineRendering();
-			this.callRender( scene, camera );
-
-			this.renderer.shadowMap.enabled = tmpEnabled;
-
-			restoreVisible();
-
-		};
-
-	}(),
-
-	callRender: function ( scene, camera ) {
-
 		if ( this.effect === null ) {
 
-			this.renderer.render( scene, camera );
+			if ( this.doOutlineDrawing ) {
 
-		} else {
-
-			this.effect.render( scene, camera );
-
-		}
-
-	},
-
-	setupMainRendering: function () {
-
-		for ( var i = 0; i < this.meshes.length; i++ ) {
-
-			this.setupMainRenderingOneMesh( this.meshes[ i ] );
-
-		}
-
-	},
-
-	setupMainRenderingOneMesh: function ( mesh ) {
-
-		for ( var i = 0; i < mesh.material.materials.length; i++ ) {
-
-			var m = mesh.material.materials[ i ];
-			m.uniforms.outlineDrawing.value = 0;
-			m.visible = true;
-
-			if ( m.uniforms.opacity.value === 1.0 ) {
-
-				m.side = THREE.FrontSide;
-				m.transparent = false;
+				this.outlineEffect.autoClear = this.autoClear;
+				this.outlineEffect.render( scene, camera );
 
 			} else {
 
-				m.side = THREE.DoubleSide;
-				m.transparent = true;
+				var currentAutoClear = this.renderer.autoClear;
+				this.renderer.autoClear = this.autoClear;
+				this.renderer.render( scene, camera );
+				this.renderer.autoClear = currentAutoClear;
 
 			}
 
-			if ( m.textureTransparency === true || m.morphTransparency === true ) {
+		} else {
 
-				m.transparent = true;
+			var currentAutoClear = this.renderer.autoClear;
+			this.renderer.autoClear = this.autoClear;
+
+			if ( this.doOutlineDrawing ) {
+
+				this.renderWithEffectAndOutline( scene, camera );
+
+			} else {
+
+				this.effect.render( scene, camera );
 
 			}
+
+			this.renderer.autoClear = currentAutoClear;
 
 		}
 
 	},
 
-	setupOutlineRendering: function () {
+	/*
+	 * Currently(r82 dev) there's no way to render with two Effects
+	 * then attempt to get them to coordinately run by myself.
+	 *
+	 * What this method does
+	 * 1. let OutlineEffect make outline materials (only once)
+	 * 2. render normally with effect
+	 * 3. set outline materials
+	 * 4. render outline with effect
+	 * 5. restore original materials
+	 */
+	renderWithEffectAndOutline: function ( scene, camera ) {
 
-		for ( var i = 0; i < this.meshes.length; i++ ) {
+		var hasOutlineMaterial = false;
 
-			this.setupOutlineRenderingOneMesh( this.meshes[ i ] );
+		function checkIfObjectHasOutlineMaterial ( object ) {
 
-		}
+			if ( object.material === undefined ) return;
 
-	},
-
-	setupOutlineRenderingOneMesh: function ( mesh ) {
-
-		for ( var i = 0; i < mesh.material.materials.length; i++ ) {
-
-			var m = mesh.material.materials[ i ];
-			m.uniforms.outlineDrawing.value = 1;
-			m.side = THREE.BackSide;
-
-			if ( m.uniforms.outlineAlpha.value < 1.0 ) {
-
-				m.transparent = true;
-
-			}
-
-			if ( m.uniforms.outlineThickness.value === 0.0 ) {
-
-				m.visible = false;
-
-			}
+			if ( object.userData.outlineMaterial !== undefined ) hasOutlineMaterial = true;
 
 		}
 
-	},
+		function setOutlineMaterial ( object ) {
+
+			if ( object.material === undefined ) return;
+
+			if ( object.userData.outlineMaterial === undefined ) return;
+
+			object.userData.originalMaterial = object.material;
+
+			object.material = object.userData.outlineMaterial;
+
+		}
+
+		function restoreOriginalMaterial ( object ) {
+
+			if ( object.material === undefined ) return;
+
+			if ( object.userData.originalMaterial === undefined ) return;
+
+			object.material = object.userData.originalMaterial;
+
+		}
+
+		return function renderWithEffectAndOutline( scene, camera ) {
+
+			hasOutlineMaterial = false;
+
+			var forceClear = false;
+
+			scene.traverse( checkIfObjectHasOutlineMaterial );
+
+			if ( ! hasOutlineMaterial ) {
+
+				this.outlineEffect.render( scene, camera );
+
+				forceClear = true;
+
+				scene.traverse( checkIfObjectHasOutlineMaterial );
+
+			}
+
+			if ( hasOutlineMaterial ) {
+
+				this.renderer.autoClear = this.autoClear || forceClear;
+
+				this.effect.render( scene, camera );
+
+				scene.traverse( setOutlineMaterial );
+
+				var currentShadowMapEnabled = this.renderer.shadowMap.enabled;
+
+				this.renderer.autoClear = false;
+				this.renderer.shadowMap.enabled = false;
+
+				this.effect.render( scene, camera );
+
+				this.renderer.shadowMap.enabled = currentShadowMapEnabled;
+
+				scene.traverse( restoreOriginalMaterial );
+
+			} else {
+
+				this.outlineEffect.autoClear = this.autoClear || forceClear;
+				this.outlineEffect.render( scene, camera );
+
+			}
+
+		}
+
+	}(),
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 

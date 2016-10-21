@@ -37,8 +37,10 @@
 
 		<script src="js/libs/charsetencoder.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
+
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
 
@@ -151,7 +153,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				helper.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -185,7 +187,6 @@
 
 				} else {
 
-					renderer.clear();
 					renderer.render( scene, camera );
 
 				}
