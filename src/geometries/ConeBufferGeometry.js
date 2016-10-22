@@ -15,6 +15,7 @@ function ConeBufferGeometry( radius, height, radialSegments, heightSegments, ope
 		height: height,
 		radialSegments: radialSegments,
 		heightSegments: heightSegments,
+		openEnded: openEnded,
 		thetaStart: thetaStart,
 		thetaLength: thetaLength
 	};
