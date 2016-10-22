@@ -2,13 +2,11 @@ import { Matrix4 } from '../math/Matrix4';
 import { Mesh } from '../objects/Mesh';
 import { Group } from '../objects/Group';
 
-var SceneUtils;
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-SceneUtils = {
+var SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 

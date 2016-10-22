@@ -1,10 +1,8 @@
-var CurveUtils;
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-CurveUtils = {
+var CurveUtils = {
 
 	tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
 
