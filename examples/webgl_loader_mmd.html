@@ -40,6 +40,7 @@
 
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/ChainableEffect.js"></script>
 		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
@@ -51,7 +52,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper;
 
 			var mouseX = 0, mouseY = 0;
@@ -91,6 +92,8 @@
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.OutlineEffect( renderer );
+
 				// model
 
 				var onProgress = function ( xhr ) {
@@ -106,7 +109,7 @@
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 				loader.setDefaultTexturePath( './models/mmd/default/' );
@@ -153,7 +156,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -180,16 +183,8 @@
 
 				camera.lookAt( scene.position );
 
-				if ( mesh ) {
-
-					helper.animate( clock.getDelta() );
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				helper.animate( clock.getDelta() );
+				effect.render( scene, camera );
 
 			}
 

@@ -3,6 +3,9 @@
  *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
+ * Dependencies
+ *  - THREE.ChainableEffect
+ *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
  * 	defaultThickNess: 0.01,
@@ -25,11 +28,11 @@
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
 
-	var _this = this;
+	THREE.ChainableEffect.call( this, renderer );
 
 	parameters = parameters || {};
 
-	this.autoClear = parameters.autoClear !== undefined ? parameters.autoClear : true;
+	this.enabled = true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
 	var defaultColor = parameters.defaultColor !== undefined ? parameters.defaultColor : new THREE.Color( 0x000000 );
@@ -257,13 +260,14 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
-	this.setSize = function ( width, height ) {
-
-		renderer.setSize( width, height );
-
-	};
-
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
+
+		if ( this.enabled === false ) {
+
+			renderer.render( scene, camera, renderTarget, forceClear );
+			return;
+
+		}
 
 		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
@@ -292,3 +296,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	};
 
 };
+
+THREE.OutlineEffect.prototype = Object.create( THREE.ChainableEffect.prototype );
+THREE.OutlineEffect.prototype.constructor = THREE.OutlineEffect;

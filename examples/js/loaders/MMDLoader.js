@@ -2396,6 +2396,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				};
 
+				// parameters for OutlineEffect
 				m.outlineParameters = {
 					thickness: p2.edgeFlag === 1 ? 0.003 : 0.0,
 					color: new THREE.Color( 0.0, 0.0, 0.0 ),
@@ -2422,6 +2423,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			} else {
 
+				// parameters for OutlineEffect
 				m.outlineParameters = {
 					thickness: p2.edgeSize / 300,
 					color: new THREE.Color( p2.edgeColor[ 0 ], p2.edgeColor[ 1 ], p2.edgeColor[ 2 ] ),
@@ -3778,15 +3780,7 @@ THREE.MMDGrantSolver.prototype = {
 
 };
 
-THREE.MMDHelper = function ( renderer ) {
-
-	this.renderer = renderer;
-
-	this.outlineEffect = null;
-
-	this.effect = null;
-
-	this.autoClear = true;
+THREE.MMDHelper = function () {
 
 	this.meshes = [];
 
@@ -3794,28 +3788,16 @@ THREE.MMDHelper = function ( renderer ) {
 	this.doIk = true;
 	this.doGrant = true;
 	this.doPhysics = true;
-	this.doOutlineDrawing = true;
 	this.doCameraAnimation = true;
 
 	this.audioManager = null;
 	this.camera = null;
-
-	this.init();
 
 };
 
 THREE.MMDHelper.prototype = {
 
 	constructor: THREE.MMDHelper,
-
-	init: function () {
-
-		this.outlineEffect = new THREE.OutlineEffect( this.renderer );
-
-		var size = this.renderer.getSize();
-		this.setSize( size.width, size.height );
-
-	},
 
 	add: function ( mesh ) {
 
@@ -3833,23 +3815,6 @@ THREE.MMDHelper.prototype = {
 
 		// workaround until I make IK and Physics Animation plugin
 		this.initBackupBones( mesh );
-
-	},
-
-	setSize: function ( width, height ) {
-
-		this.outlineEffect.setSize( width, height );
-
-	},
-
-	/*
-	 * Note: There may be a possibility that Outline wouldn't work well with Effect.
-	 *       In such a case, try to set doOutlineDrawing = false or
-	 *       manually comment out renderer.clear() in *Effect.render().
-	 */
-	setEffect: function ( effect ) {
-
-		this.effect = effect;
 
 	},
 
@@ -4147,138 +4112,6 @@ THREE.MMDHelper.prototype = {
 		}
 
 	},
-
-	render: function ( scene, camera ) {
-
-		if ( this.effect === null ) {
-
-			if ( this.doOutlineDrawing ) {
-
-				this.outlineEffect.autoClear = this.autoClear;
-				this.outlineEffect.render( scene, camera );
-
-			} else {
-
-				var currentAutoClear = this.renderer.autoClear;
-				this.renderer.autoClear = this.autoClear;
-				this.renderer.render( scene, camera );
-				this.renderer.autoClear = currentAutoClear;
-
-			}
-
-		} else {
-
-			var currentAutoClear = this.renderer.autoClear;
-			this.renderer.autoClear = this.autoClear;
-
-			if ( this.doOutlineDrawing ) {
-
-				this.renderWithEffectAndOutline( scene, camera );
-
-			} else {
-
-				this.effect.render( scene, camera );
-
-			}
-
-			this.renderer.autoClear = currentAutoClear;
-
-		}
-
-	},
-
-	/*
-	 * Currently(r82 dev) there's no way to render with two Effects
-	 * then attempt to get them to coordinately run by myself.
-	 *
-	 * What this method does
-	 * 1. let OutlineEffect make outline materials (only once)
-	 * 2. render normally with effect
-	 * 3. set outline materials
-	 * 4. render outline with effect
-	 * 5. restore original materials
-	 */
-	renderWithEffectAndOutline: function ( scene, camera ) {
-
-		var hasOutlineMaterial = false;
-
-		function checkIfObjectHasOutlineMaterial ( object ) {
-
-			if ( object.material === undefined ) return;
-
-			if ( object.userData.outlineMaterial !== undefined ) hasOutlineMaterial = true;
-
-		}
-
-		function setOutlineMaterial ( object ) {
-
-			if ( object.material === undefined ) return;
-
-			if ( object.userData.outlineMaterial === undefined ) return;
-
-			object.userData.originalMaterial = object.material;
-
-			object.material = object.userData.outlineMaterial;
-
-		}
-
-		function restoreOriginalMaterial ( object ) {
-
-			if ( object.material === undefined ) return;
-
-			if ( object.userData.originalMaterial === undefined ) return;
-
-			object.material = object.userData.originalMaterial;
-
-		}
-
-		return function renderWithEffectAndOutline( scene, camera ) {
-
-			hasOutlineMaterial = false;
-
-			var forceClear = false;
-
-			scene.traverse( checkIfObjectHasOutlineMaterial );
-
-			if ( ! hasOutlineMaterial ) {
-
-				this.outlineEffect.render( scene, camera );
-
-				forceClear = true;
-
-				scene.traverse( checkIfObjectHasOutlineMaterial );
-
-			}
-
-			if ( hasOutlineMaterial ) {
-
-				this.renderer.autoClear = this.autoClear || forceClear;
-
-				this.effect.render( scene, camera );
-
-				scene.traverse( setOutlineMaterial );
-
-				var currentShadowMapEnabled = this.renderer.shadowMap.enabled;
-
-				this.renderer.autoClear = false;
-				this.renderer.shadowMap.enabled = false;
-
-				this.effect.render( scene, camera );
-
-				this.renderer.shadowMap.enabled = currentShadowMapEnabled;
-
-				scene.traverse( restoreOriginalMaterial );
-
-			} else {
-
-				this.outlineEffect.autoClear = this.autoClear || forceClear;
-				this.outlineEffect.render( scene, camera );
-
-			}
-
-		}
-
-	}(),
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 
