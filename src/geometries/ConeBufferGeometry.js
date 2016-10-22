@@ -1,6 +1,6 @@
 import { CylinderBufferGeometry } from './CylinderBufferGeometry';
 
-/*
+/**
  * @author: abelnation / http://github.com/abelnation
  */
 
