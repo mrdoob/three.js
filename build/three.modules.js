@@ -338,14 +338,12 @@ var RGBDEncoding = 3006;
 var BasicDepthPacking = 3200;
 var RGBADepthPacking = 3201;
 
-var _Math;
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-_Math = {
+var _Math = {
 
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
@@ -4921,13 +4919,11 @@ WebGLUniforms.seqWithValue = function( seq, values ) {
 
 };
 
-var UniformsUtils;
-
 /**
  * Uniform Utilities
  */
 
-UniformsUtils = {
+var UniformsUtils = {
 
 	merge: function ( uniforms ) {
 
@@ -4961,13 +4957,10 @@ UniformsUtils = {
 
 				var parameter_src = uniforms_src[ u ][ p ];
 
-				if ( (parameter_src && parameter_src.isColor) ||
-					 (parameter_src && parameter_src.isVector2) ||
-					 (parameter_src && parameter_src.isVector3) ||
-					 (parameter_src && parameter_src.isVector4) ||
-					 (parameter_src && parameter_src.isMatrix3) ||
-					 (parameter_src && parameter_src.isMatrix4) ||
-					 (parameter_src && parameter_src.isTexture) ) {
+				if ( parameter_src.isColor ||
+					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+					parameter_src.isTexture ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 
@@ -5309,8 +5302,6 @@ var ShaderChunk = {
 	shadow_frag: shadow_frag,
 	shadow_vert: shadow_vert
 };
-
-var ColorKeywords;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -5808,7 +5799,7 @@ Color.prototype = {
 
 };
 
-ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
 'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
@@ -11822,6 +11813,19 @@ BufferAttribute.prototype = {
 
 	},
 
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		this.array = array;
+
+	},
+
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
@@ -17251,7 +17255,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false ) {
+
+			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+
+		} else if ( data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -25188,13 +25196,11 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 TorusGeometry.prototype = Object.create( Geometry.prototype );
 TorusGeometry.prototype.constructor = TorusGeometry;
 
-var ShapeUtils;
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-ShapeUtils = {
+var ShapeUtils = {
 
 	// calculate area of the contour polygon
 
@@ -27779,15 +27785,9 @@ CylinderGeometry.prototype.constructor = CylinderGeometry;
  * @author abelnation / http://github.com/abelnation
  */
 
-function ConeGeometry(
-	radius, height,
-	radialSegments, heightSegments,
-	openEnded, thetaStart, thetaLength ) {
+function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
-	CylinderGeometry.call( this,
-		0, radius, height,
-		radialSegments, heightSegments,
-		openEnded, thetaStart, thetaLength );
+	CylinderGeometry.call( this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
 	this.type = 'ConeGeometry';
 
@@ -27806,19 +27806,13 @@ function ConeGeometry(
 ConeGeometry.prototype = Object.create( CylinderGeometry.prototype );
 ConeGeometry.prototype.constructor = ConeGeometry;
 
-/*
+/**
  * @author: abelnation / http://github.com/abelnation
  */
 
-function ConeBufferGeometry(
-	radius, height,
-	radialSegments, heightSegments,
-	openEnded, thetaStart, thetaLength ) {
+function ConeBufferGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
-	CylinderBufferGeometry.call( this,
-		0, radius, height,
-		radialSegments, heightSegments,
-		openEnded, thetaStart, thetaLength );
+	CylinderBufferGeometry.call( this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
 	this.type = 'ConeBufferGeometry';
 
@@ -27827,13 +27821,14 @@ function ConeBufferGeometry(
 		height: height,
 		radialSegments: radialSegments,
 		heightSegments: heightSegments,
+		openEnded: openEnded,
 		thetaStart: thetaStart,
 		thetaLength: thetaLength
 	};
 
 }
 
-ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
 
 /**
@@ -28748,13 +28743,11 @@ var Materials = Object.freeze({
 	Material: Material
 });
 
-var Cache;
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-Cache = {
+var Cache = {
 
 	enabled: false,
 
@@ -28793,8 +28786,6 @@ Cache = {
 	}
 
 };
-
-var DefaultLoadingManager;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -28865,7 +28856,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 
 }
 
-DefaultLoadingManager = new LoadingManager();
+var DefaultLoadingManager = new LoadingManager();
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -29899,15 +29890,13 @@ AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 } );
 
-var AnimationUtils;
-
 /**
  * @author tschw
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-AnimationUtils = {
+var AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function( array, from, to ) {
@@ -34206,13 +34195,11 @@ EllipseCurve.prototype.getPoint = function( t ) {
 
 };
 
-var CurveUtils;
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-CurveUtils = {
+var CurveUtils = {
 
 	tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
 
@@ -38648,6 +38635,19 @@ InterleavedBuffer.prototype = {
 
 	},
 
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
+
+	},
+
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
@@ -40695,8 +40695,6 @@ function AxisHelper( size ) {
 AxisHelper.prototype = Object.create( LineSegments.prototype );
 AxisHelper.prototype.constructor = AxisHelper;
 
-var CatmullRomCurve3;
-
 /**
  * @author zz85 https://github.com/zz85
  *
@@ -40708,7 +40706,7 @@ var CatmullRomCurve3;
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-CatmullRomCurve3 = ( function() {
+var CatmullRomCurve3 = ( function() {
 
 	var
 		tmp = new Vector3(),
@@ -40726,9 +40724,7 @@ CatmullRomCurve3 = ( function() {
 	which can be placed in CurveUtils.
 	*/
 
-	function CubicPoly() {
-
-	}
+	function CubicPoly() {}
 
 	/*
 	 * Compute coefficients for a cubic polynomial
@@ -40936,13 +40932,11 @@ var SplineCurve3 = Curve.create(
 
 );
 
-var CubicBezierCurve3;
-
 /**************************************************************
  *	Cubic Bezier 3D curve
  **************************************************************/
 
-CubicBezierCurve3 = Curve.create(
+var CubicBezierCurve3 = Curve.create(
 
 	function ( v0, v1, v2, v3 ) {
 
@@ -40967,13 +40961,11 @@ CubicBezierCurve3 = Curve.create(
 
 );
 
-var QuadraticBezierCurve3;
-
 /**************************************************************
  *	Quadratic Bezier 3D curve
  **************************************************************/
 
-QuadraticBezierCurve3 = Curve.create(
+var QuadraticBezierCurve3 = Curve.create(
 
 	function ( v0, v1, v2 ) {
 
@@ -40985,7 +40977,7 @@ QuadraticBezierCurve3 = Curve.create(
 
 	function ( t ) {
 
-		var b2 = ShapeUtils.b2;		
+		var b2 = ShapeUtils.b2;
 
 		return new Vector3(
 			b2( t, this.v0.x, this.v1.x, this.v2.x ),
@@ -40997,13 +40989,11 @@ QuadraticBezierCurve3 = Curve.create(
 
 );
 
-var LineCurve3;
-
 /**************************************************************
  *	Line3D
  **************************************************************/
 
-LineCurve3 = Curve.create(
+var LineCurve3 = Curve.create(
 
 	function ( v1, v2 ) {
 
@@ -41045,13 +41035,11 @@ function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 ArcCurve.prototype = Object.create( EllipseCurve.prototype );
 ArcCurve.prototype.constructor = ArcCurve;
 
-var SceneUtils;
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-SceneUtils = {
+var SceneUtils = {
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 
