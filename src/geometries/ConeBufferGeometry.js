@@ -1,19 +1,12 @@
-import { BufferGeometry } from '../core/BufferGeometry';
 import { CylinderBufferGeometry } from './CylinderBufferGeometry';
 
 /*
  * @author: abelnation / http://github.com/abelnation
  */
 
-function ConeBufferGeometry(
-	radius, height,
-	radialSegments, heightSegments,
-	openEnded, thetaStart, thetaLength ) {
+function ConeBufferGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
-	CylinderBufferGeometry.call( this,
-		0, radius, height,
-		radialSegments, heightSegments,
-		openEnded, thetaStart, thetaLength );
+	CylinderBufferGeometry.call( this, 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
 	this.type = 'ConeBufferGeometry';
 
@@ -28,7 +21,7 @@ function ConeBufferGeometry(
 
 }
 
-ConeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
 
 
