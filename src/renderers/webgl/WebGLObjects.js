@@ -93,7 +93,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false ) {
+
+			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+
+		} else if ( data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
