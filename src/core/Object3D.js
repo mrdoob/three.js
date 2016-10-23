@@ -91,8 +91,10 @@ function Object3D() {
 
 	this.userData = {};
 
-	this.onBeforeRender = function(){}; 
+	this.onBeforeRender = function(){};
 	this.onAfterRender = function(){};
+
+	this.drawRange = { start: 0, count: Infinity };
 
 }
 
@@ -722,6 +724,13 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		}
 
 		return this;
+
+	},
+
+	setDrawRange: function ( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
 
 	}
 

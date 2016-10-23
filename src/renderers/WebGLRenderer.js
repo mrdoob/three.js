@@ -825,8 +825,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var rangeStart = geometry.drawRange.start * rangeFactor;
-		var rangeCount = geometry.drawRange.count * rangeFactor;
+		var rangeStart = ( object.drawRange.start || geometry.drawRange.start ) * rangeFactor;
+		var rangeCount = ( object.drawRange.count || geometry.drawRange.count ) * rangeFactor;
 
 		var groupStart = group !== null ? group.start * rangeFactor : 0;
 		var groupCount = group !== null ? group.count * rangeFactor : Infinity;
@@ -1742,7 +1742,7 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				( materialProperties.numClippingPlanes !== _clipping.numPlanes || 
+				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
  				  materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
