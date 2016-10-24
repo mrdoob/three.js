@@ -187,7 +187,7 @@
 
 	} );
 
-	var REVISION = '82dev';
+	var REVISION = '82';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -3860,7 +3860,7 @@
 
 					v1.applyMatrix4( this );
 
-					buffer.setXYZ( v1.x, v1.y, v1.z );
+					buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 				}
 
@@ -8544,7 +8544,7 @@
 
 					v1.applyMatrix3( this );
 
-					buffer.setXYZ( v1.x, v1.y, v1.z );
+					buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 				}
 
