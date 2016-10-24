@@ -2253,7 +2253,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			m.skinning = geometry.bones.length > 0 ? true : false;
 			m.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			m.lights = true;
-			m.side = p.side;
+			m.side = ( model.metadata.format === 'pmx' && ( p2.flag & 0x1 ) === 1 ) ? THREE.DoubleSide : p.side;
 			m.transparent = p.transparent;
 			m.fog = true;
 
@@ -2459,7 +2459,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 					alpha: p2.edgeColor[ 3 ]
 				};
 
-				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
+				if ( ( p2.flag & 0x10 ) === 0 || m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
 				m.uniforms.celShading.value = 1;
 
@@ -2846,21 +2846,14 @@ THREE.MMDLoader.prototype.leftToRightModel = function ( model ) {
 
 		var m = model.morphs[ i ];
 
-		if ( model.metadata.format === 'pmx' ) {
+		if ( model.metadata.format === 'pmx' && m.type !== 1 ) {
 
-			if ( m.type === 1 ) {
-
-				m = m.elements;
-
-			} else {
-
-				continue;
-
-			}
+			// TODO: implement
+			continue;
 
 		}
 
-		for ( var j = 0; j < m.elementCount; j++ ) {
+		for ( var j = 0; j < m.elements.length; j++ ) {
 
 			helper.leftToRightVector3( m.elements[ j ].position );
 
