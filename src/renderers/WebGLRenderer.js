@@ -1874,7 +1874,20 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		var uniformsList = materialProperties.uniformsList;
+
 		if ( refreshMaterial ) {
+
+			// flag all material uniforms for update
+
+			// a material or program switch typically necessitates uploading all
+			// material uniforms
+
+			for ( var i = 0, n = uniformsList.length; i < n; ++ i ) {
+
+				m_uniforms[ uniformsList[ i ].id ].needsUpdate = true;
+
+			}
 
 			if ( material.lights ) {
 
@@ -1959,8 +1972,23 @@ function WebGLRenderer( parameters ) {
 			WebGLUniforms.upload(
 					_gl, materialProperties.uniformsList, m_uniforms, _this );
 
-		}
+		} else {
 
+			// upload updated uniforms
+
+			// onBeforeRender creates the possibility that a material uniform
+			// is modified even when the current material or program hasn't
+			// switched
+
+			var updatedUniforms = WebGLUniforms.updatedList( uniformsList, m_uniforms );
+
+			if ( updatedUniforms !== null ) {
+
+				WebGLUniforms.upload( _gl, updatedUniforms, m_uniforms, _this );
+
+			}
+
+		}
 
 		// common matrices
 
