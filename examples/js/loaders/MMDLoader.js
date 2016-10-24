@@ -2645,10 +2645,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		geometry.addAttribute( 'skinWeight', THREE.Float32Attribute( buffer.skinWeights, 4 ) );
 
 		geometry.computeBoundingSphere();
-		geometry.computeFaceNormals();
-		geometry.verticesNeedUpdate = true;
-		geometry.normalsNeedUpdate = true;
-		geometry.uvsNeedUpdate = true;
 		geometry.mmdFormat = model.metadata.format;
 
 	};
