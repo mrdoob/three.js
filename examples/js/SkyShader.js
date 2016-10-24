@@ -47,17 +47,15 @@ THREE.ShaderLib[ 'sky' ] = {
 		"const float e = 2.71828182845904523536028747135266249775724709369995957;",
 		"const float pi = 3.141592653589793238462643383279502884197169;",
 
+                // wavelength of used primaries, according to preetham
+		"const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);",
+                // this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function
+                "const vec3 totalRayleigh = vec3( 0.00000580453, 0.00001278534, 0.00002853075 );",
+                
 		// mie stuff
 		// K coefficient for the primaries
 		"const float v = 4.0;",
-		"const vec3 K = vec3(0.686, 0.678, 0.666);",
-
-		// see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
-		// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE
-		"const vec3 simplifiedRayleigh = 0.0005 / vec3(94, 40, 18);",
-
-		// wavelength of used primaries, according to preetham
-		"const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);",
+		"const vec3 K = vec3(0.686, 0.678, 0.666);", 
                 "const vec3 MieConst = pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;",
 
 		// earth shadow hack
@@ -94,7 +92,7 @@ THREE.ShaderLib[ 'sky' ] = {
 
 			// extinction (absorbtion + out scattering)
 			// rayleigh coefficients
-			"vBetaR = simplifiedRayleigh * rayleighCoefficient;",
+			"vBetaR = totalRayleigh * rayleighCoefficient;",
 
 			// mie coefficients
 			"vBetaM = totalMie(lambda, turbidity) * mieCoefficient;",
@@ -168,8 +166,9 @@ THREE.ShaderLib[ 'sky' ] = {
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
 			"float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));",
-			"float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));",
-			"float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));",
+                        "float inverse = 1.0 / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));",
+			"float sR = rayleighZenithLength * inverse;",
+			"float sM = mieZenithLength * inverse;",
 
 			// combined extinction factor
 			"vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));",
