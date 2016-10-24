@@ -58,6 +58,7 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		// wavelength of used primaries, according to preetham
 		"const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);",
+                "const vec3 MieConst = pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;",
 
 		// earth shadow hack
 		"const float cutoffAngle = pi/1.95;",
@@ -73,7 +74,7 @@ THREE.ShaderLib[ 'sky' ] = {
 		"vec3 totalMie(vec3 lambda, float T)",
 		"{",
 			"float c = (0.2 * T ) * 10E-18;",
-			"return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;",
+			"return 0.434 * c * MieConst;",
 		"}",
 
 		"void main() {",
@@ -130,15 +131,20 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		"const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;",
 		// 66 arc seconds -> degrees, and the cosine of that
+                
+                "const float THREE_OVER_SIXTEENPI = 3.0 / (16.0 * pi);",
+                "const float ONE_OVER_FOURPI = (1.0 / (4.0*pi));",
 
 		"float rayleighPhase(float cosTheta)",
 		"{",
-			"return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));",
+			"return THREE_OVER_SIXTEENPI * (1.0 + pow(cosTheta, 2.0));",
 		"}",
 
 		"float hgPhase(float cosTheta, float g)",
 		"{",
-			"return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));",
+                        "float g2 = pow(g, 2.0);",
+                        "float inverse = 1.0 / pow(1.0 - 2.0*g*cosTheta + g2, 1.5);",
+			"return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);",
 		"}",
 
 		// Filmic ToneMapping http://filmicgames.com/archives/75
