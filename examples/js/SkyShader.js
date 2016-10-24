@@ -49,7 +49,9 @@ THREE.ShaderLib[ 'sky' ] = {
 
                 // wavelength of used primaries, according to preetham
 		"const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);",
-                // this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function
+		
+                // this pre-calcuation replaces the older totalRayleigh(vec3 lambda) function which was:
+		// return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));
                 "const vec3 totalRayleigh = vec3( 0.00000580453, 0.00001278534, 0.00002853075 );",
                 
 		// mie stuff
