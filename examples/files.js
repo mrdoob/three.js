@@ -9,6 +9,7 @@ var files = {
 		"webgl_camera_logarithmicdepthbuffer",
 		"webgl_clipping",
 		"webgl_clipping_advanced",
+		"webgl_clipping_intersection",
 		"webgl_decals",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
@@ -29,7 +30,6 @@ var files = {
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_hierarchy",
 		"webgl_geometry_hierarchy2",
-		"webgl_geometry_large_mesh",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_minecraft_ao",
 		"webgl_geometry_normals",
@@ -101,6 +101,7 @@ var files = {
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
 		"webgl_loader_ply",
+		"webgl_loader_ttf",
 		"webgl_loader_sea3d",
 		"webgl_loader_sea3d_hierarchy",
 		"webgl_loader_sea3d_keyframe",
@@ -257,6 +258,9 @@ var files = {
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
 		"webgl_raymarching_reflect"
+	],
+	"webgl deferred": [
+		"webgldeferred_animation"
 	],
 	"webvr": [
 		"webvr_cubes",

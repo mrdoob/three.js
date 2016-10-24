@@ -54,13 +54,13 @@
 		</div>
 		<div>Default is *false*.</div>
 
-		<h3>.[page:Blending blending]</h3>
+		<h3>[property:Blending blending]</h3>
 		<div>
 		Which blending to use when displaying objects with this material. Default is [page:Materials NormalBlending]. See the blending mode [page:Materials constants] for all possible values.
 
 		</div>
 
-		<h3>.[page:Integer blendSrc]</h3>
+		<h3>[property:Integer blendSrc]</h3>
 		<div>
 		Blending source. It's one of the blending mode constants defined in Three.js. Default is [page:CustomBlendingEquation SrcAlphaFactor]. See the destination factors [page:CustomBlendingEquation constants] for all possible values.
 		</div>
@@ -118,6 +118,10 @@
 		<div>
 		User-defined clipping planes specified as THREE.Plane objects in world space. These planes apply to the objects this material is attached to. Points in space whose dot product with the plane is negative are cut away. Default is null.
 		</div>
+
+		<h3>[property:Boolean clipIntersection]</h3>
+
+		<div>Changes the behavior of clipping planes so that only their intersection is clipped, rather than their union. Default is false. See <a href="http://threejs.org/examples/#webgl_clipping_intersection">example</a> </div>
 
 		<h3>[property:Boolean clipShadows]</h3>
 		<div>

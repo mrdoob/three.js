@@ -163,11 +163,12 @@ var Loader = function ( editor ) {
 						var json = JSON.parse( contents );
 
 						var loader = new THREE.GLTFLoader();
-						var collada = loader.parse( json );
+						loader.parse( json, function ( result ) {
 
-						collada.scene.name = filename;
+							result.scene.name = filename;
+							editor.execute( new AddObjectCommand( result.scene ) );
 
-						editor.execute( new AddObjectCommand( collada.scene ) );
+						} );
 
 					}, false );
 					reader.readAsText( file );

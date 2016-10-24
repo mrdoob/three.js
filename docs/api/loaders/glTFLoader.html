@@ -20,7 +20,10 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( )</h3>
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
 		<div>
 		Creates a new [name].
 		</div>
@@ -30,28 +33,56 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Object3D load]( [page:String url], [page:Function callback] )</h3>
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — required<br />
-		[page:Function callback] — Will be called when load completes. The argument will be an [page:Object] containing the loaded .[page:Object3D scene],  .[page:Array cameras] and .[page:Array animations].<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded JSON response returned from [page:Function parse].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
 		Begin loading from url and call the callback function with the parsed response content.
+		</div>
+
+		<h3>[method:null setPath]( [page:String path] )</h3>
+		<div>
+		[page:String path] — Base path for loading additional resources e.g. textures, GLSL shaders, .bin data.
+		</div>
+		<div>
+		Set the base path for additional resources.
+		</div>
+
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<div>
+		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h3>[method:null parse]( [page:Object json], [page:Function callBack], [page:String path] )</h3>
+		<div>
+		[page:Object json] — <em>JSON</em> object to parse.<br />
+		[page:Function callBack] — Will be called when parse completes.<br />
+		[page:String path] — The base path from which to find subsequent glTF resources such as textures, GLSL shaders and .bin data files.<br />
+		</div>
+		<div>
+		Parse a glTF-based <em>JSON</em> structure and fire [page:Function callback] when complete. The argument to [page:Function callback] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array cameras], .[page:Array animations] and .[page:Array shaders]
 		</div>
 
 
 		<h2>Notes</h2>
 
 		<div>
-		This class is often used with [page:glTFAnimator THREE.glTFAnimator] to animate parsed animations.
+		When using custom shaders provided within a glTF file [page:THREE.GLTFLoader.Shaders] should be updated on each render loop. See [example:webgl_loader_gltf] demo source code for example usage.
 		</div>
 
+		<div>
+		This class is often used with [page:THREE.GLTFLoader.Animations THREE.GLTFLoader.Animations] to animate parsed animations. See [example:webgl_loader_gltf] demo source code for example usage.
+		</div>
 
 		<h2>Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.glTFLoader();
+		var loader = new THREE.GLTFLoader();
 
 		// load a glTF resource
 		loader.load(
@@ -69,6 +100,6 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/gltf/glTFLoader.js examples/js/loaders/gltf/glTFLoader.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTFLoader.js examples/js/loaders/GLTFLoader.js]
 	</body>
 </html>

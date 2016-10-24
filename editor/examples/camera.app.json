@@ -1,4 +1,12 @@
 {
+	"metadata": {
+		"type": "App"
+	},
+	"project": {
+		"shadows": true,
+		"editable": true,
+		"vr": false
+	},
 	"camera": {
 		"metadata": {
 			"version": 4.3,

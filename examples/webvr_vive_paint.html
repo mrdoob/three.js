@@ -21,10 +21,11 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
-		<script src="js/ViveController.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/ViveController.js"></script>
+		<script src="js/vr/PaintViveController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
 
@@ -53,8 +54,6 @@
 			var vector2 = new THREE.Vector3();
 			var vector3 = new THREE.Vector3();
 			var vector4 = new THREE.Vector3();
-
-			var color = new THREE.Color( 0, 0, 0 );
 
 			var point4 = new THREE.Vector3();
 			var point5 = new THREE.Vector3();
@@ -137,7 +136,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.width = ( window.innerWidth * 2 ) + 'px';
 				renderer.sortObjects = false;
 				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
@@ -149,13 +147,13 @@
 
 				// controllers
 
-				controller1 = new THREE.ViveController( 0 );
+				controller1 = new THREE.PaintViveController( 0 );
 				controller1.standingMatrix = controls.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
-				controller2 = new THREE.ViveController( 1 );
+				controller2 = new THREE.PaintViveController( 1 );
 				controller2.standingMatrix = controls.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
@@ -183,10 +181,9 @@
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
-					var range = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
-					pivot.add( range );
-
 					controller1.add( controller.clone() );
+
+					pivot.material = pivot.material.clone();
 					controller2.add( controller.clone() );
 
 				} );
@@ -210,12 +207,15 @@
 				var geometry = new THREE.BufferGeometry();
 
 				var positions = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				positions.dynamic = true;
 				geometry.addAttribute( 'position', positions );
 
 				var normals = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				normals.dynamic = true;
 				geometry.addAttribute( 'normal', normals );
 
 				var colors = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				colors.dynamic = true;
 				geometry.addAttribute( 'color', colors );
 
 				geometry.drawRange.count = 0;
@@ -266,7 +266,9 @@
 
 			}
 
-			function stroke( point1, point2, matrix1, matrix2 ) {
+			function stroke( controller, point1, point2, matrix1, matrix2 ) {
+
+				var color = controller.getColor();
 
 				var shape = shapes[ 'tube' ];
 
@@ -350,8 +352,29 @@
 				}
 
 				geometry.drawRange.count = count;
+
+			}
+
+			function updateGeometry( start, end ) {
+
+				if ( start === end ) return;
+
+				var offset = start * 3;
+				var count = ( end - start ) * 3;
+
+				var geometry = line.geometry;
+				var attributes = geometry.attributes;
+
+				attributes.position.updateRange.offset = offset;
+				attributes.position.updateRange.count = count;
 				attributes.position.needsUpdate = true;
+
+				attributes.normal.updateRange.offset = offset;
+				attributes.normal.updateRange.count = count;
 				attributes.normal.needsUpdate = true;
+
+				attributes.color.updateRange.offset = offset;
+				attributes.color.updateRange.count = count;
 				attributes.color.needsUpdate = true;
 
 			}
@@ -374,13 +397,15 @@
 
 			}
 
-			function handleController( controller, id ) {
+			function handleController( controller ) {
 
 				controller.update();
 
 				var pivot = controller.getObjectByName( 'pivot' );
 
 				if ( pivot ) {
+
+					pivot.material.color.copy( controller.getColor() );
 
 					var matrix = pivot.matrixWorld;
 
@@ -393,15 +418,9 @@
 					point1.setFromMatrixPosition( matrix );
 					matrix1.lookAt( point2, point1, up );
 
-					if ( controller.getButtonState( 'thumbpad' ) ) {
-
-						color.setHex( Math.random() * 0xffffff );
-
-					}
-
 					if ( controller.getButtonState( 'trigger' ) ) {
 
-						stroke( point1, point2, matrix1, matrix2 );
+						stroke( controller, point1, point2, matrix1, matrix2 );
 
 					}
 
@@ -416,8 +435,12 @@
 
 				controls.update();
 
-				handleController( controller1, 0 );
-				handleController( controller2, 1 );
+				var count = line.geometry.drawRange.count;
+
+				handleController( controller1 );
+				handleController( controller2 );
+
+				updateGeometry( count, line.geometry.drawRange.count );
 
 				effect.render( scene, camera );
 
