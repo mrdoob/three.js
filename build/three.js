@@ -24411,7 +24411,7 @@
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new THREE.TetrahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
@@ -24462,7 +24462,7 @@
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new THREE.OctahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new OctahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
@@ -24520,7 +24520,7 @@
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new THREE.IcosahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new IcosahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
@@ -24602,7 +24602,7 @@
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new THREE.DodecahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new DodecahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
@@ -24661,7 +24661,7 @@
 		tubularSegments = tubularSegments || 64;
 		radius = radius || 1;
 		radialSegments = radialSegments || 8;
-		closed = closed || false;
+		closed = closed || false;
 
 		var frames = path.computeFrenetFrames( tubularSegments, closed );
 
