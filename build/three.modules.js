@@ -32789,7 +32789,17 @@ Object.assign( ObjectLoader.prototype, {
 		var loader = new XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad );
+			var json = JSON.parse( text );
+			var metadata = json.metadata;
+
+			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
+
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				return;
+
+			}
+
+			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
 
@@ -41917,3 +41927,4 @@ Object.defineProperty( exports, 'AudioContext', {
 		return exports.getAudioContext();
 	}
 });
+//# sourceMappingURL=three.modules.js.map
