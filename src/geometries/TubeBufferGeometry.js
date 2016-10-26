@@ -27,7 +27,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	tubularSegments = tubularSegments || 64;
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
-	closed = closed || false;
+	closed = closed || false;
 
 	var frames = path.computeFrenetFrames( tubularSegments, closed );
 
