@@ -16,7 +16,7 @@ function IcosahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-	this.fromBufferGeometry( new THREE.IcosahedronBufferGeometry( radius, detail ) );
+	this.fromBufferGeometry( new IcosahedronBufferGeometry( radius, detail ) );
 	this.mergeVertices();
 
 }
