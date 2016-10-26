@@ -56,7 +56,24 @@ Object.assign( ObjectLoader.prototype, {
 		var loader = new XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad );
+			var json = null;
+			
+			try {
+
+				json = JSON.parse( text );
+
+                        } catch( error ) {
+
+				console.log(err.message);
+				onError(loader);
+
+                        }
+
+			if ( json ) {
+
+                            scope.parse( json, onLoad );
+
+                        }
 
 		}, onProgress, onError );
 
