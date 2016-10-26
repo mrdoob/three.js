@@ -16,7 +16,7 @@ function TetrahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-	this.fromBufferGeometry( new THREE.TetrahedronBufferGeometry( radius, detail ) );
+	this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
 	this.mergeVertices();
 
 }
