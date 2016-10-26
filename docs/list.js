@@ -201,14 +201,20 @@ var list = {
 			[ "Texture", "api/textures/Texture" ]
 		],
 
+		"Animation": [
+			[ "AnimationAction", "api/animation/AnimationAction" ],
+			[ "AnimationClip", "api/animation/AnimationClip" ],
+			[ "AnimationMixer", "api/animation/AnimationMixer" ]
+		],
+
 		"Extras": [
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
-		"Extras / Animation": [
-			[ "Animation", "api/extras/animation/Animation" ],
-			[ "AnimationHandler", "api/extras/animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ]
+		"Extras / Collada Animation": [
+			[ "Animation", "api/extras/collada-animation/Animation" ],
+			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
+			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
 		],
 
 		"Extras / Core": [
