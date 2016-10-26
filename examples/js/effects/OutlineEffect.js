@@ -329,9 +329,11 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		// 2. render outline
 		var currentSceneAutoUpdate = scene.autoUpdate;
+		var currentSceneBackground = scene.background;
 		var currentShadowMapEnabled = renderer.shadowMap.enabled;
 
 		scene.autoUpdate = false;
+		scene.background = null;
 		renderer.autoClear = false;
 		renderer.shadowMap.enabled = false;
 
@@ -344,6 +346,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		removeUnusedOutlineMaterialFromCache();
 
 		scene.autoUpdate = currentSceneAutoUpdate;
+		scene.background = currentSceneBackground;
 		renderer.autoClear = currentAutoClear;
 		renderer.shadowMap.enabled = currentShadowMapEnabled;
 
