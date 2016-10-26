@@ -51,16 +51,8 @@
 
 		float lightDistance = length( lVector );
 
-		if ( testLightInRange( lightDistance, pointLight.distance ) ) {
-
-			directLight.color = pointLight.color;
-			directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
-
-		} else {
-
-			directLight.color = vec3( 0.0 );
-
-		}
+		directLight.color = pointLight.color;
+		directLight.color *= calcLightAttenuation( lightDistance, pointLight.distance, pointLight.decay );
 
 		return directLight;
 
@@ -98,7 +90,7 @@
 		float lightDistance = length( lVector );
 		float spotEffect = dot( directLight.direction, spotLight.direction );
 
-		if ( all( bvec2( spotEffect > spotLight.angleCos, testLightInRange( lightDistance, spotLight.distance ) ) ) ) {
+		if ( spotEffect > spotLight.angleCos ) {
 
 			float spotEffect = dot( spotLight.direction, directLight.direction );
 			spotEffect *= clamp( ( spotEffect - spotLight.angleCos ) / spotLight.penumbra, 0.0, 1.0 );
