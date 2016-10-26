@@ -1,11 +1,4 @@
 
-var outro = `
-Object.defineProperty( exports, 'AudioContext', {
-	get: function () {
-		return exports.getAudioContext();
-	}
-});`;
-
 function glsl () {
 	return {
 		transform ( code, id ) {
@@ -41,6 +34,5 @@ export default {
 			format: 'es',
 			dest: 'build/three.modules.js'
 		}
-	],
-	outro: outro
+	]
 };
