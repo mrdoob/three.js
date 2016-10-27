@@ -65,7 +65,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		directLight.color = pointLight.color;
 		directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );
-		directLight.visible = ( directLight.color != vec3( 0.0, 0.0, 0.0 ) );
+		directLight.visible = ( directLight.color != vec3( 0.0 ) );
 
 	}
 
@@ -106,7 +106,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 			directLight.color = spotLight.color;
 			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
-			directLight.visible = ( directLight.color != vec3( 0.0, 0.0, 0.0 ) );
+			directLight.visible = ( directLight.color != vec3( 0.0 ) );
 
 		} else {
 
