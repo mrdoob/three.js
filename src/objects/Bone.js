@@ -6,13 +6,11 @@ import { Object3D } from '../core/Object3D';
  * @author ikerr / http://verold.com
  */
 
-function Bone( skin ) {
+function Bone() {
 
 	Object3D.call( this );
 
 	this.type = 'Bone';
-
-	this.skin = skin;
 
 }
 
@@ -25,8 +23,6 @@ Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	copy: function ( source ) {
 
 		Object3D.prototype.copy.call( this, source );
-
-		this.skin = source.skin;
 
 		return this;
 
