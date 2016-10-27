@@ -22996,13 +22996,11 @@
 	 * @author ikerr / http://verold.com
 	 */
 
-	function Bone( skin ) {
+	function Bone() {
 
 		Object3D.call( this );
 
 		this.type = 'Bone';
-
-		this.skin = skin;
 
 	}
 
@@ -23010,17 +23008,7 @@
 
 		constructor: Bone,
 
-		isBone: true,
-
-		copy: function ( source ) {
-
-			Object3D.prototype.copy.call( this, source );
-
-			this.skin = source.skin;
-
-			return this;
-
-		}
+		isBone: true
 
 	} );
 
@@ -23055,7 +23043,7 @@
 
 				gbone = this.geometry.bones[ b ];
 
-				bone = new Bone( this );
+				bone = new Bone();
 				bones.push( bone );
 
 				bone.name = gbone.name;
