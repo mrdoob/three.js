@@ -28856,13 +28856,13 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function XHRLoader( manager ) {
+	function FileLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	}
 
-	Object.assign( XHRLoader.prototype, {
+	Object.assign( FileLoader.prototype, {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -28998,7 +28998,7 @@
 						// Some browsers return HTTP Status 0 when using non-http protocol
 						// e.g. 'file://' or 'data://'. Handle as success.
 
-						console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
+						console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 						if ( onLoad ) onLoad( response );
 
@@ -29096,7 +29096,7 @@
 			var texture = new CompressedTexture();
 			texture.image = images;
 
-			var loader = new XHRLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
@@ -29228,7 +29228,7 @@
 
 			var texture = new DataTexture();
 
-			var loader = new XHRLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( buffer ) {
@@ -29329,7 +29329,7 @@
 
 			} else {
 
-				var loader = new XHRLoader();
+				var loader = new FileLoader();
 				loader.setPath( this.path );
 				loader.setResponseType( 'blob' );
 				loader.setWithCredentials( this.withCredentials );
@@ -31659,7 +31659,7 @@
 
 			var scope = this;
 
-			var loader = new XHRLoader( scope.manager );
+			var loader = new FileLoader( scope.manager );
 			loader.load( url, function ( text ) {
 
 				onLoad( scope.parse( JSON.parse( text ) ) );
@@ -31813,7 +31813,7 @@
 
 			var scope = this;
 
-			var loader = new XHRLoader( scope.manager );
+			var loader = new FileLoader( scope.manager );
 			loader.load( url, function ( text ) {
 
 				onLoad( scope.parse( JSON.parse( text ) ) );
@@ -32246,7 +32246,7 @@
 
 			var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : Loader.prototype.extractUrlBase( url );
 
-			var loader = new XHRLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
@@ -32780,10 +32780,22 @@
 
 			var scope = this;
 
-			var loader = new XHRLoader( scope.manager );
+			var loader = new FileLoader( scope.manager );
 			loader.load( url, function ( text ) {
 
-				var json = JSON.parse( text );
+				var json = null;
+
+				try {
+
+					json = JSON.parse( text );
+
+				} catch ( error ) {
+
+					console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+					return;
+
+				}
+
 				var metadata = json.metadata;
 
 				if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
@@ -35001,7 +35013,7 @@
 
 			var scope = this;
 
-			var loader = new XHRLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.load( url, function ( text ) {
 
 				var json;
@@ -35061,7 +35073,7 @@
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var loader = new XHRLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( buffer ) {
 
@@ -41137,6 +41149,13 @@
 
 	//
 
+	function XHRLoader( manager ) {
+		console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
+		return new FileLoader( manager );
+	}
+
+	//
+
 	Object.assign( Box2.prototype, {
 		center: function ( optionalTarget ) {
 			console.warn( 'THREE.Box2: .center() has been renamed to .getCenter().' );
@@ -41494,6 +41513,22 @@
 
 	//
 
+	Object.defineProperties( Uniform.prototype, {
+		dynamic: {
+			set: function ( value ) {
+				console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
+			}
+		},
+		onUpdate: {
+			value: function () {
+				console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
+				return this;
+			}
+		}
+	} );
+
+	//
+
 	Object.defineProperties( Material.prototype, {
 		wrapAround: {
 			get: function () {
@@ -41554,22 +41589,6 @@
 		}
 
 	} ), EventDispatcher.prototype );
-
-	//
-
-	Object.defineProperties( Uniform.prototype, {
-		dynamic: {
-			set: function ( value ) {
-				console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
-			}
-		},
-		onUpdate: {
-			value: function () {
-				console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
-				return this;
-			}
-		}
-	} );
 
 	//
 
@@ -41957,7 +41976,7 @@
 	exports.JSONLoader = JSONLoader;
 	exports.ImageLoader = ImageLoader;
 	exports.FontLoader = FontLoader;
-	exports.XHRLoader = XHRLoader;
+	exports.FileLoader = FileLoader;
 	exports.Loader = Loader;
 	exports.Cache = Cache;
 	exports.AudioLoader = AudioLoader;
@@ -42279,6 +42298,7 @@
 	exports.Vertex = Vertex;
 	exports.EdgesHelper = EdgesHelper;
 	exports.WireframeHelper = WireframeHelper;
+	exports.XHRLoader = XHRLoader;
 	exports.GeometryUtils = GeometryUtils;
 	exports.ImageUtils = ImageUtils;
 	exports.Projector = Projector;
