@@ -184,7 +184,7 @@ Object.assign( XHRLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+			if ( request.overrideMimeType ) request.overrideMimeType( this.overrideMimeType !== undefined ? this.overrideMimeType : 'text/plain' );
 
 			request.send( null );
 
@@ -213,6 +213,13 @@ Object.assign( XHRLoader.prototype, {
 	setWithCredentials: function ( value ) {
 
 		this.withCredentials = value;
+		return this;
+
+	},
+
+	setOverrideMimeType: function ( value ) {
+
+		this.overrideMimeType = value;
 		return this;
 
 	}
