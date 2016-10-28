@@ -56,7 +56,19 @@ Object.assign( ObjectLoader.prototype, {
 		var loader = new XHRLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			var json = JSON.parse( text );
+			var json = null;
+
+			try {
+
+				json = JSON.parse( text );
+
+			} catch ( error ) {
+
+				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				return;
+
+			}
+
 			var metadata = json.metadata;
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
