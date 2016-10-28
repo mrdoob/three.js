@@ -2207,7 +2207,7 @@
           "!doc": "Remove all values from the cache."
         }
       },
-      "!doc": "A simple caching classe, used internaly by [page:XHRLoader].",
+      "!doc": "A simple caching classe, used internaly by [page:FileLoader].",
       "!type": "fn()"
     },
     "ColladaLoader": {
@@ -2513,8 +2513,8 @@
       "!doc": "Class for loading a [page:Texture texture].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "XHRLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/XHRLoader",
+    "FileLoader": {
+      "!url": "http://threejs.org/docs/#Reference/loaders/FileLoader",
       "prototype": {
         "cache": {
           "!type": "+THREE.Cache",

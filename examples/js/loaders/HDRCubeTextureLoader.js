@@ -27,7 +27,7 @@ THREE.HDRCubeTextureLoader.prototype.load = function(type, urls, onLoad, onProgr
   var loaded = 0;
 
   function loadHDRData(i, onLoad, onProgress, onError) {
-    var loader = new THREE.XHRLoader( this.manager );
+    var loader = new THREE.FileLoader( this.manager );
     loader.setResponseType( 'arraybuffer' );
 
     loader.load( urls[i], function ( buffer ) {
