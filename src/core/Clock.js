@@ -6,12 +6,15 @@ function Clock( autoStart ) {
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
-	this.startTime = 0;
+	this.startTime = 1;
 	this.oldTime = 0;
 	this.elapsedTime = 0;
 
 	this.running = false;
 
+	this.paused = false;
+	this.pauseTime = 0;
+	this.pauseOffset = 0;
 }
 
 Clock.prototype = {
@@ -26,6 +29,8 @@ Clock.prototype = {
 		this.elapsedTime = 0;
 		this.running = true;
 
+		this.pauseTime = 0;
+		this.paused = false;
 	},
 
 	stop: function () {
@@ -33,6 +38,18 @@ Clock.prototype = {
 		this.getElapsedTime();
 		this.running = false;
 
+	},
+
+	pause: function () {
+		if ( this.paused ) return;
+		this.getDelta();
+		this.paused = true;
+	},
+
+	resume: function () {
+		if ( !this.paused ) return;
+		this.paused = false;
+		this.oldTime = ( performance || Date ).now();
 	},
 
 	getElapsedTime: function () {
@@ -52,7 +69,10 @@ Clock.prototype = {
 
 		}
 
-		if ( this.running ) {
+		if ( this.paused ){
+			return 0;
+		}
+		else if ( this.running ) {
 
 			var newTime = ( performance || Date ).now();
 
