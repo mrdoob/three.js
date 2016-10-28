@@ -42,7 +42,7 @@ export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.
 export { JSONLoader } from './loaders/JSONLoader.js';
 export { ImageLoader } from './loaders/ImageLoader.js';
 export { FontLoader } from './loaders/FontLoader.js';
-export { XHRLoader } from './loaders/XHRLoader.js';
+export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';

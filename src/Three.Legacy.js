@@ -18,6 +18,7 @@ import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
+import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
@@ -101,6 +102,13 @@ export function EdgesHelper( object, hex ) {
 export function WireframeHelper( object, hex ) {
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
 	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+}
+
+//
+
+export function XHRLoader( manager ) {
+	console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
+	return new FileLoader( manager );
 }
 
 //
