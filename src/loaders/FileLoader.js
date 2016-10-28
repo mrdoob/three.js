@@ -1,9 +1,9 @@
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
 
 function FileLoader( manager ) {
 
