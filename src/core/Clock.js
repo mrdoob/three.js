@@ -15,13 +15,14 @@ function Clock( autoStart ) {
 	this.paused = false;
 	this.pauseTime = 0;
 	this.pauseOffset = 0;
+
 }
 
 Clock.prototype = {
 
 	constructor: Clock,
 
-	start: function () {
+	start: function() {
 
 		this.startTime = ( performance || Date ).now();
 
@@ -31,35 +32,40 @@ Clock.prototype = {
 
 		this.pauseTime = 0;
 		this.paused = false;
+
 	},
 
-	stop: function () {
+	stop: function() {
 
 		this.getElapsedTime();
 		this.running = false;
 
 	},
 
-	pause: function () {
+	pause: function() {
+
 		if ( this.paused ) return;
 		this.getDelta();
 		this.paused = true;
+
 	},
 
-	resume: function () {
-		if ( !this.paused ) return;
+	resume: function() {
+
+		if ( ! this.paused ) return;
 		this.paused = false;
 		this.oldTime = ( performance || Date ).now();
+
 	},
 
-	getElapsedTime: function () {
+	getElapsedTime: function() {
 
 		this.getDelta();
 		return this.elapsedTime;
 
 	},
 
-	getDelta: function () {
+	getDelta: function() {
 
 		var diff = 0;
 
@@ -69,8 +75,10 @@ Clock.prototype = {
 
 		}
 
-		if ( this.paused ){
+		if ( this.paused ) {
+
 			return 0;
+
 		}
 		else if ( this.running ) {
 
@@ -88,6 +96,8 @@ Clock.prototype = {
 	}
 
 };
+
+
 
 
 export { Clock };
