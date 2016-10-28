@@ -32,11 +32,13 @@
 		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank">VRML 2.0 Tutorial</a>,-->
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/loaders/VRMLLoader.js"></script>
+		<script src="js/libs/VrmlParser/vrml.js"></script>
+		<script src="js/libs/VrmlParser/Renderer/ThreeJsRenderer.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -61,8 +63,8 @@
 
 				controls = new THREE.OrbitControls( camera );
 
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
+				controls.rotateSpeed = 3.0;
+				controls.zoomSpeed = 3;
 
 				controls.noZoom = false;
 				controls.noPan = false;
@@ -78,11 +80,10 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
-
-					scene.add( object );
-
+				var loader = new THREE.VRMLLoader(vrmlParser);
+				loader.load( 'models/vrml/house.wrl', function ( tree ) {
+					var vrmlParserThreeJsRenderer = new VrmlParser.Renderer.ThreeJsRenderer();
+					vrmlParserThreeJsRenderer.render(tree, scene);
 				} );
 
 				// renderer

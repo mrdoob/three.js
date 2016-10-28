@@ -1,0 +1,39 @@
+#VRML V2.0 utf8
+
+Transform {
+	# a comment about the transform node
+	children [
+		Shape {
+            appearance Appearance {
+                material Material {
+                    diffuseColor 1 1 0
+                    emissiveColor 0.1 0 0
+                }
+            }
+            geometry IndexedFaceSet {
+                color             NULL
+                coord  Coordinate {
+                    point [
+                        0 1 0,
+                        1 0 0,
+                        0 0 1,
+                    ]
+                }
+                normal            NULL
+                texCoord          NULL
+                ccw               TRUE
+                colorIndex        [ ]
+                colorPerVertex    TRUE
+                convex            TRUE # more commenting here
+                coordIndex  [
+                    0 ,1 , 2, -1,
+                ]
+            }
+        }
+	]
+    rotation 0.4 0.2 0.1 0
+    translation -6 2 0
+    scale 4 4 4 # another comment
+}
+
+#the comment at the vrml root level
