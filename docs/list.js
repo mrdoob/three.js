@@ -143,6 +143,7 @@ var list = {
 			[ "Quaternion", "api/math/Quaternion" ],
 			[ "Ray", "api/math/Ray" ],
 			[ "Sphere", "api/math/Sphere" ],
+			[ "Spherical", "api/math/Spherical" ],
 			[ "Spline", "api/math/Spline" ],
 			[ "Triangle", "api/math/Triangle" ],
 			[ "Vector2", "api/math/Vector2" ],
