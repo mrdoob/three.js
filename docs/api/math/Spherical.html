@@ -10,7 +10,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A spherical coordinate.</div>
+		<div class="desc">A point's spherical coordinates.</div>
 
 
 		<h2>Constructor</h2>
@@ -19,11 +19,11 @@
 		<h3>[name]( [page:Float radius], [page:Float phi], [page:Float theta] )</h3>
 		<div>
 		radius -- [page:Float] the radius<br />
-		phi -- [page:Float] polar angle<br />
-		theta -- [page:Float] equator angle around y-up axis
+		phi -- [page:Float] polar angle from the y (up) axis<br />
+		theta -- [page:Float] equator angle around the y (up) axis
 		</div>
 		<div>
-		A 3D spherical coordinate.
+		The poles (phi) are at the positive and negative y axis. The equator (theta) starts at positive z.
 		</div>
 
 
@@ -38,9 +38,9 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Sperical set]( [page:Float radius], [page:Float phi], [page:Float theta] ) [page:Spherical this]</h3>
+		<h3>[method:Spherical set]( [page:Float radius], [page:Float phi], [page:Float theta] ) [page:Spherical this]</h3>
 		<div>
-		Sets values of this spherical's components.
+		Sets values of this spherical's component coordinates.
 		</div>
 
 		<h3>[method:Spherical copy]( [page:Spherical s] ) [page:Spherical this]</h3>
