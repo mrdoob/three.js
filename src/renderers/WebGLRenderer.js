@@ -322,18 +322,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function glClearColor( r, g, b, a ) {
-
-		if ( _premultipliedAlpha === true ) {
-
-			r *= a; g *= a; b *= a;
-
-		}
-
-		state.clearColor( r, g, b, a );
-
-	}
-
 	function setDefaultGLState() {
 
 		state.init();
@@ -341,7 +329,7 @@ function WebGLRenderer( parameters ) {
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	}
 
@@ -485,7 +473,7 @@ function WebGLRenderer( parameters ) {
 
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	};
 
@@ -499,7 +487,7 @@ function WebGLRenderer( parameters ) {
 
 		_clearAlpha = alpha;
 
-		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 	};
 
@@ -1209,11 +1197,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( background === null ) {
 
-			glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+			state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
 		} else if ( background && background.isColor ) {
 
-			glClearColor( background.r, background.g, background.b, 1 );
+			state.buffers.color.setClear( background.r, background.g, background.b, 1, _premultipliedAlpha );
 			forceClear = true;
 
 		}
@@ -1742,7 +1730,7 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				( materialProperties.numClippingPlanes !== _clipping.numPlanes || 
+				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
  				  materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
