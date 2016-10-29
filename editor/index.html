@@ -365,7 +365,7 @@
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.XHRLoader();
+					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 

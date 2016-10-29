@@ -96,6 +96,7 @@ var list = {
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "FileLoader", "api/loaders/FileLoader" ],
 			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
@@ -108,8 +109,7 @@ var list = {
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
-			[ "TGALoader", "api/loaders/TGALoader" ],
-			[ "XHRLoader", "api/loaders/XHRLoader" ]
+			[ "TGALoader", "api/loaders/TGALoader" ]
 		],
 
 		"Materials": [
