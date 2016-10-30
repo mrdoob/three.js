@@ -776,6 +776,38 @@ var guis = {
 
 	},
 
+	RoundedBoxGeometry : function( mesh ) {
+
+		var data = {
+			width : 15,
+			height : 15,
+			depth : 15,
+			radius : 2,
+			radiusSegments : 3
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.RoundedBoxGeometry(
+					data.width, data.height, data.depth, data.radius, data.radiusSegments
+				)
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.RoundedBoxGeometry' );
+
+		folder.add( data, 'width', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'height', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'depth', 1, 30 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 10 ).step( 1 ).onChange( generateGeometry );
+	
+		generateGeometry();
+
+	},
+
 	SphereBufferGeometry : function( mesh ) {
 
 		var data = {
