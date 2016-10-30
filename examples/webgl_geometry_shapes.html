@@ -66,6 +66,9 @@
 
 				var loader = new THREE.TextureLoader();
 				var texture = loader.load( "textures/UV_Grid_Sm.jpg" );
+
+				// it's necessary to apply these settings in order to correctly display the texture on a shape geometry
+
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 0.008, 0.008 );
 

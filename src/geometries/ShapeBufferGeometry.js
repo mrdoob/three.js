@@ -23,6 +23,7 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 	curveSegments = curveSegments || 12;
 
 	var vertices = [];
+	var normals = [];
 	var uvs = [];
 	var indices = [];
 
@@ -54,11 +55,9 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
 	this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
+	this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
 	this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
 
-	// generate normals
-
-	this.computeVertexNormals();
 
 	// helper functions
 
@@ -105,13 +104,14 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 		}
 
-		// vertices, uvs
+		// vertices, normals, uvs
 
 		for ( i = 0, l = shapeVertices.length; i < l; i ++ ) {
 
 			var vertex = shapeVertices[ i ];
 
 			vertices.push( vertex.x, vertex.y, 0 );
+			normals.push( 0, 0, 1 );
 			uvs.push( vertex.x, vertex.y ); // world uvs
 
 		}
