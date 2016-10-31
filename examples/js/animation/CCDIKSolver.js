@@ -135,9 +135,7 @@ THREE.CCDIKSolver.prototype = {
 
 			}
 
-			// update world matrix of target.parent, not root, seems like good enough
-			target.parent.updateMatrixWorld( true );
-			//this.mesh.updateMatrixWorld( true );
+			this.mesh.updateMatrixWorld( true );
 
 		}
 
