@@ -158,7 +158,6 @@
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				var canvas = renderer.context.canvas;
 
@@ -169,7 +168,7 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				effectCopy.renderToScreen = true;
+				effectColor.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -177,7 +176,6 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
-				composer.addPass( effectCopy );
 
 				// EVENTS
 
