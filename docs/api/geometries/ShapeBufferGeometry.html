@@ -8,13 +8,13 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
 		<div class="desc">Creates an one-sided polygonal geometry from one or more path shapes.</div>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#ShapeGeometry"></iframe>
+		<iframe id="scene" src="scenes/geometry-browser.html#ShapeBufferGeometry"></iframe>
 
 		<script>
 
@@ -49,7 +49,7 @@
 		heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
 		heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
 
-		var geometry = new THREE.ShapeGeometry( heartShape );
+		var geometry = new THREE.ShapeBufferGeometry( heartShape );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );
@@ -63,7 +63,6 @@
 		shapes — [page:Array] of shapes or a single [page:Shape shape].<br />
 		curveSegments - [page:Integer] - Number of segments per shape. Default is 12.
 		</div>
-
 
 		<h2>Source</h2>
 
