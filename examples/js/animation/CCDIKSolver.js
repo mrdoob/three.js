@@ -8,6 +8,7 @@
  *
  * ik parameter example
  *
+ * // target, effector, index in links are bone index in skeleton.
  * ik = {
  *	target: 1,
  *	effector: 2,
@@ -71,9 +72,6 @@ THREE.CCDIKSolver.prototype = {
 
 					var angle = targetVec.dot( effectorVec );
 
-					// TODO: continue (or break) the loop for the performance
-					//       if no longer needs to rotate (angle > 1.0-1e-5 ?)
-
 					if ( angle > 1.0 ) {
 
 						angle = 1.0;
@@ -85,6 +83,14 @@ THREE.CCDIKSolver.prototype = {
 					}
 
 					angle = math.acos( angle );
+
+					// skip if changing angle is too small to prevent vibration of bone
+					// Refer to http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
+					if ( angle < 1e-5 ) {
+
+						continue;
+
+					}
 
 					if ( ik.minAngle !== undefined && angle < ik.minAngle ) {
 
@@ -128,6 +134,8 @@ THREE.CCDIKSolver.prototype = {
 				}
 
 			}
+
+			this.mesh.updateMatrixWorld( true );
 
 		}
 
