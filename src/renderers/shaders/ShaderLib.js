@@ -18,6 +18,7 @@ var ShaderLib = {
 
 			UniformsLib.common,
 			UniformsLib.aomap,
+			UniformsLib.lightmap,
 			UniformsLib.fog
 
 		] ),

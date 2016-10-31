@@ -1978,6 +1978,13 @@ function WebGLRenderer( parameters ) {
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 
+		if ( material.lightMap ) {
+
+			uniforms.lightMap.value = material.lightMap;
+			uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+		}
+
 		if ( material.aoMap ) {
 
 			uniforms.aoMap.value = material.aoMap;
@@ -2116,13 +2123,6 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsLambert( uniforms, material ) {
 
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-		}
-
 		if ( material.emissiveMap ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
@@ -2135,13 +2135,6 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-		}
 
 		if ( material.emissiveMap ) {
 
@@ -2187,13 +2180,6 @@ function WebGLRenderer( parameters ) {
 		if ( material.metalnessMap ) {
 
 			uniforms.metalnessMap.value = material.metalnessMap;
-
-		}
-
-		if ( material.lightMap ) {
-
-			uniforms.lightMap.value = material.lightMap;
-			uniforms.lightMapIntensity.value = material.lightMapIntensity;
 
 		}
 
