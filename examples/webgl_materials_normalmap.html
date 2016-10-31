@@ -71,8 +71,6 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = true;
-
 			var container, stats, loader;
 
 			var camera, scene, renderer;
@@ -147,12 +145,9 @@
 
 				//
 
-				if ( statsEnabled ) {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
-
-				}
 
 				// COMPOSER
 
@@ -216,7 +211,7 @@
 				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-				
+
 			}
 
 			function onDocumentMouseMove(event) {
@@ -233,7 +228,8 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
+
+				stats.update();
 
 			}
 
@@ -242,7 +238,7 @@
 				targetX = mouseX * .001;
 				targetY = mouseY * .001;
 
-				if( mesh ) {
+				if ( mesh ) {
 
 					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
 					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
