@@ -9,14 +9,32 @@
 	</head>
 	<body>
 		<h1>Shadowing Type Constants</h1>
+		<p>These define the shadow map types used by the WebGLRenderer.</p>
 
-		<h2>Shadow Map</h2>
-		<div>
-		THREE.BasicShadowMap<br />
-		THREE.PCFShadowMap<br />
+		<h2>Shadow Map Types</h2>
+		<code>
+		THREE.BasicShadowMap
+		</code>
+		<p>Unfiltered shadow maps - fastest, but lowest quality.</p>
+		<code>
+		THREE.PCFShadowMap
+		</code>
+		<p>Shadow maps filtered using the Percentage-Closer Filtering (PCF) algorithm (default).</p>
+		<code>
 		THREE.PCFSoftShadowMap
-		</div>
-	
+		</code>
+		<p>Shadow maps filtered using the Percentage-Closer Soft Shadows (PCSS) algorithm.</p>
+
+		<h2>Usage</h2>
+		<code>
+		var renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFShadowMap; //default
+		</code>
+
+		Note that this just enables shadows in the renderer and sets the shadow map type. <br />
+		To actually cast shadows you will have to set up shadows for the any light you want to cast shadows, and for meshes you want to cast / receive shadows. <br />
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
