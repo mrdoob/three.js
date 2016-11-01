@@ -9,21 +9,41 @@
 	</head>
 	<body>
 		<h1>GL State Constants</h1>
+		These are used by the WebGLRenderer to set gl.cullFace and gl.frontFace states in the GPU.
 
-		<h2>Cull Face</h2>
-		<div>
-		THREE.CullFaceNone<br />
-		THREE.CullFaceBack<br />
-		THREE.CullFaceFront<br />
+		<h2>Cull Face Modes</h2>
+		<code>
+		THREE.CullFaceNone
+		</code>
+		<p>Disable face culling.</p>
+		<code>
+		THREE.CullFaceBack
+		</code>
+		<p>Cull back faces (default).</p>
+		<code>
+		THREE.CullFaceFront
+		</code>
+		<p>Cull front faces.</p>
+		<code>
 		THREE.CullFaceFrontBack
-		</div>
+		</code>
+		<p>Cull both front and back faces.</p>
 
 		<h2>Front Face Direction</h2>
-		<div>
-		THREE.FrontFaceDirectionCW<br />
-		THREE.FrontFaceDirectionCCW<br />
-		</div>
-	
+		Set the winding order for polygons to either clockwise or counter-clockwise (default).
+		<code>
+		THREE.FrontFaceDirectionCW
+		THREE.FrontFaceDirectionCCW
+		</code>
+
+		<h2>Usage</h2>
+
+		<code>
+		var renderer = new THREE.WebGLRenderer();
+
+		renderer.setFaceCulling ( THREE.CullFaceBack, THREE.FrontFaceDirectionCCW );  //defaults
+		</code>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
