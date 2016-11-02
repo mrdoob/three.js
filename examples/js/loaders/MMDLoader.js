@@ -308,9 +308,11 @@ THREE.MMDLoader.prototype.extractExtension = function ( url ) {
 
 };
 
-THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType ) {
+THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType, mimeType ) {
 
 	var loader = new THREE.FileLoader( this.manager );
+
+	if ( mimeType !== undefined ) loader.setMimeType( mimeType );
 
 	loader.setResponseType( responseType );
 
@@ -338,15 +340,7 @@ THREE.MMDLoader.prototype.loadFileAsText = function ( url, onLoad, onProgress, o
 
 THREE.MMDLoader.prototype.loadFileAsShiftJISText = function ( url, onLoad, onProgress, onError ) {
 
-	var request = this.loadFile( url, onLoad, onProgress, onError, 'text' );
-
-	/*
-	 * TODO: some browsers seem not support overrideMimeType
-	 *       so some workarounds for them may be necessary.
-	 * Note: to set property of request after calling request.send(null)
-	 *       (it's called in THREE.FileLoader.load()) could be a bad manner.
-	 */
-	request.overrideMimeType( 'text/plain; charset=shift_jis' );
+	var request = this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
 
 };
 
