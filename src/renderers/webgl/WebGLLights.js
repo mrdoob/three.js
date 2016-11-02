@@ -25,18 +25,6 @@ function WebGLLights() {
 
 			switch ( light.type ) {
 
-				case 'RectAreaLight':
-					uniforms = {
-						color: new Color(),
-						position: new Vector3(),
-						width: 0,
-						height: 0,
-						rotationMatrix: new Matrix4(),
-
-						// TODO (abelnation): set RectAreaLight shadow uniforms
-					};
-					break;
-
 				case 'DirectionalLight':
 					uniforms = {
 						direction: new Vector3(),
@@ -88,20 +76,22 @@ function WebGLLights() {
 					};
 					break;
 
+				case 'RectAreaLight':
+					uniforms = {
+						color: new THREE.Color(),
+						position: new THREE.Vector3(),
+						halfWidth: new THREE.Vector3(),
+						halfHeight: new THREE.Vector3(),
+
+						// TODO (abelnation): set RectAreaLight shadow uniforms
+					};
+					break;
+
 			}
 
 			lights[ light.id ] = uniforms;
 
 			return uniforms;
-
-			case 'RectAreaLight':
-				uniforms = {
-					color: new THREE.Color(),
-					position: new THREE.Vector3(),
-					halfWidth: new THREE.Vector3(),
-					halfHeight: new THREE.Vector3(),
-				};
-				break;
 
 		}
 
