@@ -1,10 +1,12 @@
+import { Light } from './Light';
+
 /**
  * @author abelnation / http://github.com/abelnation
  */
 
-THREE.RectAreaLight = function ( color, intensity, width, height ) {
+function RectAreaLight ( color, intensity, width, height ) {
 
-	THREE.Light.call( this, color, intensity );
+	Light.call( this, color, intensity );
 
 	this.type = 'RectAreaLight';
 
@@ -21,22 +23,28 @@ THREE.RectAreaLight = function ( color, intensity, width, height ) {
 	// TODO (abelnation): shadows
 	// this.shadow = new THREE.RectAreaLightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-};
-
-THREE.RectAreaLight.prototype = Object.create( THREE.Light.prototype );
-THREE.RectAreaLight.prototype.constructor = THREE.RectAreaLight;
+}
 
 // TODO (abelnation): RectAreaLight update when light shape is changed
+RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-THREE.RectAreaLight.prototype.copy = function ( source ) {
+	constructor: RectAreaLight,
 
-	THREE.Light.prototype.copy.call( this, source );
+	isRectAreaLight: true,
 
-	this.width = source.width;
-	this.height = source.height;
+	copy: function ( source ) {
 
-	// this.shadow = source.shadow.clone();
+		Light.prototype.copy.call( this, source );
 
-	return this;
+		this.width = source.width;
+		this.height = source.height;
 
-};
+		// this.shadow = source.shadow.clone();
+
+		return this;
+
+	}
+
+} );
+
+export { RectAreaLight };

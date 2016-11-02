@@ -24,38 +24,40 @@ struct BlinnPhongMaterial {
 // By: Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // https://eheitzresearch.wordpress.com/415-2/
 
-void RE_Area_BlinnPhong( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+#if NUM_RECT_AREA_LIGHTS > 0
+    void RE_Area_BlinnPhong( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	// Deal with colors in linear space
-	// TODO (abelnation): confirm this transformation is needed and correct
-	const float gamma = 2.2;
-	vec3 matDiffColor = GammaToLinear( vec4( material.diffuseColor, 1.0 ), gamma ).xyz;
-	vec3 matSpecColor = GammaToLinear( vec4( material.specularColor, 1.0 ), gamma ).xyz;
-	vec3 lightColor = GammaToLinear( vec4( rectAreaLight.color, 1.0 ), gamma ).xyz;
+        // Deal with colors in linear space
+        // TODO (abelnation): confirm this transformation is needed and correct
+        const float gamma = 2.2;
+        vec3 matDiffColor = GammaToLinear( vec4( material.diffuseColor, 1.0 ), gamma ).xyz;
+        vec3 matSpecColor = GammaToLinear( vec4( material.specularColor, 1.0 ), gamma ).xyz;
+        vec3 lightColor = GammaToLinear( vec4( rectAreaLight.color, 1.0 ), gamma ).xyz;
 
-	// TODO (abelnation): determine is shininess needs to be converted to "roughness" as defined by paper
-	float roughness = BlinnExponentToGGXRoughness( material.specularShininess );
+        // TODO (abelnation): determine is shininess needs to be converted to "roughness" as defined by paper
+        float roughness = BlinnExponentToGGXRoughness( material.specularShininess );
 
-	// Represent our RectAreaLight shape with a Rect
-	Rect rect;
-	rect.center = rectAreaLight.position;
-	rect.halfx = rectAreaLight.width * 0.5;
-	rect.halfy = rectAreaLight.height * 0.5;
-	rect.dirx = ( rectAreaLight.rotationMatrix * vec4( 1.0, 0.0, 0.0, 1.0 ) ).xyz;
-	rect.diry = ( rectAreaLight.rotationMatrix * vec4( 0.0, 1.0, 0.0, 1.0 ) ).xyz;
+        // Represent our RectAreaLight shape with a Rect
+        Rect rect;
+        rect.center = rectAreaLight.position;
+        rect.halfx = rectAreaLight.width * 0.5;
+        rect.halfy = rectAreaLight.height * 0.5;
+        rect.dirx = ( rectAreaLight.rotationMatrix * vec4( 1.0, 0.0, 0.0, 1.0 ) ).xyz;
+        rect.diry = ( rectAreaLight.rotationMatrix * vec4( 0.0, 1.0, 0.0, 1.0 ) ).xyz;
 
-	vec3 rectNormal = cross( rect.dirx, rect.diry );
-	rect.plane = vec4( rectNormal, -dot( rectNormal, rect.center ) );
+        vec3 rectNormal = cross( rect.dirx, rect.diry );
+        rect.plane = vec4( rectNormal, -dot( rectNormal, rect.center ) );
 
-	// Evaluate Lighting Equation
-	vec3 spec = Rect_Area_Light_Specular_Reflectance( geometry, rect, roughness );
-	vec3 diff = Rect_Area_Light_Diffuse_Reflectance( geometry, rect );
+        // Evaluate Lighting Equation
+        vec3 spec = Rect_Area_Light_Specular_Reflectance( geometry, rect, roughness );
+        vec3 diff = Rect_Area_Light_Diffuse_Reflectance( geometry, rect );
 
-	// TODO (abelnation): note why division by 2PI is necessary
-	reflectedLight.directSpecular += lightColor * matSpecColor * spec / PI2;
-	reflectedLight.directDiffuse  += lightColor * matDiffColor * diff / PI2;
+        // TODO (abelnation): note why division by 2PI is necessary
+        reflectedLight.directSpecular += lightColor * matSpecColor * spec / PI2;
+        reflectedLight.directDiffuse  += lightColor * matDiffColor * diff / PI2;
 
-}
+    }
+#endif
 
 void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 

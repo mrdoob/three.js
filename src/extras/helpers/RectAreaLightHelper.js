@@ -1,10 +1,18 @@
+
+import { Object3D } from '../../core/Object3D';
+import { Vector3 } from '../../math/Vector3';
+import { Shape } from '../../extras/core/Shape';
+import { Mesh } from '../../objects/Mesh';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { ShapeGeometry } from '../../geometries/ShapeGeometry';
+
 /**
  * @author abelnation / http://github.com/abelnation
 */
 
-THREE.RectAreaLightHelper = function ( light ) {
+function RectAreaLightHelper( light ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.light = light;
 	this.light.updateMatrixWorld();
@@ -12,12 +20,12 @@ THREE.RectAreaLightHelper = function ( light ) {
 	// this.matrix = light.matrixWorld;
 	// this.matrixAutoUpdate = false;
 
-	this.lightMat = new THREE.MeshBasicMaterial( {
+	this.lightMat = new MeshBasicMaterial( {
 		color: light.color,
 		fog: false
 	} );
 
-	this.lightWireMat = new THREE.MeshBasicMaterial( {
+	this.lightWireMat = new MeshBasicMaterial( {
 		color: light.color,
 		fog: false,
 		wireframe: true
@@ -25,17 +33,17 @@ THREE.RectAreaLightHelper = function ( light ) {
 
 	var hx = this.light.width / 2.0;
 	var hy = this.light.height / 2.0;
-	this.lightShape = new THREE.ShapeGeometry( new THREE.Shape( [
-		new THREE.Vector3( - hx,   hy, 0 ),
-		new THREE.Vector3(   hx,   hy, 0 ),
-		new THREE.Vector3(   hx, - hy, 0 ),
-		new THREE.Vector3( - hx, - hy, 0 )
+	this.lightShape = new ShapeGeometry( new Shape( [
+		new Vector3( - hx,   hy, 0 ),
+		new Vector3(   hx,   hy, 0 ),
+		new Vector3(   hx, - hy, 0 ),
+		new Vector3( - hx, - hy, 0 )
 	] ) );
 
 	// shows the "front" of the light, e.g. where light comes from
-	this.lightMesh = new THREE.Mesh( this.lightShape, this.lightMat );
+	this.lightMesh = new Mesh( this.lightShape, this.lightMat );
 	// shows the "back" of the light, which does not emit light
-	this.lightWireMesh = new THREE.Mesh( this.lightShape, this.lightWireMat );
+	this.lightWireMesh = new Mesh( this.lightShape, this.lightWireMat );
 
 	this.add( this.lightMesh );
 	this.add( this.lightWireMesh );
@@ -44,10 +52,10 @@ THREE.RectAreaLightHelper = function ( light ) {
 
 };
 
-THREE.RectAreaLightHelper.prototype = Object.create( THREE.Object3D.prototype );
-THREE.RectAreaLightHelper.prototype.constructor = THREE.RectAreaLightHelper;
+RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
+RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
 
-THREE.RectAreaLightHelper.prototype.dispose = function () {
+RectAreaLightHelper.prototype.dispose = function () {
 
 	this.lightMesh.geometry.dispose();
 	this.lightMesh.material.dispose();
@@ -56,10 +64,10 @@ THREE.RectAreaLightHelper.prototype.dispose = function () {
 
 };
 
-THREE.RectAreaLightHelper.prototype.update = function () {
+RectAreaLightHelper.prototype.update = function () {
 
-	var vector = new THREE.Vector3();
-	var vector2 = new THREE.Vector3();
+	var vector = new Vector3();
+	var vector2 = new Vector3();
 
 	return function () {
 
@@ -87,11 +95,11 @@ THREE.RectAreaLightHelper.prototype.update = function () {
 
 		var hx = this.light.width / 2.0;
 		var hy = this.light.height / 2.0;
-		this.lightShape = new THREE.ShapeGeometry( new THREE.Shape( [
-			new THREE.Vector3( - hx,   hy, 0 ),
-			new THREE.Vector3(   hx,   hy, 0 ),
-			new THREE.Vector3(   hx, - hy, 0 ),
-			new THREE.Vector3( - hx, - hy, 0 )
+		this.lightShape = new ShapeGeometry( new Shape( [
+			new Vector3( - hx,   hy, 0 ),
+			new Vector3(   hx,   hy, 0 ),
+			new Vector3(   hx, - hy, 0 ),
+			new Vector3( - hx, - hy, 0 )
 		] ) );
 
 		this.lightMesh.geometry = this.lightShape;
@@ -100,4 +108,6 @@ THREE.RectAreaLightHelper.prototype.update = function () {
 		oldShape.dispose();
 	};
 
-}();
+};
+
+export { RectAreaLightHelper };

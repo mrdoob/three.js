@@ -201,8 +201,8 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			// TODO (abelnation): is this needed?
-			if (shadow instanceof THREE.RectAreaLightShadow ) {
+			// TODO (abelnation / sam-g-steel): is this needed?
+			if (shadow && shadow.isRectAreaLightShadow ) {
 
 				shadow.update( light );
 

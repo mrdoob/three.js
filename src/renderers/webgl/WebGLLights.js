@@ -5,6 +5,7 @@
 import { Color } from '../../math/Color';
 import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
+import { Matrix4 } from '../../math/Matrix4';
 
 function WebGLLights() {
 
@@ -23,6 +24,18 @@ function WebGLLights() {
 			var uniforms;
 
 			switch ( light.type ) {
+
+				case 'RectAreaLight':
+					uniforms = {
+						color: new Color(),
+						position: new Vector3(),
+						width: 0,
+						height: 0,
+						rotationMatrix: new Matrix4(),
+
+						// TODO (abelnation): set RectAreaLight shadow uniforms
+					};
+					break;
 
 				case 'DirectionalLight':
 					uniforms = {
@@ -75,19 +88,7 @@ function WebGLLights() {
 					};
 					break;
 
-			case 'RectAreaLight':
-				uniforms = {
-					color: new THREE.Color(),
-					position: new THREE.Vector3(),
-					width: 0,
-					height: 0,
-					rotationMatrix: new THREE.Matrix4(),
-
-					// TODO (abelnation): set RectAreaLight shadow uniforms
-				};
-				break;
-
-		}
+			}
 
 			lights[ light.id ] = uniforms;
 
