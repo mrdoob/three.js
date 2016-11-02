@@ -75,7 +75,19 @@ function WebGLLights() {
 					};
 					break;
 
-			}
+			case 'RectAreaLight':
+				uniforms = {
+					color: new THREE.Color(),
+					position: new THREE.Vector3(),
+					width: 0,
+					height: 0,
+					rotationMatrix: new THREE.Matrix4(),
+
+					// TODO (abelnation): set RectAreaLight shadow uniforms
+				};
+				break;
+
+		}
 
 			lights[ light.id ] = uniforms;
 

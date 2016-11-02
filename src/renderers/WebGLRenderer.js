@@ -162,7 +162,8 @@ function WebGLRenderer( parameters ) {
 
 	_projScreenMatrix = new Matrix4(),
 
-	_vector3 = new Vector3(),
+	_vector3 = new THREE.Vector3(),
+	_matrix4 = new THREE.Matrix4(),
 
 	// light arrays cache
 
@@ -177,6 +178,8 @@ function WebGLRenderer( parameters ) {
 		spot: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
+		area: [],
+		// TODO (abelnation): arrays for area shadow map and area shadow matrix
 		point: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
@@ -1650,6 +1653,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
+			uniforms.rectAreaLights.value = _lights.area;
 			uniforms.pointLights.value = _lights.point;
 			uniforms.hemisphereLights.value = _lights.hemi;
 
@@ -1659,6 +1663,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.spotShadowMatrix.value = _lights.spotShadowMatrix;
 			uniforms.pointShadowMap.value = _lights.pointShadowMap;
 			uniforms.pointShadowMatrix.value = _lights.pointShadowMatrix;
+			// TODO (abelnation): add area lights shadow info to uniforms
 
 		}
 
@@ -2252,6 +2257,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.directionalLights.needsUpdate = value;
 		uniforms.pointLights.needsUpdate = value;
 		uniforms.spotLights.needsUpdate = value;
+		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 
 	}
@@ -2292,6 +2298,7 @@ function WebGLRenderer( parameters ) {
 		directionalLength = 0,
 		pointLength = 0,
 		spotLength = 0,
+		areaLength = 0,
 		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
@@ -2367,7 +2374,30 @@ function WebGLRenderer( parameters ) {
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				_lights.spot[ spotLength ++ ] = uniforms;
 
-			} else if ( light.isPointLight ) {
+			} else if ( light instanceof THREE.RectAreaLight ) {
+
+				var uniforms = lightCache.get( light );
+
+				uniforms.color.copy( color ).multiplyScalar( intensity );
+
+				uniforms.position.setFromMatrixPosition( light.matrixWorld );
+				uniforms.position.applyMatrix4( viewMatrix );
+
+				uniforms.width = light.width;
+				uniforms.height = light.height;
+
+				_matrix4.copy( light.matrixWorld );
+				_matrix4.premultiply( viewMatrix );
+				uniforms.rotationMatrix.extractRotation( _matrix4 );
+
+				// TODO (abelnation): RectAreaLight distance?
+				// uniforms.distance = distance;
+
+				// TODO (abelnation): RectAreaLight shadow info to uniforms
+
+				_lights.area[ areaLength ++ ] = uniforms;
+
+			} else if ( light instanceof THREE.PointLight ) {
 
 				var uniforms = lightCache.get( light );
 
@@ -2426,10 +2456,18 @@ function WebGLRenderer( parameters ) {
 
 		_lights.directional.length = directionalLength;
 		_lights.spot.length = spotLength;
+		_lights.area.length = areaLength;
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + hemiLength + ',' + _lights.shadows.length;
+		_lights.hash = [
+			directionalLength,
+			pointLength,
+			spotLength,
+			areaLength,
+			hemiLength,
+			_lights.shadows.length
+		].join(',');
 
 	}
 

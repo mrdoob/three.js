@@ -9,6 +9,7 @@ from .constants import (
     EMPTY,
     ARMATURE,
     LAMP,
+    AREA,
     SPOT,
     SUN,
     POINT,
@@ -311,6 +312,7 @@ def node_type(obj):
             POINT: constants.POINT_LIGHT,
             SUN: constants.DIRECTIONAL_LIGHT,
             SPOT: constants.SPOT_LIGHT,
+            AREA: constants.AREA_LIGHT,
             HEMI: constants.HEMISPHERE_LIGHT
         },
         CAMERA: {

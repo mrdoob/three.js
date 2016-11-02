@@ -1,0 +1,66 @@
+body {
+	background-color: #000000;
+	margin: 0px;
+	overflow: hidden;
+}
+
+
+#editor {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	border: 2px solid #404040;
+	border-radius: 6px
+}
+
+
+.canvas {
+	border: 2px solid #404040;
+	border-radius: 6px
+}
+
+
+#params {
+	display: table;
+	float: left;
+	position: relative;
+	padding: 8px 8px 0px;
+	margin: 8px;
+	background: #191919;
+	border: 2px solid #404040;
+	border-radius: 6px
+}
+
+
+#status {
+	width: 484px;
+	float: left;
+	position: relative;
+	padding: 8px;
+	margin: 16px 0px 0px 0px;
+	background: #191919;
+	border: 2px solid #404040;
+	border-radius: 6px
+}
+
+#status_text {
+	font-family: helvetica, arial, sans-serif;
+	color: #999;
+	font-size: 12px
+}
+
+
+.checkbox_label {
+	font-family: helvetica, arial, sans-serif;
+	clear: both;
+	color: #999;
+	display: block;
+	float: left;
+	font-size: 12px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.checkbox_label:hover {
+	color: #FFF;
+}

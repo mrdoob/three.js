@@ -1,0 +1,836 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<title>Shader Sandbox</title>
+	<meta charset="utf-8"></meta>
+</head>
+
+<body style="background: #191919">
+
+
+<link href="css/sandbox.css" rel="stylesheet" type="text/css"/>
+<link href="css/super_slider.css" media="screen" rel="stylesheet" type="text/css"/>
+<link href="css/super_picker.css" media="screen" rel="stylesheet" type="text/css"/>
+<link href="css/plugin.css" media="screen" rel="stylesheet" type="text/css"/>
+<link href="css/ace_theme_tweaks.css" rel="stylesheet" type="text/css"/>
+<link href="css/jquery.ui.resizable.css" rel="stylesheet">
+
+
+<div id="peekaboo" style="display: none; float: left; margin: 0px 8px 0px 0px; width: 750px; height: 600px; position: relative">
+	<pre id="editor"></pre>
+</div>
+
+
+<div id="stuff" style="display: none; overflow: auto; height: 100%">
+
+<div style="float: left; width: 512px; margin: 8px">
+	<div id="effect" style="width: 512px; height: 512px; float: left; position: relative;"></div>
+	<div id="status" style="min-width: 496px">
+		<p id="status_text"></p>
+	</div>
+</div>
+
+<div id="params"></div>
+
+</div>
+
+
+<script>
+	function Color(r, g, b) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
+	}
+</script>
+
+
+<script src="js/color_picker.js" type="text/javascript"></script>
+<script src="js/jquery-1.6.1.min.js"></script>
+<script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/theme-clouds_midnight.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/mode-glsl.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/super_picker.js" type="text/javascript"></script>
+<script src="js/super_slider.js" type="text/javascript"></script>
+<script src="js/jquery.mousewheel.min.js" type="text/javascript"></script>
+
+<script src="js/macton/macton-utils.js" type="text/javascript"></script>
+<script src="js/macton/macton-gl-utils.js" type="text/javascript"></script>
+<script src="js/macton/webgl-utils.js" type="text/javascript"></script>
+<script src="js/macton/matrix4x4.js" type="text/javascript"></script>
+<script src="js/macton/cameracontroller.js" type="text/javascript"></script>
+
+<script src="js/jquery-ui-1.8.13.custom.min.js" type="text/javascript"></script>
+
+<script src="js/ltc_tables.js" type="text/javascript"></script>
+
+
+<script>
+var g_vshader = null;
+
+var g_param_types = {};
+var g_params = {};
+var g_param_edited = {};
+var g_param_default = {};
+
+var g_sample_count = 0;
+
+var bindSlider = function(name, label, default_value, value, state) {
+	var slider = new SuperSlider(name, {
+		label: label,
+		default_value: default_value,
+		value: value,
+		min:  state.min,
+		max:  state.max,
+		step: state.step });
+
+	slider.bind("change", function(event) {
+		g_params[name] = event.target.val;
+		g_param_edited[name] = true;
+		g_sample_count = 0;
+	});
+
+	slider.bind("reset", function(event) {
+		g_param_edited[name] = undefined;
+		g_sample_count = 0;
+	});
+
+	return slider;
+}
+
+var bindPicker = function(name, label, default_value, value) {
+	var picker = new SuperPicker(name, {
+		label: label,
+		default_value: default_value,
+		value: value,
+		callback: function(col) {
+			g_params[name] = col;
+			g_param_edited[name] = true;
+			g_sample_count = 0;
+		}
+	});
+
+	picker.bind("reset", function (event) {
+		g_param_edited[name] = undefined;
+		g_sample_count = 0;
+	});
+
+	return picker;
+}
+
+var bindCheckbox = function(name, label, value) {
+	var control = $("<input>")
+		.attr({ type: "checkbox", /*id: name,*/ checked: value })
+		.css("margin", "0 0 0 4px");
+
+	var cb_label = $("<label>")
+		.attr("for", name)
+		.text(label)
+		.addClass("checkbox_label");
+
+	cb_label.append(control);
+
+	control.bind("change", function (event) {
+		g_params[name] = event.target.checked;
+		g_param_edited[name] = true;
+		g_sample_count = 0;
+	});
+
+	cb_label.bind("click", function (event) {
+		control.prop("checked", g_param_default[name]);
+		control.trigger("change");
+		g_param_edited[name] = undefined;
+		g_sample_count = 0;
+	});
+
+	control.bind("click", function (event) {
+		event.stopPropagation();
+	});
+
+	return cb_label;
+}
+</script>
+
+
+<script type="text/javascript">
+/**
+ * Provides requestAnimationFrame in a cross browser way.
+ * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ */
+if (!window.requestAnimationFrame) {
+	window.requestAnimationFrame = (function() {
+		return window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame ||
+		window.oRequestAnimationFrame   ||
+		window.msRequestAnimationFrame  ||
+		function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
+			window.setTimeout(callback, 1000/60);
+		};
+	})();
+}
+</script>
+
+
+<script type="text/javascript">
+var effectdiv,
+    sourcediv,
+    canvas,
+    gl,
+    buffer,
+    vertex_shader,
+    fragment_shader,
+    currentprogram,
+    vertexpositionlocation,
+    texturelocation,
+    parameters = {
+      start_time: new date().gettime(),
+      time: 0,
+      screenwidth: 0,
+      screenheight: 0
+    };
+
+var g_zoom = 0;
+
+var model      = new matrix4x4();
+var view       = new matrix4x4();
+var projection = new matrix4x4();
+var controller = null;
+
+var ltc_mat_texture = null;
+var ltc_mag_texture = null;
+
+var rttframebuffer = null;
+var rtttexture = null;
+
+var blit_vs = null;
+var blit_fs = null;
+var blitprogram = null;
+
+
+function fetchfile(url, cache)
+{
+  var text = $.ajax({
+    url:   url,
+    async: false,
+    datatype: "text",
+    mimetype: "text/plain",
+    cache: cache,
+  }).responsetext;
+
+  return text;
+}
+
+function setclampedtexturestate()
+{
+  gl.texparameteri(gl.texture_2d, gl.texture_min_filter, gl.nearest);
+  gl.texparameteri(gl.texture_2d, gl.texture_mag_filter, gl.linear);
+  gl.texparameteri(gl.texture_2d, gl.texture_wrap_s, gl.clamp_to_edge);
+  gl.texparameteri(gl.texture_2d, gl.texture_wrap_t, gl.clamp_to_edge);
+}
+
+function init() {
+  vertex_shader   = fetchfile("shaders/ltc/ltc.vs", false);
+  fragment_shader = fetchfile("shaders/ltc/ltc.fs", false);
+
+  g_vshader = vertex_shader;
+  $("#editor").text(fragment_shader);
+
+  canvas = document.createelement("canvas");
+  canvas.style.csstext = "border: 2px solid #404040; border-radius: 6px";
+
+  effectdiv = document.getelementbyid("effect");
+  effectdiv.appendchild(canvas);
+
+  // initialise webgl
+  try {
+    gl = canvas.getcontext("experimental-webgl");
+  } catch(error) { }
+
+  if (!gl) {
+    alert("webgl not supported");
+    throw "cannot create webgl context";
+  }
+
+  // check for float-rt support
+  if (!gl.getextension("oes_texture_float")) {
+    alert("oes_texture_float not supported");
+    throw "missing webgl extension";
+  }
+
+  if (!gl.getextension("oes_texture_float_linear")) {
+    alert("oes_texture_float_linear not supported");
+    throw "missing webgl extension";
+  }
+
+
+  // add enum strings to context
+  if (gl.enum_strings === undefined) {
+    gl.enum_strings = { };
+    for (var propertyname in gl) {
+      if (typeof gl[propertyname] == "number") {
+        gl.enum_strings[gl[propertyname]] = propertyname;
+      }
+    }
+  }
+
+  // create vertex buffer (2 triangles)
+  buffer = gl.createbuffer();
+  gl.bindbuffer(gl.array_buffer, buffer);
+  gl.bufferdata(gl.array_buffer, new float32array([
+    -1.0, -1.0,
+     1.0, -1.0,
+    -1.0,  1.0,
+     1.0, -1.0,
+     1.0,  1.0,
+    -1.0, 1.0
+  ]), gl.static_draw);
+
+  // create program
+  currentprogram = createprogram(vertex_shader, fragment_shader);
+
+  ////
+  rttframebuffer = gl.createframebuffer();
+  gl.bindframebuffer(gl.framebuffer, rttframebuffer);
+  rttframebuffer.width  = 512; // fixme
+  rttframebuffer.height = 512;
+
+  rtttexture = gl.createtexture();
+  gl.bindtexture(gl.texture_2d, rtttexture);
+  gl.teximage2d(gl.texture_2d, 0, gl.rgba,
+      rttframebuffer.width, rttframebuffer.height,
+      0, gl.rgba, gl.float, null);
+
+  gl.framebuffertexture2d(gl.framebuffer, gl.color_attachment0, gl.texture_2d, rtttexture, 0);
+  gl.bindframebuffer(gl.framebuffer, null);
+
+  gl.bindtexture(gl.texture_2d, null);
+
+
+  blit_vs = fetchfile("shaders/ltc/ltc_blit.vs", false);
+  blit_fs = fetchfile("shaders/ltc/ltc_blit.fs", false);
+
+  var header = "#ifdef gl_es\nprecision highp float;\n#endif\n#line 0\n";
+  blit_fs = header + blit_fs;
+
+  blitprogram = gl.createprogram();
+
+  var vs = createshader(blit_vs, gl.vertex_shader);
+  var fs = createshader(blit_fs, gl.fragment_shader);
+
+  gl.attachshader(blitprogram, vs);
+  gl.attachshader(blitprogram, fs);
+
+  gl.deleteshader(vs);
+  gl.deleteshader(fs);
+
+  gl.linkprogram(blitprogram);
+  ////
+
+  onwindowresize();
+  window.addeventlistener("resize", onwindowresize, false);
+
+  $("canvas").mousewheel(function(event, delta) {
+    g_zoom += delta*10.0;
+    g_sample_count = 0;
+    //		console.log("pagex: " + event.pagex + " pagey: " + event.pagey);
+    return false;
+  });
+
+  $("canvas").attr("tabindex", "0").keydown(function(event) {
+    //console.log(event);
+    return false;
+  });
+
+  // Load fitted brdf data as float texture
+  // 64 x 64 texels of 4 floats each
+  ltc_mat_texture = gl.createtexture();
+  gl.bindtexture(gl.texture_2d, ltc_mat_texture);
+  gl.teximage2d(gl.texture_2d, 0, gl.rgba, 64, 64, 0, gl.rgba, gl.float, new float32array(g_ltc_mat));
+  setclampedtexturestate();
+
+  // 64 x 64 texels of 1 float each
+  ltc_mag_texture = gl.createtexture();
+  gl.bindtexture(gl.texture_2d, ltc_mag_texture);
+  gl.teximage2d(gl.texture_2d, 0, gl.alpha, 64, 64, 0, gl.alpha, gl.float, new float32array(g_ltc_mag));
+  setclampedtexturestate();
+
+  // fetch media and kick off the main program once everything has loaded
+  $(function() {
+    $(document).ajaxstop(function() {
+      $(this).unbind("ajaxstop");
+      main_prog();
+    });
+
+    // load data here
+
+    main_prog();
+  });
+}
+
+
+function onwindowresize(event) {
+  $("#peekaboo").css("height", window.innerheight);
+  $("#stuff").css("height", window.innerheight);
+
+  canvas.width  = 512; // window.innerwidth;
+  canvas.height = 512; // window.innerheight;
+
+  parameters.screenwidth = canvas.width;
+  parameters.screenheight = canvas.height;
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+
+function gluniformtypetostring(type) {
+  switch (type) {
+    case gl.float:        return "float";
+    case gl.float_vec2:   return "float_vec2";
+    case gl.float_vec3:   return "float_vec3";
+    case gl.float_vec4:   return "float_vec4";
+    case gl.int:          return "int";
+    case gl.int_vec2:     return "int_vec2";
+    case gl.int_vec3:     return "int_vec3";
+    case gl.int_vec4:     return "int_vec4";
+    case gl.bool:         return "bool";
+    case gl.bool_vec2:    return "bool_vec2";
+    case gl.bool_vec3:    return "bool_vec3";
+    case gl.bool_vec4:    return "bool_vec4";
+    case gl.float_mat2:   return "float_mat2";
+    case gl.float_mat3:   return "float_mat3";
+    case gl.float_mat4:   return "float_mat4";
+    case gl.sampler_2d:   return "sampler_2d";
+    case gl.sampler_cube: return "sampler_cube";
+  }
+
+  return "unknown";
+}
+
+
+function createprogram(vertex, fragment) {
+  var header = "#ifdef gl_es\nprecision highp float;\n#endif\n#line 0\n";
+  fragment = header + fragment;
+
+  var program = gl.createprogram();
+
+  var vs = createshader(vertex, gl.vertex_shader);
+  var fs = createshader(fragment, gl.fragment_shader);
+
+  if (vs == null || fs == null)
+    return null;
+
+  gl.attachshader(program, vs);
+  gl.attachshader(program, fs);
+
+  gl.deleteshader(vs);
+  gl.deleteshader(fs);
+
+  gl.linkprogram(program);
+
+
+  if (!gl.getprogramparameter(program, gl.link_status)) {
+    /*
+       alert( "error:\n" +
+       "validate_status: " + gl.getprogramparameter( program, gl.validate_status ) + "\n" +
+       "error: " + gl.geterror() + "\n\n" +
+       "- vertex shader -\n" + vertex + "\n\n" +
+       "- fragment shader -\n" + fragment );
+     */
+    return null;
+  }
+
+
+  var control_names = new array();
+  var controls = {};
+
+  var lines = fragment.split("\n");
+
+  var bindings = { }
+
+  // adds double quotes around labels
+  function preprocessjson(str) {
+    return str.replace(/("(\\.|[^"])*"|'(\\.|[^'])*')|(\w+)\s*:/g,
+        function(all, string, strdouble, strsingle, jsonlabel) {
+          if (jsonlabel) {
+            return '"' + jsonlabel + '": ';
+          }
+          return all;
+        });
+  }
+
+  for (var x in lines) {
+    var line = lines[x];
+    var re = /^\/\/ bind\s+(.*?)\s(.*)/;
+    var m = re.exec(line);
+    if (m) {
+      try {
+        var obj = $.parsejson(preprocessjson(m[2]));
+        bindings[m[1]] = obj;
+        control_names.push(m[1]);
+      }
+      catch (e) {
+        console.log("failed to parse shader binding: " + m[1]);
+      }
+    }
+  }
+
+  function copyproperties(src, dest) {
+    for (x in src) {
+      if (dest.hasownproperty(x) && typeof(dest[x]) === typeof(src[x]))
+        dest[x] = src[x];
+    }
+  }
+
+  // destroy existing children
+  var container = $("#params");
+
+  var children = container.children();
+  children.each(function() {
+    var v = $(this);
+    v.detach();
+  })
+  container.empty();
+
+  g_param_types = {};
+
+  var nb_uniforms = gl.getprogramparameter(program, gl.active_uniforms);
+  for (var i = 0; i < nb_uniforms; i++) {
+    var uni = gl.getactiveuniform(program, i);
+
+    var label = uni.name;
+    var bind = bindings[uni.name];
+    if (bind && typeof(bind.label) === "string")
+      label = bind.label;
+
+    var old_value  = g_params[uni.name];
+    var is_default = !g_param_edited[uni.name];
+    var new_value  = undefined;
+
+    var control = undefined;
+
+    if (uni.type === gl.float) {
+      var state = {
+        default : 1.0,
+                  min  : 0.0,
+                  max  : 1.0,
+                  step : 0.01,
+      };
+
+      copyproperties(bind, state);
+
+      var is_default = !g_param_edited[uni.name];
+
+      new_value = is_default ? state.default : old_value;
+      control = bindslider(uni.name, label, state.default, new_value, state);
+    }
+    else if (uni.type === gl.float_vec3) {
+      var def_col = new color(1, 1, 1)
+
+        copyproperties(bind, def_col);
+
+      new_value = is_default ? def_col : old_value;
+      control = bindpicker(uni.name, label, def_col, new_value);
+    }
+    else if (uni.type === gl.bool) {
+      var def_val = true;
+
+      if (bind && typeof(bind.default) === "boolean")
+        def_val = bind.default;
+
+      g_param_default[uni.name] = def_val;
+
+      new_value = is_default ? def_val : old_value;
+      control = bindcheckbox(uni.name, label, new_value);
+    }
+    else {
+      continue;
+    }
+
+    g_param_types[uni.name] = uni.type;
+    g_params[uni.name] = new_value;
+
+    if (bind === undefined)
+      control_names.push(uni.name);
+    controls[uni.name] = control;
+  }
+
+  // finally add the controls to the page
+  for (x in control_names) {
+    var control = controls[control_names[x]];
+
+    // skip any binds that don't reference active uniforms
+    if (control === undefined)
+      continue;
+
+    // pad for next element
+    control.css("margin", "0 0 6px 0");
+
+    container.append(control);
+  }
+
+  return program;
+}
+
+
+var gl_shader_error = null;
+
+function createshader(src, type) {
+  var shader = gl.createshader(type);
+
+  gl.shadersource(shader, src);
+  gl.compileshader(shader);
+
+  gl_shader_error = null;
+
+  if (!gl.getshaderparameter(shader, gl.compile_status)) {
+    gl_shader_error = gl.getshaderinfolog(shader);
+    //		console.log((type == gl.vertex_shader ? "vertex" : "fragment") + " shader:\n" + gl.getshaderinfolog(shader));
+    return null;
+  }
+
+  return shader;
+}
+
+
+function animate() {
+  requestanimationframe(animate);
+  draw();
+}
+
+function main_prog() {
+  controller = new cameracontroller(canvas);
+  // try the following (and uncomment the "pointer-events: none;" in
+  // the index.html) to try the more precise hit detection
+  //  controller = new cameracontroller(document.getelementbyid("body"), c, gl);
+  controller.onchange = function(xrot, yrot) {
+    draw();
+    g_sample_count = 0;
+  };
+
+  requestanimationframe(animate);
+
+  draw();
+}
+
+
+function checkglerror() {
+  var error = gl.geterror();
+  if (error != gl.no_error) {
+    var str = "gl error: " + error + " " + gl.enum_strings[error];
+    console.log(str);
+    throw str;
+  }
+}
+
+
+function draw() {
+  parameters.time = new date().gettime() - parameters.start_time;
+
+  gl.enable(gl.depth_test);
+  gl.clearcolor(0.0, 0.0, 0.0, 0.0);
+
+  // note: the viewport is automatically set up to cover the entire canvas.
+  gl.clear(gl.color_buffer_bit | gl.depth_buffer_bit);
+
+  checkglerror();
+
+  // load program into gpu
+  gl.useprogram(currentprogram);
+
+  checkglerror();
+
+  // add in camera controller's rotation
+  view.loadidentity();
+  view.translate(0, 6, 0.1*g_zoom - 0.5);
+  view.rotate(controller.xrot - 10.0, 1, 0, 0);
+  view.rotate(controller.yrot, 0, 1, 0);;
+
+  // get var locations
+  vertexpositionlocation = gl.getattriblocation(currentprogram, "position");
+
+  function location(u) {
+    return gl.getuniformlocation(currentprogram, u);
+  }
+
+  // set values to program variables
+  for (var x in g_params) {
+    var type  = g_param_types[x];
+    var value = g_params[x];
+    var loc   = location(x);
+
+    if (type === gl.float)      gl.uniform1f(loc, value);
+    if (type === gl.float_vec3) gl.uniform3f(loc, value.r, value.g, value.b);
+    if (type === gl.bool)       gl.uniform1i(loc, value);
+  }
+
+  gl.uniformmatrix4fv(location("view"), gl.false, new float32array(view.elements));
+  gl.uniform1f(location("time"), parameters.time/1000);
+  gl.uniform2f(location("resolution"), parameters.screenwidth, parameters.screenheight);
+
+  gl.activetexture(gl.texture0);
+  gl.bindtexture(gl.texture_2d, ltc_mat_texture);
+  gl.uniform1i(gl.getuniformlocation(currentprogram, "ltc_mat"), 0);
+
+  gl.activetexture(gl.texture1);
+  gl.bindtexture(gl.texture_2d, ltc_mag_texture);
+  gl.uniform1i(gl.getuniformlocation(currentprogram, "ltc_mag"), 1);
+
+  checkglerror();
+
+  gl.bindframebuffer(gl.framebuffer, rttframebuffer);
+
+  if (g_sample_count === 0) {
+    gl.clearcolor(0, 0, 0, 0);
+    gl.clear(gl.color_buffer_bit);
+  }
+
+  gl.uniform1i(location("samplecount"), g_sample_count);
+  g_sample_count += 8;
+
+  gl.enable(gl.blend);
+  gl.blendfunc(gl.one, gl.one);
+
+  // render geometry
+  gl.bindbuffer(gl.array_buffer, buffer);
+  gl.vertexattribpointer(vertexpositionlocation, 2, gl.float, false, 0, 0);
+  gl.enablevertexattribarray(vertexpositionlocation);
+  gl.drawarrays(gl.triangles, 0, 6);
+  gl.disablevertexattribarray(vertexpositionlocation);
+
+  gl.bindframebuffer(gl.framebuffer, null);
+  gl.useprogram(blitprogram);
+
+  gl.disable(gl.blend);
+
+  // set textures
+  gl.activetexture(gl.texture0);
+  gl.bindtexture(gl.texture_2d, rtttexture);
+  gl.uniform1i(gl.getuniformlocation(blitprogram, "tex"), 0);
+
+  gl.texparameteri(gl.texture_2d, gl.texture_min_filter, gl.nearest);
+  gl.texparameteri(gl.texture_2d, gl.texture_mag_filter, gl.nearest);
+  gl.texparameteri(gl.texture_2d, gl.texture_wrap_s,     gl.clamp_to_edge);
+  gl.texparameteri(gl.texture_2d, gl.texture_wrap_t,     gl.clamp_to_edge);
+
+  gl.uniform2f(gl.getuniformlocation(blitprogram, "resolution"), parameters.screenwidth, parameters.screenheight);
+
+  // blit pass
+  gl.enablevertexattribarray(vertexpositionlocation);
+  gl.drawarrays(gl.triangles, 0, 6);
+  gl.disablevertexattribarray(vertexpositionlocation);
+
+  gl.bindtexture(gl.texture_2d, null);
+}
+</script>
+
+
+<script>
+  window.onload = function() {
+    init();
+
+    $("#peekaboo").resizable({ minWidth: 500 });
+    $("#peekaboo").show();
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/clouds_midnight");
+
+    var Mode = require("ace/mode/glsl").Mode;
+    editor.getSession().setMode(new Mode());
+    editor.getSession().setUseWrapMode(true);
+    editor.getSession().setOption("firstLineNumber", 0);
+    editor.setShowPrintMargin(false);
+
+    editor.renderer.setHScrollBarAlwaysVisible(false);
+    editor.renderer.setVScrollBarAlwaysVisible(false);
+
+    var markers = [];
+
+    var nb_sliders = 0;
+
+    var timeout = null;
+
+    $("#peekaboo").bind("resize", function(event, ui) {
+      editor.resize();
+    });
+
+    $("#peekaboo").css("height", window.innerHeight);
+
+    $("#stuff").show();
+
+    var rebuild = function() {
+      var vertex_shader, fragment_shader;
+      var new_prog;
+      var text = editor.getSession().getValue();
+
+      vertex_shader   = g_vshader;
+      fragment_shader = text;
+
+      editor.getSession().clearAnnotations();
+      for (m in markers) {
+        editor.getSession().removeMarker(markers[m]);
+      }
+      markers = [];
+
+      new_prog = createProgram(vertex_shader, fragment_shader);
+
+      var status_color = new_prog ? "#404040" : "#7f0000"
+        $("#status").css("border-color", status_color);
+
+      marked_lines = [];
+
+      var text = "Compiled successfully!";
+
+      if (new_prog !== null) {
+        currentProgram = new_prog;
+      }
+      else if (gl_shader_error !== null) {
+        gl_shader_error = gl_shader_error.replace(/\0/g, "");
+        text = gl_shader_error.replace(/\n/g, "<br>");
+
+        var annos = [];
+
+        var re = /\d+:(\d+):(.*)\n/g;
+        var match;
+        while (match = re.exec(gl_shader_error)) {
+          var line = parseInt(match[1]);
+          var error = match[2];
+
+          if (marked_lines[line]) {
+            error = " **** " + error;
+          }
+
+          annos.push({
+            row: line,
+            column: 0,
+            text: error,
+            type: "error"
+          });
+
+          if (marked_lines[line] === undefined) {
+            marked_lines[line] = true;
+
+            var Range = require("ace/range").Range;
+            var line_range = new Range(line, 0, line + 1, 0);
+
+            var marker = editor.getSession().addMarker(line_range, "ace_error", "line", false);
+            markers.push(marker);
+          }
+        }
+
+        editor.getSession().setAnnotations(annos);
+      }
+
+      $("#status_text").html(text);
+
+      g_sample_count = 0;
+    }
+
+    $("#editor").keyup(function() {
+      clearTimeout(timeout);
+      timeout = setTimeout(rebuild, 500);
+    });
+  }
+</script>
+
+</body>
+</html>

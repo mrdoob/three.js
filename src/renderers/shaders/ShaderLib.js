@@ -53,15 +53,16 @@ var ShaderLib = {
 
 		uniforms: UniformsUtils.merge( [
 
-			UniformsLib.common,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
+			THREE.UniformsLib[ 'common' ],
+			THREE.UniformsLib[ 'aomap' ],
+			THREE.UniformsLib[ 'lightmap' ],
+			THREE.UniformsLib[ 'emissivemap' ],
+			THREE.UniformsLib[ 'bumpmap' ],
+			THREE.UniformsLib[ 'normalmap' ],
+			THREE.UniformsLib[ 'displacementmap' ],
+			THREE.UniformsLib[ 'fog' ],
+			THREE.UniformsLib[ 'ltc_brdf' ],
+			THREE.UniformsLib[ 'lights' ],
 
 			{
 				emissive : { value: new Color( 0x000000 ) },
@@ -219,7 +220,8 @@ ShaderLib.physical = {
 
 	uniforms: UniformsUtils.merge( [
 
-		ShaderLib.standard.uniforms,
+		THREE.ShaderLib[ 'standard' ].uniforms,
+		THREE.UniformsLib[ 'ltc_brdf' ],
 
 		{
 			clearCoat: { value: 0 },

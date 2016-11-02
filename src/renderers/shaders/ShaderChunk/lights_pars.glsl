@@ -114,8 +114,22 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 			directLight.visible = false;
 
 		}
-
 	}
+
+#endif
+
+
+#if NUM_RECT_AREA_LIGHTS > 0
+
+	struct RectAreaLight {
+		vec3 color;
+		vec3 position;
+		float width;
+		float height;
+		mat4 rotationMatrix;
+	};
+
+	uniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];
 
 #endif
 

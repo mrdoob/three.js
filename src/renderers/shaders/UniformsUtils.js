@@ -36,10 +36,15 @@ var UniformsUtils = {
 
 				var parameter_src = uniforms_src[ u ][ p ];
 
-				if ( parameter_src && ( parameter_src.isColor ||
-					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
-					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
-					parameter_src.isTexture ) ) {
+				// TODO (abelnation): need to handle THREE.Polygon here?
+
+				if ( parameter_src instanceof THREE.Color ||
+					 parameter_src instanceof THREE.Vector2 ||
+					 parameter_src instanceof THREE.Vector3 ||
+					 parameter_src instanceof THREE.Vector4 ||
+					 parameter_src instanceof THREE.Matrix3 ||
+					 parameter_src instanceof THREE.Matrix4 ||
+					 parameter_src instanceof THREE.Texture ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 

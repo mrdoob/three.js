@@ -1,0 +1,193 @@
+/* Default styling for SuperSlider controls */
+
+.ss_slider {
+	border: 0px solid #333;
+	border-radius: 6px;
+	min-height: 14px;
+	clear: both;
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	}
+.ss_label {
+	font-family: helvetica, arial, sans-serif;
+	clear: both;
+	color: #999;
+	display: block;
+	float: left;
+	font-size: 12px;
+	margin: 0 0 1px 0;
+	padding: 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	}
+.ss_label:hover {
+	color: #FFF;
+	}
+.ss_track {
+	background-color: #404040;
+	border-radius: 4px;
+	padding: 1px;
+	width: 150px;
+	height: 12px;
+	float: left;
+	position: relative;
+	clear: left;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-moz-user-select: none;
+	}
+.ss_track:hover {
+	background-color: #666;
+	}
+.ss_handle {
+	background-color: #999;
+	border-radius: 4px;
+	width: 20px;
+	height: 12px;
+	position: relative;
+	left: 0;
+	top: 0;
+	cursor: pointer;
+	}
+.ss_handle:focus,
+.ss_handle:hover {
+	background-color: #FFF;
+	cursor: pointer;
+	}
+.ss_input {
+	font-family: helvetica, arial, sans-serif;
+	border-radius: 4px;
+	width: 3em;
+	font-size: 11px;
+	color: #999;
+	border: 1px solid #404040;
+	background: transparent;
+	outline: none;
+	padding: 0;
+	line-height: 1;
+	vertical-align: top;
+	margin: 0 0 0 10px;
+	float: left;
+	text-align: right;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	}
+.ss_input:focus {
+	background-color: #333;
+	color: #FFF;
+	}
+
+
+/*
+// New
+
+.ss_slider
+{
+    padding: 5px;
+    border: 1px solid #333;
+    border-radius: 2px;
+    min-height: 14px;
+    clear: both;
+    margin: 5px;
+    float: left;
+    -webkit-user-select:none;
+    -moz-user-select:none
+}
+
+.ss_label{
+	font-family: helvetica, arial, sans-serif;
+	clear:both;
+	color: #999;
+    display: block;
+    float: left;
+    font - size: 12px;
+	margin: 0 0 3px 0;
+    padding: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5)
+}
+
+.ss_slider: hover.ss_label
+{
+    color: #FFF!important
+}
+
+.ss_label: hover
+{
+    color: #FFF
+}
+
+.ss_track
+{
+    background-color: #555;
+    border-radius: 7px;
+    -moz-border-radius: 7px;
+    padding: 1px;
+    width: 150px;
+    height: 13px;
+    float: left;
+    position: relative;
+    clear: left;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -moz-user-select: none;
+    -webkit-box-shadow: inset 0 1px 0 rgba(0,0,0,0.45),inset 0 -1px 0 rgba(255,255,255,0.1),inset 0 3px 5px rgba(0,0,0,0.3),0 5px 10px rgba(0,0,0,0.1),0 -3px 10px rgba(255,255,255,0.1);
+    -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.45),inset 0 -1px 0 rgba(255,255,255,0.1),inset 0 3px 5px rgba(0,0,0,0.3),0 5px 10px rgba(0,0,0,0.1),0 -3px 10px rgba(255,255,255,0.1)
+}
+
+.ss_track: hover
+{
+	background-color:# 666
+}
+
+.ss_handle
+{
+    background-color: #999;
+    border-radius:6px;
+    -moz-border-radius:6px;
+    width:20px;
+    height:11px;
+    position:relative;
+    left:0;
+    top:1px;
+    cursor:pointer!important;
+    -webkit-user-select:none;
+    -webkit-user-drag:none;-moz-user-select:none;
+    -webkit-box-shadow:0 0 1px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 2px 5px rgba(255,255,255,0.3);
+    -moz-box-shadow:0 0 1px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 2px 5px rgba(255,255,255,0.3)
+}
+
+.ss_handle:active,.ss_handle:focus,.ss_handle:hover
+{
+	background-color: #FFF;
+    cursor: pointer!important
+}
+
+.ss_input
+{
+    font-family: helvetica,
+    arial,
+    sans - serif;
+    width: 3.5em;
+    font - size: 11px;
+    color: #999;
+    border:none;
+    background:transparent;
+    outline:none;
+    padding:0;
+    line-height:1;
+    vertical-align:top;
+    margin:0 0 0 10px;
+    float:left;
+    -webkit-user-select:text;
+    -moz-user-select:text
+}
+
+.ss_input:focus{
+	background-color:# 222;
+    color: #FFF;
+    -webkit-user-select: text!important;
+    -moz-user-select: text!important
+}*/
