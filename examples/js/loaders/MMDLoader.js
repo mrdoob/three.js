@@ -3918,7 +3918,7 @@ THREE.MMDHelper.prototype = {
 
 		var physics = new THREE.MMDPhysics( mesh, params );
 
-		if ( mesh.mixer !== null && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
 
 			this.animateOneMesh( 0, mesh );
 			physics.reset();
