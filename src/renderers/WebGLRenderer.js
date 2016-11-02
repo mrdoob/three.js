@@ -2183,9 +2183,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.toonMap ) {
+		if ( material.gradientMap ) {
 
-			uniforms.toonMap.value = material.toonMap;
+			uniforms.gradientMap.value = material.gradientMap;
 
 		}
 

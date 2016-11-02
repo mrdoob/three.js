@@ -140,8 +140,8 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.aoMap !== undefined ) material.aoMap = getTexture( json.aoMap );
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
-		if ( json.toonMap !== undefined ) material.toonMap = getTexture( json.toonMap );
-		if ( json.toonMapDirectionY !== undefined ) material.toonMapDirectionY = json.toonMapDirectionY;
+		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
+		if ( json.gradientMapAxisY !== undefined ) material.gradientMapAxisY = json.gradientMapAxisY;
 
 		// MultiMaterial
 

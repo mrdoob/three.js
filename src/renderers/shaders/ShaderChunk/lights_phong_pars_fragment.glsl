@@ -18,9 +18,9 @@ struct BlinnPhongMaterial {
 
 void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	#ifdef USE_TOONMAP
+	#ifdef USE_GRADIENTMAP
 
-		vec3 irradiance = getToonIrradiance( geometry.normal, directLight.direction ) * directLight.color;
+		vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
 
 	#else
 

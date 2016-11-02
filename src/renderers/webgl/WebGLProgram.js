@@ -445,8 +445,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
-			parameters.toonMap ? '#define USE_TOONMAP' : '',
-			parameters.toonMapDirectionY ? '#define TOONMAP_DIRECTION_Y' : '',
+			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
+			parameters.gradientMapAxisY ? '#define GRADIENTMAP_AXIS_Y' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 

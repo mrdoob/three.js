@@ -30,6 +30,7 @@ import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl';
+import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl';
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl';
@@ -72,7 +73,6 @@ import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl';
-import toonmap_pars_fragment from './ShaderChunk/toonmap_pars_fragment.glsl';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl';
@@ -139,6 +139,7 @@ export var ShaderChunk = {
 	envmap_vertex: envmap_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
+	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
@@ -181,7 +182,6 @@ export var ShaderChunk = {
 	specularmap_pars_fragment: specularmap_pars_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
-	toonmap_pars_fragment: toonmap_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,

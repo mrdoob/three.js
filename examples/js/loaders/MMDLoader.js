@@ -2399,8 +2399,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				var toonFileName = ( p2.toonIndex === -1 ) ? 'toon00.bmp' : model.toonTextures[ p2.toonIndex ].fileName;
 				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToonTexture( toonFileName ) } );
-				m.toonMap = getTexture( uuid, textures );
-				m.toonMapDirectionY = true;
+				m.gradientMap = getTexture( uuid, textures );
+				m.gradientMapAxisY = true;
 
 			} else {
 
@@ -2428,8 +2428,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				}
 
 				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToon } );
-				m.toonMap = getTexture( uuid, textures );
-				m.toonMapDirectionY = true;
+				m.gradientMap = getTexture( uuid, textures );
+				m.gradientMapAxisY = true;
 
 			}
 

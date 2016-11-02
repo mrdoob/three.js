@@ -44,8 +44,8 @@ import { Color } from '../math/Color';
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
  *
- *  toonMap: new THREE.Texture( <Image> ),
- *  toonMapDirectonY: <bool>,
+ *  gradientMap: new THREE.Texture( <Image> ),
+ *  gradientMapAxisY: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -97,8 +97,8 @@ function MeshPhongMaterial( parameters ) {
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
-	this.toonMap = null;
-	this.toonMapDirectionY = false;
+	this.gradientMap = null;
+	this.gradientMapAxisY = false;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;

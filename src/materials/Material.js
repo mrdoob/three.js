@@ -198,10 +198,10 @@ Material.prototype = {
 
 		}
 
-		if ( this.toonMap && this.toonMap.isTexture ) {
+		if ( this.gradientMap && this.gradientMap.isTexture ) {
 
-			data.toonMap = this.toonMap.toJSON( meta ).uuid;
-			data.toonMapDirectionY = this.toonMapDirectionY;
+			data.gradientMap = this.gradientMap.toJSON( meta ).uuid;
+			data.gradientMapAxisY = this.gradientMapAxisY;
 
 		}
 

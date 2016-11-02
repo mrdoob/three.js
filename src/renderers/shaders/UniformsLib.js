@@ -80,9 +80,9 @@ var UniformsLib = {
 
 	},
 
-	toonmap: {
+	gradientmap: {
 
-		toonMap: { value: null }
+		gradientMap: { value: null }
 
 	},
 

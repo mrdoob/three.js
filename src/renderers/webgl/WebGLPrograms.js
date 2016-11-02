@@ -25,7 +25,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "toonMap",
+		"roughnessMap", "metalnessMap", "gradientMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
@@ -153,8 +153,8 @@ function WebGLPrograms( renderer, capabilities ) {
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
-			toonMap: !! material.toonMap,
-			toonMapDirectionY: !! material.toonMapDirectionY,
+			gradientMap: !! material.gradientMap,
+			gradientMapAxisY: !! material.gradientMapAxisY,
 
 			combine: material.combine,
 
