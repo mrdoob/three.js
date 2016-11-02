@@ -178,7 +178,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
-			numRectAreaLights: lights.area.length,
+			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
 			numClippingPlanes: nClipPlanes,

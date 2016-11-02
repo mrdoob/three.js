@@ -21,6 +21,7 @@ from .constants import (
     NO_SHADOW,
     ZYX
 )
+# TODO: RectAreaLight support
 
 
 # Blender doesn't seem to have a good way to link a mesh back to the
@@ -307,6 +308,7 @@ def node_type(obj):
     elif obj.type == EMPTY:
         return constants.OBJECT.title()
 
+    # TODO: RectAreaLight support
     dispatch = {
         LAMP: {
             POINT: constants.POINT_LIGHT,

@@ -61,7 +61,8 @@ var ShaderLib = {
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
 			UniformsLib.fog,
-			UniformsLib.ltc_brdf,
+			// TODO (abelnation): include LTC brdf data
+			// UniformsLib.ltc_brdf,
 			UniformsLib.lights,
 
 			{
@@ -91,6 +92,7 @@ var ShaderLib = {
 			UniformsLib.roughnessmap,
 			UniformsLib.metalnessmap,
 			UniformsLib.fog,
+			// TODO (abelnation): include LTC brdf data
 			UniformsLib.lights,
 
 			{

@@ -207,6 +207,7 @@ SPOT_LIGHT = 'SpotLight'
 # TODO (abelnation): confirm this is correct area light string for exporter
 RECT_AREA_LIGHT = 'RectAreaLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
+# TODO: RectAreaLight support
 MESH = 'Mesh'
 EMPTY = 'Empty'
 SPRITE = 'Sprite'

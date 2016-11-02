@@ -162,8 +162,8 @@ function WebGLRenderer( parameters ) {
 
 		_projScreenMatrix = new Matrix4(),
 
-		_vector3 = new Vector3(),
-		_matrix4 = new THREE.Matrix4(),
+	_vector3 = new THREE.Vector3(),
+	_matrix4 = new THREE.Matrix4(), _matrix42 = new THREE.Matrix4(),
 
 		// light arrays cache
 
@@ -171,19 +171,18 @@ function WebGLRenderer( parameters ) {
 
 			hash: '',
 
-			ambient: [ 0, 0, 0 ],
-			directional: [],
-			directionalShadowMap: [],
-			directionalShadowMatrix: [],
-			spot: [],
-			spotShadowMap: [],
-			spotShadowMatrix: [],
-			area: [],
-			// TODO (abelnation): arrays for area shadow map and area shadow matrix
-			point: [],
-			pointShadowMap: [],
-			pointShadowMatrix: [],
-			hemi: [],
+		ambient: [ 0, 0, 0 ],
+		directional: [],
+		directionalShadowMap: [],
+		directionalShadowMatrix: [],
+		spot: [],
+		spotShadowMap: [],
+		spotShadowMatrix: [],
+		rectArea: [],
+		point: [],
+		pointShadowMap: [],
+		pointShadowMatrix: [],
+		hemi: [],
 
 			shadows: []
 
@@ -1653,7 +1652,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.ambientLightColor.value = _lights.ambient;
 			uniforms.directionalLights.value = _lights.directional;
 			uniforms.spotLights.value = _lights.spot;
-			uniforms.rectAreaLights.value = _lights.area;
+			uniforms.rectAreaLights.value = _lights.rectArea;
 			uniforms.pointLights.value = _lights.point;
 			uniforms.hemisphereLights.value = _lights.hemi;
 
@@ -2295,11 +2294,11 @@ function WebGLRenderer( parameters ) {
 
 			viewMatrix = camera.matrixWorldInverse,
 
-			directionalLength = 0,
-			pointLength = 0,
-			spotLength = 0,
-			areaLength = 0,
-			hemiLength = 0;
+		directionalLength = 0,
+		pointLength = 0,
+		spotLength = 0,
+		rectAreaLength = 0,
+		hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2378,24 +2377,33 @@ function WebGLRenderer( parameters ) {
 
 				var uniforms = lightCache.get( light );
 
-				uniforms.color.copy( color ).multiplyScalar( intensity );
+				// (a) intensity controls irradiance of entire light
+				uniforms.color
+					.copy( color )
+					.multiplyScalar( intensity / ( light.width * light.height ) );
+
+				// (b) intensity controls the radiance per light area
+				// uniforms.color.copy( color ).multiplyScalar( intensity );
 
 				uniforms.position.setFromMatrixPosition( light.matrixWorld );
 				uniforms.position.applyMatrix4( viewMatrix );
 
-				uniforms.width = light.width;
-				uniforms.height = light.height;
-
+				// extract local rotation of light to derive width/height half vectors
+				_matrix42.identity();
 				_matrix4.copy( light.matrixWorld );
 				_matrix4.premultiply( viewMatrix );
-				uniforms.rotationMatrix.extractRotation( _matrix4 );
+				_matrix42.extractRotation( _matrix4 );
+
+				uniforms.halfWidth.set( light.width * 0.5,                0.0, 0.0 );
+				uniforms.halfHeight.set(              0.0, light.height * 0.5, 0.0 );
+
+				uniforms.halfWidth.applyMatrix4( _matrix42 );
+				uniforms.halfHeight.applyMatrix4( _matrix42 );
 
 				// TODO (abelnation): RectAreaLight distance?
 				// uniforms.distance = distance;
 
-				// TODO (abelnation): RectAreaLight shadow info to uniforms
-
-				_lights.area[ areaLength ++ ] = uniforms;
+				_lights.rectArea[ rectAreaLength ++ ] = uniforms;
 
 			} else if ( light.isPointLight ) {
 
@@ -2456,12 +2464,12 @@ function WebGLRenderer( parameters ) {
 
 		_lights.directional.length = directionalLength;
 		_lights.spot.length = spotLength;
-		_lights.area.length = areaLength;
+		_lights.rectArea.length = rectAreaLength;
 		_lights.point.length = pointLength;
 		_lights.hemi.length = hemiLength;
 
 		// TODO (sam-g-steel) why aren't we using join
-		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + areaLength + ',' + hemiLength + ',' + _lights.shadows.length;
+		_lights.hash = directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + _lights.shadows.length;
 
 	}
 

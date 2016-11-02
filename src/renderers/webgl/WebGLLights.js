@@ -94,6 +94,15 @@ function WebGLLights() {
 
 			return uniforms;
 
+			case 'RectAreaLight':
+				uniforms = {
+					color: new THREE.Color(),
+					position: new THREE.Vector3(),
+					halfWidth: new THREE.Vector3(),
+					halfHeight: new THREE.Vector3(),
+				};
+				break;
+
 		}
 
 	};
