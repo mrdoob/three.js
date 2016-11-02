@@ -63,6 +63,7 @@ var list = {
 			[ "PolyhedronGeometry", "api/geometries/PolyhedronGeometry" ],
 			[ "RingBufferGeometry", "api/geometries/RingBufferGeometry" ],
 			[ "RingGeometry", "api/geometries/RingGeometry" ],
+			[ "ShapeBufferGeometry", "api/geometries/ShapeBufferGeometry" ],
 			[ "ShapeGeometry", "api/geometries/ShapeGeometry" ],
 			[ "SphereBufferGeometry", "api/geometries/SphereBufferGeometry" ],
 			[ "SphereGeometry", "api/geometries/SphereGeometry" ],
@@ -96,6 +97,7 @@ var list = {
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "FileLoader", "api/loaders/FileLoader" ],
 			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
@@ -108,8 +110,7 @@ var list = {
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
-			[ "TGALoader", "api/loaders/TGALoader" ],
-			[ "XHRLoader", "api/loaders/XHRLoader" ]
+			[ "TGALoader", "api/loaders/TGALoader" ]
 		],
 
 		"Materials": [
@@ -143,6 +144,7 @@ var list = {
 			[ "Quaternion", "api/math/Quaternion" ],
 			[ "Ray", "api/math/Ray" ],
 			[ "Sphere", "api/math/Sphere" ],
+			[ "Spherical", "api/math/Spherical" ],
 			[ "Spline", "api/math/Spline" ],
 			[ "Triangle", "api/math/Triangle" ],
 			[ "Vector2", "api/math/Vector2" ],
@@ -201,14 +203,20 @@ var list = {
 			[ "Texture", "api/textures/Texture" ]
 		],
 
+		"Animation": [
+			[ "AnimationAction", "api/animation/AnimationAction" ],
+			[ "AnimationClip", "api/animation/AnimationClip" ],
+			[ "AnimationMixer", "api/animation/AnimationMixer" ]
+		],
+
 		"Extras": [
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
-		"Extras / Animation": [
-			[ "Animation", "api/extras/animation/Animation" ],
-			[ "AnimationHandler", "api/extras/animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ]
+		"Extras / Collada Animation": [
+			[ "Animation", "api/extras/collada-animation/Animation" ],
+			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
+			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
 		],
 
 		"Extras / Core": [

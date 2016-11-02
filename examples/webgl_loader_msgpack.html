@@ -96,7 +96,7 @@ https://github.com/creationix/msgpack-js-browser
 
 			function loadMSGPack() {
 
-				var loader = new THREE.XHRLoader();
+				var loader = new THREE.FileLoader();
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( 'scenes/robo_pigeon.pack', function ( data ) {
 

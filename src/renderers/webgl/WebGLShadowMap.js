@@ -115,7 +115,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.clearColor( 1, 1, 1, 1 );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );

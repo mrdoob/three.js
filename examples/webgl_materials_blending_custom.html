@@ -27,10 +27,12 @@
 
 			#btn_sub { background: transparent }
 			#btn_rsub { background: transparent }
+			#btn_min { background: transparent }
+			#btn_max { background: transparent }
 
 			#btn_pre { background: transparent }
 
-			#btn_rsub, #btn_nopre { margin-bottom: 2em }
+			#btn_max, #btn_nopre { margin-bottom: 2em }
 		</style>
 	</head>
 	<body>
@@ -62,6 +64,8 @@
 			<div class="lbl btn" id="btn_add">Add</div>
 			<div class="lbl btn" id="btn_sub">Subtract</div>
 			<div class="lbl btn" id="btn_rsub">ReverseSubtract</div>
+			<div class="lbl btn" id="btn_min">Min</div>
+			<div class="lbl btn" id="btn_max">Max</div>
 
 			Premultiply alpha<br/><br/>
 			<div class="lbl btn" id="btn_pre">On</div>
@@ -97,7 +101,7 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 700;
 
 				// SCENE
@@ -204,9 +208,8 @@
 				}
 
 				// FOREGROUND OBJECTS
-
-				var src = [ "ZeroFactor", "OneFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
-				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor" ];
+				var src = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
+				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor" ];
 
 				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
 				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
@@ -311,6 +314,8 @@
 				addEqHandler( "btn_add", THREE.AddEquation );
 				addEqHandler( "btn_sub", THREE.SubtractEquation );
 				addEqHandler( "btn_rsub", THREE.ReverseSubtractEquation );
+				addEqHandler( "btn_min", THREE.MinEquation );
+				addEqHandler( "btn_max", THREE.MaxEquation );
 
 				addPreHandler( "btn_pre", mapsPre );
 				addPreHandler( "btn_nopre", mapsNoPre );
@@ -352,6 +357,8 @@
 					document.getElementById( "btn_add" ).style.backgroundColor = "transparent";
 					document.getElementById( "btn_sub" ).style.backgroundColor = "transparent";
 					document.getElementById( "btn_rsub" ).style.backgroundColor = "transparent";
+					document.getElementById( "btn_min" ).style.backgroundColor = "transparent";
+					document.getElementById( "btn_max" ).style.backgroundColor = "transparent";
 
 					el.style.backgroundColor = "darkorange";
 

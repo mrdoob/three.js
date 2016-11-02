@@ -1,4 +1,4 @@
-export var REVISION = '82dev';
+export var REVISION = '83dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;

@@ -262,6 +262,9 @@ var files = {
 	"webgl deferred": [
 		"webgldeferred_animation"
 	],
+	"webgl2": [
+		"webgl2_sandbox"
+	],
 	"webvr": [
 		"webvr_cubes",
 		"webvr_panorama",

@@ -1,5 +1,5 @@
 import { LinearFilter } from '../constants';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { CompressedTexture } from '../textures/CompressedTexture';
 import { DefaultLoadingManager } from './LoadingManager';
 
@@ -29,7 +29,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 		var texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 

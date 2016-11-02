@@ -24,7 +24,7 @@ THREE.GLTFLoader.prototype = {
 
 		var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function( text ) {
 
 			scope.parse( JSON.parse( text ), onLoad, path );
@@ -822,7 +822,7 @@ GLTFParser.prototype.loadShaders = function() {
 
 		return new Promise( function( resolve ) {
 
-			var loader = new THREE.XHRLoader();
+			var loader = new THREE.FileLoader();
 			loader.responseType = 'text';
 			loader.load( resolveURL( shader.uri, this.options.path ), function( shaderText ) {
 
@@ -844,7 +844,7 @@ GLTFParser.prototype.loadBuffers = function() {
 
 			return new Promise( function( resolve ) {
 
-				var loader = new THREE.XHRLoader();
+				var loader = new THREE.FileLoader();
 				loader.responseType = 'arraybuffer';
 				loader.load( resolveURL( buffer.uri, this.options.path ), function( buffer ) {
 

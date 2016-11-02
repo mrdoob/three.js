@@ -490,7 +490,7 @@ Matrix4.prototype = {
 
 				v1.applyMatrix4( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 

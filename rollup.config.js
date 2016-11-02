@@ -42,5 +42,6 @@ export default {
 			dest: 'build/three.modules.js'
 		}
 	],
-	outro: outro
+	outro: outro,
+	sourceMap: true
 };

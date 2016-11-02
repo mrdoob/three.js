@@ -137,7 +137,7 @@ Matrix3.prototype = {
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 

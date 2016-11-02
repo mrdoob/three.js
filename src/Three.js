@@ -3,6 +3,7 @@ import './polyfills.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
+export { WebGL2Renderer } from './renderers/WebGL2Renderer.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
 export { UniformsLib } from './renderers/shaders/UniformsLib.js';
 export { UniformsUtils } from './renderers/shaders/UniformsUtils.js';
@@ -42,7 +43,7 @@ export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.
 export { JSONLoader } from './loaders/JSONLoader.js';
 export { ImageLoader } from './loaders/ImageLoader.js';
 export { FontLoader } from './loaders/FontLoader.js';
-export { XHRLoader } from './loaders/XHRLoader.js';
+export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
