@@ -241,6 +241,29 @@
 		just over 13% of WebGL enabled devices support this extenstion.<br /><br />
 		</div>
 
+		<h2>Encoding</h2>
+		<code>
+		THREE.LinearEncoding
+		THREE.sRGBEncoding
+		THREE.GammaEncoding
+		THREE.RGBEEncoding
+		THREE.LogLuvEncoding
+		THREE.RGBM7Encoding
+		THREE.RGBM16Encoding
+		THREE.RGBDEncoding
+		THREE.BasicDepthPacking
+		THREE.RGBADepthPacking
+		</code>
+		<div>
+		For use with a Texture's [page:Texture.encoding encoding]	property.<br /><br />
+
+		If the encoding type is changed after the texture has already been used by a material,
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to *true* to make the material recompile.<br /><br />
+
+		[page:constant LinearEncoding] is the default.
+		Values other than this are only valid for a material's map, envMap and emissiveMap.
+		</div>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
