@@ -11,9 +11,8 @@ var list = {
 		"Constants": [
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
-			[ "GLState", "api/constants/GLState" ],
+			[ "Renderer", "api/constants/Renderer" ],
 			[ "Materials", "api/constants/Materials" ],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
 			[ "Textures", "api/constants/Textures" ]
 		],
 
