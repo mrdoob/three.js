@@ -129,7 +129,7 @@ THREE.CCDIKSolver.prototype = {
 					effectorVec.applyQuaternion( invLinkQ );
 					effectorVec.normalize();
 
-					targetVec.subVectors( targetPos, ltinkPos );
+					targetVec.subVectors( targetPos, linkPos );
 					targetVec.applyQuaternion( invLinkQ );
 					targetVec.normalize();
 
