@@ -1031,11 +1031,6 @@ THREE.MMDPhysics.Constraint.prototype = {
 };
 
 
-/*
- * This helper displays rigid bodies of mesh for debug.
- * It should be under Scene because it just sets world position/roration to meshes
- * for simplicity.
- */
 THREE.MMDPhysicsHelper = function ( mesh ) {
 
 	if ( mesh.physics === undefined || mesh.geometry.rigidBodies === undefined ) {
@@ -1046,9 +1041,48 @@ THREE.MMDPhysicsHelper = function ( mesh ) {
 
 	THREE.Object3D.call( this );
 
-	this.mesh = mesh;
+	this.root = mesh;
+
+	this.matrix = mesh.matrixWorld;
+	this.matrixAutoUpdate = false;
+
+	this.materials = [];
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0xff8888 ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0x88ff88 ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0x8888ff ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
 
 	this._init();
+	this.update();
 
 };
 
@@ -1056,6 +1090,9 @@ THREE.MMDPhysicsHelper.prototype = Object.create( THREE.Object3D.prototype );
 THREE.MMDPhysicsHelper.prototype.constructor = THREE.MMDPhysicsHelper;
 
 THREE.MMDPhysicsHelper.prototype._init = function () {
+
+	var mesh = this.root;
+	var rigidBodies = mesh.geometry.rigidBodies;
 
 	function createGeometry( param ) {
 
@@ -1097,48 +1134,10 @@ THREE.MMDPhysicsHelper.prototype._init = function () {
 
 	}
 
+	for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
 
-	function createMaterial( param ) {
-
-		var color;
-
-		switch ( param.type ) {
-
-			case 0:
-				color = 0xff8888;
-				break;
-
-			case 1:
-				color = 0x88ff88;
-				break;
-
-			case 2:
-				color = 0x8888ff;
-				break;
-
-			default:
-				color = 0x000000;
-				break;
-
-		}
-
-		return new THREE.MeshBasicMaterial( {
-			color: new THREE.Color( color ),
-			wireframe: true,
-			depthTest: false,
-			depthWrite: false,
-			opacity: 0.25,
-			transparent: true
-		} );
-
-	}
-
-	for ( var i = 0, il = this.mesh.geometry.rigidBodies.length; i < il; i ++ ) {
-
-		var param = this.mesh.geometry.rigidBodies[ i ];
-
-		var mesh = new THREE.Mesh( createGeometry( param ), createMaterial( param ) );
-		this.add( mesh );
+		var param = rigidBodies[ i ];
+		this.add( new THREE.Mesh( createGeometry( param ), this.materials[ param.type ] ) );
 
 	}
 
@@ -1146,18 +1145,43 @@ THREE.MMDPhysicsHelper.prototype._init = function () {
 
 THREE.MMDPhysicsHelper.prototype.update = function () {
 
-	for ( var i = 0, il = this.mesh.geometry.rigidBodies.length; i < il; i ++ ) {
+	var mesh = this.root;
+	var rigidBodies = mesh.geometry.rigidBodies;
+	var bodies = mesh.physics.bodies;
 
-		var body = this.mesh.physics.bodies[ i ].body;
+	var matrixWorldInv = new THREE.Matrix4().getInverse( mesh.matrixWorld );
+	var vector = new THREE.Vector3();
+	var quaternion = new THREE.Quaternion();
+	var quaternion2 = new THREE.Quaternion();
+
+	function getPosition( origin ) {
+
+		vector.set( origin.x(), origin.y(), origin.z() );
+		vector.applyMatrix4( matrixWorldInv );
+
+		return vector;
+
+	}
+
+	function getQuaternion( rotation ) {
+
+		quaternion.set( rotation.x(), rotation.y(), rotation.z(), rotation.w() );
+		quaternion2.setFromRotationMatrix( matrixWorldInv );
+		quaternion2.multiply( quaternion );
+
+		return quaternion2;
+
+	}
+
+	for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+		var body = bodies[ i ].body;
 		var mesh = this.children[ i ];
 
 		var tr = body.getCenterOfMassTransform();
 
-		var o = tr.getOrigin();
-		var r = tr.getRotation();
-
-		mesh.position.set( o.x(), o.y(), o.z() );
-		mesh.quaternion.set( r.x(), r.y(), r.z(), r.w() );
+		mesh.position.copy( getPosition( tr.getOrigin() ) );
+		mesh.quaternion.copy( getQuaternion( tr.getRotation() ) );
 
 	}
 
