@@ -1,12 +1,12 @@
-##### Description of the problem 
+(*** This section is for bug reports and feature requests only. This is NOT a help site. Do not ask help questions here. If you need help, please use stackoverflow. ***)
 
-(This is NOT a help site. Please read the guidelines above before posting.)
+##### Description of the problem 
 
 
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r81
+- [ ] r82
 - [ ] ...
 
 ##### Browser

@@ -308,9 +308,11 @@ THREE.MMDLoader.prototype.extractExtension = function ( url ) {
 
 };
 
-THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType ) {
+THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType, mimeType ) {
 
-	var loader = new THREE.XHRLoader( this.manager );
+	var loader = new THREE.FileLoader( this.manager );
+
+	if ( mimeType !== undefined ) loader.setMimeType( mimeType );
 
 	loader.setResponseType( responseType );
 
@@ -338,15 +340,7 @@ THREE.MMDLoader.prototype.loadFileAsText = function ( url, onLoad, onProgress, o
 
 THREE.MMDLoader.prototype.loadFileAsShiftJISText = function ( url, onLoad, onProgress, onError ) {
 
-	var request = this.loadFile( url, onLoad, onProgress, onError, 'text' );
-
-	/*
-	 * TODO: some browsers seem not support overrideMimeType
-	 *       so some workarounds for them may be necessary.
-	 * Note: to set property of request after calling request.send(null)
-	 *       (it's called in THREE.XHRLoader.load()) could be a bad manner.
-	 */
-	request.overrideMimeType( 'text/plain; charset=shift_jis' );
+	var request = this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
 
 };
 
@@ -786,7 +780,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.weight = dv.getFloat32();
 			p.positionDamping = dv.getFloat32();
 			p.rotationDamping = dv.getFloat32();
-			p.restriction = dv.getFloat32();
+			p.restitution = dv.getFloat32();
 			p.friction = dv.getFloat32();
 			p.type = dv.getUint8();
 			return p;
@@ -1340,7 +1334,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 			p.weight = dv.getFloat32();
 			p.positionDamping = dv.getFloat32();
 			p.rotationDamping = dv.getFloat32();
-			p.restriction = dv.getFloat32();
+			p.restitution = dv.getFloat32();
 			p.friction = dv.getFloat32();
 			p.type = dv.getUint8();
 			return p;
@@ -1770,6 +1764,21 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		var bones = [];
 
+		var rigidBodies = model.rigidBodies;
+		var dictionary = {};
+
+		for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+			var body = rigidBodies[ i ];
+			var value = dictionary[ body.boneIndex ];
+
+			// keeps greater number if already value is set without any special reasons
+			value = value === undefined ? body.type : Math.max( body.type, value );
+
+			dictionary[ body.boneIndex ] = value;
+
+		}
+
 		for ( var i = 0; i < model.metadata.boneCount; i++ ) {
 
 			var bone = {};
@@ -1788,6 +1797,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				bone.pos[ 2 ] -= model.bones[ bone.parent ].position[ 2 ];
 
 			}
+
+			bone.rigidBodyType = dictionary[ i ] !== undefined ? dictionary[ i ] : -1;
 
 			bones.push( bone );
 
@@ -1859,6 +1870,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var link = {};
 					link.index = ik.links[ j ].index;
+					link.enabled = true;
 
 					if ( ik.links[ j ].angleLimitation === 1 ) {
 
@@ -3857,10 +3869,12 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		mesh.mixer = null;
-		mesh.ikSolver = null;
-		mesh.grantSolver = null;
-		mesh.physics = null;
+		if ( mesh.mixer === undefined ) mesh.mixer = null;
+		if ( mesh.ikSolver === undefined ) mesh.ikSolver = null;
+		if ( mesh.grantSolver === undefined ) mesh.grantSolver = null;
+		if ( mesh.physics === undefined ) mesh.physics = null;
+		if ( mesh.looped === undefined ) mesh.looped = false;
+
 		this.meshes.push( mesh );
 
 		// workaround until I make IK and Physics Animation plugin
@@ -3910,8 +3924,76 @@ THREE.MMDHelper.prototype = {
 
 	setPhysics: function ( mesh, params ) {
 
-		mesh.physics = new THREE.MMDPhysics( mesh, params );
-		mesh.physics.warmup( 10 );
+		if ( params === undefined ) params = {};
+
+		var warmup = params.warmup !== undefined ? params.warmup : 60;
+
+		var physics = new THREE.MMDPhysics( mesh, params );
+
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
+
+			this.animateOneMesh( 0, mesh );
+			physics.reset();
+
+		}
+
+		physics.warmup( warmup );
+
+		this.updateIKParametersDependingOnPhysicsEnabled( mesh, true );
+
+		mesh.physics = physics;
+
+	},
+
+	enablePhysics: function ( enabled ) {
+
+		if ( enabled === true ) {
+
+			this.doPhysics = true;
+
+		} else {
+
+			this.doPhysics = false;
+
+		}
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			this.updateIKParametersDependingOnPhysicsEnabled( this.meshes[ i ], enabled );
+
+		}
+
+	},
+
+	updateIKParametersDependingOnPhysicsEnabled: function ( mesh, physicsEnabled ) {
+
+		var iks = mesh.geometry.iks;
+		var bones = mesh.geometry.bones;
+
+		for ( var j = 0, jl = iks.length; j < jl; j ++ ) {
+
+			var ik = iks[ j ];
+			var links = ik.links;
+
+			for ( var k = 0, kl = links.length; k < kl; k ++ ) {
+
+				var link = links[ k ];
+
+				if ( physicsEnabled === true ) {
+
+					// disable IK of the bone the corresponding rigidBody type of which is 1 or 2
+					// because its rotation will be overriden by physics
+					link.enabled = bones[ link.index ].rigidBodyType > 0 ? false : true;
+
+				} else {
+
+					link.enabled = true;
+
+				}
+
+			}
+
+		}
 
 	},
 
@@ -3930,6 +4012,17 @@ THREE.MMDHelper.prototype = {
 		if ( mesh.geometry.animations !== undefined ) {
 
 			mesh.mixer = new THREE.AnimationMixer( mesh );
+
+			// TODO: find a workaround not to access (seems like) private properties
+			//       the name of them begins with "_".
+			mesh.mixer.addEventListener( 'loop', function ( e ) {
+
+				if ( e.action._clip.tracks[ 0 ].name.indexOf( '.bones' ) !== 0 ) return;
+
+				var mesh = e.target._root;
+				mesh.looped = true;
+
+			} );
 
 			var foundAnimation = false;
 			var foundMorphAnimation = false;
@@ -4146,6 +4239,14 @@ THREE.MMDHelper.prototype = {
 		if ( grantSolver !== null && this.doGrant === true ) {
 
 			grantSolver.update();
+
+		}
+
+		if ( mesh.looped === true ) {
+
+			if ( physics !== null ) physics.reset();
+
+			mesh.looped = false;
 
 		}
 

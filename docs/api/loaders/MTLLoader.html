@@ -13,42 +13,84 @@
 
 		<div class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].</div>
 
-
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:String baseUrl], [page:Object options], [page:String crossOrigin] )</h3>
+		<h3>[name]( [page:LoadingManager loadingManager] )</h3>
 		<div>
-		[page:String baseUrl] — The base url from which to find subsequent resources.<br />
-		[page:Object options] — Options passed to the created material (side, wrap, normalizeRGB, ignoreZeroRGBs).<br />
-		[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.<br />
+			[page:LoadingManager loadingManager] — LoadingManager to use. Defaults to [page:DefaultLoadingManager DefaultLoadingManager]<br />
 		</div>
 		<div>
-		Creates a new [name].
+			Creates a new [name].
 		</div>
 
-		<h2>Properties</h2>
+		<!-- <h2>Properties</h2> -->
 
 
 		<h2>Methods</h2>
 
+
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
+			[page:String url] — required<br />
+			[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
+			[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+			[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and return the loaded material.
+			Begin loading from url and return the loaded material.
 		</div>
+
+
+		<h3>[method:null setPath]( [page:String path] )</h3>
+		<div>
+			[page:String path] — required<br />
+		</div>
+		<div>
+			 Set base path for resolving references. If set this path will be prepended to each loaded and found reference.
+		</div>
+
+
+		<h3>[method:null setTexturePath]( [page:String path] )</h3>
+		<div>
+			[page:String path] — required<br />
+		</div>
+		<div>
+			Set base path for resolving texture references. If set this path will be prepended found texture reference. If not set and setPath is, it will be used as texture base path.
+		</div>
+
+
+		<h3>[method:null setCrossOrigin]( [page:boolean useCrossOrigin] )</h3>
+		<div>
+			[page:boolean useCrossOrigin] — required<br />
+		</div>
+		<div>
+			Set to true if you need to load textures from a different origin.
+		</div>
+	
+
+		<h3>[method:null setMaterialOptions]( [page:Object options] )</h3>
+		<div>
+			[page:Object options] — required
+			<ul>
+				<li>side: Which side to apply the material. THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide</li>
+				<li>wrap: What type of wrapping to apply for textures. THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping</li>
+				<li>normalizeRGB: RGBs need to be normalized to 0-1 from 0-255. Default: false, assumed to be already normalized</li>
+				<li>ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's. Default: false</li>
+			</ul>
+		</div>
+		<div>
+			Set of options on how to construct the materials
+		</div>
+	
 
 		<h3>[method:MTLLoaderMaterialCreator parse]( [page:String text] )</h3>
 		<div>
-		[page:String text] — The textual <em>mtl</em> structure to parse.
+			[page:String text] — The textual <em>mtl</em> structure to parse.
 		</div>
 		<div>
-		Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br />
+			Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br />
 		</div>
+		
 
 		<h2>Source</h2>
 

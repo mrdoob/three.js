@@ -16,7 +16,7 @@ function OctahedronGeometry( radius, detail ) {
 		detail: detail
 	};
 
-	this.fromBufferGeometry( new THREE.OctahedronBufferGeometry( radius, detail ) );
+	this.fromBufferGeometry( new OctahedronBufferGeometry( radius, detail ) );
 	this.mergeVertices();
 
 }
