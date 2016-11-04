@@ -9,6 +9,7 @@ var list = {
 
 	"Reference": {
 		"Constants": [
+			[ "Animation", "api/constants/Animation" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "GLState", "api/constants/GLState" ],

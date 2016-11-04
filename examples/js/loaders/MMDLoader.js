@@ -1764,6 +1764,21 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		var bones = [];
 
+		var rigidBodies = model.rigidBodies;
+		var dictionary = {};
+
+		for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+			var body = rigidBodies[ i ];
+			var value = dictionary[ body.boneIndex ];
+
+			// keeps greater number if already value is set without any special reasons
+			value = value === undefined ? body.type : Math.max( body.type, value );
+
+			dictionary[ body.boneIndex ] = value;
+
+		}
+
 		for ( var i = 0; i < model.metadata.boneCount; i++ ) {
 
 			var bone = {};
@@ -1782,6 +1797,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				bone.pos[ 2 ] -= model.bones[ bone.parent ].position[ 2 ];
 
 			}
+
+			bone.rigidBodyType = dictionary[ i ] !== undefined ? dictionary[ i ] : -1;
 
 			bones.push( bone );
 
@@ -1853,6 +1870,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var link = {};
 					link.index = ik.links[ j ].index;
+					link.enabled = true;
 
 					if ( ik.links[ j ].angleLimitation === 1 ) {
 
@@ -3921,7 +3939,61 @@ THREE.MMDHelper.prototype = {
 
 		physics.warmup( warmup );
 
+		this.updateIKParametersDependingOnPhysicsEnabled( mesh, true );
+
 		mesh.physics = physics;
+
+	},
+
+	enablePhysics: function ( enabled ) {
+
+		if ( enabled === true ) {
+
+			this.doPhysics = true;
+
+		} else {
+
+			this.doPhysics = false;
+
+		}
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			this.updateIKParametersDependingOnPhysicsEnabled( this.meshes[ i ], enabled );
+
+		}
+
+	},
+
+	updateIKParametersDependingOnPhysicsEnabled: function ( mesh, physicsEnabled ) {
+
+		var iks = mesh.geometry.iks;
+		var bones = mesh.geometry.bones;
+
+		for ( var j = 0, jl = iks.length; j < jl; j ++ ) {
+
+			var ik = iks[ j ];
+			var links = ik.links;
+
+			for ( var k = 0, kl = links.length; k < kl; k ++ ) {
+
+				var link = links[ k ];
+
+				if ( physicsEnabled === true ) {
+
+					// disable IK of the bone the corresponding rigidBody type of which is 1 or 2
+					// because its rotation will be overriden by physics
+					link.enabled = bones[ link.index ].rigidBodyType > 0 ? false : true;
+
+				} else {
+
+					link.enabled = true;
+
+				}
+
+			}
+
+		}
 
 	},
 
