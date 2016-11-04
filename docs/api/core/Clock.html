@@ -67,6 +67,16 @@
 		Stops clock and sets [page:Clock.oldTime oldTime] to the current time.
 		</div>
 
+                <h3>[method:null pause]()</h3>
+                <div>
+                Pauses clock. [page:Clock.getElapsedTime] will stop changing and [page:Clock.getDelta] will always return 0.
+                </div>
+
+                <h3>[method:null resume]()</h3>
+                <div>
+                Resumes the clock if paused.
+                </div>
+
 		<h3>[method:Float getElapsedTime]()</h3>
 		<div>
 		Get the seconds passed since the clock started and sets [page:Clock.oldTime oldTime] to the current time.<br />
@@ -75,7 +85,7 @@
 
 		<h3>[method:Float getDelta]()</h3>
 		<div>
-		Get the seconds passed since the time [page:Clock.oldTime oldTime] was set and sets [page:Clock.oldTime oldTime] to the current time.<br />
+		Get the seconds passed since the time [page:Clock.oldTime oldTime] was set and sets [page:Clock.oldTime oldTime] to the current time. Returns 0 if paused.<br />
 		If [page:Clock.autoStart autoStart] is *true* and the clock is not running, also starts the clock.
 		</div>
 
