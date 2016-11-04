@@ -12,10 +12,9 @@ var list = {
 			[ "Animation", "api/constants/Animation" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
-			[ "GLState", "api/constants/GLState" ],
 			[ "Materials", "api/constants/Materials" ],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
-			[ "Textures", "api/constants/Textures" ]
+			[ "Textures", "api/constants/Textures" ],
+			[ "WebGLRenderer", "api/constants/WebGLRenderer" ]
 		],
 
 		"Cameras": [
