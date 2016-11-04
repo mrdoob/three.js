@@ -29,6 +29,11 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 	this.version = 0;
 
+	Object.defineProperty( this, 'needsUpdate', {
+		writeable: true,
+		set: function ( value ) { if ( value === true ) this.version ++; }
+	} );
+
 }
 
 Object.assign( BufferAttribute.prototype, EventDispatcher.prototype, {
@@ -36,12 +41,6 @@ Object.assign( BufferAttribute.prototype, EventDispatcher.prototype, {
 	constructor: BufferAttribute,
 
 	isBufferAttribute: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	setDynamic: function ( value ) {
 
