@@ -198,6 +198,7 @@ var list = {
 		],
 
 		"Textures": [
+			[ "CanvasTexture", "api/textures/CanvasTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
