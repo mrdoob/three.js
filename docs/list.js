@@ -201,7 +201,8 @@ var list = {
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
-			[ "Texture", "api/textures/Texture" ]
+			[ "Texture", "api/textures/Texture" ],
+			[ "VideoTexture", "api/textures/VideoTexture" ]
 		],
 
 		"Animation": [
