@@ -33,6 +33,7 @@ export default {
 	],
 	targets: [
 		{
+			outro: outro,
 			format: 'umd',
 			moduleName: 'THREE',
 			dest: 'build/three.js'
@@ -42,6 +43,5 @@ export default {
 			dest: 'build/three.modules.js'
 		}
 	],
-	outro: outro,
 	sourceMap: true
 };
