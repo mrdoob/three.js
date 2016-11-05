@@ -63,7 +63,7 @@ export { CubeCamera } from './cameras/CubeCamera.js';
 export { Camera } from './cameras/Camera.js';
 export { AudioListener } from './audio/AudioListener.js';
 export { PositionalAudio } from './audio/PositionalAudio.js';
-export { getAudioContext } from './audio/AudioContext.js';
+export { AudioContext } from './audio/AudioContext.js';
 export { AudioAnalyser } from './audio/AudioAnalyser.js';
 export { Audio } from './audio/Audio.js';
 export { VectorKeyframeTrack } from './animation/tracks/VectorKeyframeTrack.js';

@@ -35241,17 +35241,27 @@
 
 	var context;
 
-	function getAudioContext() {
+	var AudioContext = {
 
-		if ( context === undefined ) {
+		getContext: function () {
 
-			context = new ( window.AudioContext || window.webkitAudioContext )();
+			if ( context === undefined ) {
+
+				context = new ( window.AudioContext || window.webkitAudioContext )();
+
+			}
+
+			return context;
+
+		},
+
+		setContext: function ( value ) {
+
+			context = value;
 
 		}
 
-		return context;
-
-	}
+	};
 
 	/**
 	 * @author Reece Aaron Lecrivain / http://reecenotes.com/
@@ -35271,7 +35281,7 @@
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( buffer ) {
 
-				var context = getAudioContext();
+				var context = AudioContext.getContext();
 
 				context.decodeAudioData( buffer, function ( audioBuffer ) {
 
@@ -35474,7 +35484,7 @@
 
 		this.type = 'AudioListener';
 
-		this.context = getAudioContext();
+		this.context = AudioContext.getContext();
 
 		this.gain = this.context.createGain();
 		this.gain.connect( this.context.destination );
@@ -42191,7 +42201,7 @@
 	exports.Camera = Camera;
 	exports.AudioListener = AudioListener;
 	exports.PositionalAudio = PositionalAudio;
-	exports.getAudioContext = getAudioContext;
+	exports.AudioContext = AudioContext;
 	exports.AudioAnalyser = AudioAnalyser;
 	exports.Audio = Audio;
 	exports.VectorKeyframeTrack = VectorKeyframeTrack;
@@ -42501,12 +42511,6 @@
 	exports.CanvasRenderer = CanvasRenderer;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
-
-	Object.defineProperty( exports, 'AudioContext', {
-		get: function () {
-			return exports.getAudioContext();
-		}
-	});
 
 })));
 //# sourceMappingURL=three.js.map
