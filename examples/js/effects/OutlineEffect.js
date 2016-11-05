@@ -3,9 +3,6 @@
  *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
- * Dependencies
- *  - THREE.ChainableEffect
- *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
  * 	defaultThickNess: 0.01,
