@@ -30,7 +30,45 @@
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
 
-	THREE.ChainableEffect.call( this, renderer );
+	/*
+	 * See #9918
+	 *
+	 * Here enables THREE.OutlineEffect to be called from other *Effect, like
+	 *
+	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 *
+	 * function render () {
+	 *
+ 	 * 	effect.render( scene, camera );
+	 *
+	 * }
+	 */
+	var keys = Object.keys( renderer );
+
+	for ( var i = 0, il = keys.length; i < il; i ++ ) {
+
+		var key = keys[ i ];
+
+		if ( typeof renderer[ key ] === 'function' ) {
+
+			/*
+			 * this works as
+			 * 	this.func = function ( arg1, arg2, ... ) {
+			 *
+			 * 		renderer.func( arg1, arg2, ... );
+			 *
+			 * 	};
+			 */
+			this[ key ] = renderer[ key ].bind( renderer );
+
+		} else {
+
+			// just copy property
+			this[ key ] = renderer[ key ];
+
+		}
+
+	}
 
 	parameters = parameters || {};
 
@@ -357,6 +395,3 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	};
 
 };
-
-THREE.OutlineEffect.prototype = Object.create( THREE.ChainableEffect.prototype );
-THREE.OutlineEffect.prototype.constructor = THREE.OutlineEffect;
