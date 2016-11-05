@@ -42,14 +42,6 @@ Object.assign( BufferAttribute.prototype, EventDispatcher.prototype, {
 
 	isBufferAttribute: true,
 
-<<<<<<< HEAD
-=======
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
-
 	setArray: function ( array ) {
 
 		if ( Array.isArray( array ) ) {
@@ -63,7 +55,6 @@ Object.assign( BufferAttribute.prototype, EventDispatcher.prototype, {
 
 	},
 
->>>>>>> dev
 	setDynamic: function ( value ) {
 
 		this.dynamic = value;
