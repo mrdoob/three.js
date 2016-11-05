@@ -55,7 +55,7 @@
 			var container, stats;
 
 			var mesh, camera, scene, renderer;
-			var helper, physicsHelper;
+			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -131,6 +131,10 @@
 					helper.add( mesh );
 					helper.setAnimation( mesh );
 
+					// create CCDIKHelper after calling helper.setAnimation( mesh )
+					ikHelper = new THREE.CCDIKHelper( mesh );
+					ikHelper.visible = false;
+
 					/*
 					 * Note: You're recommended to call helper.setPhysics()
 					 *       after calling helper.setAnimation().
@@ -167,6 +171,7 @@
 						'ik': true,
 						'outline': true,
 						'physics': true,
+						'show IK bones': false,
 						'show rigid bodies': false
 					};
 
@@ -195,7 +200,11 @@
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
-						helper.doPhysics = api[ 'physics' ];
+						helper.enablePhysics( api[ 'physics' ] );
+					} );
+
+					gui.add( api, 'show IK bones' ).onChange( function () {
+						ikHelper.visible = api[ 'show IK bones' ];
 					} );
 
 					gui.add( api, 'show rigid bodies' ).onChange( function () {
