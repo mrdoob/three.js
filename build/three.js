@@ -35241,9 +35241,7 @@
 
 	var context;
 
-	function AudioContext() {}
-
-	Object.assign( AudioContext, {
+	var AudioContext = {
 
 		getContext: function () {
 
@@ -35260,10 +35258,10 @@
 		setContext: function ( value ) {
 
 			context = value;
-			
+
 		}
 
-	} );
+	};
 
 	/**
 	 * @author Reece Aaron Lecrivain / http://reecenotes.com/
