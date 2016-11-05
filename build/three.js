@@ -27349,136 +27349,174 @@
 	LatheGeometry.prototype.constructor = LatheGeometry;
 
 	/**
-	 * @author jonobr1 / http://jonobr1.com
+	 * @author Mugen87 / https://github.com/Mugen87
 	 *
-	 * Creates a one-sided polygonal geometry from a path shape. Similar to
-	 * ExtrudeGeometry.
+	 * Creates a one-sided polygonal geometry from one or more shapes.
 	 *
-	 * parameters = {
-	 *
-	 *	curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
-	 *
-	 *	material: <int> // material index for front and back faces
-	 *	uvGenerator: <Object> // object that provides UV generator functions
-	 *
-	 * }
 	 **/
 
-	function ShapeGeometry( shapes, options ) {
+	function ShapeBufferGeometry( shapes, curveSegments ) {
 
-		Geometry.call( this );
+		BufferGeometry.call( this );
 
-		this.type = 'ShapeGeometry';
+		this.type = 'ShapeBufferGeometry';
 
-		if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
+		this.parameters = {
+			shapes: shapes,
+			curveSegments: curveSegments
+		};
 
-		this.addShapeList( shapes, options );
+		curveSegments = curveSegments || 12;
 
-		this.computeFaceNormals();
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+		var indices = [];
 
-	}
+		var groupStart = 0;
+		var groupCount = 0;
 
-	ShapeGeometry.prototype = Object.create( Geometry.prototype );
-	ShapeGeometry.prototype.constructor = ShapeGeometry;
+		// allow single and array values for "shapes" parameter
 
-	/**
-	 * Add an array of shapes to THREE.ShapeGeometry.
-	 */
-	ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
+		if ( Array.isArray( shapes ) === false ) {
 
-		for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+			addShape( shapes );
 
-			this.addShape( shapes[ i ], options );
+		} else {
+
+			for ( var i = 0; i < shapes.length; i++ ) {
+
+				addShape( shapes[ i ] );
+
+				this.addGroup( groupStart, groupCount, i ); // enables MultiMaterial support
+
+				groupStart += groupCount;
+				groupCount = 0;
+
+			}
 
 		}
 
-		return this;
+		// build geometry
 
-	};
+		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
+		this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
+		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
 
-	/**
-	 * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
-	 */
-	ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
-		if ( options === undefined ) options = {};
-		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+		// helper functions
 
-		var material = options.material;
-		var uvgen = options.UVGenerator === undefined ? ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
+		function addShape( shape ) {
 
-		//
+			var i, l, shapeHole;
 
-		var i, l, hole;
+			var indexOffset = vertices.length / 3;
+			var points = shape.extractPoints( curveSegments );
 
-		var shapesOffset = this.vertices.length;
-		var shapePoints = shape.extractPoints( curveSegments );
+			var shapeVertices = points.shape;
+			var shapeHoles = points.holes;
 
-		var vertices = shapePoints.shape;
-		var holes = shapePoints.holes;
+			// check direction of vertices
 
-		var reverse = ! ShapeUtils.isClockWise( vertices );
+			if ( ShapeUtils.isClockWise( shapeVertices ) === false ) {
 
-		if ( reverse ) {
+				shapeVertices = shapeVertices.reverse();
 
-			vertices = vertices.reverse();
+				// also check if holes are in the opposite direction
 
-			// Maybe we should also check if holes are in the opposite direction, just to be safe...
+				for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
 
-			for ( i = 0, l = holes.length; i < l; i ++ ) {
+					shapeHole = shapeHoles[ i ];
 
-				hole = holes[ i ];
+					if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
 
-				if ( ShapeUtils.isClockWise( hole ) ) {
+						shapeHoles[ i ] = shapeHole.reverse();
 
-					holes[ i ] = hole.reverse();
+					}
 
 				}
 
 			}
 
-			reverse = false;
+			var faces = ShapeUtils.triangulateShape( shapeVertices, shapeHoles );
+
+			// join vertices of inner and outer paths to a single array
+
+			for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
+
+				shapeHole = shapeHoles[ i ];
+				shapeVertices = shapeVertices.concat( shapeHole );
+
+			}
+
+			// vertices, normals, uvs
+
+			for ( i = 0, l = shapeVertices.length; i < l; i ++ ) {
+
+				var vertex = shapeVertices[ i ];
+
+				vertices.push( vertex.x, vertex.y, 0 );
+				normals.push( 0, 0, 1 );
+				uvs.push( vertex.x, vertex.y ); // world uvs
+
+			}
+
+			// incides
+
+			for ( i = 0, l = faces.length; i < l; i ++ ) {
+
+				var face = faces[ i ];
+
+				var a = face[ 0 ] + indexOffset;
+				var b = face[ 1 ] + indexOffset;
+				var c = face[ 2 ] + indexOffset;
+
+				indices.push( a, b, c );
+				groupCount += 3;
+
+			}
 
 		}
 
-		var faces = ShapeUtils.triangulateShape( vertices, holes );
+	}
 
-		// Vertices
+	ShapeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+	ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
 
-		for ( i = 0, l = holes.length; i < l; i ++ ) {
+	/**
+	 * @author jonobr1 / http://jonobr1.com
+	 *
+	 * Creates a one-sided polygonal geometry from a path shape.
+	 *
+	 **/
 
-			hole = holes[ i ];
-			vertices = vertices.concat( hole );
+	function ShapeGeometry( shapes, curveSegments ) {
 
-		}
+		Geometry.call( this );
 
-		//
+		this.type = 'ShapeGeometry';
 
-		var vert, vlen = vertices.length;
-		var face, flen = faces.length;
+		if ( typeof curveSegments === 'object' ) {
 
-		for ( i = 0; i < vlen; i ++ ) {
+			console.warn( 'THREE.ShapeGeometry: Options parameter has been removed.' );
 
-			vert = vertices[ i ];
-
-			this.vertices.push( new Vector3( vert.x, vert.y, 0 ) );
-
-		}
-
-		for ( i = 0; i < flen; i ++ ) {
-
-			face = faces[ i ];
-
-			var a = face[ 0 ] + shapesOffset;
-			var b = face[ 1 ] + shapesOffset;
-			var c = face[ 2 ] + shapesOffset;
-
-			this.faces.push( new Face3( a, b, c, null, null, material ) );
-			this.faceVertexUvs[ 0 ].push( uvgen.generateTopUV( this, a, b, c ) );
+			curveSegments = curveSegments.curveSegments;
 
 		}
 
-	};
+		this.parameters = {
+			shapes: shapes,
+			curveSegments: curveSegments
+		};
+
+		this.fromBufferGeometry( new ShapeBufferGeometry( shapes, curveSegments ) );
+		this.mergeVertices();
+
+	}
+
+	ShapeGeometry.prototype = Object.create( Geometry.prototype );
+	ShapeGeometry.prototype.constructor = ShapeGeometry;
 
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
@@ -28125,6 +28163,7 @@
 		LatheGeometry: LatheGeometry,
 		LatheBufferGeometry: LatheBufferGeometry,
 		ShapeGeometry: ShapeGeometry,
+		ShapeBufferGeometry: ShapeBufferGeometry,
 		ExtrudeGeometry: ExtrudeGeometry,
 		EdgesGeometry: EdgesGeometry,
 		ConeGeometry: ConeGeometry,
@@ -29183,7 +29222,7 @@
 				if ( this.responseType !== undefined ) request.responseType = this.responseType;
 				if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-				if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+				if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
 				request.send( null );
 
@@ -29212,6 +29251,13 @@
 		setWithCredentials: function ( value ) {
 
 			this.withCredentials = value;
+			return this;
+
+		},
+
+		setMimeType: function ( value ) {
+
+			this.mimeType = value;
 			return this;
 
 		}
@@ -35195,17 +35241,27 @@
 
 	var context;
 
-	function getAudioContext() {
+	var AudioContext = {
 
-		if ( context === undefined ) {
+		getContext: function () {
 
-			context = new ( window.AudioContext || window.webkitAudioContext )();
+			if ( context === undefined ) {
+
+				context = new ( window.AudioContext || window.webkitAudioContext )();
+
+			}
+
+			return context;
+
+		},
+
+		setContext: function ( value ) {
+
+			context = value;
 
 		}
 
-		return context;
-
-	}
+	};
 
 	/**
 	 * @author Reece Aaron Lecrivain / http://reecenotes.com/
@@ -35225,7 +35281,7 @@
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( buffer ) {
 
-				var context = getAudioContext();
+				var context = AudioContext.getContext();
 
 				context.decodeAudioData( buffer, function ( audioBuffer ) {
 
@@ -35428,7 +35484,7 @@
 
 		this.type = 'AudioListener';
 
-		this.context = getAudioContext();
+		this.context = AudioContext.getContext();
 
 		this.gain = this.context.createGain();
 		this.gain.connect( this.context.destination );
@@ -42145,7 +42201,7 @@
 	exports.Camera = Camera;
 	exports.AudioListener = AudioListener;
 	exports.PositionalAudio = PositionalAudio;
-	exports.getAudioContext = getAudioContext;
+	exports.AudioContext = AudioContext;
 	exports.AudioAnalyser = AudioAnalyser;
 	exports.Audio = Audio;
 	exports.VectorKeyframeTrack = VectorKeyframeTrack;
@@ -42278,6 +42334,7 @@
 	exports.LatheGeometry = LatheGeometry;
 	exports.LatheBufferGeometry = LatheBufferGeometry;
 	exports.ShapeGeometry = ShapeGeometry;
+	exports.ShapeBufferGeometry = ShapeBufferGeometry;
 	exports.ExtrudeGeometry = ExtrudeGeometry;
 	exports.EdgesGeometry = EdgesGeometry;
 	exports.ConeGeometry = ConeGeometry;
@@ -42454,12 +42511,6 @@
 	exports.CanvasRenderer = CanvasRenderer;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
-
-	Object.defineProperty( exports, 'AudioContext', {
-		get: function () {
-			return exports.getAudioContext();
-		}
-	});
 
 })));
 //# sourceMappingURL=three.js.map

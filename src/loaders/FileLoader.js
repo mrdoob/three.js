@@ -184,7 +184,7 @@ Object.assign( FileLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
 			request.send( null );
 
@@ -213,6 +213,13 @@ Object.assign( FileLoader.prototype, {
 	setWithCredentials: function ( value ) {
 
 		this.withCredentials = value;
+		return this;
+
+	},
+
+	setMimeType: function ( value ) {
+
+		this.mimeType = value;
 		return this;
 
 	}
