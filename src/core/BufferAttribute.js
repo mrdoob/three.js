@@ -26,8 +26,9 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
+	this.onUpload = null;
+
 	this.version = 0;
-	this.onUploadCallback = null;
 
 }
 
@@ -323,14 +324,6 @@ BufferAttribute.prototype = {
 	clone: function () {
 
 		return new this.constructor().copy( this );
-
-	},
-
-	disposeArray: function () {
-
-		var oldArray = this.array;
-
-		this.array = new oldArray.constructor( 1 ); // create dummy minimal length TypedArray
 
 	}
 
