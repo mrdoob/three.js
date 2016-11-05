@@ -14,7 +14,7 @@ var list = {
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "Materials", "api/constants/Materials" ],
 			[ "Textures", "api/constants/Textures" ],
-			[ "WebGLRenderer", "api/constants/WebGLRenderer" ]
+			[ "Renderer", "api/constants/Renderer" ]
 		],
 
 		"Cameras": [
