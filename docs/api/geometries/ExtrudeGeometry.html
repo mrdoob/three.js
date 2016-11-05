@@ -54,7 +54,7 @@
 			bevelSegments: 1
 		};
 
-		var geometry = new THREE.ExtrudeGeometry( shape, data );
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );

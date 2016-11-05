@@ -233,7 +233,7 @@ Menubar.File = function ( editor ) {
 
 		} );
 
-		var loader = new THREE.XHRLoader( manager );
+		var loader = new THREE.FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
 			var includes = [];

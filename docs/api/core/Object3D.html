@@ -148,6 +148,16 @@
 		An optional callback that is executed immediately after the Object3D is rendered.  This function is called with the following parameters: renderer, scene, camera, geometry, material, group.
 		</div>
 
+		<h3>[property:Number renderOrder]</h3>
+		<div>
+		This value allows the default rendering order of scene graph objects to be overridden although opaque and transparent objects remain sorted independently. Sorting is from lowest to highest renderOrder. Default value is 0.
+		</div>
+
+		<h3>[property:Layers layers]</h3>
+		<div>
+		The layer membership of the object. The object is only visible if it has at least one layer in common with the [page:Camera] in use. 
+		</div>
+
 		<h2>Methods</h2>
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>

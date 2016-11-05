@@ -37,8 +37,10 @@
 
 		<script src="js/libs/charsetencoder.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
+
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
 
@@ -50,7 +52,7 @@
 			var container, stats;
 
 			var mesh, camera, scene, renderer;
-			var helper;
+			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -117,15 +119,21 @@
 					helper.add( mesh );
 					helper.setAnimation( mesh );
 
+					// create CCDIKHelper after calling helper.setAnimation()
+					ikHelper = new THREE.CCDIKHelper( mesh );
+					scene.add( ikHelper );
+
 					/*
-					 * Note: You must set Physics
-					 *       before you add mesh to scene or any other 3D object.
+					 * Note: You're recommended to call helper.setPhysics()
+					 *       after calling helper.setAnimation().
 					 * Note: Physics calculation is pretty heavy.
 					 *       It may not be acceptable for most mobile devices yet.
 			 		 */
 					if ( ! isMobileDevice() ) {
 
 						helper.setPhysics( mesh );
+						physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+						scene.add( physicsHelper );
 
 					}
 
@@ -151,7 +159,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				helper.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -181,11 +189,12 @@
 				if ( mesh ) {
 
 					helper.animate( clock.getDelta() );
+					if ( physicsHelper !== undefined ) physicsHelper.update();
+					ikHelper.update();
 					helper.render( scene, camera );
 
 				} else {
 
-					renderer.clear();
 					renderer.render( scene, camera );
 
 				}

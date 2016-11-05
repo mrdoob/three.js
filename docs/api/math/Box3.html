@@ -77,6 +77,22 @@
 		Determines whether or not this box intersects *box*.
 		</div>
 
+		<h3>[method:Boolean intersectsSphere]( [page:Sphere sphere] ) [page:Box3 this]</h3>
+		<div>
+		sphere -- Sphere to check for intersection against.
+		</div>
+		<div>
+		Determines whether or not this box intersects *sphere*.
+		</div>
+
+		<h3>[method:Boolean intersectsPlane]( [page:Plane plane] ) [page:Box3 this]</h3>
+		<div>
+		plane -- Plane to check for intersection against.
+		</div>
+		<div>
+		Determines whether or not this box intersects *plane*.
+		</div>
+
 		<h3>[method:Box3 setFromPoints]( [page:Array points] ) [page:Box3 this]</h3>
 		<div>
 		points -- Set of points that the resulting box will envelop.
@@ -96,7 +112,7 @@
 
 
 
-		<h3>[method:Vector3 size]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
+		<h3>[method:Vector3 getSize]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -221,7 +237,7 @@
 		Makes this box empty.
 		</div>
 
-		<h3>[method:Vector3 center]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
+		<h3>[method:Vector3 getCenter]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>

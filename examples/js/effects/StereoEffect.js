@@ -32,7 +32,7 @@ THREE.StereoEffect = function ( renderer ) {
 
 		var size = renderer.getSize();
 
-		renderer.clear();
+		if ( renderer.autoClear ) renderer.clear();
 		renderer.setScissorTest( true );
 
 		renderer.setScissor( 0, 0, size.width / 2, size.height );

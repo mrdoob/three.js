@@ -27,6 +27,7 @@ export { PlaneGeometry } from './PlaneGeometry.js';
 export { LatheGeometry } from './LatheGeometry.js';
 export { LatheBufferGeometry } from './LatheBufferGeometry.js';
 export { ShapeGeometry } from './ShapeGeometry.js';
+export { ShapeBufferGeometry } from './ShapeBufferGeometry.js';
 export { ExtrudeGeometry } from './ExtrudeGeometry.js';
 export { EdgesGeometry } from './EdgesGeometry.js';
 export { ConeGeometry } from './ConeGeometry.js';

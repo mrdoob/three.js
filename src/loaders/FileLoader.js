@@ -1,17 +1,17 @@
-import { Cache } from './Cache';
-import { DefaultLoadingManager } from './LoadingManager';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-function XHRLoader( manager ) {
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
+
+function FileLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 }
 
-Object.assign( XHRLoader.prototype, {
+Object.assign( FileLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -147,7 +147,7 @@ Object.assign( XHRLoader.prototype, {
 					// Some browsers return HTTP Status 0 when using non-http protocol
 					// e.g. 'file://' or 'data://'. Handle as success.
 
-					console.warn( 'THREE.XHRLoader: HTTP Status 0 received.' );
+					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
 					if ( onLoad ) onLoad( response );
 
@@ -184,7 +184,7 @@ Object.assign( XHRLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			if ( request.overrideMimeType ) request.overrideMimeType( 'text/plain' );
+			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
 			request.send( null );
 
@@ -215,9 +215,16 @@ Object.assign( XHRLoader.prototype, {
 		this.withCredentials = value;
 		return this;
 
+	},
+
+	setMimeType: function ( value ) {
+
+		this.mimeType = value;
+		return this;
+
 	}
 
 } );
 
 
-export { XHRLoader };
+export { FileLoader };

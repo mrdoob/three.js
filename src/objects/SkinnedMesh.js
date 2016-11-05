@@ -35,7 +35,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			bone = new Bone( this );
+			bone = new Bone();
 			bones.push( bone );
 
 			bone.name = gbone.name;

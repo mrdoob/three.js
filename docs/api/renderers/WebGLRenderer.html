@@ -103,7 +103,7 @@
 		<h3>[property:Integer shadowMap.type]</h3>
 
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
-		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
+		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap. See [page:WebGLRenderer WebGLRenderer constants] for details.</div>
 
 		<h3>[property:Boolean shadowMap.renderReverseSided]</h3>
 
@@ -240,11 +240,11 @@
 
 		<h3>[method:null setFaceCulling]( cullFace, frontFace )</h3>
 		<div>
-		[page:String cullFace] —- "back", "front", "front_and_back", or false.<br />
-		[page:String frontFace] —- "ccw" or "cw<br />
+		See [page:WebGLRenderer WebGLRenderer constants] for all possible values for [page:String cullFace] and [page:String frontFace].<br />
+		Used for setting the gl.frontFace and gl.cullFace states in the GPU, thus enabling/disabling face culling when rendering.<br />
+		If cullFace is set to THREE.[page:String CullFaceNone], culling will be disabled.<br />
 		</div>
-		<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
-		<div>If cullFace is false, culling will be disabled.</div>
+
 
 
 		<h3>[method:null setTexture]( [page:Texture texture], [page:number slot] )</h3>

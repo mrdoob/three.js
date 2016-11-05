@@ -9,7 +9,7 @@
  *
  */
 
-THREE.VREffect = function ( renderer, onError ) {
+THREE.VREffect = function( renderer, onError ) {
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
@@ -20,7 +20,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	if ( 'VRFrameData' in window ) {
 
-		frameData = new VRFrameData();
+		frameData = new window.VRFrameData();
 
 	}
 
@@ -42,7 +42,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	if ( navigator.getVRDisplays ) {
 
-		navigator.getVRDisplays().then( gotVRDisplays ).catch ( function () {
+		navigator.getVRDisplays().then( gotVRDisplays ).catch( function() {
 
 			console.warn( 'THREE.VREffect: Unable to get VR Displays' );
 
@@ -61,26 +61,26 @@ THREE.VREffect = function ( renderer, onError ) {
 	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
-	this.getVRDisplay = function () {
+	this.getVRDisplay = function() {
 
 		return vrDisplay;
 
 	};
 
-	this.setVRDisplay = function ( value ) {
+	this.setVRDisplay = function( value ) {
 
 		vrDisplay = value;
 
 	};
 
-	this.getVRDisplays = function () {
+	this.getVRDisplays = function() {
 
 		console.warn( 'THREE.VREffect: getVRDisplays() is being deprecated.' );
 		return vrDisplays;
 
 	};
 
-	this.setSize = function ( width, height, updateStyle ) {
+	this.setSize = function( width, height, updateStyle ) {
 
 		rendererSize = { width: width, height: height };
 		rendererUpdateStyle = updateStyle;
@@ -100,12 +100,9 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	// fullscreen
+	// VR presentation
 
 	var canvas = renderer.domElement;
-	var requestFullscreen;
-	var exitFullscreen;
-	var fullscreenElement;
 	var defaultLeftBounds = [ 0.0, 0.0, 0.5, 1.0 ];
 	var defaultRightBounds = [ 0.5, 0.0, 0.5, 1.0 ];
 
@@ -120,7 +117,7 @@ THREE.VREffect = function ( renderer, onError ) {
 			var eyeWidth = eyeParamsL.renderWidth;
 			var eyeHeight = eyeParamsL.renderHeight;
 
-			if ( !wasPresenting ) {
+			if ( ! wasPresenting ) {
 
 				rendererPixelRatio = renderer.getPixelRatio();
 				rendererSize = renderer.getSize();
@@ -141,9 +138,9 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
-	this.setFullScreen = function ( boolean ) {
+	this.setFullScreen = function( boolean ) {
 
-		return new Promise( function ( resolve, reject ) {
+		return new Promise( function( resolve, reject ) {
 
 			if ( vrDisplay === undefined ) {
 
@@ -173,19 +170,19 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	this.requestPresent = function () {
+	this.requestPresent = function() {
 
 		return this.setFullScreen( true );
 
 	};
 
-	this.exitPresent = function () {
+	this.exitPresent = function() {
 
 		return this.setFullScreen( false );
 
 	};
 
-	this.requestAnimationFrame = function ( f ) {
+	this.requestAnimationFrame = function( f ) {
 
 		if ( vrDisplay !== undefined ) {
 
@@ -199,7 +196,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	this.cancelAnimationFrame = function ( h ) {
+	this.cancelAnimationFrame = function( h ) {
 
 		if ( vrDisplay !== undefined ) {
 
@@ -213,7 +210,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	this.submitFrame = function () {
+	this.submitFrame = function() {
 
 		if ( vrDisplay !== undefined && scope.isPresenting ) {
 
@@ -233,7 +230,7 @@ THREE.VREffect = function ( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function( scene, camera, renderTarget, forceClear ) {
 
 		if ( vrDisplay && scope.isPresenting ) {
 
@@ -284,13 +281,13 @@ THREE.VREffect = function ( renderer, onError ) {
 				x: Math.round( size.width * leftBounds[ 0 ] ),
 				y: Math.round( size.height * leftBounds[ 1 ] ),
 				width: Math.round( size.width * leftBounds[ 2 ] ),
-				height: Math.round(size.height * leftBounds[ 3 ] )
+				height: Math.round( size.height * leftBounds[ 3 ] )
 			};
 			renderRectR = {
 				x: Math.round( size.width * rightBounds[ 0 ] ),
 				y: Math.round( size.height * rightBounds[ 1 ] ),
 				width: Math.round( size.width * rightBounds[ 2 ] ),
-				height: Math.round(size.height * rightBounds[ 3 ] )
+				height: Math.round( size.height * rightBounds[ 3 ] )
 			};
 
 			if ( renderTarget ) {
@@ -397,7 +394,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 	};
 
-	this.dispose = function () {
+	this.dispose = function() {
 
 		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
