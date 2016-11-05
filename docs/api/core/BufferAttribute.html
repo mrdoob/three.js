@@ -54,6 +54,11 @@
 		A version number, incremented every time the needsUpdate property is set to true.
 		</div>
 
+		<h3>[property:Function onUploadCallback]</h3>
+		<div>
+		A callback function that is executed after the Renderer has transfered the attribute array data to the GPU.
+		The callback is executed with a single parameter "name", the name of the buffer attribute, and "this" set to the BufferAttribute object.
+		</div>
 
 		<h2>Methods</h2>
 
@@ -106,6 +111,12 @@
 		<h3>[method:BufferAttribute clone]() </h3>
 		<div>
 		Copies this attribute.
+		</div>
+
+		<h3>[method:null disposeArray]() </h3>
+		<div>
+		Discards the typed array containing the attribute data. This can be executed after the data has been transfered to the GPU to allow the memory to be reclaimed.
+		For use where the attribute will not be changed after the discard method is called.
 		</div>
 
 		<h2>Source</h2>

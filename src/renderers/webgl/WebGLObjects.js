@@ -34,7 +34,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		for ( var name in attributes ) {
 
-			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
+			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER, name );
 
 		}
 
@@ -58,7 +58,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	function updateAttribute( attribute, bufferType ) {
+	function updateAttribute( attribute, bufferType, name ) {
 
 		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -66,7 +66,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( attributeProperties.__webglBuffer === undefined ) {
 
-			createBuffer( attributeProperties, data, bufferType );
+			createBuffer( attributeProperties, data, bufferType, name );
 
 		} else if ( attributeProperties.version !== data.version ) {
 
@@ -76,7 +76,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	function createBuffer( attributeProperties, data, bufferType ) {
+	function createBuffer( attributeProperties, data, bufferType, name ) {
 
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
@@ -125,6 +125,12 @@ function WebGLObjects( gl, properties, info ) {
 		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
 		attributeProperties.type = type;
 		attributeProperties.version = data.version;
+
+		if ( data.onUploadCallback ) {
+
+			data.onUploadCallback( name );
+
+		}
 
 	}
 
