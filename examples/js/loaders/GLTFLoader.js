@@ -1080,7 +1080,7 @@ GLTFParser.prototype.loadMaterials = function() {
 
 									}
 
-									if ( value ) {
+									if ( value !== undefined ) {
 
 										uvalue = value;
 
