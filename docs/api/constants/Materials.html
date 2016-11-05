@@ -12,7 +12,7 @@
 
 		<div class="desc">
 		These constants define properties common to all material types,
-		with the exception of [page:MultiMaterial MultiMaterial] where they are defined for sub-materials.
+		with the exception of Texture Combine Operations which only apply to [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] and [page:MeshPhongMaterial.combine MeshPhongMaterial].<br />
 		</div>
 
 
@@ -87,6 +87,18 @@
 		[page:Materials GreaterDepth] will return true if the incoming pixel Z-depth is greater than the current buffer Z-depth.<br />
 		[page:Materials NotEqualDepth] will return true if the incoming pixel Z-depth is equal to the current buffer Z-depth.<br />
 		</div>
+
+		<h2>Texture Combine Operations</h2>
+		<code>
+		THREE.MultiplyOperation
+		THREE.MixOperation
+		THREE.AddOperation
+		</code>
+		These define how the result of the surface's color is combined with the environment map (if present), for [page:MeshBasicMaterial.combine MeshBasicMaterial], [page:MeshLambertMaterial.combine MeshLambertMaterial] and [page:MeshPhongMaterial.combine MeshPhongMaterial]. <br />
+		[page:Constant MultiplyOperation] is the default and multiplies the environment map color with the surface color.<br />
+		[page:Constant MixOperation] uses reflectivity to blend between the two colors.<br />
+		[page:Constant AddOperation] adds the two colors.
+
 
 		<h2>Source</h2>
 
