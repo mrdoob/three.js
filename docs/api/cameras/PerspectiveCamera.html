@@ -43,31 +43,38 @@ scene.add( camera );</code>
 		<h2>Properties</h2>
 
 		<h3>[property:Float fov]</h3>
-		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.</div>
+		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is *50*.</div>
 
 		<h3>[property:number zoom]</h3>
-		<div>Gets or sets the zoom factor of the camera. </div>
+		<div>Gets or sets the zoom factor of the camera. Default is *1*.</div>
 
 		<h3>[property:Float near]</h3>
-		<div>Camera frustum near plane.</div>
+		<div>Camera frustum near plane. Default is *0.1*.</div>
 
 		<h3>[property:Float far]</h3>
-		<div>Camera frustum far plane.</div>
+		<div>Camera frustum far plane. Default is *2000*.</div>
 
 		<h3>[property:Float focus]</h3>
-		<div>Object distance used for stereoscopy and depth-of-field effects. This parameter does not influence the projection matrix unless a StereoCamera is being used.</div>
+		<div>Object distance used for stereoscopy and depth-of-field effects.
+			This parameter does not influence the projection matrix unless a StereoCamera is being used.
+			Default is *10*.
+		</div>
 
 		<h3>[property:Float aspect]</h3>
-		<div>Camera frustum aspect ratio, window width divided by window height.</div>
+		<div>Camera frustum aspect ratio, usually the canvas width / canvas height. Default is *1* (square canvas).</div>
 
 		<h3>[property:Object view]</h3>
-		<div>Frustum window specification or null.</div>
+		<div>
+			Frustum window specification or null.
+			This is set using the [page:PerspectiveCamera.setViewOffset .setViewOffset] method
+			and cleared using [page:PerspectiveCamera.clearViewOffset .clearViewOffset].
+		</div>
 
 		<h3>[property:Float filmGauge]</h3>
 		<div>Film size used for the larger axis. Default is 35 (millimeters). This parameter does not influence the projection matrix unless .filmOffset is set to a nonzero value.</div>
 
 		<h3>[property:Float filmOffset]</h3>
-		<div>Horizontal off-center offset in the same unit as .filmGauge.</div>
+		<div>Horizontal off-center offset in the same unit as .filmGauge. Default is *0*.</div>
 
 		<h2>Methods</h2>
 

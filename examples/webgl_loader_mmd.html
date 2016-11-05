@@ -53,7 +53,7 @@
 			var container, stats;
 
 			var mesh, camera, scene, renderer;
-			var helper, physicsHelper;
+			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -122,6 +122,10 @@
 					helper.add( mesh );
 					helper.setAnimation( mesh );
 
+					// create CCDIKHelper after calling helper.setAnimation()
+					ikHelper = new THREE.CCDIKHelper( mesh );
+					scene.add( ikHelper );
+
 					/*
 					 * Note: You're recommended to call helper.setPhysics()
 					 *       after calling helper.setAnimation().
@@ -186,7 +190,8 @@
 				camera.lookAt( scene.position );
 
 				helper.animate( clock.getDelta() );
-				if ( physicsHelper !== undefined ) physicsHelper.update();
+				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 				effect.render( scene, camera );
 
 			}

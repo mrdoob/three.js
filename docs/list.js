@@ -9,12 +9,12 @@ var list = {
 
 	"Reference": {
 		"Constants": [
+			[ "Animation", "api/constants/Animation" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
-			[ "GLState", "api/constants/GLState" ],
 			[ "Materials", "api/constants/Materials" ],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
-			[ "Textures", "api/constants/Textures" ]
+			[ "Textures", "api/constants/Textures" ],
+			[ "WebGLRenderer", "api/constants/WebGLRenderer" ]
 		],
 
 		"Cameras": [
@@ -197,10 +197,12 @@ var list = {
 		],
 
 		"Textures": [
+			[ "CanvasTexture", "api/textures/CanvasTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
-			[ "Texture", "api/textures/Texture" ]
+			[ "Texture", "api/textures/Texture" ],
+			[ "VideoTexture", "api/textures/VideoTexture" ]
 		],
 
 		"Animation": [

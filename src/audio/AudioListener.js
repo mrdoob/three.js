@@ -5,7 +5,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
 import { Object3D } from '../core/Object3D';
-import { getAudioContext } from './AudioContext';
+import { AudioContext } from './AudioContext';
 
 function AudioListener() {
 
@@ -13,7 +13,7 @@ function AudioListener() {
 
 	this.type = 'AudioListener';
 
-	this.context = getAudioContext();
+	this.context = AudioContext.getContext();
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
