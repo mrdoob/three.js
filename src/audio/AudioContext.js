@@ -1,8 +1,6 @@
 var context;
 
-function AudioContext() {}
-
-Object.assign( AudioContext, {
+var AudioContext = {
 
 	getContext: function () {
 
@@ -19,9 +17,9 @@ Object.assign( AudioContext, {
 	setContext: function ( value ) {
 
 		context = value;
-		
+
 	}
 
-} );
+};
 
 export { AudioContext };
