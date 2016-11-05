@@ -1,4 +1,4 @@
-import { getAudioContext } from '../audio/AudioContext';
+import { AudioContext } from '../audio/AudioContext';
 import { FileLoader } from './FileLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
@@ -20,7 +20,7 @@ Object.assign( AudioLoader.prototype, {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
-			var context = getAudioContext();
+			var context = AudioContext.getContext();
 
 			context.decodeAudioData( buffer, function ( audioBuffer ) {
 

@@ -115,6 +115,12 @@
 				var onError = function ( xhr ) {
 				};
 
+				/*
+				 * Note: Physics calculation is pretty heavy.
+				 *       It may not be acceptable for most mobile devices yet.
+				 */
+				var defaultPhysics = ! isMobileDevice();
+
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
 
@@ -127,32 +133,30 @@
 
 					mesh = object;
 					mesh.position.y = -10;
+					scene.add( mesh );
 
 					helper.add( mesh );
 					helper.setAnimation( mesh );
 
-					// create CCDIKHelper after calling helper.setAnimation( mesh )
+					/*
+					 * Note: create CCDIKHelper after calling helper.setAnimation()
+					 */
 					ikHelper = new THREE.CCDIKHelper( mesh );
 					ikHelper.visible = false;
+					scene.add( ikHelper );
 
 					/*
 					 * Note: You're recommended to call helper.setPhysics()
 					 *       after calling helper.setAnimation().
-					 * Note: Physics calculation is pretty heavy.
-					 *       It may not be acceptable for most mobile devices yet.
 			 		 */
-					if ( ! isMobileDevice() ) {
+					helper.setPhysics( mesh );
+					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+					physicsHelper.visible = false;
+					scene.add( physicsHelper );
 
-						helper.setPhysics( mesh );
-						physicsHelper = new THREE.MMDPhysicsHelper( mesh );
-						physicsHelper.visible = false;
-						scene.add( physicsHelper );
-
-					}
+					if ( ! defaultPhysics ) helper.enablePhysics( false );
 
 					helper.unifyAnimationDuration( { afterglow: 2.0 } );
-
-					scene.add( mesh );
 
 					initGui();
 
@@ -170,7 +174,7 @@
 						'gradient mapping': true,
 						'ik': true,
 						'outline': true,
-						'physics': true,
+						'physics': defaultPhysics,
 						'show IK bones': false,
 						'show rigid bodies': false
 					};
@@ -244,7 +248,8 @@
 				if ( mesh ) {
 
 					helper.animate( clock.getDelta() );
-					if ( physicsHelper !== undefined ) physicsHelper.update();
+					if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+					if ( ikHelper.visible ) ikHelper.update();
 					helper.render( scene, camera );
 
 				} else {
