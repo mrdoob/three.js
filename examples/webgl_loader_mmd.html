@@ -115,12 +115,6 @@
 				var onError = function ( xhr ) {
 				};
 
-				/*
-				 * Note: Physics calculation is pretty heavy.
-				 *       It may not be acceptable for most mobile devices yet.
-				 */
-				var defaultPhysics = ! isMobileDevice();
-
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
 
@@ -154,8 +148,6 @@
 					physicsHelper.visible = false;
 					scene.add( physicsHelper );
 
-					if ( ! defaultPhysics ) helper.enablePhysics( false );
-
 					helper.unifyAnimationDuration( { afterglow: 2.0 } );
 
 					initGui();
@@ -174,7 +166,7 @@
 						'gradient mapping': true,
 						'ik': true,
 						'outline': true,
-						'physics': defaultPhysics,
+						'physics': true,
 						'show IK bones': false,
 						'show rigid bodies': false
 					};
@@ -248,7 +240,7 @@
 				if ( mesh ) {
 
 					helper.animate( clock.getDelta() );
-					if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+					if ( physicsHelper.visible ) physicsHelper.update();
 					if ( ikHelper.visible ) ikHelper.update();
 					helper.render( scene, camera );
 
@@ -257,33 +249,6 @@
 					renderer.render( scene, camera );
 
 				}
-
-			}
-
-			// easy mobile device detection
-			function isMobileDevice () {
-
-				if ( navigator === undefined || navigator.userAgent === undefined ) {
-
-					return true;
-
-				}
-
-				var s = navigator.userAgent;
-
-				if (    s.match( /iPhone/i )
-//				     || s.match( /iPad/i )
-				     || s.match( /iPod/i )
-				     || s.match( /webOS/i )
-				     || s.match( /BlackBerry/i )
-				     || ( s.match( /Windows/i ) && s.match( /Phone/i ) )
-				     || ( s.match( /Android/i ) && s.match( /Mobile/i ) ) ) {
-
-					return true;
-
-				}
-
-				return false;
 
 			}
 
