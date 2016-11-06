@@ -16,6 +16,7 @@ var ShaderLib = {
 		uniforms: Object.assign( {},
 			UniformsLib.common,
 			UniformsLib.aomap,
+			UniformsLib.lightmap,
 			UniformsLib.fog
 		),
 
