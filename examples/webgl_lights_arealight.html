@@ -41,6 +41,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/lights/RectAreaLightUniformsLib.js"></script>
 		<script src="../examples/js/libs/dat.gui.min.js"></script>
 		<script src="../examples/js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -128,7 +129,7 @@
 
 				rectLight = new THREE.RectAreaLight( 0xFFFFFF, undefined, 2, 10 );
 				rectLight.matrixAutoUpdate = true;
-				rectLight.intensity = 2.0;
+				rectLight.intensity = 70.0;
 				rectLight.position.set( 5, 5, 0 );
 				// rectLight.target = mshBox;
 				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
@@ -290,7 +291,7 @@
 
 				} );
 
-				gui.add( param, 'intensity', 0, 20 ).onChange( function ( val ) {
+				gui.add( param, 'intensity', 0, 100 ).onChange( function ( val ) {
 
 					rectLight.intensity = val;
 
