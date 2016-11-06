@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">This can be used as a helper object to view the edges of a [page:Geometry Geometry] object.</div>
+		<div class="desc">This can be used as a helper object to view a [page:Geometry Geometry] object as a wireframe.</div>
 
 		<!-- <iframe id="scene" src="scenes/geometry-browser.html#EdgeGeometry"></iframe>
 
@@ -37,9 +37,15 @@
 		[example:webgl_helpers helpers]
 
 		<code>
-var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-var edges = new THREE.EdgesGeometry( geometry );
-var line = new THREE.LineSegments( edges );
+var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+
+var wireframe = new THREE.WireframeGeometry( geometry );
+
+var line = new THREE.LineSegments( wireframe );
+line.material.depthTest = false;
+line.material.opacity = 0.25;
+line.material.transparent = true;
+
 scene.add( line );
 		</code>
 
