@@ -154,6 +154,7 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
@@ -213,6 +214,7 @@ var list = {
 		],
 
 		"Extras": [
+			[ "CurveUtils", "api/extras/CurveUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
