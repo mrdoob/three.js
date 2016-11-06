@@ -215,7 +215,8 @@ var list = {
 
 		"Extras": [
 			[ "CurveUtils", "api/extras/CurveUtils" ],
-			[ "SceneUtils", "api/extras/SceneUtils" ]
+			[ "SceneUtils", "api/extras/SceneUtils" ],
+			[ "ShapeUtils", "api/extras/ShapeUtils" ]
 		],
 
 		"Extras / Collada Animation": [
