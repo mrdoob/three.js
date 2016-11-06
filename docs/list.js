@@ -14,7 +14,7 @@ var list = {
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "Materials", "api/constants/Materials" ],
 			[ "Textures", "api/constants/Textures" ],
-			[ "WebGLRenderer", "api/constants/WebGLRenderer" ]
+			[ "Renderer", "api/constants/Renderer" ]
 		],
 
 		"Cameras": [
@@ -201,6 +201,7 @@ var list = {
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
+			[ "DepthTexture", "api/textures/DepthTexture" ],
 			[ "Texture", "api/textures/Texture" ],
 			[ "VideoTexture", "api/textures/VideoTexture" ]
 		],
