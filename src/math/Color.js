@@ -27,7 +27,7 @@ Color.prototype = {
 
 	set: function ( value ) {
 
-		if ( (value && value.isColor) ) {
+		if ( value && value.isColor ) {
 
 			this.copy( value );
 
