@@ -76,7 +76,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	// private methods
 
-	var init = function ( parameters ) {
+	function init( parameters ) {
 
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer( { antialias: false } );
 		_this.domElement = _this.renderer.domElement;
@@ -100,9 +100,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.setAntialias( antialias );
 		_this.enableLightPrePass( false );
 
-	};
+	}
 
-	var initDepthTexture = function () {
+	function initDepthTexture() {
 
 		_depthTexture = new THREE.DepthTexture(
 			_width,
@@ -117,9 +117,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			THREE.DepthStencilFormat
 		)
 
-	};
+	}
 
-	var initPassNormalDepth = function () {
+	function initPassNormalDepth() {
 
 		_passNormalDepth = new THREE.RenderPass();
 		_passNormalDepth.clear = true;
@@ -138,9 +138,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compNormalDepth = new THREE.EffectComposer( _this.renderer, rt );
 		_compNormalDepth.addPass( _passNormalDepth );
 
-	};
+	}
 
-	var initPassColor = function () {
+	function initPassColor() {
 
 		_passColor = new THREE.RenderPass();
 		_passColor.clear = true;
@@ -158,9 +158,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compColor = new THREE.EffectComposer( _this.renderer, rt );
 		_compColor.addPass( _passColor );
 
-	};
+	}
 
-	var initPassLight = function () {
+	function initPassLight() {
 
 		_passLightFullscreen = new THREE.RenderPass();
 		_passLightFullscreen.clear = true;
@@ -183,9 +183,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compLight.addPass( _passLightFullscreen );
 		_compLight.addPass( _passLight );
 
-	};
+	}
 
-	var initPassReconstruction = function () {
+	function initPassReconstruction() {
 
 		_passReconstruction = new THREE.RenderPass();
 		_passReconstruction.clear = true;
@@ -203,9 +203,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compReconstruction = new THREE.EffectComposer( _this.renderer, rt );
 		_compReconstruction.addPass( _passReconstruction );
 
-	};
+	}
 
-	var initPassFinal = function () {
+	function initPassFinal() {
 
 		_passFinal = new THREE.ShaderPass( THREE.ShaderDeferred[ 'final' ] );
 		_passFinal.clear = true;
@@ -237,9 +237,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compFinal.addPass( _passCopy );
 		_compFinal.addPass( _passFXAA );
 
-	};
+	}
 
-	var initLightScene = function ( scene ) {
+	function initLightScene( scene ) {
 
 		if ( scene.userData.lightScene === undefined ) {
 
@@ -268,9 +268,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// emissiveLight is only for Classic Deferred Rendering
 		_lightFullscreenScene.userData.emissiveLight.visible = ! _lightPrePass;
 
-	};
+	}
 
-	var setMaterialNormalDepth = function ( object ) {
+	function setMaterialNormalDepth( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -290,9 +290,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getNormalDepthMaterial = function ( object ) {
+	function getNormalDepthMaterial( object ) {
 
 		if ( ( _lightPrePass && object.userData.normalDepthShininessMaterial === undefined ) ||
 		     ( ! _lightPrePass && object.userData.normalDepthMaterial === undefined ) ) {
@@ -303,9 +303,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return ( _lightPrePass ) ? object.userData.normalDepthShininessMaterial : object.userData.normalDepthMaterial;
 
-	};
+	}
 
-	var initDeferredNormalDepthMaterial = function ( object, isLightPrePass ) {
+	function initDeferredNormalDepthMaterial( object, isLightPrePass ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 		var material;
@@ -338,9 +338,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredNormalDepthMaterial = function ( originalMaterial, isLightPrePass ) {
+	function createDeferredNormalDepthMaterial( originalMaterial, isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'normalDepthShininess' ] : THREE.ShaderDeferred[ 'normalDepth' ];
 
@@ -353,9 +353,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredNormalDepthMaterial = function ( material, originalMaterial, isLightPrePass ) {
+	function updateDeferredNormalDepthMaterial( material, originalMaterial, isLightPrePass ) {
 
 		if ( originalMaterial.skinning !== undefined ) material.skinning = originalMaterial.skinning;
 		if ( originalMaterial.morphTargets !== undefined ) material.morphTargets = originalMaterial.morphTargets;
@@ -384,9 +384,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var setMaterialColor = function ( object ) {
+	function setMaterialColor( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -406,9 +406,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getColorMaterial = function ( object ) {
+	function getColorMaterial( object ) {
 
 		if ( object.userData.colorMaterial === undefined ) {
 
@@ -418,9 +418,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return object.userData.colorMaterial;
 
-	};
+	}
 
-	var initDeferredColorMaterial = function ( object ) {
+	function initDeferredColorMaterial( object ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 
@@ -442,9 +442,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredColorMaterial = function ( originalMaterial ) {
+	function createDeferredColorMaterial( originalMaterial ) {
 
 		var shader = THREE.ShaderDeferred[ 'color' ];
 
@@ -459,9 +459,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredColorMaterial = function ( material, originalMaterial ) {
+	function updateDeferredColorMaterial( material, originalMaterial ) {
 
 		var diffuse, emissive;
 
@@ -514,9 +514,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var setMaterialReconstruction = function ( object ) {
+	function setMaterialReconstruction( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -544,9 +544,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getReconstructionMaterial = function ( object ) {
+	function getReconstructionMaterial( object ) {
 
 		if ( object.userData.reconstructionMaterial === undefined ) {
 
@@ -556,9 +556,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return object.userData.reconstructionMaterial;
 
-	};
+	}
 
-	var initDeferredReconstructionMaterial = function ( object ) {
+	function initDeferredReconstructionMaterial( object ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 
@@ -580,9 +580,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredReconstructionMaterial = function ( originalMaterial ) {
+	function createDeferredReconstructionMaterial( originalMaterial ) {
 
 		var shader = THREE.ShaderDeferred[ 'reconstruction' ];
 
@@ -599,18 +599,18 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredReconstructionMaterial = function ( material, originalMaterial ) {
+	function updateDeferredReconstructionMaterial( material, originalMaterial ) {
 
 		updateDeferredColorMaterial( material, originalMaterial );
 
 		material.uniforms.viewWidth.value = _width;
 		material.uniforms.viewHeight.value = _height;
 
-	};
+	}
 
-	var setMaterialForwardRendering = function ( object ) {
+	function setMaterialForwardRendering( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -636,9 +636,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var initInvisibleMaterial = function ( object ) {
+	function initInvisibleMaterial( object ) {
 
 		if ( object.userData.originalMaterial.isMultiMaterial === true ) {
 
@@ -654,9 +654,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getForwardRenderingMaterial = function ( originalMaterial ) {
+	function getForwardRenderingMaterial( originalMaterial ) {
 
 		if ( originalMaterial.transparent === true && originalMaterial.visible === true ) {
 
@@ -668,9 +668,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredEmissiveLight = function () {
+	function createDeferredEmissiveLight() {
 
 		var shader = THREE.ShaderDeferred[ 'emissiveLight' ];
 
@@ -689,18 +689,18 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return mesh;
 
-	};
+	}
 
-	var updateDeferredEmissiveLight = function ( light, camera ) {
+	function updateDeferredEmissiveLight( light, camera ) {
 
 		var uniforms = light.material.uniforms;
 
 		uniforms.viewWidth.value = _width;
 		uniforms.viewHeight.value = _height;
 
-	};
+	}
 
-	var initDeferredLight = function ( light ) {
+	function initDeferredLight( light ) {
 
 		var deferredLight;
 
@@ -724,9 +724,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		light.userData.deferredLight = deferredLight;
 
-	};
+	}
 
-	var initDeferredLightMaterial = function ( light, isLightPrePass ) {
+	function initDeferredLightMaterial( light, isLightPrePass ) {
 
 		var originalLight = light.userData.originalLight;
 		var material;
@@ -759,9 +759,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getDeferredLightMaterial = function ( light ) {
+	function getDeferredLightMaterial( light ) {
 
 		if ( ( _lightPrePass && light.userData.materialLightPrePass === undefined ) ||
 		     ( ! _lightPrePass && light.userData.materialClassic === undefined ) ) {
@@ -772,9 +772,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return ( _lightPrePass ) ? light.userData.materialLightPrePass : light.userData.materialClassic;
 
-	};
+	}
 
-	var updateDeferredLight = function ( light, camera ) {
+	function updateDeferredLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 
@@ -792,9 +792,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredLightMesh = function ( light, geometry ) {
+	function createDeferredLightMesh( light, geometry ) {
 
 		var mesh = new THREE.Mesh( geometry, _invisibleMaterial );
 
@@ -802,9 +802,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return mesh;
 
-	};
+	}
 
-	var createDeferredLightMaterial = function ( shader, isLightPrePass ) {
+	function createDeferredLightMaterial( shader, isLightPrePass ) {
 
 		var material = new THREE.ShaderMaterial( {
 			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
@@ -829,19 +829,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var createDeferredPointLight = function ( light ) {
+	function createDeferredPointLight( light ) {
 
 		return createDeferredLightMesh( light, new THREE.SphereGeometry( 1, 16, 8 ) );
 
-	};
+	}
 
 	/*
 	 * optimization:
 	 * Renders PointLight only back face with stencil test.
 	 */
-	var createDeferredPointLightMaterial = function ( isLightPrePass ) {
+	function createDeferredPointLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'pointLightPre' ] : THREE.ShaderDeferred[ 'pointLight' ];
 
@@ -852,9 +852,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredPointLight = function ( light, camera ) {
+	function updateDeferredPointLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var distance = originalLight.distance;
@@ -879,15 +879,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredSpotLight = function ( light ) {
+	function createDeferredSpotLight( light ) {
 
 		return createDeferredLightMesh(	light, new THREE.PlaneBufferGeometry( 2, 2 ) );
 
-	};
+	}
 
-	var createDeferredSpotLightMaterial = function ( isLightPrePass ) {
+	function createDeferredSpotLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'spotLightPre' ] : THREE.ShaderDeferred[ 'spotLight' ];
 
@@ -897,9 +897,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredSpotLight = function ( light, camera ) {
+	function updateDeferredSpotLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
@@ -919,15 +919,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		vec2.setFromMatrixPosition( originalLight.target.matrixWorld );
 		vec.sub( vec2 ).normalize().transformDirection( camera.matrixWorldInverse );
 
-	};
+	}
 
-	var createDeferredDirectionalLight = function ( light ) {
+	function createDeferredDirectionalLight( light ) {
 
 		return createDeferredLightMesh(	light, new THREE.PlaneBufferGeometry( 2, 2 ) );
 
-	};
+	}
 
-	var createDeferredDirectionalLightMaterial = function ( isLightPrePass ) {
+	function createDeferredDirectionalLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'directionalLightPre' ] : THREE.ShaderDeferred[ 'directionalLight' ];
 
@@ -937,9 +937,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredDirectionalLight = function ( light, camera ) {
+	function updateDeferredDirectionalLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
@@ -957,9 +957,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		vec2.setFromMatrixPosition( originalLight.target.matrixWorld );
 		vec.sub( vec2 ).normalize().transformDirection( camera.matrixWorldInverse );
 
-	};
+	}
 
-	var saveOriginalMaterialAndCheckTransparency = function ( object ) {
+	function saveOriginalMaterialAndCheckTransparency( object ) {
 
 		if ( object.material !== undefined ) {
 
@@ -988,15 +988,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var restoreOriginalMaterial = function ( object ) {
+	function restoreOriginalMaterial( object ) {
 
 		if ( object.userData.originalMaterial !== undefined ) object.material = object.userData.originalMaterial;
 
-	};
+	}
 
-	var addDeferredLightsToLightScene = function ( object ) {
+	function addDeferredLightsToLightScene( object ) {
 
 		if ( object.isLight !== true ) return;
 
@@ -1027,9 +1027,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		lights[ light.uuid ].found = true;
 
-	};
+	}
 
-	var updateDeferredLightsInLightScene = function ( scene, camera ) {
+	function updateDeferredLightsInLightScene( scene, camera ) {
 
 		var lights = scene.userData.lights;
 		var keys = Object.keys( lights );
@@ -1056,9 +1056,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var enableFinalPasses = function () {
+	function enableFinalPasses() {
 
 		if ( _lightPrePass ) {
 
@@ -1150,7 +1150,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1170,7 +1170,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 *   A: depth
 	 */
 
-	var renderNormalDepth = function ( scene, camera ) {
+	function renderNormalDepth( scene, camera ) {
 
 		scene.traverse( setMaterialNormalDepth );
 
@@ -1186,7 +1186,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compNormalDepth.render();
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1199,7 +1199,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * A: shininess
 	 */
 
-	var renderColor = function ( scene, camera ) {
+	function renderColor( scene, camera ) {
 
 		scene.traverse( setMaterialColor );
 
@@ -1214,7 +1214,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compColor.render();
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1222,7 +1222,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * 3) light pass
 	 */
 
-	var renderLight = function ( scene, camera ) {
+	function renderLight( scene, camera ) {
 
 		updateDeferredEmissiveLight( _lightFullscreenScene.userData.emissiveLight, camera );
 
@@ -1243,7 +1243,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_gl.disable( _gl.STENCIL_TEST );
 
-	};
+	}
 
 	/*
 	 * Light Pre-Pass Rendering
@@ -1251,7 +1251,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * 2') Light pre pass
 	 */
 
-	var renderLightPre = function ( scene, camera ) {
+	function renderLightPre( scene, camera ) {
 
 		scene.traverse( addDeferredLightsToLightScene );
 
@@ -1271,7 +1271,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compLight.render();
 
-	};
+	}
 
 	/*
 	 * Light Pre-Pass Rendering
@@ -1282,7 +1282,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * Here renders transparent objects with normal forward rendering.
 	 */
 
-	var renderReconstruction = function ( scene, camera ) {
+	function renderReconstruction( scene, camera ) {
 
 		scene.traverse( setMaterialReconstruction );
 
@@ -1296,7 +1296,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_gl.disable( _gl.STENCIL_TEST );
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1321,7 +1321,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 *
 	 */
 
-	var renderFinal = function ( scene, camera ) {
+	function renderFinal( scene, camera ) {
 
 		if ( ! _lightPrePass && _hasTransparentObject ) {
 
@@ -1339,7 +1339,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compFinal.render();
 
-	};
+	}
 
 	// external APIs
 
