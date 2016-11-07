@@ -178,9 +178,27 @@
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
 
-						for ( var i = 0, il = mesh.material.materials.length; i < il; i ++ ) {
+						if ( mesh.userData.gradientMaps === undefined ) mesh.userData.gradientMaps = [];
 
-							var material = mesh.material.materials[ i ].uniforms.celShading.value = api[ 'gradient mapping' ] ? 1 : 0;
+						var materials = mesh.material.materials;
+						var gradientMaps = mesh.userData.gradientMaps;
+
+						for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+							var material = materials[ i ];
+
+							if ( api[ 'gradient mapping' ] ) {
+
+								material.gradientMap = gradientMaps[ i ];
+
+							} else {
+
+								gradientMaps[ i ] = material.gradientMap;
+								material.gradientMap = null;
+
+							}
+
+							material.needsUpdate = true;
 
 						}
 
