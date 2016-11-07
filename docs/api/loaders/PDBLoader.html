@@ -17,6 +17,33 @@
 		The <a href="http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)">Protein Data Bank file format</a> is a textual file format describing the three-dimensional structures of molecules.
 		</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.PDBLoader();
+
+		// load a PDB resource
+		loader.load(
+			// resource URL
+			'models/molecules/caffeine.pdb',
+			// Function when resource is loaded
+			function ( geometryAtoms, geometryBonds, json ) {
+				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_pdb]
+
 
 		<h2>Constructor</h2>
 
@@ -60,33 +87,6 @@
 		<div>
 		Parse a <em>(JSON) pdb</em> structure and return two [page:Geometry]: one for atoms, one for bonds.<br />
 		</div>
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.PDBLoader();
-
-		// load a PDB resource
-		loader.load(
-			// resource URL
-			'models/molecules/caffeine.pdb',
-			// Function when resource is loaded
-			function ( geometryAtoms, geometryBonds, json ) {
-				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
-
-		[example:webgl_loader_pdb]
 
 
 		<h2>Source</h2>

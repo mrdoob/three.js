@@ -10,26 +10,30 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an [page:Image].</div>
+		<div class="desc">
+		Class for loading a font in JSON format. Returns a [page:Font Font], which is an
+		array of [page:Shape Shape]s representing the font.<br /><br />
 
-		<h2>Example</h2>
+		You can convert fonts online using [link:https://gero3.github.io/facetype.js/ facetype.js]
+		</div>
+
+		<h2>Examples</h2>
+
+		<div>
+		[example:webgl_geometry_text geometry / text ]<br />
+		[example:webgl_geometry_text_earcut geometry / text / earcut]<br />
+		[example:webgl_geometry_text_pnltri geometry / text / pnltri]<br />
+		</div>
 
 		<code>
-		// instantiate a loader
-		var loader = new THREE.ImageLoader();
-
-		// load a image resource
-		loader.load(
+		var loader = new THREE.FontLoader();
+		var font = loader.load(
 			// resource URL
-			'textures/skyboxsun25degtest.png',
+			'fonts/helvetiker_bold.typeface.json'
 			// Function when resource is loaded
-			function ( image ) {
-				// do something with it
-
-				// like drawing a part of it on a canvas
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( '2d' );
-				context.drawImage( image, 100, 100 );
+			function ( font ) {
+				// do something with the font
+				scene.add( font );
 			},
 			// Function called when download progresses
 			function ( xhr ) {
@@ -42,8 +46,6 @@
 		);
 		</code>
 
-		[example:webgl_shaders_ocean]
-		
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:LoadingManager manager] )</h3>
@@ -54,32 +56,17 @@
 		Creates a new [name].
 		</div>
 
-		<h2>Properties</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<div>
-		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		</div>
-
 		<h2>Methods</h2>
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Image image].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the progress event.<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and return the [page:Image image] object that will contain the data.
-		</div>
-
-		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
-		<div>
-		[page:String value] — The crossOrigin string.
-		</div>
-		<div>
-		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
 		</div>
 
 		<h2>Source</h2>

@@ -13,6 +13,31 @@
 
 		<div class="desc">A loader for <em>Collada</em> files.</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.ColladaLoader();
+
+		loader.load(
+			// resource URL
+			'models/collada/monster/monster.dae',
+			// Function when resource is loaded
+			function ( collada ) {
+				scene.add( collada.scene );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_collada]<br />
+		[example:webgl_loader_collada_keyframe]<br />
+		[example:webgl_loader_collada_skinning]<br />
+		[example:webgl_loader_collada_kinematics]
+
 
 		<h2>Constructor</h2>
 
@@ -79,33 +104,6 @@
 		<div>
 		Apply a skin (vertices, animation, bones) from a <em>collada skin controller</em>, on the given [page:Geometry].
 		</div>
-
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.ColladaLoader();
-
-		loader.load(
-			// resource URL
-			'models/collada/monster/monster.dae',
-			// Function when resource is loaded
-			function ( collada ) {
-				scene.add( collada.scene );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			}
-		);
-		</code>
-
-		[example:webgl_loader_collada]<br />
-		[example:webgl_loader_collada_keyframe]<br />
-		[example:webgl_loader_collada_skinning]<br />
-		[example:webgl_loader_collada_kinematics]
-
 
 		<h2>Source</h2>
 

@@ -12,6 +12,21 @@
 
 		<div class="desc">A loader for loading a JSON resource. Unlike the [page:JSONLoader], this one make use of the <em>.type</em> attributes of objects to map them to their original classes.</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.ObjectLoader();
+
+		// assuming we loaded a JSON structure from elsewhere
+		var object = loader.parse( a_json_object );
+
+		scene.add( object );
+		</code>
+
+		[example:webgl_loader_msgpack]
+
+
 
 		<h2>Constructor</h2>
 
@@ -53,22 +68,6 @@
 		<div>
 		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
-
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.ObjectLoader();
-
-		// assuming we loaded a JSON structure from elsewhere
-		var object = loader.parse( a_json_object );
-
-		scene.add( object );
-		</code>
-
-		[example:webgl_loader_msgpack]
-
 
 		<h2>Source</h2>
 

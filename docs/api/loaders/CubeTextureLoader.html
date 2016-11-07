@@ -10,37 +10,32 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Class for loading a [page:Texture texture].</div>
+		<div class="desc">Class for loading a [page:CubeTexture CubeTexture].</div>
 
 		<h2>Example</h2>
 
 		<code>
-		// instantiate a loader
-		var loader = new THREE.TextureLoader();
-
-		// load a resource
-		loader.load(
-			// resource URL
-			'textures/land_ocean_ice_cloud_2048.jpg',
-			// Function when resource is loaded
-			function ( texture ) {
-				// do something with the texture
-				var material = new THREE.MeshBasicMaterial( {
-					map: texture
-				 } );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
+var scene = new THREE.Scene();
+scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+				'1.png',
+				'2.png',
+				'3.png',
+				'4.png',
+				'5.png',
+				'6.png'
+			] );
 		</code>
 
-		[example:canvas_geometry_earth]
+		<div>
+			[example:webgl_materials_cubemap materials / cubemap]<br />
+			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
+			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2]<br />
+			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</div>
 
 		<h2>Constructor</h2>
 
@@ -73,6 +68,16 @@
 		</div>
 		<div>
 		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		</div>
+
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<div>
+		Set the crossOrigin attribute.
+		</div>
+
+		<h3>[method:null setPath]( [page:String value] )</h3>
+		<div>
+		Set the path from which to load textures.	
 		</div>
 
 		<h2>Source</h2>
