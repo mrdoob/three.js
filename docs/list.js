@@ -92,12 +92,18 @@ var list = {
 
 
 		"Loaders": [
+			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
 			[ "AudioLoader", "api/loaders/AudioLoader" ],
 			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
+			[ "BinaryTextureLoader", "api/loaders/BinaryTextureLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "CompressedTextureLoader", "api/loaders/CompressedTextureLoader" ],
+			[ "CubeTextureLoader", "api/loaders/CubeTextureLoader" ],
+			[ "DataTextureLoader", "api/loaders/DataTextureLoader" ],
 			[ "FileLoader", "api/loaders/FileLoader" ],
+			[ "FontLoader", "api/loaders/FontLoader" ],
 			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
