@@ -128,7 +128,7 @@ Object.assign( Skeleton.prototype, {
 
 			if ( bone ) {
 
-				if ( (bone.parent && bone.parent.isBone) ) {
+				if ( bone.parent && bone.parent.isBone ) {
 
 					bone.matrix.getInverse( bone.parent.matrixWorld );
 					bone.matrix.multiply( bone.matrixWorld );

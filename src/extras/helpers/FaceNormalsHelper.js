@@ -28,7 +28,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	var objGeometry = this.object.geometry;
 
-	if ( (objGeometry && objGeometry.isGeometry) ) {
+	if ( objGeometry && objGeometry.isGeometry ) {
 
 		nNormals = objGeometry.faces.length;
 

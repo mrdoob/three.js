@@ -105,7 +105,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	normalizeSkinWeights: function () {
 
-		if ( (this.geometry && this.geometry.isGeometry) ) {
+		if ( this.geometry && this.geometry.isGeometry ) {
 
 			for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
@@ -125,7 +125,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
-		} else if ( (this.geometry && this.geometry.isBufferGeometry) ) {
+		} else if ( this.geometry && this.geometry.isBufferGeometry ) {
 
 			var vec = new Vector4();
 
