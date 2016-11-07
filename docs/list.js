@@ -167,6 +167,7 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
@@ -226,7 +227,9 @@ var list = {
 		],
 
 		"Extras": [
-			[ "SceneUtils", "api/extras/SceneUtils" ]
+			[ "CurveUtils", "api/extras/CurveUtils" ],
+			[ "SceneUtils", "api/extras/SceneUtils" ],
+			[ "ShapeUtils", "api/extras/ShapeUtils" ]
 		],
 
 		"Extras / Collada Animation": [
@@ -238,6 +241,7 @@ var list = {
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
+			[ "Font", "api/extras/core/Font" ],
 			[ "Path", "api/extras/core/Path" ],
 			[ "Shape", "api/extras/core/Shape" ]
 		],
@@ -268,6 +272,7 @@ var list = {
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
+			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
 		],
