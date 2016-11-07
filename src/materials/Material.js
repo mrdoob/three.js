@@ -55,6 +55,7 @@ function Material() {
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
+	this.layers = new Layers();
 	this.visible = true;
 
 	this._needsUpdate = true;
@@ -301,7 +302,9 @@ Material.prototype = {
 
 		this.overdraw = source.overdraw;
 
+		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
+
 		this.clipShadows = source.clipShadows;
 		this.clipIntersection = source.clipIntersection;
 

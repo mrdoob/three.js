@@ -1440,7 +1440,7 @@ function WebGLRenderer( parameters ) {
 
 					var material = object.material;
 
-					if ( material.visible === true ) {
+					if ( material.visible === true && ( material.layers.mask & camera.layers.mask ) !== 0 ) {
 
 						if ( _this.sortObjects === true ) {
 
