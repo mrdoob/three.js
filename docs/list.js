@@ -140,6 +140,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Interpolant", "api/math/Interpolant" ],
 			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
@@ -155,6 +156,14 @@ var list = {
 			[ "Vector3", "api/math/Vector3" ],
 			[ "Vector4", "api/math/Vector4" ]
 		],
+
+		"Math / Interpolants": [
+			[ "CubicInterpolant", "api/math/interpolants/CubicInterpolant" ],
+			[ "DiscreteInterpolant", "api/math/interpolants/DiscreteInterpolant" ],
+			[ "LinearInterpolant", "api/math/interpolants/LinearInterpolant" ],
+			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
+		],
+
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
