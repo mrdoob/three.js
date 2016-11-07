@@ -21,7 +21,8 @@ var list = {
 			[ "Camera", "api/cameras/Camera" ],
 			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
-			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
+			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
+			[ "StereoCamera", "api/cameras/StereoCamera" ]
 		],
 
 		"Core": [
