@@ -113,6 +113,7 @@ var list = {
 			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "OBJLoader", "api/loaders/OBJLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
+			[ "PCDLoader", "api/loaders/PCDLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
