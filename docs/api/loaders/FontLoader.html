@@ -31,11 +31,9 @@
 			// resource URL
 			'fonts/helvetiker_bold.typeface.json'
 			// Function when resource is loaded
-			function ( texture ) {
-				// do something with the texture
-				var material = new THREE.MeshBasicMaterial( {
-					map: texture
-				 } );
+			function ( font ) {
+				// do something with the font
+				scene.add( font );
 			},
 			// Function called when download progresses
 			function ( xhr ) {
