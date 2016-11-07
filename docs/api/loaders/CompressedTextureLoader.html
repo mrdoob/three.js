@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Abstract base class for block based textures loader (dds, pvr, ...).<br /><br />
+		</div>
+
+		<h2>Examples</h2>
+
+		<div>
+			See the [link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/DDSLoader.js DDSLoader]
+			and [link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/PVRLoader.js PVRLoader]
+			for examples of a derived classes.
+		</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use.
+		Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<div>
+		manager — the LoadingManager supplied in the constructor, or the [page:LoadingManager THREE.DefaultLoadingManager].<br />
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded texture.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and pass the loaded texture to onLoad.
+		</div>
+
+		<h3>[method:null setPath]( [page:String value] )</h3>
+		<div>
+		Set the path from which to load textures.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
