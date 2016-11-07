@@ -153,6 +153,14 @@ var list = {
 			[ "Vector4", "api/math/Vector4" ]
 		],
 
+		"Math / Interpolants": [
+			[ "CubicInterpolant", "api/math/interpolants/CubicInterpolant" ],
+			[ "DiscreteInterpolant", "api/math/interpolants/DiscreteInterpolant" ],
+			[ "LinearInterpolant", "api/math/interpolants/LinearInterpolant" ],
+			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
+		],
+
+
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
