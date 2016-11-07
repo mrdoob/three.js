@@ -125,10 +125,12 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
+			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
+			[ "ShadowMaterial", "api/materials/ShadowMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
