@@ -124,18 +124,7 @@
 
 					helper.add( mesh );
 					helper.setAnimation( mesh );
-
-					/*
-					 * Note: You're recommended to call helper.setPhysics()
-					 *       after calling helper.setAnimation().
-					 * Note: Physics calculation is pretty heavy.
-					 *       It may not be acceptable for most mobile devices yet.
-			 		 */
-					if ( ! isMobileDevice() ) {
-
-						helper.setPhysics( mesh );
-
-					}
+					helper.setPhysics( mesh );
 
 					loader.loadVmds( cameraFiles, function ( vmd ) {
 
@@ -222,33 +211,6 @@
 					renderer.render( scene, camera );
 
 				}
-
-			}
-
-			// easy mobile device detection
-			function isMobileDevice () {
-
-				if ( navigator === undefined || navigator.userAgent === undefined ) {
-
-					return true;
-
-				}
-
-				var s = navigator.userAgent;
-
-				if (    s.match( /iPhone/i )
-//				     || s.match( /iPad/i )
-				     || s.match( /iPod/i )
-				     || s.match( /webOS/i )
-				     || s.match( /BlackBerry/i )
-				     || ( s.match( /Windows/i ) && s.match( /Phone/i ) )
-				     || ( s.match( /Android/i ) && s.match( /Mobile/i ) ) ) {
-
-					return true;
-
-				}
-
-				return false;
 
 			}
 
