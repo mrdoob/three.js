@@ -23,6 +23,7 @@ Object.assign( TextureLoader.prototype, {
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( this.path );
+		loader.setResponseType( this.responseType );
 		loader.load( url, function ( image ) {
 
 			// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
@@ -63,9 +64,13 @@ Object.assign( TextureLoader.prototype, {
 		this.path = value;
 		return this;
 
-	}
+	},
 
-
+	setResponseType: function ( value ) {
+	
+		this.responseType = value;
+		return this;
+	},
 
 } );
 
