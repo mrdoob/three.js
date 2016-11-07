@@ -23,7 +23,7 @@ function SkeletonHelper( object ) {
 
 		var bone = this.bones[ i ];
 
-		if ( (bone.parent && bone.parent.isBone) ) {
+		if ( bone.parent && bone.parent.isBone ) {
 
 			geometry.vertices.push( new Vector3() );
 			geometry.vertices.push( new Vector3() );
@@ -57,7 +57,7 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 
 	var boneList = [];
 
-	if ( (object && object.isBone) ) {
+	if ( object && object.isBone ) {
 
 		boneList.push( object );
 
@@ -87,7 +87,7 @@ SkeletonHelper.prototype.update = function () {
 
 		var bone = this.bones[ i ];
 
-		if ( (bone.parent && bone.parent.isBone) ) {
+		if ( bone.parent && bone.parent.isBone ) {
 
 			boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
 			geometry.vertices[ j ].setFromMatrixPosition( boneMatrix );

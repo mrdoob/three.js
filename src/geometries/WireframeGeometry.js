@@ -19,7 +19,7 @@ function WireframeGeometry( geometry ) {
 
 	var keys = [ 'a', 'b', 'c' ];
 
-	if ( (geometry && geometry.isGeometry) ) {
+	if ( geometry && geometry.isGeometry ) {
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
@@ -72,7 +72,7 @@ function WireframeGeometry( geometry ) {
 
 		this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
 
-	} else if ( (geometry && geometry.isBufferGeometry) ) {
+	} else if ( geometry && geometry.isBufferGeometry ) {
 
 		if ( geometry.index !== null ) {
 

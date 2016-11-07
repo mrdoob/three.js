@@ -6,7 +6,6 @@
 import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
 import { WebGLRenderTarget } from '../WebGLRenderTarget';
 import { ShaderMaterial } from '../../materials/ShaderMaterial';
-import { UniformsUtils } from '../shaders/UniformsUtils';
 import { ShaderLib } from '../shaders/ShaderLib';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
 import { Vector4 } from '../../math/Vector4';
@@ -64,7 +63,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	depthMaterialTemplate.clipping = true;
 
 	var distanceShader = ShaderLib[ "distanceRGBA" ];
-	var distanceUniforms = UniformsUtils.clone( distanceShader.uniforms );
+	var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
 
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
@@ -115,7 +114,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.clearColor( 1, 1, 1, 1 );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );

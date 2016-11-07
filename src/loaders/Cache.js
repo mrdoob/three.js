@@ -1,10 +1,8 @@
-var Cache;
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-Cache = {
+var Cache = {
 
 	enabled: false,
 

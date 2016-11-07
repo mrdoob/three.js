@@ -41,6 +41,8 @@
 		<div>
 		color — geometry color in hexadecimal. Default is 0xffffff.<br />
 		map — Set texture map. Default is null <br />
+		lightMap — Set light map. Default is null.<br />
+		lightMapIntensity — Set light map intensity. Default is 1.<br />
 		aoMap — Set ao map. Default is null.<br />
 		aoMapIntensity — Set ao map intensity. Default is 1.<br />
 		specularMap — Set specular map. Default is null.<br />
@@ -71,11 +73,17 @@
 		Set texture map. Default is  null.
 		</div>
 
+		<h3>[property:Texture lightMap]</h3>
+		<div>Set light map. Default is null. The lightMap requires a second set of UVs.</div>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<div>Intensity of the baked light. Default is 1.</div>
+
 		<h3>[property:Texture aoMap]</h3>
 		<div>Set ambient occlusion map. Default is null.</div>
 
 		<h3>[property:Float aoMapIntensity]</h3>
-		<div>TODO</div>
+		<div>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</div>
 
 		<h3>[property:Texture specularMap]</h3>
 		<div>Set specular map. Default is null.</div>
@@ -90,7 +98,7 @@
 		<h3>[property:Integer combine]</h3>
 		<div>How to combine the result of the surface's color with the environment map, if any.</div>
 
-		<div>Options are [page:Textures THREE.Multiply] (default), [page:Textures THREE.MixOperation], [page:Textures THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
+		<div>Options are [page:Materials THREE.Multiply] (default), [page:Materials THREE.MixOperation], [page:Materials THREE.AddOperation]. If mix is chosen, the reflectivity is used to blend between the two colors.</div>
 
 		<h3>[property:Float reflectivity]</h3>
 		<div>How much the environment map affects the surface; also see "combine".</div>

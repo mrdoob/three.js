@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Creates a one-sided polygonal geometry from one or more path shapes. Similar to [page:ExtrudeGeometry].</div>
+		<div class="desc">Creates an one-sided polygonal geometry from one or more path shapes.</div>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ShapeGeometry"></iframe>
 
@@ -37,16 +37,19 @@
 
 
 		<code>
-		var length = 16, width = 12;
+		var x = 0, y = 0;
 
-		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
-		shape.lineTo( 0, width );
-		shape.lineTo( length, width );
-		shape.lineTo( length, 0 );
-		shape.lineTo( 0, 0 );
+		var heartShape = new THREE.Shape();
 
-		var geometry = new THREE.ShapeGeometry( shape );
+		heartShape.moveTo( x + 5, y + 5 );
+		heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+		heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+		heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+		heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+		heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+		heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+
+		var geometry = new THREE.ShapeGeometry( heartShape );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var mesh = new THREE.Mesh( geometry, material ) ;
 		scene.add( mesh );
@@ -55,39 +58,12 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Array shapes], [page:Object options])</h3>
+		<h3>[name]([page:Array shapes], [page:Integer curveSegments])</h3>
 		<div>
-		shapes — [page:Array] of shapes, or a single [page:Shape shape] <br />
-		options — Optional options [page:Object object]
-		<ul>
-		<li>curveSegments - [page:Integer] - Not used at the moment - defaults to 12</li>
-		<li>material - [page:Integer] - index of the material in a material list</li>
-		<li>UVGenerator - A UV generator, defaults to [page:ExtrudeGeometry]'s WorldUVGenerator</li>
-		</ul>
+		shapes — [page:Array] of shapes or a single [page:Shape shape].<br />
+		curveSegments - [page:Integer] - Number of segments per shape. Default is 12.
 		</div>
 
-
-		<h2>Methods</h2>
-
-
-
-		<h3>.addShapeList([page:Array shapes], [page:Object options]) [page:this]</h3>
-		<div>
-		shapes — [page:Array] of [page:Shape shapes] <br />
-		options — See options in constructor
-		</div>
-		<div>
-		Adds a list of shapes to the geometry.
-		</div>
-
-		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
-		<div>
-		shape — [page:Shape] <br />
-		options — See options in constructor
-		</div>
-		<div>
-		Adds a single shape to the geometry
-		</div>
 
 		<h2>Source</h2>
 

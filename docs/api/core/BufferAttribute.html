@@ -18,7 +18,7 @@
 		<h3>[name]( [page:TypedArray array], [page:Integer itemSize], [page:Boolean normalized] )</h3>
 		<div>
 		Instantiates this attribute with data from the associated buffer.
-		itemSize gives the number of values of the array that should be associated with a particular vertex. normalized indicates how the underlying data in the buffer maps to the values in the GLSL shader code. 
+		itemSize gives the number of values of the array that should be associated with a particular vertex. normalized indicates how the underlying data in the buffer maps to the values in the GLSL shader code.
 		</div>
 
 		<h2>Properties</h2>
@@ -54,6 +54,10 @@
 		A version number, incremented every time the needsUpdate property is set to true.
 		</div>
 
+		<h3>[property:Function onUpload]</h3>
+		<div>
+		A callback function that is executed after the Renderer has transfered the attribute array data to the GPU.
+		</div>
 
 		<h2>Methods</h2>
 

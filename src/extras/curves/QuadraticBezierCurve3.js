@@ -2,13 +2,11 @@ import { Vector3 } from '../../math/Vector3';
 import { ShapeUtils } from '../ShapeUtils';
 import { Curve } from '../core/Curve';
 
-var QuadraticBezierCurve3;
-
 /**************************************************************
  *	Quadratic Bezier 3D curve
  **************************************************************/
 
-QuadraticBezierCurve3 = Curve.create(
+var QuadraticBezierCurve3 = Curve.create(
 
 	function ( v0, v1, v2 ) {
 
@@ -20,7 +18,7 @@ QuadraticBezierCurve3 = Curve.create(
 
 	function ( t ) {
 
-		var b2 = ShapeUtils.b2;		
+		var b2 = ShapeUtils.b2;
 
 		return new Vector3(
 			b2( t, this.v0.x, this.v1.x, this.v2.x ),

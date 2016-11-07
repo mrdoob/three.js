@@ -1,5 +1,5 @@
 import { LinearFilter, LinearMipMapLinearFilter, ClampToEdgeWrapping } from '../constants';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { DataTexture } from '../textures/DataTexture';
 import { DefaultLoadingManager } from './LoadingManager';
 
@@ -27,7 +27,7 @@ Object.assign( BinaryTextureLoader.prototype, {
 
 		var texture = new DataTexture();
 
-		var loader = new XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {

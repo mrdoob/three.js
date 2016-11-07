@@ -11,7 +11,15 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			The Canvas renderer displays your beautifully crafted scenes <em>not</em> using WebGL, but draws it using the (slower) <a href="http://drafts.htmlwg.org/2dcontext/html5_canvas_CR/Overview.html">Canvas 2D Context</a> API.<br /><br />
+			The Canvas renderer displays your beautifully crafted scenes <em>not</em> using WebGL,
+			but draws it using the (slower) <a href="http://drafts.htmlwg.org/2dcontext/html5_canvas_CR/Overview.html">Canvas 2D Context</a>
+			API.<br /><br />
+
+			<b>
+			NOTE: The Canvas renderer has been deprecated and is no longer part of the Three.js core.
+			</b>
+			If you still need to use it you can find it here: [link:https://github.com/mrdoob/three.js/blob/master/examples/js/[path].js examples/js/[path].js].<br /><br />
+
 			This renderer can be a nice fallback from [page:WebGLRenderer] for simple scenes:
 
 			<code>
@@ -38,7 +46,6 @@
 			The "Canvas" in CanvasRenderer means it uses Canvas 2D instead of WebGL.<br /><br />
 
 			Don't confuse either CanvasRenderer with the SoftwareRenderer example, which simulates a screen buffer in a Javascript array.
-			Because the Canvas renderer is not part of the three.js core, you have to include it from /examples/js/renderers/.
 		</div>
 
 		<h2>Constructor</h2>
@@ -158,6 +165,6 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/[path].js examples/js/[path].js]
 	</body>
 </html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="../../" />
+    <script src="list.js"></script>
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+  </head>
+  <body>
+    <h1>[name]</h1>
+
+    <div class="desc">
+    An AnimationClip is a reusable set of Tracks that represent an animation.
+    </div>
+
+
+    <h2>Constructor</h2>
+
+
+    <h3>[name]( [page:String name], [page:Number duration], tracks )</h3>
+
+
+    <h2>Properties</h2>
+
+
+    <h3>[property:String uuid]</h3>
+
+    <h3>[property:String name]</h3>
+
+    <h3>[property:Number duration]</h3>
+
+    <h3>.tracks</h3>
+
+
+    <h2>Methods</h2>
+
+
+    <h3>[method:null resetDuration]()</h3>
+    <div>
+    Resets duration by scanning all tracks in the clip.
+    </div>
+
+    <h3>[method:AnimationClip trim]()</h3>
+    <div>
+    Trims all tracks to the clip's duration.
+    </div>
+
+    <h3>[method:AnimationClip optimize]()</h3>
+    <div>
+    Optimizes each track.
+    </div>
+
+
+    <h2>Static Methods</h2>
+
+
+    <h3>[method:AnimationClip parse]( [page:Object json] )</h3>
+    <div>
+    json -- JSON object
+    </div>
+
+    <h3>[method:Object toJSON]( [page:AnimationClip clip] )</h3>
+    <div>
+    clip -- AnimationClip
+    </div>
+
+    <h3>[method:AnimationClip CreateFromMorphTargetSequence]( [page:String name], [page:Array morphTargetSequence], [page:Number fps], [page:Boolean noLoop] )</h3>
+    <div>
+    name -- Name for the new clip <br />
+    morphTargetSequence -- Array of morph targets <br />
+    fps -- Number of frames per second <br />
+    noLoop -- Whether looping occurs automatically.
+    </div>
+
+    <h3>[method:AnimationClip parseAnimation]( [page:Object animation], [page:Array bones] )</h3>
+    <div>
+    Parses the animation.hierarchy format and returns an AnimationClip.
+    </div>
+
+
+    <h2>Source</h2>
+
+
+    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+  </body>
+</html>

@@ -41,19 +41,31 @@ THREE.MMDLoader = function ( manager ) {
 
 	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.defaultTexturePath = './models/default/';
 
 };
 
 THREE.MMDLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.MMDLoader.prototype.constructor = THREE.MMDLoader;
 
-THREE.MMDLoader.prototype.setDefaultTexturePath = function ( path ) {
-
-	this.defaultTexturePath = path;
-	if ( this.defaultTexturePath.lastIndexOf( '/' ) !== this.defaultTexturePath.length - 1 ) this.defaultTexturePath += '/';
-
-};
+/*
+ * base64 encoded defalut toon textures toon00.bmp - toon10.bmp
+ * Users don't need to prepare default texture files.
+ *
+ * This idea is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
+ */
+THREE.MMDLoader.prototype.defaultToonTextures = [
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
+];
 
 THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrls, callback, onProgress, onError ) {
 
@@ -309,9 +321,11 @@ THREE.MMDLoader.prototype.extractExtension = function ( url ) {
 
 };
 
-THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType ) {
+THREE.MMDLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType, mimeType ) {
 
-	var loader = new THREE.XHRLoader( this.manager );
+	var loader = new THREE.FileLoader( this.manager );
+
+	if ( mimeType !== undefined ) loader.setMimeType( mimeType );
 
 	loader.setResponseType( responseType );
 
@@ -339,15 +353,7 @@ THREE.MMDLoader.prototype.loadFileAsText = function ( url, onLoad, onProgress, o
 
 THREE.MMDLoader.prototype.loadFileAsShiftJISText = function ( url, onLoad, onProgress, onError ) {
 
-	var request = this.loadFile( url, onLoad, onProgress, onError, 'text' );
-
-	/*
-	 * TODO: some browsers seem not support overrideMimeType
-	 *       so some workarounds for them may be necessary.
-	 * Note: to set property of request after calling request.send(null)
-	 *       (it's called in THREE.XHRLoader.load()) could be a bad manner.
-	 */
-	request.overrideMimeType( 'text/plain; charset=shift_jis' );
+	var request = this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
 
 };
 
@@ -787,7 +793,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.weight = dv.getFloat32();
 			p.positionDamping = dv.getFloat32();
 			p.rotationDamping = dv.getFloat32();
-			p.restriction = dv.getFloat32();
+			p.restitution = dv.getFloat32();
 			p.friction = dv.getFloat32();
 			p.type = dv.getUint8();
 			return p;
@@ -1232,6 +1238,22 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 					m.uv = dv.getFloat32Array( 4 );
 					p.elements.push( m );
 
+				} else if ( p.type === 4 ) {  // additional uv1
+
+					// TODO: implement
+
+				} else if ( p.type === 5 ) {  // additional uv2
+
+					// TODO: implement
+
+				} else if ( p.type === 6 ) {  // additional uv3
+
+					// TODO: implement
+
+				} else if ( p.type === 7 ) {  // additional uv4
+
+					// TODO: implement
+
 				} else if ( p.type === 8 ) {  // material morph
 
 					var m = {};
@@ -1325,7 +1347,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 			p.weight = dv.getFloat32();
 			p.positionDamping = dv.getFloat32();
 			p.rotationDamping = dv.getFloat32();
-			p.restriction = dv.getFloat32();
+			p.restitution = dv.getFloat32();
 			p.friction = dv.getFloat32();
 			p.type = dv.getUint8();
 			return p;
@@ -1682,9 +1704,18 @@ THREE.MMDLoader.prototype.parseVpd = function ( text ) {
 THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress, onError ) {
 
 	var scope = this;
-	var geometry = new THREE.Geometry();
-        var material = new THREE.MultiMaterial();
+	var geometry = new THREE.BufferGeometry();
+	var material = new THREE.MultiMaterial();
 	var helper = new THREE.MMDLoader.DataCreationHelper();
+
+	var buffer = {};
+
+	buffer.vertices = [];
+	buffer.uvs = [];
+	buffer.normals = [];
+	buffer.skinIndices = [];
+	buffer.skinWeights = [];
+	buffer.indices = [];
 
 	var initVartices = function () {
 
@@ -1692,31 +1723,35 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var v = model.vertices[ i ];
 
-			geometry.vertices.push(
-				new THREE.Vector3(
-					v.position[ 0 ],
-					v.position[ 1 ],
-					v.position[ 2 ]
-				)
-			);
+			for ( var j = 0, jl = v.position.length; j < jl; j ++ ) {
 
-			geometry.skinIndices.push(
-				new THREE.Vector4(
-					v.skinIndices.length >= 1 ? v.skinIndices[ 0 ] : 0.0,
-					v.skinIndices.length >= 2 ? v.skinIndices[ 1 ] : 0.0,
-					v.skinIndices.length >= 3 ? v.skinIndices[ 2 ] : 0.0,
-					v.skinIndices.length >= 4 ? v.skinIndices[ 3 ] : 0.0
-				)
-			);
+				buffer.vertices.push( v.position[ j ] );
 
-			geometry.skinWeights.push(
-				new THREE.Vector4(
-					v.skinWeights.length >= 1 ? v.skinWeights[ 0 ] : 0.0,
-					v.skinWeights.length >= 2 ? v.skinWeights[ 1 ] : 0.0,
-					v.skinWeights.length >= 3 ? v.skinWeights[ 2 ] : 0.0,
-					v.skinWeights.length >= 4 ? v.skinWeights[ 3 ] : 0.0
-				)
-			);
+			}
+
+			for ( var j = 0, jl = v.normal.length; j < jl; j ++ ) {
+
+				buffer.normals.push( v.normal[ j ] );
+
+			}
+
+			for ( var j = 0, jl = v.uv.length; j < jl; j ++ ) {
+
+				buffer.uvs.push( v.uv[ j ] );
+
+			}
+
+			for ( var j = 0; j < 4; j ++ ) {
+
+				buffer.skinIndices.push( v.skinIndices.length - 1 >= j ? v.skinIndices[ j ] : 0.0 );
+
+			}
+
+			for ( var j = 0; j < 4; j ++ ) {
+
+				buffer.skinWeights.push( v.skinWeights.length - 1 >= j ? v.skinWeights[ j ] : 0.0 );
+
+			}
 
 		}
 
@@ -1726,22 +1761,11 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		for ( var i = 0; i < model.metadata.faceCount; i++ ) {
 
-			geometry.faces.push(
-				new THREE.Face3(
-					model.faces[ i ].indices[ 0 ],
-					model.faces[ i ].indices[ 1 ],
-					model.faces[ i ].indices[ 2 ]
-				)
-			);
+			var f = model.faces[ i ];
 
-			for ( var j = 0; j < 3; j++ ) {
+			for ( var j = 0, jl = f.indices.length; j < jl; j ++ ) {
 
-				geometry.faces[ i ].vertexNormals[ j ] =
-					new THREE.Vector3(
-						model.vertices[ model.faces[ i ].indices[ j ] ].normal[ 0 ],
-						model.vertices[ model.faces[ i ].indices[ j ] ].normal[ 1 ],
-						model.vertices[ model.faces[ i ].indices[ j ] ].normal[ 2 ]
-					);
+				buffer.indices.push( f.indices[ j ] );
 
 			}
 
@@ -1752,6 +1776,21 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	var initBones = function () {
 
 		var bones = [];
+
+		var rigidBodies = model.rigidBodies;
+		var dictionary = {};
+
+		for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+			var body = rigidBodies[ i ];
+			var value = dictionary[ body.boneIndex ];
+
+			// keeps greater number if already value is set without any special reasons
+			value = value === undefined ? body.type : Math.max( body.type, value );
+
+			dictionary[ body.boneIndex ] = value;
+
+		}
 
 		for ( var i = 0; i < model.metadata.boneCount; i++ ) {
 
@@ -1771,6 +1810,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				bone.pos[ 2 ] -= model.bones[ bone.parent ].position[ 2 ];
 
 			}
+
+			bone.rigidBodyType = dictionary[ i ] !== undefined ? dictionary[ i ] : -1;
 
 			bones.push( bone );
 
@@ -1842,6 +1883,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var link = {};
 					link.index = ik.links[ j ].index;
+					link.enabled = true;
 
 					if ( ik.links[ j ].angleLimitation === 1 ) {
 
@@ -1906,15 +1948,15 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initMorphs = function () {
 
-		function updateVertex ( params, index, v, ratio ) {
+		function updateVertex( attribute, index, v, ratio ) {
 
-			params.vertices[ index ].x += v.position[ 0 ] * ratio;
-			params.vertices[ index ].y += v.position[ 1 ] * ratio;
-			params.vertices[ index ].z += v.position[ 2 ] * ratio;
+			attribute.array[ index * 3 + 0 ] += v.position[ 0 ] * ratio;
+			attribute.array[ index * 3 + 1 ] += v.position[ 1 ] * ratio;
+			attribute.array[ index * 3 + 2 ] += v.position[ 2 ] * ratio;
 
 		};
 
-		function updateVertices ( params, m, ratio ) {
+		function updateVertices( attribute, m, ratio ) {
 
 			for ( var i = 0; i < m.elementCount; i++ ) {
 
@@ -1932,26 +1974,25 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				}
 
-				updateVertex( params, index, v, ratio );
+				updateVertex( attribute, index, v, ratio );
 
 			}
 
 		};
 
+		var morphTargets = [];
+		var attributes = [];
+
 		for ( var i = 0; i < model.metadata.morphCount; i++ ) {
 
 			var m = model.morphs[ i ];
-			var params = {};
+			var params = { name: m.name };
 
-			params.name = m.name;
-			params.vertices = [];
+			var attribute = new THREE.Float32Attribute( model.metadata.vertexCount * 3, 3 );
 
-			for ( var j = 0; j < model.metadata.vertexCount; j++ ) {
+			for ( var j = 0; j < model.metadata.vertexCount * 3; j++ ) {
 
-				params.vertices[ j ] = new THREE.Vector3( 0, 0, 0 );
-				params.vertices[ j ].x = geometry.vertices[ j ].x;
-				params.vertices[ j ].y = geometry.vertices[ j ].y;
-				params.vertices[ j ].z = geometry.vertices[ j ].z;
+				attribute.array[ j ] = buffer.vertices[ j ];
 
 			}
 
@@ -1959,13 +2000,13 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				if ( i !== 0 ) {
 
-					updateVertices( params, m, 1.0 );
+					updateVertices( attribute, m, 1.0 );
 
 				}
 
 			} else {
 
-				if ( m.type === 0 ) {
+				if ( m.type === 0 ) {    // group
 
 					for ( var j = 0; j < m.elementCount; j++ ) {
 
@@ -1974,24 +2015,59 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 						if ( m2.type === 1 ) {
 
-							updateVertices( params, m2, ratio );
+							updateVertices( attribute, m2, ratio );
+
+						} else {
+
+							// TODO: implement
 
 						}
 
 					}
 
-				} else if ( m.type === 1 ) {
+				} else if ( m.type === 1 ) {    // vertex
 
-					updateVertices( params, m, 1.0 );
+					updateVertices( attribute, m, 1.0 );
+
+				} else if ( m.type === 2 ) {    // bone
+
+					// TODO: implement
+
+				} else if ( m.type === 3 ) {    // uv
+
+					// TODO: implement
+
+				} else if ( m.type === 4 ) {    // additional uv1
+
+					// TODO: implement
+
+				} else if ( m.type === 5 ) {    // additional uv2
+
+					// TODO: implement
+
+				} else if ( m.type === 6 ) {    // additional uv3
+
+					// TODO: implement
+
+				} else if ( m.type === 7 ) {    // additional uv4
+
+					// TODO: implement
+
+				} else if ( m.type === 8 ) {    // material
+
+					// TODO: implement
 
 				}
 
 			}
 
-			// TODO: skip if this's non-vertex morphing of PMX to reduce CPU/Memory use
-			geometry.morphTargets.push( params );
+			morphTargets.push( params );
+			attributes.push( attribute );
 
 		}
+
+		geometry.morphTargets = morphTargets;
+		geometry.morphAttributes.position = attributes;
 
 	};
 
@@ -2012,8 +2088,26 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			var directoryPath = ( params.defaultTexturePath === true ) ? scope.defaultTexturePath : texturePath;
-			var fullPath = directoryPath + filePath;
+			var fullPath;
+
+			if ( params.defaultTexturePath === true ) {
+
+				try {
+
+					fullPath = scope.defaultToonTextures[ parseInt( filePath.match( 'toon([0-9]{2})\.bmp$' )[ 1 ] ) ];
+
+				} catch ( e ) {
+
+					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' )
+					fullPath = scope.defaultToonTextures[ 0 ];
+
+				}
+
+			} else {
+
+				fullPath = texturePath + filePath;
+
+			}
 
 			var loader = THREE.Loader.Handlers.get( fullPath );
 
@@ -2069,36 +2163,13 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
 
-			geometry.faceVertexUvs.push( [] );
-
-		}
-
-		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
-
 			var m = model.materials[ i ];
 			var params = {};
 
 			params.faceOffset = offset;
 			params.faceNum = m.faceCount;
 
-			for ( var j = 0; j < m.faceCount; j++ ) {
-
-				geometry.faces[ offset ].materialIndex = i;
-
-				var uvs = [];
-
-				for ( var k = 0; k < 3; k++ ) {
-
-					var v = model.vertices[ model.faces[ offset ].indices[ k ] ];
-					uvs.push( new THREE.Vector2( v.uv[ 0 ], v.uv[ 1 ] ) );
-
-				}
-
-				geometry.faceVertexUvs[ 0 ].push( uvs );
-
-				offset++;
-
-			}
+			offset += m.faceCount;
 
 			params.name = m.name;
 			params.color = color.fromArray( [ m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] ] ).clone();
@@ -2212,15 +2283,14 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var p2 = model.materials[ i ];
 			var m = new THREE.MeshPhongMaterial();
 
-			m.faceOffset = p.faceOffset;
-			m.faceNum = p.faceNum;
+			geometry.addGroup( p.faceOffset * 3, p.faceNum * 3, i );
 
 			if ( p.name !== undefined ) m.name = p.name;
 
 			m.skinning = geometry.bones.length > 0 ? true : false;
 			m.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			m.lights = true;
-			m.side = p.side;
+			m.side = ( model.metadata.format === 'pmx' && ( p2.flag & 0x1 ) === 1 ) ? THREE.DoubleSide : p.side;
 			m.transparent = p.transparent;
 			m.fog = true;
 
@@ -2231,6 +2301,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			m.blendDstAlpha = THREE.DstAlphaFactor;
 
 			if ( p.map !== undefined ) {
+
+				m.faceOffset = p.faceOffset;
+				m.faceNum = p.faceNum;
 
 				// Check if this part of the texture image the material uses requires transparency
 				function checkTextureTransparency ( m ) {
@@ -2251,7 +2324,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 						};
 
-						function detectTextureTransparency ( image, uvs ) {
+						function detectTextureTransparency( image, uvs, indices ) {
 
 							var width = image.width;
 							var height = image.height;
@@ -2264,13 +2337,14 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							}
 
-							for ( var i = 0; i < uvs.length; i++ ) {
+							for ( var i = 0; i < indices.length; i += 3 ) {
 
 								var centerUV = { x: 0.0, y: 0.0 };
 
 								for ( var j = 0; j < 3; j++ ) {
 
-									var uv = uvs[ i ][ j ];
+									var index = indices[ i * 3 + j ];
+									var uv = { x: uvs[ index * 2 + 0 ], y: uvs[ index * 2 + 1 ] };
 
 									if ( getAlphaByUv( image, uv ) < threshold ) {
 
@@ -2285,7 +2359,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 								centerUV.x /= 3;
 								centerUV.y /= 3;
-
 
 								if ( getAlphaByUv( image, centerUV ) < threshold ) {
 
@@ -2333,9 +2406,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 						};
 
 						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
-						var uvs = geometry.faceVertexUvs[ 0 ].slice( m.faceOffset, m.faceOffset + m.faceNum );
+						var indices = geometry.index.array.slice( m.faceOffset * 3, m.faceOffset * 3 + m.faceNum * 3 );
 
-						if ( detectTextureTransparency( imageData, uvs ) ) m.transparent = true;
+						if ( detectTextureTransparency( imageData, geometry.attributes.uv.array, indices ) ) m.transparent = true;
 
 						delete m.faceOffset;
 						delete m.faceNum;
@@ -2410,7 +2483,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 					alpha: p2.edgeColor[ 3 ]
 				};
 
-				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
+				if ( ( p2.flag & 0x10 ) === 0 || m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
 				var toonFileName, isDefaultToon;
 
@@ -2556,8 +2629,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var bodyB = rigidBodies[ p.rigidBodyIndex2 ];
 
 			/*
-			 * Refer http://www20.atpages.jp/katwat/wp/?p=4135
-			 * for what this is for
+			 * Refer to http://www20.atpages.jp/katwat/wp/?p=4135
 			 */
 			if ( bodyA.type !== 0 && bodyB.type === 2 ) {
 
@@ -2579,6 +2651,20 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	};
 
+	var initGeometry = function () {
+
+		geometry.setIndex( ( buffer.indices.length > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( buffer.indices, 1 ) );
+		geometry.addAttribute( 'position', THREE.Float32Attribute( buffer.vertices, 3 ) );
+		geometry.addAttribute( 'normal', THREE.Float32Attribute( buffer.normals, 3 ) );
+		geometry.addAttribute( 'uv', THREE.Float32Attribute( buffer.uvs, 2 ) );
+		geometry.addAttribute( 'skinIndex', THREE.Float32Attribute( buffer.skinIndices, 4 ) );
+		geometry.addAttribute( 'skinWeight', THREE.Float32Attribute( buffer.skinWeights, 4 ) );
+
+		geometry.computeBoundingSphere();
+		geometry.mmdFormat = model.metadata.format;
+
+	};
+
 	this.leftToRightModel( model );
 
 	initVartices();
@@ -2589,12 +2675,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	initMorphs();
 	initMaterials();
 	initPhysics();
-
-	geometry.computeFaceNormals();
-	geometry.verticesNeedUpdate = true;
-	geometry.normalsNeedUpdate = true;
-	geometry.uvsNeedUpdate = true;
-	geometry.mmdFormat = model.metadata.format;
+	initGeometry();
 
 	var mesh = new THREE.SkinnedMesh( geometry, material );
 
@@ -2781,21 +2862,14 @@ THREE.MMDLoader.prototype.leftToRightModel = function ( model ) {
 
 		var m = model.morphs[ i ];
 
-		if ( model.metadata.format === 'pmx' ) {
+		if ( model.metadata.format === 'pmx' && m.type !== 1 ) {
 
-			if ( m.type === 1 ) {
-
-				m = m.elements;
-
-			} else {
-
-				continue;
-
-			}
+			// TODO: implement
+			continue;
 
 		}
 
-		for ( var j = 0; j < m.elementCount; j++ ) {
+		for ( var j = 0; j < m.elements.length; j++ ) {
 
 			helper.leftToRightVector3( m.elements[ j ].position );
 
@@ -3732,10 +3806,12 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		mesh.mixer = null;
-		mesh.ikSolver = null;
-		mesh.grantSolver = null;
-		mesh.physics = null;
+		if ( mesh.mixer === undefined ) mesh.mixer = null;
+		if ( mesh.ikSolver === undefined ) mesh.ikSolver = null;
+		if ( mesh.grantSolver === undefined ) mesh.grantSolver = null;
+		if ( mesh.physics === undefined ) mesh.physics = null;
+		if ( mesh.looped === undefined ) mesh.looped = false;
+
 		this.meshes.push( mesh );
 
 		// workaround until I make IK and Physics Animation plugin
@@ -3785,8 +3861,76 @@ THREE.MMDHelper.prototype = {
 
 	setPhysics: function ( mesh, params ) {
 
-		mesh.physics = new THREE.MMDPhysics( mesh, params );
-		mesh.physics.warmup( 10 );
+		if ( params === undefined ) params = {};
+
+		var warmup = params.warmup !== undefined ? params.warmup : 60;
+
+		var physics = new THREE.MMDPhysics( mesh, params );
+
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
+
+			this.animateOneMesh( 0, mesh );
+			physics.reset();
+
+		}
+
+		physics.warmup( warmup );
+
+		this.updateIKParametersDependingOnPhysicsEnabled( mesh, true );
+
+		mesh.physics = physics;
+
+	},
+
+	enablePhysics: function ( enabled ) {
+
+		if ( enabled === true ) {
+
+			this.doPhysics = true;
+
+		} else {
+
+			this.doPhysics = false;
+
+		}
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			this.updateIKParametersDependingOnPhysicsEnabled( this.meshes[ i ], enabled );
+
+		}
+
+	},
+
+	updateIKParametersDependingOnPhysicsEnabled: function ( mesh, physicsEnabled ) {
+
+		var iks = mesh.geometry.iks;
+		var bones = mesh.geometry.bones;
+
+		for ( var j = 0, jl = iks.length; j < jl; j ++ ) {
+
+			var ik = iks[ j ];
+			var links = ik.links;
+
+			for ( var k = 0, kl = links.length; k < kl; k ++ ) {
+
+				var link = links[ k ];
+
+				if ( physicsEnabled === true ) {
+
+					// disable IK of the bone the corresponding rigidBody type of which is 1 or 2
+					// because its rotation will be overriden by physics
+					link.enabled = bones[ link.index ].rigidBodyType > 0 ? false : true;
+
+				} else {
+
+					link.enabled = true;
+
+				}
+
+			}
+
+		}
 
 	},
 
@@ -3805,6 +3949,17 @@ THREE.MMDHelper.prototype = {
 		if ( mesh.geometry.animations !== undefined ) {
 
 			mesh.mixer = new THREE.AnimationMixer( mesh );
+
+			// TODO: find a workaround not to access (seems like) private properties
+			//       the name of them begins with "_".
+			mesh.mixer.addEventListener( 'loop', function ( e ) {
+
+				if ( e.action._clip.tracks[ 0 ].name.indexOf( '.bones' ) !== 0 ) return;
+
+				var mesh = e.target._root;
+				mesh.looped = true;
+
+			} );
 
 			var foundAnimation = false;
 			var foundMorphAnimation = false;
@@ -4021,6 +4176,14 @@ THREE.MMDHelper.prototype = {
 		if ( grantSolver !== null && this.doGrant === true ) {
 
 			grantSolver.update();
+
+		}
+
+		if ( mesh.looped === true ) {
+
+			if ( physics !== null ) physics.reset();
+
+			mesh.looped = false;
 
 		}
 

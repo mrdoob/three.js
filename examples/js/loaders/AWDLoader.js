@@ -109,7 +109,7 @@
 			this._url = url;
 			this._baseDir = url.substr( 0, url.lastIndexOf( '/' ) + 1 );
 
-			var loader = new THREE.XHRLoader( this.manager );
+			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( text ) {
 

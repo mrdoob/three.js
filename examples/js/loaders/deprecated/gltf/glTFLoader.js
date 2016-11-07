@@ -1063,9 +1063,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 				params.color = RgbArraytoHex(diffuseColor);
 				params.opacity = opacity;
 				params.transparent = opacity < 1.0;
-				// hack hack hack
-				if (params.map && params.map.sourceFile.toLowerCase().indexOf(".png") != -1)
-					params.transparent = true;
 
 				if (!(shininess === undefined))
 				{
