@@ -27,7 +27,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	var geometry2;
 
-	if ( (geometry && geometry.isBufferGeometry) ) {
+	if ( geometry.isBufferGeometry ) {
 
 		geometry2 = new Geometry();
 		geometry2.fromBufferGeometry( geometry );

@@ -26,6 +26,8 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
+	this.onUpload = null;
+
 	this.version = 0;
 
 }

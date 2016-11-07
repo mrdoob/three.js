@@ -1014,7 +1014,6 @@
 		this.uuid = _Math.generateUUID();
 
 		this.name = '';
-		this.sourceFile = '';
 
 		this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 		this.mipmaps = [];
@@ -4925,71 +4924,6 @@
 
 	};
 
-	/**
-	 * Uniform Utilities
-	 */
-
-	var UniformsUtils = {
-
-		merge: function ( uniforms ) {
-
-			var merged = {};
-
-			for ( var u = 0; u < uniforms.length; u ++ ) {
-
-				var tmp = this.clone( uniforms[ u ] );
-
-				for ( var p in tmp ) {
-
-					merged[ p ] = tmp[ p ];
-
-				}
-
-			}
-
-			return merged;
-
-		},
-
-		clone: function ( uniforms_src ) {
-
-			var uniforms_dst = {};
-
-			for ( var u in uniforms_src ) {
-
-				uniforms_dst[ u ] = {};
-
-				for ( var p in uniforms_src[ u ] ) {
-
-					var parameter_src = uniforms_src[ u ][ p ];
-
-					if ( parameter_src && ( parameter_src.isColor ||
-						parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
-						parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
-						parameter_src.isTexture ) ) {
-
-						uniforms_dst[ u ][ p ] = parameter_src.clone();
-
-					} else if ( Array.isArray( parameter_src ) ) {
-
-						uniforms_dst[ u ][ p ] = parameter_src.slice();
-
-					} else {
-
-						uniforms_dst[ u ][ p ] = parameter_src;
-
-					}
-
-				}
-
-			}
-
-			return uniforms_dst;
-
-		}
-
-	};
-
 	var alphamap_fragment = "#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, vUv ).g;\n#endif\n";
 
 	var alphamap_pars_fragment = "#ifdef USE_ALPHAMAP\n\tuniform sampler2D alphaMap;\n#endif\n";
@@ -5172,7 +5106,7 @@
 
 	var linedashed_vert = "uniform float scale;\nattribute float lineDistance;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <color_vertex>\n\tvLineDistance = scale * lineDistance;\n\tvec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n}\n";
 
-	var meshbasic_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\tReflectedLight reflectedLight;\n\treflectedLight.directDiffuse = vec3( 0.0 );\n\treflectedLight.directSpecular = vec3( 0.0 );\n\treflectedLight.indirectDiffuse = diffuseColor.rgb;\n\treflectedLight.indirectSpecular = vec3( 0.0 );\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.indirectDiffuse;\n\t#include <normal_flip>\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
+	var meshbasic_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\t#ifdef USE_LIGHTMAP\n\t\treflectedLight.indirectDiffuse += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n\t#else\n\t\treflectedLight.indirectDiffuse += vec3( 1.0 );\n\t#endif\n\t#include <aomap_fragment>\n\treflectedLight.indirectDiffuse *= diffuseColor.rgb;\n\tvec3 outgoingLight = reflectedLight.indirectDiffuse;\n\t#include <normal_flip>\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
 	var meshbasic_vert = "#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_ENVMAP\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <envmap_vertex>\n}\n";
 
@@ -5998,13 +5932,12 @@
 
 		basic: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.aomap,
+				UniformsLib.lightmap,
 				UniformsLib.fog
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.meshbasic_vert,
 			fragmentShader: ShaderChunk.meshbasic_frag
@@ -6013,20 +5946,17 @@
 
 		lambert: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.emissivemap,
 				UniformsLib.fog,
 				UniformsLib.lights,
-
 				{
 					emissive : { value: new Color( 0x000000 ) }
 				}
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.meshlambert_vert,
 			fragmentShader: ShaderChunk.meshlambert_frag
@@ -6035,8 +5965,7 @@
 
 		phong: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
@@ -6046,14 +5975,12 @@
 				UniformsLib.displacementmap,
 				UniformsLib.fog,
 				UniformsLib.lights,
-
 				{
 					emissive : { value: new Color( 0x000000 ) },
 					specular : { value: new Color( 0x111111 ) },
 					shininess: { value: 30 }
 				}
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.meshphong_vert,
 			fragmentShader: ShaderChunk.meshphong_frag
@@ -6062,8 +5989,7 @@
 
 		standard: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
@@ -6075,15 +6001,13 @@
 				UniformsLib.metalnessmap,
 				UniformsLib.fog,
 				UniformsLib.lights,
-
 				{
 					emissive : { value: new Color( 0x000000 ) },
 					roughness: { value: 0.5 },
 					metalness: { value: 0 },
 					envMapIntensity : { value: 1 }, // temporary
 				}
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.meshphysical_vert,
 			fragmentShader: ShaderChunk.meshphysical_frag
@@ -6092,12 +6016,10 @@
 
 		points: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.points,
 				UniformsLib.fog
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.points_vert,
 			fragmentShader: ShaderChunk.points_frag
@@ -6106,18 +6028,15 @@
 
 		dashed: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.fog,
-
 				{
 					scale    : { value: 1 },
 					dashSize : { value: 1 },
 					totalSize: { value: 2 }
 				}
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.linedashed_vert,
 			fragmentShader: ShaderChunk.linedashed_frag
@@ -6126,12 +6045,10 @@
 
 		depth: {
 
-			uniforms: UniformsUtils.merge( [
-
+			uniforms: Object.assign( {},
 				UniformsLib.common,
 				UniformsLib.displacementmap
-
-			] ),
+			),
 
 			vertexShader: ShaderChunk.depth_vert,
 			fragmentShader: ShaderChunk.depth_frag
@@ -6141,9 +6058,7 @@
 		normal: {
 
 			uniforms: {
-
 				opacity : { value: 1.0 }
-
 			},
 
 			vertexShader: ShaderChunk.normal_vert,
@@ -6187,9 +6102,7 @@
 		distanceRGBA: {
 
 			uniforms: {
-
 				lightPos: { value: new Vector3() }
-
 			},
 
 			vertexShader: ShaderChunk.distanceRGBA_vert,
@@ -6201,16 +6114,13 @@
 
 	ShaderLib.physical = {
 
-		uniforms: UniformsUtils.merge( [
-
+		uniforms: Object.assign( {},
 			ShaderLib.standard.uniforms,
-
 			{
 				clearCoat: { value: 0 },
 				clearCoatRoughness: { value: 0 }
 			}
-
-		] ),
+		),
 
 		vertexShader: ShaderChunk.meshphysical_vert,
 		fragmentShader: ShaderChunk.meshphysical_frag
@@ -7641,7 +7551,7 @@
 		this.fragmentShader = source.fragmentShader;
 		this.vertexShader = source.vertexShader;
 
-		this.uniforms = UniformsUtils.clone( source.uniforms );
+		this.uniforms = Object.assign( {}, source.uniforms );
 
 		this.defines = source.defines;
 
@@ -9203,7 +9113,7 @@
 		depthMaterialTemplate.clipping = true;
 
 		var distanceShader = ShaderLib[ "distanceRGBA" ];
-		var distanceUniforms = UniformsUtils.clone( distanceShader.uniforms );
+		var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
 
 		for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
@@ -11684,6 +11594,9 @@
 	 *  opacity: <float>,
 	 *  map: new THREE.Texture( <Image> ),
 	 *
+	 *  lightMap: new THREE.Texture( <Image> ),
+	 *  lightMapIntensity: <float>
+	 *
 	 *  aoMap: new THREE.Texture( <Image> ),
 	 *  aoMapIntensity: <float>
 	 *
@@ -11717,6 +11630,9 @@
 		this.color = new Color( 0xffffff ); // emissive
 
 		this.map = null;
+
+		this.lightMap = null;
+		this.lightMapIntensity = 1.0;
 
 		this.aoMap = null;
 		this.aoMapIntensity = 1.0;
@@ -11756,6 +11672,9 @@
 		this.color.copy( source.color );
 
 		this.map = source.map;
+
+		this.lightMap = source.lightMap;
+		this.lightMapIntensity = source.lightMapIntensity;
 
 		this.aoMap = source.aoMap;
 		this.aoMapIntensity = source.aoMapIntensity;
@@ -11802,6 +11721,8 @@
 
 		this.dynamic = false;
 		this.updateRange = { offset: 0, count: - 1 };
+
+		this.onUpload = null;
 
 		this.version = 0;
 
@@ -17253,7 +17174,52 @@
 
 			gl.bufferData( bufferType, data.array, usage );
 
+			var type = gl.FLOAT;
+			var array = data.array;
+
+			if ( array instanceof Float32Array ) {
+
+				type = gl.FLOAT;
+
+			} else if ( array instanceof Float64Array ) {
+
+				console.warn( "Unsupported data buffer format: Float64Array" );
+
+			} else if ( array instanceof Uint16Array ) {
+
+				type = gl.UNSIGNED_SHORT;
+
+			} else if ( array instanceof Int16Array ) {
+
+				type = gl.SHORT;
+
+			} else if ( array instanceof Uint32Array ) {
+
+				type = gl.UNSIGNED_INT;
+
+			} else if ( array instanceof Int32Array ) {
+
+				type = gl.INT;
+
+			} else if ( array instanceof Int8Array ) {
+
+				type = gl.BYTE;
+
+			} else if ( array instanceof Uint8Array ) {
+
+				type = gl.UNSIGNED_BYTE;
+
+			}
+
+			attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
+			attributeProperties.type = type;
 			attributeProperties.version = data.version;
+
+			if ( data.onUpload !== null ) {
+
+				data.onUpload();
+
+			}
 
 		}
 
@@ -17297,6 +17263,18 @@
 			}
 
 			return properties.get( attribute ).__webglBuffer;
+
+		}
+
+		function getAttributeProperties( attribute ) {
+
+			if ( attribute.isInterleavedBufferAttribute ) {
+
+				return properties.get( attribute.data );
+
+			}
+
+			return properties.get( attribute );
 
 		}
 
@@ -17365,6 +17343,7 @@
 		return {
 
 			getAttributeBuffer: getAttributeBuffer,
+			getAttributeProperties: getAttributeProperties,
 			getWireframeAttribute: getWireframeAttribute,
 
 			update: update
@@ -20373,46 +20352,14 @@
 
 					if ( geometryAttribute !== undefined ) {
 
-						var type = _gl.FLOAT;
-						var array = geometryAttribute.array;
 						var normalized = geometryAttribute.normalized;
-
-						if ( array instanceof Float32Array ) {
-
-							type = _gl.FLOAT;
-
-						} else if ( array instanceof Float64Array ) {
-
-							console.warn( "Unsupported data buffer format: Float64Array" );
-
-						} else if ( array instanceof Uint16Array ) {
-
-							type = _gl.UNSIGNED_SHORT;
-
-						} else if ( array instanceof Int16Array ) {
-
-							type = _gl.SHORT;
-
-						} else if ( array instanceof Uint32Array ) {
-
-							type = _gl.UNSIGNED_INT;
-
-						} else if ( array instanceof Int32Array ) {
-
-							type = _gl.INT;
-
-						} else if ( array instanceof Int8Array ) {
-
-							type = _gl.BYTE;
-
-						} else if ( array instanceof Uint8Array ) {
-
-							type = _gl.UNSIGNED_BYTE;
-
-						}
-
 						var size = geometryAttribute.itemSize;
-						var buffer = objects.getAttributeBuffer( geometryAttribute );
+
+						var attributeProperties = objects.getAttributeProperties( geometryAttribute );
+
+						var buffer = attributeProperties.__webglBuffer;
+						var type = attributeProperties.type;
+						var bytesPerElement = attributeProperties.bytesPerElement;
 
 						if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
@@ -20437,7 +20384,7 @@
 							}
 
 							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+							_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, ( startIndex * stride + offset ) * bytesPerElement );
 
 						} else {
 
@@ -20458,7 +20405,7 @@
 							}
 
 							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * geometryAttribute.array.BYTES_PER_ELEMENT );
+							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, startIndex * size * bytesPerElement );
 
 						}
 
@@ -21006,7 +20953,7 @@
 
 					materialProperties.__webglShader = {
 						name: material.type,
-						uniforms: UniformsUtils.clone( shader.uniforms ),
+						uniforms: Object.assign( {}, shader.uniforms ),
 						vertexShader: shader.vertexShader,
 						fragmentShader: shader.fragmentShader
 					};
@@ -21418,6 +21365,13 @@
 			uniforms.specularMap.value = material.specularMap;
 			uniforms.alphaMap.value = material.alphaMap;
 
+			if ( material.lightMap ) {
+
+				uniforms.lightMap.value = material.lightMap;
+				uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+			}
+
 			if ( material.aoMap ) {
 
 				uniforms.aoMap.value = material.aoMap;
@@ -21556,13 +21510,6 @@
 
 		function refreshUniformsLambert( uniforms, material ) {
 
-			if ( material.lightMap ) {
-
-				uniforms.lightMap.value = material.lightMap;
-				uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-			}
-
 			if ( material.emissiveMap ) {
 
 				uniforms.emissiveMap.value = material.emissiveMap;
@@ -21575,13 +21522,6 @@
 
 			uniforms.specular.value = material.specular;
 			uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
-			if ( material.lightMap ) {
-
-				uniforms.lightMap.value = material.lightMap;
-				uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-			}
 
 			if ( material.emissiveMap ) {
 
@@ -21627,13 +21567,6 @@
 			if ( material.metalnessMap ) {
 
 				uniforms.metalnessMap.value = material.metalnessMap;
-
-			}
-
-			if ( material.lightMap ) {
-
-				uniforms.lightMap.value = material.lightMap;
-				uniforms.lightMapIntensity.value = material.lightMapIntensity;
 
 			}
 
@@ -28183,12 +28116,12 @@
 	function ShadowMaterial() {
 
 		ShaderMaterial.call( this, {
-			uniforms: UniformsUtils.merge( [
-				UniformsLib[ "lights" ],
+			uniforms: Object.assign( {},
+				UniformsLib.lights,
 				{
 					opacity: { value: 1.0 }
 				}
-			] ),
+			),
 			vertexShader: ShaderChunk[ 'shadow_vert' ],
 			fragmentShader: ShaderChunk[ 'shadow_frag' ]
 		} );
@@ -42095,6 +42028,71 @@
 
 	};
 
+	var UniformsUtils = {
+
+		merge: function ( uniforms ) {
+
+			console.warn( 'THREE.UniformsUtils.merge() has been deprecated. Use Object.assign() instead.' );
+
+			var merged = {};
+
+			for ( var u = 0; u < uniforms.length; u ++ ) {
+
+				var tmp = this.clone( uniforms[ u ] );
+
+				for ( var p in tmp ) {
+
+					merged[ p ] = tmp[ p ];
+
+				}
+
+			}
+
+			return merged;
+
+		},
+
+		clone: function ( uniforms_src ) {
+
+			console.warn( 'THREE.UniformsUtils.clone() has been deprecated.' );
+
+			var uniforms_dst = {};
+
+			for ( var u in uniforms_src ) {
+
+				uniforms_dst[ u ] = {};
+
+				for ( var p in uniforms_src[ u ] ) {
+
+					var parameter_src = uniforms_src[ u ][ p ];
+
+					if ( parameter_src && ( parameter_src.isColor ||
+						parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+						parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+						parameter_src.isTexture ) ) {
+
+						uniforms_dst[ u ][ p ] = parameter_src.clone();
+
+					} else if ( Array.isArray( parameter_src ) ) {
+
+						uniforms_dst[ u ][ p ] = parameter_src.slice();
+
+					} else {
+
+						uniforms_dst[ u ][ p ] = parameter_src;
+
+					}
+
+				}
+
+			}
+
+			return uniforms_dst;
+
+		}
+
+	};
+
 	//
 
 	function Projector () {
@@ -42143,7 +42141,6 @@
 	exports.WebGL2Renderer = WebGL2Renderer;
 	exports.ShaderLib = ShaderLib;
 	exports.UniformsLib = UniformsLib;
-	exports.UniformsUtils = UniformsUtils;
 	exports.ShaderChunk = ShaderChunk;
 	exports.FogExp2 = FogExp2;
 	exports.Fog = Fog;
@@ -42507,6 +42504,7 @@
 	exports.XHRLoader = XHRLoader;
 	exports.GeometryUtils = GeometryUtils;
 	exports.ImageUtils = ImageUtils;
+	exports.UniformsUtils = UniformsUtils;
 	exports.Projector = Projector;
 	exports.CanvasRenderer = CanvasRenderer;
 

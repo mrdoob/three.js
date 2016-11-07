@@ -44,8 +44,11 @@
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
 
+		<script src="js/controls/OrbitControls.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -70,11 +73,15 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 25;
+				camera.position.z = 30;
 
 				// scene
 
 				scene = new THREE.Scene();
+
+				var gridHelper = new THREE.GridHelper( 100, 100 )
+				gridHelper.position.y = -10;
+				scene.add( gridHelper );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
@@ -92,6 +99,10 @@
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.OutlineEffect( renderer );
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				// model
 
@@ -111,45 +122,92 @@
 				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
-				loader.setDefaultTexturePath( './models/mmd/default/' );
 
 				loader.load( modelFile, vmdFiles, function ( object ) {
 
 					mesh = object;
 					mesh.position.y = -10;
+					scene.add( mesh );
 
 					helper.add( mesh );
 					helper.setAnimation( mesh );
 
-					// create CCDIKHelper after calling helper.setAnimation()
+					/*
+					 * Note: create CCDIKHelper after calling helper.setAnimation()
+					 */
 					ikHelper = new THREE.CCDIKHelper( mesh );
+					ikHelper.visible = false;
 					scene.add( ikHelper );
 
 					/*
 					 * Note: You're recommended to call helper.setPhysics()
 					 *       after calling helper.setAnimation().
-					 * Note: Physics calculation is pretty heavy.
-					 *       It may not be acceptable for most mobile devices yet.
 			 		 */
-					if ( ! isMobileDevice() ) {
-
-						helper.setPhysics( mesh );
-						physicsHelper = new THREE.MMDPhysicsHelper( mesh );
-						scene.add( physicsHelper );
-
-					}
+					helper.setPhysics( mesh );
+					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+					physicsHelper.visible = false;
+					scene.add( physicsHelper );
 
 					helper.unifyAnimationDuration( { afterglow: 2.0 } );
 
-					scene.add( mesh );
+					initGui();
 
 				}, onProgress, onError );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				function initGui () {
+
+					var api = {
+						'animation': true,
+						'gradient mapping': true,
+						'ik': true,
+						'outline': true,
+						'physics': true,
+						'show IK bones': false,
+						'show rigid bodies': false
+					};
+
+					var gui = new dat.GUI();
+
+					gui.add( api, 'animation' ).onChange( function () {
+						helper.doAnimation = api[ 'animation' ];
+					} );
+
+					gui.add( api, 'gradient mapping' ).onChange( function () {
+
+						for ( var i = 0, il = mesh.material.materials.length; i < il; i ++ ) {
+
+							var material = mesh.material.materials[ i ].uniforms.celShading.value = api[ 'gradient mapping' ] ? 1 : 0;
+
+						}
+
+					} );
+
+					gui.add( api, 'ik' ).onChange( function () {
+						helper.doIk = api[ 'ik' ];
+					} );
+
+					gui.add( api, 'outline' ).onChange( function () {
+						helper.doOutlineDrawing = api[ 'outline' ];
+					} );
+
+					gui.add( api, 'physics' ).onChange( function () {
+						helper.enablePhysics( api[ 'physics' ] );
+					} );
+
+					gui.add( api, 'show IK bones' ).onChange( function () {
+						ikHelper.visible = api[ 'show IK bones' ];
+					} );
+
+					gui.add( api, 'show rigid bodies' ).onChange( function () {
+						if ( physicsHelper !== undefined ) physicsHelper.visible = api[ 'show rigid bodies' ];
+					} );
+
+				}
 
 			}
 
@@ -165,60 +223,24 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
-
-			}
-
 			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				stats.begin();
 				render();
+				stats.end();
 
 			}
 
 			function render() {
 
-				camera.position.x += ( - mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
 				helper.animate( clock.getDelta() );
 				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
 				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 				effect.render( scene, camera );
-
-			}
-
-			// easy mobile device detection
-			function isMobileDevice () {
-
-				if ( navigator === undefined || navigator.userAgent === undefined ) {
-
-					return true;
-
-				}
-
-				var s = navigator.userAgent;
-
-				if (    s.match( /iPhone/i )
-//				     || s.match( /iPad/i )
-				     || s.match( /iPod/i )
-				     || s.match( /webOS/i )
-				     || s.match( /BlackBerry/i )
-				     || ( s.match( /Windows/i ) && s.match( /Phone/i ) )
-				     || ( s.match( /Android/i ) && s.match( /Mobile/i ) ) ) {
-
-					return true;
-
-				}
-
-				return false;
 
 			}
 

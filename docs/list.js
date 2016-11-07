@@ -14,14 +14,15 @@ var list = {
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "Materials", "api/constants/Materials" ],
 			[ "Textures", "api/constants/Textures" ],
-			[ "WebGLRenderer", "api/constants/WebGLRenderer" ]
+			[ "Renderer", "api/constants/Renderer" ]
 		],
 
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
 			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
-			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
+			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
+			[ "StereoCamera", "api/cameras/StereoCamera" ]
 		],
 
 		"Core": [
@@ -48,6 +49,7 @@ var list = {
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
+			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
@@ -75,7 +77,8 @@ var list = {
 			[ "TorusKnotBufferGeometry", "api/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
-			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ]
+			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
+			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
 		],
 
 		"Lights": [
@@ -123,10 +126,12 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
+			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
+			[ "ShadowMaterial", "api/materials/ShadowMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -136,6 +141,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Interpolant", "api/math/Interpolant" ],
 			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
@@ -152,8 +158,17 @@ var list = {
 			[ "Vector4", "api/math/Vector4" ]
 		],
 
+		"Math / Interpolants": [
+			[ "CubicInterpolant", "api/math/interpolants/CubicInterpolant" ],
+			[ "DiscreteInterpolant", "api/math/interpolants/DiscreteInterpolant" ],
+			[ "LinearInterpolant", "api/math/interpolants/LinearInterpolant" ],
+			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
+		],
+
+
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
@@ -201,6 +216,7 @@ var list = {
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
+			[ "DepthTexture", "api/textures/DepthTexture" ],
 			[ "Texture", "api/textures/Texture" ],
 			[ "VideoTexture", "api/textures/VideoTexture" ]
 		],
@@ -212,7 +228,9 @@ var list = {
 		],
 
 		"Extras": [
-			[ "SceneUtils", "api/extras/SceneUtils" ]
+			[ "CurveUtils", "api/extras/CurveUtils" ],
+			[ "SceneUtils", "api/extras/SceneUtils" ],
+			[ "ShapeUtils", "api/extras/ShapeUtils" ]
 		],
 
 		"Extras / Collada Animation": [
@@ -224,6 +242,7 @@ var list = {
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
+			[ "Font", "api/extras/core/Font" ],
 			[ "Path", "api/extras/core/Path" ],
 			[ "Shape", "api/extras/core/Shape" ]
 		],
@@ -254,6 +273,7 @@ var list = {
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
+			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
 		],

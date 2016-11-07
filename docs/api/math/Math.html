@@ -26,6 +26,43 @@
 		Clamps the *value* to be between *min* and *max*.
 		</div>
 
+		<h3>[method:Float degToRad]( [page:Float degrees] )</h3>
+		<div>
+		degrees -- [page:Float]
+		</div>
+		<div>
+		Converts degrees to radians.
+		</div>
+
+		<h3>[method:Integer euclideanModulo]( [page:Integer n], [page:Integer m] )</h3>
+		<div>
+		n, m --Integers
+		</div>
+		<div>
+		Compute the Euclidian modulo of m % n, that is:
+		<code>( ( n % m ) + m ) % m</code>
+		</div>
+
+		<h3>[method:UUID generateUUID]( )</h3>
+		<div>
+		Generate a [link:https://en.wikipedia.org/wiki/Universally_unique_identifier UUID] (universally unique identifier).
+		</div>
+
+		<h3>[method:Boolean isPowerOfTwo]( n )</h3>
+		<div>
+		Return *true* if n is a power of 2.
+		</div>
+
+		<h3>[method:Float lerp]( [page:Float x], [page:Float y], [page:Float t] )</h3>
+		<div>
+		x -- Start point. <br />
+		y -- End point. <br />
+		t -- Closed unit interval from [0,1].
+		</div>
+		<div>
+		Returns a value [link:https://en.wikipedia.org/wiki/Linear_interpolation linearly interpolated] from two known points based on the given interval.
+		</div>
+
 		<h3>[method:Float mapLinear]( [page:Float x], [page:Float a1], [page:Float a2], [page:Float b1], [page:Float b2] )</h3>
 		<div>
 		x — Value to be mapped.<br />
@@ -38,15 +75,22 @@
 		Linear mapping of *x* from range [*a1*, *a2*] to range [*b1*, *b2*].
 		</div>
 
-		<h3>[method:Float random16]()</h3>
+		<h3>[method:Integer nearestPowerOfTwo]( n )</h3>
 		<div>
-		Random float from 0 to 1 with 16 bits of randomness.<br />
-		Standard Math.random() creates repetitive patterns when applied over larger space.
+		Return the nearest power of 2 to a given number n.
 		</div>
 
-		<h3>[method:Integer randInt]( [page:Integer low], [page:Integer high] )</h3>
+		<h3>[method:Integer nextPowerOfTwo]( n )</h3>
 		<div>
-		Random integer from *low* to *high* interval.
+		Return the nearest power of 2 that is bigger than n.
+		</div>
+
+		<h3>[method:Float radToDeg]( [page:Float radians] )</h3>
+		<div>
+		radians -- [page:Float]
+		</div>
+		<div>
+		Converts radians to degrees
 		</div>
 
 		<h3>[method:Float randFloat]( [page:Float low], [page:Float high] )</h3>
@@ -59,32 +103,15 @@
 		Random float from *- range / 2* to *range / 2* interval.
 		</div>
 
-		<h3>[method:Float degToRad]( [page:Float degrees] )</h3>
+		<h3>[method:Integer randInt]( [page:Integer low], [page:Integer high] )</h3>
 		<div>
-		degrees -- [page:Float]
-		</div>
-		<div>
-		Converts degrees to radians.
+		Random integer from *low* to *high* interval.
 		</div>
 
-		<h3>[method:Float radToDeg]( [page:Float radians] )</h3>
+		<h3>[method:Float random16]()</h3>
 		<div>
-		radians -- [page:Float]
-		</div>
-		<div>
-		Converts radians to degrees
-		</div>
-
-		<h3>[method:Float lerp]( [page:Float x], [page:Float y], [page:Float t] )</h3>
-		<div>
-		x -- Start point. <br />
-		y -- End point. <br />
-		t -- Closed unit interval from [0,1].
-		</div>
-		<div>
-		Returns a value interpolated from two known points based on the interval.<br/><br/>
-
-		[link:https://en.wikipedia.org/wiki/Linear_interpolation Wikipedia]
+		Random float from 0 to 1 with 16 bits of randomness.<br />
+		Standard Math.random() creates repetitive patterns when applied over larger space.
 		</div>
 
 		<h3>[method:Float smoothstep]( [page:Float x], [page:Float min], [page:Float max] )</h3>
@@ -94,7 +121,8 @@
 		max -- Any x value above max will be 1
 		</div>
 		<div>
-		Returns a value between 0-1 that represents the percentage that x has moved between min and max, but smoothed or slowed down the closer X is to the min and max.<br/><br/>
+		Returns a value between 0-1 that represents the percentage that x has moved between min and max,
+		but smoothed or slowed down the closer X is to the min and max.<br/><br/>
 
 		[link:http://en.wikipedia.org/wiki/Smoothstep Wikipedia]
 		</div>

@@ -41,18 +41,31 @@ THREE.MMDLoader = function ( manager ) {
 
 	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.defaultTexturePath = './models/default/';
 
 };
 
 THREE.MMDLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.MMDLoader.prototype.constructor = THREE.MMDLoader;
 
-THREE.MMDLoader.prototype.setDefaultTexturePath = function ( path ) {
-
-	this.defaultTexturePath = path;
-
-};
+/*
+ * base64 encoded defalut toon textures toon00.bmp - toon10.bmp
+ * Users don't need to prepare default texture files.
+ *
+ * This idea is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
+ */
+THREE.MMDLoader.prototype.defaultToonTextures = [
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/bWiiMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh8aBHZBl14e8wAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOUlEQVRYR+3WMREAMAwDsYY/yoDI7MLwIiP40+RJklfcCCBAgAABAgTqArfb/QMCCBAgQIAAgbbAB3z/e0F3js2cAAAAAElFTkSuQmCC',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVRYR+3WQREAMBACsZ5/B5ilMvgEBTt5cW37hjsBBAgQIECAwFwgyfYPCCBAgAABAgTWAh81dWyx0gFwKAAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAOklEQVRYR+3WoREAMAwDsWb/UQtCy9wxTOQJ/oQ8SXKKGwEECBAgQIBAXeDt7f4BAQQIECBAgEBb4AOz8Hzx7WLY4wAAAABJRU5ErkJggg==',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABPUlEQVRYR+1XwW7CMAy1+f9fZOMysSEOEweEOPRNdm3HbdOyIhAcklPrOs/PLy9RygBALxzcCDQFmgJNgaZAU6Ap0BR4PwX8gsRMVLssMRH5HcpzJEaWL7EVg9F1IHRlyqQohgVr4FGUlUcMJSjcUlDw0zvjeun70cLWmneoyf7NgBTQSniBTQQSuJAZsOnnaczjIMb5hCiuHKxokCrJfVnrctyZL0PkJAJe1HMil4nxeyi3Ypfn1kX51jpPvo/JeCNC4PhVdHdJw2XjBR8brF8PEIhNVn12AgP7uHsTBguBn53MUZCqv7Lp07Pn5k1Ro+uWmUNn7D+M57rtk7aG0Vo73xyF/fbFf0bPJjDXngnGocDTdFhygZjwUQrMNrDcmZlQT50VJ/g/UwNyHpu778+yW+/ksOz/BFo54P4AsUXMfRq7XWsAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMElEQVRYR+2Xv4pTQRTGf2dubhLdICiii2KnYKHVolhauKWPoGAnNr6BD6CvIVaihYuI2i1ia0BY0MZGRHQXjZj/mSPnnskfNWiWZUlzJ5k7M2cm833nO5Mziej2DWWJRUoCpQKlAntSQCqgw39/iUWAGmh37jrRnVsKlgpiqmkoGVABA7E57fvY+pJDdgKqF6HzFCSADkDq+F6AHABtQ+UMVE5D7zXod7fFNhTEckTbj5XQgHzNN+5tQvc5NG7C6BNkp6D3EmpXHDR+dQAjFLchW3VS9rlw3JBh+B7ys5Cf9z0GW1C/7P32AyBAOAz1q4jGliIH3YPuBnSfQX4OGreTIgEYQb/pBDtPnEQ4CivXYPAWBk13oHrB54yA9QuSn2H4AcKRpEILDt0BUzj+RLR1V5EqjD66NPRBVpLcQwjHoHYJOhsQv6U4mnzmrIXJCFr4LDwm/xBUoboG9XX4cc9VKdYoSA2yk5NQLJaKDUjTBoveG3Z2TElTxwjNK4M3LEZgUdDdruvcXzKBpStgp2NPiWi3ks9ZXxIoFVi+AvHLdc9TqtjL3/aYjpPlrzOcEnK62Szhimdd7xX232zFDTgtxezOu3WNMRLjiKgjtOhHVMd1loynVHvOgjuIIJMaELEqhJAV/RCSLbWTcfPFakFgFlALTRRvx+ok6Hlp/Q+v3fmx90bMyUzaEAhmM3KvHlXTL5DxnbGf/1M8RNNACLL5MNtPxP/mypJAqcDSFfgFhpYqWUzhTEAAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
+	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
+];
 
 THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrls, callback, onProgress, onError ) {
 
@@ -224,67 +237,186 @@ THREE.MMDLoader.prototype.pourVmdIntoCamera = function ( camera, vmd, name ) {
 
 		var orderedMotions = helper.createOrderedMotionArray( vmd.cameras );
 
-		var q = new THREE.Quaternion();
-		var e = new THREE.Euler();
-		var pkeys = [];
-		var ckeys = [];
-		var ukeys = [];
-		var fkeys = [];
+		var times = [];
+		var centers = [];
+		var quaternions = [];
+		var positions = [];
+		var fovs = [];
+
+		var cInterpolations = [];
+		var qInterpolations = [];
+		var pInterpolations = [];
+		var fInterpolations = [];
+
+		var quaternion = new THREE.Quaternion();
+		var euler = new THREE.Euler();
+		var position = new THREE.Vector3();
+		var center = new THREE.Vector3();
+
+		var pushVector3 = function ( array, vec ) {
+
+			array.push( vec.x );
+			array.push( vec.y );
+			array.push( vec.z );
+
+		};
+
+		var pushQuaternion = function ( array, q ) {
+
+			array.push( q.x );
+			array.push( q.y );
+			array.push( q.z );
+			array.push( q.w );
+
+		};
+
+		var pushInterpolation = function ( array, interpolation, index ) {
+
+			array.push( interpolation[ index * 4 + 0 ] / 127 ); // x1
+			array.push( interpolation[ index * 4 + 1 ] / 127 ); // x2
+			array.push( interpolation[ index * 4 + 2 ] / 127 ); // y1
+			array.push( interpolation[ index * 4 + 3 ] / 127 ); // y2
+
+		};
+
+		var createTrack = function ( node, type, times, values, interpolations ) {
+
+			/*
+			 * optimizes here not to let KeyframeTrackPrototype optimize
+			 * because KeyframeTrackPrototype optimizes times and values but
+			 * doesn't optimize interpolations.
+			 */
+			if ( times.length > 2 ) {
+
+				times = times.slice();
+				values = values.slice();
+				interpolations = interpolations.slice();
+
+				var stride = values.length / times.length;
+				var interpolateStride = ( stride === 3 ) ? 12 : 4;  // 3: Vector3, others: Quaternion or Number
+
+				var aheadIndex = 2;
+				var index = 1;
+
+				for ( aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex ++ ) {
+
+					for ( var i = 0; i < stride; i ++ ) {
+
+						if ( values[ index * stride + i ] !== values[ ( index - 1 ) * stride + i ] ||
+							values[ index * stride + i ] !== values[ aheadIndex * stride + i ] ) {
+
+							index ++;
+							break;
+
+						}
+
+					}
+
+					if ( aheadIndex > index ) {
+
+						times[ index ] = times[ aheadIndex ];
+
+						for ( var i = 0; i < stride; i ++ ) {
+
+							values[ index * stride + i ] = values[ aheadIndex * stride + i ];
+
+						}
+
+						for ( var i = 0; i < interpolateStride; i ++ ) {
+
+							interpolations[ index * interpolateStride + i ] = interpolations[ aheadIndex * interpolateStride + i ];
+
+						}
+
+					}
+
+				}
+
+				times.length = index + 1;
+				values.length = ( index + 1 ) * stride;
+				interpolations.length = ( index + 1 ) * interpolateStride;
+
+			}
+
+			return new THREE.MMDLoader[ type ]( node, times, values, interpolations );
+
+		};
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
 			var m = orderedMotions[ i ];
-			var t = m.frameNum / 30;
-			var p = m.position;
-			var r = m.rotation;
-			var d = m.distance;
-			var f = m.fov;
 
-			var position = new THREE.Vector3( 0, 0, -d );
-			var center = new THREE.Vector3( p[ 0 ], p[ 1 ], p[ 2 ] );
-			var up = new THREE.Vector3( 0, 1, 0 );
+			var time = m.frameNum / 30;
+			var pos = m.position;
+			var rot = m.rotation;
+			var distance = m.distance;
+			var fov = m.fov;
+			var interpolation = m.interpolation;
 
-			e.set( -r[ 0 ], -r[ 1 ], -r[ 2 ] );
-			q.setFromEuler( e );
+			position.set( 0, 0, -distance );
+			center.set( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+
+			euler.set( -rot[ 0 ], -rot[ 1 ], -rot[ 2 ] );
+			quaternion.setFromEuler( euler );
 
 			position.add( center );
-			position.applyQuaternion( q );
+			position.applyQuaternion( quaternion );
 
-			up.applyQuaternion( q );
+			/*
+			 * Note: This is a workaround not to make Animation system calculate lerp
+			 *       if the diff from the last frame is 1 frame (in 30fps).
+			 */
+			if ( times.length > 0 && time < times[ times.length - 1 ] + ( 1 / 30 ) * 1.5 ) {
 
-			helper.pushAnimationKey( pkeys, t, position, true );
-			helper.pushAnimationKey( ckeys, t, center, true );
-			helper.pushAnimationKey( ukeys, t, up, true );
-			helper.pushAnimationKey( fkeys, t, f, true );
+				times[ times.length - 1 ] = time - 1e-13;
+
+			}
+
+			times.push( time );
+
+			pushVector3( centers, center );
+			pushQuaternion( quaternions, quaternion );
+			pushVector3( positions, position );
+
+			fovs.push( fov );
+
+			for ( var j = 0; j < 3; j ++ ) {
+
+				pushInterpolation( cInterpolations, interpolation, j );
+
+			}
+
+			pushInterpolation( qInterpolations, interpolation, 3 );
+
+			// use same one parameter for x, y, z axis.
+			for ( var j = 0; j < 3; j ++ ) {
+
+				pushInterpolation( pInterpolations, interpolation, 4 );
+
+			}
+
+			pushInterpolation( fInterpolations, interpolation, 5 );
 
 		}
 
-		helper.insertAnimationKeyAtTimeZero( pkeys, new THREE.Vector3( 0, 0, 0 ) );
-		helper.insertAnimationKeyAtTimeZero( ckeys, new THREE.Vector3( 0, 0, 0 ) );
-		helper.insertAnimationKeyAtTimeZero( ukeys, new THREE.Vector3( 0, 0, 0 ) );
-		helper.insertAnimationKeyAtTimeZero( fkeys, 45 );
-
-		helper.insertStartAnimationKey( pkeys );
-		helper.insertStartAnimationKey( ckeys );
-		helper.insertStartAnimationKey( ukeys );
-		helper.insertStartAnimationKey( fkeys );
+		if ( times.length === 0 ) return;
 
 		var tracks = [];
 
-		tracks.push( helper.generateTrackFromAnimationKeys( pkeys, 'VectorKeyframeTrackEx', '.position' ) );
-		tracks.push( helper.generateTrackFromAnimationKeys( ckeys, 'VectorKeyframeTrackEx', '.center' ) );
-		tracks.push( helper.generateTrackFromAnimationKeys( ukeys, 'VectorKeyframeTrackEx', '.up' ) );
-		tracks.push( helper.generateTrackFromAnimationKeys( fkeys, 'NumberKeyframeTrackEx', '.fov' ) );
+		tracks.push( createTrack( '.center', 'VectorKeyframeTrackEx', times, centers, cInterpolations ) );
+		tracks.push( createTrack( '.quaternion', 'QuaternionKeyframeTrackEx', times, quaternions, qInterpolations ) );
+		tracks.push( createTrack( '.position', 'VectorKeyframeTrackEx', times, positions, pInterpolations ) );
+		tracks.push( createTrack( '.fov', 'NumberKeyframeTrackEx', times, fovs, fInterpolations ) );
 
-		camera.center = new THREE.Vector3( 0, 0, 0 );
+		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
-		if ( camera.animations === undefined ) {
+		if ( clip !== null ) {
 
-			camera.animations = [];
+			if ( camera.center === undefined ) camera.center = new THREE.Vector3( 0, 0, 0 );
+			if ( camera.animations === undefined ) camera.animations = [];
+			camera.animations.push( clip );
 
 		}
-
-		camera.animations.push( new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks ) );
 
 	};
 
@@ -364,7 +496,6 @@ THREE.MMDLoader.prototype.parseModel = function ( buffer, modelExtension ) {
 
 THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 
-	var scope = this;
 	var pmd = {};
 	var dv = new THREE.MMDLoader.DataView( buffer );
 	var helper = new THREE.MMDLoader.DataCreationHelper();
@@ -859,7 +990,6 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 
 THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
-	var scope = this;
 	var pmx = {};
 	var dv = new THREE.MMDLoader.DataView( buffer );
 	var helper = new THREE.MMDLoader.DataCreationHelper();
@@ -1408,7 +1538,6 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 
 THREE.MMDLoader.prototype.parseVmd = function ( buffer ) {
 
-	var scope = this;
 	var vmd = {};
 	var dv = new THREE.MMDLoader.DataView( buffer );
 	var helper = new THREE.MMDLoader.DataCreationHelper();
@@ -1441,7 +1570,6 @@ THREE.MMDLoader.prototype.parseVmd = function ( buffer ) {
 			p.position = dv.getFloat32Array( 3 );
 			p.rotation = dv.getFloat32Array( 4 );
 			p.interpolation = dv.getUint8Array( 64 );
-
 			return p;
 
 		};
@@ -1924,10 +2052,17 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			param.isLocal = grant.isLocal;
 			param.affectRotation = grant.affectRotation;
 			param.affectPosition = grant.affectPosition;
+			param.transformationClass = b.transformationClass;
 
 			grants.push( param );
 
 		}
+
+		grants.sort( function ( a, b ) {
+
+			return a.transformationClass - b.transformationClass;
+
+		} );
 
 		geometry.grants = grants;
 
@@ -2075,8 +2210,26 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			var directoryPath = ( params.defaultTexturePath === true ) ? scope.defaultTexturePath : texturePath;
-			var fullPath = directoryPath + filePath;
+			var fullPath;
+
+			if ( params.defaultTexturePath === true ) {
+
+				try {
+
+					fullPath = scope.defaultToonTextures[ parseInt( filePath.match( 'toon([0-9]{2})\.bmp$' )[ 1 ] ) ];
+
+				} catch ( e ) {
+
+					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' )
+					fullPath = scope.defaultToonTextures[ 0 ];
+
+				}
+
+			} else {
+
+				fullPath = texturePath + filePath;
+
+			}
 
 			var loader = THREE.Loader.Handlers.get( fullPath );
 
@@ -2685,8 +2838,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
-	var scope = this;
-
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
 	var initMotionAnimations = function () {
@@ -2700,50 +2851,73 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 		var bones = mesh.geometry.bones;
 		var orderedMotions = helper.createOrderedMotionArrays( bones, vmd.motions, 'boneName' );
 
-		var animation = {
-			name: name === undefined ? THREE.Math.generateUUID() : name,
-			fps: 30,
-			hierarchy: []
+		var tracks = [];
+
+		var pushInterpolation = function ( array, interpolation, index ) {
+
+			array.push( interpolation[ index + 0 ] / 127 );  // x1
+			array.push( interpolation[ index + 8 ] / 127 );  // x2
+			array.push( interpolation[ index + 4 ] / 127 );  // y1
+			array.push( interpolation[ index + 12 ] / 127 ); // y2
+
 		};
 
 		for ( var i = 0; i < orderedMotions.length; i++ ) {
 
-			animation.hierarchy.push(
-				{
-					parent: bones[ i ].parent,
-					keys: []
-				}
-			);
+			var times = [];
+			var positions = [];
+			var rotations = [];
+			var pInterpolations = [];
+			var rInterpolations = [];
 
-			var array = orderedMotions[ i ];
-			var keys = animation.hierarchy[ i ].keys;
 			var bone = bones[ i ];
+			var array = orderedMotions[ i ];
 
 			for ( var j = 0; j < array.length; j++ ) {
 
-				var t = array[ j ].frameNum / 30;
-				var p = array[ j ].position;
-				var r = array[ j ].rotation;
+				var time = array[ j ].frameNum / 30;
+				var pos = array[ j ].position;
+				var rot = array[ j ].rotation;
+				var interpolation = array[ j ].interpolation;
 
-				helper.pushBoneAnimationKey( keys, t, bone, p, r );
+				times.push( time );
+
+				for ( var k = 0; k < 3; k ++ ) {
+
+					positions.push( bone.pos[ k ] + pos[ k ] );
+
+				}
+
+				for ( var k = 0; k < 4; k ++ ) {
+
+					rotations.push( rot[ k ] );
+
+				}
+
+				for ( var k = 0; k < 3; k ++ ) {
+
+					pushInterpolation( pInterpolations, interpolation, k );
+
+				}
+
+				pushInterpolation( rInterpolations, interpolation, 3 );
 
 			}
 
-			helper.insertBoneAnimationKeyAtTimeZero( keys, bone );
-			helper.insertStartBoneAnimationKey( keys );
+			if ( times.length === 0 ) continue;
+
+			var boneName = '.bones[' + bone.name + ']';
+
+			tracks.push( new THREE.MMDLoader.VectorKeyframeTrackEx( boneName + '.position', times, positions, pInterpolations ) );
+			tracks.push( new THREE.MMDLoader.QuaternionKeyframeTrackEx( boneName + '.quaternion', times, rotations, rInterpolations ) );
 
 		}
 
-		var clip = THREE.AnimationClip.parseAnimation( animation, mesh.geometry.bones );
+		var clip = new THREE.AnimationClip( name === undefined ? THREE.Math.generateUUID() : name, -1, tracks );
 
 		if ( clip !== null ) {
 
-			if ( mesh.geometry.animations === undefined ) {
-
-				mesh.geometry.animations = [];
-
-			}
-
+			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
 			mesh.geometry.animations.push( clip );
 
 		}
@@ -2760,44 +2934,24 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		var orderedMorphs = helper.createOrderedMotionArrays( mesh.geometry.morphTargets, vmd.morphs, 'morphName' );
 
-		var morphAnimation = {
-			fps: 30,
-			hierarchy: []
-		};
-
-		for ( var i = 0; i < orderedMorphs.length; i++ ) {
-
-			morphAnimation.hierarchy.push( { keys: [] } );
-
-			var array = orderedMorphs[ i ];
-			var keys = morphAnimation.hierarchy[ i ].keys;
-
-			for ( var j = 0; j < array.length; j++ ) {
-
-				var t = array[ j ].frameNum / 30;
-				var w = array[ j ].weight;
-
-				helper.pushAnimationKey( keys, t, w );
-
-			}
-
-		}
-
-		// TODO: should we use THREE.AnimationClip.CreateFromMorphTargetSequence() instead?
-
 		var tracks = [];
 
 		for ( var i = 0; i < orderedMorphs.length; i++ ) {
 
-			var keys = morphAnimation.hierarchy[ i ].keys;
+			var times = [];
+			var values = [];
+			var array = orderedMorphs[ i ];
 
-			if ( keys.length === 0 ) {
+			for ( var j = 0; j < array.length; j++ ) {
 
-				continue;
+				times.push( array[ j ].frameNum / 30 );
+				values.push( array[ j ].weight );
 
 			}
 
-			tracks.push( helper.generateTrackFromAnimationKeys( keys, 'NumberKeyframeTrackEx', '.morphTargetInfluences[' + i + ']' ) );
+			if ( times.length === 0 ) continue;
+
+			tracks.push( new THREE.NumberKeyframeTrack( '.morphTargetInfluences[' + i + ']', times, values ) );
 
 		}
 
@@ -2805,12 +2959,7 @@ THREE.MMDLoader.prototype.createAnimation = function ( mesh, vmd, name ) {
 
 		if ( clip !== null ) {
 
-			if ( mesh.geometry.animations === undefined ) {
-
-				mesh.geometry.animations = [];
-
-			}
-
+			if ( mesh.geometry.animations === undefined ) mesh.geometry.animations = [];
 			mesh.geometry.animations.push( clip );
 
 		}
@@ -2914,6 +3063,7 @@ THREE.MMDLoader.prototype.leftToRightVmd = function ( vmd ) {
 
 	for ( var i = 0; i < vmd.metadata.cameraCount; i++ ) {
 
+		helper.leftToRightVector3( vmd.cameras[ i ].position );
 		helper.leftToRightEuler( vmd.cameras[ i ].rotation );
 
 	}
@@ -3113,164 +3263,20 @@ THREE.MMDLoader.DataCreationHelper.prototype = {
 
 		return result;
 
-	},
-
-	pushAnimationKey: function ( keys, time, value, preventInterpolation ) {
-
-		/*
-		 * Note: This is a workaround not to make Animation system calculate lerp
-		 *       if the diff from the last frame is 1 frame (in 30fps).
-		 */
-		if ( keys.length > 0 && preventInterpolation === true ) {
-
-			var k = keys[ keys.length - 1 ];
-
-			if ( time < k.time + ( 1 / 30 ) * 1.5 ) {
-
-				keys.push(
-					{
-						time: time - 1e-13,
-						value: k.value.clone === undefined ? k.value : k.value.clone()
-					}
-				);
-
-			}
-
-		}
-
-		keys.push(
-			{
-				time: time,
-				value: value
-			}
-		);
-
-	},
-
-	insertAnimationKeyAtTimeZero: function ( keys, value ) {
-
-		if ( keys.length === 0 ) {
-
-			keys.push(
-				{
-					time: 0.0,
-					value: value
-				}
-			);
-
-		}
-
-	},
-
-	insertStartAnimationKey: function ( keys ) {
-
-		var k = keys[ 0 ];
-
-		if ( k.time !== 0.0 ) {
-
-			keys.unshift(
-				{
-					time: 0.0,
-					value: k.value.clone === undefined ? k.value : k.value.clone()
-				}
-			);
-
-		}
-
-	},
-
-	pushBoneAnimationKey: function ( keys, time, bone, pos, rot ) {
-
-		keys.push(
-			{
-				time: time,
-				 pos: [ bone.pos[ 0 ] + pos[ 0 ],
-				        bone.pos[ 1 ] + pos[ 1 ],
-				        bone.pos[ 2 ] + pos[ 2 ] ],
-				 rot: [ rot[ 0 ], rot[ 1 ], rot[ 2 ], rot[ 3 ] ],
-				 scl: [ 1, 1, 1 ]
-			}
-		);
-
-	},
-
-	insertBoneAnimationKeyAtTimeZero: function ( keys, bone ) {
-
-		if ( keys.length === 0 ) {
-
-			keys.push(
-				{
-					time: 0.0,
-					 pos: [ bone.pos[ 0 ], bone.pos[ 1 ], bone.pos[ 2 ] ],
-					 rot: [ 0, 0, 0, 1 ],
-					 scl: [ 1, 1, 1 ]
-				}
-			);
-
-		}
-
-	},
-
-	insertStartBoneAnimationKey: function ( keys ) {
-
-		var k = keys[ 0 ];
-
-		if ( k.time !== 0.0 ) {
-
-			keys.unshift(
-				{
-					time: 0.0,
-					pos: [ k.pos[ 0 ], k.pos[ 1 ], k.pos[ 2 ] ],
-					rot: [ k.rot[ 0 ], k.rot[ 1 ], k.rot[ 2 ], k.rot[ 3 ] ],
-					scl: [ k.scl[ 0 ], k.scl[ 1 ], k.scl[ 2 ] ]
-				}
-			);
-
-		}
-
-	},
-
-	/*
-	 * This method wraps r74 Animation key frame track API for r73 Animation.
-	 */
-	generateTrackFromAnimationKeys: function ( keys, trackKey, name ) {
-
-		var times = [];
-		var values = [];
-
-		for ( var i = 0; i < keys.length; i++ ) {
-
-			var key = keys[ i ];
-
-			times.push( key.time );
-
-			if ( trackKey === 'VectorKeyframeTrackEx' ) {
-
-				values.push( key.value.x );
-				values.push( key.value.y );
-				values.push( key.value.z );
-
-			} else {
-
-				values.push( key.value );
-
-			}
-
-		}
-
-		return new THREE.MMDLoader[ trackKey ]( name, times, values );
-
 	}
 
 };
 
 /*
- * These two classes are for high precision of times and values.
- * TODO: Let Three.KeyframeTrack support type select on instance creation.
+ * extends existing KeyframeTrack for bone and camera animation.
+ *   - use Float64Array for times
+ *   - use Cubic Bezier curves interpolation
  */
-THREE.MMDLoader.VectorKeyframeTrackEx = function ( name, times, values, interpolation ) {
+THREE.MMDLoader.VectorKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
 
-	THREE.VectorKeyframeTrack.call( this, name, times, values, interpolation );
+	this.interpolationParameters = new Float32Array( interpolationParameterArray );
+
+	THREE.VectorKeyframeTrack.call( this, name, times, values );
 
 };
 
@@ -3278,15 +3284,199 @@ THREE.MMDLoader.VectorKeyframeTrackEx.prototype = Object.create( THREE.VectorKey
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.VectorKeyframeTrackEx;
 THREE.MMDLoader.VectorKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
 
-THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpolation ) {
+THREE.MMDLoader.VectorKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function( result ) {
 
-	THREE.VectorKeyframeTrack.call( this, name, times, values, interpolation );
+	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
+
+};
+
+THREE.MMDLoader.VectorKeyframeTrackEx.prototype.setInterpolation = function( interpolation ) {
+
+	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
+
+};
+
+THREE.MMDLoader.QuaternionKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
+
+	this.interpolationParameters = new Float32Array( interpolationParameterArray );
+
+	THREE.QuaternionKeyframeTrack.call( this, name, times, values );
+
+};
+
+THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype = Object.create( THREE.QuaternionKeyframeTrack.prototype );
+THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.QuaternionKeyframeTrackEx;
+THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
+
+THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function( result ) {
+
+	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
+
+};
+
+THREE.MMDLoader.QuaternionKeyframeTrackEx.prototype.setInterpolation = function( interpolation ) {
+
+	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
+
+};
+
+THREE.MMDLoader.NumberKeyframeTrackEx = function ( name, times, values, interpolationParameterArray ) {
+
+	this.interpolationParameters = new Float32Array( interpolationParameterArray );
+
+	THREE.NumberKeyframeTrack.call( this, name, times, values );
 
 };
 
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype = Object.create( THREE.NumberKeyframeTrack.prototype );
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.constructor = THREE.MMDLoader.NumberKeyframeTrackEx;
 THREE.MMDLoader.NumberKeyframeTrackEx.prototype.TimeBufferType = Float64Array;
+
+THREE.MMDLoader.NumberKeyframeTrackEx.prototype.InterpolantFactoryMethodCubicBezier = function( result ) {
+
+	return new THREE.MMDLoader.CubicBezierInterpolation( this.times, this.values, this.getValueSize(), result, this.interpolationParameters );
+
+};
+
+THREE.MMDLoader.NumberKeyframeTrackEx.prototype.setInterpolation = function( interpolation ) {
+
+	this.createInterpolant = this.InterpolantFactoryMethodCubicBezier;
+
+};
+
+THREE.MMDLoader.CubicBezierInterpolation = function ( parameterPositions, sampleValues, sampleSize, resultBuffer, params ) {
+
+	THREE.Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+
+	this.params = params;
+
+}
+
+THREE.MMDLoader.CubicBezierInterpolation.prototype = Object.create( THREE.LinearInterpolant.prototype );
+THREE.MMDLoader.CubicBezierInterpolation.prototype.constructor = THREE.MMDLoader.CubicBezierInterpolation;
+
+THREE.MMDLoader.CubicBezierInterpolation.prototype.interpolate_ = function( i1, t0, t, t1 ) {
+
+	var result = this.resultBuffer;
+	var values = this.sampleValues;
+	var stride = this.valueSize;
+
+	var offset1 = i1 * stride;
+	var offset0 = offset1 - stride;
+
+	var weight1 = ( t - t0 ) / ( t1 - t0 );
+
+	if ( stride === 4 ) {  // Quaternion
+
+		var x1 = this.params[ i1 * 4 + 0 ];
+		var x2 = this.params[ i1 * 4 + 1 ];
+		var y1 = this.params[ i1 * 4 + 2 ];
+		var y2 = this.params[ i1 * 4 + 3 ];
+
+		var ratio = this._calculate( x1, x2, y1, y2, weight1 );
+
+		THREE.Quaternion.slerpFlat( result, 0, values, offset0, values, offset1, ratio );
+
+	} else if ( stride === 3 ) {  // Vector3
+
+		for ( var i = 0; i !== stride; ++ i ) {
+
+			var x1 = this.params[ i1 * 12 + i * 4 + 0 ];
+			var x2 = this.params[ i1 * 12 + i * 4 + 1 ];
+			var y1 = this.params[ i1 * 12 + i * 4 + 2 ];
+			var y2 = this.params[ i1 * 12 + i * 4 + 3 ];
+
+			var ratio = this._calculate( x1, x2, y1, y2, weight1 );
+
+			result[ i ] = values[ offset0 + i ] * ( 1 - ratio ) + values[ offset1 + i ] * ratio;
+
+		}
+
+	} else {  // Number
+
+		var x1 = this.params[ i1 * 4 + 0 ];
+		var x2 = this.params[ i1 * 4 + 1 ];
+		var y1 = this.params[ i1 * 4 + 2 ];
+		var y2 = this.params[ i1 * 4 + 3 ];
+
+		var ratio = this._calculate( x1, x2, y1, y2, weight1 );
+
+		result[ 0 ] = values[ offset0 ] * ( 1 - ratio ) + values[ offset1 ] * ratio;
+
+	}
+
+	return result;
+
+};
+
+THREE.MMDLoader.CubicBezierInterpolation.prototype._calculate = function( x1, x2, y1, y2, x ) {
+
+	/*
+	 * Cubic Bezier curves
+	 *   https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B.C3.A9zier_curves
+	 *
+	 * B(t) = ( 1 - t ) ^ 3 * P0
+	 *      + 3 * ( 1 - t ) ^ 2 * t * P1
+	 *      + 3 * ( 1 - t ) * t^2 * P2
+	 *      + t ^ 3 * P3
+	 *      ( 0 <= t <= 1 )
+	 *
+	 * MMD uses Cubic Bezier curves for bone and camera animation interpolation.
+	 *   http://d.hatena.ne.jp/edvakf/20111016/1318716097
+	 *
+	 *    x = ( 1 - t ) ^ 3 * x0
+	 *      + 3 * ( 1 - t ) ^ 2 * t * x1
+	 *      + 3 * ( 1 - t ) * t^2 * x2
+	 *      + t ^ 3 * x3
+	 *    y = ( 1 - t ) ^ 3 * y0
+	 *      + 3 * ( 1 - t ) ^ 2 * t * y1
+	 *      + 3 * ( 1 - t ) * t^2 * y2
+	 *      + t ^ 3 * y3
+	 *      ( x0 = 0, y0 = 0 )
+	 *      ( x3 = 1, y3 = 1 )
+	 *      ( 0 <= t, x1, x2, y1, y2 <= 1 )
+	 *
+	 * Here solves this equation with Bisection method,
+	 *   https://en.wikipedia.org/wiki/Bisection_method
+	 * gets t, and then calculate y.
+	 *
+	 * f(t) = 3 * ( 1 - t ) ^ 2 * t * x1
+	 *      + 3 * ( 1 - t ) * t^2 * x2
+	 *      + t ^ 3 - x = 0
+	 *
+	 * (Another option: Newton's method
+	 *    https://en.wikipedia.org/wiki/Newton%27s_method)
+	 */
+
+	var c = 0.5;
+	var t = c;
+	var s = 1.0 - t;
+	var loop = 15;
+	var eps = 1e-5;
+	var math = Math;
+
+	var sst3, stt3, ttt;
+
+	for ( var i = 0; i < loop; i ++ ) {
+
+		sst3 = 3.0 * s * s * t;
+		stt3 = 3.0 * s * t * t;
+		ttt = t * t * t;
+
+		var ft = ( sst3 * x1 ) + ( stt3 * x2 ) + ( ttt ) - x;
+
+		if ( math.abs( ft ) < eps ) break;
+
+		c /= 2.0;
+
+		t += ( ft < 0 ) ? c : -c;
+		s = 1.0 - t;
+
+	}
+
+	return ( sst3 * y1 ) + ( stt3 * y2 ) + ttt;
+
+};
 
 THREE.MMDLoader.DataView = function ( buffer, littleEndian ) {
 
@@ -3810,7 +4000,6 @@ THREE.MMDGrantSolver.prototype = {
 						q.set( 0, 0, 0, 1 );
 						q.slerp( pb.quaternion, g.ratio );
 						b.quaternion.multiply( q );
-						b.updateMatrixWorld( true );
 
 					}
 
@@ -4240,6 +4429,8 @@ THREE.MMDHelper.prototype = {
 			// TODO: Let PerspectiveCamera automatically update?
 			this.camera.updateProjectionMatrix();
 
+			this.camera.up.set( 0, 1, 0 );
+			this.camera.up.applyQuaternion( this.camera.quaternion );
 			this.camera.lookAt( this.camera.center );
 
 		}
