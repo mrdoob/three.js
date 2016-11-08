@@ -4606,11 +4606,9 @@ THREE.MMDHelper.prototype = {
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 
-		if ( ! ( params && params.preventResetPose === true ) ) {
+		if ( params === undefined ) params = {};
 
-			mesh.pose();
-
-		}
+		if ( params.preventResetPose !== true ) mesh.pose();
 
 		var bones = mesh.skeleton.bones;
 		var bones2 = vpd.bones;
@@ -4619,8 +4617,7 @@ THREE.MMDHelper.prototype = {
 
 		for ( var i = 0; i < bones.length; i++ ) {
 
-			var b = bones[ i ];
-			table[ b.name ] = i;
+			table[ bones[ i ].name ] = i;
 
 		}
 
@@ -4632,11 +4629,7 @@ THREE.MMDHelper.prototype = {
 			var b = bones2[ i ];
 			var index = table[ b.name ];
 
-			if ( index === undefined ) {
-
-				continue;
-
-			}
+			if ( index === undefined ) continue;
 
 			var b2 = bones[ index ];
 			var t = b.translation;
@@ -4648,25 +4641,21 @@ THREE.MMDHelper.prototype = {
 			b2.position.add( thV );
 			b2.quaternion.multiply( thQ );
 
-			b2.updateMatrixWorld( true );
-
 		}
 
-		if ( params === undefined || params.preventIk !== true ) {
+		mesh.updateMatrixWorld( true );
+
+		if ( params.preventIk !== true ) {
 
 			var solver = new THREE.CCDIKSolver( mesh );
-			solver.update();
+			solver.update( params.saveOriginalBonesBeforeIK );
 
 		}
 
-		if ( params === undefined || params.preventGrant !== true ) {
+		if ( params.preventGrant !== true && mesh.geometry.grants !== undefined ) {
 
-			if ( mesh.geometry.grants !== undefined ) {
-
-				var solver = new THREE.MMDGrantSolver( mesh );
-				solver.update();
-
-			}
+			var solver = new THREE.MMDGrantSolver( mesh );
+			solver.update();
 
 		}
 

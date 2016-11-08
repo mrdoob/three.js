@@ -69,7 +69,27 @@ THREE.CCDIKSolver.prototype = {
 
 	},
 
-	update: function () {
+	/*
+	 * save the bone matrices before solving IK.
+	 * they're used for generating VMD and VPD.
+	 */
+	_saveOriginalBonesInfo: function () {
+
+		var bones = this.mesh.skeleton.bones;
+
+		for ( var i = 0, il = bones.length; i < il; i ++ ) {
+
+			var bone = bones[ i ];
+
+			if ( bone.userData.ik === undefined ) bone.userData.ik = {};
+
+			bone.userData.ik.originalMatrix = bone.matrix.toArray();
+
+		}
+
+	},
+
+	update: function ( saveOriginalBones ) {
 
 		var q = new THREE.Quaternion();
 
@@ -90,6 +110,8 @@ THREE.CCDIKSolver.prototype = {
 		var math = Math;
 
 		this.mesh.updateMatrixWorld( true );
+
+		if ( saveOriginalBones === true ) this._saveOriginalBonesInfo();
 
 		for ( var i = 0, il = iks.length; i < il; i++ ) {
 
