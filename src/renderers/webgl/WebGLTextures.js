@@ -67,11 +67,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) return true;
-		if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) return true;
-
-		return false;
-
+		return (texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) || ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
+		
 	}
 
 	// Fallback filters for non-power-of-2 textures
