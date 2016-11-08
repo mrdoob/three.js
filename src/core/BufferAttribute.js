@@ -26,7 +26,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
 
-	this.onUpload = null;
+	this.onUploadCallback = function () {};
 
 	this.version = 0;
 
@@ -316,6 +316,14 @@ BufferAttribute.prototype = {
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
+
+		return this;
+
+	},
+
+	onUpload: function ( callback ) {
+
+		this.onUploadCallback = callback;
 
 		return this;
 
