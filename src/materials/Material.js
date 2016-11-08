@@ -1,6 +1,7 @@
 import { EventDispatcher } from '../core/EventDispatcher';
 import { NoColors, FrontSide, SmoothShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
 import { _Math } from '../math/Math';
+import { Layers } from '../core/Layers';
 
 /**
  * @author mrdoob / http://mrdoob.com/
