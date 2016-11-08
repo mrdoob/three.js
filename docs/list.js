@@ -8,6 +8,14 @@ var list = {
 	},
 
 	"Reference": {
+		"Audio": [
+			[ "Audio", "api/audio/Audio" ],
+			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
+			[ "AudioContext", "api/audio/AudioContext" ],
+			[ "AudioListener", "api/audio/AudioListener" ],
+			[ "PositionalAudio", "api/audio/PositionalAudio" ]
+		],
+
 		"Constants": [
 			[ "Animation", "api/constants/Animation" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
