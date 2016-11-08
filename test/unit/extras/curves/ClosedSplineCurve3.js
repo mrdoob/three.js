@@ -21,7 +21,6 @@ function vectorsAreEqual( check, that ) {
 		}
 	}
 
-	return;
 }
 
 test( "basic check", function() {
