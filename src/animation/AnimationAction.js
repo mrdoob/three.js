@@ -473,7 +473,7 @@ AnimationAction.prototype = {
 			if ( loopCount === -1 ) {
 				// just started
 
-				this.loopCount = 0;
+				this._loopCount = 0;
 				this._setEndings( true, true, false );
 
 			}
