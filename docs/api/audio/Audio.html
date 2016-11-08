@@ -30,6 +30,10 @@
 
 		// create a global audio source
 		var sound = new THREE.Audio( listener );
+
+		var audioLoader = new THREE.AudioLoader();
+
+		//Load a sound and set it as the Audio object's buffer
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop(true);

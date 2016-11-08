@@ -8,108 +8,118 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr; [page:Camera] &rarr;
+		[page:Object3D] &rarr; [page:Audio] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">Camera with orthographic projection.</div>
+		<div class="desc">
+			Create a positional audio object.<br /><br />
+
+			This used the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API]
+			for control and playback of audio.
+
+		</div>
 
 
 		<h2>Example</h2>
 
-		<div>[example:canvas_camera_orthographic camera / orthographic ]</div>
-		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
-		<div>[example:webgl_camera camera ]</div>
-		<div>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</div>
-		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
-		<div>[example:webgl_postprocessing_advanced postprocessing / advanced ]</div>
-		<div>[example:webgl_postprocessing_dof2 postprocessing / dof2 ]</div>
-		<div>[example:webgl_postprocessing_godrays postprocessing / godrays ]</div>
-		<div>[example:webgl_rtt rtt ]</div>
-		<div>[example:webgl_shaders_tonemapping shaders / tonemapping ]</div>
-		<div>[example:webgl_shadowmap shadowmap ]</div>
-		<div>[example:webgl_terrain_dynamic terrain / dynamic ]</div>
+		<div>[example:misc_sound misc / sound ]</div>
+		<code>
 
-		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-scene.add( camera );</code>
+		//Create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		//Create the PositionalAudio object (passing in the listener)
+		var sound = new THREE.PositionalAudio( listener );
+
+		//Load a sound and set it as the PositionalAudio object's buffer
+		var audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+			sound1.setBuffer( buffer );
+			sound1.setRefDistance( 20 );
+			sound1.play();
+		});
+
+		//Create an object for the sound to play from
+		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		var mesh = new THREE.Mesh( sphere, material );
+		scene.add( mesh );
+
+		//Finally add the sound to the mesh
+		mesh.add( sound );
+		</code>
 
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]( [page:Float left], [page:Float right], [page:Float top], [page:Float bottom], [page:Float near], [page:Float far] )</h3>
+		<h3>[name]( [page:AudioListener listener] )</h3>
 		<div>
-		left — Camera frustum left plane.<br />
-		right — Camera frustum right plane.<br />
-		top — Camera frustum top plane.<br />
-		bottom — Camera frustum bottom plane.<br />
-		near — Camera frustum near plane.<br />
-		far — Camera frustum far plane.
+		listener — (required) [page:AudioListener AudioListener] instance.
 		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>[property:number zoom]</h3>
-		<div>Gets or sets the zoom factor of the camera. Default is *1*.</div>
+		<div>
+			See the [page:Audio Audio] class for inherited properties.
+		</div>
 
-		<h3>[property:Float left]</h3>
-		<div>Camera frustum left plane.</div>
-
-		<h3>[property:Float right]</h3>
-		<div>Camera frustum right plane.</div>
-
-		<h3>[property:Float top]</h3>
-		<div>Camera frustum top plane.</div>
-
-		<h3>[property:Float bottom]</h3>
-		<div>Camera frustum bottom plane.</div>
-
-		<h3>[property:Float near]</h3>
-		<div>Camera frustum near plane. Default is *0.1*.</div>
-
-		<h3>[property:Float far]</h3>
-		<div>Camera frustum far plane. Default is *2000*.</div>
+		<h3>[property:PannerNode panner]</h3>
+		<div>The PositionalAudio's [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode].</div>
 
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
 		<div>
-		fullWidth — full width of multiview setup<br />
-		fullHeight — full height of multiview setup<br />
-		x — horizontal offset of subcamera<br />
-		y — vertical offset of subcamera<br />
-		width — width of subcamera<br />
-		height — height of subcamera
+			See the [page:Audio Audio] class for inherited methods.
 		</div>
 
+		<h3>[method:PannerNode getOutput]()</h3>
 		<div>
-		Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups. For an example on how to use it see [page:PerspectiveCamera].
+		Returns the [page:PositionalAudio.panner panner].
 		</div>
 
-		<h3>[method:null clearViewOffset]()</h3>
+		<h3>[method:Number getRefDistance]()</h3>
 		<div>
-		Removes any offset set by the .setViewOffset method.
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
 		</div>
 
-		<h3>[method:null updateProjectionMatrix]()</h3>
+		<h3>[method:PannerNode setRefDistance]( [page:Number value] )</h3>
 		<div>
-		Updates the camera projection matrix. Must be called after change of parameters.
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
 		</div>
 
-		<h3>[method:OrthographicCamera clone]()</h3>
+		<h3>[method:PannerNode getRolloffFactor]()</h3>
 		<div>
-		<br />
-		Returns a clone of the OrthographicCamera.
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
 		</div>
 
-
-		<h3>[method:JSON toJSON]()</h3>
+		<h3>[method:PannerNode setRolloffFactor]( [page:Number value] )</h3>
 		<div>
-		Return camera data in JSON format.
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
 		</div>
 
+		<h3>[method:String getDistanceModel]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</div>
+
+		<h3>[method:String setDistanceModel]( [page:String value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</div>
+
+		<h3>[method:PannerNode getMaxDistance]()</h3>
+		<div>
+		Returns the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		</div>
+
+		<h3>[method:PannerNode setMaxDistance]( [page:Number value] )</h3>
+		<div>
+		Sets the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.distanceModel].
+		</div>
 
 		<h2>Source</h2>
 
