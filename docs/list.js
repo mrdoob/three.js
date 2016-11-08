@@ -9,11 +9,11 @@ var list = {
 
 	"Reference": {
 		"Audio": [
-			[ "Audio", "docs/api/audio/Audio.html" ],
-			[ "AudioAnalyser", "docs/api/audio/AudioAnalyser.html" ],
-			[ "AudioContext", "docs/api/audio/AudioContext.html" ],
-			[ "AudioListener", "docs/api/audio/AudioListener.html" ],
-			[ "PositionalAudio", "docs/api/audio/PositionalAudio.html" ]
+			[ "Audio", "api/audio/Audio" ],
+			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
+			[ "AudioContext", "api/audio/AudioContext" ],
+			[ "AudioListener", "api/audio/AudioListener" ],
+			[ "PositionalAudio", "api/audio/PositionalAudio" ]
 		],
 
 		"Constants": [
