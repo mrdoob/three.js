@@ -310,8 +310,7 @@ Object.assign( AnimationClip, {
 					var times = [];
 					var values = [];
 
-					for ( var m = 0;
-							m !== animationKeys[k].morphTargets.length; ++ m ) {
+					for ( var m = 0; m !== animationKeys[k].morphTargets.length; ++ m ) {
 
 						var animationKey = animationKeys[k];
 
@@ -320,8 +319,7 @@ Object.assign( AnimationClip, {
 
 					}
 
-					tracks.push( new NumberKeyframeTrack(
-							'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+					tracks.push( new NumberKeyframeTrack('.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 				}
 
