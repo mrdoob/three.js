@@ -86,7 +86,7 @@ var ShaderLib = {
 				emissive : { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
 				metalness: { value: 0 },
-				envMapIntensity : { value: 1 }, // temporary
+				envMapIntensity : { value: 1 } // temporary
 			}
 		),
 
