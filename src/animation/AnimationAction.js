@@ -273,7 +273,7 @@ AnimationAction.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._timeScaleInterpolant = interpolant;
 
 		}
@@ -636,7 +636,7 @@ AnimationAction.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._weightInterpolant = interpolant;
 
 		}
