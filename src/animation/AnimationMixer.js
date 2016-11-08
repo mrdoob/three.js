@@ -654,7 +654,7 @@ Object.assign( AnimationMixer.prototype, {
 
 		remove_empty_map: {
 
-			for ( var _ in bindingByName ) break remove_empty_map;
+			// for ( var _ in bindingByName ) break remove_empty_map;
 
 			delete bindingsByRoot[ rootUuid ];
 
