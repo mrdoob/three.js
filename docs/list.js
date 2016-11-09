@@ -228,7 +228,6 @@ var list = {
 		],
 
 		"Renderers": [
-			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
 			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
@@ -324,19 +323,31 @@ var list = {
 	"Examples": {
 
 		"Collada Animation": [
-			[ "Animation", "api/extras/collada-animation/Animation" ],
-			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
+			[ "ColladaAnimation", "examples/collada/Animation" ],
+			[ "AnimationHandler", "examples/collada/AnimationHandler" ],
+			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
 		"Loaders": [
-
+			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
+			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
+			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "MTLLoader", "examples/loaders/MTLLoader" ],
+			[ "OBJLoader", "examples/loaders/OBJLoader" ],
+			[ "PCDLoader", "examples/loaders/PCDLoader" ],
+			[ "PDBLoader", "examples/loaders/PDBLoader" ],
+			[ "SVGLoader", "examples/loaders/SVGLoader" ],
+			[ "TGALoader", "examples/loaders/TGALoader" ]
 		],
 
 		"Plugins": [
 			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "examples/Lut" ],
 			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
+		],
+
+		"Renderers": [
+			[ "CanvasRenderer", "examples/renderers/CanvasRenderer" ]
 		]
 
 	},
