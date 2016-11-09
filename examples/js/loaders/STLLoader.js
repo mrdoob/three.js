@@ -179,12 +179,12 @@ THREE.STLLoader.prototype = {
 
 		}
 
-		geometry.addAttribute( 'position', THREE.Float32Attribute( vertices, 3 ) );
-		geometry.addAttribute( 'normal', THREE.Float32Attribute( normals, 3 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+		geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
 		if ( hasColors ) {
 
-			geometry.addAttribute( 'color', THREE.Float32Attribute( colors, 3 ) );
+			geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 			geometry.hasColors = true;
 			geometry.alpha = alpha;
 
@@ -229,8 +229,8 @@ THREE.STLLoader.prototype = {
 
 		}
 
-		geometry.addAttribute( 'position', THREE.Float32Attribute( vertices, 3 ) );
-		geometry.addAttribute( 'normal', THREE.Float32Attribute( normals, 3 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+		geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
 		return geometry;
 
