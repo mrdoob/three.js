@@ -9,18 +9,6 @@ var list = {
 
 	"Reference": {
 
-
-
-
-
-
-
-
-
-
-
-
-
 		"Animation / Tracks": [
 			[ "BooleanKeyframeTrack", "api/animation/tracks/BooleanKeyframeTrack" ],
 			[ "ColorKeyframeTrack", "api/animation/tracks/ColorKeyframeTrack" ],

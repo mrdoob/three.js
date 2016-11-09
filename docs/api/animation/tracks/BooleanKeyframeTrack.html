@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="../../../" />
+    <script src="list.js"></script>
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+  </head>
+  <body>
+
+		[page:KeyframeTrack] &rarr;
+
+    <h1>[name]</h1>
+
+    <div class="desc">
+     A Track of Boolean keyframe values.
+    </div>
+
+
+    <h2>Constructor</h2>
+
+
+    <h3>[name]( [page:String name], [page:Array times], [page:Array values] )</h3>
+    <div>
+      -- [page:String name] (required) identifier for the KeyframeTrack.<br />
+      -- [page:Array times] (required) array of keyframe times<br />
+      -- [page:Array values] values for the keyframes at the times specified.<br />
+    </div>
+
+    <h2>Properties</h2>
+
+		See [page:KeyframeTrack] for inherited properties.
+
+
+    <h3>[property:String ValueTypeName]</h3>
+    <div>
+    String 'bool'.
+    </div>
+
+    <h3>[property:Constant DefaultInterpolation]</h3>
+    <div>
+    The default interpolation type to use, [page:Animation InterpolateDiscrete].
+    </div>
+
+
+    <h2>Methods</h2>
+
+		See [page:KeyframeTrack] for inherited methods.
+
+    <h3>[method:null InterpolantFactoryMethodLinear ](  )</h3>
+    <div>
+      The value of this method here is 'undefined', as it does not make sense for discrete properties.
+    </div>
+
+    <h3>[method:null InterpolantFactoryMethodSmooth ](  )</h3>
+    <div>
+      The value of this method here is 'undefined', as it does not make sense for discrete properties.
+    </div>
+
+    <h3>[method:null ValueBufferType ](  )</h3>
+    <div>
+      Used to convert the values array passed in the constructor to an Array.
+			Note: In this case this does nothing, other Track types may convert the array to a Typed Array.
+    </div>
+
+    <h2>Source</h2>
+
+
+    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+  </body>
+</html>
