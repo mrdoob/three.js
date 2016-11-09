@@ -234,6 +234,10 @@ var list = {
 			[ "Sprite", "api/objects/Sprite" ]
 		],
 
+		"Polyfills": [
+			[ "Polyfills", "api/polyfills" ]
+		],
+
 		"Renderers": [
 			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
