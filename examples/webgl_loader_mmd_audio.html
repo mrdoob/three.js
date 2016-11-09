@@ -107,12 +107,11 @@
 				var onError = function ( xhr ) {
 				};
 
-				// read https://github.com/takahirox/mmd-assets if you wanna use them in your work
-				var modelFile = 'https://cdn.rawgit.com/takahirox/mmd-assets/master/models/miku/miku_v2.pmd';
-				var vmdFiles = [ 'https://cdn.rawgit.com/takahirox/mmd-assets/master/vmds/wavefile/wavefile_v2.vmd' ];
-				var cameraFiles = [ 'https://cdn.rawgit.com/takahirox/mmd-assets/master/vmds/wavefile/wavefile_camera.vmd' ];
-				var stageFile = 'https://cdn.rawgit.com/takahirox/mmd-assets/master/models/stage/stage.pmd';
-				var audioFile = 'https://cdn.rawgit.com/takahirox/mmd-assets/master/audios/wavefile/wavefile_short.mp3';
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
+				var cameraFiles = [ 'models/mmd/vmd/wavefile_camera.vmd' ];
+				var stageFile = 'models/mmd/stage/stage.pmd';
+				var audioFile = 'models/mmd/audio/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
 				helper = new THREE.MMDHelper( renderer );
