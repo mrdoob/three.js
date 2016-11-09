@@ -161,8 +161,9 @@ function WebGLRenderer( parameters ) {
 
 		_projScreenMatrix = new Matrix4(),
 
-	_vector3 = new THREE.Vector3(),
-	_matrix4 = new THREE.Matrix4(), _matrix42 = new THREE.Matrix4(),
+		_vector3 = new Vector3(),
+		_matrix4 = new Matrix4(), 
+		_matrix42 = new Matrix4(),
 
 		// light arrays cache
 
