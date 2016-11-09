@@ -57,6 +57,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
+		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
@@ -191,6 +192,26 @@ Sidebar.Material = function ( editor ) {
 	materialShininessRow.add( materialShininess );
 
 	container.add( materialShininessRow );
+
+	// clearCoat
+
+	var materialClearCoatRow = new UI.Row();
+	var materialClearCoat = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialClearCoatRow.add( new UI.Text( 'ClearCoat' ).setWidth( '90px' ) );
+	materialClearCoatRow.add( materialClearCoat );
+
+	container.add( materialClearCoatRow );
+
+	// clearCoatRoughness
+
+	var materialClearCoatRoughnessRow = new UI.Row();
+	var materialClearCoatRoughness = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialClearCoatRoughnessRow.add( new UI.Text( 'ClearCoat Roughness' ).setWidth( '90px' ) );
+	materialClearCoatRoughnessRow.add( materialClearCoatRoughness );
+
+	container.add( materialClearCoatRoughnessRow );
 
 	// vertex colors
 
@@ -533,6 +554,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetMaterialValueCommand( currentObject, 'shininess', materialShininess.getValue() ) );
+
+			}
+
+			if ( material.clearCoat !== undefined && Math.abs( material.clearCoat - materialClearCoat.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'clearCoat', materialClearCoat.getValue() ) );
+
+			}
+
+			if ( material.clearCoatRoughness !== undefined && Math.abs( material.clearCoatRoughness - materialClearCoatRoughness.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'clearCoatRoughness', materialClearCoatRoughness.getValue() ) );
 
 			}
 
@@ -917,6 +950,8 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'clearCoat': materialClearCoatRow,
+			'clearCoatRoughness': materialClearCoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
@@ -1005,6 +1040,18 @@ Sidebar.Material = function ( editor ) {
 		if ( material.shininess !== undefined ) {
 
 			materialShininess.setValue( material.shininess );
+
+		}
+
+		if ( material.clearCoat !== undefined ) {
+
+			materialClearCoat.setValue( material.clearCoat );
+
+		}
+
+		if ( material.clearCoatRoughness !== undefined ) {
+
+			materialClearCoatRoughness.setValue( material.clearCoatRoughness );
 
 		}
 
