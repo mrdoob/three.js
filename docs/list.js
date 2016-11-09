@@ -49,6 +49,7 @@ var list = {
 		"Constants": [
 			[ "Animation", "api/constants/Animation" ],
 			[ "Colors", "api/constants/Colors" ],
+			[ "Core", "api/constants/Core" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "Materials", "api/constants/Materials" ],
