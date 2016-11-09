@@ -54,7 +54,7 @@
 		A version number, incremented every time the needsUpdate property is set to true.
 		</div>
 
-		<h3>[property:Function onUpload]</h3>
+		<h3>[property:Function onUploadCallback]</h3>
 		<div>
 		A callback function that is executed after the Renderer has transfered the attribute array data to the GPU.
 		</div>
@@ -106,6 +106,12 @@
 		the value of the array at <code>index * itemSize + 2</code> to z, and
 		the value of the array at <code>index * itemSize + 3</code> to w.
 		</div>
+
+		<h3>[method:null onUpload]( [page:Function callback] ) </h3>
+		<div>
+		Sets the value of the onUploadCallback property.
+		</div>
+		<div>Example: [example:webgl_buffergeometry used to free memory after the buffer has been transfered to GPU].</div>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<div>
