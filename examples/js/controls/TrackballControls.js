@@ -473,7 +473,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_zoomStart.y -= event.deltaY * 0.01;
+		_zoomStart.y -= event.deltaY * ( ( event.deltaMode )  ? 0.01 : 0.0001 );
 
 		_this.dispatchEvent( startEvent );
 		_this.dispatchEvent( endEvent );
