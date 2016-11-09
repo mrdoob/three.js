@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometries</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+      function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+        camera.position.y = 300;
+        camera.position.z = 300;
+
+				scene = new THREE.Scene();
+        camera.lookAt( scene.position );
+
+				var light, object;
+
+				scene.add( new THREE.AmbientLight( 0x808080 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 1, 0 );
+				scene.add( light );
+
+				// var material = new THREE.MeshLambertMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
+          vertexColors: THREE.VertexColors,
+          side: THREE.DoubleSide
+        } );
+
+				// create sphere colored with sphericalDist values
+
+        var numSphereSegments = 100;
+
+        var dist;
+        var geom;
+        var baseDist = new THREE.CosineSphericalDistribution();
+
+        dist = new THREE.LinearlyTransformedSphericalDistribution(baseDist)
+          .shear(-0.5, 0.0, 0.0);
+        geom = new THREE.SphereGeometry( 20, numSphereSegments, numSphereSegments );
+        colorSphereWithDistributionValues(geom, dist);
+        object = new THREE.Mesh( geom, material );
+				object.position.set( -100, 0, 0 );
+        object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
+				scene.add( object );
+
+        dist = new THREE.LinearlyTransformedSphericalDistribution(baseDist)
+          .scale(0.5, 1.0, 1.0);
+        geom = new THREE.SphereGeometry( 20, numSphereSegments, numSphereSegments );
+        colorSphereWithDistributionValues(geom, dist);
+        object = new THREE.Mesh( geom, material );
+				object.position.set( -50, 0, 0 );
+        object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
+				scene.add( object );
+
+        dist = new THREE.CosineSphericalDistribution();
+        geom = new THREE.SphereGeometry( 20, numSphereSegments, numSphereSegments );
+        colorSphereWithDistributionValues(geom, dist);
+        object = new THREE.Mesh( geom, material );
+				object.position.set( 0, 0, 0 );
+        object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
+				scene.add( object );
+
+        dist = new THREE.LinearlyTransformedSphericalDistribution(baseDist)
+          .scale(1.0, 0.5, 1.0);
+        geom = new THREE.SphereGeometry( 20, numSphereSegments, numSphereSegments );
+        colorSphereWithDistributionValues(geom, dist);
+        object = new THREE.Mesh( geom, material );
+				object.position.set( 50, 0, 0 );
+        object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
+				scene.add( object );
+
+        dist = new THREE.LinearlyTransformedSphericalDistribution(baseDist)
+          .shear(0.0, -0.5, 0.0);
+        geom = new THREE.SphereGeometry( 20, numSphereSegments, numSphereSegments );
+        colorSphereWithDistributionValues(geom, dist);
+        object = new THREE.Mesh( geom, material );
+				object.position.set( 100, 0, 0 );
+        object.rotation.set( -Math.PI / 2.0, 0.0, 0.0 );
+				scene.add( object );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+      function colorSphereWithDistributionValues(geom, dist) {
+
+        var maxVal = 0.65;
+        var sum = 0.0;
+
+        var values = [];
+
+        // calc dist values, and note max value to map colors
+        for ( var i = 0; i < geom.faces.length; i ++ ) {
+
+          values.push({});
+          var face = geom.faces[ i ];
+
+          for ( var j = 0; j < 3; j ++ ) {
+            var faceIdx = [ 'a', 'b', 'c' ][ j ];
+            var pos = geom.vertices[ face[ faceIdx ] ];
+
+            var distValue = dist.valueAtPosVec3( pos );
+
+            // sum += distValue;
+            // maxVal = Math.max(maxVal, distValue);
+
+            values[i][faceIdx] = distValue;
+          }
+
+        }
+
+        console.log('max: ' + maxVal);
+        console.log('sum: ' + sum);
+
+        // set colors using maxValue to interpolate properly
+        for ( var i = 0; i < geom.faces.length; i ++ ) {
+
+          var face = geom.faces[ i ];
+
+          for ( var j = 0; j < 3; j ++ ) {
+
+            var red = new THREE.Color( 'red' );
+            var blue = new THREE.Color( 'blue' );
+            var white = new THREE.Color( 'white' );
+
+            var faceIdx = [ 'a', 'b', 'c' ][ j ];
+            var distValue = values[i][faceIdx] / maxVal;
+
+            var color;
+            if (distValue > 0.5) {
+
+              // 1.0 -> 0.5: red -> white
+              color = red.lerp( white, 1.0 - ( ( distValue - 0.5 ) * 2.0 ) );
+
+            } else {
+
+              // 0.5 -> 0.0: white -> blue
+              color = blue.lerp( white, distValue * 2.0 );
+
+            }
+            face.vertexColors[ j ] = color;
+          }
+        }
+
+        geom.colorsNeedUpdate = true;
+
+      }
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0001;
+
+				// camera.position.x = Math.cos( timer ) * 800;
+				// camera.position.z = Math.sin( timer ) * 800;
+
+				// camera.lookAt( scene.position );
+
+				// for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					// var object = scene.children[ i ];
+
+					// object.rotation.x = timer * 5;
+					// object.rotation.y = timer * 2.5;
+
+				// }
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

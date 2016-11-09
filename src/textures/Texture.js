@@ -102,6 +102,10 @@ Texture.prototype = {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
+		// TODO (abelnation): this was added as something causes texture constants to be "copied" before they are properly uploaded to GPU
+		this.needsUpdate = source.needsUpdate;
+		this.version = source.version;
+
 		return this;
 
 	},

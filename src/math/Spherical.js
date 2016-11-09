@@ -80,6 +80,25 @@ Spherical.prototype = {
 
 	},
 
+	getCartesian: function() {
+		if ( this.radius === 0 ) {
+
+			return new THREE.Vector3();
+
+		} else {
+
+			var sinPhi = Math.sin( this.phi );
+			var cosPhi = Math.cos( this.phi );
+			var sinTheta = Math.sin( this.theta );
+			var cosTheta = Math.cos( this.theta );
+
+			return new THREE.Vector3(
+				this.radius * sinPhi * cosTheta,
+				this.radius * sinPhi * sinTheta,
+				this.radius * cosPhi );
+
+		}
+	}
 };
 
 

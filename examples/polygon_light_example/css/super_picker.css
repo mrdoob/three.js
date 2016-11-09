@@ -1,0 +1,35 @@
+/* Default styling for SuperPicker controls */
+
+.sp_picker {
+	border: 0px solid #333;
+	border-radius: 6px;
+	min-height: 14px;
+	clear: both;
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	}
+.sp_label {
+	font-family: helvetica, arial, sans-serif;
+	clear: both;
+	color: #999;
+	display: block;
+	float: left;
+	font-size: 12px;
+	margin: 0 0 1px 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	}
+.sp_label:hover {
+	color: #FFF;
+	}
+
+.sp_swatch {
+	background: #ff0000;
+	border-radius: 6px;
+	width: 32px;
+	height: 32px;
+	float: left;
+	position: relative;
+	clear: left;
+}

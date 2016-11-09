@@ -1,0 +1,28 @@
+.ace-clouds-midnight .ace_gutter {
+  width: 50px;
+  background: #191919;
+  color: #333;
+  overflow : hidden;
+}
+
+.ace-clouds-midnight .ace_support.ace_function {
+  color:#B58900;
+}
+
+.ace-clouds-midnight .ace_constant.ace_language {
+  color:#B58900;
+}
+
+.ace-clouds-midnight .ace_variable.ace_language {
+  color:#1F74CF;
+}
+
+.ace_gutter-cell.ace_error {
+  background-image: url("../images/error_icon.png");
+}
+
+.ace_marker-layer .ace_error {
+	position: absolute;
+	z-index: 5;
+	background: rgba(255, 0, 0, 0.5);
+}
