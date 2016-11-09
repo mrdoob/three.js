@@ -7339,6 +7339,8 @@
 			if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
 			if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 			if ( this.shininess !== undefined ) data.shininess = this.shininess;
+			if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
+			if ( this.clearCoatRoughness !== undefined ) data.clearCoatRoughness = this.clearCoatRoughness;
 
 			if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 			if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
@@ -16012,11 +16014,10 @@
 
 					case 'RectAreaLight':
 						uniforms = {
-							color: new THREE.Color(),
-							position: new THREE.Vector3(),
-							halfWidth: new THREE.Vector3(),
-							halfHeight: new THREE.Vector3(),
-
+							color: new Color(),
+							position: new Vector3(),
+							halfWidth: new Vector3(),
+							halfHeight: new Vector3()
 							// TODO (abelnation): set RectAreaLight shadow uniforms
 						};
 						break;
@@ -19663,8 +19664,9 @@
 
 			_projScreenMatrix = new Matrix4(),
 
-		_vector3 = new THREE.Vector3(),
-		_matrix4 = new THREE.Matrix4(), _matrix42 = new THREE.Matrix4(),
+			_vector3 = new Vector3(),
+			_matrix4 = new Matrix4(), 
+			_matrix42 = new Matrix4(),
 
 			// light arrays cache
 
@@ -31925,6 +31927,8 @@
 			if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 			if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 			if ( json.shininess !== undefined ) material.shininess = json.shininess;
+			if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
+			if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
 			if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
 			if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 			if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
@@ -39510,27 +39514,8 @@
 
 			return this;
 
-		},
-
-		getCartesian: function() {
-			if ( this.radius === 0 ) {
-
-				return new THREE.Vector3();
-
-			} else {
-
-				var sinPhi = Math.sin( this.phi );
-				var cosPhi = Math.cos( this.phi );
-				var sinTheta = Math.sin( this.theta );
-				var cosTheta = Math.cos( this.theta );
-
-				return new THREE.Vector3(
-					this.radius * sinPhi * cosTheta,
-					this.radius * sinPhi * sinTheta,
-					this.radius * cosPhi );
-
-			}
 		}
+
 	};
 
 	/**
@@ -42531,7 +42516,6 @@
 	exports.Vector3 = Vector3;
 	exports.Vector2 = Vector2;
 	exports.Quaternion = Quaternion;
-	exports.ColorKeywords = ColorKeywords;
 	exports.Color = Color;
 	exports.MorphBlendMesh = MorphBlendMesh;
 	exports.ImmediateRenderObject = ImmediateRenderObject;
