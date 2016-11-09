@@ -150,7 +150,6 @@ var list = {
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
-			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "OBJLoader", "api/loaders/OBJLoader" ],
@@ -160,6 +159,11 @@ var list = {
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 			[ "TGALoader", "api/loaders/TGALoader" ]
+		],
+
+		"Loaders / Managers": [
+			[ "DefaultLoadingManager", "api/loaders/DefaultLoadingManager" ],
+			[ "LoadingManager", "api/loaders/LoadingManager" ]
 		],
 
 		"Materials": [
