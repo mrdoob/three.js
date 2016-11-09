@@ -37,13 +37,12 @@ var list = {
 			[ "PositionalAudio", "api/audio/PositionalAudio" ]
 		],
 
-
-		"Audio": [
-			[ "Audio", "api/audio/Audio" ],
-			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
-			[ "AudioContext", "api/audio/AudioContext" ],
-			[ "AudioListener", "api/audio/AudioListener" ],
-			[ "PositionalAudio", "api/audio/PositionalAudio" ]
+		"Cameras": [
+			[ "Camera", "api/cameras/Camera" ],
+			[ "CubeCamera", "api/cameras/CubeCamera" ],
+			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
+			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
+			[ "StereoCamera", "api/cameras/StereoCamera" ]
 		],
 
 		"Constants": [
@@ -54,14 +53,6 @@ var list = {
 			[ "Materials", "api/constants/Materials" ],
 			[ "Textures", "api/constants/Textures" ],
 			[ "Renderer", "api/constants/Renderer" ]
-		],
-
-		"Cameras": [
-			[ "Camera", "api/cameras/Camera" ],
-			[ "CubeCamera", "api/cameras/CubeCamera" ],
-			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
-			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
-			[ "StereoCamera", "api/cameras/StereoCamera" ]
 		],
 
 		"Core": [
@@ -135,7 +126,6 @@ var list = {
 			[ "SpotLight", "api/lights/SpotLight" ],
 			[ "SpotLightShadow", "api/lights/SpotLightShadow" ]
 		],
-
 
 		"Loaders": [
 			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
@@ -219,7 +209,6 @@ var list = {
 			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
 		],
 
-
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
 			[ "Group", "api/objects/Group" ],
@@ -285,11 +274,6 @@ var list = {
 			[ "ShapeUtils", "api/extras/ShapeUtils" ]
 		],
 
-		"Extras / Collada Animation": [
-			[ "Animation", "api/extras/collada-animation/Animation" ],
-			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
-		],
 
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
@@ -335,14 +319,27 @@ var list = {
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
 		],
 
-		"Examples" : [
-			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ],
-			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
+	},
 
+	"Examples": {
+
+		"Collada Animation": [
+			[ "Animation", "api/extras/collada-animation/Animation" ],
+			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
+			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
+		],
+
+		"Loaders": [
+
+		],
+
+		"Plugins": [
+			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
+			[ "LookupTable", "examples/Lut" ],
+			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
 		]
 
-	}
+	},
 
 };
 
