@@ -1,5 +1,6 @@
 #define PI 3.14159265359
 #define PI2 6.28318530718
+#define PI_HALF 1.5707963267949
 #define RECIPROCAL_PI 0.31830988618
 #define RECIPROCAL_PI2 0.15915494
 #define LOG2 1.442695
@@ -39,7 +40,6 @@ struct GeometricContext {
 	vec3 viewDir;
 };
 
-
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
@@ -70,5 +70,22 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 
 	return lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;
+
+}
+
+float gaussianPdf(in float x, in float sigma) {
+
+	return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
+
+}
+
+mat3 transpose( const in mat3 v ) {
+
+    mat3 tmp;
+    tmp[0] = vec3(v[0].x, v[1].x, v[2].x);
+    tmp[1] = vec3(v[0].y, v[1].y, v[2].y);
+    tmp[2] = vec3(v[0].z, v[1].z, v[2].z);
+
+    return tmp;
 
 }

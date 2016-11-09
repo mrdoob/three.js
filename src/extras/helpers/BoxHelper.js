@@ -38,7 +38,7 @@ BoxHelper.prototype.update = ( function () {
 
 	return function update( object ) {
 
-		if ( (object && object.isBox3) ) {
+		if ( object && object.isBox3 ) {
 
 			box.copy( object );
 

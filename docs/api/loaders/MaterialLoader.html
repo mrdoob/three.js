@@ -12,6 +12,32 @@
 
 		<div class="desc">A loader for loading a [page:Material] in JSON format.</div>
 
+		<h2>Example</h2>
+
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.MaterialLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'path/to/material.json',
+			// Function when resource is loaded
+			function ( material ) {
+				object.material = material;
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
 
 		<h2>Constructor</h2>
 
@@ -44,34 +70,6 @@
 		<div>
 		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
 		</div>
-
-
-		<h2>Example</h2>
-
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.MaterialLoader();
-
-		// load a resource
-		loader.load(
-			// resource URL
-			'path/to/material.json',
-			// Function when resource is loaded
-			function ( material ) {
-				object.material = material;
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
-
 
 		<h2>Source</h2>
 

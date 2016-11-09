@@ -13,6 +13,32 @@
 
 		<div class="desc">A loader for loading a <em>.babylon</em> resource.</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.BabylonLoader();
+
+		// load a Babylon resource
+		loader.load(
+			// resource URL
+			'models/babylon/skull.babylon',
+			// Function when resource is loaded
+			function ( object ) {
+				scene.add( object );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_babylon]
 
 		<h2>Constructor</h2>
 
@@ -49,34 +75,6 @@
 		Found objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].<br />
 		Lights are parsed accordingly.
 		</div>
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.BabylonLoader();
-
-		// load a Babylon resource
-		loader.load(
-			// resource URL
-			'models/babylon/skull.babylon',
-			// Function when resource is loaded
-			function ( object ) {
-				scene.add( object );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
-
-		[example:webgl_loader_babylon]
-
 
 		<h2>Source</h2>
 

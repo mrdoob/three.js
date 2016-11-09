@@ -11,7 +11,28 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for <em>PCD</em> files. Loads ascii and binary. Compressed binary files are not suported.</div>
+		<div class="desc">A loader for <em>PCD</em> files. Loads ascii and binary.
+			Compressed binary files are not supported.</div>
+
+		<h2>Example</h2>
+
+		<code>
+
+		// instantiate a loader
+		var loader = new THREE.PCDLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'pointcloud.pcd' ,
+			// Function when resource is loaded
+			function ( mesh ) {
+				scene.add( mesh );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_pcd]
 
 
 		<h2>Constructor</h2>
@@ -52,30 +73,9 @@
 		[page:String url] — The file name or file url.
 		</div>
 		<div>
-		Parse an <em>pcd</em> binary structure and return an [page:Object3D].<br /> 
+		Parse an <em>pcd</em> binary structure and return an [page:Object3D].<br />
 		The object is converted to [page:Points] with a [page:BufferGeometry] and a [page:PointsMaterial].
 		</div>
-
-		<h2>Example</h2>
-
-		<code>
-
-		// instantiate a loader
-		var loader = new THREE.PCDLoader();
-		
-		// load a resource
-		loader.load( 
-			// resource URL
-			'pointcloud.pcd' , 
-			// Function when resource is loaded
-			function ( mesh ) {
-				scene.add( mesh );
-			}
-		);
-		</code>
-
-		[example:webgl_loader_pcd]
-
 
 		<h2>Source</h2>
 

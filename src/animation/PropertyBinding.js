@@ -518,7 +518,7 @@ PropertyBinding.Composite.prototype = {
 
 PropertyBinding.create = function( root, path, parsedPath ) {
 
-	if ( ! ( (root && root.isAnimationObjectGroup) ) ) {
+	if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
 		return new PropertyBinding( root, path, parsedPath );
 

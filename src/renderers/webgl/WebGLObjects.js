@@ -126,14 +126,9 @@ function WebGLObjects( gl, properties, info ) {
 		attributeProperties.type = type;
 		attributeProperties.version = data.version;
 
-
 		data.addEventListener( 'dispose', onAttributeDispose );
 
-		if ( data.onUpload !== null ) {
-
-			data.onUpload();
-
-		}
+		data.onUploadCallback();
 
 	}
 

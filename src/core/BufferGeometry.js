@@ -301,7 +301,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var geometry = object.geometry;
 
-		if ( (object && object.isPoints) || (object && object.isLine) ) {
+		if ( object.isPoints || object.isLine ) {
 
 			var positions = new Float32Attribute( geometry.vertices.length * 3, 3 );
 			var colors = new Float32Attribute( geometry.colors.length * 3, 3 );
@@ -329,9 +329,9 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-		} else if ( (object && object.isMesh) ) {
+		} else if ( object.isMesh ) {
 
-			if ( (geometry && geometry.isGeometry) ) {
+			if ( geometry && geometry.isGeometry ) {
 
 				this.fromGeometry( geometry );
 
@@ -347,7 +347,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var geometry = object.geometry;
 
-		if ( (object && object.isMesh) ) {
+		if ( object.isMesh ) {
 
 			var direct = geometry.__directGeometry;
 

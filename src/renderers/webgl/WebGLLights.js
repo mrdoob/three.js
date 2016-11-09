@@ -5,6 +5,7 @@
 import { Color } from '../../math/Color';
 import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
+import { Matrix4 } from '../../math/Matrix4';
 
 function WebGLLights() {
 
@@ -72,6 +73,17 @@ function WebGLLights() {
 						direction: new Vector3(),
 						skyColor: new Color(),
 						groundColor: new Color()
+					};
+					break;
+
+				case 'RectAreaLight':
+					uniforms = {
+						color: new THREE.Color(),
+						position: new THREE.Vector3(),
+						halfWidth: new THREE.Vector3(),
+						halfHeight: new THREE.Vector3(),
+
+						// TODO (abelnation): set RectAreaLight shadow uniforms
 					};
 					break;
 

@@ -575,6 +575,7 @@ Object.assign( WebGLRenderer.prototype, {
 		return this.extensions.get( 'EXT_blend_minmax' );
 	},
 	supportsVertexTextures: function () {
+		console.warn( 'THREE.WebGLRenderer: .supportsVertexTextures() is now .capabilities.vertexTextures.' );
 		return this.capabilities.vertexTextures;
 	},
 	supportsInstancedArrays: function () {

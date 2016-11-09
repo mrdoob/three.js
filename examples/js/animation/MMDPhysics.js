@@ -26,7 +26,13 @@ THREE.MMDPhysics = function ( mesh, params ) {
 	this.mesh = mesh;
 	this.helper = new THREE.MMDPhysics.ResourceHelper();
 
-	this.unitStep = ( params.unitStep !== undefined ) ? params.unitStep : 1 / 60;
+	/*
+	 * I don't know why but 1/60 unitStep easily breaks models
+	 * so I set it 1/65 so far.
+	 * Don't set too small unitStep because
+	 * the smaller unitStep can make the performance worse.
+	 */
+	this.unitStep = ( params.unitStep !== undefined ) ? params.unitStep : 1 / 65;
 	this.maxStepNum = ( params.maxStepNum !== undefined ) ? params.maxStepNum : 3;
 
 	this.world = null;

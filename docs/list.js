@@ -8,8 +8,17 @@ var list = {
 	},
 
 	"Reference": {
+		"Audio": [
+			[ "Audio", "api/audio/Audio" ],
+			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
+			[ "AudioContext", "api/audio/AudioContext" ],
+			[ "AudioListener", "api/audio/AudioListener" ],
+			[ "PositionalAudio", "api/audio/PositionalAudio" ]
+		],
+
 		"Constants": [
 			[ "Animation", "api/constants/Animation" ],
+			[ "Colors", "api/constants/Colors" ],
 			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
 			[ "DrawModes", "api/constants/DrawModes" ],
 			[ "Materials", "api/constants/Materials" ],
@@ -21,7 +30,8 @@ var list = {
 			[ "Camera", "api/cameras/Camera" ],
 			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
-			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
+			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
+			[ "StereoCamera", "api/cameras/StereoCamera" ]
 		],
 
 		"Core": [
@@ -48,6 +58,7 @@ var list = {
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
+			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
@@ -75,7 +86,8 @@ var list = {
 			[ "TorusKnotBufferGeometry", "api/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
-			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ]
+			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
+			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
 		],
 
 		"Lights": [
@@ -92,12 +104,18 @@ var list = {
 
 
 		"Loaders": [
+			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
 			[ "AudioLoader", "api/loaders/AudioLoader" ],
 			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
+			[ "BinaryTextureLoader", "api/loaders/BinaryTextureLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "CompressedTextureLoader", "api/loaders/CompressedTextureLoader" ],
+			[ "CubeTextureLoader", "api/loaders/CubeTextureLoader" ],
+			[ "DataTextureLoader", "api/loaders/DataTextureLoader" ],
 			[ "FileLoader", "api/loaders/FileLoader" ],
+			[ "FontLoader", "api/loaders/FontLoader" ],
 			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
@@ -107,6 +125,7 @@ var list = {
 			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "OBJLoader", "api/loaders/OBJLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
+			[ "PCDLoader", "api/loaders/PCDLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
@@ -123,10 +142,12 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
+			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
+			[ "ShadowMaterial", "api/materials/ShadowMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -136,6 +157,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Interpolant", "api/math/Interpolant" ],
 			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
@@ -152,8 +174,17 @@ var list = {
 			[ "Vector4", "api/math/Vector4" ]
 		],
 
+		"Math / Interpolants": [
+			[ "CubicInterpolant", "api/math/interpolants/CubicInterpolant" ],
+			[ "DiscreteInterpolant", "api/math/interpolants/DiscreteInterpolant" ],
+			[ "LinearInterpolant", "api/math/interpolants/LinearInterpolant" ],
+			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
+		],
+
+
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
@@ -213,7 +244,9 @@ var list = {
 		],
 
 		"Extras": [
-			[ "SceneUtils", "api/extras/SceneUtils" ]
+			[ "CurveUtils", "api/extras/CurveUtils" ],
+			[ "SceneUtils", "api/extras/SceneUtils" ],
+			[ "ShapeUtils", "api/extras/ShapeUtils" ]
 		],
 
 		"Extras / Collada Animation": [
@@ -225,6 +258,7 @@ var list = {
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
+			[ "Font", "api/extras/core/Font" ],
 			[ "Path", "api/extras/core/Path" ],
 			[ "Shape", "api/extras/core/Shape" ]
 		],
@@ -255,6 +289,7 @@ var list = {
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
+			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
 		],

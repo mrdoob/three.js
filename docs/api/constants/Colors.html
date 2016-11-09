@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Color Constants</h1>
+
+		<div>
+			These match the standard [link:https://en.wikipedia.org/wiki/X11_color_names X11 Named Colors], supported by most modern browsers. This means that you
+			can easily match Three colors with CSS named colors. <br /><br />
+
+			<code>
+			var black = THREE.ColorKeywords['black'];
+
+		var red = THREE.ColorKeywords['red'];
+
+		var bisque = THREE.ColorKeywords['bisque'];
+			</code>
+
+			Note that these don't use camelCase so to match, for example, the X11 color
+			Blanched Almond ( #FFEBCD ) you would use:
+
+			<code>
+				var blanchedAlmond = THREE.ColorKeywords['blanchedalmond'];
+			</code>
+		</div>
+
+		See the [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 Color Chart] for the full list of supported named colors.
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/math/Color.js src/math/Color.js]
+	</body>
+</html>
