@@ -16,10 +16,8 @@ var list = {
 			[ "AnimationObjectGroup", "api/animation/AnimationObjectGroup" ],
 			[ "AnimationUtils", "api/animation/AnimationUtils" ],
 			[ "KeyframeTrack", "api/animation/KeyframeTrack" ],
-			[ "KeyframeTrackConstructor", "api/animation/KeyframeTrackConstructor" ],
-			[ "KeyframeTrackPrototype", "api/animation/KeyframeTrackPrototype" ],
 			[ "PropertyBinding", "api/animation/PropertyBinding" ],
-			[ "PropertyMixerPropertyMixer", "api/animation/PropertyMixer" ]
+			[ "PropertyMixer", "api/animation/PropertyMixer" ]
 		],
 
 		"Audio": [
