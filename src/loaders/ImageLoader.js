@@ -15,8 +15,6 @@ Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
-
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
@@ -25,8 +23,6 @@ Object.assign( ImageLoader.prototype, {
 			URL.revokeObjectURL( image.src );
 
 			if ( onLoad ) onLoad( image );
-
-			scope.manager.itemEnd( url );
 
 		};
 		image.onerror = onError;
@@ -37,7 +33,7 @@ Object.assign( ImageLoader.prototype, {
 
 		} else {
 
-			var loader = new FileLoader();
+			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
 			loader.setWithCredentials( this.withCredentials );
@@ -48,8 +44,6 @@ Object.assign( ImageLoader.prototype, {
 			}, onProgress, onError );
 
 		}
-
-		scope.manager.itemStart( url );
 
 		return image;
 

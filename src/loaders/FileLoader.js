@@ -140,7 +140,7 @@ Object.assign( FileLoader.prototype, {
 
 					if ( onLoad ) onLoad( response );
 
-					scope.manager.itemEnd( url );
+					scope.manager.itemEnd( url, request );
 
 				} else if ( this.status === 0 ) {
 
@@ -151,7 +151,7 @@ Object.assign( FileLoader.prototype, {
 
 					if ( onLoad ) onLoad( response );
 
-					scope.manager.itemEnd( url );
+					scope.manager.itemEnd( url, request );
 
 				} else {
 
@@ -190,7 +190,7 @@ Object.assign( FileLoader.prototype, {
 
 		}
 
-		scope.manager.itemStart( url );
+		scope.manager.itemStart( url, request );
 
 		return request;
 
