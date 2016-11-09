@@ -1,26 +1,4 @@
-﻿wavefile_camera.vmd is a camera motion data
-customized from an existing camera motion data.
-
-The original data is
-
-http://www.nicovideo.jp/watch/sm19168559
-
-Note that the original author allows customized data file 
-(including wavefile_camera.vmd) redistribution
-but doesn't allow the original file redistribution.
-
-And wavefile_camera.vmd inherits the policy of the original file.
-- You must not use the file for porn.
-- You must not cause any troubles to anyone especially other copyright holders,
-  (WAVEFILE music composer, WAVEFILE dance motion author, and so on)
-
-Just in case I've put the readme of the original file below.
-
-                                       by Takahiro
-
--------------------------------------------------------
-
-MikuMikuDance用カメラモーションデータ+おまけピンナップ
+﻿MikuMikuDance用カメラモーションデータ+おまけピンナップ
 
 この度はDLしていただきありがとうございます(´∀｀)
 
