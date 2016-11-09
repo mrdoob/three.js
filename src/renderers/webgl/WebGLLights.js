@@ -78,11 +78,10 @@ function WebGLLights() {
 
 				case 'RectAreaLight':
 					uniforms = {
-						color: new THREE.Color(),
-						position: new THREE.Vector3(),
-						halfWidth: new THREE.Vector3(),
-						halfHeight: new THREE.Vector3(),
-
+						color: new Color(),
+						position: new Vector3(),
+						halfWidth: new Vector3(),
+						halfHeight: new Vector3()
 						// TODO (abelnation): set RectAreaLight shadow uniforms
 					};
 					break;
