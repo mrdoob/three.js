@@ -38,7 +38,7 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		var count = 0;
 
-		if ( (position && position.isInterleavedBufferAttribute) ) {
+		if ( position.isInterleavedBufferAttribute ) {
 
 			count = position.data.count;
 
