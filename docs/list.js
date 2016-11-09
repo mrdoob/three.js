@@ -8,6 +8,17 @@ var list = {
 	},
 
 	"Reference": {
+
+
+		"Animation / Tracks": [
+			[ "BooleanKeyframeTrack", "api/animation/tracks/BooleanKeyframeTrack" ],
+			[ "ColorKeyframeTrack", "api/animation/tracks/ColorKeyframeTrack" ],
+			[ "NumberKeyframeTrack", "api/animation/tracks/NumberKeyframeTrack" ],
+			[ "QuaternionKeyframeTrack", "api/animation/tracks/QuaternionKeyframeTrack" ],
+			[ "StringKeyframeTrack", "api/animation/tracks/StringKeyframeTrack" ],
+			[ "VectorKeyframeTrack", "api/animation/tracks/VectorKeyframeTrack" ]
+		],
+
 		"Audio": [
 			[ "Audio", "api/audio/Audio" ],
 			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
