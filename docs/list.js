@@ -77,6 +77,10 @@ var list = {
 			[ "Uniform", "api/core/Uniform"]
 		],
 
+		"Deprecated": [
+			[ "DeprecatedList", "api/deprecated/DeprecatedList" ]
+		],
+
 		"Geometries": [
 			[ "BoxBufferGeometry", "api/geometries/BoxBufferGeometry" ],
 			[ "BoxGeometry", "api/geometries/BoxGeometry" ],
