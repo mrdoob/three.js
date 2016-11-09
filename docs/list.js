@@ -8,31 +8,35 @@ var list = {
 	},
 
 	"Reference": {
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+		"Animation": [
+			[ "AnimationAction", "api/animation/AnimationAction" ],
+			[ "AnimationClip", "api/animation/AnimationClip" ],
+			[ "AnimationMixer", "api/animation/AnimationMixer" ],
+			[ "AnimationObjectGroup", "api/animation/AnimationObjectGroup" ],
+			[ "AnimationUtils", "api/animation/AnimationUtils" ],
+			[ "KeyframeTrack", "api/animation/KeyframeTrack" ],
+			[ "PropertyBinding", "api/animation/PropertyBinding" ],
+			[ "PropertyMixer", "api/animation/PropertyMixer" ]
+		],
 
 		"Animation / Tracks": [
-			[ "BooleanKeyframeTrack", "api/animation/tracks/BooleanKeyframeTrack" ],
-			[ "ColorKeyframeTrack", "api/animation/tracks/ColorKeyframeTrack" ],
-			[ "NumberKeyframeTrack", "api/animation/tracks/NumberKeyframeTrack" ],
-			[ "QuaternionKeyframeTrack", "api/animation/tracks/QuaternionKeyframeTrack" ],
-			[ "StringKeyframeTrack", "api/animation/tracks/StringKeyframeTrack" ],
-			[ "VectorKeyframeTrack", "api/animation/tracks/VectorKeyframeTrack" ]
+		  [ "BooleanKeyframeTrack", "api/animation/tracks/BooleanKeyframeTrack" ],
+		  [ "ColorKeyframeTrack", "api/animation/tracks/ColorKeyframeTrack" ],
+		  [ "NumberKeyframeTrack", "api/animation/tracks/NumberKeyframeTrack" ],
+		  [ "QuaternionKeyframeTrack", "api/animation/tracks/QuaternionKeyframeTrack" ],
+		  [ "StringKeyframeTrack", "api/animation/tracks/StringKeyframeTrack" ],
+		  [ "VectorKeyframeTrack", "api/animation/tracks/VectorKeyframeTrack" ]
 		],
+
+		"Audio": [
+			[ "Audio", "api/audio/Audio" ],
+			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
+			[ "AudioContext", "api/audio/AudioContext" ],
+			[ "AudioListener", "api/audio/AudioListener" ],
+			[ "PositionalAudio", "api/audio/PositionalAudio" ]
+		],
+
 
 		"Audio": [
 			[ "Audio", "api/audio/Audio" ],
@@ -261,12 +265,6 @@ var list = {
 			[ "DepthTexture", "api/textures/DepthTexture" ],
 			[ "Texture", "api/textures/Texture" ],
 			[ "VideoTexture", "api/textures/VideoTexture" ]
-		],
-
-		"Animation": [
-			[ "AnimationAction", "api/animation/AnimationAction" ],
-			[ "AnimationClip", "api/animation/AnimationClip" ],
-			[ "AnimationMixer", "api/animation/AnimationMixer" ]
 		],
 
 		"Extras": [
