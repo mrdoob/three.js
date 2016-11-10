@@ -67,7 +67,7 @@ Object.assign( DirectGeometry.prototype, EventDispatcher.prototype, {
 
 		var group;
 		var groups = [];
-		var materialIndex;
+		var materialIndex = undefined;
 
 		var faces = geometry.faces;
 
