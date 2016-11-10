@@ -362,6 +362,6 @@ KeyframeTrackPrototype = {
 
 	}
 
-}
+};
 
 export { KeyframeTrackPrototype };
