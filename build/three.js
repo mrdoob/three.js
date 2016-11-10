@@ -12102,68 +12102,94 @@
 
 	//
 
-	function Int8Attribute( array, itemSize ) {
+	function Int8BufferAttribute( array, itemSize ) {
 
-		return new BufferAttribute( new Int8Array( array ), itemSize );
-
-	}
-
-	function Uint8Attribute( array, itemSize ) {
-
-		return new BufferAttribute( new Uint8Array( array ), itemSize );
+		BufferAttribute.call( this, new Int8Array( array ), itemSize );
 
 	}
 
-	function Uint8ClampedAttribute( array, itemSize ) {
+	Int8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Int8BufferAttribute.prototype.constructor = Int8BufferAttribute;
 
-		return new BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
-	}
+	function Uint8BufferAttribute( array, itemSize ) {
 
-	function Int16Attribute( array, itemSize ) {
-
-		return new BufferAttribute( new Int16Array( array ), itemSize );
+		BufferAttribute.call( this, new Uint8Array( array ), itemSize );
 
 	}
 
-	function Uint16Attribute( array, itemSize ) {
+	Uint8BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Uint8BufferAttribute.prototype.constructor = Uint8BufferAttribute;
 
-		return new BufferAttribute( new Uint16Array( array ), itemSize );
 
-	}
+	function Uint8ClampedBufferAttribute( array, itemSize ) {
 
-	function Int32Attribute( array, itemSize ) {
-
-		return new BufferAttribute( new Int32Array( array ), itemSize );
+		BufferAttribute.call( this, new Uint8ClampedArray( array ), itemSize );
 
 	}
 
-	function Uint32Attribute( array, itemSize ) {
+	Uint8ClampedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Uint8ClampedBufferAttribute.prototype.constructor = Uint8ClampedBufferAttribute;
 
-		return new BufferAttribute( new Uint32Array( array ), itemSize );
 
-	}
+	function Int16BufferAttribute( array, itemSize ) {
 
-	function Float32Attribute( array, itemSize ) {
-
-		return new BufferAttribute( new Float32Array( array ), itemSize );
+		BufferAttribute.call( this, new Int16Array( array ), itemSize );
 
 	}
 
-	function Float64Attribute( array, itemSize ) {
+	Int16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Int16BufferAttribute.prototype.constructor = Int16BufferAttribute;
 
-		return new BufferAttribute( new Float64Array( array ), itemSize );
+
+	function Uint16BufferAttribute( array, itemSize ) {
+
+		BufferAttribute.call( this, new Uint16Array( array ), itemSize );
+
+	}
+
+	Uint16BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Uint16BufferAttribute.prototype.constructor = Uint16BufferAttribute;
+
+
+	function Int32BufferAttribute( array, itemSize ) {
+
+		BufferAttribute.call( this, new Int32Array( array ), itemSize );
 
 	}
 
-	// Deprecated
+	Int32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Int32BufferAttribute.prototype.constructor = Int32BufferAttribute;
 
-	function DynamicBufferAttribute( array, itemSize ) {
 
-		console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-		return new BufferAttribute( array, itemSize ).setDynamic( true );
+	function Uint32BufferAttribute( array, itemSize ) {
+
+		BufferAttribute.call( this, new Uint32Array( array ), itemSize );
 
 	}
+
+	Uint32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
+
+
+	function Float32BufferAttribute( array, itemSize ) {
+
+		BufferAttribute.call( this, new Float32Array( array ), itemSize );
+
+	}
+
+	Float32BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Float32BufferAttribute.prototype.constructor = Float32BufferAttribute;
+
+
+	function Float64BufferAttribute( array, itemSize ) {
+
+		BufferAttribute.call( this, new Float64Array( array ), itemSize );
+
+	}
+
+	Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
+	Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -14004,15 +14030,15 @@
 
 			if ( object.isPoints || object.isLine ) {
 
-				var positions = new Float32Attribute( geometry.vertices.length * 3, 3 );
-				var colors = new Float32Attribute( geometry.colors.length * 3, 3 );
+				var positions = new Float32BufferAttribute( geometry.vertices.length * 3, 3 );
+				var colors = new Float32BufferAttribute( geometry.colors.length * 3, 3 );
 
 				this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
 				this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
 
 				if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
 
-					var lineDistances = new Float32Attribute( geometry.lineDistances.length, 1 );
+					var lineDistances = new Float32BufferAttribute( geometry.lineDistances.length, 1 );
 
 					this.addAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
 
@@ -14235,7 +14261,7 @@
 
 					var morphTarget = morphTargets[ i ];
 
-					var attribute = new Float32Attribute( morphTarget.length * 3, 3 );
+					var attribute = new Float32BufferAttribute( morphTarget.length * 3, 3 );
 
 					array.push( attribute.copyVector3sArray( morphTarget ) );
 
@@ -14249,14 +14275,14 @@
 
 			if ( geometry.skinIndices.length > 0 ) {
 
-				var skinIndices = new Float32Attribute( geometry.skinIndices.length * 4, 4 );
+				var skinIndices = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
 				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 
 			}
 
 			if ( geometry.skinWeights.length > 0 ) {
 
-				var skinWeights = new Float32Attribute( geometry.skinWeights.length * 4, 4 );
+				var skinWeights = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
 				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
 
 			}
@@ -24199,9 +24225,9 @@
 
 		// build geometry
 
-		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
-		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
-		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		// generate normals
 
@@ -24278,9 +24304,9 @@
 
 		// build non-indexed geometry
 
-		this.addAttribute( 'position', Float32Attribute( vertexBuffer, 3 ) );
-		this.addAttribute( 'normal', Float32Attribute( vertexBuffer.slice(), 3 ) );
-		this.addAttribute( 'uv', Float32Attribute( uvBuffer, 2 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 		this.normalizeNormals();
 
 		this.boundingSphere = new Sphere( new Vector3(), radius );
@@ -24861,10 +24887,10 @@
 
 		// build geometry
 
-		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
-		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
-		this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
-		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		// functions
 
@@ -26980,7 +27006,7 @@
 
 		}
 
-		this.setIndex( new ( positions.count > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+		this.setIndex( new ( positions.count > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
 		this.addAttribute( 'position', positions );
 		this.addAttribute( 'normal', normals );
 		this.addAttribute( 'uv', uvs );
@@ -27432,10 +27458,10 @@
 
 		// build geometry
 
-		this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
-		this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
-		this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
-		this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 
 		// helper functions
@@ -39887,7 +39913,7 @@
 
 		var geometry = new BufferGeometry();
 
-		var positions = new Float32Attribute( nNormals * 2 * 3, 3 );
+		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
 		geometry.addAttribute( 'position', positions );
 
@@ -40036,7 +40062,7 @@
 
 		}
 
-		geometry.addAttribute( 'position', new Float32Attribute( positions, 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 		var material = new LineBasicMaterial( { fog: false } );
 
@@ -40446,8 +40472,8 @@
 		}
 
 		var geometry = new BufferGeometry();
-		geometry.addAttribute( 'position', new Float32Attribute( vertices, 3 ) );
-		geometry.addAttribute( 'color', new Float32Attribute( colors, 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 		var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 
@@ -40501,7 +40527,7 @@
 
 		var geometry = new BufferGeometry();
 
-		var positions = new Float32Attribute( nNormals * 2 * 3, 3 );
+		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
 		geometry.addAttribute( 'position', positions );
 
@@ -40594,7 +40620,7 @@
 		if ( size === undefined ) size = 1;
 
 		var geometry = new BufferGeometry();
-		geometry.addAttribute( 'position', new Float32Attribute( [
+		geometry.addAttribute( 'position', new Float32BufferAttribute( [
 			- size,   size, 0,
 			  size,   size, 0,
 			  size, - size, 0,
@@ -40607,7 +40633,7 @@
 		this.add( new Line( geometry, material ) );
 
 		geometry = new BufferGeometry();
-		geometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
 		this.add( new Line( geometry, material ));
 
@@ -40978,7 +41004,7 @@
 	 */
 
 	var lineGeometry = new BufferGeometry();
-	lineGeometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
 	var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.translate( 0, - 0.5, 0 );
@@ -41520,6 +41546,58 @@
 	function Vertex ( x, y, z ) {
 		console.warn( 'THREE.Vertex has been removed. Use THREE.Vector3 instead.' );
 		return new Vector3( x, y, z );
+	}
+
+	//
+
+	function DynamicBufferAttribute( array, itemSize ) {
+		console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
+		return new BufferAttribute( array, itemSize ).setDynamic( true );
+	}
+
+	function Int8Attribute( array, itemSize ) {
+		console.warn( 'THREE.Int8Attribute has been removed. Use new THREE.Int8BufferAttribute() instead.' );
+		return new Int8BufferAttribute( array, itemSize );
+	}
+
+	function Uint8Attribute( array, itemSize ) {
+		console.warn( 'THREE.Uint8Attribute has been removed. Use new THREE.Uint8BufferAttribute() instead.' );
+		return new Uint8BufferAttribute( array, itemSize );
+	}
+
+	function Uint8ClampedAttribute( array, itemSize ) {
+		console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use new THREE.Uint8ClampedBufferAttribute() instead.' );
+		return new Uint8ClampedBufferAttribute( array, itemSize );
+	}
+
+	function Int16Attribute( array, itemSize ) {
+		console.warn( 'THREE.Int16Attribute has been removed. Use new THREE.Int16BufferAttribute() instead.' );
+		return new Int16BufferAttribute( array, itemSize );
+	}
+
+	function Uint16Attribute( array, itemSize ) {
+		console.warn( 'THREE.Uint16Attribute has been removed. Use new THREE.Uint16BufferAttribute() instead.' );
+		return new Uint16BufferAttribute( array, itemSize );
+	}
+
+	function Int32Attribute( array, itemSize ) {
+		console.warn( 'THREE.Int32Attribute has been removed. Use new THREE.Int32BufferAttribute() instead.' );
+		return new Int32BufferAttribute( array, itemSize );
+	}
+
+	function Uint32Attribute( array, itemSize ) {
+		console.warn( 'THREE.Uint32Attribute has been removed. Use new THREE.Uint32BufferAttribute() instead.' );
+		return new Uint32BufferAttribute( array, itemSize );
+	}
+
+	function Float32Attribute( array, itemSize ) {
+		console.warn( 'THREE.Float32Attribute has been removed. Use new THREE.Float32BufferAttribute() instead.' );
+		return new Float32BufferAttribute( array, itemSize );
+	}
+
+	function Float64Attribute( array, itemSize ) {
+		console.warn( 'THREE.Float64Attribute has been removed. Use new THREE.Float64BufferAttribute() instead.' );
+		return new Float64BufferAttribute( array, itemSize );
 	}
 
 	//
@@ -42475,16 +42553,15 @@
 	exports.InstancedInterleavedBuffer = InstancedInterleavedBuffer;
 	exports.InterleavedBuffer = InterleavedBuffer;
 	exports.InstancedBufferAttribute = InstancedBufferAttribute;
-	exports.DynamicBufferAttribute = DynamicBufferAttribute;
-	exports.Float64Attribute = Float64Attribute;
-	exports.Float32Attribute = Float32Attribute;
-	exports.Uint32Attribute = Uint32Attribute;
-	exports.Int32Attribute = Int32Attribute;
-	exports.Uint16Attribute = Uint16Attribute;
-	exports.Int16Attribute = Int16Attribute;
-	exports.Uint8ClampedAttribute = Uint8ClampedAttribute;
-	exports.Uint8Attribute = Uint8Attribute;
-	exports.Int8Attribute = Int8Attribute;
+	exports.Float64BufferAttribute = Float64BufferAttribute;
+	exports.Float32BufferAttribute = Float32BufferAttribute;
+	exports.Uint32BufferAttribute = Uint32BufferAttribute;
+	exports.Int32BufferAttribute = Int32BufferAttribute;
+	exports.Uint16BufferAttribute = Uint16BufferAttribute;
+	exports.Int16BufferAttribute = Int16BufferAttribute;
+	exports.Uint8ClampedBufferAttribute = Uint8ClampedBufferAttribute;
+	exports.Uint8BufferAttribute = Uint8BufferAttribute;
+	exports.Int8BufferAttribute = Int8BufferAttribute;
 	exports.BufferAttribute = BufferAttribute;
 	exports.Face3 = Face3;
 	exports.Object3DIdCount = Object3DIdCount;
@@ -42751,6 +42828,16 @@
 	exports.ParticleBasicMaterial = ParticleBasicMaterial;
 	exports.ParticleSystemMaterial = ParticleSystemMaterial;
 	exports.Vertex = Vertex;
+	exports.DynamicBufferAttribute = DynamicBufferAttribute;
+	exports.Int8Attribute = Int8Attribute;
+	exports.Uint8Attribute = Uint8Attribute;
+	exports.Uint8ClampedAttribute = Uint8ClampedAttribute;
+	exports.Int16Attribute = Int16Attribute;
+	exports.Uint16Attribute = Uint16Attribute;
+	exports.Int32Attribute = Int32Attribute;
+	exports.Uint32Attribute = Uint32Attribute;
+	exports.Float32Attribute = Float32Attribute;
+	exports.Float64Attribute = Float64Attribute;
 	exports.EdgesHelper = EdgesHelper;
 	exports.WireframeHelper = WireframeHelper;
 	exports.XHRLoader = XHRLoader;
