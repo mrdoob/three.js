@@ -45,8 +45,7 @@ AnimationClip.prototype = {
 
 			var track = this.tracks[ i ];
 
-			duration = Math.max(
-					duration, track.times[ track.times.length - 1 ] );
+			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
 
 		}
 
