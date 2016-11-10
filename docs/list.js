@@ -59,6 +59,7 @@ var list = {
 			[ "BufferAttribute", "api/core/BufferAttribute" ],
 			[ "BufferGeometry", "api/core/BufferGeometry" ],
 			[ "Clock", "api/core/Clock" ],
+			[ "DirectGeometry", "api/core/DirectGeometry" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
