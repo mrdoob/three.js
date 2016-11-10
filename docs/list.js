@@ -68,6 +68,10 @@ var list = {
 			[ "Uniform", "api/core/Uniform"]
 		],
 
+		"Core / BufferAttributes": [
+			[ "BufferAttribute Types", "api/core/bufferAttributeTypes/BufferAttributeTypes" ]
+		],
+
 		"Deprecated": [
 			[ "DeprecatedList", "api/deprecated/DeprecatedList" ]
 		],
