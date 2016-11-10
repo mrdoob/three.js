@@ -74,7 +74,7 @@ function AnimationAction( mixer, clip, localRoot ) {
 	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
 	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
 
-};
+}
 
 AnimationAction.prototype = {
 
