@@ -7,6 +7,7 @@ varying vec4 vWorldPosition;
 
 void main() {
 
+	#include <common_vertex>
 	#include <skinbase_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>

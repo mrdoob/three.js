@@ -5,7 +5,7 @@
 import { WebGLUniforms } from './WebGLUniforms';
 import { WebGLShader } from './WebGLShader';
 import { ShaderChunk } from '../shaders/ShaderChunk';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, AutoInstancingDisabled, AutoInstancingAttributes, AutoInstancingTexture } from '../../constants';
 
 var programIdCount = 0;
 
@@ -311,7 +311,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 		prefixVertex = [
 
-        
+
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
@@ -324,9 +324,14 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 			'#define MAX_BONES ' + parameters.maxBones,
+			'#define MAX_INSTANCES ' + parameters.maxInstances,
+
+			parameters.instancingMode != AutoInstancingDisabled ? '#define USE_INSTANCING' : '',
+			parameters.instancingMode == AutoInstancingTexture ? '#define USE_INSTANCING_TEXTURE' : '',
+			parameters.instancingMode == AutoInstancingAttributes ? '#define USE_INSTANCING_ATTRIBUTES' : '',
+
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 			( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
-
 
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
@@ -363,11 +368,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			'uniform mat4 modelMatrix;',
-			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
 			'uniform mat4 viewMatrix;',
-			'uniform mat3 normalMatrix;',
 			'uniform vec3 cameraPosition;',
 
 			'attribute vec3 position;',
@@ -411,6 +413,29 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			'	attribute vec4 skinWeight;',
 
 			'#endif',
+
+			'#ifdef USE_INSTANCING',
+
+			'	#ifdef USE_INSTANCING_ATTRIBUTES',
+
+			'		attribute vec4 instanceWorld1;',
+			'		attribute vec4 instanceWorld2;',
+			'		attribute vec4 instanceWorld3;',
+			'		attribute vec4 instanceWorld4;',
+
+			'		attribute vec3 instanceNormal1;',
+			'		attribute vec3 instanceNormal2;',
+			'		attribute vec3 instanceNormal3;',
+
+			'	#else',
+
+			'		attribute float instanceIndex;',
+
+			'	#endif',
+
+			'#endif',
+
+			ShaderChunk[ 'model_matrix_pars_vertex' ],
 
 			'\n'
 

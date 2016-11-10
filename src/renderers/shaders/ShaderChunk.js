@@ -16,6 +16,7 @@ import color_pars_fragment from './ShaderChunk/color_pars_fragment.glsl';
 import color_pars_vertex from './ShaderChunk/color_pars_vertex.glsl';
 import color_vertex from './ShaderChunk/color_vertex.glsl';
 import common from './ShaderChunk/common.glsl';
+import common_vertex from './ShaderChunk/common_vertex.glsl';
 import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragment.glsl';
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl';
 import displacementmap_pars_vertex from './ShaderChunk/displacementmap_pars_vertex.glsl';
@@ -52,6 +53,7 @@ import map_particle_fragment from './ShaderChunk/map_particle_fragment.glsl';
 import map_particle_pars_fragment from './ShaderChunk/map_particle_pars_fragment.glsl';
 import metalnessmap_fragment from './ShaderChunk/metalnessmap_fragment.glsl';
 import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment.glsl';
+import model_matrix_pars_vertex from './ShaderChunk/model_matrix_pars_vertex.glsl';
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl';
 import morphtarget_vertex from './ShaderChunk/morphtarget_vertex.glsl';
@@ -127,6 +129,7 @@ export var ShaderChunk = {
 	color_pars_vertex: color_pars_vertex,
 	color_vertex: color_vertex,
 	common: common,
+	common_vertex: common_vertex,
 	cube_uv_reflection_fragment: cube_uv_reflection_fragment,
 	defaultnormal_vertex: defaultnormal_vertex,
 	displacementmap_pars_vertex: displacementmap_pars_vertex,
@@ -163,6 +166,7 @@ export var ShaderChunk = {
 	map_particle_pars_fragment: map_particle_pars_fragment,
 	metalnessmap_fragment: metalnessmap_fragment,
 	metalnessmap_pars_fragment: metalnessmap_pars_fragment,
+	model_matrix_pars_vertex: model_matrix_pars_vertex,
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
 	morphtarget_vertex: morphtarget_vertex,

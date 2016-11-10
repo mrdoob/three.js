@@ -46,7 +46,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	function renderInstances( geometry, start, count ) {
+	function renderInstances( geometry, instanceCount, start, vertexCount ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -57,13 +57,12 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
+		extension.drawElementsInstancedANGLE( mode, vertexCount, type, start * size, instanceCount );
 
 		infoRender.calls ++;
-		infoRender.vertices += count * geometry.maxInstancedCount;
+		infoRender.vertices += vertexCount * instanceCount;
 
-		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
-
+		if ( mode === gl.TRIANGLES ) infoRender.faces += instanceCount * vertexCount / 3;
 	}
 
 	return {
