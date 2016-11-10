@@ -81,4 +81,4 @@ Viewport.Info = function ( editor ) {
 
 	return container;
 
-}
+};
