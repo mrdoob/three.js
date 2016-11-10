@@ -218,7 +218,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			if ( factor !== 1.0 && factor > 0.0 ) {
 
 				_eye.multiplyScalar( factor );
-				
+
 			}
 
 			if ( _this.staticMoving ) {
@@ -473,7 +473,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_zoomStart.y -= event.deltaY * ( ( event.deltaMode )  ? 0.01 : 0.0001 );
+		switch ( event.deltaMode ) {
+
+			case 1:
+				_zoomStart.y -= event.deltaY * 0.01;
+				break;
+
+			default:
+				// undefined, 0
+				_zoomStart.y -= event.deltaY * 0.00025;
+				break;
+		}
 
 		_this.dispatchEvent( startEvent );
 		_this.dispatchEvent( endEvent );
