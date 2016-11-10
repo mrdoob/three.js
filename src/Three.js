@@ -88,17 +88,16 @@ export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export {
-  DynamicBufferAttribute,
-  Float64Attribute,
-  Float32Attribute,
-  Uint32Attribute,
-  Int32Attribute,
-  Uint16Attribute,
-  Int16Attribute,
-  Uint8ClampedAttribute,
-  Uint8Attribute,
-  Int8Attribute,
-  BufferAttribute
+	Float64BufferAttribute,
+	Float32BufferAttribute,
+	Uint32BufferAttribute,
+	Int32BufferAttribute,
+	Uint16BufferAttribute,
+	Int16BufferAttribute,
+	Uint8ClampedBufferAttribute,
+	Uint8BufferAttribute,
+	Int8BufferAttribute,
+	BufferAttribute
 } from './core/BufferAttribute.js';
 export { Face3 } from './core/Face3.js';
 export { Object3DIdCount, Object3D } from './core/Object3D.js';
