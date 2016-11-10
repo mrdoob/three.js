@@ -2110,7 +2110,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var m = model.morphs[ i ];
 			var params = { name: m.name };
 
-			var attribute = new THREE.Float32Attribute( model.metadata.vertexCount * 3, 3 );
+			var attribute = new THREE.Float32BufferAttribute( model.metadata.vertexCount * 3, 3 );
 
 			for ( var j = 0; j < model.metadata.vertexCount * 3; j++ ) {
 
@@ -2802,12 +2802,12 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initGeometry = function () {
 
-		geometry.setIndex( ( buffer.indices.length > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( buffer.indices, 1 ) );
-		geometry.addAttribute( 'position', THREE.Float32Attribute( buffer.vertices, 3 ) );
-		geometry.addAttribute( 'normal', THREE.Float32Attribute( buffer.normals, 3 ) );
-		geometry.addAttribute( 'uv', THREE.Float32Attribute( buffer.uvs, 2 ) );
-		geometry.addAttribute( 'skinIndex', THREE.Float32Attribute( buffer.skinIndices, 4 ) );
-		geometry.addAttribute( 'skinWeight', THREE.Float32Attribute( buffer.skinWeights, 4 ) );
+		geometry.setIndex( new ( buffer.indices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
+		geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
+		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
+		geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( buffer.skinIndices, 4 ) );
+		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffer.skinWeights, 4 ) );
 
 		geometry.computeBoundingSphere();
 		geometry.mmdFormat = model.metadata.format;
