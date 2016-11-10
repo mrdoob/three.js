@@ -824,19 +824,43 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				switch ( object.drawMode ) {
+				if ( object.drawMode ) {
 
-					case TrianglesDrawMode:
-						renderer.setMode( _gl.TRIANGLES );
-						break;
+					// backwards compatibility
 
-					case TriangleStripDrawMode:
-						renderer.setMode( _gl.TRIANGLE_STRIP );
-						break;
+					switch ( object.drawMode ) {
 
-					case TriangleFanDrawMode:
-						renderer.setMode( _gl.TRIANGLE_FAN );
-						break;
+						case TrianglesDrawMode:
+							renderer.setMode( _gl.TRIANGLES );
+							break;
+
+						case TriangleStripDrawMode:
+							renderer.setMode( _gl.TRIANGLE_STRIP );
+							break;
+
+						case TriangleFanDrawMode:
+							renderer.setMode( _gl.TRIANGLE_FAN );
+							break;
+
+					}
+
+				} else {
+
+					switch ( geometry.drawMode ) {
+
+						case TrianglesDrawMode:
+							renderer.setMode(_gl.TRIANGLES);
+							break;
+
+						case TriangleStripDrawMode:
+							renderer.setMode(_gl.TRIANGLE_STRIP);
+							break;
+
+						case TriangleFanDrawMode:
+							renderer.setMode(_gl.TRIANGLE_FAN);
+							break;
+
+					}
 
 				}
 
