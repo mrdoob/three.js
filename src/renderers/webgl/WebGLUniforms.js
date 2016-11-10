@@ -73,6 +73,7 @@ var arrayCacheI32 = [];
 
 function flatten( array, nBlocks, blockSize ) {
 
+	nBlocks = Math.min( nBlocks, array.length );
 	var firstElem = array[ 0 ];
 
 	if ( firstElem <= 0 || firstElem > 0 ) return array;
