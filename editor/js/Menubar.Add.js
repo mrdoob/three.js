@@ -312,6 +312,27 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// AreaLight
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'AreaLight' );
+	option.onClick( function () {
+
+		var color = 0xffffff;
+		var intensity = 1;
+		var width = 2;
+		var height = 5;
+
+		var light = new THREE.RectAreaLight( color, intensity, width, height );
+		light.matrixAutoUpdate = true;
+		light.name = 'AreaLight ' + ( ++ lightCount );
+
+		editor.execute( new AddObjectCommand( light ) );
+
+	} );
+	options.add( option );
+	
 	// SpotLight
 
 	var option = new UI.Row();
