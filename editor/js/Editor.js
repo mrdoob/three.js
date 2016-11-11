@@ -260,6 +260,10 @@ Editor.prototype = {
 
 				helper = new THREE.CameraHelper( object, 1 );
 
+			} else if ( object instanceof THREE.RectAreaLight ) {
+
+				helper = new THREE.RectAreaLightHelper( object, 1 );
+
 			} else if ( object instanceof THREE.PointLight ) {
 
 				helper = new THREE.PointLightHelper( object, 1 );
