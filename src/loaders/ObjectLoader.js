@@ -15,6 +15,7 @@ import { FogExp2 } from '../scenes/FogExp2';
 import { HemisphereLight } from '../lights/HemisphereLight';
 import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
+import { RectAreaLight } from '../lights/RectAreaLight';
 import { DirectionalLight } from '../lights/DirectionalLight';
 import { AmbientLight } from '../lights/AmbientLight';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
@@ -573,6 +574,12 @@ Object.assign( ObjectLoader.prototype, {
 				case 'PointLight':
 
 					object = new PointLight( data.color, data.intensity, data.distance, data.decay );
+
+					break;
+
+				case 'RectAreaLight':
+
+					object = new RectAreaLight ( data.color, data.intensity, data.width, data.height );
 
 					break;
 
