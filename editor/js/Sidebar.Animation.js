@@ -111,4 +111,4 @@ Sidebar.Animation = function ( editor ) {
 
 	return container;
 
-}
+};
