@@ -49,6 +49,8 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.angle !== undefined ) data.object.angle = this.angle;
 		if ( this.decay !== undefined ) data.object.decay = this.decay;
 		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
+		if ( this.width !== undefined ) data.object.width = this.width;
+		if ( this.height !== undefined ) data.object.height = this.height;
 
 		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
 
