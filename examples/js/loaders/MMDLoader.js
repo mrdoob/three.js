@@ -41,6 +41,7 @@ THREE.MMDLoader = function ( manager ) {
 
 	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.imageCrossOrigin = false;
 
 };
 
@@ -66,6 +67,23 @@ THREE.MMDLoader.prototype.defaultToonTextures = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
 ];
+
+/*
+ * getImageData() of CanvasRenderingContext2D with image in other domain
+ * for transparency detection fails because of cross-origin problem
+ * even if server responds with "Access-Control-Allow-Origin: *".
+ * If this.imageCrossOrigin is true, MMDLoader tries to solve this issue
+ * with
+ *   var image = new Image();
+ *   image.crossOrigin = 'anonymous';
+ *   image.src = url;
+ * This workaround can be removed if ImageLoader supports crossOrigin.
+ */
+THREE.MMDLoader.prototype.enableImageCrossOrigin = function ( enabled ) {
+
+	this.imageCrossOrigin = enabled;
+
+};
 
 THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrls, callback, onProgress, onError ) {
 
@@ -2240,26 +2258,96 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var texture = loader.load( fullPath, function ( t ) {
 
-				t.flipY = false;
-				t.wrapS = THREE.RepeatWrapping;
-				t.wrapT = THREE.RepeatWrapping;
+				function checkCrossOrigin( image ) {
 
-				if ( params.sphericalReflectionMapping === true ) {
+					if ( ! scope.imageCrossOrigin ) return true;
 
-					t.mapping = THREE.SphericalReflectionMapping;
+					// any better ways to check image has cross-origin problem?
+
+					var c = document.createElement( 'canvas' );
+					c.width = 1;
+					c.height = 1;
+
+					var ctx = c.getContext( '2d' );
+					ctx.drawImage( image, 0, 0 );
+
+					try {
+
+						ctx.getImageData( 0, 0, c.width, c.height );
+						return true;
+
+					} catch ( e ) {
+
+						if ( e.name.toLowerCase() === 'securityerror' && e.message.toLowerCase().indexOf( 'cross-origin' ) >= 0 ) {
+
+							return false;
+
+						} else {
+
+							throw e;
+
+						}
+
+					}
 
 				}
 
-				for ( var i = 0; i < texture.readyCallbacks.length; i++ ) {
+				function onLoad( t ) {
 
-					texture.readyCallbacks[ i ]( texture );
+					t.flipY = false;
+					t.wrapS = THREE.RepeatWrapping;
+					t.wrapT = THREE.RepeatWrapping;
+
+					if ( params.sphericalReflectionMapping === true ) {
+
+						t.mapping = THREE.SphericalReflectionMapping;
+
+					}
+
+					for ( var i = 0; i < t.readyCallbacks.length; i++ ) {
+
+						t.readyCallbacks[ i ]( t );
+
+					}
+
+					delete t.readyCallbacks;
 
 				}
 
-				delete texture.readyCallbacks;
+				if ( checkCrossOrigin( t.image ) ) {
+
+					onLoad( t );
+
+				} else {
+
+					// Override the image of texture. See enableImageCrossOrigin()
+
+					console.warn( 'THREE.MMDLoader: trying reload the image ' + fullPath +
+							' with image.crossOrigin="anonymous"; image.src=url; because of cross-origin issue' );
+
+					t.image = undefined;
+					t.version --;  // This's necessary not to update texture.
+					t.needsUpdate = false;
+
+					var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+					image.onload = function () {
+
+						image.onload = null;
+
+						t.image = image;
+						t.needsUpdate = true;
+
+						onLoad( t );
+
+					};
+					image.crossOrigin = 'anonymous';
+					image.src = fullPath;
+
+				}
 
 			} );
 
+			// this'll be removed later
 			texture.readyCallbacks = [];
 
 			var uuid = THREE.Math.generateUUID();
