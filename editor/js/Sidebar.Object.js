@@ -172,6 +172,17 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectIntensityRow );
 
+	// width & height
+
+	var objectSizeRow = new UI.Row();
+	var objectWidth = new UI.Number().setRange( 0, Infinity ).setWidth( '50px' ).onChange( update );
+	var objectHeight = new UI.Number().setRange( 0, Infinity ).setWidth( '50px' ).onChange( update );
+
+	objectSizeRow.add( new UI.Text( 'Size' ).setWidth( '90px' ) );
+	objectSizeRow.add( objectWidth, objectHeight );
+
+	container.add( objectSizeRow );
+
 	// color
 
 	var objectColorRow = new UI.Row();
@@ -394,6 +405,18 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
+			if ( object.width !== undefined && Math.abs( object.width - objectWidth.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'width', objectWidth.getValue() ) );
+
+			}
+
+			if ( object.height !== undefined && Math.abs( object.height - objectHeight.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( object, 'height', objectHeight.getValue() ) );
+
+			}
+
 			if ( object.color !== undefined && object.color.getHex() !== objectColor.getHexValue() ) {
 
 				editor.execute( new SetColorCommand( object, 'color', objectColor.getHexValue() ) );
@@ -485,6 +508,8 @@ Sidebar.Object = function ( editor ) {
 			'near': objectNearRow,
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
+			'width': objectSizeRow,
+			'height': objectSizeRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
 			'distance' : objectDistanceRow,
@@ -596,6 +621,18 @@ Sidebar.Object = function ( editor ) {
 		if ( object.intensity !== undefined ) {
 
 			objectIntensity.setValue( object.intensity );
+
+		}
+
+		if ( object.width !== undefined ) {
+
+			objectWidth.setValue( object.width );
+
+		}
+
+		if ( object.height !== undefined ) {
+
+			objectHeight.setValue( object.height );
 
 		}
 
