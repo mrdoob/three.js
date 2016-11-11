@@ -49,6 +49,7 @@ export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
+export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
@@ -87,17 +88,16 @@ export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export {
-  DynamicBufferAttribute,
-  Float64Attribute,
-  Float32Attribute,
-  Uint32Attribute,
-  Int32Attribute,
-  Uint16Attribute,
-  Int16Attribute,
-  Uint8ClampedAttribute,
-  Uint8Attribute,
-  Int8Attribute,
-  BufferAttribute
+	Float64BufferAttribute,
+	Float32BufferAttribute,
+	Uint32BufferAttribute,
+	Int32BufferAttribute,
+	Uint16BufferAttribute,
+	Int16BufferAttribute,
+	Uint8ClampedBufferAttribute,
+	Uint8BufferAttribute,
+	Int8BufferAttribute,
+	BufferAttribute
 } from './core/BufferAttribute.js';
 export { Face3 } from './core/Face3.js';
 export { Object3DIdCount, Object3D } from './core/Object3D.js';
@@ -128,13 +128,14 @@ export { Vector4 } from './math/Vector4.js';
 export { Vector3 } from './math/Vector3.js';
 export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
-export { ColorKeywords, Color } from './math/Color.js';
+export { Color } from './math/Color.js';
 export { MorphBlendMesh } from './extras/objects/MorphBlendMesh.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { VertexNormalsHelper } from './extras/helpers/VertexNormalsHelper.js';
 export { SpotLightHelper } from './extras/helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './extras/helpers/SkeletonHelper.js';
 export { PointLightHelper } from './extras/helpers/PointLightHelper.js';
+export { RectAreaLightHelper } from './extras/helpers/RectAreaLightHelper.js';
 export { HemisphereLightHelper } from './extras/helpers/HemisphereLightHelper.js';
 export { GridHelper } from './extras/helpers/GridHelper.js';
 export { FaceNormalsHelper } from './extras/helpers/FaceNormalsHelper.js';

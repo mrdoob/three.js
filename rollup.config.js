@@ -33,6 +33,5 @@ export default {
 			format: 'es',
 			dest: 'build/three.modules.js'
 		}
-	],
-	sourceMap: true
+	]
 };

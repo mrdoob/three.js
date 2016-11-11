@@ -276,7 +276,7 @@
 				bezierGeometry.computeVertexNormals();
 
 				bezierGeometry = new THREE.BufferGeometry().fromGeometry( bezierGeometry );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32Attribute( invert, 1 ) );
+				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				//
 

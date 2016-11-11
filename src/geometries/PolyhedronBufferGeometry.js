@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32Attribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
 import { Sphere } from '../math/Sphere';
@@ -43,9 +43,9 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// build non-indexed geometry
 
-	this.addAttribute( 'position', Float32Attribute( vertexBuffer, 3 ) );
-	this.addAttribute( 'normal', Float32Attribute( vertexBuffer.slice(), 3 ) );
-	this.addAttribute( 'uv', Float32Attribute( uvBuffer, 2 ) );
+	this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 	this.normalizeNormals();
 
 	this.boundingSphere = new Sphere( new Vector3(), radius );

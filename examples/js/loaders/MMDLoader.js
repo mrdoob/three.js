@@ -581,7 +581,7 @@ THREE.MMDLoader.prototype.parsePmd = function ( buffer ) {
 			p.diffuse = dv.getFloat32Array( 4 );
 			p.shininess = dv.getFloat32();
 			p.specular = dv.getFloat32Array( 3 );
-			p.emissive = dv.getFloat32Array( 3 );
+			p.ambient = dv.getFloat32Array( 3 );
 			p.toonIndex = dv.getInt8();
 			p.edgeFlag = dv.getUint8();
 			p.faceCount = dv.getUint32() / 3;
@@ -1163,7 +1163,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 			p.diffuse = dv.getFloat32Array( 4 );
 			p.specular = dv.getFloat32Array( 3 );
 			p.shininess = dv.getFloat32();
-			p.emissive = dv.getFloat32Array( 3 );
+			p.ambient = dv.getFloat32Array( 3 );
 			p.flag = dv.getUint8();
 			p.edgeColor = dv.getFloat32Array( 4 );
 			p.edgeSize = dv.getFloat32();
@@ -1379,7 +1379,7 @@ THREE.MMDLoader.prototype.parsePmx = function ( buffer ) {
 					m.diffuse = dv.getFloat32Array( 4 );
 					m.specular = dv.getFloat32Array( 3 );
 					m.shininess = dv.getFloat32();
-					m.emissive = dv.getFloat32Array( 3 );
+					m.ambient = dv.getFloat32Array( 3 );
 					m.edgeColor = dv.getFloat32Array( 4 );
 					m.edgeSize = dv.getFloat32();
 					m.textureColor = dv.getFloat32Array( 4 );
@@ -2110,7 +2110,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var m = model.morphs[ i ];
 			var params = { name: m.name };
 
-			var attribute = new THREE.Float32Attribute( model.metadata.vertexCount * 3, 3 );
+			var attribute = new THREE.Float32BufferAttribute( model.metadata.vertexCount * 3, 3 );
 
 			for ( var j = 0; j < model.metadata.vertexCount * 3; j++ ) {
 
@@ -2198,7 +2198,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		var textures = [];
 		var textureLoader = new THREE.TextureLoader( this.manager );
 		var tgaLoader = new THREE.TGALoader( this.manager );
-		var color = new THREE.Color();
 		var offset = 0;
 		var materialParams = [];
 
@@ -2294,9 +2293,22 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			offset += m.faceCount;
 
 			params.name = m.name;
-			params.color = color.fromArray( [ m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] ] ).clone();
+
+			/*
+			 * Color
+			 *
+			 * MMD         MeshPhongMaterial
+			 * diffuse  -  color
+			 * specular -  specular
+			 * ambient  -  emissive * a
+			 *               (a = 1.0 without map texture or 0.2 with map texture)
+			 *
+			 * MeshPhongMaterial doesn't have ambient. Set it to emissive instead.
+			 * It'll be too bright if material has map texture so using coef 0.2.
+			 */
+			params.color = new THREE.Color( m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] );
 			params.opacity = m.diffuse[ 3 ];
-			params.specular = color.fromArray( [ m.specular[ 0 ], m.specular[ 1 ], m.specular[ 2 ] ] ).clone();
+			params.specular = new THREE.Color( m.specular[ 0 ], m.specular[ 1 ], m.specular[ 2 ] );
 			params.shininess = m.shininess;
 
 			if ( params.opacity === 1.0 ) {
@@ -2388,12 +2400,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			// TODO: check if this logic is right
-			if ( params.map === undefined /* && params.envMap === undefined */ ) {
-
-				params.emissive = color.fromArray( [ m.emissive[ 0 ], m.emissive[ 1 ], m.emissive[ 2 ] ] ).clone();
-
-			}
+			var coef = ( params.map === undefined ) ? 1.0 : 0.2;
+			params.emissive = new THREE.Color( m.ambient[ 0 ] * coef, m.ambient[ 1 ] * coef, m.ambient[ 2 ] * coef );
 
 			materialParams.push( params );
 
@@ -2802,12 +2810,12 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initGeometry = function () {
 
-		geometry.setIndex( ( buffer.indices.length > 65535 ? THREE.Uint32Attribute : THREE.Uint16Attribute )( buffer.indices, 1 ) );
-		geometry.addAttribute( 'position', THREE.Float32Attribute( buffer.vertices, 3 ) );
-		geometry.addAttribute( 'normal', THREE.Float32Attribute( buffer.normals, 3 ) );
-		geometry.addAttribute( 'uv', THREE.Float32Attribute( buffer.uvs, 2 ) );
-		geometry.addAttribute( 'skinIndex', THREE.Float32Attribute( buffer.skinIndices, 4 ) );
-		geometry.addAttribute( 'skinWeight', THREE.Float32Attribute( buffer.skinWeights, 4 ) );
+		geometry.setIndex( new ( buffer.indices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
+		geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
+		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
+		geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( buffer.skinIndices, 4 ) );
+		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffer.skinWeights, 4 ) );
 
 		geometry.computeBoundingSphere();
 		geometry.mmdFormat = model.metadata.format;
