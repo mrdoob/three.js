@@ -17,77 +17,211 @@
 			Below is a list of such elements, along with info regarding their replacements.
 		</div>
 
-		<h2>Deprecated Constants</h2>
 
-		<h3>[page:LineStrip LineStrip]</h3>
+		<h2>Buffers</h2>
 
-		<h3>[page:LinePieces LinePieces]</h3>
-		<div>
-		[page:Line Line] LinePieces mode is no longer supported. Create a [page:LineSegments LineSegments] instead.
-		</div>
-
-		<h2>Deprecated Objects</h2>
-
-		<h3>[page:GeometryUtils GeometryUtils]</h3>
-		<div>
-			GeometryUtils.merge has been moved to [page:Geometry.merge Geometry.merge].<br /><br />
-
-			GeometryUtils.center has been moved to [page:Geometry.center Geometry.center].
-		</div>
-
-		<h3>[page:ImageUtils ImageUtils]</h3>
-		<div>
-			ImageUtils.loadTexture has been deprecated. Use [page:TextureLoader TextureLoader] instead.<br /><br />
-
-			ImageUtils.loadTextureCube has been deprecated. Use [page:CubeTextureLoader CubeTextureLoader] instead.<br /><br />
-
-			ImageUtils.loadCompressedTexture has been removed. Use [page:DDSLoader DDSLoader] instead.<br /><br />
-
-			ImageUtils.loadCompressedTextureCube has been removed. Use [page:DDSLoader DDSLoader] instead.
-		</div>
-
-		<h2>Deprecated Classes</h2>
-
-		<h3>[page:EdgesHelper EdgesHelper]</h3>
-		<div>EdgesHelper has been removed. Use [page:EdgesGeometry EdgesGeometry] instead.</div>
-
-		<h3>[page:DynamicBufferAttribute DynamicBufferAttribute]</h3>
+		<h3>[page:DynamicBufferAttribute]</h3>
 		<div>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic BufferAttribute.setDynamic]( true ) instead.</div>
 
-		<h3>[page:Face4 Face4]</h3>
-		<div>Face4 has been removed. Use [page:Face3 Face3] instead.</div>
+		<h3>[page:Int8Attribute]</h3>
+		<div>Int8Attribute has been removed. Use [page:BufferAttributeTypes Int8BufferAttribute] instead.</div>
 
-		<h3>[page:ParticleBasicMaterial ParticleBasicMaterial]</h3>
-		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+		<h3>[page:Uint8Attribute]</h3>
+		<div>Uint8Attribute has been removed. Use [page:BufferAttributeTypes Uint8BufferAttribute] instead.</div>
 
-		<h3>[page:ParticleSystem ParticleSystem]</h3>
-		<div>ParticleSystem has been renamed to [page:Points Points].</div>
+		<h3>[page:Uint8ClampedAttribute]</h3>
+		<div>Uint8ClampedAttribute has been removed. Use [page:BufferAttributeTypes Uint8ClampedBufferAttribute] instead.</div>
 
-		<h3>[page:ParticleSystemMaterial ParticleSystemMaterial]</h3>
-		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+		<h3>[page:Int16Attribute]</h3>
+		<div>Int16Attribute has been removed. Use [page:BufferAttributeTypes Int16BufferAttribute] instead.</div>
 
-		<h3>[page:PointCloud PointCloud]</h3>
-		<div>PointCloud has been renamed to [page:Points Points].</div>
+		<h3>[page:Uint16Attribute]</h3>
+		<div>Uint16Attribute has been removed. Use [page:BufferAttributeTypes Uint16BufferAttribute] instead.</div>
 
-		<h3>[page:PointCloudMaterial PointCloudMaterial]</h3>
-		<div>PointCloudMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+		<h3>[page:Int32Attribute]</h3>
+		<div>Int32Attribute has been removed. Use [page:BufferAttributeTypes Int32BufferAttribute] instead.</div>
 
-		<h3>[page:Projector Projector]</h3>
+		<h3>[page:Uint32Attribute]</h3>
+		<div>Uint32Attribute has been removed. Use [page:BufferAttributeTypes Uint32BufferAttribute] instead.</div>
+
+		<h3>[page:Float32Attribute]</h3>
+		<div>Float32Attribute has been removed. Use [page:BufferAttributeTypes Float32BufferAttribute] instead.</div>
+
+		<h3>[page:Float64Attribute]</h3>
+		<div>Float64Attribute has been removed. Use [page:BufferAttributeTypes Float64BufferAttribute] instead.</div>
+
+
+		<h2>Constants</h2>
+
+		<h3>[page:LineStrip]</h3>
+
+		<h3>[page:LinePieces]</h3>
+		<div>
+		LinePieces mode is no longer supported for [page:Line]s. Create a [page:LineSegments] instead.
+		</div>
+
+
+
+
+
+		<h2>Geometry</h2>
+
+		<h3>[page:CubeGeometry]</h3>
+		<div>
+			CubeGeometry has been renamed to [page:BoxGeometry].
+		</div>
+
+		<h3>[page:GeometryUtils]</h3>
+		<div>
+			GeometryUtils.merge has been moved to [page:Geometry.merge].<br /><br />
+
+			GeometryUtils.center has been moved to [page:Geometry.center].
+		</div>
+
+
+
+
+
+
+
+
+		<h2>Helpers</h2>
+
+		<h3>[page:EdgesHelper]</h3>
+		<div>EdgesHelper has been removed. Use [page:EdgesGeometry] instead.</div>
+
+		<h3>[page:WireframeHelper WireframeHelper]</h3>
+		<div>WireframeHelper has been removed. Use [page:WireframeGeometry] instead.</div>
+
+
+
+
+		<h2>Loaders</h2>
+
+		<h3>[page:XHRLoader]</h3>
+		<div>XHRLoader has been renamed to [page:FileLoader].</div>
+
+
+
+
+
+
+
+		<h2>Maths</h2>
+
+		<h3>[page:Box2.center]</h3>
+		<div>Box2.center has been renamed to [page:Box2.getCenter]().</div>
+
+		<h3>[page:Box2.empty]</h3>
+		<div>Box2.empty has been renamed to [page:Box2.isEmpty]().</div>
+
+		<h3>[page:Box2.isIntersectionBox]</h3>
+		<div>Box2.isIntersectionBox has been renamed to [page:Box2.intersectsBox]().</div>
+
+		<h3>[page:Box2.size]</h3>
+		<div>Box2.size has been renamed to [page:Box2.getSize]().</div>
+
+		<h3>[page:Box3.center]</h3>
+		<div>Box3.center has been renamed to [page:Box3.getCenter]().</div>
+
+		<h3>[page:Box3.empty]</h3>
+		<div>Box3.empty has been renamed to [page:Box3.isEmpty]().</div>
+
+		<h3>[page:Box3.isIntersectionBox]</h3>
+		<div>Box3.isIntersectionBox has been renamed to [page:Box3.intersectsBox]().</div>
+
+		<h3>[page:Box3.isIntersectionSphere]</h3>
+		<div>Box3.isIntersectionBox has been renamed to [page:Box3.intersectsSphere]().</div>
+
+		<h3>[page:Box3.size]</h3>
+		<div>Box3.size has been renamed to [page:Box3.getSize]().</div>
+
+		<h3>[page:Face4]</h3>
+		<div>Face4 has been removed. Use [page:Face3] instead.</div>
+
+		<h3>[page:Line3.center]</h3>
+		<div>Line3.center has been renamed to [page:Line3.getCenter]().</div>
+
+		<h3>[page:Matrix3.multiplyVector3]</h3>
+		<div>Matrix3.multiplyVector3 has been removed. Use [page:Vector.applyMatrix3]( matrix ) instead.<div>
+
+		<h3>[page:Matrix3.multiplyVector3Array]</h3>
+		<div>Matrix3.multiplyVector3Array has been renamed to [page:Matrix3.applyToVector3Array]( array ).</div>
+
+
+		<h3>[page:Vertex]</h3>
+		<div>Vertex has been removed. Use [page:Vector3] instead.</div>
+
+
+
+
+
+		<h2>Materials</h2>
+
+		<h3>[page:MeshFaceMaterial]</h3>
+		<div>MeshFaceMaterial has been removed. Use [page:MultiMaterial] instead.</div>
+
+		<h3>[page:ParticleBasicMaterial]</h3>
+		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</div>
+
+		<h3>[page:ParticleSystemMaterial]</h3>
+		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</div>
+
+		<h3>[page:PointCloudMaterial]</h3>
+		<div>PointCloudMaterial has been renamed to [page:PointsMaterial].</div>
+
+
+
+
+		<h2>Objects</h2>
+
+		<h3>[page:Particle]</h3>
+		<div>ParticleSystem has been renamed to [page:Sprite].</div>
+
+		<h3>[page:ParticleSystem]</h3>
+		<div>ParticleSystem has been renamed to [page:Points].</div>
+
+		<h3>[page:PointCloud]</h3>
+		<div>PointCloud has been renamed to [page:Points].</div>
+
+
+
+
+
+
+
+		<h2>Renderer</h2>
+
+		<h3>[page:Projector]</h3>
 		<div>
 			Projector has been moved to
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/Projector.js 	/examples/js/renderers/Projector.js].<br /><br />
 
-			Projector.projectVector() is now [page:Vector.project Vector.project].<br /><br />
+			Projector.projectVector() is now [page:Vector.project].<br /><br />
 
-			Projector.unprojectVector() is now [page:Vector.unproject Vector.unproject].<br /><br />
+			Projector.unprojectVector() is now [page:Vector.unproject].<br /><br />
 
-			Projector:.pickingRay() is now [page:Raycaster.setFromCamera Raycaster.setFromCamera].
+			Projector:.pickingRay() is now [page:Raycaster.setFromCamera].
 		</div>
 
-		<h3>[page:Vertex Vertex]</h3>
-		<div>Vertex has been removed. Use [page:Vector3 Vector3] instead.</div>
 
-		<h3>[page:WireframeHelper WireframeHelper]</h3>
-		<div>WireframeHelper has been removed. Use [page:WireframeGeometry WireframeGeometry] instead.</div>
-	</body>
+
+
+		<h2>Textures</h2>
+
+		<h3>[page:ImageUtils]</h3>
+		<div>
+			ImageUtils.loadTexture has been deprecated. Use [page:TextureLoader] instead.<br /><br />
+
+			ImageUtils.loadTextureCube has been deprecated. Use [page:CubeTextureLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTexture has been removed. Use [page:DDSLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTextureCube has been removed. Use [page:DDSLoader] instead.
+		</div>
+
+
+
+
+		</body>
 </html>
