@@ -1235,7 +1235,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			return new THREE.Float32Attribute( array, sourceStride );
+			return new THREE.Float32BufferAttribute( array, sourceStride );
 
 		}
 
