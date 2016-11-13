@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32Attribute, Uint16Attribute, Uint32Attribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from '../core/BufferAttribute';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
 
@@ -58,10 +58,10 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	// build geometry
 
-	this.setIndex( ( indices.length > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
-	this.addAttribute( 'position', Float32Attribute( vertices, 3 ) );
-	this.addAttribute( 'normal', Float32Attribute( normals, 3 ) );
-	this.addAttribute( 'uv', Float32Attribute( uvs, 2 ) );
+	this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	// functions
 

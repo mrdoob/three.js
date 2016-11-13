@@ -61,6 +61,8 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
+		if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
+		if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
 		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;

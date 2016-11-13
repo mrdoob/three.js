@@ -1,5 +1,5 @@
 import { Texture } from './Texture';
-import { NearestFilter, UnsignedShortType, DepthFormat, DepthStencilFormat } from '../constants';
+import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants';
 
 /**
  * @author Matt DesLauriers / @mattdesl
@@ -16,11 +16,12 @@ function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, mi
 
 	}
 
+	if ( type === undefined && format === DepthFormat ) type = UnsignedShortType;
+	if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+
 	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.image = { width: width, height: height };
-
-	this.type = type !== undefined ? type : UnsignedShortType;
 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;

@@ -126,11 +126,7 @@ function WebGLObjects( gl, properties, info ) {
 		attributeProperties.type = type;
 		attributeProperties.version = data.version;
 
-		if ( data.onUpload !== null ) {
-
-			data.onUpload();
-
-		}
+		data.onUploadCallback();
 
 	}
 

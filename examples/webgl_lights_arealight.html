@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - rect light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Just to show the rect light and it's edge - by <a href="http://github.com/abelnation" target="_blank">abelnation</a><br />
+			Click and drag to move OrbitControls, center across the edge of the shadow.<br />
+			Click to set random color CTRL-Click for White.<br />
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/lights/RectAreaLightUniformsLib.js"></script>
+		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			var container = document.getElementById( 'container' );
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var rnd = new THREE.WebGLRenderer();
+			var cam = new THREE.PerspectiveCamera( 34, window.innerWidth / window.innerHeight, 0.1, 20000 );
+			var orb = new THREE.OrbitControls( cam, rnd.domElement );
+
+			var scn = new THREE.Scene();
+
+			var matParams = {
+				specular: 0xFFFFFF,
+				shininess: 10000
+			}
+
+			var matFloor = new THREE.MeshPhongMaterial( matParams );
+			var matBox = new THREE.MeshPhongMaterial( matParams );
+			var geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
+			var geoBox = new THREE.BoxGeometry( Math.PI, Math.sqrt( 2 ), Math.E );
+			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+			var mshBox = new THREE.Mesh( geoBox, matBox );
+
+			var amb = new THREE.AmbientLight( 0x080808 );
+
+			// TODO (abelnation): temp point light for debugging
+			var dir = new THREE.DirectionalLight( 0xFFFFFF );
+			var dirHelper = new THREE.DirectionalLightHelper( dir );
+
+			var shapes, shapeNames;
+			var rectLight;
+			var rectLightHelper;
+
+			var ray = new THREE.Raycaster();
+			var mouseDown = new THREE.Vector2();
+			var mouse = new THREE.Vector2();
+
+			var gui, guiElements;
+			var param = {};
+
+			function init() {
+
+				var gl = rnd.context;
+
+				// Check for float-RT support
+				// TODO (abelnation): figure out fall-back for float textures
+				if (!gl.getExtension("OES_texture_float")) {
+					alert("OES_texture_float not supported");
+					throw "missing webgl extension";
+				}
+
+				if (!gl.getExtension("OES_texture_float_linear")) {
+					alert("OES_texture_float_linear not supported");
+					throw "missing webgl extension";
+				}
+
+				rnd.shadowMap.enabled = true;
+				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
+				rnd.gammaInput = true;
+				rnd.gammaOutput = true;
+				rnd.antialias = true;
+				rnd.domElement.addEventListener( 'mousedown', onDocumentClick );
+				rnd.domElement.addEventListener( 'mouseup', onDocumentClick );
+
+				// cam.position.set( 0, 100, 0 );
+				cam.position.set( 45, 20, 45 );
+
+				// shapes = {
+				// 	square: THREE.Polygon.makeSquare( 10.0 ),
+				// 	rectangle: THREE.Polygon.makeRectangle( 10.0, 5.0 ),
+				// 	circle: THREE.Polygon.makeCircle( 5.0, 20 ),
+				// 	star: THREE.Polygon.makeStar( 5, 5.0, 2.5 ),
+				// 	triangle: new THREE.Polygon( [
+				// 		new THREE.Vector3( -5.0, -5.0, 0 ),
+				// 		new THREE.Vector3(  0.0,  5.0, 0 ),
+				// 		new THREE.Vector3(  5.0, -5.0, 0 ),
+				// 	] )
+				// };
+				// shapeNames = Object.keys( shapes );
+
+				rectLight = new THREE.RectAreaLight( 0xFFFFFF, undefined, 2, 10 );
+				rectLight.matrixAutoUpdate = true;
+				rectLight.intensity = 70.0;
+				rectLight.position.set( 5, 5, 0 );
+				// rectLight.target = mshBox;
+				rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+				rectLight.add( rectLightHelper );
+
+				// TODO (abelnation): rect light shadow
+
+				matFloor.color.set( 0x808080 );
+				randomColor( matBox );
+
+				mshFloor.receiveShadow = true;
+				mshFloor.position.set( 0, 0, 0 );
+
+				mshBox.castShadow = true;
+				mshBox.receiveShadow = true;
+				mshBox.position.set( 0, 5, 0 );
+
+				scn.add( cam );
+
+				scn.add( mshFloor );
+				scn.add( mshBox );
+
+				// scn.add( amb );
+
+				// scn.add( dir );
+				// scn.add( dirHelper );
+
+				scn.add( rectLight );
+				// scn.add( rectLightHelper );
+
+				// scn.add( new THREE.AxisHelper( 10 ) );
+
+				document.body.appendChild( rnd.domElement );
+				onResize();
+				window.addEventListener( 'resize', onResize, false );
+
+				orb.addEventListener( 'change', render );
+				orb.update();
+
+			}
+
+			function onResize() {
+
+				rnd.setSize( window.innerWidth, window.innerHeight );
+				cam.aspect = ( window.innerWidth / window.innerHeight );
+				cam.updateProjectionMatrix();
+				orb.target = mshBox.position;
+
+			}
+
+			function tick() {
+
+				update();
+				render();
+
+				requestAnimationFrame( tick );
+
+			}
+
+			function update() {
+
+				var dt = 6000;
+				var qdt = dt / 4.0;
+				var dirSigns = [
+					[ 1,  1 ],
+					[ - 1,  1 ],
+					[ - 1,  1 ],
+					[ 1,  1 ]
+				];
+				var t = ( Date.now() / 1000 );
+
+				// move light in circle around center
+				// change light height with sine curve
+
+				var r = 10.0;
+
+				var lx = r * Math.cos( t );
+				var lz = r * Math.sin( t );
+
+				var ly = 5.0 + 5.0 * Math.sin( t / 3.0 );
+				// var ly = 7.0;
+
+				rectLight.position.set( lx, ly, lz );
+				rectLight.lookAt( mshBox.position );
+				rectLight.updateMatrixWorld();
+
+				// // move box in figure 8 path
+				// // xz is a figure 8
+				// // y is gently rising and falling
+				// 				var r = t * ( 4.0 * Math.PI );
+				// var s = Math.floor( t * dirSigns.length );
+                //
+				// var sign = dirSigns[ s ];
+				// var x = 5.0 * ( Math.cos( r ) + 1.0 ) * sign[ 0 ];
+				// var z = 5.0 * Math.sin( r ) * sign[ 1 ];
+				// var y = 2.5 * Math.cos( 0.5 * r ) + 5.0;
+                //
+				// mshBox.position.set( x, y, z );
+				// mshBox.updateMatrixWorld();
+
+			}
+
+			function render() {
+
+				rectLightHelper.update(); // required
+				rnd.render( scn, cam );
+
+			}
+
+			function clearGui() {
+
+				if ( gui ) gui.destroy();
+
+				gui = new dat.GUI();
+				gui.width = 190;
+				var gStyle = gui.domElement.style;
+				gStyle.position = "absolute";
+				gStyle.top = "48px";
+				gStyle.height = "220px";
+
+				gui.open();
+
+			}
+
+			function buildGui() {
+
+				clearGui();
+
+				param = {
+					'light color': rectLight.color.getHex(),
+					intensity: rectLight.intensity,
+					width: rectLight.width,
+					height: rectLight.height,
+					shininess: matFloor.shininess,
+					// shape: shapeNames[0]
+				};
+
+				gui.add( param, 'width', 0.1, 20).onChange( function ( val ) {
+
+					rectLight.width = val;
+
+				} );
+
+				gui.add( param, 'height', 0.1, 20).onChange( function ( val ) {
+
+					rectLight.height = val;
+
+				} );
+
+				// gui.add( param, 'shape', shapeNames ).onChange( function ( val ) {
+                //
+				// 	rectLight.polygon = shapes[ val ].clone();
+                //
+				// } );
+
+				gui.addColor( param, 'light color' ).onChange( function ( val ) {
+
+					rectLight.color.setHex( val );
+
+				} );
+
+				gui.add( param, 'intensity', 0, 100 ).onChange( function ( val ) {
+
+					rectLight.intensity = val;
+
+				} );
+
+				gui.add( param, 'shininess', 0, 100000 ).onChange( function ( val ) {
+
+					matBox.shininess = val;
+					matFloor.shininess = val;
+
+				} );
+
+				// TODO (abelnation): shadow controls
+				// addGui( 'distance', rectLight.distance, function( val ) {
+				// rectLight.distance = val;
+				// render();
+				// }, false, 0, 1000 );
+
+				// addGui( 'penumbra', rectLight.penumbra, function( val ) {
+				// rectLight.penumbra = val;
+				// render();
+				// }, false, 0, 1 );
+
+				// addGui( 'decay', rectLight.decay, function( val ) {
+				// rectLight.decay = val;
+				// render();
+				// }, false, 0, 100 );
+
+			}
+
+			function onDocumentClick( event ) {
+
+				event.preventDefault();
+
+				var rndDom = rnd.domElement;
+
+				if ( event.type === 'mousedown' ) {
+
+					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+				} else {
+
+					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
+
+					if ( mouseDown.distanceTo( mouse ) < 0.0075 ) {
+
+						ray.setFromCamera( mouse, cam );
+						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
+
+						if ( found.length > 0 ) {
+
+							if ( event.ctrlKey === false ) randomColor( found[ 0 ].object );
+							else found[ 0 ].object.material.color.set( 0xffffff );
+
+							render();
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function randomColor( target ) {
+
+				if ( target !== undefined ) {
+
+					if ( target.material !== undefined ) target = target.material;
+
+					if ( target.color !== undefined ) {
+
+						target.color.setHex( 0xffffff * Math.random() );
+
+					}
+
+				}
+
+			}
+
+			init();
+			buildGui();
+			tick();
+
+		</script>
+	</body>
+</html>

@@ -81,6 +81,19 @@ IncidentLight directLight;
 
 #endif
 
+#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )
+
+	RectAreaLight rectAreaLight;
+
+	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
+
+		rectAreaLight = rectAreaLights[ i ];
+		RE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );
+
+	}
+
+#endif
+
 #if defined( RE_IndirectDiffuse )
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );

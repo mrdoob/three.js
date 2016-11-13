@@ -61,6 +61,16 @@ vec3 directLightColor_Diffuse;
 
 #endif
 
+#if NUM_RECT_AREA_LIGHTS > 0
+
+	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
+
+		// TODO (abelnation): implement
+
+	}
+
+#endif
+
 #if NUM_DIR_LIGHTS > 0
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {

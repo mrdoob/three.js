@@ -1,7 +1,7 @@
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 import { Sphere } from '../math/Sphere';
-import { Uint16Attribute, Uint32Attribute, BufferAttribute } from '../core/BufferAttribute';
+import { Uint16BufferAttribute, Uint32BufferAttribute, BufferAttribute } from '../core/BufferAttribute';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -93,7 +93,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 	}
 
-	this.setIndex( new ( positions.count > 65535 ? Uint32Attribute : Uint16Attribute )( indices, 1 ) );
+	this.setIndex( new ( positions.count > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
 	this.addAttribute( 'position', positions );
 	this.addAttribute( 'normal', normals );
 	this.addAttribute( 'uv', uvs );
