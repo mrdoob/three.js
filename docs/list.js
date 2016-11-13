@@ -88,7 +88,8 @@ var list = {
 			[ "CurvePath", "api/extras/core/CurvePath" ],
 			[ "Font", "api/extras/core/Font" ],
 			[ "Path", "api/extras/core/Path" ],
-			[ "Shape", "api/extras/core/Shape" ]
+			[ "Shape", "api/extras/core/Shape" ],
+			[ "ShapePath", "api/extras/core/ShapePath" ]
 		],
 
 		"Extras / Curves": [
