@@ -59,6 +59,7 @@ var list = {
 			[ "BufferAttribute", "api/core/BufferAttribute" ],
 			[ "BufferGeometry", "api/core/BufferGeometry" ],
 			[ "Clock", "api/core/Clock" ],
+			[ "DirectGeometry", "api/core/DirectGeometry" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
@@ -66,6 +67,10 @@ var list = {
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 			[ "Uniform", "api/core/Uniform"]
+		],
+
+		"Core / BufferAttributes": [
+			[ "BufferAttribute Types", "api/core/bufferAttributeTypes/BufferAttributeTypes" ]
 		],
 
 		"Deprecated": [
@@ -83,7 +88,8 @@ var list = {
 			[ "CurvePath", "api/extras/core/CurvePath" ],
 			[ "Font", "api/extras/core/Font" ],
 			[ "Path", "api/extras/core/Path" ],
-			[ "Shape", "api/extras/core/Shape" ]
+			[ "Shape", "api/extras/core/Shape" ],
+			[ "ShapePath", "api/extras/core/ShapePath" ]
 		],
 
 		"Extras / Curves": [
