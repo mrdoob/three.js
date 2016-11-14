@@ -46,6 +46,7 @@ import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
 import { Color } from './math/Color.js';
 import { Line3 } from './math/Line3.js';
+import { _Math } from './math/Math.js';
 import { Matrix3 } from './math/Matrix3.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
@@ -160,7 +161,7 @@ export function Float64Attribute( array, itemSize ) {
 
 //
 
-function ClosedSplineCurve3( points ) {
+export function ClosedSplineCurve3( points ) {
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
 
@@ -172,8 +173,6 @@ function ClosedSplineCurve3( points ) {
 
 ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
-
-export { ClosedSplineCurve3 };
 
 //
 
@@ -249,6 +248,13 @@ Object.assign( Line3.prototype, {
 		console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
 		return this.getCenter( optionalTarget );
 	}
+} );
+
+Object.assign( _Math, {
+	random16: function () {
+		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
+		return Math.random();
+	},
 } );
 
 Object.assign( Matrix3.prototype, {
