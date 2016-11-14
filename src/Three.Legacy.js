@@ -21,8 +21,10 @@ import {
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
+import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
+import { GridHelper } from './extras/helpers/GridHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
@@ -161,6 +163,12 @@ export function EdgesHelper( object, hex ) {
 	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
 	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
 }
+
+Object.assign( GridHelper.prototype, {
+	setColors: function () {
+		console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
+	}
+} )
 
 export function WireframeHelper( object, hex ) {
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
@@ -344,6 +352,13 @@ Object.assign( Vector3.prototype, {
 } );
 
 //
+
+Object.assign( Geometry.prototype, {
+	computeTangents: function () {
+		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+	},
+
+} );
 
 Object.assign( Object3D.prototype, {
 	getChildByName: function ( name ) {
