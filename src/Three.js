@@ -145,7 +145,6 @@ export { BoundingBoxHelper } from './extras/helpers/BoundingBoxHelper.js';
 export { BoxHelper } from './extras/helpers/BoxHelper.js';
 export { ArrowHelper } from './extras/helpers/ArrowHelper.js';
 export { AxisHelper } from './extras/helpers/AxisHelper.js';
-// export { ClosedSplineCurve3 } from './extras/curves/ClosedSplineCurve3.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 export { SplineCurve3 } from './extras/curves/SplineCurve3.js';
 export { CubicBezierCurve3 } from './extras/curves/CubicBezierCurve3.js';
