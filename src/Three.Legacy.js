@@ -24,6 +24,7 @@ import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
+import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { GridHelper } from './extras/helpers/GridHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
@@ -156,6 +157,23 @@ export function Float64Attribute( array, itemSize ) {
 	console.warn( 'THREE.Float64Attribute has been removed. Use new THREE.Float64BufferAttribute() instead.' );
 	return new Float64BufferAttribute( array, itemSize );
 }
+
+//
+
+function ClosedSplineCurve3( points ) {
+
+	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
+
+	CatmullRomCurve3.call( this, points );
+	this.type = 'catmullrom';
+	this.closed = true;
+
+}
+
+ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
+
+
+export { ClosedSplineCurve3 };
 
 //
 
