@@ -20,8 +20,12 @@
 
 		<h2>Buffers</h2>
 
+		<h3>[page:BufferAttribute.length]</h3>
+		<div>BufferAttribute.length has been renamed to [page:BufferAttribute.count].</div>
+
+
 		<h3>[page:DynamicBufferAttribute]</h3>
-		<div>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic BufferAttribute.setDynamic]( true ) instead.</div>
+		<div>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic]( true ) instead.</div>
 
 		<h3>[page:Int8Attribute]</h3>
 		<div>Int8Attribute has been removed. Use [page:BufferAttributeTypes Int8BufferAttribute] instead.</div>
@@ -51,6 +55,25 @@
 		<div>Float64Attribute has been removed. Use [page:BufferAttributeTypes Float64BufferAttribute] instead.</div>
 
 
+
+
+
+
+
+		<h2>Cameras</h2>
+
+		<h3>[page:PerspectiveCamera.setLens]</h3>
+		<div>
+		PerspectiveCamera.setLens is deprecated. Use [page:PerspectiveCamera.setFocalLength]
+		 and [page:PerspectiveCamera.filmGauge] for a photographic setup.
+		</div>
+
+
+
+
+
+
+
 		<h2>Constants</h2>
 
 		<h3>[page:LineStrip]</h3>
@@ -64,18 +87,60 @@
 
 
 
+		<h2>Core</h2>
+
+		<h3>[page:EventDispatcher.apply]</h3>
+		<div>EventDispatcher.apply has been has been removed. Inherit or Object.assign the prototype to mix-in instead.</div>
+
+		<h3>[page:Uniform.dynamic]</h3>
+		<div>Uniform.dynamic has been has been removed. Use object.onBeforeRender() instead.</div>
+
+		<h3>[page:Uniform.onUpdate]</h3>
+		<div>Uniform.onUpdate has been has been removed. Use object.onBeforeRender() instead.</div>
+
+
+
+
+
+
+
+
 		<h2>Geometry</h2>
 
+		<h3>[page:BufferGeometry.addIndex]</h3>
+		<div>BufferGeometry.addIndex has been renamed to [page:BufferGeometry.setIndex].</div>
+
+		<h3>[page:BufferGeometry.addDrawCall]</h3>
+		<div>BufferGeometry.addDrawCall is now [page:BufferGeometry.addGroup].</div>
+
+		<h3>[page:BufferGeometry.clearDrawCalls]</h3>
+		<div>BufferGeometry.clearDrawCalls is now [page:BufferGeometry.clearGroups].</div>
+
+		<h3>[page:BufferGeometry.computeTangents]</h3>
+		<div>BufferGeometry.computeTangents has been removed.</div>
+
+		<h3>[page:BufferGeometry.computeOffsets]</h3>
+		<div>BufferGeometry.computeOffsets has been removed.</div>
+
+		<h3>[page:BufferGeometry.drawcalls]</h3>
+		<div>BufferGeometry.drawcalls has been renamed to [page:BufferGeometry.groups].</div>
+
+		<h3>[page:BufferGeometry.offsets]</h3>
+		<div>BufferGeometry.offsets has been renamed to [page:BufferGeometry.groups].</div>
+
 		<h3>[page:CubeGeometry]</h3>
-		<div>
-			CubeGeometry has been renamed to [page:BoxGeometry].
-		</div>
+		<div>CubeGeometry has been renamed to [page:BoxGeometry].</div>
 
 		<h3>[page:GeometryUtils]</h3>
 		<div>
 			GeometryUtils.merge has been moved to [page:Geometry.merge].<br /><br />
 
 			GeometryUtils.center has been moved to [page:Geometry.center].
+		</div>
+
+		<h3>[page:Plane]</h3>
+		<div>
+			[page:Plane.isIntersectionLine]() has been renamed to	[page:Plane.intersectsLine]().
 		</div>
 
 
@@ -143,11 +208,70 @@
 		<div>Line3.center has been renamed to [page:Line3.getCenter]().</div>
 
 		<h3>[page:Matrix3.multiplyVector3]</h3>
-		<div>Matrix3.multiplyVector3 has been removed. Use [page:Vector.applyMatrix3]( matrix ) instead.<div>
+		<div>Matrix3.multiplyVector3 has been removed. Use vector.applyMatrix3( matrix ) instead.<div>
 
 		<h3>[page:Matrix3.multiplyVector3Array]</h3>
 		<div>Matrix3.multiplyVector3Array has been renamed to [page:Matrix3.applyToVector3Array]( array ).</div>
 
+		<h3>[page:Matrix4.extractPosition]</h3>
+		<div>Matrix4.extractPosition has been renamed to [page:Matrix4.copyPosition].</div>
+
+		<h3>[page:Matrix4.setRotationFromQuaternion]</h3>
+		<div>Matrix4.setRotationFromQuaternion has been renamed to [page:Matrix4.makeRotationFromQuaternion].</div>
+
+		<h3>[page:Matrix4.multiplyVector3]</h3>
+		<div>Matrix4.multiplyVector3 has been has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.</div>
+
+		<h3>[page:Matrix4.multiplyVector4]</h3>
+		<div>Matrix4.multiplyVector4 has been removed. Use vector.applyMatrix4( matrix ) instead.</div>
+
+		<h3>[page:Matrix4.multiplyVector3Array]</h3>
+		<div>Matrix4.multiplyVector3Array has been renamed to [page:Matrix4.applyToVector3Array] (array ).</div>
+
+		<h3>[page:Matrix4.rotateAxis]</h3>
+		<div>Matrix4.rotateAxis has been removed. Use[page:Matrix4.transformDirection]( matrix ) instead.</div>
+
+		<h3>[page:Matrix4.crossVector]</h3>
+		<div>Matrix4.crossVector has been removed. Use vector.applyMatrix4( matrix ) instead.</div>
+
+		<h3>[page:Matrix4.rotateX]</h3>
+		<div>Matrix4.rotateX has been removed.</div>
+
+		<h3>[page:Matrix4.rotateY]</h3>
+		<div>Matrix4.rotateY has been removed.</div>
+
+		<h3>[page:Matrix4.rotateZ]</h3>
+		<div>Matrix4.rotateZ has been removed.</div>
+
+		<h3>[page:Matrix4.rotateByAxis]</h3>
+		<div>Matrix4.rotateByAxis has been removed.</div>
+
+		<h3>[page:Quaternion.multiplyVector3]</h3>
+		<div>Quaternion.multiplyVector3 has been removed. Use vector.applyQuaternion( quaternion ) instead.</div>
+
+		<h3>[page:Ray.isIntersectionBox]</h3>
+		<div>Ray.isIntersectionBox has been renamed to [page:Ray.intersectsBox].</div>
+
+		<h3>[page:Ray.isIntersectionBox]</h3>
+		<div>Ray.isIntersectionPlane has been renamed to [page:Ray.intersectsPlane].</div>
+
+		<h3>[page:Ray.isIntersectionBox]</h3>
+		<div>Ray.isIntersectionSphere has been renamed to [page:Ray.intersectsSphere].</div>
+
+		<h3>[page:Vector3.setEulerFromRotationMatrix]</h3>
+		<div>Vector3.setEulerFromRotationMatrix has been removed. Use [page:Euler.setFromRotationMatrix] instead.</div>
+
+		<h3>[page:Vector3.setEulerFromQuaternion]</h3>
+		<div>Vector3.setEulerFromQuaternion has been removed. Use [page:Euler.setFromQuaternion] instead.</div>
+
+		<h3>[page:Vector3.getPositionFromMatrix]</h3>
+		<div>Vector3.getPositionFromMatrix has been renamed to [page:Vector3.setFromMatrixPosition].</div>
+
+		<h3>[page:Vector3.getScaleFromMatrix]</h3>
+		<div>Vector3.getScaleFromMatrix has been renamed to [page:Vector3.setFromMatrixScale].</div>
+
+		<h3>[page:Vector3.getColumnFromMatrix]</h3>
+		<div>Vector3.getColumnFromMatrix has been renamed to [page:Vector3.setFromMatrixColumn].</div>
 
 		<h3>[page:Vertex]</h3>
 		<div>Vertex has been removed. Use [page:Vector3] instead.</div>
@@ -156,10 +280,68 @@
 
 
 
+
+
+
 		<h2>Materials</h2>
+
+		<h3>[page:Light.onlyShadow]</h3>
+		<div>Light.onlyShadow has been removed.</div>
+
+		<h3>[page:Light.shadowCameraLeft]</h3>
+		<div>Light.shadowCameraLeft is now [page:Light.shadow.camera.left].</div>
+
+		<h3>[page:Light.shadowCameraRight]</h3>
+		<div>Light.shadowCameraRight is now [page:Light.shadow.camera.right].</div>
+
+		<h3>[page:Light.shadowCameraTop]</h3>
+		<div>Light.shadowCameraTop is now [page:Light.shadow.camera.top].</div>
+
+		<h3>[page:Light.shadowCameraBottom]</h3>
+		<div>Light.shadowCameraBottom is now [page:Light.shadow.camera.bottom].</div>
+
+		<h3>[page:Light.shadowCameraNear]</h3>
+		<div>Light.shadowCameraNear is now [page:Light.shadow.camera.near].</div>
+
+		<h3>[page:Light.shadowCameraFar]</h3>
+		<div>Light.shadowCameraFar is now [page:Light.shadow.camera.far].</div>
+
+		<h3>[page:Light.shadowCameraVisible]</h3>
+		<div>Light.shadowCameraVisible has been removed. Use [page:CameraHelper] ( light.shadow.camera ) instead.</div>
+
+		<h3>[page:Light.shadowBias]</h3>
+		<div>Light.shadowBias is now [page:Light.shadow.bias].</div>
+
+		<h3>[page:Light.shadowDarkness]</h3>
+		<div>Light.shadowDarkness has been removed.</div>
+
+		<h3>[page:Light.shadowMapWidth]</h3>
+		<div>Light.shadowMapWidth is now [page:Light.shadow.mapSize.width].</div>
+
+		<h3>[page:Light.shadowMapHeight]</h3>
+		<div>Light.shadowMapHeight is now [page:Light.shadow.mapSize.height].</div>
+
+
+
+
+
+
+
+
+
+		<h2>Materials</h2>
+
+		<h3>[page:Material.wrapAround]</h3>
+		<div>Material.wrapAround has been removed.</div>
+
+		<h3>[page:Material.wrapRGB]</h3>
+		<div>Material.wrapRGB has been removed.</div>
 
 		<h3>[page:MeshFaceMaterial]</h3>
 		<div>MeshFaceMaterial has been removed. Use [page:MultiMaterial] instead.</div>
+
+		<h3>[page:MeshPhongMaterial.metal]</h3>
+		<div>MeshPhongMaterial.metal has been removed. Use [page:MeshStandardMaterial] instead.</div>
 
 		<h3>[page:ParticleBasicMaterial]</h3>
 		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial].</div>
@@ -170,10 +352,35 @@
 		<h3>[page:PointCloudMaterial]</h3>
 		<div>PointCloudMaterial has been renamed to [page:PointsMaterial].</div>
 
+		<h3>[page:ShaderMaterial.derivatives]</h3>
+		<div>ShaderMaterial.derivatives has been moved to [page:ShaderMaterial.extensions.derivatives].</div>
+
+
+
+
+
 
 
 
 		<h2>Objects</h2>
+
+		<h3>[page:LOD.objects]</h3>
+		<div>LOD.objects has been renamed to [page:LOD.levels].</div>
+
+		<h3>[page:Object3D.eulerOrder]</h3>
+		<div>Object3D.eulerOrder is now [page:Object3D.rotation.order].</div>
+
+		<h3>[page:Object3D.getChildByName]</h3>
+		<div>Object3D.getChildByName has been renamed to [page:Object3D.getObjectByName].</div>
+
+		<h3>[page:Object3D.renderDepth]</h3>
+		<div>Object3D.renderDepth has been removed. Use [page:Object3D.renderOrder] instead.</div>
+
+		<h3>[page:Object3D.translate]</h3>
+		<div>Object3D.translate has been removed. Use [page:Object3D.translateOnAxis]( axis, distance ) instead.</div>
+
+		<h3>[page:Object3D.useQuaternion]</h3>
+		<div>Object3D.useQuaternion has been removed. The library now uses quaternions by default.</div>
 
 		<h3>[page:Particle]</h3>
 		<div>ParticleSystem has been renamed to [page:Sprite].</div>
@@ -184,6 +391,11 @@
 		<h3>[page:PointCloud]</h3>
 		<div>PointCloud has been renamed to [page:Points].</div>
 
+		<h3>[page:Shape.extrude]</h3>
+		<div>Shape.extrude has been removed. Use [page:ExtrudeGeometry] instead.</div>
+
+		<h3>[page:Shape.makeGeometry]</h3>
+		<div>Shape.makeGeometry has been removed. Use [page:ShapeGeometry] instead.</div>
 
 
 
