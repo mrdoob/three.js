@@ -282,6 +282,17 @@ Object.assign( Matrix4.prototype, {
 
 		return this.toArray( array, offset );
 	},
+	getPosition: function () {
+
+		var v1;
+
+		return function getPosition() {
+			if ( v1 === undefined ) v1 = new Vector3();
+			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
+			return v1.setFromMatrixColumn( this, 3 );
+		};
+
+	}(),
 	setRotationFromQuaternion: function ( q ) {
 		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 		return this.makeRotationFromQuaternion( q );
