@@ -890,9 +890,28 @@ GLTFParser.prototype.loadAccessors = function() {
 			var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
 			var TypedArray = WEBGL_COMPONENT_TYPES[ accessor.componentType ];
 
-			var array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
+			// For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
+			var elementBytes = TypedArray.BYTES_PER_ELEMENT;
+			var itemBytes = elementBytes * itemSize;
 
-			return new THREE.BufferAttribute( array, itemSize );
+			// The buffer is not interleaved if the stride is the item size in bytes.
+			if ( accessor.byteStride && accessor.byteStride !== itemBytes ) {
+
+				// Use the full buffer if it's interleaved.
+				var array = new TypedArray( arraybuffer );
+
+				// Integer parameters to IB/IBA are in array elements, not bytes.
+				var ib = new THREE.InterleavedBuffer( array, accessor.byteStride / elementBytes );
+
+				return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
+
+			} else {
+
+				array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
+
+				return new THREE.BufferAttribute( array, itemSize );
+
+			}
 
 		});
 
