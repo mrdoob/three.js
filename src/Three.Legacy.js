@@ -258,6 +258,10 @@ Object.assign( _Math, {
 } );
 
 Object.assign( Matrix3.prototype, {
+	flattenToArrayOffset: function ( array, offset ) {
+		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		return this.toArray( array, offset );
+	},
 	multiplyVector3: function ( vector ) {
 		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
 		return vector.applyMatrix3( this );
