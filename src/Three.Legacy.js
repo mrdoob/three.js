@@ -277,6 +277,11 @@ Object.assign( Matrix4.prototype, {
 		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 	},
+	flattenToArrayOffset: function ( array, offset ) {
+		console.warn( "THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+
+		return this.toArray( array, offset );
+	},
 	setRotationFromQuaternion: function ( q ) {
 		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 		return this.makeRotationFromQuaternion( q );
