@@ -235,7 +235,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			for ( var i = 0; i < triangleNodes.length; i++ ) {
 
-				triangleNode = triangleNodes[ i ];
+				var triangleNode = triangleNodes[ i ];
 				var v1 = triangleNode.getAttribute( 'v1' );
 				var v2 = triangleNode.getAttribute( 'v2' );
 				var v3 = triangleNode.getAttribute( 'v3' );
