@@ -2,7 +2,7 @@
  * @author takahiro / http://github.com/takahirox
  *
  * Dependencies
- *  - charset-encoder-js https://github.com/takahirox/charset-encoder-js
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
 THREE.MMDExporter = function () {
@@ -14,7 +14,7 @@ THREE.MMDExporter = function () {
 
 		if ( u2sTable === undefined ) {
 
-			var encoder = new CharsetEncoder();
+			var encoder = new MMDParser.CharsetEncoder();
 			var table = encoder.s2uTable;
 			u2sTable = {};
 
