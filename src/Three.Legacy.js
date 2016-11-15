@@ -21,8 +21,11 @@ import {
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
+import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
+import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
+import { GridHelper } from './extras/helpers/GridHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
 import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
@@ -43,6 +46,7 @@ import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
 import { Color } from './math/Color.js';
 import { Line3 } from './math/Line3.js';
+import { _Math } from './math/Math.js';
 import { Matrix3 } from './math/Matrix3.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
@@ -157,10 +161,31 @@ export function Float64Attribute( array, itemSize ) {
 
 //
 
+export function ClosedSplineCurve3( points ) {
+
+	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
+
+	CatmullRomCurve3.call( this, points );
+	this.type = 'catmullrom';
+	this.closed = true;
+
+}
+
+ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
+
+
+//
+
 export function EdgesHelper( object, hex ) {
 	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
 	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
 }
+
+Object.assign( GridHelper.prototype, {
+	setColors: function () {
+		console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
+	}
+} )
 
 export function WireframeHelper( object, hex ) {
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
@@ -225,7 +250,18 @@ Object.assign( Line3.prototype, {
 	}
 } );
 
+Object.assign( _Math, {
+	random16: function () {
+		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
+		return Math.random();
+	},
+} );
+
 Object.assign( Matrix3.prototype, {
+	flattenToArrayOffset: function ( array, offset ) {
+		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+		return this.toArray( array, offset );
+	},
 	multiplyVector3: function ( vector ) {
 		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
 		return vector.applyMatrix3( this );
@@ -241,6 +277,22 @@ Object.assign( Matrix4.prototype, {
 		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 	},
+	flattenToArrayOffset: function ( array, offset ) {
+		console.warn( "THREE.Matrix4: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
+
+		return this.toArray( array, offset );
+	},
+	getPosition: function () {
+
+		var v1;
+
+		return function getPosition() {
+			if ( v1 === undefined ) v1 = new Vector3();
+			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
+			return v1.setFromMatrixColumn( this, 3 );
+		};
+
+	}(),
 	setRotationFromQuaternion: function ( q ) {
 		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 		return this.makeRotationFromQuaternion( q );
@@ -344,6 +396,13 @@ Object.assign( Vector3.prototype, {
 } );
 
 //
+
+Object.assign( Geometry.prototype, {
+	computeTangents: function () {
+		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+	},
+
+} );
 
 Object.assign( Object3D.prototype, {
 	getChildByName: function ( name ) {
