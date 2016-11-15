@@ -1079,7 +1079,7 @@ SEA3D.GeometryDeltaBase = function( name, data, sea3d ) {
 	else {
 
 		data.readNumber = data.readShort;
-		numDiv = 0xFFFF / 2;
+		this.numDiv = 0xFFFF / 2;
 
 	}
 
