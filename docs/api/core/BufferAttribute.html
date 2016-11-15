@@ -68,6 +68,13 @@
 			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] flag.
 		</div>
 
+		<h3>[property:Boolean isBufferAttribute]</h3>
+		<div>
+			Used to check whether this or derived classes are BufferAttributes. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
 		<h3>[property:Integer itemSize]</h3>
 		<div>The length of vectors that are being stored in the [page:BufferAttribute.array array].</div>
 
@@ -103,7 +110,7 @@
 		<h3>[property:String uuid]</h3>
 		<div>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
-		This gets automatically assigned, so this shouldn't be edited.
+		This gets automatically assigned and this shouldn't be edited.
 		</div>
 
 		<h3>[property:Integer version]</h3>
