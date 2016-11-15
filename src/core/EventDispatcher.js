@@ -68,9 +68,18 @@ Object.assign( EventDispatcher.prototype, {
 
 			event.target = this;
 
-			for ( var i = 0, length = listenerArray.length ; i < length; ++i ) {
+			var array = [], i = 0;
+			var length = listenerArray.length;
 
-				listenerArray[ i ].call( this, event );
+			for ( i = 0; i < length; i ++ ) {
+
+				array[ i ] = listenerArray[ i ];
+
+			}
+
+			for ( i = 0; i < length; i ++ ) {
+
+				array[ i ].call( this, event );
 
 			}
 
