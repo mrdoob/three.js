@@ -100,7 +100,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		PCDheader.offset = {}
+		PCDheader.offset = {};
 		var sizeSum = 0;
 		for ( var i = 0; i < PCDheader.fields.length; i ++ ) {
 
