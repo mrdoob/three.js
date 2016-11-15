@@ -6,6 +6,13 @@
  * @author erich666 / http://erichaines.com
  */
 
+
+ // We'll be exposing the states through the prototype. Define it outside the function
+ // so it is in the correct scope. Also freeze it to make it immutable by outside code
+ const STATE = Object.freeze(
+	 { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 }
+ );
+
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 //
@@ -103,7 +110,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.object.zoom = scope.zoom0;
 
 		scope.object.updateProjectionMatrix();
-		scope.dispatchEvent( changeEvent );
+		scope.dispatchEvent( Object.assign( {state}, changeEvent ) );
 
 		scope.update();
 
@@ -192,7 +199,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 				lastPosition.distanceToSquared( scope.object.position ) > EPS ||
 				8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
-				scope.dispatchEvent( changeEvent );
+				scope.dispatchEvent( Object.assign( {state}, changeEvent ) );
 
 				lastPosition.copy( scope.object.position );
 				lastQuaternion.copy( scope.object.quaternion );
@@ -236,8 +243,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var changeEvent = { type: 'change' };
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
-
-	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
 
 	var state = STATE.NONE;
 
@@ -685,7 +690,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			document.addEventListener( 'mousemove', onMouseMove, false );
 			document.addEventListener( 'mouseup', onMouseUp, false );
 
-			scope.dispatchEvent( startEvent );
+			scope.dispatchEvent( Object.assign( {state}, startEvent ) );
 
 		}
 
@@ -728,7 +733,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		scope.dispatchEvent( endEvent );
+		scope.dispatchEvent( Object.assign( {state}, endEvent ) );
 
 		state = STATE.NONE;
 
@@ -743,8 +748,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleMouseWheel( event );
 
-		scope.dispatchEvent( startEvent ); // not sure why these are here...
-		scope.dispatchEvent( endEvent );
+		 // not sure why these are here...
+		scope.dispatchEvent( Object.assign( {state: STATE.DOLLY}, startEvent ) );
+		scope.dispatchEvent( Object.assign( {state: STATE.DOLLY}, endEvent ) );
 
 	}
 
@@ -800,7 +806,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			scope.dispatchEvent( startEvent );
+			scope.dispatchEvent( Object.assign( {state}, startEvent ) );
 
 		}
 
@@ -856,7 +862,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleTouchEnd( event );
 
-		scope.dispatchEvent( endEvent );
+		scope.dispatchEvent( Object.assign( {state}, endEvent ) );
 
 		state = STATE.NONE;
 
@@ -1008,6 +1014,16 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
 			this.dampingFactor = value;
+
+		}
+
+	},
+
+	STATES : {
+
+		get: function () {
+
+			return STATE;
 
 		}
 
