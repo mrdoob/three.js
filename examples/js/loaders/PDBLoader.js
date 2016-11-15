@@ -175,10 +175,10 @@ THREE.PDBLoader.prototype = {
 
 		}
 
-		geometryAtoms.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( verticesAtoms ), 3 ) );
-		geometryAtoms.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+		geometryAtoms.addAttribute( 'position',  new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
+		geometryAtoms.addAttribute( 'color',  new THREE.Float32BufferAttribute( colors, 3 ) );
 
-		geometryBonds.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( verticesBonds ), 3 ) );
+		geometryBonds.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
 
 		callback( geometryAtoms, geometryBonds, json );
 
