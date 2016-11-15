@@ -175,8 +175,8 @@ THREE.PDBLoader.prototype = {
 
 		}
 
-		geometryAtoms.addAttribute( 'position',  new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
-		geometryAtoms.addAttribute( 'color',  new THREE.Float32BufferAttribute( colors, 3 ) );
+		geometryAtoms.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
+		geometryAtoms.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 		geometryBonds.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
 
