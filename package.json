@@ -26,6 +26,7 @@
     "build": "rollup -c",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar utils/build/compiler/closure-compiler-v20160713.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-closure-js": "rollup -c && node utils/build/closure-build",
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -43,6 +44,7 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "argparse": "^1.0.3",
+    "google-closure-compiler-js": "^20160828.0.0",
     "jscs": "^1.13.1",
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
