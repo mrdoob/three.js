@@ -202,7 +202,7 @@ var list = {
 			[ "Loader", "api/loaders/Loader" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
-			[ "TextureLoader", "api/loaders/TextureLoader" ],
+			[ "TextureLoader", "api/loaders/TextureLoader" ]
 		],
 
 		"Loaders / Managers": [
@@ -349,7 +349,7 @@ var list = {
 			[ "CanvasRenderer", "examples/renderers/CanvasRenderer" ]
 		]
 
-	},
+	}
 
 };
 
