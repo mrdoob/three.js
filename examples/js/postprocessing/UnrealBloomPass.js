@@ -231,7 +231,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			uniforms: {
 				"colorTexture": { value: null },
 				"texSize": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
-				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
+				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) }
 			},
 
 			vertexShader:
