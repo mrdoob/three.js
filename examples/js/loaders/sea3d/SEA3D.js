@@ -1326,7 +1326,6 @@ SEA3D.GeometryDelta = function( name, data, sea3d ) {
 					vec.push( a );
 
 				}
-				else continue;
 
 			}
 
