@@ -27,6 +27,7 @@
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar utils/build/compiler/closure-compiler-v20160713.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "rollup -c -w",
+    "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -42,6 +43,8 @@
   },
   "homepage": "http://threejs.org/",
   "devDependencies": {
+    "eslint": "^3.10.1",
+    "eslint-config-mdcs": "^4.2.1",
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
