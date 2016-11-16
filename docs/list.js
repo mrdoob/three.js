@@ -95,7 +95,6 @@ var list = {
 		"Extras / Curves": [
 			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
 			[ "CatmullRomCurve3", "api/extras/curves/CatmullRomCurve3" ],
-			[ "ClosedSplineCurve3", "api/extras/curves/ClosedSplineCurve3" ],
 			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
 			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
 			[ "EllipseCurve", "api/extras/curves/EllipseCurve" ],
