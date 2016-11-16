@@ -214,7 +214,7 @@
 			var camera, scene;
 			var cameraOrtho, sceneRenderTarget;
 
-			var uniformsNoise, uniformsNormal,
+			var uniformsNoise, uniformsNormal, uniformsTerrain,
 				heightMap, normalMap,
 				quadTarget;
 
@@ -335,7 +335,7 @@
 
 				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-				var uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
+				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
 				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
 				uniformsTerrain[ 'uNormalScale' ].value = 3.5;
