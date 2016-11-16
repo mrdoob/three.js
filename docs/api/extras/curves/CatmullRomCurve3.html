@@ -31,6 +31,9 @@ var geometry = new THREE.Geometry();
 geometry.vertices = curve.getPoints( 50 );
 
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+// Create the final object to add to the scene
+var curveObject = new THREE.Line( geometry, material );
 </code>
 
 		<h3>[example:webgl_geometry_extrude_splines geometry / extrude / splines]</h3>
