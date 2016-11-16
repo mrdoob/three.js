@@ -12,8 +12,13 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Create a smooth 2d spline curve from a series of points. Internally this uses
-		[page:CurveUtils.interpolate] to create the curve.</div>
+		<div class="desc">
+		Create a smooth 2d spline curve from a series of points. Internally this uses
+		[page:CurveUtils.interpolate] to create the curve.
+
+		Note that this will be deprecated. Please use a [page:CatmullRomCurve3] instead.
+
+		</div>
 
 		<h2>Example</h2>
 
@@ -47,14 +52,7 @@ var splineObject = new THREE.Line( geometry, material );
 		<div>See the base [page:Curve] class for common properties.</div>
 
 		<h3>[property:Array points]</h3>
-		<div>The array of [page:Vector2] points that define the curve.</div>
-
-		<h3>[property:Boolean isSplineCurve]</h3>
-		<div>
-			Used to check whether this or derived classes are SplineCurves. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</div>
+		<div>The array of [page:Vector3] points that define the curve.</div>
 
 
 
