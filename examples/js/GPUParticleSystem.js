@@ -388,6 +388,7 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 		lifetime = 0.,
 		size = 0.,
 		sizeRandomness = 0.,
+		smoothPosition = false,
 		i;
 
 	var maxVel = 2;
@@ -409,8 +410,8 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 		turbulence = options.turbulence !== undefined ? options.turbulence : 1.0;
 		lifetime = options.lifetime !== undefined ? options.lifetime : 5.0;
 		size = options.size !== undefined ? options.size : 10;
-		sizeRandomness = options.sizeRandomness !== undefined ? options.sizeRandomness : 0.0,
-			smoothPosition = options.smoothPosition !== undefined ? options.smoothPosition : false;
+		sizeRandomness = options.sizeRandomness !== undefined ? options.sizeRandomness : 0.0;
+		smoothPosition = options.smoothPosition !== undefined ? options.smoothPosition : false;
 
 		if (self.DPR !== undefined) size *= self.DPR;
 
