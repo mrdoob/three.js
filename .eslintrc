@@ -1,6 +1,0 @@
-{
-  "extends": "mdcs",
-  "parserOptions": {
-    "sourceType": "module"
-  }
-}
