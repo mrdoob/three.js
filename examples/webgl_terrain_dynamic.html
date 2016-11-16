@@ -335,7 +335,7 @@
 
 				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
+				var uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
 				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
 				uniformsTerrain[ 'uNormalScale' ].value = 3.5;
