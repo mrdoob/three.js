@@ -200,7 +200,7 @@ THREE.GPUParticleSystem = function(options) {
 
 	self.random = function() {
 		return ++i >= self.rand.length ? self.rand[i = 1] : self.rand[i];
-	}
+	};
 
 	var textureLoader = new THREE.TextureLoader();
 
@@ -252,7 +252,7 @@ THREE.GPUParticleSystem = function(options) {
 
 		}
 
-	}
+	};
 
 	this.spawnParticle = function(options) {
 
@@ -265,7 +265,7 @@ THREE.GPUParticleSystem = function(options) {
 
 		currentContainer.spawnParticle(options);
 
-	}
+	};
 
 	this.update = function(time) {
 		for (var i = 0; i < self.PARTICLE_CONTAINERS; i++) {
@@ -277,7 +277,7 @@ THREE.GPUParticleSystem = function(options) {
 
 	this.init();
 
-}
+};
 
 THREE.GPUParticleSystem.prototype = Object.create(THREE.Object3D.prototype);
 THREE.GPUParticleSystem.prototype.constructor = THREE.GPUParticleSystem;
@@ -299,14 +299,14 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 	THREE.Object3D.apply(this, arguments);
 
 	// construct a couple small arrays used for packing variables into floats etc
-	var UINT8_VIEW = new Uint8Array(4)
-	var FLOAT_VIEW = new Float32Array(UINT8_VIEW.buffer)
+	var UINT8_VIEW = new Uint8Array(4);
+	var FLOAT_VIEW = new Float32Array(UINT8_VIEW.buffer);
 
 	function decodeFloat(x, y, z, w) {
-		UINT8_VIEW[0] = Math.floor(w)
-		UINT8_VIEW[1] = Math.floor(z)
-		UINT8_VIEW[2] = Math.floor(y)
-		UINT8_VIEW[3] = Math.floor(x)
+		UINT8_VIEW[0] = Math.floor(w);
+		UINT8_VIEW[1] = Math.floor(z);
+		UINT8_VIEW[2] = Math.floor(y);
+		UINT8_VIEW[3] = Math.floor(x);
 		return FLOAT_VIEW[0]
 	}
 
@@ -329,7 +329,7 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 		if (b > 0) b--;
 
 		return [r, g, b];
-	};
+	}
 
 	self.particles = [];
 	self.deadParticles = [];
@@ -366,7 +366,7 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 	self.particleShaderGeo.addAttribute('particlePositionsStartTime', new THREE.BufferAttribute(self.particlePositionsStartTime, 4).setDynamic(true));
 	self.particleShaderGeo.addAttribute('particleVelColSizeLife', new THREE.BufferAttribute(self.particleVelColSizeLife, 4).setDynamic(true));
 
-	self.posStart = self.particleShaderGeo.getAttribute('particlePositionsStartTime')
+	self.posStart = self.particleShaderGeo.getAttribute('particlePositionsStartTime');
 	self.velCol = self.particleShaderGeo.getAttribute('particleVelColSizeLife');
 
 	self.particleShaderMat = self.GPUParticleSystem.particleShaderMat;
@@ -467,7 +467,7 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 
 		self.particleUpdate = true;
 
-	}
+	};
 
 	this.update = function(time) {
 
@@ -497,11 +497,11 @@ THREE.GPUParticleContainer = function(maxParticles, particleSystem) {
 			self.offset = 0;
 			self.count = 0;
 		}
-	}
+	};
 
 	this.init();
 
-}
+};
 
 THREE.GPUParticleContainer.prototype = Object.create(THREE.Object3D.prototype);
 THREE.GPUParticleContainer.prototype.constructor = THREE.GPUParticleContainer;
