@@ -165,7 +165,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ]
 		].join( "\n" ) );
 
 		var output = [
