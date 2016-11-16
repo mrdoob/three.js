@@ -22,6 +22,9 @@
     "example": "examples",
     "test": "test"
   },
+  "eslintConfig": {
+    "extends": "mdcs"
+  },
   "scripts": {
     "build": "rollup -c",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
@@ -44,7 +47,7 @@
   "homepage": "http://threejs.org/",
   "devDependencies": {
     "eslint": "^3.10.1",
-    "eslint-config-mdcs": "^4.2.1",
+    "eslint-config-mdcs": "^4.2.2",
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
