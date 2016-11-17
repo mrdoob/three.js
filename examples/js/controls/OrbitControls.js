@@ -110,7 +110,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.object.zoom = scope.zoom0;
 
 		scope.object.updateProjectionMatrix();
-		scope.dispatchEvent( Object.assign( {state}, changeEvent ) );
+		scope.dispatchEvent( Object.assign( { state }, changeEvent ) );
 
 		scope.update();
 
@@ -199,7 +199,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 				lastPosition.distanceToSquared( scope.object.position ) > EPS ||
 				8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
-				scope.dispatchEvent( Object.assign( {state}, changeEvent ) );
+				scope.dispatchEvent( Object.assign( { state }, changeEvent ) );
 
 				lastPosition.copy( scope.object.position );
 				lastQuaternion.copy( scope.object.quaternion );
@@ -690,7 +690,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			document.addEventListener( 'mousemove', onMouseMove, false );
 			document.addEventListener( 'mouseup', onMouseUp, false );
 
-			scope.dispatchEvent( Object.assign( {state}, startEvent ) );
+			scope.dispatchEvent( Object.assign( { state }, startEvent ) );
 
 		}
 
@@ -733,7 +733,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		scope.dispatchEvent( Object.assign( {state}, endEvent ) );
+		scope.dispatchEvent( Object.assign( { state }, endEvent ) );
 
 		state = STATE.NONE;
 
@@ -749,8 +749,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		handleMouseWheel( event );
 
 		 // not sure why these are here...
-		scope.dispatchEvent( Object.assign( {state: STATE.DOLLY}, startEvent ) );
-		scope.dispatchEvent( Object.assign( {state: STATE.DOLLY}, endEvent ) );
+		scope.dispatchEvent( Object.assign( { state: STATE.DOLLY }, startEvent ) );
+		scope.dispatchEvent( Object.assign( { state: STATE.DOLLY }, endEvent ) );
 
 	}
 
@@ -806,7 +806,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			scope.dispatchEvent( Object.assign( {state}, startEvent ) );
+			scope.dispatchEvent( Object.assign( { state }, startEvent ) );
 
 		}
 
@@ -862,7 +862,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleTouchEnd( event );
 
-		scope.dispatchEvent( Object.assign( {state}, endEvent ) );
+		scope.dispatchEvent( Object.assign( { state }, endEvent ) );
 
 		state = STATE.NONE;
 
@@ -1019,7 +1019,7 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 	},
 
-	STATES : {
+	STATES: {
 
 		get: function () {
 
