@@ -616,7 +616,7 @@ def normals(mesh):
     normal_vectors = []
 
     for vector in _normals(mesh):
-        vector = (vector[0], vector[2], -vector[1])
+        vector = (vector[0], vector[1], vector[2])
         normal_vectors.extend(vector)
 
     return normal_vectors
