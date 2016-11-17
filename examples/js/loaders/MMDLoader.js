@@ -144,7 +144,7 @@ THREE.MMDLoader.prototype.loadVmds = function ( urls, callback, onProgress, onEr
 
 		}, onProgress, onError );
 
-	};
+	}
 
 	run();
 
@@ -474,7 +474,7 @@ THREE.MMDLoader.prototype.loadFileAsText = function ( url, onLoad, onProgress, o
 
 THREE.MMDLoader.prototype.loadFileAsShiftJISText = function ( url, onLoad, onProgress, onError ) {
 
-	var request = this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
+	this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
 
 };
 
@@ -738,7 +738,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			attribute.array[ index * 3 + 1 ] += v.position[ 1 ] * ratio;
 			attribute.array[ index * 3 + 2 ] += v.position[ 2 ] * ratio;
 
-		};
+		}
 
 		function updateVertices( attribute, m, ratio ) {
 
@@ -762,7 +762,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-		};
+		}
 
 		var morphTargets = [];
 		var attributes = [];
@@ -858,8 +858,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	var initMaterials = function () {
 
 		var textures = [];
-		var textureLoader = new THREE.TextureLoader( this.manager );
-		var tgaLoader = new THREE.TGALoader( this.manager );
+		var textureLoader = new THREE.TextureLoader( scope.manager );
+		var tgaLoader = new THREE.TGALoader( scope.manager );
 		var offset = 0;
 		var materialParams = [];
 
@@ -881,7 +881,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				} catch ( e ) {
 
-					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' )
+					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' );
 					fullPath = scope.defaultToonTextures[ 0 ];
 
 				}
@@ -930,7 +930,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			return uuid;
 
-		};
+		}
 
 		function getTexture( name, textures ) {
 
@@ -942,7 +942,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			return textures[ name ];
 
-		};
+		}
 
 		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
 
@@ -1076,7 +1076,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
 			var m = new THREE.ShaderMaterial( {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				uniforms: Object.assign( {}, shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
 			} );
@@ -1120,7 +1120,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return ctx.getImageData( 0, 0, c.width, c.height );
 
-						};
+						}
 
 						function detectTextureTransparency( image, uvs, indices ) {
 
@@ -1168,7 +1168,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return false;
 
-						};
+						}
 
 						/*
 						 * This method expects
@@ -1201,7 +1201,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return image.data[ index * 4 + 3 ];
 
-						};
+						}
 
 						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
 						var indices = geometry.index.array.slice( m.faceOffset * 3, m.faceOffset * 3 + m.faceNum * 3 );
@@ -1260,7 +1260,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					return n.match( /toon(10|0[0-9]).bmp/ ) === null ? false : true;
 
-				};
+				}
 
 				m.outlineParameters = {
 					thickness: p2.edgeFlag === 1 ? 0.003 : 0.0,
@@ -1983,18 +1983,18 @@ THREE.MMDLoader.CubicBezierInterpolation.prototype._calculate = function( x1, x2
  */
 THREE.ShaderLib[ 'mmd' ] = {
 
-	uniforms: THREE.UniformsUtils.merge( [
-
-		THREE.ShaderLib[ 'phong' ].uniforms,
+	uniforms: Object.assign(
 
 		// MMD specific for toon mapping
 		{
 			"celShading"      : { type: "i", value: 0 },
 			"toonMap"         : { type: "t", value: null },
 			"hasToonTexture"  : { type: "i", value: 0 }
-		}
+		},
 
-	] ),
+		THREE.ShaderLib[ 'phong' ].uniforms
+
+	),
 
 	vertexShader: THREE.ShaderLib[ 'phong' ].vertexShader,
 
@@ -2039,7 +2039,7 @@ THREE.ShaderLib[ 'mmd' ] = {
 		"#define RE_Direct	RE_Direct_BlinnMMD",
 		// ---- MMD specific for toon mapping
 
-		"void main()",
+		"void main()"
 
 	].join( "\n" ) )
 

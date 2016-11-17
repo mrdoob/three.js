@@ -5,7 +5,7 @@
 
 'use strict';
 
-var SEA3D = { VERSION : 18000 }
+var SEA3D = { VERSION : 18000 };
 
 SEA3D.getVersion = function() {
 
@@ -1013,7 +1013,7 @@ SEA3D.Geometry = function( name, data, sea3d ) {
 
 			this.groups.push( {
 				start : len,
-				count : j,
+				count : j
 			} );
 
 			len += j;
@@ -1034,7 +1034,7 @@ SEA3D.Geometry = function( name, data, sea3d ) {
 
 			this.groups.push( {
 				start : j,
-				count : len,
+				count : len
 			} );
 
 			j += len;
@@ -1079,7 +1079,7 @@ SEA3D.GeometryDeltaBase = function( name, data, sea3d ) {
 	else {
 
 		data.readNumber = data.readShort;
-		numDiv = 0xFFFF / 2;
+		this.numDiv = 0xFFFF / 2;
 
 	}
 
@@ -1278,7 +1278,7 @@ SEA3D.GeometryDelta = function( name, data, sea3d ) {
 
 		this.groups.push( {
 			start : j,
-			count : len,
+			count : len
 		} );
 
 		len += j;
@@ -1326,13 +1326,12 @@ SEA3D.GeometryDelta = function( name, data, sea3d ) {
 					vec.push( a );
 
 				}
-				else continue;
 
 			}
 
 			this.groups.push( {
 				start : start,
-				count : vec.length - start,
+				count : vec.length - start
 			} );
 
 		}
@@ -1347,7 +1346,7 @@ SEA3D.GeometryDelta = function( name, data, sea3d ) {
 
 			this.groups.push( {
 				start : j,
-				count : len,
+				count : len
 			} );
 
 			len += j;
@@ -2238,7 +2237,7 @@ SEA3D.Light = function( name, data, sea3d ) {
 
 		var shadowHeader = data.readUByte();
 
-		this.shadow = {}
+		this.shadow = {};
 
 		this.shadow.opacity = shadowHeader & 1 ? data.readFloat() : 1;
 		this.shadow.color = shadowHeader & 2 ? data.readUInt24() : 0x000000;
@@ -2552,8 +2551,8 @@ SEA3D.Material = function( name, data, sea3d ) {
 
 			case SEA3D.Material.AMBIENT_MAP:
 				tech = {
-						texture: sea3d.getObject( data.readUInt() )
-					}
+					texture: sea3d.getObject(data.readUInt())
+				};
 				break;
 
 			case SEA3D.Material.ALPHA_MAP:
@@ -2998,7 +2997,7 @@ SEA3D.CarController.Wheel = function( data, sea3d ) {
 
 	var attrib = data.readUShort();
 
-	this.isFront = ( attrib & 1 ) != 0,
+	this.isFront = ( attrib & 1 ) != 0;
 
 	this.target = sea3d.getObject( data.readUInt() );
 
@@ -3391,7 +3390,7 @@ SEA3D.File = function( config ) {
 };
 
 SEA3D.File.CompressionLibs = {};
-SEA3D.File.DecompressionMethod = {}
+SEA3D.File.DecompressionMethod = {};
 
 SEA3D.File.setDecompressionEngine = function( id, name, method ) {
 
@@ -3749,7 +3748,7 @@ SEA3D.File.prototype.load = function( url ) {
 
 		}
 
-	}
+	};
 
 	xhr.onreadystatechange = function() {
 
@@ -3772,7 +3771,7 @@ SEA3D.File.prototype.load = function( url ) {
 
 		}
 
-	}
+	};
 
 	xhr.send();
 

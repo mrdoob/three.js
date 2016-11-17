@@ -175,7 +175,7 @@ var GLTFShader = function( targetNode, allNodes ) {
 
 	this._m4 = new THREE.Matrix4();
 
-}
+};
 
 // Update - update all the uniform values
 GLTFShader.prototype.update = function( scene, camera ) {
@@ -274,7 +274,7 @@ GLTFAnimation.prototype.createInterpolators = function( interps ) {
 
 	}
 
-}
+};
 
 // Start/stop
 GLTFAnimation.prototype.play = function() {
@@ -315,7 +315,6 @@ GLTFAnimation.prototype.update = function() {
 
 		}.bind( this ));
 		this.stop();
-		return;
 
 	} else {
 
@@ -714,7 +713,7 @@ var DeferredShaderMaterial = function( params ) {
 
 DeferredShaderMaterial.prototype.create = function() {
 
-	var uniforms = THREE.UniformsUtils.clone( this.params.uniforms );
+	var uniforms = Object.assign( {}, this.params.uniforms );
 
 	_each( this.params.uniforms, function( originalUniform, uniformId ) {
 

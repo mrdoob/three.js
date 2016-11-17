@@ -27,7 +27,7 @@ THREE.ManualMSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) 
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.ManualMSAARenderPass relies on THREE.CopyShader" );
 
 	var copyShader = THREE.CopyShader;
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
 
 	this.copyMaterial = new THREE.ShaderMaterial(	{
 		uniforms: this.copyUniforms,

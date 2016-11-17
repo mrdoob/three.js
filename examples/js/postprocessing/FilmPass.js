@@ -11,7 +11,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 	var shader = THREE.FilmShader;
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 

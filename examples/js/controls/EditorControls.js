@@ -13,9 +13,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.enabled = true;
 	this.center = new THREE.Vector3();
-	this.panSpeed = 0.001
-	this.zoomSpeed = 0.001
-	this.rotationSpeed = 0.005
+	this.panSpeed = 0.001;
+	this.zoomSpeed = 0.001;
+	this.rotationSpeed = 0.005;
 
 	// internals
 

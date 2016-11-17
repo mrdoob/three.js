@@ -94,7 +94,7 @@
 					middleGrey: 0.04,
 					maxLuminance: 16,
 
-					adaptionRate: 2.0,
+					adaptionRate: 2.0
 				};
 
 				container = document.createElement( 'div' );
@@ -135,12 +135,12 @@
 					// blending: THREE.AdditiveBlending,
 					transparent: true,
 					lights: true,
-					uniforms: THREE.UniformsUtils.merge( [
+					uniforms: Object.assign( {},
 
 						THREE.UniformsLib[ "common" ],
 						THREE.UniformsLib[ "lights" ]
 
-					] ),
+					),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
 						"varying vec3 vNormal;",
@@ -190,7 +190,7 @@
 
 						"}"
 
-					].join("\n"),
+					].join("\n")
 				};
 
 				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -298,7 +298,7 @@
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
-					depthTest: false,
+					depthTest: false
 					// color: 0xffffff
 					// blending: THREE.NoBlending
 				} );

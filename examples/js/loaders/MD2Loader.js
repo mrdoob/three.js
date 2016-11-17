@@ -308,4 +308,4 @@ THREE.MD2Loader.prototype = {
 
 	} )()
 
-}
+};

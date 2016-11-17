@@ -25,7 +25,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
 
 	this.copyUniforms[ "opacity" ].value = strength;
 
@@ -46,7 +46,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	var convolutionShader = THREE.ConvolutionShader;
 
-	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
+	this.convolutionUniforms = Object.assign( {}, convolutionShader.uniforms );
 
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );

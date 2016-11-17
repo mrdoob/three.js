@@ -54,7 +54,7 @@ THREE.SMAAPass = function ( width, height ) {
 		console.error( "THREE.SMAAPass relies on THREE.SMAAShader" );
 	}
 
-	this.uniformsEdges = THREE.UniformsUtils.clone( THREE.SMAAShader[0].uniforms );
+	this.uniformsEdges = Object.assign( {}, THREE.SMAAShader[0].uniforms );
 
 	this.uniformsEdges[ "resolution" ].value.set( 1 / width, 1 / height );
 
@@ -67,7 +67,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	// materials - pass 2
 
-	this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAShader[1].uniforms );
+	this.uniformsWeights = Object.assign( {}, THREE.SMAAShader[1].uniforms );
 
 	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
@@ -83,7 +83,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	// materials - pass 3
 
-	this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAAShader[2].uniforms );
+	this.uniformsBlend = Object.assign( {}, THREE.SMAAShader[2].uniforms );
 
 	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;

@@ -115,7 +115,7 @@
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
-				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
+				var uniformsUV = Object.assign( {}, shader.uniforms );
 
 				var textureLoader = new THREE.TextureLoader();
 
@@ -133,7 +133,7 @@
 				uniformsUV[ "uSpecularBrightness" ].value = 0.7;
 
 
-				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
+				var uniforms = Object.assign( {}, uniformsUV );
 				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
 				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
