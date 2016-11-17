@@ -858,8 +858,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	var initMaterials = function () {
 
 		var textures = [];
-		var textureLoader = new THREE.TextureLoader( this.manager );
-		var tgaLoader = new THREE.TGALoader( this.manager );
+		var textureLoader = new THREE.TextureLoader( scope.manager );
+		var tgaLoader = new THREE.TGALoader( scope.manager );
 		var offset = 0;
 		var materialParams = [];
 
