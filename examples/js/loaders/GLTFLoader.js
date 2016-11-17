@@ -713,7 +713,7 @@ var DeferredShaderMaterial = function( params ) {
 
 DeferredShaderMaterial.prototype.create = function() {
 
-	var uniforms = THREE.UniformsUtils.clone( this.params.uniforms );
+	var uniforms = Object.assign( {}, this.params.uniforms );
 
 	_each( this.params.uniforms, function( originalUniform, uniformId ) {
 
