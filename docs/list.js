@@ -122,6 +122,7 @@ var list = {
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
+			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
 			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
 			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
