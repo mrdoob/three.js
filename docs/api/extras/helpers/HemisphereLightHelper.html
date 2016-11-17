@@ -13,17 +13,17 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Creates a visual aid for a [page:HemisphereLight HemisphereLight].
+			Creates a visual aid consisting of a spherical [page:Mesh] for a [page:HemisphereLight HemisphereLight].
 		</div>
 
 		<h3>Example</h3>
 
 		<code>
-			var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 
-			var helper = new THREE.HemisphereLightHelper( light, 5 );
+var helper = new THREE.HemisphereLightHelper( light, 5 );
 
-			scene.add( helper );
+scene.add( helper );
 		</code>
 
 
