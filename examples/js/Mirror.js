@@ -119,7 +119,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.renderTarget2 = new THREE.WebGLRenderTarget( width, height, parameters );
 
 	var mirrorShader = THREE.ShaderLib[ "mirror" ];
-	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
+	var mirrorUniforms = Object.assign( {}, mirrorShader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 

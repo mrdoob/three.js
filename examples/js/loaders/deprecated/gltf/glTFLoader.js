@@ -151,7 +151,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 		// clone most uniforms but then clobber textures, we want them to
 		// be reused
-		var uniforms = THREE.UniformsUtils.clone(material.params.uniforms);
+		var uniforms = Objecct.asasign( {}, material.params.uniforms);
 		for (uniform in material.params.uniforms) {
 			var src = material.params.uniforms[uniform];
 			var dst = uniforms[uniform];

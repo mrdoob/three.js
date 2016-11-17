@@ -14,7 +14,7 @@ THREE.TexturePass = function ( map, opacity ) {
 	this.map = map;
 	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 

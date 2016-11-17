@@ -1076,7 +1076,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
 			var m = new THREE.ShaderMaterial( {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				uniforms: Object.assign( {}, shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
 			} );
@@ -1983,18 +1983,18 @@ THREE.MMDLoader.CubicBezierInterpolation.prototype._calculate = function( x1, x2
  */
 THREE.ShaderLib[ 'mmd' ] = {
 
-	uniforms: THREE.UniformsUtils.merge( [
-
-		THREE.ShaderLib[ 'phong' ].uniforms,
+	uniforms: Object.assign(
 
 		// MMD specific for toon mapping
 		{
 			"celShading"      : { type: "i", value: 0 },
 			"toonMap"         : { type: "t", value: null },
 			"hasToonTexture"  : { type: "i", value: 0 }
-		}
+		},
 
-	] ),
+		THREE.ShaderLib[ 'phong' ].uniforms
+
+	),
 
 	vertexShader: THREE.ShaderLib[ 'phong' ].vertexShader,
 
