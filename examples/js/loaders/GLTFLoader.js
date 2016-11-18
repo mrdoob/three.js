@@ -106,7 +106,9 @@ THREE.GLTFLoader = ( function () {
 
 			update: function ( scene, camera ) {
 
-				_each( objects, function ( object ) {
+				for ( var name in objects ) {
+
+					var object = objects[ name ];
 
 					if ( object.update ) {
 
@@ -114,7 +116,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-				} );
+				}
 
 			}
 
@@ -135,7 +137,12 @@ THREE.GLTFLoader = ( function () {
 		this.boundUniforms = {};
 
 		// bind each uniform to its source node
-		_each( targetNode.material.uniforms, function ( uniform, uniformId ) {
+
+		var uniforms = targetNode.material.uniforms;
+
+		for ( var uniformId in uniforms ) {
+
+			var uniform = uniforms[ uniformId ];
 
 			if ( uniform.semantic ) {
 
@@ -158,7 +165,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-		} );
+		}
 
 		this._m4 = new THREE.Matrix4();
 
@@ -176,7 +183,11 @@ THREE.GLTFLoader = ( function () {
 		camera.updateMatrixWorld();
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		_each( this.boundUniforms, function ( boundUniform ) {
+		var boundUniforms = this.boundUniforms;
+
+		for ( var name in boundUniforms ) {
+
+			var boundUniform = boundUniforms[ name ];
 
 			switch ( boundUniform.semantic ) {
 
@@ -225,7 +236,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-		}.bind( this ) );
+		}
 
 	};
 
@@ -293,26 +304,27 @@ THREE.GLTFLoader = ( function () {
 		var deltat = ( now - this.startTime ) / 1000;
 		var t = deltat % this.duration;
 		var nCycles = Math.floor( deltat / this.duration );
+		var interps = this.interps;
 
 		if ( nCycles >= 1 && ! this.loop ) {
 
 			this.running = false;
 
-			_each( this.interps, function ( _, i ) {
+			for ( var i = 0, l = interps.length; i < l; i ++ ) {
 
-				this.interps[ i ].interp( this.duration );
+				interps[ i ].interp( this.duration );
 
-			}.bind( this ) );
+			}
 
 			this.stop();
 
 		} else {
 
-			_each( this.interps, function ( _, i ) {
+			for ( var i = 0, l = interps.length; i < l; i ++ ) {
 
-				this.interps[ i ].interp( t );
+				interps[ i ].interp( t );
 
-			}.bind( this ) );
+			}
 
 		}
 
@@ -617,7 +629,9 @@ THREE.GLTFLoader = ( function () {
 		// Expected technique attributes
 		var attributes = {};
 
-		_each( technique.attributes, function ( pname, attributeId ) {
+		for ( var attributeId in technique.attributes ) {
+
+			var pname = technique.attributes[ attributeId ];
 
 			var param = technique.parameters[ pname ];
 			var atype = param.type;
@@ -628,7 +642,7 @@ THREE.GLTFLoader = ( function () {
 				semantic: semantic
 			};
 
-		} );
+		}
 
 		// Figure out which attributes to change in technique
 
@@ -636,7 +650,7 @@ THREE.GLTFLoader = ( function () {
 		var shaderAttributes = technique.attributes;
 		var params = {};
 
-		_each( attributes, function ( _, attributeId ) {
+		for ( var attributeId in attributes ) {
 
 			var pname = shaderAttributes[ attributeId ];
 			var shaderParam = shaderParams[ pname ];
@@ -647,10 +661,11 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-		} );
+		}
 
-		_each( params, function ( param, pname ) {
+		for ( var pname in params ) {
 
+			var param = params[ pname ];
 			var semantic = param.semantic;
 
 			var regEx = new RegExp( "\\b" + pname + "\\b", "g" );
@@ -686,7 +701,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-		} );
+		}
 
 		return shaderText;
 
@@ -705,7 +720,9 @@ THREE.GLTFLoader = ( function () {
 
 		var uniforms = THREE.UniformsUtils.clone( this.params.uniforms );
 
-		_each( this.params.uniforms, function ( originalUniform, uniformId ) {
+		for ( var uniformId in this.params.uniforms ) {
+
+			var originalUniform = this.params.uniforms[ uniformId ];
 
 			if ( originalUniform.value instanceof THREE.Texture ) {
 
@@ -717,7 +734,7 @@ THREE.GLTFLoader = ( function () {
 			uniforms[ uniformId ].semantic = originalUniform.semantic;
 			uniforms[ uniformId ].node = originalUniform.node;
 
-		} );
+		}
 
 		this.params.uniforms = uniforms;
 
@@ -789,19 +806,21 @@ THREE.GLTFLoader = ( function () {
 
 			var cameras = [];
 
-			_each( dependencies.cameras, function ( camera ) {
+			for ( var name in dependencies.cameras ) {
 
+				var camera = dependencies.cameras[ name ];
 				cameras.push( camera );
 
-			} );
+			}
 
 			var animations = [];
 
-			_each( dependencies.animations, function ( animation ) {
+			for ( var name in dependencies.animations ) {
 
+				var animation = dependencies.animations[ name ];
 				animations.push( animation );
 
-			} );
+			}
 
 			callback( scene, cameras, animations );
 
@@ -1010,11 +1029,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					_each( khr_material.values, function ( value, prop ) {
-
-						materialValues[ prop ] = value;
-
-					} );
+					Object.assign( materialValues, khr_material.values );
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
@@ -1033,11 +1048,7 @@ THREE.GLTFLoader = ( function () {
 
 					materialType = THREE.MeshPhongMaterial;
 
-					_each( material.values, function ( value, prop ) {
-
-						materialValues[ prop ] = value;
-
-					} );
+					Object.assign( materialValues, material.values );
 
 				} else {
 
@@ -1074,8 +1085,9 @@ THREE.GLTFLoader = ( function () {
 
 						var uniforms = technique.uniforms;
 
-						_each( uniforms, function ( pname, uniformId ) {
+						for ( var uniformId in uniforms ) {
 
+							var pname = uniforms[ uniformId ];
 							var shaderParam = technique.parameters[ pname ];
 
 							var ptype = shaderParam.type;
@@ -1198,7 +1210,7 @@ THREE.GLTFLoader = ( function () {
 
 							}
 
-						} );
+						}
 
 					}
 
@@ -1273,7 +1285,9 @@ THREE.GLTFLoader = ( function () {
 
 				var primitives = mesh.primitives;
 
-				_each( primitives, function ( primitive ) {
+				for ( var name in primitives ) {
+
+					var primitive = primitives[ name ];
 
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
@@ -1281,7 +1295,9 @@ THREE.GLTFLoader = ( function () {
 
 						var attributes = primitive.attributes;
 
-						_each( attributes, function ( attributeEntry, attributeId ) {
+						for ( var attributeId in attributes ) {
+
+							var attributeEntry = attributes[ attributeId ];
 
 							if ( ! attributeEntry ) return;
 
@@ -1313,7 +1329,7 @@ THREE.GLTFLoader = ( function () {
 
 							}
 
-						} );
+						}
 
 						if ( primitive.indices ) {
 
@@ -1347,7 +1363,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-				} );
+				}
 
 				return group;
 
@@ -1434,8 +1450,9 @@ THREE.GLTFLoader = ( function () {
 
 				var interps = [];
 
-				_each( animation.channels, function ( channel ) {
+				for ( var channelId in animation.channels ) {
 
+					var channel = animation.channels[ channelId ];
 					var sampler = animation.samplers[ channel.sampler ];
 
 					if ( sampler && animation.parameters ) {
@@ -1467,7 +1484,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-				} );
+				}
 
 				var _animation = new GLTFAnimation( interps );
 				_animation.name = "animation_" + animationId;
@@ -1549,16 +1566,19 @@ THREE.GLTFLoader = ( function () {
 
 					if ( node.meshes !== undefined ) {
 
-						_each( node.meshes, function ( meshId ) {
+						for ( var meshId in node.meshes ) {
 
-							var group = dependencies.meshes[ meshId ];
+							var mesh = node.meshes[ meshId ];
+							var group = dependencies.meshes[ mesh ];
 
-							_each( group.children, function ( mesh ) {
+							for ( var childrenId in group.children ) {
+
+								var child = group.children[ childrenId ];
 
 								// clone Mesh to add to _node
 
-								var originalMaterial = mesh.material;
-								var originalGeometry = mesh.geometry;
+								var originalMaterial = child.material;
+								var originalGeometry = child.geometry;
 
 								var material;
 
@@ -1572,10 +1592,11 @@ THREE.GLTFLoader = ( function () {
 
 								}
 
-								mesh = new THREE.Mesh( originalGeometry, material );
-								mesh.castShadow = true;
+								child = new THREE.Mesh( originalGeometry, material );
+								child.castShadow = true;
 
 								var skinEntry;
+
 								if ( node.skin ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
@@ -1589,19 +1610,20 @@ THREE.GLTFLoader = ( function () {
 									var material = originalMaterial;
 									material.skinning = true;
 
-									mesh = new THREE.SkinnedMesh( geometry, material, false );
-									mesh.castShadow = true;
+									child = new THREE.SkinnedMesh( geometry, material, false );
+									child.castShadow = true;
 
 									var bones = [];
 									var boneInverses = [];
 
-									_each( skinEntry.jointNames, function ( jointId, i ) {
+									for ( var i = 0, l = skinEntry.jointNames.length; i < l; i ++ ) {
 
+										var jointId = skinEntry.jointNames[ i ];
 										var jointNode = __nodes[ jointId ];
 
 										if ( jointNode ) {
 
-											jointNode.skin = mesh;
+											jointNode.skin = child;
 											bones.push( jointNode );
 
 											var m = skinEntry.inverseBindMatrices.array;
@@ -1614,17 +1636,17 @@ THREE.GLTFLoader = ( function () {
 
 										}
 
-									} );
+									}
 
-									mesh.bind( new THREE.Skeleton( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
+									child.bind( new THREE.Skeleton( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
 
 								}
 
-								_node.add( mesh );
+								_node.add( child );
 
-							} );
+							}
 
-						} );
+						}
 
 					}
 
@@ -1668,8 +1690,9 @@ THREE.GLTFLoader = ( function () {
 
 					var lights = extension.lights;
 
-					_each( lights, function ( light, lightID ) {
+					for ( var lightId in lights ) {
 
+						var light = lights[ lightId ];
 						var lightNode;
 
 						var lightParams = light[ light.type ];
@@ -1699,11 +1722,11 @@ THREE.GLTFLoader = ( function () {
 
 						if ( lightNode ) {
 
-							extensionNode.lights[ lightID ] = lightNode;
+							extensionNode.lights[ lightId ] = lightNode;
 
 						}
 
-					} );
+					}
 
 					return extensionNode;
 
@@ -1730,11 +1753,14 @@ THREE.GLTFLoader = ( function () {
 
 			if ( node.children ) {
 
-				_each( node.children, function ( child ) {
+				var children = node.children;
 
+				for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+					var child = children[ i ];
 					buildNodeHierachy( child, _node, allNodes );
 
-				} );
+				}
 
 			}
 
@@ -1751,11 +1777,14 @@ THREE.GLTFLoader = ( function () {
 				var _scene = new THREE.Scene();
 				_scene.name = scene.name;
 
-				_each( scene.nodes, function ( nodeId ) {
+				var nodes = scene.nodes;
 
+				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+
+					var nodeId = nodes[ i ];
 					buildNodeHierachy( nodeId, _scene, dependencies.nodes );
 
-				} );
+				}
 
 				_scene.traverse( function ( child ) {
 
