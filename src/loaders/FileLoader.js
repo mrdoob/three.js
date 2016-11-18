@@ -175,6 +175,8 @@ Object.assign( FileLoader.prototype, {
                                         
                                         if ( onLoad ) onLoad( response );
                                         
+                                        scope.manager.itemEnd( url );
+                                        
                                     }
 
                                 } else if ( this.status === 0 ) {
