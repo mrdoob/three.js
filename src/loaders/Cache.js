@@ -5,9 +5,13 @@
 
 var Cache = {
 
+    enabled: false,
+
     objects: {},
 
     addObject: function ( key, obj ) {
+        
+        if ( this.enabled === false ) return;
 
         this.objects[ key ] = {
             loaded: false,
@@ -18,6 +22,8 @@ var Cache = {
     },
 
     addCallback: function ( key, callback ) {
+        
+        if ( this.enabled === false ) return;
 
         this.objects[ key ].callbacks.push( callback );
 
@@ -32,6 +38,8 @@ var Cache = {
     },
 
     getObject: function ( key ) {
+        
+        if ( this.enabled === false ) return;
 
         return this.objects[ key ];
 

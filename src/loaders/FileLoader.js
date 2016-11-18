@@ -155,19 +155,26 @@ Object.assign( FileLoader.prototype, {
 
                                 if ( this.status === 200 ) {
 
-                                    Cache.loaded ( url, response );
-                                    var cached = Cache.getObject ( url );
+                                    if ( Cache.enabled ) {
+                                    
+                                        Cache.loaded ( url, response );
+                                        var cached = Cache.getObject ( url );
 
-                                    for ( var i = 0; i < cached.callbacks.length; i ++ ) {
+                                        for ( var i = 0; i < cached.callbacks.length; i ++ ) {
 
-                                        if ( cached.callbacks[ i ] ) {
+                                            if ( cached.callbacks[ i ] ) {
 
-                                            cached.callbacks[ i ]( response );
+                                                cached.callbacks[ i ]( response );
+
+                                            }
+
+                                            scope.manager.itemEnd( url );
 
                                         }
-
-                                        scope.manager.itemEnd( url );
-
+                                    } else {
+                                        
+                                        if ( onLoad ) onLoad( response );
+                                        
                                     }
 
                                 } else if ( this.status === 0 ) {
