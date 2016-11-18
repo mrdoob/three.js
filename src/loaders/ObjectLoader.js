@@ -2,6 +2,7 @@ import { TextureMapping, TextureWrapping, TextureFilter } from '../constants';
 import { Color } from '../math/Color';
 import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../core/Object3D';
+import { Bone } from '../objects/Bone';
 import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
