@@ -605,6 +605,21 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+
+					object = new SkinnedMesh( geometry, material );
+
+					break;
+
+				case 'Bone':
+
+					object = new Bone();
+
+					break;
+
 				case 'LOD':
 
 					object = new LOD();
