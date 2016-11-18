@@ -47,8 +47,8 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		this.quad.material = this.material;
 
-		this.uniforms[ "opacity" ].value = this.opacity;
-		this.uniforms[ "tDiffuse" ].value = this.map;
+		this.uniforms[ "opacity" ] = { value: this.opacity };
+		this.uniforms[ "tDiffuse" ] = { value: this.map };
 		this.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );

@@ -45,7 +45,7 @@ THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].value = readBuffer.texture;
+			this.uniforms[ this.textureID ] = { value: readBuffer.texture };
 
 		}
 
