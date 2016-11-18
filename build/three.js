@@ -1092,10 +1092,6 @@
 			this.unpackAlignment = source.unpackAlignment;
 			this.encoding = source.encoding;
 
-			// TODO (abelnation): this was added as something causes texture constants to be "copied" before they are properly uploaded to GPU
-			this.needsUpdate = source.needsUpdate;
-			this.version = source.version;
-
 			return this;
 
 		},
@@ -32814,7 +32810,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function ObjectLoader ( manager ) {
+	function ObjectLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 		this.texturePath = '';
@@ -32886,7 +32882,7 @@
 
 			} );
 
-			var textures  = this.parseTextures( json.textures, images );
+			var textures = this.parseTextures( json.textures, images );
 			var materials = this.parseMaterials( json.materials, textures );
 
 			var object = this.parseObject( json.object, geometries, materials );
