@@ -94,15 +94,15 @@ THREE.MMDLoader.prototype.loadModel = function ( url, callback, onProgress, onEr
 
 	this.loadFileAsBuffer( url, function ( buffer ) {
 
-		callback( scope.createModel( buffer, modelExtension, texturePath ) );
+		callback( scope.createModel( buffer, modelExtension, texturePath, onProgress, onError ) );
 
 	}, onProgress, onError );
 
 };
 
-THREE.MMDLoader.prototype.createModel = function ( buffer, modelExtension, texturePath ) {
+THREE.MMDLoader.prototype.createModel = function ( buffer, modelExtension, texturePath, onProgress, onError ) {
 
-	return this.createMesh( this.parseModel( buffer, modelExtension ), texturePath );
+	return this.createMesh( this.parseModel( buffer, modelExtension ), texturePath, onProgress, onError );
 
 };
 
@@ -860,6 +860,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		var textures = [];
 		var textureLoader = new THREE.TextureLoader( scope.manager );
 		var tgaLoader = new THREE.TGALoader( scope.manager );
+		var canvas = document.createElement( 'canvas' );
+		var context = canvas.getContext( '2d' );
 		var offset = 0;
 		var materialParams = [];
 
@@ -902,7 +904,29 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var texture = loader.load( fullPath, function ( t ) {
 
-				t.flipY = ( params.isToonTexture === true ) ? true : false;
+				// MMD toon texture is Axis-Y oriented
+				// but Three.js gradient map is Axis-X oriented.
+				// So here replaces the toon texture image with the rotated one.
+				if ( params.isToonTexture === true ) {
+
+					var image = t.image;
+					var width = image.width;
+					var height = image.height;
+
+					canvas.width = width;
+					canvas.height = height;
+
+					context.clearRect( 0, 0, width, height );
+					context.translate( width / 2.0, height / 2.0 );
+					context.rotate( 0.5 * Math.PI );  // 90.0 * Math.PI / 180.0
+					context.translate( -width / 2.0, -height / 2.0 );
+					context.drawImage( image, 0, 0 );
+
+					t.image = context.getImageData( 0, 0, width, height );
+
+				}
+
+				t.flipY = false;
 				t.wrapS = THREE.RepeatWrapping;
 				t.wrapT = THREE.RepeatWrapping;
 
@@ -920,7 +944,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				delete texture.readyCallbacks;
 
-			} );
+			}, onProgress, onError );
 
 			texture.readyCallbacks = [];
 
@@ -1265,7 +1289,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				var toonFileName = ( p2.toonIndex === -1 ) ? 'toon00.bmp' : model.toonTextures[ p2.toonIndex ].fileName;
 				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToonTexture( toonFileName ) } );
 				m.gradientMap = getTexture( uuid, textures );
-				m.gradientMapAxisY = true;
 
 			} else {
 
@@ -1294,7 +1317,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToon } );
 				m.gradientMap = getTexture( uuid, textures );
-				m.gradientMapAxisY = true;
 
 			}
 

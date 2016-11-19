@@ -205,7 +205,6 @@ Material.prototype = {
 		if ( this.gradientMap && this.gradientMap.isTexture ) {
 
 			data.gradientMap = this.gradientMap.toJSON( meta ).uuid;
-			data.gradientMapAxisY = this.gradientMapAxisY;
 
 		}
 

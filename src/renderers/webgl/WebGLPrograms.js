@@ -154,7 +154,6 @@ function WebGLPrograms( renderer, capabilities ) {
 			alphaMap: !! material.alphaMap,
 
 			gradientMap: !! material.gradientMap,
-			gradientMapAxisY: !! material.gradientMapAxisY,
 
 			combine: material.combine,
 

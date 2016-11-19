@@ -447,7 +447,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
-			parameters.gradientMapAxisY ? '#define GRADIENTMAP_AXIS_Y' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
