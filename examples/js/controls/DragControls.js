@@ -232,4 +232,4 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	}
 
-}
+};

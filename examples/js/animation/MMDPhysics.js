@@ -634,7 +634,7 @@ THREE.MMDPhysics.ResourceHelper.prototype = {
 		q.setW( w );
 		return q;
 
-	},
+	}
 
 };
 
@@ -678,7 +678,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 			}
 
-		};
+		}
 
 		var helper = this.helper;
 		var params = this.params;
@@ -871,7 +871,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 		thQ.set( q.x(), q.y(), q.z(), q.w() );
 		thQ2.setFromRotationMatrix( this.bone.matrixWorld );
-		thQ2.conjugate()
+		thQ2.conjugate();
 		thQ2.multiply( thQ );
 
 		//this.bone.quaternion.multiply( thQ2 );

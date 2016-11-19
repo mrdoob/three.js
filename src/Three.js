@@ -3,7 +3,7 @@ import './polyfills.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
-export { WebGL2Renderer } from './renderers/WebGL2Renderer.js';
+// export { WebGL2Renderer } from './renderers/WebGL2Renderer.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
 export { UniformsLib } from './renderers/shaders/UniformsLib.js';
 export { ShaderChunk } from './renderers/shaders/ShaderChunk.js';
@@ -27,10 +27,9 @@ export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';
-export { TextureIdCount, Texture } from './textures/Texture.js';
+export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
-export { MaterialIdCount } from './materials/Material.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
 export { BinaryTextureLoader, DataTextureLoader } from './loaders/BinaryTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
@@ -49,6 +48,7 @@ export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
+export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
@@ -87,20 +87,19 @@ export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
 export {
-  DynamicBufferAttribute,
-  Float64Attribute,
-  Float32Attribute,
-  Uint32Attribute,
-  Int32Attribute,
-  Uint16Attribute,
-  Int16Attribute,
-  Uint8ClampedAttribute,
-  Uint8Attribute,
-  Int8Attribute,
-  BufferAttribute
+	Float64BufferAttribute,
+	Float32BufferAttribute,
+	Uint32BufferAttribute,
+	Int32BufferAttribute,
+	Uint16BufferAttribute,
+	Int16BufferAttribute,
+	Uint8ClampedBufferAttribute,
+	Uint8BufferAttribute,
+	Int8BufferAttribute,
+	BufferAttribute
 } from './core/BufferAttribute.js';
 export { Face3 } from './core/Face3.js';
-export { Object3DIdCount, Object3D } from './core/Object3D.js';
+export { Object3D } from './core/Object3D.js';
 export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
 export { EventDispatcher } from './core/EventDispatcher.js';
@@ -128,13 +127,14 @@ export { Vector4 } from './math/Vector4.js';
 export { Vector3 } from './math/Vector3.js';
 export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
-export { ColorKeywords, Color } from './math/Color.js';
+export { Color } from './math/Color.js';
 export { MorphBlendMesh } from './extras/objects/MorphBlendMesh.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { VertexNormalsHelper } from './extras/helpers/VertexNormalsHelper.js';
 export { SpotLightHelper } from './extras/helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './extras/helpers/SkeletonHelper.js';
 export { PointLightHelper } from './extras/helpers/PointLightHelper.js';
+export { RectAreaLightHelper } from './extras/helpers/RectAreaLightHelper.js';
 export { HemisphereLightHelper } from './extras/helpers/HemisphereLightHelper.js';
 export { GridHelper } from './extras/helpers/GridHelper.js';
 export { FaceNormalsHelper } from './extras/helpers/FaceNormalsHelper.js';
@@ -144,7 +144,6 @@ export { BoundingBoxHelper } from './extras/helpers/BoundingBoxHelper.js';
 export { BoxHelper } from './extras/helpers/BoxHelper.js';
 export { ArrowHelper } from './extras/helpers/ArrowHelper.js';
 export { AxisHelper } from './extras/helpers/AxisHelper.js';
-export { ClosedSplineCurve3 } from './extras/curves/ClosedSplineCurve3.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 export { SplineCurve3 } from './extras/curves/SplineCurve3.js';
 export { CubicBezierCurve3 } from './extras/curves/CubicBezierCurve3.js';

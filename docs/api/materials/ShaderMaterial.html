@@ -45,21 +45,18 @@
 		</code>
 
 		<h3>Vertex shaders and fragment shaders</h3>
-		<p>You can specify two different types of shaders for each material:
+		<p>You can specify two different types of shaders for each material:</p>
 		<ul>
 			<li>The *vertex shader* runs first; it receives *attributes*, calculates/manipulates the position of each individual vertex, and passes additional data (*varying*s) to the fragment shader.</li>
 			<li>The *fragment shader* runs second; it sets the color of each individual "fragment" (pixel) rendered to the screen.</li>
 		</ul>
-		</p>
-		<p>
-		There are three types of variables in shaders: uniforms, attributes, and varyings:
+		<p>There are three types of variables in shaders: uniforms, attributes, and varyings:</p>
 		<ul>
 			<li>*Uniforms* are variables that have the same value for all vertices---lighting, fog, and shadow maps are examples of data that would be stored in uniforms. Uniforms can be accessed by both the vertex shader and the fragment shader.</li>
-			<li>*Attributes* are variables associated with each vertex---for instance, the vertex position, face normal, and vertex color are all examples of data that would be stored in attributes. Attributes can <emph>only</emph> be accessed within the vertex shader.</li>
+			<li>*Attributes* are variables associated with each vertex---for instance, the vertex position, face normal, and vertex color are all examples of data that would be stored in attributes. Attributes can <em>only</em> be accessed within the vertex shader.</li>
 			<li>*Varyings* are variables that are passed from the vertex shader to the fragment shader. For each fragment, the value of each varying will be smoothly interpolated from the values of adjacent vertices.</li>
 		</ul>
-		Note that <emph>within</emph> the shader itself, uniforms and attributes act like constants; you can only modify their values by passing different values to the buffers from your JavaScript code.
-		</p>
+		<p>Note that <em>within</em> the shader itself, uniforms and attributes act like constants; you can only modify their values by passing different values to the buffers from your JavaScript code.</p>
 		<h3>Built-in attributes and uniforms</h3>
 		<p>
 		[page:WebGLRenderer] provides many attributes and uniforms to shaders by default; definitions of these variables are prepended to your *fragmentShader* and *vertexShader* code by [page:WebGLProgram] when the shader is compiled; you don't need to declare them yourself. These variables are described in [page:WebGLProgram].
@@ -72,7 +69,7 @@
 		</p>
 
 		<h3>Custom attributes and uniforms</h3>
-		<p>Both custom attributes and uniforms must be declared in your GLSL shader code (within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <emph>both</emph> the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be defined via [page:BufferAttribute] instances. Note that *varying*s only need to be declared within the shader code (not within the material).
+		<p>Both custom attributes and uniforms must be declared in your GLSL shader code (within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <em>both</em> the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be defined via [page:BufferAttribute] instances. Note that *varying*s only need to be declared within the shader code (not within the material).
 		</p>
 
 		<p>To declare a custom attribute, please reference the [page:BufferGeometry] page for an overview, and the [page:BufferAttribute] page for a detailed look at the *BufferAttribute* API.</p>
@@ -116,8 +113,7 @@
 			</tbody>
 		</table>
 
-		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change. To update custom attributes, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry] for further details).
-		</p>
+		<p>Note that attribute buffers are <em>not</em> refreshed automatically when their values change. To update custom attributes, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry] for further details).</p>
 
 		<p>
 		To declare a custom [page:Uniform], use the *uniforms* property:
@@ -245,7 +241,7 @@
 
 		<h3>[method:ShaderMaterial clone]() [page:ShaderMaterial this]</h3>
 		<div>
-		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader are copied <emph>by reference</emph>, as are the definitions of the *attributes*; this means that clones of the material will share the same compiled [page:WebGLProgram]. However, the *uniforms* are copied <emph>by value</emph>, which allows you to have different sets of uniforms for different copies of the material.
+		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader are copied <em>by reference</em>, as are the definitions of the *attributes*; this means that clones of the material will share the same compiled [page:WebGLProgram]. However, the *uniforms* are copied <em>by value</em>, which allows you to have different sets of uniforms for different copies of the material.
 		</div>
 
 		<h2>Source</h2>

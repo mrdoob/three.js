@@ -416,4 +416,4 @@ Menubar.Add = function ( editor ) {
 
 	return container;
 
-}
+};

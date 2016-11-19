@@ -12,7 +12,33 @@
 
 		<div class="desc">A loader for loading a [page:BufferGeometry].</div>
 
+		<h2>Example</h2>
 
+		<code>
+		// instantiate a loader
+		var loader = new THREE.BufferGeometryLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/json/pressure.json',
+			// Function when resource is loaded
+			function ( geometry ) {
+				var material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
+				var object = new THREE.Mesh( geometry, material );
+				scene.add( object );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+		
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:LoadingManager manager] )</h3>
@@ -47,34 +73,6 @@
 		<div>
 		Parse a <em>JSON</em> structure and return a [page:BufferGeometry].
 		</div>
-
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.BufferGeometryLoader();
-
-		// load a resource
-		loader.load(
-			// resource URL
-			'models/json/pressure.json',
-			// Function when resource is loaded
-			function ( geometry ) {
-				var material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
-				var object = new THREE.Mesh( geometry, material );
-				scene.add( object );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
 
 		<h2>Source</h2>
 

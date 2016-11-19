@@ -656,12 +656,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	computeTangents: function () {
-
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-
 	computeLineDistances: function () {
 
 		var d = 0;

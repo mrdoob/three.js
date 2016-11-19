@@ -205,7 +205,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -251,7 +251,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -296,7 +296,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -339,7 +339,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -380,7 +380,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -410,7 +410,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -438,7 +438,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -464,7 +464,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -490,7 +490,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -516,7 +516,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -551,7 +551,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -587,7 +587,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -614,7 +614,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -640,7 +640,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -730,7 +730,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -764,7 +764,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -799,7 +799,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -835,7 +835,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -866,7 +866,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -892,7 +892,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {

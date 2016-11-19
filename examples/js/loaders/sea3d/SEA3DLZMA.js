@@ -577,7 +577,7 @@ SEA3D.File.LZMAUncompress = function( data ) {
 			return this.data[ this.position ++ ];
 
 		}
-	}
+	};
 
 	var outStream = {
 		data: [],
@@ -587,12 +587,12 @@ SEA3D.File.LZMAUncompress = function( data ) {
 			this.data[ this.position ++ ] = value;
 
 		}
-	}
+	};
 
 	LZMA.decompressFile( inStream, outStream );
 
 	return new Uint8Array( outStream.data ).buffer;
 
-}
+};
 
 SEA3D.File.setDecompressionEngine( 2, "lzma", SEA3D.File.LZMAUncompress );

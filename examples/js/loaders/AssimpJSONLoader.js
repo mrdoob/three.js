@@ -122,7 +122,7 @@ THREE.AssimpJSONLoader.prototype = {
 		for ( in_data = json.faces, i = 0, e = in_data.length; i < e; ++ i ) {
 
 			src = in_data[ i ];
-			face = new THREE.Face3( src[ 0 ], src[ 1 ], src[ 2 ] );
+			var face = new THREE.Face3( src[ 0 ], src[ 1 ], src[ 2 ] );
 			geometry.faces.push( face );
 
 		}
@@ -381,5 +381,5 @@ THREE.AssimpJSONLoader.prototype = {
 
 		return obj;
 
-	},
+	}
 };

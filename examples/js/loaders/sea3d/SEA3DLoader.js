@@ -346,31 +346,31 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		return domain.id;
 
-	}
+	};
 
 	this.isRoot = function() {
 
 		return root;
 
-	}
+	};
 
 	this.addEvent = function( type, listener ) {
 
 		events.addEventListener( type, listener );
 
-	}
+	};
 
 	this.hasEvent = function( type, listener ) {
 
 		return events.hasEventListener( type, listener );
 
-	}
+	};
 
 	this.removeEvent = function( type, listener ) {
 
 		events.removeEventListener( type, listener );
 
-	}
+	};
 
 	this.dispatchEvent = function( event ) {
 
@@ -378,7 +378,7 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		events.dispatchEvent( event );
 
-	}
+	};
 
 	this.dispose = function() {
 
@@ -388,7 +388,7 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		this.dispatchEvent( { type : "dispose" } );
 
-	}
+	};
 
 };
 
@@ -412,7 +412,7 @@ THREE.SEA3D.ScriptManager = function() {
 
 		this.scripts.push( src );
 
-	}
+	};
 
 	this.remove = function( src ) {
 
@@ -420,13 +420,13 @@ THREE.SEA3D.ScriptManager = function() {
 
 		this.scripts.splice( this.scripts.indexOf( src ), 1 );
 
-	}
+	};
 
 	this.contains = function( src ) {
 
 		return this.scripts.indexOf( src ) > - 1;
 
-	}
+	};
 
 	this.dispatchEvent = function( event ) {
 
@@ -439,7 +439,7 @@ THREE.SEA3D.ScriptManager = function() {
 
 		}
 
-	}
+	};
 
 };
 
@@ -579,7 +579,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 	if ( animation == this.currentAnimation ) {
 
-		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset :
 			( this.mixer.timeScale >= 0 ? 0 : this.currentAnimation.duration );
 
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
@@ -604,7 +604,7 @@ THREE.SEA3D.Animator.prototype.play = function( name, crossfade, offset, weight 
 
 		this.updateTimeScale();
 
-		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset : 
+		if ( offset !== undefined || ! animation.loop ) this.currentAnimationAction.time = offset !== undefined ? offset :
 			( this.mixer.timeScale >= 0 ? 0 : this.currentAnimation.duration );
 
 		this.currentAnimationAction.setEffectiveWeight( weight !== undefined ? weight : 1 );
@@ -1120,7 +1120,7 @@ THREE.SEA3D.QUABUF = new THREE.Quaternion();
 
 THREE.SEA3D.prototype.setShadowMap = function( light ) {
 
-	light.shadow.mapSize.width = 2048
+	light.shadow.mapSize.width = 2048;
 	light.shadow.mapSize.height = 1024;
 
 	light.castShadow = true;
@@ -1535,8 +1535,8 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 
 	if ( sea.joint ) {
 
-		geo.addAttribute( 'skinIndex', new THREE.Float32Attribute( sea.joint, sea.jointPerVertex ) );
-		geo.addAttribute( 'skinWeight', new THREE.Float32Attribute( sea.weight, sea.jointPerVertex ) );
+		geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( sea.joint, sea.jointPerVertex ) );
+		geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( sea.weight, sea.jointPerVertex ) );
 
 	}
 
@@ -1584,7 +1584,7 @@ THREE.SEA3D.prototype.readLine = function( sea ) {
 	if ( sea.closed )
 		sea.vertex.push( sea.vertex[ 0 ], sea.vertex[ 1 ], sea.vertex[ 2 ] );
 
-	geo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( sea.vertex ), 3 ) );
+	geo.addAttribute( 'position', new THREE.Float32BufferAttribute( sea.vertex, 3 ) );
 
 	var line = new THREE.Line( geo, new THREE.LineBasicMaterial( { color: THREE.SEA3D.HELPER_COLOR, linewidth: 3 } ) );
 	line.name = sea.name;
@@ -1917,7 +1917,7 @@ THREE.SEA3D.prototype.readCubeMap = function( sea ) {
 
 			}
 
-		}
+		};
 
 		cubeImage.src = this.bufferToTexture( faces[ i ].buffer );
 
@@ -2006,7 +2006,7 @@ THREE.SEA3D.prototype.readJavaScriptMethod = function( sea ) {
 			'hasEvent = $SRC.hasEvent.bind( $SRC ),\n' +
 			'dispatchEvent = $SRC.dispatchEvent.bind( $SRC ),\n' +
 			'removeEvent = $SRC.removeEvent.bind( $SRC ),\n' +
-			'dispose = $SRC.dispose.bind( $SRC );\n'
+			'dispose = $SRC.dispose.bind( $SRC );\n';
 
 		for ( var name in sea.methods ) {
 
@@ -2014,7 +2014,7 @@ THREE.SEA3D.prototype.readJavaScriptMethod = function( sea ) {
 
 		}
 
-		src += 'return $METHOD; })'
+		src += 'return $METHOD; })';
 
 		this.domain.methods = eval( src )();
 
@@ -2046,7 +2046,7 @@ THREE.SEA3D.prototype.readGLSL = function( sea ) {
 THREE.SEA3D.prototype.materialTechnique =
 ( function() {
 
-	var techniques = {}
+	var techniques = {};
 
 	// FINAL
 	techniques.onComplete = function( mat, sea ) {
@@ -2487,12 +2487,12 @@ THREE.SEA3D.prototype.readMorpher = function( sea ) {
 
 		var node = sea.node[ i ];
 
-		attribs.position[ i ] = new THREE.Float32Attribute( new Float32Array( node.vertex ), 3 );
+		attribs.position[ i ] = new THREE.Float32BufferAttribute( node.vertex, 3 );
 
 		if ( node.normal ) {
 
 			attribs.normal = attribs.normal || [];
-			attribs.normal[ i ] = new THREE.Float32Attribute( new Float32Array( node.normal ), 3 );
+			attribs.normal[ i ] = new THREE.Float32BufferAttribute( node.normal, 3 );
 
 		}
 
@@ -2590,12 +2590,12 @@ THREE.SEA3D.prototype.readVertexAnimation = function( sea ) {
 
 		var frame = sea.frame[ i ];
 
-		attribs.position[ i ] = new THREE.Float32Attribute( new Float32Array( frame.vertex ), 3 );
+		attribs.position[ i ] = new THREE.Float32BufferAttribute( frame.vertex, 3 );
 
 		if ( frame.normal ) {
 
 			attribs.normal = attribs.normal || [];
-			attribs.normal[ i ] = new THREE.Float32Attribute( new Float32Array( frame.normal ), 3 );
+			attribs.normal[ i ] = new THREE.Float32BufferAttribute( frame.normal, 3 );
 
 		}
 

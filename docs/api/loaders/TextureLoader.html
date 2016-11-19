@@ -12,6 +12,35 @@
 
 		<div class="desc">Class for loading a [page:Texture texture].</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.TextureLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'textures/land_ocean_ice_cloud_2048.jpg',
+			// Function when resource is loaded
+			function ( texture ) {
+				// do something with the texture
+				var material = new THREE.MeshBasicMaterial( {
+					map: texture
+				 } );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		[example:canvas_geometry_earth]
 
 		<h2>Constructor</h2>
 
@@ -45,39 +74,6 @@
 		<div>
 		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
 		</div>
-
-
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.TextureLoader();
-
-		// load a resource
-		loader.load(
-			// resource URL
-			'textures/land_ocean_ice_cloud_2048.jpg',
-			// Function when resource is loaded
-			function ( texture ) {
-				// do something with the texture
-				var material = new THREE.MeshBasicMaterial( {
-					map: texture
-				 } );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
-			}
-		);
-		</code>
-
-		[example:canvas_geometry_earth]
-
 
 		<h2>Source</h2>
 

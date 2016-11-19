@@ -29,7 +29,7 @@ if ( Function.prototype.name === undefined ) {
 
 		get: function () {
 
-			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
+			return this.toString().match( /^\s*function\s*([^\(\s]*)/ )[ 1 ];
 
 		}
 

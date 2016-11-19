@@ -21,6 +21,10 @@
 
 	#endif
 
+    #if NUM_RECT_AREA_LIGHTS > 0
+        // TODO (abelnation): create uniforms for area light shadows
+    #endif
+
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 
 		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
