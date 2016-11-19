@@ -69,8 +69,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	// external properties
 
-	this.renderer;
-	this.domElement;
+	this.renderer = undefined;
+	this.domElement = undefined;
 
 	this.forwardRendering = false;  // for debug
 
@@ -1474,7 +1474,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec4 packedNormalDepth;",
 		"packedNormalDepth.xyz = normal * 0.5 + 0.5;",
-		"packedNormalDepth.w = position.z / position.w;",
+		"packedNormalDepth.w = position.z / position.w;"
 
 	].join( "\n" ),
 
@@ -1528,7 +1528,7 @@ THREE.DeferredShaderChunk = {
 		"vec3 diffuseColor = float_to_vec3( colorMap.x );",
 		"vec3 emissiveColor = float_to_vec3( colorMap.y );",
 		"vec3 specularColor = float_to_vec3( colorMap.z );",
-		"float shininess = colorMap.w;",
+		"float shininess = colorMap.w;"
 
 	].join( "\n" ),
 
@@ -1536,7 +1536,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec4 packedLight;",
 		"packedLight.xyz = lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * attenuation;",
-		"packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;",
+		"packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;"
 
 	].join( "\n" ),
 
@@ -1555,7 +1555,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec3 halfVector = normalize( lightVector - normalize( vertexPositionVS.xyz ) );",
 		"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-		"float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );",
+		"float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );"
 
 	].join( "\n" ),
 
@@ -1964,7 +1964,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join( '\n' ),
+		].join( '\n' )
 
 	},
 
@@ -2250,7 +2250,7 @@ THREE.ShaderDeferred = {
 
 			"}"
 
-		].join( '\n' ),
+		].join( '\n' )
 
 	},
 

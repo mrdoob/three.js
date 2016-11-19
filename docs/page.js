@@ -104,7 +104,7 @@ var onDocumentLoad = function ( event ) {
 
 		prettyPrint();
 
-	}
+	};
 
 	document.head.appendChild( prettify );
 

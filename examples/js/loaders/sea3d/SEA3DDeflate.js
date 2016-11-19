@@ -77,7 +77,7 @@ var zip_border = new Array(  // Order of the bit length code lengths
 var zip_HuftList = function() {
     this.next = null;
     this.list = null;
-}
+};
 
 var zip_HuftNode = function() {
     this.e = 0; // number of extra bits or operation
@@ -86,7 +86,7 @@ var zip_HuftNode = function() {
     // union
     this.n = 0; // literal, length base, or distance base
     this.t = null; // (zip_HuftNode) pointer to next level of table
-}
+};
 
 var zip_HuftBuild = function(b,	// code lengths in bits (all assumed <= BMAX)
 		       n,	// number of codes (assumed <= N_MAX)
@@ -309,7 +309,7 @@ var zip_HuftBuild = function(b,	// code lengths in bits (all assumed <= BMAX)
 	/* Return true (1) if we were given an incomplete table */
 	this.status = ((y != 0 && g != 1) ? 1 : 0);
     } /* end of constructor */
-}
+};
 
 
 /* routines (inflate) */
@@ -318,23 +318,23 @@ var zip_GET_BYTE = function() {
     if(zip_inflate_data.length == zip_inflate_pos)
 	return -1;
 	return zip_inflate_data[zip_inflate_pos++];
-}
+};
 
 var zip_NEEDBITS = function(n) {
     while(zip_bit_len < n) {
 	zip_bit_buf |= zip_GET_BYTE() << zip_bit_len;
 	zip_bit_len += 8;
     }
-}
+};
 
 var zip_GETBITS = function(n) {
     return zip_bit_buf & zip_MASK_BITS[n];
-}
+};
 
 var zip_DUMPBITS = function(n) {
     zip_bit_buf >>= n;
     zip_bit_len -= n;
-}
+};
 
 var zip_inflate_codes = function(buff, off, size) {
     /* inflate (decompress) the codes in a deflated (compressed) block.
@@ -416,7 +416,7 @@ var zip_inflate_codes = function(buff, off, size) {
 
     zip_method = -1; // done
     return n;
-}
+};
 
 var zip_inflate_stored = function(buff, off, size) {
     /* "decompress" an inflated type 0 (stored) block. */
@@ -451,7 +451,7 @@ var zip_inflate_stored = function(buff, off, size) {
     if(zip_copy_leng == 0)
       zip_method = -1; // done
     return n;
-}
+};
 
 var zip_inflate_fixed = function(buff, off, size) {
     /* decompress an inflated type 1 (fixed Huffman codes) block.  We should
@@ -504,7 +504,7 @@ var zip_inflate_fixed = function(buff, off, size) {
     zip_bl = zip_fixed_bl;
     zip_bd = zip_fixed_bd;
     return zip_inflate_codes(buff, off, size);
-}
+};
 
 var zip_inflate_dynamic = function(buff, off, size) {
     // decompress an inflated type 2 (dynamic Huffman codes) block.
@@ -627,7 +627,7 @@ var zip_inflate_dynamic = function(buff, off, size) {
 
     // decompress until an end-of-block code
     return zip_inflate_codes(buff, off, size);
-}
+};
 
 var zip_inflate_start = function() {
     var i;
@@ -641,7 +641,7 @@ var zip_inflate_start = function() {
     zip_eof = false;
     zip_copy_leng = zip_copy_dist = 0;
     zip_tl = null;
-}
+};
 
 var zip_inflate_internal = function(buff, off, size) {
     // decompress an inflated entry
@@ -727,7 +727,7 @@ var zip_inflate_internal = function(buff, off, size) {
 	n += i;
     }
     return n;
-}
+};
 
 var zip_inflate = function(data) {
     var i, j, pos = 0;
@@ -745,7 +745,7 @@ var zip_inflate = function(data) {
 	
     zip_inflate_data = null; // G.C.
     return new Uint8Array(out).buffer;
-}
+};
 
 if (! ctx.RawDeflate) ctx.RawDeflate = {};
 ctx.RawDeflate.inflate = zip_inflate;
@@ -761,6 +761,6 @@ SEA3D.File.DeflateUncompress = function( data ) {
 
 	return RawDeflate.inflate( data );
 
-}
+};
 
 SEA3D.File.setDecompressionEngine( 1, "deflate", SEA3D.File.DeflateUncompress );

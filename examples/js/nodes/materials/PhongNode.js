@@ -29,13 +29,13 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
 
-		material.mergeUniform( THREE.UniformsUtils.merge( [
+		material.mergeUniform( Object.assign( {},
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
-		] ) );
+		) );
 
 		material.addVertexPars( [
 			"varying vec3 vViewPosition;",

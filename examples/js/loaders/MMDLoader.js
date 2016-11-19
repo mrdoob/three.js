@@ -144,7 +144,7 @@ THREE.MMDLoader.prototype.loadVmds = function ( urls, callback, onProgress, onEr
 
 		}, onProgress, onError );
 
-	};
+	}
 
 	run();
 
@@ -474,7 +474,7 @@ THREE.MMDLoader.prototype.loadFileAsText = function ( url, onLoad, onProgress, o
 
 THREE.MMDLoader.prototype.loadFileAsShiftJISText = function ( url, onLoad, onProgress, onError ) {
 
-	var request = this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
+	this.loadFile( url, onLoad, onProgress, onError, 'text', 'text/plain; charset=shift_jis' );
 
 };
 
@@ -738,7 +738,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			attribute.array[ index * 3 + 1 ] += v.position[ 1 ] * ratio;
 			attribute.array[ index * 3 + 2 ] += v.position[ 2 ] * ratio;
 
-		};
+		}
 
 		function updateVertices( attribute, m, ratio ) {
 
@@ -762,7 +762,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-		};
+		}
 
 		var morphTargets = [];
 		var attributes = [];
@@ -858,8 +858,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	var initMaterials = function () {
 
 		var textures = [];
-		var textureLoader = new THREE.TextureLoader( this.manager );
-		var tgaLoader = new THREE.TGALoader( this.manager );
+		var textureLoader = new THREE.TextureLoader( scope.manager );
+		var tgaLoader = new THREE.TGALoader( scope.manager );
 		var offset = 0;
 		var materialParams = [];
 
@@ -881,7 +881,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				} catch ( e ) {
 
-					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' )
+					console.warn( 'THREE.MMDLoader: ' + filePath + ' seems like not right default texture path. Using toon00.bmp instead.' );
 					fullPath = scope.defaultToonTextures[ 0 ];
 
 				}
@@ -930,7 +930,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			return uuid;
 
-		};
+		}
 
 		function getTexture( name, textures ) {
 
@@ -942,7 +942,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			return textures[ name ];
 
-		};
+		}
 
 		for ( var i = 0; i < model.metadata.materialCount; i++ ) {
 
@@ -1114,7 +1114,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return ctx.getImageData( 0, 0, c.width, c.height );
 
-						};
+						}
 
 						function detectTextureTransparency( image, uvs, indices ) {
 
@@ -1162,7 +1162,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return false;
 
-						};
+						}
 
 						/*
 						 * This method expects
@@ -1195,7 +1195,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 							return image.data[ index * 4 + 3 ];
 
-						};
+						}
 
 						var imageData = t.image.data !== undefined ? t.image : createImageData( t.image );
 						var indices = geometry.index.array.slice( m.faceOffset * 3, m.faceOffset * 3 + m.faceNum * 3 );
@@ -1252,7 +1252,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					return n.match( /toon(10|0[0-9]).bmp/ ) === null ? false : true;
 
-				};
+				}
 
 				m.outlineParameters = {
 					thickness: p2.edgeFlag === 1 ? 0.003 : 0.0,
@@ -2689,11 +2689,9 @@ THREE.MMDHelper.prototype = {
 
 	poseAsVpd: function ( mesh, vpd, params ) {
 
-		if ( ! ( params && params.preventResetPose === true ) ) {
+		if ( params === undefined ) params = {};
 
-			mesh.pose();
-
-		}
+		if ( params.preventResetPose !== true ) mesh.pose();
 
 		var bones = mesh.skeleton.bones;
 		var bones2 = vpd.bones;
@@ -2702,8 +2700,7 @@ THREE.MMDHelper.prototype = {
 
 		for ( var i = 0; i < bones.length; i++ ) {
 
-			var b = bones[ i ];
-			table[ b.name ] = i;
+			table[ bones[ i ].name ] = i;
 
 		}
 
@@ -2715,11 +2712,7 @@ THREE.MMDHelper.prototype = {
 			var b = bones2[ i ];
 			var index = table[ b.name ];
 
-			if ( index === undefined ) {
-
-				continue;
-
-			}
+			if ( index === undefined ) continue;
 
 			var b2 = bones[ index ];
 			var t = b.translation;
@@ -2731,25 +2724,21 @@ THREE.MMDHelper.prototype = {
 			b2.position.add( thV );
 			b2.quaternion.multiply( thQ );
 
-			b2.updateMatrixWorld( true );
-
 		}
 
-		if ( params === undefined || params.preventIk !== true ) {
+		mesh.updateMatrixWorld( true );
+
+		if ( params.preventIk !== true ) {
 
 			var solver = new THREE.CCDIKSolver( mesh );
-			solver.update();
+			solver.update( params.saveOriginalBonesBeforeIK );
 
 		}
 
-		if ( params === undefined || params.preventGrant !== true ) {
+		if ( params.preventGrant !== true && mesh.geometry.grants !== undefined ) {
 
-			if ( mesh.geometry.grants !== undefined ) {
-
-				var solver = new THREE.MMDGrantSolver( mesh );
-				solver.update();
-
-			}
+			var solver = new THREE.MMDGrantSolver( mesh );
+			solver.update();
 
 		}
 

@@ -10,11 +10,44 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">JavaScript events for custom objects.<br />
-		<a href="https://github.com/mrdoob/eventdispatcher.js">https://github.com/mrdoob/eventdispatcher.js</a></div>
+		<div class="desc">
+			JavaScript events for custom objects.<br />
+			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+// Adding events to a custom object
+
+var Car = function () {
+
+    this.start = function () {
+
+        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+
+    };
+
+};
+
+// Mixin the EventDispatcher.prototype with the custom object prototype
+
+Object.assign( Car.prototype, EventDispatcher.prototype );
+
+// Using events with the custom object
+
+var car = new Car();
+
+car.addEventListener( 'start', function ( event ) {
+
+    alert( event.message );
+
+} );
+
+car.start();
+		</code>
 
 		<h2>Constructor</h2>
-
 
 		<h3>[name]()</h3>
 		<div>

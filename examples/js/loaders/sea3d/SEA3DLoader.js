@@ -346,31 +346,31 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		return domain.id;
 
-	}
+	};
 
 	this.isRoot = function() {
 
 		return root;
 
-	}
+	};
 
 	this.addEvent = function( type, listener ) {
 
 		events.addEventListener( type, listener );
 
-	}
+	};
 
 	this.hasEvent = function( type, listener ) {
 
 		return events.hasEventListener( type, listener );
 
-	}
+	};
 
 	this.removeEvent = function( type, listener ) {
 
 		events.removeEventListener( type, listener );
 
-	}
+	};
 
 	this.dispatchEvent = function( event ) {
 
@@ -378,7 +378,7 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		events.dispatchEvent( event );
 
-	}
+	};
 
 	this.dispose = function() {
 
@@ -388,7 +388,7 @@ THREE.SEA3D.ScriptDomain = function( domain, root ) {
 
 		this.dispatchEvent( { type : "dispose" } );
 
-	}
+	};
 
 };
 
@@ -412,7 +412,7 @@ THREE.SEA3D.ScriptManager = function() {
 
 		this.scripts.push( src );
 
-	}
+	};
 
 	this.remove = function( src ) {
 
@@ -420,13 +420,13 @@ THREE.SEA3D.ScriptManager = function() {
 
 		this.scripts.splice( this.scripts.indexOf( src ), 1 );
 
-	}
+	};
 
 	this.contains = function( src ) {
 
 		return this.scripts.indexOf( src ) > - 1;
 
-	}
+	};
 
 	this.dispatchEvent = function( event ) {
 
@@ -439,7 +439,7 @@ THREE.SEA3D.ScriptManager = function() {
 
 		}
 
-	}
+	};
 
 };
 
@@ -1120,7 +1120,7 @@ THREE.SEA3D.QUABUF = new THREE.Quaternion();
 
 THREE.SEA3D.prototype.setShadowMap = function( light ) {
 
-	light.shadow.mapSize.width = 2048
+	light.shadow.mapSize.width = 2048;
 	light.shadow.mapSize.height = 1024;
 
 	light.castShadow = true;
@@ -1917,7 +1917,7 @@ THREE.SEA3D.prototype.readCubeMap = function( sea ) {
 
 			}
 
-		}
+		};
 
 		cubeImage.src = this.bufferToTexture( faces[ i ].buffer );
 
@@ -2006,7 +2006,7 @@ THREE.SEA3D.prototype.readJavaScriptMethod = function( sea ) {
 			'hasEvent = $SRC.hasEvent.bind( $SRC ),\n' +
 			'dispatchEvent = $SRC.dispatchEvent.bind( $SRC ),\n' +
 			'removeEvent = $SRC.removeEvent.bind( $SRC ),\n' +
-			'dispose = $SRC.dispose.bind( $SRC );\n'
+			'dispose = $SRC.dispose.bind( $SRC );\n';
 
 		for ( var name in sea.methods ) {
 
@@ -2014,7 +2014,7 @@ THREE.SEA3D.prototype.readJavaScriptMethod = function( sea ) {
 
 		}
 
-		src += 'return $METHOD; })'
+		src += 'return $METHOD; })';
 
 		this.domain.methods = eval( src )();
 
@@ -2046,7 +2046,7 @@ THREE.SEA3D.prototype.readGLSL = function( sea ) {
 THREE.SEA3D.prototype.materialTechnique =
 ( function() {
 
-	var techniques = {}
+	var techniques = {};
 
 	// FINAL
 	techniques.onComplete = function( mat, sea ) {

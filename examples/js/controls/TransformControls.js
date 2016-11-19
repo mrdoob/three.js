@@ -444,7 +444,7 @@
 			var group = {
 
 				handles: this[ "handles" ],
-				pickers: this[ "pickers" ],
+				pickers: this[ "pickers" ]
 
 			};
 

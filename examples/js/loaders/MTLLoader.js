@@ -473,7 +473,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		var texParams = {
 
 			scale: new THREE.Vector2( 1, 1 ),
-			offset: new THREE.Vector2( 0, 0 ),
+			offset: new THREE.Vector2( 0, 0 )
 
 		 };
 

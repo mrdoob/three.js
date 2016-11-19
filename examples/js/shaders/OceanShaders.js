@@ -86,7 +86,7 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
 		"u_wind": { value: new THREE.Vector2( 10.0, 10.0 ) },
 		"u_resolution": { value: 512.0 },
-		"u_size": { value: 250.0 },
+		"u_size": { value: 250.0 }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -163,7 +163,7 @@ THREE.ShaderLib[ 'ocean_phase' ] = {
 		"u_phases": { value: null },
 		"u_deltaTime": { value: null },
 		"u_resolution": { value: null },
-		"u_size": { value: null },
+		"u_size": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -204,7 +204,7 @@ THREE.ShaderLib[ 'ocean_spectrum' ] = {
 		"u_resolution": { value: null },
 		"u_choppiness": { value: null },
 		"u_phases": { value: null },
-		"u_initialSpectrum": { value: null },
+		"u_initialSpectrum": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -266,7 +266,7 @@ THREE.ShaderLib[ 'ocean_normals' ] = {
 	uniforms: {
 		"u_displacementMap": { value: null },
 		"u_resolution": { value: null },
-		"u_size": { value: null },
+		"u_size": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -308,7 +308,7 @@ THREE.ShaderLib[ 'ocean_main' ] = {
 		"u_skyColor": { value: null },
 		"u_oceanColor": { value: null },
 		"u_sunDirection": { value: null },
-		"u_exposure": { value: null },
+		"u_exposure": { value: null }
 	},
 	vertexShader: [
 		'precision highp float;',
