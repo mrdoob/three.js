@@ -1000,9 +1000,11 @@
 	 * @author szimek / https://github.com/szimek/
 	 */
 
+	var textureId = 0;
+
 	function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-		Object.defineProperty( this, 'id', { value: TextureIdCount() } );
+		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
 		this.uuid = _Math.generateUUID();
 
@@ -1037,7 +1039,7 @@
 		//
 		// Also changing the encoding after already used by a Material will not automatically make the Material
 		// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
-		this.encoding = encoding !== undefined ? encoding :  LinearEncoding;
+		this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
 		this.version = 0;
 		this.onUpdate = null;
@@ -1196,7 +1198,7 @@
 
 		transformUv: function ( uv ) {
 
-			if ( this.mapping !== UVMapping )  return;
+			if ( this.mapping !== UVMapping ) return;
 
 			uv.multiply( this.repeat );
 			uv.add( this.offset );
@@ -1274,9 +1276,6 @@
 	};
 
 	Object.assign( Texture.prototype, EventDispatcher.prototype );
-
-	var count = 0;
-	function TextureIdCount() { return count++; }
 
 	/**
 	 * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -7142,9 +7141,11 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
+	var materialId = 0;
+
 	function Material() {
 
-		Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
+		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 		this.uuid = _Math.generateUUID();
 
@@ -7476,9 +7477,6 @@
 	};
 
 	Object.assign( Material.prototype, EventDispatcher.prototype );
-
-	var count$1 = 0;
-	function MaterialIdCount() { return count$1++; }
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -10443,9 +10441,11 @@
 	 * @author elephantatwork / www.elephantatwork.ch
 	 */
 
+	var object3DId = 0;
+
 	function Object3D() {
 
-		Object.defineProperty( this, 'id', { value: Object3DIdCount() } );
+		Object.defineProperty( this, 'id', { value: object3DId ++ } );
 
 		this.uuid = _Math.generateUUID();
 
@@ -10519,7 +10519,7 @@
 
 		this.userData = {};
 
-		this.onBeforeRender = function(){}; 
+		this.onBeforeRender = function(){};
 		this.onAfterRender = function(){};
 
 	}
@@ -11154,9 +11154,6 @@
 		}
 
 	} );
-
-	var count$2 = 0;
-	function Object3DIdCount() { return count$2++; }
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -13397,8 +13394,8 @@
 
 	} );
 
-	var count$3 = 0;
-	function GeometryIdCount() { return count$3++; }
+	var count = 0;
+	function GeometryIdCount() { return count++; }
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -42326,9 +42323,7 @@
 	exports.CubeTexture = CubeTexture;
 	exports.CanvasTexture = CanvasTexture;
 	exports.DepthTexture = DepthTexture;
-	exports.TextureIdCount = TextureIdCount;
 	exports.Texture = Texture;
-	exports.MaterialIdCount = MaterialIdCount;
 	exports.CompressedTextureLoader = CompressedTextureLoader;
 	exports.BinaryTextureLoader = BinaryTextureLoader;
 	exports.DataTextureLoader = DataTextureLoader;
@@ -42399,7 +42394,6 @@
 	exports.Int8BufferAttribute = Int8BufferAttribute;
 	exports.BufferAttribute = BufferAttribute;
 	exports.Face3 = Face3;
-	exports.Object3DIdCount = Object3DIdCount;
 	exports.Object3D = Object3D;
 	exports.Raycaster = Raycaster;
 	exports.Layers = Layers;
