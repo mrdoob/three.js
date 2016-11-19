@@ -54,7 +54,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
@@ -99,6 +99,7 @@
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.OutlineEffect( renderer );
+
 				// STATS
 
 				stats = new Stats();

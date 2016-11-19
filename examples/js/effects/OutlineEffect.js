@@ -26,46 +26,6 @@
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
 
-	/*
-	 * See #9918
-	 *
-	 * Here enables THREE.OutlineEffect to be called from other *Effect, like
-	 *
-	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
-	 *
-	 * function render () {
-	 *
- 	 * 	effect.render( scene, camera );
-	 *
-	 * }
-	 */
-	var keys = Object.keys( renderer );
-
-	for ( var i = 0, il = keys.length; i < il; i ++ ) {
-
-		var key = keys[ i ];
-
-		if ( typeof renderer[ key ] === 'function' ) {
-
-			/*
-			 * this works as
-			 * 	this.func = function ( arg1, arg2, ... ) {
-			 *
-			 * 		renderer.func( arg1, arg2, ... );
-			 *
-			 * 	};
-			 */
-			this[ key ] = renderer[ key ].bind( renderer );
-
-		} else {
-
-			// just copy property
-			this[ key ] = renderer[ key ];
-
-		}
-
-	}
-
 	parameters = parameters || {};
 
 	this.enabled = true;
@@ -501,6 +461,78 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		scene.background = currentSceneBackground;
 		renderer.autoClear = currentAutoClear;
 		renderer.shadowMap.enabled = currentShadowMapEnabled;
+
+	};
+
+	/*
+	 * See #9918
+	 *
+	 * The following property copies and wrapper methods enable
+	 * THREE.OutlineEffect to be called from other *Effect, like
+	 *
+	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 *
+	 * function render () {
+	 *
+ 	 * 	effect.render( scene, camera );
+	 *
+	 * }
+	 */
+	this.autoClear = renderer.autoClear;
+	this.domElement = renderer.domElement;
+	this.shadowMap = renderer.shadowMap;
+
+	this.clear = function ( color, depth, stencil ) {
+
+		renderer.clear( color, depth, stencil );
+
+	};
+
+	this.getPixelRatio = function () {
+
+		return renderer.getPixelRatio();
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		renderer.setPixelRatio( value );
+
+	};
+
+	this.getSize = function () {
+
+		return renderer.getSize();
+
+	};
+
+	this.setSize = function ( width, height, updateStyle ) {
+
+		renderer.setSize( width, height, updateStyle );
+
+	};
+
+	this.setViewport = function ( x, y, width, height ) {
+
+		renderer.setViewport( x, y, width, height );
+
+	};
+
+	this.setScissor = function ( x, y, width, height ) {
+
+		renderer.setScissor( x, y, width, height );
+
+	};
+
+	this.setScissorTest = function ( boolean ) {
+
+		renderer.setScissorTest( boolean );
+
+	};
+
+	this.setRenderTarget = function ( renderTarget ) {
+
+		renderer.setRenderTarget( renderTarget );
 
 	};
 
