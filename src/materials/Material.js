@@ -7,9 +7,11 @@ import { _Math } from '../math/Math';
  * @author alteredq / http://alteredqualia.com/
  */
 
+var materialId = 0;
+
 function Material() {
 
-	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
+	Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -342,8 +344,4 @@ Material.prototype = {
 
 Object.assign( Material.prototype, EventDispatcher.prototype );
 
-var count = 0;
-function MaterialIdCount() { return count++; };
-
-
-export { MaterialIdCount, Material };
+export { Material };

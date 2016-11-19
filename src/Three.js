@@ -27,10 +27,9 @@ export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';
-export { TextureIdCount, Texture } from './textures/Texture.js';
+export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
-export { MaterialIdCount } from './materials/Material.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
 export { BinaryTextureLoader, DataTextureLoader } from './loaders/BinaryTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
@@ -100,7 +99,7 @@ export {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 export { Face3 } from './core/Face3.js';
-export { Object3DIdCount, Object3D } from './core/Object3D.js';
+export { Object3D } from './core/Object3D.js';
 export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
 export { EventDispatcher } from './core/EventDispatcher.js';
