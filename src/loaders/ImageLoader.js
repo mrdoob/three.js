@@ -37,6 +37,8 @@ Object.assign( ImageLoader.prototype, {
 
 		} else if ( this.crossOrigin !== undefined ) {
 
+			// crossOrigin doesn't work with URL.createObjectURL()?
+
 			image.crossOrigin = this.crossOrigin;
 			image.src = url;
 
