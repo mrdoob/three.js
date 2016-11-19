@@ -857,7 +857,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initMaterials = function () {
 
-		var textures = [];
+		var textures = {};
 		var textureLoader = new THREE.TextureLoader( scope.manager );
 		var tgaLoader = new THREE.TGALoader( scope.manager );
 		var canvas = document.createElement( 'canvas' );
@@ -893,6 +893,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				fullPath = texturePath + filePath;
 
 			}
+
+			if ( textures[ fullPath ] !== undefined ) return fullPath;
 
 			var loader = THREE.Loader.Handlers.get( fullPath );
 
@@ -948,11 +950,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			texture.readyCallbacks = [];
 
-			var uuid = THREE.Math.generateUUID();
+			textures[ fullPath ] = texture;
 
-			textures[ uuid ] = texture;
-
-			return uuid;
+			return fullPath;
 
 		}
 
@@ -983,13 +983,13 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			/*
 			 * Color
 			 *
-			 * MMD         MeshPhongMaterial
+			 * MMD         MeshToonMaterial
 			 * diffuse  -  color
 			 * specular -  specular
 			 * ambient  -  emissive * a
 			 *               (a = 1.0 without map texture or 0.2 with map texture)
 			 *
-			 * MeshPhongMaterial doesn't have ambient. Set it to emissive instead.
+			 * MeshToonMaterial doesn't have ambient. Set it to emissive instead.
 			 * It'll be too bright if material has map texture so using coef 0.2.
 			 */
 			params.color = new THREE.Color( m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] );
@@ -1097,7 +1097,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
-			var m = new THREE.MeshPhongMaterial();
+			var m = new THREE.MeshToonMaterial();
 
 			geometry.addGroup( p.faceOffset * 3, p.faceNum * 3, i );
 

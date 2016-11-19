@@ -158,6 +158,27 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				var phongMaterials;
+				var originalMaterials;
+
+				function makePhongMaterials ( materials ) {
+
+					var array = [];
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var m = new THREE.MeshPhongMaterial();
+						m.copy( materials[ i ] );
+						m.needsUpdate = true;
+
+						array.push( m );
+
+					}
+
+					phongMaterials = new THREE.MultiMaterial( array );
+
+				}
+
 				function initGui () {
 
 					var api = {
@@ -178,27 +199,16 @@
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
 
-						if ( mesh.userData.gradientMaps === undefined ) mesh.userData.gradientMaps = [];
+						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
+						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material.materials );
 
-						var materials = mesh.material.materials;
-						var gradientMaps = mesh.userData.gradientMaps;
+						if ( api[ 'gradient mapping' ] ) {
 
-						for ( var i = 0, il = materials.length; i < il; i ++ ) {
+							mesh.material = originalMaterials;
 
-							var material = materials[ i ];
+						} else {
 
-							if ( api[ 'gradient mapping' ] ) {
-
-								material.gradientMap = gradientMaps[ i ];
-
-							} else {
-
-								gradientMaps[ i ] = material.gradientMap;
-								material.gradientMap = null;
-
-							}
-
-							material.needsUpdate = true;
+							mesh.material = phongMaterials;
 
 						}
 

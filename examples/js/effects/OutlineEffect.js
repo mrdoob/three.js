@@ -64,6 +64,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
+		MeshToonMaterial: 'toon',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical'
 	};
@@ -93,7 +94,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	var vertexShaderChunk2 = [
 
-		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( PHYSICAL )",
+		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
 
 		"	#ifndef USE_ENVMAP",
 		"		vec3 objectNormal = normalize( normal );",
