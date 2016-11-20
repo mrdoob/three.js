@@ -115,7 +115,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			undefined,
 			undefined,
 			THREE.DepthStencilFormat
-		)
+		);
 
 	}
 
@@ -164,7 +164,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_passLightFullscreen = new THREE.RenderPass();
 		_passLightFullscreen.clear = true;
-		_passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+		_passLightFullscreen.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 		_passLight = new THREE.RenderPass();
 		_passLight.clear = false;
@@ -670,7 +670,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( originalMaterial.transparent === true && originalMaterial.visible === true ) {
 
-			return originalMaterial
+			return originalMaterial;
 
 		} else {
 
@@ -850,7 +850,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.side = THREE.BackSide;
 		material.depthFunc = THREE.GreaterEqualDepth;
-	
+
 		var uniforms = material.uniforms;
 
 		uniforms.lightColor = uniforms.lightColor.clone();
@@ -1464,9 +1464,9 @@ THREE.DeferredShaderChunk = {
 
 		"float vec3_to_float( vec3 data ) {",
 
-			"const float unit = 255.0/256.0;",
-			"highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
-			"return compressed;",
+		"	const float unit = 255.0/256.0;",
+		"	highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
+		"	return compressed;",
 
 		"}"
 
@@ -1476,13 +1476,13 @@ THREE.DeferredShaderChunk = {
 
 		"vec3 float_to_vec3( float data ) {",
 
-			"const float unit = 255.0;",
-			"vec3 uncompressed;",
-			"uncompressed.x = fract( data );",
-			"float zInt = floor( data / unit );",
-			"uncompressed.z = fract( zInt / unit );",
-			"uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );",
-			"return uncompressed;",
+		"	const float unit = 255.0;",
+		"	vec3 uncompressed;",
+		"	uncompressed.x = fract( data );",
+		"	float zInt = floor( data / unit );",
+		"	uncompressed.z = fract( zInt / unit );",
+		"	uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );",
+		"	return uncompressed;",
 
 		"}"
 
@@ -1602,7 +1602,7 @@ THREE.ShaderDeferredCommon = {
 
 	}
 
-}
+};
 
 THREE.ShaderDeferred = {
 
@@ -1620,17 +1620,17 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
-				"vNormal = normalize( normalMatrix * objectNormal );",
-				"vPosition = gl_Position;",
+			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vPosition = gl_Position;",
 
 			"}"
 
@@ -1643,12 +1643,12 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec3 normal = vNormal;",
-				"vec4 position = vPosition;",
+			"	vec3 normal = vNormal;",
+			"	vec4 position = vPosition;",
 
-				THREE.DeferredShaderChunk[ "packNormalDepth" ],
+			THREE.DeferredShaderChunk[ "packNormalDepth" ],
 
-				"gl_FragColor = packedNormalDepth;",
+			"	gl_FragColor = packedNormalDepth;",
 
 			"}"
 
@@ -1678,15 +1678,15 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "uv_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
 			"}"
 
@@ -1705,14 +1705,14 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 diffuseColor = vec4( diffuse, 1.0 );",
-				"vec3 emissiveColor = emissive;",
-				"vec3 specularColor = specular;",
+			"	vec4 diffuseColor = vec4( diffuse, 1.0 );",
+			"	vec3 emissiveColor = emissive;",
+			"	vec3 specularColor = specular;",
 
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.DeferredShaderChunk[ "packColor" ],
+			THREE.ShaderChunk[ "map_fragment" ],
+			THREE.DeferredShaderChunk[ "packColor" ],
 
-				"gl_FragColor = packedColor;",
+			"	gl_FragColor = packedColor;",
 
 			"}"
 
@@ -1738,7 +1738,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1755,10 +1755,10 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"gl_FragColor = vec4( emissiveColor, 1.0 );",
+			"	gl_FragColor = vec4( emissiveColor, 1.0 );",
 
 			"}"
 
@@ -1790,7 +1790,7 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
 
@@ -1815,33 +1815,33 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
-				"float distance = length( lightVector );",
+			"	vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
+			"	float distance = length( lightVector );",
 
-				"if ( distance > lightRadius ) discard;",
+			"	if ( distance > lightRadius ) discard;",
 
-				"lightVector = normalize( lightVector );",
+			"	lightVector = normalize( lightVector );",
 
-				THREE.DeferredShaderChunk[ "unpackColor" ],
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"//float cutoff = 0.3;",
-				"//float denom = distance / lightRadius + 1.0;",
-				"//float attenuation = 1.0 / ( denom * denom );",
-				"//attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
-				"//attenuation = max( attenuation, 0.0 );",
-				"//attenuation *= attenuation;",
+			"	//float cutoff = 0.3;",
+			"	//float denom = distance / lightRadius + 1.0;",
+			"	//float attenuation = 1.0 / ( denom * denom );",
+			"	//attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
+			"	//attenuation = max( attenuation, 0.0 );",
+			"	//attenuation *= attenuation;",
 
-				"//diffuseColor *= saturate( -distance / lightRadius + 1.0 );",
-				"//float attenuation = 1.0;",
+			"	//diffuseColor *= saturate( -distance / lightRadius + 1.0 );",
+			"	//float attenuation = 1.0;",
 
-				"float attenuation = saturate( -distance / lightRadius + 1.0 );",
+			"	float attenuation = saturate( -distance / lightRadius + 1.0 );",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -1874,7 +1874,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1900,45 +1900,45 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
+			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
-				"float rho = dot( lightDirectionVS, lightVector );",
-				"float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rho = dot( lightDirectionVS, lightVector );",
+			"	float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho <= rhoMax ) discard;",
+			"	if ( rho <= rhoMax ) discard;",
 
-				"float theta = rhoMax + 0.0001;",
-				"float phi = rhoMax + 0.05;",
-				"float falloff = 4.0;",
+			"	float theta = rhoMax + 0.0001;",
+			"	float phi = rhoMax + 0.05;",
+			"	float falloff = 4.0;",
 
-				"float spot = 0.0;",
+			"	float spot = 0.0;",
 
-				"if ( rho >= phi ) {",
+			"	if ( rho >= phi ) {",
 
-					"spot = 1.0;",
+			"		spot = 1.0;",
 
-				"} else if ( rho <= theta ) {",
+			"	} else if ( rho <= theta ) {",
 
-					"spot = 0.0;",
+			"		spot = 0.0;",
 
-				"} else { ",
+			"	} else { ",
 
-					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
+			"		spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
-				"}",
+			"	}",
 
-				"diffuseColor *= spot;",
+			"	diffuseColor *= spot;",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -1968,7 +1968,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1992,18 +1992,18 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"vec3 lightVector = normalize( lightDirectionVS );",
+			"	vec3 lightVector = normalize( lightDirectionVS );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -2029,17 +2029,17 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
-				"vNormal = normalize( normalMatrix * objectNormal );",
-				"vPosition = gl_Position;",
+			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vPosition = gl_Position;",
 
 			"}"
 
@@ -2056,12 +2056,12 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec3 normal = vNormal;",
-				"vec4 position = vPosition;",
+			"	vec3 normal = vNormal;",
+			"	vec4 position = vPosition;",
 
-				THREE.DeferredShaderChunk[ "packNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "packNormalDepthShininess" ],
 
-				"gl_FragColor = packedNormalDepthShininess;",
+			"	gl_FragColor = packedNormalDepthShininess;",
 
 			"}"
 
@@ -2092,7 +2092,7 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
 
@@ -2116,24 +2116,24 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
-				"float distance = length( lightVector );",
+			"	vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
+			"	float distance = length( lightVector );",
 
-				"if ( distance > lightRadius ) discard;",
+			"	if ( distance > lightRadius ) discard;",
 
-				"lightVector = normalize( lightVector );",
+			"	lightVector = normalize( lightVector );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"float attenuation = saturate( -distance / lightRadius + 1.0 );",
+			"	float attenuation = saturate( -distance / lightRadius + 1.0 );",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = packedLight;",
+			"	gl_FragColor = packedLight;",
 
 			"}"
 
@@ -2165,7 +2165,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -2190,44 +2190,44 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
+			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
-				"float rho = dot( lightDirectionVS, lightVector );",
-				"float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rho = dot( lightDirectionVS, lightVector );",
+			"	float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho <= rhoMax ) discard;",
+			"	if ( rho <= rhoMax ) discard;",
 
-				"float theta = rhoMax + 0.0001;",
-				"float phi = rhoMax + 0.05;",
-				"float falloff = 4.0;",
+			"	float theta = rhoMax + 0.0001;",
+			"	float phi = rhoMax + 0.05;",
+			"	float falloff = 4.0;",
 
-				"float spot = 0.0;",
+			"	float spot = 0.0;",
 
-				"if ( rho >= phi ) {",
+			"	if ( rho >= phi ) {",
 
-					"spot = 1.0;",
+			"		spot = 1.0;",
 
-				"} else if ( rho <= theta ) {",
+			"	} else if ( rho <= theta ) {",
 
-					"spot = 0.0;",
+			"		spot = 0.0;",
 
-				"} else { ",
+			"	} else { ",
 
-					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
+			"		spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
-				"}",
+			"	}",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = spot * packedLight;",
+			"	gl_FragColor = spot * packedLight;",
 
 			"}"
 
@@ -2257,7 +2257,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -2280,19 +2280,19 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = normalize( lightDirectionVS );",
+			"	vec3 lightVector = normalize( lightDirectionVS );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = packedLight;",
+			"	gl_FragColor = packedLight;",
 
 			"}"
 
@@ -2330,15 +2330,15 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "uv_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
 			"}"
 
@@ -2363,21 +2363,21 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 diffuseColor = vec4( diffuse, 1.0 );",
-				"vec3 emissiveColor = emissive;",
-				"vec3 specularColor = specular;",
+			"	vec4 diffuseColor = vec4( diffuse, 1.0 );",
+			"	vec3 emissiveColor = emissive;",
+			"	vec3 specularColor = specular;",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
 
-				"vec4 light = texture2D( samplerLight, texCoord );",
+			"	vec4 light = texture2D( samplerLight, texCoord );",
 
-				THREE.ShaderChunk[ "map_fragment" ],
+			THREE.ShaderChunk[ "map_fragment" ],
 
-				"vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
-				"vec3 emissiveFinal = emissiveColor;",
-				"vec3 specularFinal = specularColor * light.rgb * ( light.a / ( 0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b + 0.00001 ) );",
+			"	vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
+			"	vec3 emissiveFinal = emissiveColor;",
+			"	vec3 specularFinal = specularColor * light.rgb * ( light.a / ( 0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b + 0.00001 ) );",
 
-				"gl_FragColor = vec4( diffuseFinal + emissiveFinal + specularFinal, 1.0 );",
+			"	gl_FragColor = vec4( diffuseFinal + emissiveFinal + specularFinal, 1.0 );",
 
 			"}"
 
@@ -2400,9 +2400,9 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
-				"texCoord = pos.xy * vec2( 0.5 ) + 0.5;",
-				"gl_Position = pos;",
+			"	vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	texCoord = pos.xy * vec2( 0.5 ) + 0.5;",
+			"	gl_Position = pos;",
 
 			"}"
 
@@ -2415,7 +2415,7 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"gl_FragColor = texture2D( samplerResult, texCoord );",
+			"	gl_FragColor = texture2D( samplerResult, texCoord );",
 
 			"}"
 
