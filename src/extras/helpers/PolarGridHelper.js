@@ -16,7 +16,7 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
     radius = radius || 10;
     radials = radials || 16;
     circles = circles || 8;
-    divisions = divisions || 50;
+    divisions = divisions || 64;
     color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
     color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
