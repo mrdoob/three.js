@@ -20,13 +20,11 @@ THREE.SEA3D = function ( config ) {
 		useEnvironment: true,
 		useVertexTexture: true,
 		forceStatic: false,
+		forcePremultipliedAlpha: false,
 		streaming: true,
 		async: true,
 		paths: {},
-		timeLimit: 10,
-		premultipliedAlpha: false,
-		stageWidth: window ? window.innerWidth : 1024,
-		stageHeight: window ? window.innerHeight : 1024
+		timeLimit: 10
 	};
 
 	if ( config ) this.loadConfig( config );
@@ -2574,7 +2572,7 @@ THREE.SEA3D.prototype.readMaterial = function ( sea ) {
 	var mat = this.createMaterial( sea );
 	mat.name = sea.name;
 
-	mat.premultipliedAlpha = this.config.premultipliedAlpha;
+	mat.premultipliedAlpha = this.config.forcePremultipliedAlpha;
 	mat.side = sea.bothSides ? THREE.DoubleSide : THREE.FrontSide;
 
 	this.setBlending( mat, sea.blendMode );
@@ -2728,16 +2726,19 @@ THREE.SEA3D.prototype.readOrthographicCamera = function ( sea ) {
 
 	var aspect, width, height;
 
-	if ( this.config.stageWidth > this.config.stageHeight ) {
+	var stageWidth = this.config.stageWidth !== undefined ? this.config.stageWidth : ( window ? window.innerWidth : 1024 );
+	var stageHeight = this.config.stageHeight !== undefined ? this.config.stageHeight : ( window ? window.innerHeight : 1024 );
 
-		aspect = this.config.stageWidth / this.config.stageHeight;
+	if ( stageWidth > stageHeight ) {
+
+		aspect = stageWidth / stageHeight;
 
 		width = sea.height * aspect;
 		height = sea.height;
 
 	} else {
 
-		aspect = this.config.stageHeight / this.config.stageWidth;
+		aspect = stageHeight / stageWidth;
 
 		width = sea.height;
 		height = sea.height * aspect;
