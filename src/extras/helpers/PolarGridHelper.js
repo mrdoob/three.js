@@ -91,3 +91,5 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 
 PolarGridHelper.prototype = Object.create( LineSegments.prototype );
 PolarGridHelper.prototype.constructor = PolarGridHelper;
+
+export { PolarGridHeler };
