@@ -42,6 +42,7 @@ THREE.MMDLoader = function ( manager ) {
 	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.parser = new MMDParser.Parser();
+	this.textureCrossOrigin = null;
 
 };
 
@@ -67,6 +68,17 @@ THREE.MMDLoader.prototype.defaultToonTextures = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
 ];
+
+/*
+ * Set 'anonymous' for the the texture image file in other domain
+ * even if server responds with "Access-Control-Allow-Origin: *"
+ * because some image operation fails in MMDLoader.
+ */
+THREE.MMDLoader.prototype.setTextureCrossOrigin = function ( value ) {
+
+	this.textureCrossOrigin = value;
+
+};
 
 THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrls, callback, onProgress, onError ) {
 
@@ -123,6 +135,7 @@ THREE.MMDLoader.prototype.loadVmds = function ( urls, callback, onProgress, onEr
 	var scope = this;
 
 	var vmds = [];
+	urls = urls.slice();
 
 	function run () {
 
@@ -865,7 +878,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		var offset = 0;
 		var materialParams = [];
 
-		function loadTexture( filePath, params ) {
+		if ( scope.textureCrossOrigin !== null ) textureLoader.setCrossOrigin( scope.textureCrossOrigin );
+
+		function loadTexture ( filePath, params ) {
 
 			if ( params === undefined ) {
 
@@ -2208,9 +2223,17 @@ THREE.MMDHelper.prototype = {
 
 	setPhysicses: function ( params ) {
 
+		params = ( params === undefined ) ? {} : Object.assign( {}, params );
+
 		for ( var i = 0; i < this.meshes.length; i++ ) {
 
 			this.setPhysics( this.meshes[ i ], params );
+
+			if ( i === 0 && params.sharePhysicsWorld === true ) {
+
+				params.world = this.meshes[ 0 ].physics.world;
+
+			}
 
 		}
 

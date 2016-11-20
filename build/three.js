@@ -28934,15 +28934,13 @@
 			// Safari can not handle Data URIs through XMLHttpRequest so process manually
 			if ( dataUriRegexResult ) {
 
-				var mimeType = dataUriRegexResult[1];
-				var isBase64 = !!dataUriRegexResult[2];
-				var data = dataUriRegexResult[3];
+				var mimeType = dataUriRegexResult[ 1 ];
+				var isBase64 = !! dataUriRegexResult[ 2 ];
+				var data = dataUriRegexResult[ 3 ];
 
-				data = window.decodeURIComponent(data);
+				data = window.decodeURIComponent( data );
 
-				if( isBase64 ) {
-					data = window.atob(data);
-				}
+				if ( isBase64 ) data = window.atob( data );
 
 				try {
 
@@ -28955,16 +28953,18 @@
 						case 'blob':
 
 						 	response = new ArrayBuffer( data.length );
+
 							var view = new Uint8Array( response );
+
 							for ( var i = 0; i < data.length; i ++ ) {
 
-									view[ i ] = data.charCodeAt( i );
+								view[ i ] = data.charCodeAt( i );
 
 							}
 
 							if ( responseType === 'blob' ) {
 
-								response = new Blob( [ response ], { "type" : mimeType } );
+								response = new Blob( [ response ], { type: mimeType } );
 
 							}
 
@@ -28992,24 +28992,24 @@
 					}
 
 					// Wait for next browser tick
-					window.setTimeout( function() {
+					window.setTimeout( function () {
 
 						if ( onLoad ) onLoad( response );
 
 						scope.manager.itemEnd( url );
 
-					}, 0);
+					}, 0 );
 
 				} catch ( error ) {
 
 					// Wait for next browser tick
-					window.setTimeout( function() {
+					window.setTimeout( function () {
 
 						if ( onError ) onError( error );
 
 						scope.manager.itemError( url );
 
-					}, 0);
+					}, 0 );
 
 				}
 
@@ -29369,6 +29369,13 @@
 
 			if ( url.indexOf( 'data:' ) === 0 ) {
 
+				image.src = url;
+
+			} else if ( this.crossOrigin !== undefined ) {
+
+				// crossOrigin doesn't work with URL.createObjectURL()?
+
+				image.crossOrigin = this.crossOrigin;
 				image.src = url;
 
 			} else {
