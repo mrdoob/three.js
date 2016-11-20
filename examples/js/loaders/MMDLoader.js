@@ -42,6 +42,7 @@ THREE.MMDLoader = function ( manager ) {
 	THREE.Loader.call( this );
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.parser = new MMDParser.Parser();
+	this.textureCrossOrigin = null;
 
 };
 
@@ -67,6 +68,17 @@ THREE.MMDLoader.prototype.defaultToonTextures = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII='
 ];
+
+/*
+ * Set 'anonymous' for the the texture image file in other domain
+ * even if server responds with "Access-Control-Allow-Origin: *"
+ * because some image operation fails in MMDLoader.
+ */
+THREE.MMDLoader.prototype.setTextureCrossOrigin = function ( value ) {
+
+	this.textureCrossOrigin = value;
+
+};
 
 THREE.MMDLoader.prototype.load = function ( modelUrl, vmdUrls, callback, onProgress, onError ) {
 
@@ -94,15 +106,15 @@ THREE.MMDLoader.prototype.loadModel = function ( url, callback, onProgress, onEr
 
 	this.loadFileAsBuffer( url, function ( buffer ) {
 
-		callback( scope.createModel( buffer, modelExtension, texturePath ) );
+		callback( scope.createModel( buffer, modelExtension, texturePath, onProgress, onError ) );
 
 	}, onProgress, onError );
 
 };
 
-THREE.MMDLoader.prototype.createModel = function ( buffer, modelExtension, texturePath ) {
+THREE.MMDLoader.prototype.createModel = function ( buffer, modelExtension, texturePath, onProgress, onError ) {
 
-	return this.createMesh( this.parseModel( buffer, modelExtension ), texturePath );
+	return this.createMesh( this.parseModel( buffer, modelExtension ), texturePath, onProgress, onError );
 
 };
 
@@ -123,6 +135,7 @@ THREE.MMDLoader.prototype.loadVmds = function ( urls, callback, onProgress, onEr
 	var scope = this;
 
 	var vmds = [];
+	urls = urls.slice();
 
 	function run () {
 
@@ -857,11 +870,15 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initMaterials = function () {
 
-		var textures = [];
+		var textures = {};
 		var textureLoader = new THREE.TextureLoader( scope.manager );
 		var tgaLoader = new THREE.TGALoader( scope.manager );
+		var canvas = document.createElement( 'canvas' );
+		var context = canvas.getContext( '2d' );
 		var offset = 0;
 		var materialParams = [];
+
+		if ( scope.textureCrossOrigin !== null ) textureLoader.setCrossOrigin( scope.textureCrossOrigin );
 
 		function loadTexture ( filePath, params ) {
 
@@ -892,6 +909,8 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
+			if ( textures[ fullPath ] !== undefined ) return fullPath;
+
 			var loader = THREE.Loader.Handlers.get( fullPath );
 
 			if ( loader === null ) {
@@ -901,6 +920,28 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			}
 
 			var texture = loader.load( fullPath, function ( t ) {
+
+				// MMD toon texture is Axis-Y oriented
+				// but Three.js gradient map is Axis-X oriented.
+				// So here replaces the toon texture image with the rotated one.
+				if ( params.isToonTexture === true ) {
+
+					var image = t.image;
+					var width = image.width;
+					var height = image.height;
+
+					canvas.width = width;
+					canvas.height = height;
+
+					context.clearRect( 0, 0, width, height );
+					context.translate( width / 2.0, height / 2.0 );
+					context.rotate( 0.5 * Math.PI );  // 90.0 * Math.PI / 180.0
+					context.translate( -width / 2.0, -height / 2.0 );
+					context.drawImage( image, 0, 0 );
+
+					t.image = context.getImageData( 0, 0, width, height );
+
+				}
 
 				t.flipY = false;
 				t.wrapS = THREE.RepeatWrapping;
@@ -920,15 +961,13 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				delete texture.readyCallbacks;
 
-			} );
+			}, onProgress, onError );
 
 			texture.readyCallbacks = [];
 
-			var uuid = THREE.Math.generateUUID();
+			textures[ fullPath ] = texture;
 
-			textures[ uuid ] = texture;
-
-			return uuid;
+			return fullPath;
 
 		}
 
@@ -959,13 +998,13 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			/*
 			 * Color
 			 *
-			 * MMD         MeshPhongMaterial
+			 * MMD         MeshToonMaterial
 			 * diffuse  -  color
 			 * specular -  specular
 			 * ambient  -  emissive * a
 			 *               (a = 1.0 without map texture or 0.2 with map texture)
 			 *
-			 * MeshPhongMaterial doesn't have ambient. Set it to emissive instead.
+			 * MeshToonMaterial doesn't have ambient. Set it to emissive instead.
 			 * It'll be too bright if material has map texture so using coef 0.2.
 			 */
 			params.color = new THREE.Color( m.diffuse[ 0 ], m.diffuse[ 1 ], m.diffuse[ 2 ] );
@@ -1069,17 +1108,11 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 		}
 
-		var shader = THREE.ShaderLib[ 'mmd' ];
-
 		for ( var i = 0; i < materialParams.length; i++ ) {
 
 			var p = materialParams[ i ];
 			var p2 = model.materials[ i ];
-			var m = new THREE.ShaderMaterial( {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			} );
+			var m = new THREE.MeshToonMaterial();
 
 			geometry.addGroup( p.faceOffset * 3, p.faceNum * 3, i );
 
@@ -1216,7 +1249,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				}
 
 				m.map = getTexture( p.map, textures );
-				m.uniforms.map.value = m.map;
 				checkTextureTransparency( m );
 
 			}
@@ -1224,7 +1256,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 			if ( p.envMap !== undefined ) {
 
 				m.envMap = getTexture( p.envMap, textures );
-				m.uniforms.envMap.value = m.envMap;
 				m.combine = p.envMapType;
 
 				// TODO: WebGLRenderer should automatically update?
@@ -1236,17 +1267,17 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			m.uniforms.opacity.value = p.opacity;
-			m.uniforms.diffuse.value.copy( p.color );
+			m.opacity = p.opacity;
+			m.color = p.color;
 
 			if ( p.emissive !== undefined ) {
 
-				m.uniforms.emissive.value.copy( p.emissive );
+				m.emissive = p.emissive;
 
 			}
 
-			m.uniforms.specular.value.copy( p.specular );
-			m.uniforms.shininess.value = Math.max( p.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+			m.specular = p.specular;
+			m.shininess = Math.max( p.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
 			if ( model.metadata.format === 'pmd' ) {
 
@@ -1271,21 +1302,9 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				if ( m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
-				m.uniforms.toonMap.value = textures[ p2.toonIndex ];
-				m.uniforms.celShading.value = 1;
-
-				if ( p2.toonIndex === -1 ) {
-
-					m.uniforms.hasToonTexture.value = 0;
-
-				} else {
-
-					var n = model.toonTextures[ p2.toonIndex ].fileName;
-					var uuid = loadTexture( n, { defaultTexturePath: isDefaultToonTexture( n ) } );
-					m.uniforms.toonMap.value = textures[ uuid ];
-					m.uniforms.hasToonTexture.value = 1;
-
-				}
+				var toonFileName = ( p2.toonIndex === -1 ) ? 'toon00.bmp' : model.toonTextures[ p2.toonIndex ].fileName;
+				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToonTexture( toonFileName ) } );
+				m.gradientMap = getTexture( uuid, textures );
 
 			} else {
 
@@ -1298,32 +1317,23 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 				if ( ( p2.flag & 0x10 ) === 0 || m.outlineParameters.thickness === 0.0 ) m.outlineParameters.visible = false;
 
-				m.uniforms.celShading.value = 1;
+				var toonFileName, isDefaultToon;
 
-				if ( p2.toonIndex === -1 ) {
+				if ( p2.toonIndex === -1 || p2.toonFlag !== 0 ) {
 
-					m.uniforms.hasToonTexture.value = 0;
+					var num = p2.toonIndex + 1;
+					toonFileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
+					isDefaultToon = true;
 
 				} else {
 
-					if ( p2.toonFlag === 0 ) {
-
-						var n = model.textures[ p2.toonIndex ];
-						var uuid = loadTexture( n );
-						m.uniforms.toonMap.value = textures[ uuid ];
-
-					} else {
-
-						var num = p2.toonIndex + 1;
-						var fileName = 'toon' + ( num < 10 ? '0' + num : num ) + '.bmp';
-						var uuid = loadTexture( fileName, { defaultTexturePath: true } );
-						m.uniforms.toonMap.value = textures[ uuid ];
-
-					}
-
-					m.uniforms.hasToonTexture.value = 1;
+					toonFileName = model.textures[ p2.toonIndex ];
+					isDefaultToon = false;
 
 				}
+
+				var uuid = loadTexture( toonFileName, { isToonTexture: true, defaultTexturePath: isDefaultToon } );
+				m.gradientMap = getTexture( uuid, textures );
 
 			}
 
@@ -1353,7 +1363,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					var m = material.materials[ e.index ];
 
-					if ( m.uniforms.opacity.value !== e.diffuse[ 3 ] ) {
+					if ( m.opacity !== e.diffuse[ 3 ] ) {
 
 						m.transparent = true;
 
@@ -1979,74 +1989,6 @@ THREE.MMDLoader.CubicBezierInterpolation.prototype._calculate = function( x1, x2
 
 };
 
-/*
- * Shaders are copied from MeshPhongMaterial and then MMD spcific codes are inserted.
- * Keep shaders updated on MeshPhongMaterial.
- */
-THREE.ShaderLib[ 'mmd' ] = {
-
-	uniforms: THREE.UniformsUtils.merge( [
-
-		THREE.ShaderLib[ 'phong' ].uniforms,
-
-		// MMD specific for toon mapping
-		{
-			"celShading"      : { type: "i", value: 0 },
-			"toonMap"         : { type: "t", value: null },
-			"hasToonTexture"  : { type: "i", value: 0 }
-		}
-
-	] ),
-
-	vertexShader: THREE.ShaderLib[ 'phong' ].vertexShader,
-
-	// put toon mapping logic right before "void main() {...}"
-	fragmentShader: THREE.ShaderLib[ 'phong' ].fragmentShader.replace( /void\s+main\s*\(\s*\)/, [
-
-		"	uniform bool celShading;",
-		"	uniform sampler2D toonMap;",
-		"	uniform bool hasToonTexture;",
-
-		"	vec3 toon ( vec3 lightDirection, vec3 norm ) {",
-		"		if ( ! hasToonTexture ) {",
-		"			return vec3( 1.0 );",
-		"		}",
-		"		vec2 coord = vec2( 0.0, 0.5 * ( 1.0 - dot( lightDirection, norm ) ) );",
-		"		return texture2D( toonMap, coord ).rgb;",
-		"	}",
-
-		// redefine for MMD
-		"#undef RE_Direct",
-		"void RE_Direct_BlinnMMD( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {",
-		"	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );",
-		"	vec3 irradiance = dotNL * directLight.color;",
-
-		"	#ifndef PHYSICALLY_CORRECT_LIGHTS",
-
-		"		irradiance *= PI; // punctual light",
-
-		"	#endif",
-
-		// ---- MMD specific for toon mapping
-		"	if ( celShading ) {",
-		"		reflectedLight.directDiffuse += material.diffuseColor * directLight.color * toon( directLight.direction, geometry.normal );",
-		"	} else {",
-		"		reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );",
-		"	}",
-		// ---- MMD specific for toon mapping
-
-		"	reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess ) * material.specularStrength;",
-		"}",
-		// ---- MMD specific for toon mapping
-		"#define RE_Direct	RE_Direct_BlinnMMD",
-		// ---- MMD specific for toon mapping
-
-		"void main()"
-
-	].join( "\n" ) )
-
-};
-
 THREE.MMDAudioManager = function ( audio, listener, p ) {
 
 	var params = ( p === null || p === undefined ) ? {} : p;
@@ -2201,6 +2143,9 @@ THREE.MMDHelper = function () {
 	this.doPhysics = true;
 	this.doCameraAnimation = true;
 
+	this.sharedPhysics = false;
+	this.masterPhysics = null;
+
 	this.audioManager = null;
 	this.camera = null;
 
@@ -2256,13 +2201,21 @@ THREE.MMDHelper.prototype = {
 
 	setPhysics: function ( mesh, params ) {
 
-		if ( params === undefined ) params = {};
+		params = ( params === undefined ) ? {} : Object.assign( {}, params );
+
+		if ( params.world === undefined && this.sharedPhysics ) {
+
+			var masterPhysics = this.getMasterPhysics();
+
+			if ( masterPhysics !== null ) params.world = masterPhysics.world;
+
+		}
 
 		var warmup = params.warmup !== undefined ? params.warmup : 60;
 
 		var physics = new THREE.MMDPhysics( mesh, params );
 
-		if ( mesh.mixer !== null && mesh.mixer !== undefined && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== false ) {
 
 			this.animateOneMesh( 0, mesh );
 			physics.reset();
@@ -2274,6 +2227,26 @@ THREE.MMDHelper.prototype = {
 		this.updateIKParametersDependingOnPhysicsEnabled( mesh, true );
 
 		mesh.physics = physics;
+
+	},
+
+	getMasterPhysics: function () {
+
+		if ( this.masterPhysics !== null ) return this.masterPhysics;
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var physics = this.meshes[ i ].physics;
+
+			if ( physics !== undefined && physics !== null ) {
+
+				this.masterPhysics = physics;
+				return this.masterPhysics;
+
+			}
+		}
+
+		return null;
 
 	},
 
@@ -2539,6 +2512,8 @@ THREE.MMDHelper.prototype = {
 
 		}
 
+		if ( this.sharedPhysics ) this.updateSharedPhysics( delta );
+
 		this.animateCamera( delta );
 
 	},
@@ -2582,9 +2557,45 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( physics !== null && this.doPhysics === true ) {
+		if ( physics !== null && this.doPhysics && ! this.sharedPhysics) {
 
 			physics.update( delta );
+
+		}
+
+	},
+
+	updateSharedPhysics: function ( delta ) {
+
+		if ( this.meshes.length === 0 || ! this.doPhysics || ! this.sharedPhysics ) return;
+
+		var physics = this.getMasterPhysics();
+
+		if ( physics === null ) return;
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var p = this.meshes[ i ].physics;
+
+			if ( p !== null && p !== undefined ) {
+
+				p.updateRigidBodies();
+
+			}
+
+		}
+
+		physics.stepSimulation( delta );
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var p = this.meshes[ i ].physics;
+
+			if ( p !== null && p !== undefined ) {
+
+				p.updateBones();
+
+			}
 
 		}
 

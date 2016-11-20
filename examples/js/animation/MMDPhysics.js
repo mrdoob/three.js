@@ -35,7 +35,7 @@ THREE.MMDPhysics = function ( mesh, params ) {
 	this.unitStep = ( params.unitStep !== undefined ) ? params.unitStep : 1 / 65;
 	this.maxStepNum = ( params.maxStepNum !== undefined ) ? params.maxStepNum : 3;
 
-	this.world = null;
+	this.world = params.world !== undefined ? params.world : null;
 	this.bodies = [];
 	this.constraints = [];
 
@@ -67,7 +67,7 @@ THREE.MMDPhysics.prototype = {
 
 		mesh.updateMatrixWorld( true );
 
-		this.initWorld();
+		if ( this.world === null ) this.initWorld();
 		this.initRigidBodies();
 		this.initConstraints();
 
@@ -131,6 +131,14 @@ THREE.MMDPhysics.prototype = {
 
 	update: function ( delta ) {
 
+		this.updateRigidBodies();
+		this.stepSimulation( delta );
+		this.updateBones();
+
+	},
+
+	stepSimulation: function ( delta ) {
+
 		var unitStep = this.unitStep;
 		var stepTime = delta;
 		var maxStepNum = ( ( delta / unitStep ) | 0 ) + 1;
@@ -148,9 +156,7 @@ THREE.MMDPhysics.prototype = {
 
 		}
 
-		this.updateRigidBodies();
 		this.world.stepSimulation( stepTime, maxStepNum, unitStep );
-		this.updateBones();
 
 	},
 

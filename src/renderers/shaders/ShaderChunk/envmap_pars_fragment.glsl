@@ -5,7 +5,7 @@
 
 #ifdef USE_ENVMAP
 
-	#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
+	#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON ) )
 		varying vec3 vWorldPosition;
 	#endif
 
@@ -16,7 +16,7 @@
 	#endif
 	uniform float flipEnvMap;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON ) || defined( PHYSICAL )
 		uniform float refractionRatio;
 	#else
 		varying vec3 vReflect;

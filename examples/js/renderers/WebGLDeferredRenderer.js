@@ -1623,13 +1623,13 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			map: { type: "t", value: null },
-			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+			map: { value: null },
+			offsetRepeat: { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-			diffuse: { type: "c", value: new THREE.Color( 0x000000 ) },
-			emissive: { type: "c", value: new THREE.Color( 0x000000 ) },
-			specular: { type: "c", value: new THREE.Color( 0x000000 ) },
-			shininess: { type: "f", value: 30.0 }
+			diffuse: { value: new THREE.Color( 0x000000 ) },
+			emissive: { value: new THREE.Color( 0x000000 ) },
+			specular: { value: new THREE.Color( 0x000000 ) },
+			shininess: { value: 30.0 }
 
 		},
 
@@ -1687,9 +1687,9 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerColor: { type: "t", value: null },
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 }
+			samplerColor: { value: null },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 }
 
 		},
 
@@ -1729,18 +1729,18 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			samplerNormalDepth: { value: null },
+			samplerColor: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 },
-			lightRadius: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightIntensity: { value: 1.0 },
+			lightRadius: { value: 1.0 }
 
 		},
 
@@ -1811,19 +1811,19 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			samplerNormalDepth: { value: null },
+			samplerColor: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { type: "f", value: 1.0 },
-			lightIntensity: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightAngle: { value: 1.0 },
+			lightIntensity: { value: 1.0 }
 
 		},
 
@@ -1907,17 +1907,17 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			samplerNormalDepth: { value: null },
+			samplerColor: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS : { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightDirectionVS : { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightIntensity: { value: 1.0 }
 
 		},
 
@@ -1972,7 +1972,7 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			shininess: { type: "f", value: 30.0 }
+			shininess: { value: 30.0 }
 
 		},
 
@@ -2030,17 +2030,17 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			samplerNormalDepthShininess: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 },
-			lightRadius: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightIntensity: { value: 1.0 },
+			lightRadius: { value: 1.0 }
 
 		},
 
@@ -2101,18 +2101,18 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			samplerNormalDepthShininess: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { type: "f", value: 1.0 },
-			lightIntensity: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightAngle: { value: 1.0 },
+			lightIntensity: { value: 1.0 }
 
 		},
 
@@ -2194,16 +2194,16 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			samplerNormalDepthShininess: { value: null },
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matProjInverse: { value: new THREE.Matrix4() },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS : { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 }
+			lightColor: { value: new THREE.Color( 0x000000 ) },
+			lightDirectionVS : { value: new THREE.Vector3( 0, 1, 0 ) },
+			lightIntensity: { value: 1.0 }
 
 		},
 
@@ -2258,18 +2258,18 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerLight: { type: "t", value: null },
+			samplerLight: { value: null },
 
-			map: { type: "t", value: null },
-			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+			map: { value: null },
+			offsetRepeat: { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+			viewWidth: { value: 800 },
+			viewHeight: { value: 600 },
 
-			diffuse: { type: "c", value: new THREE.Color( 0x000000 ) },
-			emissive: { type: "c", value: new THREE.Color( 0x000000 ) },
-			specular: { type: "c", value: new THREE.Color( 0x000000 ) },
-			shininess: { type: "f", value: 30.0 }
+			diffuse: { value: new THREE.Color( 0x000000 ) },
+			emissive: { value: new THREE.Color( 0x000000 ) },
+			specular: { value: new THREE.Color( 0x000000 ) },
+			shininess: { value: 30.0 }
 
 		},
 
@@ -2341,7 +2341,7 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerResult: { type: "t", value: null }
+			samplerResult: { value: null }
 
 		},
 
