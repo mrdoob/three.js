@@ -38679,6 +38679,12 @@
 
 	}
 
+	Uniform.prototype.clone = function () {
+
+		return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
+
+	};
+
 	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
 	 */
