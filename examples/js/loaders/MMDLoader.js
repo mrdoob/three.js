@@ -2281,9 +2281,17 @@ THREE.MMDHelper.prototype = {
 
 	setPhysicses: function ( params ) {
 
+		params = ( params === undefined ) ? {} : Object.assign( {}, params );
+
 		for ( var i = 0; i < this.meshes.length; i++ ) {
 
 			this.setPhysics( this.meshes[ i ], params );
+
+			if ( i === 0 && params.sharePhysicsWorld === true ) {
+
+				params.world = this.meshes[ 0 ].physics.world;
+
+			}
 
 		}
 
