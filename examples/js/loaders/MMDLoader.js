@@ -123,6 +123,7 @@ THREE.MMDLoader.prototype.loadVmds = function ( urls, callback, onProgress, onEr
 	var scope = this;
 
 	var vmds = [];
+	urls = urls.slice();
 
 	function run () {
 
