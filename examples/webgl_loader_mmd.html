@@ -54,7 +54,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
@@ -98,6 +98,8 @@
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.OutlineEffect( renderer );
+
 				// STATS
 
 				stats = new Stats();
@@ -118,7 +120,7 @@
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 
@@ -219,7 +221,7 @@
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
-						helper.doOutlineDrawing = api[ 'outline' ];
+						effect.enabled = api[ 'outline' ];
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
@@ -246,7 +248,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -264,18 +266,10 @@
 
 			function render() {
 
-				if ( mesh ) {
-
-					helper.animate( clock.getDelta() );
-					if ( physicsHelper.visible ) physicsHelper.update();
-					if ( ikHelper.visible ) ikHelper.update();
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				helper.animate( clock.getDelta() );
+				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
+				effect.render( scene, camera );
 
 			}
 

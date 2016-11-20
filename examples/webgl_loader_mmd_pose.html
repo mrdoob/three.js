@@ -52,7 +52,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 			var helper;
 
 			var vpds = [];
@@ -96,6 +96,8 @@
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.OutlineEffect( renderer );
+
 				// model
 
 				var onProgress = function ( xhr ) {
@@ -123,7 +125,7 @@
 					'models/mmd/vpds/11.vpd'
 				];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 
@@ -132,8 +134,6 @@
 					mesh = object;
 
 					mesh.position.y = -10;
-
-					helper.add( mesh );
 
 					scene.add( mesh );
 
@@ -294,7 +294,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -321,15 +321,7 @@
 
 				camera.lookAt( scene.position );
 */
-				if ( ready ) {
-
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				effect.render( scene, camera );
 
 			}
 

@@ -26,11 +26,9 @@
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
 
-	var _this = this;
-
 	parameters = parameters || {};
 
-	this.autoClear = parameters.autoClear !== undefined ? parameters.autoClear : true;
+	this.enabled = true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
 	var defaultColor = parameters.defaultColor !== undefined ? parameters.defaultColor : new THREE.Color( 0x000000 );
@@ -427,13 +425,14 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
-	this.setSize = function ( width, height ) {
-
-		renderer.setSize( width, height );
-
-	};
-
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
+
+		if ( this.enabled === false ) {
+
+			renderer.render( scene, camera, renderTarget, forceClear );
+			return;
+
+		}
 
 		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
@@ -463,6 +462,78 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		scene.background = currentSceneBackground;
 		renderer.autoClear = currentAutoClear;
 		renderer.shadowMap.enabled = currentShadowMapEnabled;
+
+	};
+
+	/*
+	 * See #9918
+	 *
+	 * The following property copies and wrapper methods enable
+	 * THREE.OutlineEffect to be called from other *Effect, like
+	 *
+	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 *
+	 * function render () {
+	 *
+ 	 * 	effect.render( scene, camera );
+	 *
+	 * }
+	 */
+	this.autoClear = renderer.autoClear;
+	this.domElement = renderer.domElement;
+	this.shadowMap = renderer.shadowMap;
+
+	this.clear = function ( color, depth, stencil ) {
+
+		renderer.clear( color, depth, stencil );
+
+	};
+
+	this.getPixelRatio = function () {
+
+		return renderer.getPixelRatio();
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		renderer.setPixelRatio( value );
+
+	};
+
+	this.getSize = function () {
+
+		return renderer.getSize();
+
+	};
+
+	this.setSize = function ( width, height, updateStyle ) {
+
+		renderer.setSize( width, height, updateStyle );
+
+	};
+
+	this.setViewport = function ( x, y, width, height ) {
+
+		renderer.setViewport( x, y, width, height );
+
+	};
+
+	this.setScissor = function ( x, y, width, height ) {
+
+		renderer.setScissor( x, y, width, height );
+
+	};
+
+	this.setScissorTest = function ( boolean ) {
+
+		renderer.setScissorTest( boolean );
+
+	};
+
+	this.setRenderTarget = function ( renderTarget ) {
+
+		renderer.setRenderTarget( renderTarget );
 
 	};
 

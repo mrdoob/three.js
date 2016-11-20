@@ -53,7 +53,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper;
 
 			var ready = false;
@@ -96,6 +96,8 @@
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.OutlineEffect( renderer );
+
 				// model
 
 				var onProgress = function ( xhr ) {
@@ -114,7 +116,7 @@
 				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 
@@ -173,7 +175,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -197,15 +199,11 @@
 
 				if ( ready ) {
 
-					var delta = clock.getDelta();
-					helper.animate( delta );
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
+					helper.animate( clock.getDelta() );
 
 				}
+
+				effect.render( scene, camera );
 
 			}
 
