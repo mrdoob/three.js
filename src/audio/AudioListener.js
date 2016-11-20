@@ -113,8 +113,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				listener.upY.setValueAtTime( up.y, this.context.currentTime );
 				listener.upZ.setValueAtTime( up.z, this.context.currentTime );
 
-			}
-			else {
+			} else {
 
 				listener.setPosition( position.x, position.y, position.z );
 				listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
