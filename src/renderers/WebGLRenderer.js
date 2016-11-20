@@ -1892,13 +1892,13 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsLambert( m_uniforms, material );
 
-			} else if ( material.isMeshPhongMaterial ) {
-
-				refreshUniformsPhong( m_uniforms, material );
-
 			} else if ( material.isMeshToonMaterial ) {
 
 				refreshUniformsToon( m_uniforms, material );
+
+			} else if ( material.isMeshPhongMaterial ) {
+
+				refreshUniformsPhong( m_uniforms, material );
 
 			} else if ( material.isMeshPhysicalMaterial ) {
 
