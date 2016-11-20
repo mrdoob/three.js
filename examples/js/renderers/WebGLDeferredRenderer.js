@@ -345,11 +345,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'normalDepthShininess' ] : THREE.ShaderDeferred[ 'normalDepth' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
 		} );
+
+		var uniforms = material.uniforms;
+
+		if ( uniforms.shininess !== undefined ) uniforms.shininess = new THREE.Uniform( uniforms.shininess.value );
 
 		return material;
 
@@ -449,13 +453,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var shader = THREE.ShaderDeferred[ 'color' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
 		} );
 
+		var uniforms = material.uniforms;
+
+		uniforms.diffuse = new THREE.Uniform( uniforms.diffuse.value.clone() );
+		uniforms.emissive = new THREE.Uniform( uniforms.emissive.value.clone() );
+		uniforms.specular = new THREE.Uniform( uniforms.specular.value.clone() );
+
+		uniforms.shininess = new THREE.Uniform( uniforms.shininess.value );
+
 		if ( originalMaterial.map !== undefined ) material.map = originalMaterial.map;
+
+		uniforms.map = new THREE.Uniform();
 
 		return material;
 
@@ -587,7 +601,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var shader = THREE.ShaderDeferred[ 'reconstruction' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
@@ -604,9 +618,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	function updateDeferredReconstructionMaterial( material, originalMaterial ) {
 
 		updateDeferredColorMaterial( material, originalMaterial );
-
-		material.uniforms.viewWidth.value = _width;
-		material.uniforms.viewHeight.value = _height;
 
 	}
 
@@ -675,7 +686,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var shader = THREE.ShaderDeferred[ 'emissiveLight' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			blending: THREE.NoBlending,
@@ -688,15 +699,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var mesh = new THREE.Mesh( geometry, material );
 
 		return mesh;
-
-	}
-
-	function updateDeferredEmissiveLight( light, camera ) {
-
-		var uniforms = light.material.uniforms;
-
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 
 	}
 
@@ -807,7 +809,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	function createDeferredLightMaterial( shader, isLightPrePass ) {
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			transparent: true,
@@ -849,6 +851,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.side = THREE.BackSide;
 		material.depthFunc = THREE.GreaterEqualDepth;
+	
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = new THREE.Uniform( uniforms.lightColor.value.clone() );
+		uniforms.lightRadius = new THREE.Uniform( uniforms.lightRadius.value );
+		uniforms.lightIntensity = new THREE.Uniform( uniforms.lightIntensity.value );
+		uniforms.lightPositionVS = new THREE.Uniform( uniforms.lightPositionVS.value.clone() );
 
 		return material;
 
@@ -860,9 +869,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var distance = originalLight.distance;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightColor.value.copy( originalLight.color );
 
 		if ( distance > 0 ) {
@@ -895,6 +901,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.depthTest = false;
 
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = new THREE.Uniform( uniforms.lightColor.value.clone() );
+		uniforms.lightAngle = new THREE.Uniform( uniforms.lightAngle.value );
+		uniforms.lightIntensity = new THREE.Uniform( uniforms.lightIntensity.value );
+		uniforms.lightPositionVS = new THREE.Uniform( uniforms.lightPositionVS.value.clone() );
+		uniforms.lightDirectionVS = new THREE.Uniform( uniforms.lightDirectionVS.value.clone() );
+
 		return material;
 
 	}
@@ -904,9 +918,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightAngle.value = originalLight.angle;
 		uniforms.lightColor.value.copy( originalLight.color );
 		uniforms.lightIntensity.value = originalLight.intensity;
@@ -935,6 +946,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.depthTest = false;
 
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = new THREE.Uniform( uniforms.lightColor.value.clone() );
+		uniforms.lightIntensity = new THREE.Uniform( uniforms.lightIntensity.value );
+		uniforms.lightDirectionVS = new THREE.Uniform( uniforms.lightDirectionVS.value.clone() );
+
 		return material;
 
 	}
@@ -944,9 +961,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightColor.value.copy( originalLight.color );
 		uniforms.lightIntensity.value = originalLight.intensity;
 
@@ -1055,6 +1069,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			}
 
 		}
+
+	}
+
+	function updateDeferredCommonUniforms( camera ) {
+
+		var uniforms = THREE.ShaderDeferredCommon[ 'commonUniforms' ];
+
+		uniforms.viewWidth.value = _width;
+		uniforms.viewHeight.value = _height;
+
+		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
 
 	}
 
@@ -1223,8 +1248,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 */
 
 	function renderLight( scene, camera ) {
-
-		updateDeferredEmissiveLight( _lightFullscreenScene.userData.emissiveLight, camera );
 
 		scene.traverse( addDeferredLightsToLightScene );
 
@@ -1403,6 +1426,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		scene.traverse( saveOriginalMaterialAndCheckTransparency );
 
+		updateDeferredCommonUniforms( camera );
+
 		renderNormalDepth( scene, camera );
 
 		if ( _lightPrePass ) {
@@ -1567,6 +1592,19 @@ THREE.DeferredShaderChunk = {
 
 };
 
+THREE.ShaderDeferredCommon = {
+
+	commonUniforms: {
+
+		matProjInverse: { value: new THREE.Matrix4() },
+
+		viewWidth: { value: 800 },
+		viewHeight: { value: 600 }
+
+	}
+
+}
+
 THREE.ShaderDeferred = {
 
 	normalDepth: {
@@ -1685,13 +1723,15 @@ THREE.ShaderDeferred = {
 
 	emissiveLight: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerColor: { value: null },
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 }
+				samplerColor: { value: null }
 
-		},
+			},
+
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
@@ -1727,22 +1767,21 @@ THREE.ShaderDeferred = {
 
 	pointLight: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerNormalDepth: { value: null },
-			samplerColor: { value: null },
+				samplerNormalDepth: { value: null },
+				samplerColor: { value: null },
 
-			matProjInverse: { value: new THREE.Matrix4() },
+				lightColor: { value: new THREE.Color( 0x000000 ) },
+				lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightIntensity: { value: 1.0 },
+				lightRadius: { value: 1.0 }
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
+			},
 
-			lightColor: { value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { value: 1.0 },
-			lightRadius: { value: 1.0 }
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-		},
+		),
 
 		vertexShader: [
 
@@ -1809,23 +1848,22 @@ THREE.ShaderDeferred = {
 
 	spotLight: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerNormalDepth: { value: null },
-			samplerColor: { value: null },
+				samplerNormalDepth: { value: null },
+				samplerColor: { value: null },
 
-			matProjInverse: { value: new THREE.Matrix4() },
+				lightColor: { value: new THREE.Color( 0x000000 ) },
+				lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightAngle: { value: 1.0 },
+				lightIntensity: { value: 1.0 }
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
+			},
 
-			lightColor: { value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { value: 1.0 },
-			lightIntensity: { value: 1.0 }
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-		},
+		),
 
 		vertexShader: [
 
@@ -1905,21 +1943,19 @@ THREE.ShaderDeferred = {
 
 	directionalLight: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerNormalDepth: { value: null },
-			samplerColor: { value: null },
+				samplerNormalDepth: { value: null },
+				samplerColor: { value: null },
 
-			matProjInverse: { value: new THREE.Matrix4() },
+				lightColor: { value: new THREE.Color( 0x000000 ) },
+				lightDirectionVS : { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightIntensity: { value: 1.0 }
+			},
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-			lightColor: { value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS : { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { value: 1.0 }
-
-		},
+		),
 
 		vertexShader: [
 
@@ -2028,21 +2064,20 @@ THREE.ShaderDeferred = {
 
 	pointLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerNormalDepthShininess: { value: null },
+				samplerNormalDepthShininess: { value: null },
 
-			matProjInverse: { value: new THREE.Matrix4() },
+				lightColor: { value: new THREE.Color( 0x000000 ) },
+				lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightIntensity: { value: 1.0 },
+				lightRadius: { value: 1.0 }
+			},
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-			lightColor: { value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { value: 1.0 },
-			lightRadius: { value: 1.0 }
+		),
 
-		},
 
 		vertexShader: [
 
@@ -2099,22 +2134,21 @@ THREE.ShaderDeferred = {
 
 	spotLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
-			samplerNormalDepthShininess: { value: null },
+				samplerNormalDepthShininess: { value: null },
 
-			matProjInverse: { value: new THREE.Matrix4() },
+				lightColor: { value: new THREE.Color( 0x000000 ) },
+				lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
+				lightAngle: { value: 1.0 },
+				lightIntensity: { value: 1.0 }
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
+			},
 
-			lightColor: { value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { value: 1.0 },
-			lightIntensity: { value: 1.0 }
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-		},
+		),
 
 		vertexShader: [
 
@@ -2192,20 +2226,19 @@ THREE.ShaderDeferred = {
 
 	directionalLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
 			samplerNormalDepthShininess: { value: null },
-
-			matProjInverse: { value: new THREE.Matrix4() },
-
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
 
 			lightColor: { value: new THREE.Color( 0x000000 ) },
 			lightDirectionVS : { value: new THREE.Vector3( 0, 1, 0 ) },
 			lightIntensity: { value: 1.0 }
 
-		},
+			},
+
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
@@ -2256,22 +2289,23 @@ THREE.ShaderDeferred = {
 
 	reconstruction: {
 
-		uniforms: {
+		uniforms: Object.assign( {
 
 			samplerLight: { value: null },
 
 			map: { value: null },
 			offsetRepeat: { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-			viewWidth: { value: 800 },
-			viewHeight: { value: 600 },
-
 			diffuse: { value: new THREE.Color( 0x000000 ) },
 			emissive: { value: new THREE.Color( 0x000000 ) },
 			specular: { value: new THREE.Color( 0x000000 ) },
 			shininess: { value: 30.0 }
 
-		},
+			},
+
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
