@@ -2223,6 +2223,9 @@ THREE.MMDHelper = function ( renderer ) {
 	this.doOutlineDrawing = true;
 	this.doCameraAnimation = true;
 
+	this.sharedPhysics = false;
+	this.masterPhysics = null;
+
 	this.audioManager = null;
 	this.camera = null;
 
@@ -2296,17 +2299,9 @@ THREE.MMDHelper.prototype = {
 
 	setPhysicses: function ( params ) {
 
-		params = ( params === undefined ) ? {} : Object.assign( {}, params );
-
 		for ( var i = 0; i < this.meshes.length; i++ ) {
 
 			this.setPhysics( this.meshes[ i ], params );
-
-			if ( i === 0 && params.sharePhysicsWorld === true ) {
-
-				params.world = this.meshes[ 0 ].physics.world;
-
-			}
 
 		}
 
@@ -2314,13 +2309,21 @@ THREE.MMDHelper.prototype = {
 
 	setPhysics: function ( mesh, params ) {
 
-		if ( params === undefined ) params = {};
+		params = ( params === undefined ) ? {} : Object.assign( {}, params );
+
+		if ( params.world === undefined && this.sharedPhysics ) {
+
+			var masterPhysics = this.getMasterPhysics();
+
+			if ( masterPhysics !== null ) params.world = masterPhysics.world;
+
+		}
 
 		var warmup = params.warmup !== undefined ? params.warmup : 60;
 
 		var physics = new THREE.MMDPhysics( mesh, params );
 
-		if ( mesh.mixer !== null && mesh.mixer !== undefined && this.doAnimation === true && params.preventAnimationWarmup !== false ) {
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== false ) {
 
 			this.animateOneMesh( 0, mesh );
 			physics.reset();
@@ -2332,6 +2335,26 @@ THREE.MMDHelper.prototype = {
 		this.updateIKParametersDependingOnPhysicsEnabled( mesh, true );
 
 		mesh.physics = physics;
+
+	},
+
+	getMasterPhysics: function () {
+
+		if ( this.masterPhysics !== null ) return this.masterPhysics;
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var physics = this.meshes[ i ].physics;
+
+			if ( physics !== undefined && physics !== null ) {
+
+				this.masterPhysics = physics;
+				return this.masterPhysics;
+
+			}
+		}
+
+		return null;
 
 	},
 
@@ -2597,6 +2620,8 @@ THREE.MMDHelper.prototype = {
 
 		}
 
+		if ( this.sharedPhysics ) this.updateSharedPhysics( delta );
+
 		this.animateCamera( delta );
 
 	},
@@ -2640,9 +2665,45 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( physics !== null && this.doPhysics === true ) {
+		if ( physics !== null && this.doPhysics && ! this.sharedPhysics) {
 
 			physics.update( delta );
+
+		}
+
+	},
+
+	updateSharedPhysics: function ( delta ) {
+
+		if ( this.meshes.length === 0 || ! this.doPhysics || ! this.sharedPhysics ) return;
+
+		var physics = this.getMasterPhysics();
+
+		if ( physics === null ) return;
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var p = this.meshes[ i ].physics;
+
+			if ( p !== null && p !== undefined ) {
+
+				p.updateRigidBodies();
+
+			}
+
+		}
+
+		physics.stepSimulation( delta );
+
+		for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+
+			var p = this.meshes[ i ].physics;
+
+			if ( p !== null && p !== undefined ) {
+
+				p.updateBones();
+
+			}
 
 		}
 
