@@ -45,7 +45,7 @@ Object.assign(THREE.UniformsLib, {
 	ltc_brdf: {
 		"ltcMat": { type: "t", value: THREE.UniformsLib.LTC_MAT_TEXTURE },
 		"ltcMag": { type: "t", value: THREE.UniformsLib.LTC_MAG_TEXTURE }
-	},
+	}
 
 } );
 
@@ -99,7 +99,7 @@ Object.assign(THREE.ShaderLib, {
 				"emissive" : { value: new THREE.Color( 0x000000 ) },
 				"roughness": { value: 0.5 },
 				"metalness": { value: 0 },
-				"envMapIntensity" : { value: 1 }, // temporary
+				"envMapIntensity" : { value: 1 } // temporary
 			}
 
 		),
@@ -107,7 +107,7 @@ Object.assign(THREE.ShaderLib, {
 		vertexShader: THREE.ShaderChunk.meshphysical_vert,
 		fragmentShader: THREE.ShaderChunk.meshphysical_frag
 
-	},
+	}
 
 } );
 

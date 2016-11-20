@@ -49,7 +49,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 		console.error( "THREE.UnrealBloomPass relies on THREE.LuminosityHighPassShader" );
 
 	var highPassShader = THREE.LuminosityHighPassShader;
-	this.highPassUniforms = THREE.UniformsUtils.clone( highPassShader.uniforms );
+	this.highPassUniforms = Object.assign( {}, highPassShader.uniforms );
 
 	this.highPassUniforms[ "luminosityThreshold" ].value = threshold;
 	this.highPassUniforms[ "smoothWidth" ].value = 0.01;
@@ -101,7 +101,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
 	this.copyUniforms[ "opacity" ].value = 1.0;
 
 	this.materialCopy = new THREE.ShaderMaterial( {
@@ -231,7 +231,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			uniforms: {
 				"colorTexture": { value: null },
 				"texSize": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
-				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
+				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) }
 			},
 
 			vertexShader:

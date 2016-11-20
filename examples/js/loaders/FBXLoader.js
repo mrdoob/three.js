@@ -789,7 +789,7 @@
 
 				// node's property
 				var propExp = new RegExp( "^\\t{" + ( this.currentIndent ) + "}(\\w+):[\\s\\t\\r\\n](.*)" );
-				match = l.match( propExp );
+				var match = l.match( propExp );
 				if ( match ) {
 
 					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();

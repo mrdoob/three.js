@@ -155,6 +155,7 @@ var files = {
 		"webgl_materials_variations_phong",
 		"webgl_materials_variations_standard",
 		"webgl_materials_variations_physical",
+		"webgl_materials_variations_toon",
 		"webgl_materials_video",
 		"webgl_materials_wireframe",
 		"webgl_math_spherical_distribution",

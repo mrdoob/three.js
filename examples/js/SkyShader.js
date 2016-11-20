@@ -98,7 +98,7 @@ THREE.ShaderLib[ 'sky' ] = {
 			// mie coefficients
 			"vBetaM = totalMie(lambda, turbidity) * mieCoefficient;",
 
-		"}",
+		"}"
 
 	].join( "\n" ),
 
@@ -201,7 +201,7 @@ THREE.ShaderLib[ 'sky' ] = {
 			"gl_FragColor.rgb = retColor;",
 
 			"gl_FragColor.a = 1.0;",
-		"}",
+		"}"
 
 	].join( "\n" )
 
@@ -210,7 +210,7 @@ THREE.ShaderLib[ 'sky' ] = {
 THREE.Sky = function () {
 
 	var skyShader = THREE.ShaderLib[ "sky" ];
-	var skyUniforms = THREE.UniformsUtils.clone( skyShader.uniforms );
+	var skyUniforms = Object.assign( {}, skyShader.uniforms );
 
 	var skyMat = new THREE.ShaderMaterial( {
 		fragmentShader: skyShader.fragmentShader,

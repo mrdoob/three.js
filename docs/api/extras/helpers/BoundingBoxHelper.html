@@ -27,42 +27,39 @@
 		bbox.update();
 		scene.add( bbox );
 		</code>
-		<div>Note that this helper will create a wireframe [page:Mesh] object with a [page:BoxGeometry]; the resulting bounding box object will therefore have face diagonals. You may want to use [page:BoxHelper], which generates a [page:Line] object without face diagonals.</div>
+		<div>
+			Note that this helper will create a wireframe [page:Mesh] object with a [page:BoxGeometry];
+			the resulting bounding box object will therefore have face diagonals. You may want to
+			use [page:BoxHelper], which generates a [page:LineSegments] object without face diagonals.
+		</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Object3D object], [page:Number hex])</h3>
+		<h3>[name]( [page:Object3D object], [page:Number hex] )</h3>
 		<div>
-		object -- Object3D -- the object3D to show the world-axis-aligned boundingbox.<br />
-		hex -- hexadecimal value to define color ex:0x888888
-		</div>
-		<div>
-		This creates an line object to the boundingbox.
+		[page:Object3D object] -- Object3D -- the object3D to show the world-axis-aligned boundingbox.<br />
+		[page:Number hex] -- hexadecimal value that defines the box's color. Default is 0x888888.
 		</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Mesh] class for common properties.</div>
 
 
 
 		<h3>[property:Object3D object]</h3>
-		<div>
-		Contains the object3D to show the world-axis-aligned boundingbox.
-		</div>
+		<div>Contains the object3D to show the world-axis-aligned boundingbox.</div>
 
 		<h3>[property:Box3 box]</h3>
-		<div>
-		Contains the bounding box of the object.
-		</div>
+		<div>Contains the bounding box of the object.</div>
 
 		<h2>Methods</h2>
+		<div>See the base [page:LineSegments] class for common methods.</div>
 
 		<h3>[method:null update]()</h3>
-		<div>
-		Updates the BoundingBoxHelper based on the object property.
-		</div>
+		<div>Updates the BoundingBoxHelper based on the object property.</div>
 
 
 		<h2>Source</h2>

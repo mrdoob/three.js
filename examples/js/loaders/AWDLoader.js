@@ -52,7 +52,7 @@
 
 	}
 
-	AWDProperties = function() {}
+	AWDProperties = function() {};
 
 	AWDProperties.prototype = {
 		set : function( key, value ) {
@@ -68,7 +68,7 @@
 			else return fallback;
 
 		}
-	}
+	};
 
 	THREE.AWDLoader = function ( manager ) {
 
@@ -81,7 +81,7 @@
 		this._url     = '';
 		this._baseDir = '';
 
-		this._data;
+		this._data = undefined;
 		this._ptr = 0;
 
 		this._version =  [];

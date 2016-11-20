@@ -456,7 +456,7 @@ THREE.SEA3D.prototype.readSkeleton = function( sea ) {
 
 		for ( var i = 0; i < sea.joint.length; i ++ ) {
 
-			var bone = sea.joint[ i ]
+			var bone = sea.joint[ i ];
 
 			// get world inverse matrix
 
