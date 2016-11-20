@@ -537,8 +537,6 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( this.mixer ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
 
-		//THREE.SEA3D.AnimationHandler.addAnimator( this ); //////////§§§§!!!
-
 		this.mixer = mixer;
 
 		this.relative = false;
@@ -551,10 +549,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 		this.animationsIndex = [];
 		this.animationsData = {};
 
-		// if no geometry animation
-		if ( this.geometry && this.geometry.animations === undefined ) return;
-
-		this.clips = this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations;
+		this.clips = ( this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations ) || [];
 
 		for ( var i = 0; i < this.clips.length; i ++ ) {
 
