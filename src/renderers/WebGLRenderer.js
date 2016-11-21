@@ -623,7 +623,6 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
 			if ( ! material.isMeshPhongMaterial &&
-				! material.isMeshToonMaterial &&
 				! material.isMeshStandardMaterial &&
 				material.shading === FlatShading ) {
 
@@ -1776,7 +1775,6 @@ function WebGLRenderer( parameters ) {
 
 			if ( material.isShaderMaterial ||
 				material.isMeshPhongMaterial ||
-				material.isMeshToonMaterial ||
 				material.isMeshStandardMaterial ||
 				material.envMap ) {
 
@@ -1792,7 +1790,6 @@ function WebGLRenderer( parameters ) {
 			}
 
 			if ( material.isMeshPhongMaterial ||
-				material.isMeshToonMaterial ||
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
@@ -1865,7 +1862,6 @@ function WebGLRenderer( parameters ) {
 			if ( material.isMeshBasicMaterial ||
 				material.isMeshLambertMaterial ||
 				material.isMeshPhongMaterial ||
-				material.isMeshToonMaterial ||
 				material.isMeshStandardMaterial ||
 				material.isMeshDepthMaterial ) {
 

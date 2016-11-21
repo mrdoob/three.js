@@ -15,7 +15,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
-		MeshToonMaterial: 'toon',
+		MeshToonMaterial: 'phong',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical',
 		LineBasicMaterial: 'basic',

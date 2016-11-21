@@ -54,6 +54,7 @@ var ShaderLib = {
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
+			UniformsLib.gradientmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
@@ -65,31 +66,6 @@ var ShaderLib = {
 
 		vertexShader: ShaderChunk.meshphong_vert,
 		fragmentShader: ShaderChunk.meshphong_frag
-
-	},
-
-	toon: {
-
-		uniforms: Object.assign( {},
-			UniformsLib.common,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.gradientmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
-			{
-				emissive : { value: new Color( 0x000000 ) },
-				specular : { value: new Color( 0x111111 ) },
-				shininess: { value: 30 }
-			}
-		),
-
-		vertexShader: ShaderChunk.meshtoon_vert,
-		fragmentShader: ShaderChunk.meshtoon_frag
 
 	},
 
