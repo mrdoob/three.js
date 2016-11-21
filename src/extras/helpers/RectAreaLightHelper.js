@@ -11,44 +11,44 @@ import { ShapeBufferGeometry } from '../../geometries/ShapeBufferGeometry';
 
 function RectAreaLightHelper( light ) {
 
-    Object3D.call( this );
+	Object3D.call( this );
 
-    this.light = light;
-    this.light.updateMatrixWorld();
+	this.light = light;
+	this.light.updateMatrixWorld();
 
-    this.lightMat = new MeshBasicMaterial( {
-        color: light.color,
-        fog: false
-    } );
+	this.lightMat = new MeshBasicMaterial( {
+		color: light.color,
+		fog: false
+	} );
 
-    this.lightWireMat = new MeshBasicMaterial( {
-        color: light.color,
-        fog: false,
-        wireframe: true
-    } );
+	this.lightWireMat = new MeshBasicMaterial( {
+		color: light.color,
+		fog: false,
+		wireframe: true
+	} );
 
-    var hx = this.light.width / 2.0;
-    var hy = this.light.height / 2.0;
+	var hx = this.light.width / 2.0;
+	var hy = this.light.height / 2.0;
 
-    this.lightShape = new ShapeBufferGeometry( new Shape( [
-        new Vector3( - hx,   hy, 0 ),
-        new Vector3(   hx,   hy, 0 ),
-        new Vector3(   hx, - hy, 0 ),
-        new Vector3( - hx, - hy, 0 )
-    ] ) );
+	this.lightShape = new ShapeBufferGeometry( new Shape( [
+		new Vector3( - hx,   hy, 0 ),
+		new Vector3(   hx,   hy, 0 ),
+		new Vector3(   hx, - hy, 0 ),
+		new Vector3( - hx, - hy, 0 )
+	] ) );
 
-    // shows the "front" of the light, e.g. where light comes from
+	// shows the "front" of the light, e.g. where light comes from
 
-    this.lightMesh = new Mesh( this.lightShape, this.lightMat );
+	this.lightMesh = new Mesh( this.lightShape, this.lightMat );
 
-    // shows the "back" of the light, which does not emit light
+	// shows the "back" of the light, which does not emit light
 
-    this.lightWireMesh = new Mesh( this.lightShape, this.lightWireMat );
+	this.lightWireMesh = new Mesh( this.lightShape, this.lightWireMat );
 
-    this.add( this.lightMesh );
-    this.add( this.lightWireMesh );
+	this.add( this.lightMesh );
+	this.add( this.lightWireMesh );
 
-    this.update();
+	this.update();
 
 }
 
@@ -57,49 +57,49 @@ RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
 
 RectAreaLightHelper.prototype.dispose = function () {
 
-    this.lightMesh.geometry.dispose();
-    this.lightMesh.material.dispose();
-    this.lightWireMesh.geometry.dispose();
-    this.lightWireMesh.material.dispose();
+	this.lightMesh.geometry.dispose();
+	this.lightMesh.material.dispose();
+	this.lightWireMesh.geometry.dispose();
+	this.lightWireMesh.material.dispose();
 
 };
 
 RectAreaLightHelper.prototype.update = function () {
 
-    var vector = new Vector3();
-    var vector2 = new Vector3();
+	var vector = new Vector3();
+	var vector2 = new Vector3();
 
-    // TODO (abelnation) why not just make light helpers a child of the light object?
-    if ( this.light.target ) {
+	// TODO (abelnation) why not just make light helpers a child of the light object?
+	if ( this.light.target ) {
 
-        vector.setFromMatrixPosition( this.light.matrixWorld );
-        vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+		vector.setFromMatrixPosition( this.light.matrixWorld );
+		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-        var lookVec = vector2.clone().sub( vector );
-        this.lightMesh.lookAt( lookVec );
-        this.lightWireMesh.lookAt( lookVec );
+		var lookVec = vector2.clone().sub( vector );
+		this.lightMesh.lookAt( lookVec );
+		this.lightWireMesh.lookAt( lookVec );
 
-    }
+	}
 
-    this.lightMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-    this.lightWireMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	this.lightMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	this.lightWireMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-    var oldShape = this.lightShape;
+	var oldShape = this.lightShape;
 
-    var hx = this.light.width / 2.0;
-    var hy = this.light.height / 2.0;
+	var hx = this.light.width / 2.0;
+	var hy = this.light.height / 2.0;
 
-		this.lightShape = new ShapeBufferGeometry( new Shape( [
-				new Vector3( - hx,   hy, 0 ),
-				new Vector3(   hx,   hy, 0 ),
-				new Vector3(   hx, - hy, 0 ),
-				new Vector3( - hx, - hy, 0 )
-		] ) );
+	this.lightShape = new ShapeBufferGeometry( new Shape( [
+		new Vector3( - hx,   hy, 0 ),
+		new Vector3(   hx,   hy, 0 ),
+		new Vector3(   hx, - hy, 0 ),
+		new Vector3( - hx, - hy, 0 )
+	] ) );
 
-    this.lightMesh.geometry = this.lightShape;
-    this.lightWireMesh.geometry = this.lightShape;
+	this.lightMesh.geometry = this.lightShape;
+	this.lightWireMesh.geometry = this.lightShape;
 
-    oldShape.dispose();
+	oldShape.dispose();
 
 };
 
