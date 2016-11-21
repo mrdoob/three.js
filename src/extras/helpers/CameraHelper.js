@@ -4,10 +4,12 @@ import { LineSegments } from '../../objects/LineSegments';
 import { Color } from '../../math/Color';
 import { FaceColors } from '../../constants';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Geometry } from '../../core/Geometry';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author Mugen87 / https://github.com/Mugen87
  *
  *	- shows frustum, line of sight and up of the camera
  *	- suitable for fast updates
@@ -17,77 +19,80 @@ import { Geometry } from '../../core/Geometry';
 
 function CameraHelper( camera ) {
 
-	var geometry = new Geometry();
+	var geometry = new BufferGeometry();
 	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
+
+	var vertices = [];
+	var colors = [];
 
 	var pointMap = {};
 
 	// colors
 
-	var hexFrustum = 0xffaa00;
-	var hexCone = 0xff0000;
-	var hexUp = 0x00aaff;
-	var hexTarget = 0xffffff;
-	var hexCross = 0x333333;
+	var colorFrustum = new Color( 0xffaa00 );
+	var colorCone = new Color( 0xff0000 );
+	var colorUp = new Color( 0x00aaff );
+	var colorTarget = new Color( 0xffffff );
+	var colorCross = new Color( 0x333333 );
 
 	// near
 
-	addLine( "n1", "n2", hexFrustum );
-	addLine( "n2", "n4", hexFrustum );
-	addLine( "n4", "n3", hexFrustum );
-	addLine( "n3", "n1", hexFrustum );
+	addLine( "n1", "n2", colorFrustum );
+	addLine( "n2", "n4", colorFrustum );
+	addLine( "n4", "n3", colorFrustum );
+	addLine( "n3", "n1", colorFrustum );
 
 	// far
 
-	addLine( "f1", "f2", hexFrustum );
-	addLine( "f2", "f4", hexFrustum );
-	addLine( "f4", "f3", hexFrustum );
-	addLine( "f3", "f1", hexFrustum );
+	addLine( "f1", "f2", colorFrustum );
+	addLine( "f2", "f4", colorFrustum );
+	addLine( "f4", "f3", colorFrustum );
+	addLine( "f3", "f1", colorFrustum );
 
 	// sides
 
-	addLine( "n1", "f1", hexFrustum );
-	addLine( "n2", "f2", hexFrustum );
-	addLine( "n3", "f3", hexFrustum );
-	addLine( "n4", "f4", hexFrustum );
+	addLine( "n1", "f1", colorFrustum );
+	addLine( "n2", "f2", colorFrustum );
+	addLine( "n3", "f3", colorFrustum );
+	addLine( "n4", "f4", colorFrustum );
 
 	// cone
 
-	addLine( "p", "n1", hexCone );
-	addLine( "p", "n2", hexCone );
-	addLine( "p", "n3", hexCone );
-	addLine( "p", "n4", hexCone );
+	addLine( "p", "n1", colorCone );
+	addLine( "p", "n2", colorCone );
+	addLine( "p", "n3", colorCone );
+	addLine( "p", "n4", colorCone );
 
 	// up
 
-	addLine( "u1", "u2", hexUp );
-	addLine( "u2", "u3", hexUp );
-	addLine( "u3", "u1", hexUp );
+	addLine( "u1", "u2", colorUp );
+	addLine( "u2", "u3", colorUp );
+	addLine( "u3", "u1", colorUp );
 
 	// target
 
-	addLine( "c", "t", hexTarget );
-	addLine( "p", "c", hexCross );
+	addLine( "c", "t", colorTarget );
+	addLine( "p", "c", colorCross );
 
 	// cross
 
-	addLine( "cn1", "cn2", hexCross );
-	addLine( "cn3", "cn4", hexCross );
+	addLine( "cn1", "cn2", colorCross );
+	addLine( "cn3", "cn4", colorCross );
 
-	addLine( "cf1", "cf2", hexCross );
-	addLine( "cf3", "cf4", hexCross );
+	addLine( "cf1", "cf2", colorCross );
+	addLine( "cf3", "cf4", colorCross );
 
-	function addLine( a, b, hex ) {
+	function addLine( a, b, color ) {
 
-		addPoint( a, hex );
-		addPoint( b, hex );
+		addPoint( a, color );
+		addPoint( b, color );
 
 	}
 
-	function addPoint( id, hex ) {
+	function addPoint( id, color ) {
 
-		geometry.vertices.push( new Vector3() );
-		geometry.colors.push( new Color( hex ) );
+		vertices.push( 0, 0, 0 );
+		colors.push( color.r, color.g, color.b );
 
 		if ( pointMap[ id ] === undefined ) {
 
@@ -95,14 +100,17 @@ function CameraHelper( camera ) {
 
 		}
 
-		pointMap[ id ].push( geometry.vertices.length - 1 );
+		pointMap[ id ].push( ( vertices.length / 3 ) - 1 );
 
 	}
+
+	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	LineSegments.call( this, geometry, material );
 
 	this.camera = camera;
-	if( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
+	if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
 	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -131,9 +139,11 @@ CameraHelper.prototype.update = function () {
 
 		if ( points !== undefined ) {
 
-			for ( var i = 0, il = points.length; i < il; i ++ ) {
+			var position = geometry.getAttribute( 'position' );
 
-				geometry.vertices[ points[ i ] ].copy( vector );
+			for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+				position.setXYZ( points[ i ], vector.x, vector.y, vector.z );
 
 			}
 
@@ -190,7 +200,7 @@ CameraHelper.prototype.update = function () {
 		setPoint( "cn3",   0, - h, - 1 );
 		setPoint( "cn4",   0,   h, - 1 );
 
-		geometry.verticesNeedUpdate = true;
+		geometry.getAttribute( 'position' ).needsUpdate = true;
 
 	};
 
