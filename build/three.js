@@ -1,7 +1,7 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (factory((global.THREE = global.THREE || {})));
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.THREE = global.THREE || {})));
 }(this, (function (exports) { 'use strict';
 
 	// Polyfills
@@ -4927,11 +4927,11 @@
 
 	var clipping_planes_fragment = "#if NUM_CLIPPING_PLANES > 0\n\tfor ( int i = 0; i < UNION_CLIPPING_PLANES; ++ i ) {\n\t\tvec4 plane = clippingPlanes[ i ];\n\t\tif ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;\n\t}\n\t\t\n\t#if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES\n\t\tbool clipped = true;\n\t\tfor ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; ++ i ) {\n\t\t\tvec4 plane = clippingPlanes[ i ];\n\t\t\tclipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;\n\t\t}\n\t\tif ( clipped ) discard;\n\t\n\t#endif\n#endif\n";
 
-	var clipping_planes_pars_fragment = "#if NUM_CLIPPING_PLANES > 0\n\t#if ! defined( PHYSICAL ) && ! defined( PHONG ) && ! defined( TOON )\n\t\tvarying vec3 vViewPosition;\n\t#endif\n\tuniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];\n#endif\n";
+	var clipping_planes_pars_fragment = "#if NUM_CLIPPING_PLANES > 0\n\t#if ! defined( PHYSICAL ) && ! defined( PHONG )\n\t\tvarying vec3 vViewPosition;\n\t#endif\n\tuniform vec4 clippingPlanes[ NUM_CLIPPING_PLANES ];\n#endif\n";
 
-	var clipping_planes_pars_vertex = "#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG ) && ! defined( TOON )\n\tvarying vec3 vViewPosition;\n#endif\n";
+	var clipping_planes_pars_vertex = "#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG )\n\tvarying vec3 vViewPosition;\n#endif\n";
 
-	var clipping_planes_vertex = "#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG ) && ! defined( TOON )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n";
+	var clipping_planes_vertex = "#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n";
 
 	var color_fragment = "#ifdef USE_COLOR\n\tdiffuseColor.rgb *= vColor;\n#endif";
 
@@ -4959,13 +4959,13 @@
 
 	var encodings_pars_fragment = "\nvec4 LinearToLinear( in vec4 value ) {\n  return value;\n}\nvec4 GammaToLinear( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );\n}\nvec4 LinearToGamma( in vec4 value, in float gammaFactor ) {\n  return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );\n}\nvec4 sRGBToLinear( in vec4 value ) {\n  return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );\n}\nvec4 LinearTosRGB( in vec4 value ) {\n  return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.w );\n}\nvec4 RGBEToLinear( in vec4 value ) {\n  return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );\n}\nvec4 LinearToRGBE( in vec4 value ) {\n  float maxComponent = max( max( value.r, value.g ), value.b );\n  float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );\n  return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );\n}\nvec4 RGBMToLinear( in vec4 value, in float maxRange ) {\n  return vec4( value.xyz * value.w * maxRange, 1.0 );\n}\nvec4 LinearToRGBM( in vec4 value, in float maxRange ) {\n  float maxRGB = max( value.x, max( value.g, value.b ) );\n  float M      = clamp( maxRGB / maxRange, 0.0, 1.0 );\n  M            = ceil( M * 255.0 ) / 255.0;\n  return vec4( value.rgb / ( M * maxRange ), M );\n}\nvec4 RGBDToLinear( in vec4 value, in float maxRange ) {\n    return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );\n}\nvec4 LinearToRGBD( in vec4 value, in float maxRange ) {\n    float maxRGB = max( value.x, max( value.g, value.b ) );\n    float D      = max( maxRange / maxRGB, 1.0 );\n    D            = min( floor( D ) / 255.0, 1.0 );\n    return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );\n}\nconst mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );\nvec4 LinearToLogLuv( in vec4 value )  {\n  vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;\n  Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n  vec4 vResult;\n  vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n  float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n  vResult.w = fract(Le);\n  vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n  return vResult;\n}\nconst mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );\nvec4 LogLuvToLinear( in vec4 value ) {\n  float Le = value.z * 255.0 + value.w;\n  vec3 Xp_Y_XYZp;\n  Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n  Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;\n  Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;\n  vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;\n  return vec4( max(vRGB, 0.0), 1.0 );\n}\n";
 
-	var envmap_fragment = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON )\n\t\tvec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#elif defined( ENVMAP_TYPE_EQUIREC )\n\t\tvec2 sampleUV;\n\t\tsampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n\t\tsampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n\t\tvec4 envColor = texture2D( envMap, sampleUV );\n\t#elif defined( ENVMAP_TYPE_SPHERE )\n\t\tvec3 reflectView = flipNormal * normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );\n\t\tvec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\tenvColor = envMapTexelToLinear( envColor );\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif\n";
+	var envmap_fragment = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\t\tvec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#elif defined( ENVMAP_TYPE_EQUIREC )\n\t\tvec2 sampleUV;\n\t\tsampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n\t\tsampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n\t\tvec4 envColor = texture2D( envMap, sampleUV );\n\t#elif defined( ENVMAP_TYPE_SPHERE )\n\t\tvec3 reflectView = flipNormal * normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );\n\t\tvec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\tenvColor = envMapTexelToLinear( envColor );\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif\n";
 
-	var envmap_pars_fragment = "#if defined( USE_ENVMAP ) || defined( PHYSICAL )\n\tuniform float reflectivity;\n\tuniform float envMapIntenstiy;\n#endif\n#ifdef USE_ENVMAP\n\t#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON ) )\n\t\tvarying vec3 vWorldPosition;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tuniform samplerCube envMap;\n\t#else\n\t\tuniform sampler2D envMap;\n\t#endif\n\tuniform float flipEnvMap;\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON ) || defined( PHYSICAL )\n\t\tuniform float refractionRatio;\n\t#else\n\t\tvarying vec3 vReflect;\n\t#endif\n#endif\n";
+	var envmap_pars_fragment = "#if defined( USE_ENVMAP ) || defined( PHYSICAL )\n\tuniform float reflectivity;\n\tuniform float envMapIntenstiy;\n#endif\n#ifdef USE_ENVMAP\n\t#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )\n\t\tvarying vec3 vWorldPosition;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tuniform samplerCube envMap;\n\t#else\n\t\tuniform sampler2D envMap;\n\t#endif\n\tuniform float flipEnvMap;\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )\n\t\tuniform float refractionRatio;\n\t#else\n\t\tvarying vec3 vReflect;\n\t#endif\n#endif\n";
 
-	var envmap_pars_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON )\n\t\tvarying vec3 vWorldPosition;\n\t#else\n\t\tvarying vec3 vReflect;\n\t\tuniform float refractionRatio;\n\t#endif\n#endif\n";
+	var envmap_pars_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\t\tvarying vec3 vWorldPosition;\n\t#else\n\t\tvarying vec3 vReflect;\n\t\tuniform float refractionRatio;\n\t#endif\n#endif\n";
 
-	var envmap_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( TOON )\n\t\tvWorldPosition = worldPosition.xyz;\n\t#else\n\t\tvec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvReflect = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#endif\n#endif\n";
+	var envmap_vertex = "#ifdef USE_ENVMAP\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\t\tvWorldPosition = worldPosition.xyz;\n\t#else\n\t\tvec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\t\tvec3 worldNormal = inverseTransformDirection( transformedNormal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvReflect = reflect( cameraToVertex, worldNormal );\n\t\t#else\n\t\t\tvReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\t\t#endif\n\t#endif\n#endif\n";
 
 	var fog_fragment = "#ifdef USE_FOG\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tfloat depth = gl_FragDepthEXT / gl_FragCoord.w;\n\t#else\n\t\tfloat depth = gl_FragCoord.z / gl_FragCoord.w;\n\t#endif\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, depth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif\n";
 
@@ -5069,7 +5069,7 @@
 
 	var uv2_vertex = "#if defined( USE_LIGHTMAP ) || defined( USE_AOMAP )\n\tvUv2 = uv2;\n#endif";
 
-	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( TOON ) || defined( PHYSICAL ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )\n\t#ifdef USE_SKINNING\n\t\tvec4 worldPosition = modelMatrix * skinned;\n\t#else\n\t\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n\t#endif\n#endif\n";
+	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( PHYSICAL ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )\n\t#ifdef USE_SKINNING\n\t\tvec4 worldPosition = modelMatrix * skinned;\n\t#else\n\t\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n\t#endif\n#endif\n";
 
 	var cube_frag = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldPosition;\n#include <common>\nvoid main() {\n\tgl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );\n\tgl_FragColor.a *= opacity;\n}\n";
 
@@ -5099,17 +5099,13 @@
 
 	var meshlambert_vert = "#define LAMBERT\nvarying vec3 vLightFront;\n#ifdef DOUBLE_SIDED\n\tvarying vec3 vLightBack;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <bsdfs>\n#include <lights_pars>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <lights_lambert_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
-	var meshphong_frag = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_template>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
+	var meshphong_frag = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <gradientmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_template>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
 	var meshphong_vert = "#define PHONG\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
 	var meshphysical_frag = "#define PHYSICAL\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float roughness;\nuniform float metalness;\nuniform float opacity;\n#ifndef STANDARD\n\tuniform float clearCoat;\n\tuniform float clearCoatRoughness;\n#endif\nuniform float envMapIntensity;\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <cube_uv_reflection_fragment>\n#include <lights_pars>\n#include <lights_physical_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <roughnessmap_pars_fragment>\n#include <metalnessmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <roughnessmap_fragment>\n\t#include <metalnessmap_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\t#include <emissivemap_fragment>\n\t#include <lights_physical_fragment>\n\t#include <lights_template>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
 	var meshphysical_vert = "#define PHYSICAL\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n}\n";
-
-	var meshtoon_frag = "#define TOON\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_pars_fragment>\n#include <gradientmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_template>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
-
-	var meshtoon_vert = "#define TOON\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
 	var normal_frag = "uniform float opacity;\nvarying vec3 vNormal;\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tgl_FragColor = vec4( packNormalToRGB( vNormal ), opacity );\n\t#include <logdepthbuf_fragment>\n}\n";
 
@@ -5225,8 +5221,6 @@
 		meshphong_vert: meshphong_vert,
 		meshphysical_frag: meshphysical_frag,
 		meshphysical_vert: meshphysical_vert,
-		meshtoon_frag: meshtoon_frag,
-		meshtoon_vert: meshtoon_vert,
 		normal_frag: normal_frag,
 		normal_vert: normal_vert,
 		points_frag: points_frag,
@@ -6003,6 +5997,7 @@
 				UniformsLib.bumpmap,
 				UniformsLib.normalmap,
 				UniformsLib.displacementmap,
+				UniformsLib.gradientmap,
 				UniformsLib.fog,
 				UniformsLib.lights,
 				{
@@ -6014,31 +6009,6 @@
 
 			vertexShader: ShaderChunk.meshphong_vert,
 			fragmentShader: ShaderChunk.meshphong_frag
-
-		},
-
-		toon: {
-
-			uniforms: Object.assign( {},
-				UniformsLib.common,
-				UniformsLib.aomap,
-				UniformsLib.lightmap,
-				UniformsLib.emissivemap,
-				UniformsLib.bumpmap,
-				UniformsLib.normalmap,
-				UniformsLib.displacementmap,
-				UniformsLib.gradientmap,
-				UniformsLib.fog,
-				UniformsLib.lights,
-				{
-					emissive : { value: new Color( 0x000000 ) },
-					specular : { value: new Color( 0x111111 ) },
-					shininess: { value: 30 }
-				}
-			),
-
-			vertexShader: ShaderChunk.meshtoon_vert,
-			fragmentShader: ShaderChunk.meshtoon_frag
 
 		},
 
@@ -16740,7 +16710,7 @@
 			MeshBasicMaterial: 'basic',
 			MeshLambertMaterial: 'lambert',
 			MeshPhongMaterial: 'phong',
-			MeshToonMaterial: 'toon',
+			MeshToonMaterial: 'phong',
 			MeshStandardMaterial: 'physical',
 			MeshPhysicalMaterial: 'physical',
 			LineBasicMaterial: 'basic',
@@ -20143,7 +20113,6 @@
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
 				if ( ! material.isMeshPhongMaterial &&
-					! material.isMeshToonMaterial &&
 					! material.isMeshStandardMaterial &&
 					material.shading === FlatShading ) {
 
@@ -21296,7 +21265,6 @@
 
 				if ( material.isShaderMaterial ||
 					material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
 					material.isMeshStandardMaterial ||
 					material.envMap ) {
 
@@ -21312,7 +21280,6 @@
 				}
 
 				if ( material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
 					material.isMeshLambertMaterial ||
 					material.isMeshBasicMaterial ||
 					material.isMeshStandardMaterial ||
@@ -21385,7 +21352,6 @@
 				if ( material.isMeshBasicMaterial ||
 					material.isMeshLambertMaterial ||
 					material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
 					material.isMeshStandardMaterial ||
 					material.isMeshDepthMaterial ) {
 
@@ -28575,56 +28541,15 @@
 	 * @author takahirox / http://github.com/takahirox
 	 *
 	 * parameters = {
-	 *  color: <hex>,
-	 *  specular: <hex>,
-	 *  shininess: <float>,
-	 *  opacity: <float>,
-	 *
-	 *  map: new THREE.Texture( <Image> ),
-	 *
-	 *  lightMap: new THREE.Texture( <Image> ),
-	 *  lightMapIntensity: <float>
-	 *
-	 *  aoMap: new THREE.Texture( <Image> ),
-	 *  aoMapIntensity: <float>
-	 *
-	 *  emissive: <hex>,
-	 *  emissiveIntensity: <float>
-	 *  emissiveMap: new THREE.Texture( <Image> ),
-	 *
-	 *  bumpMap: new THREE.Texture( <Image> ),
-	 *  bumpScale: <float>,
-	 *
-	 *  normalMap: new THREE.Texture( <Image> ),
-	 *  normalScale: <Vector2>,
-	 *
-	 *  displacementMap: new THREE.Texture( <Image> ),
-	 *  displacementScale: <float>,
-	 *  displacementBias: <float>,
-	 *
-	 *  specularMap: new THREE.Texture( <Image> ),
-	 *
-	 *  alphaMap: new THREE.Texture( <Image> ),
-	 *
-	 *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
-	 *  combine: THREE.Multiply,
-	 *  reflectivity: <float>,
-	 *  refractionRatio: <float>,
-	 *
-	 *  gradientMap: new THREE.Texture( <Image> ),
-	 *
-	 *  wireframe: <boolean>,
-	 *  wireframeLinewidth: <float>,
-	 *
-	 *  skinning: <bool>,
-	 *  morphTargets: <bool>,
-	 *  morphNormals: <bool>
+	 *  gradientMap: new THREE.Texture( <Image> )
 	 * }
 	 */
 
 	function MeshToonMaterial( parameters ) {
 
 		MeshPhongMaterial.call( this );
+
+		this.defines = { 'TOON': '' };
 
 		this.type = 'MeshToonMaterial';
 
@@ -40239,100 +40164,97 @@
 	 * @author abelnation / http://github.com/abelnation
 	 */
 
-	function RectAreaLightHelper(light) {
+	function RectAreaLightHelper( light ) {
 
-	    Object3D.call(this);
+		Object3D.call( this );
 
-	    this.light = light;
-	    this.light.updateMatrixWorld();
+		this.light = light;
+		this.light.updateMatrixWorld();
 
-	    // this.matrix = light.matrixWorld;
-	    // this.matrixAutoUpdate = false;
+		this.lightMat = new MeshBasicMaterial( {
+			color: light.color,
+			fog: false
+		} );
 
-	    this.lightMat = new MeshBasicMaterial({
-	        color: light.color,
-	        fog: false
-	    });
+		this.lightWireMat = new MeshBasicMaterial( {
+			color: light.color,
+			fog: false,
+			wireframe: true
+		} );
 
-	    this.lightWireMat = new MeshBasicMaterial({
-	        color: light.color,
-	        fog: false,
-	        wireframe: true
-	    });
+		var hx = this.light.width / 2.0;
+		var hy = this.light.height / 2.0;
 
-	    var hx = this.light.width / 2.0;
-	    var hy = this.light.height / 2.0;
-	    this.lightShape = new ShapeGeometry(new Shape([
-	        new Vector3(-hx, hy, 0),
-	        new Vector3(hx, hy, 0),
-	        new Vector3(hx, -hy, 0),
-	        new Vector3(-hx, -hy, 0)
-	    ]));
+		this.lightShape = new ShapeBufferGeometry( new Shape( [
+			new Vector3( - hx,   hy, 0 ),
+			new Vector3(   hx,   hy, 0 ),
+			new Vector3(   hx, - hy, 0 ),
+			new Vector3( - hx, - hy, 0 )
+		] ) );
 
-	    // shows the "front" of the light, e.g. where light comes from
-	    this.lightMesh = new Mesh(this.lightShape, this.lightMat);
-	    // shows the "back" of the light, which does not emit light
-	    this.lightWireMesh = new Mesh(this.lightShape, this.lightWireMat);
+		// shows the "front" of the light, e.g. where light comes from
 
-	    this.add(this.lightMesh);
-	    this.add(this.lightWireMesh);
+		this.lightMesh = new Mesh( this.lightShape, this.lightMat );
 
-	    this.update();
+		// shows the "back" of the light, which does not emit light
+
+		this.lightWireMesh = new Mesh( this.lightShape, this.lightWireMat );
+
+		this.add( this.lightMesh );
+		this.add( this.lightWireMesh );
+
+		this.update();
 
 	}
 
-	RectAreaLightHelper.prototype = Object.create(Object3D.prototype);
+	RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
 	RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
 
 	RectAreaLightHelper.prototype.dispose = function () {
 
-	    this.lightMesh.geometry.dispose();
-	    this.lightMesh.material.dispose();
-	    this.lightWireMesh.geometry.dispose();
-	    this.lightWireMesh.material.dispose();
+		this.lightMesh.geometry.dispose();
+		this.lightMesh.material.dispose();
+		this.lightWireMesh.geometry.dispose();
+		this.lightWireMesh.material.dispose();
 
 	};
 
 	RectAreaLightHelper.prototype.update = function () {
 
-	    var vector = new Vector3();
-	    var vector2 = new Vector3();
+		var vector = new Vector3();
+		var vector2 = new Vector3();
 
-	    // TODO (abelnation) why not just make light helpers a child of the light object?
-	    if (this.light.target) {
+		// TODO (abelnation) why not just make light helpers a child of the light object?
+		if ( this.light.target ) {
 
-	        vector.setFromMatrixPosition(this.light.matrixWorld);
-	        vector2.setFromMatrixPosition(this.light.target.matrixWorld);
+			vector.setFromMatrixPosition( this.light.matrixWorld );
+			vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-	        var lookVec = vector2.clone().sub(vector);
-	        this.lightMesh.lookAt(lookVec);
-	        this.lightWireMesh.lookAt(lookVec);
+			var lookVec = vector2.clone().sub( vector );
+			this.lightMesh.lookAt( lookVec );
+			this.lightWireMesh.lookAt( lookVec );
 
-	    }
+		}
 
-	    this.lightMesh.material.color
-	        .copy(this.light.color)
-	        .multiplyScalar(this.light.intensity);
+		this.lightMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.lightWireMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	    this.lightWireMesh.material.color
-	        .copy(this.light.color)
-	        .multiplyScalar(this.light.intensity);
+		var oldShape = this.lightShape;
 
-	    var oldShape = this.lightShape;
+		var hx = this.light.width / 2.0;
+		var hy = this.light.height / 2.0;
 
-	    var hx = this.light.width / 2.0;
-	    var hy = this.light.height / 2.0;
-	    this.lightShape = new ShapeGeometry(new Shape([
-	        new Vector3(-hx, hy, 0),
-	        new Vector3(hx, hy, 0),
-	        new Vector3(hx, -hy, 0),
-	        new Vector3(-hx, -hy, 0)
-	    ]));
+		this.lightShape = new ShapeBufferGeometry( new Shape( [
+			new Vector3( - hx,   hy, 0 ),
+			new Vector3(   hx,   hy, 0 ),
+			new Vector3(   hx, - hy, 0 ),
+			new Vector3( - hx, - hy, 0 )
+		] ) );
 
-	    this.lightMesh.geometry = this.lightShape;
-	    this.lightWireMesh.geometry = this.lightShape;
+		this.lightMesh.geometry = this.lightShape;
+		this.lightWireMesh.geometry = this.lightShape;
 
-	    oldShape.dispose();
+		oldShape.dispose();
 
 	};
 
@@ -40631,6 +40553,7 @@
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
+	 * @author Mugen87 / https://github.com/Mugen87
 	 *
 	 *	- shows frustum, line of sight and up of the camera
 	 *	- suitable for fast updates
@@ -40640,77 +40563,80 @@
 
 	function CameraHelper( camera ) {
 
-		var geometry = new Geometry();
+		var geometry = new BufferGeometry();
 		var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
+
+		var vertices = [];
+		var colors = [];
 
 		var pointMap = {};
 
 		// colors
 
-		var hexFrustum = 0xffaa00;
-		var hexCone = 0xff0000;
-		var hexUp = 0x00aaff;
-		var hexTarget = 0xffffff;
-		var hexCross = 0x333333;
+		var colorFrustum = new Color( 0xffaa00 );
+		var colorCone = new Color( 0xff0000 );
+		var colorUp = new Color( 0x00aaff );
+		var colorTarget = new Color( 0xffffff );
+		var colorCross = new Color( 0x333333 );
 
 		// near
 
-		addLine( "n1", "n2", hexFrustum );
-		addLine( "n2", "n4", hexFrustum );
-		addLine( "n4", "n3", hexFrustum );
-		addLine( "n3", "n1", hexFrustum );
+		addLine( "n1", "n2", colorFrustum );
+		addLine( "n2", "n4", colorFrustum );
+		addLine( "n4", "n3", colorFrustum );
+		addLine( "n3", "n1", colorFrustum );
 
 		// far
 
-		addLine( "f1", "f2", hexFrustum );
-		addLine( "f2", "f4", hexFrustum );
-		addLine( "f4", "f3", hexFrustum );
-		addLine( "f3", "f1", hexFrustum );
+		addLine( "f1", "f2", colorFrustum );
+		addLine( "f2", "f4", colorFrustum );
+		addLine( "f4", "f3", colorFrustum );
+		addLine( "f3", "f1", colorFrustum );
 
 		// sides
 
-		addLine( "n1", "f1", hexFrustum );
-		addLine( "n2", "f2", hexFrustum );
-		addLine( "n3", "f3", hexFrustum );
-		addLine( "n4", "f4", hexFrustum );
+		addLine( "n1", "f1", colorFrustum );
+		addLine( "n2", "f2", colorFrustum );
+		addLine( "n3", "f3", colorFrustum );
+		addLine( "n4", "f4", colorFrustum );
 
 		// cone
 
-		addLine( "p", "n1", hexCone );
-		addLine( "p", "n2", hexCone );
-		addLine( "p", "n3", hexCone );
-		addLine( "p", "n4", hexCone );
+		addLine( "p", "n1", colorCone );
+		addLine( "p", "n2", colorCone );
+		addLine( "p", "n3", colorCone );
+		addLine( "p", "n4", colorCone );
 
 		// up
 
-		addLine( "u1", "u2", hexUp );
-		addLine( "u2", "u3", hexUp );
-		addLine( "u3", "u1", hexUp );
+		addLine( "u1", "u2", colorUp );
+		addLine( "u2", "u3", colorUp );
+		addLine( "u3", "u1", colorUp );
 
 		// target
 
-		addLine( "c", "t", hexTarget );
-		addLine( "p", "c", hexCross );
+		addLine( "c", "t", colorTarget );
+		addLine( "p", "c", colorCross );
 
 		// cross
 
-		addLine( "cn1", "cn2", hexCross );
-		addLine( "cn3", "cn4", hexCross );
+		addLine( "cn1", "cn2", colorCross );
+		addLine( "cn3", "cn4", colorCross );
 
-		addLine( "cf1", "cf2", hexCross );
-		addLine( "cf3", "cf4", hexCross );
+		addLine( "cf1", "cf2", colorCross );
+		addLine( "cf3", "cf4", colorCross );
 
-		function addLine( a, b, hex ) {
+		function addLine( a, b, color ) {
 
-			addPoint( a, hex );
-			addPoint( b, hex );
+			addPoint( a, color );
+			addPoint( b, color );
 
 		}
 
-		function addPoint( id, hex ) {
+		function addPoint( id, color ) {
 
-			geometry.vertices.push( new Vector3() );
-			geometry.colors.push( new Color( hex ) );
+			vertices.push( 0, 0, 0 );
+			colors.push( color.r, color.g, color.b );
 
 			if ( pointMap[ id ] === undefined ) {
 
@@ -40718,14 +40644,17 @@
 
 			}
 
-			pointMap[ id ].push( geometry.vertices.length - 1 );
+			pointMap[ id ].push( ( vertices.length / 3 ) - 1 );
 
 		}
+
+		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 		LineSegments.call( this, geometry, material );
 
 		this.camera = camera;
-		if( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
+		if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
 		this.matrix = camera.matrixWorld;
 		this.matrixAutoUpdate = false;
@@ -40754,9 +40683,11 @@
 
 			if ( points !== undefined ) {
 
-				for ( var i = 0, il = points.length; i < il; i ++ ) {
+				var position = geometry.getAttribute( 'position' );
 
-					geometry.vertices[ points[ i ] ].copy( vector );
+				for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+					position.setXYZ( points[ i ], vector.x, vector.y, vector.z );
 
 				}
 
@@ -40813,7 +40744,7 @@
 			setPoint( "cn3",   0, - h, - 1 );
 			setPoint( "cn4",   0,   h, - 1 );
 
-			geometry.verticesNeedUpdate = true;
+			geometry.getAttribute( 'position' ).needsUpdate = true;
 
 		};
 
@@ -40833,7 +40764,7 @@
 
 		this.box = new Box3();
 
-		Mesh.call( this, new BoxGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
+		Mesh.call( this, new BoxBufferGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
 
 	}
 
@@ -41047,21 +40978,21 @@
 
 		size = size || 1;
 
-		var vertices = new Float32Array( [
+		var vertices = [
 			0, 0, 0,  size, 0, 0,
 			0, 0, 0,  0, size, 0,
 			0, 0, 0,  0, 0, size
-		] );
+		];
 
-		var colors = new Float32Array( [
+		var colors = [
 			1, 0, 0,  1, 0.6, 0,
 			0, 1, 0,  0.6, 1, 0,
 			0, 0, 1,  0, 0.6, 1
-		] );
+		];
 
 		var geometry = new BufferGeometry();
-		geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-		geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 		var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 
