@@ -1,6 +1,6 @@
 import { Mesh } from '../../objects/Mesh';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { BoxGeometry } from '../../geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../geometries/BoxBufferGeometry';
 import { Box3 } from '../../math/Box3';
 
 /**
@@ -17,7 +17,7 @@ function BoundingBoxHelper( object, hex ) {
 
 	this.box = new Box3();
 
-	Mesh.call( this, new BoxGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
+	Mesh.call( this, new BoxBufferGeometry( 1, 1, 1 ), new MeshBasicMaterial( { color: color, wireframe: true } ) );
 
 }
 
