@@ -5,6 +5,21 @@
 
 'use strict';
 
+//
+//	Polyfills
+//
+
+if (THREE.Float32BufferAttribute === undefined) {
+
+	THREE.Float32BufferAttribute = THREE.Float32Attribute;
+
+}
+
+//
+//
+//	SEA3D
+//
+
 THREE.SEA3D = function ( config ) {
 
 	this.config = {
@@ -522,8 +537,6 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( this.mixer ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
 
-		//THREE.SEA3D.AnimationHandler.addAnimator( this ); //////////§§§§!!!
-
 		this.mixer = mixer;
 
 		this.relative = false;
@@ -536,10 +549,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 		this.animationsIndex = [];
 		this.animationsData = {};
 
-		// if no geometry animation
-		if ( this.geometry && this.geometry.animations === undefined ) return;
-
-		this.clips = this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations;
+		this.clips = ( this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations ) || [];
 
 		for ( var i = 0; i < this.clips.length; i ++ ) {
 
@@ -1743,19 +1753,8 @@ THREE.SEA3D.prototype.readGeometryBuffer = function ( sea ) {
 
 	if ( sea.joint ) {
 
-		if ( THREE.Float32BufferAttribute ) {
-
-			// three dev
-
-			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( sea.joint, sea.jointPerVertex ) );
-			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( sea.weight, sea.jointPerVertex ) );
-
-		} else {
-
-			geo.addAttribute( 'skinIndex', new THREE.Float32Attribute( sea.joint, sea.jointPerVertex ) );
-			geo.addAttribute( 'skinWeight', new THREE.Float32Attribute( sea.weight, sea.jointPerVertex ) );
-
-		}
+		geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( sea.joint, sea.jointPerVertex ) );
+		geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( sea.weight, sea.jointPerVertex ) );
 
 	}
 
@@ -1803,17 +1802,7 @@ THREE.SEA3D.prototype.readLine = function ( sea ) {
 	if ( sea.closed )
 		sea.vertex.push( sea.vertex[ 0 ], sea.vertex[ 1 ], sea.vertex[ 2 ] );
 
-	if ( THREE.Float32BufferAttribute ) {
-
-		// three dev
-
-		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( sea.vertex, 3 ) );
-
-	} else {
-
-		geo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( sea.vertex ), 3 ) );
-
-	}
+	geo.addAttribute( 'position', new THREE.Float32BufferAttribute( sea.vertex, 3 ) );
 
 	var line = new THREE.Line( geo, new THREE.LineBasicMaterial( { color: THREE.SEA3D.HELPER_COLOR, linewidth: 3 } ) );
 	line.name = sea.name;
@@ -2805,45 +2794,20 @@ THREE.SEA3D.prototype.readMorpher = function ( sea ) {
 
 	var attribs = { position: [] }, targets = [];
 
-	if ( THREE.Float32BufferAttribute ) {
+	for ( var i = 0; i < sea.node.length; i ++ ) {
 
-		// three dev
+		var node = sea.node[ i ];
 
-		for ( var i = 0; i < sea.node.length; i ++ ) {
+		attribs.position[ i ] = new THREE.Float32BufferAttribute( node.vertex, 3 );
 
-			var node = sea.node[ i ];
+		if ( node.normal ) {
 
-			attribs.position[ i ] = new THREE.Float32BufferAttribute( node.vertex, 3 );
-
-			if ( node.normal ) {
-
-				attribs.normal = attribs.normal || [];
-				attribs.normal[ i ] = new THREE.Float32BufferAttribute( node.normal, 3 );
-
-			}
-
-			targets[ i ] = { name: node.name };
+			attribs.normal = attribs.normal || [];
+			attribs.normal[ i ] = new THREE.Float32BufferAttribute( node.normal, 3 );
 
 		}
 
-	} else {
-
-		for ( var i = 0; i < sea.node.length; i ++ ) {
-
-			var node = sea.node[ i ];
-
-			attribs.position[ i ] = new THREE.Float32Attribute( new Float32Array( node.vertex ), 3 );
-
-			if ( node.normal ) {
-
-				attribs.normal = attribs.normal || [];
-				attribs.normal[ i ] = new THREE.Float32Attribute( new Float32Array( node.normal ), 3 );
-
-			}
-
-			targets[ i ] = { name: node.name };
-
-		}
+		targets[ i ] = { name: node.name };
 
 	}
 
@@ -2927,45 +2891,20 @@ THREE.SEA3D.prototype.readVertexAnimation = function ( sea ) {
 
 	var attribs = { position: [] }, targets = [], animations = [], i, j, l;
 
-	if ( THREE.Float32BufferAttribute ) {
+	for ( i = 0, l = sea.frame.length; i < l; i ++ ) {
 
-		// three dev
+		var frame = sea.frame[ i ];
 
-		for ( i = 0, l = sea.frame.length; i < l; i ++ ) {
+		attribs.position[ i ] = new THREE.Float32BufferAttribute( frame.vertex, 3 );
 
-			var frame = sea.frame[ i ];
+		if ( frame.normal ) {
 
-			attribs.position[ i ] = new THREE.Float32BufferAttribute( frame.vertex, 3 );
-
-			if ( frame.normal ) {
-
-				attribs.normal = attribs.normal || [];
-				attribs.normal[ i ] = new THREE.Float32BufferAttribute( frame.normal, 3 );
-
-			}
-
-			targets[ i ] = { name: i };
+			attribs.normal = attribs.normal || [];
+			attribs.normal[ i ] = new THREE.Float32BufferAttribute( frame.normal, 3 );
 
 		}
 
-	} else {
-
-		for ( i = 0, l = sea.frame.length; i < l; i ++ ) {
-
-			var frame = sea.frame[ i ];
-
-			attribs.position[ i ] = new THREE.Float32Attribute( new Float32Array( frame.vertex ), 3 );
-
-			if ( frame.normal ) {
-
-				attribs.normal = attribs.normal || [];
-				attribs.normal[ i ] = new THREE.Float32Attribute( new Float32Array( frame.normal ), 3 );
-
-			}
-
-			targets[ i ] = { name: i };
-
-		}
+		targets[ i ] = { name: i };
 
 	}
 
