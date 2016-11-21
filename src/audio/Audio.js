@@ -83,8 +83,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
+		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
 		source.start( 0, this.startTime );
-		source.playbackRate.value = this.playbackRate;
 
 		this.isPlaying = true;
 
@@ -227,7 +227,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this.source.playbackRate.value = this.playbackRate;
+			this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
 
 		}
 
