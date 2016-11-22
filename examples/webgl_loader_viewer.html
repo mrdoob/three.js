@@ -42,6 +42,10 @@
 			<option value="models/gltf/duck/glTF/duck.gltf">models/gltf/duck/glTF/duck.gltf</option>
 			<option value="models/json/teapot-claraio.json">models/json/teapot-claraio.json</option>
 			<option value="models/skinned/marine/marine_anims_core.json">models/skinned/marine/marine_anims_core.json</option>
+			<option value="models/assimp/jeep/jeep.assimp.json">models/assimp/jeep/jeep.assimp.json</option>
+			<option value="models/pcd/Zaghetto.pcd">models/pcd/Zaghetto.pcd</option>
+			<option value="models/sea3d/mascot.tjs.sea">models/sea3d/mascot.tjs.sea</option>
+			<option value="models/vrml/house.wrl">models/vrml/house.wrl</option>
 		</select>
 		<br>
 		Custom model:
@@ -50,6 +54,7 @@
 		<br>
 	</div>
 
+
 	<script src="../build/three.js"></script>
 	<script src="js/loaders/BabylonLoader.js"></script>
 	<script src="js/loaders/OBJLoader.js"></script>
@@ -57,10 +62,20 @@
 	<script src="js/loaders/ColladaLoader.js"></script>
 	<script src="js/loaders/FBXLoader.js"></script>
 	<script src="js/loaders/GLTFLoader.js"></script>
-	<script src='js/loaders/MD2Loader.js'></script>
+	<script src="js/loaders/AssimpJSONLoader.js"></script>
+	<script src="js/loaders/PCDLoader.js"></script>
+	<script src="js/loaders/sea3d/SEA3D.js"></script>
+	<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
+	<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+	<script src="js/loaders/VRMLLoader.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
+	<script src="js/Detector.js"></script>
 	<script>
+
+	if ( ! Detector.webgl ) {
+		Detector.addGetWebGLMessage();
+	}
 
 	var camera, controls, scene, renderer;
 
@@ -94,6 +109,12 @@
 		var token = objPath.split('.');
 		var fileType = token[token.length-1];
 
+		if (fileType == "json")
+		{
+			if (token[token.length-2] == "assimp")
+				fileType = "assimp.json";
+ 		}
+
 		var onProgress = function ( xhr ) {
 			if ( xhr.lengthComputable ) {
 				var percentComplete = xhr.loaded / xhr.total * 100;
@@ -113,10 +134,18 @@
 
 		var loader = selectLoader(fileType, manager);
 
-		if (fileType == "dae")
+		if (fileType == "dae" )
 		{
 			loader.options.convertUpAxis = true;
 		}
+		else if (fileType == "pcd"){
+			//do something to invert upside down
+		}
+
+		clearScene();
+		setupLights();
+
+		//note: sea loader does not use onload function
 
 		loader.load( objPath , function ( myScene ) {
 
@@ -164,10 +193,8 @@
 
 	function OnLoadScene(fileScene, objType)
 	{
-		clearScene();
-		setupLights();
 
-		if (objType == "dae" || objType == "gltf")
+		if (objType == "dae" || objType == "gltf" || objType == "sea")
 		{
 			fileScene = fileScene.scene;
 			//scene.scale.x = scene.scale.y = scene.scale.z = 0.05;
@@ -192,10 +219,20 @@
 			else if ( object.constructor.name == "SkinnedMesh" || object.constructor.name == "Mesh" || object.constructor.name == "Object3D" ) {
 				console.log(space+"child:" + childcnt);
 				console.log(space+"constructor: "+object.constructor.name);
-				object.material = new THREE.MeshPhongMaterial( {
+				/*object.material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff
-				} );
+				} );*/
 
+				if (childcnt == 0)
+				{
+					scene.add(object);
+				}
+				else {
+					childcnt--;
+				}
+			}
+			else if ( object.constructor.name == "Points")
+			{
 				if (childcnt == 0)
 				{
 					scene.add(object);
@@ -215,13 +252,26 @@
 		} );
 	}
 
-
+	//improvement - support Geometry Loaders
+	//right now only supports Mesh Loaders
 	function selectLoader(ext, mgr) {
 		switch(ext)
 		{
-			case "md2":
-				console.log("md2");
-				return new THREE.MD2Loader( mgr );
+			case "wrl":
+				console.log("wrl");
+				return new THREE.VRMLLoader();
+			case "sea":
+				console.log("sea");
+				return new THREE.SEA3D({
+					autoPlay : false, // Auto play animations
+					container : scene // Container to add models
+				} );
+			case "pcd":
+				console.log("pcd");
+				return new THREE.PCDLoader();
+			case "assimp.json":
+				console.log("assimp.json");
+				return new THREE.AssimpJSONLoader( mgr );
 			case "babylon":
 				console.log("babylon");
 				return new THREE.BabylonLoader( mgr );
