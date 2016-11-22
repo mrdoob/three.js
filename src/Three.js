@@ -129,7 +129,6 @@ export { GridHelper } from './extras/helpers/GridHelper.js';
 export { FaceNormalsHelper } from './extras/helpers/FaceNormalsHelper.js';
 export { DirectionalLightHelper } from './extras/helpers/DirectionalLightHelper.js';
 export { CameraHelper } from './extras/helpers/CameraHelper.js';
-export { BoundingBoxHelper } from './extras/helpers/BoundingBoxHelper.js';
 export { BoxHelper } from './extras/helpers/BoxHelper.js';
 export { ArrowHelper } from './extras/helpers/ArrowHelper.js';
 export { AxisHelper } from './extras/helpers/AxisHelper.js';

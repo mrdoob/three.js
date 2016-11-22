@@ -25,6 +25,7 @@ import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
+import { BoxHelper } from './extras/helpers/BoxHelper';
 import { GridHelper } from './extras/helpers/GridHelper.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { EdgesGeometry } from './geometries/EdgesGeometry.js';
@@ -219,6 +220,11 @@ ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
 
 //
+export function BoundingBoxHelper ( object, color ) {
+	console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
+	return new BoxHelper( object, color );
+}
+
 
 export function EdgesHelper( object, hex ) {
 
