@@ -5,9 +5,9 @@
 THREE.ShaderLib[ 'mirror' ] = {
 
 	uniforms: {
-		"mirrorColor": { value: new THREE.Color( 0x7F7F7F ) },
-		"mirrorSampler": { value: null },
-		"textureMatrix" : { value: new THREE.Matrix4() }
+		"mirrorColor": new THREE.Uniform( new THREE.Color( 0x7F7F7F ) ),
+		"mirrorSampler": new THREE.Uniform( null ),
+		"textureMatrix" : new THREE.Uniform( new THREE.Matrix4() )
 	},
 
 	vertexShader: [
