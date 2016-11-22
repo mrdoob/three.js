@@ -92,7 +92,7 @@ export function PointCloud( geometry, material ) {
 
 export function Particle( material ) {
 
-	console.warn( 'THREE.Particle has been renamed to THREE.Sprite. Please use that instead.' );
+	console.warn( 'THREE.Particle has been renamed to THREE.Sprite.' );
 	return new Sprite( material );
 
 }
@@ -208,7 +208,7 @@ export function Float64Attribute( array, itemSize ) {
 
 export function ClosedSplineCurve3( points ) {
 
-	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Please use THREE.CatmullRomCurve3.' );
+	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
 
 	CatmullRomCurve3.call( this, points );
 	this.type = 'catmullrom';
@@ -220,11 +220,12 @@ ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
 
 //
-export function BoundingBoxHelper ( object, color ) {
+export function BoundingBoxHelper( object, color ) {
+
 	console.warn( 'THREE.BoundingBoxHelper has been deprecated. Creating a THREE.BoxHelper instead.' );
 	return new BoxHelper( object, color );
-}
 
+}
 
 export function EdgesHelper( object, hex ) {
 
@@ -233,14 +234,11 @@ export function EdgesHelper( object, hex ) {
 
 }
 
-Object.assign( GridHelper.prototype, {
+GridHelper.prototype.setColors = function () {
 
-	setColors: function () {
+	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
 
-		console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
-
-	}
-} );
+};
 
 export function WireframeHelper( object, hex ) {
 
@@ -322,25 +320,22 @@ Object.assign( Box3.prototype, {
 	}
 } );
 
-Object.assign( Line3.prototype, {
-	center: function ( optionalTarget ) {
+Line3.prototype.center = function ( optionalTarget ) {
 
-		console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
-		return this.getCenter( optionalTarget );
+	console.warn( 'THREE.Line3: .center() has been renamed to .getCenter().' );
+	return this.getCenter( optionalTarget );
 
-	}
-} );
+};
 
-Object.assign( _Math, {
-	random16: function () {
+_Math.random16 = function () {
 
-		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
-		return Math.random();
+	console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
+	return Math.random();
 
-	},
-} );
+};
 
 Object.assign( Matrix3.prototype, {
+
 	flattenToArrayOffset: function ( array, offset ) {
 
 		console.warn( "THREE.Matrix3: .flattenToArrayOffset() has been deprecated. Use .toArray() instead." );
@@ -359,9 +354,11 @@ Object.assign( Matrix3.prototype, {
 		return this.applyToVector3Array( a );
 
 	}
+
 } );
 
 Object.assign( Matrix4.prototype, {
+
 	extractPosition: function ( m ) {
 
 		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
@@ -423,52 +420,50 @@ Object.assign( Matrix4.prototype, {
 		return vector.applyMatrix4( this );
 
 	},
-	translate: function ( ) {
+	translate: function () {
 
 		console.error( 'THREE.Matrix4: .translate() has been removed.' );
 
 	},
-	rotateX: function ( ) {
+	rotateX: function () {
 
 		console.error( 'THREE.Matrix4: .rotateX() has been removed.' );
 
 	},
-	rotateY: function ( ) {
+	rotateY: function () {
 
 		console.error( 'THREE.Matrix4: .rotateY() has been removed.' );
 
 	},
-	rotateZ: function ( ) {
+	rotateZ: function () {
 
 		console.error( 'THREE.Matrix4: .rotateZ() has been removed.' );
 
 	},
-	rotateByAxis: function ( ) {
+	rotateByAxis: function () {
 
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	}
+
 } );
 
-Object.assign( Plane.prototype, {
-	isIntersectionLine: function ( line ) {
+Plane.prototype.isIntersectionLine = function ( line ) {
 
-		console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
-		return this.intersectsLine( line );
+	console.warn( 'THREE.Plane: .isIntersectionLine() has been renamed to .intersectsLine().' );
+	return this.intersectsLine( line );
 
-	}
-} );
+};
 
-Object.assign( Quaternion.prototype, {
-	multiplyVector3: function ( vector ) {
+Quaternion.prototype.multiplyVector3 = function ( vector ) {
 
-		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
-		return vector.applyQuaternion( this );
+	console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+	return vector.applyQuaternion( this );
 
-	}
-} );
+};
 
 Object.assign( Ray.prototype, {
+
 	isIntersectionBox: function ( box ) {
 
 		console.warn( 'THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().' );
@@ -487,9 +482,11 @@ Object.assign( Ray.prototype, {
 		return this.intersectsSphere( sphere );
 
 	}
+
 } );
 
 Object.assign( Shape.prototype, {
+
 	extrude: function ( options ) {
 
 		console.warn( 'THREE.Shape: .extrude() has been removed. Use ExtrudeGeometry() instead.' );
@@ -502,9 +499,11 @@ Object.assign( Shape.prototype, {
 		return new ShapeGeometry( this, options );
 
 	}
+
 } );
 
 Object.assign( Vector3.prototype, {
+
 	setEulerFromRotationMatrix: function () {
 
 		console.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
@@ -533,26 +532,26 @@ Object.assign( Vector3.prototype, {
 		return this.setFromMatrixColumn( matrix, index );
 
 	}
+
 } );
 
 //
 
-Object.assign( Geometry.prototype, {
-	computeTangents: function () {
+Geometry.prototype.computeTangents = function () {
 
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
+	console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
 
-	},
-} );
+};
 
 Object.assign( Object3D.prototype, {
+
 	getChildByName: function ( name ) {
 
 		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name );
 
 	},
-	renderDepth: function ( ) {
+	renderDepth: function () {
 
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
@@ -563,9 +562,11 @@ Object.assign( Object3D.prototype, {
 		return this.translateOnAxis( axis, distance );
 
 	}
+
 } );
 
 Object.defineProperties( Object3D.prototype, {
+
 	eulerOrder: {
 		get: function () {
 
@@ -586,15 +587,17 @@ Object.defineProperties( Object3D.prototype, {
 			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 		},
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 		}
 	}
+
 } );
 
 Object.defineProperties( LOD.prototype, {
+
 	objects: {
 		get: function () {
 
@@ -603,6 +606,7 @@ Object.defineProperties( LOD.prototype, {
 
 		}
 	}
+
 } );
 
 //
@@ -621,7 +625,7 @@ PerspectiveCamera.prototype.setLens = function ( focalLength, filmGauge ) {
 
 Object.defineProperties( Light.prototype, {
 	onlyShadow: {
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.Light: .onlyShadow has been removed.' );
 
@@ -684,7 +688,7 @@ Object.defineProperties( Light.prototype, {
 		}
 	},
 	shadowCameraVisible: {
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.Light: .shadowCameraVisible has been removed. Use new THREE.CameraHelper( light.shadow.camera ) instead.' );
 
@@ -699,7 +703,7 @@ Object.defineProperties( Light.prototype, {
 		}
 	},
 	shadowDarkness: {
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.Light: .shadowDarkness has been removed.' );
 
@@ -726,17 +730,20 @@ Object.defineProperties( Light.prototype, {
 //
 
 Object.defineProperties( BufferAttribute.prototype, {
+
 	length: {
 		get: function () {
 
-			console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+			console.warn( 'THREE.BufferAttribute: .length has been deprecated. Use .count instead.' );
 			return this.array.length;
 
 		}
 	}
+
 } );
 
 Object.assign( BufferGeometry.prototype, {
+
 	addIndex: function ( index ) {
 
 		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
@@ -770,9 +777,11 @@ Object.assign( BufferGeometry.prototype, {
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
 	}
+
 } );
 
 Object.defineProperties( BufferGeometry.prototype, {
+
 	drawcalls: {
 		get: function () {
 
@@ -789,13 +798,15 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 		}
 	}
+
 } );
 
 //
 
 Object.defineProperties( Uniform.prototype, {
+
 	dynamic: {
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
 
@@ -809,18 +820,20 @@ Object.defineProperties( Uniform.prototype, {
 
 		}
 	}
+
 } );
 
 //
 
 Object.defineProperties( Material.prototype, {
+
 	wrapAround: {
 		get: function () {
 
 			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
 
 		},
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
 
@@ -834,9 +847,11 @@ Object.defineProperties( Material.prototype, {
 
 		}
 	}
+
 } );
 
 Object.defineProperties( MeshPhongMaterial.prototype, {
+
 	metal: {
 		get: function () {
 
@@ -844,15 +859,17 @@ Object.defineProperties( MeshPhongMaterial.prototype, {
 			return false;
 
 		},
-		set: function ( ) {
+		set: function () {
 
 			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead' );
 
 		}
 	}
+
 } );
 
 Object.defineProperties( ShaderMaterial.prototype, {
+
 	derivatives: {
 		get: function () {
 
@@ -867,6 +884,7 @@ Object.defineProperties( ShaderMaterial.prototype, {
 
 		}
 	}
+
 } );
 
 //
@@ -891,6 +909,7 @@ EventDispatcher.prototype = Object.assign( Object.create( {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
 	supportsFloatTextures: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
@@ -965,9 +984,11 @@ Object.assign( WebGLRenderer.prototype, {
 		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
 	}
+
 } );
 
 Object.defineProperties( WebGLRenderer.prototype, {
+
 	shadowMapEnabled: {
 		get: function () {
 
@@ -1010,6 +1031,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 } );
 
 Object.defineProperties( WebGLShadowMap.prototype, {
+
 	cullFace: {
 		get: function () {
 
@@ -1024,11 +1046,13 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 		}
 	}
+
 } );
 
 //
 
 Object.defineProperties( WebGLRenderTarget.prototype, {
+
 	wrapS: {
 		get: function () {
 
@@ -1169,34 +1193,31 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 		}
 	}
+
 } );
 
 //
 
-Object.assign( Audio.prototype, {
-	load: function ( file ) {
+Audio.prototype.load = function ( file ) {
 
-		console.warn( 'THREE.Audio: .load has been deprecated. Please use THREE.AudioLoader.' );
-		var scope = this;
-		var audioLoader = new AudioLoader();
-		audioLoader.load( file, function ( buffer ) {
+	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+	var scope = this;
+	var audioLoader = new AudioLoader();
+	audioLoader.load( file, function ( buffer ) {
 
-			scope.setBuffer( buffer );
+		scope.setBuffer( buffer );
 
-		} );
-		return this;
+	} );
+	return this;
 
-	}
-} );
+};
 
-Object.assign( AudioAnalyser.prototype, {
-	getData: function ( ) {
+AudioAnalyser.prototype.getData = function () {
 
-		console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
-		return this.getFrequencyData();
+	console.warn( 'THREE.AudioAnalyser: .getData() is now .getFrequencyData().' );
+	return this.getFrequencyData();
 
-	}
-} );
+};
 
 //
 
@@ -1362,7 +1383,7 @@ export function Projector() {
 
 	};
 
-	this.pickingRay = function ( ) {
+	this.pickingRay = function () {
 
 		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
