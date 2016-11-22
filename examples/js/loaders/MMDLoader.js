@@ -2000,7 +2000,7 @@ THREE.MMDAudioManager = function ( audio, listener, p ) {
 	this.currentTime = 0.0;
 	this.delayTime = params.delayTime !== undefined ? params.delayTime : 0.0;
 
-	this.audioDuration = this.audio.source.buffer.duration;
+	this.audioDuration = this.audio.buffer.duration;
 	this.duration = this.audioDuration + this.delayTime;
 
 };
