@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - model viewer</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+	body {
+		font-family: Monospace;
+		background-color: #000;
+		color: #fff;
+		margin: 0px;
+		overflow: hidden;
+	}
+	#info {
+		color: #fff;
+		position: absolute;
+		top: 10px;
+		width: 100%;
+		text-align: center;
+		z-index: 100;
+		display:block;
+	}
+	#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+	</style>
+</head>
+
+<body>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test
+		<br>
+		select model:
+		<select id="fileModel" onchange="reloadModel(this.value);">
+			<option value="models/babylon/skull.babylon">models/babylon/skull.babylon</option>
+			<option value="obj/female02/female02.obj">obj/female02/female02.obj</option>
+			<option value="obj/male02/male02.obj">obj/male02/male02.obj</option>
+			<option value="obj/walt/WaltHead.obj">obj/walt/WaltHead.obj</option>
+			<option value="models/awd/simple/simple.awd">models/awd/simple/simple.awd</option>
+			<option value="models/collada/monster/monster.dae">models/collada/monster/monster.dae</option>
+			<option value="models/collada/kawada-hironx.dae">models/collada/kawada-hironx.dae</option>
+			<option value="models/fbx/xsi_man_skinning.fbx">models/fbx/xsi_man_skinning.fbx</option>
+			<option value="models/gltf/duck/glTF/duck.gltf">models/gltf/duck/glTF/duck.gltf</option>
+			<option value="models/json/teapot-claraio.json">models/json/teapot-claraio.json</option>
+			<option value="models/skinned/marine/marine_anims_core.json">models/skinned/marine/marine_anims_core.json</option>
+		</select>
+		<br>
+		Custom model:
+		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
+		<button onclick="reloadModel(getElementById('customModel').value)">Load Custom Model</button>
+		<br>
+	</div>
+
+	<script src="../build/three.js"></script>
+	<script src="js/loaders/BabylonLoader.js"></script>
+	<script src="js/loaders/OBJLoader.js"></script>
+	<script src="js/loaders/AWDLoader.js"></script>
+	<script src="js/loaders/ColladaLoader.js"></script>
+	<script src="js/loaders/FBXLoader.js"></script>
+	<script src="js/loaders/GLTFLoader.js"></script>
+	<script src='js/loaders/MD2Loader.js'></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
+	<script>
+
+	var camera, controls, scene, renderer;
+
+	init();
+
+	animate();
+
+	function clearScene() {
+		camera.position.z = 250;
+		scene.scale.x = scene.scale.y = scene.scale.z = 1.0;
+
+		for( var i = scene.children.length - 1; i >= 0; i--){
+			obj = scene.children[i];
+			scene.remove(obj);
+		}
+	}
+
+	function setupLights() {
+		var ambient = new THREE.AmbientLight( 0x101030 );
+		scene.add( ambient );
+
+		var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+		directionalLight.position.set( 0, 0, 1 );
+		scene.add( directionalLight );
+	}
+
+	function reloadModel(objPath)
+	{
+		console.log(objPath);
+
+		var token = objPath.split('.');
+		var fileType = token[token.length-1];
+
+		var onProgress = function ( xhr ) {
+			if ( xhr.lengthComputable ) {
+				var percentComplete = xhr.loaded / xhr.total * 100;
+				console.log( Math.round(percentComplete, 2) + '% downloaded' );
+			}
+		};
+
+		var onError = function ( xhr ) {
+		};
+
+		var manager = new THREE.LoadingManager();
+		manager.onProgress = function ( item, loaded, total ) {
+
+			console.log( item, loaded, total );
+
+		};
+
+		var loader = selectLoader(fileType, manager);
+
+		if (fileType == "dae")
+		{
+			loader.options.convertUpAxis = true;
+		}
+
+		loader.load( objPath , function ( myScene ) {
+
+			OnLoadScene(myScene, fileType);
+
+		}, onProgress, onError );
+	}
+
+	function init() {
+
+		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+		//camera.position.z = 100;
+		camera.position.z = 250;
+
+		//controls = new THREE.TrackballControls( camera );
+
+		// scene
+
+		scene = new THREE.Scene();
+
+		// texture
+
+		var texture = new THREE.Texture();
+
+		var material = new THREE.MeshBasicMaterial( { color: 'red' } );
+
+		// model
+		var model = 'models/babylon/skull.babylon';
+		reloadModel(model);
+
+		//
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		//
+
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+		window.addEventListener( 'resize', onWindowResize, false );
+
+	}
+
+	function OnLoadScene(fileScene, objType)
+	{
+		clearScene();
+		setupLights();
+
+		if (objType == "dae" || objType == "gltf")
+		{
+			fileScene = fileScene.scene;
+			//scene.scale.x = scene.scale.y = scene.scale.z = 0.05;
+		}
+
+		console.log("children:" + fileScene.children.length);
+		var space ="";
+		var childcnt = 0;
+		fileScene.traverse( function ( object ) {
+
+			// improvement - handle nested groups?
+			if ( object.constructor.name == "Group" ) {
+				scene.add(object);
+				childcnt = object.children.length;
+				console.log(space+"constructor: "+object.constructor.name);
+				console.log(space+"children:" + childcnt);
+				if (childcnt > 0)
+				{
+					space = "  ";
+				}
+			}
+			else if ( object.constructor.name == "SkinnedMesh" || object.constructor.name == "Mesh" || object.constructor.name == "Object3D" ) {
+				console.log(space+"child:" + childcnt);
+				console.log(space+"constructor: "+object.constructor.name);
+				object.material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff
+				} );
+
+				if (childcnt == 0)
+				{
+					scene.add(object);
+				}
+				else {
+					childcnt--;
+				}
+			}
+			else {
+				console.log(space+"child:" + childcnt);
+				console.log(space+"constructor: "+object.constructor.name);
+				if (childcnt> 0)
+				{
+					childcnt--;
+				}
+			}
+		} );
+	}
+
+
+	function selectLoader(ext, mgr) {
+		switch(ext)
+		{
+			case "md2":
+				console.log("md2");
+				return new THREE.MD2Loader( mgr );
+			case "babylon":
+				console.log("babylon");
+				return new THREE.BabylonLoader( mgr );
+			case "obj":
+				console.log("obj");
+				return new THREE.OBJLoader( mgr );
+			case "awd":
+				console.log("awd");
+				return new THREE.AWDLoader( mgr );
+			case "dae":
+				console.log("dae");
+				return new THREE.ColladaLoader( mgr );
+			case "fbx":
+				console.log("fbx");
+				return new THREE.FBXLoader( mgr );
+			case "gltf":
+				console.log("gltf");
+				return new THREE.GLTFLoader( mgr );
+			case "json":
+				console.log("json");
+				return new THREE.ObjectLoader( mgr);
+			default:
+				return null;
+		}
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+		controls.handleResize();
+
+	}
+
+	//
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+		render();
+
+	}
+
+	function render() {
+
+		controls.update();
+		renderer.render( scene, camera );
+
+	}
+
+	</script>
+
+</body>
+</html>
