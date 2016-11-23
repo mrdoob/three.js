@@ -69,14 +69,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	// external properties
 
-	this.renderer;
-	this.domElement;
+	this.renderer = undefined;
+	this.domElement = undefined;
 
 	this.forwardRendering = false;  // for debug
 
 	// private methods
 
-	var init = function ( parameters ) {
+	function init( parameters ) {
 
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer( { antialias: false } );
 		_this.domElement = _this.renderer.domElement;
@@ -100,9 +100,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.setAntialias( antialias );
 		_this.enableLightPrePass( false );
 
-	};
+	}
 
-	var initDepthTexture = function () {
+	function initDepthTexture() {
 
 		_depthTexture = new THREE.DepthTexture(
 			_width,
@@ -115,11 +115,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			undefined,
 			undefined,
 			THREE.DepthStencilFormat
-		)
+		);
 
-	};
+	}
 
-	var initPassNormalDepth = function () {
+	function initPassNormalDepth() {
 
 		_passNormalDepth = new THREE.RenderPass();
 		_passNormalDepth.clear = true;
@@ -138,9 +138,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compNormalDepth = new THREE.EffectComposer( _this.renderer, rt );
 		_compNormalDepth.addPass( _passNormalDepth );
 
-	};
+	}
 
-	var initPassColor = function () {
+	function initPassColor() {
 
 		_passColor = new THREE.RenderPass();
 		_passColor.clear = true;
@@ -158,13 +158,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compColor = new THREE.EffectComposer( _this.renderer, rt );
 		_compColor.addPass( _passColor );
 
-	};
+	}
 
-	var initPassLight = function () {
+	function initPassLight() {
 
 		_passLightFullscreen = new THREE.RenderPass();
 		_passLightFullscreen.clear = true;
-		_passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+		_passLightFullscreen.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 		_passLight = new THREE.RenderPass();
 		_passLight.clear = false;
@@ -183,9 +183,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compLight.addPass( _passLightFullscreen );
 		_compLight.addPass( _passLight );
 
-	};
+	}
 
-	var initPassReconstruction = function () {
+	function initPassReconstruction() {
 
 		_passReconstruction = new THREE.RenderPass();
 		_passReconstruction.clear = true;
@@ -203,9 +203,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compReconstruction = new THREE.EffectComposer( _this.renderer, rt );
 		_compReconstruction.addPass( _passReconstruction );
 
-	};
+	}
 
-	var initPassFinal = function () {
+	function initPassFinal() {
 
 		_passFinal = new THREE.ShaderPass( THREE.ShaderDeferred[ 'final' ] );
 		_passFinal.clear = true;
@@ -237,9 +237,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_compFinal.addPass( _passCopy );
 		_compFinal.addPass( _passFXAA );
 
-	};
+	}
 
-	var initLightScene = function ( scene ) {
+	function initLightScene( scene ) {
 
 		if ( scene.userData.lightScene === undefined ) {
 
@@ -268,9 +268,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// emissiveLight is only for Classic Deferred Rendering
 		_lightFullscreenScene.userData.emissiveLight.visible = ! _lightPrePass;
 
-	};
+	}
 
-	var setMaterialNormalDepth = function ( object ) {
+	function setMaterialNormalDepth( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -290,9 +290,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getNormalDepthMaterial = function ( object ) {
+	function getNormalDepthMaterial( object ) {
 
 		if ( ( _lightPrePass && object.userData.normalDepthShininessMaterial === undefined ) ||
 		     ( ! _lightPrePass && object.userData.normalDepthMaterial === undefined ) ) {
@@ -303,9 +303,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return ( _lightPrePass ) ? object.userData.normalDepthShininessMaterial : object.userData.normalDepthMaterial;
 
-	};
+	}
 
-	var initDeferredNormalDepthMaterial = function ( object, isLightPrePass ) {
+	function initDeferredNormalDepthMaterial( object, isLightPrePass ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 		var material;
@@ -338,24 +338,28 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredNormalDepthMaterial = function ( originalMaterial, isLightPrePass ) {
+	function createDeferredNormalDepthMaterial( originalMaterial, isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'normalDepthShininess' ] : THREE.ShaderDeferred[ 'normalDepth' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
 		} );
 
+		var uniforms = material.uniforms;
+
+		if ( uniforms.shininess !== undefined ) uniforms.shininess = uniforms.shininess.clone();
+
 		return material;
 
-	};
+	}
 
-	var updateDeferredNormalDepthMaterial = function ( material, originalMaterial, isLightPrePass ) {
+	function updateDeferredNormalDepthMaterial( material, originalMaterial, isLightPrePass ) {
 
 		if ( originalMaterial.skinning !== undefined ) material.skinning = originalMaterial.skinning;
 		if ( originalMaterial.morphTargets !== undefined ) material.morphTargets = originalMaterial.morphTargets;
@@ -384,9 +388,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var setMaterialColor = function ( object ) {
+	function setMaterialColor( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -406,9 +410,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getColorMaterial = function ( object ) {
+	function getColorMaterial( object ) {
 
 		if ( object.userData.colorMaterial === undefined ) {
 
@@ -418,9 +422,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return object.userData.colorMaterial;
 
-	};
+	}
 
-	var initDeferredColorMaterial = function ( object ) {
+	function initDeferredColorMaterial( object ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 
@@ -442,26 +446,35 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredColorMaterial = function ( originalMaterial ) {
+	function createDeferredColorMaterial( originalMaterial ) {
 
 		var shader = THREE.ShaderDeferred[ 'color' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
 		} );
 
+		var uniforms = material.uniforms;
+
+		uniforms.diffuse = uniforms.diffuse.clone();
+		uniforms.emissive = uniforms.emissive.clone();
+		uniforms.specular = uniforms.specular.clone();
+		uniforms.shininess = uniforms.shininess.clone();
+
 		if ( originalMaterial.map !== undefined ) material.map = originalMaterial.map;
+
+		uniforms.map = new THREE.Uniform();
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredColorMaterial = function ( material, originalMaterial ) {
+	function updateDeferredColorMaterial( material, originalMaterial ) {
 
 		var diffuse, emissive;
 
@@ -514,9 +527,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var setMaterialReconstruction = function ( object ) {
+	function setMaterialReconstruction( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -544,9 +557,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getReconstructionMaterial = function ( object ) {
+	function getReconstructionMaterial( object ) {
 
 		if ( object.userData.reconstructionMaterial === undefined ) {
 
@@ -556,9 +569,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return object.userData.reconstructionMaterial;
 
-	};
+	}
 
-	var initDeferredReconstructionMaterial = function ( object ) {
+	function initDeferredReconstructionMaterial( object ) {
 
 		var originalMaterial = object.userData.originalMaterial;
 
@@ -580,14 +593,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredReconstructionMaterial = function ( originalMaterial ) {
+	function createDeferredReconstructionMaterial( originalMaterial ) {
 
 		var shader = THREE.ShaderDeferred[ 'reconstruction' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
 			blending: THREE.NoBlending
@@ -599,18 +612,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var updateDeferredReconstructionMaterial = function ( material, originalMaterial ) {
+	function updateDeferredReconstructionMaterial( material, originalMaterial ) {
 
 		updateDeferredColorMaterial( material, originalMaterial );
 
-		material.uniforms.viewWidth.value = _width;
-		material.uniforms.viewHeight.value = _height;
+	}
 
-	};
-
-	var setMaterialForwardRendering = function ( object ) {
+	function setMaterialForwardRendering( object ) {
 
 		if ( object.material === undefined ) return;
 
@@ -636,9 +646,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var initInvisibleMaterial = function ( object ) {
+	function initInvisibleMaterial( object ) {
 
 		if ( object.userData.originalMaterial.isMultiMaterial === true ) {
 
@@ -654,13 +664,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getForwardRenderingMaterial = function ( originalMaterial ) {
+	function getForwardRenderingMaterial( originalMaterial ) {
 
 		if ( originalMaterial.transparent === true && originalMaterial.visible === true ) {
 
-			return originalMaterial
+			return originalMaterial;
 
 		} else {
 
@@ -668,14 +678,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredEmissiveLight = function () {
+	function createDeferredEmissiveLight() {
 
 		var shader = THREE.ShaderDeferred[ 'emissiveLight' ];
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			blending: THREE.NoBlending,
@@ -689,18 +699,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return mesh;
 
-	};
+	}
 
-	var updateDeferredEmissiveLight = function ( light, camera ) {
-
-		var uniforms = light.material.uniforms;
-
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
-
-	};
-
-	var initDeferredLight = function ( light ) {
+	function initDeferredLight( light ) {
 
 		var deferredLight;
 
@@ -724,9 +725,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		light.userData.deferredLight = deferredLight;
 
-	};
+	}
 
-	var initDeferredLightMaterial = function ( light, isLightPrePass ) {
+	function initDeferredLightMaterial( light, isLightPrePass ) {
 
 		var originalLight = light.userData.originalLight;
 		var material;
@@ -759,9 +760,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var getDeferredLightMaterial = function ( light ) {
+	function getDeferredLightMaterial( light ) {
 
 		if ( ( _lightPrePass && light.userData.materialLightPrePass === undefined ) ||
 		     ( ! _lightPrePass && light.userData.materialClassic === undefined ) ) {
@@ -772,9 +773,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return ( _lightPrePass ) ? light.userData.materialLightPrePass : light.userData.materialClassic;
 
-	};
+	}
 
-	var updateDeferredLight = function ( light, camera ) {
+	function updateDeferredLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 
@@ -792,9 +793,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredLightMesh = function ( light, geometry ) {
+	function createDeferredLightMesh( light, geometry ) {
 
 		var mesh = new THREE.Mesh( geometry, _invisibleMaterial );
 
@@ -802,12 +803,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return mesh;
 
-	};
+	}
 
-	var createDeferredLightMaterial = function ( shader, isLightPrePass ) {
+	function createDeferredLightMaterial( shader, isLightPrePass ) {
 
 		var material = new THREE.ShaderMaterial( {
-			uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+			uniforms: Object.assign( {}, shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			transparent: true,
@@ -829,19 +830,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		return material;
 
-	};
+	}
 
-	var createDeferredPointLight = function ( light ) {
+	function createDeferredPointLight( light ) {
 
 		return createDeferredLightMesh( light, new THREE.SphereGeometry( 1, 16, 8 ) );
 
-	};
+	}
 
 	/*
 	 * optimization:
 	 * Renders PointLight only back face with stencil test.
 	 */
-	var createDeferredPointLightMaterial = function ( isLightPrePass ) {
+	function createDeferredPointLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'pointLightPre' ] : THREE.ShaderDeferred[ 'pointLight' ];
 
@@ -850,19 +851,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		material.side = THREE.BackSide;
 		material.depthFunc = THREE.GreaterEqualDepth;
 
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = uniforms.lightColor.clone();
+		uniforms.lightRadius = uniforms.lightRadius.clone();
+		uniforms.lightIntensity = uniforms.lightIntensity.clone();
+		uniforms.lightPositionVS = uniforms.lightPositionVS.clone();
+
 		return material;
 
-	};
+	}
 
-	var updateDeferredPointLight = function ( light, camera ) {
+	function updateDeferredPointLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var distance = originalLight.distance;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightColor.value.copy( originalLight.color );
 
 		if ( distance > 0 ) {
@@ -879,15 +884,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var createDeferredSpotLight = function ( light ) {
+	function createDeferredSpotLight( light ) {
 
 		return createDeferredLightMesh(	light, new THREE.PlaneBufferGeometry( 2, 2 ) );
 
-	};
+	}
 
-	var createDeferredSpotLightMaterial = function ( isLightPrePass ) {
+	function createDeferredSpotLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'spotLightPre' ] : THREE.ShaderDeferred[ 'spotLight' ];
 
@@ -895,18 +900,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.depthTest = false;
 
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = uniforms.lightColor.clone();
+		uniforms.lightAngle = uniforms.lightAngle.clone();
+		uniforms.lightIntensity = uniforms.lightIntensity.clone();
+		uniforms.lightPositionVS = uniforms.lightPositionVS.clone();
+		uniforms.lightDirectionVS = uniforms.lightDirectionVS.clone();
+
 		return material;
 
-	};
+	}
 
-	var updateDeferredSpotLight = function ( light, camera ) {
+	function updateDeferredSpotLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightAngle.value = originalLight.angle;
 		uniforms.lightColor.value.copy( originalLight.color );
 		uniforms.lightIntensity.value = originalLight.intensity;
@@ -919,15 +929,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		vec2.setFromMatrixPosition( originalLight.target.matrixWorld );
 		vec.sub( vec2 ).normalize().transformDirection( camera.matrixWorldInverse );
 
-	};
+	}
 
-	var createDeferredDirectionalLight = function ( light ) {
+	function createDeferredDirectionalLight( light ) {
 
 		return createDeferredLightMesh(	light, new THREE.PlaneBufferGeometry( 2, 2 ) );
 
-	};
+	}
 
-	var createDeferredDirectionalLightMaterial = function ( isLightPrePass ) {
+	function createDeferredDirectionalLightMaterial( isLightPrePass ) {
 
 		var shader = ( isLightPrePass ) ? THREE.ShaderDeferred[ 'directionalLightPre' ] : THREE.ShaderDeferred[ 'directionalLight' ];
 
@@ -935,18 +945,21 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.depthTest = false;
 
+		var uniforms = material.uniforms;
+
+		uniforms.lightColor = uniforms.lightColor.clone();
+		uniforms.lightIntensity = uniforms.lightIntensity.clone();
+		uniforms.lightDirectionVS = uniforms.lightDirectionVS.clone();
+
 		return material;
 
-	};
+	}
 
-	var updateDeferredDirectionalLight = function ( light, camera ) {
+	function updateDeferredDirectionalLight( light, camera ) {
 
 		var originalLight = light.userData.originalLight;
 		var uniforms = light.material.uniforms;
 
-		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
-		uniforms.viewWidth.value = _width;
-		uniforms.viewHeight.value = _height;
 		uniforms.lightColor.value.copy( originalLight.color );
 		uniforms.lightIntensity.value = originalLight.intensity;
 
@@ -957,9 +970,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		vec2.setFromMatrixPosition( originalLight.target.matrixWorld );
 		vec.sub( vec2 ).normalize().transformDirection( camera.matrixWorldInverse );
 
-	};
+	}
 
-	var saveOriginalMaterialAndCheckTransparency = function ( object ) {
+	function saveOriginalMaterialAndCheckTransparency( object ) {
 
 		if ( object.material !== undefined ) {
 
@@ -988,15 +1001,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var restoreOriginalMaterial = function ( object ) {
+	function restoreOriginalMaterial( object ) {
 
 		if ( object.userData.originalMaterial !== undefined ) object.material = object.userData.originalMaterial;
 
-	};
+	}
 
-	var addDeferredLightsToLightScene = function ( object ) {
+	function addDeferredLightsToLightScene( object ) {
 
 		if ( object.isLight !== true ) return;
 
@@ -1027,9 +1040,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		lights[ light.uuid ].found = true;
 
-	};
+	}
 
-	var updateDeferredLightsInLightScene = function ( scene, camera ) {
+	function updateDeferredLightsInLightScene( scene, camera ) {
 
 		var lights = scene.userData.lights;
 		var keys = Object.keys( lights );
@@ -1056,9 +1069,20 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	var enableFinalPasses = function () {
+	function updateDeferredCommonUniforms( camera ) {
+
+		var uniforms = THREE.ShaderDeferredCommon[ 'commonUniforms' ];
+
+		uniforms.viewWidth.value = _width;
+		uniforms.viewHeight.value = _height;
+
+		uniforms.matProjInverse.value.getInverse( camera.projectionMatrix );
+
+	}
+
+	function enableFinalPasses() {
 
 		if ( _lightPrePass ) {
 
@@ -1150,7 +1174,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1170,7 +1194,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 *   A: depth
 	 */
 
-	var renderNormalDepth = function ( scene, camera ) {
+	function renderNormalDepth( scene, camera ) {
 
 		scene.traverse( setMaterialNormalDepth );
 
@@ -1186,7 +1210,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compNormalDepth.render();
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1199,7 +1223,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * A: shininess
 	 */
 
-	var renderColor = function ( scene, camera ) {
+	function renderColor( scene, camera ) {
 
 		scene.traverse( setMaterialColor );
 
@@ -1214,7 +1238,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compColor.render();
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1222,9 +1246,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * 3) light pass
 	 */
 
-	var renderLight = function ( scene, camera ) {
-
-		updateDeferredEmissiveLight( _lightFullscreenScene.userData.emissiveLight, camera );
+	function renderLight( scene, camera ) {
 
 		scene.traverse( addDeferredLightsToLightScene );
 
@@ -1243,7 +1265,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_gl.disable( _gl.STENCIL_TEST );
 
-	};
+	}
 
 	/*
 	 * Light Pre-Pass Rendering
@@ -1251,7 +1273,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * 2') Light pre pass
 	 */
 
-	var renderLightPre = function ( scene, camera ) {
+	function renderLightPre( scene, camera ) {
 
 		scene.traverse( addDeferredLightsToLightScene );
 
@@ -1271,7 +1293,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compLight.render();
 
-	};
+	}
 
 	/*
 	 * Light Pre-Pass Rendering
@@ -1282,7 +1304,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 * Here renders transparent objects with normal forward rendering.
 	 */
 
-	var renderReconstruction = function ( scene, camera ) {
+	function renderReconstruction( scene, camera ) {
 
 		scene.traverse( setMaterialReconstruction );
 
@@ -1296,7 +1318,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_gl.disable( _gl.STENCIL_TEST );
 
-	};
+	}
 
 	/*
 	 * Classic Deferred Rendering
@@ -1321,7 +1343,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 *
 	 */
 
-	var renderFinal = function ( scene, camera ) {
+	function renderFinal( scene, camera ) {
 
 		if ( ! _lightPrePass && _hasTransparentObject ) {
 
@@ -1339,7 +1361,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compFinal.render();
 
-	};
+	}
 
 	// external APIs
 
@@ -1403,6 +1425,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		scene.traverse( saveOriginalMaterialAndCheckTransparency );
 
+		updateDeferredCommonUniforms( camera );
+
 		renderNormalDepth( scene, camera );
 
 		if ( _lightPrePass ) {
@@ -1440,9 +1464,9 @@ THREE.DeferredShaderChunk = {
 
 		"float vec3_to_float( vec3 data ) {",
 
-			"const float unit = 255.0/256.0;",
-			"highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
-			"return compressed;",
+		"	const float unit = 255.0/256.0;",
+		"	highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
+		"	return compressed;",
 
 		"}"
 
@@ -1452,13 +1476,13 @@ THREE.DeferredShaderChunk = {
 
 		"vec3 float_to_vec3( float data ) {",
 
-			"const float unit = 255.0;",
-			"vec3 uncompressed;",
-			"uncompressed.x = fract( data );",
-			"float zInt = floor( data / unit );",
-			"uncompressed.z = fract( zInt / unit );",
-			"uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );",
-			"return uncompressed;",
+		"	const float unit = 255.0;",
+		"	vec3 uncompressed;",
+		"	uncompressed.x = fract( data );",
+		"	float zInt = floor( data / unit );",
+		"	uncompressed.z = fract( zInt / unit );",
+		"	uncompressed.y = fract( floor( data - ( zInt * unit ) ) / unit );",
+		"	return uncompressed;",
 
 		"}"
 
@@ -1474,7 +1498,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec4 packedNormalDepth;",
 		"packedNormalDepth.xyz = normal * 0.5 + 0.5;",
-		"packedNormalDepth.w = position.z / position.w;",
+		"packedNormalDepth.w = position.z / position.w;"
 
 	].join( "\n" ),
 
@@ -1528,7 +1552,7 @@ THREE.DeferredShaderChunk = {
 		"vec3 diffuseColor = float_to_vec3( colorMap.x );",
 		"vec3 emissiveColor = float_to_vec3( colorMap.y );",
 		"vec3 specularColor = float_to_vec3( colorMap.z );",
-		"float shininess = colorMap.w;",
+		"float shininess = colorMap.w;"
 
 	].join( "\n" ),
 
@@ -1536,7 +1560,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec4 packedLight;",
 		"packedLight.xyz = lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * attenuation;",
-		"packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;",
+		"packedLight.w = lightIntensity * specular * max( dot( lightVector, normal ), 0.0 ) * attenuation;"
 
 	].join( "\n" ),
 
@@ -1555,7 +1579,7 @@ THREE.DeferredShaderChunk = {
 
 		"vec3 halfVector = normalize( lightVector - normalize( vertexPositionVS.xyz ) );",
 		"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-		"float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );",
+		"float specular = 0.31830988618 * ( shininess * 0.5 + 1.0 ) * pow( dotNormalHalf, shininess );"
 
 	].join( "\n" ),
 
@@ -1564,6 +1588,19 @@ THREE.DeferredShaderChunk = {
 		"gl_FragColor = vec4( lightIntensity * lightColor * max( dot( lightVector, normal ), 0.0 ) * ( diffuseColor + specular * specularColor ) * attenuation, 1.0 );"
 
 	].join( "\n" )
+
+};
+
+THREE.ShaderDeferredCommon = {
+
+	commonUniforms: {
+
+		matProjInverse: new THREE.Uniform( new THREE.Matrix4() ),
+
+		viewWidth: new THREE.Uniform( 800 ),
+		viewHeight: new THREE.Uniform( 600 )
+
+	}
 
 };
 
@@ -1583,17 +1620,17 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
-				"vNormal = normalize( normalMatrix * objectNormal );",
-				"vPosition = gl_Position;",
+			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vPosition = gl_Position;",
 
 			"}"
 
@@ -1606,12 +1643,12 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec3 normal = vNormal;",
-				"vec4 position = vPosition;",
+			"	vec3 normal = vNormal;",
+			"	vec4 position = vPosition;",
 
-				THREE.DeferredShaderChunk[ "packNormalDepth" ],
+			THREE.DeferredShaderChunk[ "packNormalDepth" ],
 
-				"gl_FragColor = packedNormalDepth;",
+			"	gl_FragColor = packedNormalDepth;",
 
 			"}"
 
@@ -1623,13 +1660,13 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			map: { type: "t", value: null },
-			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+			map: new THREE.Uniform( null ),
+			offsetRepeat: new THREE.Uniform( new THREE.Vector4( 0, 0, 1, 1 ) ),
 
-			diffuse: { type: "c", value: new THREE.Color( 0x000000 ) },
-			emissive: { type: "c", value: new THREE.Color( 0x000000 ) },
-			specular: { type: "c", value: new THREE.Color( 0x000000 ) },
-			shininess: { type: "f", value: 30.0 }
+			diffuse: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+			emissive: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+			specular: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+			shininess: new THREE.Uniform( 30.0 )
 
 		},
 
@@ -1641,15 +1678,15 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "uv_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
 			"}"
 
@@ -1668,14 +1705,14 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 diffuseColor = vec4( diffuse, 1.0 );",
-				"vec3 emissiveColor = emissive;",
-				"vec3 specularColor = specular;",
+			"	vec4 diffuseColor = vec4( diffuse, 1.0 );",
+			"	vec3 emissiveColor = emissive;",
+			"	vec3 specularColor = specular;",
 
-				THREE.ShaderChunk[ "map_fragment" ],
-				THREE.DeferredShaderChunk[ "packColor" ],
+			THREE.ShaderChunk[ "map_fragment" ],
+			THREE.DeferredShaderChunk[ "packColor" ],
 
-				"gl_FragColor = packedColor;",
+			"	gl_FragColor = packedColor;",
 
 			"}"
 
@@ -1685,19 +1722,23 @@ THREE.ShaderDeferred = {
 
 	emissiveLight: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerColor: { type: "t", value: null },
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 }
+			{
 
-		},
+				samplerColor: new THREE.Uniform( null )
+
+			},
+
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1714,10 +1755,10 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"gl_FragColor = vec4( emissiveColor, 1.0 );",
+			"	gl_FragColor = vec4( emissiveColor, 1.0 );",
 
 			"}"
 
@@ -1727,28 +1768,29 @@ THREE.ShaderDeferred = {
 
 	pointLight: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepth: new THREE.Uniform( null ),
+				samplerColor: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightPositionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightIntensity: new THREE.Uniform( 1.0 ),
+				lightRadius: new THREE.Uniform( 1.0 )
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 },
-			lightRadius: { type: "f", value: 1.0 }
+			},
 
-		},
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
 			"void main() {",
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
 
@@ -1773,33 +1815,33 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
-				"float distance = length( lightVector );",
+			"	vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
+			"	float distance = length( lightVector );",
 
-				"if ( distance > lightRadius ) discard;",
+			"	if ( distance > lightRadius ) discard;",
 
-				"lightVector = normalize( lightVector );",
+			"	lightVector = normalize( lightVector );",
 
-				THREE.DeferredShaderChunk[ "unpackColor" ],
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"//float cutoff = 0.3;",
-				"//float denom = distance / lightRadius + 1.0;",
-				"//float attenuation = 1.0 / ( denom * denom );",
-				"//attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
-				"//attenuation = max( attenuation, 0.0 );",
-				"//attenuation *= attenuation;",
+			"	//float cutoff = 0.3;",
+			"	//float denom = distance / lightRadius + 1.0;",
+			"	//float attenuation = 1.0 / ( denom * denom );",
+			"	//attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
+			"	//attenuation = max( attenuation, 0.0 );",
+			"	//attenuation *= attenuation;",
 
-				"//diffuseColor *= saturate( -distance / lightRadius + 1.0 );",
-				"//float attenuation = 1.0;",
+			"	//diffuseColor *= saturate( -distance / lightRadius + 1.0 );",
+			"	//float attenuation = 1.0;",
 
-				"float attenuation = saturate( -distance / lightRadius + 1.0 );",
+			"	float attenuation = saturate( -distance / lightRadius + 1.0 );",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -1809,29 +1851,30 @@ THREE.ShaderDeferred = {
 
 	spotLight: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepth: new THREE.Uniform( null ),
+				samplerColor: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightDirectionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightPositionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightAngle: new THREE.Uniform( 1.0 ),
+				lightIntensity: new THREE.Uniform( 1.0 )
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { type: "f", value: 1.0 },
-			lightIntensity: { type: "f", value: 1.0 }
+			},
 
-		},
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1857,45 +1900,45 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
+			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
-				"float rho = dot( lightDirectionVS, lightVector );",
-				"float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rho = dot( lightDirectionVS, lightVector );",
+			"	float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho <= rhoMax ) discard;",
+			"	if ( rho <= rhoMax ) discard;",
 
-				"float theta = rhoMax + 0.0001;",
-				"float phi = rhoMax + 0.05;",
-				"float falloff = 4.0;",
+			"	float theta = rhoMax + 0.0001;",
+			"	float phi = rhoMax + 0.05;",
+			"	float falloff = 4.0;",
 
-				"float spot = 0.0;",
+			"	float spot = 0.0;",
 
-				"if ( rho >= phi ) {",
+			"	if ( rho >= phi ) {",
 
-					"spot = 1.0;",
+			"		spot = 1.0;",
 
-				"} else if ( rho <= theta ) {",
+			"	} else if ( rho <= theta ) {",
 
-					"spot = 0.0;",
+			"		spot = 0.0;",
 
-				"} else { ",
+			"	} else { ",
 
-					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
+			"		spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
-				"}",
+			"	}",
 
-				"diffuseColor *= spot;",
+			"	diffuseColor *= spot;",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -1905,27 +1948,27 @@ THREE.ShaderDeferred = {
 
 	directionalLight: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepth: { type: "t", value: null },
-			samplerColor: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepth: new THREE.Uniform( null ),
+				samplerColor: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightDirectionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightIntensity: new THREE.Uniform( 1.0 )
+			},
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS : { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 }
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-		},
+		),
 
 		vertexShader: [
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -1949,22 +1992,22 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
-				THREE.DeferredShaderChunk[ "unpackColor" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepth" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "unpackColor" ],
 
-				"vec3 lightVector = normalize( lightDirectionVS );",
+			"	vec3 lightVector = normalize( lightDirectionVS );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "combine" ],
+			THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
-		].join( '\n' ),
+		].join( '\n' )
 
 	},
 
@@ -1972,7 +2015,7 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			shininess: { type: "f", value: 30.0 }
+			shininess: new THREE.Uniform( 30.0 )
 
 		},
 
@@ -1986,17 +2029,17 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
-				"vNormal = normalize( normalMatrix * objectNormal );",
-				"vPosition = gl_Position;",
+			"	vNormal = normalize( normalMatrix * objectNormal );",
+			"	vPosition = gl_Position;",
 
 			"}"
 
@@ -2013,12 +2056,12 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec3 normal = vNormal;",
-				"vec4 position = vPosition;",
+			"	vec3 normal = vNormal;",
+			"	vec4 position = vPosition;",
 
-				THREE.DeferredShaderChunk[ "packNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "packNormalDepthShininess" ],
 
-				"gl_FragColor = packedNormalDepthShininess;",
+			"	gl_FragColor = packedNormalDepthShininess;",
 
 			"}"
 
@@ -2028,27 +2071,28 @@ THREE.ShaderDeferred = {
 
 	pointLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepthShininess: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightPositionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightIntensity: new THREE.Uniform( 1.0 ),
+				lightRadius: new THREE.Uniform( 1.0 )
+			},
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 },
-			lightRadius: { type: "f", value: 1.0 }
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
 
-		},
+		),
+
 
 		vertexShader: [
 
 			"void main() {",
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
 
@@ -2072,24 +2116,24 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
-				"float distance = length( lightVector );",
+			"	vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
+			"	float distance = length( lightVector );",
 
-				"if ( distance > lightRadius ) discard;",
+			"	if ( distance > lightRadius ) discard;",
 
-				"lightVector = normalize( lightVector );",
+			"	lightVector = normalize( lightVector );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"float attenuation = saturate( -distance / lightRadius + 1.0 );",
+			"	float attenuation = saturate( -distance / lightRadius + 1.0 );",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = packedLight;",
+			"	gl_FragColor = packedLight;",
 
 			"}"
 
@@ -2099,28 +2143,29 @@ THREE.ShaderDeferred = {
 
 	spotLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepthShininess: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightDirectionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightPositionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightAngle: new THREE.Uniform( 1.0 ),
+				lightIntensity: new THREE.Uniform( 1.0 )
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightAngle: { type: "f", value: 1.0 },
-			lightIntensity: { type: "f", value: 1.0 }
+			},
 
-		},
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -2145,44 +2190,44 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
+			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
-				"float rho = dot( lightDirectionVS, lightVector );",
-				"float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rho = dot( lightDirectionVS, lightVector );",
+			"	float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho <= rhoMax ) discard;",
+			"	if ( rho <= rhoMax ) discard;",
 
-				"float theta = rhoMax + 0.0001;",
-				"float phi = rhoMax + 0.05;",
-				"float falloff = 4.0;",
+			"	float theta = rhoMax + 0.0001;",
+			"	float phi = rhoMax + 0.05;",
+			"	float falloff = 4.0;",
 
-				"float spot = 0.0;",
+			"	float spot = 0.0;",
 
-				"if ( rho >= phi ) {",
+			"	if ( rho >= phi ) {",
 
-					"spot = 1.0;",
+			"		spot = 1.0;",
 
-				"} else if ( rho <= theta ) {",
+			"	} else if ( rho <= theta ) {",
 
-					"spot = 0.0;",
+			"		spot = 0.0;",
 
-				"} else { ",
+			"	} else { ",
 
-					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
+			"		spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
-				"}",
+			"	}",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = spot * packedLight;",
+			"	gl_FragColor = spot * packedLight;",
 
 			"}"
 
@@ -2192,26 +2237,27 @@ THREE.ShaderDeferred = {
 
 	directionalLightPre: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerNormalDepthShininess: { type: "t", value: null },
+			{
 
-			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+				samplerNormalDepthShininess: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				lightColor: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				lightDirectionVS: new THREE.Uniform( new THREE.Vector3( 0, 1, 0 ) ),
+				lightIntensity: new THREE.Uniform( 1.0 )
 
-			lightColor: { type: "c", value: new THREE.Color( 0x000000 ) },
-			lightDirectionVS : { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightIntensity: { type: "f", value: 1.0 }
+			},
 
-		},
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
 			"void main() { ",
 
-				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -2234,44 +2280,47 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
-				THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
-				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "unpackNormalDepthShininess" ],
+			THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec3 lightVector = normalize( lightDirectionVS );",
+			"	vec3 lightVector = normalize( lightDirectionVS );",
 
-				THREE.DeferredShaderChunk[ "computeSpecular" ],
+			THREE.DeferredShaderChunk[ "computeSpecular" ],
 
-				"const float attenuation = 1.0;",
+			"	const float attenuation = 1.0;",
 
-				THREE.DeferredShaderChunk[ "packLight" ],
+			THREE.DeferredShaderChunk[ "packLight" ],
 
-				"gl_FragColor = packedLight;",
+			"	gl_FragColor = packedLight;",
 
 			"}"
 
-		].join( '\n' ),
+		].join( '\n' )
 
 	},
 
 	reconstruction: {
 
-		uniforms: {
+		uniforms: Object.assign(
 
-			samplerLight: { type: "t", value: null },
+			{
 
-			map: { type: "t", value: null },
-			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+				samplerLight: new THREE.Uniform( null ),
 
-			viewWidth: { type: "f", value: 800 },
-			viewHeight: { type: "f", value: 600 },
+				map: new THREE.Uniform( null ),
+				offsetRepeat: new THREE.Uniform( new THREE.Vector4( 0, 0, 1, 1 ) ),
 
-			diffuse: { type: "c", value: new THREE.Color( 0x000000 ) },
-			emissive: { type: "c", value: new THREE.Color( 0x000000 ) },
-			specular: { type: "c", value: new THREE.Color( 0x000000 ) },
-			shininess: { type: "f", value: 30.0 }
+				diffuse: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				emissive: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				specular: new THREE.Uniform( new THREE.Color( 0x000000 ) ),
+				shininess: new THREE.Uniform( 30.0 )
 
-		},
+			},
+
+			THREE.ShaderDeferredCommon[ 'commonUniforms' ]
+
+		),
 
 		vertexShader: [
 
@@ -2281,15 +2330,15 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				THREE.ShaderChunk[ "uv_vertex" ],
-				THREE.ShaderChunk[ "begin_vertex" ],
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "uv_vertex" ],
+			THREE.ShaderChunk[ "begin_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
 
 			"}"
 
@@ -2314,21 +2363,21 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 diffuseColor = vec4( diffuse, 1.0 );",
-				"vec3 emissiveColor = emissive;",
-				"vec3 specularColor = specular;",
+			"	vec4 diffuseColor = vec4( diffuse, 1.0 );",
+			"	vec3 emissiveColor = emissive;",
+			"	vec3 specularColor = specular;",
 
-				THREE.DeferredShaderChunk[ "computeTextureCoord" ],
+			THREE.DeferredShaderChunk[ "computeTextureCoord" ],
 
-				"vec4 light = texture2D( samplerLight, texCoord );",
+			"	vec4 light = texture2D( samplerLight, texCoord );",
 
-				THREE.ShaderChunk[ "map_fragment" ],
+			THREE.ShaderChunk[ "map_fragment" ],
 
-				"vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
-				"vec3 emissiveFinal = emissiveColor;",
-				"vec3 specularFinal = specularColor * light.rgb * ( light.a / ( 0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b + 0.00001 ) );",
+			"	vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
+			"	vec3 emissiveFinal = emissiveColor;",
+			"	vec3 specularFinal = specularColor * light.rgb * ( light.a / ( 0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b + 0.00001 ) );",
 
-				"gl_FragColor = vec4( diffuseFinal + emissiveFinal + specularFinal, 1.0 );",
+			"	gl_FragColor = vec4( diffuseFinal + emissiveFinal + specularFinal, 1.0 );",
 
 			"}"
 
@@ -2341,7 +2390,7 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerResult: { type: "t", value: null }
+			samplerResult: new THREE.Uniform( null )
 
 		},
 
@@ -2351,9 +2400,9 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
-				"texCoord = pos.xy * vec2( 0.5 ) + 0.5;",
-				"gl_Position = pos;",
+			"	vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"	texCoord = pos.xy * vec2( 0.5 ) + 0.5;",
+			"	gl_Position = pos;",
 
 			"}"
 
@@ -2366,7 +2415,7 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"gl_FragColor = texture2D( samplerResult, texCoord );",
+			"	gl_FragColor = texture2D( samplerResult, texCoord );",
 
 			"}"
 

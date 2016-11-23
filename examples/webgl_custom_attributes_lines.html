@@ -139,13 +139,13 @@
 
 			var buffergeometry = new THREE.BufferGeometry();
 
-			var position = new THREE.Float32Attribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
-			buffergeometry.addAttribute( 'position', position )
+			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
+			buffergeometry.addAttribute( 'position', position );
 
-			var displacement = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'displacement', displacement );
 
-			var customColor = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'customColor', customColor );
 
 			var color = new THREE.Color( 0xffffff );

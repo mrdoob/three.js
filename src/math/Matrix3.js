@@ -173,7 +173,7 @@ Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( (matrix && matrix.isMatrix4) ) {
+		if ( matrix && matrix.isMatrix4 ) {
 
 			console.error( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
@@ -236,15 +236,6 @@ Matrix3.prototype = {
 		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
 
 		return this;
-
-	},
-
-	flattenToArrayOffset: function ( array, offset ) {
-
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
-				"- just use .toArray instead." );
-
-		return this.toArray( array, offset );
 
 	},
 

@@ -27,7 +27,14 @@
 		<h3>Uniform types</h3>
 
 		<p>
-		Each uniform must have a *value* property. The type of the value must correspond to the type of the uniform variable in the GLSL code as specified for the primitive GLSL types in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive type must either be specified as an array of the corresponding THREE objects or as a flat array containing the data of all the objects. In other words; GLSL primitives in arrays must not be represented by arrays. This rule does not apply transitively.  An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays, of either five *THREE.Vector2* objects or ten *number*s.
+		Each uniform must have a *value* property. The type of the value must correspond to the
+		type of the uniform variable in the GLSL code as specified for the primitive GLSL types
+		in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive
+		type must either be specified as an array of the corresponding THREE objects or as a flat
+		array containing the data of all the objects. In other words; GLSL primitives in arrays
+		must not be represented by arrays. This rule does not apply transitively.
+		An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays,
+		of either five [page:Vector2] objects or ten *number*s.
 		</p>
 		<table>
 			<caption><a id="uniform-types">Uniform types</a></caption>
@@ -104,11 +111,11 @@
 				<tr>
 					<td>mat2</td>
 					<td>[page:Float32Array Float32Array] (*)</td>
-				</td>
+				</tr>
 				<tr>
 					<td>mat2</td>
 					<td>[page:Array Array] (*)</td>
-				</td>
+				</tr>
 				<tr>
 					<td>mat3</td>
 					<td>[page:Matrix3 THREE.Matrix3]</td>
@@ -165,12 +172,12 @@
 				</tr>
 				<tr>
 					<td>samplerCube</td>
-					<td>[page:CubeTexture THREE.CubeTexture]</tr>
+					<td>[page:CubeTexture THREE.CubeTexture]</td>
 				</tr>
 
 			</tbody>
 		</table>
-		</p>
+		
 		<p>
 		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
 		</p>
@@ -187,6 +194,16 @@
 		<h3>[property:Object value]</h3>
 		<div>
 		Current value of the uniform.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Uniform clone]()</h3>
+		<div>
+		Returns a clone of this uniform.<br />
+		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assigment.
+		Array values are shared between cloned [page:Uniform]s.<br /><br />
+		See [example:webgldeferred_animation WebGL deferred animation] for an example of this method in use.
 		</div>
 
 		<h2>Source</h2>

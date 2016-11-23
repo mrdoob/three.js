@@ -27,7 +27,7 @@ Color.prototype = {
 
 	set: function ( value ) {
 
-		if ( (value && value.isColor) ) {
+		if ( value && value.isColor ) {
 
 			this.copy( value );
 
@@ -522,4 +522,4 @@ var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
 'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
 
 
-export { ColorKeywords, Color };
+export { Color };

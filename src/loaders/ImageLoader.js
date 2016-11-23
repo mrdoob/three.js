@@ -35,6 +35,13 @@ Object.assign( ImageLoader.prototype, {
 
 			image.src = url;
 
+		} else if ( this.crossOrigin !== undefined ) {
+
+			// crossOrigin doesn't work with URL.createObjectURL()?
+
+			image.crossOrigin = this.crossOrigin;
+			image.src = url;
+
 		} else {
 
 			var loader = new FileLoader();

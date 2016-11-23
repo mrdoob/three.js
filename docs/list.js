@@ -8,33 +8,129 @@ var list = {
 	},
 
 	"Reference": {
-		"Constants": [
-			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
-			[ "DrawModes", "api/constants/DrawModes" ],
-			[ "GLState", "api/constants/GLState" ],
-			[ "Materials", "api/constants/Materials" ],
-			[ "ShadowingTypes", "api/constants/ShadowingTypes" ],
-			[ "Textures", "api/constants/Textures" ]
+
+		"Animation": [
+			[ "AnimationAction", "api/animation/AnimationAction" ],
+			[ "AnimationClip", "api/animation/AnimationClip" ],
+			[ "AnimationMixer", "api/animation/AnimationMixer" ],
+			[ "AnimationObjectGroup", "api/animation/AnimationObjectGroup" ],
+			[ "AnimationUtils", "api/animation/AnimationUtils" ],
+			[ "KeyframeTrack", "api/animation/KeyframeTrack" ],
+			[ "PropertyBinding", "api/animation/PropertyBinding" ],
+			[ "PropertyMixer", "api/animation/PropertyMixer" ]
+		],
+
+		"Animation / Tracks": [
+		  [ "BooleanKeyframeTrack", "api/animation/tracks/BooleanKeyframeTrack" ],
+		  [ "ColorKeyframeTrack", "api/animation/tracks/ColorKeyframeTrack" ],
+		  [ "NumberKeyframeTrack", "api/animation/tracks/NumberKeyframeTrack" ],
+		  [ "QuaternionKeyframeTrack", "api/animation/tracks/QuaternionKeyframeTrack" ],
+		  [ "StringKeyframeTrack", "api/animation/tracks/StringKeyframeTrack" ],
+		  [ "VectorKeyframeTrack", "api/animation/tracks/VectorKeyframeTrack" ]
+		],
+
+		"Audio": [
+			[ "Audio", "api/audio/Audio" ],
+			[ "AudioAnalyser", "api/audio/AudioAnalyser" ],
+			[ "AudioContext", "api/audio/AudioContext" ],
+			[ "AudioListener", "api/audio/AudioListener" ],
+			[ "PositionalAudio", "api/audio/PositionalAudio" ]
 		],
 
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
 			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
-			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
+			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ],
+			[ "StereoCamera", "api/cameras/StereoCamera" ]
+		],
+
+		"Constants": [
+			[ "Animation", "api/constants/Animation" ],
+			[ "Core", "api/constants/Core" ],
+			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations" ],
+			[ "DrawModes", "api/constants/DrawModes" ],
+			[ "Materials", "api/constants/Materials" ],
+			[ "Renderer", "api/constants/Renderer" ],
+			[ "Textures", "api/constants/Textures" ]
 		],
 
 		"Core": [
 			[ "BufferAttribute", "api/core/BufferAttribute" ],
 			[ "BufferGeometry", "api/core/BufferGeometry" ],
 			[ "Clock", "api/core/Clock" ],
+			[ "DirectGeometry", "api/core/DirectGeometry" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
+			[ "InstancedBufferAttribute", "api/core/InstancedBufferAttribute" ],
+			[ "InstancedBufferGeometry", "api/core/InstancedBufferGeometry" ],
+			[ "InstancedInterleavedBuffer", "api/core/InstancedInterleavedBuffer" ],
+			[ "InterleavedBuffer", "api/core/InterleavedBuffer" ],
+			[ "InterleavedBufferAttribute", "api/core/InterleavedBufferAttribute" ],
 			[ "Layers", "api/core/Layers" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 			[ "Uniform", "api/core/Uniform"]
+		],
+
+		"Core / BufferAttributes": [
+			[ "BufferAttribute Types", "api/core/bufferAttributeTypes/BufferAttributeTypes" ]
+		],
+
+		"Deprecated": [
+			[ "DeprecatedList", "api/deprecated/DeprecatedList" ]
+		],
+
+		"Extras": [
+			[ "CurveUtils", "api/extras/CurveUtils" ],
+			[ "SceneUtils", "api/extras/SceneUtils" ],
+			[ "ShapeUtils", "api/extras/ShapeUtils" ]
+		],
+
+		"Extras / Core": [
+			[ "Curve", "api/extras/core/Curve" ],
+			[ "CurvePath", "api/extras/core/CurvePath" ],
+			[ "Font", "api/extras/core/Font" ],
+			[ "Path", "api/extras/core/Path" ],
+			[ "Shape", "api/extras/core/Shape" ],
+			[ "ShapePath", "api/extras/core/ShapePath" ]
+		],
+
+		"Extras / Curves": [
+			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
+			[ "CatmullRomCurve3", "api/extras/curves/CatmullRomCurve3" ],
+			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
+			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
+			[ "EllipseCurve", "api/extras/curves/EllipseCurve" ],
+			[ "LineCurve", "api/extras/curves/LineCurve" ],
+			[ "LineCurve3", "api/extras/curves/LineCurve3" ],
+			[ "QuadraticBezierCurve", "api/extras/curves/QuadraticBezierCurve" ],
+			[ "QuadraticBezierCurve3", "api/extras/curves/QuadraticBezierCurve3" ],
+			[ "SplineCurve", "api/extras/curves/SplineCurve" ],
+			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
+		],
+
+		"Extras / Helpers": [
+			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
+			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
+			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
+			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
+			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
+			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
+			[ "GridHelper", "api/extras/helpers/GridHelper" ],
+			[ "PolarGridHelper", "api/extras/helpers/PolarGridHelper"],
+			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
+			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
+			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
+			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
+			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
+			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
+		],
+
+		"Extras / Objects": [
+			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
+			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
 		],
 
 		"Geometries": [
@@ -48,6 +144,7 @@ var list = {
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
+			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
@@ -75,42 +172,47 @@ var list = {
 			[ "TorusKnotBufferGeometry", "api/geometries/TorusKnotBufferGeometry" ],
 			[ "TorusKnotGeometry", "api/geometries/TorusKnotGeometry" ],
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
-			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ]
+			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
+			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
 		],
 
 		"Lights": [
 			[ "AmbientLight", "api/lights/AmbientLight" ],
 			[ "DirectionalLight", "api/lights/DirectionalLight" ],
-			[ "DirectionalLightShadow", "api/lights/DirectionalLightShadow" ],
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],
-			[ "LightShadow", "api/lights/LightShadow" ],
 			[ "PointLight", "api/lights/PointLight" ],
-			[ "SpotLight", "api/lights/SpotLight" ],
+			[ "SpotLight", "api/lights/SpotLight" ]
+		],
+
+		"Lights / Shadows": [
+			[ "DirectionalLightShadow", "api/lights/DirectionalLightShadow" ],
+			[ "LightShadow", "api/lights/LightShadow" ],
 			[ "SpotLightShadow", "api/lights/SpotLightShadow" ]
 		],
 
-
 		"Loaders": [
+			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
 			[ "AudioLoader", "api/loaders/AudioLoader" ],
-			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
+			[ "BinaryTextureLoader", "api/loaders/BinaryTextureLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
-			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "CompressedTextureLoader", "api/loaders/CompressedTextureLoader" ],
+			[ "CubeTextureLoader", "api/loaders/CubeTextureLoader" ],
+			[ "DataTextureLoader", "api/loaders/DataTextureLoader" ],
 			[ "FileLoader", "api/loaders/FileLoader" ],
-			[ "GLTFLoader", "api/loaders/GLTFLoader" ],
+			[ "FontLoader", "api/loaders/FontLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
-			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
-			[ "MTLLoader", "api/loaders/MTLLoader" ],
-			[ "OBJLoader", "api/loaders/OBJLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
-			[ "PDBLoader", "api/loaders/PDBLoader" ],
-			[ "SVGLoader", "api/loaders/SVGLoader" ],
-			[ "TextureLoader", "api/loaders/TextureLoader" ],
-			[ "TGALoader", "api/loaders/TGALoader" ]
+			[ "TextureLoader", "api/loaders/TextureLoader" ]
+		],
+
+		"Loaders / Managers": [
+			[ "DefaultLoadingManager", "api/loaders/DefaultLoadingManager" ],
+			[ "LoadingManager", "api/loaders/LoadingManager" ]
 		],
 
 		"Materials": [
@@ -119,14 +221,16 @@ var list = {
 			[ "Material", "api/materials/Material" ],
 			[ "MeshBasicMaterial", "api/materials/MeshBasicMaterial" ],
 			[ "MeshDepthMaterial", "api/materials/MeshDepthMaterial" ],
-			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
+			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
+			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
+			[ "ShadowMaterial", "api/materials/ShadowMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
@@ -136,6 +240,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Interpolant", "api/math/Interpolant" ],
 			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
@@ -152,8 +257,16 @@ var list = {
 			[ "Vector4", "api/math/Vector4" ]
 		],
 
+		"Math / Interpolants": [
+			[ "CubicInterpolant", "api/math/interpolants/CubicInterpolant" ],
+			[ "DiscreteInterpolant", "api/math/interpolants/DiscreteInterpolant" ],
+			[ "LinearInterpolant", "api/math/interpolants/LinearInterpolant" ],
+			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
+		],
+
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
@@ -165,8 +278,11 @@ var list = {
 			[ "Sprite", "api/objects/Sprite" ]
 		],
 
+		"Polyfills": [
+			[ "Polyfills", "api/polyfills" ]
+		],
+
 		"Renderers": [
-			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
 			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
@@ -197,75 +313,45 @@ var list = {
 		],
 
 		"Textures": [
+			[ "CanvasTexture", "api/textures/CanvasTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
-			[ "Texture", "api/textures/Texture" ]
+			[ "DepthTexture", "api/textures/DepthTexture" ],
+			[ "Texture", "api/textures/Texture" ],
+			[ "VideoTexture", "api/textures/VideoTexture" ]
+		]
+
+	},
+
+	"Examples": {
+
+		"Collada Animation": [
+			[ "ColladaAnimation", "examples/collada/Animation" ],
+			[ "AnimationHandler", "examples/collada/AnimationHandler" ],
+			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
-		"Animation": [
-			[ "AnimationAction", "api/animation/AnimationAction" ],
-			[ "AnimationClip", "api/animation/AnimationClip" ],
-			[ "AnimationMixer", "api/animation/AnimationMixer" ]
+		"Loaders": [
+			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
+			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
+			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "MTLLoader", "examples/loaders/MTLLoader" ],
+			[ "OBJLoader", "examples/loaders/OBJLoader" ],
+			[ "PCDLoader", "examples/loaders/PCDLoader" ],
+			[ "PDBLoader", "examples/loaders/PDBLoader" ],
+			[ "SVGLoader", "examples/loaders/SVGLoader" ],
+			[ "TGALoader", "examples/loaders/TGALoader" ]
 		],
 
-		"Extras": [
-			[ "SceneUtils", "api/extras/SceneUtils" ]
+		"Plugins": [
+			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
+			[ "LookupTable", "examples/Lut" ],
+			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
 		],
 
-		"Extras / Collada Animation": [
-			[ "Animation", "api/extras/collada-animation/Animation" ],
-			[ "AnimationHandler", "api/extras/collada-animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/collada-animation/KeyFrameAnimation" ]
-		],
-
-		"Extras / Core": [
-			[ "Curve", "api/extras/core/Curve" ],
-			[ "CurvePath", "api/extras/core/CurvePath" ],
-			[ "Path", "api/extras/core/Path" ],
-			[ "Shape", "api/extras/core/Shape" ]
-		],
-
-		"Extras / Curves": [
-			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
-			[ "CatmullRomCurve3", "api/extras/curves/CatmullRomCurve3" ],
-			[ "ClosedSplineCurve3", "api/extras/curves/ClosedSplineCurve3" ],
-			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
-			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
-			[ "EllipseCurve", "api/extras/curves/EllipseCurve" ],
-			[ "LineCurve", "api/extras/curves/LineCurve" ],
-			[ "LineCurve3", "api/extras/curves/LineCurve3" ],
-			[ "QuadraticBezierCurve", "api/extras/curves/QuadraticBezierCurve" ],
-			[ "QuadraticBezierCurve3", "api/extras/curves/QuadraticBezierCurve3" ],
-			[ "SplineCurve", "api/extras/curves/SplineCurve" ],
-			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
-		],
-
-		"Extras / Helpers": [
-			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
-			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
-			[ "BoundingBoxHelper", "api/extras/helpers/BoundingBoxHelper" ],
-			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
-			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
-			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
-			[ "GridHelper", "api/extras/helpers/GridHelper" ],
-			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
-			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
-			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
-		],
-
-		"Extras / Objects": [
-			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
-			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
-		],
-
-		"Examples" : [
-			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
-			[ "LookupTable", "api/examples/Lut" ],
-			[ "SpriteCanvasMaterial", "api/examples/SpriteCanvasMaterial" ]
-
+		"Renderers": [
+			[ "CanvasRenderer", "examples/renderers/CanvasRenderer" ]
 		]
 
 	}

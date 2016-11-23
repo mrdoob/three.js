@@ -204,7 +204,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			var uvs, intersection;
 
-			if ( (geometry && geometry.isBufferGeometry) ) {
+			if ( geometry.isBufferGeometry ) {
 
 				var a, b, c;
 				var index = geometry.index;
@@ -260,7 +260,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				}
 
-			} else if ( (geometry && geometry.isGeometry) ) {
+			} else if ( geometry.isGeometry ) {
 
 				var fvA, fvB, fvC;
 				var isFaceMaterial = (material && material.isMultiMaterial);

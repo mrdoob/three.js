@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Class for loading a font in JSON format. Returns a [page:Font Font], which is an
+		array of [page:Shape Shape]s representing the font.<br /><br />
+
+		You can convert fonts online using [link:https://gero3.github.io/facetype.js/ facetype.js]
+		</div>
+
+		<h2>Examples</h2>
+
+		<div>
+		[example:webgl_geometry_text geometry / text ]<br />
+		[example:webgl_geometry_text_earcut geometry / text / earcut]<br />
+		[example:webgl_geometry_text_pnltri geometry / text / pnltri]<br />
+		</div>
+
+		<code>
+		var loader = new THREE.FontLoader();
+		var font = loader.load(
+			// resource URL
+			'fonts/helvetiker_bold.typeface.json'
+			// Function when resource is loaded
+			function ( font ) {
+				// do something with the font
+				scene.add( font );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

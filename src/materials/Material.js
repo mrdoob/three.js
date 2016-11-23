@@ -7,9 +7,11 @@ import { _Math } from '../math/Math';
  * @author alteredq / http://alteredqualia.com/
  */
 
+var materialId = 0;
+
 function Material() {
 
-	Object.defineProperty( this, 'id', { value: MaterialIdCount() } );
+	Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -104,7 +106,7 @@ Material.prototype = {
 
 			}
 
-			if ( (currentValue && currentValue.isColor) ) {
+			if ( currentValue && currentValue.isColor ) {
 
 				currentValue.set( newValue );
 
@@ -154,47 +156,55 @@ Material.prototype = {
 
 		if ( this.name !== '' ) data.name = this.name;
 
-		if ( (this.color && this.color.isColor) ) data.color = this.color.getHex();
+		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
-		if ( (this.emissive && this.emissive.isColor) ) data.emissive = this.emissive.getHex();
-		if ( (this.specular && this.specular.isColor) ) data.specular = this.specular.getHex();
+		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
+		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
+		if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
+		if ( this.clearCoatRoughness !== undefined ) data.clearCoatRoughness = this.clearCoatRoughness;
 
-		if ( (this.map && this.map.isTexture) ) data.map = this.map.toJSON( meta ).uuid;
-		if ( (this.alphaMap && this.alphaMap.isTexture) ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
-		if ( (this.lightMap && this.lightMap.isTexture) ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
-		if ( (this.bumpMap && this.bumpMap.isTexture) ) {
+		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
+		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+		if ( this.lightMap && this.lightMap.isTexture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+		if ( this.bumpMap && this.bumpMap.isTexture ) {
 
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
 			data.bumpScale = this.bumpScale;
 
 		}
-		if ( (this.normalMap && this.normalMap.isTexture) ) {
+		if ( this.normalMap && this.normalMap.isTexture ) {
 
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
 			data.normalScale = this.normalScale.toArray();
 
 		}
-		if ( (this.displacementMap && this.displacementMap.isTexture) ) {
+		if ( this.displacementMap && this.displacementMap.isTexture ) {
 
 			data.displacementMap = this.displacementMap.toJSON( meta ).uuid;
 			data.displacementScale = this.displacementScale;
 			data.displacementBias = this.displacementBias;
 
 		}
-		if ( (this.roughnessMap && this.roughnessMap.isTexture) ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
-		if ( (this.metalnessMap && this.metalnessMap.isTexture) ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
+		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
+		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
 
-		if ( (this.emissiveMap && this.emissiveMap.isTexture) ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
-		if ( (this.specularMap && this.specularMap.isTexture) ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+		if ( this.emissiveMap && this.emissiveMap.isTexture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
+		if ( this.specularMap && this.specularMap.isTexture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
 
-		if ( (this.envMap && this.envMap.isTexture) ) {
+		if ( this.envMap && this.envMap.isTexture ) {
 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
+
+		}
+
+		if ( this.gradientMap && this.gradientMap.isTexture ) {
+
+			data.gradientMap = this.gradientMap.toJSON( meta ).uuid;
 
 		}
 
@@ -340,8 +350,4 @@ Material.prototype = {
 
 Object.assign( Material.prototype, EventDispatcher.prototype );
 
-var count = 0;
-function MaterialIdCount() { return count++; };
-
-
-export { MaterialIdCount, Material };
+export { Material };

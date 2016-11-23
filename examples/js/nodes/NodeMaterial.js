@@ -41,7 +41,7 @@ THREE.NodeMaterial.addShortcuts = function( proto, prop, list ) {
 			}
 		};
 
-	};
+	}
 
 	return ( function() {
 
@@ -335,7 +335,7 @@ THREE.NodeMaterial.prototype.getVar = function( uuid, type, ns ) {
 		var index = this.vars.length,
 			name = ns ? ns : 'nVv' + index;
 
-		data = { name : name, type : type }
+		data = { name : name, type : type };
 
 		this.vars.push( data );
 		this.vars[ uuid ] = data;

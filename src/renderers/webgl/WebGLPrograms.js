@@ -15,6 +15,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
+		MeshToonMaterial: 'phong',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical',
 		LineBasicMaterial: 'basic',
@@ -25,12 +26,12 @@ function WebGLPrograms( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap",
+		"roughnessMap", "metalnessMap", "gradientMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights",
+		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking"
 	];
@@ -82,11 +83,11 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			encoding = LinearEncoding;
 
-		} else if ( (map && map.isTexture) ) {
+		} else if ( map.isTexture ) {
 
 			encoding = map.encoding;
 
-		} else if ( (map && map.isWebGLRenderTarget) ) {
+		} else if ( map.isWebGLRenderTarget ) {
 
 			console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
 			encoding = map.texture.encoding;
@@ -153,6 +154,8 @@ function WebGLPrograms( renderer, capabilities ) {
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
+			gradientMap: !! material.gradientMap,
+
 			combine: material.combine,
 
 			vertexColors: material.vertexColors,
@@ -178,6 +181,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
+			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
 			numClippingPlanes: nClipPlanes,
