@@ -322,7 +322,7 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
