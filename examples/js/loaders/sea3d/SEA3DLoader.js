@@ -9,7 +9,7 @@
 //	Polyfills
 //
 
-if (THREE.Float32BufferAttribute === undefined) {
+if ( THREE.Float32BufferAttribute === undefined ) {
 
 	THREE.Float32BufferAttribute = THREE.Float32Attribute;
 
@@ -545,9 +545,9 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		this.timeScale = 1;
 
-		this.animations = {};
-		this.animationsIndex = [];
+		this.animations = [];
 		this.animationsData = {};
+		this.animationsDict = [];
 
 		this.clips = ( this instanceof THREE.SEA3D.Animator ? this.clips : this.geometry.animations ) || [];
 
@@ -565,9 +565,9 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		var name = clip.name;
 
-		this.animations[ name ] = clip;
+		this.animations.push( clip );
+		this.animationsDict[ name ] = clip;
 		this.animationsData[ name ] = {};
-		this.animationsIndex.push( clip );
 
 		this.mixer.clipAction( clip );
 
@@ -579,13 +579,37 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		var name = clip.name;
 
-		delete this.animations[ name ];
+		delete this.animationsDict[ name ];
 		delete this.animationsData[ name ];
-		this.animationsIndex.splice( this.animationsIndex.indexOf( clip ), 1 );
+		this.animations.splice( this.animations.indexOf( clip ), 1 );
 
 		this.mixer.uncacheClip( clip );
 
 		return this;
+
+	},
+
+	getAnimation: function ( name ) {
+
+		return this.animationsDict[ name ] || this.animations[ name ];
+
+	},
+
+	getAnimationData: function ( name ) {
+
+		return this.animationsData[ this.getAnimation( name ).name ];
+
+	},
+
+	setAnimationWeight: function ( name, val ) {
+
+		this.mixer.clipAction( this.getAnimation( name ) ).setEffectiveWeight( val );
+
+	},
+
+	getAnimationWeight: function ( name ) {
+
+		return this.mixer.clipAction( this.getAnimation( name ) ).getEffectiveWeight();
 
 	},
 
@@ -643,9 +667,9 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 	play: function ( name, crossfade, offset, weight ) {
 
-		var animation = this.animations[ name ] || this.animationsIndex[ name ];
+		var animation = this.getAnimation( name );
 
-		name = animation.name;
+		if ( ! animation ) throw new Error( 'Animation "' + name + '" not found.' );
 
 		if ( animation == this.currentAnimation ) {
 
@@ -659,8 +683,6 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		} else {
 
-			if ( ! animation ) throw new Error( 'Animation "' + name + '" not found.' );
-
 			this.previousAnimation = this.currentAnimation;
 			this.currentAnimation = animation;
 
@@ -670,7 +692,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 			this.currentAnimationAction.paused = false;
 
 			this.previousAnimationData = this.currentAnimationData;
-			this.currentAnimationData = this.animationsData[ name ];
+			this.currentAnimationData = this.animationsData[ animation.name ];
 
 			this.updateTimeScale();
 
@@ -685,7 +707,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 			this.playing = true;
 
-			if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, true );
+			if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, false );
 
 			THREE.SEA3D.AnimationHandler.addAnimator( this );
 
@@ -702,8 +724,6 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 		if ( this.currentAnimation ) {
 
 			this.currentAnimationAction.stop();
-
-			//THREE.SEA3D.AnimationHandler.removeAnimator( this );
 
 			this.previousAnimation = this.currentAnimation;
 			this.previousAnimationData = this.currentAnimationData;
@@ -725,13 +745,13 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( ! this.playing && ! this.paused ) THREE.SEA3D.AnimationHandler.addAnimator( this );
 
-		var anim = this.animations[ name ] || this.animationsIndex[ name ];
+		var animation = this.getAnimation( name );
 
 		this.playing = true;
 
-		var clip = this.mixer.clipAction( anim );
-		clip.setLoop( anim.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
-		clip.clampWhenFinished = ! anim.loop;
+		var clip = this.mixer.clipAction( animation );
+		clip.setLoop( animation.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity ).reset();
+		clip.clampWhenFinished = ! animation.loop;
 		clip.paused = false;
 
 		clip.setEffectiveWeight( weight ).play();
@@ -748,17 +768,6 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 		var toAction = this.playw( toAnimName, 1 );
 
 		fromAction.crossFadeTo( toAction, duration, wrap !== undefined ? wrap : false );
-
-		return this;
-
-	},
-
-	setClipTimeScale: function ( name, value ) {
-
-		var anim = this.animations[ name ];
-		var clip = this.mixer.clipAction( anim );
-
-		clip.setEffectiveTimeScale( value );
 
 		return this;
 
@@ -1053,21 +1062,19 @@ THREE.SEA3D.Mesh = function ( geometry, material ) {
 
 };
 
-THREE.SEA3D.Mesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), THREE.SEA3D.Mesh.prototype, THREE.SEA3D.Object3D.prototype, {
+THREE.SEA3D.Mesh.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), THREE.SEA3D.Object3D.prototype, {
 
 	constructor: THREE.SEA3D.Mesh,
 
 	setWeight: function ( name, val ) {
 
-		if ( this.animations && ( this.animations[ name ] || this.animationsIndex[ name ] ) ) this.mixer.clipAction( name ).setEffectiveWeight( val );
-		if ( this.morphTargetInfluences && this.morphTargetDictionary[ name ] !== undefined ) this.morphTargetInfluences[ this.morphTargetDictionary[ name ] ] = val;
+		this.morphTargetInfluences[ this.morphTargetDictionary[ name ] ] = val;
 
 	},
 
 	getWeight: function ( name ) {
 
-		if ( this.animations && ( this.animations[ name ] || this.animationsIndex[ name ] ) ) return this.mixer.clipAction( name ).getEffectiveWeight();
-		if ( this.morphTargetDictionary && this.morphTargetDictionary[ name ] !== undefined ) return this.morphTargetInfluences[ this.morphTargetDictionary[ name ] ];
+		return this.morphTargetInfluences[ this.morphTargetDictionary[ name ] ];
 
 	},
 
