@@ -110,7 +110,7 @@ SkeletonHelper.prototype.update = function () {
 				vector.setFromMatrixPosition( boneMatrix );
 				position.setXYZ( j + 1, vector.x, vector.y, vector.z );
 
-				j += 2
+				j += 2;
 
 			}
 
