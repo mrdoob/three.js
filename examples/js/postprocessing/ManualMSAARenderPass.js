@@ -87,7 +87,7 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
-		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+		this.copyUniforms[ "tDiffuse" ] = new THREE.Uniform( this.sampleRenderTarget.texture );
 
 		var width = readBuffer.width, height = readBuffer.height;
 
@@ -110,7 +110,7 @@ THREE.ManualMSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.
 				sampleWeight += roundingRange * uniformCenteredDistribution;
 			}
 
-			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			this.copyUniforms[ "opacity" ] = new THREE.Uniform( sampleWeight );
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 			if (i === 0) {

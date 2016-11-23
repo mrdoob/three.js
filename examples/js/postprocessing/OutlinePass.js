@@ -59,11 +59,11 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	var MAX_EDGE_GLOW = 4;
 
 	this.separableBlurMaterial1 = this.getSeperableBlurMaterial(MAX_EDGE_THICKNESS);
-	this.separableBlurMaterial1.uniforms[ "texSize" ].value = new THREE.Vector2(resx, resy);
-	this.separableBlurMaterial1.uniforms[ "kernelRadius" ].value = 1;
+	this.separableBlurMaterial1.uniforms[ "texSize" ] = new THREE.Uniform( new THREE.Vector2(resx, resy) );
+	this.separableBlurMaterial1.uniforms[ "kernelRadius" ] = new THREE.Uniform( 1 );
 	this.separableBlurMaterial2 = this.getSeperableBlurMaterial(MAX_EDGE_GLOW);
-	this.separableBlurMaterial2.uniforms[ "texSize" ].value = new THREE.Vector2(Math.round(resx/2), Math.round(resy/2));
-	this.separableBlurMaterial2.uniforms[ "kernelRadius" ].value = MAX_EDGE_GLOW;
+	this.separableBlurMaterial2.uniforms[ "texSize" ] = new THREE.Uniform(new THREE.Vector2(Math.round(resx/2), Math.round(resy/2) ) );
+	this.separableBlurMaterial2.uniforms[ "kernelRadius" ] = new THREE.Uniform( MAX_EDGE_GLOW) ;
 
 	// Overlay material
 	this.overlayMaterial = this.getOverlayMaterial();
@@ -127,15 +127,15 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.renderTargetMaskDownSampleBuffer.setSize(resx, resy );
 		this.renderTargetBlurBuffer1.setSize(resx, resy );
 		this.renderTargetEdgeBuffer1.setSize(resx, resy );
-		this.separableBlurMaterial1.uniforms[ "texSize" ].value = new THREE.Vector2(resx, resy);
+		this.separableBlurMaterial1.uniforms[ "texSize" ] = new THREE.Uniform( new THREE.Vector2(resx, resy) );
 
-	  resx = Math.round(resx/2);
-	  resy = Math.round(resy/2);
+		resx = Math.round(resx/2);
+		resy = Math.round(resy/2);
 
 		this.renderTargetBlurBuffer2.setSize(resx, resy );
 		this.renderTargetEdgeBuffer2.setSize(resx, resy );
 
-		this.separableBlurMaterial2.uniforms[ "texSize" ].value = new THREE.Vector2(resx, resy);
+		this.separableBlurMaterial2.uniforms[ "texSize" ] = new THREE.Uniform( new THREE.Vector2(resx, resy) );
 	},
 
 	changeVisibilityOfSelectedObjects: function( bVisible ) {

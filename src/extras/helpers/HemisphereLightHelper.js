@@ -1,17 +1,19 @@
 import { Vector3 } from '../../math/Vector3';
+import { Color } from '../../math/Color';
 import { Object3D } from '../../core/Object3D';
 import { Mesh } from '../../objects/Mesh';
-import { FaceColors } from '../../constants';
+import { VertexColors } from '../../constants';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { SphereGeometry } from '../../geometries/SphereGeometry';
-import { Color } from '../../math/Color';
+import { OctahedronBufferGeometry } from '../../geometries/OctahedronBufferGeometry';
+import { BufferAttribute } from '../../core/BufferAttribute';
 
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-function HemisphereLightHelper( light, sphereSize ) {
+function HemisphereLightHelper( light, size ) {
 
 	Object3D.call( this );
 
@@ -21,21 +23,17 @@ function HemisphereLightHelper( light, sphereSize ) {
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.colors = [ new Color(), new Color() ];
+	var geometry = new OctahedronBufferGeometry( size );
+	geometry.rotateY( Math.PI * 0.5 );
 
-	var geometry = new SphereGeometry( sphereSize, 4, 2 );
-	geometry.rotateX( - Math.PI / 2 );
+	var material = new MeshBasicMaterial( { vertexColors: VertexColors, wireframe: true } );
 
-	for ( var i = 0, il = 8; i < il; i ++ ) {
+	var position = geometry.getAttribute( 'position' );
+	var colors = new Float32Array( position.count * 3 );
 
-		geometry.faces[ i ].color = this.colors[ i < 4 ? 0 : 1 ];
+	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-	}
-
-	var material = new MeshBasicMaterial( { vertexColors: FaceColors, wireframe: true } );
-
-	this.lightSphere = new Mesh( geometry, material );
-	this.add( this.lightSphere );
+	this.add( new Mesh( geometry, material ) );
 
 	this.update();
 
@@ -46,8 +44,8 @@ HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
 
 HemisphereLightHelper.prototype.dispose = function () {
 
-	this.lightSphere.geometry.dispose();
-	this.lightSphere.material.dispose();
+	this.children[ 0 ].geometry.dispose();
+	this.children[ 0 ].material.dispose();
 
 };
 
@@ -55,13 +53,29 @@ HemisphereLightHelper.prototype.update = function () {
 
 	var vector = new Vector3();
 
+	var color1 = new Color();
+	var color2 = new Color();
+
 	return function update() {
 
-		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
-		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+		var mesh = this.children[ 0 ];
 
-		this.lightSphere.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
-		this.lightSphere.geometry.colorsNeedUpdate = true;
+		var colors = mesh.geometry.getAttribute( 'color' );
+
+		color1.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		color2.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+
+		for ( var i = 0, l = colors.count; i < l; i ++ ) {
+
+			var color = ( i < ( l / 2 ) ) ? color1 : color2;
+
+			colors.setXYZ( i, color.r, color.g, color.b );
+
+		}
+
+		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+
+		colors.needsUpdate = true;
 
 	};
 
