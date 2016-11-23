@@ -126,6 +126,7 @@ export { PointLightHelper } from './extras/helpers/PointLightHelper.js';
 export { RectAreaLightHelper } from './extras/helpers/RectAreaLightHelper.js';
 export { HemisphereLightHelper } from './extras/helpers/HemisphereLightHelper.js';
 export { GridHelper } from './extras/helpers/GridHelper.js';
+export { PolarGridHelper } from './extras/helpers/PolarGridHelper.js';
 export { FaceNormalsHelper } from './extras/helpers/FaceNormalsHelper.js';
 export { DirectionalLightHelper } from './extras/helpers/DirectionalLightHelper.js';
 export { CameraHelper } from './extras/helpers/CameraHelper.js';

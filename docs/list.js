@@ -119,6 +119,7 @@ var list = {
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
 			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
+			[ "PolarGridHelper", "api/extras/helpers/PolarGridHelper"],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
