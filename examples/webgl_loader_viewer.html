@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - model viewer</title>
+	<title>three.js webgl - model viewer with OrbitControls</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
@@ -27,7 +27,7 @@
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test
+		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
 		select model:
 		<select id="fileModel" onchange="reloadModel(this.value);">
@@ -47,13 +47,14 @@
 			<option value="models/sea3d/mascot.tjs.sea">models/sea3d/mascot.tjs.sea</option>
 			<option value="models/vrml/house.wrl">models/vrml/house.wrl</option>
 		</select>
+		<button onclick="toggleDiv('debug')">Toggle Debug output</button>
 		<br>
 		Custom model:
 		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
 		<button onclick="reloadModel(getElementById('customModel').value)">Load Custom Model</button>
 		<br>
+		<div id="debug" align="left" style="display: none"></div>
 	</div>
-
 
 	<script src="../build/three.js"></script>
 	<script src="js/loaders/BabylonLoader.js"></script>
@@ -83,7 +84,42 @@
 
 	animate();
 
+	function resetCamera() {
+		// to do: improvement - resetCamera() does not always result in best view
+		// http://stackoverflow.com/questions/11766163/smart-centering-and-scaling-after-model-import-in-three-js
+		// fit camera to object
+		var bBox = new THREE.Box3().setFromObject(scene);
+		var height = bBox.size().y;
+		var dist = height / (2 * Math.tan(camera.fov * Math.PI / 360));
+		var pos = scene.position;
+
+		// fudge factor so the object doesn't take up the whole view
+		camera.position.set(pos.x, pos.y, dist * 3);
+		camera.lookAt(pos);
+	}
+
+	function toggleDiv(id) {
+		var div = document.getElementById(id);
+		div.style.display = (div.style.display == 'block') ? 'none' : 'block';
+	}
+
+	function clearDiv(id) {
+		var div = document.getElementById(id);
+		div.innerHTML = "";
+	}
+
+	function appendDiv(id, extra) {
+		var div = document.getElementById(id);
+		div.innerHTML = div.innerHTML + extra;
+	}
+
+	function debugPrint(text)
+	{
+		appendDiv('debug',text);
+	}
+
 	function clearScene() {
+		clearDiv('debug');
 		camera.position.z = 250;
 		scene.scale.x = scene.scale.y = scene.scale.z = 1.0;
 
@@ -104,8 +140,12 @@
 
 	function reloadModel(objPath)
 	{
-		console.log(objPath);
+		controls.reset();
+		loadModel(objPath);
+	}
 
+	function loadModel(objPath)
+	{
 		var token = objPath.split('.');
 		var fileType = token[token.length-1];
 
@@ -115,10 +155,13 @@
 				fileType = "assimp.json";
  		}
 
+		token = objPath.split('/');
+		var fileName = token[token.length-1];
+
 		var onProgress = function ( xhr ) {
 			if ( xhr.lengthComputable ) {
 				var percentComplete = xhr.loaded / xhr.total * 100;
-				console.log( Math.round(percentComplete, 2) + '% downloaded' );
+				console.log( Math.round(percentComplete, 2) + '% downloaded');
 			}
 		};
 
@@ -143,15 +186,39 @@
 		}
 
 		clearScene();
+
+		//to do: improvement - setupLights() improve to use better lights
 		setupLights();
 
-		//note: sea loader does not use onload function
-
+		//to do: improvement - loader.load() note: sea loader does not use onload function - loader.load 2nd param
 		loader.load( objPath , function ( myScene ) {
 
-			OnLoadScene(myScene, fileType);
+			debugPrint(objPath+"<br>");
+			OnLoadScene(myScene, fileType, fileName);
+			resetCamera();
 
 		}, onProgress, onError );
+
+		//to do: improvement - post loader.load() fixes - handle camera for these files automaticaly
+		if (fileName=="mascot.tjs.sea")
+		{
+			camera.position.z = 2000;
+		}
+		else if (fileName=="house.wrl")
+		{
+			camera.position.z = 30;
+		}
+		else if (fileName=="kawada-hironx.dae"){
+			camera.position.z = 3;
+		}
+		else if (fileName=="duck.gltf"){
+			camera.position.z = 6;
+		}
+		else if (fileName=="Zaghetto.pcd")
+		{
+			//to do: improvement - Zaghetto.pcd need to flip pcd model upside down as needed
+			//to do: improvement - Zaghetto.pcd find correct camera settings
+		}
 	}
 
 	function init() {
@@ -174,7 +241,7 @@
 
 		// model
 		var model = 'models/babylon/skull.babylon';
-		reloadModel(model);
+		loadModel(model);
 
 		//
 
@@ -191,7 +258,7 @@
 
 	}
 
-	function OnLoadScene(fileScene, objType)
+	function OnLoadScene(fileScene, objType, objName)
 	{
 
 		if (objType == "dae" || objType == "gltf" || objType == "sea")
@@ -200,31 +267,41 @@
 			//scene.scale.x = scene.scale.y = scene.scale.z = 0.05;
 		}
 
-		console.log("children:" + fileScene.children.length);
+		debugPrint("root children:" + fileScene.children.length+"<br>");
 		var space ="";
 		var childcnt = 0;
 		fileScene.traverse( function ( object ) {
 
-			// improvement - handle nested groups?
+			//to do: bug - fileScene.traverse() dae error on traversing last child?
+
+			//to do: improvement - fileScene.traverse() handle nested groups?
 			if ( object.constructor.name == "Group" ) {
 				scene.add(object);
 				childcnt = object.children.length;
-				console.log(space+"constructor: "+object.constructor.name);
-				console.log(space+"children:" + childcnt);
+				debugPrint("constructor: "+object.constructor.name+", children:" + childcnt+"<br>");
 				if (childcnt > 0)
 				{
-					space = "  ";
+					space = "++";
 				}
 			}
 			else if ( object.constructor.name == "SkinnedMesh" || object.constructor.name == "Mesh" || object.constructor.name == "Object3D" ) {
-				console.log(space+"child:" + childcnt);
-				console.log(space+"constructor: "+object.constructor.name);
-				/*object.material = new THREE.MeshPhongMaterial( {
-					color: 0xffffff
-				} );*/
+				if (childcnt > 0)
+				{
+					debugPrint(space+"child:" + childcnt+", ");
+				}
+				debugPrint("constructor: "+object.constructor.name+", children: "+object.children.length+"<br>");
+
+				if (objName == "skull.babylon" || objName == "duck.gltf" )
+				{
+					//to do: bug - with gltf file can not move model unless material is changed
+					object.material = new THREE.MeshPhongMaterial( {
+						color: 0xffffff
+					} );
+				}
 
 				if (childcnt == 0)
 				{
+					space = "";
 					scene.add(object);
 				}
 				else {
@@ -235,6 +312,7 @@
 			{
 				if (childcnt == 0)
 				{
+					space = "";
 					scene.add(object);
 				}
 				else {
@@ -242,17 +320,18 @@
 				}
 			}
 			else {
-				console.log(space+"child:" + childcnt);
-				console.log(space+"constructor: "+object.constructor.name);
+					debugPrint(space+"child:" + childcnt+", ");
+					debugPrint(space+"constructor: "+object.constructor.name+", children: "+object.children.length+"<br>");
 				if (childcnt> 0)
 				{
 					childcnt--;
 				}
 			}
 		} );
+
 	}
 
-	//improvement - support Geometry Loaders
+	//to do: improvement - selectLoader()/OnLoadScene() add support for Geometry Loaders
 	//right now only supports Mesh Loaders
 	function selectLoader(ext, mgr) {
 		switch(ext)
