@@ -74,7 +74,7 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
 	this.copyUniforms[ "opacity" ].value = 1.0;
 
 	this.materialCopy = new THREE.ShaderMaterial( {
@@ -145,7 +145,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			if( object instanceof THREE.Mesh ) {
 				object.visible = bVisible;
 			}
-		}
+		};
 
 		for( var i=0; i<this.selectedObjects.length; i++ ) {
 
@@ -166,7 +166,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				selectedMeshes.push(object);
 
 			}
-		}
+		};
 
 		for( var i=0; i<this.selectedObjects.length; i++ ) {
 
@@ -198,7 +198,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 					object.bVisible = visibility;
 				}
 			}
-		}
+		};
 		this.renderScene.traverse( VisibilityChangeCallBack );
 	},
 
@@ -259,7 +259,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.tempPulseColor1.copy( this.visibleEdgeColor );
 		this.tempPulseColor2.copy( this.hiddenEdgeColor );
 		if( this.pulsePeriod > 0 ) {
-			var scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01/ this.pulsePeriod ) * ( 1.0 - 0.25 )/2
+			var scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01/ this.pulsePeriod ) * ( 1.0 - 0.25 )/2;
 			this.tempPulseColor1.multiplyScalar( scalar );
 			this.tempPulseColor2.multiplyScalar( scalar );
 		}
@@ -358,7 +358,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				"maskTexture": { value: null },
 				"texSize": { value: new THREE.Vector2( 0.5, 0.5 ) },
 				"visibleEdgeColor": { value: new THREE.Vector3( 1.0, 1.0, 1.0 ) },
-				"hiddenEdgeColor":  { value: new THREE.Vector3( 1.0, 1.0, 1.0 ) },
+				"hiddenEdgeColor":  { value: new THREE.Vector3( 1.0, 1.0, 1.0 ) }
 			},
 
 			vertexShader:
@@ -399,7 +399,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		return new THREE.ShaderMaterial( {
 
 			defines: {
-				"MAX_RADIUS" : maxRadius,
+				"MAX_RADIUS" : maxRadius
 			},
 
 			uniforms: {

@@ -56,7 +56,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( (attribute && attribute.isBufferAttribute) === false && (attribute && attribute.isInterleavedBufferAttribute) === false ) {
+		if ( ( attribute && attribute.isBufferAttribute ) === false && ( attribute && attribute.isInterleavedBufferAttribute ) === false ) {
 
 			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -684,14 +684,9 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			var normals = attributes.normal.array;
 
-			var vA, vB, vC,
-
-			pA = new Vector3(),
-			pB = new Vector3(),
-			pC = new Vector3(),
-
-			cb = new Vector3(),
-			ab = new Vector3();
+			var vA, vB, vC;
+			var pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
+			var cb = new Vector3(), ab = new Vector3();
 
 			// indexed elements
 
@@ -782,7 +777,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	merge: function ( geometry, offset ) {
 
-		if ( (geometry && geometry.isBufferGeometry) === false ) {
+		if ( ( geometry && geometry.isBufferGeometry ) === false ) {
 
 			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;

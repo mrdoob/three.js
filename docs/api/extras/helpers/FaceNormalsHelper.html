@@ -8,47 +8,65 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Line] &rarr;
+		[page:LineSegments] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">Renders [page:ArrowHelper arrows] to visualize an object's [page:Face3 face] normals. Requires that the object's geometry be an instance of [page:Geometry] (does not work with [page:BufferGeometry]), and that face normals have been specified on all [page:Face3 faces] or calculated with [page:Geometry.computeFaceNormals computeFaceNormals].</div>
+		<div class="desc">
+			Renders [page:ArrowHelper arrows] to visualize an object's [page:Face3 face] normals.
+			Requires  that face normals have been specified on all 	[page:Face3 faces] or calculated with [page:Geometry.computeFaceNormals computeFaceNormals].</div>
+
+			Note that this only works with the objects whose geometry is an instance of [page:Geometry].
+			For [page:BufferGeometry] use a [page:VertexNormalsHelper] instead.
+		<div>
+
 
 		<h2>Example</h2>
+
+		<div>[example:webgl_helpers WebGL / helpers]</div>
 
 		<code>
 		geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
 		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		object = new THREE.Mesh( geometry, material );
+		box = new THREE.Mesh( geometry, material );
 
-		edges = new THREE.FaceNormalsHelper( object, 2, 0x00ff00, 1 );
+		helper = new THREE.FaceNormalsHelper( box, 2, 0x00ff00, 1 );
 
 		scene.add( object );
-		scene.add( edges );
+		scene.add( helper );
 		</code>
-		[example:webgl_helpers Example using various helpers]
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]( [page:Object3D object], [page:Number size], [page:Color color], [page:Number linewidth] )</h3>
 		<div>
-		object -- object for which to render face normals<br />
-		size -- size (length) of the arrows<br />
-		color -- color of the arrows<br />
-		linewidth -- width of the arrow lines
+		[page:Object3D object] -- object for which to render face normals.<br />
+		[page:Number size] -- (optional) length of the arrows. Default is *1*.<br />
+		[page:Hex color] -- (optional) hex color of the arrows. Default is *0xffff00*.<br />
+		[page:Number linewidth] -- (optional) width of the arrow lines.  Default is *1*.
 		</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:LineSegments] class for common properties.</div>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<div>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			objects's [page:Object3D.matrixWorld matrixWorld].
+		</div>
 
 		<h3>[property:Object3D object]</h3>
-		<div>
-		The attached object
-		</div>
+		<div>The object for which the face normals are being visualized.</div>
+
+		<h3>[property:Number size]</h3>
+		<div>Length of the arrows. Default is *1*.</div>
+
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:LineSegments] class for common methods.</div>
 
 
 		<h3>[method:null update]()</h3>

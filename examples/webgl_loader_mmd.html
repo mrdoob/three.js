@@ -18,7 +18,6 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
@@ -28,6 +27,7 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
 		Copyright
 		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
@@ -54,7 +54,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
 
 			var mouseX = 0, mouseY = 0;
@@ -79,7 +79,7 @@
 
 				scene = new THREE.Scene();
 
-				var gridHelper = new THREE.GridHelper( 100, 100 )
+				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
 				gridHelper.position.y = -10;
 				scene.add( gridHelper );
 
@@ -97,6 +97,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
 
 				// STATS
 
@@ -118,7 +120,7 @@
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 
@@ -158,6 +160,27 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				var phongMaterials;
+				var originalMaterials;
+
+				function makePhongMaterials ( materials ) {
+
+					var array = [];
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var m = new THREE.MeshPhongMaterial();
+						m.copy( materials[ i ] );
+						m.needsUpdate = true;
+
+						array.push( m );
+
+					}
+
+					phongMaterials = new THREE.MultiMaterial( array );
+
+				}
+
 				function initGui () {
 
 					var api = {
@@ -178,9 +201,16 @@
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
 
-						for ( var i = 0, il = mesh.material.materials.length; i < il; i ++ ) {
+						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
+						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material.materials );
 
-							var material = mesh.material.materials[ i ].uniforms.celShading.value = api[ 'gradient mapping' ] ? 1 : 0;
+						if ( api[ 'gradient mapping' ] ) {
+
+							mesh.material = originalMaterials;
+
+						} else {
+
+							mesh.material = phongMaterials;
 
 						}
 
@@ -191,7 +221,7 @@
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
-						helper.doOutlineDrawing = api[ 'outline' ];
+						effect.enabled = api[ 'outline' ];
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
@@ -218,7 +248,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -236,18 +266,10 @@
 
 			function render() {
 
-				if ( mesh ) {
-
-					helper.animate( clock.getDelta() );
-					if ( physicsHelper.visible ) physicsHelper.update();
-					if ( ikHelper.visible ) ikHelper.update();
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				helper.animate( clock.getDelta() );
+				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
+				effect.render( scene, camera );
 
 			}
 

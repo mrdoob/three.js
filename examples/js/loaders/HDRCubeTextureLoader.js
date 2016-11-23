@@ -9,7 +9,7 @@ THREE.HDRCubeTextureLoader = function (manager) {
   this.hdrLoader = new THREE.RGBELoader();
 
   if( THREE.Encodings === undefined ) throw new Error( "HDRCubeMapLoader requires THREE.Encodings" );
-}
+};
 
 THREE.HDRCubeTextureLoader.prototype.load = function(type, urls, onLoad, onProgress, onError) {
   var texture = new THREE.CubeTexture();

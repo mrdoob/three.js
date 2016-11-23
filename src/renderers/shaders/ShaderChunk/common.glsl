@@ -73,19 +73,13 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 
 }
 
-float gaussianPdf(in float x, in float sigma) {
-
-	return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
-
-}
-
 mat3 transpose( const in mat3 v ) {
 
-    mat3 tmp;
-    tmp[0] = vec3(v[0].x, v[1].x, v[2].x);
-    tmp[1] = vec3(v[0].y, v[1].y, v[2].y);
-    tmp[2] = vec3(v[0].z, v[1].z, v[2].z);
+	mat3 tmp;
+	tmp[0] = vec3(v[0].x, v[1].x, v[2].x);
+	tmp[1] = vec3(v[0].y, v[1].y, v[2].y);
+	tmp[2] = vec3(v[0].z, v[1].z, v[2].z);
 
-    return tmp;
+	return tmp;
 
 }

@@ -18,7 +18,6 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
@@ -28,6 +27,7 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
 		Copyright
 		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
@@ -53,7 +53,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper;
 
 			var ready = false;
@@ -79,7 +79,7 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( new THREE.GridHelper( 100, 100 ) );
+				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
@@ -95,6 +95,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
 
 				// model
 
@@ -114,7 +116,7 @@
 				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
 
@@ -173,7 +175,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				helper.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -197,15 +199,11 @@
 
 				if ( ready ) {
 
-					var delta = clock.getDelta();
-					helper.animate( delta );
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.render( scene, camera );
+					helper.animate( clock.getDelta() );
 
 				}
+
+				effect.render( scene, camera );
 
 			}
 

@@ -81,6 +81,12 @@ var UniformsLib = {
 
 	},
 
+	gradientmap: {
+
+		gradientMap: { value: null }
+
+	},
+
 	fog: {
 
 		fogDensity: { value: 0.00025 },
@@ -147,19 +153,12 @@ var UniformsLib = {
 		} },
 
         // TODO (abelnation): RectAreaLight BRDF data needs to be moved from example to main src
-        rectAreaLights: { type: "sa", value: [], properties: {
-            color: { type: "c" },
-            position: { type: "v3" },
-            width: { type: "v3" },
-            height: { type: "v3" },
+        rectAreaLights: { value: [], properties: {
+            color: {},
+            position: {},
+            width: {},
+            height: {},
         } }
-        // rectAreaLights: { type: "sa", value: [], properties: {
-        //     color: { type: "c" },
-        //     position: { type: "v3" },
-        //     width: { type: "1f" },
-        //     height: { type: "1f" },
-        //     rotationMatrix: { type: "m4" }
-        // } },
 
 	},
 

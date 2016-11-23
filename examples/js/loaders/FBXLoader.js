@@ -64,7 +64,7 @@
 
 	THREE.FBXLoader.prototype.isFbxFormatASCII = function ( body ) {
 
-		CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
+		var CORRECT = [ 'K', 'a', 'y', 'd', 'a', 'r', 'a', '\\', 'F', 'B', 'X', '\\', 'B', 'i', 'n', 'a', 'r', 'y', '\\', '\\' ];
 
 		var cursor = 0;
 		var read = function ( offset ) {
@@ -78,7 +78,7 @@
 
 		for ( var i = 0; i < CORRECT.length; ++ i ) {
 
-			num = read( 1 );
+			var num = read( 1 );
 			if ( num == CORRECT[ i ] ) {
 
 				return false;
@@ -94,7 +94,7 @@
 	THREE.FBXLoader.prototype.isFbxVersionSupported = function ( body ) {
 
 		var versionExp = /FBXVersion: (\d+)/;
-		match = body.match( versionExp );
+		var match = body.match( versionExp );
 		if ( match ) {
 
 			var version = parseInt( match[ 1 ] );
@@ -124,7 +124,7 @@
 		console.timeEnd( 'FBXLoader: ObjectParser' );
 
 		console.time( 'FBXLoader: GeometryParser' );
-		geometries = this.parseGeometries( nodes );
+		var geometries = this.parseGeometries( nodes );
 		console.timeEnd( 'FBXLoader: GeometryParser' );
 
 		var container = new THREE.Group();
@@ -203,7 +203,7 @@
 
 	THREE.FBXLoader.prototype.parseGeometry = function ( node, nodes ) {
 
-		geo = ( new Geometry() ).parse( node );
+		var geo = ( new Geometry() ).parse( node );
 		geo.addBones( this.hierarchy.hierarchy );
 
 		//*
@@ -448,7 +448,7 @@
 		};
 
 		var bones = mesh.geometry.bones;
-		for ( frame = 0; frame < animations.frames; frame ++ ) {
+		for ( var frame = 0; frame < animations.frames; frame ++ ) {
 
 
 			for ( i = 0; i < bones.length; i ++ ) {
@@ -664,7 +664,7 @@
 		var key = id + ',' + to; // TODO: to hash
 		if ( this.__cache_search_connection_type === undefined ) {
 
-			this.__cache_search_connection_type = '';
+			this.__cache_search_connection_type = {};
 
 		}
 
@@ -772,7 +772,7 @@
 
 				// beginning of node
 				var beginningOfNodeExp = new RegExp( "^\\t{" + this.currentIndent + "}(\\w+):(.*){", '' );
-				match = l.match( beginningOfNodeExp );
+				var match = l.match( beginningOfNodeExp );
 				if ( match ) {
 
 					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, "" );
@@ -789,7 +789,7 @@
 
 				// node's property
 				var propExp = new RegExp( "^\\t{" + ( this.currentIndent ) + "}(\\w+):[\\s\\t\\r\\n](.*)" );
-				match = l.match( propExp );
+				var match = l.match( propExp );
 				if ( match ) {
 
 					var propName = match[ 1 ].replace( /^"/, '' ).replace( /"$/, "" ).trim();
@@ -2574,7 +2574,7 @@
 	// what want:　normal per vertex, order vertice
 	// i have: normal per polygon
 	// i have: indice per polygon
-	parse_Data_ByPolygonVertex_Direct = function ( node, indices, strides, itemSize ) {
+	var parse_Data_ByPolygonVertex_Direct = function ( node, indices, strides, itemSize ) {
 
 		// *21204 > 3573
 		// Geometry: 690680816, "Geometry::", "Mesh" {
@@ -2684,19 +2684,19 @@
 
 	};
 
-	degToRad = function ( degrees ) {
+	var degToRad = function ( degrees ) {
 
 		return degrees * Math.PI / 180;
 
 	};
 
-	radToDeg = function ( radians ) {
+	var radToDeg = function ( radians ) {
 
 		return radians * 180 / Math.PI;
 
 	};
 
-	quatFromVec = function ( x, y, z ) {
+	var quatFromVec = function ( x, y, z ) {
 
 		var euler = new THREE.Euler( x, y, z, 'ZYX' );
 		var quat = new THREE.Quaternion();
@@ -2708,7 +2708,7 @@
 
 
 	// extend Array.prototype ?  ....uuuh
-	toInt = function ( arr ) {
+	var toInt = function ( arr ) {
 
 		return arr.map( function ( element ) {
 
@@ -2718,7 +2718,7 @@
 
 	};
 
-	toFloat = function ( arr ) {
+	var toFloat = function ( arr ) {
 
 		return arr.map( function ( element ) {
 
@@ -2728,7 +2728,7 @@
 
 	};
 
-	toRad = function ( arr ) {
+	var toRad = function ( arr ) {
 
 		return arr.map( function ( element ) {
 
@@ -2738,7 +2738,7 @@
 
 	};
 
-	toMat44 = function ( arr ) {
+	var toMat44 = function ( arr ) {
 
 		var mat = new THREE.Matrix4();
 		mat.set(

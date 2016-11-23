@@ -31,9 +31,9 @@
 	this.geometrySize = optionalParameter( options.GEOMETRY_SIZE, 2000 );
 	this.resolution = optionalParameter( options.RESOLUTION, 64 );
 	this.floatSize = optionalParameter( options.SIZE_OF_FLOAT, 4 );
-	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 ),
-	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 ),
-	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 ),
+	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 );
+	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 );
+	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 );
 	this.choppiness = optionalParameter( options.INITIAL_CHOPPINESS, 1.5 );
 
 	//
@@ -91,7 +91,7 @@
 
 	// 1 - Horizontal wave vertices used for FFT
 	var oceanHorizontalShader = THREE.ShaderLib[ "ocean_subtransform" ];
-	var oceanHorizontalUniforms = THREE.UniformsUtils.clone( oceanHorizontalShader.uniforms );
+	var oceanHorizontalUniforms = Object.assign( {}, oceanHorizontalShader.uniforms );
 	this.materialOceanHorizontal = new THREE.ShaderMaterial( {
 		uniforms: oceanHorizontalUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -104,7 +104,7 @@
 
 	// 2 - Vertical wave vertices used for FFT
 	var oceanVerticalShader = THREE.ShaderLib[ "ocean_subtransform" ];
-	var oceanVerticalUniforms = THREE.UniformsUtils.clone( oceanVerticalShader.uniforms );
+	var oceanVerticalUniforms = Object.assign( {}, oceanVerticalShader.uniforms );
 	this.materialOceanVertical = new THREE.ShaderMaterial( {
 		uniforms: oceanVerticalUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -117,7 +117,7 @@
 
 	// 3 - Initial spectrum used to generate height map
 	var initialSpectrumShader = THREE.ShaderLib[ "ocean_initial_spectrum" ];
-	var initialSpectrumUniforms = THREE.UniformsUtils.clone( initialSpectrumShader.uniforms );
+	var initialSpectrumUniforms = Object.assign( {}, initialSpectrumShader.uniforms );
 	this.materialInitialSpectrum = new THREE.ShaderMaterial( {
 		uniforms: initialSpectrumUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -129,7 +129,7 @@
 
 	// 4 - Phases used to animate heightmap
 	var phaseShader = THREE.ShaderLib[ "ocean_phase" ];
-	var phaseUniforms = THREE.UniformsUtils.clone( phaseShader.uniforms );
+	var phaseUniforms = Object.assign( {}, phaseShader.uniforms );
 	this.materialPhase = new THREE.ShaderMaterial( {
 		uniforms: phaseUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -140,7 +140,7 @@
 
 	// 5 - Shader used to update spectrum
 	var spectrumShader = THREE.ShaderLib[ "ocean_spectrum" ];
-	var spectrumUniforms = THREE.UniformsUtils.clone( spectrumShader.uniforms );
+	var spectrumUniforms = Object.assign( {}, spectrumShader.uniforms );
 	this.materialSpectrum = new THREE.ShaderMaterial( {
 		uniforms: spectrumUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -152,7 +152,7 @@
 
 	// 6 - Shader used to update spectrum normals
 	var normalShader = THREE.ShaderLib[ "ocean_normals" ];
-	var normalUniforms = THREE.UniformsUtils.clone( normalShader.uniforms );
+	var normalUniforms = Object.assign( {}, normalShader.uniforms );
 	this.materialNormal = new THREE.ShaderMaterial( {
 		uniforms: normalUniforms,
 		vertexShader: fullscreeenVertexShader.vertexShader,
@@ -164,7 +164,7 @@
 
 	// 7 - Shader used to update normals
 	var oceanShader = THREE.ShaderLib[ "ocean_main" ];
-	var oceanUniforms = THREE.UniformsUtils.clone( oceanShader.uniforms );
+	var oceanUniforms = Object.assign( {}, oceanShader.uniforms );
 	this.materialOcean = new THREE.ShaderMaterial( {
 		uniforms: oceanUniforms,
 		vertexShader: oceanShader.vertexShader,
