@@ -22,7 +22,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	} );
 
 	this.uniforms[ "tDiffuse" ] = new THREE.Uniform();
-	this.uniforms[ "time" ] = new THREE.Uniform();
+	this.uniforms[ "time" ] = new THREE.Uniform( 0 );
 
 	if ( grayscale !== undefined )	this.uniforms.grayscale = new THREE.Uniform( grayscale );
 	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity = new THREE.Uniform( noiseIntensity );
