@@ -96,7 +96,7 @@ SkeletonHelper.prototype.update = function () {
 
 		matrixWorldInv.getInverse( this.root.matrixWorld );
 
-		for ( var i = 0, j = 0; i < this.bones.length; i ++, j += 2 ) {
+		for ( var i = 0, j = 0; i < this.bones.length; i ++ ) {
 
 			var bone = this.bones[ i ];
 
@@ -109,6 +109,8 @@ SkeletonHelper.prototype.update = function () {
 				boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
 				vector.setFromMatrixPosition( boneMatrix );
 				position.setXYZ( j + 1, vector.x, vector.y, vector.z );
+
+				j += 2
 
 			}
 
