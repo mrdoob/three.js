@@ -121,6 +121,7 @@
 		scope.weights	= ( new Weights() ).parse( nodes, scope.hierarchy );
 		scope.animations = ( new Animation() ).parse( nodes, scope.hierarchy );
 		scope.textures = ( new Textures() ).parse( nodes, scope.hierarchy );
+		scope.materials = ( new Materials() ).parse( nodes, scope.hierarchy );
 		console.timeEnd( 'FBXLoader: ObjectParser' );
 
 		console.time( 'FBXLoader: GeometryParser' );
@@ -252,14 +253,38 @@
 		}
 
 		var material;
-		if ( texture !== undefined ) {
+		var mats = this.materials.getById( nodes.searchConnectionParent( geo.id ) );
+		if ( mats !== undefined && mats.length > 0) {
+			var mat_data = mats[0];
 
-			material = new THREE.MeshBasicMaterial( { map: texture } );
-
+			// TODO:
+			// Cannot find a list of possible ShadingModel values.
+			// If someone finds a list, please add additional cases
+			// and map to appropriate materials.
+			switch(mat_data.type) {
+				case "phong":
+				material = new THREE.MeshPhongMaterial();
+				break;
+				default:
+				console.warn("No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material")
+				material = new THREE.MeshBasicMaterial({ color: 0x3300ff });
+				break;
+			}
+			if (texture !== undefined) {
+				mat_data.parameters.map = texture;
+			}
+			material.setValues(mat_data.parameters);
 		} else {
+			//No material found for this geometry, create default
+			if (texture !== undefined) {
 
-			material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+				material = new THREE.MeshBasicMaterial({ map: texture });
 
+			} else {
+
+				material = new THREE.MeshBasicMaterial({ color: 0x3300ff });
+
+			}
 		}
 
 		geometry = new THREE.Geometry().fromBufferGeometry( geometry );
@@ -522,7 +547,7 @@
 
 	// TODO
 	THREE.FBXLoader.prototype.parseMaterial = function ( node ) {
-
+		
 	};
 
 
@@ -2496,6 +2521,114 @@
 	};
 
 	Texture.prototype.searchParents = function ( id, nodes ) {
+
+		var p = nodes.searchConnectionParent( id );
+
+		return p;
+
+	};
+
+	function Materials() {
+		this.materials = [];
+		this.perGeoMap = {};
+	}
+
+	Materials.prototype.add = function ( mat ) {
+
+		if ( this.materials === undefined ) {
+
+			this.materials = [];
+
+		}
+
+		this.materials.push( mat );
+
+		for ( var i = 0; i < mat.parentIds.length; ++ i ) {
+
+			if ( this.perGeoMap[ mat.parentIds[ i ] ] === undefined ) {
+
+				this.perGeoMap[ mat.parentIds[ i ] ] = [];
+
+			}
+
+			this.perGeoMap[ mat.parentIds[ i ] ].push( this.materials[ this.materials.length - 1 ] );
+
+		}
+
+	};
+
+	Materials.prototype.parse = function ( node, bones ) {
+
+		var rawNodes = node.Objects.subNodes.Material;
+
+		for ( var n in rawNodes ) {
+
+			var mat = ( new Material() ).parse( rawNodes[ n ], node );
+			this.add( mat );
+
+		}
+
+		return this;
+
+	};
+
+	Materials.prototype.getById = function ( id ) {
+
+		return this.perGeoMap[ id ];
+
+	};
+
+	function Material() {
+
+		this.fileName = "";
+		this.name = "";
+		this.id = null;
+		this.parentIds = [];
+
+	}
+
+	Material.prototype.parse = function ( node, nodes ) {
+
+		this.id = node.id;
+		this.name = node.attrName;
+		this.type = node.properties.ShadingModel;
+
+		this.parameters = this.getParameters( node.properties );
+
+		this.parentIds = this.searchParents( this.id, nodes );
+
+		return this;
+
+	};
+
+	Material.prototype.getParameters = function( properties ) {
+		var parameters = {};
+
+		//TODO: Missing parameters:
+		// - Ambient
+		// - AmbientColor
+		// - (Diffuse?) Using DiffuseColor, which has same value, so I dunno.
+		// - (Emissive?) Same as above)
+		// - MultiLayer
+		// - ShininessExponent (Same vals as Shininess)
+		// - Specular (Same vals as SpecularColor)
+		// - TransparencyFactor (Maybe same as Opacity?).
+
+		parameters.color = new THREE.Color().fromArray(toFloat([properties.DiffuseColor.value.x, properties.DiffuseColor.value.y, properties.DiffuseColor.value.z]));
+		parameters.specular = new THREE.Color().fromArray(toFloat([properties.SpecularColor.value.x, properties.SpecularColor.value.y, properties.SpecularColor.value.z]));
+		parameters.shininess = properties.Shininess.value;
+		parameters.emissive = new THREE.Color().fromArray(toFloat([properties.EmissiveColor.value.x, properties.EmissiveColor.value.y, properties.EmissiveColor.value.z]));
+		parameters.emissiveIntensity = properties.EmissiveFactor.value;
+		parameters.reflectivity = properties.Reflectivity.value;
+		parameters.opacity = properties.Opacity.value;
+		if(parameters.opacity < 1.0) {
+			parameters.transparent = true;
+		}
+
+		return parameters;
+	};
+
+	Material.prototype.searchParents = function ( id, nodes ) {
 
 		var p = nodes.searchConnectionParent( id );
 

@@ -44,7 +44,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, controls;
-			var camera, scene, renderer;
+			var camera, scene, renderer, light;
 
 			var clock = new THREE.Clock();
 
@@ -137,6 +137,10 @@
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				light = new THREE.DirectionalLight(0xffffff, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
 
 				animate();
 
