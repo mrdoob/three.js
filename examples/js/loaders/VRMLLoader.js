@@ -416,8 +416,8 @@ THREE.VRMLLoader.prototype = {
 
 							break;
 							
-+						case 'location':
-+						case 'direction':
+						case 'location':
+						case 'direction':
 						case 'translation':
 						case 'scale':
 						case 'size':
