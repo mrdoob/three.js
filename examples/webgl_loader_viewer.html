@@ -100,7 +100,7 @@
 
 	function toggleDiv(id) {
 		var div = document.getElementById(id);
-		div.style.display = (div.style.display == 'block') ? 'none' : 'block';
+		div.style.display = (div.style.display === 'block') ? 'none' : 'block';
 	}
 
 	function clearDiv(id) {
@@ -149,9 +149,9 @@
 		var token = objPath.split('.');
 		var fileType = token[token.length-1];
 
-		if (fileType == "json")
+		if (fileType === "json")
 		{
-			if (token[token.length-2] == "assimp")
+			if (token[token.length-2] === "assimp")
 				fileType = "assimp.json";
  		}
 
@@ -177,11 +177,11 @@
 
 		var loader = selectLoader(fileType, manager);
 
-		if (fileType == "dae" )
+		if (fileType === "dae" )
 		{
 			loader.options.convertUpAxis = true;
 		}
-		else if (fileType == "pcd"){
+		else if (fileType === "pcd"){
 			//do something to invert upside down
 		}
 
@@ -200,21 +200,21 @@
 		}, onProgress, onError );
 
 		//to do: improvement - post loader.load() fixes - handle camera for these files automaticaly
-		if (fileName=="mascot.tjs.sea")
+		if (fileName==="mascot.tjs.sea")
 		{
 			camera.position.z = 2000;
 		}
-		else if (fileName=="house.wrl")
+		else if (fileName==="house.wrl")
 		{
 			camera.position.z = 30;
 		}
-		else if (fileName=="kawada-hironx.dae"){
+		else if (fileName==="kawada-hironx.dae"){
 			camera.position.z = 3;
 		}
-		else if (fileName=="duck.gltf"){
+		else if (fileName==="duck.gltf"){
 			camera.position.z = 6;
 		}
-		else if (fileName=="Zaghetto.pcd")
+		else if (fileName==="Zaghetto.pcd")
 		{
 			//to do: improvement - Zaghetto.pcd need to flip pcd model upside down as needed
 			//to do: improvement - Zaghetto.pcd find correct camera settings
@@ -261,7 +261,7 @@
 	function OnLoadScene(fileScene, objType, objName)
 	{
 
-		if (objType == "dae" || objType == "gltf" || objType == "sea")
+		if (objType === "dae" || objType === "gltf" || objType === "sea")
 		{
 			fileScene = fileScene.scene;
 			//scene.scale.x = scene.scale.y = scene.scale.z = 0.05;
@@ -275,7 +275,7 @@
 			//to do: bug - fileScene.traverse() dae error on traversing last child?
 
 			//to do: improvement - fileScene.traverse() handle nested groups?
-			if ( object.constructor.name == "Group" ) {
+			if ( object.constructor.name === "Group" ) {
 				scene.add(object);
 				childcnt = object.children.length;
 				debugPrint("constructor: "+object.constructor.name+", children:" + childcnt+"<br>");
@@ -284,14 +284,14 @@
 					space = "++";
 				}
 			}
-			else if ( object.constructor.name == "SkinnedMesh" || object.constructor.name == "Mesh" || object.constructor.name == "Object3D" ) {
+			else if ( object.constructor.name === "SkinnedMesh" || object.constructor.name === "Mesh" || object.constructor.name === "Object3D" ) {
 				if (childcnt > 0)
 				{
 					debugPrint(space+"child:" + childcnt+", ");
 				}
 				debugPrint("constructor: "+object.constructor.name+", children: "+object.children.length+"<br>");
 
-				if (objName == "skull.babylon" || objName == "duck.gltf" )
+				if (objName === "skull.babylon" || objName === "duck.gltf" )
 				{
 					//to do: bug - with gltf file can not move model unless material is changed
 					object.material = new THREE.MeshPhongMaterial( {
@@ -299,7 +299,7 @@
 					} );
 				}
 
-				if (childcnt == 0)
+				if (childcnt === 0)
 				{
 					space = "";
 					scene.add(object);
@@ -308,9 +308,9 @@
 					childcnt--;
 				}
 			}
-			else if ( object.constructor.name == "Points")
+			else if ( object.constructor.name === "Points")
 			{
-				if (childcnt == 0)
+				if (childcnt === 0)
 				{
 					space = "";
 					scene.add(object);
