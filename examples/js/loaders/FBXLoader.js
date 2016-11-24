@@ -238,7 +238,6 @@
 		geometry.computeBoundingSphere();
 		geometry.computeBoundingBox();
 
-		// TODO: texture & material support
 		var texture;
 		var texs = this.textures.getById( nodes.searchConnectionParent( geo.id ) );
 		if ( texs !== undefined && texs.length > 0 ) {
@@ -252,28 +251,57 @@
 
 		}
 
+		var materials = [];
 		var material;
 		var mats = this.materials.getById( nodes.searchConnectionParent( geo.id ) );
 		if ( mats !== undefined && mats.length > 0) {
-			var mat_data = mats[0];
+			for(var i = 0; i < mats.length; ++i) {
+				var mat_data = mats[i];
+				var tmpMat;
 
-			// TODO:
-			// Cannot find a list of possible ShadingModel values.
-			// If someone finds a list, please add additional cases
-			// and map to appropriate materials.
-			switch(mat_data.type) {
-				case "phong":
-				material = new THREE.MeshPhongMaterial();
-				break;
-				default:
-				console.warn("No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material")
-				material = new THREE.MeshBasicMaterial({ color: 0x3300ff });
-				break;
+				// TODO:
+				// Cannot find a list of possible ShadingModel values.
+				// If someone finds a list, please add additional cases
+				// and map to appropriate materials.
+				switch(mat_data.type) {
+					case "phong":
+					tmpMat = new THREE.MeshPhongMaterial();
+					break;
+					case "Lambert":
+					tmpMat = new THREE.MeshLambertMaterial();
+					break;
+					default:
+					console.warn("No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material")
+					tmpMat = new THREE.MeshBasicMaterial({ color: 0x3300ff });
+					break;
+				}
+				if (texture !== undefined) {
+					mat_data.parameters.map = texture;
+				}
+				tmpMat.setValues(mat_data.parameters);
+
+				materials.push(tmpMat);
 			}
-			if (texture !== undefined) {
-				mat_data.parameters.map = texture;
+
+			if(materials.length === 1) {
+				material = materials[0];
+			} else {
+				//Set up for multi-material
+				material = new THREE.MultiMaterial(materials);
+				var material_groupings = [];
+				var last_material_group = -1;
+				var material_index_list = toInt(node.subNodes.LayerElementMaterial.subNodes.Materials.properties.a.split( ',' ));
+				for(var i = 0; i < geo.polyIndices.length; ++i) {
+					if(last_material_group !== material_index_list[geo.polyIndices[i]]) {
+						material_groupings.push({start: i * 3, count: 0, materialIndex: material_index_list[geo.polyIndices[i]]});
+						last_material_group = material_index_list[geo.polyIndices[i]];
+					}
+					material_groupings[material_groupings.length - 1].count += 3;
+				}
+				geometry.groups = material_groupings;
 			}
-			material.setValues(mat_data.parameters);
+
+
 		} else {
 			//No material found for this geometry, create default
 			if (texture !== undefined) {
@@ -1589,8 +1617,10 @@
 
 		if ( this.getPolygonTopologyMax() > 3 ) {
 
-			this.indices = this.convertPolyIndicesToTri(
+			var indexInfo = this.convertPolyIndicesToTri(
 								this.indices, this.getPolygonTopologyArray() );
+			this.indices = indexInfo.res;
+			this.polyIndices = indexInfo.polyIndices;
 
 		}
 
@@ -1734,14 +1764,16 @@
 	//
 	// [( a, b, c, d ) ...........
 	// [( a, b, c ), (a, c, d )....
+
+	// Also keep track of original poly index.
 	Geometry.prototype.convertPolyIndicesToTri = function ( indices, strides ) {
 
 		var res = [];
 
 		var i = 0;
-		var tmp = [];
 		var currentPolyNum = 0;
 		var currentStride = 0;
+		var polyIndices = [];
 
 		while ( i < indices.length ) {
 
@@ -1754,14 +1786,14 @@
 				res.push( indices[ i + ( currentStride - 2 - j ) ] );
 				res.push( indices[ i + ( currentStride - 1 - j ) ] );
 
+				polyIndices.push(currentPolyNum);
 			}
 
 			currentPolyNum ++;
 			i += currentStride;
-
 		}
 
-		return res;
+		return {res: res, polyIndices: polyIndices};
 
 	};
 
