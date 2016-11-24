@@ -1,4 +1,4 @@
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
 /**
@@ -29,6 +29,7 @@ Object.assign( ImageLoader.prototype, {
 			scope.manager.itemEnd( url );
 
 		};
+		image.onerror = onError;
 
 		if ( url.indexOf( 'data:' ) === 0 ) {
 
@@ -36,7 +37,7 @@ Object.assign( ImageLoader.prototype, {
 
 		} else {
 
-			var loader = new XHRLoader();
+			var loader = new FileLoader();
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
 			loader.setWithCredentials( this.withCredentials );

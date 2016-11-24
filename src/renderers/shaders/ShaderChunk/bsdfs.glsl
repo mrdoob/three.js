@@ -1,9 +1,3 @@
-bool testLightInRange( const in float lightDistance, const in float cutoffDistance ) {
-
-	return any( bvec2( cutoffDistance == 0.0, lightDistance < cutoffDistance ) );
-
-}
-
 float punctualLightIntensityToIrradianceFactor( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
 
 		if( decayExponent > 0.0 ) {
@@ -116,6 +110,301 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 } // validated
 
+//
+// Rect Area Light BRDF Approximations
+//
+
+// Area light computation code adapted from:
+// http://blog.selfshadow.com/sandbox/ltc.html
+//
+// Based on paper:
+// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
+// By: Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
+// https://eheitzresearch.wordpress.com/415-2/
+
+vec2 ltcTextureCoords( const in GeometricContext geometry, const in float roughness ) {
+
+	const float LUT_SIZE  = 64.0;
+	const float LUT_SCALE = (LUT_SIZE - 1.0)/LUT_SIZE;
+	const float LUT_BIAS  = 0.5/LUT_SIZE;
+
+	vec3 N = geometry.normal;
+	vec3 V = geometry.viewDir;
+	vec3 P = geometry.position;
+
+	// view angle on surface determines which LTC BRDF values we use
+	float theta = acos( dot( N, V ) );
+
+	// Parameterization of texture:
+	// sqrt(roughness) -> [0,1]
+	// theta -> [0, PI/2]
+	vec2 uv = vec2(
+		sqrt( saturate( roughness ) ),
+		saturate( theta / ( 0.5 * PI ) ) );
+
+	// Ensure we don't have nonlinearities at the look-up table's edges
+	// see: http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter24.html
+	//      "Shader Analysis" section
+	uv = uv * LUT_SCALE + LUT_BIAS;
+
+	return uv;
+
+}
+
+void clipQuadToHorizon( inout vec3 L[5], out int n ) {
+
+	// detect clipping config
+	int config = 0;
+	if ( L[0].z > 0.0 ) config += 1;
+	if ( L[1].z > 0.0 ) config += 2;
+	if ( L[2].z > 0.0 ) config += 4;
+	if ( L[3].z > 0.0 ) config += 8;
+
+	// clip
+	n = 0;
+
+	if ( config == 0 ) {
+
+		// clip all
+
+	} else if ( config == 1 ) {
+
+		// V1 clip V2 V3 V4
+		n = 3;
+		L[1] = -L[1].z * L[0] + L[0].z * L[1];
+		L[2] = -L[3].z * L[0] + L[0].z * L[3];
+
+	} else if ( config == 2 ) {
+
+		// V2 clip V1 V3 V4
+		n = 3;
+		L[0] = -L[0].z * L[1] + L[1].z * L[0];
+		L[2] = -L[2].z * L[1] + L[1].z * L[2];
+
+	} else if ( config == 3 ) {
+
+		// V1 V2 clip V3 V4
+		n = 4;
+		L[2] = -L[2].z * L[1] + L[1].z * L[2];
+		L[3] = -L[3].z * L[0] + L[0].z * L[3];
+
+	} else if ( config == 4 ) {
+
+		// V3 clip V1 V2 V4
+		n = 3;
+		L[0] = -L[3].z * L[2] + L[2].z * L[3];
+		L[1] = -L[1].z * L[2] + L[2].z * L[1];
+
+	} else if ( config == 5 ) {
+
+		// V1 V3 clip V2 V4) impossible
+		n = 0;
+
+	} else if ( config == 6 ) {
+
+		// V2 V3 clip V1 V4
+		n = 4;
+		L[0] = -L[0].z * L[1] + L[1].z * L[0];
+		L[3] = -L[3].z * L[2] + L[2].z * L[3];
+
+	} else if ( config == 7 ) {
+
+		// V1 V2 V3 clip V4
+		n = 5;
+		L[4] = -L[3].z * L[0] + L[0].z * L[3];
+		L[3] = -L[3].z * L[2] + L[2].z * L[3];
+
+	} else if ( config == 8 ) {
+
+		// V4 clip V1 V2 V3
+		n = 3;
+		L[0] = -L[0].z * L[3] + L[3].z * L[0];
+		L[1] = -L[2].z * L[3] + L[3].z * L[2];
+		L[2] =  L[3];
+
+	} else if ( config == 9 ) {
+
+		// V1 V4 clip V2 V3
+		n = 4;
+		L[1] = -L[1].z * L[0] + L[0].z * L[1];
+		L[2] = -L[2].z * L[3] + L[3].z * L[2];
+
+	} else if ( config == 10 ) {
+
+		// V2 V4 clip V1 V3) impossible
+		n = 0;
+
+	} else if ( config == 11 ) {
+
+		// V1 V2 V4 clip V3
+		n = 5;
+		L[4] = L[3];
+		L[3] = -L[2].z * L[3] + L[3].z * L[2];
+		L[2] = -L[2].z * L[1] + L[1].z * L[2];
+
+	} else if ( config == 12 ) {
+
+		// V3 V4 clip V1 V2
+		n = 4;
+		L[1] = -L[1].z * L[2] + L[2].z * L[1];
+		L[0] = -L[0].z * L[3] + L[3].z * L[0];
+
+	} else if ( config == 13 ) {
+
+		// V1 V3 V4 clip V2
+		n = 5;
+		L[4] = L[3];
+		L[3] = L[2];
+		L[2] = -L[1].z * L[2] + L[2].z * L[1];
+		L[1] = -L[1].z * L[0] + L[0].z * L[1];
+
+	} else if ( config == 14 ) {
+
+		// V2 V3 V4 clip V1
+		n = 5;
+		L[4] = -L[0].z * L[3] + L[3].z * L[0];
+		L[0] = -L[0].z * L[1] + L[1].z * L[0];
+
+	} else if ( config == 15 ) {
+
+		// V1 V2 V3 V4
+		n = 4;
+
+	}
+
+	if ( n == 3 )
+		L[3] = L[0];
+	if ( n == 4 )
+		L[4] = L[0];
+
+}
+
+// Equation (11) of "Real-Time Polygonal-Light Shading with Linearly Transformed Cosines"
+float integrateLtcBrdfOverRectEdge( vec3 v1, vec3 v2 ) {
+
+	float cosTheta = dot( v1, v2 );
+	float theta = acos( cosTheta );
+	float res = cross( v1, v2 ).z * ( ( theta > 0.001 ) ? theta / sin( theta ) : 1.0 );
+
+	return res;
+
+}
+
+void initRectPoints( const in vec3 pos, const in vec3 halfWidth, const in vec3 halfHeight, out vec3 rectPoints[4] ) {
+
+	rectPoints[0] = pos - halfWidth - halfHeight;
+	rectPoints[1] = pos + halfWidth - halfHeight;
+	rectPoints[2] = pos + halfWidth + halfHeight;
+	rectPoints[3] = pos - halfWidth + halfHeight;
+
+}
+
+vec3 integrateLtcBrdfOverRect( const in GeometricContext geometry, const in mat3 brdfMat, const in vec3 rectPoints[4] ) {
+
+	vec3 N = geometry.normal;
+	vec3 V = geometry.viewDir;
+	vec3 P = geometry.position;
+
+	// construct orthonormal basis around N
+	vec3 T1, T2;
+	T1 = normalize(V - N * dot( V, N ));
+	// TODO (abelnation): I had to negate this cross product to get proper light.  Curious why sample code worked without negation
+	T2 = - cross( N, T1 );
+
+	// rotate area light in (T1, T2, N) basis
+	mat3 brdfWrtSurface = brdfMat * transpose( mat3( T1, T2, N ) );
+
+	// transformed rect relative to surface point
+	vec3 clippedRect[5];
+	clippedRect[0] = brdfWrtSurface * ( rectPoints[0] - P );
+	clippedRect[1] = brdfWrtSurface * ( rectPoints[1] - P );
+	clippedRect[2] = brdfWrtSurface * ( rectPoints[2] - P );
+	clippedRect[3] = brdfWrtSurface * ( rectPoints[3] - P );
+
+	// clip light rect to horizon, resulting in at most 5 points
+	// we do this because we are integrating the BRDF over the hemisphere centered on the surface points normal
+	int n;
+	clipQuadToHorizon(clippedRect, n);
+
+	// light is completely below horizon
+	if ( n == 0 )
+		return vec3( 0, 0, 0 );
+
+	// project clipped rect onto sphere
+	clippedRect[0] = normalize( clippedRect[0] );
+	clippedRect[1] = normalize( clippedRect[1] );
+	clippedRect[2] = normalize( clippedRect[2] );
+	clippedRect[3] = normalize( clippedRect[3] );
+	clippedRect[4] = normalize( clippedRect[4] );
+
+	// integrate
+	// simplified integration only needs to be evaluated for each edge in the polygon
+	float sum = 0.0;
+	sum += integrateLtcBrdfOverRectEdge( clippedRect[0], clippedRect[1] );
+	sum += integrateLtcBrdfOverRectEdge( clippedRect[1], clippedRect[2] );
+	sum += integrateLtcBrdfOverRectEdge( clippedRect[2], clippedRect[3] );
+	if (n >= 4)
+		sum += integrateLtcBrdfOverRectEdge( clippedRect[3], clippedRect[4] );
+	if (n == 5)
+		sum += integrateLtcBrdfOverRectEdge( clippedRect[4], clippedRect[0] );
+
+	// TODO (abelnation): two-sided area light
+	// sum = twoSided ? abs(sum) : max(0.0, sum);
+	sum = max( 0.0, sum );
+	// sum = abs( sum );
+
+	vec3 Lo_i = vec3( sum, sum, sum );
+
+	return Lo_i;
+
+}
+
+vec3 Rect_Area_Light_Specular_Reflectance(
+		const in GeometricContext geometry,
+		const in vec3 lightPos, const in vec3 lightHalfWidth, const in vec3 lightHalfHeight,
+		const in float roughness,
+		const in sampler2D ltcMat, const in sampler2D ltcMag ) {
+
+	vec3 rectPoints[4];
+	initRectPoints( lightPos, lightHalfWidth, lightHalfHeight, rectPoints );
+
+	vec2 uv = ltcTextureCoords( geometry, roughness );
+
+	vec4 brdfLtcApproxParams, t;
+
+	brdfLtcApproxParams = texture2D( ltcMat, uv );
+	t = texture2D( ltcMat, uv );
+
+	float brdfLtcScalar = texture2D( ltcMag, uv ).a;
+
+	// inv(M) matrix referenced by equation (6) in paper
+	mat3 brdfLtcApproxMat = mat3(
+		vec3(   1,   0, t.y ),
+		vec3(   0, t.z,   0 ),
+		vec3( t.w,   0, t.x )
+	);
+
+	vec3 specularReflectance = integrateLtcBrdfOverRect( geometry, brdfLtcApproxMat, rectPoints );
+	specularReflectance *= brdfLtcScalar;
+
+	return specularReflectance;
+
+}
+
+vec3 Rect_Area_Light_Diffuse_Reflectance(
+		const in GeometricContext geometry,
+		const in vec3 lightPos, const in vec3 lightHalfWidth, const in vec3 lightHalfHeight ) {
+
+	vec3 rectPoints[4];
+	initRectPoints( lightPos, lightHalfWidth, lightHalfHeight, rectPoints );
+
+	mat3 diffuseBrdfMat = mat3(1);
+	vec3 diffuseReflectance = integrateLtcBrdfOverRect( geometry, diffuseBrdfMat, rectPoints );
+
+	return diffuseReflectance;
+
+}
+// End RectArea BRDF
 
 // ref: https://www.unrealengine.com/blog/physically-based-shading-on-mobile - environmentBRDF for GGX on mobile
 vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {

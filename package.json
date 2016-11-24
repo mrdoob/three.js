@@ -1,14 +1,17 @@
 {
   "name": "three",
-  "version": "0.81.2",
+  "version": "0.82.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "repository": "mrdoob/three.js",
+  "jsnext:main": "build/three.modules.js",
   "files": [
     "package.json",
     "LICENSE",
     "README.md",
     "build/three.js",
     "build/three.min.js",
+    "build/three.modules.js",
     "src",
     "examples/js",
     "examples/fonts",
@@ -26,10 +29,6 @@
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
-  },
   "keywords": [
     "three",
     "three.js",
@@ -45,7 +44,7 @@
   "devDependencies": {
     "argparse": "^1.0.3",
     "jscs": "^1.13.1",
-    "rollup": "^0.34.8",
+    "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
   }

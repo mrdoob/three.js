@@ -1,7 +1,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Box3 } from '../math/Box3';
 import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32Attribute } from './BufferAttribute';
+import { BufferAttribute, Float32BufferAttribute } from './BufferAttribute';
 import { Sphere } from '../math/Sphere';
 import { DirectGeometry } from './DirectGeometry';
 import { Object3D } from './Object3D';
@@ -294,17 +294,17 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var geometry = object.geometry;
 
-		if ( (object && object.isPoints) || (object && object.isLine) ) {
+		if ( object.isPoints || object.isLine ) {
 
-			var positions = new Float32Attribute( geometry.vertices.length * 3, 3 );
-			var colors = new Float32Attribute( geometry.colors.length * 3, 3 );
+			var positions = new Float32BufferAttribute( geometry.vertices.length * 3, 3 );
+			var colors = new Float32BufferAttribute( geometry.colors.length * 3, 3 );
 
 			this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
 			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
 
 			if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
 
-				var lineDistances = new Float32Attribute( geometry.lineDistances.length, 1 );
+				var lineDistances = new Float32BufferAttribute( geometry.lineDistances.length, 1 );
 
 				this.addAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
 
@@ -322,9 +322,9 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-		} else if ( (object && object.isMesh) ) {
+		} else if ( object.isMesh ) {
 
-			if ( (geometry && geometry.isGeometry) ) {
+			if ( geometry && geometry.isGeometry ) {
 
 				this.fromGeometry( geometry );
 
@@ -340,7 +340,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		var geometry = object.geometry;
 
-		if ( (object && object.isMesh) ) {
+		if ( object.isMesh ) {
 
 			var direct = geometry.__directGeometry;
 
@@ -527,7 +527,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 				var morphTarget = morphTargets[ i ];
 
-				var attribute = new Float32Attribute( morphTarget.length * 3, 3 );
+				var attribute = new Float32BufferAttribute( morphTarget.length * 3, 3 );
 
 				array.push( attribute.copyVector3sArray( morphTarget ) );
 
@@ -541,14 +541,14 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		if ( geometry.skinIndices.length > 0 ) {
 
-			var skinIndices = new Float32Attribute( geometry.skinIndices.length * 4, 4 );
+			var skinIndices = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
 			this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 
 		}
 
 		if ( geometry.skinWeights.length > 0 ) {
 
-			var skinWeights = new Float32Attribute( geometry.skinWeights.length * 4, 4 );
+			var skinWeights = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
 			this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
 
 		}

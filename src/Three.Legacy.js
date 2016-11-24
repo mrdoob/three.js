@@ -6,7 +6,18 @@ import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 import { CullFaceFront, CullFaceBack } from './constants.js';
-import { BufferAttribute } from './core/BufferAttribute.js';
+import {
+	Float64BufferAttribute,
+	Float32BufferAttribute,
+	Uint32BufferAttribute,
+	Int32BufferAttribute,
+	Uint16BufferAttribute,
+	Int16BufferAttribute,
+	Uint8ClampedBufferAttribute,
+	Uint8BufferAttribute,
+	Int8BufferAttribute,
+	BufferAttribute
+} from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
 import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
@@ -18,6 +29,7 @@ import { ExtrudeGeometry } from './geometries/ExtrudeGeometry.js';
 import { ShapeGeometry } from './geometries/ShapeGeometry.js';
 import { WireframeGeometry } from './geometries/WireframeGeometry.js';
 import { Light } from './lights/Light.js';
+import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
@@ -93,6 +105,58 @@ export function Vertex ( x, y, z ) {
 
 //
 
+export function DynamicBufferAttribute( array, itemSize ) {
+	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
+	return new BufferAttribute( array, itemSize ).setDynamic( true );
+}
+
+export function Int8Attribute( array, itemSize ) {
+	console.warn( 'THREE.Int8Attribute has been removed. Use new THREE.Int8BufferAttribute() instead.' );
+	return new Int8BufferAttribute( array, itemSize );
+}
+
+export function Uint8Attribute( array, itemSize ) {
+	console.warn( 'THREE.Uint8Attribute has been removed. Use new THREE.Uint8BufferAttribute() instead.' );
+	return new Uint8BufferAttribute( array, itemSize );
+}
+
+export function Uint8ClampedAttribute( array, itemSize ) {
+	console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use new THREE.Uint8ClampedBufferAttribute() instead.' );
+	return new Uint8ClampedBufferAttribute( array, itemSize );
+}
+
+export function Int16Attribute( array, itemSize ) {
+	console.warn( 'THREE.Int16Attribute has been removed. Use new THREE.Int16BufferAttribute() instead.' );
+	return new Int16BufferAttribute( array, itemSize );
+}
+
+export function Uint16Attribute( array, itemSize ) {
+	console.warn( 'THREE.Uint16Attribute has been removed. Use new THREE.Uint16BufferAttribute() instead.' );
+	return new Uint16BufferAttribute( array, itemSize );
+}
+
+export function Int32Attribute( array, itemSize ) {
+	console.warn( 'THREE.Int32Attribute has been removed. Use new THREE.Int32BufferAttribute() instead.' );
+	return new Int32BufferAttribute( array, itemSize );
+}
+
+export function Uint32Attribute( array, itemSize ) {
+	console.warn( 'THREE.Uint32Attribute has been removed. Use new THREE.Uint32BufferAttribute() instead.' );
+	return new Uint32BufferAttribute( array, itemSize );
+}
+
+export function Float32Attribute( array, itemSize ) {
+	console.warn( 'THREE.Float32Attribute has been removed. Use new THREE.Float32BufferAttribute() instead.' );
+	return new Float32BufferAttribute( array, itemSize );
+}
+
+export function Float64Attribute( array, itemSize ) {
+	console.warn( 'THREE.Float64Attribute has been removed. Use new THREE.Float64BufferAttribute() instead.' );
+	return new Float64BufferAttribute( array, itemSize );
+}
+
+//
+
 export function EdgesHelper( object, hex ) {
 	console.warn( 'THREE.EdgesHelper has been removed. Use THREE.EdgesGeometry instead.' );
 	return new LineSegments( new EdgesGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
@@ -101,6 +165,13 @@ export function EdgesHelper( object, hex ) {
 export function WireframeHelper( object, hex ) {
 	console.warn( 'THREE.WireframeHelper has been removed. Use THREE.WireframeGeometry instead.' );
 	return new LineSegments( new WireframeGeometry( object.geometry ), new LineBasicMaterial( { color: hex !== undefined ? hex : 0xffffff } ) );
+}
+
+//
+
+export function XHRLoader( manager ) {
+	console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
+	return new FileLoader( manager );
 }
 
 //
@@ -462,6 +533,22 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 //
 
+Object.defineProperties( Uniform.prototype, {
+	dynamic: {
+		set: function ( value ) {
+			console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
+		}
+	},
+	onUpdate: {
+		value: function () {
+			console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
+			return this;
+		}
+	}
+} );
+
+//
+
 Object.defineProperties( Material.prototype, {
 	wrapAround: {
 		get: function () {
@@ -525,22 +612,6 @@ EventDispatcher.prototype = Object.assign( Object.create( {
 
 //
 
-Object.defineProperties( Uniform.prototype, {
-	dynamic: {
-		set: function ( value ) {
-			console.warn( 'THREE.Uniform: .dynamic has been removed. Use object.onBeforeRender() instead.' );
-		}
-	},
-	onUpdate: {
-		value: function () {
-			console.warn( 'THREE.Uniform: .onUpdate() has been removed. Use object.onBeforeRender() instead.' );
-			return this;
-		}
-	}
-} );
-
-//
-
 Object.assign( WebGLRenderer.prototype, {
 	supportsFloatTextures: function () {
 		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
@@ -567,6 +638,7 @@ Object.assign( WebGLRenderer.prototype, {
 		return this.extensions.get( 'EXT_blend_minmax' );
 	},
 	supportsVertexTextures: function () {
+		console.warn( 'THREE.WebGLRenderer: .supportsVertexTextures() is now .capabilities.vertexTextures.' );
 		return this.capabilities.vertexTextures;
 	},
 	supportsInstancedArrays: function () {
@@ -835,6 +907,71 @@ export var ImageUtils = {
 	loadCompressedTextureCube: function () {
 
 		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
+
+	}
+
+};
+
+export var UniformsUtils = {
+
+	merge: function ( uniforms ) {
+
+		console.warn( 'THREE.UniformsUtils.merge() has been deprecated. Use Object.assign() instead.' );
+
+		var merged = {};
+
+		for ( var u = 0; u < uniforms.length; u ++ ) {
+
+			var tmp = this.clone( uniforms[ u ] );
+
+			for ( var p in tmp ) {
+
+				merged[ p ] = tmp[ p ];
+
+			}
+
+		}
+
+		return merged;
+
+	},
+
+	clone: function ( uniforms_src ) {
+
+		console.warn( 'THREE.UniformsUtils.clone() has been deprecated.' );
+
+		var uniforms_dst = {};
+
+		for ( var u in uniforms_src ) {
+
+			uniforms_dst[ u ] = {};
+
+			for ( var p in uniforms_src[ u ] ) {
+
+				var parameter_src = uniforms_src[ u ][ p ];
+
+				if ( parameter_src && ( parameter_src.isColor ||
+					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+					parameter_src.isTexture ) ) {
+
+					uniforms_dst[ u ][ p ] = parameter_src.clone();
+
+				} else if ( Array.isArray( parameter_src ) ) {
+
+					uniforms_dst[ u ][ p ] = parameter_src.slice();
+
+				} else {
+
+					uniforms_dst[ u ][ p ] = parameter_src;
+
+				}
+
+			}
+
+		}
+
+		return uniforms_dst;
 
 	}
 

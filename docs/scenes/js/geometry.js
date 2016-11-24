@@ -91,6 +91,40 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
+var CustomSinCurve = THREE.Curve.create(
+
+	function ( scale ) {
+
+		this.scale = ( scale === undefined ) ? 1 : scale;
+
+	},
+
+	function ( t ) {
+
+		var tx = t * 3 - 1.5;
+		var ty = Math.sin( 2 * Math.PI * t );
+		var tz = 0;
+
+		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+	}
+
+);
+
+// heart shape
+
+var x = 0, y = 0;
+
+var heartShape = new THREE.Shape();
+
+heartShape.moveTo( x + 5, y + 5 );
+heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+
 var guis = {
 
 	BoxBufferGeometry : function( mesh ) {
@@ -1136,26 +1170,6 @@ var guis = {
 			radiusSegments: 8
 		};
 
-		var CustomSinCurve = THREE.Curve.create(
-
-			function ( scale ) {
-
-				this.scale = ( scale === undefined ) ? 1 : scale;
-
-			},
-
-			function ( t ) {
-
-				var tx = t * 3 - 1.5;
-				var ty = Math.sin( 2 * Math.PI * t );
-				var tz = 0;
-
-				return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
-
-			}
-
-		);
-
 		var path = new CustomSinCurve( 10 );
 
 		function generateGeometry() {
@@ -1176,26 +1190,71 @@ var guis = {
 
 	},
 
-	ShapeGeometry: function( mesh ) {
+	TubeBufferGeometry : function( mesh ) {
 
-		var length = 16, width = 12;
+		var data = {
+			segments : 20,
+			radius : 2,
+			radiusSegments: 8
+		};
 
-		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
-		shape.lineTo( 0, width );
-		shape.lineTo( length, width );
-		shape.lineTo( length, 0 );
-		shape.lineTo( 0, 0 );
+		var path = new CustomSinCurve( 10 );
 
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.ShapeGeometry( shape )
+				new THREE.TubeBufferGeometry( path, data.segments, data.radius, data.radiusSegments, false )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.TubeBufferGeometry' );
+
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'radius', 1, 10 ).onChange( generateGeometry );
+		folder.add( data, 'radiusSegments', 1, 20 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ShapeGeometry: function( mesh ) {
+
+		var data = {
+			segments : 12
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ShapeGeometry( heartShape, data.segments )
 			);
 
 		}
 
 		var folder = gui.addFolder( 'THREE.ShapeGeometry' );
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ShapeBufferGeometry: function( mesh ) {
+
+		var data = {
+			segments : 12
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ShapeBufferGeometry( heartShape, data.segments )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ShapeBufferGeometry' );
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

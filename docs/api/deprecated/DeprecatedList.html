@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Deprecated API List</h1>
+
+		<div>
+			As Three.js has a rapidly evolving interface, you may come across examples that
+			suggest the use of API elements that are no longer part of the core.<br /><br />
+
+			Below is a list of such elements, along with info regarding their replacements.
+		</div>
+
+		<h2>Deprecated Constants</h2>
+
+		<h3>[page:LineStrip LineStrip]</h3>
+
+		<h3>[page:LinePieces LinePieces]</h3>
+		<div>
+		[page:Line Line] LinePieces mode is no longer supported. Create a [page:LineSegments LineSegments] instead.
+		</div>
+
+		<h2>Deprecated Objects</h2>
+
+		<h3>[page:GeometryUtils GeometryUtils]</h3>
+		<div>
+			GeometryUtils.merge has been moved to [page:Geometry.merge Geometry.merge].<br /><br />
+
+			GeometryUtils.center has been moved to [page:Geometry.center Geometry.center].
+		</div>
+
+		<h3>[page:ImageUtils ImageUtils]</h3>
+		<div>
+			ImageUtils.loadTexture has been deprecated. Use [page:TextureLoader TextureLoader] instead.<br /><br />
+
+			ImageUtils.loadTextureCube has been deprecated. Use [page:CubeTextureLoader CubeTextureLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTexture has been removed. Use [page:DDSLoader DDSLoader] instead.<br /><br />
+
+			ImageUtils.loadCompressedTextureCube has been removed. Use [page:DDSLoader DDSLoader] instead.
+		</div>
+
+		<h2>Deprecated Classes</h2>
+
+		<h3>[page:EdgesHelper EdgesHelper]</h3>
+		<div>EdgesHelper has been removed. Use [page:EdgesGeometry EdgesGeometry] instead.</div>
+
+		<h3>[page:DynamicBufferAttribute DynamicBufferAttribute]</h3>
+		<div>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic BufferAttribute.setDynamic]( true ) instead.</div>
+
+		<h3>[page:Face4 Face4]</h3>
+		<div>Face4 has been removed. Use [page:Face3 Face3] instead.</div>
+
+		<h3>[page:ParticleBasicMaterial ParticleBasicMaterial]</h3>
+		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+
+		<h3>[page:ParticleSystem ParticleSystem]</h3>
+		<div>ParticleSystem has been renamed to [page:Points Points].</div>
+
+		<h3>[page:ParticleSystemMaterial ParticleSystemMaterial]</h3>
+		<div>ParticleBasicMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+
+		<h3>[page:PointCloud PointCloud]</h3>
+		<div>PointCloud has been renamed to [page:Points Points].</div>
+
+		<h3>[page:PointCloudMaterial PointCloudMaterial]</h3>
+		<div>PointCloudMaterial has been renamed to [page:PointsMaterial PointsMaterial].</div>
+
+		<h3>[page:Projector Projector]</h3>
+		<div>
+			Projector has been moved to
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/Projector.js 	/examples/js/renderers/Projector.js].<br /><br />
+
+			Projector.projectVector() is now [page:Vector.project Vector.project].<br /><br />
+
+			Projector.unprojectVector() is now [page:Vector.unproject Vector.unproject].<br /><br />
+
+			Projector:.pickingRay() is now [page:Raycaster.setFromCamera Raycaster.setFromCamera].
+		</div>
+
+		<h3>[page:Vertex Vertex]</h3>
+		<div>Vertex has been removed. Use [page:Vector3 Vector3] instead.</div>
+
+		<h3>[page:WireframeHelper WireframeHelper]</h3>
+		<div>WireframeHelper has been removed. Use [page:WireframeGeometry WireframeGeometry] instead.</div>
+	</body>
+</html>

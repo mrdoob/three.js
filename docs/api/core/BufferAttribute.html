@@ -18,7 +18,7 @@
 		<h3>[name]( [page:TypedArray array], [page:Integer itemSize], [page:Boolean normalized] )</h3>
 		<div>
 		Instantiates this attribute with data from the associated buffer.
-		itemSize gives the number of values of the array that should be associated with a particular vertex. normalized indicates how the underlying data in the buffer maps to the values in the GLSL shader code. 
+		itemSize gives the number of values of the array that should be associated with a particular vertex. normalized indicates how the underlying data in the buffer maps to the values in the GLSL shader code.
 		</div>
 
 		<h2>Properties</h2>
@@ -54,6 +54,10 @@
 		A version number, incremented every time the needsUpdate property is set to true.
 		</div>
 
+		<h3>[property:Function onUploadCallback]</h3>
+		<div>
+		A callback function that is executed after the Renderer has transfered the attribute array data to the GPU.
+		</div>
 
 		<h2>Methods</h2>
 
@@ -102,6 +106,12 @@
 		the value of the array at <code>index * itemSize + 2</code> to z, and
 		the value of the array at <code>index * itemSize + 3</code> to w.
 		</div>
+
+		<h3>[method:null onUpload]( [page:Function callback] ) </h3>
+		<div>
+		Sets the value of the onUploadCallback property.
+		</div>
+		<div>Example: [example:webgl_buffergeometry used to free memory after the buffer has been transfered to GPU].</div>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<div>

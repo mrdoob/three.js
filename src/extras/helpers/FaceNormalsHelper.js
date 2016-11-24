@@ -2,7 +2,7 @@ import { Matrix3 } from '../../math/Matrix3';
 import { Vector3 } from '../../math/Vector3';
 import { LineSegments } from '../../objects/LineSegments';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Float32Attribute } from '../../core/BufferAttribute';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 
 /**
@@ -28,7 +28,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	var objGeometry = this.object.geometry;
 
-	if ( (objGeometry && objGeometry.isGeometry) ) {
+	if ( objGeometry && objGeometry.isGeometry ) {
 
 		nNormals = objGeometry.faces.length;
 
@@ -42,7 +42,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	var geometry = new BufferGeometry();
 
-	var positions = new Float32Attribute( nNormals * 2 * 3, 3 );
+	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
 	geometry.addAttribute( 'position', positions );
 

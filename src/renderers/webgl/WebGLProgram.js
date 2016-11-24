@@ -144,6 +144,7 @@ function replaceLightNums( string, parameters ) {
 	return string
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
+		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
 
@@ -451,6 +452,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.flipSided ? '#define FLIP_SIDED' : '',
 
 			'#define NUM_CLIPPING_PLANES ' + parameters.numClippingPlanes,
+			'#define UNION_CLIPPING_PLANES ' + (parameters.numClippingPlanes - parameters.numClipIntersection),
 
 			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
@@ -592,7 +594,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 		if ( cachedUniforms === undefined ) {
 
 			cachedUniforms =
-					new WebGLUniforms( gl, program, renderer );
+				new WebGLUniforms( gl, program, renderer );
 
 		}
 

@@ -490,7 +490,7 @@ Matrix4.prototype = {
 
 				v1.applyMatrix4( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 
@@ -787,6 +787,21 @@ Matrix4.prototype = {
 			x, 0, 0, 0,
 			0, y, 0, 0,
 			0, 0, z, 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeShear: function ( x, y, z ) {
+
+		this.set(
+
+			1, y, z, 0,
+			x, 1, z, 0,
+			x, y, 1, 0,
 			0, 0, 0, 1
 
 		);

@@ -112,7 +112,7 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 		cx, cy, pos, pos2 = new THREE.Vector3(),
 		i, j, ip, jp, a, b, c, d, uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
+	var frames = path.computeFrenetFrames( segments, closed ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;

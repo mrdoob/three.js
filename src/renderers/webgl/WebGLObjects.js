@@ -85,7 +85,48 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bufferData( bufferType, data.array, usage );
 
+		var type = gl.FLOAT;
+		var array = data.array;
+
+		if ( array instanceof Float32Array ) {
+
+			type = gl.FLOAT;
+
+		} else if ( array instanceof Float64Array ) {
+
+			console.warn( "Unsupported data buffer format: Float64Array" );
+
+		} else if ( array instanceof Uint16Array ) {
+
+			type = gl.UNSIGNED_SHORT;
+
+		} else if ( array instanceof Int16Array ) {
+
+			type = gl.SHORT;
+
+		} else if ( array instanceof Uint32Array ) {
+
+			type = gl.UNSIGNED_INT;
+
+		} else if ( array instanceof Int32Array ) {
+
+			type = gl.INT;
+
+		} else if ( array instanceof Int8Array ) {
+
+			type = gl.BYTE;
+
+		} else if ( array instanceof Uint8Array ) {
+
+			type = gl.UNSIGNED_BYTE;
+
+		}
+
+		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
+		attributeProperties.type = type;
 		attributeProperties.version = data.version;
+
+		data.onUploadCallback();
 
 	}
 
@@ -93,7 +134,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false ) {
+
+			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+
+		} else if ( data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -125,6 +170,18 @@ function WebGLObjects( gl, properties, info ) {
 		}
 
 		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function getAttributeProperties( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data );
+
+		}
+
+		return properties.get( attribute );
 
 	}
 
@@ -193,6 +250,7 @@ function WebGLObjects( gl, properties, info ) {
 	return {
 
 		getAttributeBuffer: getAttributeBuffer,
+		getAttributeProperties: getAttributeProperties,
 		getWireframeAttribute: getWireframeAttribute,
 
 		update: update

@@ -2,7 +2,7 @@ import { Vector3 } from '../../math/Vector3';
 import { Object3D } from '../../core/Object3D';
 import { LineSegments } from '../../objects/LineSegments';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Float32Attribute } from '../../core/BufferAttribute';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 
 /**
@@ -43,7 +43,7 @@ function SpotLightHelper( light ) {
 
 	}
 
-	geometry.addAttribute( 'position', new Float32Attribute( positions, 3 ) );
+	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 	var material = new LineBasicMaterial( { fog: false } );
 

@@ -17,7 +17,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.sourceFile = '';
 
 	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
@@ -102,6 +101,10 @@ Texture.prototype = {
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
+
+		// TODO (abelnation): this was added as something causes texture constants to be "copied" before they are properly uploaded to GPU
+		this.needsUpdate = source.needsUpdate;
+		this.version = source.version;
 
 		return this;
 

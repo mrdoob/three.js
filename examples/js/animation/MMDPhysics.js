@@ -4,37 +4,42 @@
  * Dependencies
  *  - Ammo.js https://github.com/kripken/ammo.js
  *
- *
  * MMD specific Physics class.
  *
  * See THREE.MMDLoader for the passed parameter list of RigidBody/Constraint.
  *
+ * Requirement:
+ *  - don't change object's scale from (1,1,1) after setting physics to object
  *
  * TODO
+ *  - optimize for the performance
  *  - use Physijs http://chandlerprall.github.io/Physijs/
  *    and improve the performance by making use of Web worker.
  *  - if possible, make this class being non-MMD specific.
+ *  - object scale change support
  */
 
 THREE.MMDPhysics = function ( mesh, params ) {
 
+	if ( params === undefined ) params = {};
+
 	this.mesh = mesh;
-	this.helper = new THREE.MMDPhysics.PhysicsHelper();
+	this.helper = new THREE.MMDPhysics.ResourceHelper();
 
 	/*
-	 * Note: Default 1 / 65 unit step is a workaround that
-	 *       some bones go wrong at near 60fps if it's 1 / 60.
-	 *       Be careful that small unitStep could cause heavy
-	 *       physics calculation.
+	 * I don't know why but 1/60 unitStep easily breaks models
+	 * so I set it 1/65 so far.
+	 * Don't set too small unitStep because
+	 * the smaller unitStep can make the performance worse.
 	 */
-	this.unitStep = ( params && params.unitStep ) ? params.unitStep : 1 / 65;
-	this.maxStepNum = ( params && params.maxStepNum ) ? params.maxStepNum : 3;
+	this.unitStep = ( params.unitStep !== undefined ) ? params.unitStep : 1 / 65;
+	this.maxStepNum = ( params.maxStepNum !== undefined ) ? params.maxStepNum : 3;
 
 	this.world = null;
 	this.bodies = [];
 	this.constraints = [];
 
-	this.init();
+	this.init( mesh );
 
 };
 
@@ -42,11 +47,42 @@ THREE.MMDPhysics.prototype = {
 
 	constructor: THREE.MMDPhysics,
 
-	init: function () {
+	init: function ( mesh ) {
+
+		var parent = mesh.parent;
+
+		if ( parent !== null ) {
+
+			parent.remove( mesh );
+
+		}
+
+		var currentPosition = mesh.position.clone();
+		var currentRotation = mesh.rotation.clone();
+		var currentScale = mesh.scale.clone();
+
+		mesh.position.set( 0, 0, 0 );
+		mesh.rotation.set( 0, 0, 0 );
+		mesh.scale.set( 1, 1, 1 );
+
+		mesh.updateMatrixWorld( true );
 
 		this.initWorld();
 		this.initRigidBodies();
 		this.initConstraints();
+
+		if ( parent !== null ) {
+
+			parent.add( mesh );
+
+		}
+
+		mesh.position.copy( currentPosition );
+		mesh.rotation.copy( currentRotation );
+		mesh.scale.copy( currentScale );
+
+		mesh.updateMatrixWorld( true );
+
 		this.reset();
 
 	},
@@ -58,7 +94,7 @@ THREE.MMDPhysics.prototype = {
 		var cache = new Ammo.btDbvtBroadphase();
 		var solver = new Ammo.btSequentialImpulseConstraintSolver();
 		var world = new Ammo.btDiscreteDynamicsWorld( dispatcher, cache, solver, config );
-		world.setGravity( new Ammo.btVector3( 0, -10 * 10, 0 ) );
+		world.setGravity( new Ammo.btVector3( 0, -9.8 * 10, 0 ) );
 		this.world = world;
 
 	},
@@ -98,6 +134,13 @@ THREE.MMDPhysics.prototype = {
 		var unitStep = this.unitStep;
 		var stepTime = delta;
 		var maxStepNum = ( ( delta / unitStep ) | 0 ) + 1;
+
+		if ( stepTime < unitStep ) {
+
+			stepTime = unitStep;
+			maxStepNum = 1;
+
+		}
 
 		if ( maxStepNum > this.maxStepNum ) {
 
@@ -145,7 +188,7 @@ THREE.MMDPhysics.prototype = {
 
 		for ( var i = 0; i < cycles; i++ ) {
 
-			this.update( 1 );
+			this.update( 1 / 60 );
 
 		}
 
@@ -162,12 +205,13 @@ THREE.MMDPhysics.prototype = {
  *
  * 2. provide simple Ammo object operations.
  */
-THREE.MMDPhysics.PhysicsHelper = function () {
+THREE.MMDPhysics.ResourceHelper = function () {
 
 	// for Three.js
 	this.threeVector3s = [];
 	this.threeMatrix4s = [];
 	this.threeQuaternions = [];
+	this.threeEulers = [];
 
 	// for Ammo.js
 	this.transforms = [];
@@ -176,7 +220,7 @@ THREE.MMDPhysics.PhysicsHelper = function () {
 
 };
 
-THREE.MMDPhysics.PhysicsHelper.prototype = {
+THREE.MMDPhysics.ResourceHelper.prototype = {
 
 	allocThreeVector3: function () {
 
@@ -211,6 +255,18 @@ THREE.MMDPhysics.PhysicsHelper.prototype = {
 	freeThreeQuaternion: function ( q ) {
 
 		this.threeQuaternions.push( q );
+
+	},
+
+	allocThreeEuler: function () {
+
+		return ( this.threeEulers.length > 0 ) ? this.threeEulers.pop() : new THREE.Euler();
+
+	},
+
+	freeThreeEuler: function ( e ) {
+
+		this.threeEulers.push( e );
 
 	},
 
@@ -314,7 +370,13 @@ THREE.MMDPhysics.PhysicsHelper.prototype = {
 
 	setBasisFromArray3: function ( t, a ) {
 
-		t.getBasis().setEulerZYX( a[ 0 ], a[ 1 ], a[ 2 ] );
+		var thQ = this.allocThreeQuaternion();
+		var thE = this.allocThreeEuler();
+		thE.set( a[ 0 ], a[ 1 ], a[ 2 ] );
+		this.setBasisFromArray4( t, thQ.setFromEuler( thE ).toArray() );
+
+		this.freeThreeEuler( thE );
+		this.freeThreeQuaternion( thQ );
 
 	},
 
@@ -598,7 +660,7 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 	init: function () {
 
-		function generateShape ( p ) {
+		function generateShape( p ) {
 
 			switch( p.shapeType ) {
 
@@ -648,13 +710,19 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 		var info = new Ammo.btRigidBodyConstructionInfo( weight, state, shape, localInertia );
 		info.set_m_friction( params.friction );
-		info.set_m_restitution( params.restriction );
+		info.set_m_restitution( params.restitution );
 
 		var body = new Ammo.btRigidBody( info );
 
 		if ( params.type === 0 ) {
 
 			body.setCollisionFlags( body.getCollisionFlags() | 2 );
+
+			/*
+			 * It'd be better to comment out this line though in general I should call this method
+			 * because I'm not sure why but physics will be more like MMD's
+			 * if I comment out.
+			 */
 			body.setActivationState( 4 );
 
 		}
@@ -695,12 +763,6 @@ THREE.MMDPhysics.RigidBody.prototype = {
 
 		}
 
-		if ( this.params.type === 2 ) {
-
-			this.setPositionFromBone();
-
-		}
-
 	},
 
 	updateBone: function () {
@@ -720,6 +782,12 @@ THREE.MMDPhysics.RigidBody.prototype = {
 		}
 
 		this.bone.updateMatrixWorld( true );
+
+		if ( this.params.type === 2 ) {
+
+			this.setPositionFromBone();
+
+		}
 
 	},
 
@@ -932,6 +1000,23 @@ THREE.MMDPhysics.Constraint.prototype = {
 
 		}
 
+		/*
+		 * Currently(10/31/2016) official ammo.js doesn't support
+		 * btGeneric6DofSpringConstraint.setParam method.
+		 * You need custom ammo.js (add the method into idl) if you wanna use.
+		 * By setting this parameter, physics will be more like MMD's
+		 */
+		if ( constraint.setParam !== undefined ) {
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				// this parameter is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
+				constraint.setParam( 2, 0.475, i );
+
+			}
+
+		}
+
 		this.world.addConstraint( constraint, true );
 		this.constraint = constraint;
 
@@ -946,6 +1031,163 @@ THREE.MMDPhysics.Constraint.prototype = {
 		helper.freeVector3( lul );
 		helper.freeVector3( all );
 		helper.freeVector3( aul );
+
+	}
+
+};
+
+
+THREE.MMDPhysicsHelper = function ( mesh ) {
+
+	if ( mesh.physics === undefined || mesh.geometry.rigidBodies === undefined ) {
+
+		throw 'THREE.MMDPhysicsHelper requires physics in mesh and rigidBodies in mesh.geometry.';
+
+	}
+
+	THREE.Object3D.call( this );
+
+	this.root = mesh;
+
+	this.matrix = mesh.matrixWorld;
+	this.matrixAutoUpdate = false;
+
+	this.materials = [];
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0xff8888 ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0x88ff88 ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
+
+	this.materials.push(
+		new THREE.MeshBasicMaterial( {
+			color: new THREE.Color( 0x8888ff ),
+			wireframe: true,
+			depthTest: false,
+			depthWrite: false,
+			opacity: 0.25,
+			transparent: true
+		} )
+	);
+
+	this._init();
+	this.update();
+
+};
+
+THREE.MMDPhysicsHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.MMDPhysicsHelper.prototype.constructor = THREE.MMDPhysicsHelper;
+
+THREE.MMDPhysicsHelper.prototype._init = function () {
+
+	var mesh = this.root;
+	var rigidBodies = mesh.geometry.rigidBodies;
+
+	function createGeometry( param ) {
+
+		switch ( param.shapeType ) {
+
+			case 0:
+				return new THREE.SphereBufferGeometry( param.width, 16, 8 );
+
+			case 1:
+				return new THREE.BoxBufferGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8);
+
+			case 2:
+				return new createCapsuleGeometry( param.width, param.height, 16, 8 );
+
+			default:
+				return null;
+
+		}
+
+	}
+
+	// copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
+	function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
+
+		var geometry = new THREE.CylinderBufferGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
+		var upperSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
+		var lowerSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
+
+		upperSphere.position.set( 0, cylinderHeight / 2, 0 );
+		lowerSphere.position.set( 0, -cylinderHeight / 2, 0 );
+
+		upperSphere.updateMatrix();
+		lowerSphere.updateMatrix();
+
+		geometry.merge( upperSphere.geometry, upperSphere.matrix );
+		geometry.merge( lowerSphere.geometry, lowerSphere.matrix );
+
+		return geometry;
+
+	}
+
+	for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+		var param = rigidBodies[ i ];
+		this.add( new THREE.Mesh( createGeometry( param ), this.materials[ param.type ] ) );
+
+	}
+
+};
+
+THREE.MMDPhysicsHelper.prototype.update = function () {
+
+	var mesh = this.root;
+	var rigidBodies = mesh.geometry.rigidBodies;
+	var bodies = mesh.physics.bodies;
+
+	var matrixWorldInv = new THREE.Matrix4().getInverse( mesh.matrixWorld );
+	var vector = new THREE.Vector3();
+	var quaternion = new THREE.Quaternion();
+	var quaternion2 = new THREE.Quaternion();
+
+	function getPosition( origin ) {
+
+		vector.set( origin.x(), origin.y(), origin.z() );
+		vector.applyMatrix4( matrixWorldInv );
+
+		return vector;
+
+	}
+
+	function getQuaternion( rotation ) {
+
+		quaternion.set( rotation.x(), rotation.y(), rotation.z(), rotation.w() );
+		quaternion2.setFromRotationMatrix( matrixWorldInv );
+		quaternion2.multiply( quaternion );
+
+		return quaternion2;
+
+	}
+
+	for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
+		var body = bodies[ i ].body;
+		var mesh = this.children[ i ];
+
+		var tr = body.getCenterOfMassTransform();
+
+		mesh.position.copy( getPosition( tr.getOrigin() ) );
+		mesh.quaternion.copy( getQuaternion( tr.getRotation() ) );
 
 	}
 
