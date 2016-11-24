@@ -1,5 +1,6 @@
 /**
  * @author yamahigashi https://github.com/yamahigashi
+ * @author Kyle-Larson https://github.com/Kyle-Larson
  *
  * This loader loads FBX file in *ASCII and version 7 format*.
  *
