@@ -533,51 +533,6 @@
 
 	};
 
-	THREE.FBXLoader.prototype.parseMaterials = function ( node ) {
-
-		// has not mat, return []
-		if ( ! ( 'Material' in node.subNodes ) ) {
-
-			return [];
-
-		}
-
-		// has many
-		var matCount = 0;
-		for ( var mat in node.subNodes.Materials ) {
-
-			if ( mat.match( /^\d+$/ ) ) {
-
-				matCount ++;
-
-			}
-
-		}
-
-		var res = [];
-		if ( matCount > 0 ) {
-
-			for ( mat in node.subNodes.Material ) {
-
-				res.push( parseMaterial( node.subNodes.Material[ mat ] ) );
-
-			}
-
-		} else {
-
-			res.push( parseMaterial( node.subNodes.Material ) );
-
-		}
-
-		return res;
-
-	};
-
-	// TODO
-	THREE.FBXLoader.prototype.parseMaterial = function ( node ) {
-		
-	};
-
 
 	THREE.FBXLoader.prototype.loadFile = function ( url, onLoad, onProgress, onError, responseType ) {
 
