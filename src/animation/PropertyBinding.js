@@ -518,7 +518,7 @@ PropertyBinding.Composite.prototype = {
 
 PropertyBinding.create = function( root, path, parsedPath ) {
 
-	if ( ! ( (root && root.isAnimationObjectGroup) ) ) {
+	if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
 		return new PropertyBinding( root, path, parsedPath );
 
@@ -540,10 +540,11 @@ PropertyBinding.parseTrackName = function( trackName ) {
 	//    uuid.objectName[objectIndex].propertyName[propertyIndex]
 	//    parentName/nodeName.property
 	//    parentName/parentName/nodeName.property[index]
-	//	  .bone[Armature.DEF_cog].position
+	//    .bone[Armature.DEF_cog].position
+	//    scene:helium_balloon_model:helium_balloon_model.position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^((?:\w+\/)*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
+	var re = /^((?:\w+[\/:])*)(\w+)?(?:\.(\w+)(?:\[(.+)\])?)?\.(\w+)(?:\[(.+)\])?$/;
 	var matches = re.exec( trackName );
 
 	if ( ! matches ) {

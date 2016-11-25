@@ -2,13 +2,11 @@ import { Vector3 } from '../../math/Vector3';
 import { ShapeUtils } from '../ShapeUtils';
 import { Curve } from '../core/Curve';
 
-var CubicBezierCurve3;
-
 /**************************************************************
  *	Cubic Bezier 3D curve
  **************************************************************/
 
-CubicBezierCurve3 = Curve.create(
+var CubicBezierCurve3 = Curve.create(
 
 	function ( v0, v1, v2, v3 ) {
 

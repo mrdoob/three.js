@@ -65,7 +65,7 @@
 				'mode': 'relief',
 				'scale': 0.005,
 				'minLayers': 20,
-				'maxLayers': 25,
+				'maxLayers': 25
 			};
 
 			init();
@@ -138,7 +138,7 @@
 			function initScene() {
 
 				var shader = THREE.ParallaxShader;
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var uniforms = Object.assign( {}, shader.uniforms );
 				var parameters = {
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,

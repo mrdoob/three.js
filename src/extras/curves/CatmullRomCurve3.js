@@ -1,8 +1,6 @@
 import { Vector3 } from '../../math/Vector3';
 import { Curve } from '../core/Curve';
 
-var CatmullRomCurve3;
-
 /**
  * @author zz85 https://github.com/zz85
  *
@@ -14,7 +12,7 @@ var CatmullRomCurve3;
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-CatmullRomCurve3 = ( function() {
+var CatmullRomCurve3 = ( function() {
 
 	var
 		tmp = new Vector3(),
@@ -32,9 +30,7 @@ CatmullRomCurve3 = ( function() {
 	which can be placed in CurveUtils.
 	*/
 
-	function CubicPoly() {
-
-	}
+	function CubicPoly() {}
 
 	/*
 	 * Compute coefficients for a cubic polynomial

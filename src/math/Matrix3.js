@@ -137,7 +137,7 @@ Matrix3.prototype = {
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 
@@ -173,7 +173,7 @@ Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( (matrix && matrix.isMatrix4) ) {
+		if ( matrix && matrix.isMatrix4 ) {
 
 			console.error( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
@@ -239,15 +239,6 @@ Matrix3.prototype = {
 
 	},
 
-	flattenToArrayOffset: function ( array, offset ) {
-
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
-				"- just use .toArray instead." );
-
-		return this.toArray( array, offset );
-
-	},
-
 	getNormalMatrix: function ( matrix4 ) {
 
 		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
@@ -272,9 +263,15 @@ Matrix3.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.elements.set( array );
+		if ( offset === undefined ) offset = 0;
+
+		for( var i = 0; i < 9; i ++ ) {
+
+			this.elements[ i ] = array[ i + offset ];
+
+		}
 
 		return this;
 

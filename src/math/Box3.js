@@ -111,7 +111,7 @@ Box3.prototype = {
 
 				if ( geometry !== undefined ) {
 
-					if ( (geometry && geometry.isGeometry) ) {
+					if ( geometry.isGeometry ) {
 
 						var vertices = geometry.vertices;
 
@@ -124,7 +124,7 @@ Box3.prototype = {
 
 						}
 
-					} else if ( (geometry && geometry.isBufferGeometry) ) {
+					} else if ( geometry.isBufferGeometry ) {
 
 						var attribute = geometry.attributes.position;
 
@@ -132,7 +132,7 @@ Box3.prototype = {
 
 							var array, offset, stride;
 
-							if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
+							if ( attribute.isInterleavedBufferAttribute ) {
 
 								array = attribute.data.array;
 								offset = attribute.offset;
@@ -201,17 +201,17 @@ Box3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
-		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function ( optionalTarget ) {
+	getSize: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
-		return result.subVectors( this.max, this.min );
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
 
 	},
 
@@ -394,8 +394,9 @@ Box3.prototype = {
 
 			var result = optionalTarget || new Sphere();
 
-			result.center = this.center();
-			result.radius = this.size( v1 ).length() * 0.5;
+			this.getCenter( result.center );
+
+			result.radius = this.getSize( v1 ).length() * 0.5;
 
 			return result;
 

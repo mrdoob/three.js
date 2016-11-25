@@ -84,7 +84,7 @@
 
 		<script src="../examples/js/effects/VREffect.js"></script>
 		<script src="../examples/js/controls/VRControls.js"></script>
-		<script src="../examples/js/WebVR.js"></script>
+		<script src="../examples/js/vr/WebVR.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -365,7 +365,7 @@
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.XHRLoader();
+					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 

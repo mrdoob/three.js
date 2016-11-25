@@ -356,7 +356,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		this.computeBoundingBox();
 
-		var offset = this.boundingBox.center().negate();
+		var offset = this.boundingBox.getCenter().negate();
 
 		this.translate( offset.x, offset.y, offset.z );
 
@@ -453,6 +453,8 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		} else {
 
+			this.computeFaceNormals();
+
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
@@ -488,6 +490,42 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 				vertexNormals[ 0 ] = vertices[ face.a ].clone();
 				vertexNormals[ 1 ] = vertices[ face.b ].clone();
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeFlatVertexNormals: function () {
+
+		var f, fl, face;
+
+		this.computeFaceNormals();
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( face.normal );
+				vertexNormals[ 1 ].copy( face.normal );
+				vertexNormals[ 2 ].copy( face.normal );
+
+			} else {
+
+				vertexNormals[ 0 ] = face.normal.clone();
+				vertexNormals[ 1 ] = face.normal.clone();
+				vertexNormals[ 2 ] = face.normal.clone();
 
 			}
 
@@ -618,12 +656,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	},
 
-	computeTangents: function () {
-
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-
 	computeLineDistances: function () {
 
 		var d = 0;
@@ -683,7 +715,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		faces1 = this.faces,
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ];
+		uvs2 = geometry.faceVertexUvs[ 0 ],
+		colors1 = this.colors,
+		colors2 = geometry.colors;
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
@@ -704,6 +738,14 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 			if ( matrix !== undefined ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
+
+		}
+
+		// colors
+
+		for ( var i = 0, il = colors2.length; i < il; i ++ ) {
+
+			colors1.push( colors2[ i ].clone() );
 
 		}
 
@@ -1159,12 +1201,21 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		this.vertices = [];
 		this.faces = [];
 		this.faceVertexUvs = [ [] ];
+		this.colors = [];
 
 		var vertices = source.vertices;
 
 		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 			this.vertices.push( vertices[ i ].clone() );
+
+		}
+
+		var colors = source.colors;
+
+		for ( var i = 0, il = colors.length; i < il; i ++ ) {
+
+			this.colors.push( colors[ i ].clone() );
 
 		}
 

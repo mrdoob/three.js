@@ -10,14 +10,15 @@ import { Vector2 } from '../math/Vector2';
  * @author szimek / https://github.com/szimek/
  */
 
+var textureId = 0;
+
 function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
-	Object.defineProperty( this, 'id', { value: TextureIdCount() } );
+	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
 	this.uuid = _Math.generateUUID();
 
 	this.name = '';
-	this.sourceFile = '';
 
 	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
@@ -48,7 +49,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
 	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding :  LinearEncoding;
+	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
 	this.version = 0;
 	this.onUpdate = null;
@@ -207,7 +208,7 @@ Texture.prototype = {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== UVMapping )  return;
+		if ( this.mapping !== UVMapping ) return;
 
 		uv.multiply( this.repeat );
 		uv.add( this.offset );
@@ -286,8 +287,4 @@ Texture.prototype = {
 
 Object.assign( Texture.prototype, EventDispatcher.prototype );
 
-var count = 0;
-function TextureIdCount() { return count++; };
-
-
-export { TextureIdCount, Texture };
+export { Texture };

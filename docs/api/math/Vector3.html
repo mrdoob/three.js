@@ -68,6 +68,14 @@
 		Sets z value of this vector.
 		</div>
 
+		<h3>[method:Vector3 setScalar]( [page:Float scalar] ) [page:Vector3 this]</h3>
+		<div>
+		scalar -- [page:Float]
+		</div>
+		<div>
+		set all component values of this vector to *scalar*.
+		</div>
+
 		<h3>[method:Vector3 copy]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
@@ -187,6 +195,11 @@
 		<h3>[method:Vector3 setFromMatrixScale]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting scale from matrix transform.
+		</div>
+
+		<h3>[method:Vector3 setFromSpherical]( [page:Spherical s] ) [page:Vector3 this]</h3>
+		<div>
+		Sets this vector from the spherical coordinates *s*.
 		</div>
 
 		<h3>[method:Vector3 clamp]( [page:Vector3 min], [page:Vector3 max] ) [page:Vector3 this]</h3>
@@ -380,10 +393,10 @@
 		Returns the angle between this vector and vector v in radians.
 		</div>
 
-		<h3>[method:Vector3 setFromMatrixColumn]( [page:Integer index], [page:Matrix4 matrix] ) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 setFromMatrixColumn]( [page:Matrix4 matrix], [page:Integer index] ) [page:Vector3 this]</h3>
 		<div>
-		index -- 0, 1, 2, or 3 <br />
-		matrix -- [page:Matrix4]
+		matrix -- [page:Matrix4]<br />
+		index -- 0, 1, 2, or 3
 		</div>
 		<div>
 		Sets this vector's x, y, and z equal to the column of the matrix specified by the index.

@@ -4,37 +4,46 @@ import { VertexColors } from '../../constants';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
 import { Color } from '../../math/Color';
 import { Vector3 } from '../../math/Vector3';
-import { Geometry } from '../../core/Geometry';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 
 /**
  * @author Sean Griffin / http://twitter.com/sgrif
  * @author Michael Guerrero / http://realitymeltdown.com
  * @author mrdoob / http://mrdoob.com/
  * @author ikerr / http://verold.com
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 function SkeletonHelper( object ) {
 
 	this.bones = this.getBoneList( object );
 
-	var geometry = new Geometry();
+	var geometry = new BufferGeometry();
+
+	var vertices = [];
+	var colors = [];
+
+	var color1 = new Color( 0, 0, 1 );
+	var color2 = new Color( 0, 1, 0 );
 
 	for ( var i = 0; i < this.bones.length; i ++ ) {
 
 		var bone = this.bones[ i ];
 
-		if ( (bone.parent && bone.parent.isBone) ) {
+		if ( bone.parent && bone.parent.isBone ) {
 
-			geometry.vertices.push( new Vector3() );
-			geometry.vertices.push( new Vector3() );
-			geometry.colors.push( new Color( 0, 0, 1 ) );
-			geometry.colors.push( new Color( 0, 1, 0 ) );
+			vertices.push( 0, 0, 0 );
+			vertices.push( 0, 0, 0 );
+			colors.push( color1.r, color1.g, color1.b );
+			colors.push( color2.r, color2.g, color2.b );
 
 		}
 
 	}
 
-	geometry.dynamic = true;
+	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
 
@@ -57,7 +66,7 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 
 	var boneList = [];
 
-	if ( (object && object.isBone) ) {
+	if ( object && object.isBone ) {
 
 		boneList.push( object );
 
@@ -75,37 +84,43 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 
 SkeletonHelper.prototype.update = function () {
 
-	var geometry = this.geometry;
-
-	var matrixWorldInv = new Matrix4().getInverse( this.root.matrixWorld );
+	var vector = new Vector3();
 
 	var boneMatrix = new Matrix4();
+	var matrixWorldInv = new Matrix4();
 
-	var j = 0;
+	return function update() {
 
-	for ( var i = 0; i < this.bones.length; i ++ ) {
+		var geometry = this.geometry;
+		var position = geometry.getAttribute( 'position' );
 
-		var bone = this.bones[ i ];
+		matrixWorldInv.getInverse( this.root.matrixWorld );
 
-		if ( (bone.parent && bone.parent.isBone) ) {
+		for ( var i = 0, j = 0; i < this.bones.length; i ++ ) {
 
-			boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
-			geometry.vertices[ j ].setFromMatrixPosition( boneMatrix );
+			var bone = this.bones[ i ];
 
-			boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
-			geometry.vertices[ j + 1 ].setFromMatrixPosition( boneMatrix );
+			if ( bone.parent && bone.parent.isBone ) {
 
-			j += 2;
+				boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
+				vector.setFromMatrixPosition( boneMatrix );
+				position.setXYZ( j, vector.x, vector.y, vector.z );
+
+				boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
+				vector.setFromMatrixPosition( boneMatrix );
+				position.setXYZ( j + 1, vector.x, vector.y, vector.z );
+
+				j += 2;
+
+			}
 
 		}
 
-	}
+		geometry.getAttribute( 'position' ).needsUpdate = true;
 
-	geometry.verticesNeedUpdate = true;
+	};
 
-	geometry.computeBoundingSphere();
-
-};
+}();
 
 
 export { SkeletonHelper };

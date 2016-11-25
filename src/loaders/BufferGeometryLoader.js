@@ -2,7 +2,7 @@ import { Sphere } from '../math/Sphere';
 import { Vector3 } from '../math/Vector3';
 import { BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
 import { DefaultLoadingManager } from './LoadingManager';
 
 /**
@@ -21,7 +21,7 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		var scope = this;
 
-		var loader = new XHRLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );

@@ -490,7 +490,7 @@ Matrix4.prototype = {
 
 				v1.applyMatrix4( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 
@@ -566,30 +566,6 @@ Matrix4.prototype = {
 		return this;
 
 	},
-
-	flattenToArrayOffset: function ( array, offset ) {
-
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
-				"- just use .toArray instead." );
-
-		return this.toArray( array, offset );
-
-	},
-
-	getPosition: function () {
-
-		var v1;
-
-		return function getPosition() {
-
-			if ( v1 === undefined ) v1 = new Vector3();
-			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
-
-			return v1.setFromMatrixColumn( this, 3 );
-
-		};
-
-	}(),
 
 	setPosition: function ( v ) {
 
@@ -795,6 +771,21 @@ Matrix4.prototype = {
 
 	},
 
+	makeShear: function ( x, y, z ) {
+
+		this.set(
+
+			1, y, z, 0,
+			x, 1, z, 0,
+			x, y, 1, 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
 	compose: function ( position, quaternion, scale ) {
 
 		this.makeRotationFromQuaternion( quaternion );
@@ -934,9 +925,15 @@ Matrix4.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.elements.set( array );
+		if ( offset === undefined ) offset = 0;
+
+		for( var i = 0; i < 16; i ++ ) {
+
+			this.elements[ i ] = array[ i + offset ];
+
+		}
 
 		return this;
 

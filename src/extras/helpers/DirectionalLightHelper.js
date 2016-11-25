@@ -1,7 +1,7 @@
 import { Vector3 } from '../../math/Vector3';
 import { Object3D } from '../../core/Object3D';
 import { Line } from '../../objects/Line';
-import { Float32Attribute } from '../../core/BufferAttribute';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
 
@@ -24,7 +24,7 @@ function DirectionalLightHelper( light, size ) {
 	if ( size === undefined ) size = 1;
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32Attribute( [
+	geometry.addAttribute( 'position', new Float32BufferAttribute( [
 		- size,   size, 0,
 		  size,   size, 0,
 		  size, - size, 0,
@@ -37,7 +37,7 @@ function DirectionalLightHelper( light, size ) {
 	this.add( new Line( geometry, material ) );
 
 	geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32Attribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
+	geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 1 ], 3 ) );
 
 	this.add( new Line( geometry, material ));
 

@@ -13,6 +13,26 @@
 
 		<div class="desc">A loader for loading objects in JSON format.</div>
 
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.JSONLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/animated/monster/monster.js',
+			// Function when resource is loaded
+			function ( geometry, materials ) {
+				var material = new THREE.MultiMaterial( materials );
+				var object = new THREE.Mesh( geometry, material );
+				scene.add( object );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_json_blender]
 
 		<h2>Constructor</h2>
 
@@ -53,28 +73,6 @@
 		<div>
 		Parse a <em>JSON</em> structure and return an [page:object] containing the parsed [page:Geometry geometry] and [page:Array materials].
 		</div>
-
-		<h2>Example</h2>
-
-		<code>
-		// instantiate a loader
-		var loader = new THREE.JSONLoader();
-
-		// load a resource
-		loader.load(
-			// resource URL
-			'models/animated/monster/monster.js',
-			// Function when resource is loaded
-			function ( geometry, materials ) {
-				var material = new THREE.MultiMaterial( materials );
-				var object = new THREE.Mesh( geometry, material );
-				scene.add( object );
-			}
-		);
-		</code>
-
-		[example:webgl_loader_json_blender]
-
 
 		<h2>Source</h2>
 

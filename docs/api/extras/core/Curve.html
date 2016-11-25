@@ -17,7 +17,7 @@
 
 		<h2>Examples</h2>
 
-		<h3>[example:webgl_geometry_extrude_splines geometry / extrude / splines ]
+		<h3>[example:webgl_geometry_extrude_splines geometry / extrude / splines ]</h3>
 
 		<h2>Constructor</h2>
 
@@ -30,36 +30,62 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vector getPoint]( t )</h3>
+		<h3>[method:Vector getPoint]( [page:Number t] )</h3>
 		<div>Returns a vector for point t of the curve where t is between 0 and 1. Must be implemented in the extending class.</div>
 
-		<h3>[method:Vector getPointAt]( u )</h3>
-		<div>Returns a vector for point at relative position in curve according to arc length</div>
+		<h3>[method:Vector getPointAt]( [page:Number u] )</h3>
+		<div>
+			Returns a vector for point at a relative position in curve according to arc length.
+			u is in the range [0, 1].
+		</div>
 
-		<h3>[method:Array getPoints]( divisions )</h3>
-		<div>Get sequence of points using getPoint( t ) </div>
+		<h3>[method:Array getPoints]( [page:integer divisions] )</h3>
+		<div>
+			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
+
+			Returns a set of divisions + 1 points using getPoint( t ).
+		</div>
 
 		<h3>[method:Array getSpacedPoints]( divisions )</h3>
-		<div>Get sequence of equi-spaced points using getPointAt( u )</div>
+		<div>
+			divisions -- number of pieces to divide the curve into. Default is *5*.<br /><br />
+
+			Returns a set of divisions + 1 equi-spaced points using getPointAt( u ).
+		</div>
 
 		<h3>[method:Float getLength]()</h3>
-		<div>Get total curve arc length</div>
+		<div>Get total curve arc length.</div>
 
 		<h3>[method:Array getLengths]( divisions )</h3>
-		<div>Get list of cumulative segment lengths</div>
+		<div>Get list of cumulative segment lengths.</div>
 
 		<h3>[method:null updateArcLengths]()</h3>
-		<div>Update the cumlative segment distance cache</div>
+		<div>Update the cumlative segment distance cache.</div>
 
-		<h3>[method:Float getUtoTmapping]( u, distance )</h3>
-		<div>Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant</div>
+		<h3>[method:Float getUtoTmapping]( [page:Number u], distance )</h3>
+		<div>
+			Given u in the range ( 0 .. 1 ), returns [page:Number t] also in the range ( 0 .. 1 ).
+			u and t can then be used to give you points which are equidistant from the ends of the curve,
+			using [page:.getPoint].
+		 </div>
 
-		<h3>[method:Vector getTangent]( t )</h3>
-		<div>Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation</div>
+		<h3>[method:Vector getTangent]( [page:Number t] )</h3>
+		<div>
+			Returns a unit vector tangent at t. If the subclassed curve do not implement its
+			tangent derivation, 2 points a small delta apart will be used to find its gradient
+			which seems to give a reasonable approximation
+		</div>
 
-		<h3>[method:Vector getTangentAt]( u )</h3>
-		<div>Returns tangent at equidistant point u on the curve</div>
+		<h3>[method:Vector getTangentAt]( [page:Number u] )</h3>
+		<div>
+			Returns tangent at a point which is equidistant to the ends of the curve from the
+			point given in [page:.getTangent].
+		</div>
 
+		<h3>[method:Object computeFrenetFrames]( segments, closed )</h3>
+		<div>
+		Generates the Frenet Frames. Used in geometries like [page:TubeGeometry] or [page:ExtrudeGeometry].
+		</div>
 
 		<h2>Source</h2>
 

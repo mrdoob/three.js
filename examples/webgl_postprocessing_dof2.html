@@ -300,7 +300,7 @@ Use WEBGL Depth buffer support?
 					postprocessing.enabled = effectController.enabled;
 					postprocessing.bokeh_uniforms[ 'znear' ].value = camera.near;
 					postprocessing.bokeh_uniforms[ 'zfar' ].value = camera.far;
-					camera.setLens(effectController.focalLength);
+					camera.setFocalLength(effectController.focalLength);
 
 				};
 
@@ -402,7 +402,7 @@ Use WEBGL Depth buffer support?
 
 				var bokeh_shader = THREE.BokehShader;
 
-				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
+				postprocessing.bokeh_uniforms = Object.assign( {}, bokeh_shader.uniforms );
 
 				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor.texture;
 				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth.texture;

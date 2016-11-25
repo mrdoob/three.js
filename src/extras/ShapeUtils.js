@@ -1,10 +1,8 @@
-var ShapeUtils;
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-ShapeUtils = {
+var ShapeUtils = {
 
 	// calculate area of the contour polygon
 
@@ -54,7 +52,7 @@ ShapeUtils = {
 			cx = contour[ verts[ w ] ].x;
 			cy = contour[ verts[ w ] ].y;
 
-			if ( Number.EPSILON > ( ( ( bx - ax ) * ( cy - ay ) ) - ( ( by - ay ) * ( cx - ax ) ) ) ) return false;
+			if ( ( bx - ax ) * ( cy - ay ) - ( by - ay ) * ( cx - ax ) <= 0 ) return false;
 
 			var aX, aY, bX, bY, cX, cY;
 			var apx, apy, bpx, bpy, cpx, cpy;

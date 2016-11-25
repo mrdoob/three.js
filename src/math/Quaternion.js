@@ -108,7 +108,7 @@ Quaternion.prototype = {
 
 		if ( (euler && euler.isEuler) === false ) {
 
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 		}
 

@@ -1,9 +1,9 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 import { BufferAttribute } from '../../core/BufferAttribute';
 import { WebGLGeometries } from './WebGLGeometries';
-
-/**
-* @author mrdoob / http://mrdoob.com/
-*/
 
 function WebGLObjects( gl, properties, info ) {
 
@@ -17,7 +17,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( (object.geometry && object.geometry.isGeometry) ) {
+		if ( object.geometry.isGeometry ) {
 
 			geometry.updateFromObject( object );
 
@@ -60,7 +60,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	function updateAttribute( attribute, bufferType ) {
 
-		var data = ( (attribute && attribute.isInterleavedBufferAttribute) ) ? attribute.data : attribute;
+		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
 
 		var attributeProperties = properties.get( data );
 
@@ -85,7 +85,48 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bufferData( bufferType, data.array, usage );
 
+		var type = gl.FLOAT;
+		var array = data.array;
+
+		if ( array instanceof Float32Array ) {
+
+			type = gl.FLOAT;
+
+		} else if ( array instanceof Float64Array ) {
+
+			console.warn( "Unsupported data buffer format: Float64Array" );
+
+		} else if ( array instanceof Uint16Array ) {
+
+			type = gl.UNSIGNED_SHORT;
+
+		} else if ( array instanceof Int16Array ) {
+
+			type = gl.SHORT;
+
+		} else if ( array instanceof Uint32Array ) {
+
+			type = gl.UNSIGNED_INT;
+
+		} else if ( array instanceof Int32Array ) {
+
+			type = gl.INT;
+
+		} else if ( array instanceof Int8Array ) {
+
+			type = gl.BYTE;
+
+		} else if ( array instanceof Uint8Array ) {
+
+			type = gl.UNSIGNED_BYTE;
+
+		}
+
+		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
+		attributeProperties.type = type;
 		attributeProperties.version = data.version;
+
+		data.onUploadCallback();
 
 	}
 
@@ -93,7 +134,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.dynamic === false || data.updateRange.count === - 1 ) {
+		if ( data.dynamic === false ) {
+
+			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+
+		} else if ( data.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
@@ -118,13 +163,25 @@ function WebGLObjects( gl, properties, info ) {
 
 	function getAttributeBuffer( attribute ) {
 
-		if ( (attribute && attribute.isInterleavedBufferAttribute) ) {
+		if ( attribute.isInterleavedBufferAttribute ) {
 
 			return properties.get( attribute.data ).__webglBuffer;
 
 		}
 
 		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function getAttributeProperties( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data );
+
+		}
+
+		return properties.get( attribute );
 
 	}
 
@@ -157,9 +214,7 @@ function WebGLObjects( gl, properties, info ) {
 				var b = array[ i + 1 ];
 				var c = array[ i + 2 ];
 
-				if ( checkEdge( edges, a, b ) ) indices.push( a, b );
-				if ( checkEdge( edges, b, c ) ) indices.push( b, c );
-				if ( checkEdge( edges, c, a ) ) indices.push( c, a );
+				indices.push( a, b, b, c, c, a );
 
 			}
 
@@ -192,38 +247,15 @@ function WebGLObjects( gl, properties, info ) {
 
 	}
 
-	function checkEdge( edges, a, b ) {
+	return {
 
-		if ( a > b ) {
+		getAttributeBuffer: getAttributeBuffer,
+		getAttributeProperties: getAttributeProperties,
+		getWireframeAttribute: getWireframeAttribute,
 
-			var tmp = a;
-			a = b;
-			b = tmp;
+		update: update
 
-		}
-
-		var list = edges[ a ];
-
-		if ( list === undefined ) {
-
-			edges[ a ] = [ b ];
-			return true;
-
-		} else if ( list.indexOf( b ) === -1 ) {
-
-			list.push( b );
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-	this.getAttributeBuffer = getAttributeBuffer;
-	this.getWireframeAttribute = getWireframeAttribute;
-
-	this.update = update;
+	};
 
 }
 

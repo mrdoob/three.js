@@ -87,6 +87,8 @@ Vector2.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
+		
+		return this;
 
 	},
 

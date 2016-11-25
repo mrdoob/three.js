@@ -237,14 +237,14 @@
 			</div>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
 
 		<script>
 
 		function extractQuery() {
-			var p = window.location.search.indexOf( '?q=' )
+			var p = window.location.search.indexOf( '?q=' );
 			if( p !== -1 ) {
 				return window.location.search.substr( 3 );
 			}
@@ -282,17 +282,7 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			try {
-
-				var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-				window.open( 'view-source:' + url + '/' + selected + '.html' );
-
-			} catch ( e ) {
-
-				window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
-				console.log( e );
-
-			}
+			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';
@@ -393,7 +383,7 @@
 			} else {
 				window.history.replaceState( {} , '', window.location.pathname );
 			}
-			if( selected ) window.location.hash = selected
+			if( selected ) window.location.hash = selected;
 
 			var exp = new RegExp( v, 'gi' );
 
@@ -483,7 +473,7 @@
 
 		}
 
-		filterInput.value = extractQuery()
+		filterInput.value = extractQuery();
 		updateFilter( )
 
 		</script>

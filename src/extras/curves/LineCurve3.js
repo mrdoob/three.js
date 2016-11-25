@@ -1,13 +1,11 @@
 import { Vector3 } from '../../math/Vector3';
 import { Curve } from '../core/Curve';
 
-var LineCurve3;
-
 /**************************************************************
  *	Line3D
  **************************************************************/
 
-LineCurve3 = Curve.create(
+var LineCurve3 = Curve.create(
 
 	function ( v1, v2 ) {
 

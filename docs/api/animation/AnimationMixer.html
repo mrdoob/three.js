@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="../../" />
+    <script src="list.js"></script>
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+  </head>
+  <body>
+    <h1>[name]</h1>
+
+    <div class="desc">
+    The AnimationMixer is a player for AnimationClip objects.
+    </div>
+
+
+    <h2>Constructor</h2>
+
+
+    <h3>[name]( [page:Object3D root] )</h3>
+
+
+    <h2>Properties</h2>
+
+
+    <h3>[property:Number time]</h3>
+
+    <h3>[property:Number timeScale]</h3>
+
+
+    <h2>Methods</h2>
+
+
+    <h3>[method:AnimationAction clipAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+    <div>
+    clip -- AnimationClip <br />
+    optionalRoot -- Object3D
+    </div>
+    <div>
+    Return an action for a clip, optionally using a custom root target object.
+    </div>
+
+    <h3>[method:AnimationAction existingAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+    <div>
+    clip -- AnimationClip <br />
+    optionalRoot -- Object3D
+    </div>
+    <div>
+    Return an existing action.
+    </div>
+
+    <h3>[method:AnimationMixer stopAllAction]()</h3>
+    <div>
+    Deactivates all scheduled actions.
+    </div>
+
+    <h3>[method:AnimationMixer update]([page:Number deltaTimeMS]) </h3>
+    <div>
+    deltaTimeMS -- Time elapsed since last update in milliseconds.
+    </div>
+    <div>
+    Updates the animation with deltaTimeMS.
+    </div>
+
+    <h3>[method:Object3D getRoot]()</h3>
+    <div>
+    Return this mixer's root target object.
+    </div>
+
+    <h3>[method:null uncacheClip]([page:AnimationClip clip])</h3>
+    <div>
+    clip -- AnimationClip
+    </div>
+    <div>
+    Free all resources for a clip.
+    </div>
+
+    <h3>[method:null uncacheRoot]([page:Object3D root]) </h3>
+    <div>
+    root -- Object3D
+    </div>
+    <div>
+    Free all resources for a root target object.
+    </div>
+
+    <h3>[method:null uncacheAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+    <div>
+    clip -- AnimationClip <br />
+    optionalRoot -- Object3D
+    </div>
+    <div>
+    Free all resources for an action.
+    </div>
+
+
+    <h2>Source</h2>
+
+
+    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+  </body>
+</html>

@@ -481,7 +481,9 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var sstep, tstep;
 	var vertPerRow, eps;
 
-	var s, t, sval, tval, p, dsval, dtval;
+	var s, t, sval, tval, p;
+	var dsval = 0;
+	var dtval = 0;
 
 	var normOut = new THREE.Vector3();
 	var v1, v2, v3, v4;

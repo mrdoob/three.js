@@ -18,7 +18,7 @@
 
 		<h3>[name]( [page:Vector3 min], [page:Vector3 max] )</h3>
 		<div>
-		min -- Lower (x, y, z) boundary of the box.<br />
+		min -- Lower (x, y, z) boundary of the box.<br>
 		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
@@ -45,7 +45,7 @@
 
 		<h3>[method:Box3 set]( [page:Vector3 min], [page:Vector3 max] ) [page:Box3 this]</h3>
 		<div>
-		min -- Lower (x, y, z) boundary of the box. <br />
+		min -- Lower (x, y, z) boundary of the box. <br>
 		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
@@ -62,7 +62,7 @@
 
 		<h3>[method:Vector3 clampPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
 		<div>
-		point -- Position to clamp. <br />
+		point -- Position to clamp. <br>
 		optionalTarget -- If specified, the clamped result will be copied here.
 		</div>
 		<div>
@@ -75,6 +75,22 @@
 		</div>
 		<div>
 		Determines whether or not this box intersects *box*.
+		</div>
+
+		<h3>[method:Boolean intersectsSphere]( [page:Sphere sphere] ) [page:Box3 this]</h3>
+		<div>
+		sphere -- Sphere to check for intersection against.
+		</div>
+		<div>
+		Determines whether or not this box intersects *sphere*.
+		</div>
+
+		<h3>[method:Boolean intersectsPlane]( [page:Plane plane] ) [page:Box3 this]</h3>
+		<div>
+		plane -- Plane to check for intersection against.
+		</div>
+		<div>
+		Determines whether or not this box intersects *plane*.
 		</div>
 
 		<h3>[method:Box3 setFromPoints]( [page:Array points] ) [page:Box3 this]</h3>
@@ -90,13 +106,13 @@
 		object -- [page:Object3D] to compute the bounding box for.
 		</div>
 		<div>
-		Computes the world-axis-aligned bounding box of an object (including its children),
+		Computes the world-axis-aligned bounding box of an object (including its children), <br>
 		accounting for both the object's, and childrens', world transforms
 		</div>
 
 
 
-		<h3>[method:Vector3 size]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
+		<h3>[method:Vector3 getSize]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -109,8 +125,8 @@
 		box -- Box that will be unioned with this box.
 		</div>
 		<div>
-		Unions this box with *box* setting the upper bound of this box to the greater of the
-		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
+		Unions this box with *box* setting the upper bound of this box to the greater of the <br>
+		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes' <br>
 		lower bounds.
 		</div>
 
@@ -128,8 +144,8 @@
 		box -- Box to intersect with.
 		</div>
 		<div>
-		Returns the intersection of this and *box*, setting the upper bound of this box to the lesser </br>
-		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' </br>
+		Returns the intersection of this and *box*, setting the upper bound of this box to the lesser <br>
+		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' <br>
 		lower bounds.
 		</div>
 
@@ -138,7 +154,7 @@
 		box -- Box to test for inclusion.
 		</div>
 		<div>
-		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,</br>
+		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,<br>
 		this function also returns true.
 		</div>
 
@@ -155,14 +171,14 @@
 		offset -- Direction and distance of offset.
 		</div>
 		<div>
-		Adds *offset* to both the upper and lower bounds of this box, effectively moving this box </br>
+		Adds *offset* to both the upper and lower bounds of this box, effectively moving this box <br>
 		*offset* units in 3D space.
 		</div>
 
 		<h3>[method:Boolean isEmpty]() [page:Box3 this]</h3>
 		<div>
-		Returns true if this box includes zero points within its bounds.</br>
-		Note that a box with equal lower and upper bounds still includes one point, the
+		Returns true if this box includes zero points within its bounds.<br>
+		Note that a box with equal lower and upper bounds still includes one point, the <br>
 		one both bounds share.
 		</div>
 
@@ -201,10 +217,10 @@
 		vector -- Amount to expand this box in each dimension.
 		</div>
 		<div>
-		Expands this box equilaterally by *vector*. The width of this box will be
-		expanded by the x component of *vector* in both directions. The height of
-		this box will be expanded by the y component of *vector* in both directions.
-		The depth of this box will be expanded by the z component of *vector* in
+		Expands this box equilaterally by *vector*. The width of this box will be <br>
+		expanded by the x component of *vector* in both directions. The height of <br>
+		this box will be expanded by the y component of *vector* in both directions. <br>
+		The depth of this box will be expanded by the z component of *vector* in <br>
 		both directions.
 		</div>
 
@@ -221,7 +237,7 @@
 		Makes this box empty.
 		</div>
 
-		<h3>[method:Vector3 center]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
+		<h3>[method:Vector3 getCenter]( [page:Vector3 optionalTarget] ) [page:Box3 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -242,17 +258,17 @@
 		point -- Point to measure distance to.
 		</div>
 		<div>
-		Returns the distance from any edge of this box to the specified point. </br>
+		Returns the distance from any edge of this box to the specified point. <br>
 		If the point lies inside of this box, the distance will be 0.
 		</div>
 
 		<h3>[method:Box3 setFromCenterAndSize]( [page:Vector3 center], [page:Vector3 size] ) [page:Box3 this]</h3>
 		<div>
-		center -- Desired center position of the box. <br />
+		center -- Desired center position of the box. <br>
 		size -- Desired x, y and z dimensions of the box.
 		</div>
 		<div>
-		Centers this box on *center* and sets this box's width, height and depth to the values specified
+		Centers this box on *center* and sets this box's width, height and depth to the values specified <br>
 		in *size*.
 		</div>
 

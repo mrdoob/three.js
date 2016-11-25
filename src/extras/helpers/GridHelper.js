@@ -1,7 +1,7 @@
 import { LineSegments } from '../../objects/LineSegments';
 import { VertexColors } from '../../constants';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Float32Attribute } from '../../core/BufferAttribute';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { Color } from '../../math/Color';
 
@@ -11,7 +11,8 @@ import { Color } from '../../math/Color';
 
 function GridHelper( size, divisions, color1, color2 ) {
 
-	divisions = divisions || 1;
+	size = size || 10;
+	divisions = divisions || 10;
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
@@ -34,8 +35,8 @@ function GridHelper( size, divisions, color1, color2 ) {
 	}
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32Attribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32Attribute( colors, 3 ) );
+	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 
@@ -45,12 +46,5 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 GridHelper.prototype = Object.create( LineSegments.prototype );
 GridHelper.prototype.constructor = GridHelper;
-
-GridHelper.prototype.setColors = function () {
-
-	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
-
-};
-
 
 export { GridHelper };

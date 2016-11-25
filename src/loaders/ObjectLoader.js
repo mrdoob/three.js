@@ -1,3 +1,5 @@
+import { TextureMapping, TextureWrapping, TextureFilter } from '../constants';
+import { Color } from '../math/Color';
 import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../core/Object3D';
 import { Group } from '../objects/Group';
@@ -25,13 +27,14 @@ import { AnimationClip } from '../animation/AnimationClip';
 import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
-import { XHRLoader } from './XHRLoader';
+import { FileLoader } from './FileLoader';
+import * as Geometries from '../geometries/Geometries';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-function ObjectLoader ( manager ) {
+function ObjectLoader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.texturePath = '';
@@ -50,10 +53,32 @@ Object.assign( ObjectLoader.prototype, {
 
 		var scope = this;
 
-		var loader = new XHRLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			scope.parse( JSON.parse( text ), onLoad );
+			var json = null;
+
+			try {
+
+				json = JSON.parse( text );
+
+			} catch ( error ) {
+
+				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				return;
+
+			}
+
+			var metadata = json.metadata;
+
+			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
+
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				return;
+
+			}
+
+			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
 
@@ -81,7 +106,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		} );
 
-		var textures  = this.parseTextures( json.textures, images );
+		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
 		var object = this.parseObject( json.object, geometries, materials );
@@ -121,7 +146,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'PlaneGeometry':
 					case 'PlaneBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.width,
 							data.height,
 							data.widthSegments,
@@ -134,7 +159,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'BoxBufferGeometry':
 					case 'CubeGeometry': // backwards compatible
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.width,
 							data.height,
 							data.depth,
@@ -148,7 +173,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'CircleGeometry':
 					case 'CircleBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.segments,
 							data.thetaStart,
@@ -160,7 +185,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'CylinderGeometry':
 					case 'CylinderBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radiusTop,
 							data.radiusBottom,
 							data.height,
@@ -176,7 +201,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'ConeGeometry':
 					case 'ConeBufferGeometry':
 
-						geometry = new THREE [ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.height,
 							data.radialSegments,
@@ -191,7 +216,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'SphereGeometry':
 					case 'SphereBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.widthSegments,
 							data.heightSegments,
@@ -208,7 +233,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'OctahedronGeometry':
 					case 'TetrahedronGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.detail
 						);
@@ -218,7 +243,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'RingGeometry':
 					case 'RingBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.innerRadius,
 							data.outerRadius,
 							data.thetaSegments,
@@ -232,7 +257,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'TorusGeometry':
 					case 'TorusBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.tube,
 							data.radialSegments,
@@ -245,7 +270,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'TorusKnotGeometry':
 					case 'TorusKnotBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.radius,
 							data.tube,
 							data.tubularSegments,
@@ -259,7 +284,7 @@ Object.assign( ObjectLoader.prototype, {
 					case 'LatheGeometry':
 					case 'LatheBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new Geometries[ data.type ](
 							data.points,
 							data.segments,
 							data.phiStart,
@@ -385,13 +410,13 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseTextures: function ( json, images ) {
 
-		function parseConstant( value ) {
+		function parseConstant( value, type ) {
 
 			if ( typeof( value ) === 'number' ) return value;
 
 			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
-			return THREE[ value ];
+			return type[ value ];
 
 		}
 
@@ -422,19 +447,19 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( data.name !== undefined ) texture.name = data.name;
 
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
+				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TextureMapping );
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
 				if ( data.wrap !== undefined ) {
 
-					texture.wrapS = parseConstant( data.wrap[ 0 ] );
-					texture.wrapT = parseConstant( data.wrap[ 1 ] );
+					texture.wrapS = parseConstant( data.wrap[ 0 ], TextureWrapping );
+					texture.wrapT = parseConstant( data.wrap[ 1 ], TextureWrapping );
 
 				}
 
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
+				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TextureFilter );
+				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TextureFilter );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
@@ -493,7 +518,7 @@ Object.assign( ObjectLoader.prototype, {
 
 						if ( Number.isInteger( data.background ) ) {
 
-							object.background = new THREE.Color( data.background );
+							object.background = new Color( data.background );
 
 						}
 

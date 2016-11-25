@@ -1,13 +1,25 @@
 var context;
 
-export function getAudioContext() {
+var AudioContext = {
 
-	if ( context === undefined ) {
+	getContext: function () {
 
-		context = new ( window.AudioContext || window.webkitAudioContext )();
+		if ( context === undefined ) {
+
+			context = new ( window.AudioContext || window.webkitAudioContext )();
+
+		}
+
+		return context;
+
+	},
+
+	setContext: function ( value ) {
+
+		context = value;
 
 	}
 
-	return context;
+};
 
-}
+export { AudioContext };

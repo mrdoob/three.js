@@ -35,7 +35,7 @@
 		var objectsSearch = [];
 		var totalFaces = 0;
 
-		var simpleMeshCount = 2000;
+		var simpleMeshCount = 5000;
 		var radius = 100;
 		var radiusMax = radius * 10;
 		var radiusMaxHalf = radiusMax * 0.5;
@@ -114,19 +114,6 @@
 
 			}
 
-			var loader = new THREE.JSONLoader();
-
-			loader.load( 'obj/lucy/Lucy100k_slim.js', function ( geometry ) {
-
-				geometry.computeVertexNormals();
-				totalFaces += geometry.faces.length;
-
-				var material = new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x030303, shininess: 30 } );
-
-				modifyOctree( geometry, material, true );
-
-			} );
-
 			// camera controls
 
 			controls = new THREE.TrackballControls( camera );
@@ -147,7 +134,7 @@
 			info.style.textAlign = 'center';
 			info.style.padding = '10px';
 			info.style.background = '#FFFFFF';
-			info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - octree (raycasting performance) - by <a href="http://github.com/collinhover/threeoctree" target="_blank">collinhover</a><br><small style="opacity:0.5">Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>(decimated with <a href="http://meshlab.sourceforge.net/">Meshlab</a>)</small>';
+			info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - octree (raycasting performance) - by <a href="http://github.com/collinhover/threeoctree" target="_blank">collinhover</a>)</small>';
 			document.body.appendChild( info );
 
 			// stats

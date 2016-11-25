@@ -1,11 +1,9 @@
-var _Math;
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
 
-_Math = {
+var _Math = {
 
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
@@ -70,6 +68,14 @@ _Math = {
 
 	},
 
+	// https://en.wikipedia.org/wiki/Linear_interpolation
+
+	lerp: function ( x, y, t ) {
+
+		return ( 1 - t ) * x + t * y;
+
+	},
+
 	// http://en.wikipedia.org/wiki/Smoothstep
 
 	smoothstep: function ( x, min, max ) {
@@ -91,13 +97,6 @@ _Math = {
 		x = ( x - min ) / ( max - min );
 
 		return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
-
-	},
-
-	random16: function () {
-
-		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
-		return Math.random();
 
 	},
 

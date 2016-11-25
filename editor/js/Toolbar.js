@@ -60,4 +60,4 @@ var Toolbar = function ( editor ) {
 
 	return container;
 
-}
+};
