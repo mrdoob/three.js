@@ -663,7 +663,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		return getMaterialFromCacheOrCreate(
 			originalMaterial,
 			_invisibleMultiMaterialsCache,
-			createInvisibleMultiMaterial
+			createInvisibleMaterial
 		);
 
 	}
