@@ -2215,7 +2215,7 @@ THREE.MMDHelper.prototype = {
 
 		var physics = new THREE.MMDPhysics( mesh, params );
 
-		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== false ) {
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== true ) {
 
 			this.animateOneMesh( 0, mesh );
 			physics.reset();
@@ -2557,7 +2557,7 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( physics !== null && this.doPhysics && ! this.sharedPhysics) {
+		if ( physics !== null && this.doPhysics && ! this.sharedPhysics ) {
 
 			physics.update( delta );
 
