@@ -1270,7 +1270,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	 *
 	 * 1') g-buffer normal + depth pass + shininess
 	 *
-	 *   R: normal
+	 *  RG: normal
 	 *   B: shininess
 	 *   A: depth
 	 */
@@ -1571,6 +1571,33 @@ THREE.DeferredShaderChunk = {
 
 	].join( "\n" ),
 
+	// Refer to http://aras-p.info/texts/CompactNormalStorage.html
+	packNormal: [
+
+		"vec2 normal_to_vec2( vec3 normal ) {",
+
+		"	return normal.xy / sqrt( normal.z * 8.0 + 8.0 ) + 0.5;",
+
+		"}"
+
+	].join( "\n" ),
+
+	unpackVector2: [
+
+		"vec3 vec2_to_normal( vec2 data ) {",
+
+		"	vec2 fenc = data * 4.0 - 2.0;",
+		"	float f = dot( fenc, fenc );",
+		"	float g = sqrt( 1.0 - f / 4.0 );",
+		"	vec3 normal;",
+		"	normal.xy = fenc * g;",
+		"	normal.z = 1.0 - f / 2.0;",
+		"	return normal;",
+
+		"}"
+
+	].join( "\n" ),
+
 	computeTextureCoord: [
 
 		"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"
@@ -1596,11 +1623,10 @@ THREE.DeferredShaderChunk = {
 
 	].join( "\n" ),
 
-	// TODO: optimize normal packing. reference http://aras-p.info/texts/CompactNormalStorage.html
 	packNormalDepthShininess: [
 
 		"vec4 packedNormalDepthShininess;",
-		"packedNormalDepthShininess.x = vec3_to_float( normal * 0.5 + 0.5 );",
+		"packedNormalDepthShininess.xy = normal_to_vec2( normal );",
 		"packedNormalDepthShininess.z = shininess;",
 		"packedNormalDepthShininess.w = position.z / position.w;"
 
@@ -1613,9 +1639,8 @@ THREE.DeferredShaderChunk = {
 
 		"if ( depth == 0.0 ) discard;",
 
-		"vec3 normal = float_to_vec3( normalDepthMap.x ) * 2.0 - 1.0;",
+		"vec3 normal = vec2_to_normal( normalDepthMap.xy );",
 		"float shininess = normalDepthMap.z;"
-
 
 	].join( "\n" ),
 
@@ -1991,7 +2016,7 @@ THREE.ShaderDeferred = {
 			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
 			"	float rho = dot( lightDirectionVS, lightVector );",
-			"	float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rhoMax = cos( lightAngle );",
 
 			"	if ( rho <= rhoMax ) discard;",
 
@@ -2135,7 +2160,7 @@ THREE.ShaderDeferred = {
 
 			"uniform float shininess;",
 
-			THREE.DeferredShaderChunk[ "packVector3" ],
+			THREE.DeferredShaderChunk[ "packNormal" ],
 
 			"void main() {",
 
@@ -2196,6 +2221,7 @@ THREE.ShaderDeferred = {
 			"uniform mat4 matProjInverse;",
 
 			THREE.DeferredShaderChunk[ "unpackFloat" ],
+			THREE.DeferredShaderChunk[ "unpackVector2" ],
 
 			"void main() {",
 
@@ -2270,6 +2296,7 @@ THREE.ShaderDeferred = {
 			"uniform mat4 matProjInverse;",
 
 			THREE.DeferredShaderChunk[ "unpackFloat" ],
+			THREE.DeferredShaderChunk[ "unpackVector2" ],
 
 			"void main() {",
 
@@ -2280,7 +2307,7 @@ THREE.ShaderDeferred = {
 			"	vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
 			"	float rho = dot( lightDirectionVS, lightVector );",
-			"	float rhoMax = cos( lightAngle * 0.5 );",
+			"	float rhoMax = cos( lightAngle );",
 
 			"	if ( rho <= rhoMax ) discard;",
 
@@ -2360,6 +2387,7 @@ THREE.ShaderDeferred = {
 			"uniform mat4 matProjInverse;",
 
 			THREE.DeferredShaderChunk[ "unpackFloat" ],
+			THREE.DeferredShaderChunk[ "unpackVector2" ],
 
 			"void main() {",
 
@@ -2458,7 +2486,7 @@ THREE.ShaderDeferred = {
 
 			"	vec3 diffuseFinal = diffuseColor.rgb * light.rgb;",
 			"	vec3 emissiveFinal = emissiveColor;",
-			"	vec3 specularFinal = specularColor * light.rgb * ( light.a / ( 0.2126 * light.r + 0.7152 * light.g + 0.0722 * light.b + 0.00001 ) );",
+			"	vec3 specularFinal = specularColor * light.rgb * light.a;",
 
 			"	gl_FragColor = vec4( diffuseFinal + emissiveFinal + specularFinal, 1.0 );",
 
