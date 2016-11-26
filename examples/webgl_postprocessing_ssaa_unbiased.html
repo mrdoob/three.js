@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing manual msaa</title>
+		<title>three.js webgl - postprocessing manual ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -30,8 +30,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Unbiased Manual Multi-Sample Anti-Aliasing (MSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
-			This example shows how to unbias the rounding errors accumulated using high number of MSAA samples on a 8-bit per channel buffer.<br/><br/>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
+			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
 
@@ -44,7 +44,7 @@
 		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
+		<script src="js/postprocessing/SSAARenderPass.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -53,8 +53,8 @@
 		<script>
 
 			var scene, renderer, composer, copyPass;
-			var cameraP, msaaRenderPassP;
-			var cameraO, msaaRenderPassO;
+			var cameraP, ssaaRenderPassP;
+			var cameraO, ssaaRenderPassO;
 			var gui, stats, texture;
 
 			var params = {
@@ -114,8 +114,6 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				//
 
 				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
 				cameraP.position.z = 7;
@@ -178,14 +176,14 @@
 				// postprocessing
 
 				composer = new THREE.EffectComposer( renderer );
-				msaaRenderPassP = new THREE.ManualMSAARenderPass( scene, cameraP );
-				composer.addPass( msaaRenderPassP );
-				msaaRenderPassO = new THREE.ManualMSAARenderPass( scene, cameraO );
-				composer.addPass( msaaRenderPassO );
+				ssaaRenderPassP = new THREE.SSAARenderPass( scene, cameraP );
+				composer.addPass( ssaaRenderPassP );
+				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
+				composer.addPass( ssaaRenderPassO );
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-				
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -231,7 +229,7 @@
 					}
 				}
 
-				var newColor = msaaRenderPassP.clearColor;
+				var newColor = ssaaRenderPassP.clearColor;
 				switch( params.clearColor ) {
 					case 'blue': newColor = 0x0000ff; break;
 					case 'red': newColor = 0xff0000; break;
@@ -239,16 +237,16 @@
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
 				}
-				msaaRenderPassP.clearColor = msaaRenderPassO.clearColor = newColor;
-				msaaRenderPassP.clearAlpha = msaaRenderPassO.clearAlpha = params.clearAlpha;
+				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
+				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
 
-				msaaRenderPassP.sampleLevel = msaaRenderPassO.sampleLevel = params.sampleLevel;
-				msaaRenderPassP.unbiased = msaaRenderPassO.unbiased = params.unbiased;
+				ssaaRenderPassP.sampleLevel = ssaaRenderPassO.sampleLevel = params.sampleLevel;
+				ssaaRenderPassP.unbiased = ssaaRenderPassO.unbiased = params.unbiased;
 
-				msaaRenderPassP.enabled = ( params.camera === 'perspective' );
-				msaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
+				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
-				msaaRenderPassP.renderToScreen = msaaRenderPassO.renderToScreen = params.renderToScreen;
+				ssaaRenderPassP.renderToScreen = ssaaRenderPassO.renderToScreen = params.renderToScreen;
 				copyPass.enabled = !params.renderToScreen;
 
 				composer.render();
