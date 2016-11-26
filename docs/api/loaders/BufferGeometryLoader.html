@@ -10,9 +10,14 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading a [page:BufferGeometry].</div>
+		<div class="desc">
+			A loader for loading a [page:BufferGeometry].
+			This uses the [page:FileLoader] internally for loading files.
+		</div>
 
 		<h2>Example</h2>
+
+		[example:webgl_geometry_colors_lookuptable WebGL / geometry / colors / lookuptable]
 
 		<code>
 		// instantiate a loader
@@ -38,7 +43,7 @@
 			}
 		);
 		</code>
-		
+
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:LoadingManager manager] )</h3>
@@ -52,6 +57,10 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:LoadingManager manager]</h3>
+		<div>
+			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
+		</div>
 
 		<h2>Methods</h2>
 
