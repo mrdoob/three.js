@@ -11,7 +11,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		Abstract base class to load generic binary textures formats (rgbe, hdr, ...).<br /><br />
+		Abstract base class to load generic binary textures formats (rgbe, hdr, ...).
+		This uses the [page:FileLoader] internally for loading files.
 		</div>
 
 		<h2>Examples</h2>
@@ -34,9 +35,9 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:LoadingManager loadingManager]</h3>
+		<h3>[property:LoadingManager manager]</h3>
 		<div>
-		loadingManager — the LoadingManager supplied in the constructor, or the [page:LoadingManager THREE.DefaultLoadingManager].<br />
+		The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
 		</div>
 
 
