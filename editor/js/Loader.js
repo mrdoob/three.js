@@ -155,25 +155,25 @@ var Loader = function ( editor ) {
 
 				break;
 
-				case 'gltf':
+			case 'gltf':
 
-					reader.addEventListener( 'load', function ( event ) {
+				reader.addEventListener( 'load', function ( event ) {
 
-						var contents = event.target.result;
-						var json = JSON.parse( contents );
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
 
-						var loader = new THREE.GLTFLoader();
-						loader.parse( json, function ( result ) {
+					var loader = new THREE.GLTFLoader();
+					loader.parse( json, function ( result ) {
 
-							result.scene.name = filename;
-							editor.execute( new AddObjectCommand( result.scene ) );
+						result.scene.name = filename;
+						editor.execute( new AddObjectCommand( result.scene ) );
 
-						} );
+					} );
 
-					}, false );
-					reader.readAsText( file );
+				}, false );
+				reader.readAsText( file );
 
-					break;
+				break;
 
 			case 'js':
 			case 'json':
@@ -322,7 +322,7 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 

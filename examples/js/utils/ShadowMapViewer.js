@@ -39,7 +39,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		x: 10,
 		y: 10,
 		width: 256,
-		height: 256,
+		height: 256
 	};
 
 	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
@@ -49,7 +49,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	//HUD for shadow map
 	var shader = THREE.UnpackDepthRGBAShader;
 
-	var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
+	var uniforms = Object.assign( {}, shader.uniforms );
 	var material = new THREE.ShaderMaterial( {
 		uniforms: uniforms,
 		vertexShader: shader.vertexShader,

@@ -1,109 +1,113 @@
 /**
  * @author abelnation / http://github.com/abelnation
+ * @author Mugen87 / http://github.com/Mugen87
  */
 
-import {Object3D} from '../../core/Object3D';
-import {Vector3} from '../../math/Vector3';
-import {Shape} from '../../extras/core/Shape';
-import {Mesh} from '../../objects/Mesh';
-import {MeshBasicMaterial} from '../../materials/MeshBasicMaterial';
-import {ShapeGeometry} from '../../geometries/ShapeGeometry';
+import { Object3D } from '../../core/Object3D';
+import { Vector3 } from '../../math/Vector3';
+import { Mesh } from '../../objects/Mesh';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { BufferAttribute } from '../../core/BufferAttribute';
 
-function RectAreaLightHelper(light) {
+function RectAreaLightHelper( light ) {
 
-    Object3D.call(this);
+	Object3D.call( this );
 
-    this.light = light;
-    this.light.updateMatrixWorld();
+	this.light = light;
+	this.light.updateMatrixWorld();
 
-    // this.matrix = light.matrixWorld;
-    // this.matrixAutoUpdate = false;
+	var materialFront = new MeshBasicMaterial( {
+		color: light.color,
+		fog: false
+	} );
 
-    this.lightMat = new MeshBasicMaterial({
-        color: light.color,
-        fog: false
-    });
+	var materialBack = new MeshBasicMaterial( {
+		color: light.color,
+		fog: false,
+		wireframe: true
+	} );
 
-    this.lightWireMat = new MeshBasicMaterial({
-        color: light.color,
-        fog: false,
-        wireframe: true
-    });
+	var geometry = new BufferGeometry();
 
-    var hx = this.light.width / 2.0;
-    var hy = this.light.height / 2.0;
-    this.lightShape = new ShapeGeometry(new Shape([
-        new Vector3(-hx, hy, 0),
-        new Vector3(hx, hy, 0),
-        new Vector3(hx, -hy, 0),
-        new Vector3(-hx, -hy, 0)
-    ]));
+	geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 6 * 3 ), 3 ) );
 
-    // shows the "front" of the light, e.g. where light comes from
-    this.lightMesh = new Mesh(this.lightShape, this.lightMat);
-    // shows the "back" of the light, which does not emit light
-    this.lightWireMesh = new Mesh(this.lightShape, this.lightWireMat);
+	// shows the "front" of the light, e.g. where light comes from
 
-    this.add(this.lightMesh);
-    this.add(this.lightWireMesh);
+	this.add( new Mesh( geometry, materialFront ) );
 
-    this.update();
+	// shows the "back" of the light, which does not emit light
+
+	this.add( new Mesh( geometry, materialBack ) );
+
+	this.update();
 
 }
 
-RectAreaLightHelper.prototype = Object.create(Object3D.prototype);
+RectAreaLightHelper.prototype = Object.create( Object3D.prototype );
 RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
 
 RectAreaLightHelper.prototype.dispose = function () {
 
-    this.lightMesh.geometry.dispose();
-    this.lightMesh.material.dispose();
-    this.lightWireMesh.geometry.dispose();
-    this.lightWireMesh.material.dispose();
+	this.children[ 0 ].geometry.dispose();
+	this.children[ 0 ].material.dispose();
+	this.children[ 1 ].geometry.dispose();
+	this.children[ 1 ].material.dispose();
 
 };
 
 RectAreaLightHelper.prototype.update = function () {
 
-    var vector = new Vector3();
-    var vector2 = new Vector3();
+	var vector1 = new Vector3();
+	var vector2 = new Vector3();
 
-    // TODO (abelnation) why not just make light helpers a child of the light object?
-    if (this.light.target) {
+	return function update() {
 
-        vector.setFromMatrixPosition(this.light.matrixWorld);
-        vector2.setFromMatrixPosition(this.light.target.matrixWorld);
+		var mesh1 = this.children[ 0 ];
+		var mesh2 = this.children[ 1 ];
 
-        var lookVec = vector2.clone().sub(vector);
-        this.lightMesh.lookAt(lookVec);
-        this.lightWireMesh.lookAt(lookVec);
+		if ( this.light.target ) {
 
-    }
+			vector1.setFromMatrixPosition( this.light.matrixWorld );
+			vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-    this.lightMesh.material.color
-        .copy(this.light.color)
-        .multiplyScalar(this.light.intensity);
+			var lookVec = vector2.clone().sub( vector1 );
+			mesh1.lookAt( lookVec );
+			mesh2.lookAt( lookVec );
 
-    this.lightWireMesh.material.color
-        .copy(this.light.color)
-        .multiplyScalar(this.light.intensity);
+		}
 
-    var oldShape = this.lightShape;
+		// update materials
 
-    var hx = this.light.width / 2.0;
-    var hy = this.light.height / 2.0;
-    this.lightShape = new ShapeGeometry(new Shape([
-        new Vector3(-hx, hy, 0),
-        new Vector3(hx, hy, 0),
-        new Vector3(hx, -hy, 0),
-        new Vector3(-hx, -hy, 0)
-    ]));
+		mesh1.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		mesh2.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-    this.lightMesh.geometry = this.lightShape;
-    this.lightWireMesh.geometry = this.lightShape;
+		// calculate new dimensions of the helper
 
-    oldShape.dispose();
+		var hx = this.light.width * 0.5;
+		var hy = this.light.height * 0.5;
 
-};
+		// because the buffer attribute is shared over both geometries, we only have to update once
 
-export {RectAreaLightHelper};
+		var position = mesh1.geometry.getAttribute( 'position' );
+		var array = position.array;
+
+		// first face
+
+		array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
+		array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
+		array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
+
+		// second face
+
+		array[  9 ] = - hx; array[ 10 ] =   hy; array[ 11 ] = 0;
+		array[ 12 ] = - hx; array[ 13 ] = - hy; array[ 14 ] = 0;
+		array[ 15 ] =   hx; array[ 16 ] = - hy; array[ 17 ] = 0;
+
+		position.needsUpdate = true;
+
+	};
+
+}();
+
+export { RectAreaLightHelper };

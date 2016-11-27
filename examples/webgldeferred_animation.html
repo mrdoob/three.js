@@ -36,6 +36,7 @@
 	<body>
 		<div id="container"></div>
 
+		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
@@ -65,6 +66,7 @@
 
 			var numLights = 40;
 			var lights = [];
+			var transparentObjects = [];
 
 			var ready = false;
 
@@ -93,6 +95,7 @@
 				initKnight();
 				initRoom();
 				initLights();
+				initGui();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -178,7 +181,7 @@
 				room.position.y = size / 2 - 30;
 
 				// top
-				mesh = new THREE.Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = Math.PI/2;
 				mesh.position.y = size / 2;
 				room.add( mesh );
@@ -210,15 +213,75 @@
 				mesh = new THREE.Mesh( geometry, transparentMaterial );
 				mesh.position.z = size / 2;
 				mesh.scale.multiplyScalar( 0.33 );
-				//room.add( mesh );
+				mesh.visible = false;
+				transparentObjects.push( mesh );
+				room.add( mesh );
 
 				// back2, to check if transparency works
 				mesh = new THREE.Mesh( geometry, transparentMaterial );
 				mesh.position.z = -size / 4;
 				mesh.scale.multiplyScalar( 0.75 );
-				//room.add( mesh );
+				mesh.visible = false;
+				transparentObjects.push( mesh );
+				room.add( mesh );
 
 				scene.add( room );
+
+			}
+
+			function initGui() {
+
+				var gui = new dat.GUI( { width: 280 } );
+
+				var api = {
+					'mode': 0,
+					'transparent_objects': false
+				};
+
+				var folder = gui.addFolder( 'menu' );
+
+				folder.add( api, 'mode', {
+
+					'classic': 0,
+					'light pre-pass': 1,
+					'forward': 2
+
+				} ).onChange( function() {
+
+					switch( parseInt( api.mode ) ) {
+
+						case 0:
+							renderer.forwardRendering = false;
+							renderer.enableLightPrePass( false );
+							break;
+
+						case 1:
+							renderer.forwardRendering = false;
+							renderer.enableLightPrePass( true );
+							break;
+
+						case 2:
+							renderer.forwardRendering = true;
+							break;
+
+						default:
+							break;
+
+					}
+
+				} );
+
+				folder.add( api, 'transparent_objects' ).onChange( function () {
+
+					for ( var i = 0, il = transparentObjects.length; i < il; i ++ ) {
+
+						transparentObjects[ i ].visible = api[ 'transparent_objects' ];
+
+					}
+
+				} );
+
+				folder.open();
 
 			}
 

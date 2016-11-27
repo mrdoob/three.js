@@ -13,7 +13,7 @@ THREE.SavePass = function ( renderTarget ) {
 
 	this.textureID = "tDiffuse";
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 

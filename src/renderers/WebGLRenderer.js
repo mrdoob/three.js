@@ -161,8 +161,9 @@ function WebGLRenderer( parameters ) {
 
 		_projScreenMatrix = new Matrix4(),
 
-	_vector3 = new THREE.Vector3(),
-	_matrix4 = new THREE.Matrix4(), _matrix42 = new THREE.Matrix4(),
+		_vector3 = new Vector3(),
+		_matrix4 = new Matrix4(), 
+		_matrix42 = new Matrix4(),
 
 		// light arrays cache
 
@@ -1887,6 +1888,10 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsLambert( m_uniforms, material );
 
+			} else if ( material.isMeshToonMaterial ) {
+
+				refreshUniformsToon( m_uniforms, material );
+
 			} else if ( material.isMeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
@@ -2132,6 +2137,18 @@ function WebGLRenderer( parameters ) {
 			uniforms.displacementMap.value = material.displacementMap;
 			uniforms.displacementScale.value = material.displacementScale;
 			uniforms.displacementBias.value = material.displacementBias;
+
+		}
+
+	}
+
+	function refreshUniformsToon( uniforms, material ) {
+
+		refreshUniformsPhong( uniforms, material );
+
+		if ( material.gradientMap ) {
+
+			uniforms.gradientMap.value = material.gradientMap;
 
 		}
 

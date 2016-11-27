@@ -339,12 +339,14 @@
 
 				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
 				var material = new THREE.ShaderMaterial( {
-					uniforms: THREE.UniformsUtils.merge( [
-						THREE.ShaderLib[ 'phong' ].uniforms,
+					uniforms: Object.assign(
+
 						{
 							heightmap: { value: null }
-						}
-					] ),
+						},
+
+						THREE.ShaderLib[ 'phong' ].uniforms
+					),
 					vertexShader: document.getElementById( 'waterVertexShader' ).textContent,
 					fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
 

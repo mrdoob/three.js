@@ -100,13 +100,6 @@ var _Math = {
 
 	},
 
-	random16: function () {
-
-		console.warn( 'THREE.Math.random16() has been deprecated. Use Math.random() instead.' );
-		return Math.random();
-
-	},
-
 	// Random integer from <low, high> interval
 
 	randInt: function ( low, high ) {

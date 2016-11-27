@@ -45,7 +45,7 @@ Object.assign(THREE.UniformsLib, {
 	ltc_brdf: {
 		"ltcMat": { type: "t", value: THREE.UniformsLib.LTC_MAT_TEXTURE },
 		"ltcMag": { type: "t", value: THREE.UniformsLib.LTC_MAG_TEXTURE }
-	},
+	}
 
 } );
 
@@ -54,80 +54,77 @@ Object.assign(THREE.ShaderLib, {
 
 	'phong': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: Object.assign( {},
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'lightmap' ],
-			THREE.UniformsLib[ 'emissivemap' ],
-			THREE.UniformsLib[ 'bumpmap' ],
-			THREE.UniformsLib[ 'normalmap' ],
-			THREE.UniformsLib[ 'displacementmap' ],
-			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'ltc_brdf' ],
-			THREE.UniformsLib[ 'lights' ],
-
+			THREE.UniformsLib.common,
+			THREE.UniformsLib.aomap,
+			THREE.UniformsLib.lightmap,
+			THREE.UniformsLib.emissivemap,
+			THREE.UniformsLib.bumpmap,
+			THREE.UniformsLib.normalmap,
+			THREE.UniformsLib.displacementmap,
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.ltc_brdf,
+			THREE.UniformsLib.lights,
 			{
 				"emissive" : { value: new THREE.Color( 0x000000 ) },
 				"specular" : { value: new THREE.Color( 0x111111 ) },
 				"shininess": { value: 30 }
 			}
 
-		] ),
+		),
 
-		vertexShader: THREE.ShaderChunk[ 'meshphong_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshphong_frag' ]
+		vertexShader: THREE.ShaderChunk.meshphong_vert,
+		fragmentShader: THREE.ShaderChunk.meshphong_frag
 
 	},
 
 	'standard': {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: Object.assign( {},
 
-			THREE.UniformsLib[ 'common' ],
-			THREE.UniformsLib[ 'aomap' ],
-			THREE.UniformsLib[ 'lightmap' ],
-			THREE.UniformsLib[ 'emissivemap' ],
-			THREE.UniformsLib[ 'bumpmap' ],
-			THREE.UniformsLib[ 'normalmap' ],
-			THREE.UniformsLib[ 'displacementmap' ],
-			THREE.UniformsLib[ 'roughnessmap' ],
-			THREE.UniformsLib[ 'metalnessmap' ],
-			THREE.UniformsLib[ 'fog' ],
-			THREE.UniformsLib[ 'ltc_brdf' ],
-			THREE.UniformsLib[ 'lights' ],
-
+			THREE.UniformsLib.common,
+			THREE.UniformsLib.aomap,
+			THREE.UniformsLib.lightmap,
+			THREE.UniformsLib.emissivemap,
+			THREE.UniformsLib.bumpmap,
+			THREE.UniformsLib.normalmap,
+			THREE.UniformsLib.displacementmap,
+			THREE.UniformsLib.roughnessmap,
+			THREE.UniformsLib.metalnessmap,
+			THREE.UniformsLib.fog,
+			THREE.UniformsLib.ltc_brdf,
+			THREE.UniformsLib.lights,
 			{
 				"emissive" : { value: new THREE.Color( 0x000000 ) },
 				"roughness": { value: 0.5 },
 				"metalness": { value: 0 },
-				"envMapIntensity" : { value: 1 }, // temporary
+				"envMapIntensity" : { value: 1 } // temporary
 			}
 
-		] ),
+		),
 
-		vertexShader: THREE.ShaderChunk[ 'meshphysical_vert' ],
-		fragmentShader: THREE.ShaderChunk[ 'meshphysical_frag' ]
+		vertexShader: THREE.ShaderChunk.meshphysical_vert,
+		fragmentShader: THREE.ShaderChunk.meshphysical_frag
 
-	},
+	}
 
 } );
 
 // Standard must be redefined before defining physical
-THREE.ShaderLib[ 'physical' ] = {
+THREE.ShaderLib.physical = {
 
-	uniforms: THREE.UniformsUtils.merge( [
+	uniforms: Object.assign( {},
 
-		THREE.ShaderLib[ 'standard' ].uniforms,
-
+		THREE.ShaderLib.standard.uniforms,
 		{
 			"clearCoat": { value: 0 },
 			"clearCoatRoughness": { value: 0 }
 		}
 
-	] ),
+	),
 
-	vertexShader: THREE.ShaderChunk[ 'meshphysical_vert' ],
-	fragmentShader: THREE.ShaderChunk[ 'meshphysical_frag' ]
+	vertexShader: THREE.ShaderChunk.meshphysical_vert,
+	fragmentShader: THREE.ShaderChunk.meshphysical_frag
 
 };

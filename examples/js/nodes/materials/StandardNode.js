@@ -30,13 +30,13 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
 
-		material.mergeUniform( THREE.UniformsUtils.merge( [
+		material.mergeUniform( Object.assign( {},
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
-		] ) );
+		) );
 
 		material.addVertexPars( [
 			"varying vec3 vViewPosition;",
@@ -165,7 +165,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ]
 		].join( "\n" ) );
 
 		var output = [

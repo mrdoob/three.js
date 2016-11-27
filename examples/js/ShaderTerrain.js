@@ -15,10 +15,8 @@ THREE.ShaderTerrain = {
 
 	'terrain' : {
 
-		uniforms: THREE.UniformsUtils.merge( [
+		uniforms: Object.assign(
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -49,9 +47,12 @@ THREE.ShaderTerrain = {
 
 				"uOffset": { value: new THREE.Vector2( 0, 0 ) }
 
-			}
+			},
 
-		] ),
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ]
+
+		),
 
 		fragmentShader: [
 

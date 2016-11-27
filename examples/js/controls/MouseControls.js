@@ -36,7 +36,7 @@ THREE.MouseControls = function ( object ) {
 
 	this.orientation = {
 		x: 0,
-		y: 0,
+		y: 0
 	};
 
 	this.update = function() {
@@ -46,7 +46,6 @@ THREE.MouseControls = function ( object ) {
 		mouseQuat.x.setFromAxisAngle( xVector, this.orientation.x );
 		mouseQuat.y.setFromAxisAngle( yVector, this.orientation.y );
 		object.quaternion.copy( mouseQuat.y ).multiply( mouseQuat.x );
-		return;
 
 	};
 
@@ -54,7 +53,7 @@ THREE.MouseControls = function ( object ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 
-	}
+	};
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
 

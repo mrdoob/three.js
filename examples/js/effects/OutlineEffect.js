@@ -26,11 +26,9 @@
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
 
-	var _this = this;
-
 	parameters = parameters || {};
 
-	this.autoClear = parameters.autoClear !== undefined ? parameters.autoClear : true;
+	this.enabled = true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
 	var defaultColor = parameters.defaultColor !== undefined ? parameters.defaultColor : new THREE.Color( 0x000000 );
@@ -64,6 +62,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
+		MeshToonMaterial: 'phong',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical'
 	};
@@ -87,13 +86,13 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		"	vec4 norm = normalize( pos - pos2 );",
 		"	return pos + norm * thickness * pos.w * ratio;",
 
-		"}",
+		"}"
 
 	].join( "\n" );
 
 	var vertexShaderChunk2 = [
 
-		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( PHYSICAL )",
+		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
 
 		"	#ifndef USE_ENVMAP",
 		"		vec3 objectNormal = normalize( normal );",
@@ -110,7 +109,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		"	gl_Position = calculateOutline( gl_Position, objectNormal, skinned );",
 		"#else",
 		"	gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
-		"#endif",
+		"#endif"
 
 	].join( "\n" );
 
@@ -128,7 +127,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		"	#include <fog_fragment>",
 
-		"}",
+		"}"
 
 	].join( "\n" );
 
@@ -256,11 +255,11 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		if ( object.material === undefined ) return;
 
-		var originalMaterial = originalMaterials[ object.material.uuid ]
+		var originalMaterial = originalMaterials[ object.material.uuid ];
 
 		if ( originalMaterial === undefined ) {
 
-			originalMaterial = originalMaterials[ object.uuid ]
+			originalMaterial = originalMaterials[ object.uuid ];
 
 			if ( originalMaterial === undefined ) return;
 
@@ -426,13 +425,14 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
-	this.setSize = function ( width, height ) {
-
-		renderer.setSize( width, height );
-
-	};
-
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
+
+		if ( this.enabled === false ) {
+
+			renderer.render( scene, camera, renderTarget, forceClear );
+			return;
+
+		}
 
 		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
@@ -462,6 +462,78 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		scene.background = currentSceneBackground;
 		renderer.autoClear = currentAutoClear;
 		renderer.shadowMap.enabled = currentShadowMapEnabled;
+
+	};
+
+	/*
+	 * See #9918
+	 *
+	 * The following property copies and wrapper methods enable
+	 * THREE.OutlineEffect to be called from other *Effect, like
+	 *
+	 * effect = new THREE.VREffect( new THREE.OutlineEffect( renderer ) );
+	 *
+	 * function render () {
+	 *
+ 	 * 	effect.render( scene, camera );
+	 *
+	 * }
+	 */
+	this.autoClear = renderer.autoClear;
+	this.domElement = renderer.domElement;
+	this.shadowMap = renderer.shadowMap;
+
+	this.clear = function ( color, depth, stencil ) {
+
+		renderer.clear( color, depth, stencil );
+
+	};
+
+	this.getPixelRatio = function () {
+
+		return renderer.getPixelRatio();
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		renderer.setPixelRatio( value );
+
+	};
+
+	this.getSize = function () {
+
+		return renderer.getSize();
+
+	};
+
+	this.setSize = function ( width, height, updateStyle ) {
+
+		renderer.setSize( width, height, updateStyle );
+
+	};
+
+	this.setViewport = function ( x, y, width, height ) {
+
+		renderer.setViewport( x, y, width, height );
+
+	};
+
+	this.setScissor = function ( x, y, width, height ) {
+
+		renderer.setScissor( x, y, width, height );
+
+	};
+
+	this.setScissorTest = function ( boolean ) {
+
+		renderer.setScissorTest( boolean );
+
+	};
+
+	this.setRenderTarget = function ( renderTarget ) {
+
+		renderer.setRenderTarget( renderTarget );
 
 	};
 
