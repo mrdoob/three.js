@@ -30,7 +30,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
 		select model:
-		<select id="fileModel" onchange="reloadModel(this.value);">
+		<select id="fileModel" onchange="reloadModel(this.value,1);">
 			<option value="models/babylon/skull.babylon">models/babylon/skull.babylon</option>
 			<option value="obj/female02/female02.obj">obj/female02/female02.obj</option>
 			<option value="obj/male02/male02.obj">obj/male02/male02.obj</option>
@@ -51,9 +51,12 @@
 		<br>
 		Custom model:
 		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
-		<button onclick="reloadModel(getElementById('customModel').value)">Load Custom Model</button>
+		<button onclick="reloadModel(getElementById('customModel').value,1)">Load Custom Model</button>
 		<br>
-		<div id="debug" align="left" style="display: none"></div>
+		<input type="file" id="file"/>
+		<output id="list"></output>
+		<br>
+		<div id="debug" align="left" style="display: none; width: 300px; height: 150px; overflow: auto;" ></div>
 	</div>
 
 	<script src="../build/three.js"></script>
@@ -73,6 +76,14 @@
 	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="js/Detector.js"></script>
 	<script>
+	//window.onerror = function() {
+  //  alert("Error caught");
+	//};
+	var fileInput= document.getElementById("file");
+	fileInput.addEventListener( 'change', function ( event ) {
+		console.log(fileInput.files[ 0 ].name);
+		reloadModel( fileInput.files[ 0 ], 0);
+	} );
 
 	if ( ! Detector.webgl ) {
 		Detector.addGetWebGLMessage();
@@ -84,12 +95,24 @@
 
 	animate();
 
+	function binarryToStr( data ) {
+
+		var text = "";
+		var charArray = new Uint8Array( data );
+		for ( var i = 0; i < data.byteLength; i ++ ) {
+
+			text += String.fromCharCode( charArray[ i ] );
+
+		}
+		return text;
+	}
+
 	function resetCamera() {
 		// to do: improvement - resetCamera() does not always result in best view
 		// http://stackoverflow.com/questions/11766163/smart-centering-and-scaling-after-model-import-in-three-js
 		// fit camera to object
 		var bBox = new THREE.Box3().setFromObject(scene);
-		var height = bBox.size().y;
+		var height = bBox.getSize().y;
 		var dist = height / (2 * Math.tan(camera.fov * Math.PI / 360));
 		var pos = scene.position;
 
@@ -138,16 +161,26 @@
 		scene.add( directionalLight );
 	}
 
-	function reloadModel(objPath)
+	function reloadModel(object, flgIsPath)
 	{
 		controls.reset();
-		loadModel(objPath);
+		loadModel(object, flgIsPath);
 	}
 
-	function loadModel(objPath)
+	function loadModel(object, flgIsPath)
 	{
-		var token = objPath.split('.');
-		var fileType = token[token.length-1];
+		var token, fileName, fileType;
+
+		if (flgIsPath === 1)
+		{
+			token = object.split('.');
+		}
+		else
+		{
+			token = object.name.split('.')
+		}
+
+		fileType = token[token.length-1].toLowerCase();
 
 		if (fileType === "json")
 		{
@@ -155,17 +188,24 @@
 				fileType = "assimp.json";
  		}
 
-		token = objPath.split('/');
-		var fileName = token[token.length-1];
+		if (flgIsPath === 1)
+		{
+			token = object.split('/');
+			fileName = token[token.length-1];
+		}
+		else {
+			fileName = object.name;
+		}
 
 		var onProgress = function ( xhr ) {
 			if ( xhr.lengthComputable ) {
 				var percentComplete = xhr.loaded / xhr.total * 100;
-				console.log( Math.round(percentComplete, 2) + '% downloaded');
+				console.log( Math.round(percentComplete, 2) + '% loaded');
 			}
 		};
 
 		var onError = function ( xhr ) {
+			console.log("There was an error.")
 		};
 
 		var manager = new THREE.LoadingManager();
@@ -191,14 +231,56 @@
 		setupLights();
 
 		//to do: improvement - loader.load() note: sea loader does not use onload function - loader.load 2nd param
-		loader.load( objPath , function ( myScene ) {
 
-			debugPrint(objPath+"<br>");
-			OnLoadScene(myScene, fileType, fileName);
+		if (flgIsPath === 1)
+		{
+			loader.load( object , function ( data ) {
+
+				debugPrint(object+"<br>");
+				OnLoadScene(data, fileType, fileName);
+				resetCamera();
+
+				}, onProgress, onError );
+		}
+		else {
+			var reader = new FileReader();
+			reader.addEventListener( 'progress', onProgress);
+			reader.addEventListener('error', onError);
+			reader.addEventListener( 'load', function ( event ) {
+			var data, json;
+			if (fileType === "babylon" || fileType === "gltf"
+				|| fileType === "assimp.json"	|| fileType === "json")
+			{
+				json = JSON.parse(event.target.result);
+				console.log(json);
+				data = loader.parse(json);
+				console.log(data);
+			}
+			else if (fileType === "pcd")
+			{
+				//data = binarryToStr(event.target.result);
+			}
+			else {
+				data = loader.parse( event.target.result);
+			}
+
+			OnLoadScene(data, fileType, fileName);
 			resetCamera();
+			}
+		);
+		if (fileType === "awd")
+		{
+			reader.readAsArrayBuffer(object);
+		}
+		else if (fileType === "pcd") {
 
-		}, onProgress, onError );
+			//reader.readAsBinaryString(object);
+		}
+		else {
+			reader.readAsText(object);
+		}
 
+	}
 		//to do: improvement - post loader.load() fixes - handle camera for these files automaticaly
 		if (fileName==="mascot.tjs.sea")
 		{
@@ -241,7 +323,7 @@
 
 		// model
 		var model = 'models/babylon/skull.babylon';
-		loadModel(model);
+		loadModel(model, 1);
 
 		//
 
@@ -258,76 +340,38 @@
 
 	}
 
-	function OnLoadScene(fileScene, objType, objName)
+	function printNode(node, header, space)
 	{
+		debugPrint(space+header+": "+node.type+"<br>");
+		var childCount = 0;
+		space+="-";
+		while(node.children.length>0)
+		{
+			childCount++;
+			printNode(node.children.pop(),childCount,space);
+		}
+	}
 
+	function OnLoadScene(rootNode, objType, objName)
+	{
 		if (objType === "dae" || objType === "gltf" || objType === "sea")
 		{
-			fileScene = fileScene.scene;
+			rootNode = rootNode.scene;
 			//scene.scale.x = scene.scale.y = scene.scale.z = 0.05;
 		}
 
-		debugPrint("root children:" + fileScene.children.length+"<br>");
-		var space ="";
-		var childcnt = 0;
-		fileScene.traverse( function ( object ) {
+		printNode(rootNode.clone(),"root","");
 
-			//to do: bug - fileScene.traverse() dae error on traversing last child?
-
-			//to do: improvement - fileScene.traverse() handle nested groups?
-			if ( object.constructor.name === "Group" ) {
-				scene.add(object);
-				childcnt = object.children.length;
-				debugPrint("constructor: "+object.constructor.name+", children:" + childcnt+"<br>");
-				if (childcnt > 0)
-				{
-					space = "++";
-				}
-			}
-			else if ( object.constructor.name === "SkinnedMesh" || object.constructor.name === "Mesh" || object.constructor.name === "Object3D" ) {
-				if (childcnt > 0)
-				{
-					debugPrint(space+"child:" + childcnt+", ");
-				}
-				debugPrint("constructor: "+object.constructor.name+", children: "+object.children.length+"<br>");
-
-				if (objName === "skull.babylon" || objName === "duck.gltf" )
-				{
-					//to do: bug - with gltf file can not move model unless material is changed
-					object.material = new THREE.MeshPhongMaterial( {
-						color: 0xffffff
-					} );
-				}
-
-				if (childcnt === 0)
-				{
-					space = "";
-					scene.add(object);
-				}
-				else {
-					childcnt--;
-				}
-			}
-			else if ( object.constructor.name === "Points")
+		if (!(rootNode instanceof THREE.Scene))
+		{
+			scene.add(rootNode);
+		}
+		else {
+			while(rootNode.children.length > 0)
 			{
-				if (childcnt === 0)
-				{
-					space = "";
-					scene.add(object);
-				}
-				else {
-					childcnt--;
-				}
+				scene.add(rootNode.children.pop());
 			}
-			else {
-					debugPrint(space+"child:" + childcnt+", ");
-					debugPrint(space+"constructor: "+object.constructor.name+", children: "+object.children.length+"<br>");
-				if (childcnt> 0)
-				{
-					childcnt--;
-				}
-			}
-		} );
+		}
 
 	}
 
@@ -384,7 +428,7 @@
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
-		controls.handleResize();
+		//controls.handleResize();
 
 	}
 
