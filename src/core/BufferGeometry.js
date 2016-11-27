@@ -75,8 +75,6 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		this.removeAttribute( name );
-
 		this.attributes[ name ] = attribute;
 
 		return this;
@@ -91,12 +89,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	removeAttribute: function ( name ) {
 
-		if ( this.attributes[ name ] !== undefined ) {
-
-			this.attributes[ name ].dispose();
-			delete this.attributes[ name ];
-
-		}
+		delete this.attributes[ name ];
 
 		return this;
 
