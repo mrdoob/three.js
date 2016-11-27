@@ -36,8 +36,8 @@
 		</div>
 
 		<code>
-var line_material = new THREE.LineBasicMaterial( {
-	color: 0x303030,
+var material = new THREE.LineBasicMaterial( {
+	color: 0xffffff,
 	lineWidth: 1,
 	linecap: 'round', //ignored by WebGLRenderer
 	linejoin:  'round' //ignored by WebGLRenderer
@@ -50,14 +50,17 @@ var line_material = new THREE.LineBasicMaterial( {
 
 		<div>
 		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-		Any property of the material (including any property inherited from [page:Material]) can be passed in here.
+		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
+
+		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal string and is *0xffffff* (white) by default.<br />
+		[page:Color.set]( color ) is called internally.
 		</div>
 
 		<h2>Properties</h2>
 		<div>See the base [page:Material] class for common properties.</div>
 
 		<h3>[property:Integer color]</h3>
-		<div>Color of the line. Default is 0xffffff.</div>
+		<div>[page:Color] of the material, by default set to white (0xffffff).</div>
 
 		<h3>[property:Boolean isLineBasicMaterial]</h3>
 		<div>
@@ -71,7 +74,7 @@ var line_material = new THREE.LineBasicMaterial( {
 
 		<h3>[property:Float linewidth]</h3>
 		<div>
-			Controls line thickness. Default is 1.<br /><br />
+			Controls line thickness. Default is *1*.<br /><br />
 
 			Due to limitations in the [link:https://code.google.com/p/angleproject ANGLE layer],
 			with the [page:WebGLRenderer WebGL] renderer on Windows platforms linewidth will
@@ -83,18 +86,16 @@ var line_material = new THREE.LineBasicMaterial( {
 			Define appearance of line ends. Possible values are 'butt', 'round' and 'square'.
 			Default is 'round'.<br /><br />
 
-			This setting might not have any effect when used with certain renderers.
-			For example, it is ignored with the [page:WebGLRenderer WebGL] renderer,
-			but does work with the [page:CanvasRenderer Canvas] renderer.
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] property
+			and it is ignored with the [page:WebGLRenderer WebGL] renderer.
 		</div>
 
 		<h3>[property:String linejoin]</h3>
 		<div>
 			Define appearance of line joints. Possible values are 'round', 'bevel' and 'miter'. Default is 'round'. <br /><br />
 
-			This setting might not have any effect when used with certain renderers.
-			For example, it is ignored with the [page:WebGLRenderer WebGL] renderer,
-			but does work with the [page:CanvasRenderer Canvas] renderer.
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] property
+			and it is ignored with the [page:WebGLRenderer WebGL] renderer.
 		</div>
 
 
