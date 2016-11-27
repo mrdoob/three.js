@@ -11,13 +11,14 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
+		Abstract base class for materials.<br /><br />
+
 		Materials describe the appearance of [page:Object objects].
 		They are defined in a (mostly) renderer-independent way, so you don't have to
 		rewrite materials if you decide to use a different renderer.<br /><br />
 
 		With the exception of [page:MultiMaterial MultiMaterial], the following properties
 		and methods are inherited by all other material types (although they may have different defaults).
-		</P>
 		</div>
 
 		<h2>Constructor</h2>
@@ -157,8 +158,6 @@
 		This is a workaround for cases when gaps appear between triangles when using [page:CanvasRenderer].
 		*0.5* tends to give good results across browsers. Default is *0*.
 		</div>
-
-
 
 		<h3>[property:Boolean polygonOffset]</h3>
 		<div>
