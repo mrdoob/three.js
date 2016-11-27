@@ -58,13 +58,26 @@
 		<div>Encoding for depth packing. Default is [page:Textures BasicDepthPacking].</div>
 
 		<h3>[property:Texture displacementMap]</h3>
-		<div>The displacement map. Default is null.</div>
+		<div>
+			The displacement map affects the position of the mesh's vertices. Unlike other maps
+			which only affect the light and shade of the material the displaced vertices can cast shadows,
+			block other objects, and otherwise act as real geometry. The displacement texture is
+			an image where the value of each pixel (white being the highest) is mapped against,
+			and repositions, the vertices of the mesh.
+		</div>
 
-		<h3>[property:Number displacementMapBias]</h3>
-		<div>The displacement map's bias. Default is *0*.</div>
+		<h3>[property:Float displacementScale]</h3>
+		<div>
+			How much the displacement map affects the mesh (where black is no displacement,
+			and white is maximum displacement). Without a displacement map set, this value is not applied.
+			 Default is 1.
+		</div>
 
-		<h3>[property:Number displacementMapScale]</h3>
-		<div>The displacement map. Default is *1*.</div>
+		<h3>[property:Float displacementBias]</h3>
+		<div>
+			The offset of the displacement map's values on the mesh's vertices.
+			Without a displacement map set, this value is not applied. Default is 0.
+		</div>
 
 		<h3>[property:Boolean fog]</h3>
 		<div>Whether the material is affected by fog. Default is *false*.</div>

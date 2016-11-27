@@ -13,8 +13,10 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A material for non-shiny (Lambertian) surfaces. Lighting is calculated
-			per vertex and interpolated in between.
+			A material for non-shiny (Lambertian) surfaces. <br />
+
+			Unlike the [page:MeshPhongMaterial] which calculates lighting per pixel,
+			lighting is calculated per vertex and interpolated in between.
 		</div>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshLambertMaterial"></iframe>
@@ -66,7 +68,7 @@
 		<h3>[property:Float aoMapIntensity]</h3>
 		<div>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</div>
 
-		<h3>[property:Integer color]</h3>
+		<h3>[property:Color color]</h3>
 		<div>[page:Color] of the material, by default set to white (0xffffff).</div>
 
 		<h3>[property:Integer combine]</h3>
@@ -76,13 +78,6 @@
 			Options are [page:Materials THREE.Multiply] (default), [page:Materials THREE.MixOperation],
 			[page:Materials THREE.AddOperation]. If mix is chosen, the [page:.reflectivity] is used to
 			blend between the two colors.
-		</div>
-
-		<h3>[property:Boolean isMeshLambertMaterial]</h3>
-		<div>
-			Used to check whether this or derived classes are mesh Lambert materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
 		</div>
 
 		<h3>[property:Color emissive]</h3>
@@ -103,6 +98,13 @@
 
 		<h3>[property:TextureCube envMap]</h3>
 		<div>The environment map. Default is null.</div>
+
+		<h3>[property:Boolean isMeshLambertMaterial]</h3>
+		<div>
+			Used to check whether this or derived classes are mesh Lambert materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
 
 		<h3>[property:Texture lightMap]</h3>
 		<div>The light map. Default is null. The lightMap requires a second set of UVs.</div>
