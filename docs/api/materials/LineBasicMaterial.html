@@ -52,8 +52,8 @@ var material = new THREE.LineBasicMaterial( {
 		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
-		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal string and is *0xffffff* (white) by default.<br />
-		[page:Color.set]( color ) is called internally.
+		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
+		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
 		</div>
 
 		<h2>Properties</h2>
@@ -86,16 +86,16 @@ var material = new THREE.LineBasicMaterial( {
 			Define appearance of line ends. Possible values are 'butt', 'round' and 'square'.
 			Default is 'round'.<br /><br />
 
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] property
-			and it is ignored with the [page:WebGLRenderer WebGL] renderer.
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</div>
 
 		<h3>[property:String linejoin]</h3>
 		<div>
 			Define appearance of line joints. Possible values are 'round', 'bevel' and 'miter'. Default is 'round'. <br /><br />
 
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] property
-			and it is ignored with the [page:WebGLRenderer WebGL] renderer.
+			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</div>
 
 
