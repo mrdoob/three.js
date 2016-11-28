@@ -13,10 +13,21 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A material for non-shiny (Lambertian) surfaces. <br />
+			A material for non-shiny surfaces, without specular highlights.<br /><br />
 
-			Unlike the [page:MeshPhongMaterial] which calculates lighting per pixel,
-			lighting is calculated per vertex and interpolated in between.
+			The uses a non-physically based [link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertian]
+			model	for calculating reflectance. This can simulate some surfaces (such as untreated wood or stone) well,
+			but cannot simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
+
+
+
+			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud] shading model.
+			This calculates shading per vertex (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader])
+			and interpolates the results over the polygon's faces.<br /><br />
+
+			Due to the simplicity of the reflectance and illumination models, performance will be greater
+			when using this material over the [page:MeshPhongMaterial],	[page:MeshStandardMaterial] or [page:MeshPhysicalMaterial],
+			at the cost of some graphical accuracy.
 		</div>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshLambertMaterial"></iframe>
