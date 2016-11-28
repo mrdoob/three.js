@@ -37,6 +37,7 @@
 		<script src="../../build/three.min.js"></script>
 		<script src='../../examples/js/libs/dat.gui.min.js'></script>
 		<script src="../../examples/js/controls/OrbitControls.js"></script>
+		<script src="../../examples/js/ParametricGeometries.js"></script>
 
 		<script src='js/geometry.js'></script>
 
@@ -52,13 +53,11 @@
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor( 0x000000, 1 );
 			document.body.appendChild( renderer.domElement );
 
 			var orbit = new THREE.OrbitControls( camera, renderer.domElement );
 			orbit.enableZoom = false;
-
-			var ambientLight = new THREE.AmbientLight( 0x000000 );
-			scene.add( ambientLight );
 
 			var lights = [];
 			lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
@@ -73,7 +72,7 @@
 			scene.add( lights[ 1 ] );
 			scene.add( lights[ 2 ] );
 
-			var mesh = new THREE.Object3D()
+			var mesh = new THREE.Object3D();
 
 			mesh.add( new THREE.LineSegments(
 
@@ -109,8 +108,6 @@
 			var render = function () {
 
 				requestAnimationFrame( render );
-
-				var time = Date.now() * 0.001;
 
 				if ( ! options.fixed ) {
 

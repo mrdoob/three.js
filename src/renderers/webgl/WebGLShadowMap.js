@@ -3,19 +3,31 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
+import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
+import { WebGLRenderTarget } from '../WebGLRenderTarget';
+import { ShaderMaterial } from '../../materials/ShaderMaterial';
+import { ShaderLib } from '../shaders/ShaderLib';
+import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
+import { Vector4 } from '../../math/Vector4';
+import { Vector3 } from '../../math/Vector3';
+import { Vector2 } from '../../math/Vector2';
+import { Matrix4 } from '../../math/Matrix4';
+import { Frustum } from '../../math/Frustum';
+
+function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	var _gl = _renderer.context,
 	_state = _renderer.state,
-	_frustum = new THREE.Frustum(),
-	_projScreenMatrix = new THREE.Matrix4(),
+	_frustum = new Frustum(),
+	_projScreenMatrix = new Matrix4(),
 
 	_lightShadows = _lights.shadows,
 
-	_shadowMapSize = new THREE.Vector2(),
+	_shadowMapSize = new Vector2(),
+	_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
 
-	_lookTarget = new THREE.Vector3(),
-	_lightPositionWorld = new THREE.Vector3(),
+	_lookTarget = new Vector3(),
+	_lightPositionWorld = new Vector3(),
 
 	_renderList = [],
 
@@ -30,28 +42,28 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_materialCache = {};
 
 	var cubeDirections = [
-		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( - 1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ),
-		new THREE.Vector3( 0, 0, - 1 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, - 1, 0 )
+		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
+		new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
 	];
 
 	var cubeUps = [
-		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 1, 0 ),
-		new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),	new THREE.Vector3( 0, 0, - 1 )
+		new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
+		new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
 	];
 
 	var cube2DViewPorts = [
-		new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(),
-		new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()
+		new Vector4(), new Vector4(), new Vector4(),
+		new Vector4(), new Vector4(), new Vector4()
 	];
 
 	// init
 
-	var depthMaterialTemplate = new THREE.MeshDepthMaterial();
-	depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
+	var depthMaterialTemplate = new MeshDepthMaterial();
+	depthMaterialTemplate.depthPacking = RGBADepthPacking;
 	depthMaterialTemplate.clipping = true;
 
-	var distanceShader = THREE.ShaderLib[ "distanceRGBA" ];
-	var distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms );
+	var distanceShader = ShaderLib[ "distanceRGBA" ];
+	var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
 
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
@@ -64,7 +76,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		_depthMaterials[ i ] = depthMaterial;
 
-		var distanceMaterial = new THREE.ShaderMaterial( {
+		var distanceMaterial = new ShaderMaterial( {
 			defines: {
 				'USE_SHADOWMAP': ''
 			},
@@ -89,7 +101,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.autoUpdate = true;
 	this.needsUpdate = false;
 
-	this.type = THREE.PCFShadowMap;
+	this.type = PCFShadowMap;
 
 	this.renderReverseSided = true;
 	this.renderSingleSided = true;
@@ -102,7 +114,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.clearColor( 1, 1, 1, 1 );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
 		_state.setDepthTest( true );
 		_state.setScissorTest( false );
@@ -126,8 +138,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			var shadowCamera = shadow.camera;
 
 			_shadowMapSize.copy( shadow.mapSize );
+			_shadowMapSize.min( _maxShadowMapSize );
 
-			if ( light instanceof THREE.PointLight ) {
+			if ( light && light.isPointLight ) {
 
 				faceCount = 6;
 				isPointLight = true;
@@ -173,15 +186,22 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( shadow.map === null ) {
 
-				var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
-				shadow.map = new THREE.WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 
 				shadowCamera.updateProjectionMatrix();
 
 			}
 
-			if ( shadow instanceof THREE.SpotLightShadow ) {
+			if ( shadow.isSpotLightShadow ) {
+
+				shadow.update( light );
+
+			}
+
+			// TODO (abelnation / sam-g-steel): is this needed?
+			if (shadow && shadow.isRectAreaLightShadow ) {
 
 				shadow.update( light );
 
@@ -253,7 +273,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 					var geometry = _objects.update( object );
 					var material = object.material;
 
-					if ( material instanceof THREE.MultiMaterial ) {
+					if ( material && material.isMultiMaterial ) {
 
 						var groups = geometry.groups;
 						var materials = material.materials;
@@ -312,10 +332,23 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( ! customMaterial ) {
 
-			var useMorphing = geometry.morphTargets !== undefined &&
-					geometry.morphTargets.length > 0 && material.morphTargets;
+			var useMorphing = false;
 
-			var useSkinning = object instanceof THREE.SkinnedMesh && material.skinning;
+			if ( material.morphTargets ) {
+
+				if ( geometry && geometry.isBufferGeometry ) {
+
+					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
+
+				} else if ( geometry && geometry.isGeometry ) {
+
+					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
+
+				}
+
+			}
+
+			var useSkinning = object.isSkinnedMesh && material.skinning;
 
 			var variantIndex = 0;
 
@@ -366,16 +399,16 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		var side = material.side;
 
-		if ( scope.renderSingleSided && side == THREE.DoubleSide ) {
+		if ( scope.renderSingleSided && side == DoubleSide ) {
 
-			side = THREE.FrontSide;
+			side = FrontSide;
 
 		}
 
 		if ( scope.renderReverseSided ) {
 
-			if ( side === THREE.FrontSide ) side = THREE.BackSide;
-			else if ( side === THREE.BackSide ) side = THREE.FrontSide;
+			if ( side === FrontSide ) side = BackSide;
+			else if ( side === BackSide ) side = FrontSide;
 
 		}
 
@@ -401,7 +434,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object.layers.test( camera.layers ) && ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) ) {
+		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+
+		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
@@ -428,4 +463,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	}
 
-};
+}
+
+
+export { WebGLShadowMap };

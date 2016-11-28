@@ -2,9 +2,9 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-THREE.EventDispatcher = function () {};
+function EventDispatcher() {}
 
-Object.assign( THREE.EventDispatcher.prototype, {
+Object.assign( EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
@@ -94,3 +94,6 @@ Object.assign( THREE.EventDispatcher.prototype, {
 	}
 
 } );
+
+
+export { EventDispatcher };

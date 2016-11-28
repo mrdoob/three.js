@@ -1,3 +1,15 @@
+import { EventDispatcher } from './EventDispatcher';
+import { Face3 } from './Face3';
+import { Matrix3 } from '../math/Matrix3';
+import { Sphere } from '../math/Sphere';
+import { Box3 } from '../math/Box3';
+import { Vector3 } from '../math/Vector3';
+import { Matrix4 } from '../math/Matrix4';
+import { Vector2 } from '../math/Vector2';
+import { Color } from '../math/Color';
+import { Object3D } from './Object3D';
+import { _Math } from '../math/Math';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
@@ -7,11 +19,11 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Geometry = function () {
+function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.name = '';
 	this.type = 'Geometry';
@@ -34,21 +46,23 @@ THREE.Geometry = function () {
 
 	// update flags
 
-	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
+	this.verticesNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
-Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
+Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+
+	isGeometry: true,
 
 	applyMatrix: function ( matrix ) {
 
-		var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -97,7 +111,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateX( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -117,7 +131,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateY( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -137,7 +151,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function rotateZ( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -157,7 +171,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function translate( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -177,7 +191,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function scale( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -195,7 +209,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			if ( obj === undefined ) obj = new THREE.Object3D();
+			if ( obj === undefined ) obj = new Object3D();
 
 			obj.lookAt( vector );
 
@@ -228,29 +242,29 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
-			scope.vertices.push( new THREE.Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
+			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
 
 			if ( normals !== undefined ) {
 
-				tempNormals.push( new THREE.Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
+				tempNormals.push( new Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
 
 			}
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new THREE.Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
 
 			}
 
 			if ( uvs !== undefined ) {
 
-				tempUVs.push( new THREE.Vector2( uvs[ j ], uvs[ j + 1 ] ) );
+				tempUVs.push( new Vector2( uvs[ j ], uvs[ j + 1 ] ) );
 
 			}
 
 			if ( uvs2 !== undefined ) {
 
-				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
 
 			}
 
@@ -261,7 +275,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
+			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
 			scope.faces.push( face );
 
@@ -342,7 +356,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		this.computeBoundingBox();
 
-		var offset = this.boundingBox.center().negate();
+		var offset = this.boundingBox.getCenter().negate();
 
 		this.translate( offset.x, offset.y, offset.z );
 
@@ -359,7 +373,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		var s = radius === 0 ? 1 : 1.0 / radius;
 
-		var matrix = new THREE.Matrix4();
+		var matrix = new Matrix4();
 		matrix.set(
 			s, 0, 0, - s * center.x,
 			0, s, 0, - s * center.y,
@@ -375,7 +389,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	computeFaceNormals: function () {
 
-		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+		var cb = new Vector3(), ab = new Vector3();
 
 		for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -407,7 +421,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			vertices[ v ] = new THREE.Vector3();
+			vertices[ v ] = new Vector3();
 
 		}
 
@@ -417,7 +431,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
 			var vA, vB, vC;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+			var cb = new Vector3(), ab = new Vector3();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -438,6 +452,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			}
 
 		} else {
+
+			this.computeFaceNormals();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -474,6 +490,42 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 				vertexNormals[ 0 ] = vertices[ face.a ].clone();
 				vertexNormals[ 1 ] = vertices[ face.b ].clone();
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeFlatVertexNormals: function () {
+
+		var f, fl, face;
+
+		this.computeFaceNormals();
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( face.normal );
+				vertexNormals[ 1 ].copy( face.normal );
+				vertexNormals[ 2 ].copy( face.normal );
+
+			} else {
+
+				vertexNormals[ 0 ] = face.normal.clone();
+				vertexNormals[ 1 ] = face.normal.clone();
+				vertexNormals[ 2 ] = face.normal.clone();
 
 			}
 
@@ -529,7 +581,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		// use temp geometry to compute face and vertex normals for each morph
 
-		var tmpGeo = new THREE.Geometry();
+		var tmpGeo = new Geometry();
 		tmpGeo.faces = this.faces;
 
 		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
@@ -549,8 +601,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-					faceNormal = new THREE.Vector3();
-					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+					faceNormal = new Vector3();
+					vertexNormals = { a: new Vector3(), b: new Vector3(), c: new Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -604,12 +656,6 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	computeTangents: function () {
-
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-
 	computeLineDistances: function () {
 
 		var d = 0;
@@ -633,7 +679,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new THREE.Box3();
+			this.boundingBox = new Box3();
 
 		}
 
@@ -645,7 +691,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new THREE.Sphere();
+			this.boundingSphere = new Sphere();
 
 		}
 
@@ -655,7 +701,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
-		if ( geometry instanceof THREE.Geometry === false ) {
+		if ( (geometry && geometry.isGeometry) === false ) {
 
 			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
@@ -669,13 +715,15 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		faces1 = this.faces,
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ];
+		uvs2 = geometry.faceVertexUvs[ 0 ],
+		colors1 = this.colors,
+		colors2 = geometry.colors;
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
-			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+			normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
 		}
 
@@ -693,6 +741,14 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
+		// colors
+
+		for ( var i = 0, il = colors2.length; i < il; i ++ ) {
+
+			colors1.push( colors2[ i ].clone() );
+
+		}
+
 		// faces
 
 		for ( i = 0, il = faces2.length; i < il; i ++ ) {
@@ -701,7 +757,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 			faceVertexNormals = face.vertexNormals,
 			faceVertexColors = face.vertexColors;
 
-			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+			faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix !== undefined ) {
@@ -765,7 +821,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 	mergeMesh: function ( mesh ) {
 
-		if ( mesh instanceof THREE.Mesh === false ) {
+		if ( (mesh && mesh.isMesh) === false ) {
 
 			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
@@ -1136,7 +1192,7 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		return new this.constructor().copy( this );
 		*/
 
-		return new THREE.Geometry().copy( this );
+		return new Geometry().copy( this );
 
 	},
 
@@ -1145,12 +1201,21 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 		this.vertices = [];
 		this.faces = [];
 		this.faceVertexUvs = [ [] ];
+		this.colors = [];
 
 		var vertices = source.vertices;
 
 		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 			this.vertices.push( vertices[ i ].clone() );
+
+		}
+
+		var colors = source.colors;
+
+		for ( var i = 0, il = colors.length; i < il; i ++ ) {
+
+			this.colors.push( colors[ i ].clone() );
 
 		}
 
@@ -1202,4 +1267,8 @@ Object.assign( THREE.Geometry.prototype, THREE.EventDispatcher.prototype, {
 
 } );
 
-THREE.GeometryIdCount = 0;
+var count = 0;
+function GeometryIdCount() { return count++; };
+
+
+export { GeometryIdCount, Geometry };

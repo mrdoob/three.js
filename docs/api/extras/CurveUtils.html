@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A class containing utility functions for curves.<br />
+
+		Note that these are all linear functions so it is neccessary to calculate seperately for
+		x, y (and z, w if present) components of a curve.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Number interpolate]( p0, p1, p2, p3, t )</h3>
+		<div>
+		t -- interpolation weight. <br />
+		p0, p1, p2, p4 -- the points defining the spline curve.<br /><br />
+
+		Used internally by [page:SplineCurve SplineCurve] and [page:SplineCurve3 SplineCurve3].
+		</div>
+
+		<h3>[method:Number tangentQuadraticBezier]( t, p0, p1, p2 )</h3>
+		<div>
+		t -- the point at which to calculate the tangent. <br />
+		p0, p1, p2 -- the three points defining the quadratic Bézier curve.<br /><br />
+
+		Calculate the tangent at the point t on a quadratic Bézier curve given by the three points.<br /><br />
+
+		Used internally by [page:QuadraticBezierCurve QuadraticBezierCurve].
+		</div>
+
+		<h3>[method:Number tangentCubicBezier]( t, p0, p1, p2, p3 )</h3>
+		<div>
+		t -- the point at which to calculate the tangent. <br />
+		p0, p1, p2, p3 -- the points defining the cubic Bézier curve.<br /><br />
+
+		Calculate the tangent at the point t on a cubic Bézier curve given by the four points.<br /><br />
+
+		Used internally by [page:CubicBezierCurve CubicBezierCurve].
+		</div>
+
+		<h3>[method:Number tangentSpline]( t, p0, p1, p2, p3 )</h3>
+		<div>
+		t -- the point at which to calculate the tangent. <br />
+		p0, p1, p2, p3 -- the points defining the spline curve.<br /><br />
+
+		Calculate the tangent at the point t on a spline curve given by the four points.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

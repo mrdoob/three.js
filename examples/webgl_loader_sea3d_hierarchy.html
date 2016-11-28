@@ -28,7 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>. Asset by <a href="http://vhalldez.cgsociety.org/" style="color:#FFFFFF" target="_blank">Valdez Araujo</a>
+			<br/>
+			<br/>High geometry compression with <a href="https://github.com/amd/rest3d/tree/master/server/o3dgc" style="color:#FFFFFF" target="_blank">Open3DGC</a> and LZMA<br>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -46,6 +48,9 @@
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+		
+		<script src="js/libs/o3dgc.js"></script>
+		<script src="js/loaders/sea3d/SEA3DGC.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -81,8 +86,8 @@
 
 				for(var i = 0; i < loader.meshes.length; i++) {
 
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.play( "root" );
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.play( "root" );
 
 				}
 
@@ -99,7 +104,8 @@
 
 			};
 
-			loader.load( './models/sea3d/robot.tjs.sea' );
+			// Open3DGC - Export by SEA3D Studio
+			loader.load( './models/sea3d/robot.o3dgc.tjs.sea' );
 
 			//
 
@@ -118,7 +124,6 @@
 				renderer.setClearColor( 0x333333, 1 );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -129,7 +134,6 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
@@ -143,8 +147,9 @@
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
-				composer.addPass( copyPass );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
 
 				// events
 

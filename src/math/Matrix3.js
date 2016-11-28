@@ -1,3 +1,5 @@
+import { Vector3 } from './Vector3';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -5,7 +7,7 @@
  * @author tschw
  */
 
-THREE.Matrix3 = function () {
+function Matrix3() {
 
 	this.elements = new Float32Array( [
 
@@ -21,11 +23,13 @@ THREE.Matrix3 = function () {
 
 	}
 
-};
+}
 
-THREE.Matrix3.prototype = {
+Matrix3.prototype = {
 
-	constructor: THREE.Matrix3,
+	constructor: Matrix3,
+
+	isMatrix3: true,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -95,9 +99,9 @@ THREE.Matrix3.prototype = {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToVector3Array( array, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
@@ -121,7 +125,7 @@ THREE.Matrix3.prototype = {
 
 		return function applyToBuffer( buffer, offset, length ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
@@ -133,7 +137,7 @@ THREE.Matrix3.prototype = {
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				buffer.setXYZ( j, v1.x, v1.y, v1.z );
 
 			}
 
@@ -169,7 +173,7 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( matrix instanceof THREE.Matrix4 ) {
+		if ( matrix && matrix.isMatrix4 ) {
 
 			console.error( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
@@ -192,7 +196,7 @@ THREE.Matrix3.prototype = {
 
 			var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnDegenerate || false ) {
+			if ( throwOnDegenerate === true ) {
 
 				throw new Error( msg );
 
@@ -205,19 +209,21 @@ THREE.Matrix3.prototype = {
 			return this.identity();
 		}
 
-		te[ 0 ] = t11;
-		te[ 1 ] = n31 * n23 - n33 * n21;
-		te[ 2 ] = n32 * n21 - n31 * n22;
+		var detInv = 1 / det;
 
-		te[ 3 ] = t12;
-		te[ 4 ] = n33 * n11 - n31 * n13;
-		te[ 5 ] = n31 * n12 - n32 * n11;
+		te[ 0 ] = t11 * detInv;
+		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
+		te[ 2 ] = ( n32 * n21 - n31 * n22 ) * detInv;
 
-		te[ 6 ] = t13;
-		te[ 7 ] = n21 * n13 - n23 * n11;
-		te[ 8 ] = n22 * n11 - n21 * n12;
+		te[ 3 ] = t12 * detInv;
+		te[ 4 ] = ( n33 * n11 - n31 * n13 ) * detInv;
+		te[ 5 ] = ( n31 * n12 - n32 * n11 ) * detInv;
 
-		return this.multiplyScalar( 1 / det );
+		te[ 6 ] = t13 * detInv;
+		te[ 7 ] = ( n21 * n13 - n23 * n11 ) * detInv;
+		te[ 8 ] = ( n22 * n11 - n21 * n12 ) * detInv;
+
+		return this;
 
 	},
 
@@ -230,15 +236,6 @@ THREE.Matrix3.prototype = {
 		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
 
 		return this;
-
-	},
-
-	flattenToArrayOffset: function ( array, offset ) {
-
-		console.warn( "THREE.Matrix3: .flattenToArrayOffset is deprecated " +
-				"- just use .toArray instead." );
-
-		return this.toArray( array, offset );
 
 	},
 
@@ -266,9 +263,15 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.elements.set( array );
+		if ( offset === undefined ) offset = 0;
+
+		for( var i = 0; i < 9; i ++ ) {
+
+			this.elements[ i ] = array[ i + offset ];
+
+		}
 
 		return this;
 
@@ -298,3 +301,6 @@ THREE.Matrix3.prototype = {
 	}
 
 };
+
+
+export { Matrix3 };

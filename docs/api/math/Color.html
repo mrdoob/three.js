@@ -89,7 +89,7 @@
 		Copies given color.
 		</div>
 
-		<h3>[method:Color fromArray]([page:Array array], [page:Integer offset]) [page:Color this]</h3>
+		<h3>[method:Color fromArray]( [page:Array array], [page:Integer offset] ) [page:Color this]</h3>
 		<div>
 		array -- [page:Array] [r, g, b] <br />
 		offset -- [page:Integer] An optional offset into the array.
@@ -165,6 +165,14 @@
 		Returns the value of this color as a CSS-style string. Example: rgb(255,0,0)
 		</div>
 
+		<h3>[method:Color setScalar]( [page:Float scalar] ) [page:Color this]</h3>
+		<div>
+		scalar — a value between 0.0 and 1.0.
+		</div>
+		<div>
+		Sets all three color components to the value *scalar*.
+		</div>
+
 		<h3>[method:Color setHSL]( [page:Float h], [page:Float s], [page:Float l] ) [page:Color this]</h3>
 		<div>
 		h — hue value between 0.0 and 1.0 <br />
@@ -175,7 +183,7 @@
 		Sets color from hsl
 		</div>
 
-		<h3>.getHSL() [page:Object hsl]</h3>
+		<h3>[method:Object getHSL]() [page:Object hsl]</h3>
 		<div>
 		Returns an object with properties h, s, and l.
 		</div>
@@ -183,6 +191,11 @@
 		<h3>[method:Color offsetHSL]( [page:Float h], [page:Float s], [page:Float l] ) [page:Color this]</h3>
 		<div>
 		Adds given h, s, and l to this color's existing h, s, and l values.
+		</div>
+
+		<h3>[method:Color sub]( [page:Color color] ) [page:Color this]</h3>
+		<div>
+		Subtracts rgb components of given color from rgb components of this color. If a component is negative, it is set to zero.
 		</div>
 
 		<h3>[method:Color add]( [page:Color color] ) [page:Color this]</h3>
@@ -218,7 +231,7 @@
 		Linear interpolation of this colors rgb values and the rgb values of the first argument. The alpha argument can be thought of as the percent between the two colors, where 0 is this color and 1 is the first argument.
 		</div>
 
-		<h3>[method:Color equals]( [page:Color c] ) [page:Color this]</h3>
+		<h3>[method:Boolean equals]( [page:Color c] ) [page:Color this]</h3>
 		<div>
 		Compares this color and c and returns true if they are the same, false otherwise.
 		</div>
@@ -228,7 +241,7 @@
 		Clones this color.
 		</div>
 
-		<h3>[method:Array toArray]([page:Array array], [page:Integer offset]) [page:Color this]</h3>
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Color this]</h3>
 		<div>
 		array -- An optional array to store the color to. <br />
 		offset -- An optional offset into the array.

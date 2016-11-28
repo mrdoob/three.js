@@ -41,9 +41,9 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -80,13 +80,13 @@
 				"400 lx (Sunrise/Sunset)": 400,
 				"1000 lx (Overcast)": 1000,
 				"18000 lx (Daylight)": 18000,
-				"50000 lx (Direct Sun)": 50000,
+				"50000 lx (Direct Sun)": 50000
 			};
 
 			var params = {
 				shadows: true,
 				exposure: 0.68,
-				bulbPower: Object.keys( bulbLuminousPowers )[2],
+				bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
 				hemiIrradiance: Object.keys( hemiLuminousIrradiances )[0]
 			};
 
@@ -107,7 +107,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.x = -4;
 				camera.position.z = 4;
-				camera.position.y = 3;
+				camera.position.y = 2;
 
 				scene = new THREE.Scene();
 
@@ -131,10 +131,10 @@
 					roughness: 0.8,
 					color: 0xffffff,
 					metalness: 0.2,
-					bumpScale: 0.0005,
+					bumpScale: 0.0005
 				});
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -142,7 +142,7 @@
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/hardwood2_bump.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_bump.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -150,7 +150,7 @@
 					floorMat.bumpMap = map;
 					floorMat.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/hardwood2_roughness.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_roughness.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -165,7 +165,7 @@
 					bumpScale: 0.002,
 					metalness: 0.2
 				});
-				textureLoader.load( "../examples/textures/brick_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/brick_diffuse.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -173,7 +173,7 @@
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/brick_bump.jpg", function( map ) {
+				textureLoader.load( "textures/brick_bump.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
@@ -183,24 +183,18 @@
 				} );
 
 				ballMat = new THREE.MeshStandardMaterial( {
-					roughness: 0,
-					metalness: 0.0,
-					color: 0xffffff
+					color: 0xffffff,
+					roughness: 0.5,
+					metalness: 1.0
 				});
-				textureLoader.load( "../examples/textures/planets/earth_atmos_2048.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
+				textureLoader.load( "textures/planets/earth_atmos_2048.jpg", function( map ) {
 					map.anisotropy = 4;
-					map.repeat.set( 1, 1 );
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 				} );
-				textureLoader.load( "../examples/textures/planets/earth_specular_2048.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
+				textureLoader.load( "textures/planets/earth_specular_2048.jpg", function( map ) {
 					map.anisotropy = 4;
-					map.repeat.set( 1, 1 );
-					ballMat.roughnessMap = map;
+					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 				} );
 
@@ -210,9 +204,10 @@
 				floorMesh.rotation.x = -Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereGeometry( 0.1213, 32, 32 );
+				var ballGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
-				ballMesh.position.set( 1, 0.1213, 1 );
+				ballMesh.position.set( 1, 0.5, 1 );
+				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
 

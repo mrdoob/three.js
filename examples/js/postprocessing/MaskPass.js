@@ -16,9 +16,9 @@ THREE.MaskPass = function ( scene, camera ) {
 
 };
 
-THREE.MaskPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.MaskPass.prototype, {
+	constructor: THREE.MaskPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

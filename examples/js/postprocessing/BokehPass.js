@@ -41,7 +41,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	}
 
 	var bokehShader = THREE.BokehShader;
-	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
+	var bokehUniforms = Object.assign( {}, bokehShader.uniforms );
 
 	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 
@@ -67,9 +67,9 @@ THREE.BokehPass = function ( scene, camera, params ) {
 
 };
 
-THREE.BokehPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.BokehPass.prototype, {
+	constructor: THREE.BokehPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

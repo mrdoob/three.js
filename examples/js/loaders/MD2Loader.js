@@ -16,7 +16,7 @@ THREE.MD2Loader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
@@ -308,4 +308,4 @@ THREE.MD2Loader.prototype = {
 
 	} )()
 
-}
+};

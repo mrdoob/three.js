@@ -66,9 +66,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	var hyperfocus = ( near + far ) / 2;
 
 	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
-	var planeHeight = 2 * halfHeight;
-	var planeWidth = planeHeight * aspect;
-	var halfWidth = planeWidth / 2;
+	var halfWidth = halfHeight * aspect;
 
 	halfHeight /= this.zoom;
 	halfWidth /= this.zoom;
@@ -189,8 +187,6 @@ THREE.CombinedCamera.prototype.toFrontView = function() {
 
 	// should we be modifing the matrix instead?
 
-	this.rotationAutoUpdate = false;
-
 };
 
 THREE.CombinedCamera.prototype.toBackView = function() {
@@ -198,7 +194,6 @@ THREE.CombinedCamera.prototype.toBackView = function() {
 	this.rotation.x = 0;
 	this.rotation.y = Math.PI;
 	this.rotation.z = 0;
-	this.rotationAutoUpdate = false;
 
 };
 
@@ -207,7 +202,6 @@ THREE.CombinedCamera.prototype.toLeftView = function() {
 	this.rotation.x = 0;
 	this.rotation.y = - Math.PI / 2;
 	this.rotation.z = 0;
-	this.rotationAutoUpdate = false;
 
 };
 
@@ -216,7 +210,6 @@ THREE.CombinedCamera.prototype.toRightView = function() {
 	this.rotation.x = 0;
 	this.rotation.y = Math.PI / 2;
 	this.rotation.z = 0;
-	this.rotationAutoUpdate = false;
 
 };
 
@@ -225,7 +218,6 @@ THREE.CombinedCamera.prototype.toTopView = function() {
 	this.rotation.x = - Math.PI / 2;
 	this.rotation.y = 0;
 	this.rotation.z = 0;
-	this.rotationAutoUpdate = false;
 
 };
 
@@ -234,6 +226,5 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 	this.rotation.x = Math.PI / 2;
 	this.rotation.y = 0;
 	this.rotation.z = 0;
-	this.rotationAutoUpdate = false;
 
 };

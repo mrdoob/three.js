@@ -13,7 +13,7 @@ THREE.SavePass = function ( renderTarget ) {
 
 	this.textureID = "tDiffuse";
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -42,9 +42,9 @@ THREE.SavePass = function ( renderTarget ) {
 
 };
 
-THREE.SavePass.prototype = Object.create( THREE.Pass.prototype );
+THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.SavePass.prototype, {
+	constructor: THREE.SavePass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

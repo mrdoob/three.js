@@ -9,7 +9,7 @@ THREE.GlitchPass = function ( dt_size ) {
 	if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
 
 	var shader = THREE.DigitalGlitch;
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	if ( dt_size == undefined ) dt_size = 64;
 
@@ -35,9 +35,9 @@ THREE.GlitchPass = function ( dt_size ) {
 
 };
 
-THREE.GlitchPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.GlitchPass.prototype, {
+	constructor: THREE.GlitchPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

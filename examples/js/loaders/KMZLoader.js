@@ -16,7 +16,7 @@ THREE.KMZLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
@@ -32,21 +32,59 @@ THREE.KMZLoader.prototype = {
 
 		// console.log( zip );
 
-		for ( var name in zip.files ) {
+		// var xml = new DOMParser().parseFromString( zip.file( 'doc.kml' ).asText(), 'application/xml' );
 
-			if ( name.toLowerCase().substr( - 4 ) === '.dae' ) {
+		function loadImage( image ) {
 
-				return new THREE.ColladaLoader().parse( zip.file( name ).asText() );
+			var path = decodeURI( image.init_from );
+
+			// Hack to support relative paths
+			path = path.replace( '../', '' );
+
+			var regex = new RegExp( path + '$' );
+			var files = zip.file( regex );
+
+			// console.log( image, files );
+
+			if ( files.length ) {
+
+				var file = files[ 0 ];
+				var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-binary' } );
+				image.build.src = URL.createObjectURL( blob );
 
 			}
 
 		}
 
-		console.error( 'KZMLoader: Couldn\'t find .dae file.' );
+		// load collada
+
+		var files = zip.file( /dae$/i );
+
+		if ( files.length ) {
+
+			var file = files[ 0 ];
+
+			var collada = new THREE.ColladaLoader().parse( file.asText() );
+
+			// fix images
+
+			var images = collada.library.images;
+
+			for ( var name in images ) {
+
+				loadImage( images[ name ] );
+
+			}
+
+			return collada;
+
+		}
+
+		console.error( 'KMZLoader: Couldn\'t find .dae file.' );
 
 		return {
 			scene: new THREE.Group()
-		}
+		};
 
 	}
 

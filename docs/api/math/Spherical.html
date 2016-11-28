@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A point's spherical coordinates.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float radius], [page:Float phi], [page:Float theta] )</h3>
+		<div>
+		radius -- [page:Float] the radius<br />
+		phi -- [page:Float] polar angle from the y (up) axis<br />
+		theta -- [page:Float] equator angle around the y (up) axis
+		</div>
+		<div>
+		The poles (phi) are at the positive and negative y axis. The equator (theta) starts at positive z.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float phi]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Spherical set]( [page:Float radius], [page:Float phi], [page:Float theta] ) [page:Spherical this]</h3>
+		<div>
+		Sets values of this spherical's component coordinates.
+		</div>
+
+		<h3>[method:Spherical copy]( [page:Spherical s] ) [page:Spherical this]</h3>
+		<div>
+		Copies value of *s* to this spherical.
+		</div>
+
+		<h3>[method:Spherical clone]() [page:Spherical this]</h3>
+		<div>
+		Clones this spherical.
+		</div>
+
+		<h3>[method:Spherical makeSafe]() [page:Spherical this]</h3>
+		<div>
+		Restricts the polar angle phi to be between 0.000001 and pi - 0.000001.
+		</div>
+
+		<h3>[method:Spherical setFromVector3]( [page:Vector3 v] ) [page:Spherical this]</h3>
+		<div>
+		Sets this object from the vector *v*.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

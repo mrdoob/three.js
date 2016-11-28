@@ -32,13 +32,13 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -70,7 +70,9 @@
 
 				video = document.createElement( 'video' );
 				video.loop = true;
+				video.muted = true;
 				video.src = 'textures/MaryOculus.webm';
+				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 				video.play();
 
 				texture = new THREE.VideoTexture( video );
@@ -170,7 +172,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}

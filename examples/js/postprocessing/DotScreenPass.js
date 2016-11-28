@@ -11,7 +11,7 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 	var shader = THREE.DotScreenShader;
 
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+	this.uniforms = Object.assign( {}, shader.uniforms );
 
 	if ( center !== undefined ) this.uniforms[ "center" ].value.copy( center );
 	if ( angle !== undefined ) this.uniforms[ "angle" ].value = angle;
@@ -33,9 +33,9 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 
 };
 
-THREE.DotScreenPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.DotScreenPass.prototype, {
+	constructor: THREE.DotScreenPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

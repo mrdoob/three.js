@@ -68,6 +68,14 @@
 		Sets z value of this vector.
 		</div>
 
+		<h3>[method:Vector3 setScalar]( [page:Float scalar] ) [page:Vector3 this]</h3>
+		<div>
+		scalar -- [page:Float]
+		</div>
+		<div>
+		set all component values of this vector to *scalar*.
+		</div>
+
 		<h3>[method:Vector3 copy]( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
@@ -130,33 +138,38 @@
 
 		<h3>[method:Float lengthSq]() [page:Vector3 this]</h3>
 		<div>
-		Computes squared length of this vector.
+		Computes the squared length of this vector.
 		</div>
 
 		<h3>[method:Float length]() [page:Vector3 this]</h3>
 		<div>
-		Computes length of this vector.
+		Computes the length of this vector.
 		</div>
 
 		<h3>[method:Float lengthManhattan]() [page:Vector3 this]</h3>
 		<div>
-		Computes Manhattan length of this vector.<br />
+		Computes the Manhattan length of this vector.<br />
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
 		<h3>[method:Vector3 normalize]() [page:Vector3 this]</h3>
 		<div>
-		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by it's length.
+		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by its length.
 		</div>
 
-		<h3>[method:Float distanceTo]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<h3>[method:Float distanceTo]( [page:Vector3 v] )</h3>
 		<div>
-		Computes distance of this vector to *v*.
+		Computes the distance from this vector to *v*.
 		</div>
 
-		<h3>[method:Float distanceToSquared]( [page:Vector3 v] ) [page:Vector3 this]</h3>
+		<h3>[method:Float distanceToSquared]( [page:Vector3 v] )</h3>
 		<div>
-		Computes squared distance of this vector to *v*.
+		Computes the squared distance from this vector to *v*.
+		</div>
+
+		<h3>[method:Float distanceToManhattan]( [page:Vector3 v] )</h3>
+		<div>
+		Computes the Manhattan distance from this vector to *v*.
 		</div>
 
 		<h3>[method:Vector3 setLength]( [page:Float l] ) [page:Vector3 this]</h3>
@@ -182,6 +195,16 @@
 		<h3>[method:Vector3 setFromMatrixScale]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting scale from matrix transform.
+		</div>
+
+		<h3>[method:Vector3 setFromSpherical]( [page:Spherical s] ) [page:Vector3 this]</h3>
+		<div>
+		Sets this vector from the spherical coordinates *s*.
+		</div>
+
+		<h3>[method:Vector3 setFromCylindrical]( [page:Cylindrical c] ) [page:Vector3 this]</h3>
+		<div>
+		Sets this vector from the cylindrical coordinates *c*.
 		</div>
 
 		<h3>[method:Vector3 clamp]( [page:Vector3 min], [page:Vector3 max] ) [page:Vector3 this]</h3>
@@ -298,7 +321,7 @@
 		If this vector's x, y, or z value is less than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
 		</div>
 
-		<h3>[method:Vector3 setComponent]( [page:Integer index], [page:Float value] ) [page:Vector3 this]</h3>
+		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] ) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, or 2 <br />
 		value -- [page:Float]
@@ -375,10 +398,10 @@
 		Returns the angle between this vector and vector v in radians.
 		</div>
 
-		<h3>[method:Vector3 setFromMatrixColumn]( [page:Integer index], [page:Matrix4 matrix] ) [page:Vector3 this]</h3>
+		<h3>[method:Vector3 setFromMatrixColumn]( [page:Matrix4 matrix], [page:Integer index] ) [page:Vector3 this]</h3>
 		<div>
-		index -- 0, 1, 2, or 3 <br />
-		matrix -- [page:Matrix4]
+		matrix -- [page:Matrix4]<br />
+		index -- 0, 1, 2, or 3
 		</div>
 		<div>
 		Sets this vector's x, y, and z equal to the column of the matrix specified by the index.
@@ -389,7 +412,7 @@
 		normal -- [page:Vector3] the normal to the reflecting plane
 		</div>
 		<div>
-		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
+		Reflect incident vector off of plane orthogonal to normal. Normal is assumed to have unit length.
 		</div>
 
 		<h3>[method:Vector3 multiply]( [page:Vector3 v] ) [page:Vector3 this]</h3>
@@ -397,7 +420,7 @@
 		v -- [page:Vector3] <br />
 		</div>
 		<div>
-		Multipies this vector by vector v.
+		Multiplies this vector by vector v.
 		</div>
 
 		<h3>[method:Vector3 applyProjection]( [page:Matrix4 m] ) [page:Vector3 this]</h3>
@@ -413,7 +436,7 @@
 		euler -- [page:Euler]
 		</div>
 		<div>
-		Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying.
+		Applies euler transform to this vector by converting the [page:Euler] object to a [page:Quaternion] and applying.
 		</div>
 
 		<h3>[method:Vector3 applyQuaternion]( [page:Quaternion quaternion] ) [page:Vector3 this]</h3>

@@ -14,28 +14,30 @@
 
 THREE.TAARenderPass = function ( scene, camera, params ) {
 
-	if ( THREE.ManualMSAARenderPass === undefined ) {
+	if ( THREE.SSAARenderPass === undefined ) {
 
-		console.error( "THREE.TAARenderPass relies on THREE.ManualMSAARenderPass" );
+		console.error( "THREE.TAARenderPass relies on THREE.SSAARenderPass" );
 
 	}
-	THREE.ManualMSAARenderPass.call( this, scene, camera, params );
+
+	THREE.SSAARenderPass.call( this, scene, camera, params );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;
 
 };
 
-THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
+THREE.TAARenderPass.JitterVectors = THREE.SSAARenderPass.JitterVectors;
 
-THREE.TAARenderPass.prototype = Object.create( THREE.ManualMSAARenderPass.prototype );
-Object.assign( THREE.TAARenderPass.prototype, {
+THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPass.prototype ), {
+
+	constructor: THREE.TAARenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		if( ! this.accumulate ) {
 
-				THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
+				THREE.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
 
 				this.accumulateIndex = -1;
 				return;
@@ -43,8 +45,6 @@ Object.assign( THREE.TAARenderPass.prototype, {
 		}
 
 		var jitterOffsets = THREE.TAARenderPass.JitterVectors[ 5 ];
-
-		var camera = ( this.camera || this.scene.camera );
 
 		if ( ! this.sampleRenderTarget ) {
 
@@ -60,7 +60,7 @@ Object.assign( THREE.TAARenderPass.prototype, {
 
 		if( this.accumulate && this.accumulateIndex === -1 ) {
 
-				THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
+				THREE.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
 
 				this.accumulateIndex = 0;
 
@@ -73,46 +73,42 @@ Object.assign( THREE.TAARenderPass.prototype, {
 
 		if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
-			this.compositeUniforms[ "scale" ].value = sampleWeight;
-			this.compositeUniforms[ "tForeground" ].value = writeBuffer.texture;
+			this.copyUniforms[ "opacity" ].value = sampleWeight;
+			this.copyUniforms[ "tDiffuse" ].value = writeBuffer.texture;
 
 			// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 			var numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
 			for ( var i = 0; i < numSamplesPerFrame; i ++ ) {
 
 				var j = this.accumulateIndex;
-				// only jitters perspective cameras.	TODO: add support for jittering orthogonal cameras
 				var jitterOffset = jitterOffsets[j];
-				if ( camera.setViewOffset ) {
-					camera.setViewOffset( readBuffer.width, readBuffer.height,
+				if ( this.camera.setViewOffset ) {
+					this.camera.setViewOffset( readBuffer.width, readBuffer.height,
 						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 						readBuffer.width, readBuffer.height );
 				}
 
 				renderer.render( this.scene, this.camera, writeBuffer, true );
-
 				renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex === 0 ) );
 
 				this.accumulateIndex ++;
 				if( this.accumulateIndex >= jitterOffsets.length ) break;
 			}
 
-			// reset jitter to nothing.	TODO: add support for orthogonal cameras
-			if ( camera.setViewOffset ) camera.setViewOffset( undefined, undefined, undefined, undefined, undefined, undefined );
+			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
 
 		}
 
 		var accumulationWeight = this.accumulateIndex * sampleWeight;
 
 		if( accumulationWeight > 0 ) {
-			this.compositeUniforms[ "scale" ].value = 1.0;
-			this.compositeUniforms[ "tForeground" ].value = this.sampleRenderTarget.texture;
+			this.copyUniforms[ "opacity" ].value = 1.0;
+			this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, true );
 		}
-
 		if( accumulationWeight < 1.0 ) {
-			this.compositeUniforms[ "scale" ].value = 1.0 - accumulationWeight;
-			this.compositeUniforms[ "tForeground" ].value = this.holdRenderTarget.texture;
+			this.copyUniforms[ "opacity" ].value = 1.0 - accumulationWeight;
+			this.copyUniforms[ "tDiffuse" ].value = this.holdRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
 		}
 

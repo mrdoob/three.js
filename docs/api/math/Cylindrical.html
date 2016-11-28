@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A point's cylindrical coordinates.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float radius], [page:Float theta], [page:Float y] )</h3>
+		<div>
+		radius -- [page:Float] distance from the origin to a point in the x-z plane<br />
+		theta -- [page:Float] counterclockwise angle in the x-z plane measured in radians from the positive z-axis<br />
+		y -- [page:Float] height above the x-z plane
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+		<h3>[property:Float y]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Cylindrical set]( [page:Float radius], [page:Float theta], [page:Float y] ) [page:Cylindrical this]</h3>
+		<div>
+		Sets values of this cylindrical's component coordinates.
+		</div>
+
+		<h3>[method:Cylindrical copy]( [page:Cylindrical c] ) [page:Cylindrical this]</h3>
+		<div>
+		Copies value of *c* to this cylindrical.
+		</div>
+
+		<h3>[method:Cylindrical clone]() [page:Cylindrical this]</h3>
+		<div>
+		Clones this cylindrical.
+		</div>
+
+		<h3>[method:Cylindrical setFromVector3]( [page:Vector3 v] ) [page:Cylindrical this]</h3>
+		<div>
+		Sets this object from the vector *v*.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -30,10 +30,10 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
 // NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
 
-float viewZToOrthoDepth( const in float viewZ, const in float near, const in float far ) {
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
   return ( viewZ + near ) / ( near - far );
 }
-float OrthoDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {
+float orthographicDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {
   return linearClipZ * ( near - far ) - near;
 }
 

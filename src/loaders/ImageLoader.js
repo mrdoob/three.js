@@ -1,84 +1,62 @@
+import { FileLoader } from './FileLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+function ImageLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-THREE.ImageLoader.prototype = {
-
-	constructor: THREE.ImageLoader,
+Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.path !== undefined ) url = this.path + url;
-
 		var scope = this;
 
-		var cached = THREE.Cache.get( url );
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+		image.onload = function () {
 
-		if ( cached !== undefined ) {
+			image.onload = null;
 
-			scope.manager.itemStart( url );
+			URL.revokeObjectURL( image.src );
 
-			if ( onLoad ) {
-
-				setTimeout( function () {
-
-					onLoad( cached );
-
-					scope.manager.itemEnd( url );
-
-				}, 0 );
-
-			} else {
-
-				scope.manager.itemEnd( url );
-
-			}
-
-			return cached;
-
-		}
-
-		var image = document.createElement( 'img' );
-
-		image.addEventListener( 'load', function ( event ) {
-
-			THREE.Cache.add( url, this );
-
-			if ( onLoad ) onLoad( this );
+			if ( onLoad ) onLoad( image );
 
 			scope.manager.itemEnd( url );
 
-		}, false );
+		};
+		image.onerror = onError;
 
-		if ( onProgress !== undefined ) {
+		if ( url.indexOf( 'data:' ) === 0 ) {
 
-			image.addEventListener( 'progress', function ( event ) {
+			image.src = url;
 
-				onProgress( event );
+		} else if ( this.crossOrigin !== undefined ) {
 
-			}, false );
+			// crossOrigin doesn't work with URL.createObjectURL()?
+
+			image.crossOrigin = this.crossOrigin;
+			image.src = url;
+
+		} else {
+
+			var loader = new FileLoader();
+			loader.setPath( this.path );
+			loader.setResponseType( 'blob' );
+			loader.setWithCredentials( this.withCredentials );
+			loader.load( url, function ( blob ) {
+
+				image.src = URL.createObjectURL( blob );
+
+			}, onProgress, onError );
 
 		}
 
-		image.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event );
-
-			scope.manager.itemError( url );
-
-		}, false );
-
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
 		scope.manager.itemStart( url );
-
-		image.src = url;
 
 		return image;
 
@@ -87,13 +65,25 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
+		return this;
 
 	},
 
 	setPath: function ( value ) {
 
 		this.path = value;
+		return this;
 
 	}
 
-};
+} );
+
+
+export { ImageLoader };

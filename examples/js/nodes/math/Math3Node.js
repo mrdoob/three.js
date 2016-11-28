@@ -30,7 +30,7 @@ THREE.Math3Node.prototype.getType = function( builder ) {
 
 	if ( a > b && a > c ) return this.a.getType( builder );
 	else if ( b > c ) return this.b.getType( builder );
-	
+
 	return this.c.getType( builder );
 
 };
@@ -44,7 +44,7 @@ THREE.Math3Node.prototype.generate = function( builder, output ) {
 	var a, b, c,
 		al = builder.getFormatLength( this.a.getType( builder ) ),
 		bl = builder.getFormatLength( this.b.getType( builder ) ),
-		cl = builder.getFormatLength( this.c.getType( builder ) )
+		cl = builder.getFormatLength( this.c.getType( builder ) );
 
 	// optimzer
 

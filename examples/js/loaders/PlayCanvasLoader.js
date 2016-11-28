@@ -16,7 +16,7 @@ THREE.PlayCanvasLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -55,7 +55,7 @@ THREE.PlayCanvasLoader.prototype = {
 
 			var geometry = new THREE.BufferGeometry();
 
-			geometry.setIndex( new THREE.Uint16Attribute( data.indices, 1 ) );
+			geometry.setIndex( new THREE.Uint16BufferAttribute( data.indices, 1 ) );
 
 			var attributes = model.vertices[ data.vertices ]._attributes;
 

@@ -4,9 +4,10 @@
 
 THREE.ShaderLib[ 'mirror' ] = {
 
-	uniforms: { "mirrorColor": { type: "c", value: new THREE.Color( 0x7F7F7F ) },
-				"mirrorSampler": { type: "t", value: null },
-				"textureMatrix" : { type: "m4", value: new THREE.Matrix4() }
+	uniforms: {
+		"mirrorColor": new THREE.Uniform( new THREE.Color( 0x7F7F7F ) ),
+		"mirrorSampler": new THREE.Uniform( null ),
+		"textureMatrix" : new THREE.Uniform( new THREE.Matrix4() )
 	},
 
 	vertexShader: [
@@ -118,7 +119,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.renderTarget2 = new THREE.WebGLRenderTarget( width, height, parameters );
 
 	var mirrorShader = THREE.ShaderLib[ "mirror" ];
-	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
+	var mirrorUniforms = Object.assign( {}, mirrorShader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -128,9 +129,9 @@ THREE.Mirror = function ( renderer, camera, options ) {
 
 	} );
 
-	this.material.uniforms.mirrorSampler.value = this.renderTarget.texture;
-	this.material.uniforms.mirrorColor.value = mirrorColor;
-	this.material.uniforms.textureMatrix.value = this.textureMatrix;
+	this.material.uniforms.mirrorSampler = new THREE.Uniform( this.renderTarget.texture );
+	this.material.uniforms.mirrorColor = new THREE.Uniform( mirrorColor );
+	this.material.uniforms.textureMatrix = new THREE.Uniform( this.textureMatrix );
 
 	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) ) {
 

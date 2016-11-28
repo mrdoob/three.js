@@ -18,7 +18,7 @@
 
 		<h3>[name]( [page:Vector2 min], [page:Vector2 max] )</h3>
 		<div>
-		min -- Lower (x, y) boundary of the box.<br />
+		min -- Lower (x, y) boundary of the box.<br>
 		max -- Upper (x, y) boundary of the box.
 		</div>
 		<div>
@@ -46,7 +46,7 @@
 
 		<h3>[method:Box2 set]( [page:Vector2 min], [page:Vector2 max] ) [page:Box2 this]</h3>
 		<div>
-		min -- Lower (x, y) boundary of the box. <br />
+		min -- Lower (x, y) boundary of the box. <br>
 		max -- Upper (x, y) boundary of the box.
 		</div>
 		<div>
@@ -63,7 +63,7 @@
 
 		<h3>[method:Vector2 clampPoint]( [page:Vector2 point], [page:Vector2 optionalTarget] ) [page:Box2 this]</h3>
 		<div>
-		point -- Position to clamp. <br />
+		point -- Position to clamp. <br>
 		optionalTarget -- If specified, the clamped result will be copied here.
 		</div>
 		<div>
@@ -86,7 +86,7 @@
 		Sets the upper and lower bounds of this box to include all of the points in *points*.
 		</div>
 
-		<h3>[method:Vector2 size]( [page:Vector2 optionalTarget] ) [page:Box2 this]</h3>
+		<h3>[method:Vector2 getSize]( [page:Vector2 optionalTarget] ) [page:Box2 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -99,8 +99,8 @@
 		box -- Box that will be unioned with this box.
 		</div>
 		<div>
-		Unions this box with *box* setting the upper bound of this box to the greater of the
-		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
+		Unions this box with *box* setting the upper bound of this box to the greater of the <br>
+		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes' <br>
 		lower bounds.
 		</div>
 
@@ -119,7 +119,7 @@
 		scalar -- Distance to expand.
 		</div>
 		<div>
-		Expands each dimension of the box by *scalar*. If negative, the dimensions of the box </br>
+		Expands each dimension of the box by *scalar*. If negative, the dimensions of the box <br>
 		will be contracted.
 		</div>
 
@@ -128,8 +128,8 @@
 		box -- Box to intersect with.
 		</div>
 		<div>
-		Returns the intersection of this and *box*, setting the upper bound of this box to the lesser </br>
-		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' </br>
+		Returns the intersection of this and *box*, setting the upper bound of this box to the lesser <br>
+		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' <br>
 		lower bounds.
 		</div>
 
@@ -138,7 +138,7 @@
 		box -- Box to test for inclusion.
 		</div>
 		<div>
-		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,</br>
+		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly, <br>
 		this function also returns true.
 		</div>
 
@@ -147,14 +147,14 @@
 		offset -- Direction and distance of offset.
 		</div>
 		<div>
-		Adds *offset* to both the upper and lower bounds of this box, effectively moving this box </br>
+		Adds *offset* to both the upper and lower bounds of this box, effectively moving this box <br>
 		*offset* units in 2D space.
 		</div>
 
 		<h3>[method:Boolean isEmpty]() [page:Box2 this]</h3>
 		<div>
-		Returns true if this box includes zero points within its bounds.</br>
-		Note that a box with equal lower and upper bounds still includes one point, the
+		Returns true if this box includes zero points within its bounds.<br>
+		Note that a box with equal lower and upper bounds still includes one point, the <br>
 		one both bounds share.
 		</div>
 
@@ -176,8 +176,8 @@
 		vector -- Amount to expand this box in each dimension.
 		</div>
 		<div>
-		Expands this box equilaterally by *vector*. The width of this box will be
-		expanded by the x component of *vector* in both directions. The height of
+		Expands this box equilaterally by *vector*. The width of this box will be <br>
+		expanded by the x component of *vector* in both directions. The height of <br>
 		this box will be expanded by the y component of *vector* in both directions.
 		</div>
 
@@ -194,7 +194,7 @@
 		Makes this box empty.
 		</div>
 
-		<h3>[method:Vector2 center]( [page:Vector2 optionalTarget] ) [page:Box2 this]</h3>
+		<h3>[method:Vector2 getCenter]( [page:Vector2 optionalTarget] ) [page:Box2 this]</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -207,7 +207,7 @@
 		point -- Point to measure distance to.
 		</div>
 		<div>
-		Returns the distance from any edge of this box to the specified point. </br>
+		Returns the distance from any edge of this box to the specified point. <br>
 		If the point lies inside of this box, the distance will be 0.
 		</div>
 
@@ -221,11 +221,11 @@
 
 		<h3>[method:Box2 setFromCenterAndSize]( [page:Vector2 center], [page:Vector2 size] ) [page:Box2 this]</h3>
 		<div>
-		center -- Desired center position of the box. <br />
+		center -- Desired center position of the box. <br>
 		size -- Desired x and y dimensions of the box.
 		</div>
 		<div>
-		Centers this box on *center* and sets this box's width and height to the values specified
+		Centers this box on *center* and sets this box's width and height to the values specified <br>
 		in *size*.
 		</div>
 

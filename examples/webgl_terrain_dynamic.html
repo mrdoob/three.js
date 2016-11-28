@@ -214,7 +214,7 @@
 			var camera, scene;
 			var cameraOrtho, sceneRenderTarget;
 
-			var uniformsNoise, uniformsNormal,
+			var uniformsNoise, uniformsNormal, uniformsTerrain,
 				heightMap, normalMap,
 				quadTarget;
 
@@ -298,13 +298,13 @@
 
 				uniformsNoise = {
 
-					time:   { type: "f", value: 1.0 },
-					scale:  { type: "v2", value: new THREE.Vector2( 1.5, 1.5 ) },
-					offset: { type: "v2", value: new THREE.Vector2( 0, 0 ) }
+					time:   { value: 1.0 },
+					scale:  { value: new THREE.Vector2( 1.5, 1.5 ) },
+					offset: { value: new THREE.Vector2( 0, 0 ) }
 
 				};
 
-				uniformsNormal = THREE.UniformsUtils.clone( normalShader.uniforms );
+				uniformsNormal = Object.assign( {}, normalShader.uniforms );
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
@@ -335,7 +335,7 @@
 
 				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
+				uniformsTerrain = Object.assign( {}, terrainShader.uniforms );
 
 				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
 				uniformsTerrain[ 'uNormalScale' ].value = 3.5;

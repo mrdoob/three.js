@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Clock = function ( autoStart ) {
+function Clock( autoStart ) {
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
@@ -12,17 +12,18 @@ THREE.Clock = function ( autoStart ) {
 
 	this.running = false;
 
-};
+}
 
-THREE.Clock.prototype = {
+Clock.prototype = {
 
-	constructor: THREE.Clock,
+	constructor: Clock,
 
 	start: function () {
 
 		this.startTime = ( performance || Date ).now();
 
 		this.oldTime = this.startTime;
+		this.elapsedTime = 0;
 		this.running = true;
 
 	},
@@ -67,3 +68,6 @@ THREE.Clock.prototype = {
 	}
 
 };
+
+
+export { Clock };

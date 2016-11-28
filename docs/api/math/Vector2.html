@@ -64,6 +64,14 @@
 		replace this vector's y value with y.
 		</div>
 
+		<h3>[method:Vector2 setScalar]( [page:Float scalar] ) [page:Vector2 this]</h3>
+		<div>
+		scalar -- [page:Float]
+		</div>
+		<div>
+		set all component values of this vector to *scalar*.
+		</div>
+
 		<h3>[method:Vector2 copy]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
@@ -126,17 +134,17 @@
 
 		<h3>[method:Float lengthSq]() [page:Vector2 this]</h3>
 		<div>
-		Computes squared length of this vector.
+		Computes the squared length of this vector.
 		</div>
 
 		<h3>[method:Float length]() [page:Vector2 this]</h3>
 		<div>
-		Computes length of this vector.
+		Computes the length of this vector.
 		</div>
 
 		<h3>[method:Float lengthManhattan]() [page:Vector2 this]</h3>
 		<div>
-		Computes Manhattan length of this vector.<br />
+		Computes the Manhattan length of this vector.<br />
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
@@ -152,12 +160,17 @@
 
 		<h3>[method:Float distanceTo]( [page:Vector2 v] )</h3>
 		<div>
-		Computes distance of this vector to *v*.
+		Computes the distance from this vector to *v*.
 		</div>
 
 		<h3>[method:Float distanceToSquared]( [page:Vector2 v] )</h3>
 		<div>
-		Computes squared distance of this vector to *v*.
+		Computes the squared distance from this vector to *v*.
+		</div>
+
+		<h3>[method:Float distanceToManhattan]( [page:Vector2 v] )</h3>
+		<div>
+		Computes the Manhattan distance from this vector to *v*.
 		</div>
 
 		<h3>[method:Vector2 setLength]( [page:Float l] ) [page:Vector2 this]</h3>
@@ -234,7 +247,7 @@
 		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
 		</div>
 
-		<h3>[method:undefined setComponent]( [page:Integer index], [page:Float value] ) [page:Vector2 this]</h3>
+		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] ) [page:Vector2 this]</h3>
 		<div>
 		index -- 0 or 1 <br />
 		value -- [page:Float]

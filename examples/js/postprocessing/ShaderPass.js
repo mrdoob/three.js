@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function( shader, textureID ) {
+THREE.ShaderPass = function ( shader, textureID ) {
 
 	THREE.Pass.call( this );
 
@@ -14,10 +14,9 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 		this.material = shader;
 
-	}
-	else if ( shader ) {
+	} else if ( shader ) {
 
-		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+		this.uniforms = Object.assign( {}, shader.uniforms );
 
 		this.material = new THREE.ShaderMaterial( {
 
@@ -38,15 +37,15 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 };
 
-THREE.ShaderPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.ShaderPass.prototype, {
+	constructor: THREE.ShaderPass,
 
 	render: function( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].value = readBuffer.texture;
+			this.uniforms[ this.textureID ] = new THREE.Uniform( readBuffer.texture );
 
 		}
 

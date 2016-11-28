@@ -24,7 +24,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
 
 	this.materialCopy = new THREE.ShaderMaterial( {
 
@@ -41,21 +41,21 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
+		uniforms: Object.assign( {}, THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
-		blending: THREE.NoBlending,
+		blending: THREE.NoBlending
 	} );
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 ),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
 		},
 		uniforms: {
-			"lastLum": { type: "t", value: null },
-			"currentLum": { type: "t", value: null },
-			"delta": { type: 'f', value: 0.016 },
-			"tau": { type: 'f', value: 1.0 }
+			"lastLum": { value: null },
+			"currentLum": { value: null },
+			"delta": { value: 0.016 },
+			"tau": { value: 1.0 }
 		},
 		vertexShader: [
 			"varying vec2 vUv;",
@@ -91,13 +91,13 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
 				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
-			"}",
+			"}"
 		].join( '\n' )
 	};
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
+		uniforms: Object.assign( {}, this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
 		defines: this.adaptLuminanceShader.defines,
@@ -109,7 +109,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
+		uniforms: Object.assign( {}, THREE.ToneMapShader.uniforms ),
 		vertexShader: THREE.ToneMapShader.vertexShader,
 		fragmentShader: THREE.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending
@@ -123,9 +123,9 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 };
 
-THREE.AdaptiveToneMappingPass.prototype = Object.create( THREE.Pass.prototype );
+THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-Object.assign( THREE.AdaptiveToneMappingPass.prototype, {
+	constructor: THREE.AdaptiveToneMappingPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 

@@ -67,9 +67,10 @@
 		Copies the values of matrix *m* into this matrix.
 		</div>
 
-		<h3>[method:Matrix4 fromArray]( [page:Array array] ) [page:Matrix4 this]</h3>
+		<h3>[method:Matrix4 fromArray]( [page:Array array], [page:Integer offset] ) [page:Matrix4 this]</h3>
 		<div>
-		array -- [page:Array] The array to read the elements from.
+		array -- [page:Array] The array to read the elements from.<br />
+		offset -- [page:Integer] optional offset into the array. Default is 0.
 		</div>
 		<div>
 		Sets the elements of this matrix based on an array in column-major format.
@@ -172,7 +173,7 @@
 		Sets this matrix to the transformation composed of *translation*, *quaternion* and *scale*.
 		</div>
 
-		<h3>[method:Array decompose]( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] ) [page:Matrix4 this]</h3>
+		<h3>[method:null decompose]( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] ) [page:Matrix4 this]</h3>
 		<div>
 		Decomposes this matrix into the *translation*, *quaternion* and *scale* components.
 		</div>

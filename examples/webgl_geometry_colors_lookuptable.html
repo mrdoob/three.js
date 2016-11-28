@@ -34,8 +34,8 @@
 	<body>
 
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - lookuptable - vertex color values from a range of data values.</br>
-		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout</br>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - lookuptable - vertex color values from a range of data values.<br />
+		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout<br />
 		</div>
 
 		<div id="container"></div>
@@ -205,7 +205,7 @@
 
 					geometry.computeBoundingBox();
 					var boundingBox = geometry.boundingBox;
-					var center = boundingBox.center();
+					var center = boundingBox.getCenter();
 
 					if ( position === undefined ) {
 
