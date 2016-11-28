@@ -30,7 +30,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
 		select model:
-		<select id="fileModel" onchange="reloadModel(this.value,1);">
+		<select id="fileModel" onchange="loadModelFromPath(this.value);">
 			<option value="models/babylon/skull.babylon">models/babylon/skull.babylon</option>
 			<option value="obj/female02/female02.obj">obj/female02/female02.obj</option>
 			<option value="obj/male02/male02.obj">obj/male02/male02.obj</option>
@@ -51,7 +51,7 @@
 		<br>
 		Custom model:
 		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
-		<button onclick="reloadModel(getElementById('customModel').value,1)">Load Custom Model</button>
+		<button onclick="loadModelFromPath(getElementById('customModel').value)">Load Custom Model</button>
 		<input type="file" id="selectedFile" style="display: none;" />
 		<input type="button" value="Open local file..." onclick="document.getElementById('selectedFile').click();" />
 		<br>
@@ -73,6 +73,7 @@
 	<script src="js/loaders/VRMLLoader.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 	<script src="js/Detector.js"></script>
+	<script src="js/loaders/ModelViewerLoader.js"></script>
 	<script src="js/ModelViewer.js"></script>
 	<script>
 	//window.onerror = function() {
