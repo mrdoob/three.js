@@ -52,9 +52,8 @@
 		Custom model:
 		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
 		<button onclick="reloadModel(getElementById('customModel').value,1)">Load Custom Model</button>
-		<br>
-		<input type="file" id="file"/>
-		<output id="list"></output>
+		<input type="file" id="selectedFile" style="display: none;" />
+		<input type="button" value="Open local file..." onclick="document.getElementById('selectedFile').click();" />
 		<br>
 		<div id="debug" align="left" style="display: none; width: 300px; height: 150px; overflow: auto;" ></div>
 	</div>
@@ -79,10 +78,13 @@
 	//window.onerror = function() {
   //  alert("Error caught");
 	//};
-	var fileInput= document.getElementById("file");
+	var fileInput= document.getElementById("selectedFile");
 	fileInput.addEventListener( 'change', function ( event ) {
 		console.log(fileInput.files[ 0 ].name);
 		loadModelFromFile( fileInput.files[ 0 ]);
+		document.getElementById("customModel")
+		.value = "**selected file: "+fileInput.files[ 0 ].name + "**";
+		fileInput.value ="";
 	} );
 	</script>
 </body>
