@@ -16,9 +16,10 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	if ( THREE.SSAARenderPass === undefined ) {
 
-		console.error( "THREE.TAARenderPass relies on THREE.ManualSSAARenderPass" );
+		console.error( "THREE.TAARenderPass relies on THREE.SSAARenderPass" );
 
 	}
+
 	THREE.SSAARenderPass.call( this, scene, camera, params );
 
 	this.sampleLevel = 0;
