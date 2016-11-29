@@ -322,7 +322,7 @@ loadFile: function ( file, onLoad ) {
 					worker.onmessage = function ( event ) {
 
 						event.data.metadata = { version: 2 };
-						scope.handleJSON( event.data, file, filename );
+						scope.handleJSON( event.data, file, filename, onLoad );
 
 					};
 
@@ -347,7 +347,7 @@ loadFile: function ( file, onLoad ) {
 
 				}
 
-				scope.handleJSON( data, file, filename );
+				scope.handleJSON( data, file, filename, onLoad );
 
 			}, false );
 			reader.readAsText( file );
@@ -546,7 +546,7 @@ loadFile: function ( file, onLoad ) {
 	}
 },
 
-handleJSON: function ( data, file, filename ) {
+handleJSON: function ( data, file, filename, onLoad ) {
 	//copied from:
 	//https://github.com/mrdoob/three.js/blob/dev/editor/js/Loader.js
 
@@ -572,19 +572,20 @@ handleJSON: function ( data, file, filename ) {
 
 		case 'buffergeometry':
 
-			var loader = new THREE.BufferGeometryLoader( scope.manager );
+			var loader = new THREE.BufferGeometryLoader( this.manager );
 			var result = loader.parse( data );
 
 			var mesh = new THREE.Mesh( result );
 
-			editor.execute( new AddObjectCommand( mesh ) );
+			//editor.execute( new AddObjectCommand( mesh ) );
+			onLoad(mesh);
 
 			break;
 
 		case 'geometry':
 
-			var loader = new THREE.JSONLoader( scope.manager );
-			loader.setTexturePath( scope.texturePath );
+			var loader = new THREE.JSONLoader( this.manager );
+			loader.setTexturePath( this.texturePath );
 
 			var result = loader.parse( data );
 
@@ -626,18 +627,19 @@ handleJSON: function ( data, file, filename ) {
 
 			mesh.name = filename;
 
-			editor.execute( new AddObjectCommand( mesh ) );
+			//editor.execute( new AddObjectCommand( mesh ) );
+			onLoad( mesh );
 
 			break;
 
 		case 'object':
 
-			var loader = new THREE.ObjectLoader( scope.manager );
-			loader.setTexturePath( scope.texturePath );
+			var loader = new THREE.ObjectLoader( this.manager );
+			loader.setTexturePath( this.texturePath );
 
 			var result = loader.parse( data );
 
-			if ( result instanceof THREE.Scene ) {
+			/*if ( result instanceof THREE.Scene ) {
 
 				editor.execute( new SetSceneCommand( result ) );
 
@@ -645,7 +647,8 @@ handleJSON: function ( data, file, filename ) {
 
 				editor.execute( new AddObjectCommand( result ) );
 
-			}
+			}*/
+			onLoad ( result );
 
 			break;
 
@@ -653,20 +656,20 @@ handleJSON: function ( data, file, filename ) {
 
 			// DEPRECATED
 
-			var loader = new THREE.SceneLoader( scope.manager );
+			var loader = new THREE.SceneLoader( this.manager );
 			loader.parse( data, function ( result ) {
 
-				editor.execute( new SetSceneCommand( result.scene ) );
-
+				//editor.execute( new SetSceneCommand( result.scene ) );
+				onLoad ( result.scene );
 			}, '' );
 
 			break;
 
-		case 'app':
+		/*case 'app':
 
 			editor.fromJSON( data );
 
-			break;
+			break;*/
 
 	}
 

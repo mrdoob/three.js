@@ -6,14 +6,27 @@ if ( ! Detector.webgl ) {
   Detector.addGetWebGLMessage();
 }
 
-var camera, controls, scene, renderer, loader, fileType;
+var camera, controls, scene, renderer, loader, fileType, loadedFile;
 
 var fileInput= document.getElementById("selectedFile");
 
+var params = {
+  source: 'list',
+  list: 'models/babylon/skull.babylon',
+  url: 'http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj',
+  file: function ()
+  {
+    fileInput.click();
+  }
+};
+
+var list = [];
+
 fileInput.addEventListener( 'change', function ( event ) {
   console.log(fileInput.files[ 0 ].name);
-  loadModelFromFile( fileInput.files[ 0 ]);
-  replaceDiv('selectedFileOut',"**selected file: "+fileInput.files[ 0 ].name + "**");
+  loadedFile = fileInput.files[ 0 ];
+  loadModelFromFile(loadedFile);
+  //replaceDiv('selectedFileOut',"**selected file: "+fileInput.files[ 0 ].name + "**");
   fileInput.value ="";
 } );
 
@@ -36,6 +49,8 @@ manager.onProgress = function ( item, loaded, total ) {
 };
 
 loadList('list',"webgl_loader_viewer.list");
+
+var gui = new dat.GUI();
 
 init();
 
@@ -81,7 +96,7 @@ function loadList(id, url)
     console.log("load");
     console.log(text);
     var options = text.split('\n');
-    console.log(options);
+    //console.log(options);
 
     //http://stackoverflow.com/questions/18284869/populate-drop-down-list-box-with-values-from-array
     var i;
@@ -90,11 +105,37 @@ function loadList(id, url)
       var opt = options[i];
       if (opt === "")
       break;
-      var el = document.createElement("option");
-      el.textContent = opt;
-      el.value = opt;
-      select.appendChild(el);
+      list.push(opt);
+      //select.appendChild(el);
     }
+
+    gui.add( params, 'source', ['list','url','file'])
+    .onChange(function(newValue) {
+      if (newValue === 'list' )
+      {
+        loadModelFromList(params.list);
+      }
+      else if (newValue === 'url' )
+      {
+        loadModelFromURL(params.url);
+      }
+      else {
+        if (loadedFile !== undefined) {
+          loadModelFromFile(loadedFile);
+        }
+        else {
+          alert("No file selected: click on file and select model");
+        }
+      }
+    }).listen();
+    gui.add( params, 'list', list ).onChange(function(newValue) {
+      loadModelFromList(newValue);
+    });
+    gui.add( params, 'url').onChange(function(newValue) {
+      loadModelFromURL(newValue);
+    });
+    gui.add( params, 'file');
+    gui.open();
 
   }, onProgress, onError );
 }
@@ -116,11 +157,12 @@ function replaceDiv(id, replace) {
 
 function debugPrint(text)
 {
-  appendDiv('debug',text);
+  //appendDiv('debug',text);
+  console.log(text);
 }
 
 function clearScene() {
-  clearDiv('debug');
+  //clearDiv('debug');
   camera.position.z = 250;
   scene.scale.x = scene.scale.y = scene.scale.z = 1.0;
 
@@ -141,13 +183,23 @@ function setupLights() {
 
 function loadModelFromFile(file)
 {
+  params.source = 'file';
   fileType = file.name.split('.').pop().toLowerCase();
   clearScene();
   loader.loadFile( file, setupScene, onProgress, onError );
 }
 
-function loadModelFromPath(path)
+function loadModelFromList(path)
 {
+  params.source = 'list';
+  fileType = path.split('.').pop().toLowerCase();
+  clearScene();
+  loader.loadFromPath( path, setupScene, onProgress, onError );
+}
+
+function loadModelFromURL(path)
+{
+  params.source = 'url';
   fileType = path.split('.').pop().toLowerCase();
   clearScene();
   loader.loadFromPath( path, setupScene, onProgress, onError );
@@ -190,7 +242,7 @@ function init() {
   // model
   var modelPath = 'models/babylon/skull.babylon';
   loader = new THREE.ModelViewerLoader( manager );
-  loadModelFromPath( modelPath );
+  loadModelFromList( modelPath );
 
   //
 
@@ -209,7 +261,7 @@ function init() {
 
 function printNode(node, header, space)
 {
-  debugPrint(space+header+": "+node.type+"<br>");
+  debugPrint(space+header+": "+node.type);
   var childCount = 0;
   space+="-";
   while(node.children.length>0)

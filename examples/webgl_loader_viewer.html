@@ -27,6 +27,9 @@
 
 <body>
 	<div id="info">
+	<input type="file" id="selectedFile" style="display: none;" />
+</div>
+	<!--<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
 		Select model:
@@ -43,8 +46,7 @@
 		<input type="button" value="Open local file..." onclick="document.getElementById('selectedFile').click();" />
 		<label id="selectedFileOut"></label>
 		<br>
-		<div id="debug" align="left" style="display: none; width: 300px; height: 150px; overflow: auto;" ></div>
-	</div>
+	</div>-->
 
 	<script src="../build/three.js"></script>
 	<script src="js/loaders/BabylonLoader.js"></script>
@@ -61,6 +63,7 @@
 	<script src="js/loaders/VRMLLoader.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 	<script src="js/Detector.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="js/loaders/ModelViewerLoader.js"></script>
 	<script src="js/ModelViewer.js"></script>
 </body>
