@@ -13,19 +13,44 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A standard physically-based material.<br /><br />
+			A standard physically based material.<br /><br />
 
-			A physically based micro-faceted reflectance model is used for this material - this gives a more
-			accurate and realistic looking result than the [page:MeshLambertMaterial] or [page:MeshPhongMaterial],
-			at the cost of being more computationally expensive.<br /><br />
+			Physically based rendering (PBR) has recently become the standard in many 3D applications, such as
+			[link:https://blogs.unity3d.com/2014/10/29/physically-based-shading-in-unity-5-a-primer/ Unity],
+			[link:https://docs.unrealengine.com/latest/INT/Engine/Rendering/Materials/PhysicallyBased/ Unreal] and
+			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max].<br /><br />
 
-			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.
-			This calculates shading per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders pixel shader], AKA fragment shader)
-			which gives more accurate results than the Gouraud model used by [page:MeshLambertMaterial],
-			at the cost of some performance. The [page:MeshPhongMaterial] also uses this shading model.<br /><br />
+			This approach differs from older approaches in that instead of using approximations for the way in which
+			light	interacts with a surface, a physically correct model is used. The idea is that, instead of
+			tweaking materials to look good under specific lighting, a material can	be created that
+			will react 'correctly' under all lighting scenarios.<br /><br />
 
-			Note that for best results you should always specify a [page:.envMap environment map] when using this material.
+			In practice this gives a more	accurate and realistic looking result than the [page:MeshLambertMaterial]
+			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive.<br /><br />
 
+			Shading is calculated in the same way as for the [page:MeshPhongMaterial], using a
+			[link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.	This calculates shading
+			per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
+			AKA pixel shader) which gives more accurate results than the Gouraud model used by
+			[page:MeshLambertMaterial], at the cost of some performance.<br /><br />
+
+			Note that for best results you should always specify an [page:.envMap environment map] when using
+			this material.<br /><br />
+
+			For a non-technical introduction to the concept of PBR and how to set up a PBR material,
+			check out these articles by the people at [link:https://www.marmoset.co marmoset]:
+			<ul>
+				<li>
+					[link:https://www.marmoset.co/posts/basic-theory-of-physically-based-rendering/ Basic Theory of Physically Based Rendering]
+				</li>
+				<li>
+					[link:https://www.marmoset.co/posts/physically-based-rendering-and-you-can-too/ Physically Based Rendering and You Can Too]
+				</li>
+			</ul>
+
+			Technical details of the approach used in Three (and most other PBR systems) can be found is this
+			[link:https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf paper from Disney] (pdf),
+			by Brent Burley.
 		</div>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshStandardMaterial"></iframe>
