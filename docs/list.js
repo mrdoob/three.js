@@ -226,6 +226,7 @@ var list = {
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
 			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
+			[ "MeshToonMaterial", "api/materials/MeshToonMaterial" ],
 			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
