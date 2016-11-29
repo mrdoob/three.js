@@ -702,6 +702,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
+		this.layers.copy( source.layers );
+
 		this.visible = source.visible;
 
 		this.castShadow = source.castShadow;
