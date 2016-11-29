@@ -4,7 +4,9 @@
  * This controls allow to change the orientation of the camera using the mouse
  */
 
-THREE.MouseControls = function ( object ) {
+THREE.MouseControls = function ( object, mouseDownEnabled ) {
+
+	mouseDownEnabled = mouseDownEnabled !== true ? false : true;
 
 	var scope = this;
 	var PI_2 = Math.PI / 2;
@@ -19,6 +21,7 @@ THREE.MouseControls = function ( object ) {
 	var onMouseMove = function ( event ) {
 
 		if ( scope.enabled === false ) return;
+		if ( mouseDownEnabled === true && scope.isMouseDown === false ) return;
 
 		var orientation = scope.orientation;
 
@@ -32,7 +35,24 @@ THREE.MouseControls = function ( object ) {
 
 	};
 
+	var onMouseDown = function ( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		scope.isMouseDown = true;
+
+	};
+
+	var onMouseUp = function ( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		scope.isMouseDown = false;
+
+	};
+
 	this.enabled = true;
+	this.isMouseDown = false;
 
 	this.orientation = {
 		x: 0,
@@ -57,4 +77,12 @@ THREE.MouseControls = function ( object ) {
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
 
+	if ( mouseDownEnabled === true ) {
+
+		document.addEventListener( 'mousedown', onMouseDown, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	}
+
 };
+
