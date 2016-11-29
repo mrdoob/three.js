@@ -182,7 +182,7 @@ THREE.ColladaLoader.prototype = {
 
 		// image
 
-		var imageLoader = new THREE.ImageLoader();
+		var imageLoader = new THREE.ImageLoader( this.manager );
 		imageLoader.setCrossOrigin( this.crossOrigin );
 
 		function parseImage( xml ) {
