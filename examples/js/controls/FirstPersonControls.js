@@ -214,7 +214,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualLookSpeed = delta * this.lookSpeed;
 
-		if ( ! this.activeLook ) {
+		if ( ! ( this.activeLook || this.mouseDragOn ) ) {
 
 			actualLookSpeed = 0;
 
