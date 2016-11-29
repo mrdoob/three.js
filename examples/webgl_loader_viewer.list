@@ -1,0 +1,15 @@
+models/babylon/skull.babylon
+obj/female02/female02.obj
+obj/male02/male02.obj
+obj/walt/WaltHead.obj
+models/awd/simple/simple.awd
+models/collada/monster/monster.dae
+models/collada/kawada-hironx.dae
+models/fbx/xsi_man_skinning.fbx
+models/gltf/duck/glTF/duck.gltf
+models/json/teapot-claraio.json
+models/skinned/marine/marine_anims_core.json
+models/assimp/jeep/jeep.assimp.json
+models/pcd/Zaghetto.pcd
+models/sea3d/mascot.tjs.sea
+models/vrml/house.wrl

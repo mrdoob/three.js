@@ -30,22 +30,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
 		select model:
-		<select id="fileModel" onchange="loadModelFromPath(this.value);">
-			<option value="models/babylon/skull.babylon">models/babylon/skull.babylon</option>
-			<option value="obj/female02/female02.obj">obj/female02/female02.obj</option>
-			<option value="obj/male02/male02.obj">obj/male02/male02.obj</option>
-			<option value="obj/walt/WaltHead.obj">obj/walt/WaltHead.obj</option>
-			<option value="models/awd/simple/simple.awd">models/awd/simple/simple.awd</option>
-			<option value="models/collada/monster/monster.dae">models/collada/monster/monster.dae</option>
-			<option value="models/collada/kawada-hironx.dae">models/collada/kawada-hironx.dae</option>
-			<option value="models/fbx/xsi_man_skinning.fbx">models/fbx/xsi_man_skinning.fbx</option>
-			<option value="models/gltf/duck/glTF/duck.gltf">models/gltf/duck/glTF/duck.gltf</option>
-			<option value="models/json/teapot-claraio.json">models/json/teapot-claraio.json</option>
-			<option value="models/skinned/marine/marine_anims_core.json">models/skinned/marine/marine_anims_core.json</option>
-			<option value="models/assimp/jeep/jeep.assimp.json">models/assimp/jeep/jeep.assimp.json</option>
-			<option value="models/pcd/Zaghetto.pcd">models/pcd/Zaghetto.pcd</option>
-			<option value="models/sea3d/mascot.tjs.sea">models/sea3d/mascot.tjs.sea</option>
-			<option value="models/vrml/house.wrl">models/vrml/house.wrl</option>
+		<select id="list" onchange="loadModelFromPath(this.value);">
 		</select>
 		<button onclick="toggleDiv('debug')">Toggle Debug output</button>
 		<br>
@@ -75,18 +60,5 @@
 	<script src="js/Detector.js"></script>
 	<script src="js/loaders/ModelViewerLoader.js"></script>
 	<script src="js/ModelViewer.js"></script>
-	<script>
-	//window.onerror = function() {
-  //  alert("Error caught");
-	//};
-	var fileInput= document.getElementById("selectedFile");
-	fileInput.addEventListener( 'change', function ( event ) {
-		console.log(fileInput.files[ 0 ].name);
-		loadModelFromFile( fileInput.files[ 0 ]);
-		document.getElementById("customModel")
-		.value = "**selected file: "+fileInput.files[ 0 ].name + "**";
-		fileInput.value ="";
-	} );
-	</script>
 </body>
 </html>

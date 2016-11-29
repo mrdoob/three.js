@@ -8,9 +8,15 @@
 
  	var camera, controls, scene, renderer, loader, fileType;
 
- 	init();
+  var fileInput= document.getElementById("selectedFile");
 
- 	animate();
+  fileInput.addEventListener( 'change', function ( event ) {
+    console.log(fileInput.files[ 0 ].name);
+    loadModelFromFile( fileInput.files[ 0 ]);
+    document.getElementById("customModel")
+    .value = "**selected file: "+fileInput.files[ 0 ].name + "**";
+    fileInput.value ="";
+  } );
 
   var onProgress = function ( xhr ) {
     if ( xhr.lengthComputable ) {
@@ -29,6 +35,12 @@
     console.log( item, loaded, total );
 
   };
+
+  loadList('list',"webgl_loader_viewer.list");
+
+  init();
+
+  animate();
 
   function setupScene ( rootNode ) {
  		//to do: improvement - setupLights() improve to use better lights
@@ -59,6 +71,34 @@
  		var div = document.getElementById(id);
  		div.style.display = (div.style.display === 'block') ? 'none' : 'block';
  	}
+
+  function loadList(id, url)
+  {
+    console.log("loadList");
+		var select = document.getElementById(id);
+    var loader = new THREE.FileLoader( manager );
+		loader.load( url, function ( text ) {
+
+      console.log("load");
+      console.log(text);
+      var options = text.split('\n');
+      console.log(options);
+
+      //http://stackoverflow.com/questions/18284869/populate-drop-down-list-box-with-values-from-array
+      var i;
+
+      for (i = 0; i < options.length; i++) {
+        var opt = options[i];
+        if (opt === "")
+          break;
+        var el = document.createElement("option");
+        el.textContent = opt;
+        el.value = opt;
+        select.appendChild(el);
+      }
+
+		}, onProgress, onError );
+  }
 
  	function clearDiv(id) {
  		var div = document.getElementById(id);
