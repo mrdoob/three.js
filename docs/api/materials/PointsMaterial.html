@@ -33,6 +33,28 @@
 			[example:webgl_trails WebGL / trails]
 		</div>
 
+		<code>
+//This will add a starfield to the background of a scene
+var starsGeometry = new THREE.Geometry();
+
+for ( var i = 0; i < 10000; i ++ ) {
+
+	var star = new THREE.Vector3();
+	star.x = THREE.Math.randFloatSpread( 2000 );
+	star.y = THREE.Math.randFloatSpread( 2000 );
+	star.z = THREE.Math.randFloatSpread( 2000 );
+
+	geometry.vertices.push( star );
+
+}
+
+var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } )
+
+var starField = new THREE.Points( geometry, starsMaterial );
+
+scene.add( starField );
+		</code>
+
 		<h3>[name]( [page:Object parameters] )</h3>
 		<div>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
