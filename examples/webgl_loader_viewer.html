@@ -29,7 +29,7 @@
 	<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - Model Viewer test with OrbitControls
 		<br>
-		select model:
+		Select model:
 		<select id="list" onchange="loadModelFromPath(this.value);">
 		</select>
 		<button onclick="toggleDiv('debug')">Toggle Debug output</button>
@@ -37,8 +37,11 @@
 		Custom model:
 		<input type="text" name="custompath" size="50" id="customModel" value="http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj">
 		<button onclick="loadModelFromPath(getElementById('customModel').value)">Load Custom Model</button>
+		<br>
 		<input type="file" id="selectedFile" style="display: none;" />
+		Local file:
 		<input type="button" value="Open local file..." onclick="document.getElementById('selectedFile').click();" />
+		<label id="selectedFileOut"></label>
 		<br>
 		<div id="debug" align="left" style="display: none; width: 300px; height: 150px; overflow: auto;" ></div>
 	</div>

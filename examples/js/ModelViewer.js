@@ -13,8 +13,7 @@
   fileInput.addEventListener( 'change', function ( event ) {
     console.log(fileInput.files[ 0 ].name);
     loadModelFromFile( fileInput.files[ 0 ]);
-    document.getElementById("customModel")
-    .value = "**selected file: "+fileInput.files[ 0 ].name + "**";
+    replaceDiv('selectedFileOut',"**selected file: "+fileInput.files[ 0 ].name + "**");
     fileInput.value ="";
   } );
 
@@ -108,6 +107,11 @@
  	function appendDiv(id, extra) {
  		var div = document.getElementById(id);
  		div.innerHTML = div.innerHTML + extra;
+ 	}
+
+  function replaceDiv(id, replace) {
+ 		var div = document.getElementById(id);
+ 		div.innerHTML = replace;
  	}
 
  	function debugPrint(text)
