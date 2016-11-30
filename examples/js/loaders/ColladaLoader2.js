@@ -1261,10 +1261,14 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
+
 						if ( child.hasAttribute( 'id' ) ) {
+
 							data.nodes.push( child.getAttribute( 'id' ) );
 							parseNode( child );
+
 						}
+
 						break;
 
 					case 'instance_camera':
