@@ -45,7 +45,7 @@
     <div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a>
 			<a href="https://github.com/Virtulous" target="_blank">Assimp Binary File format</a>
-			<div>Assbin loader by <a href="https://virtulo.us" target="_blank">Virtulous</a></div>
+			<div>Assimp binary loader by <a href="https://virtulo.us" target="_blank">Virtulous</a></div>
 			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank">Teh_Bucket and raymoohawk</a></div>
 	</div>
     <script src="../build/three.js"></script>
@@ -97,7 +97,7 @@
     	container.appendChild( stats.dom );
     	var loader = new THREE.AssimpLoader();
 
-    	loader.load( "./models/assbin/squid.assbin", function( err, object ) {
+    	loader.load( "./models/assimp/binary/squid.assimp", function( err, object ) {
 
     		object.object.rotation.x = Math.PI / 2;
     		scene.add( object.object );
