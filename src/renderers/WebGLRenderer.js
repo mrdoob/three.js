@@ -1833,7 +1833,7 @@ function WebGLRenderer( parameters ) {
 
 		for ( name in map ) {
 
-			console.log( "uniform: ", name );
+			console.log( "uniform: ", name, "present: ", material.hasParameter( name ) );
 
 		}
 

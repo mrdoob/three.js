@@ -7,6 +7,25 @@ import { _Math } from '../math/Math';
  * @author alteredq / http://alteredqualia.com/
  */
 
+function MaterialParameter( name, value ) {
+
+}
+
+MaterialParameter.prototype = {
+
+	constructor: MaterialParameter,
+
+	setValue: function ( value ) {
+
+	},
+
+	getValue: function () {
+
+
+	}
+
+}
+
 var materialId = 0;
 
 function Material() {
@@ -58,6 +77,8 @@ function Material() {
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
+
+	this.parameters = {};
 
 	this._needsUpdate = true;
 
@@ -343,6 +364,25 @@ Material.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	addParameter: function ( name, value ) {
+
+		var parameter = new MaterialParameter();
+
+		this.parameters[ name ] = parameter;
+
+		Object.defineProperty( this, name, {
+			set: function( value ) { parameter.setValue( value ) },
+			get: function() { return parameter.getValue() }
+		} )
+
+	},
+
+	hasParameter: function( name ) {
+
+		return ( this.parameters[ name ] !== undefined );
 
 	}
 
