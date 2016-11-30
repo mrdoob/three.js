@@ -1261,8 +1261,10 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
-						parseNode( child );
-						data.nodes.push( child.getAttribute( 'id' ) );
+						if ( child.hasAttribute( 'id' ) ) {
+							data.nodes.push( child.getAttribute( 'id' ) );
+							parseNode( child );
+						}
 						break;
 
 					case 'instance_camera':
@@ -1313,7 +1315,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			if ( xml.getAttribute( 'id' ) !== null ) {
+			if ( xml.hasAttribute( 'id' ) ) {
 
 				library.nodes[ xml.getAttribute( 'id' ) ] = data;
 
