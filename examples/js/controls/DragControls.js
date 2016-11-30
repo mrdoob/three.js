@@ -1,8 +1,10 @@
 /*
  * @author zz85 / https://github.com/zz85
+ * @author mrdoob / http://mrdoob.com
  * Running this will allow you to drag three.js objects around the screen.
  */
-THREE.DragControls = function( _camera, _objects, _domElement ) {
+
+THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 	var _raycaster = new THREE.Raycaster();
 
@@ -12,74 +14,27 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	var p3subp1 = new THREE.Vector3();
 	var targetposition = new THREE.Vector3();
-	var zerovector = new THREE.Vector3();
 
 	this.enabled = false;
 
-	 /* Custom Event Handling */
-	var _listeners = {
+	var scope = this;
 
-	};
+	this.setObjects = function ( objects ) {
 
-	var me = this;
-	this.on = function( event, handler ) {
+		if ( Array.isArray( objects ) === false ) {
 
-		if ( ! _listeners[ event ] ) _listeners[ event ] = [];
-
-		_listeners[ event ].push( handler );
-		return me;
-
-	};
-
-	this.off = function( event, handler ) {
-
-		var l = _listeners[ event ];
-		if ( ! l ) return me;
-
-		if ( l.indexOf( handler ) > - 1 ) {
-
-			l.splice( handler, 1 );
+			console.error( 'THREE.DragControls.setObjects() expects an Array.' );
+			return;
 
 		}
 
-		return me;
-
-	};
-
-	var notify = function( event, data, member ) {
-
-		var l = _listeners[ event ];
-		if ( ! l ) return;
-
-		if ( ! member ) {
-
-			for ( var i = 0; i < l.length; i ++ ) {
-
-				l[ i ]( data );
-
-			}
-
-		}
-
-	};
-
-	this.setObjects = function( objects ) {
-
-		if ( objects instanceof THREE.Scene ) {
-
-			_objects = objects.children;
-
-		} else {
-
-			_objects = objects;
-
-		}
+		_objects = objects;
 
 	};
 
 	this.setObjects( _objects );
 
-	this.activate = function() {
+	this.activate = function () {
 
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -87,7 +42,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	};
 
-	this.deactivate = function() {
+	this.deactivate = function () {
 
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -95,9 +50,9 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
-		me.deactivate();
+		scope.deactivate();
 
 	};
 
@@ -111,10 +66,10 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
+
 		var ray = _raycaster.ray;
 
-
-		if ( _selected && me.enabled ) {
+		if ( _selected && scope.enabled ) {
 
 			var normal = _selected.normal;
 
@@ -136,7 +91,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 			targetposition.copy( ray.direction ).multiplyScalar( u ).add( ray.origin ).sub( _offset );
 			// _selected.object.position.copy(targetposition);
 
-			var xLock, yLock, zLock = false;
+			var xLock, yLock;
 
 			var moveX, moveY, moveZ;
 
@@ -164,7 +119,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 			if ( moveY ) _selected.object.position.y = targetposition.y;
 			if ( moveZ ) _selected.object.position.z = targetposition.z;
 
-			notify( 'drag', _selected );
+			scope.dispatchEvent( { type: 'drag', object: _selected } );
 
 			return;
 
@@ -177,11 +132,13 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 			_domElement.style.cursor = 'pointer';
 			_hovered = intersects[ 0 ];
-			notify( 'hoveron', _hovered );
+
+			scope.dispatchEvent( { type: 'hoveron', object: _hovered } );
 
 		} else {
 
-			notify( 'hoveroff', _hovered );
+			scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
 			_hovered = null;
 			_domElement.style.cursor = 'auto';
 
@@ -205,12 +162,12 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 			_selected = intersects[ 0 ];
 			_selected.ray = ray;
-			_selected.normal = normal ;
+			_selected.normal = normal;
 			_offset.copy( _selected.point ).sub( _selected.object.position );
 
 			_domElement.style.cursor = 'move';
 
-			notify( 'dragstart', _selected );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
 
 		}
 
@@ -223,7 +180,7 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 		if ( _selected ) {
 
-			notify( 'dragend', _selected );
+			scope.dispatchEvent( { type: 'dragend', object: _selected } );
 			_selected = null;
 
 		}
@@ -232,4 +189,30 @@ THREE.DragControls = function( _camera, _objects, _domElement ) {
 
 	}
 
+	// Backward compatibility
+
+	this.on = function ( type, listener ) {
+
+		console.warn( 'THREE.DragControls: on() has been deprecated. Use addEventListener() instead.' );
+		scope.addEventListener( type, listener );
+
+	};
+
+	this.off = function ( type, listener ) {
+
+		console.warn( 'THREE.DragControls: off() has been deprecated. Use removeEventListener() instead.' );
+		scope.removeEventListener( type, listener );
+
+	};
+
+	this.notify = function ( type ) {
+
+		console.error( 'THREE.DragControls: notify() has been deprecated. Use dispatchEvent() instead.' );
+		scope.removeEventListener( type );
+
+	};
+
 };
+
+THREE.DragControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.DragControls.prototype.constructor = THREE.DragControls;
