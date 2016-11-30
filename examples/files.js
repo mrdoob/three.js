@@ -158,7 +158,6 @@ var files = {
 		"webgl_materials_variations_toon",
 		"webgl_materials_video",
 		"webgl_materials_wireframe",
-		"webgl_math_spherical_distribution",
 		"webgl_mirror",
 		"webgl_mirror_nodes",
 		"webgl_modifier_simplifier",
