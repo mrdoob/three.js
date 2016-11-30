@@ -30,7 +30,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 	}
 
@@ -38,7 +37,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
-		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 
 	}
 
@@ -52,8 +50,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
-		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
+		var rect = _domElement.getBoundingClientRect();
+		var x = event.clientX - rect.left;
+		var y = event.clientY - rect.top;
+
+		_mouse.x = ( x / _domElement.width ) * 2 - 1;
+		_mouse.y = - ( y / _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -70,8 +72,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 			return;
 
 		}
-
-		_raycaster.setFromCamera( _mouse, _camera );
 
 		var intersects = _raycaster.intersectObjects( _objects );
 
@@ -123,6 +123,10 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			}
 
+			_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
 			_domElement.style.cursor = 'move';
 
 			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
@@ -143,6 +147,10 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 			_selected = null;
 
 		}
+
+		document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+		document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 		_domElement.style.cursor = 'auto';
 
