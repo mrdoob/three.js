@@ -5,37 +5,37 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		body {
-				color: #000;
-				font-family: Monospace;
-				font-size: 13px;
+			body {
+					color: #000;
+					font-family: Monospace;
+					font-size: 13px;
+					text-align: center;
+					background-color: #000;
+					margin: 0px;
+					overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
 				text-align: center;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-		}
+				z-index: 100;
+				display:block;
 
-	#info {
-		color: #fff;
-		position: absolute;
-		top: 10px;
-		width: 100%;
-		text-align: center;
-		z-index: 100;
-		display:block;
+			}
 
-	}
+			a { color: skyblue }
+			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+			.highlight { background:orange; color:#fff; }
 
-	a { color: skyblue }
-	.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-	.highlight { background:orange; color:#fff; }
-
-	span {
-		display: inline-block;
-		width: 60px;
-		float: left;
-		text-align: center;
-	}
+			span {
+				display: inline-block;
+				width: 60px;
+				float: left;
+				text-align: center;
+			}
 		</style>
 </head>
 
@@ -46,7 +46,7 @@
 			<a href="https://github.com/Virtulous" target="_blank">Assimp File format</a>
 			<div>Assimp loader by <a href="https://virtulo.us" target="_blank">Virtulous</a></div>
 			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank">Teh_Bucket and raymoohawk</a></div>
-	</div>
+		</div>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/AssimpLoader.js"></script>
 		<script src="js/Detector.js"></script>
@@ -55,11 +55,13 @@
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
-		if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 		var container, stats;
 		var camera, scene, renderer;
-		var clock = new THREE.Clock();
 		var animation;
+
 		init();
 
 		function init() {
@@ -71,36 +73,35 @@
 			camera.lookAt( new THREE.Vector3( -100, 0, 0 ) );
 
 			scene = new THREE.Scene();
-			var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+
+			var ambient = new THREE.HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
+			ambient.position.set( 0, 1, 0 );
+			scene.add( ambient );
+
+			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( 0, 4, 4 ).normalize();
 			scene.add( light );
-			var ambient = new THREE.AmbientLight( 0x333333, 1.5 );
-			scene.add( ambient );
-			renderer = new THREE.WebGLRenderer( {
-				antialias: true
-			} );
 
-			renderer.setClearColor( 0xfff4e5 );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.sortObjects = false;
 			container.appendChild( renderer.domElement );
-			renderer.setClearColor( new THREE.Color( 0, 0, 0 ), 1 );
 
 			var controls = new THREE.OrbitControls( camera, renderer.domElement );
-		controls.target.set(-100,0,0);
-
-		controls.update();
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
+
 			var loader = new THREE.AssimpLoader();
+			loader.load( "./models/assimp/octaminator/Octaminator.assimp", function ( err, result ) {
 
-			loader.load( "./models/assimp/octaminator/Octaminator.assimp", function( err, object ) {
+				var object = result.object;
 
-				object.object.rotation.x = Math.PI / 2;
-				scene.add( object.object );
-				animation = object.animation;
+				object.position.y = - 100;
+				object.rotation.x = Math.PI / 2;
+				scene.add( object );
+
+				animation = result.animation;
 
 			} );
 
@@ -117,17 +118,12 @@
 
 		}
 
-		var now = performance.now();
-
 		function animate() {
 
-			var delta = performance.now() - now;
-			now += delta;
 			requestAnimationFrame( animate, renderer.domElement );
 			renderer.render( scene, camera );
 
-			if ( animation )
-				animation.setTime( now / 1000 );
+			if ( animation ) animation.setTime( performance.now() / 1000 );
 
 			stats.update();
 
