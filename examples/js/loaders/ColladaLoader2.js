@@ -14,20 +14,12 @@ THREE.ColladaLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		function getBaseUrl( url ) {
-
-			var parts = url.split( '/' );
-			parts.pop();
-			return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
-
-		}
-
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text, getBaseUrl( url ) ) );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
@@ -35,7 +27,7 @@ THREE.ColladaLoader.prototype = {
 
 	options: {
 
-		set convertUpAxis ( value ) {
+		set convertUpAxis( value ) {
 
 			console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
 
@@ -49,7 +41,7 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
-	parse: function ( text, baseUrl ) {
+	parse: function ( text ) {
 
 		function getElementsByTagName( xml, name ) {
 
@@ -182,9 +174,6 @@ THREE.ColladaLoader.prototype = {
 
 		// image
 
-		var imageLoader = new THREE.ImageLoader();
-		imageLoader.setCrossOrigin( this.crossOrigin );
-
 		function parseImage( xml ) {
 
 			var data = {
@@ -199,11 +188,7 @@ THREE.ColladaLoader.prototype = {
 
 			if ( data.build !== undefined ) return data.build;
 
-			var url = data.init_from;
-
-			if ( baseUrl !== undefined ) url = baseUrl + url;
-
-			return imageLoader.load( url );
+			return new Image();
 
 		}
 
@@ -626,6 +611,7 @@ THREE.ColladaLoader.prototype = {
 				var parameter = parameters[ key ];
 
 				switch ( key ) {
+
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
@@ -648,6 +634,7 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.float !== 1 )
 							material.transparent = true;
 						break;
+
 				}
 
 			}
@@ -1589,6 +1576,7 @@ THREE.ColladaLoader.prototype = {
 		return {
 			animations: [],
 			kinematics: { joints: [] },
+			library: library,
 			scene: scene
 		};
 
