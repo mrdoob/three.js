@@ -1662,7 +1662,192 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function setProgram2( camera, fog, material, object ) {
+
+		_usedTextureUnits = 0;
+//		console.log("s2");
+
+		var materialProperties = properties.get( material );
+
+		if ( _clippingEnabled ) {
+
+			if ( _localClippingEnabled || camera !== _currentCamera ) {
+
+				var useCache =
+					camera === _currentCamera &&
+					material.id === _currentMaterialId;
+
+				// we might want to call this function with some ClippingGroup
+				// object instead of the material, once it becomes feasible
+				// (#8465, #8379)
+				_clipping.setState(
+					material.clippingPlanes, material.clipIntersection, material.clipShadows,
+					camera, materialProperties, useCache );
+
+			}
+
+		}
+
+		if ( material.needsUpdate === false ) {
+
+			if ( materialProperties.program === undefined ) {
+
+				material.needsUpdate = true;
+
+			} else if ( material.fog && materialProperties.fog !== fog ) {
+
+				material.needsUpdate = true;
+
+			} else if ( material.lights && materialProperties.lightsHash !== _lights.hash ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.numClippingPlanes !== undefined &&
+				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
+				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
+
+				material.needsUpdate = true;
+
+			}
+
+		}
+
+		if ( material.needsUpdate ) {
+
+			initMaterial( material, fog, object );
+			material.needsUpdate = false;
+
+		}
+
+		var refreshProgram = false;
+		var refreshMaterial = false;
+		var refreshLights = false;
+
+		var program = materialProperties.program,
+			p_uniforms = program.getUniforms(),
+			m_uniforms = materialProperties.__webglShader.uniforms;
+
+		if ( program.id !== _currentProgram ) {
+
+			_gl.useProgram( program.program );
+			_currentProgram = program.id;
+
+			refreshProgram = true;
+			refreshMaterial = true;
+			refreshLights = true;
+
+		}
+
+		if ( material.id !== _currentMaterialId ) {
+
+			_currentMaterialId = material.id;
+
+			refreshMaterial = true;
+
+		}
+
+		if ( refreshProgram || camera !== _currentCamera ) {
+
+			p_uniforms.set( _gl, camera, 'projectionMatrix' );
+
+			if ( capabilities.logarithmicDepthBuffer ) {
+
+				p_uniforms.setValue( _gl, 'logDepthBufFC',
+					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+
+			}
+
+
+			if ( camera !== _currentCamera ) {
+
+				_currentCamera = camera;
+
+				// lighting uniforms depend on the camera so enforce an update
+				// now, in case this material supports lights - or later, when
+				// the next material that does gets activated:
+
+				refreshMaterial = true;		// set to true on material change
+				refreshLights = true;		// remains set until update done
+
+			}
+
+			// load material specific uniforms
+			// (shader material also gets them for the sake of genericity)
+
+
+			var uCamPos = p_uniforms.map.cameraPosition;
+
+			if ( uCamPos !== undefined ) {
+
+				uCamPos.setValue( _gl,
+					_vector3.setFromMatrixPosition( camera.matrixWorld ) );
+
+			}
+
+	
+			p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+
+			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
+			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
+
+		}
+
+		if ( refreshMaterial ) {
+
+			if ( material.lights ) {
+
+				// the current material requires lighting info
+
+				// note: all lighting uniforms are always set correctly
+				// they simply reference the renderer's state for their
+				// values
+				//
+				// use the current material's .needsUpdate flags to set
+				// the GL state when required
+
+				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
+
+			}
+
+			// refresh uniforms common to several materials
+
+			if ( fog && material.fog ) {
+
+				refreshUniformsFog( m_uniforms, fog );
+
+			}
+
+			// refresh single material specific uniforms
+
+			console.log( p_uniforms );
+			console.log( m_uniforms );
+
+			WebGLUniforms.upload(
+				_gl, materialProperties.uniformsList, m_uniforms, _this );
+
+		}
+
+		// common matrices
+
+		var map = p_uniforms.map;
+
+		for ( name in map ) {
+
+			console.log( "uniform: ", name );
+
+		}
+
+		p_uniforms.set( _gl, object, 'modelViewMatrix' );
+		p_uniforms.set( _gl, object, 'normalMatrix' );
+		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		return program;
+
+	}
+
 	function setProgram( camera, fog, material, object ) {
+
+ 		if ( material.isShaderMaterial ) return setProgram2( camera, fog, material, object );
 
 		_usedTextureUnits = 0;
 
