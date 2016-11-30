@@ -102,6 +102,7 @@ export { Triangle } from './math/Triangle.js';
 export { Spline } from './math/Spline.js';
 export { _Math as Math } from './math/Math.js';
 export { Spherical } from './math/Spherical.js';
+export { Cylindrical } from './math/Cylindrical.js';
 export { Plane } from './math/Plane.js';
 export { Frustum } from './math/Frustum.js';
 export { Sphere } from './math/Sphere.js';
