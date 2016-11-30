@@ -167,7 +167,7 @@
 				} );
 
 				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
-
+				dragcontrols.enabled = false;
 				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 
 					transformControl.attach( event.object );

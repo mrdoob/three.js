@@ -13,15 +13,14 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
+	var _plane = new THREE.Plane();
 	var _raycaster = new THREE.Raycaster();
 
-	var _mouse = new THREE.Vector3(), _offset = new THREE.Vector3();
-	var _selected, _hovered = null;
+	var _mouse = new THREE.Vector2();
+	var _offset = new THREE.Vector3();
+	var _intersection = new THREE.Vector3();
 
-	var p3subp1 = new THREE.Vector3();
-	var targetposition = new THREE.Vector3();
-
-	this.enabled = true;
+	var _selected = null, _hovered = null;
 
 	//
 
@@ -58,60 +57,15 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var ray = _raycaster.ray;
-
 		if ( _selected && scope.enabled ) {
 
-			var normal = _selected.normal;
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-			// I found this article useful about plane-line intersections
-			// http://paulbourke.net/geometry/planeline/
-
-			var denom = normal.dot( ray.direction );
-
-			if ( denom == 0 ) {
-
-				// bail
-				console.log( 'no or infinite solutions' );
-				return;
+				_selected.position.copy( _intersection.sub( _offset ) );
 
 			}
 
-			var num = normal.dot( p3subp1.copy( _selected.point ).sub( ray.origin ) );
-			var u = num / denom;
-
-			targetposition.copy( ray.direction ).multiplyScalar( u ).add( ray.origin ).sub( _offset );
-			// _selected.object.position.copy(targetposition);
-
-			var xLock, yLock;
-
-			var moveX, moveY, moveZ;
-
-
-			if ( xLock ) {
-
-				moveX = true;
-				moveY = false;
-				moveZ = false;
-
-			} else if ( yLock ) {
-
-				moveX = false;
-				moveY = true;
-				moveZ = false;
-
-			} else {
-
-				moveX = moveY = moveZ = true;
-
-			}
-
-			// Reverse Matrix?
-			if ( moveX ) _selected.object.position.x = targetposition.x;
-			if ( moveY ) _selected.object.position.y = targetposition.y;
-			if ( moveZ ) _selected.object.position.z = targetposition.z;
-
-			scope.dispatchEvent( { type: 'drag', object: _selected.object } );
+			scope.dispatchEvent( { type: 'drag', object: _selected } );
 
 			return;
 
@@ -124,6 +78,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		if ( intersects.length > 0 ) {
 
 			var object = intersects[ 0 ].object;
+
+			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), object.position );
 
 			if ( _hovered !== object ) {
 
@@ -153,24 +109,23 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
-		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
-
 		_raycaster.setFromCamera( _mouse, _camera );
-		var intersects = _raycaster.intersectObjects( _objects );
-		var ray = _raycaster.ray;
 
-		var normal = ray.direction; // normal ray to the camera position
+		var intersects = _raycaster.intersectObjects( _objects );
+
 		if ( intersects.length > 0 ) {
 
-			_selected = intersects[ 0 ];
-			_selected.ray = ray;
-			_selected.normal = normal;
-			_offset.copy( _selected.point ).sub( _selected.object.position );
+			_selected = intersects[ 0 ].object;
+
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				_offset.copy( _intersection ).sub( _selected.position );
+
+			}
 
 			_domElement.style.cursor = 'move';
 
-			scope.dispatchEvent( { type: 'dragstart', object: _selected.object } );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
 
 		}
 
@@ -183,7 +138,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected.object } );
+			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+
 			_selected = null;
 
 		}
@@ -195,6 +151,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	activate();
 
 	// API
+
+	this.enabled = true;
 
 	this.activate = activate;
 	this.deactivate = deactivate;
