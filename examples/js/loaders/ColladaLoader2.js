@@ -630,7 +630,7 @@ THREE.ColladaLoader.prototype = {
 							material.emissive.fromArray( parameter.color );
 						break;
 					case 'transparent':
-						if ( parameter.texture ) material.alphaMap = getTexture( parameter.texture );
+						// if ( parameter.texture ) material.alphaMap = getTexture( parameter.texture );
 						material.transparent = true;
 						break;
 					case 'transparency':
