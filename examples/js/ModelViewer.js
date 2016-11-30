@@ -13,7 +13,7 @@ var fileInput= document.getElementById("selectedFile");
 var params = {
   source: 'list',
   list: 'models/babylon/skull.babylon',
-  url: 'http://people.sc.fsu.edu/~jburkardt/data/obj/shuttle.obj',
+  url: 'models/collada/multimaterial.dae',
   file: function ()
   {
     fileInput.click();
