@@ -86,6 +86,10 @@ test( "getWorldRotation", function() {
 	ok( obj.getWorldRotation().y * RadToDeg === 90 , "y is equal" );
 });
 
+test( "serializeWithMesh", function() {
+	ok( JSON.stringify({ mesh: new THREE.Mesh }), "can serialize an object with Mesh property");
+});
+
 function checkIfPropsAreEqual(reference, obj) {
 	ok( obj.x === reference.x , "x is equal" );
 	ok( obj.y === reference.y , "y is equal!" );
