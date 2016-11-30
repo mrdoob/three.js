@@ -40,6 +40,20 @@ Layers.prototype = {
 
 		return ( this.mask & layers.mask ) !== 0;
 
+	},
+
+	clone: function ( ) {
+
+		return new Layers().copy( this );
+
+	},
+
+	copy: function ( source ) {
+
+		this.mask = source.mask;
+
+		return this;
+
 	}
 
 };
