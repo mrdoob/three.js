@@ -948,7 +948,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'polygons':
-						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
+						console.warn( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
 					case 'lines':
