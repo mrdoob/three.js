@@ -10,7 +10,7 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 	var _mouse = new THREE.Vector3(),
 		_offset = new THREE.Vector3();
-	var _selected, _hovered;
+	var _selected, _hovered = null;
 
 	var p3subp1 = new THREE.Vector3();
 	var targetposition = new THREE.Vector3();
@@ -119,28 +119,40 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 			if ( moveY ) _selected.object.position.y = targetposition.y;
 			if ( moveZ ) _selected.object.position.z = targetposition.z;
 
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
+			scope.dispatchEvent( { type: 'drag', object: _selected.object } );
 
 			return;
 
 		}
 
 		_raycaster.setFromCamera( _mouse, _camera );
+
 		var intersects = _raycaster.intersectObjects( _objects );
 
 		if ( intersects.length > 0 ) {
 
-			_domElement.style.cursor = 'pointer';
-			_hovered = intersects[ 0 ];
+			var object = intersects[ 0 ].object;
 
-			scope.dispatchEvent( { type: 'hoveron', object: _hovered } );
+			if ( _hovered !== object ) {
+
+				scope.dispatchEvent( { type: 'hoveron', object: object } );
+
+				_domElement.style.cursor = 'pointer';
+				_hovered = object;
+
+			}
 
 		} else {
 
-			scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+			if ( _hovered !== null ) {
 
-			_hovered = null;
-			_domElement.style.cursor = 'auto';
+				scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
+				_domElement.style.cursor = 'auto';
+				_hovered = null;
+
+			}
+
 
 		}
 
@@ -167,7 +179,7 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 			_domElement.style.cursor = 'move';
 
-			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected.object } );
 
 		}
 
@@ -180,7 +192,7 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+			scope.dispatchEvent( { type: 'dragend', object: _selected.object } );
 			_selected = null;
 
 		}
@@ -208,7 +220,7 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 	this.notify = function ( type ) {
 
 		console.error( 'THREE.DragControls: notify() has been deprecated. Use dispatchEvent() instead.' );
-		scope.removeEventListener( type );
+		scope.dispatchEvent( { type: type } );
 
 	};
 
