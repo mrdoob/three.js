@@ -93,8 +93,8 @@ function Object3D() {
 
 	this.userData = {};
 
-	this.onBeforeRender = function(){};
-	this.onAfterRender = function(){};
+	this.onBeforeRender = function () {};
+	this.onAfterRender = function () {};
 
 }
 
@@ -308,7 +308,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( (object && object.isObject3D) ) {
+		if ( ( object && object.isObject3D ) ) {
 
 			if ( object.parent !== null ) {
 
