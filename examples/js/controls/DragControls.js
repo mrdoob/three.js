@@ -4,59 +4,50 @@
  * Running this will allow you to drag three.js objects around the screen.
  */
 
-THREE.DragControls = function ( _camera, _objects, _domElement ) {
+THREE.DragControls = function ( _objects, _camera, _domElement ) {
+
+	if ( _objects instanceof THREE.Camera ) {
+
+		console.warn( 'THREE.DragControls: Constructor now expects ( objects, camera, domElement )' );
+		var temp = _objects; _objects = _camera; _camera = temp;
+
+	}
 
 	var _raycaster = new THREE.Raycaster();
 
-	var _mouse = new THREE.Vector3(),
-		_offset = new THREE.Vector3();
+	var _mouse = new THREE.Vector3(), _offset = new THREE.Vector3();
 	var _selected, _hovered = null;
 
 	var p3subp1 = new THREE.Vector3();
 	var targetposition = new THREE.Vector3();
 
-	this.enabled = false;
+	this.enabled = true;
+
+	//
 
 	var scope = this;
 
-	this.setObjects = function ( objects ) {
-
-		if ( Array.isArray( objects ) === false ) {
-
-			console.error( 'THREE.DragControls.setObjects() expects an Array.' );
-			return;
-
-		}
-
-		_objects = objects;
-
-	};
-
-	this.setObjects( _objects );
-
-	this.activate = function () {
+	function activate() {
 
 		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
-	};
+	}
 
-	this.deactivate = function () {
+	function deactivate() {
 
 		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
 		_domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 
-	};
+	}
 
-	this.dispose = function () {
+	function dispose() {
 
-		scope.deactivate();
+		deactivate();
 
-	};
-
-	this.activate();
+	}
 
 	function onDocumentMouseMove( event ) {
 
@@ -77,6 +68,7 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 			// http://paulbourke.net/geometry/planeline/
 
 			var denom = normal.dot( ray.direction );
+
 			if ( denom == 0 ) {
 
 				// bail
@@ -153,7 +145,6 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 			}
 
-
 		}
 
 	}
@@ -201,7 +192,21 @@ THREE.DragControls = function ( _camera, _objects, _domElement ) {
 
 	}
 
+	activate();
+
+	// API
+
+	this.activate = activate;
+	this.deactivate = deactivate;
+	this.dispose = dispose;
+
 	// Backward compatibility
+
+	this.setObjects = function () {
+
+		console.error( 'THREE.DragControls: setObjects() has been removed.' );
+
+	};
 
 	this.on = function ( type, listener ) {
 
