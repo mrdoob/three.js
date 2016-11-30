@@ -49,7 +49,7 @@
 			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank">Teh_Bucket and raymoohawk</a></div>
 	</div>
     <script src="../build/three.js"></script>
-    <script src="js/loaders/ABINloader.js"></script>
+    <script src="js/loaders/AssimpLoader.js"></script>
     <script src="js/Detector.js"></script>
     <script src="js/libs/stats.min.js"></script>
 
@@ -95,7 +95,7 @@
 
     	stats = new Stats();
     	container.appendChild( stats.dom );
-    	var loader = new THREE.AssbinLoader();
+    	var loader = new THREE.AssimpLoader();
 
     	loader.load( "./models/assbin/squid.assbin", function( err, object ) {
 
