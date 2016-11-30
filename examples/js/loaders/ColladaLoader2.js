@@ -1561,7 +1561,7 @@ THREE.ColladaLoader.prototype = {
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
-		buildLibrary( library.nodes, buildNode );
+		// buildLibrary( library.nodes, buildNode );
 		buildLibrary( library.visualScenes, buildVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Build' );
