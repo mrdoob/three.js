@@ -17,9 +17,8 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-
 		<script src="js/controls/DragControls.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -103,10 +102,10 @@
 
 				container.appendChild( renderer.domElement );
 
-				var dragControls = new THREE.DragControls(camera, objects, renderer.domElement);
+				var dragControls = new THREE.DragControls( camera, objects, renderer.domElement );
 				dragControls.enabled = true;
-				dragControls.on('dragstart', function(e) { controls.enabled = false;  });
-				dragControls.on('dragend',   function(e) { controls.enabled = true;  });
+				dragControls.addEventListener( 'dragstart', function ( e ) { controls.enabled = false; } );
+				dragControls.addEventListener( 'dragend', function ( e ) { controls.enabled = true; } );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
