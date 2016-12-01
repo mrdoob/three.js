@@ -1871,7 +1871,9 @@
 					mesh.mIndexArray.push( f.mIndices[ 0 ] );
 
 				} else {
+
 					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
+					
 				}
 
 
