@@ -1820,12 +1820,20 @@ function WebGLRenderer( parameters ) {
 		}
 
 		var map = p_uniforms.map;
-		var parameterCache = objectProperties.parameterCache;
+		var parameterCache;
+
+		if ( objectProperties.materialId === material.id ) {
+
+			parameterCache = objectProperties.parameterCache;
+
+		}
 
 		if ( parameterCache === undefined || material.needsUpdate ) {
 
-			// populate object parameter cache via search of object/material/camera for parameter sources
+			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
+
+			objectProperties.materialId = material.id;
 
 			parameterCache = {};
 
@@ -1845,7 +1853,7 @@ function WebGLRenderer( parameters ) {
 
 				} else {
 
-					console.log("uniform: ", name, " missing." );
+//					console.log("uniform: ", name, " missing." );
 
 				}
 
@@ -1858,7 +1866,7 @@ function WebGLRenderer( parameters ) {
 
 		var parameterVersions = materialProperties.parameterVersions;
 
-		var parameter;
+		var parameter; 
 		var parameterVersion;
 
 		for ( name in parameterCache ) {
@@ -1868,7 +1876,8 @@ function WebGLRenderer( parameters ) {
 
 			if ( parameterVersion === undefined || parameter.version !== parameterVersion ) {
 
-					console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
+					// console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
+
 					p_uniforms.setValue( _gl, name, parameter.value );
 					parameterVersions[ name ] =  parameter.version;
 
