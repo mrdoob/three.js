@@ -8,7 +8,9 @@ if ( ! Detector.webgl ) {
 
 var camera, controls, scene, renderer, loader, fileType, loadedFile;
 
-var fileInput= document.getElementById("selectedFile");
+var fileName = "";
+
+var fileInput = document.getElementById("selectedFile");
 
 var params = {
   source: 'list',
@@ -58,10 +60,27 @@ animate();
 
 function setupScene ( rootNode ) {
   //to do: improvement - setupLights() improve to use better lights
+  var material = new THREE.MeshPhongMaterial( {
+    color: 0xffffff
+  } );
+
   setupLights();
-  addSceneRoot( rootNode );
-  if (fileType !== "wrl") {
+  addSceneRoot( rootNode.clone() );
+  if (fileType !== "wrl" && fileType !== "sea" && fileType !== "gltf" ) {
     resetCamera();
+  }
+  else {
+    if (fileName === "duck.gltf")
+    {
+      console.log("duck.gltf");
+      //removeCamera( scene );
+      //setMeshMaterial ( scene, material );
+      //controls.update();
+      //debugPrint ( rootNode );
+      //camera.position = new THREE.Vector3(0, 3, 5);
+      //controls.update();
+      //controls = new THREE.OrbitControls( camera );
+    }
   }
 };
 
@@ -163,13 +182,17 @@ function debugPrint(text)
 
 function clearScene() {
   //clearDiv('debug');
-  camera.position.z = 250;
   scene.scale.x = scene.scale.y = scene.scale.z = 1.0;
 
   for( var i = scene.children.length - 1; i >= 0; i--){
     obj = scene.children[i];
     scene.remove(obj);
   }
+
+  if (controls !== undefined) {
+    controls.reset();
+  }
+
 }
 
 function setupLights() {
@@ -193,8 +216,15 @@ function loadModelFromList(path)
 {
   params.source = 'list';
   fileType = path.split('.').pop().toLowerCase();
+  fileName = path.split('/').pop().toLowerCase();
   clearScene();
-  loader.loadFromPath( path, setupScene, onProgress, onError );
+  if (fileName === "mascot.tjs.sea")
+  {
+    loader.loadFromPath( path, "Camera007", setupScene, onProgress, onError );
+  }
+  else {
+    loader.loadFromPath( path, "", setupScene, onProgress, onError );
+  }
 }
 
 function loadModelFromURL(path)
@@ -202,7 +232,13 @@ function loadModelFromURL(path)
   params.source = 'url';
   fileType = path.split('.').pop().toLowerCase();
   clearScene();
-  loader.loadFromPath( path, setupScene, onProgress, onError );
+  if (fileName === "mascot.tjs.sea")
+  {
+    loader.loadFromPath( path, "Camera007", setupScene, onProgress, onError );
+  }
+  else {
+    loader.loadFromPath( path, "", setupScene, onProgress, onError );
+  }
 }
 
 function addSceneRoot(rootNode)
@@ -223,9 +259,7 @@ function addSceneRoot(rootNode)
 
 function init() {
 
-  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-  //camera.position.z = 100;
-  camera.position.z = 250;
+  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
   //controls = new THREE.TrackballControls( camera );
 
@@ -257,6 +291,39 @@ function init() {
 
   window.addEventListener( 'resize', onWindowResize, false );
 
+}
+
+function setMeshMaterial(node, replaceMaterial)
+{
+    for( var i = 0; i < node.children.length; i++)
+    {
+      console.log(node.children[i].type);
+      if (node.children[i] instanceof THREE.Mesh)
+      {
+        node.children[i].material = replaceMaterial;
+      }
+      else
+      {
+        setMeshMaterial(node.children[i], replaceMaterial);
+      }
+    }
+}
+
+
+function removeCamera(node)
+{
+    for( var i = 0; i < node.children.length; i++)
+    {
+      console.log(node.children[i].type);
+      if (node.children[i] instanceof THREE.PerspectiveCamera)
+      {
+        node.remove(node.children[i]);
+      }
+      else
+      {
+        removeCamera(node.children[i]);
+      }
+    }
 }
 
 function printNode(node, header, space)

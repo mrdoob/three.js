@@ -10,7 +10,7 @@ THREE.ModelViewerLoader = function ( manager ) {
 
 THREE.ModelViewerLoader.prototype = {
 
-loadFromPath: function ( path, onLoad, onProgress, onError ) {
+loadFromPath: function ( path, extra, onLoad, onProgress, onError ) {
   var token, fileName, fileType;
 
 	var scope = this;
@@ -106,7 +106,13 @@ loadFromPath: function ( path, onLoad, onProgress, onError ) {
         container : scene // Container to add models
       } );
       loader.load( path );
-      //resetCamera();
+			loader.onComplete = function( e ) {
+				// Get camera from SEA3D Studio
+				// use loader.get... to get others objects
+				var cam = loader.getCamera( extra );
+				camera.position.copy( cam.position );
+				camera.rotation.copy( cam.rotation );
+			};
       break;
     case "wrl":
       console.log("wrl");
@@ -248,6 +254,10 @@ loadFile: function ( file, onLoad ) {
 				var contents = event.target.result;
 
 				var loader = new THREE.ColladaLoader( scope.manager );
+
+				//display model facing camera
+				loader.options.convertUpAxis = true;
+
 				var collada = loader.parse( contents );
 
 				collada.scene.name = filename;
