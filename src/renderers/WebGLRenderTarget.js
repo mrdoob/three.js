@@ -59,6 +59,24 @@ Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
 	},
 
+	setViewport: function ( x, y, width, height ) {
+
+		this.viewport.set( x, y, width, height );
+
+	},
+
+	setScissor: function ( x, y, width, height ) {
+
+		this.scissor.set( x, y, width, height );
+
+	},
+
+	setScissorTest: function ( boolean ) {
+
+		this.setScissorTest = boolean;
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
