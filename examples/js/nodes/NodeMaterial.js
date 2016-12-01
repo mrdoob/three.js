@@ -212,7 +212,7 @@ THREE.NodeMaterial.prototype.build = function() {
 	}
 
 	this.lights = this.requestAttribs.light;
-	this.transparent = this.requestAttribs.transparent || this.blendMode > THREE.NormalBlending;
+	this.transparent = this.requestAttribs.transparent || this.blending > THREE.NormalBlending;
 
 	this.vertexShader = [
 		this.prefixCode,
