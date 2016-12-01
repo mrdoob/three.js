@@ -2,7 +2,7 @@
 function MaterialParameter( value ) {
 
 	this.value = value;
-	this.version = 0;
+	this.version = ++MaterialParameter.version;
 
 }
 
@@ -23,7 +23,6 @@ MaterialParameter.prototype = {
 
 	getValue: function () {
 
-//		console.log(" get value ", this.value );
 		this.version = ++MaterialParameter.version;
 
 		return this.value;
