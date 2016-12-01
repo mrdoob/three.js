@@ -650,7 +650,7 @@
 				mat = new THREE.MeshLambertMaterial();
 			geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
-			if ( this.mNormalBuffer.length > 0 )
+			if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
 			if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
@@ -1850,9 +1850,31 @@
 
 					}
 
-					mesh.mIndexArray.push( f.mIndices[ a ] );
+					
 
 				}
+
+				if(f.mNumIndices === 3) {
+
+					mesh.mIndexArray.push( f.mIndices[ 0 ] );
+					mesh.mIndexArray.push( f.mIndices[ 1 ] );
+					mesh.mIndexArray.push( f.mIndices[ 2 ] );
+
+				}
+				else if(f.mNumIndices === 4) {
+
+					mesh.mIndexArray.push( f.mIndices[ 0 ] );
+					mesh.mIndexArray.push( f.mIndices[ 1 ] );
+					mesh.mIndexArray.push( f.mIndices[ 2 ] );
+					mesh.mIndexArray.push( f.mIndices[ 2 ] );
+					mesh.mIndexArray.push( f.mIndices[ 3 ] );
+					mesh.mIndexArray.push( f.mIndices[ 0 ] );
+
+				} else {
+					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
+				}
+
+
 
 			}
 
