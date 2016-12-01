@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler';
 import { Layers } from './Layers';
 import { Matrix3 } from '../math/Matrix3';
 import { _Math } from '../math/Math';
+import { ParameterSource } from './ParameterSource';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -67,14 +68,17 @@ function Object3D() {
 		scale: {
 			enumerable: true,
 			value: scale
-		},
-		modelViewMatrix: {
+		} /*,
+/*		modelViewMatrix: {
 			value: new Matrix4()
 		},
 		normalMatrix: {
 			value: new Matrix3()
-		}
+		} */
 	} );
+
+	this.addParameter( "modelViewMatrix", new Matrix4() );
+	this.addParameter( "normalMatrix", new Matrix3() );
 
 	this.matrix = new Matrix4();
 	this.matrixWorld = new Matrix4();
@@ -101,7 +105,7 @@ function Object3D() {
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+Object.assign( Object3D.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
 	isObject3D: true,
 

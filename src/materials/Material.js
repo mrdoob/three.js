@@ -1,4 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher';
+import { ParameterSource } from '../core/ParameterSource';
 import { NoColors, FrontSide, SmoothShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
 import { _Math } from '../math/Math';
 
@@ -6,25 +7,6 @@ import { _Math } from '../math/Math';
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
-
-function MaterialParameter( name, value ) {
-
-}
-
-MaterialParameter.prototype = {
-
-	constructor: MaterialParameter,
-
-	setValue: function ( value ) {
-
-	},
-
-	getValue: function () {
-
-
-	}
-
-}
 
 var materialId = 0;
 
@@ -77,8 +59,6 @@ function Material() {
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
-
-	this.parameters = {};
 
 	this._needsUpdate = true;
 
@@ -367,27 +347,8 @@ Material.prototype = {
 
 	},
 
-	addParameter: function ( name, value ) {
-
-		var parameter = new MaterialParameter();
-
-		this.parameters[ name ] = parameter;
-
-		Object.defineProperty( this, name, {
-			set: function( value ) { parameter.setValue( value ) },
-			get: function() { return parameter.getValue() }
-		} )
-
-	},
-
-	hasParameter: function( name ) {
-
-		return ( this.parameters[ name ] !== undefined );
-
-	}
-
 };
 
-Object.assign( Material.prototype, EventDispatcher.prototype );
+Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype );
 
-export { Material };
+export { Material, MaterialParameter };

@@ -1662,12 +1662,12 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function setProgram2( camera, fog, material, object ) {
+	function setProgramExperimental( camera, fog, material, object ) {
 
 		_usedTextureUnits = 0;
-//		console.log("s2");
 
 		var materialProperties = properties.get( material );
+		var objectProperties = properties.get( object );
 
 		if ( _clippingEnabled ) {
 
@@ -1817,28 +1817,67 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// refresh single material specific uniforms
+		}
 
-			console.log( p_uniforms );
-			console.log( m_uniforms );
+		var map = p_uniforms.map;
+		var parameterCache = objectProperties.parameterCache;
 
-			WebGLUniforms.upload(
-				_gl, materialProperties.uniformsList, m_uniforms, _this );
+		if ( parameterCache === undefined || material.needsUpdate ) {
+
+			// populate object parameter cache via search of object/material/camera for parameter sources
+			// cache removes need to search list on every render.
+
+			parameterCache = {};
+
+			for ( name in map ) {
+
+				parameter = object.getParameter( name );
+
+				if ( parameter === undefined ) {
+
+					parameter = material.getParameter( name );
+
+				}
+
+				if ( parameter !== undefined ) {
+
+					parameterCache[ name ] = parameter;
+
+				} else {
+
+					console.log("uniform: ", name, " missing." );
+
+				}
+
+			}
+
+			objectProperties.parameterCache = parameterCache;
+			materialProperties.parameterVersions = {};
+
+		}
+
+		var parameterVersions = materialProperties.parameterVersions;
+
+		var parameter;
+		var parameterVersion;
+
+		for ( name in parameterCache ) {
+
+			parameter = parameterCache[ name ];
+			parameterVersion = parameterVersions[ name ];
+
+			if ( parameterVersion === undefined || parameter.version !== parameterVersion ) {
+
+					console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
+					p_uniforms.setValue( _gl, name, parameter.value );
+					parameterVersions[ name ] =  parameter.version;
+
+			}
 
 		}
 
 		// common matrices
 
-		var map = p_uniforms.map;
-
-		for ( name in map ) {
-
-			console.log( "uniform: ", name, "present: ", material.hasParameter( name ) );
-
-		}
-
-		p_uniforms.set( _gl, object, 'modelViewMatrix' );
-		p_uniforms.set( _gl, object, 'normalMatrix' );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;
@@ -1847,7 +1886,7 @@ function WebGLRenderer( parameters ) {
 
 	function setProgram( camera, fog, material, object ) {
 
- 		if ( material.isShaderMaterial ) return setProgram2( camera, fog, material, object );
+ 		if ( material.isExperimentalMaterial ) return setProgramExperimental( camera, fog, material, object );
 
 		_usedTextureUnits = 0;
 
