@@ -66,21 +66,10 @@ function setupScene ( rootNode ) {
 
   setupLights();
   addSceneRoot( rootNode.clone() );
-  if (fileType !== "wrl" && fileType !== "sea" && fileType !== "gltf" ) {
+  if (fileType !== "wrl" && fileType !== "sea") {
     resetCamera();
   }
   else {
-    if (fileName === "duck.gltf")
-    {
-      console.log("duck.gltf");
-      //removeCamera( scene );
-      //setMeshMaterial ( scene, material );
-      //controls.update();
-      //debugPrint ( rootNode );
-      //camera.position = new THREE.Vector3(0, 3, 5);
-      //controls.update();
-      //controls = new THREE.OrbitControls( camera );
-    }
   }
 };
 
@@ -354,6 +343,10 @@ function onWindowResize() {
 function animate() {
 
   requestAnimationFrame( animate );
+  if (fileType === "gltf")
+  {
+    THREE.GLTFLoader.Shaders.update(scene, camera);
+  }
   render();
 
 }
