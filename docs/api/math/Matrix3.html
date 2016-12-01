@@ -18,9 +18,15 @@
 		<code>
 var m = new Matrix3();
 
+//The set method takes elements in row-major order
 m.set( 11, 12, 13,
        21, 22, 23,
        31, 32, 33 );
+
+//Internally they are stored in column major order, so the value of m.elements will now be:
+m.elements = [ 11, 21, 31,
+              12, 22, 32,
+              13, 23, 33 ];
 		</code>
 
 		<h2>Constructor</h2>
@@ -38,7 +44,7 @@ m.set( 11, 12, 13,
 
 		<h3>[property:Float32Array elements]</h3>
 		<div>
-		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]
+		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]
 		 list of matrix values.
 		</div>
 
@@ -56,7 +62,7 @@ m.set( 11, 12, 13,
 		<h3>[method:Array applyToBuffer]( [page:ArrayBuffer buffer], [page:Number offset], [page:Number length] )</h3>
 		<div>
 		[page:Array buffer] - An [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer]
-		of floats in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...], that represent 3D vectors.<br />>
+		of floats in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...], that represent 3D vectors.<br />
 		[page:Number offset] - (optional) index in the array of the first vector's x component. Default is 0.<br />
 		[page:Number length] - (optional) index in the array of the last vector's z component.
 		Default is the last element in the array.<br /><br />
@@ -67,7 +73,7 @@ m.set( 11, 12, 13,
 		<h3>[method:Array applyToVector3Array]( [page:Array array], [page:Number offset], [page:Number length] )</h3>
 		<div>
 		[page:Array array] - An array of floats in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...],
-		that represent 3D vectors.<br />>
+		that represent 3D vectors.<br />
 		[page:Number offset] - (optional) index in the array of the first vector's x component. Default is 0.<br />
 		[page:Number length] - (optional) index in the array of the last vector's z component.
 		Default is the last element in the array.<br /><br />
@@ -83,7 +89,8 @@ m.set( 11, 12, 13,
 
 		<h3>[method:Float determinant]()</h3>
 		<div>
-		Computes and returns the [link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
+		Computes and returns the
+		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
 		</div>
 
 		<h3>[method:Matrix3 fromArray]( [page:Array array], [page:Integer offset] )</h3>
@@ -103,7 +110,7 @@ m.set( 11, 12, 13,
 		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
 		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is invertible, return the 3x3 identity matrix.
+		If [page:Boolean throwOnDegenerate] is not set and the matrix is invertible, set this to the 3x3 identity matrix.
 		</div>
 
 		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] )</h3>
@@ -144,7 +151,8 @@ m.set( 11, 12, 13,
 		[page:Float n32] - value to put in row 3, col 2.<br />
 		[page:Float n33] - value to put in row 3, col 3.<br /><br />
 
-		Sets the 3x3 matrix values to the given [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
+		Sets the 3x3 matrix values to the given
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
 		sequence of values.
 		</div>
 
