@@ -95,17 +95,20 @@
 				player = loader.getMesh("Player");
 				hat = loader.getMesh("Hat");
 
-				// events
-
 				// on animation complete example
-				player.animationsData['pass#1'].onComplete = function() {
 
-					console.log("Animation completed!");
+				//player.animation['pass#1'].onComplete = function(e) { console.log("Animation completed!", e); };
 
-				};
+				// or
 
-				window.addEventListener( 'click', onMouseClick, false );
-				window.addEventListener( 'contextmenu', onRightClick, false );
+				player.animation['pass#1'].addEventListener(THREE.SEA3D.Animation.COMPLETE, function(e) {
+
+					console.log("Animation completed!", e);
+
+				} );
+
+				window.addEventListener( 'click', onMouseClick );
+				window.addEventListener( 'contextmenu', onRightClick );
 
 				animate();
 
