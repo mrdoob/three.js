@@ -345,7 +345,7 @@ Material.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
+	}
 
 };
 
