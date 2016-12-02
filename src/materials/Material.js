@@ -351,4 +351,4 @@ Material.prototype = {
 
 Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype );
 
-export { Material, MaterialParameter };
+export { Material };
