@@ -1822,20 +1822,20 @@ function WebGLRenderer( parameters ) {
 		var map = p_uniforms.map;
 		var parameterCache;
 
-		if ( objectProperties.materialId === material.id ) {
+		if ( objectProperties.parameterCache === undefined ) {
 
-			parameterCache = objectProperties.parameterCache;
+			objectProperties.parameterCache = [];
 
 		}
+
+		parameterCache = objectProperties.parameterCache[ material.id ];
 
 		if ( parameterCache === undefined || material.needsUpdate ) {
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
 
-			objectProperties.materialId = material.id;
-
-			parameterCache = {};
+			parameterCache = [];
 
 			for ( name in map ) {
 
@@ -1849,7 +1849,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( parameter !== undefined ) {
 
-					parameterCache[ name ] = parameter;
+					parameterCache.push( { name: name, parameter: parameter } );
 
 				} else {
 
@@ -1859,7 +1859,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			objectProperties.parameterCache = parameterCache;
+			objectProperties.parameterCache[ material.id ] = parameterCache;
 			materialProperties.parameterVersions = {};
 
 		}
@@ -1869,11 +1869,16 @@ function WebGLRenderer( parameters ) {
 		var parameter; 
 		var parameterVersion;
 		var name;
+		var cacheEntry;
 
-		for ( name in parameterCache ) {
+		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
 
-			parameter = parameterCache[ name ];
-			parameterVersion = parameterVersions[ name ];
+			cacheEntry = parameterCache[ i ];
+
+			name = cacheEntry.name;
+			parameter = cacheEntry.parameter;
+
+			var parameterVersion = parameterVersions[ name ];
 
 			if ( parameterVersion === undefined || parameter.version !== parameterVersion ) {
 
