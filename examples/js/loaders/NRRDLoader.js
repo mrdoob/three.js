@@ -298,6 +298,15 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 			_data = parseDataAsText( _data );
 
 		}
+        else if (headerObject.encoding === 'raw')
+        {
+            //we need to copy the array to create a new array buffer, else we retrieve the original arraybuffer with the header
+            var _copy = new Uint8Array(_data.length);
+            for (var i = 0; i < _data.length; i++) {
+                _copy[i] = _data[i];
+            }
+            _data = _copy;
+        }
 		// .. let's use the underlying array buffer
 		_data = _data.buffer;
 
