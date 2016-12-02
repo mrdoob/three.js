@@ -1868,6 +1868,7 @@ function WebGLRenderer( parameters ) {
 
 		var parameter; 
 		var parameterVersion;
+		var name;
 
 		for ( name in parameterCache ) {
 
