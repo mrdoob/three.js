@@ -23,6 +23,8 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
  *  frames: <Object> // containing arrays of tangents, normals, binormals
  *
+ *  lid: <int>, // turn on top/bottom/both lid-faces by value THREE.FrontSide/THREE.BackSide/THREE.DoubleSide.
+ *
  *  uvGenerator: <Object> // object that provides UV generator functions
  *
  * }
@@ -84,6 +86,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+
+	var lid = options.lid !== undefined ? options.lid : THREE.DoubleSide;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
@@ -511,49 +515,67 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildLidFaces() {
 
+		var layer, offset;
+
 		if ( bevelEnabled ) {
 
-			var layer = 0; // steps + 1
-			var offset = vlen * layer;
+			if ( lid === THREE.BackSide || lid === THREE.DoubleSide ) {
 
-			// Bottom faces
+				// Bottom faces
 
-			for ( i = 0; i < flen; i ++ ) {
+				layer = 0; // steps + 1
+				offset = vlen * layer;
 
-				face = faces[ i ];
-				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+
+				}
 
 			}
 
-			layer = steps + bevelSegments * 2;
-			offset = vlen * layer;
+			if ( lid === THREE.FrontSide || lid === THREE.DoubleSide ) {
 
-			// Top faces
+				// Top faces
 
-			for ( i = 0; i < flen; i ++ ) {
+				layer = steps + bevelSegments * 2;
+				offset = vlen * layer;
 
-				face = faces[ i ];
-				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+
+				}
 
 			}
 
 		} else {
 
-			// Bottom faces
+			if ( lid === THREE.BackSide || lid === THREE.DoubleSide ) {
 
-			for ( i = 0; i < flen; i ++ ) {
+				// Bottom faces
+
+				for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
 				f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
+				}
+
 			}
 
-			// Top faces
+			if ( lid === THREE.FrontSide || lid === THREE.DoubleSide ) {
 
-			for ( i = 0; i < flen; i ++ ) {
+				// Top faces
 
-				face = faces[ i ];
-				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+				for ( i = 0; i < flen; i ++ ) {
+
+					face = faces[ i ];
+					f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+
+				}
 
 			}
 
