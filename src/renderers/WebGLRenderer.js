@@ -1667,7 +1667,6 @@ function WebGLRenderer( parameters ) {
 		_usedTextureUnits = 0;
 
 		var materialProperties = properties.get( material );
-		var objectProperties = properties.get( object );
 
 		if ( _clippingEnabled ) {
 
@@ -1819,8 +1818,47 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var map = p_uniforms.map;
+		var parameterCache = getParameterCache( object, material, materialProperties, p_uniforms.map );
+		var parameterVersions = materialProperties.parameterVersions;
+
+		var parameter; 
+		var parameterVersion;
+		var name;
+		var cacheEntry;
+
+		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
+
+			cacheEntry = parameterCache[ i ];
+
+			name = cacheEntry.name;
+			parameter = cacheEntry.parameter;
+
+			if ( parameter.version !== parameterVersions[ name ] ) {
+
+					// console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
+
+					p_uniforms.setValue( _gl, name, parameter.value );
+					parameterVersions[ name ] =  parameter.version;
+
+			}
+
+		}
+
+		// common matrices
+
+		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		return program;
+
+	}
+
+	function getParameterCache( object, material, materialProperties, map ) {
+
+		var parameter;
 		var parameterCache;
+		var name;
+
+		var objectProperties = properties.get( object );
 
 		if ( objectProperties.parameterCache === undefined ) {
 
@@ -1838,6 +1876,8 @@ function WebGLRenderer( parameters ) {
 			parameterCache = [];
 
 			for ( name in map ) {
+
+				// parameter sources = add fog if material.fog.
 
 				parameter = object.getParameter( name );
 
@@ -1864,38 +1904,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var parameterVersions = materialProperties.parameterVersions;
-
-		var parameter; 
-		var parameterVersion;
-		var name;
-		var cacheEntry;
-
-		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
-
-			cacheEntry = parameterCache[ i ];
-
-			name = cacheEntry.name;
-			parameter = cacheEntry.parameter;
-
-			var parameterVersion = parameterVersions[ name ];
-
-			if ( parameterVersion === undefined || parameter.version !== parameterVersion ) {
-
-					// console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
-
-					p_uniforms.setValue( _gl, name, parameter.value );
-					parameterVersions[ name ] =  parameter.version;
-
-			}
-
-		}
-
-		// common matrices
-
-		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
-
-		return program;
+		return parameterCache;
 
 	}
 
@@ -2019,6 +2028,7 @@ function WebGLRenderer( parameters ) {
 
 				var uCamPos = p_uniforms.map.cameraPosition;
 
+ 
 				if ( uCamPos !== undefined ) {
 
 					uCamPos.setValue( _gl,
