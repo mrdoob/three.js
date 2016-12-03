@@ -10,7 +10,45 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A class representing a 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].</div>
+		<div class="desc">
+			A class representing a 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].<br /><br />
+
+			The most common use of a 4x4 matrix in 3D computer graphics is as a
+			[link:https://en.wikipedia.org/wiki/Transformation_matrix Transformation Matrix].
+			For an introduction to transformation matrices as used in WebGL, check out
+			[link:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices this tutorial].<br /><br />
+
+			This allows a [page:Vector3] representing a point in 3D space to undergo transformations
+			such as translation, rotation, shear, scale, reflection, orthogonal or perspective projection
+			and so on, by being multiplied by the matrix, which is known as	<em>applying</em>
+			the  matrix to the vector.<br /><br />
+
+			Every [page:Object3D] has three associated Matrix4s:
+			<ul>
+				<li>
+					[page:Object3D.matrix]: This stores the local transform of the object.
+				</li>
+				<li>
+					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the objects transformation relative to its parent.
+					If the object has no parent, then this is identical to the local transform.
+				</li>
+				<li>
+					[page:Object3D.modelViewMatrix]:
+				</li>
+			</ul>
+
+			Every [page:Camera Cameras] have two additional matrix4s:
+			<ul>
+				<li>
+					[page:Object3D.matrixWorldInverse]: The inverse of the [page:Object3D.matrixWorld] descibed above. 
+				</li>
+				<li>
+					[page:Object3D.projectionMatrix]:
+				</li>
+			</ul>
+			<br />
+
+		</div>
 
 
 		<h2>Example</h2>
@@ -22,7 +60,7 @@ var m = new Matrix4();
 		<h2>A Note on Row-Major and Column-Major Ordering</h2>
 		<div>
 			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
-			order, while internally they are stored in the [page:elements] array in column-major order.<br /><br />
+			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
 
 			This means that calling
 		<code>
@@ -31,7 +69,7 @@ m.set( 11, 12, 13, 14,
        31, 32, 33, 34 );
 
 		</code>
-		will result in the elements array containing:
+		will result in the [page:.elements elements] array containing:
 		<code>
 m.elements = [ 11, 21, 31, 41,
                12, 22, 32, 42,
@@ -98,7 +136,7 @@ m.elements = [ 11, 21, 31, 41,
 		</div>
 
 		<h3>[method:Matrix4 clone]()</h3>
-		<div>Creates a new Matrix4 with identical elements to this one.</div>
+		<div>Creates a new Matrix4 with identical [page:.elements elements] to this one.</div>
 
 		<h3>[method:Matrix4 compose]( [page:Vector3 position], [page:Quaternion quaternion], [page:Vector3 scale] )</h3>
 		<div>
@@ -184,7 +222,7 @@ zAxis = (c, g, k)
 		<div>Gets the maximum scale value of the 3 axes.</div>
 
 		<h3>[method:Matrix4 identity]()</h3>
-		<div>Resets this matrix to [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].</div>
+		<div>Resets this matrix to the [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].</div>
 
 		<h3>[method:Matrix4 lookAt]( [page:Vector3 eye], [page:Vector3 center], [page:Vector3 up], )</h3>
 		<div>
