@@ -81,7 +81,7 @@ function Object3D() {
 	this.addParameter( "normalMatrix", new Matrix3() );
 
 	this.matrix = new Matrix4();
-	this.matrixWorld = new Matrix4();
+	this.addParameter( "matrixWorld", new Matrix4(), "modelMatrix" );
 
 	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 	this.matrixWorldNeedsUpdate = false;
