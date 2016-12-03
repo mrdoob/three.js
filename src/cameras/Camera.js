@@ -15,8 +15,8 @@ function Camera() {
 
 	this.type = 'Camera';
 
-	this.matrixWorldInverse = new Matrix4();
-	this.projectionMatrix = new Matrix4();
+	this.addParameter( "matrixWorldInverse", new Matrix4(), "viewMatrix" );
+	this.addParameter( "projectionMatrix", new Matrix4() );
 
 }
 
