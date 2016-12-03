@@ -27,7 +27,8 @@ function Material() {
 	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
 	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
-	this.opacity = 1;
+	this.addParameter( "opacity", 1 );
+
 	this.transparent = false;
 
 	this.blendSrc = SrcAlphaFactor;
