@@ -1747,15 +1747,12 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || camera !== _currentCamera ) {
 
-			p_uniforms.set( _gl, camera, 'projectionMatrix' );
-
 			if ( capabilities.logarithmicDepthBuffer ) {
 
 				p_uniforms.setValue( _gl, 'logDepthBufFC',
 					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
 
 			}
-
 
 			if ( camera !== _currentCamera ) {
 
@@ -1767,6 +1764,7 @@ function WebGLRenderer( parameters ) {
 
 				refreshMaterial = true;		// set to true on material change
 				refreshLights = true;		// remains set until update done
+				// flush program parameter cache - FIXME
 
 			}
 
@@ -1783,8 +1781,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-	
-			p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
 			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
@@ -1818,8 +1814,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var parameterCache = getParameterCache( object, material, materialProperties, p_uniforms.map );
-		var parameterVersions = materialProperties.parameterVersions;
+		var parameterCache = getParameterCache( object, material, p_uniforms.map );
+
+		if ( program.parameterVersions === undefined ) {
+
+			program.parameterVersions = {};
+
+		}
+
+		var parameterVersions = program.parameterVersions;
 
 		var parameter; 
 		var parameterVersion;
@@ -1835,7 +1838,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( parameter.version !== parameterVersions[ name ] ) {
 
-					// console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
+//					console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
 
 					p_uniforms.setValue( _gl, name, parameter.value );
 					parameterVersions[ name ] =  parameter.version;
@@ -1845,14 +1848,13 @@ function WebGLRenderer( parameters ) {
 		}
 
 		// common matrices
-
-		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+		p_uniforms.setValue( _gl, 'flipEnvMap', ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1 );
 
 		return program;
 
 	}
 
-	function getParameterCache( object, material, materialProperties, map ) {
+	function getParameterCache( object, material, map ) {
 
 		var parameter;
 		var parameterCache;
@@ -1887,20 +1889,25 @@ function WebGLRenderer( parameters ) {
 
 				}
 
+				if ( parameter === undefined ) {
+
+					parameter = camera.getParameter( name );
+
+				}
+
 				if ( parameter !== undefined ) {
 
 					parameterCache.push( { name: name, parameter: parameter } );
 
 				} else {
 
-//					console.log("uniform: ", name, " missing." );
+					console.log("uniform: ", name, " missing." );
 
 				}
 
 			}
 
 			objectProperties.parameterCache[ material.id ] = parameterCache;
-			materialProperties.parameterVersions = {};
 
 		}
 
