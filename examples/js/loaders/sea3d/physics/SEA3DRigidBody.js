@@ -1,5 +1,5 @@
 /**
- * 	SEA3D - Delta Lossy Compression
+ * 	SEA3D - Rigid Body
  * 	@author Sunag / http://www.sunag.com.br/
  */
 
