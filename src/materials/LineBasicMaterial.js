@@ -20,8 +20,9 @@ function LineBasicMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'LineBasicMaterial';
+	this.isExperimentalMaterial = true;
 
-	this.color = new Color( 0xffffff );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
 	this.linewidth = 1;
 	this.linecap = 'round';
