@@ -108,6 +108,7 @@ var files = {
 		"webgl_loader_sea3d_hierarchy",
 		"webgl_loader_sea3d_keyframe",
 		"webgl_loader_sea3d_morph",
+		"webgl_loader_sea3d_physics",
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_scene",
