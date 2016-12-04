@@ -651,7 +651,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( this.playing ) this.stop();
 
-		if ( this.mixer ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
+		if ( this.mixer ) THREE.SEA3D.AnimationHandler.remove( this );
 
 		this.mixer = mixer;
 
@@ -750,7 +750,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( this.playing && this.currentAnimation ) {
 
-			THREE.SEA3D.AnimationHandler.removeAnimator( this );
+			THREE.SEA3D.AnimationHandler.remove( this );
 
 			this.playing = false;
 
@@ -764,7 +764,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 		if ( ! this.playing && this.currentAnimation ) {
 
-			THREE.SEA3D.AnimationHandler.addAnimator( this );
+			THREE.SEA3D.AnimationHandler.add( this );
 
 			this.playing = true;
 
@@ -839,7 +839,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 			if ( this.previousAnimation ) this.previousAnimationAction.crossFadeTo( this.currentAnimationAction, crossfade || 0, false );
 
-			THREE.SEA3D.AnimationHandler.addAnimator( this );
+			THREE.SEA3D.AnimationHandler.add( this );
 
 		}
 
@@ -849,7 +849,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 	stop: function () {
 
-		if ( this.playing ) THREE.SEA3D.AnimationHandler.removeAnimator( this );
+		if ( this.playing ) THREE.SEA3D.AnimationHandler.remove( this );
 
 		if ( this.currentAnimation ) {
 
@@ -871,7 +871,7 @@ Object.assign( THREE.SEA3D.Animator.prototype, {
 
 	playw: function ( name, weight ) {
 
-		if ( ! this.playing && ! this.paused ) THREE.SEA3D.AnimationHandler.addAnimator( this );
+		if ( ! this.playing && ! this.paused ) THREE.SEA3D.AnimationHandler.add( this );
 
 		var animation = this.getAnimationByName( name );
 
@@ -1455,7 +1455,7 @@ THREE.SEA3D.AnimationHandler = {
 
 	},
 
-	addAnimator: function ( animator ) {
+	add: function ( animator ) {
 
 		var index = this.animators.indexOf( animator );
 
@@ -1463,7 +1463,7 @@ THREE.SEA3D.AnimationHandler = {
 
 	},
 
-	removeAnimator: function ( animator ) {
+	remove: function ( animator ) {
 
 		var index = this.animators.indexOf( animator );
 
