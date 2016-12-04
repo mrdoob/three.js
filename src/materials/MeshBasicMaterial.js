@@ -44,24 +44,24 @@ function MeshBasicMaterial( parameters ) {
 
 	this.type = 'MeshBasicMaterial';
 
-	this.addParameter( "color", new Color( 0xffffff ), "diffuse" ); // emissive
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // emissive
 
-	this.addParameter( "map",  null );
+	this.addParameter( 'map',  null );
 
-	this.addParameter( "lightMap", null );
-	this.addParameter( "lightMapIntensity", 1.0 );
+	this.addParameter( 'lightMap', null );
+	this.addParameter( 'lightMapIntensity', 1.0 );
 
-	this.addParameter( "aoMap", null );
-	this.addParameter( "aoMapIntensity", 1.0 );
+	this.addParameter( 'aoMap', null );
+	this.addParameter( 'aoMapIntensity', 1.0 );
 
-	this.addParameter( "specularMap",  null);
+	this.addParameter( 'specularMap',  null);
 
-	this.addParameter( "alphaMap",  null );
+	this.addParameter( 'alphaMap',  null );
 
-	this.addParameter( "envMap",  null );
+	this.addParameter( 'envMap',  null );
 	this.combine = MultiplyOperation;
-	this.addParameter( "reflectivity", 1 );
-	this.addParameter( "refractionRatio ", 0.98 );
+	this.addParameter( 'reflectivity', 1 );
+	this.addParameter( 'refractionRatio', 0.98 );
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
