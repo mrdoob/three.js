@@ -3,6 +3,8 @@ import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
 import { _Math } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
+import { Vector4 } from '../math/Vector4';
+import { ParameterSource } from '../core/ParameterSource';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -36,8 +38,19 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.format = format !== undefined ? format : RGBAFormat;
 	this.type = type !== undefined ? type : UnsignedByteType;
 
-	this.offset = new Vector2( 0, 0 );
-	this.repeat = new Vector2( 1, 1 );
+	this.addParameter( 'offsetRepeat', new Vector4( 0, 0, 1, 1 ) );
+
+	Object.defineProperties( this, {
+		'offset': {
+			set: function ( v ) { this.offsetRepeat.setX( v.x ); this.offsetRepeat.setY( v.y ); },
+			get: function () { new Vector2( this.offsetRepeat.x, this.offsetRepeat.y ) }
+		},
+
+		'repeat' : {
+			set: function ( v ) { this.offsetRepeat.setZ( v.x ); this.offsetRepeat.setW( v.y ); },
+			get: function () { new Vector2( this.offsetRepeat.z, this.offsetRepeat.w ) }
+		}
+	} );
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -285,6 +298,6 @@ Texture.prototype = {
 
 };
 
-Object.assign( Texture.prototype, EventDispatcher.prototype );
+Object.assign( Texture.prototype, EventDispatcher.prototype, ParameterSource.prototype );
 
 export { Texture };
