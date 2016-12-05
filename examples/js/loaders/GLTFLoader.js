@@ -248,58 +248,26 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0, len = interps.length; i < len; i ++ ) {
 
-			validateInterpolator( interps[ i ] );
+			var interp = interps[ i ];
 
-			interps[ i ].target.updateMatrix();
-			interps[ i ].target.matrixAutoUpdate = true;
+			// KeyframeTrack.optimize() will modify given 'times' and 'values'
+			// buffers before creating a truncated copy to keep. Because buffers may
+			// be reused by other tracks, make copies here.
+			interp.times = THREE.AnimationUtils.arraySlice( interp.times, 0 );
+			interp.values = THREE.AnimationUtils.arraySlice( interp.values, 0 );
+
+			interp.target.updateMatrix();
+			interp.target.matrixAutoUpdate = true;
 
 			tracks.push( new THREE.KeyframeTrack(
-				interps[ i ].name,
-				interps[ i ].times,
-				interps[ i ].values,
-				interps[ i ].type
+				interp.name,
+				interp.times,
+				interp.values,
+				interp.type
 			) );
 		}
 
 		return new THREE.AnimationClip( name, undefined, tracks );
-	}
-
-	/**
-	 * Interp times are frequently non-sequential in the monster and cesium man
-	 * models. That's probably a sign that the exporter is misbehaving, but to
-	 * keep this backward-compatible we can swallow the errors.
-	 */
-	function validateInterpolator( interp ) {
-
-		var times = [];
-		var values = [];
-		var prevTime = null;
-		var currTime = null;
-
-		var stride = interp.values.length / interp.times.length;
-
-		for ( var i = 0; i < interp.times.length; i ++ ) {
-
-			currTime = interp.times[ i ];
-
-			if ( prevTime === null || prevTime <= currTime ) {
-
-				times.push( currTime );
-
-				for ( var j = 0; j < stride; j++ ) {
-
-					values.push( interp.values[ i * stride + j ] );
-
-				}
-
-			}
-
-			prevTime = currTime;
-		}
-
-		interp.times = new Float32Array( times );
-		interp.values = new Float32Array( values );
-
 	}
 
 	/*********************************/
