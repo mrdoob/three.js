@@ -51,7 +51,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 		} else if ( isUnique ) {
 
-			data.name = data.name || THREE.GLNode.prototype.build.call( this, builder, output, uuid )
+			data.name = data.name || THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 			return data.name;
 
