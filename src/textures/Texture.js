@@ -43,12 +43,12 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	Object.defineProperties( this, {
 		'offset': {
 			set: function ( v ) { this.offsetRepeat.setX( v.x ); this.offsetRepeat.setY( v.y ); },
-			get: function () { new Vector2( this.offsetRepeat.x, this.offsetRepeat.y ) }
+			get: function () { return new Vector2( this.offsetRepeat.x, this.offsetRepeat.y ) }
 		},
 
 		'repeat' : {
 			set: function ( v ) { this.offsetRepeat.setZ( v.x ); this.offsetRepeat.setW( v.y ); },
-			get: function () { new Vector2( this.offsetRepeat.z, this.offsetRepeat.w ) }
+			get: function () { return new Vector2( this.offsetRepeat.z, this.offsetRepeat.w ) }
 		}
 	} );
 
