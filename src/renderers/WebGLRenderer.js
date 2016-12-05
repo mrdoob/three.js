@@ -30,6 +30,7 @@ import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
 import { Color } from '../math/Color';
 import { ParameterSource } from '../core/ParameterSource';
+import { UniformsLib } from './shaders/UniformsLib';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -1535,10 +1536,21 @@ function WebGLRenderer( parameters ) {
 			if ( parameters.shaderID ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
+				var uniforms;
+
+				if ( material.isExperimentalMaterial ) {
+
+					uniforms = Object.assign( {}, UniformsLib.fog, UniformsLib.lights );
+
+				} else {
+
+					uniforms = Object.assign( {}, shader.uniforms );
+
+				}
 
 				materialProperties.__webglShader = {
 					name: material.type,
-					uniforms: Object.assign( {}, shader.uniforms ),
+					uniforms: uniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -1773,17 +1785,11 @@ function WebGLRenderer( parameters ) {
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
 
-
 			var uCamPos = p_uniforms.map.cameraPosition;
 
-//			if ( uCamPos !== undefined && camera.cameraPosition === undefined ) {
-
-			if ( camera.cameraPosition === undefined ) {
+			if ( uCamPos && camera.cameraPosition === undefined ) {
 
 				camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
-
-//				uCamPos.setValue( _gl,
-//					_vector3.setFromMatrixPosition( camera.matrixWorld ) );
 
 			}
 
@@ -1818,7 +1824,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var parameterCache = getParameterCache( object, material, p_uniforms.map );
+		var parameterCache = getParameterCache( object, material, p_uniforms.map, materialProperties );
 
 		if ( program.parameterVersions === undefined ) {
 
@@ -1832,6 +1838,7 @@ function WebGLRenderer( parameters ) {
 		var parameterVersion;
 		var name;
 		var cacheEntry;
+		var value;
 
 		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
 
@@ -1842,7 +1849,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( parameter.version !== parameterVersions[ name ] ) {
 
-				p_uniforms.setValue( _gl, name, parameter.value );
+				value = parameter.value;
+
+				if ( value.isTexture && value.image === undefined ) continue;
+
+				p_uniforms.setValue( _gl, name, value );
 				parameterVersions[ name ] =  parameter.version;
 
 			}
@@ -1856,23 +1867,21 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function getParameterCache( object, material, map ) {
+	function getParameterCache( object, material, map, materialProperties ) {
 
 		var parameter;
 		var parameterCache;
 		var name;
 
-		var objectProperties = properties.get( object );
+		if ( materialProperties.parameterCache === undefined ) {
 
-		if ( objectProperties.parameterCache === undefined ) {
-
-			objectProperties.parameterCache = [];
+			materialProperties.parameterCache = [];
 
 		}
 
-		parameterCache = objectProperties.parameterCache[ material.id ];
+		parameterCache = materialProperties.parameterCache[ object.id ];
 
-		if ( parameterCache === undefined || true ) { //FIXME - hack because 
+		if ( parameterCache === undefined || material.needsUpdate ) {
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
@@ -1951,12 +1960,15 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						if ( uvScaleMap.image === undefined ) console.log("undefined image");
 						parameterCache.push( { name: 'offsetRepeat', parameter: uvScaleMap.getParameter( 'offsetRepeat') } );
 
 					} else {
 
-//						console.log('uniform: ', name, ' missing.' );
+						if ( map[ name ].seq === undefined && name !== 'ambientLightColor' && name !== 'flipEnvMap' ) {
+
+							console.log('uniform: ', name, ' missing.' );
+
+						}
 
 					}
 
@@ -1964,7 +1976,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			objectProperties.parameterCache[ material.id ] = parameterCache;
+			materialProperties.parameterCache[ object.id ] = parameterCache;
 
 		}
 
@@ -2337,7 +2349,6 @@ function WebGLRenderer( parameters ) {
 				uvScaleMap = uvScaleMap.texture;
 
 			}
-						if ( uvScaleMap.image === undefined ) console.log("undefined image - common");
 
 //			var offset = uvScaleMap.offset;
 //			var repeat = uvScaleMap.repeat;
