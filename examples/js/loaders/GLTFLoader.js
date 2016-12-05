@@ -282,7 +282,7 @@ THREE.GLTFLoader = ( function () {
 
 			currTime = interp.times[ i ];
 
-			if (prevTime !== null && prevTime <= currTime) {
+			if ( prevTime === null || prevTime <= currTime ) {
 
 				times.push( currTime );
 
