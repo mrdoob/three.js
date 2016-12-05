@@ -184,6 +184,8 @@
 
 				camera.lookAt( scene.position );
 
+				sphere.visible = false;
+
 				// pingpong
 
 				if ( count % 2 === 0 ) {
@@ -199,6 +201,8 @@
 				}
 
 				count ++;
+
+				sphere.visible = true;
 
 				renderer.render( scene, camera );
 
