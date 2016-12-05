@@ -54,14 +54,14 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			parser.parse( function ( scene, cameras, animations ) {
+			parser.parse( function ( scene, cameras, clips ) {
 
 				console.timeEnd( 'GLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
 					"cameras": cameras,
-					"animations": animations
+					"clips": clips
 				};
 
 				callback( glTF );
@@ -241,233 +241,66 @@ THREE.GLTFLoader = ( function () {
 	};
 
 
-	/* GLTFANIMATION */
+	/* ANIMATION */
 
-	GLTFLoader.Animations = new GLTFRegistry();
-
-	// Construction/initialization
-	function GLTFAnimation( interps ) {
-
-		this.running = false;
-		this.loop = false;
-		this.duration = 0;
-		this.startTime = 0;
-		this.interps = [];
-
-		this.uuid = THREE.Math.generateUUID();
-
-		if ( interps ) {
-
-			this.createInterpolators( interps );
-
-		}
-
-	}
-
-	GLTFAnimation.prototype.createInterpolators = function ( interps ) {
+	function createClip( name, interps ) {
+		var tracks = [];
 
 		for ( var i = 0, len = interps.length; i < len; i ++ ) {
 
-			var interp = new GLTFInterpolator( interps[ i ] );
-			this.interps.push( interp );
-			this.duration = Math.max( this.duration, interp.duration );
+			validateInterpolator( interps[ i ] );
 
+			interps[ i ].target.updateMatrix();
+			interps[ i ].target.matrixAutoUpdate = true;
+
+			tracks.push( new THREE.KeyframeTrack(
+				interps[ i ].name,
+				interps[ i ].times,
+				interps[ i ].values,
+				interps[ i ].type
+			) );
 		}
 
-	};
-
-	// Start/stop
-	GLTFAnimation.prototype.play = function () {
-
-		if ( this.running )
-			return;
-
-		this.startTime = Date.now();
-		this.running = true;
-		GLTFLoader.Animations.add( this.uuid, this );
-
-	};
-
-	GLTFAnimation.prototype.stop = function () {
-
-		this.running = false;
-		GLTFLoader.Animations.remove( this.uuid );
-
-	};
-
-	// Update - drive key frame evaluation
-	GLTFAnimation.prototype.update = function () {
-
-		if ( ! this.running ) return;
-
-		var now = Date.now();
-		var deltat = ( now - this.startTime ) / 1000;
-		var t = deltat % this.duration;
-		var nCycles = Math.floor( deltat / this.duration );
-		var interps = this.interps;
-
-		if ( nCycles >= 1 && ! this.loop ) {
-
-			this.running = false;
-
-			for ( var i = 0, l = interps.length; i < l; i ++ ) {
-
-				interps[ i ].interp( this.duration );
-
-			}
-
-			this.stop();
-
-		} else {
-
-			for ( var i = 0, l = interps.length; i < l; i ++ ) {
-
-				interps[ i ].interp( t );
-
-			}
-
-		}
-
-	};
-
-	/* GLTFINTERPOLATOR */
-
-	function GLTFInterpolator( param ) {
-
-		this.keys = param.keys;
-		this.values = param.values;
-		this.count = param.count;
-		this.type = param.type;
-		this.path = param.path;
-		this.isRot = false;
-
-		var node = param.target;
-		node.updateMatrix();
-		node.matrixAutoUpdate = true;
-		this.targetNode = node;
-
-		switch ( param.path ) {
-
-			case "translation" :
-
-				this.target = node.position;
-				this.originalValue = node.position.clone();
-				break;
-
-			case "rotation" :
-
-				this.target = node.quaternion;
-				this.originalValue = node.quaternion.clone();
-				this.isRot = true;
-				break;
-
-			case "scale" :
-
-				this.target = node.scale;
-				this.originalValue = node.scale.clone();
-				break;
-
-		}
-
-		this.duration = this.keys[ this.count - 1 ];
-
-		this.vec1 = new THREE.Vector3();
-		this.vec2 = new THREE.Vector3();
-		this.vec3 = new THREE.Vector3();
-		this.quat1 = new THREE.Quaternion();
-		this.quat2 = new THREE.Quaternion();
-		this.quat3 = new THREE.Quaternion();
-
+		return new THREE.AnimationClip( name, undefined, tracks );
 	}
 
-	//Interpolation and tweening methods
-	GLTFInterpolator.prototype.interp = function ( t ) {
+	/**
+	 * Interp times are frequently non-sequential in the monster and cesium man
+	 * models. That's probably a sign that the exporter is misbehaving, but to
+	 * keep this backward-compatible we can swallow the errors.
+	 */
+	function validateInterpolator( interp ) {
 
-		if ( t == this.keys[ 0 ] ) {
+		var times = [];
+		var values = [];
+		var prevTime = null;
+		var currTime = null;
 
-			if ( this.isRot ) {
+		var stride = interp.values.length / interp.times.length;
 
-				this.quat3.fromArray( this.values );
+		for ( var i = 0; i < interp.times.length; i ++ ) {
 
-			} else {
+			currTime = interp.times[ i ];
 
-				this.vec3.fromArray( this.values );
+			if (prevTime !== null && prevTime <= currTime) {
 
-			}
+				times.push( currTime );
 
-		} else if ( t < this.keys[ 0 ] ) {
+				for ( var j = 0; j < stride; j++ ) {
 
-			if ( this.isRot ) {
-
-				this.quat1.copy( this.originalValue );
-				this.quat2.fromArray( this.values );
-				THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, t / this.keys[ 0 ] );
-
-			} else {
-
-				this.vec3.copy( this.originalValue );
-				this.vec2.fromArray( this.values );
-				this.vec3.lerp( this.vec2, t / this.keys[ 0 ] );
-
-			}
-
-		} else if ( t >= this.keys[ this.count - 1 ] ) {
-
-			if ( this.isRot ) {
-
-				this.quat3.fromArray( this.values, ( this.count - 1 ) * 4 );
-
-			} else {
-
-				this.vec3.fromArray( this.values, ( this.count - 1 ) * 3 );
-
-			}
-
-		} else {
-
-			for ( var i = 0; i < this.count - 1; i ++ ) {
-
-				var key1 = this.keys[ i ];
-				var key2 = this.keys[ i + 1 ];
-
-				if ( t >= key1 && t <= key2 ) {
-
-					if ( this.isRot ) {
-
-						this.quat1.fromArray( this.values, i * 4 );
-						this.quat2.fromArray( this.values, ( i + 1 ) * 4 );
-						THREE.Quaternion.slerp( this.quat1, this.quat2, this.quat3, ( t - key1 ) / ( key2 - key1 ) );
-
-					} else {
-
-						this.vec3.fromArray( this.values, i * 3 );
-						this.vec2.fromArray( this.values, ( i + 1 ) * 3 );
-						this.vec3.lerp( this.vec2, ( t - key1 ) / ( key2 - key1 ) );
-
-					}
+					values.push( interp.values[ i * stride + j ] );
 
 				}
 
 			}
 
+			prevTime = currTime;
 		}
 
-		if ( this.target ) {
+		interp.times = new Float32Array( times );
+		interp.values = new Float32Array( values );
 
-			if ( this.isRot ) {
-
-				this.target.copy( this.quat3 );
-
-			} else {
-
-				this.target.copy( this.vec3 );
-
-			}
-
-		}
-
-	};
-
+	}
 
 	/*********************************/
 	/********** INTERNALS ************/
@@ -537,6 +370,16 @@ THREE.GLTFLoader = ( function () {
 		'MAT2': 4,
 		'MAT3': 9,
 		'MAT4': 16
+	};
+
+	var PATH_PROPERTIES = {
+		scale: 'scale',
+		translation: 'position',
+		rotation: 'quaternion'
+	};
+
+	var INTERPOLATION = {
+		LINEAR: THREE.InterpolateLinear
 	};
 
 	/* UTILITY FUNCTIONS */
@@ -798,7 +641,7 @@ THREE.GLTFLoader = ( function () {
 
 			"scenes",
 			"cameras",
-			"animations"
+			"clips"
 
 		] ).then( function ( dependencies ) {
 
@@ -813,16 +656,16 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var animations = [];
+			var clips = [];
 
-			for ( var name in dependencies.animations ) {
+			for ( var name in dependencies.clips ) {
 
-				var animation = dependencies.animations[ name ];
-				animations.push( animation );
+				var clip = dependencies.clips[ name ];
+				clips.push( clip );
 
 			}
 
-			callback( scene, cameras, animations );
+			callback( scene, cameras, clips);
 
 		}.bind( this ) );
 
@@ -1435,7 +1278,9 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	GLTFParser.prototype.loadAnimations = function () {
+
+
+	GLTFParser.prototype.loadClips = function () {
 
 		var scope = this;
 
@@ -1470,12 +1315,11 @@ THREE.GLTFLoader = ( function () {
 						if ( node ) {
 
 							var interp = {
-								keys: inputAccessor.array,
+								times: inputAccessor.array,
 								values: outputAccessor.array,
-								count: inputAccessor.count,
 								target: node,
-								path: target.path,
-								type: sampler.interpolation
+								type: INTERPOLATION[ sampler.interpolation ],
+								name: node.name + '.' + PATH_PROPERTIES[ target.path ]
 							};
 
 							interps.push( interp );
@@ -1486,10 +1330,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				var _animation = new GLTFAnimation( interps );
-				_animation.name = "animation_" + animationId;
-
-				return _animation;
+				return createClip( "animation_" + animationId, interps );
 
 			} );
 

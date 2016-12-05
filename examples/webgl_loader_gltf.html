@@ -137,6 +137,8 @@
 			var cameraNames = [];
 			var defaultCamera = null;
 			var gltf = null;
+			var mixer = null;
+			var clock = new THREE.Clock();
 
 			function onload() {
 
@@ -312,17 +314,18 @@
 
 					}
 
-					if (gltf.animations && gltf.animations.length) {
+					if (gltf.clips && gltf.clips.length) {
 
-						var i, len = gltf.animations.length;
+						mixer = new THREE.AnimationMixer(object);
+
+						var i, len = gltf.clips.length;
 						for (i = 0; i < len; i++) {
-							var animation = gltf.animations[i];
-							animation.loop = true;
+							var clip = gltf.clips[i];
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
 							if (sceneInfo.animationTime)
-								animation.duration = sceneInfo.animationTime;
-							animation.play();
+								clip.duration = sceneInfo.animationTime;
+							mixer.clipAction(clip).play();
 						}
 					}
 
@@ -353,7 +356,7 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.GLTFLoader.Animations.update();
+				if (mixer) mixer.update(clock.getDelta());
 				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
@@ -513,16 +516,17 @@
 
 			function toggleAnimations() {
 
-				var i, len = gltf.animations.length;
+				var i, len = gltf.clips.length;
 
 				for (i = 0; i < len; i++) {
 
-					var animation = gltf.animations[i];
+					var clip = gltf.clips[i];
+					var action = mixer.existingAction( clip );
 
-					if (animation.running) {
-						animation.stop();
+					if (action.isRunning()) {
+						action.stop();
 					} else {
-						animation.play();
+						action.play();
 					}
 
 				}
@@ -549,17 +553,10 @@
 				cameraNames = [];
 				defaultCamera = null;
 
-				if (!loader || !gltf.animations)
+				if (!loader || !mixer)
 					return;
 
-				var i, len = gltf.animations.length;
-
-				for (i = 0; i < len; i++) {
-					var animation = gltf.animations[i];
-					if (animation.running) {
-						animation.stop();
-					}
-				}
+				mixer.stopAllAction();
 
 			}
 
