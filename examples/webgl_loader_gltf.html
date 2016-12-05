@@ -325,7 +325,7 @@
 							var animation = animations[ i ];
 
 							// There's .3333 seconds junk at the tail of the Monster animation that
-							// keeps it from looping cleanly. Animation it at 3 seconds
+							// keeps it from looping cleanly. Clip it at 3 seconds
 							if ( sceneInfo.animationTime )
 								animation.duration = sceneInfo.animationTime;
 
