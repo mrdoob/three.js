@@ -60,6 +60,7 @@
 <script src="../build/three.min.js"></script>
 <script src="js/libs/vrml.min.js"></script>
 
+<script src="js/loaders/VRMLLoader.js"></script>
 <script src="js/renderers/Projector.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
 <script src="js/controls/FlyControls.js"></script>
@@ -146,27 +147,11 @@
 			}
 		}; // key value store of cameras based on VRML viewpoint nodes, stored by their name.
 
-		// VRML parser example:
-		var fileLoader = new THREE.FileLoader();
-		// onLoad, onProgress, onError
-		fileLoader.load('models/vrml/house.wrl', function (data) {
-			try {
-				var tree = vrmlParser.parse(data);
-			} catch ( e ) {
-				console.log('Exception with message ' + e.message);
+		var vrmlLoader = new THREE.VRMLLoader(vrmlParser, new THREE.LoadingManager(), true);
 
-				if ( undefined !== e.location ) {
-					console.log('Exception at location start: offset: ' + e.location.start.offset + ' line: ' + e.location.start.line + ' column: ' + e.location.start.column);
-					console.log('Exception at location end: offset: ' + e.location.end.offset + ' line: ' + e.location.end.line + ' column: ' + e.location.end.column);
-				}
+		var onLoad = function (vrmlTree) {
+            vrmlConverter.render(vrmlTree, scene);
 
-				return;
-			}
-			console.log(tree);
-
-			vrmlConverter.render(tree, scene);
-
-			// @todo: move viewpointSelector to its own class
 			var viewpointSelector = document.getElementById('viewpoints');
 
 			for ( a in vrmlConverter.viewpoints ) {
@@ -181,14 +166,21 @@
 				}
 			}
 
-		}, function () {
-		}, function (error) {
+		};
+
+		var onError = function (error) {
 			var request = error.target;
 			if ( 404 === request.status ) {
 				console.log('VRML Document not found at ' + request.responseURL);
 			}
 			console.log(error);
-		});
+		}
+
+		var onProgress = function () {
+
+		}
+
+		vrmlLoader.load('models/vrml/house.wrl', onLoad, onProgress, onError);
 
 		container = document.createElement('div');
 		document.body.appendChild(container);
