@@ -34,13 +34,13 @@ Loader.prototype = {
 
 	},
 
-	initMaterials: function ( materials, texturePath, crossOrigin ) {
+	initMaterials: function ( materials, texturePath, crossOrigin, textureLoadedCallback ) {
 
 		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			array[ i ] = this.createMaterial( materials[ i ], texturePath, crossOrigin );
+			array[ i ] = this.createMaterial( materials[ i ], texturePath, crossOrigin, textureLoadedCallback );
 
 		}
 
@@ -52,7 +52,7 @@ Loader.prototype = {
 
 		var color, textureLoader, materialLoader;
 
-		return function createMaterial( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin, textureLoadedCallback ) {
 
 			if ( color === undefined ) color = new Color();
 			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
@@ -71,12 +71,12 @@ Loader.prototype = {
 
 				if ( loader !== null ) {
 
-					texture = loader.load( fullPath );
+					texture = loader.load( fullPath, textureLoadedCallback );
 
 				} else {
 
 					textureLoader.setCrossOrigin( crossOrigin );
-					texture = textureLoader.load( fullPath );
+					texture = textureLoader.load( fullPath, textureLoadedCallback );
 
 				}
 

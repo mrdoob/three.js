@@ -81,7 +81,7 @@ Object.assign( JSONLoader.prototype, {
 
 	},
 
-	parse: function ( json, texturePath ) {
+	parse: function ( json, texturePath, textureLoadedCallback ) {
 
 		var geometry = new Geometry(),
 		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
@@ -538,7 +538,7 @@ Object.assign( JSONLoader.prototype, {
 
 		} else {
 
-			var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+			var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin, textureLoadedCallback );
 
 			return { geometry: geometry, materials: materials };
 
