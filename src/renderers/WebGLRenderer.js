@@ -1872,7 +1872,7 @@ function WebGLRenderer( parameters ) {
 
 		parameterCache = objectProperties.parameterCache[ material.id ];
 
-		if ( parameterCache === undefined || true ) {
+		if ( parameterCache === undefined || true ) { //FIXME - hack because 
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
