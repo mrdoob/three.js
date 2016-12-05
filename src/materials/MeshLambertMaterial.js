@@ -46,28 +46,30 @@ function MeshLambertMaterial( parameters ) {
 
 	this.type = 'MeshLambertMaterial';
 
-	this.color = new Color( 0xffffff ); // diffuse
+	this.isExperimentalMaterial = true;
 
-	this.map = null;
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
 
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
+	this.addParameter( 'map', null );
 
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
+	this.addParameter( 'lightMap', null );
+	this.addParameter( 'lightMapIntensity', 1.0 );
 
-	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
+	this.addParameter( 'aoMap', null );
+	this.addParameter( 'aoMapIntensity', 1.0 );
 
-	this.specularMap = null;
+	this.addParameter( 'emissive', new Color( 0x000000 ) );
+	this.addParameter( 'emissiveIntensity', 1.0 );
+	this.addParameter( 'emissiveMap', null );
 
-	this.alphaMap = null;
+	this.addParameter( 'specularMap', null );
 
-	this.envMap = null;
+	this.addParameter( 'alphaMap', null );
+
+	this.addParameter( 'envMap', null );
 	this.combine = MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
+	this.addParameter( 'reflectivity', 1 );
+	this.addParameter( 'refractionRatio', 0.98 );
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
