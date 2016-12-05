@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d / skin</title>
+		<title>three.js webgl - sea3d / keyframe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -28,11 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank">Trivision</a>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Ammo Physics Example - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>
 			<br/>
-			<br/>BoneObject: Object3D attached in a Bone
-			<br/>Left Click to hidden/show the hat - Right click to run
-			<br/><div id="playercount"></div>
+			<br/><div id="description">Right click to clone</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -51,6 +49,11 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
+		<script src="js/libs/ammo.js"></script>
+		<script src="js/loaders/sea3d/physics/SEA3DRigidBody.js"></script>
+		<script src="js/loaders/sea3d/physics/SEA3DAmmo.js"></script>
+		<script src="js/loaders/sea3d/physics/SEA3DAmmoLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -62,13 +65,17 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls, player, hat;
+			var camera, scene, renderer, composer, controls, demoAt = -1;
 
 			var loader;
 
 			// Initialize Three.JS
 
 			init();
+			
+			// Initialize Physics Engine
+			
+			SEA3D.AMMO.init(); 
 
 			//
 			// SEA3D Loader
@@ -76,84 +83,52 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : true, // Auto play animations
-				container : scene, // Container to add models
-				multiplier : .6 // Light multiplier
+				container : scene // Container to add models
 
 			} );
 
 			loader.onComplete = function( e ) {
 
-				// Get the first camera from SEA3D Studio
-				// use loader.get... to get others objects
-
-				var cam = loader.cameras[0];
-				camera.position.copy( cam.position );
-				camera.rotation.copy( cam.rotation );
-
 				controls = new THREE.OrbitControls( camera );
 
-				// get meshes
-				player = loader.getMesh("Player");
-				hat = loader.getMesh("Hat");
+				// events
 
-				// on animation complete example
+				window.addEventListener( 'contextmenu', function(e) { 
 
-				//player.animation['pass#1'].onComplete = function(e) { console.log("Animation completed!", e); };
+					e.preventDefault(); 
 
-				// or
-
-				player.animation['pass#1'].addEventListener(THREE.SEA3D.Animation.COMPLETE, function(e) {
-
-					console.log("Animation completed!", e);
+					cloneAsset(); 
 
 				} );
 
-				window.addEventListener( 'click', onMouseClick );
-				window.addEventListener( 'contextmenu', onRightClick );
-
 				animate();
-
-				updatePlayerCountDescription( 1 );
 
 			};
 
-			loader.load( './models/sea3d/skin.tjs.sea' );
-
-			//
-
-			function updatePlayerCountDescription( count ) {
-
-				document.getElementById("playercount").innerText = "Numbers of players " + count + " | Middle click to clone";
-
-			}
+			loader.load( './models/sea3d/car.tjs.sea' );
 
 			var cloneAsset = function() {
 
-				var count = 2, size = 25;
+				var offset = 0;
 
 				return function() {
 
-					updatePlayerCountDescription( count );
+					var domain = this.loader.clone( { lights : false, runScripts : false, autoPlay: false, enabledPhysics : false } );
 
-					var PHI = Math.PI * 2 * (Math.sqrt(5) + 1) / 2;  // golden ratio
-					var angle = PHI * count++;
+					offset += 180;
 
-					var container = new THREE.Object3D();
-					container.position.z = ( size * count ) * Math.cos( angle );
-					container.position.x = ( size * count ) * Math.sin( angle );
+					domain.container.position.x += offset;
+					domain.applyContainerTransform();
+					domain.enabledPhysics( true );
+					domain.runScripts();
 
-					scene.add( container );
-					
-					var domain = loader.clone( { 
-						autoPlay : true, 
-						container : container, 
-						lights : false 
-					});
+					this.scene.add( domain.container );
 
 				}
 
 			}();
+
+			//
 
 			function init() {
 
@@ -162,8 +137,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
-				camera.position.set( 1000, - 300, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera.position.set( -300, 200, 300 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -202,32 +177,6 @@
 
 			}
 
-			function onRightClick( e ) {
-
-				// play character animation
-				if (player.currentAnimation.name == "idle")
-					player.play("run", .5);// play "pass#1" to caller .onComplete animation example
-				else
-					player.play("idle", .5);
-
-				e.preventDefault();
-
-			}
-
-			function onMouseClick( e ) {
-
-				if (e.button === 0) {
-
-					hat.visible = !hat.visible;
-
-				} else if (e.button === 1) {
-
-					cloneAsset();
-
-				}
-
-			}
-
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -248,7 +197,12 @@
 
 				requestAnimationFrame( animate );
 
+				// Update Physics Engine
+
+				SEA3D.AMMO.update( delta );
+
 				// Update SEA3D Animations
+
 				THREE.SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
