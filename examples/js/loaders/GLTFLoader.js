@@ -54,14 +54,14 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			parser.parse( function ( scene, cameras, clips ) {
+			parser.parse( function ( scene, cameras, animations ) {
 
 				console.timeEnd( 'GLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
 					"cameras": cameras,
-					"clips": clips
+					"animations": animations
 				};
 
 				callback( glTF );
@@ -243,7 +243,8 @@ THREE.GLTFLoader = ( function () {
 
 	/* ANIMATION */
 
-	function createClip( name, interps ) {
+	function createAnimation( name, interps ) {
+
 		var tracks = [];
 
 		for ( var i = 0, len = interps.length; i < len; i ++ ) {
@@ -265,9 +266,11 @@ THREE.GLTFLoader = ( function () {
 				interp.values,
 				interp.type
 			) );
+
 		}
 
 		return new THREE.AnimationClip( name, undefined, tracks );
+
 	}
 
 	/*********************************/
@@ -609,7 +612,7 @@ THREE.GLTFLoader = ( function () {
 
 			"scenes",
 			"cameras",
-			"clips"
+			"animations"
 
 		] ).then( function ( dependencies ) {
 
@@ -624,16 +627,15 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var clips = [];
+			var animations = [];
 
-			for ( var name in dependencies.clips ) {
+			for ( var name in dependencies.animations ) {
 
-				var clip = dependencies.clips[ name ];
-				clips.push( clip );
+				animations.push( dependencies.animations[ name ] );
 
 			}
 
-			callback( scene, cameras, clips);
+			callback( scene, cameras, animations );
 
 		}.bind( this ) );
 
@@ -1246,9 +1248,7 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-
-
-	GLTFParser.prototype.loadClips = function () {
+	GLTFParser.prototype.loadAnimations = function () {
 
 		var scope = this;
 
@@ -1298,7 +1298,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return createClip( "animation_" + animationId, interps );
+				return createAnimation( "animation_" + animationId, interps );
 
 			} );
 
