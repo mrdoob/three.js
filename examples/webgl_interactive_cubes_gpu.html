@@ -77,6 +77,14 @@
 				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 				pickingTexture.texture.minFilter = THREE.LinearFilter;
 
+				// set the scissor test for the off-screen render target (also see the scissor set command in the "pick()" render loop)
+				pickingTexture.scissorTest = true;
+
+				// TODO: After adding scissor methods to the "WebGLRenderTarget" object, the above line should be:
+				// pickingTexture.setScissorTest(true);
+				// This use of the "setScissorTest" method on the WebGLRenderTarget mirrors the "setScissorTest" method of the WebGLRenderer, which does not apply the scissor to the non-null render target
+
+
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
@@ -197,8 +205,14 @@
 
 			function pick() {
 
-				//render the picking scene off-screen
+				// set the scissor on the off-screen render target to the pixel under the mouse (that will be picked) - this disables the fragment shader for the pixels that will not be picked (reducing rendering time)
+				pickingTexture.scissor.set(mouse.x, pickingTexture.height - mouse.y, 1, 1);
 
+				// TODO: After adding scissor methods to the "WebGLRenderTarget" object, the above line should be:
+				// pickingTexture.setScissor(mouse.x, pickingTexture.height - mouse.y, 1, 1);
+				// This use of the "setScissor" method on the WebGLRenderTarget mirrors the "setScissor" method of the WebGLRenderer, which does not apply the scissor to the non-null render target
+
+				//render the picking scene off-screen
 				renderer.render( pickingScene, camera, pickingTexture );
 
 				//create buffer for reading single pixel
