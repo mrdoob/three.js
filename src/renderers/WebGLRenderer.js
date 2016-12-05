@@ -29,6 +29,7 @@ import { WebGLClipping } from './webgl/WebGLClipping';
 import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
 import { Color } from '../math/Color';
+import { ParameterSource } from '../core/ParameterSource';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -99,9 +100,11 @@ function WebGLRenderer( parameters ) {
 
 	// tone mapping
 
-	this.toneMapping = LinearToneMapping;
-	this.toneMappingExposure = 1.0;
-	this.toneMappingWhitePoint = 1.0;
+	Object.assign( this, ParameterSource.prototype );
+
+	this.addParameter( "toneMapping", LinearToneMapping );
+	this.addParameter( "toneMappingExposure", 1.0 );
+	this.addParameter( "toneMappingWhitePoint", 1.0 );
 
 	// morphs
 
@@ -211,7 +214,6 @@ function WebGLRenderer( parameters ) {
 		programs: null
 
 	};
-
 
 	// initialize
 
@@ -1774,16 +1776,16 @@ function WebGLRenderer( parameters ) {
 
 			var uCamPos = p_uniforms.map.cameraPosition;
 
-			if ( uCamPos !== undefined ) {
+//			if ( uCamPos !== undefined && camera.cameraPosition === undefined ) {
 
-				uCamPos.setValue( _gl,
-					_vector3.setFromMatrixPosition( camera.matrixWorld ) );
+			if ( camera.cameraPosition === undefined ) {
+
+				camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
+
+//				uCamPos.setValue( _gl,
+//					_vector3.setFromMatrixPosition( camera.matrixWorld ) );
 
 			}
-
-
-			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
-			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
 
 		}
 
@@ -1812,6 +1814,8 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, _this );
+
 		}
 
 		var parameterCache = getParameterCache( object, material, p_uniforms.map );
@@ -1838,10 +1842,8 @@ function WebGLRenderer( parameters ) {
 
 			if ( parameter.version !== parameterVersions[ name ] ) {
 
-//					console.log( "uniform: ", name, "updating, value: ", parameter.value, parameter.version );
-
-					p_uniforms.setValue( _gl, name, parameter.value );
-					parameterVersions[ name ] =  parameter.version;
+				p_uniforms.setValue( _gl, name, parameter.value );
+				parameterVersions[ name ] =  parameter.version;
 
 			}
 
@@ -1870,7 +1872,7 @@ function WebGLRenderer( parameters ) {
 
 		parameterCache = objectProperties.parameterCache[ material.id ];
 
-		if ( parameterCache === undefined || material.needsUpdate ) {
+		if ( parameterCache === undefined || true ) {
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
@@ -1895,13 +1897,68 @@ function WebGLRenderer( parameters ) {
 
 				}
 
+				if ( parameter === undefined ) {
+
+					parameter = _this.getParameter( name );
+
+				}
+
 				if ( parameter !== undefined ) {
 
 					parameterCache.push( { name: name, parameter: parameter } );
 
 				} else {
 
-					console.log("uniform: ", name, " missing." );
+					if ( name === 'offsetRepeat' ) {
+
+						var uvScaleMap;
+
+						if ( material.map ) {
+
+							uvScaleMap = material.map;
+
+						} else if ( material.specularMap ) {
+
+							uvScaleMap = material.specularMap;
+
+						} else if ( material.displacementMap ) {
+
+							uvScaleMap = material.displacementMap;
+
+						} else if ( material.normalMap ) {
+
+							uvScaleMap = material.normalMap;
+
+						} else if ( material.bumpMap ) {
+
+							uvScaleMap = material.bumpMap;
+
+						} else if ( material.roughnessMap ) {
+
+							uvScaleMap = material.roughnessMap;
+
+						} else if ( material.metalnessMap ) {
+
+							uvScaleMap = material.metalnessMap;
+
+						} else if ( material.alphaMap ) {
+
+							uvScaleMap = material.alphaMap;
+
+						} else if ( material.emissiveMap ) {
+
+							uvScaleMap = material.emissiveMap;
+
+						}
+
+						if ( uvScaleMap.image === undefined ) console.log("undefined image");
+						parameterCache.push( { name: 'offsetRepeat', parameter: uvScaleMap.getParameter( 'offsetRepeat') } );
+
+					} else {
+
+//						console.log('uniform: ', name, ' missing.' );
+
+					}
 
 				}
 
@@ -2280,11 +2337,14 @@ function WebGLRenderer( parameters ) {
 				uvScaleMap = uvScaleMap.texture;
 
 			}
+						if ( uvScaleMap.image === undefined ) console.log("undefined image - common");
 
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
+//			var offset = uvScaleMap.offset;
+//			var repeat = uvScaleMap.repeat;
+			var offsetRepeat = uvScaleMap.offsetRepeat;
 
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+//			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+			uniforms.offsetRepeat.value.copy( offsetRepeat );
 
 		}
 
