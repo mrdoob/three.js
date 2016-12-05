@@ -15,11 +15,12 @@ function MeshPhysicalMaterial( parameters ) {
 	this.defines = { 'PHYSICAL': '' };
 
 	this.type = 'MeshPhysicalMaterial';
+	this.isExperimentalMaterial = true;
 
-	this.reflectivity = 0.5; // maps to F0 = 0.04
+	this.addParameter( 'reflectivity', 0.5 ); // maps to F0 = 0.04
 
-	this.clearCoat = 0.0;
-	this.clearCoatRoughness = 0.0;
+	this.addParameter( 'clearCoat', 0.0 );
+	this.addParameter( 'clearCoatRoughness',  0.0 );
 
 	this.setValues( parameters );
 
