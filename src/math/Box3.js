@@ -59,6 +59,37 @@ Box3.prototype = {
 
 	},
 
+	setFromBuffer: function ( buffer ) {
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, l = buffer.count; i < l; i ++ ) {
+
+			var x = buffer.getX( i );
+			var y = buffer.getY( i );
+			var z = buffer.getZ( i );
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		this.makeEmpty();
