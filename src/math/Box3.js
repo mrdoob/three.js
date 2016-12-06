@@ -59,7 +59,7 @@ Box3.prototype = {
 
 	},
 
-	setFromBuffer: function ( buffer ) {
+	setFromBufferAttribute: function ( attribute ) {
 
 		var minX = + Infinity;
 		var minY = + Infinity;
@@ -69,11 +69,11 @@ Box3.prototype = {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, l = buffer.count; i < l; i ++ ) {
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-			var x = buffer.getX( i );
-			var y = buffer.getY( i );
-			var z = buffer.getZ( i );
+			var x = attribute.getX( i );
+			var y = attribute.getY( i );
+			var z = attribute.getZ( i );
 
 			if ( x < minX ) minX = x;
 			if ( y < minY ) minY = y;
