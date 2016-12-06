@@ -2674,7 +2674,7 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
-			
+
 			return this;
 
 		},
@@ -3275,6 +3275,16 @@
 			this.x = sinPhiRadius * Math.sin( s.theta );
 			this.y = Math.cos( s.phi ) * s.radius;
 			this.z = sinPhiRadius * Math.cos( s.theta );
+
+			return this;
+
+		},
+
+		setFromCylindrical: function( c ) {
+
+			this.x = c.radius * Math.sin( c.theta );
+			this.y = c.y;
+			this.z = c.radius * Math.cos( c.theta );
 
 			return this;
 
@@ -10535,8 +10545,8 @@
 
 		this.userData = {};
 
-		this.onBeforeRender = function(){};
-		this.onAfterRender = function(){};
+		this.onBeforeRender = function () {};
+		this.onAfterRender = function () {};
 
 	}
 
@@ -10750,7 +10760,7 @@
 
 			}
 
-			if ( (object && object.isObject3D) ) {
+			if ( ( object && object.isObject3D ) ) {
 
 				if ( object.parent !== null ) {
 
@@ -11144,6 +11154,7 @@
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
 			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
+			this.layers.mask = source.layers.mask;
 			this.visible = source.visible;
 
 			this.castShadow = source.castShadow;
@@ -25974,7 +25985,7 @@
 	 *  bevelSize: <float>, // how far from shape outline is bevel
 	 *  bevelSegments: <int>, // number of bevel layers
 	 *
-	 *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+	 *  extrudePath: <THREE.Curve> // curve to extrude shape along
 	 *  frames: <Object> // containing arrays of tangents, normals, binormals
 	 *
 	 *  uvGenerator: <Object> // object that provides UV generator functions
@@ -39427,6 +39438,65 @@
 	};
 
 	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 *
+	 * Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
+	 *
+	 */
+
+	function Cylindrical( radius, theta, y ) {
+
+		this.radius = ( radius !== undefined ) ? radius : 1.0; // distance from the origin to a point in the x-z plane
+		this.theta = ( theta !== undefined ) ? theta : 0; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
+		this.y = ( y !== undefined ) ? y : 0; // height above the x-z plane
+
+		return this;
+
+	}
+
+	Cylindrical.prototype = {
+
+		constructor: Cylindrical,
+
+		set: function ( radius, theta, y ) {
+
+			this.radius = radius;
+			this.theta = theta;
+			this.y = y;
+
+			return this;
+
+		},
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( other ) {
+
+			this.radius = other.radius;
+			this.theta = other.theta;
+			this.y = other.y;
+
+			return this;
+
+		},
+
+		setFromVector3: function( vec3 ) {
+
+			this.radius = Math.sqrt( vec3.x * vec3.x + vec3.z * vec3.z );
+			this.theta = Math.atan2( vec3.x, vec3.z );
+			this.y = vec3.y;
+
+			return this;
+
+		}
+
+	};
+
+	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
@@ -40179,6 +40249,7 @@
 
 	/**
 	 * @author abelnation / http://github.com/abelnation
+	 * @author Mugen87 / http://github.com/Mugen87
 	 */
 
 	function RectAreaLightHelper( light ) {
@@ -40188,37 +40259,28 @@
 		this.light = light;
 		this.light.updateMatrixWorld();
 
-		this.lightMat = new MeshBasicMaterial( {
+		var materialFront = new MeshBasicMaterial( {
 			color: light.color,
 			fog: false
 		} );
 
-		this.lightWireMat = new MeshBasicMaterial( {
+		var materialBack = new MeshBasicMaterial( {
 			color: light.color,
 			fog: false,
 			wireframe: true
 		} );
 
-		var hx = this.light.width / 2.0;
-		var hy = this.light.height / 2.0;
+		var geometry = new BufferGeometry();
 
-		this.lightShape = new ShapeBufferGeometry( new Shape( [
-			new Vector3( - hx,   hy, 0 ),
-			new Vector3(   hx,   hy, 0 ),
-			new Vector3(   hx, - hy, 0 ),
-			new Vector3( - hx, - hy, 0 )
-		] ) );
+		geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 6 * 3 ), 3 ) );
 
 		// shows the "front" of the light, e.g. where light comes from
 
-		this.lightMesh = new Mesh( this.lightShape, this.lightMat );
+		this.add( new Mesh( geometry, materialFront ) );
 
 		// shows the "back" of the light, which does not emit light
 
-		this.lightWireMesh = new Mesh( this.lightShape, this.lightWireMat );
-
-		this.add( this.lightMesh );
-		this.add( this.lightWireMesh );
+		this.add( new Mesh( geometry, materialBack ) );
 
 		this.update();
 
@@ -40229,51 +40291,66 @@
 
 	RectAreaLightHelper.prototype.dispose = function () {
 
-		this.lightMesh.geometry.dispose();
-		this.lightMesh.material.dispose();
-		this.lightWireMesh.geometry.dispose();
-		this.lightWireMesh.material.dispose();
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
+		this.children[ 1 ].geometry.dispose();
+		this.children[ 1 ].material.dispose();
 
 	};
 
 	RectAreaLightHelper.prototype.update = function () {
 
-		var vector = new Vector3();
+		var vector1 = new Vector3();
 		var vector2 = new Vector3();
 
-		// TODO (abelnation) why not just make light helpers a child of the light object?
-		if ( this.light.target ) {
+		return function update() {
 
-			vector.setFromMatrixPosition( this.light.matrixWorld );
-			vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+			var mesh1 = this.children[ 0 ];
+			var mesh2 = this.children[ 1 ];
 
-			var lookVec = vector2.clone().sub( vector );
-			this.lightMesh.lookAt( lookVec );
-			this.lightWireMesh.lookAt( lookVec );
+			if ( this.light.target ) {
 
-		}
+				vector1.setFromMatrixPosition( this.light.matrixWorld );
+				vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.lightMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-		this.lightWireMesh.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+				var lookVec = vector2.clone().sub( vector1 );
+				mesh1.lookAt( lookVec );
+				mesh2.lookAt( lookVec );
 
-		var oldShape = this.lightShape;
+			}
 
-		var hx = this.light.width / 2.0;
-		var hy = this.light.height / 2.0;
+			// update materials
 
-		this.lightShape = new ShapeBufferGeometry( new Shape( [
-			new Vector3( - hx,   hy, 0 ),
-			new Vector3(   hx,   hy, 0 ),
-			new Vector3(   hx, - hy, 0 ),
-			new Vector3( - hx, - hy, 0 )
-		] ) );
+			mesh1.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+			mesh2.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-		this.lightMesh.geometry = this.lightShape;
-		this.lightWireMesh.geometry = this.lightShape;
+			// calculate new dimensions of the helper
 
-		oldShape.dispose();
+			var hx = this.light.width * 0.5;
+			var hy = this.light.height * 0.5;
 
-	};
+			// because the buffer attribute is shared over both geometries, we only have to update once
+
+			var position = mesh1.geometry.getAttribute( 'position' );
+			var array = position.array;
+
+			// first face
+
+			array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
+			array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
+			array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
+
+			// second face
+
+			array[  9 ] = - hx; array[ 10 ] =   hy; array[ 11 ] = 0;
+			array[ 12 ] = - hx; array[ 13 ] = - hy; array[ 14 ] = 0;
+			array[ 15 ] =   hx; array[ 16 ] = - hy; array[ 17 ] = 0;
+
+			position.needsUpdate = true;
+
+		};
+
+	}();
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -42899,6 +42976,7 @@
 	exports.Spline = Spline;
 	exports.Math = _Math;
 	exports.Spherical = Spherical;
+	exports.Cylindrical = Cylindrical;
 	exports.Plane = Plane;
 	exports.Frustum = Frustum;
 	exports.Sphere = Sphere;

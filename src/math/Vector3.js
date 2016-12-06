@@ -79,7 +79,7 @@ Vector3.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
-		
+
 		return this;
 
 	},
@@ -680,6 +680,16 @@ Vector3.prototype = {
 		this.x = sinPhiRadius * Math.sin( s.theta );
 		this.y = Math.cos( s.phi ) * s.radius;
 		this.z = sinPhiRadius * Math.cos( s.theta );
+
+		return this;
+
+	},
+
+	setFromCylindrical: function( c ) {
+
+		this.x = c.radius * Math.sin( c.theta );
+		this.y = c.y;
+		this.z = c.radius * Math.cos( c.theta );
 
 		return this;
 

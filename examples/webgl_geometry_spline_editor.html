@@ -16,9 +16,10 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+
+		<script src="js/controls/DragControls.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
-		<script src="js/controls/DragControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -165,18 +166,18 @@
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( camera, splineHelperObjects, renderer.domElement ); //
+				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
+				dragcontrols.enabled = false;
+				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 
-				dragcontrols.on( 'hoveron', function( e ) {
-
-					transformControl.attach( e.object );
-					cancelHideTransorm(); // *
+					transformControl.attach( event.object );
+					cancelHideTransorm();
 
 				} );
 
-				dragcontrols.on( 'hoveroff', function( e ) {
+				dragcontrols.addEventListener( 'hoveroff', function ( event ) {
 
-					if ( e ) delayHideTransform();
+					delayHideTransform();
 
 				} );
 
