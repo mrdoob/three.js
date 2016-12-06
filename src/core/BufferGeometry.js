@@ -579,11 +579,11 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		var positions = this.attributes.position;
+		var position = this.attributes.position;
 
-		if ( positions !== undefined ) {
+		if ( position !== undefined ) {
 
-			this.boundingBox.setFromBuffer( positions );
+			this.boundingBox.setFromBuffer( position );
 
 		} else {
 
@@ -612,13 +612,13 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-			var positions = this.attributes.position;
+			var position = this.attributes.position;
 
-			if ( positions ) {
+			if ( position ) {
 
 				var center = this.boundingSphere.center;
 
-				box.setFromBuffer( positions );
+				box.setFromBuffer( position );
 				box.getCenter( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
@@ -626,11 +626,11 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.count; i < il; i ++ ) {
+				for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-					vector.x = positions.getX( i );
-					vector.y = positions.getY( i );
-					vector.z = positions.getZ( i );
+					vector.x = position.getX( i );
+					vector.y = position.getY( i );
+					vector.z = position.getZ( i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
