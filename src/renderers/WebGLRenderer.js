@@ -103,9 +103,10 @@ function WebGLRenderer( parameters ) {
 
 	Object.assign( this, ParameterSource.prototype );
 
-	this.addParameter( "toneMapping", LinearToneMapping );
-	this.addParameter( "toneMappingExposure", 1.0 );
-	this.addParameter( "toneMappingWhitePoint", 1.0 );
+	this.addParameter( 'toneMapping', LinearToneMapping );
+	this.addParameter( 'toneMappingExposure', 1.0 );
+	this.addParameter( 'toneMappingWhitePoint', 1.0 );
+	this.addParameter( 'logDepthBufFC', 1.0 );
 
 	// morphs
 
@@ -1540,7 +1541,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( material.isExperimentalMaterial ) {
 
-					uniforms = Object.assign( {}, UniformsLib.fog, UniformsLib.lights );
+					uniforms = Object.assign( {}, UniformsLib.lights );
 
 				} else {
 
@@ -1763,8 +1764,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( capabilities.logarithmicDepthBuffer ) {
 
-				p_uniforms.setValue( _gl, 'logDepthBufFC',
-					2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+				_this.logDepthBufFC = 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 );
 
 			}
 
@@ -1795,36 +1795,24 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( refreshMaterial ) {
+		if ( refreshMaterial && material.lights ) {
 
-			if ( material.lights ) {
+			// the current material requires lighting info
 
-				// the current material requires lighting info
+			// note: all lighting uniforms are always set correctly
+			// they simply reference the renderer's state for their
+			// values
+			//
+			// use the current material's .needsUpdate flags to set
+			// the GL state when required
 
-				// note: all lighting uniforms are always set correctly
-				// they simply reference the renderer's state for their
-				// values
-				//
-				// use the current material's .needsUpdate flags to set
-				// the GL state when required
-
-				markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
-
-			}
-
-			// refresh uniforms common to several materials
-
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
+			markUniformsLightsNeedsUpdate( m_uniforms, refreshLights );
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, _this );
 
 		}
 
-		var parameterCache = getParameterCache( object, material, p_uniforms.map, materialProperties );
+		var parameterCache = getParameterCache( object, material, p_uniforms.map, materialProperties, fog );
 
 		if ( program.parameterVersions === undefined ) {
 
@@ -1867,7 +1855,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function getParameterCache( object, material, map, materialProperties ) {
+	function getParameterCache( object, material, map, materialProperties, fog ) {
 
 		var parameter;
 		var parameterCache;
@@ -1909,6 +1897,12 @@ function WebGLRenderer( parameters ) {
 				if ( parameter === undefined ) {
 
 					parameter = _this.getParameter( name );
+
+				}
+
+				if ( parameter === undefined && fog && material.fog ) {
+
+					parameter = fog.getParameter( name );
 
 				}
 
