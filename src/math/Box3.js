@@ -244,9 +244,9 @@ Box3.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( point.x < this.min.x || point.x > this.max.x ||
-				 point.y < this.min.y || point.y > this.max.y ||
-				 point.z < this.min.z || point.z > this.max.z ) {
+		if ( point.x <= this.min.x || point.x >= this.max.x ||
+			 point.y <= this.min.y || point.y >= this.max.y ||
+			 point.z <= this.min.z || point.z >= this.max.z ) {
 
 			return false;
 
