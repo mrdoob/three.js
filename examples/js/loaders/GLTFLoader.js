@@ -243,6 +243,16 @@ THREE.GLTFLoader = ( function () {
 
 	/* ANIMATION */
 
+	GLTFLoader.Animations = {
+
+		update: function () {
+
+			console.warn( 'THREE.GLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
+
+		}
+
+	};
+
 	function createAnimation( name, interps ) {
 
 		var tracks = [];
