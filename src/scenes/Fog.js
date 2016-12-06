@@ -1,4 +1,6 @@
 import { Color } from '../math/Color';
+import { ParameterSource } from '../core/ParameterSource';
+
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -9,10 +11,10 @@ function Fog ( color, near, far ) {
 
 	this.name = '';
 
-	this.color = new Color( color );
+	this.addParameter( 'color', new Color( color ), 'fogColor' );
 
-	this.near = ( near !== undefined ) ? near : 1;
-	this.far = ( far !== undefined ) ? far : 1000;
+	this.addParameter( 'near', ( near !== undefined ) ? near : 1, 'fogNear' );
+	this.addParameter( 'far', ( far !== undefined ) ? far : 1000, 'fogFar' );
 
 }
 
@@ -34,5 +36,7 @@ Fog.prototype.toJSON = function ( meta ) {
 	};
 
 };
+
+Object.assign( Fog.prototype, ParameterSource.prototype );
 
 export { Fog };
