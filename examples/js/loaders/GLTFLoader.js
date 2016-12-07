@@ -795,7 +795,11 @@ THREE.GLTFLoader = ( function () {
 
 						resolve( _texture );
 
-					}.bind( this ) );
+					}.bind( this ), undefined, function () {
+
+						resolve();
+
+					} );
 
 				}.bind( this ) );
 
