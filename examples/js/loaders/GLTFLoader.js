@@ -359,7 +359,8 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	var INTERPOLATION = {
-		LINEAR: THREE.InterpolateLinear
+		LINEAR: THREE.InterpolateLinear,
+		STEP: THREE.InterpolateDiscrete
 	};
 
 	/* UTILITY FUNCTIONS */
