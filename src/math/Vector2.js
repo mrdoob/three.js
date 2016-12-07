@@ -453,7 +453,13 @@ Vector2.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index ) {
+	fromAttribute: function ( attribute, index, offset ) {
+
+		if ( offset !== undefined ) {
+
+			console.warn( 'THREE.Vector2: offset has been removed from .fromAttribute().' );
+
+		}
 
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
