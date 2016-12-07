@@ -10,10 +10,7 @@ function ShadowMaterial() {
 
 	ShaderMaterial.call( this, {
 		uniforms: Object.assign( {},
-			UniformsLib.lights,
-			{
-				opacity: { value: 1.0 }
-			}
+			UniformsLib.lights
 		),
 		vertexShader: ShaderChunk[ 'shadow_vert' ],
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
@@ -21,18 +18,7 @@ function ShadowMaterial() {
 
 	this.lights = true;
 	this.transparent = true;
-
-	Object.defineProperties( this, {
-		opacity: {
-			enumerable: true,
-			get: function () {
-				return this.uniforms.opacity.value;
-			},
-			set: function ( value ) {
-				this.uniforms.opacity.value = value;
-			}
-		}
-	} );
+	this.isExperimentalMaterial = true;
 
 }
 
