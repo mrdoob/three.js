@@ -131,13 +131,14 @@ Box3.prototype = {
 		return function setFromObject( object ) {
 
 			var scope = this;
-			var i, l;
 
 			object.updateMatrixWorld( true );
 
 			this.makeEmpty();
 
 			object.traverse( function ( node ) {
+
+				var i, l;
 
 				var geometry = node.geometry;
 
