@@ -368,8 +368,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	var saveTimeout;
-
 	signals.cameraChanged.add( function () {
 
 		render();
