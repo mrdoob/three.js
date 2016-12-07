@@ -761,15 +761,11 @@ Vector3.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromAttribute: function ( attribute, index ) {
 
-		if ( offset === undefined ) offset = 0;
-
-		index = index * attribute.itemSize + offset;
-
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
+		this.z = attribute.getZ( index );
 
 		return this;
 

@@ -165,9 +165,7 @@ Box3.prototype = {
 
 							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-								v1.x = attribute.getX( i );
-								v1.y = attribute.getY( i );
-								v1.z = attribute.getZ( i );
+								v1.fromAttribute( attribute, i );
 								v1.applyMatrix4( node.matrixWorld );
 
 								scope.expandByPoint( v1 );

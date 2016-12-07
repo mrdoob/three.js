@@ -87,7 +87,7 @@ Vector2.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
-		
+
 		return this;
 
 	},
@@ -453,14 +453,10 @@ Vector2.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromAttribute: function ( attribute, index ) {
 
-		if ( offset === undefined ) offset = 0;
-
-		index = index * attribute.itemSize + offset;
-
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
 
 		return this;
 
