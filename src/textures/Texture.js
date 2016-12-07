@@ -79,6 +79,9 @@ Texture.prototype = {
 
 	copy: function ( source ) {
 
+
+		this.name = source.name + " (Copy)";
+
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
 

@@ -37,6 +37,8 @@ function WebGLRenderTarget( width, height, options ) {
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
+	this.texture.name = options.name !== undefined ? options.name : "";
+
 }
 
 Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
