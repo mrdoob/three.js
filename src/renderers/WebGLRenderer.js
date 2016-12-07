@@ -1665,7 +1665,6 @@ function WebGLRenderer( parameters ) {
 				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
-		program.parameterVersions = {};
 
 		return true;
 
@@ -1746,11 +1745,12 @@ function WebGLRenderer( parameters ) {
 
 				// uniforms may have changed - cache rebuild required
 				materialProperties.parameterCache = [];
+				materialProperties.program.parameterVersions = {};
 
 			}
 
 			material.needsUpdate = false;
-console.log( "j");
+
 		}
 
 		var refreshProgram = false;
@@ -1982,7 +1982,7 @@ console.log( "j");
 
 					} else {
 
-						if ( map[ name ] === 'flipEnvMap' ) {
+						if ( name === 'flipEnvMap' ) {
 
 							p_uniforms.setValue( _gl, 'flipEnvMap', ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1 );
 
