@@ -21,14 +21,22 @@ function LineDashedMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'LineDashedMaterial';
+	this.isExperimentalMaterial = true;
 
-	this.color = new Color( 0xffffff );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
 	this.linewidth = 1;
 
-	this.scale = 1;
-	this.dashSize = 3;
-	this.gapSize = 1;
+	this.addParameter( 'scale', 1 );
+	this.addParameter( 'dashSize', 3 );
+	this.addParameter( 'totalSize', 4 );
+
+	this._gapSize = 1;
+
+	Object.defineProperty( this, 'gapSize', {
+		set: function ( value ) { this._gapSize = value; this.totalSize = value + this.dashSize },
+		get: function () { return this._gapSize }
+	} );
 
 	this.lights = false;
 
