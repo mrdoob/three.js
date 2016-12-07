@@ -32,6 +32,7 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 	};
 
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size, params );
+	this.CubeUVRenderTarget.texture.name = "PMREMCubeUVPacker.cubeUv";
 	this.CubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
 

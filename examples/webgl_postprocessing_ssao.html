@@ -178,7 +178,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				depthMaterial.depthPacking = THREE.RGBADepthPacking;
 				depthMaterial.blending = THREE.NoBlending;
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, name: "SSAOShader.rt" };
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Setup SSAO pass

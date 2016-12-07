@@ -42,6 +42,7 @@ THREE.PMREMGenerator = function( sourceTexture ) {
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
 		var renderTarget = new THREE.WebGLRenderTargetCube( size, size, params );
+		renderTarget.texture.name = "PMREMGenerator.cube" + i;
 		this.cubeLods.push( renderTarget );
 		size = Math.max( 16, size / 2 );
 

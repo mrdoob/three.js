@@ -186,7 +186,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			if ( shadow.map === null ) {
 
-				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat, name: ( light.name + ".shadowMap" ) };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 

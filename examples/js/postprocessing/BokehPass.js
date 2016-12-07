@@ -23,10 +23,12 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.renderTargetColor = new THREE.WebGLRenderTarget( width, height, {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat
+		format: THREE.RGBFormat,
+		name: "BokehPass.color"
 	} );
 
 	this.renderTargetDepth = this.renderTargetColor.clone();
+	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material
 

@@ -49,12 +49,14 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.sampleRenderTarget.texture.name = "TAARenderPass.sample";
 
 		}
 
 		if ( ! this.holdRenderTarget ) {
 
 			this.holdRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.holdRenderTarget.texture.name = "TAARenderPass.hold";
 
 		}
 
