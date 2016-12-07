@@ -148,7 +148,7 @@ Box3.prototype = {
 
 						var vertices = geometry.vertices;
 
-						for ( i = 0, il = vertices.length; i < il; i ++ ) {
+						for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 							v1.copy( vertices[ i ] );
 							v1.applyMatrix4( node.matrixWorld );
