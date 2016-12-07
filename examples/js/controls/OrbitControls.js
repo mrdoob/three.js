@@ -221,7 +221,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
 
-		scope.domElement..removeEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
