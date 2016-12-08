@@ -1833,37 +1833,25 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var parameterCache = getParameterCache( object, material, p_uniforms.map, materialProperties, fog, camera, p_uniforms );
-
-		if ( program.parameterVersions === undefined ) {
-
-			program.parameterVersions = {};
-
-		}
-
-		var parameterVersions = program.parameterVersions;
+		var parameterCache = getParameterCache( object, material, p_uniforms.seq, materialProperties, fog, camera );
 
 		var parameter; 
-		var parameterVersion;
-		var name;
 		var cacheEntry;
 		var value;
+		var uniform;
 
 		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
 
 			cacheEntry = parameterCache[ i ];
 
-			name = cacheEntry.name;
 			parameter = cacheEntry.parameter;
+			value = parameter.value;
+			uniform = cacheEntry.uniform;
 
-			if ( parameter.version !== parameterVersions[ name ] ) {
+			if ( parameter.version !== uniform.version || value.isTexture ) {
 
-				value = parameter.value;
-
-				if ( value && value.isTexture && value.image === undefined ) continue;
-
-				p_uniforms.setValue( _gl, name, value );
-				parameterVersions[ name ] =  parameter.version;
+				uniform.setValue( _gl, value, _this );
+				uniform.version = parameter.version;
 
 			}
 
@@ -1873,10 +1861,11 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function getParameterCache( object, material, map, materialProperties, fog, camera, p_uniforms ) {
+	function getParameterCache( object, material, uniforms, materialProperties, fog, camera ) {
 
 		var parameter;
 		var parameterCache;
+		var uniform;
 		var name;
 
 		if ( materialProperties.parameterCache === undefined ) {
@@ -1894,7 +1883,12 @@ function WebGLRenderer( parameters ) {
 
 			parameterCache = [];
 
-			for ( name in map ) {
+			for ( var i = 0, l = uniforms.length; i < l; i++ ) {
+
+				uniform = uniforms[ i ];
+				name = uniform.id;
+
+				if ( ! uniform.isSingleUniform ) continue;
 
 				// parameter sources = add fog if material.fog.
 
@@ -1932,7 +1926,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( parameter !== undefined ) {
 
-					parameterCache.push( { name: name, parameter: parameter } );
+					parameterCache.push( { uniform: uniform, parameter: parameter } );
 
 				} else {
 
@@ -1978,26 +1972,28 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						parameterCache.push( { name: 'offsetRepeat', parameter: uvScaleMap.getParameter( 'offsetRepeat') } );
+						parameterCache.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat') } );
 
 					} else {
 
 						if ( name === 'flipEnvMap' ) {
 
-							p_uniforms.setValue( _gl, 'flipEnvMap', ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1 );
+							uniform.setValue( _gl, ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1, _this );
 
-						} else if ( map[ name ].seq === undefined &&
+						} else if (
 							name !== 'clippingPlanes' &&
 							name !== 'ambientLightColor' &&
 							name !== 'morphTargetInfluences' &&
 							name !== 'directionalShadowMap' &&
 							name !== 'directionalShadowMatrix' &&
 							name !== 'pointShadowMap' &&
+							name !== 'ltcMat' &&
+							name !== 'ltcMag' &&
 							name !== 'pointShadowMatrix' &&
 							name !== 'spotShadowMap' &&
 							name !== 'spotShadowMatrix' ) {
 
-							console.log('uniform: <', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
+							console.log('uniform: []', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
 
 						}
 
