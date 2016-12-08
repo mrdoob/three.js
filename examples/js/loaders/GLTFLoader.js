@@ -1473,11 +1473,11 @@ THREE.GLTFLoader = ( function () {
 
 										for ( var j = 0, jl = keys.length; j < jl; j ++ ) {
 
-											var node = __nodes[ keys[ j ] ];
+											var n = __nodes[ keys[ j ] ];
 
-											if ( node.jointName === jointId ) {
+											if ( n.jointName === jointId ) {
 
-												jointNode = node;
+												jointNode = n;
 												break;
 
 											}
