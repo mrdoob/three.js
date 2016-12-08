@@ -20,12 +20,12 @@ function PointsMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'PointsMaterial';
+	this.isExperimentalMaterial = true;
 
-	this.color = new Color( 0xffffff );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
+	this.addParameter( 'map', null );
+	this.addParameter( 'size', 1 );
 
-	this.map = null;
-
-	this.size = 1;
 	this.sizeAttenuation = true;
 
 	this.lights = false;
