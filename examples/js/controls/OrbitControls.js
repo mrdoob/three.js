@@ -221,6 +221,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
+		document.removeEventListener( 'mousedown', onDocumentMouseDown, false );
+
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
@@ -648,6 +650,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// event handlers - FSM: listen for events and reset state
 	//
 
+	function onDocumentMouseDown( event ) {
+		scope.enabled = event.target == scope.domElement;
+	}
+
 	function onMouseDown( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -878,6 +884,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
+
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 	window.addEventListener( 'keydown', onKeyDown, false );
 
