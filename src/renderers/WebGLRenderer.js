@@ -1745,7 +1745,6 @@ function WebGLRenderer( parameters ) {
 
 				// uniforms may have changed - cache rebuild required
 				materialProperties.parameterCache = [];
-				materialProperties.program.parameterVersions = {};
 
 			}
 
@@ -1784,7 +1783,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( capabilities.logarithmicDepthBuffer ) {
 
-				_this.logDepthBufFC = 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ); // move to scene - to scene camera change
+				_this.logDepthBufFC = 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ); // move to 'frame to frame'' camera change
 
 			}
 
@@ -1801,7 +1800,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materialProperties.parameterCache[ object.id ] = null;
+			materialProperties.parameterCache[ object.id ] = null; // this is called too often move 'frame to frame camera'' change
 
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
@@ -1867,12 +1866,6 @@ function WebGLRenderer( parameters ) {
 		var parameterCache;
 		var uniform;
 		var name;
-
-		if ( materialProperties.parameterCache === undefined ) {
-
-			materialProperties.parameterCache = [];
-
-		}
 
 		parameterCache = materialProperties.parameterCache[ object.id ];
 
@@ -1972,7 +1965,7 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						parameterCache.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat') } );
+						parameterCache.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat' ) } );
 
 					} else {
 
