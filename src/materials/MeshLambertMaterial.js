@@ -58,8 +58,8 @@ function MeshLambertMaterial( parameters ) {
 	this.addParameter( 'aoMap', null );
 	this.addParameter( 'aoMapIntensity', 1.0 );
 
-	this.addParameter( 'emissive', new Color( 0x000000 ) );
-	this.addParameter( 'emissiveIntensity', 1.0 );
+	this.addParameter( 'emissive', new Color( 0x000000 ), 'emissiveColor' );
+	this.addParameter( 'emissiveIntensity',  1.0 );
 	this.addParameter( 'emissiveMap', null );
 
 	this.addParameter( 'specularMap', null );

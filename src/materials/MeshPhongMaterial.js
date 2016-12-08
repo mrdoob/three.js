@@ -58,41 +58,42 @@ function MeshPhongMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'MeshPhongMaterial';
+	this.isExperimentalMaterial = true;
 
-	this.color = new Color( 0xffffff ); // diffuse
-	this.specular = new Color( 0x111111 );
-	this.shininess = 30;
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
+	this.addParameter( 'specular', new Color( 0x111111 ) );
+	this.addParameter( 'shininess', 30 );
 
-	this.map = null;
+	this.addParameter( 'map', null );
 
-	this.lightMap = null;
-	this.lightMapIntensity = 1.0;
+	this.addParameter( 'lightMap', null );
+	this.addParameter( 'lightMapIntensity', 1.0 );
 
-	this.aoMap = null;
-	this.aoMapIntensity = 1.0;
+	this.addParameter( 'aoMap', null );
+	this.addParameter( 'aoMapIntensity',  1.0 );
 
-	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity = 1.0;
-	this.emissiveMap = null;
+	this.addParameter( 'emissive', new Color( 0x000000 ), 'emissiveColor' );
+	this.addParameter( 'emissiveIntensity',  1.0 );
+	this.addParameter( 'emissiveMap',  null );
 
-	this.bumpMap = null;
-	this.bumpScale = 1;
+	this.addParameter( 'bumpMap', null );
+	this.addParameter( 'bumpScale', 1 );
 
-	this.normalMap = null;
-	this.normalScale = new Vector2( 1, 1 );
+	this.addParameter( 'normalMap', null );
+	this.addParameter( 'normalScale', new Vector2( 1, 1 ) );
 
-	this.displacementMap = null;
-	this.displacementScale = 1;
-	this.displacementBias = 0;
+	this.addParameter( 'displacementMap', null );
+	this.addParameter( 'displacementScale', 1 );
+	this.addParameter( 'displacementBias', 0 );
 
-	this.specularMap = null;
+	this.addParameter( 'specularMap', null );
 
-	this.alphaMap = null;
+	this.addParameter( 'alphaMap', null );
 
-	this.envMap = null;
+	this.addParameter( 'envMap', null );
 	this.combine = MultiplyOperation;
-	this.reflectivity = 1;
-	this.refractionRatio = 0.98;
+	this.addParameter( 'reflectivity', 1 );
+	this.addParameter( 'refractionRatio',  0.98 );
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
