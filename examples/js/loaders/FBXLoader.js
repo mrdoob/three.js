@@ -125,23 +125,28 @@
 			scope.animations = ( new Animation() ).parse( nodes, scope.hierarchy );
 			scope.textures = ( new Textures() ).parse( nodes, scope.hierarchy );
 			scope.materials = ( new Materials() ).parse( nodes, scope.hierarchy );
+			scope.geometries = ( new Geometries() ).parse( nodes, scope.hierarchy );
 			console.timeEnd( 'FBXLoader: ObjectParser' );
 
+			this.texture_cache = {};
+			this.material_cache = {};
+			this.geometry_cache = {};
+
 			console.time( 'FBXLoader: GeometryParser' );
-			var geometries = this.parseGeometries( nodes );
+			var meshes = this.parseMeshes( nodes );
 			console.timeEnd( 'FBXLoader: GeometryParser' );
 
 			var container = new THREE.Group();
 
-			for ( var i = 0; i < geometries.length; ++ i ) {
+			for ( var i = 0; i < meshes.length; ++ i ) {
 
-				if ( geometries[ i ] === undefined ) {
+				if ( meshes[ i ] === undefined ) {
 
 					continue;
 
 				}
 
-				container.add( geometries[ i ] );
+				container.add( meshes[ i ] );
 
 				//wireframe = new THREE.WireframeHelper( geometries[i], 0x00ff00 );
 				//container.add( wireframe );
@@ -158,6 +163,242 @@
 
 			console.timeEnd( 'FBXLoader' );
 			return container;
+
+		},
+
+		getTexture: function ( texNode ) {
+
+			if ( ! ( texNode.id in this.texture_cache ) ) {
+
+				if ( this.textureLoader === null ) {
+
+					this.textureLoader = new THREE.TextureLoader();
+
+				}
+
+				this.texture_cache[ texNode.id ] = this.textureLoader.load( this.textureBasePath + '/' + texNode.fileName );
+
+			}
+
+			return this.texture_cache[ texNode.id ];
+
+		},
+
+		getMaterial: function ( matNode, nodes ) {
+
+			if ( ! ( matNode.id in this.material_cache ) ) {
+
+				// TODO:
+				// Cannot find a list of possible ShadingModel values.
+				// If someone finds a list, please add additional cases
+				// and map to appropriate materials.
+				var tmpMat;
+				switch ( matNode.type ) {
+
+					case "phong":
+						tmpMat = new THREE.MeshPhongMaterial();
+						break;
+					case "lambert":
+						tmpMat = new THREE.MeshLambertMaterial();
+						break;
+					default:
+						console.warn( "No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material" );
+						tmpMat = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+						break;
+
+				}
+
+				var children = nodes.searchConnectionChildren( matNode.id );
+				for ( var i = 0; i < children.length; ++ i ) {
+
+					var type = nodes.searchConnectionType( matNode.id, children[ i ] );
+					switch ( type ) {
+
+						case " \"AmbientColor":
+							//TODO: Support AmbientColor textures
+							break;
+
+						case " \"DiffuseColor":
+							matNode.parameters.map = this.getTexture( this.textures.textures[ children[ i ] ] );
+							break;
+
+						default:
+							console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
+							break;
+
+					}
+
+				}
+
+				tmpMat.setValues( matNode.parameters );
+
+				this.material_cache[ matNode.id ] = tmpMat;
+
+			}
+
+			return this.material_cache[ matNode.id ];
+
+		},
+
+		getGeometry: function ( geoNode ) {
+
+			if ( ! ( geoNode.id in this.geometry_cache ) ) {
+
+				var tmpGeo = new THREE.BufferGeometry();
+				tmpGeo.name = geoNode.name;
+				tmpGeo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geoNode.vertices ), 3 ) );
+
+				if ( geoNode.normals !== undefined && geoNode.normals.length > 0 ) {
+
+					tmpGeo.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geoNode.normals ), 3 ) );
+
+				}
+
+				if ( geoNode.uvs !== undefined && geoNode.uvs.length > 0 ) {
+
+					tmpGeo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geoNode.uvs ), 2 ) );
+
+				}
+
+				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
+
+					if ( geoNode.indices.length > 65535 ) {
+
+						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint32Array( geoNode.indices ), 1 ) );
+
+					} else {
+
+						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint16Array( geoNode.indices ), 1 ) );
+
+					}
+
+				}
+
+				tmpGeo.verticesNeedUpdate = true;
+				tmpGeo.computeBoundingSphere();
+				tmpGeo.computeBoundingBox();
+
+				//Material groupings
+				if ( geoNode.materialIndices.length > 1 ) {
+
+					tmpGeo.groups = [];
+
+					for ( var i = 0, prevIndex = - 1; i < geoNode.materialIndices.length; ++ i ) {
+
+						if ( geoNode.materialIndices[ i ] !== prevIndex ) {
+
+							tmpGeo.groups.push( { start: i * 3, count: 0, materialIndex: geoNode.materialIndices[ i ] } );
+							prevIndex = geoNode.materialIndices[ i ];
+
+						}
+
+						tmpGeo.groups[ tmpGeo.groups.length - 1 ].count += 3;
+
+					}
+
+				}
+
+				this.geometry_cache[ geoNode.id ] = new THREE.Geometry().fromBufferGeometry( tmpGeo );
+				this.geometry_cache[ geoNode.id ].bones = geoNode.bones;
+				this.geometry_cache[ geoNode.id ].skinIndices = this.weights.skinIndices;
+				this.geometry_cache[ geoNode.id ].skinWeights = this.weights.skinWeights;
+
+			}
+
+			return this.geometry_cache[ geoNode.id ];
+
+		},
+
+		parseMeshes: function ( node ) {
+
+			var modelNode = node.Objects.subNodes.Model;
+			var meshes = [];
+
+			for ( var ID in modelNode ) {
+
+				if ( modelNode[ ID ].attrType === 'Mesh' ) {
+
+					//Parse Mesh
+					meshes.push( this.parseMesh( modelNode[ ID ], node ) );
+
+				}
+
+			}
+
+			return meshes;
+
+		},
+
+		parseMesh: function ( meshNode, FBXNodes ) {
+
+			var geoNodes = FBXNodes.Objects.subNodes.Geometry;
+			var matNodes = FBXNodes.Objects.subNodes.Material;
+
+			var children = FBXNodes.searchConnectionChildren( meshNode.id );
+			var geometry;
+			var materials = [];
+			var material;
+			var mesh;
+			for ( var i = 0; i < children.length; ++ i ) {
+
+				if ( children[ i ] in geoNodes ) {
+
+					geometry = this.getGeometry( this.geometries.geometries[ children[ i ] ] );
+					continue;
+
+				}
+
+				if ( children[ i ] in matNodes ) {
+
+					materials.push( this.getMaterial( this.materials.materials[ children[ i ] ], FBXNodes ) );
+					continue;
+
+				}
+
+			}
+
+			if ( materials.length > 1 ) {
+
+				material = new THREE.MultiMaterial( materials );
+				//material = materials[ 0 ];
+
+			} else {
+
+				material = materials[ 0 ];
+
+			}
+
+			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined ) {
+
+				if ( material instanceof THREE.MultiMaterial ) {
+
+					for ( var i = 0; i < material.materials.length; ++ i ) {
+
+						material.materials[ i ].skinning = true;
+
+					}
+
+				} else {
+
+					material.skinning = true;
+
+				}
+
+				mesh = new THREE.SkinnedMesh( geometry, material );
+
+			} else {
+
+				mesh = new THREE.Mesh( geometry, material );
+
+			}
+
+			if ( this.animations !== undefined ) {
+
+				this.addAnimation( mesh, this.weights.matrices, this.animations );
+
+			}
+
+			return mesh;
 
 		},
 
@@ -196,6 +437,8 @@
 				}
 
 			} else {
+
+				debugger;
 
 				res.push( this.parseGeometry( node.Objects.subNodes.Geometry, node ) );
 
@@ -241,18 +484,18 @@
 			geometry.computeBoundingSphere();
 			geometry.computeBoundingBox();
 
-			var texture;
-			var texs = this.textures.getById( nodes.searchConnectionParent( geo.id ) );
-			if ( texs !== undefined && texs.length > 0 ) {
+			// var texture;
+			// var texs = this.textures.getById( nodes.searchConnectionParent( geo.id ) );
+			// if ( texs !== undefined && texs.length > 0 ) {
 
-				if ( this.textureLoader === null ) {
+			// 	if ( this.textureLoader === null ) {
 
-					this.textureLoader = new THREE.TextureLoader();
+			// 		this.textureLoader = new THREE.TextureLoader();
 
-				}
-				texture = this.textureLoader.load( this.textureBasePath + '/' + texs[ 0 ].fileName );
+			// 	}
+			// 	texture = this.textureLoader.load( this.textureBasePath + '/' + texs[ 0 ].fileName );
 
-			}
+			// }
 
 			var materials = [];
 			var material;
@@ -1575,6 +1818,39 @@
 
 	};
 
+	function Geometries() {
+
+		this.geometries = {};
+
+	}
+
+	Object.assign( Geometries.prototype, {
+
+		parse: function ( FBXNodes, hierarchy ) {
+
+			if ( ! ( 'Geometry' in FBXNodes.Objects.subNodes ) ) {
+
+				return this;
+
+			}
+
+			for ( var geo in FBXNodes.Objects.subNodes.Geometry ) {
+
+				if ( FBXNodes.Objects.subNodes.Geometry[ geo ].attrType === 'Mesh' ) {
+
+					this.geometries[ geo ] = ( new Geometry() ).parse( FBXNodes.Objects.subNodes.Geometry[ geo ] );
+					this.geometries[ geo ].addBones( hierarchy.hierarchy );
+
+				}
+
+			}
+
+			return this;
+
+		}
+
+	} );
+
 
 	function Geometry() {
 
@@ -1588,7 +1864,6 @@
 		this.uvs = [];
 
 		this.bones = [];
-		this.skins = null;
 
 	}
 
@@ -1610,12 +1885,16 @@
 		this.indices = this.getPolygonVertexIndices();
 		this.uvs = ( new UV() ).parse( this.node, this );
 		this.normals = ( new Normal() ).parse( this.node, this );
+		this.materialIndices = ( new MaterialIndex() ).parse( this.node, this );
 
 		if ( this.getPolygonTopologyMax() > 3 ) {
 
 			var indexInfo = this.convertPolyIndicesToTri(
-								this.indices, this.getPolygonTopologyArray() );
+								this.indices,
+								this.materialIndices,
+								this.getPolygonTopologyArray() );
 			this.indices = indexInfo.res;
+			this.materialIndices = indexInfo.materialIndices;
 			this.polyIndices = indexInfo.polyIndices;
 
 		}
@@ -1762,7 +2041,7 @@
 	// [( a, b, c ), (a, c, d )....
 
 	// Also keep track of original poly index.
-	Geometry.prototype.convertPolyIndicesToTri = function ( indices, strides ) {
+	Geometry.prototype.convertPolyIndicesToTri = function ( indices, materialIndices, strides ) {
 
 		var res = [];
 
@@ -1791,7 +2070,22 @@
 
 		}
 
-		return { res: res, polyIndices: polyIndices };
+		var newMaterialIndices = [ materialIndices[ 0 ] ];
+
+		if ( materialIndices.length > 1 ) {
+
+			for ( var i = 0; i < polyIndices.length; ++ i ) {
+
+				newMaterialIndices[ i ] = materialIndices[ polyIndices[ i ] ];
+
+			}
+
+		}
+
+		return {
+			res: res,
+			materialIndices: newMaterialIndices,
+			polyIndices: polyIndices };
 
 	};
 
@@ -2234,6 +2528,73 @@
 
 	};
 
+	function MaterialIndex() {
+
+		this.indexBuffer = [];
+
+	}
+
+	Object.assign( MaterialIndex.prototype, {
+
+		parse: function ( node, geo ) {
+
+			if ( ! ( 'LayerElementMaterial' in node.subNodes ) ) {
+
+				return;
+
+			}
+
+			var indexNode = node.subNodes.LayerElementMaterial[ 0 ];
+			var mappingType = indexNode.properties.MappingInformationType;
+			var refType = indexNode.properties.ReferenceInformationType;
+			var indices = parseArrayToInt( indexNode.subNodes.Materials.properties.a );
+
+			// it means that there is a normal for every vertex of every polygon of the model.
+			// For example, if the models has 8 vertices that make up four quads, then there
+			// will be 16 normals (one normal * 4 polygons * 4 vertices of the polygon). Note
+			// that generally a game engine needs the vertices to have only one normal defined.
+			// So, if you find a vertex has more tha one normal, you can either ignore the normals
+			// you find after the first, or calculate the mean from all of them (normal smoothing).
+			//if ( mappingType == "ByPolygonVertex" ){
+			switch ( mappingType ) {
+
+
+				case "ByPolygon":
+
+					switch ( refType ) {
+
+						// Direct
+						// The material indices are in order.
+						case "IndexToDirect":
+							this.indexBuffer = this.parse_ByPolygon_IndexToDirect( indices );
+							break;
+
+						default:
+							this.indexBuffer = [ 0 ];
+							break;
+
+					}
+					break;
+
+				default:
+
+					this.indexBuffer = [ 0 ];
+					break;
+
+			}
+
+			return this.indexBuffer;
+
+		},
+
+		parse_ByPolygon_IndexToDirect: function ( indices ) {
+
+			return indices;
+
+		},
+
+	} );
+
 	function AnimationCurve() {
 
 		this.version = null;
@@ -2584,12 +2945,14 @@
 
 	function Textures() {
 
-		this.textures = [];
-		this.perGeoMap = {};
+		this.textures = {};
+		//this.perGeoMap = {};
 
 	}
 
 	Textures.prototype.add = function ( tex ) {
+
+		debugger;
 
 		if ( this.textures === undefined ) {
 
@@ -2620,7 +2983,7 @@
 		for ( var n in rawNodes ) {
 
 			var tex = ( new Texture() ).parse( rawNodes[ n ], node );
-			this.add( tex );
+			this.textures[ n ] = tex;
 
 		}
 
@@ -2688,55 +3051,29 @@
 
 	function Materials() {
 
-		this.materials = [];
+		this.materials = {};
 		this.perGeoMap = {};
 
 	}
 
-	Materials.prototype.add = function ( mat ) {
+	Object.assign( Materials.prototype, {
 
-		if ( this.materials === undefined ) {
+		parse: function ( node ) {
 
-			this.materials = [];
+			var rawNodes = node.Objects.subNodes.Material;
 
-		}
+			for ( var n in rawNodes ) {
 
-		this.materials.push( mat );
-
-		for ( var i = 0; i < mat.parentIds.length; ++ i ) {
-
-			if ( this.perGeoMap[ mat.parentIds[ i ] ] === undefined ) {
-
-				this.perGeoMap[ mat.parentIds[ i ] ] = [];
+				var mat = ( new Material() ).parse( rawNodes[ n ], node );
+				this.materials[ n ] = mat;
 
 			}
 
-			this.perGeoMap[ mat.parentIds[ i ] ].push( this.materials[ this.materials.length - 1 ] );
+			return this;
 
 		}
 
-	};
-
-	Materials.prototype.parse = function ( node ) {
-
-		var rawNodes = node.Objects.subNodes.Material;
-
-		for ( var n in rawNodes ) {
-
-			var mat = ( new Material() ).parse( rawNodes[ n ], node );
-			this.add( mat );
-
-		}
-
-		return this;
-
-	};
-
-	Materials.prototype.getById = function ( id ) {
-
-		return this.perGeoMap[ id ];
-
-	};
+	} );
 
 	function Material() {
 
@@ -2747,83 +3084,88 @@
 
 	}
 
-	Material.prototype.parse = function ( node, nodes ) {
+	Object.assign( Material.prototype, {
 
-		this.id = node.id;
-		this.name = node.attrName;
-		this.type = node.properties.ShadingModel;
+		parse: function ( node, nodes ) {
 
-		this.parameters = this.getParameters( node.properties );
+			this.id = node.id;
+			this.name = node.attrName;
+			this.type = node.properties.ShadingModel;
 
-		this.parentIds = this.searchParents( this.id, nodes );
+			this.parameters = this.parseParameters( node.properties );
 
-		return this;
+			this.parentIds = this.searchParents( this.id, nodes );
 
-	};
+			return this;
 
-	Material.prototype.getParameters = function ( properties ) {
+		},
 
-		var parameters = {};
+		parseParameters: function ( properties ) {
 
-		//TODO: Missing parameters:
-		// - Ambient
-		// - MultiLayer
-		// - ShininessExponent (Same vals as Shininess)
-		// - Specular (Same vals as SpecularColor)
-		// - TransparencyFactor (Maybe same as Opacity?).
+			var parameters = {};
 
-		if ( properties.Diffuse ) {
+			//TODO: Missing parameters:
+			// - Ambient
+			// - MultiLayer
+			// - ShininessExponent (Same vals as Shininess)
+			// - Specular (Same vals as SpecularColor)
+			// - TransparencyFactor (Maybe same as Opacity?).
 
-			parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.Diffuse.value.x ), parseFloat( properties.Diffuse.value.y ), parseFloat( properties.Diffuse.value.z ) ] );
+			if ( properties.Diffuse ) {
+
+				parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.Diffuse.value.x ), parseFloat( properties.Diffuse.value.y ), parseFloat( properties.Diffuse.value.z ) ] );
+
+			}
+			if ( properties.Specular ) {
+
+				parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.Specular.value.x ), parseFloat( properties.Specular.value.y ), parseFloat( properties.Specular.value.z ) ] );
+
+			}
+			if ( properties.Shininess ) {
+
+				parameters.shininess = properties.Shininess.value;
+
+			}
+			if ( properties.Emissive ) {
+
+				parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.Emissive.value.x ), parseFloat( properties.Emissive.value.y ), parseFloat( properties.Emissive.value.z ) ] );
+
+			}
+			if ( properties.EmissiveFactor ) {
+
+				parameters.emissiveIntensity = properties.EmissiveFactor.value;
+
+			}
+			if ( properties.Reflectivity ) {
+
+				parameters.reflectivity = properties.Reflectivity.value;
+
+			}
+			if ( properties.Opacity ) {
+
+				parameters.opacity = properties.Opacity.value;
+
+			}
+			if ( parameters.opacity < 1.0 ) {
+
+				parameters.transparent = true;
+
+			}
+
+			//Assigning textures
+
+
+			return parameters;
+
+		},
+
+		searchParents: function ( id, nodes ) {
+
+			return nodes.searchConnectionParent( id );
 
 		}
-		if ( properties.Specular ) {
 
-			parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.Specular.value.x ), parseFloat( properties.Specular.value.y ), parseFloat( properties.Specular.value.z ) ] );
-
-		}
-		if ( properties.Shininess ) {
-
-			parameters.shininess = properties.Shininess.value;
-
-		}
-		if ( properties.Emissive ) {
-
-			parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.Emissive.value.x ), parseFloat( properties.Emissive.value.y ), parseFloat( properties.Emissive.value.z ) ] );
-
-		}
-		if ( properties.EmissiveFactor ) {
-
-			parameters.emissiveIntensity = properties.EmissiveFactor.value;
-
-		}
-		if ( properties.Reflectivity ) {
-
-			parameters.reflectivity = properties.Reflectivity.value;
-
-		}
-		if ( properties.Opacity ) {
-
-			parameters.opacity = properties.Opacity.value;
-
-		}
-		if ( parameters.opacity < 1.0 ) {
-
-			parameters.transparent = true;
-
-		}
-
-		return parameters;
-
-	};
-
-	Material.prototype.searchParents = function ( id, nodes ) {
-
-		var p = nodes.searchConnectionParent( id );
-
-		return p;
-
-	};
+	} );
 
 
 	/* --------------------------------------------------------------------- */
@@ -2862,7 +3204,7 @@
 	// what want:　normal per vertex, order vertice
 	// i have: normal per polygon
 	// i have: indice per polygon
-	var parse_Data_ByPolygonVertex_Direct = function ( node, indices, strides, itemSize ) {
+	function parse_Data_ByPolygonVertex_Direct( node, indices, strides, itemSize ) {
 
 		// *21204 > 3573
 		// Geometry: 690680816, "Geometry::", "Mesh" {
