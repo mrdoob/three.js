@@ -346,6 +346,9 @@ function SingleUniform( id, activeInfo, addr ) {
 	this.addr = addr;
 	this.setValue = getSingularSetter( activeInfo.type );
 
+	this.isSingleUniform = true;
+	this.version = -1.0;
+
 	// this.path = activeInfo.name; // DEBUG
 
 }
