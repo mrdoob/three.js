@@ -103,6 +103,8 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+
 			var container, raycaster, stats;
 
 			var camera, scene, renderer, composer, controls, velocity;
@@ -221,33 +223,7 @@
 
 						// Ask the browser to lock the pointer
 						element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-						if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-							var fullscreenchange = function ( event ) {
-
-								if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-									document.removeEventListener( 'fullscreenchange', fullscreenchange );
-									document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-									element.requestPointerLock();
-								}
-
-							};
-
-							document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-							document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-							element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-							element.requestFullscreen();
-
-						} else {
-
-							element.requestPointerLock();
-
-						}
+						element.requestPointerLock();
 
 					}, false );
 

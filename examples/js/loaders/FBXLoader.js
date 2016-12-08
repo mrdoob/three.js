@@ -1,5 +1,6 @@
 /**
  * @author yamahigashi https://github.com/yamahigashi
+ * @author Kyle-Larson https://github.com/Kyle-Larson
  *
  * This loader loads FBX file in *ASCII and version 7 format*.
  *
@@ -123,8 +124,7 @@
 			scope.weights	= ( new Weights() ).parse( nodes, scope.hierarchy );
 			scope.animations = ( new Animation() ).parse( nodes, scope.hierarchy );
 			scope.textures = ( new Textures() ).parse( nodes, scope.hierarchy );
-			//scope.materials = ( new Materials() ).parse( nodes, scope.hierarchy );
-			//scope.geometries = ( new Geometries() ).parse( nodes, scope.hierarchy );
+			scope.materials = ( new Materials() ).parse( nodes, scope.hierarchy );
 			console.timeEnd( 'FBXLoader: ObjectParser' );
 
 			console.time( 'FBXLoader: GeometryParser' );
@@ -241,7 +241,6 @@
 			geometry.computeBoundingSphere();
 			geometry.computeBoundingBox();
 
-			// TODO: texture & material support
 			var texture;
 			var texs = this.textures.getById( nodes.searchConnectionParent( geo.id ) );
 			if ( texs !== undefined && texs.length > 0 ) {
@@ -252,6 +251,87 @@
 
 				}
 				texture = this.textureLoader.load( this.textureBasePath + '/' + texs[ 0 ].fileName );
+
+			}
+
+			var materials = [];
+			var material;
+			var mats = this.materials.getById( nodes.searchConnectionParent( geo.id ) );
+			if ( mats !== undefined && mats.length > 0 ) {
+
+				for ( var i = 0; i < mats.length; ++ i ) {
+
+					var mat_data = mats[ i ];
+					var tmpMat;
+
+					// TODO:
+					// Cannot find a list of possible ShadingModel values.
+					// If someone finds a list, please add additional cases
+					// and map to appropriate materials.
+					switch ( mat_data.type ) {
+
+						case "phong":
+							tmpMat = new THREE.MeshPhongMaterial();
+							break;
+						case "Lambert":
+							tmpMat = new THREE.MeshLambertMaterial();
+							break;
+						default:
+							console.warn( "No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material" );
+							tmpMat = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+							break;
+
+					}
+					if ( texture !== undefined ) {
+
+						mat_data.parameters.map = texture;
+
+					}
+					tmpMat.setValues( mat_data.parameters );
+
+					materials.push( tmpMat );
+
+				}
+
+				if ( materials.length === 1 ) {
+
+					material = materials[ 0 ];
+
+				} else {
+
+					//Set up for multi-material
+					material = new THREE.MultiMaterial( materials );
+					var material_groupings = [];
+					var last_material_group = - 1;
+					var material_index_list = parseArrayToInt( node.subNodes.LayerElementMaterial.subNodes.Materials.properties.a );
+					for ( var i = 0; i < geo.polyIndices.length; ++ i ) {
+
+						if ( last_material_group !== material_index_list[ geo.polyIndices[ i ] ] ) {
+
+							material_groupings.push( { start: i * 3, count: 0, materialIndex: material_index_list[ geo.polyIndices[ i ] ] } );
+							last_material_group = material_index_list[ geo.polyIndices[ i ] ];
+
+						}
+						material_groupings[ material_groupings.length - 1 ].count += 3;
+
+					}
+					geometry.groups = material_groupings;
+
+				}
+
+
+			} else {
+
+				//No material found for this geometry, create default
+				if ( texture !== undefined ) {
+
+					material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				} else {
+
+					material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+
+				}
 
 			}
 
@@ -1483,7 +1563,6 @@
 
 			if ( this.hierarchy[ i ].internalId == id ) {
 
-				var res = i;
 				node.__cache_get_boneid_from_internalid[ id ] = i;
 				return i;
 
@@ -1534,8 +1613,10 @@
 
 		if ( this.getPolygonTopologyMax() > 3 ) {
 
-			this.indices = this.convertPolyIndicesToTri(
+			var indexInfo = this.convertPolyIndicesToTri(
 								this.indices, this.getPolygonTopologyArray() );
+			this.indices = indexInfo.res;
+			this.polyIndices = indexInfo.polyIndices;
 
 		}
 
@@ -1679,14 +1760,16 @@
 	//
 	// [( a, b, c, d ) ...........
 	// [( a, b, c ), (a, c, d )....
+
+	// Also keep track of original poly index.
 	Geometry.prototype.convertPolyIndicesToTri = function ( indices, strides ) {
 
 		var res = [];
 
 		var i = 0;
-		var tmp = [];
 		var currentPolyNum = 0;
 		var currentStride = 0;
+		var polyIndices = [];
 
 		while ( i < indices.length ) {
 
@@ -1699,6 +1782,8 @@
 				res.push( indices[ i + ( currentStride - 2 - j ) ] );
 				res.push( indices[ i + ( currentStride - 1 - j ) ] );
 
+				polyIndices.push( currentPolyNum );
+
 			}
 
 			currentPolyNum ++;
@@ -1706,7 +1791,7 @@
 
 		}
 
-		return res;
+		return { res: res, polyIndices: polyIndices };
 
 	};
 
@@ -1810,13 +1895,11 @@
 		}
 
 		var count = 0;
-		var x = '';
 		for ( var n in uvNode ) {
 
 			if ( n.match( /^\d+$/ ) ) {
 
 				count ++;
-				x = n;
 
 			}
 
@@ -2057,7 +2140,7 @@
 	Normal.prototype.parse = function ( topnode, geo ) {
 
 		var normals = this.getNormal( topnode );
-		var normalNode = this.getNode( topnode );
+		//var normalNode = this.getNode( topnode );
 		var mappingType = this.getMap( topnode );
 		var refType = this.getRef( topnode );
 
@@ -2110,6 +2193,7 @@
 
 				}
 				break;
+
 		}
 
 		return normals;
@@ -2254,7 +2338,7 @@
 			if ( boneId >= 0 ) {
 
 				this.containerBoneId = boneId;
-				this.containerId = this.containerIndices [ i ];
+				this.containerId = this.containerIndices[ i ];
 
 			}
 
@@ -2395,7 +2479,7 @@
 
 					}
 
-					layer[ tmp[ children[ i ] ].containerBoneId ][ tmp[ children[ i ] ].attr ] = tmp[ children[ i ] ];	
+					layer[ tmp[ children[ i ] ].containerBoneId ][ tmp[ children[ i ] ].attr ] = tmp[ children[ i ] ];
 
 				}
 
@@ -2524,7 +2608,7 @@
 
 	};
 
-	Textures.prototype.parse = function ( node, bones ) {
+	Textures.prototype.parse = function ( node ) {
 
 		var rawNodes = node.Objects.subNodes.Texture;
 
@@ -2590,6 +2674,120 @@
 	};
 
 	Texture.prototype.searchParents = function ( id, nodes ) {
+
+		var p = nodes.searchConnectionParent( id );
+
+		return p;
+
+	};
+
+	function Materials() {
+
+		this.materials = [];
+		this.perGeoMap = {};
+
+	}
+
+	Materials.prototype.add = function ( mat ) {
+
+		if ( this.materials === undefined ) {
+
+			this.materials = [];
+
+		}
+
+		this.materials.push( mat );
+
+		for ( var i = 0; i < mat.parentIds.length; ++ i ) {
+
+			if ( this.perGeoMap[ mat.parentIds[ i ] ] === undefined ) {
+
+				this.perGeoMap[ mat.parentIds[ i ] ] = [];
+
+			}
+
+			this.perGeoMap[ mat.parentIds[ i ] ].push( this.materials[ this.materials.length - 1 ] );
+
+		}
+
+	};
+
+	Materials.prototype.parse = function ( node ) {
+
+		var rawNodes = node.Objects.subNodes.Material;
+
+		for ( var n in rawNodes ) {
+
+			var mat = ( new Material() ).parse( rawNodes[ n ], node );
+			this.add( mat );
+
+		}
+
+		return this;
+
+	};
+
+	Materials.prototype.getById = function ( id ) {
+
+		return this.perGeoMap[ id ];
+
+	};
+
+	function Material() {
+
+		this.fileName = "";
+		this.name = "";
+		this.id = null;
+		this.parentIds = [];
+
+	}
+
+	Material.prototype.parse = function ( node, nodes ) {
+
+		this.id = node.id;
+		this.name = node.attrName;
+		this.type = node.properties.ShadingModel;
+
+		this.parameters = this.getParameters( node.properties );
+
+		this.parentIds = this.searchParents( this.id, nodes );
+
+		return this;
+
+	};
+
+	Material.prototype.getParameters = function ( properties ) {
+
+		var parameters = {};
+
+		//TODO: Missing parameters:
+		// - Ambient
+		// - AmbientColor
+		// - (Diffuse?) Using DiffuseColor, which has same value, so I dunno.
+		// - (Emissive?) Same as above)
+		// - MultiLayer
+		// - ShininessExponent (Same vals as Shininess)
+		// - Specular (Same vals as SpecularColor)
+		// - TransparencyFactor (Maybe same as Opacity?).
+
+		parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.DiffuseColor.value.x ), parseFloat( properties.DiffuseColor.value.y ), parseFloat( properties.DiffuseColor.value.z ) ] );
+		parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.SpecularColor.value.x ), parseFloat( properties.SpecularColor.value.y ), parseFloat( properties.SpecularColor.value.z ) ] );
+		parameters.shininess = properties.Shininess.value;
+		parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.EmissiveColor.value.x ), parseFloat( properties.EmissiveColor.value.y ), parseFloat( properties.EmissiveColor.value.z ) ] );
+		parameters.emissiveIntensity = properties.EmissiveFactor.value;
+		parameters.reflectivity = properties.Reflectivity.value;
+		parameters.opacity = properties.Opacity.value;
+		if ( parameters.opacity < 1.0 ) {
+
+			parameters.transparent = true;
+
+		}
+
+		return parameters;
+
+	};
+
+	Material.prototype.searchParents = function ( id, nodes ) {
 
 		var p = nodes.searchConnectionParent( id );
 
