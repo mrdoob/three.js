@@ -211,7 +211,7 @@
 				var children = nodes.searchConnectionChildren( matNode.id );
 				for ( var i = 0; i < children.length; ++ i ) {
 
-					var type = nodes.searchConnectionType( matNode.id, children[ i ] );
+					var type = nodes.searchConnectionType( children[ i ], matNode.id );
 					switch ( type ) {
 
 						case " \"AmbientColor":
