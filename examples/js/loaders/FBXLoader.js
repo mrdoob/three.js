@@ -273,7 +273,7 @@
 						case "phong":
 							tmpMat = new THREE.MeshPhongMaterial();
 							break;
-						case "Lambert":
+						case "lambert":
 							tmpMat = new THREE.MeshLambertMaterial();
 							break;
 						default:
@@ -303,7 +303,7 @@
 					material = new THREE.MultiMaterial( materials );
 					var material_groupings = [];
 					var last_material_group = - 1;
-					var material_index_list = parseArrayToInt( node.subNodes.LayerElementMaterial.subNodes.Materials.properties.a );
+					var material_index_list = parseArrayToInt( node.subNodes.LayerElementMaterial[ 0 ].subNodes.Materials.properties.a );
 					for ( var i = 0; i < geo.polyIndices.length; ++ i ) {
 
 						if ( last_material_group !== material_index_list[ geo.polyIndices[ i ] ] ) {
@@ -2561,14 +2561,19 @@
 
 			}
 
-			this.stacks[ key ] = {
+			//Do we have an animation clip with an actual length?
+			if ( max > min ) {
 
-				name: rawStacks[ key ].attrName,
-				layers: layers,
-				length: max - min,
-				frames: ( max - min ) * 30,
+				this.stacks[ key ] = {
 
-			};
+					name: rawStacks[ key ].attrName,
+					layers: layers,
+					length: max - min,
+					frames: ( max - min ) * 30,
+
+				};
+
+			}
 
 		}
 
@@ -2762,21 +2767,46 @@
 
 		//TODO: Missing parameters:
 		// - Ambient
-		// - AmbientColor
-		// - (Diffuse?) Using DiffuseColor, which has same value, so I dunno.
-		// - (Emissive?) Same as above)
 		// - MultiLayer
 		// - ShininessExponent (Same vals as Shininess)
 		// - Specular (Same vals as SpecularColor)
 		// - TransparencyFactor (Maybe same as Opacity?).
 
-		parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.DiffuseColor.value.x ), parseFloat( properties.DiffuseColor.value.y ), parseFloat( properties.DiffuseColor.value.z ) ] );
-		parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.SpecularColor.value.x ), parseFloat( properties.SpecularColor.value.y ), parseFloat( properties.SpecularColor.value.z ) ] );
-		parameters.shininess = properties.Shininess.value;
-		parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.EmissiveColor.value.x ), parseFloat( properties.EmissiveColor.value.y ), parseFloat( properties.EmissiveColor.value.z ) ] );
-		parameters.emissiveIntensity = properties.EmissiveFactor.value;
-		parameters.reflectivity = properties.Reflectivity.value;
-		parameters.opacity = properties.Opacity.value;
+		if ( properties.Diffuse ) {
+
+			parameters.color = new THREE.Color().fromArray( [ parseFloat( properties.Diffuse.value.x ), parseFloat( properties.Diffuse.value.y ), parseFloat( properties.Diffuse.value.z ) ] );
+
+		}
+		if ( properties.Specular ) {
+
+			parameters.specular = new THREE.Color().fromArray( [ parseFloat( properties.Specular.value.x ), parseFloat( properties.Specular.value.y ), parseFloat( properties.Specular.value.z ) ] );
+
+		}
+		if ( properties.Shininess ) {
+
+			parameters.shininess = properties.Shininess.value;
+
+		}
+		if ( properties.Emissive ) {
+
+			parameters.emissive = new THREE.Color().fromArray( [ parseFloat( properties.Emissive.value.x ), parseFloat( properties.Emissive.value.y ), parseFloat( properties.Emissive.value.z ) ] );
+
+		}
+		if ( properties.EmissiveFactor ) {
+
+			parameters.emissiveIntensity = properties.EmissiveFactor.value;
+
+		}
+		if ( properties.Reflectivity ) {
+
+			parameters.reflectivity = properties.Reflectivity.value;
+
+		}
+		if ( properties.Opacity ) {
+
+			parameters.opacity = properties.Opacity.value;
+
+		}
 		if ( parameters.opacity < 1.0 ) {
 
 			parameters.transparent = true;

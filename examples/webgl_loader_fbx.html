@@ -61,10 +61,6 @@
 
 				scene = new THREE.Scene();
 
-				lights = new THREE.DirectionalLight();
-				lights.position.set(0,5,0);
-				scene.add(lights);
-
 				// grid
 				var gridHelper = new THREE.GridHelper( 14, 28, 0x303030, 0x303030 );
 				gridHelper.position.set( 0, - 0.04, 0 );
@@ -114,7 +110,7 @@
 								child.mixer = new THREE.AnimationMixer( child );
 								mixers.push( child.mixer );
 
-								var action = child.mixer.clipAction( child.geometry.animations[ 1 ] );
+								var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
 								action.play();
 
 							}
