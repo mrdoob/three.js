@@ -287,6 +287,9 @@ class Geometry(base_classes.BaseNode):
             data = {
                 constants.DATA: {constants.ATTRIBUTES: data}
             }
+            index = self.get(constants.INDEX)
+            if index is not None:
+                data[constants.DATA][constants.INDEX] = index
 
         data[constants.METADATA] = {
             constants.TYPE: self[constants.TYPE]
