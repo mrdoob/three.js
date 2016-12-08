@@ -8,10 +8,10 @@
  *  - mesh
  *  - skinning
  *  - normal / uv
+ *  - material (Multi-Material too)
+ *  - textures (Must be in same directory)
  *
- *  Not Support
- *  - material
- *  - texture
+ *  No Support
  *  - morph
  */
 
@@ -132,9 +132,9 @@
 			this.material_cache = {};
 			this.geometry_cache = {};
 
-			console.time( 'FBXLoader: GeometryParser' );
+			console.time( 'FBXLoader: MeshParser' );
 			var meshes = this.parseMeshes( nodes );
-			console.timeEnd( 'FBXLoader: GeometryParser' );
+			console.timeEnd( 'FBXLoader: MeshParser' );
 
 			var container = new THREE.Group();
 
@@ -202,7 +202,7 @@
 						tmpMat = new THREE.MeshLambertMaterial();
 						break;
 					default:
-						console.warn( "No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material" );
+						console.warn( "No implementation given for material type " + matNode.type + " in FBXLoader.js.  Defaulting to basic material" );
 						tmpMat = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
 						break;
 
@@ -394,215 +394,6 @@
 
 			if ( this.animations !== undefined ) {
 
-				this.addAnimation( mesh, this.weights.matrices, this.animations );
-
-			}
-
-			return mesh;
-
-		},
-
-		parseGeometries: function ( node ) {
-
-			// has not geo, return []
-			if ( ! ( 'Geometry' in node.Objects.subNodes ) ) {
-
-				return [];
-
-			}
-
-			// has many
-			var geoCount = 0;
-			for ( var geo in node.Objects.subNodes.Geometry ) {
-
-				if ( geo.match( /^\d+$/ ) ) {
-
-					geoCount ++;
-
-				}
-
-			}
-
-			var res = [];
-			if ( geoCount > 0 ) {
-
-				for ( geo in node.Objects.subNodes.Geometry ) {
-
-					if ( node.Objects.subNodes.Geometry[ geo ].attrType === 'Mesh' ) {
-
-						res.push( this.parseGeometry( node.Objects.subNodes.Geometry[ geo ], node ) );
-
-					}
-
-				}
-
-			} else {
-
-				debugger;
-
-				res.push( this.parseGeometry( node.Objects.subNodes.Geometry, node ) );
-
-			}
-
-			return res;
-
-		},
-
-		parseGeometry: function ( node, nodes ) {
-
-			var geo = ( new Geometry() ).parse( node );
-			geo.addBones( this.hierarchy.hierarchy );
-
-			//*
-			var geometry = new THREE.BufferGeometry();
-			geometry.name = geo.name;
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geo.vertices ), 3 ) );
-
-			if ( geo.normals !== undefined && geo.normals.length > 0 ) {
-
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geo.normals ), 3 ) );
-
-			}
-
-			if ( geo.uvs !== undefined && geo.uvs.length > 0 ) {
-
-				geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geo.uvs ), 2 ) );
-
-			}
-
-			if ( geo.indices !== undefined && geo.indices.length > 65535 ) {
-
-				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( geo.indices ), 1 ) );
-
-			} else if ( geo.indices !== undefined ) {
-
-				geometry.setIndex( new THREE.BufferAttribute( new Uint16Array( geo.indices ), 1 ) );
-
-			}
-
-			geometry.verticesNeedUpdate = true;
-			geometry.computeBoundingSphere();
-			geometry.computeBoundingBox();
-
-			// var texture;
-			// var texs = this.textures.getById( nodes.searchConnectionParent( geo.id ) );
-			// if ( texs !== undefined && texs.length > 0 ) {
-
-			// 	if ( this.textureLoader === null ) {
-
-			// 		this.textureLoader = new THREE.TextureLoader();
-
-			// 	}
-			// 	texture = this.textureLoader.load( this.textureBasePath + '/' + texs[ 0 ].fileName );
-
-			// }
-
-			var materials = [];
-			var material;
-			var mats = this.materials.getById( nodes.searchConnectionParent( geo.id ) );
-			if ( mats !== undefined && mats.length > 0 ) {
-
-				for ( var i = 0; i < mats.length; ++ i ) {
-
-					var mat_data = mats[ i ];
-					var tmpMat;
-
-					// TODO:
-					// Cannot find a list of possible ShadingModel values.
-					// If someone finds a list, please add additional cases
-					// and map to appropriate materials.
-					switch ( mat_data.type ) {
-
-						case "phong":
-							tmpMat = new THREE.MeshPhongMaterial();
-							break;
-						case "lambert":
-							tmpMat = new THREE.MeshLambertMaterial();
-							break;
-						default:
-							console.warn( "No implementation given for material type " + mat_data.type + " in FBXLoader.js.  Defaulting to basic material" );
-							tmpMat = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
-							break;
-
-					}
-					if ( texture !== undefined ) {
-
-						mat_data.parameters.map = texture;
-
-					}
-					tmpMat.setValues( mat_data.parameters );
-
-					materials.push( tmpMat );
-
-				}
-
-				if ( materials.length === 1 ) {
-
-					material = materials[ 0 ];
-
-				} else {
-
-					//Set up for multi-material
-					material = new THREE.MultiMaterial( materials );
-					var material_groupings = [];
-					var last_material_group = - 1;
-					var material_index_list = parseArrayToInt( node.subNodes.LayerElementMaterial[ 0 ].subNodes.Materials.properties.a );
-					for ( var i = 0; i < geo.polyIndices.length; ++ i ) {
-
-						if ( last_material_group !== material_index_list[ geo.polyIndices[ i ] ] ) {
-
-							material_groupings.push( { start: i * 3, count: 0, materialIndex: material_index_list[ geo.polyIndices[ i ] ] } );
-							last_material_group = material_index_list[ geo.polyIndices[ i ] ];
-
-						}
-						material_groupings[ material_groupings.length - 1 ].count += 3;
-
-					}
-					geometry.groups = material_groupings;
-
-				}
-
-
-			} else {
-
-				//No material found for this geometry, create default
-				if ( texture !== undefined ) {
-
-					material = new THREE.MeshBasicMaterial( { map: texture } );
-
-				} else {
-
-					material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
-
-				}
-
-			}
-
-			var material;
-			if ( texture !== undefined ) {
-
-				material = new THREE.MeshBasicMaterial( { map: texture } );
-
-			} else {
-
-				material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
-
-			}
-
-			geometry = new THREE.Geometry().fromBufferGeometry( geometry );
-			geometry.bones = geo.bones;
-			geometry.skinIndices = this.weights.skinIndices;
-			geometry.skinWeights = this.weights.skinWeights;
-
-			var mesh = null;
-			if ( geo.bones === undefined || geo.skins === undefined || this.animations === undefined ) {
-
-				mesh = new THREE.Mesh( geometry, material );
-
-			} else {
-
-				material.skinning = true;
-				mesh = new THREE.SkinnedMesh( geometry, material );
 				this.addAnimation( mesh, this.weights.matrices, this.animations );
 
 			}
@@ -1885,7 +1676,7 @@
 		this.indices = this.getPolygonVertexIndices();
 		this.uvs = ( new UV() ).parse( this.node, this );
 		this.normals = ( new Normal() ).parse( this.node, this );
-		this.materialIndices = ( new MaterialIndex() ).parse( this.node, this );
+		this.materialIndices = ( new MaterialIndex() ).parse( this.node );
 
 		if ( this.getPolygonTopologyMax() > 3 ) {
 
@@ -2536,7 +2327,7 @@
 
 	Object.assign( MaterialIndex.prototype, {
 
-		parse: function ( node, geo ) {
+		parse: function ( node ) {
 
 			if ( ! ( 'LayerElementMaterial' in node.subNodes ) ) {
 
@@ -3255,7 +3046,7 @@
 
 		return res;
 
-	};
+	}
 
 	// convert from by polygon(vert) data into by verts data
 	function mapByPolygonVertexToByVertex( data, indices, stride ) {
