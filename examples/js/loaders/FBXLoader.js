@@ -272,7 +272,7 @@
 			geometry.skinWeights = this.weights.skinWeights;
 
 			var mesh = null;
-			if ( geo.bones === undefined || geo.skins === undefined || this.animations === undefined || this.animations.length === 0 ) {
+			if ( geo.bones === undefined || geo.skins === undefined || this.animations === undefined ) {
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -295,7 +295,7 @@
 				var animationData = {
 					name: animations.stacks[ key ].name,
 					fps: 30,
-					length: animations.length,
+					length: animations.stacks[ key ].length,
 					hierarchy: []
 				};
 
@@ -447,7 +447,7 @@
 				}
 
 				var bones = mesh.geometry.bones;
-				for ( var frame = 0; frame < animations.frames; frame ++ ) {
+				for ( var frame = 0; frame < animations.stacks[ key ].frames; frame ++ ) {
 
 
 					for ( i = 0; i < bones.length; i ++ ) {
@@ -2322,14 +2322,12 @@
 
 		// third: insert curves into the dict
 		var ac = [];
-		var max = 0.0;
 		for ( key in rawCurves ) {
 
 			if ( key.match( /\d+/ ) ) {
 
 				var c = ( new AnimationCurve() ).fromNode( rawCurves[ key ] );
 				ac.push( c );
-				max = c.getLength() ? c.getLength() : max;
 
 				var parentId = node.searchConnectionParent( c.id )[ 0 ];
 				var axis = node.searchConnectionType( c.id, parentId );
@@ -2338,15 +2336,17 @@
 
 					axis = 'x';
 
-				}
-				if ( axis.match( /Y/ ) ) {
+				} else if ( axis.match( /Y/ ) ) {
 
 					axis = 'y';
 
-				}
-				if ( axis.match( /Z/ ) ) {
+				} else if ( axis.match( /Z/ ) ) {
 
 					axis = 'z';
+
+				} else {
+
+					continue;
 
 				}
 
@@ -2382,17 +2382,22 @@
 			var children = node.searchConnectionChildren( key );
 			for ( var i = 0; i < children.length; ++ i ) {
 
-				if ( layer[ tmp[ children[ i ] ].containerBoneId ] === undefined ) {
+				//Skip lockInfluenceWeights
+				if ( tmp[ children[ i ] ] ) {
 
-					layer[ tmp[ children[ i ] ].containerBoneId ] = {
-						T: null,
-						R: null,
-						S: null
-					};
+					if ( layer[ tmp[ children[ i ] ].containerBoneId ] === undefined ) {
+
+						layer[ tmp[ children[ i ] ].containerBoneId ] = {
+							T: null,
+							R: null,
+							S: null
+						};
+
+					}
+
+					layer[ tmp[ children[ i ] ].containerBoneId ][ tmp[ children[ i ] ].attr ] = tmp[ children[ i ] ];	
 
 				}
-
-				layer[ tmp[ children[ i ] ].containerBoneId ][ tmp[ children[ i ] ].attr ] = tmp[ children[ i ] ];
 
 			}
 
@@ -2406,11 +2411,67 @@
 
 			var layers = [];
 			var children = node.searchConnectionChildren( key );
+			var max = 0.0;
+			var min = Number.MAX_VALUE;
 			for ( var i = 0; i < children.length; ++ i ) {
 
 				if ( children[ i ] in this.layers ) {
 
 					layers.push( this.layers[ children[ i ] ] );
+
+					for ( var j = 0; j < this.layers[ children[ i ] ].length; ++ j ) {
+
+						function getMaxMin( layer ) {
+
+							function _getMaxMin( curves ) {
+
+								if ( curves.x ) {
+
+									max = curves.x.getLength() > max ? curves.x.getLength() : max;
+									min = curves.x.times[ 0 ] < min ? curves.x.times[ 0 ] : min;
+
+								}
+								if ( curves.y ) {
+
+									max = curves.y.getLength() > max ? curves.y.getLength() : max;
+									min = curves.y.times[ 0 ] < min ? curves.y.times[ 0 ] : min;
+
+								}
+								if ( curves.z ) {
+
+									max = curves.z.getLength() > max ? curves.z.getLength() : max;
+									min = curves.z.times[ 0 ] < min ? curves.z.times[ 0 ] : min;
+
+								}
+
+							}
+
+							if ( layer.R ) {
+
+								_getMaxMin( layer.R.curves );
+
+							}
+							if ( layer.S ) {
+
+								_getMaxMin( layer.S.curves );
+
+							}
+							if ( layer.T ) {
+
+								_getMaxMin( layer.T.curves );
+
+							}
+
+						}
+
+						var layer = this.layers[ children[ i ] ][ j ];
+						if ( layer ) {
+
+							getMaxMin( layer );
+
+						}
+
+					}
 
 				}
 
@@ -2419,15 +2480,13 @@
 			this.stacks[ key ] = {
 
 				name: rawStacks[ key ].attrName,
-				layers: layers
+				layers: layers,
+				length: max - min,
+				frames: ( max - min ) * 30,
 
 			};
 
 		}
-
-
-		this.length = max;
-		this.frames = this.length * this.fps;
 
 		return this;
 
