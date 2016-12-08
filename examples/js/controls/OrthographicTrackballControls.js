@@ -379,7 +379,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		window.removeEventListener( 'keydown', keydown );
+		_this.domElement.removeEventListener( 'keydown', keydown );
 
 		_prevState = _state;
 
@@ -409,7 +409,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		_state = _prevState;
 
-		window.addEventListener( 'keydown', keydown, false );
+		_this.domElement.addEventListener( 'keydown', keydown, false );
 
 	}
 
@@ -609,8 +609,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', mousemove, false );
 		document.removeEventListener( 'mouseup', mouseup, false );
 
-		window.removeEventListener( 'keydown', keydown, false );
-		window.removeEventListener( 'keyup', keyup, false );
+		this.domElement.removeEventListener( 'keydown', keydown, false );
+		this.domElement.removeEventListener( 'keyup', keyup, false );
 
 	};
 
@@ -622,8 +622,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
+	this.domElement.addEventListener( 'keydown', keydown, false );
+	this.domElement.addEventListener( 'keyup', keyup, false );
 
 	this.handleResize();
 
