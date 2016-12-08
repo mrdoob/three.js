@@ -1463,10 +1463,26 @@ THREE.GLTFLoader = ( function () {
 									var bones = [];
 									var boneInverses = [];
 
+									var keys = Object.keys( __nodes );
+
 									for ( var i = 0, l = skinEntry.jointNames.length; i < l; i ++ ) {
 
 										var jointId = skinEntry.jointNames[ i ];
-										var jointNode = __nodes[ jointId ];
+
+										var jointNode;
+
+										for ( var j = 0, jl = keys.length; j < jl; j ++ ) {
+
+											var n = __nodes[ keys[ j ] ];
+
+											if ( n.jointName === jointId ) {
+
+												jointNode = n;
+												break;
+
+											}
+
+										}
 
 										if ( jointNode ) {
 
