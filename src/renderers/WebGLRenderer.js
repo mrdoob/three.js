@@ -1582,9 +1582,6 @@ function WebGLRenderer( parameters ) {
 			materialProperties.program = program;
 			material.program = program;
 
-			// clear cache 
-			program.parameterVersions = {};
-
 		}
 
 		var attributes = program.getAttributes();
@@ -1851,9 +1848,9 @@ function WebGLRenderer( parameters ) {
 
 			cacheEntry = parameterCache[ i ];
 
+			uniform = cacheEntry.uniform;
 			parameter = cacheEntry.parameter;
 			value = parameter.value;
-			uniform = cacheEntry.uniform;
 
 			if ( parameter.version !== uniform.version || value.isTexture ) {
 
