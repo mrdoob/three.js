@@ -1807,9 +1807,17 @@ function WebGLRenderer( parameters ) {
 
 			var uCamPos = p_uniforms.map.cameraPosition;
 
-			if ( uCamPos && camera.cameraPosition === undefined ) {
+			if ( uCamPos ) {
 
-				camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
+				if ( camera.cameraPosition === undefined ) {
+
+					camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
+
+				} else {
+
+					camera.cameraPosition.setFromMatrixPosition( camera.matrixWorld );
+
+				}
 
 			}
 
@@ -1856,6 +1864,16 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		// fixup for emissive
+
+		var emissive = p_uniforms.map.emissive; 
+
+		if ( emissive ) {
+
+			emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
+
+		}
+
 		return program;
 
 	}
@@ -1881,9 +1899,9 @@ function WebGLRenderer( parameters ) {
 				uniform = uniforms[ i ];
 				name = uniform.id;
 
-				if ( ! uniform.isSingleUniform ) continue;
+				if ( ! uniform.isSimpleUniform ) continue;
 
-				// parameter sources = add fog if material.fog.
+				// parameter sources = 
 
 				parameter = object.getParameter( name );
 
@@ -1984,9 +2002,10 @@ function WebGLRenderer( parameters ) {
 							name !== 'ltcMag' &&
 							name !== 'pointShadowMatrix' &&
 							name !== 'spotShadowMap' &&
+							name !== 'emissive' &&
 							name !== 'spotShadowMatrix' ) {
 
-							console.log('uniform: []', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
+							console.log('uniform: [', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
 
 						}
 
