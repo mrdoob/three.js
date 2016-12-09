@@ -50,14 +50,14 @@ MaterialParameter.prototype = {
 
 }
 
-function DerivedMaterialParameter( value, func ) {
+function DerivedMaterialParameter( value, getFunc ) {
 
 	this._value = value;
-	this.func = func;
+	this.getFunc = getFunc;
 
 	if ( typeof value === "number" ) {
 
-		this.version = func ( value );
+		this.version = getFunc ( value );
 
 	} else {
 
@@ -65,7 +65,7 @@ function DerivedMaterialParameter( value, func ) {
 	}
 
 	Object.defineProperty( this, 'value', {
-		get: function () { return func( this._value ) }
+		get: function () { return getFunc( this._value ) }
 	} );
 
 }
@@ -78,7 +78,7 @@ DerivedMaterialParameter.prototype = {
 	setValue: function ( value ) {
 
 		this._value = value;
-		this.version = this.func( value );
+		this.version = this.getFunc( value );
 
 	},
 
@@ -109,11 +109,11 @@ function ParameterSource() {}
 
 Object.assign( ParameterSource.prototype, {
 
-	addParameter: function ( name, value, alias, func ) {
+	addParameter: function ( name, value, alias, getFunc ) {
 
 		if ( this._parameters === undefined ) this._parameters = {};
 
-		var parameter = func === undefined ? new MaterialParameter( value ) : new DerivedMaterialParameter( value, func );
+		var parameter = getFunc === undefined ? new MaterialParameter( value ) : new DerivedMaterialParameter( value, getFunc );
 		var shaderName = ! alias ? name : alias;
 
 		this._parameters[ shaderName ] = parameter;
@@ -139,11 +139,11 @@ Object.assign( ParameterSource.prototype, {
 
 	},
 
-	addParameterRO: function ( name, value, alias, func ) {
+	addParameterRO: function ( name, value, alias, getFunc ) {
 
 		if ( this._parameters === undefined ) this._parameters = {};
 
-		var parameter = func === undefined ? new MaterialParameter( value ) : new DerivedMaterialParameter( value, func );
+		var parameter = getFunc === undefined ? new MaterialParameter( value ) : new DerivedMaterialParameter( value, getFunc );
 		var shaderName = ! alias ? name : alias;
 
 		this._parameters[ shaderName ] = parameter;
