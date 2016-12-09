@@ -1086,15 +1086,29 @@ THREE.GLTFLoader = ( function () {
 
 				if ( Array.isArray( materialValues.emission ) ) {
 
-					materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+					if ( materialType === THREE.MeshBasicMaterial ) {
+
+						materialParams.color = new THREE.Color().fromArray( materialValues.emission );
+
+					} else {
+
+						materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+
+					}
 
 				} else if ( typeof( materialValues.emission ) === 'string' ) {
 
-					materialParams.map = dependencies.textures[ materialValues.emission ];
+					if ( materialType === THREE.MeshBasicMaterial ) {
+
+						materialParams.map = dependencies.textures[ materialValues.emission ];
+
+					} else {
+
+						materialParams.emissiveMap = dependencies.textures[ materialValues.emission ];
+
+					}
 
 				}
-
-				delete materialParams.emission;
 
 				if ( Array.isArray( materialValues.specular ) ) {
 
@@ -1104,9 +1118,9 @@ THREE.GLTFLoader = ( function () {
 
 					materialParams.specularMap = dependencies.textures[ materialValues.specular ];
 
-				}
+					delete materialParams.specular;
 
-				delete materialParams.specular;
+				}
 
 				if ( materialValues.shininess !== undefined ) {
 
