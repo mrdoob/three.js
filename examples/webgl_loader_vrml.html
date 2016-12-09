@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loader - VRML</title>
+		<title>three.js webgl - loaders - vrml loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -12,7 +12,6 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-
 			#info {
 				color: #fff;
 				position: absolute;
@@ -20,195 +19,111 @@
 				width: 100%;
 				text-align: center;
 				z-index: 100;
-				display: block;
+				display:block;
 			}
-
-			#info a, .button {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-
-			#viewpoints {
-				background-color: gray;
-				z-index: 101;
-				position: absolute;
-				width: 140px;
-				top: 10px;
-				left: 10px;
-				padding: 2px;
-				border: 1px solid white;
-			}
-
-			#viewpoints div {
-				width: inherit;
-			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
-
 	</head>
 
 	<body>
-	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js / VrmlParser</a> -
-		vrml format loader test using VrmlParser -
-	</div>
-	<div id="viewpoints">
-		<h4>Viewpoints from the VRML file</h4>
-	</div>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> -
+		vrml format loader test -
+		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank">VRML 2.0 Tutorial</a>,-->
+		</div>
 
-	<script src="../build/three.min.js"></script>
-	<script src="js/libs/vrml.min.js"></script>
+		<script src="../build/three.js"></script>
 
-	<script src="js/loaders/VRMLLoader.js"></script>
-	<script src="js/renderers/Projector.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/controls/FlyControls.js"></script>
-	<script src="js/controls/FirstPersonControls.js"></script>
-	<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
-	<script>
+		<script src="js/loaders/VRMLLoader.js"></script>
 
-		var container;
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		var camera, controls, scene, renderer, dirLight;
+		<script>
 
-		var animation;
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-		// setup a clock
-		var clock = new THREE.Clock();
+			var container, stats;
 
-		init();
-		animate();
+			var camera, controls, scene, renderer;
 
-		function resetControls() {
-			controls       = new THREE.FlyControls(camera);
-			controls.rotateSpeed = 1;
-			controls.zoomSpeed   = 0.2;
-			controls.panSpeed  = 0.2;
-			controls.enableZoom  = true;
-			controls.enablePan   = true;
-		}
+			var cross;
 
-		function setupLight() {
-			if ( ! dirLight ) {
-				dirLight = new THREE.DirectionalLight(0xaaaaaa);
-				dirLight.position.set(500, 500, 1000).normalize();
-				dirLight.castShadow = false;
-			}
-			camera.add(dirLight);
-			camera.add(dirLight.target);
-		}
+			init();
+			animate();
 
-		function selectViewpoint(event, vrmlConverter) {
-			var viewpoint = event.target.dataset.name;
-			console.log('clicked ' + viewpoint);
-			camera = vrmlConverter.viewpoints[ viewpoint ].getCamera();
-			setupLight();
-			resetControls();
-			animation.addClickSupport(camera, renderer);
-		}
+			function init() {
 
-		function init() {
-			camera= new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1e5);
-			camera.position.z = 4;
-			camera.position.y = 3;
-			camera.position.x = 0;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera.position.z = 6;
 
-			scene = new THREE.Scene();
+				controls = new THREE.OrbitControls( camera );
 
-			scene.fog = new THREE.Fog(0xffffff, 1, 5000);
-			scene.fog.color.setHSL(0.6, 0, 1);
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
 
-			scene.add(camera);
+				scene = new THREE.Scene();
+				scene.add( camera );
 
-			setupLight();
-			resetControls();
+				// light
 
-			var debug = true;
-			var vrmlConverter = new VrmlParser.Renderer.ThreeJs(debug);
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
 
-			// renderer
-			renderer = new THREE.WebGLRenderer({ antialias: true });
-			renderer.shadowMap.enabled = true;
-			renderer.setClearColor(0x000000, 1);
-			renderer.setSize(window.innerWidth, window.innerHeight);
+				camera.add( dirLight );
+				camera.add( dirLight.target );
 
-			// add support for animation and interaction
-			animation = new VrmlParser.Renderer.ThreeJs.Animation(debug);
-			animation.addClickSupport(camera, renderer);
+				var loader = new THREE.VRMLLoader();
+				loader.load( 'models/vrml/house.wrl', function ( object ) {
 
-			// initialize the viewpoinst with the camera from the global scope
-			vrmlConverter.viewpoints = {
-				reset: {
-					getCamera: function () {
-						return this.camera;
-					}, name: 'surrounding_reset', camera: camera
-				}
-			}; // key value store of cameras based on VRML viewpoint nodes, stored by their name.
+					scene.add( object );
 
-			var vrmlLoader = new THREE.VRMLLoader(vrmlParser, new THREE.LoadingManager(), true);
+				} );
 
-			var onLoad = function (vrmlTree) {
-				vrmlConverter.render(vrmlTree, scene);
+				// renderer
 
-				var viewpointSelector = document.getElementById('viewpoints');
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				for ( a in vrmlConverter.viewpoints ) {
-					if ( typeof a === 'string' ) {
-						var option     = document.createElement('div');
-						option.innerHTML = a;
-						option.setAttribute('data-name', a);
-						viewpointSelector.appendChild(option);
-						option.addEventListener('click', function (event) {
-							selectViewpoint(event, vrmlConverter);
-						});
-					}
-				}
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
 
-			};
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-			var onError = function (error) {
-				var request = error.target;
-				if ( 404 === request.status ) {
-					console.log('VRML Document not found at ' + request.responseURL);
-				}
-				console.log(error);
-			}
+				//
 
-			var onProgress = function () {
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			vrmlLoader.load('models/vrml/house.wrl', onLoad, onProgress, onError);
+			function onWindowResize() {
 
-			container = document.createElement('div');
-			document.body.appendChild(container);
-			container.appendChild(renderer.domElement);
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-			//
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			window.addEventListener('resize', onWindowResize, false);
+				controls.handleResize();
 
-		}
-
-		function onWindowResize() {
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-			renderer.setSize(window.innerWidth, window.innerHeight);
-		}
-
-		function animate() {
-			requestAnimationFrame(animate);
-			var delta = clock.getDelta();
-			if ( undefined !== controls ) {
-				controls.update(delta);
 			}
-			animation.update(delta);
-			renderer.render(scene, camera);
-		}
 
-	</script>
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
 
 	</body>
 </html>
