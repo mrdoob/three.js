@@ -1088,7 +1088,13 @@ THREE.GLTFLoader = ( function () {
 
 					materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
 
+				} else if ( typeof( materialValues.emission ) === 'string' ) {
+
+					materialParams.map = dependencies.textures[ materialValues.emission ];
+
 				}
+
+				delete materialParams.emission;
 
 				if ( Array.isArray( materialValues.specular ) ) {
 
