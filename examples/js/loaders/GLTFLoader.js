@@ -217,12 +217,13 @@ THREE.GLTFLoader = ( function () {
 
 						// So it goes like this:
 						// SkinnedMesh world matrix is already baked into MODELVIEW;
-						// ransform joints to local space,
+						// transform joints to local space,
 						// then transform using joint's inverse
 						m4v[ mi ]
 							.getInverse( boundUniform.sourceNode.matrixWorld )
 							.multiply( boundUniform.targetNode.skeleton.bones[ mi ].matrixWorld )
-							.multiply( boundUniform.targetNode.skeleton.boneInverses[ mi ] );
+							.multiply( boundUniform.targetNode.skeleton.boneInverses[ mi ] )
+							.multiply( boundUniform.targetNode.bindMatrix );
 
 					}
 
