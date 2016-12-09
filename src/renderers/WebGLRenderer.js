@@ -1120,6 +1120,14 @@ function WebGLRenderer( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
+		// a material is using camera position for lighting. update
+
+		if ( camera.cameraPosition ) camera.cameraPosition.setFromMatrixPosition( camera.matrixWorld );
+
+		// using logarithmic DepthBuffer, make available to shaders
+
+		if ( capabilities.logarithmicDepthBuffer ) _this.logDepthBufFC = 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 );
+
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -1749,7 +1757,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var refreshProgram = false;
 		var refreshMaterial = false;
 		var refreshLights = false;
 
@@ -1762,7 +1769,6 @@ function WebGLRenderer( parameters ) {
 			_gl.useProgram( program.program );
 			_currentProgram = program.id;
 
-			refreshProgram = true;
 			refreshMaterial = true;
 			refreshLights = true;
 
@@ -1776,47 +1782,16 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( refreshProgram || camera !== _currentCamera ) {
+		if ( camera !== _currentCamera ) {
 
-			if ( capabilities.logarithmicDepthBuffer ) {
+			_currentCamera = camera;
 
-				_this.logDepthBufFC = 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ); // move to 'frame to frame'' camera change
+			// lighting uniforms depend on the camera so enforce an update
+			// now, in case this material supports lights - or later, when
+			// the next material that does gets activated:
 
-			}
-
-			if ( camera !== _currentCamera ) {
-
-				_currentCamera = camera;
-
-				// lighting uniforms depend on the camera so enforce an update
-				// now, in case this material supports lights - or later, when
-				// the next material that does gets activated:
-
-				refreshMaterial = true;		// set to true on material change
-				refreshLights = true;		// remains set until update done
-
-			}
-
-			materialProperties.parameterCache[ object.id ] = null; // this is called too often move 'frame to frame camera'' change
-
-			// load material specific uniforms
-			// (shader material also gets them for the sake of genericity)
-
-			var uCamPos = p_uniforms.map.cameraPosition;
-
-			if ( uCamPos ) {
-
-				if ( camera.cameraPosition === undefined ) {
-
-					camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
-
-				} else {
-
-					camera.cameraPosition.setFromMatrixPosition( camera.matrixWorld );
-
-				}
-
-			}
+			refreshMaterial = true;		// set to true on material change
+			refreshLights = true;		// remains set until update done
 
 		}
 
@@ -1837,22 +1812,23 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var parameterCache = getParameterCache( object, material, p_uniforms.seq, materialProperties, fog, camera );
+		var parameters = getParameters( object, material, p_uniforms.seq, materialProperties, fog, camera );
 
+		var parameters; 
 		var parameter; 
 		var cacheEntry;
 		var value;
 		var uniform;
 
-		for ( var i = 0, l = parameterCache.length ; i < l ; i++ ) {
+		for ( var i = 0, l = parameters.length ; i < l ; i++ ) {
 
-			cacheEntry = parameterCache[ i ];
+			cacheEntry = parameters[ i ];
 
 			uniform = cacheEntry.uniform;
 			parameter = cacheEntry.parameter;
 			value = parameter.value;
 
-			if ( parameter.version !== uniform.version || value.isTexture ) {
+			if ( parameter.version !== uniform.version || ( value.isTexture && refreshMaterial ) ) {
 
 				uniform.setValue( _gl, value, _this );
 				uniform.version = parameter.version;
@@ -1875,21 +1851,26 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function getParameterCache( object, material, uniforms, materialProperties, fog, camera ) {
+	function getParameters( object, material, uniforms, materialProperties, fog, camera ) {
 
+		var parameters; 
+		 
 		var parameter;
 		var parameterCache;
 		var uniform;
 		var name;
 
-		parameterCache = materialProperties.parameterCache[ object.id ];
+		// cache of parameter -> uniform linkage allocated for object/camera combination
 
-		if ( ! parameterCache ) {
+		var key = object.id + ':' + camera.id;
+
+		parameters = materialProperties.parameterCache[ key ];
+
+		if ( ! parameters ) {
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
-
-			parameterCache = [];
+			parameters = [];
 
 			for ( var i = 0, l = uniforms.length; i < l; i++ ) {
 
@@ -1898,7 +1879,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! uniform.isSimpleUniform ) continue;
 
-				// parameter sources = 
+				// parameter sources
 
 				parameter = object.getParameter( name );
 
@@ -1934,7 +1915,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( parameter !== undefined ) {
 
-					parameterCache.push( { uniform: uniform, parameter: parameter } );
+					parameters.push( { uniform: uniform, parameter: parameter } );
 
 				} else {
 
@@ -1980,13 +1961,19 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						parameterCache.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat' ) } );
+						parameters.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat' ) } );
 
 					} else {
 
 						if ( name === 'flipEnvMap' ) {
 
 							uniform.setValue( _gl, ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1, _this );
+
+						} else if ( name === 'cameraPosition' ) {
+
+							camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
+
+							parameters.push( { uniform: uniform, parameter: camera.getParameter( 'cameraPosition' ) } );
 
 						} else if (
 							name !== 'clippingPlanes' &&
@@ -2012,17 +1999,17 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materialProperties.parameterCache[ object.id ] = parameterCache;
+			materialProperties.parameterCache[ key ] = parameters;
 
 		}
 
-		return parameterCache;
+		return parameters;
 
 	}
 
 	function setProgram( camera, fog, material, object ) {
 
- 		if ( material.isExperimentalMaterial ) return setProgramExperimental( camera, fog, material, object );
+		if ( material.isExperimentalMaterial ) return setProgramExperimental( camera, fog, material, object );
 
 		_usedTextureUnits = 0;
 
