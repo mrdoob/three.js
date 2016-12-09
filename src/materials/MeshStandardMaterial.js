@@ -95,7 +95,14 @@ function MeshStandardMaterial( parameters ) {
 
 	this.addParameter( 'alphaMap', null );
 
-	this.addParameter( 'envMap', null );
+	this.addParameter( '_envMap', null, 'envMap' );
+	this.addParameter( 'flipEnvMap', 1, null );
+
+	Object.defineProperty( this, 'envMap', {
+		set: function ( value ) { this._envMap = value; this.flipEnvMap = ( ! ( value && value.isCubeTexture ) ) ? 1 : - 1 },
+		get: function () { return this._envMap }
+	} );
+
 	this.addParameter( 'envMapIntensity', 1.0 );
 
 	this.addParameter( 'refractionRatio', 0.98 );
