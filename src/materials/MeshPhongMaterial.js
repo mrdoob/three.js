@@ -62,7 +62,7 @@ function MeshPhongMaterial( parameters ) {
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
 	this.addParameter( 'specular', new Color( 0x111111 ) );
-	this.addParameter( 'shininess', 30 );
+	this.addParameter( 'shininess', 30, null, function ( value ) { return Math.max( value, 1e-4 ) } );
 
 	this.addParameter( 'map', null );
 
