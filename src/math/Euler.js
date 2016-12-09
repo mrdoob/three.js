@@ -112,6 +112,18 @@ Euler.prototype = {
 
 	},
 
+	negate: function () {
+
+		this._x = - this._x;
+		this._y = - this._y;
+		this._z = - this._z;
+
+		this.onChangeCallback();
+
+		return this;
+
+	},
+
 	setFromRotationMatrix: function ( m, order, update ) {
 
 		var clamp = _Math.clamp;
