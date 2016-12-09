@@ -217,12 +217,13 @@ THREE.GLTFLoader = ( function () {
 
 						// So it goes like this:
 						// SkinnedMesh world matrix is already baked into MODELVIEW;
-						// ransform joints to local space,
+						// transform joints to local space,
 						// then transform using joint's inverse
 						m4v[ mi ]
 							.getInverse( boundUniform.sourceNode.matrixWorld )
 							.multiply( boundUniform.targetNode.skeleton.bones[ mi ].matrixWorld )
-							.multiply( boundUniform.targetNode.skeleton.boneInverses[ mi ] );
+							.multiply( boundUniform.targetNode.skeleton.boneInverses[ mi ] )
+							.multiply( boundUniform.targetNode.bindMatrix );
 
 					}
 
@@ -1086,13 +1087,37 @@ THREE.GLTFLoader = ( function () {
 
 				if ( Array.isArray( materialValues.emission ) ) {
 
-					materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+					if ( materialType === THREE.MeshBasicMaterial ) {
+
+						materialParams.color = new THREE.Color().fromArray( materialValues.emission );
+
+					} else {
+
+						materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+
+					}
+
+				} else if ( typeof( materialValues.emission ) === 'string' ) {
+
+					if ( materialType === THREE.MeshBasicMaterial ) {
+
+						materialParams.map = dependencies.textures[ materialValues.emission ];
+
+					} else {
+
+						materialParams.emissiveMap = dependencies.textures[ materialValues.emission ];
+
+					}
 
 				}
 
 				if ( Array.isArray( materialValues.specular ) ) {
 
 					materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
+
+				} else if ( typeof( materialValues.specular ) === 'string' ) {
+
+					materialParams.specularMap = dependencies.textures[ materialValues.specular ];
 
 				}
 
