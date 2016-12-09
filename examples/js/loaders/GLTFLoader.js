@@ -1100,7 +1100,13 @@ THREE.GLTFLoader = ( function () {
 
 					materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
 
+				} else if ( typeof( materialValues.specular ) === 'string' ) {
+
+					materialParams.specularMap = dependencies.textures[ materialValues.specular ];
+
 				}
+
+				delete materialParams.specular;
 
 				if ( materialValues.shininess !== undefined ) {
 
