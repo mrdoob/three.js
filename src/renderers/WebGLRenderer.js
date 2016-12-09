@@ -1796,7 +1796,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( refreshMaterial && material.lights ) {
-//console.log('m');
+
 			// the current material requires lighting info
 
 			// note: all lighting uniforms are always set correctly
@@ -1819,10 +1819,35 @@ function WebGLRenderer( parameters ) {
 		var cacheEntry;
 		var value;
 		var uniform;
+		var list;
 
-		for ( var i = 0, l = parameters.length ; i < l ; i++ ) {
+		if ( refreshMaterial ) {
 
-			cacheEntry = parameters[ i ];
+			list = parameters.perRender;
+	
+			for ( var i = 0, l = list.length ; i < l ; i++ ) {
+
+				cacheEntry = list[ i ];
+
+				uniform = cacheEntry.uniform;
+				parameter = cacheEntry.parameter;
+				value = parameter.value;
+
+				if ( parameter.version !== uniform.version || ( value.isTexture ) ) {
+
+					uniform.setValue( _gl, value, _this );
+					uniform.version = parameter.version;
+
+				}
+
+			}
+		}
+
+		list = parameters.perObject;
+	
+		for ( var i = 0, l = list.length ; i < l ; i++ ) {
+
+			cacheEntry = list[ i ];
 
 			uniform = cacheEntry.uniform;
 			parameter = cacheEntry.parameter;
@@ -1870,7 +1895,11 @@ function WebGLRenderer( parameters ) {
 
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
-			parameters = [];
+			parameters = { perObject: [], perRender: [] };
+	
+			var perRender = parameters.perRender;
+			var perObject = parameters.perObject;
+			var list;
 
 			for ( var i = 0, l = uniforms.length; i < l; i++ ) {
 
@@ -1881,41 +1910,56 @@ function WebGLRenderer( parameters ) {
 
 				// parameter sources
 
-				parameter = object.getParameter( name );
+				list = perRender;
 
-				if ( parameter === undefined ) {
+
+				search: {
+
+					list = perObject;
+
+					parameter = object.getParameter( name );
+
+					if ( parameter !== undefined ) break search;
+
+					if ( material.skinning && object.skeleton ) {
+
+						parameter = object.skeleton.getParameter( name );
+
+						if ( parameter !== undefined ) break search;
+
+					}
+
+					list = perRender;
 
 					parameter = material.getParameter( name );
 
-				}
+					if ( parameter !== undefined ) break search;
 
-				if ( parameter === undefined && camera !== undefined ) {
+					if ( camera !== undefined ) {
 
-					parameter = camera.getParameter( name );
+						parameter = camera.getParameter( name );
 
-				}
+						if ( parameter !== undefined ) break search;
 
-				if ( parameter === undefined ) {
+					}
 
 					parameter = _this.getParameter( name );
 
-				}
+					if ( parameter !== undefined ) break search;
 
-				if ( parameter === undefined && material.skinning && object.skeleton ) {
+					if ( fog && material.fog ) {
 
-					parameter = object.skeleton.getParameter( name );
+						parameter = fog.getParameter( name );
 
-				}
+						if ( parameter !== undefined ) break search;
 
-				if ( parameter === undefined && fog && material.fog ) {
-
-					parameter = fog.getParameter( name );
+					}
 
 				}
 
 				if ( parameter !== undefined ) {
 
-					parameters.push( { uniform: uniform, parameter: parameter } );
+					list.push( { uniform: uniform, parameter: parameter } );
 
 				} else {
 
@@ -1926,7 +1970,7 @@ function WebGLRenderer( parameters ) {
 						if ( material.map ) {
 
 							uvScaleMap = material.map;
-
+	
 						} else if ( material.specularMap ) {
 
 							uvScaleMap = material.specularMap;
@@ -1961,7 +2005,7 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-						parameters.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat' ) } );
+						perRender.push( { uniform: uniform, parameter: uvScaleMap.getParameter( 'offsetRepeat' ) } );
 
 					} else {
 
@@ -1969,7 +2013,7 @@ function WebGLRenderer( parameters ) {
 
 							camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
 
-							parameters.push( { uniform: uniform, parameter: camera.getParameter( 'cameraPosition' ) } );
+							perRender.push( { uniform: uniform, parameter: camera.getParameter( 'cameraPosition' ) } );
 
 						} else if (
 							name !== 'clippingPlanes' &&
@@ -1990,7 +2034,6 @@ function WebGLRenderer( parameters ) {
 						}
 
 					}
-
 				}
 
 			}
