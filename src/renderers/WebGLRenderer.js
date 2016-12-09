@@ -1796,7 +1796,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		if ( refreshMaterial && material.lights ) {
-
+//console.log('m');
 			// the current material requires lighting info
 
 			// note: all lighting uniforms are always set correctly
@@ -1965,11 +1965,7 @@ function WebGLRenderer( parameters ) {
 
 					} else {
 
-						if ( name === 'flipEnvMap' ) {
-
-							uniform.setValue( _gl, ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1, _this );
-
-						} else if ( name === 'cameraPosition' ) {
+						if ( name === 'cameraPosition' ) {
 
 							camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
 
