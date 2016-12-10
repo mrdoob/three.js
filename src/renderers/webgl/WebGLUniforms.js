@@ -274,10 +274,7 @@ function setValueM3a( gl, v ) {
 }
 
 function setValueM4a( gl, v ) {
-if ( this.id === 'spotShadowMatrix' ) {
-	console.log( v );
-	var t = r / 0;
-}
+
 	gl.uniformMatrix4fv( this.addr, false, flatten( v, this.size, 16 ) );
 
 }
