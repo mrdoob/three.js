@@ -1814,37 +1814,36 @@ function WebGLRenderer( parameters ) {
 
 		var parameters = getParameters( object, material, p_uniforms.seq, materialProperties, fog, camera );
 
-		var parameters; 
+		if ( refreshMaterial ) {
+
+			updateParameters( parameters.perRender, 'm' )
+
+		var emissive = p_uniforms.map.emissive; 
+		if ( emissive ) {
+
+			emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
+
+		}
+
+		}
+
+		updateParameters( parameters.perObject, 'o' );
+
+		// fixup for emissive
+
+		return program;
+
+	}
+
+	function updateParameters( list, tag ) {
+
 		var parameter; 
 		var cacheEntry;
 		var value;
 		var uniform;
 		var list;
 
-		if ( refreshMaterial ) {
-
-			list = parameters.perRender;
-	
-			for ( var i = 0, l = list.length ; i < l ; i++ ) {
-
-				cacheEntry = list[ i ];
-
-				uniform = cacheEntry.uniform;
-				parameter = cacheEntry.parameter;
-				value = parameter.value;
-
-				if ( parameter.version !== uniform.version || ( value.isTexture ) ) {
-
-					uniform.setValue( _gl, value, _this );
-					uniform.version = parameter.version;
-
-				}
-
-			}
-		}
-
-		list = parameters.perObject;
-	
+//		console.log(tag,  list.length );
 		for ( var i = 0, l = list.length ; i < l ; i++ ) {
 
 			cacheEntry = list[ i ];
@@ -1853,7 +1852,7 @@ function WebGLRenderer( parameters ) {
 			parameter = cacheEntry.parameter;
 			value = parameter.value;
 
-			if ( parameter.version !== uniform.version || ( value.isTexture && refreshMaterial ) ) {
+			if ( parameter.version !== uniform.version || ( value.isTexture ) ) {
 
 				uniform.setValue( _gl, value, _this );
 				uniform.version = parameter.version;
@@ -1861,18 +1860,6 @@ function WebGLRenderer( parameters ) {
 			}
 
 		}
-
-		// fixup for emissive
-
-		var emissive = p_uniforms.map.emissive; 
-
-		if ( emissive ) {
-
-			emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
-
-		}
-
-		return program;
 
 	}
 
@@ -1892,7 +1879,7 @@ function WebGLRenderer( parameters ) {
 		parameters = materialProperties.parameterCache[ key ];
 
 		if ( ! parameters ) {
-
+//console.log( "building cache for ", key );
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
 			parameters = { perObject: [], perRender: [] };
@@ -1911,7 +1898,6 @@ function WebGLRenderer( parameters ) {
 				// parameter sources
 
 				list = perRender;
-
 
 				search: {
 
@@ -2009,7 +1995,12 @@ function WebGLRenderer( parameters ) {
 
 					} else {
 
-						if ( name === 'cameraPosition' ) {
+
+						if ( name === 'flipEnvMap' ) {
+
+							uniform.setValue( _gl, ( ! ( material.envMap && material.envMap.isCubeTexture ) ) ? 1 : - 1, _this );
+
+						} else if ( name === 'cameraPosition' ) {
 
 							camera.addParameter( "cameraPosition", new Vector3().setFromMatrixPosition( camera.matrixWorld ) );
 
