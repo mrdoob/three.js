@@ -71,7 +71,6 @@
 		is not modified.
 		</div>
 
-
 		<h3>[method:Box3 clone]()</h3>
 		<div>Returns a new [page:Box3] with the same [page:.min] and [page:.max] as this one.</div>
 
@@ -105,27 +104,8 @@
 		If the [page:Vector3 point] lies inside of this box, the distance will be 0.
 		</div>
 
-<<<<<<< HEAD
+
 		<h3>[method:Boolean equals]( [page:Box3 box] )</h3>
-=======
-		<h3>[method:Box3 setFromArray]( [page:Array array] ) [page:Box3 this]</h3>
-		<div>
-		array -- An array of position data that the resulting box will envelop.
-		</div>
-		<div>
-		Sets the upper and lower bounds of this box to include all of the data in *array*.
-		</div>
-
-		<h3>[method:Box3 setFromBufferAttribute]( [page:BufferAttribute attribute] ) [page:Box3 this]</h3>
-		<div>
-		buffer -- A buffer attribute of position data that the resulting box will envelop.
-		</div>
-		<div>
-		Sets the upper and lower bounds of this box to include all of the data in *attribute*.
-		</div>
-
-		<h3>[method:Box3 setFromPoints]( [page:Array points] ) [page:Box3 this]</h3>
->>>>>>> 576c75dadaf04c76b10e3f9b6e36f9af53e3896c
 		<div>
 		[page:Box3 box] - Box to compare with this one.<br /><br />
 
@@ -139,21 +119,7 @@
 		Expands the boundaries of this box to include [page:Vector3 point].
 		</div>
 
-<<<<<<< HEAD
 		<h3>[method:Box3 expandByScalar]( [page:float scalar] )</h3>
-=======
-		<h3>[method:Box3 setFromCenterAndSize]( [page:Vector3 center], [page:Vector3 size] ) [page:Box3 this]</h3>
-		<div>
-		center -- Desired center position of the box. <br>
-		size -- Desired x, y and z dimensions of the box.
-		</div>
-		<div>
-		Centers this box on *center* and sets this box's width, height and depth to the values specified <br>
-		in *size*.
-		</div>
-
-		<h3>[method:Box3 setFromObject]( [page:Object3D object] ) [page:Box3 this]</h3>
->>>>>>> 576c75dadaf04c76b10e3f9b6e36f9af53e3896c
 		<div>
 		[page:float scalar] - Distance to expand the box by.<br /><br />
 
@@ -171,11 +137,9 @@
 		The depth of this box will be expanded by the z component of *vector* in both directions.
 		</div>
 
-
-
 		<h3>[method:Sphere getBoundingSphere]( [page:Sphere optionalTarget] )</h3>
 		<div>
-		[page:Sphere optionalTarget] -  If specified, the  result will be copied into this [page:Sphere].<br /><br />
+		[page:Sphere optionalTarget] -  (optional) if specified, the  result will be copied into this [page:Sphere].<br /><br />
 
 		Gets a [page:Sphere] that bounds the box. If [page:Sphere optionalTarget] is not set,
 		a new [page:Sphere] containing the result will be returned.
@@ -254,6 +218,20 @@
 		Sets the lower and upper (x, y, z) boundaries of this box.
 		</div>
 
+		<h3>[method:Box3 setFromArray]( [page:Array array] ) [page:Box3 this]</h3>
+		<div>
+		array -- An array of position data that the resulting box will envelop.<br /><br />
+
+		Sets the upper and lower bounds of this box to include all of the data in *array*.
+		</div>
+
+		<h3>[method:Box3 setFromBufferAttribute]( [page:BufferAttribute attribute] ) [page:Box3 this]</h3>
+		<div>
+		[page:BufferAttribute attribute] - A buffer attribute of position data that the resulting box will envelop.<br /><br />
+
+		Sets the upper and lower bounds of this box to include all of the data in [page:BufferAttribute attribute].
+		</div>
+
 		<h3>[method:Box3 setFromCenterAndSize]( [page:Vector3 center], [page:Vector3 size] )</h3>
 		<div>
 		[page:Vector3 center] - Desired center position of the box ([page:Vector3]). <br>
@@ -263,14 +241,21 @@
 		in [page:Vector3 size].
 		</div>
 
+		<h3>[method:Box3 setFromCenterAndSize]( [page:Vector3 center], [page:Vector3 size] ) [page:Box3 this]</h3>
+		<div>
+		[page:Vector3 center], - Desired center position of the box. <br>
+		[page:Vector3 size] - Desired x, y and z dimensions of the box.<br /><br />
 
+		Centers this box on [page:Vector3 center] and sets this box's width, height and depth to the values specified <br>
+		in [page:Vector3 size]
+		</div>
 
 		<h3>[method:Box3 setFromObject]( [page:Object3D object] )</h3>
 		<div>
 		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br /><br />
 
 		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
-		accounting for both the object's, and childrens', world transforms.
+		accounting for the world transforms of both the object and its childrens.
 		</div>
 
 		<h3>[method:Box3 setFromPoints]( [page:Array points] )</h3>
@@ -280,7 +265,6 @@
 		Sets the upper and lower bounds of this box to include all of the points in [page:Array points].
 		</div>
 
-<<<<<<< HEAD
 		<h3>[method:Box3 translate]( [page:Vector3 offset] )</h3>
 		<div>
 		[page:Vector3 offset] - Direction and distance of offset.<br /><br />
@@ -298,8 +282,6 @@
 		lower bounds.
 		</div>
 
-=======
->>>>>>> 576c75dadaf04c76b10e3f9b6e36f9af53e3896c
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
