@@ -68,20 +68,18 @@ function Object3D() {
 		scale: {
 			enumerable: true,
 			value: scale
-		} /*,
-/*		modelViewMatrix: {
+		} ,
+		modelViewMatrix: {
 			value: new Matrix4()
 		},
 		normalMatrix: {
 			value: new Matrix3()
-		} */
+		}
 	} );
 
-	this.addParameter( "modelViewMatrix", new Matrix4() );
-	this.addParameter( "normalMatrix", new Matrix3() );
-
 	this.matrix = new Matrix4();
-	this.addParameter( "matrixWorld", new Matrix4(), "modelMatrix" );
+
+	this.matrixWorld = new Matrix4();
 
 	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 	this.matrixWorldNeedsUpdate = false;

@@ -122,6 +122,8 @@ function WebGLRenderer( parameters ) {
 
 		// internal state cache
 
+		_frameCount = 0,
+		_currentObjectId = -1,
 		_currentProgram = null,
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
@@ -1104,6 +1106,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		_frameCount++;
+
 		// reset caching for this frame
 
 		_currentGeometryProgram = '';
@@ -1695,7 +1699,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function setProgramExperimental( camera, fog, material, object ) {
+	function setXXX( camera, fog, material, object ) {
 
 		_usedTextureUnits = 0;
 
@@ -1736,7 +1740,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
+				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
@@ -1770,7 +1774,13 @@ function WebGLRenderer( parameters ) {
 			_currentProgram = program.id;
 
 			refreshMaterial = true;
-			refreshLights = true;
+
+			if ( program.lastUsed !== _frameCount ) {
+
+				program.lastUsed = _frameCount;
+				refreshLights = true;
+
+			}
 
 		}
 
@@ -1781,6 +1791,15 @@ function WebGLRenderer( parameters ) {
 			refreshMaterial = true;
 
 		}
+
+		if ( ! refreshMaterial && object.id === _currentObjectId ) {
+
+			// bail out - we have upto date program for this object/material combination. This case exists for objects with multiMaterials.
+			return program;
+
+		}
+
+		_currentObjectId = object.id;
 
 		if ( camera !== _currentCamera ) {
 
@@ -1816,35 +1835,40 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			updateParameters( parameters.perRender, 'm' )
+			updateParameters( parameters.perRender );
 
-		var emissive = p_uniforms.map.emissive; 
-		if ( emissive ) {
+			var emissive = p_uniforms.map.emissive;
 
-			emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
+			if ( emissive ) {
+
+				emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
+
+			}
 
 		}
 
-		}
-
-		updateParameters( parameters.perObject, 'o' );
+		if ( parameters.perObject.length !== 0 ) updateParameters( parameters.perObject );
 
 		// fixup for emissive
+		// common matrices
+
+		p_uniforms.set( _gl, object, 'modelViewMatrix' );
+		p_uniforms.set( _gl, object, 'normalMatrix' );
+		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;
 
 	}
 
-	function updateParameters( list, tag ) {
+	function updateParameters( list ) {
 
-		var parameter; 
+		var parameter;
 		var cacheEntry;
 		var value;
 		var uniform;
 		var list;
 
-//		console.log(tag,  list.length );
-		for ( var i = 0, l = list.length ; i < l ; i++ ) {
+		for ( var i = 0, l = list.length; i < l; i ++ ) {
 
 			cacheEntry = list[ i ];
 
@@ -1865,10 +1889,8 @@ function WebGLRenderer( parameters ) {
 
 	function getParameters( object, material, uniforms, materialProperties, fog, camera ) {
 
-		var parameters; 
-		 
+		var parameters;
 		var parameter;
-		var parameterCache;
 		var uniform;
 		var name;
 
@@ -1879,7 +1901,7 @@ function WebGLRenderer( parameters ) {
 		parameters = materialProperties.parameterCache[ key ];
 
 		if ( ! parameters ) {
-//console.log( "building cache for ", key );
+
 			// populate object parameter cache via search of object/material/ other?
 			// cache removes need to search list on every render.
 			parameters = { perObject: [], perRender: [] };
@@ -1888,7 +1910,7 @@ function WebGLRenderer( parameters ) {
 			var perObject = parameters.perObject;
 			var list;
 
-			for ( var i = 0, l = uniforms.length; i < l; i++ ) {
+			for ( var i = 0, l = uniforms.length; i < l; i ++ ) {
 
 				uniform = uniforms[ i ];
 				name = uniform.id;
@@ -1956,7 +1978,7 @@ function WebGLRenderer( parameters ) {
 						if ( material.map ) {
 
 							uvScaleMap = material.map;
-	
+
 						} else if ( material.specularMap ) {
 
 							uvScaleMap = material.specularMap;
@@ -2006,7 +2028,7 @@ function WebGLRenderer( parameters ) {
 
 							perRender.push( { uniform: uniform, parameter: camera.getParameter( 'cameraPosition' ) } );
 
-						} else if (
+						} /*else if (
 							name !== 'clippingPlanes' &&
 							name !== 'ambientLightColor' &&
 							name !== 'morphTargetInfluences' &&
@@ -2022,7 +2044,7 @@ function WebGLRenderer( parameters ) {
 
 							console.log('uniform: [', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
 
-						}
+						} */
 
 					}
 				}
@@ -2039,7 +2061,7 @@ function WebGLRenderer( parameters ) {
 
 	function setProgram( camera, fog, material, object ) {
 
-		if ( material.isExperimentalMaterial ) return setProgramExperimental( camera, fog, material, object );
+		if ( material.isExperimentalMaterial ) return setXXX( camera, fog, material, object );
 
 		_usedTextureUnits = 0;
 
@@ -2080,7 +2102,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
+				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
