@@ -239,6 +239,7 @@ var list = {
 			[ "Box2", "api/math/Box2" ],
 			[ "Box3", "api/math/Box3" ],
 			[ "Color", "api/math/Color" ],
+			[ "Cylindrical", "api/math/Cylindrical" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
 			[ "Interpolant", "api/math/Interpolant" ],

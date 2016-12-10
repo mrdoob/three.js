@@ -948,7 +948,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'polygons':
-						console.log( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
+						console.warn( 'ColladaLoader: Unsupported primitive type: ', child.nodeName );
 						break;
 
 					case 'lines':
@@ -1261,10 +1261,14 @@ THREE.ColladaLoader.prototype = {
 				switch ( child.nodeName ) {
 
 					case 'node':
+
 						if ( child.hasAttribute( 'id' ) ) {
+
 							data.nodes.push( child.getAttribute( 'id' ) );
 							parseNode( child );
+
 						}
+
 						break;
 
 					case 'instance_camera':
@@ -1557,7 +1561,7 @@ THREE.ColladaLoader.prototype = {
 		buildLibrary( library.cameras, buildCamera );
 		buildLibrary( library.lights, buildLight );
 		buildLibrary( library.geometries, buildGeometry );
-		buildLibrary( library.nodes, buildNode );
+		// buildLibrary( library.nodes, buildNode );
 		buildLibrary( library.visualScenes, buildVisualScene );
 
 		console.timeEnd( 'ColladaLoader: Build' );

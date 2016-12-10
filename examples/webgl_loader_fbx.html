@@ -93,7 +93,7 @@
 				};
 
 				var loader = new THREE.FBXLoader( manager );
-				loader.load( 'models/fbx/xsi_man.fbx', function( object ) {
+				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
 
 					object.traverse( function( child ) {
 
@@ -137,6 +137,10 @@
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
 
 				light = new THREE.DirectionalLight(0xffffff, 1.0);
 				light.position.set(0, 1, 0);

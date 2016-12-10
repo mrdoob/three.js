@@ -82,7 +82,9 @@ THREE.NodeMaterial.prototype.build = function() {
 	this.uniforms = {};
 	this.attributes = {};
 
-	this.nodeData = {};
+	this.extensions = {};
+
+	this.nodeData = {};	
 
 	this.vertexUniform = [];
 	this.fragmentUniform = [];
@@ -115,21 +117,24 @@ THREE.NodeMaterial.prototype.build = function() {
 	this.prefixCode = [
 	"#ifdef GL_EXT_shader_texture_lod",
 
-		"#define texCube(a, b) textureCube(a, b)",
-		"#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
+	"	#define texCube(a, b) textureCube(a, b)",
+	"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
 
-		"#define tex2D(a, b) texture2D(a, b)",
-		"#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
+	"	#define tex2D(a, b) texture2D(a, b)",
+	"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
 
 	"#else",
 
-		"#define texCube(a, b) textureCube(a, b)",
-		"#define texCubeBias(a, b, c) textureCube(a, b, c)",
+	"	#define texCube(a, b) textureCube(a, b)",
+	"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
 
-		"#define tex2D(a, b) texture2D(a, b)",
-		"#define tex2DBias(a, b, c) texture2D(a, b, c)",
+	"	#define tex2D(a, b) texture2D(a, b)",
+	"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
 
-	"#endif"
+	"#endif",
+
+	"#include <packing>"
+
 	].join( "\n" );
 
 	var builder = new THREE.NodeBuilder( this );
@@ -212,7 +217,7 @@ THREE.NodeMaterial.prototype.build = function() {
 	}
 
 	this.lights = this.requestAttribs.light;
-	this.transparent = this.requestAttribs.transparent || this.blendMode > THREE.NormalBlending;
+	this.transparent = this.requestAttribs.transparent || this.blending > THREE.NormalBlending;
 
 	this.vertexShader = [
 		this.prefixCode,
