@@ -1,5 +1,5 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { Geometry } from '../core/Geometry';
 import { _Math } from '../math/Math';
 
@@ -76,6 +76,9 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
+		// A valid edge is only detected if the angle between two consecutive faces is greater than the given threshold angle.
+		// The implementation detects this via the dot product of two consecutive faces normals.
+
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
@@ -92,7 +95,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	}
 
-	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
+	this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
 
 }
 
