@@ -184,7 +184,7 @@ Object.assign( FileLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
+			if ( this.mimeType && request.overrideMimeType ) request.overrideMimeType( this.mimeType );
 
 			request.send( null );
 
