@@ -18,7 +18,6 @@ function ShadowMaterial() {
 
 	this.lights = true;
 	this.transparent = true;
-	this.isExperimentalMaterial = true;
 
 }
 
@@ -26,6 +25,6 @@ ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
 ShadowMaterial.prototype.constructor = ShadowMaterial;
 
 ShadowMaterial.prototype.isShadowMaterial = true;
-
+ShadowMaterial.prototype.isExperimentalMaterial = true;
 
 export { ShadowMaterial };
