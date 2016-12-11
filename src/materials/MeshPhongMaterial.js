@@ -73,11 +73,11 @@ function MeshPhongMaterial( parameters ) {
 	this.lightMapIntensity = 1.0;
 
 	this.aoMap = null;
-	this.aoMapIntensity =  1.0;
+	this.aoMapIntensity = 1.0;
 
 	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity =  1.0;
-	this.emissiveMap =  null;
+	this.emissiveIntensity = 1.0;
+	this.emissiveMap = null;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -98,7 +98,7 @@ function MeshPhongMaterial( parameters ) {
 	this.combine = MultiplyOperation;
 
 	this.reflectivity = 1;
-	this.refractionRatio =  0.98;
+	this.refractionRatio = 0.98;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
