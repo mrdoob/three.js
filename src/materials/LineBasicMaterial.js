@@ -20,7 +20,6 @@ function LineBasicMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'LineBasicMaterial';
-	this.isExperimentalMaterial = true;
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
@@ -38,6 +37,7 @@ LineBasicMaterial.prototype = Object.create( Material.prototype );
 LineBasicMaterial.prototype.constructor = LineBasicMaterial;
 
 LineBasicMaterial.prototype.isLineBasicMaterial = true;
+LineBasicMaterial.prototype.isExperimentalMaterial = true;
 
 LineBasicMaterial.prototype.copy = function ( source ) {
 

@@ -21,7 +21,6 @@ function LineDashedMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'LineDashedMaterial';
-	this.isExperimentalMaterial = true;
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
@@ -29,14 +28,12 @@ function LineDashedMaterial( parameters ) {
 
 	this.addParameter( 'scale', 1 );
 	this.addParameter( 'dashSize', 3 );
-	this.addParameter( 'totalSize', 4 );
 
-	this._gapSize = 1;
+	this.gapSize = 1;
 
-	Object.defineProperty( this, 'gapSize', {
-		set: function ( value ) { this._gapSize = value; this.totalSize = value + this.dashSize },
-		get: function () { return this._gapSize }
-	} );
+	var _this = this;
+
+	this.addParameter( 'totalSize', 4, 'totalSize', function ( value ) { return _this.dashSize + _this.gapSize} );
 
 	this.lights = false;
 
@@ -48,6 +45,7 @@ LineDashedMaterial.prototype = Object.create( Material.prototype );
 LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
+LineDashedMaterial.prototype.isExperimentalMaterial = true;
 
 LineDashedMaterial.prototype.copy = function ( source ) {
 
