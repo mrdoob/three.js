@@ -1699,7 +1699,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function setXXX( camera, fog, material, object ) {
+	function setExperimentalProgram( camera, fog, material, object ) {
 
 		_usedTextureUnits = 0;
 
@@ -1833,23 +1833,10 @@ function WebGLRenderer( parameters ) {
 
 		var parameters = getParameters( object, material, p_uniforms.seq, materialProperties, fog, camera );
 
-		if ( refreshMaterial ) {
-
-			updateParameters( parameters.perRender );
-
-			var emissive = p_uniforms.map.emissive;
-
-			if ( emissive ) {
-
-				emissive.setValue( _gl, new Color().copy( material.emissive ).multiplyScalar( material.emissiveIntensity ) );
-
-			}
-
-		}
+		if ( refreshMaterial ) updateParameters( parameters.perRender );
 
 		if ( parameters.perObject.length !== 0 ) updateParameters( parameters.perObject );
 
-		// fixup for emissive
 		// common matrices
 
 		p_uniforms.set( _gl, object, 'modelViewMatrix' );
@@ -2020,25 +2007,10 @@ function WebGLRenderer( parameters ) {
 
 							perRender.push( { uniform: uniform, parameter: camera.getParameter( 'cameraPosition' ) } );
 
-						} /*else if (
-							name !== 'clippingPlanes' &&
-							name !== 'ambientLightColor' &&
-							name !== 'morphTargetInfluences' &&
-							name !== 'directionalShadowMap' &&
-							name !== 'directionalShadowMatrix' &&
-							name !== 'pointShadowMap' &&
-							name !== 'ltcMat' &&
-							name !== 'ltcMag' &&
-							name !== 'pointShadowMatrix' &&
-							name !== 'spotShadowMap' &&
-							name !== 'emissive' &&
-							name !== 'spotShadowMatrix' ) {
-
-							console.log('uniform: [', name, '] missing.' ); // debugging - exclude lights and other unifomrs set elsewhere
-
-						} */
+						}
 
 					}
+
 				}
 
 			}
@@ -2053,7 +2025,7 @@ function WebGLRenderer( parameters ) {
 
 	function setProgram( camera, fog, material, object ) {
 
-		if ( material.isExperimentalMaterial ) return setXXX( camera, fog, material, object );
+		if ( material.isExperimentalMaterial ) return setExperimentalProgram( camera, fog, material, object );
 
 		_usedTextureUnits = 0;
 
@@ -2170,7 +2142,6 @@ function WebGLRenderer( parameters ) {
 				material.envMap ) {
 
 				var uCamPos = p_uniforms.map.cameraPosition;
-
  
 				if ( uCamPos !== undefined ) {
 

@@ -49,7 +49,7 @@ function MeshBasicMaterial( parameters ) {
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // emissive
 
-	this.map =  null;
+	this.map = null;
 
 	this.lightMap = null;
 	this.lightMapIntensity = 1.0;
@@ -81,12 +81,11 @@ function MeshBasicMaterial( parameters ) {
 
 }
 
-MeshBasicMaterial.prototype.isExperimentalMaterial = true;
-
 MeshBasicMaterial.prototype = Object.create( Material.prototype );
 MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
 
 MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
+MeshBasicMaterial.prototype.isExperimentalMaterial = true;
 
 MeshBasicMaterial.prototype.copy = function ( source ) {
 

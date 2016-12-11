@@ -116,12 +116,11 @@ function MeshStandardMaterial( parameters ) {
 
 }
 
-MeshStandardMaterial.prototype.isExperimentalMaterial = true;
-
 MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
+MeshStandardMaterial.prototype.isExperimentalMaterial = true;
 
 MeshStandardMaterial.prototype.copy = function ( source ) {
 
@@ -144,6 +143,9 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.emissive.copy( source.emissive );
 	this.emissiveMap = source.emissiveMap;
 	this.emissiveIntensity = source.emissiveIntensity;
+
+	var _this = this;
+	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( value ) { return value.copy( _this.emissive ).multiplyScalar( _this.emissiveIntensity ) } );
 
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;

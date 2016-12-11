@@ -28,7 +28,7 @@ function DerivedMaterialParameter( parent, name, getFunc ) {
 
 DerivedMaterialParameter.prototype = {
 
-	constructor: MaterialParameter,
+	constructor: DerivedMaterialParameter,
 
 	getValue: function () {
 
@@ -46,7 +46,7 @@ Object.assign( ParameterSource.prototype, {
 
 		for ( var i = 0, l = parameterList.length; i < l; i++ ) {
 
-			this.addParameter( this, parameterList[ i ] );
+			this.addParameter( parameterList[ i ] );
 
 		}
 

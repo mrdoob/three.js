@@ -25,6 +25,6 @@ ShadowMaterial.prototype = Object.create( ShaderMaterial.prototype );
 ShadowMaterial.prototype.constructor = ShadowMaterial;
 
 ShadowMaterial.prototype.isShadowMaterial = true;
-ShadowMaterial.prototype.isExperimentalMaterial = true;
+//ShadowMaterial.prototype.isExperimentalMaterial = true;
 
 export { ShadowMaterial };
