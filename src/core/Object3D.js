@@ -68,7 +68,7 @@ function Object3D() {
 		scale: {
 			enumerable: true,
 			value: scale
-		} ,
+		},
 		modelViewMatrix: {
 			value: new Matrix4()
 		},
