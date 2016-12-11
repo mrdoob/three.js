@@ -1864,9 +1864,7 @@ function WebGLRenderer( parameters ) {
 
 		var parameter;
 		var cacheEntry;
-		var value;
 		var uniform;
-		var list;
 
 		for ( var i = 0, l = list.length; i < l; i ++ ) {
 
@@ -1874,14 +1872,8 @@ function WebGLRenderer( parameters ) {
 
 			uniform = cacheEntry.uniform;
 			parameter = cacheEntry.parameter;
-			value = parameter.value;
 
-			if ( parameter.version !== uniform.version || ( value.isTexture ) ) {
-
-				uniform.setValue( _gl, value, _this );
-				uniform.version = parameter.version;
-
-			}
+			uniform.setValue( _gl, parameter.getValue(), _this );
 
 		}
 

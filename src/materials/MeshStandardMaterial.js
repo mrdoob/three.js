@@ -61,45 +61,47 @@ function MeshStandardMaterial( parameters ) {
 
 	this.type = 'MeshStandardMaterial';
 
-	this.isExperimentalMaterial = true;
+	this.addParameters( [ 'roughness', 'metalness', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'emissiveMap',
+		' bumpMap', 'bumpScale','normalMap', 'NormalScale', 'displacementMap', 'displacementScale', 'displacementBias', 'roughnessMap', 'metalnessMap', 'alphaMap',
+		'envMap', 'envMapIntensity', 'refractionRatio' ] );
 
-	this.addParameter( 'color',  new Color( 0xffffff ), 'diffuse' ); // diffuse
-	this.addParameter( 'roughness', 0.5 );
-	this.addParameter( 'metalness', 0.5 );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
+	this.roughness = 0.5;
+	this.metalness = 0.5;
 
-	this.addParameter( 'map', null );
+	this.map = null;
 
-	this.addParameter( 'lightMap', null );
-	this.addParameter( 'lightMapIntensity', 1.0 );
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
-	this.addParameter( 'aoMap', null );
-	this.addParameter( 'aoMapIntensity', 1.0 );
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
-	this.addParameter( 'emissive', new Color( 0x000000 ), 'emissiveColor' );
-	this.addParameter( 'emissiveIntensity',  1.0 );
-	this.addParameter( 'emissiveMap', null );
+	this.emissive = new Color( 0x000000 );
+	this.emissiveIntensity =  1.0;
+	this.emissiveMap = null;
 
-	this.addParameter( 'bumpMap', null );
-	this.addParameter( 'bumpScale', 1 );
+	this.bumpMap = null;
+	this.bumpScale = 1;
 
-	this.addParameter( 'normalMap', null );
-	this.addParameter( 'normalScale', new Vector2( 1, 1 ) );
+	this.normalMap = null;
+	this.normalScale = new Vector2( 1, 1 );
 
-	this.addParameter( 'displacementMap', null );
-	this.addParameter( 'displacementScale', 1 );
-	this.addParameter( 'displacementBias', 0 );
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
-	this.addParameter( 'roughnessMap', null );
+	this.roughnessMap = null;
 
-	this.addParameter( 'metalnessMap', null );
+	this.metalnessMap = null;
 
-	this.addParameter( 'alphaMap', null );
+	this.alphaMap = null;
 
-	this.addParameter( 'envMap', null );
+	this.envMap = null;
 
-	this.addParameter( 'envMapIntensity', 1.0 );
+	this.envMapIntensity = 1.0;
 
-	this.addParameter( 'refractionRatio', 0.98 );
+	this.refractionRatio = 0.98;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -113,6 +115,8 @@ function MeshStandardMaterial( parameters ) {
 	this.setValues( parameters );
 
 }
+
+MeshStandardMaterial.prototype.isExperimentalMaterial = true;
 
 MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;

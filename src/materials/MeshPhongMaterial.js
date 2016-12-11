@@ -58,43 +58,47 @@ function MeshPhongMaterial( parameters ) {
 	Material.call( this );
 
 	this.type = 'MeshPhongMaterial';
-	this.isExperimentalMaterial = true;
+
+	this.addParameters( [ 'specular', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'bumpMap', 'bumpScale',
+		'normalMap', 'NormalScale', 'displacementMap', 'displacementScale', 'displacementBias', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
-	this.addParameter( 'specular', new Color( 0x111111 ) );
 	this.addParameter( 'shininess', 30, null, function ( value ) { return Math.max( value, 1e-4 ) } );
 
-	this.addParameter( 'map', null );
+	this.specular = new Color( 0x111111 );
 
-	this.addParameter( 'lightMap', null );
-	this.addParameter( 'lightMapIntensity', 1.0 );
+	this.map = null;
 
-	this.addParameter( 'aoMap', null );
-	this.addParameter( 'aoMapIntensity',  1.0 );
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
-	this.addParameter( 'emissive', new Color( 0x000000 ), 'emissiveColor' );
-	this.addParameter( 'emissiveIntensity',  1.0 );
-	this.addParameter( 'emissiveMap',  null );
+	this.aoMap = null;
+	this.aoMapIntensity =  1.0;
 
-	this.addParameter( 'bumpMap', null );
-	this.addParameter( 'bumpScale', 1 );
+	this.emissive = new Color( 0x000000 );
+	this.emissiveIntensity =  1.0;
+	this.emissiveMap =  null;
 
-	this.addParameter( 'normalMap', null );
-	this.addParameter( 'normalScale', new Vector2( 1, 1 ) );
+	this.bumpMap = null;
+	this.bumpScale = 1;
 
-	this.addParameter( 'displacementMap', null );
-	this.addParameter( 'displacementScale', 1 );
-	this.addParameter( 'displacementBias', 0 );
+	this.normalMap = null;
+	this.normalScale = new Vector2( 1, 1 );
 
-	this.addParameter( 'specularMap', null );
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
 
-	this.addParameter( 'alphaMap', null );
+	this.specularMap = null;
 
-	this.addParameter( 'envMap', null, 'envMap' );
+	this.alphaMap = null;
+
+	this.envMap = null;
 
 	this.combine = MultiplyOperation;
-	this.addParameter( 'reflectivity', 1 );
-	this.addParameter( 'refractionRatio',  0.98 );
+
+	this.reflectivity = 1;
+	this.refractionRatio =  0.98;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -108,6 +112,8 @@ function MeshPhongMaterial( parameters ) {
 	this.setValues( parameters );
 
 }
+
+MeshPhongMaterial.prototype.isExperimentalMaterial = true;
 
 MeshPhongMaterial.prototype = Object.create( Material.prototype );
 MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;

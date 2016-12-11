@@ -346,12 +346,11 @@ function SingleUniform( id, activeInfo, addr ) {
 	this.addr = addr;
 	this.setValue = getSingularSetter( activeInfo.type );
 
-	this.isSimpleUniform = true;
-	this.version = -1.0;
-
 	// this.path = activeInfo.name; // DEBUG
 
 }
+
+SingleUniform.prototype.isSimpleUniform = true;
 
 function PureArrayUniform( id, activeInfo, addr ) {
 
@@ -360,12 +359,11 @@ function PureArrayUniform( id, activeInfo, addr ) {
 	this.size = activeInfo.size;
 	this.setValue = getPureArraySetter( activeInfo.type );
 
-	this.isSimpleUniform = true;
-	this.version = -1.0;
-
 	// this.path = activeInfo.name; // DEBUG
 
 }
+
+PureArrayUniform.prototype.isSimpleUniform = true;
 
 function StructuredUniform( id ) {
 

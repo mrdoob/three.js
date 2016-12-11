@@ -44,25 +44,28 @@ function MeshBasicMaterial( parameters ) {
 
 	this.type = 'MeshBasicMaterial';
 
+	this.addParameters( [ 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity',
+		'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
+
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // emissive
 
-	this.addParameter( 'map',  null );
+	this.map =  null;
 
-	this.addParameter( 'lightMap', null );
-	this.addParameter( 'lightMapIntensity', 1.0 );
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
-	this.addParameter( 'aoMap', null );
-	this.addParameter( 'aoMapIntensity', 1.0 );
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
-	this.addParameter( 'specularMap',  null);
+	this.specularMap =  null;
 
-	this.addParameter( 'alphaMap',  null );
+	this.alphaMap =  null;
 
-	this.addParameter( 'envMap', null );
+	this.envMap = null;
 
 	this.combine = MultiplyOperation;
-	this.addParameter( 'reflectivity', 1 );
-	this.addParameter( 'refractionRatio', 0.98 );
+	this.reflectivity = 1;
+	this.refractionRatio = 0.98;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -73,11 +76,12 @@ function MeshBasicMaterial( parameters ) {
 	this.morphTargets = false;
 
 	this.lights = false;
-	this.isExperimentalMaterial = true;
 
 	this.setValues( parameters );
 
 }
+
+MeshBasicMaterial.prototype.isExperimentalMaterial = true;
 
 MeshBasicMaterial.prototype = Object.create( Material.prototype );
 MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
