@@ -78,7 +78,7 @@ function MeshStandardMaterial( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.emissive = new Color( 0x000000 );
-	this.emissiveIntensity =  1.0;
+	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
 	this.bumpMap = null;
