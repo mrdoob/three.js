@@ -59,7 +59,8 @@
 
 			var params = {
 				material: 'normal',
-				camera: 'perspective'
+				camera: 'perspective',
+				side: 'double'
 			};
 
 			var cameraOrtho, cameraPerspective;
@@ -84,7 +85,7 @@
 				var gui = new dat.GUI();
 				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
-
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 			}
 
 			function init() {
@@ -188,7 +189,9 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialNormal = new THREE.MeshNormalMaterial();
+				materialNormal = new THREE.MeshNormalMaterial( {
+					side: THREE.DoubleSide
+				} );
 
 				//
 
@@ -264,6 +267,14 @@
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
 
+					}
+
+					switch ( params.side ) {
+
+						case 'front': material.side = THREE.FrontSide; break;
+						case 'back': material.side = THREE.BackSide; break;
+						case 'double': material.side = THREE.DoubleSide; break;
+	
 					}
 
 					mesh.material = material;
