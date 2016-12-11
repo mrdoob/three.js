@@ -78,7 +78,6 @@ function Object3D() {
 	} );
 
 	this.matrix = new Matrix4();
-
 	this.matrixWorld = new Matrix4();
 
 	this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
