@@ -139,9 +139,15 @@ var ShaderLib = {
 
 	normal: {
 
-		uniforms: {
-			opacity : { value: 1.0 }
-		},
+		uniforms: Object.assign( {},
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			{
+				opacity : { value: 1.0 }
+			}
+		),
 
 		vertexShader: ShaderChunk.normal_vert,
 		fragmentShader: ShaderChunk.normal_frag
