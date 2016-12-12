@@ -32,7 +32,9 @@ DerivedMaterialParameter.prototype = {
 
 	getValue: function () {
 
-		return this.getFunc( this.parent[ this.name ] );
+		var parent = this.parent;
+
+		return this.getFunc( parent, parent[ this.name ] );
 
 	}
 

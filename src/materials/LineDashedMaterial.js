@@ -31,9 +31,7 @@ function LineDashedMaterial( parameters ) {
 
 	this.gapSize = 1;
 
-	var _this = this;
-
-	this.addParameter( 'totalSize', 4, 'totalSize', function ( value ) { return _this.dashSize + _this.gapSize} );
+	this.addParameter( 'totalSize', 4, 'totalSize', function ( parent, value ) { return parent.dashSize + parent.gapSize} );
 
 	this.lights = false;
 

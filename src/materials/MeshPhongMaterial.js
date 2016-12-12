@@ -63,7 +63,7 @@ function MeshPhongMaterial( parameters ) {
 		'normalMap', 'NormalScale', 'displacementMap', 'displacementScale', 'displacementBias', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
 
 	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
-	this.addParameter( 'shininess', 30, null, function ( value ) { return Math.max( value, 1e-4 ) } );
+	this.addParameter( 'shininess', 30, null, function ( parent, value ) { return Math.max( value, 1e-4 ) } );
 
 	this.specular = new Color( 0x111111 );
 
@@ -79,8 +79,7 @@ function MeshPhongMaterial( parameters ) {
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
-	var _this = this;
-	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( value ) { return value.copy( _this.emissive ).multiplyScalar( _this.emissiveIntensity ) } );
+	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( parent, value ) { return value.copy( parent.emissive ).multiplyScalar( parent.emissiveIntensity ) } );
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
