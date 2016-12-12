@@ -2387,6 +2387,7 @@ function WebGLRenderer( parameters ) {
 				uvScaleMap = uvScaleMap.texture;
 
 			}
+
 			var offset = uvScaleMap.offset;
 			var repeat = uvScaleMap.repeat;
 
