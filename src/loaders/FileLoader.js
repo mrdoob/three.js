@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author vladgaidukov / vlad@meliar.ru
  */
 
 import { Cache } from './Cache';
@@ -21,22 +22,26 @@ Object.assign( FileLoader.prototype, {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
+		if (Cache.isLoaded (url))
+		{
+			var cached = Cache.getObject (url).object;
 
-		if ( cached !== undefined ) {
+			scope.manager.itemStart (url);
 
-			scope.manager.itemStart( url );
-
-			setTimeout( function () {
-
-				if ( onLoad ) onLoad( cached );
-
-				scope.manager.itemEnd( url );
-
-			}, 0 );
+			if (onLoad)
+			{
+				setTimeout (function ()
+				{
+					onLoad (cached);
+					scope.manager.itemEnd (url);
+				}, 0);
+			}
+			else
+			{
+				scope.manager.itemEnd (url);
+			}
 
 			return cached;
-
 		}
 
 		// Check for data: URI
@@ -129,65 +134,76 @@ Object.assign( FileLoader.prototype, {
 
 			var request = new XMLHttpRequest();
 			request.open( 'GET', url, true );
+            
+            if (Cache.isCached( url )){
+                Cache.addCallback( url, onLoad );
+            } 
+            else {
+                Cache.addObject( url );
+                Cache.addCallback( url, onLoad );
+                
+                request.addEventListener( 'load', function ( event ) {
 
-			request.addEventListener( 'load', function ( event ) {
+                    var response = event.target.response;
 
-				var response = event.target.response;
+                    if ( this.status === 200 ) {
 
-				Cache.add( url, response );
+                        Cache.loaded (url, response);
+                        var cached = Cache.getObject (url);
 
-				if ( this.status === 200 ) {
+                        for ( var i = 0; i < cached.callbacks.length; i ++ ) {
+                            if (cached.callbacks[i])
+                                cached.callbacks[i] (response);
+                            scope.manager.itemEnd( url );
+                        }
+                        
+                    } else if ( this.status === 0 ) {
 
-					if ( onLoad ) onLoad( response );
+                        // Some browsers return HTTP Status 0 when using non-http protocol
+                        // e.g. 'file://' or 'data://'. Handle as success.
 
-					scope.manager.itemEnd( url );
+                        console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-				} else if ( this.status === 0 ) {
+                        if ( onLoad ) onLoad( response );
 
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
+                        scope.manager.itemEnd( url );
 
-					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+                    } else {
+                        Cache.remove (url);
 
-					if ( onLoad ) onLoad( response );
+                        if ( onError ) onError( event );
 
-					scope.manager.itemEnd( url );
+                        scope.manager.itemError( url );
 
-				} else {
+                    }
 
-					if ( onError ) onError( event );
+                }, false );
 
-					scope.manager.itemError( url );
+                if ( onProgress !== undefined ) {
 
-				}
+                    request.addEventListener( 'progress', function ( event ) {
 
-			}, false );
+                        onProgress( event );
 
-			if ( onProgress !== undefined ) {
+                    }, false );
 
-				request.addEventListener( 'progress', function ( event ) {
+                }
 
-					onProgress( event );
+                request.addEventListener( 'error', function ( event ) {
 
-				}, false );
+                    if ( onError ) onError( event );
 
-			}
+                    scope.manager.itemError( url );
 
-			request.addEventListener( 'error', function ( event ) {
+                }, false );
 
-				if ( onError ) onError( event );
+                if ( this.responseType !== undefined ) request.responseType = this.responseType;
+                if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-				scope.manager.itemError( url );
+                if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
-			}, false );
-
-			if ( this.responseType !== undefined ) request.responseType = this.responseType;
-			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
-
-			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
-
-			request.send( null );
-
+                request.send( null );
+            }
 		}
 
 		scope.manager.itemStart( url );
