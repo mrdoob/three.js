@@ -76,8 +76,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
-		// A valid edge is only detected if the angle between two consecutive faces is greater than the given threshold angle.
-		// The implementation detects this via the dot product of two consecutive faces normals.
+		// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
