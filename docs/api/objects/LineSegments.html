@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Line] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr;
 
 		<h1>[name]</h1>
 
@@ -28,6 +28,7 @@
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Line] class for common properties.</div>
 
 		<h3>[property:Geometry geometry]</h3>
 		<div>
@@ -41,12 +42,13 @@
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:Line] class for common methods.</div>
 
 		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
 		<div>
 		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
 		</div>
-		
+
 		<h3>[method:LineSegments clone]()</h3>
 		<div>
 		Returns a clone of this LineSegments object and its descendants.

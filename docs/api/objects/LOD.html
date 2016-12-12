@@ -15,23 +15,23 @@
 		<div class="desc">Level of Detail - Show meshes with more or less geometry based on distance.</div>
 
 		<h2>Example</h2>
-		
+
 		<div>
 		[example:webgl_lod LOD]
 		</div>
-		
+
 		<code>
 		var lod = new THREE.LOD();
-		
+
 		//Create 5 levels of spheres
 		for( var i = 0; i < 5; i++ ) {
-			
+
 			var geometry = new THREE.IcosahedronGeometry( 10, 5 - i )
-			
+
 			new THREE.Mesh( geometry, material );
-			
+
 			lod.addLevel( mesh, i * 50 );
-			
+
 		}
 		</code>
 
@@ -42,6 +42,7 @@
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Object3D] class for common properties.</div>
 
 
 
@@ -58,6 +59,7 @@
 		</div>
 
 		<h2>Methods</h2>
+		<div>See the base [page:Object3D] class for common methods.</div>
 
 
 
@@ -83,7 +85,7 @@
 		<div>
 		Update the visiblility of the level of detail based on the distance from the camera.
 		</div>
-		
+
 		<h3>[method:LOD clone]()</h3>
 		<div>
 		Returns a clone of this LOD object and its associated distance specific objects.
