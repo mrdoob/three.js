@@ -2387,10 +2387,10 @@ function WebGLRenderer( parameters ) {
 				uvScaleMap = uvScaleMap.texture;
 
 			}
+			var offset = uvScaleMap.offset;
+			var repeat = uvScaleMap.repeat;
 
-			var offsetRepeat = uvScaleMap.offsetRepeat;
-
-			uniforms.offsetRepeat.value.copy( offsetRepeat );
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
 
