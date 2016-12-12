@@ -11,8 +11,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Represents a box or cube in 3D space. The main purpose of this is to calculate
-			[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]
+			Represents a box or cube in 3D space. The main purpose of this is to represent
+			the [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]
 			for objects.
 		</div>
 
@@ -65,15 +65,14 @@
 		<h3>[method:Vector3 clampPoint]( [page:Vector3 point], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3] to clamp. <br>
-		[page:Vector3 optionalTarget] - If specified, the clamped result will be copied into this [page:Vector3].<br /><br />
+		[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
+		otherwise a new Vector3 will be created. <br /><br />
 
 		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps] the [page:Vector3 point] within the bounds of this box.<br />
-		Note: if [page:Vector3 optionalTarget] is not specified, a new [page:Vector3] will be returned. The original point
-		is not modified.
 		</div>
 
 		<h3>[method:Box3 clone]()</h3>
-		<div>Returns a new [page:Box3] with the same [page:.min] and [page:.max] as this one.</div>
+		<div>Returns a new [page:Box3] with the same [page:.min min] and [page:.max max] as this one.</div>
 
 		<h3>[method:Boolean containsBox]( [page:Box3 box] )</h3>
 		<div>
@@ -94,7 +93,7 @@
 		<div>
 		[page:Box3 box]  - [page:Box3] to copy.<br /><br />
 
-		Copies the [page:.min] and [page:.max] from [page:Box3 box] to this box.
+		Copies the [page:.min min] and [page:.max max] from [page:Box3 box] to this box.
 		</div>
 
 		<h3>[method:Float distanceToPoint]( [page:Vector3 point] )</h3>
@@ -140,35 +139,35 @@
 
 		<h3>[method:Sphere getBoundingSphere]( [page:Sphere optionalTarget] )</h3>
 		<div>
-		[page:Sphere optionalTarget] -  (optional) if specified, the  result will be copied into this [page:Sphere].<br /><br />
+			[page:Sphere optionalTarget] — (optional) if specified, the result will be copied into this Sphere,
+			otherwise a new Sphere will be created. <br /><br />
 
-		Gets a [page:Sphere] that bounds the box. If [page:Sphere optionalTarget] is not set,
-		a new [page:Sphere] containing the result will be returned.
+		Gets a [page:Sphere] that bounds the box.
 		</div>
 
 		<h3>[method:Vector3 getCenter]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-		[page:Vector3 optionalTarget] - (optional) If specified, the result will be copied into this [page:Vector3].<br /><br />
+			[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
+			otherwise a new Vector3 will be created. <br /><br />
 
-		Returns the center point of the box as a [page:Vector3]. If [page:Vector3 optionalTarget] is not set,
-		a new [page:Vector3] containing the result will be returned.
+		Returns the center point of the box as a [page:Vector3].
 		</div>
 
 		<h3>[method:Vector3 getParameter]( [page:Vector3 point], [page:Vector3 optionalTarget] ) </h3>
 		<div>
 		[page:Vector3 point] - [page:Vector3].<br/>
-		optionalTarget - (optional) If specified, the result will be copied into this [page:Vector3].<br/><br/>
+		[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
+		otherwise a new Vector3 will be created. <br /><br />
 
-		Returns a point as a proportion of this box's width and height. If [page:Vector3 optionalTarget] is not set,
-		a new [page:Vector3] containing the result will be returned.
+		Returns a point as a proportion of this box's width and height.
 		</div>
 
 		<h3>[method:Vector3 getSize]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-		optionalTarget - (optional) If specified, the result will be copied into this [page:Vector3].<br /><br />
+			[page:Vector3 optionalTarget] — (optional) if specified, the result will be copied into this Vector3,
+			otherwise a new Vector3 will be created. <br /><br />
 
-		Returns the width and height of this box. If [page:Vector3 optionalTarget] is not set,
-		a new [page:Vector3] containing the result will be returned.
+		Returns the width and height of this box.
 		</div>
 
 		<h3>[method:Box3 intersect]( [page:Box3 box] )</h3>

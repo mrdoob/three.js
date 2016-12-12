@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Implementation of a <[link:http://en.wikipedia.org/wiki/Quaternion quaternion].
+			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].
 			This is used for [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotating things]
 			without encountering the dreaded
 			[link:http://en.wikipedia.org/wiki/Gimbal_lock gimbal lock] issue, amongst other
@@ -45,22 +45,16 @@
 		<h2>Properties</h2>
 
 		<h3>[property:Float x]</h3>
-		<div>Changing this property will result in </div>
+		<div>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</div>
 
 		<h3>[property:Float y]</h3>
-		<div>
-
-		</div>
+		<div>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</div>
 
 		<h3>[property:Float z]</h3>
-		<div>
-
-		</div>
+		<div>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</div>
 
 		<h3>[property:Float w]</h3>
-		<div>
-
-		</div>
+		<div>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</div>
 
 
 		<h2>Methods</h2>
@@ -110,7 +104,7 @@
 
 		<h3>[method:Quaternion inverse]()</h3>
 		<div>
-			Inverts this quaternion - calculated the [page:.conjugate conjugate] and then
+			Inverts this quaternion - calculate the [page:.conjugate conjugate] and then
 			[page:.normalize normalizes] the result.
 		</div>
 
@@ -139,7 +133,7 @@
 		<h3>[method:Quaternion multiplyQuaternions]( [page:Quaternion a], [page:Quaternion b] )</h3>
 		<div>
 		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
-		Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm].
+		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
 		</div>
 
 		<h3>[method:Quaternion onChange]( [page:Function onChangeCallback] )</h3>
@@ -174,7 +168,7 @@
 		<h3>[method:Quaternion slerp]( [page:Quaternion qb], [page:float t] )</h3>
 		<div>
 			[page:Quaternion qb] - The other quaternion rotation<br />
-			[page:float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 			Handles the spherical linear interpolation between quaternions. [page:float t] represents the
 			amount of rotation between this quaternion (where [page:float t] is 0) and [page:Quaternion qb] (where
@@ -188,12 +182,12 @@
 		</div>
 
 		<h3>[method:Quaternion set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
-		<div>Sets [page.x x], [page.y y], [page.z z], [page.w w] properties of this quaternion.</div>
+		<div>Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion.</div>
 
 		<h3>[method:Quaternion setFromAxisAngle]( [page:Vector3 axis], [page:Float angle] )</h3>
 		<div>
 		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
-		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm].<br />
+		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
 		*Axis* is asumed to be normalized, *angle* is in radians.
 		</div>
 
@@ -203,14 +197,14 @@
 		<h3>[method:Quaternion setFromRotationMatrix]( [page:Matrix4 m] )</h3>
 		<div>
 		Sets this quaternion from rotation component of [page:Matrix4 m].<br />
-		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm].
+		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here].
 		</div>
 
 		<h3>[method:Quaternion setFromUnitVectors]( [page:Vector3 vFrom], [page:Vector3 vTo] )</h3>
 		<div>
 		Sets this quaternion to the rotation required to rotate direction vector [page:Vector3 vFrom] to
 		direction vector [page:Vector3 vTo].<br />
-		Adapted from [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors].<br />
+		Adapted from the method [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors here].<br />
 		[page:Vector3 vFrom] and [page:Vector3 vTo] are assumed to be normalized.
 		</div>
 
@@ -225,12 +219,29 @@
 
 		<h2>Static Methods</h2>
 
+		<div>
+			Static methods (as opposed to instance methods) are designed to be called directly from the class,
+			rather than from a specific instance. So to use the static version of, call it like so:
+			<code>
+THREE.Quaternion.slerp( qStart, qEnd, qTarget, t );
+			</code>
+			By contrast, to call the 'normal' or instanced slerp method, you would do the following:
+			<code>
+//instantiate a quaternion with default values
+var q = new THREE.Quaternion();
+
+//call the instanced slerp method
+q.slerp( qb, t )
+			</code>
+
+		</div>
+
 		<h3>[method:Quaternion slerp]( [page:Quaternion qStart], [page:Quaternion qEnd], [page:Quaternion qTarget], [page:Float t] )</h3>
 		<div>
 			[page:Quaternion qStart] - The starting quaternion (where [page:Float t] is 0)<br />
 			[page:Quaternion qEnd] - The ending quaternion (where [page:Float t] is 1)<br />
 			[page:Quaternion qTarget] - The target quaternion that gets set with the result<br />
-			[page:float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+			[page:float t] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 			Unlike the normal method, the static version of slerp sets a target quaternion to the result of the slerp operation.
 			<code>

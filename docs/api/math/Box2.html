@@ -11,8 +11,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Represents a [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box]
-			in 2D space.
+			Represents a box in 2D space.
 		</div>
 
 
@@ -54,15 +53,14 @@
 		<h3>[method:Vector2 clampPoint]( [page:Vector2 point], [page:Vector2 optionalTarget] )</h3>
 		<div>
 		[page:Vector2 point] - [page:Vector2] to clamp. <br>
-		[page:Vector2 optionalTarget] - If specified, the clamped result will be copied into this [page:Vector2].<br /><br />
+		[page:Vector2 optionalTarget] — (optional) if specified, the result will be copied into this Vector2,
+		otherwise a new Vector2 will be created. <br /><br />
 
 		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps] the [page:Vector2 point] within the bounds of this box.<br />
-		Note: if [page:Vector2 optionalTarget] is not specified, a new [page:Vector2] will be returned. The original point
-		is not modified.
 		</div>
 
 		<h3>[method:Box2 clone]()</h3>
-		<div>Returns a new [page:Box2] with the same [page:.min] and [page:.max] as this one.</div>
+		<div>Returns a new [page:Box2] with the same [page:.min min] and [page:.max max] as this one.</div>
 
 		<h3>[method:Boolean containsBox]( [page:Box2 box] )</h3>
 		<div>
@@ -81,9 +79,7 @@
 
 		<h3>[method:Box2 copy]( [page:Box2 box] )</h3>
 		<div>
-		[page:Box2 box]  - [page:Box2]  to copy.<br /><br />
-
-		Copies the [page:.min] and [page:.max] from [page:Box2 box] to this box.
+		Copies the [page:.min min] and [page:.max max] from [page:Box2 box] to this box.
 		</div>
 
 		<h3>[method:Float distanceToPoint]( [page:Vector2 point] )</h3>
@@ -127,27 +123,27 @@
 
 		<h3>[method:Vector2 getCenter]( [page:Vector2 optionalTarget] )</h3>
 		<div>
-		[page:Vector2 optionalTarget] - (optional) If specified, the result will be copied into this [page:Vector2].<br /><br />
+			[page:Vector2 optionalTarget] — (optional) if specified, the result will be copied into this Vector2,
+			otherwise a new Vector2 will be created. <br /><br />
 
-		Returns the center point of the box as a [page:Vector2]. If [page:Vector2 optionalTarget] is not set,
-		a new [page:Vector2] containing the result will be returned.
+		Returns the center point of the box as a [page:Vector2].
 		</div>
 
 		<h3>[method:Vector2 getParameter]( [page:Vector2 point], [page:Vector2 optionalTarget] ) </h3>
 		<div>
 		[page:Vector2 point] - [page:Vector2].<br/>
-		optionalTarget - (optional) If specified, the result will be copied into this [page:Vector2].<br/><br/>
+		[page:Vector2 optionalTarget] — (optional) if specified, the result will be copied into this Vector2,
+		otherwise a new Vector2 will be created. <br /><br />
 
-		Returns a point as a proportion of this box's width and height. If [page:Vector2 optionalTarget] is not set,
-		a new [page:Vector2] containing the result will be returned.
+		Returns a point as a proportion of this box's width and height.
 		</div>
 
 		<h3>[method:Vector2 getSize]( [page:Vector2 optionalTarget] )</h3>
 		<div>
-		optionalTarget - (optional) If specified, the result will be copied into this [page:Vector2].<br /><br />
+			[page:Vector2 optionalTarget] — (optional) if specified, the result will be copied into this Vector2,
+			otherwise a new Vector2 will be created. <br /><br />
 
-		Returns the width and height of this box. If [page:Vector2 optionalTarget] is not set,
-		a new [page:Vector2] containing the result will be returned.
+		Returns the width and height of this box.
 		</div>
 
 		<h3>[method:Box2 intersect]( [page:Box2 box] )</h3>

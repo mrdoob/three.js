@@ -46,8 +46,6 @@
 					[page:Object3D.projectionMatrix]:
 				</li>
 			</ul>
-			<br />
-
 		</div>
 
 
@@ -77,8 +75,8 @@ m.elements = [ 11, 21, 31, 41,
 		</code>
 		and internally all calculations are performed using column-major ordering. However, as the actual ordering
 		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
-		the rest of this document show matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the transpose of the matrices outlined here to make sense of the calculations.
+		the Three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
+		code, you'll have to take the transpose of any matrices outlined here to make sense of the calculations.
 		</div>
 
 
@@ -167,7 +165,7 @@ m.elements = [ 11, 21, 31, 41,
 		Computes and returns the
 		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.<br /><br />
 
-		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm]
+		Based on the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
 		</div>
 
 		<h3>[method:Boolean equals]( [page:Matrix4 m] )</h3>
@@ -214,7 +212,7 @@ zAxis = (c, g, k)
 		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
 		using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
 
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is invertible, set this to the 4x4 identity matrix.
+		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 4x4 identity matrix.
 		</div>
 
 
@@ -238,7 +236,7 @@ zAxis = (c, g, k)
 		Sets this matrix as rotation transform around [page:Vector3 axis] by [page:Float theta] radians.<br />
 
 		This is a somewhat controversial but mathematically sound alternative to rotating via [page:Quaternions].
-		[link:http://www.gamedev.net/reference/articles/article1199.asp].
+		See the discussion [link:http://www.gamedev.net/reference/articles/article1199.asp here].
 		</div>
 
 		<h3>[method:Matrix4 makeBasis]( [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] )</h3>

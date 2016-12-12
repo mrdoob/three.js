@@ -37,12 +37,12 @@
 		<h2>Example</h2>
 
 		<code>
-			var a = new THREE.Vector4( 0, 1, 0, 0 );
+var a = new THREE.Vector4( 0, 1, 0, 0 );
 
-			//no arguments; will be initialised to (0, 0, 0, 1)
-			var b = new THREE.Vector4( );
+//no arguments; will be initialised to (0, 0, 0, 1)
+var b = new THREE.Vector4( );
 
-			var d = a.distanceTo( b );
+var d = a.distanceTo( b );
 		</code>
 
 
@@ -53,9 +53,9 @@
 		[page:Float x] - the x value of the vector. Default is *0*.<br />
 		[page:Float y] -  the y value of the vector. Default is *0*.<br />
 		[page:Float z] - the z value of the vector. Default is *0*.<br />
-		[page:Float w] - the w value of the vector. Default is *1*.
+		[page:Float w] - the w value of the vector. Default is *1*.<br /><br />
 
-		Created a new [name].
+		Creates a new [name].
 		</div>
 
 
@@ -195,7 +195,7 @@
 		<h3>[method:Vector4 lerp]( [page:Vector4 v], [page:Float alpha] )</h3>
 		<div>
 		[page:Vector4 v] - [page:Vector4] to interpolate towards.<br />
-		alpha - [page:Float] between 0 and 1<br /><br />
+		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolate between this vector and [page:Vector4 v], where alpha is the
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
@@ -205,7 +205,7 @@
 		<div>
 		[page:Vector4 v1] - the starting [page:Vector4].<br />
 		[page:Vector4 v2] - [page:Vector4] to interpolate towards.<br />
-		[page:Float alpha] - number between 0 and 1.<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector4 v1] and
 		[page:Vector4 v2] where alpha is the distance along the line connecting the two vectors
@@ -244,10 +244,7 @@
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>[method:Vector4 set]( [page:Float x], [page:Float y] )</h3>
-		<div>Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector.</div>
-
-		<h3>[method:Vector4 set]( [page:Float x], [page:Float y] )</h3>
+		<h3>[method:Vector4 set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
 		<div>Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector.</div>
 
 		<h3>[method:Vector4 setAxisAngleFromQuaternion]( [page:Quaterion q] )</h3>
@@ -273,7 +270,7 @@
 		If index equals 0 set [page:.x x] to [page:Float value].<br />
 		If index equals 1 set [page:.y y] to [page:Float value].<br />
 		If index equals 2 set [page:.z z] to [page:Float value].<br />
-		If index equals 2 set [page:.w w] to [page:Float value].
+		If index equals 3 set [page:.w w] to [page:Float value].
 		</div>
 
 
@@ -294,10 +291,10 @@
 		<h3>[method:Vector4 setY]( [page:Float y] )</h3>
 		<div>Replace this vector's [page:.y y] value with [page:Float y].</div>
 
-		<h3>[method:Vector4 setZ( [page:Float z] )</h3>
+		<h3>[method:Vector4 setZ]( [page:Float z] )</h3>
 		<div>Replace this vector's [page:.z z] value with [page:Float z].</div>
 
-		<h3>[method:Vector4 setW( [page:Float w] )</h3>
+		<h3>[method:Vector4 setW]( [page:Float w] )</h3>
 		<div>Replace this vector's [page:.w w] value with [page:Float w].</div>
 
 		<h3>[method:Vector4 sub]( [page:Vector4 v] )</h3>

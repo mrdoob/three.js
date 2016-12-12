@@ -45,11 +45,11 @@
 		<h3>[method:Vector3 at]( [page:Float t], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Float t] - Use values 0-1 to return a position along the line segment. <br />
-		[page:Vector3 optionalTarget] - (optional) if provided the result will be copied into this [page:Vector3].<br /><br />
+		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
+		otherwise a new [page:Vector3] will be created.<br /><br />
 
 		Return a vector at a certain position along the line. When [page:Float t] = 0, it returns the start vector,
 		and when [page:Float t] = 1 it returns the end vector.<br />
-		If [page:Vector3 optionalTarget] is not given, a new [page:Vector3] containing the result will be created.
 		</div>
 
 		<h3>[method:Line3 clone]()</h3>
@@ -59,11 +59,11 @@
 		<div>
 		[page:Vector3 point] - return the closest point on the line to this point.<br />
 		[page:Boolean clampToLine] - whether to clamp the returned value to the line segment.<br />
-		[page:Vector3 optionalTarget] - (optional) if provided the result will be copied into this [page:Vector3].<br /><br />
+		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
+		otherwise a new [page:Vector3] will be created.<br /><br />
 
-		Returns the closets point on the line. If clamp to line is true, then the returned value will be
-		clamped to the line segment.<br />
-		If [page:Vector3 optionalTarget] is not given, a new [page:Vector3]	containing the result will be created.
+		Returns the closets point on the line. If [page:Boolean clampToLine] is true, then the returned value will be
+		clamped to the line segment.
 		</div>
 
 		<h3>[method:Float closestPointToPointParameter]( [page:Vector3 point], [page:Boolean clampToLine] )</h3>
@@ -80,15 +80,15 @@
 
 		<h3>[method:Vector3 delta]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-			[page:Vector3 optionalTarget] - (optional) if provided the result will be copied into this [page:Vector3].<br /><br />
+			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
+			otherwise a new [page:Vector3] will be created.<br /><br />
 
 			Returns the delta vector of the line segment ( [page:.end end] vector minus the [page:.start start] vector).
-			If [page:Vector3 optionalTarget] is not given, a new [page:Vector3]	containing the result will be created.
 		</div>
 
 		<h3>[method:Float distance]()</h3>
 		<div>Returns the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
-		(straight-line distance) between the line's [page:.start start] and [page:.end end] vectors.</div>
+		(straight-line distance) between the line's [page:.start start] and [page:.end end] points.</div>
 
 		<h3>[method:Float distanceSq]()</h3>
 		<div>
@@ -106,10 +106,10 @@
 
 		<h3>[method:Vector3 getCenter]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-		[page:Vector3 optionalTarget] - (optional) if provided the result will be copied into this [page:Vector3].<br /><br />
+			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
+			otherwise a new [page:Vector3] will be created.<br /><br />
 
-		Return the center of the line segment.	If [page:Vector3 optionalTarget] is not given, a new [page:Vector3]
-		containing the result will be created.
+		Return the center of the line segment.
 		</div>
 
 		<h3>[method:Line3 set]( [page:Vector3 start], [page:Vector3 end] )</h3>

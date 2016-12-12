@@ -13,7 +13,7 @@
 		<div class="desc">
 			A ray that emits from an origin in a certain direction. This is used by the
 			[page:RayCaster] to assist with [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
-			Raycasting is used for mouse picking (working out what objects in the 3d space the mouse is over) amongst
+			Raycasting is used for mouse picking (working out what objects in the 3D space the mouse is over) amongst
 			other things.
 		</div>
 
@@ -27,8 +27,7 @@
 		[page:Vector3 direction] - [page:Vector3] The direction of the [page:Ray]. This must be normalized
 		 (with [page:Vector3.normalize]) for the methods to operate properly.  Default is a [page:Vector3] at (0, 0, 0).<br /><br />
 
-		Creates a new [name] and initialises the origin and direction properties to the
-		provided values.
+		Creates a new [name].
 		</div>
 
 		<h2>Properties</h2>
@@ -90,12 +89,12 @@
 		Get the squared distance of the closest approach between the [page:Ray] and the [page:Vector3].
 		</div>
 
-		<h3>[method:Float distanceSqToSegment]( [page:Vector3 v0], [page:Vector3 v1], [page:Vector3 optionalPointOnRay] = null, [page:Vector3 optionalPointOnSegment] = null ) [page:Float]</h3>
+		<h3>[method:Float distanceSqToSegment]( [page:Vector3 v0], [page:Vector3 v1], [page:Vector3 optionalPointOnRay], [page:Vector3 optionalPointOnSegment] )</h3>
 		<div>
-		[page:Vector3 v0] - the start of the line segment.
-		[page:Vector3 v1] - the end of the line segment.
+		[page:Vector3 v0] - the start of the line segment.<br />
+		[page:Vector3 v1] - the end of the line segment.<br />
 		optionalPointOnRay - (optional) if this is provided, it receives the point on this
-			[page:Ray] that is closest to the segment.
+			[page:Ray] that is closest to the segment.<br />
 		optionalPointOnSegment - (optional) if this is provided, it receives the point
 			on the line segment that is closest to this [page:Ray].<br /><br />
 
@@ -125,7 +124,7 @@
 		 and [page:.direction direction].
 		</div>
 
-		<h3>[method:Vector3 intersectBox]( [page:Box3 box], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
+		<h3>[method:Vector3 intersectBox]( [page:Box3 box], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Box3 box] - the [page:Box3] to intersect with.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
@@ -135,7 +134,7 @@
 		*null* if there is no intersection.
 		</div>
 
-		<h3>[method:Vector3 intersectPlane]( [page:Plane plane], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
+		<h3>[method:Vector3 intersectPlane]( [page:Plane plane], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Plane plane] - the [page:Plane] to intersect with.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
@@ -145,7 +144,7 @@
 		*null* if there is no intersection.
 		</div>
 
-		<h3>[method:Vector3 intersectSphere]( [page:Sphere sphere], [page:Vector3 optionalTarget] = null ) [page:Vector3]</h3>
+		<h3>[method:Vector3 intersectSphere]( [page:Sphere sphere], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Sphere sphere] - the [page:Sphere] to intersect with.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
@@ -158,7 +157,7 @@
 		<h3>[method:Vector3 intersectTriangle]( [page:Vector3 a], [page:Vector3 b], [page:Vector3 c], [page:Boolean backfaceCulling], [page:Vector3 optionalTarget] )</h3>
 		<div>
 		[page:Vector3 a], [page:Vector3 b], [page:Vector3 c] - The [page:Vector3] points making up the triangle.<br />
-		[page:Boolean backfaceCulling] - [page:Boolean] Whether to use backface culling.<br />
+		[page:Boolean backfaceCulling] - whether to use backface culling.<br />
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
 		otherwise a new [page:Vector3] will be created.<br /><br />
 

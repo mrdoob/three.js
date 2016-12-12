@@ -164,7 +164,8 @@ var color = new THREE.Color( 1, 0, 0 );
 
 		<h3>[method:Object getHSL]( [page:Object optionalTarget] )</h3>
 		<div>
-			[page:Object optionalTarget] - (optional) object into which to pass the results.<br /><br />
+			[page:Object optionalTarget] — (optional) if specified, adds h, s and l keys to object (if not already present)
+			and sets the results there, otherwise a new Object will be created. <br /><br />
 
 			Convert the values [page:.r r], [page:.g g] and [page:.b b] to [link:https://en.wikipedia.org/wiki/HSL_and_HSV HSL]
 			format and returns an object of the form:
@@ -173,8 +174,6 @@ var color = new THREE.Color( 1, 0, 0 );
 				{ h: 0, s: 0, l: 0 }
 			</code>
 
-			If [page:Object optionalTarget] is passed in, adds h, s and l keys to that object (if not already present)
-			and sets the results there.
 		</div>
 
 		<h3>[method:String getStyle]()</h3>
@@ -183,7 +182,7 @@ var color = new THREE.Color( 1, 0, 0 );
 		<h3>[method:Color lerp]( [page:Color color], [page:Float alpha] ) </h3>
 		<div>
 		[page:Color color] - color to converge on.<br />
-		[page:Float alpha] - a number between 0 and 1.<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Linear interpolation of this colors RGB values and the RGB values of the passed argument.
 		The alpha argument can be thought of as the percent between the two colors, where 0 is

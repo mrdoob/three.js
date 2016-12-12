@@ -17,17 +17,30 @@
 		<h2>Example</h2>
 		<code>
 var m = new Matrix3();
+		</code>
 
-//The set method takes elements in row-major order
+		<h2>A Note on Row-Major and Column-Major Ordering</h2>
+		<div>
+			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
+			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
+
+			This means that calling
+		<code>
 m.set( 11, 12, 13,
        21, 22, 23,
        31, 32, 33 );
-
-//Internally they are stored in column major order, so the value of m.elements will now be:
+		</code>
+		will result in the [page:.elements elements] array containing:
+		<code>
 m.elements = [ 11, 21, 31,
               12, 22, 32,
               13, 23, 33 ];
 		</code>
+		and internally all calculations are performed using column-major ordering. However, as the actual ordering
+		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
+		the Three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
+		code, you'll have to take the transpose of any matrices outlined here to make sense of the calculations.
+		</div>
 
 		<h2>Constructor</h2>
 
@@ -110,7 +123,7 @@ m.elements = [ 11, 21, 31,
 		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
 		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is invertible, set this to the 3x3 identity matrix.
+		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 3x3 identity matrix.
 		</div>
 
 		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] )</h3>
@@ -124,11 +137,13 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:Matrix3 identity]()</h3>
 		<div>
-		Resets this matrix to the 3x3 identity matrix.<br/><br/>
+		Resets this matrix to the 3x3 identity matrix:
+		<code>
+1, 0, 0
+0, 1, 0
+0, 0, 1
+		</code>
 
-		1, 0, 0<br/>
-		0, 1, 0<br/>
-		0, 0, 1<br/>
 		</div>
 
 		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] )</h3>
@@ -143,11 +158,8 @@ m.elements = [ 11, 21, 31,
 		<div>
 		[page:Float n11] - value to put in row 1, col 1.<br />
 		[page:Float n12] - value to put in row 1, col 2.<br />
-		[page:Float n13] - value to put in row 1, col 3.<br />
-		[page:Float n21] - value to put in row 2, col 1.<br />
-		[page:Float n22] - value to put in row 2, col 2.<br />
-		[page:Float n23] - value to put in row 2, col 3.<br />
-		[page:Float n31] - value to put in row 3, col 1.<br />
+		...<br />
+		...<br />
 		[page:Float n32] - value to put in row 3, col 2.<br />
 		[page:Float n33] - value to put in row 3, col 3.<br /><br />
 
@@ -161,7 +173,7 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		[page:Array array] - (optional) array to store the resulting vector in.<br />
+		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />
 		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
 
 		Writes the elements of this matrix to an array in
@@ -169,13 +181,13 @@ m.elements = [ 11, 21, 31,
 		</div>
 
 		<h3>[method:Matrix3 transpose]()</h3>
-		<div>[linkLhttps://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</div>
+		<div>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</div>
 
 		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
 		<div>
 		[page:Array array] -  array to store the resulting vector in.<br /><br />
 
-		[linkLhttps://en.wikipedia.org/wiki/Transpose Transposes] this matrix into the supplied array,
+		[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix into the supplied array,
 		and returns itself unchanged.
 		</div>
 

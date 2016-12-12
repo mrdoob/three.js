@@ -38,12 +38,12 @@
 		<h2>Example</h2>
 
 		<code>
-			var a = new THREE.Vector3( 0, 1, 0 );
+var a = new THREE.Vector3( 0, 1, 0 );
 
-			//no arguments; will be initialised to (0, 0, 0)
-			var b = new THREE.Vector3( );
+//no arguments; will be initialised to (0, 0, 0)
+var b = new THREE.Vector3( );
 
-			var d = a.distanceTo( b );
+var d = a.distanceTo( b );
 		</code>
 
 
@@ -53,9 +53,9 @@
 		<div>
 		[page:Float x] - the x value of the vector. Default is *0*.<br />
 		[page:Float y] -  the y value of the vector. Default is *0*.<br />
-		[page:Float z] - the z value of the vector. Default is *0*.<br />
+		[page:Float z] - the z value of the vector. Default is *0*.<br /><br />
 
-		Created a new [name].
+		Creates a new [name].
 		</div>
 
 
@@ -277,7 +277,7 @@ m, n, o
 		<h3>[method:Vector3 lerp]( [page:Vector3 v], [page:Float alpha] )</h3>
 		<div>
 		[page:Vector3 v] - [page:Vector3] to interpolate towards.<br />
-		alpha - [page:Float] between 0 and 1<br /><br />
+		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolate between this vector and [page:Vector3 v], where alpha is the
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
@@ -287,7 +287,7 @@ m, n, o
 		<div>
 		[page:Vector3 v1] - the starting [page:Vector3].<br />
 		[page:Vector3 v2] - [page:Vector3] to interpolate towards.<br />
-		[page:Float alpha] - number between 0 and 1.<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector3 v1] and
 		[page:Vector3 v2] where alpha is the distance along the line connecting the two vectors
@@ -358,7 +358,7 @@ m, n, o
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>[method:Vector3 set]( [page:Float x], [page:Float y] )</h3>
+		<h3>[method:Vector3 set]( [page:Float x], [page:Float y], [page:Float z] )</h3>
 		<div>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</div>
 
 		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] )</h3>
