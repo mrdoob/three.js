@@ -38,19 +38,17 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.format = format !== undefined ? format : RGBAFormat;
 	this.type = type !== undefined ? type : UnsignedByteType;
 
-	this.addParameter( 'offsetRepeat', new Vector4( 0, 0, 1, 1 ) );
+	function getOffsetRepeat ( parent, value ) {
 
-	Object.defineProperties( this, {
-		'offset': {
-			set: function ( v ) { this.offsetRepeat.setX( v.x ); this.offsetRepeat.setY( v.y ); },
-			get: function () { return new Vector2( this.offsetRepeat.x, this.offsetRepeat.y ) }
-		},
+		return value.set( parent.offset.x, parent.offset.y, parent.repeat.x, parent.repeat.y );
 
-		'repeat' : {
-			set: function ( v ) { this.offsetRepeat.setZ( v.x ); this.offsetRepeat.setW( v.y ); },
-			get: function () { return new Vector2( this.offsetRepeat.z, this.offsetRepeat.w ) }
-		}
-	} );
+	};
+
+	this.addParameter( 'offsetRepeat', new Vector4( 0, 0, 1, 1 ), 'offsetRepeat', getOffsetRepeat );
+
+	this.offset = new Vector2( 0, 0 );
+	this.repeat = new Vector2( 1, 1 );
+
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
