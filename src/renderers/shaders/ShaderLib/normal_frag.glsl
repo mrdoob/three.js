@@ -9,7 +9,9 @@ varying vec3 vNormal;
 void main() {
 
 	#include <clipping_planes_fragment>
-	gl_FragColor = vec4( packNormalToRGB( vNormal ), opacity );
+	#include <normal_flip>
+   
+   	gl_FragColor = vec4( packNormalToRGB( vNormal * flipNormal ), opacity );
 
 	#include <logdepthbuf_fragment>
 
