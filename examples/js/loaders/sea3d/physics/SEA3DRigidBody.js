@@ -168,6 +168,12 @@ SEA3D.Physics = function ( name, data, sea3d ) {
 	if ( this.attrib & 1 ) this.target = sea3d.getObject( data.readUInt() );
 	else this.transform = data.readMatrix();
 
+	if ( this.attrib & 2 ) this.offset = data.readMatrix();
+
+	if ( this.attrib & 4 ) this.scripts = data.readScriptList( sea3d );
+
+	if ( this.attrib & 16 ) this.attributes = sea3d.getObject( data.readUInt() );
+
 };
 
 SEA3D.Physics.prototype.readTag = function ( kind, data, size ) {
@@ -257,11 +263,21 @@ SEA3D.CarController.Wheel = function ( data, sea3d ) {
 	this.data = data;
 	this.sea3d = sea3d;
 
-	var attrib = data.readUShort();
+	this.attrib = data.readUShort();
 
-	this.isFront = ( attrib & 1 ) != 0,
+	this.isFront = ( this.attrib & 1 ) != 0;
 
-	this.target = sea3d.getObject( data.readUInt() );
+	if ( this.attrib & 2 ) {
+
+		this.target = sea3d.getObject( data.readUInt() );
+
+	}
+
+	if ( this.attrib & 4 ) {
+
+		this.offset = data.readMatrix();
+
+	}
 
 	this.pos = data.readVector3();
 	this.dir = data.readVector3();
