@@ -18,10 +18,11 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
-
 		<div>
-		geometry — An instance of [page:Geometry].<br />
-		material — An instance of [page:Material] (optional).
+			[page:Geometry geometry] — (optional) an instance of [page:Geometry] or [page:BufferGeometry].
+				Default is a new [page:BufferGeometry].<br />
+			[page:Material material] — (optional) a [page:Material]. Default is a new [page:PointsMaterial]
+				with a random color.
 		</div>
 
 
@@ -29,12 +30,25 @@
 		<div>See the base [page:Object3D] class for common properties.</div>
 
 		<h3>[property:Geometry geometry]</h3>
+		<div>
+			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
+			defining the object's structure.<br /><br />
 
-		<div>An instance of [page:Geometry], where each vertex designates the position the points.</div>
+			Its recommended to always use a [page:BufferGeometry] if possible for best performance.
+		</div>
+
+		<h3>[property:Boolean isPoints]</h3>
+		<div>
+			Used to check whether this or derived classes are points. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
 
 		<h3>[property:Material material]</h3>
-
-		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:PointsMaterial] with randomised colour.</div>
+		<div>
+			An instance of [page:Material], defining the object's appearance.
+			Default is a [page:PointsMaterial] with a random colour.
+		</div>
 
 
 		<h2>Methods</h2>
@@ -42,7 +56,8 @@
 
 		<h3>[method:Array raycast]( [page:Raycaster raycaster], [page:Array intersects] )</h3>
 		<div>
-		Get intersections between a casted ray and this Points. [page:Raycaster.intersectObject] will call this method.
+		Get intersections between a casted ray and this Points.
+		[page:Raycaster.intersectObject] will call this method.
 		</div>
 
 		<h3>[method:Points clone]()</h3>
