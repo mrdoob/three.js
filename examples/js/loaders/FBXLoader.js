@@ -10,6 +10,7 @@
  *  - normal / uv
  *  - material (Multi-Material too)
  *  - textures (Must be in same directory)
+ *  - nurbs
  *
  *  No Support
  *  - morph
@@ -321,11 +322,98 @@
 					//Parse Mesh
 					meshes.push( this.parseMesh( modelNode[ ID ], node ) );
 
+				} else if ( modelNode[ ID ].attrType === 'NurbsCurve' ) {
+
+					//Parse NURBS
+					meshes.push( this.parseNURBS( modelNode[ ID ], node ) );
+
 				}
 
 			}
 
 			return meshes;
+
+		},
+
+		parseFloatList: function ( floatList ) {
+
+			return floatList.split( ',' ).map( function ( number ) {
+
+				return parseFloat( number );
+
+			} );
+
+		},
+
+		parseNURBS: function ( meshNode, FBXNodes ) {
+
+			if ( THREE.NURBSCurve === undefined ) {
+
+				console.error( "THREE.FBXLoader relies on THREE.NURBSCurve" );
+				return;
+
+			}
+
+			var geoNodes = FBXNodes.Objects.subNodes.Geometry;
+
+			var children = FBXNodes.searchConnectionChildren( meshNode.id );
+			var nurbsInfo;
+
+			for ( var i = 0; i < children.length; ++ i ) {
+
+				if ( children[ i ] in geoNodes ) {
+
+					nurbsInfo = geoNodes[ children[ i ] ];
+					break;
+
+				}
+
+			}
+
+			if ( nurbsInfo === undefined ) {
+
+				return;
+
+			}
+
+			var order = parseInt( nurbsInfo.properties.Order );
+
+			if ( isNaN( order ) ) {
+
+				console.error( "Invalid Order: `" + nurbsInfo.properties.Order + "` (should be an integer)" );
+				return;
+
+			}
+
+			var knots = this.parseFloatList( nurbsInfo.subNodes.KnotVector.properties.a );
+
+			var controlPoints = [];
+			var pointsValues = this.parseFloatList( nurbsInfo.subNodes.Points.properties.a );
+
+			for ( var i = 0; i < pointsValues.length; i += 4 ) {
+
+				// NURBSCurve recreates a Vector4, so no need to construct it twice
+				controlPoints.push( { x: pointsValues[ i ], y: pointsValues[ i + 1 ], z: pointsValues[ i + 2 ], w: pointsValues[ i + 3 ] } );
+
+			}
+
+			if ( nurbsInfo.properties.Form == "Closed" ) {
+
+				controlPoints.push( controlPoints[ 0 ] );
+
+			}
+
+			var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
+
+			// Pre-generate a geometry
+			var geometry = new THREE.Geometry();
+			geometry.vertices = curve.getPoints( controlPoints.length * 1.5 );
+
+			var mesh = new THREE.Line( geometry );
+			// Store the THREE.NURBSCurve class so the user can recreate a new geometry with a different number of points
+			mesh.userData.curve = curve;
+
+			return mesh;
 
 		},
 
