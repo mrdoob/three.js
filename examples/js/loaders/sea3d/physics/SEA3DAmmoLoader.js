@@ -146,9 +146,14 @@ THREE.SEA3D.prototype.readCompound = function ( sea ) {
 THREE.SEA3D.prototype.readRigidBodyBase = function ( sea ) {
 
 	var shape = sea.shape.tag,
-		transform;
+		transform, target;
 
 	if ( sea.target ) {
+
+		target = sea.target.tag;
+
+		target.physics = { enabled: true };
+		target.updateMatrix();
 
 		transform = SEA3D.AMMO.getTransformFromMatrix( sea.target.tag.matrix );
 
@@ -173,6 +178,23 @@ THREE.SEA3D.prototype.readRigidBodyBase = function ( sea ) {
 
 	var rb = new Ammo.btRigidBody( info );
 
+	if ( target ) {
+
+		target.physics.rigidBody = rb;
+
+		if ( sea.offset ) {
+
+			var offset = new THREE.Matrix4();
+			offset.elements.set( sea.offset );
+
+			target.physics.offset = offset;
+
+		}
+
+	}
+
+	Ammo.destroy( info );
+
 	this.domain.rigidBodies = this.rigidBodies = this.rigidBodies || [];
 	this.rigidBodies.push( this.objects[ "rb/" + sea.name ] = sea.tag = rb );
 
@@ -188,7 +210,7 @@ THREE.SEA3D.prototype.readRigidBody = function ( sea ) {
 
 	var rb = this.readRigidBodyBase( sea );
 
-	SEA3D.AMMO.addRigidBody( rb, sea.target ? sea.target.tag : undefined, sea.offset ? new THREE.Matrix4().elements.set( sea.offset ) : undefined, this.config.enabledPhysics );
+	SEA3D.AMMO.addRigidBody( rb, sea.target ? sea.target.tag : undefined, this.config.enabledPhysics );
 
 };
 
@@ -238,6 +260,17 @@ THREE.SEA3D.prototype.readCarController = function ( sea ) {
 
 		if ( target ) {
 
+			target.physics = { enabled: true, rigidBody: wheelInfo };
+
+			if ( wheel.offset ) {
+
+				var offset = new THREE.Matrix4();
+				offset.elements.set( wheel.offset );
+
+				target.physics.offset = offset;
+
+			}
+
 			if ( target.parent ) {
 
 				target.parent.remove( target );
@@ -260,7 +293,7 @@ THREE.SEA3D.prototype.readCarController = function ( sea ) {
 	}
 
 	SEA3D.AMMO.addVehicle( vehicle, wheels );
-	SEA3D.AMMO.addRigidBody( body, sea.target ? sea.target.tag : undefined, sea.offset ? new THREE.Matrix4().elements.set( sea.offset ) : undefined, this.config.enabledPhysics );
+	SEA3D.AMMO.addRigidBody( body, sea.target ? sea.target.tag : undefined, this.config.enabledPhysics );
 
 	this.domain.vehicles = this.vehicles = this.vehicles || [];
 	this.vehicles.push( this.objects[ "vhc/" + sea.name ] = sea.tag = vehicle );
