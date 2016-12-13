@@ -5,6 +5,7 @@
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
   "jsnext:main": "build/three.modules.js",
+  "module": "build/three.modules.js",
   "files": [
     "package.json",
     "LICENSE",
