@@ -4911,6 +4911,71 @@
 
 	};
 
+	/**
+	 * Uniform Utilities
+	 */
+
+	var UniformsUtils = {
+
+		merge: function ( uniforms ) {
+
+			var merged = {};
+
+			for ( var u = 0; u < uniforms.length; u ++ ) {
+
+				var tmp = this.clone( uniforms[ u ] );
+
+				for ( var p in tmp ) {
+
+					merged[ p ] = tmp[ p ];
+
+				}
+
+			}
+
+			return merged;
+
+		},
+
+		clone: function ( uniforms_src ) {
+
+			var uniforms_dst = {};
+
+			for ( var u in uniforms_src ) {
+
+				uniforms_dst[ u ] = {};
+
+				for ( var p in uniforms_src[ u ] ) {
+
+					var parameter_src = uniforms_src[ u ][ p ];
+
+					if ( parameter_src && ( parameter_src.isColor ||
+						parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+						parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+						parameter_src.isTexture ) ) {
+
+						uniforms_dst[ u ][ p ] = parameter_src.clone();
+
+					} else if ( Array.isArray( parameter_src ) ) {
+
+						uniforms_dst[ u ][ p ] = parameter_src.slice();
+
+					} else {
+
+						uniforms_dst[ u ][ p ] = parameter_src;
+
+					}
+
+				}
+
+			}
+
+			return uniforms_dst;
+
+		}
+
+	};
+
 	var alphamap_fragment = "#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, vUv ).g;\n#endif\n";
 
 	var alphamap_pars_fragment = "#ifdef USE_ALPHAMAP\n\tuniform sampler2D alphaMap;\n#endif\n";
@@ -5960,12 +6025,12 @@
 
 		basic: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
 				UniformsLib.fog
-			),
+			] ),
 
 			vertexShader: ShaderChunk.meshbasic_vert,
 			fragmentShader: ShaderChunk.meshbasic_frag
@@ -5974,7 +6039,7 @@
 
 		lambert: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
@@ -5982,9 +6047,9 @@
 				UniformsLib.fog,
 				UniformsLib.lights,
 				{
-					emissive : { value: new Color( 0x000000 ) }
+					emissive: { value: new Color( 0x000000 ) }
 				}
-			),
+			] ),
 
 			vertexShader: ShaderChunk.meshlambert_vert,
 			fragmentShader: ShaderChunk.meshlambert_frag
@@ -5993,7 +6058,7 @@
 
 		phong: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
@@ -6005,11 +6070,11 @@
 				UniformsLib.fog,
 				UniformsLib.lights,
 				{
-					emissive : { value: new Color( 0x000000 ) },
-					specular : { value: new Color( 0x111111 ) },
+					emissive: { value: new Color( 0x000000 ) },
+					specular: { value: new Color( 0x111111 ) },
 					shininess: { value: 30 }
 				}
-			),
+			] ),
 
 			vertexShader: ShaderChunk.meshphong_vert,
 			fragmentShader: ShaderChunk.meshphong_frag
@@ -6018,7 +6083,7 @@
 
 		standard: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.aomap,
 				UniformsLib.lightmap,
@@ -6031,12 +6096,12 @@
 				UniformsLib.fog,
 				UniformsLib.lights,
 				{
-					emissive : { value: new Color( 0x000000 ) },
+					emissive: { value: new Color( 0x000000 ) },
 					roughness: { value: 0.5 },
 					metalness: { value: 0 },
-					envMapIntensity : { value: 1 } // temporary
+					envMapIntensity: { value: 1 } // temporary
 				}
-			),
+			] ),
 
 			vertexShader: ShaderChunk.meshphysical_vert,
 			fragmentShader: ShaderChunk.meshphysical_frag
@@ -6045,10 +6110,10 @@
 
 		points: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.points,
 				UniformsLib.fog
-			),
+			] ),
 
 			vertexShader: ShaderChunk.points_vert,
 			fragmentShader: ShaderChunk.points_frag
@@ -6057,15 +6122,15 @@
 
 		dashed: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.fog,
 				{
-					scale    : { value: 1 },
-					dashSize : { value: 1 },
+					scale: { value: 1 },
+					dashSize: { value: 1 },
 					totalSize: { value: 2 }
 				}
-			),
+			] ),
 
 			vertexShader: ShaderChunk.linedashed_vert,
 			fragmentShader: ShaderChunk.linedashed_frag
@@ -6074,10 +6139,10 @@
 
 		depth: {
 
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.common,
 				UniformsLib.displacementmap
-			),
+			] ),
 
 			vertexShader: ShaderChunk.depth_vert,
 			fragmentShader: ShaderChunk.depth_frag
@@ -6087,7 +6152,7 @@
 		normal: {
 
 			uniforms: {
-				opacity : { value: 1.0 }
+				opacity: { value: 1.0 }
 			},
 
 			vertexShader: ShaderChunk.normal_vert,
@@ -6143,13 +6208,13 @@
 
 	ShaderLib.physical = {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			ShaderLib.standard.uniforms,
 			{
 				clearCoat: { value: 0 },
 				clearCoatRoughness: { value: 0 }
 			}
-		),
+		] ),
 
 		vertexShader: ShaderChunk.meshphysical_vert,
 		fragmentShader: ShaderChunk.meshphysical_frag
@@ -7568,7 +7633,7 @@
 		this.fragmentShader = source.fragmentShader;
 		this.vertexShader = source.vertexShader;
 
-		this.uniforms = Object.assign( {}, source.uniforms );
+		this.uniforms = UniformsUtils.clone( source.uniforms );
 
 		this.defines = source.defines;
 
@@ -9133,7 +9198,7 @@
 		depthMaterialTemplate.clipping = true;
 
 		var distanceShader = ShaderLib[ "distanceRGBA" ];
-		var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
+		var distanceUniforms = UniformsUtils.clone( distanceShader.uniforms );
 
 		for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
@@ -19648,7 +19713,7 @@
 			_projScreenMatrix = new Matrix4(),
 
 			_vector3 = new Vector3(),
-			_matrix4 = new Matrix4(), 
+			_matrix4 = new Matrix4(),
 			_matrix42 = new Matrix4(),
 
 			// light arrays cache
@@ -21022,7 +21087,7 @@
 
 					materialProperties.__webglShader = {
 						name: material.type,
-						uniforms: Object.assign( {}, shader.uniforms ),
+						uniforms: UniformsUtils.clone( shader.uniforms ),
 						vertexShader: shader.vertexShader,
 						fragmentShader: shader.fragmentShader
 					};
@@ -27446,6 +27511,8 @@
 
 			var h = hash[ key ];
 
+			// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+
 			if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 				var vertex = vertices[ h.vert1 ];
@@ -27462,7 +27529,7 @@
 
 		}
 
-		this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
 
 	}
 
@@ -28038,12 +28105,12 @@
 	function ShadowMaterial() {
 
 		ShaderMaterial.call( this, {
-			uniforms: Object.assign( {},
+			uniforms: UniformsUtils.merge( [
 				UniformsLib.lights,
 				{
 					opacity: { value: 1.0 }
 				}
-			),
+			] ),
 			vertexShader: ShaderChunk[ 'shadow_vert' ],
 			fragmentShader: ShaderChunk[ 'shadow_frag' ]
 		} );
@@ -42764,71 +42831,6 @@
 
 	};
 
-	var UniformsUtils = {
-
-		merge: function ( uniforms ) {
-
-			console.warn( 'THREE.UniformsUtils.merge() has been deprecated. Use Object.assign() instead.' );
-
-			var merged = {};
-
-			for ( var u = 0; u < uniforms.length; u ++ ) {
-
-				var tmp = this.clone( uniforms[ u ] );
-
-				for ( var p in tmp ) {
-
-					merged[ p ] = tmp[ p ];
-
-				}
-
-			}
-
-			return merged;
-
-		},
-
-		clone: function ( uniforms_src ) {
-
-			console.warn( 'THREE.UniformsUtils.clone() has been deprecated.' );
-
-			var uniforms_dst = {};
-
-			for ( var u in uniforms_src ) {
-
-				uniforms_dst[ u ] = {};
-
-				for ( var p in uniforms_src[ u ] ) {
-
-					var parameter_src = uniforms_src[ u ][ p ];
-
-					if ( parameter_src && ( parameter_src.isColor ||
-						parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
-						parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
-						parameter_src.isTexture ) ) {
-
-						uniforms_dst[ u ][ p ] = parameter_src.clone();
-
-					} else if ( Array.isArray( parameter_src ) ) {
-
-						uniforms_dst[ u ][ p ] = parameter_src.slice();
-
-					} else {
-
-						uniforms_dst[ u ][ p ] = parameter_src;
-
-					}
-
-				}
-
-			}
-
-			return uniforms_dst;
-
-		}
-
-	};
-
 	//
 
 	function Projector() {
@@ -42876,6 +42878,7 @@
 	exports.WebGLRenderer = WebGLRenderer;
 	exports.ShaderLib = ShaderLib;
 	exports.UniformsLib = UniformsLib;
+	exports.UniformsUtils = UniformsUtils;
 	exports.ShaderChunk = ShaderChunk;
 	exports.FogExp2 = FogExp2;
 	exports.Fog = Fog;
@@ -43249,7 +43252,6 @@
 	exports.XHRLoader = XHRLoader;
 	exports.GeometryUtils = GeometryUtils;
 	exports.ImageUtils = ImageUtils;
-	exports.UniformsUtils = UniformsUtils;
 	exports.Projector = Projector;
 	exports.CanvasRenderer = CanvasRenderer;
 

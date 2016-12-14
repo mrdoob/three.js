@@ -4905,6 +4905,71 @@ WebGLUniforms.seqWithValue = function( seq, values ) {
 
 };
 
+/**
+ * Uniform Utilities
+ */
+
+var UniformsUtils = {
+
+	merge: function ( uniforms ) {
+
+		var merged = {};
+
+		for ( var u = 0; u < uniforms.length; u ++ ) {
+
+			var tmp = this.clone( uniforms[ u ] );
+
+			for ( var p in tmp ) {
+
+				merged[ p ] = tmp[ p ];
+
+			}
+
+		}
+
+		return merged;
+
+	},
+
+	clone: function ( uniforms_src ) {
+
+		var uniforms_dst = {};
+
+		for ( var u in uniforms_src ) {
+
+			uniforms_dst[ u ] = {};
+
+			for ( var p in uniforms_src[ u ] ) {
+
+				var parameter_src = uniforms_src[ u ][ p ];
+
+				if ( parameter_src && ( parameter_src.isColor ||
+					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+					parameter_src.isTexture ) ) {
+
+					uniforms_dst[ u ][ p ] = parameter_src.clone();
+
+				} else if ( Array.isArray( parameter_src ) ) {
+
+					uniforms_dst[ u ][ p ] = parameter_src.slice();
+
+				} else {
+
+					uniforms_dst[ u ][ p ] = parameter_src;
+
+				}
+
+			}
+
+		}
+
+		return uniforms_dst;
+
+	}
+
+};
+
 var alphamap_fragment = "#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, vUv ).g;\n#endif\n";
 
 var alphamap_pars_fragment = "#ifdef USE_ALPHAMAP\n\tuniform sampler2D alphaMap;\n#endif\n";
@@ -5954,12 +6019,12 @@ var ShaderLib = {
 
 	basic: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.fog
-		),
+		] ),
 
 		vertexShader: ShaderChunk.meshbasic_vert,
 		fragmentShader: ShaderChunk.meshbasic_frag
@@ -5968,7 +6033,7 @@ var ShaderLib = {
 
 	lambert: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -5976,9 +6041,9 @@ var ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive : { value: new Color( 0x000000 ) }
+				emissive: { value: new Color( 0x000000 ) }
 			}
-		),
+		] ),
 
 		vertexShader: ShaderChunk.meshlambert_vert,
 		fragmentShader: ShaderChunk.meshlambert_frag
@@ -5987,7 +6052,7 @@ var ShaderLib = {
 
 	phong: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -5999,11 +6064,11 @@ var ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive : { value: new Color( 0x000000 ) },
-				specular : { value: new Color( 0x111111 ) },
+				emissive: { value: new Color( 0x000000 ) },
+				specular: { value: new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
-		),
+		] ),
 
 		vertexShader: ShaderChunk.meshphong_vert,
 		fragmentShader: ShaderChunk.meshphong_frag
@@ -6012,7 +6077,7 @@ var ShaderLib = {
 
 	standard: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -6025,12 +6090,12 @@ var ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive : { value: new Color( 0x000000 ) },
+				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
 				metalness: { value: 0 },
-				envMapIntensity : { value: 1 } // temporary
+				envMapIntensity: { value: 1 } // temporary
 			}
-		),
+		] ),
 
 		vertexShader: ShaderChunk.meshphysical_vert,
 		fragmentShader: ShaderChunk.meshphysical_frag
@@ -6039,10 +6104,10 @@ var ShaderLib = {
 
 	points: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.points,
 			UniformsLib.fog
-		),
+		] ),
 
 		vertexShader: ShaderChunk.points_vert,
 		fragmentShader: ShaderChunk.points_frag
@@ -6051,15 +6116,15 @@ var ShaderLib = {
 
 	dashed: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.fog,
 			{
-				scale    : { value: 1 },
-				dashSize : { value: 1 },
+				scale: { value: 1 },
+				dashSize: { value: 1 },
 				totalSize: { value: 2 }
 			}
-		),
+		] ),
 
 		vertexShader: ShaderChunk.linedashed_vert,
 		fragmentShader: ShaderChunk.linedashed_frag
@@ -6068,10 +6133,10 @@ var ShaderLib = {
 
 	depth: {
 
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.common,
 			UniformsLib.displacementmap
-		),
+		] ),
 
 		vertexShader: ShaderChunk.depth_vert,
 		fragmentShader: ShaderChunk.depth_frag
@@ -6081,7 +6146,7 @@ var ShaderLib = {
 	normal: {
 
 		uniforms: {
-			opacity : { value: 1.0 }
+			opacity: { value: 1.0 }
 		},
 
 		vertexShader: ShaderChunk.normal_vert,
@@ -6137,13 +6202,13 @@ var ShaderLib = {
 
 ShaderLib.physical = {
 
-	uniforms: Object.assign( {},
+	uniforms: UniformsUtils.merge( [
 		ShaderLib.standard.uniforms,
 		{
 			clearCoat: { value: 0 },
 			clearCoatRoughness: { value: 0 }
 		}
-	),
+	] ),
 
 	vertexShader: ShaderChunk.meshphysical_vert,
 	fragmentShader: ShaderChunk.meshphysical_frag
@@ -7562,7 +7627,7 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = Object.assign( {}, source.uniforms );
+	this.uniforms = UniformsUtils.clone( source.uniforms );
 
 	this.defines = source.defines;
 
@@ -9127,7 +9192,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	depthMaterialTemplate.clipping = true;
 
 	var distanceShader = ShaderLib[ "distanceRGBA" ];
-	var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
+	var distanceUniforms = UniformsUtils.clone( distanceShader.uniforms );
 
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
@@ -19642,7 +19707,7 @@ function WebGLRenderer( parameters ) {
 		_projScreenMatrix = new Matrix4(),
 
 		_vector3 = new Vector3(),
-		_matrix4 = new Matrix4(), 
+		_matrix4 = new Matrix4(),
 		_matrix42 = new Matrix4(),
 
 		// light arrays cache
@@ -21016,7 +21081,7 @@ function WebGLRenderer( parameters ) {
 
 				materialProperties.__webglShader = {
 					name: material.type,
-					uniforms: Object.assign( {}, shader.uniforms ),
+					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -27440,6 +27505,8 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
+		// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
@@ -27456,7 +27523,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	}
 
-	this.addAttribute( 'position', new BufferAttribute( new Float32Array( coords ), 3 ) );
+	this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
 
 }
 
@@ -28032,12 +28099,12 @@ var Geometries = Object.freeze({
 function ShadowMaterial() {
 
 	ShaderMaterial.call( this, {
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.lights,
 			{
 				opacity: { value: 1.0 }
 			}
-		),
+		] ),
 		vertexShader: ShaderChunk[ 'shadow_vert' ],
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );
@@ -42758,71 +42825,6 @@ var ImageUtils = {
 
 };
 
-var UniformsUtils = {
-
-	merge: function ( uniforms ) {
-
-		console.warn( 'THREE.UniformsUtils.merge() has been deprecated. Use Object.assign() instead.' );
-
-		var merged = {};
-
-		for ( var u = 0; u < uniforms.length; u ++ ) {
-
-			var tmp = this.clone( uniforms[ u ] );
-
-			for ( var p in tmp ) {
-
-				merged[ p ] = tmp[ p ];
-
-			}
-
-		}
-
-		return merged;
-
-	},
-
-	clone: function ( uniforms_src ) {
-
-		console.warn( 'THREE.UniformsUtils.clone() has been deprecated.' );
-
-		var uniforms_dst = {};
-
-		for ( var u in uniforms_src ) {
-
-			uniforms_dst[ u ] = {};
-
-			for ( var p in uniforms_src[ u ] ) {
-
-				var parameter_src = uniforms_src[ u ][ p ];
-
-				if ( parameter_src && ( parameter_src.isColor ||
-					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
-					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
-					parameter_src.isTexture ) ) {
-
-					uniforms_dst[ u ][ p ] = parameter_src.clone();
-
-				} else if ( Array.isArray( parameter_src ) ) {
-
-					uniforms_dst[ u ][ p ] = parameter_src.slice();
-
-				} else {
-
-					uniforms_dst[ u ][ p ] = parameter_src;
-
-				}
-
-			}
-
-		}
-
-		return uniforms_dst;
-
-	}
-
-};
-
 //
 
 function Projector() {
@@ -42865,4 +42867,4 @@ function CanvasRenderer() {
 
 }
 
-export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, BinaryTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, Spline, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, SplineCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, ShapePath, Path, Font, CurvePath, Curve, ShapeUtils, SceneUtils, CurveUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, SphereBufferGeometry, SphereGeometry, RingGeometry, RingBufferGeometry, PlaneBufferGeometry, PlaneGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleBufferGeometry, CircleGeometry, BoxBufferGeometry, BoxGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MultiMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, BlendingMode, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, TextureMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, TextureWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, TextureFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, GeometryUtils, ImageUtils, UniformsUtils, Projector, CanvasRenderer };
+export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, BinaryTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, Spline, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, SplineCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, ShapePath, Path, Font, CurvePath, Curve, ShapeUtils, SceneUtils, CurveUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, SphereBufferGeometry, SphereGeometry, RingGeometry, RingBufferGeometry, PlaneBufferGeometry, PlaneGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleBufferGeometry, CircleGeometry, BoxBufferGeometry, BoxGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MultiMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, BlendingMode, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, TextureMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, TextureWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, TextureFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };
