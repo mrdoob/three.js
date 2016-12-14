@@ -138,6 +138,8 @@ Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
+				var i, l;
+
 				var geometry = node.geometry;
 
 				if ( geometry !== undefined ) {
@@ -146,7 +148,7 @@ Box3.prototype = {
 
 						var vertices = geometry.vertices;
 
-						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+						for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 							v1.copy( vertices[ i ] );
 							v1.applyMatrix4( node.matrixWorld );
@@ -161,26 +163,9 @@ Box3.prototype = {
 
 						if ( attribute !== undefined ) {
 
-							var array, offset, stride;
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-							if ( attribute.isInterleavedBufferAttribute ) {
-
-								array = attribute.data.array;
-								offset = attribute.offset;
-								stride = attribute.data.stride;
-
-							} else {
-
-								array = attribute.array;
-								offset = 0;
-								stride = 3;
-
-							}
-
-							for ( var i = offset, il = array.length; i < il; i += stride ) {
-
-								v1.fromArray( array, i );
-								v1.applyMatrix4( node.matrixWorld );
+								v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 								scope.expandByPoint( v1 );
 

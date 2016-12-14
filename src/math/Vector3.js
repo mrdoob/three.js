@@ -763,13 +763,15 @@ Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector3: offset has been removed from .fromAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
+		this.z = attribute.getZ( index );
 
 		return this;
 
