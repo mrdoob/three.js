@@ -41,7 +41,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	}
 
 	var bokehShader = THREE.BokehShader;
-	var bokehUniforms = Object.assign( {}, bokehShader.uniforms );
+	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
 	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 

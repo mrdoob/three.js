@@ -49,7 +49,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	//HUD for shadow map
 	var shader = THREE.UnpackDepthRGBAShader;
 
-	var uniforms = Object.assign( {}, shader.uniforms );
+	var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 	var material = new THREE.ShaderMaterial( {
 		uniforms: uniforms,
 		vertexShader: shader.vertexShader,

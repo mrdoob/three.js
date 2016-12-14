@@ -402,7 +402,7 @@ Use WEBGL Depth buffer support?
 
 				var bokeh_shader = THREE.BokehShader;
 
-				postprocessing.bokeh_uniforms = Object.assign( {}, bokeh_shader.uniforms );
+				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
 				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor.texture;
 				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth.texture;

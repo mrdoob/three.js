@@ -203,7 +203,7 @@
 				// god-ray shaders
 
 				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
-				postprocessing.godrayGenUniforms = Object.assign( {}, godraysGenShader.uniforms );
+				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.godrayGenUniforms,
@@ -213,7 +213,7 @@
 				} );
 
 				var godraysCombineShader = THREE.ShaderGodRays[ "godrays_combine" ];
-				postprocessing.godrayCombineUniforms = Object.assign( {}, godraysCombineShader.uniforms );
+				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.godrayCombineUniforms,
@@ -223,7 +223,7 @@
 				} );
 
 				var godraysFakeSunShader = THREE.ShaderGodRays[ "godrays_fake_sun" ];
-				postprocessing.godraysFakeSunUniforms = Object.assign( {}, godraysFakeSunShader.uniforms );
+				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.godraysFakeSunUniforms,

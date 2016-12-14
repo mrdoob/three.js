@@ -6,6 +6,7 @@
 import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, RGBADepthPacking } from '../../constants';
 import { WebGLRenderTarget } from '../WebGLRenderTarget';
 import { ShaderMaterial } from '../../materials/ShaderMaterial';
+import { UniformsUtils } from '../shaders/UniformsUtils';
 import { ShaderLib } from '../shaders/ShaderLib';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
 import { Vector4 } from '../../math/Vector4';
@@ -63,7 +64,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	depthMaterialTemplate.clipping = true;
 
 	var distanceShader = ShaderLib[ "distanceRGBA" ];
-	var distanceUniforms = Object.assign( {}, distanceShader.uniforms );
+	var distanceUniforms = UniformsUtils.clone( distanceShader.uniforms );
 
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
