@@ -456,7 +456,7 @@
 
 			}
 
-			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined ) {
+			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined && geometry.skinWeights.length > 0 ) {
 
 				if ( material instanceof THREE.MultiMaterial ) {
 
