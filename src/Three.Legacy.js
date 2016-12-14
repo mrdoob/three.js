@@ -353,6 +353,11 @@ Object.assign( Matrix3.prototype, {
 		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
+	},
+	applyToBuffer: function( buffer, offset, length ) {
+
+		console.error( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute, offset, count ) instead.' );
+
 	}
 
 } );
@@ -443,6 +448,11 @@ Object.assign( Matrix4.prototype, {
 	rotateByAxis: function () {
 
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
+
+	},
+	applyToBuffer: function( buffer, offset, length ) {
+
+		console.error( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute, offset, count ) instead.' );
 
 	}
 
