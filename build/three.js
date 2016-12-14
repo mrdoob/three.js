@@ -124,13 +124,7 @@
 
 			var listeners = this._listeners;
 
-			if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
-
-				return true;
-
-			}
-
-			return false;
+			return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
 		},
 
@@ -6040,7 +6034,7 @@
 					emissive : { value: new Color( 0x000000 ) },
 					roughness: { value: 0.5 },
 					metalness: { value: 0 },
-					envMapIntensity : { value: 1 }, // temporary
+					envMapIntensity : { value: 1 } // temporary
 				}
 			),
 
@@ -6291,27 +6285,15 @@
 
 		containsPoint: function ( point ) {
 
-			if ( point.x < this.min.x || point.x > this.max.x ||
-			     point.y < this.min.y || point.y > this.max.y ) {
-
-				return false;
-
-			}
-
-			return true;
+			return point.x < this.min.x || point.x > this.max.x ||
+				point.y < this.min.y || point.y > this.max.y ? false : true;
 
 		},
 
 		containsBox: function ( box ) {
 
-			if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			     ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
-
-				return true;
-
-			}
-
-			return false;
+			return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+				this.min.y <= box.min.y && box.max.y <= this.max.y;
 
 		},
 
@@ -6332,15 +6314,8 @@
 		intersectsBox: function ( box ) {
 
 			// using 6 splitting planes to rule out intersections.
-
-			if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-			     box.max.y < this.min.y || box.min.y > this.max.y ) {
-
-				return false;
-
-			}
-
-			return true;
+			return box.max.x < this.min.x || box.min.x > this.max.x ||
+				box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
 		},
 
@@ -7981,29 +7956,17 @@
 
 		containsPoint: function ( point ) {
 
-			if ( point.x < this.min.x || point.x > this.max.x ||
-					 point.y < this.min.y || point.y > this.max.y ||
-					 point.z < this.min.z || point.z > this.max.z ) {
-
-				return false;
-
-			}
-
-			return true;
+			return point.x < this.min.x || point.x > this.max.x ||
+				point.y < this.min.y || point.y > this.max.y ||
+				point.z < this.min.z || point.z > this.max.z ? false : true;
 
 		},
 
 		containsBox: function ( box ) {
 
-			if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-				 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-				 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
-
-				return true;
-
-			}
-
-			return false;
+			return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+				this.min.y <= box.min.y && box.max.y <= this.max.y &&
+				this.min.z <= box.min.z && box.max.z <= this.max.z;
 
 		},
 
@@ -8025,16 +7988,9 @@
 		intersectsBox: function ( box ) {
 
 			// using 6 splitting planes to rule out intersections.
-
-			if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-					 box.max.y < this.min.y || box.min.y > this.max.y ||
-					 box.max.z < this.min.z || box.min.z > this.max.z ) {
-
-				return false;
-
-			}
-
-			return true;
+			return box.max.x < this.min.x || box.min.x > this.max.x ||
+				box.max.y < this.min.y || box.min.y > this.max.y ||
+				box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
 
 		},
 
@@ -12236,7 +12192,7 @@
 
 			var group;
 			var groups = [];
-			var materialIndex;
+			var materialIndex = undefined;
 
 			var faces = geometry.faces;
 
@@ -16158,7 +16114,7 @@
 			( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 			( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 			( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
-			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : '',
+			( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
 		];
 
 		return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -17502,10 +17458,8 @@
 
 		function textureNeedsPowerOfTwo( texture ) {
 
-			if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) return true;
-			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) return true;
-
-			return false;
+			return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
+				( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
 
 		}
 
@@ -17674,8 +17628,8 @@
 
 					_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
-					var isCompressed = (texture && texture.isCompressedTexture);
-					var isDataTexture = (texture.image[ 0 ] && texture.image[ 0 ].isDataTexture);
+					var isCompressed = ( texture && texture.isCompressedTexture );
+					var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 					var cubeImage = [];
 
@@ -30020,7 +29974,7 @@
 
 		constructor: AmbientLight,
 
-		isAmbientLight: true,
+		isAmbientLight: true
 
 	} );
 
@@ -30676,28 +30630,28 @@
 
 		DefaultInterpolation: InterpolateLinear,
 
-		InterpolantFactoryMethodDiscrete: function( result ) {
+		InterpolantFactoryMethodDiscrete: function ( result ) {
 
 			return new DiscreteInterpolant(
 					this.times, this.values, this.getValueSize(), result );
 
 		},
 
-		InterpolantFactoryMethodLinear: function( result ) {
+		InterpolantFactoryMethodLinear: function ( result ) {
 
 			return new LinearInterpolant(
 					this.times, this.values, this.getValueSize(), result );
 
 		},
 
-		InterpolantFactoryMethodSmooth: function( result ) {
+		InterpolantFactoryMethodSmooth: function ( result ) {
 
 			return new CubicInterpolant(
 					this.times, this.values, this.getValueSize(), result );
 
 		},
 
-		setInterpolation: function( interpolation ) {
+		setInterpolation: function ( interpolation ) {
 
 			var factoryMethod;
 
@@ -30752,7 +30706,7 @@
 
 		},
 
-		getInterpolation: function() {
+		getInterpolation: function () {
 
 			switch ( this.createInterpolant ) {
 
@@ -30772,20 +30726,20 @@
 
 		},
 
-		getValueSize: function() {
+		getValueSize: function () {
 
 			return this.values.length / this.times.length;
 
 		},
 
 		// move all keyframes either forwards or backwards in time
-		shift: function( timeOffset ) {
+		shift: function ( timeOffset ) {
 
-			if( timeOffset !== 0.0 ) {
+			if ( timeOffset !== 0.0 ) {
 
 				var times = this.times;
 
-				for( var i = 0, n = times.length; i !== n; ++ i ) {
+				for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 					times[ i ] += timeOffset;
 
@@ -30798,13 +30752,13 @@
 		},
 
 		// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-		scale: function( timeScale ) {
+		scale: function ( timeScale ) {
 
-			if( timeScale !== 1.0 ) {
+			if ( timeScale !== 1.0 ) {
 
 				var times = this.times;
 
-				for( var i = 0, n = times.length; i !== n; ++ i ) {
+				for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 					times[ i ] *= timeScale;
 
@@ -30818,7 +30772,7 @@
 
 		// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 		// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-		trim: function( startTime, endTime ) {
+		trim: function ( startTime, endTime ) {
 
 			var times = this.times,
 				nKeys = times.length,
@@ -30826,14 +30780,14 @@
 				to = nKeys - 1;
 
 			while ( from !== nKeys && times[ from ] < startTime ) ++ from;
-			while ( to !== -1 && times[ to ] > endTime ) -- to;
+			while ( to !== - 1 && times[ to ] > endTime ) -- to;
 
 			++ to; // inclusive -> exclusive bound
 
-			if( from !== 0 || to !== nKeys ) {
+			if ( from !== 0 || to !== nKeys ) {
 
 				// empty tracks are forbidden, so keep at least one keyframe
-				if ( from >= to ) to = Math.max( to , 1 ), from = to - 1;
+				if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
 
 				var stride = this.getValueSize();
 				this.times = AnimationUtils.arraySlice( times, from, to );
@@ -30847,7 +30801,7 @@
 		},
 
 		// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-		validate: function() {
+		validate: function () {
 
 			var valid = true;
 
@@ -30864,7 +30818,7 @@
 
 				nKeys = times.length;
 
-			if( nKeys === 0 ) {
+			if ( nKeys === 0 ) {
 
 				console.error( "track is empty", this );
 				valid = false;
@@ -30873,7 +30827,7 @@
 
 			var prevTime = null;
 
-			for( var i = 0; i !== nKeys; i ++ ) {
+			for ( var i = 0; i !== nKeys; i ++ ) {
 
 				var currTime = times[ i ];
 
@@ -30885,7 +30839,7 @@
 
 				}
 
-				if( prevTime !== null && prevTime > currTime ) {
+				if ( prevTime !== null && prevTime > currTime ) {
 
 					console.error( "out of order keys", this, i, currTime, prevTime );
 					valid = false;
@@ -30925,7 +30879,7 @@
 
 		// removes equivalent sequential keys as common in morph target sequences
 		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-		optimize: function() {
+		optimize: function () {
 
 			var times = this.times,
 				values = this.values,
@@ -30936,7 +30890,7 @@
 				writeIndex = 1,
 				lastIndex = times.length - 1;
 
-			for( var i = 1; i < lastIndex; ++ i ) {
+			for ( var i = 1; i < lastIndex; ++ i ) {
 
 				var keep = false;
 
@@ -31173,7 +31127,7 @@
 
 		constructor: NumberKeyframeTrack,
 
-		ValueTypeName: 'number',
+		ValueTypeName: 'number'
 
 		// ValueBufferType is inherited
 
@@ -31465,8 +31419,7 @@
 
 				var track = this.tracks[ i ];
 
-				duration = Math.max(
-						duration, track.times[ track.times.length - 1 ] );
+				duration = Math.max( duration, track.times[ track.times.length - 1 ] );
 
 			}
 
@@ -31730,8 +31683,7 @@
 						var times = [];
 						var values = [];
 
-						for ( var m = 0;
-								m !== animationKeys[k].morphTargets.length; ++ m ) {
+						for ( var m = 0; m !== animationKeys[k].morphTargets.length; ++ m ) {
 
 							var animationKey = animationKeys[k];
 
@@ -31740,8 +31692,7 @@
 
 						}
 
-						tracks.push( new NumberKeyframeTrack(
-								'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+						tracks.push( new NumberKeyframeTrack('.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 					}
 
@@ -36047,14 +35998,18 @@
 
 		switch ( typeName ) {
 
-			case 'quaternion':			mixFunction = this._slerp;		break;
+			case 'quaternion':
+				mixFunction = this._slerp;
+				break;
 
 			case 'string':
 			case 'bool':
+				bufferType = Array;
+				mixFunction = this._select;
+				break;
 
-				bufferType = Array,		mixFunction = this._select;		break;
-
-			default:					mixFunction = this._lerp;
+			default:
+				mixFunction = this._lerp;
 
 		}
 
@@ -36972,7 +36927,8 @@
 
 				var object = arguments[ i ],
 					uuid = object.uuid,
-					index = indicesByUUID[ uuid ];
+					index = indicesByUUID[ uuid ],
+					knownObject = undefined;
 
 				if ( index === undefined ) {
 
@@ -36994,7 +36950,7 @@
 
 				} else if ( index < nCachedObjects ) {
 
-					var knownObject = objects[ index ];
+					knownObject = objects[ index ];
 
 					// move existing object to the ACTIVE region
 
@@ -37525,7 +37481,7 @@
 
 			if ( interpolant === null ) {
 
-				interpolant = mixer._lendControlInterpolant(),
+				interpolant = mixer._lendControlInterpolant();
 				this._timeScaleInterpolant = interpolant;
 
 			}
@@ -37725,7 +37681,7 @@
 				if ( loopCount === -1 ) {
 					// just started
 
-					this.loopCount = 0;
+					this._loopCount = 0;
 					this._setEndings( true, true, false );
 
 				}
@@ -37888,7 +37844,7 @@
 
 			if ( interpolant === null ) {
 
-				interpolant = mixer._lendControlInterpolant(),
+				interpolant = mixer._lendControlInterpolant();
 				this._weightInterpolant = interpolant;
 
 			}
