@@ -9,7 +9,11 @@ var unit3 = new THREE.Vector3( 1, 0, 0 );
 var planeEquals = function ( a, b, tolerance ) {
 
 	tolerance = tolerance || 0.0001;
-	return !( a.normal.distanceTo( b.normal ) > tolerance ) && !( Math.abs( a.constant - b.constant ) > tolerance );
+
+	if ( a.normal.distanceTo( b.normal ) > tolerance ) return false;
+	if ( Math.abs( a.constant - b.constant ) > tolerance ) return false;
+
+	return true;
 
 };
 

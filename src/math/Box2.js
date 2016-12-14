@@ -129,13 +129,15 @@ Box2.prototype = {
 
 	containsPoint: function ( point ) {
 
-		return !(point.x < this.min.x || point.x > this.max.x || point.y < this.min.y || point.y > this.max.y);
+		return point.x < this.min.x || point.x > this.max.x ||
+			point.y < this.min.y || point.y > this.max.y ? false : true;
 
 	},
 
 	containsBox: function ( box ) {
 
-		return ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) && ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y );
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y;
 
 	},
 
@@ -156,8 +158,8 @@ Box2.prototype = {
 	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-
-		return !(box.max.x < this.min.x || box.min.x > this.max.x || box.max.y < this.min.y || box.min.y > this.max.y);
+		return box.max.x < this.min.x || box.min.x > this.max.x ||
+			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
 	},
 
