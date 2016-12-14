@@ -36,7 +36,7 @@
 
 			var scope = this;
 
-			var loader = new THREE.FileLoader( scope.manager );
+			var loader = new THREE.XHRLoader( scope.manager );
 			// loader.setCrossOrigin( this.crossOrigin );
 			loader.load( url, function ( text ) {
 
@@ -368,7 +368,7 @@
 
 			}
 
-			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined ) {
+			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined && geometry.skinWeights.length > 0 ) {
 
 				if ( material instanceof THREE.MultiMaterial ) {
 
@@ -597,7 +597,7 @@
 
 		loadFile: function ( url, onLoad, onProgress, onError, responseType ) {
 
-			var loader = new THREE.FileLoader( this.manager );
+			var loader = new THREE.XHRLoader( this.manager );
 
 			loader.setResponseType( responseType );
 
