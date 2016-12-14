@@ -217,7 +217,7 @@ test( "makeBasis/extractBasis", function() {
 	var identity = new THREE.Matrix4();
 	ok( matrixEquals4( a, identity ), "Passed!" );
 
-	var testBases = [ [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ] ]
+	var testBases = [ [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ] ];
 	for( var i = 0; i < testBases.length; i ++ ) {
 		var testBasis = testBases[i];
 		var b = new THREE.Matrix4().makeBasis( testBasis[0], testBasis[1], testBasis[2] );
