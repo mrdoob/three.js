@@ -6,7 +6,7 @@ module( "OrthographicCamera" );
 
 test( "updateProjectionMatrix", function() {
 	var left = -1, right = 1, top = 1, bottom = -1, near = 1, far = 3;
-	cam = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+	var cam = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
 
 	// updateProjectionMatrix is called in contructor
 	var pMatrix = cam.projectionMatrix.elements;

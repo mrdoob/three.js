@@ -21,7 +21,7 @@ NumberKeyframeTrack.prototype =
 
 	constructor: NumberKeyframeTrack,
 
-	ValueTypeName: 'number',
+	ValueTypeName: 'number'
 
 	// ValueBufferType is inherited
 
