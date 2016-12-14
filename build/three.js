@@ -593,7 +593,7 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
-			
+
 			return this;
 
 		},
@@ -961,12 +961,14 @@
 
 		fromAttribute: function ( attribute, index, offset ) {
 
-			if ( offset === undefined ) offset = 0;
+			if ( offset !== undefined ) {
 
-			index = index * attribute.itemSize + offset;
+				console.warn( 'THREE.Vector2: offset has been removed from .fromAttribute().' );
 
-			this.x = attribute.array[ index ];
-			this.y = attribute.array[ index + 1 ];
+			}
+
+			this.x = attribute.getX( index );
+			this.y = attribute.getY( index );
 
 			return this;
 
@@ -1359,7 +1361,7 @@
 				default: throw new Error( 'index is out of range: ' + index );
 
 			}
-			
+
 			return this;
 
 		},
@@ -1886,14 +1888,16 @@
 
 		fromAttribute: function ( attribute, index, offset ) {
 
-			if ( offset === undefined ) offset = 0;
+			if ( offset !== undefined ) {
 
-			index = index * attribute.itemSize + offset;
+				console.warn( 'THREE.Vector4: offset has been removed from .fromAttribute().' );
 
-			this.x = attribute.array[ index ];
-			this.y = attribute.array[ index + 1 ];
-			this.z = attribute.array[ index + 2 ];
-			this.w = attribute.array[ index + 3 ];
+			}
+
+			this.x = attribute.getX( index );
+			this.y = attribute.getY( index );
+			this.z = attribute.getZ( index );
+			this.w = attribute.getW( index );
 
 			return this;
 
@@ -3352,13 +3356,15 @@
 
 		fromAttribute: function ( attribute, index, offset ) {
 
-			if ( offset === undefined ) offset = 0;
+			if ( offset !== undefined ) {
 
-			index = index * attribute.itemSize + offset;
+				console.warn( 'THREE.Vector3: offset has been removed from .fromAttribute().' );
 
-			this.x = attribute.array[ index ];
-			this.y = attribute.array[ index + 1 ];
-			this.z = attribute.array[ index + 2 ];
+			}
+
+			this.x = attribute.getX( index );
+			this.y = attribute.getY( index );
+			this.z = attribute.getZ( index );
 
 			return this;
 
@@ -7884,6 +7890,8 @@
 
 				object.traverse( function ( node ) {
 
+					var i, l;
+
 					var geometry = node.geometry;
 
 					if ( geometry !== undefined ) {
@@ -7892,7 +7900,7 @@
 
 							var vertices = geometry.vertices;
 
-							for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+							for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 								v1.copy( vertices[ i ] );
 								v1.applyMatrix4( node.matrixWorld );
@@ -7907,26 +7915,9 @@
 
 							if ( attribute !== undefined ) {
 
-								var array, offset, stride;
+								for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-								if ( attribute.isInterleavedBufferAttribute ) {
-
-									array = attribute.data.array;
-									offset = attribute.offset;
-									stride = attribute.data.stride;
-
-								} else {
-
-									array = attribute.array;
-									offset = 0;
-									stride = 3;
-
-								}
-
-								for ( var i = offset, il = array.length; i < il; i += stride ) {
-
-									v1.fromArray( array, i );
-									v1.applyMatrix4( node.matrixWorld );
+									v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 									scope.expandByPoint( v1 );
 
@@ -29182,7 +29173,7 @@
 				if ( this.responseType !== undefined ) request.responseType = this.responseType;
 				if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-				if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
+				if ( this.mimeType && request.overrideMimeType ) request.overrideMimeType( this.mimeType );
 
 				request.send( null );
 
