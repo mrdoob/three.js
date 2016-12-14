@@ -123,21 +123,19 @@ Matrix3.prototype = {
 
 		var v1;
 
-		return function applyToBufferAttribute( attribute, offset, count ) {
+		return function applyToBufferAttribute( attribute ) {
 
 			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( count === undefined ) count = attribute.count;
 
-			for ( var i = 0, j = offset; i < count; i ++, j ++ ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.x = attribute.getX( j );
-				v1.y = attribute.getY( j );
-				v1.z = attribute.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix3( this );
 
-				attribute.setXYZ( j, v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
