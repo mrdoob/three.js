@@ -728,9 +728,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	function setLineWidth( width ) {
 
-		if ( lineWidthAvailable && width !== currentLineWidth ) {
+		if ( width !== currentLineWidth ) {
 
-			gl.lineWidth( width );
+			if ( lineWidthAvailable ) gl.lineWidth( width );
 
 			currentLineWidth = width;
 
