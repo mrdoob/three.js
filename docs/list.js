@@ -280,10 +280,6 @@ var list = {
 			[ "Sprite", "api/objects/Sprite" ]
 		],
 
-		"Polyfills": [
-			[ "Polyfills", "api/polyfills" ]
-		],
-
 		"Renderers": [
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
@@ -295,17 +291,6 @@ var list = {
 			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
 			[ "UniformsLib", "api/renderers/shaders/UniformsLib" ],
 			[ "UniformsUtils", "api/renderers/shaders/UniformsUtils" ]
-		],
-
-		"Renderers / WebGL": [
-			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
-			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ],
-			[ "WebGLState", "api/renderers/webgl/WebGLState" ]
-		],
-
-		"Renderers / WebGL / Plugins": [
-			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
-			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
 		"Scenes": [
@@ -354,6 +339,24 @@ var list = {
 
 		"Renderers": [
 			[ "CanvasRenderer", "examples/renderers/CanvasRenderer" ]
+		]
+
+	},
+
+	"Developer Reference": {
+		"Polyfills": [
+			[ "Polyfills", "api/polyfills" ]
+		],
+
+		"WebGLRenderer": [
+			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
+			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ],
+			[ "WebGLState", "api/renderers/webgl/WebGLState" ]
+		],
+
+		"WebGLRenderer / Plugins": [
+			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
+			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		]
 
 	}
