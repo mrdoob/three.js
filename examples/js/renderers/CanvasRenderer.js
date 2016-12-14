@@ -319,7 +319,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		if ( this.autoClear === true ) this.clear();
+		var background = scene.background;
+
+		if ( background && background.isColor ) {
+
+			setFillStyle( 'rgb(' + Math.floor( background.r * 255 ) + ',' + Math.floor( background.g * 255 ) + ',' + Math.floor( background.b * 255 ) + ')' );
+			_context.fillRect( 0, 0, _canvasWidth, _canvasHeight );
+
+		} else if ( this.autoClear === true ) {
+
+			this.clear();
+
+		}
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;

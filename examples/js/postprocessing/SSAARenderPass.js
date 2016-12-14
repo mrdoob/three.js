@@ -27,7 +27,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 	if ( THREE.CopyShader === undefined ) console.error( "THREE.SSAARenderPass relies on THREE.CopyShader" );
 
 	var copyShader = THREE.CopyShader;
-	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
 	this.copyMaterial = new THREE.ShaderMaterial(	{
 		uniforms: this.copyUniforms,
@@ -87,7 +87,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 		var baseSampleWeight = 1.0 / jitterOffsets.length;
 		var roundingRange = 1 / 32;
-		this.copyUniforms[ "tDiffuse" ] = new THREE.Uniform( this.sampleRenderTarget.texture );
+		this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 
 		var width = readBuffer.width, height = readBuffer.height;
 
@@ -110,7 +110,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 				sampleWeight += roundingRange * uniformCenteredDistribution;
 			}
 
-			this.copyUniforms[ "opacity" ] = new THREE.Uniform( sampleWeight );
+			this.copyUniforms[ "opacity" ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
 			if (i === 0) {

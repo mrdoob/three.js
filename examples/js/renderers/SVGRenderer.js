@@ -104,7 +104,7 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.clear = function () {
+	function removeChildNodes() {
 
 		_pathCount = 0;
 		_lineCount = 0;
@@ -116,7 +116,12 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		_svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
+	}
+
+	this.clear = function () {
+
+		removeChildNodes();
+		_svg.style.backgroundColor = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearAlpha + ')';
 
 	};
 
@@ -129,7 +134,18 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		if ( this.autoClear === true ) this.clear();
+		var background = scene.background;
+
+		if ( background && background.isColor ) {
+
+			removeChildNodes();
+			_svg.style.backgroundColor = 'rgb(' + Math.floor( background.r * 255 ) + ',' + Math.floor( background.g * 255 ) + ',' + Math.floor( background.b * 255 ) + ')';
+
+		} else if ( this.autoClear === true ) {
+
+			this.clear();
+
+		}
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
