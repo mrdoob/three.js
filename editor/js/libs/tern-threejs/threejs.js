@@ -3921,12 +3921,8 @@
           "!type": "fn(x: number, y: number, z: number) -> +THREE.Matrix4",
           "!doc": "Sets this matrix as scale transform."
         },
-        "makeFrustum": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
-          "!doc": "Creates a [page:Frustum frustum] matrix."
-        },
         "makePerspective": {
-          "!type": "fn(fov: number, aspect: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates a perspective projection matrix."
         },
         "makeOrthographic": {

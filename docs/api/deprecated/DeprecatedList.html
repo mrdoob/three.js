@@ -306,7 +306,7 @@
 
 		<h3>[page:Matrix4]</h3>
 		<div>
-			Matrix4.flattenToArrayOffset is deprecated. Use [page:Matrix4.toArray]() instead.<br /><br />
+			Matrix4.flattenToArrayOffset() is deprecated. Use [page:Matrix4.toArray]() instead.<br /><br />
 
 			Matrix4.extractPosition() has been renamed to [page:Matrix4.copyPosition]( matrix ).<br /><br />
 
@@ -314,28 +314,30 @@
 
 			Matrix4.setRotationFromQuaternion() has been renamed to [page:Matrix4.makeRotationFromQuaternion]( quaternion ).<br /><br />
 
-			Matrix4.multiplyVector3 has been has been removed. Use vector.applyMatrix4( matrix )
+			Matrix4.multiplyVector3() has been has been removed. Use vector.applyMatrix4( matrix )
 			or vector.applyProjection( matrix ) instead.<br /><br />
 
-			Matrix4.multiplyVector4 has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+			Matrix4.multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
 
-			Matrix4.multiplyVector3Array has been renamed to [page:Matrix4.applyToVector3Array] (array ).<br /><br />
+			Matrix4.multiplyVector3Array() has been renamed to [page:Matrix4.applyToVector3Array] ( array ).<br /><br />
 
-			Matrix4.rotateAxis has been removed. Use [page:Matrix4.transformDirection]( matrix ) instead.<br /><br />
+			Matrix4.rotateAxis() has been removed. Use [page:Matrix4.transformDirection]( matrix ) instead.<br /><br />
 
-			Matrix4.crossVector has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
+			Matrix4.crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
 
-			Matrix4.rotateX has been removed.<br /><br />
+			Matrix4.rotateX() has been removed.<br /><br />
 
-			Matrix4.rotateY has been removed.<br /><br />
+			Matrix4.rotateY() has been removed.<br /><br />
 
-			Matrix4.rotateZ has been removed.<br /><br />
+			Matrix4.rotateZ() has been removed.<br /><br />
 
-			Matrix4.rotateByAxis has been removed.<br /><br />
+			Matrix4.rotateByAxis() has been removed.<br /><br />
 
-			Matrix4.applyToBuffer has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.<br /><br />
+			Matrix4.applyToBuffer() has been removed. Use matrix.applyToBufferAttribute() instead.<br /><br />
 
-			Matrix4.applyToVector3Array has been removed.
+			Matrix4.applyToVector3Array() has been removed.<br /><br />
+
+			Matrix4.makeFrustum() has been renamed to [page:Matrix4.makePerspective]().
 		</div>
 
 
