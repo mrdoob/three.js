@@ -53,6 +53,7 @@
 			var camera, controls, scene, renderer;
 
 			init();
+			render(); // remove when using next line for animation loop (requestAnimationFrame)
 			//animate();
 
 			function init() {
@@ -72,7 +73,7 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // remove when using animation loop (requestAnimationFrame)
+				controls.addEventListener( 'change', render ); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
