@@ -35,7 +35,6 @@ THREE.SEA3D = function ( config ) {
 		useEnvironment: true,
 		useVertexTexture: true,
 		forceStatic: false,
-		forcePremultipliedAlpha: false,
 		streaming: true,
 		async: true,
 		paths: {},
@@ -97,6 +96,16 @@ Object.defineProperties( THREE.SEA3D.prototype, {
 		get: function () {
 
 			return this.config.container;
+
+		}
+
+	},
+
+	elapsedTime: {
+
+		get: function () {
+
+			return this.file.timer.elapsedTime;
 
 		}
 
@@ -1147,6 +1156,19 @@ THREE.SEA3D.Object3D.prototype = Object.assign( Object.create( THREE.Object3D.pr
 
 		return this.animate != undefined;
 
+	},
+
+	copy: function ( source ) {
+
+		THREE.Object3D.prototype.copy.call( this, source );
+
+		this.attribs = source.attribs;
+		this.scripts = source.scripts;
+
+		if ( source.animator ) this.animator = source.animator.clone( this );
+
+		return this;
+
 	}
 
 } );
@@ -2019,6 +2041,7 @@ THREE.SEA3D.prototype.readMesh = function ( sea ) {
 
 	}
 
+
 	mesh.name = sea.name;
 
 	mesh.castShadow = sea.castShadows;
@@ -2519,6 +2542,22 @@ THREE.SEA3D.prototype.materialTechnique =
 
 	};
 
+	// EMISSIVE
+	techniques[ SEA3D.Material.EMISSIVE ] =
+	function ( mat, tech ) {
+
+		mat.emissive.setHex( tech.color );
+
+	};
+
+	// EMISSIVE_MAP
+	techniques[ SEA3D.Material.EMISSIVE_MAP ] =
+	function ( mat, tech ) {
+
+		mat.emissiveMap = tech.texture.tag;
+
+	};
+
 	// ALPHA_MAP
 	techniques[ SEA3D.Material.ALPHA_MAP ] =
 	function ( mat, tech, sea ) {
@@ -2594,7 +2633,11 @@ THREE.SEA3D.prototype.readMaterial = function ( sea ) {
 	var mat = this.createMaterial( sea );
 	mat.name = sea.name;
 
-	mat.premultipliedAlpha = this.config.forcePremultipliedAlpha;
+	mat.depthWrite = sea.depthWrite;
+	mat.depthTest = sea.depthTest;
+
+	mat.premultipliedAlpha = sea.premultipliedAlpha;
+
 	mat.side = sea.bothSides ? THREE.DoubleSide : THREE.FrontSide;
 
 	this.setBlending( mat, sea.blendMode );

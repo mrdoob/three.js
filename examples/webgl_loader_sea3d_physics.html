@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d / keyframe</title>
+		<title>three.js webgl - sea3d / physics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -115,7 +115,7 @@
 
 					var domain = this.loader.clone( { lights : false, runScripts : false, autoPlay: false, enabledPhysics : false } );
 
-					offset += 180;
+					offset -= 180;
 
 					domain.container.position.x += offset;
 					domain.applyContainerTransform();
@@ -138,7 +138,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.set( -300, 200, 300 );
+				camera.position.set( 300, 200, -300 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

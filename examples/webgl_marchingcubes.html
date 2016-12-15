@@ -383,7 +383,7 @@
 
 			var shader = THREE.ShaderToon[ id ];
 
-			var u = Object.assign( {}, shader.uniforms );
+			var u = THREE.UniformsUtils.clone( shader.uniforms );
 
 			var vs = shader.vertexShader;
 			var fs = shader.fragmentShader;

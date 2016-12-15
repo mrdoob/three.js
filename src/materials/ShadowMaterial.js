@@ -1,6 +1,7 @@
 import { ShaderMaterial } from './ShaderMaterial';
 import { ShaderChunk } from '../renderers/shaders/ShaderChunk';
 import { UniformsLib } from '../renderers/shaders/UniformsLib';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
 
 /**
  * @author mrdoob / http://mrdoob.com/

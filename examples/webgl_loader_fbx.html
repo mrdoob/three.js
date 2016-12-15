@@ -34,6 +34,8 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src="js/curves/NURBSCurve.js"></script>
+		<script src="js/curves/NURBSUtils.js"></script>
 		<script src="js/loaders/FBXLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -121,6 +123,26 @@
 
 					scene.add( object );
 
+
+				}, onProgress, onError );
+
+				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
+
+					object.traverse( function( child ) {
+
+						if ( child instanceof THREE.Line ) {
+
+							child.material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 5 } );
+							// Generate a more detailed geometry
+							var nurbsGeometry = new THREE.Geometry();
+							nurbsGeometry.vertices = child.userData.curve.getPoints( 100 );
+							child.geometry = nurbsGeometry;
+
+						}
+
+					} );
+
+					scene.add( object );
 
 				}, onProgress, onError );
 

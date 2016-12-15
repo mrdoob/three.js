@@ -2130,8 +2130,10 @@ SEA3D.Material = function ( name, data, sea3d ) {
 	if ( this.attrib & 128 )
 		this.animations = data.readAnimationList( sea3d );
 
-	this.depthMask = ( this.attrib & 256 ) == 0;
+	this.depthWrite = ( this.attrib & 256 ) == 0;
 	this.depthTest = ( this.attrib & 512 ) == 0;
+
+	this.premultipliedAlpha = ( this.attrib & 1024 ) != 0;
 
 	var count = data.readUByte();
 

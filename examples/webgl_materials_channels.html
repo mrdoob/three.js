@@ -166,6 +166,8 @@
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
 
+					//shading: THREE.FlatShading,
+
 					side: THREE.DoubleSide
 				} );
 
@@ -190,6 +192,15 @@
 				} );
 
 				materialNormal = new THREE.MeshNormalMaterial( {
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+
+					//shading: THREE.FlatShading,
+
 					side: THREE.DoubleSide
 				} );
 
@@ -269,12 +280,18 @@
 
 					}
 
-					switch ( params.side ) {
+					if ( params.side !== material.side ) {
 
-						case 'front': material.side = THREE.FrontSide; break;
-						case 'back': material.side = THREE.BackSide; break;
-						case 'double': material.side = THREE.DoubleSide; break;
-	
+						switch ( params.side ) {
+
+							case 'front': material.side = THREE.FrontSide; break;
+							case 'back': material.side = THREE.BackSide; break;
+							case 'double': material.side = THREE.DoubleSide; break;
+
+						}
+
+						material.needsUpdate = true;
+
 					}
 
 					mesh.material = material;

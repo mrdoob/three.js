@@ -138,7 +138,7 @@
 			function initScene() {
 
 				var shader = THREE.ParallaxShader;
-				var uniforms = Object.assign( {}, shader.uniforms );
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 				var parameters = {
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,

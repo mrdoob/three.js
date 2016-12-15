@@ -34,12 +34,12 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		var transform = this.transform ? this.transform.parseAndBuildCode( builder, 'v3', { cache : 'transform' } ) : undefined;
 
-		material.mergeUniform( Object.assign( {},
+		material.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ]
 
-		) );
+		] ) );
 
 		material.addVertexPars( [
 			"varying vec3 vViewPosition;",
