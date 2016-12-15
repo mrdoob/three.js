@@ -146,8 +146,6 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.emissiveMap = source.emissiveMap;
 	this.emissiveIntensity = source.emissiveIntensity;
 
-	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( parent, value ) { return value.copy( parent.emissive ).multiplyScalar( parent.emissiveIntensity ) } );
-
 	this.bumpMap = source.bumpMap;
 	this.bumpScale = source.bumpScale;
 
