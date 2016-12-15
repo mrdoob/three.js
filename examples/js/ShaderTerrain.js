@@ -236,9 +236,9 @@ THREE.ShaderTerrain = {
 
 				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor + totalSpecularLight );",
 
-				THREE.ShaderChunk[ "fog_fragment" ],
-
 				"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
+				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"}"
 

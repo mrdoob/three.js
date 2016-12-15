@@ -970,7 +970,7 @@
       "!doc": "A class containing useful utility functions for scene manipulation."
     },
     "Animation": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/Animation",
+      "!url": "http://threejs.org/docs/#Reference/extras/collada-animation/Animation",
       "prototype": {
         "root": {
           "!type": "Object3d",
@@ -1037,7 +1037,7 @@
       "!type": "fn(root: Object3d, name: string)"
     },
     "AnimationHandler": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/AnimationHandler",
+      "!url": "http://threejs.org/docs/#Reference/extras/collada-animation/AnimationHandler",
       "prototype": {
         "CATMULLROM": {
           "!type": "number",
@@ -1080,7 +1080,7 @@
       "!type": "fn()"
     },
     "AnimationMorphTarget": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/AnimationMorphTarget",
+      "!url": "http://threejs.org/docs/#Reference/extras/collada-animation/AnimationMorphTarget",
       "prototype": {
         "root": {
           "!type": "todo",
@@ -1139,7 +1139,7 @@
       "!type": "fn(root: todo, data: todo)"
     },
     "KeyFrameAnimation": {
-      "!url": "http://threejs.org/docs/#Reference/extras/animation/KeyFrameAnimation",
+      "!url": "http://threejs.org/docs/#Reference/extras/collada-animation/KeyFrameAnimation",
       "prototype": {
         "root": {
           "!type": "todo",
@@ -2207,7 +2207,7 @@
           "!doc": "Remove all values from the cache."
         }
       },
-      "!doc": "A simple caching classe, used internaly by [page:XHRLoader].",
+      "!doc": "A simple caching classe, used internaly by [page:FileLoader].",
       "!type": "fn()"
     },
     "ColladaLoader": {
@@ -2513,8 +2513,8 @@
       "!doc": "Class for loading a [page:Texture texture].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "XHRLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/XHRLoader",
+    "FileLoader": {
+      "!url": "http://threejs.org/docs/#Reference/loaders/FileLoader",
       "prototype": {
         "cache": {
           "!type": "+THREE.Cache",

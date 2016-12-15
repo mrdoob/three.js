@@ -111,6 +111,20 @@ var CustomSinCurve = THREE.Curve.create(
 
 );
 
+// heart shape
+
+var x = 0, y = 0;
+
+var heartShape = new THREE.Shape();
+
+heartShape.moveTo( x + 5, y + 5 );
+heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+
 var guis = {
 
 	BoxBufferGeometry : function( mesh ) {
@@ -191,7 +205,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -237,7 +251,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -282,7 +296,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -325,7 +339,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -366,7 +380,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -396,7 +410,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -424,7 +438,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -450,7 +464,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -476,7 +490,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -502,7 +516,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -537,7 +551,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -573,7 +587,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -600,7 +614,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -626,7 +640,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -716,7 +730,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -750,7 +764,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -785,7 +799,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -821,7 +835,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -852,7 +866,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -878,7 +892,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -1206,24 +1220,41 @@ var guis = {
 
 	ShapeGeometry: function( mesh ) {
 
-		var length = 16, width = 12;
-
-		var shape = new THREE.Shape();
-		shape.moveTo( 0,0 );
-		shape.lineTo( 0, width );
-		shape.lineTo( length, width );
-		shape.lineTo( length, 0 );
-		shape.lineTo( 0, 0 );
+		var data = {
+			segments : 12
+		};
 
 		function generateGeometry() {
 
 			updateGroupGeometry( mesh,
-				new THREE.ShapeGeometry( shape )
+				new THREE.ShapeGeometry( heartShape, data.segments )
 			);
 
 		}
 
 		var folder = gui.addFolder( 'THREE.ShapeGeometry' );
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ShapeBufferGeometry: function( mesh ) {
+
+		var data = {
+			segments : 12
+		};
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ShapeBufferGeometry( heartShape, data.segments )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ShapeBufferGeometry' );
+		folder.add( data, 'segments', 1, 100 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

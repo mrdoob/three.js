@@ -21,7 +21,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( data ) {
 
@@ -100,7 +100,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		PCDheader.offset = {}
+		PCDheader.offset = {};
 		var sizeSum = 0;
 		for ( var i = 0; i < PCDheader.fields.length; i ++ ) {
 

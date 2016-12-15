@@ -111,8 +111,8 @@
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
-		<script src="js/Menubar.View.js"></script>
-		<!-- <script src="js/Menubar.Examples.js"></script> -->
+		<!-- <script src="js/Menubar.View.js"></script> -->
+		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -379,7 +379,7 @@
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.XHRLoader();
+					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 

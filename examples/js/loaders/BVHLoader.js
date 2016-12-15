@@ -24,7 +24,7 @@ THREE.BVHLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( buffer ) {
 
@@ -116,7 +116,7 @@ THREE.BVHLoader.prototype = {
 			var keyframe = {
 				time: frameTime,
 				position: { x: 0, y: 0, z: 0 },
-				rotation: new THREE.Quaternion(),
+				rotation: new THREE.Quaternion()
 			};
 
 			bone.frames.push( keyframe );

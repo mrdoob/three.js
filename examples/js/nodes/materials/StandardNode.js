@@ -20,11 +20,15 @@ THREE.StandardNode.prototype.build = function( builder ) {
 	var material = builder.material;
 	var code;
 
-	material.define( 'STANDARD' );
 	material.define( 'PHYSICAL' );
+
+	if ( !this.clearCoat && !this.clearCoatRoughness ) material.define( 'STANDARD' );
+
 	material.define( 'ALPHATEST', '0.0' );
 
 	material.requestAttribs.light = true;
+
+	material.extensions.shaderTextureLOD = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
 
@@ -33,7 +37,6 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		material.mergeUniform( THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "ambient" ],
 			THREE.UniformsLib[ "lights" ]
 
 		] ) );
@@ -56,11 +59,11 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		].join( "\n" ) );
 
 		var output = [
-				THREE.ShaderChunk[ "beginnormal_vertex" ],
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+			THREE.ShaderChunk[ "beginnormal_vertex" ],
+			THREE.ShaderChunk[ "morphnormal_vertex" ],
+			THREE.ShaderChunk[ "skinbase_vertex" ],
+			THREE.ShaderChunk[ "skinnormal_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
@@ -68,7 +71,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-				THREE.ShaderChunk[ "begin_vertex" ]
+			THREE.ShaderChunk[ "begin_vertex" ]
 		];
 
 		if ( transform ) {
@@ -81,21 +84,20 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		}
 
 		output.push(
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "project_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+			THREE.ShaderChunk[ "morphtarget_vertex" ],
+			THREE.ShaderChunk[ "skinning_vertex" ],
+			THREE.ShaderChunk[ "project_vertex" ],
+			THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"	vViewPosition = - mvPosition.xyz;",
 
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ]
+			THREE.ShaderChunk[ "worldpos_vertex" ],
+			THREE.ShaderChunk[ "shadowmap_vertex" ]
 		);
 
 		code = output.join( "\n" );
 
-	}
-	else {
+	} else {
 
 		// blur textures for PBR effect
 
@@ -105,6 +107,8 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			offsetV : 0
 		};
 
+		var useClearCoat = !material.isDefined( 'STANDARD' );
+		
 		// parse all nodes to reuse generate codes
 
 		this.color.parse( builder, { slot : 'color' } );
@@ -112,6 +116,14 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		this.metalness.parse( builder );
 
 		if ( this.alpha ) this.alpha.parse( builder );
+		
+		if ( this.normal ) this.normal.parse( builder );
+		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
+		
+		if (this.clearCoat) this.clearCoat.parse( builder );
+		if (this.clearCoatRoughness) this.clearCoatRoughness.parse( builder );
+		
+		if ( this.reflectivity ) this.reflectivity.parse( builder );
 
 		if ( this.light ) this.light.parse( builder, { cache : 'light' } );
 
@@ -119,9 +131,6 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		if ( this.ambient ) this.ambient.parse( builder );
 		if ( this.shadow ) this.shadow.parse( builder );
 		if ( this.emissive ) this.emissive.parse( builder, { slot : 'emissive' } );
-
-		if ( this.normal ) this.normal.parse( builder );
-		if ( this.normalScale && this.normal ) this.normalScale.parse( builder );
 
 		if ( this.environment ) this.environment.parse( builder, { cache : 'env', requires : requires, slot : 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
@@ -131,9 +140,15 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		var roughness = this.roughness.buildCode( builder, 'fv1' );
 		var metalness = this.metalness.buildCode( builder, 'fv1' );
 
-		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
-
 		var alpha = this.alpha ? this.alpha.buildCode( builder, 'fv1' ) : undefined;
+		
+		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
+		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
+		
+		var clearCoat = this.clearCoat ? this.clearCoat.buildCode( builder, 'fv1' ) : undefined;
+		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.buildCode( builder, 'fv1' ) : undefined;
+		
+		var reflectivity = this.reflectivity ? this.reflectivity.buildCode( builder, 'fv1' ) : undefined;
 
 		var light = this.light ? this.light.buildCode( builder, 'v3', { cache : 'light' } ) : undefined;
 
@@ -142,10 +157,9 @@ THREE.StandardNode.prototype.build = function( builder ) {
 		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot : 'emissive' } ) : undefined;
 
-		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
-		var normalScale = this.normalScale && this.normal ? this.normalScale.buildCode( builder, 'v2' ) : undefined;
-
 		var environment = this.environment ? this.environment.buildCode( builder, 'c', { cache : 'env', requires : requires, slot : 'environment' } ) : undefined;
+
+		var clearCoatEnv = useClearCoat && environment ? this.environment.buildCode( builder, 'c', { cache : 'clearCoat', requires : requires, slot : 'environment' } ) : undefined;
 
 		material.requestAttribs.transparent = alpha != undefined;
 
@@ -165,7 +179,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "lights_physical_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ]
 		].join( "\n" ) );
 
 		var output = [
@@ -222,20 +236,46 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		output.push(
 			// accumulation
-			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );' // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
+			'material.specularRoughness = clamp( roughnessFactor, DEFAULT_SPECULAR_COEFFICIENT, 1.0 );' // disney's remapping of [ 0, 1 ] roughness to [ 0.001, 1 ]
 		);
-
+		
+		if (clearCoat) {
+			
+			output.push(
+				clearCoat.code,
+				'material.clearCoat = saturate( ' + clearCoat.result + ' );'
+			);
+			
+		} else if (useClearCoat) {
+			
+			output.push( 'material.clearCoat = 0.0;' );
+			
+		}
+		
+		if (clearCoatRoughness) {
+			
+			output.push(
+				clearCoatRoughness.code,
+				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', DEFAULT_SPECULAR_COEFFICIENT, 1.0 );'
+			);
+			
+		} else if (useClearCoat) {
+			
+			output.push( 'material.clearCoatRoughness = 0.0;' );
+			
+		}
+		
 		if ( reflectivity ) {
 
 			output.push(
-				'material.specularColor = mix( vec3( 0.16 * pow2( ' + reflectivity.builder( builder, 'fv1' ) + ' ) ), diffuseColor, metalnessFactor );'
+				reflectivity.code,
+				'material.specularColor = mix( vec3( MAXIMUM_SPECULAR_COEFFICIENT * pow2( ' + reflectivity.result + ' ) ), diffuseColor, metalnessFactor );'
 			);
 
-		}
-		else {
+		} else {
 
 			output.push(
-				'material.specularColor = mix( vec3( 0.04 ), diffuseColor, metalnessFactor );'
+				'material.specularColor = mix( vec3( DEFAULT_SPECULAR_COEFFICIENT ), diffuseColor, metalnessFactor );'
 			);
 
 		}
@@ -303,10 +343,22 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 		if ( environment ) {
 
-			output.push(
-				environment.code,
-				"RE_IndirectSpecular_Physical(" + environment.result + ", vec3( 0.0 ), geometry, material, reflectedLight );"
-			);
+			output.push( environment.code );
+
+			if (clearCoatEnv) {
+
+				output.push(
+					clearCoatEnv.code,
+					"vec3 clearCoatRadiance = " + clearCoatEnv.result + ";"
+				);
+
+			} else {
+
+				output.push("vec3 clearCoatRadiance = vec3( 0.0 );");
+
+			}
+
+			output.push( "RE_IndirectSpecular(" + environment.result + ", clearCoatRadiance, geometry, material, reflectedLight );" );
 
 		}
 
@@ -316,8 +368,7 @@ THREE.StandardNode.prototype.build = function( builder ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
 
-		}
-		else {
+		} else {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
 

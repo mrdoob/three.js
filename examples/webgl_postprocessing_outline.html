@@ -79,71 +79,71 @@
 				pulsePeriod: 0,
 				rotate: false,
 				usePatternTexture: false
-			}
+			};
 
 			// Init gui
 			var gui = new dat.GUI();
-			gui.add( params, "edgeStrength", 0.01, 10 ).onChange( function(value) {
-	        outlinePass.edgeStrength = Number(value);
-	    });
-			gui.add( params, "edgeGlow", 0.0, 1 ).onChange( function(value) {
-	        outlinePass.edgeGlow = Number(value);
-	    })
-			gui.add( params, "edgeThickness", 1, 4 ).onChange( function(value) {
-	        outlinePass.edgeThickness = Number(value);
-	    })
-			gui.add( params, "pulsePeriod", 0.0, 5 ).onChange( function(value) {
-	        outlinePass.pulsePeriod = Number(value);
-	    })
-			gui.add( params, "rotate" )
-			gui.add( params, "usePatternTexture" ).onChange( function(value) {
+			gui.add(params, "edgeStrength", 0.01, 10).onChange(function( value ) {
+				outlinePass.edgeStrength = Number(value);
+			});
+			gui.add(params, "edgeGlow", 0.0, 1).onChange(function( value ) {
+				outlinePass.edgeGlow = Number(value);
+			});
+			gui.add(params, "edgeThickness", 1, 4).onChange(function( value ) {
+				outlinePass.edgeThickness = Number(value);
+			});
+			gui.add(params, "pulsePeriod", 0.0, 5).onChange(function( value ) {
+				outlinePass.pulsePeriod = Number(value);
+			});
+			gui.add(params, "rotate");
+			gui.add(params, "usePatternTexture").onChange(function( value ) {
 				outlinePass.usePatternTexture = value;
-	    })
-			var Configuration=function(){
-	            this.visibleEdgeColor = "#ffffff";
-							this.hiddenEdgeColor = "#190a05";
-	    };
-	    var conf = new Configuration();
+			});
+			var Configuration = function() {
+				this.visibleEdgeColor = "#ffffff";
+				this.hiddenEdgeColor  = "#190a05";
+			};
+			var conf = new Configuration();
 
-	    var controladorVisible = gui.addColor( conf, 'visibleEdgeColor');
-			var controladorHidden = gui.addColor( conf, 'hiddenEdgeColor');
-	    controladorVisible.onChange( function( colorValue  )
-	    {
-	      //the return value by the chooser is like as: #ffff
-	      colorValue=colorValue.replace( '#','' );
-	      function hexToRgb(hex) {
-	            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	            return result ? {
-	                r: parseInt(result[1], 16),
-	                g: parseInt(result[2], 16),
-	                b: parseInt(result[3], 16)
-	            } : null;
-	        }
-	      var rgba = hexToRgb(colorValue);
-        var color = outlinePass.visibleEdgeColor;
-        color.r = rgba.r/255;
-        color.g = rgba.g/255;
-        color.b = rgba.b/255;
-	    });
+			var controladorVisible = gui.addColor( conf, 'visibleEdgeColor');
+				var controladorHidden = gui.addColor( conf, 'hiddenEdgeColor');
+			controladorVisible.onChange(function( colorValue ) {
+				//the return value by the chooser is like as: #ffff
+				colorValue = colorValue.replace('#', '');
+				function hexToRgb( hex ) {
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+					return result ? {
+						r: parseInt(result[ 1 ], 16),
+						g: parseInt(result[ 2 ], 16),
+						b: parseInt(result[ 3 ], 16)
+					} : null;
+				}
 
-			controladorHidden.onChange( function( colorValue  )
-	    {
-	      //the return value by the chooser is like as: #ffff
-	      colorValue=colorValue.replace( '#','' );
-	      function hexToRgb(hex) {
-	            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	            return result ? {
-	                r: parseInt(result[1], 16),
-	                g: parseInt(result[2], 16),
-	                b: parseInt(result[3], 16)
-	            } : null;
-	        }
-	      var rgba = hexToRgb(colorValue);
-        var color = outlinePass.hiddenEdgeColor;
-        color.r = rgba.r/255;
-        color.g = rgba.g/255;
-        color.b = rgba.b/255;
-	    });
+				var rgba  = hexToRgb(colorValue);
+				var color = outlinePass.visibleEdgeColor;
+				color.r   = rgba.r / 255;
+				color.g   = rgba.g / 255;
+				color.b   = rgba.b / 255;
+			});
+
+			controladorHidden.onChange(function( colorValue ) {
+				//the return value by the chooser is like as: #ffff
+				colorValue = colorValue.replace('#', '');
+				function hexToRgb( hex ) {
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+					return result ? {
+						r: parseInt(result[ 1 ], 16),
+						g: parseInt(result[ 2 ], 16),
+						b: parseInt(result[ 3 ], 16)
+					} : null;
+				}
+
+				var rgba  = hexToRgb(colorValue);
+				var color = outlinePass.hiddenEdgeColor;
+				color.r   = rgba.r / 255;
+				color.g   = rgba.g / 255;
+				color.b   = rgba.b / 255;
+			});
 
 			init();
 			animate();
@@ -307,8 +307,8 @@
 				);
 
 				effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-		    effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
-		    effectFXAA.renderToScreen = true;
+				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -387,7 +387,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-        composer.setSize( width, height );
+				composer.setSize( width, height );
 				effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 			}
 

@@ -18,8 +18,7 @@ var Config = function ( name ) {
 
 		'settings/history': false,
 
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/script/collapsed': true
+		'ui/sidebar/animation/collapsed': true
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

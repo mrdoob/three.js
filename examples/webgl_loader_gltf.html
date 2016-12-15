@@ -92,7 +92,7 @@
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
 		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader -
-		<br></br>
+		<br>
 		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
 		COLLADA duck by Sony - other models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
 		</div>
@@ -137,6 +137,8 @@
 			var cameraNames = [];
 			var defaultCamera = null;
 			var gltf = null;
+			var mixer = null;
+			var clock = new THREE.Clock();
 
 			function onload() {
 
@@ -212,7 +214,7 @@
 				if (sceneInfo.addGround) {
 					var groundMaterial = new THREE.MeshPhongMaterial({
 							color: 0xFFFFFF,
-							shading: THREE.SmoothShading,
+							shading: THREE.SmoothShading
 						});
 					ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
 
@@ -312,18 +314,25 @@
 
 					}
 
-					if (gltf.animations && gltf.animations.length) {
+					var animations = gltf.animations;
 
-						var i, len = gltf.animations.length;
-						for (i = 0; i < len; i++) {
-							var animation = gltf.animations[i];
-							animation.loop = true;
+					if ( animations && animations.length ) {
+
+						mixer = new THREE.AnimationMixer( object );
+
+						for ( var i = 0; i < animations.length; i ++ ) {
+
+							var animation = animations[ i ];
+
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
-							if (sceneInfo.animationTime)
+							if ( sceneInfo.animationTime )
 								animation.duration = sceneInfo.animationTime;
-							animation.play();
+
+							mixer.clipAction( animation ).play();
+
 						}
+
 					}
 
 					scene.add( object );
@@ -353,7 +362,7 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.GLTFLoader.Animations.update();
+				if (mixer) mixer.update(clock.getDelta());
 				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
@@ -513,16 +522,17 @@
 
 			function toggleAnimations() {
 
-				var i, len = gltf.animations.length;
+				var i, len = gltf.clips.length;
 
 				for (i = 0; i < len; i++) {
 
-					var animation = gltf.animations[i];
+					var clip = gltf.clips[i];
+					var action = mixer.existingAction( clip );
 
-					if (animation.running) {
-						animation.stop();
+					if (action.isRunning()) {
+						action.stop();
 					} else {
-						animation.play();
+						action.play();
 					}
 
 				}
@@ -549,17 +559,10 @@
 				cameraNames = [];
 				defaultCamera = null;
 
-				if (!loader || !gltf.animations)
+				if (!loader || !mixer)
 					return;
 
-				var i, len = gltf.animations.length;
-
-				for (i = 0; i < len; i++) {
-					var animation = gltf.animations[i];
-					if (animation.running) {
-						animation.stop();
-					}
-				}
+				mixer.stopAllAction();
 
 			}
 

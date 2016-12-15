@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+    <h1>[name]</h1>
+
+    <div class="desc">
+    An AnimationAction schedules clip playback on specific objects.
+    </div>
+
+
+    <h2>Constructor</h2>
+
+
+    <h3>[name]( [page:AnimationMixer mixer], [page:AnimationClip clip], [page:Object3D localRoot] )</h3>
+
+
+    <h2>Properties</h2>
+
+
+    <h3>[property:Number time]</h3>
+
+    <h3>[property:Number timeScale]</h3>
+
+    <h3>[property:Number weight]</h3>
+
+    <h3>[property:Number loop]</h3>
+
+    <h3>[property:Number repetitions]</h3>
+
+    <h3>[property:Boolean paused]</h3>
+
+    <h3>[property:Boolean enabled]</h3>
+
+    <h3>[property:Boolean clampWhenFinished]</h3>
+
+    <h3>[property:Boolean zeroSlopeAtStart]</h3>
+
+    <h3>[property:Boolean zeroSlopeAtEnd]</h3>
+
+
+    <h2>Methods</h2>
+
+
+    <h3>[method:AnimationAction play]()</h3>
+
+    <h3>[method:AnimationAction stop]()</h3>
+
+    <h3>[method:AnimationAction reset]()</h3>
+
+    <h3>[method:Boolean isRunning]()</h3>
+
+    <h3>[method:Boolean isScheduled]()</h3>
+
+    <h3>[method:AnimationAction startAt]()</h3>
+
+    <h3>[method:AnimationAction setLoop]( [page:Number mode], [page:Number repetitions] )</h3>
+
+    <h3>[method:AnimationAction setEffectiveWeight]( [page:Number weight] )</h3>
+
+    <h3>[method:number getEffectiveWeight]()</h3>
+
+    <h3>[method:AnimationAction fadeIn]( [page:Number duration] )</h3>
+
+    <h3>[method:AnimationAction fadeOut]( [page:Number duration] )</h3>
+
+    <h3>[method:AnimationAction crossFadeFrom]( [page:AnimationAction fadeOutAction], [page:Number duration], [page:Boolean warp] )</h3>
+
+    <h3>[method:AnimationAction crossFadeTo]( [page:AnimationAction fadeInAction], [page:Number duration], [page:Boolean warp] )</h3>
+
+    <h3>[method:AnimationAction stopFading]()</h3>
+
+    <h3>[method:AnimationAction setEffectiveTimeScale]( [page:Number timeScale] )</h3>
+
+    <h3>[method:Number getEffectiveTimeScale]()</h3>
+
+    <h3>[method:AnimationAction setDuration]( [page:Number duration] )</h3>
+
+    <h3>[method:AnimationAction syncWith]( [page:AnimationAction action] )</h3>
+
+    <h3>[method:AnimationAction halt]( [page:Number duration] )</h3>
+
+    <h3>[method:AnimationAction warp]( [page:Number startTimeScale], [page:Number endTimeScale], [page:Number duration] )</h3>
+
+    <h3>[method:AnimationAction stopWarping]()</h3>
+
+    <h3>[method:AnimationMixer getMixer]()</h3>
+
+    <h3>[method:AnimationClip getClip]()</h3>
+
+    <h3>[method:Object3D getRoot]()</h3>
+
+
+    <h2>Static Methods</h2>
+
+
+    <h3>[method:AnimationClip parse]( [page:Object json] )</h3>
+    <div>
+    json -- JSON object
+    </div>
+
+    <h3>[method:Object toJSON]( [page:AnimationClip clip] )</h3>
+    <div>
+    clip -- AnimationClip
+    </div>
+
+    <h3>[method:AnimationClip CreateFromMorphTargetSequence]( [page:String name], [page:Array morphTargetSequence], [page:Number fps], [page:Boolean noLoop] )</h3>
+    <div>
+    name -- Name for the new clip <br />
+    morphTargetSequence -- Array of morph targets <br />
+    fps -- Number of frames per second <br />
+    noLoop -- Whether looping occurs automatically.
+    </div>
+
+    <h3>[method:AnimationClip parseAnimation]( [page:Object animation], [page:Array bones] )</h3>
+    <div>
+    Parses the animation.hierarchy format and returns an AnimationClip.
+    </div>
+
+
+    <h2>Source</h2>
+
+
+    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+  </body>
+</html>
