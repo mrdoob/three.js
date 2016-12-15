@@ -119,29 +119,27 @@ Matrix3.prototype = {
 
 	}(),
 
-	applyToBuffer: function () {
+	applyToBufferAttribute: function () {
 
 		var v1;
 
-		return function applyToBuffer( buffer, offset, length ) {
+		return function applyToBufferAttribute( attribute ) {
 
 			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( j, v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
-			return buffer;
+			return attribute;
 
 		};
 

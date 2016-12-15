@@ -72,15 +72,11 @@ m.elements = [ 11, 21, 31,
 
 		<h2>Methods</h2>
 
-		<h3>[method:Array applyToBuffer]( [page:ArrayBuffer buffer], [page:Number offset], [page:Number length] )</h3>
+		<h3>[method:Array applyToBufferAttribute]( [page:BufferAttribute attribute] )</h3>
 		<div>
-		[page:Array buffer] - An [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer]
-		of floats in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...], that represent 3D vectors.<br />
-		[page:Number offset] - (optional) index in the array of the first vector's x component. Default is 0.<br />
-		[page:Number length] - (optional) index in the array of the last vector's z component.
-		Default is the last element in the array.<br /><br />
+		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
 
-		Multiplies (applies) this matrix to every 3D vector in the [page:ArrayBuffer buffer].
+		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
 		</div>
 
 		<h3>[method:Array applyToVector3Array]( [page:Array array], [page:Number offset], [page:Number length] )</h3>
