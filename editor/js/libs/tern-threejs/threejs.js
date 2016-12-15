@@ -3774,9 +3774,9 @@
           "!type": "fn(scalar: number) -> +THREE.Matrix3",
           "!doc": "Multiply every component of the matrix by a scalar value."
         },
-        "applyToVector3Array": {
-          "!type": "fn(array: []) -> []",
-          "!doc": "Multiply (apply) this matrix to every vector3 in the array."
+        "applyToBufferAttribute": {
+          "!type": "fn(attribute: []) -> +THREE.BufferAttribute",
+          "!doc": "Multiply (apply) this matrix to every vector3 in the attribute."
         },
         "getNormalMatrix": {
           "!type": "fn(matrix4: +THREE.Matrix4) -> +THREE.Matrix3",
@@ -3937,9 +3937,9 @@
           "!type": "fn() -> +THREE.Matrix4",
           "!doc": "Clones this matrix."
         },
-        "applyToVector3Array": {
-          "!type": "fn(a: []) -> []",
-          "!doc": "Multiply (apply) this matrix to every vector3 in the array."
+				"applyToBufferAttribute": {
+          "!type": "fn(attribute: []) -> +THREE.BufferAttribute",
+          "!doc": "Multiply (apply) this matrix to every vector3 in the attribute."
         },
         "getMaxScaleOnAxis": {
           "!type": "fn() -> number",

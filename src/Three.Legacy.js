@@ -359,6 +359,11 @@ Object.assign( Matrix3.prototype, {
 		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
+	},
+	applyToVector3Array: function( array, offset, length ) {
+
+		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
+
 	}
 
 } );
@@ -455,6 +460,11 @@ Object.assign( Matrix4.prototype, {
 
 		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
+
+	},
+	applyToVector3Array: function( array, offset, length ) {
+
+		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 
 	}
 
