@@ -3774,7 +3774,7 @@
           "!type": "fn(scalar: number) -> +THREE.Matrix3",
           "!doc": "Multiply every component of the matrix by a scalar value."
         },
-        "applyToBufferAttribute": {
+				"applyToBufferAttribute": {
           "!type": "fn(attribute: []) -> +THREE.BufferAttribute",
           "!doc": "Multiply (apply) this matrix to every vector3 in the attribute."
         },
