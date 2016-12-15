@@ -14,7 +14,9 @@
 
 		<div class="desc">
 			This light gets emitted from a single point in one direction, along a cone that increases in size
-			the further from the light it gets. This light can cast shadows - see the [page:SpotLightShadow].
+			the further from the light it gets. <br /><br />
+
+			This light can cast shadows - see the [page:SpotLightShadow] page for details.
 		</div>
 
 
@@ -30,7 +32,6 @@
 		<h2>Other Examples</h2>
 
 		<div>
-
 			[example:webgl_interactive_cubes_gpu interactive / cubes / gpu ]<br />
 			[example:webgl_interactive_draggablecubes interactive / draggablecubes ]<br />
 			[example:webgl_materials_bumpmap_skin materials / bumpmap / skin ]<br />
@@ -125,6 +126,11 @@
 			zero and 1. The default is *0.0*.
 		</div>
 
+		<h3>[property:Vector3 position]</h3>
+		<div>
+			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+		</div>
+
 		<h3>[property:Float power]</h3>
 		<div>
 			The light's power.<br />
@@ -140,7 +146,7 @@
 
 		<h3>[property:SpotLightShadow shadow]</h3>
 		<div>
-			A [page:LightShadow] used to calculate shadows for this light.
+			A [page:SpotLightShadow] used to calculate shadows for this light.
 		</div>
 
 
