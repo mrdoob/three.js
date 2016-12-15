@@ -175,7 +175,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '83dev';
+var REVISION = '83';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -3837,29 +3837,27 @@ Matrix4.prototype = {
 
 	}(),
 
-	applyToBuffer: function () {
+	applyToBufferAttribute: function () {
 
 		var v1;
 
-		return function applyToBuffer( buffer, offset, length ) {
+		return function applyToBufferAttribute( attribute ) {
 
 			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix4( this );
 
-				buffer.setXYZ( j, v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
-			return buffer;
+			return attribute;
 
 		};
 
@@ -5176,9 +5174,9 @@ var meshphysical_frag = "#define PHYSICAL\nuniform vec3 diffuse;\nuniform vec3 e
 
 var meshphysical_vert = "#define PHYSICAL\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
-var normal_frag = "uniform float opacity;\nvarying vec3 vNormal;\n#include <common>\n#include <packing>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\t#include <normal_flip>\n   \n   \tgl_FragColor = vec4( packNormalToRGB( vNormal * flipNormal ), opacity );\n\t#include <logdepthbuf_fragment>\n}\n";
+var normal_frag = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED  ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n\t#include <premultiplied_alpha_fragment>\n\t#include <encodings_fragment>\n}\n";
 
-var normal_vert = "varying vec3 vNormal;\n#include <common>\n#include <morphtarget_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\tvNormal = normalize( normalMatrix * normal );\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n}\n";
+var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED  ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n#if defined( FLAT_SHADED  ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}\n";
 
 var points_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}\n";
 
@@ -6151,9 +6149,15 @@ var ShaderLib = {
 
 	normal: {
 
-		uniforms: {
-			opacity: { value: 1.0 }
-		},
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			{
+				opacity: { value: 1.0 }
+			}
+		] ),
 
 		vertexShader: ShaderChunk.normal_vert,
 		fragmentShader: ShaderChunk.normal_frag
@@ -8515,29 +8519,27 @@ Matrix3.prototype = {
 
 	}(),
 
-	applyToBuffer: function () {
+	applyToBufferAttribute: function () {
 
 		var v1;
 
-		return function applyToBuffer( buffer, offset, length ) {
+		return function applyToBufferAttribute( attribute ) {
 
 			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
 
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( j, v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
-			return buffer;
+			return attribute;
 
 		};
 
@@ -18475,7 +18477,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		var currentStencilFunc = null;
 		var currentStencilRef = null;
 		var currentStencilFuncMask = null;
-		var currentStencilFail  = null;
+		var currentStencilFail = null;
 		var currentStencilZFail = null;
 		var currentStencilZPass = null;
 		var currentStencilClear = null;
@@ -18513,10 +18515,10 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilRef 	!== stencilRef 	||
 				     currentStencilFuncMask !== stencilMask ) {
 
-					gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
+					gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
 
 					currentStencilFunc = stencilFunc;
-					currentStencilRef  = stencilRef;
+					currentStencilRef = stencilRef;
 					currentStencilFuncMask = stencilMask;
 
 				}
@@ -18529,9 +18531,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 
-					gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
+					gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
 
-					currentStencilFail  = stencilFail;
+					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
 					currentStencilZPass = stencilZPass;
 
@@ -18610,6 +18612,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 	var currentScissorTest = null;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+
+	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
+	var lineWidthAvailable = parseFloat( version ) >= 1.0;
 
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
@@ -19001,7 +19006,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		if ( width !== currentLineWidth ) {
 
-			gl.lineWidth( width );
+			if ( lineWidthAvailable ) gl.lineWidth( width );
 
 			currentLineWidth = width;
 
@@ -20160,6 +20165,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( ! material.isMeshPhongMaterial &&
 				! material.isMeshStandardMaterial &&
+				! material.isMeshNormalMaterial &&
 				material.shading === FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
@@ -21399,6 +21405,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
+				material.isMeshNormalMaterial ||
 				material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
@@ -21452,9 +21459,15 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
-				m_uniforms.opacity.value = material.opacity;
+				refreshUniformsNormal( m_uniforms, material );
 
 			}
+
+			// RectAreaLight Texture
+			// TODO (mrdoob): Find a nicer implementation
+
+			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = THREE.UniformsLib.LTC_MAT_TEXTURE;
+			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = THREE.UniformsLib.LTC_MAG_TEXTURE;
 
 			WebGLUniforms.upload(
 				_gl, materialProperties.uniformsList, m_uniforms, _this );
@@ -21750,6 +21763,32 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
 		refreshUniformsStandard( uniforms, material );
+
+	}
+
+	function refreshUniformsNormal( uniforms, material ) {
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
 
 	}
 
@@ -28624,12 +28663,27 @@ MeshToonMaterial.prototype.copy = function ( source ) {
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
  *
  * parameters = {
  *  opacity: <float>,
  *
+ *  bumpMap: new THREE.Texture( <Image> ),
+ *  bumpScale: <float>,
+ *
+ *  normalMap: new THREE.Texture( <Image> ),
+ *  normalScale: <Vector2>,
+ *
+ *  displacementMap: new THREE.Texture( <Image> ),
+ *  displacementScale: <float>,
+ *  displacementBias: <float>,
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
+ *
+ *  skinning: <bool>,
+ *  morphTargets: <bool>,
+ *  morphNormals: <bool>
  * }
  */
 
@@ -28639,12 +28693,25 @@ function MeshNormalMaterial( parameters ) {
 
 	this.type = 'MeshNormalMaterial';
 
+	this.bumpMap = null;
+	this.bumpScale = 1;
+
+	this.normalMap = null;
+	this.normalScale = new Vector2( 1, 1 );
+
+	this.displacementMap = null;
+	this.displacementScale = 1;
+	this.displacementBias = 0;
+
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
 	this.lights = false;
+
+	this.skinning = false;
 	this.morphTargets = false;
+	this.morphNormals = false;
 
 	this.setValues( parameters );
 
@@ -28659,8 +28726,22 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
+	this.bumpMap = source.bumpMap;
+	this.bumpScale = source.bumpScale;
+
+	this.normalMap = source.normalMap;
+	this.normalScale.copy( source.normalScale );
+
+	this.displacementMap = source.displacementMap;
+	this.displacementScale = source.displacementScale;
+	this.displacementBias = source.displacementBias;
+
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
+
+	this.skinning = source.skinning;
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
 
 	return this;
 
@@ -29167,7 +29248,7 @@ Object.assign( FileLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			if ( this.mimeType && request.overrideMimeType ) request.overrideMimeType( this.mimeType );
+			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
 			request.send( null );
 
@@ -41871,6 +41952,12 @@ Object.assign( Matrix3.prototype, {
 		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
+	},
+	applyToBuffer: function( buffer, offset, length ) {
+
+		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
+		return this.applyToBufferAttribute( buffer );
+
 	}
 
 } );
@@ -41961,6 +42048,12 @@ Object.assign( Matrix4.prototype, {
 	rotateByAxis: function () {
 
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
+
+	},
+	applyToBuffer: function( buffer, offset, length ) {
+
+		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
+		return this.applyToBufferAttribute( buffer );
 
 	}
 
