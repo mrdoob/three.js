@@ -348,6 +348,7 @@ var files = {
 	],
 	"software": [
 		"software_geometry_earth",
+		"software_lines_splines",
 		"software_sandbox"
 	],
 	"svg": [
