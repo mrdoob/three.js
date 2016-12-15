@@ -90,21 +90,6 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				/**
-				 * @todo @fixme This method depends on a global var dirLight... bad
-				 * @param camera
-				 * @private
-				 */
-				var _setupLight = function (camera) {
-					if ( window['dirLight'] === undefined ) {
-						dirLight = new THREE.DirectionalLight(0xaaaaaa);
-						dirLight.position.set(500, 500, 1000).normalize();
-						dirLight.castShadow = false;
-					}
-					camera.add(dirLight);
-					camera.add(dirLight.target);
-				}
-
-				/**
 				 * Triggers when a viewpoint is selected from the list. Currently replaces the camera,
 				 * but @todo just animating the camera to a new position and rotation would probably be better.
 				 * @param event
@@ -115,8 +100,7 @@ THREE.VRMLLoader.prototype = {
 					console.log('clicked ' + viewpoint);
 					camera = vrmlConverter.viewpoints[ viewpoint ].getCamera();
 					_resetControls(camera);
-					_setupLight(camera);
-					// animation is not available in this scope, and also, replacing the camera does not work, instead, try to animate the camera
+					// animation isnot available in this scope, and also, replacing the camera does not work, instead, try to animate the camera
 					//animation.addClickSupport(camera, renderer);
 				}
 

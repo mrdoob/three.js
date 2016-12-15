@@ -79,16 +79,6 @@
 	init();
 	animate();
 
-	function setupLight() {
-		if ( ! dirLight ) {
-			dirLight = new THREE.DirectionalLight(0xaaaaaa);
-			dirLight.position.set(500, 500, 1000).normalize();
-			dirLight.castShadow = false;
-		}
-		camera.add(dirLight);
-		camera.add(dirLight.target);
-	}
-
 	function init() {
 		camera            = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1e5);
 		camera.position.z = 4;
@@ -101,8 +91,6 @@
 		scene.fog.color.setHSL(0.6, 0, 1);
 
 		scene.add(camera);
-
-		setupLight();
 
 		var debug = true;
 
