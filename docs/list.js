@@ -182,12 +182,14 @@ var list = {
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],
 			[ "PointLight", "api/lights/PointLight" ],
+			[ "RectAreaLight", "api/lights/RectAreaLight" ],
 			[ "SpotLight", "api/lights/SpotLight" ]
 		],
 
 		"Lights / Shadows": [
 			[ "DirectionalLightShadow", "api/lights/shadows/DirectionalLightShadow" ],
 			[ "LightShadow", "api/lights/shadows/LightShadow" ],
+			[ "RectAreaLightShadow", "api/lights/shadows/RectAreaLightShadow" ],
 			[ "SpotLightShadow", "api/lights/shadows/SpotLightShadow" ]
 		],
 
