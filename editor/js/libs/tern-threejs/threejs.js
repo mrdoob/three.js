@@ -3926,7 +3926,7 @@
           "!doc": "Creates a perspective projection matrix."
         },
         "makeOrthographic": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, top: number, bottom: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates an orthographic projection matrix."
         },
         "clone": {
