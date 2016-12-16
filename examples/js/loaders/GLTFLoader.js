@@ -1153,7 +1153,8 @@ THREE.GLTFLoader = ( function () {
 
 				var group = new THREE.Object3D();
 				group.name = mesh.name;
-				group.userData = mesh.extras || {};
+
+				if ( mesh.extras ) group.userData = mesh.extras;
 
 				var primitives = mesh.primitives;
 
@@ -1226,7 +1227,8 @@ THREE.GLTFLoader = ( function () {
 
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
-						meshNode.userData = primitive.extras || {};
+
+						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
 						group.add( meshNode );
 
@@ -1268,7 +1270,8 @@ THREE.GLTFLoader = ( function () {
 
 				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				_camera.name = camera.name;
-				_camera.userData = camera.extras || {};
+
+				if ( camera.extras ) _camera.userData = camera.extras;
 
 				return _camera;
 
@@ -1276,7 +1279,8 @@ THREE.GLTFLoader = ( function () {
 
 				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
 				_camera.name = camera.name;
-				_camera.userData = camera.extras || {};
+
+				if ( camera.extras ) _camera.userData = camera.extras;
 
 				return _camera;
 
@@ -1393,7 +1397,8 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			_node.name = node.name;
-			_node.userData = node.extras || {};
+
+			if ( node.extras ) _node.userData = node.extras;
 
 			_node.matrixAutoUpdate = false;
 
@@ -1674,7 +1679,8 @@ THREE.GLTFLoader = ( function () {
 
 				var _scene = new THREE.Scene();
 				_scene.name = scene.name;
-				_scene.userData = scene.extras || {};
+
+				if ( scene.extras ) _scene.userData = scene.extras;
 
 				var nodes = scene.nodes;
 

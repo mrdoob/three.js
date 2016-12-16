@@ -150,15 +150,9 @@
                     },
                     "indices": "accessor_21",
                     "material": "blinn3-fx",
-                    "mode": 4,
-                    "extras": {
-                      "foo": "primitive"
-                    }
+                    "mode": 4
                 }
-            ],
-            "extras": {
-              "foo": "mesh"
-            }
+            ]
         }
     },
     "nodes": {
@@ -185,10 +179,7 @@
             "meshes": [
                 "LOD3spShape-lib"
             ],
-            "name": "LOD3sp",
-            "extras": {
-              "foo": "node"
-            }
+            "name": "LOD3sp"
         },
         "camera1": {
             "camera": "cameraShape1",
@@ -211,10 +202,7 @@
                 -4.31078,
                 1
             ],
-            "name": "camera1",
-            "extras": {
-              "foo": "camera"
-            }
+            "name": "camera1"
         },
         "directionalLight1": {
             "children": [],
@@ -236,10 +224,7 @@
                 -2.92179,
                 1
             ],
-            "name": "directionalLight1",
-            "extras": {
-              "foo": "light"
-            }
+            "name": "directionalLight1"
         }
     },
     "programs": {
@@ -268,10 +253,7 @@
                 "LOD3sp",
                 "camera1",
                 "directionalLight1"
-            ],
-            "extras": {
-              "foo": "scene"
-            }
+            ]
         }
     },
     "shaders": {
