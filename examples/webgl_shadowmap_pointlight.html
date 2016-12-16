@@ -60,7 +60,10 @@
 					pointLight.shadow.camera.near = 1;
 					pointLight.shadow.camera.far = 30;
 					// pointLight.shadowCameraVisible = true;
+					pointLight.shadow.mapSize.set(1024, 1024);
+					// pointLight.shadow.mapSize.set(2048, 2048);
 					pointLight.shadow.bias = 0.01;
+					pointLight.shadow.radius = 64;
 
 					var geometry = new THREE.SphereGeometry( 0.3, 12, 6 );
 					var material = new THREE.MeshBasicMaterial( { color: color } );
@@ -71,11 +74,15 @@
 
 				}
 
+				// var shadowType = THREE.BasicShadowMap;
+				// var shadowType = THREE.PCFShadowMap;
+				var shadowType = THREE.PCFSoftShadowMap;
+
 				pointLight = createLight( 0xffffff );
 				scene.add( pointLight );
 
-				pointLight2 = createLight( 0xff0000 );
-				scene.add( pointLight2 );
+				// pointLight2 = createLight( 0xff0000 );
+				// scene.add( pointLight2 );
 
 				var geometry = new THREE.TorusKnotGeometry( 14, 1, 150, 20 );
 				var material = new THREE.MeshPhongMaterial( {
@@ -107,7 +114,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.BasicShadowMap;
+				renderer.shadowMap.type = shadowType;
 				document.body.appendChild( renderer.domElement );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -143,15 +150,15 @@
 
 				var time = performance.now() * 0.001;
 
-				pointLight.position.x = Math.sin( time ) * 9;
-				pointLight.position.y = Math.sin( time * 1.1 ) * 9 + 5;
-				pointLight.position.z = Math.sin( time * 1.2 ) * 9;
+				// pointLight.position.x = Math.sin( time ) * 9;
+				// pointLight.position.y = Math.sin( time * 1.1 ) * 9 + 5;
+				// pointLight.position.z = Math.sin( time * 1.2 ) * 9;
 
 				time += 10000;
 
-				pointLight2.position.x = Math.sin( time ) * 9;
-				pointLight2.position.y = Math.sin( time * 1.1 ) * 9 + 5;
-				pointLight2.position.z = Math.sin( time * 1.2 ) * 9;
+				// pointLight2.position.x = Math.sin( time ) * 9;
+				// pointLight2.position.y = Math.sin( time * 1.1 ) * 9 + 5;
+				// pointLight2.position.z = Math.sin( time * 1.2 ) * 9;
 
 				torusKnot.rotation.y = time * 0.1;
 
