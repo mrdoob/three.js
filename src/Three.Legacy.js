@@ -470,7 +470,7 @@ Object.assign( Matrix4.prototype, {
 	makeFrustum: function( left, right, bottom, top, near, far ) {
 
 		console.warn( 'THREE.Matrix4: .makeFrustum() has been renamed to .makePerspective().' );
-		return this.makePerspective( left, right, bottom, top, near, far );
+		return this.makePerspective( left, right, top, bottom, near, far );
 
 	}
 

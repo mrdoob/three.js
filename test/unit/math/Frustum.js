@@ -88,7 +88,7 @@ test( "setFromMatrix/makeOrthographic/containsPoint", function() {
 });
 
 test( "setFromMatrix/makePerspective/containsPoint", function() {
-	var m = new THREE.Matrix4().makePerspective( -1, 1, -1, 1, 1, 100 );
+	var m = new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 100 );
 	var a = new THREE.Frustum().setFromMatrix( m );
 
 	ok( ! a.containsPoint( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
@@ -107,7 +107,7 @@ test( "setFromMatrix/makePerspective/containsPoint", function() {
 });
 
 test( "setFromMatrix/makePerspective/intersectsSphere", function() {
-	var m = new THREE.Matrix4().makePerspective( -1, 1, -1, 1, 1, 100 );
+	var m = new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 100 );
 	var a = new THREE.Frustum().setFromMatrix( m );
 
 	ok( ! a.intersectsSphere( new THREE.Sphere( new THREE.Vector3( 0, 0, 0 ), 0 ) ), "Passed!" );

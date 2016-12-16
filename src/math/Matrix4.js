@@ -833,7 +833,7 @@ Matrix4.prototype = {
 
 	}(),
 
-	makePerspective: function ( left, right, bottom, top, near, far ) {
+	makePerspective: function ( left, right, top, bottom, near, far ) {
 
 		var te = this.elements;
 		var x = 2 * near / ( right - left );
