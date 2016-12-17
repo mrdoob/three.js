@@ -346,7 +346,7 @@ THREE.Projector = function () {
 			_object.object = object;
 
 			_vector3.setFromMatrixPosition( object.matrixWorld );
-			_vector3.applyProjection( _viewProjectionMatrix );
+			_vector3.applyMatrix4( _viewProjectionMatrix );
 			_object.z = _vector3.z;
 			_object.renderOrder = object.renderOrder;
 

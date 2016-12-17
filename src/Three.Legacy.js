@@ -403,8 +403,8 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-		return vector.applyProjection( this );
+		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 	multiplyVector4: function ( vector ) {
