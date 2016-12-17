@@ -29488,6 +29488,13 @@ Object.assign( ImageLoader.prototype, {
 			loader.setPath( this.path );
 			loader.setResponseType( 'blob' );
 			loader.setWithCredentials( this.withCredentials );
+
+			// By default the FileLoader requests files to be loaded with a MIME
+			// type of `text/plain`. Using `URL.createObjectURL()` with SVGs that
+			// have a MIME type of `text/plain` results in an error, so explicitly
+			// set the SVG MIME type.
+			if ( /\.svg$/.test( url ) ) loader.setMimeType( 'image/svg+xml' );
+
 			loader.load( url, function ( blob ) {
 
 				image.src = URL.createObjectURL( blob );
