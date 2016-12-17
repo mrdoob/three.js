@@ -854,16 +854,52 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
+		var repeatX, repeatY, mirrorX, mirrorY;
+		if (texture.wrapS === THREE.RepeatWrapping) {
+			repeatX = true;
+		}
+		else if (texture.wrapS === THREE.MirroredRepeatWrapping) {
+			repeatX = true;
+			mirrorX = true;
+		}
+		if (texture.wrapT === THREE.RepeatWrapping) {
+			repeatY = true;
+		}
+		else if (texture.wrapT === THREE.MirroredRepeatWrapping) {
+			repeatY = true;
+			mirrorY = true;
+		}
+
 		var canvas = document.createElement( 'canvas' );
-		canvas.width = image.width;
-		canvas.height = image.height;
+		if (mirrorX) {
+			canvas.width = image.width * 2;
+		}
+		else {
+			canvas.width = image.width;
+		}
+		if (mirrorY) {
+			canvas.height = image.height * 2;
+		}
+		else {
+			canvas.height = image.height;
+		}
 
 		var context = canvas.getContext( '2d' );
 		context.setTransform( 1, 0, 0, - 1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
-		var repeatX = texture.wrapS === THREE.RepeatWrapping;
-		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+		if (mirrorX) {
+			context.setTransform(-1, 0, 0, -1, image.width, image.height);
+			context.drawImage(image, -image.width, 0);
+		}
+		if (mirrorY) {
+			context.setTransform(1, 0, 0, 1, 0, 0);
+			context.drawImage(image, 0, image.height);
+		}
+		if (mirrorX && mirrorY) {
+			context.setTransform(-1, 0, 0, 1, image.width, 0);
+			context.drawImage(image, -image.width, image.height);
+		}
 
 		var repeat = 'no-repeat';
 
