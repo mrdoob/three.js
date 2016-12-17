@@ -837,7 +837,7 @@ Matrix4.prototype = {
 
 		if ( far === undefined ) {
 
-			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.');
+			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
 
 		}
 
