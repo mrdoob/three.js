@@ -84,7 +84,7 @@ AnimationMixer.prototype = {
 	},
 
 	// get an existing action
-	existingAction: function( clip, optionalRoot ) {
+	existingAction: function ( clip, optionalRoot ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -107,7 +107,7 @@ AnimationMixer.prototype = {
 	},
 
 	// deactivates all previously scheduled actions
-	stopAllAction: function() {
+	stopAllAction: function () {
 
 		var actions = this._actions,
 			nActions = this._nActiveActions,
@@ -134,7 +134,7 @@ AnimationMixer.prototype = {
 	},
 
 	// advance the time and update apply the animation
-	update: function( deltaTime ) {
+	update: function ( deltaTime ) {
 
 		deltaTime *= this.timeScale;
 
@@ -176,14 +176,14 @@ AnimationMixer.prototype = {
 	},
 
 	// return this mixer's root target object
-	getRoot: function() {
+	getRoot: function () {
 
 		return this._root;
 
 	},
 
 	// free all resources specific to a particular clip
-	uncacheClip: function( clip ) {
+	uncacheClip: function ( clip ) {
 
 		var actions = this._actions,
 			clipUuid = clip.uuid,
@@ -225,7 +225,7 @@ AnimationMixer.prototype = {
 	},
 
 	// free all resources specific to a particular root target object
-	uncacheRoot: function( root ) {
+	uncacheRoot: function ( root ) {
 
 		var rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
@@ -262,7 +262,7 @@ AnimationMixer.prototype = {
 	},
 
 	// remove a targeted clip from the cache
-	uncacheAction: function( clip, optionalRoot ) {
+	uncacheAction: function ( clip, optionalRoot ) {
 
 		var action = this.existingAction( clip, optionalRoot );
 
