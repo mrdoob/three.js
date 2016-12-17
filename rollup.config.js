@@ -1,7 +1,10 @@
-function glsl () {
+function glsl() {
+
 	return {
-		transform ( code, id ) {
-			if ( !/\.glsl$/.test( id ) ) return;
+
+		transform( code, id ) {
+
+			if ( /\.glsl$/.test( id ) === false ) return;
 
 			var transformedCode = 'export default ' + JSON.stringify(
 				code
@@ -12,9 +15,12 @@ function glsl () {
 			return {
 				code: transformedCode,
 				map: { mappings: '' }
-			}
+			};
+
 		}
+
 	};
+
 }
 
 export default {
@@ -23,6 +29,7 @@ export default {
 	plugins: [
 		glsl()
 	],
+	// sourceMap: true,
 	targets: [
 		{
 			format: 'umd',
