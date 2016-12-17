@@ -31,7 +31,7 @@ Object.assign( ImageLoader.prototype, {
 		};
 		image.onerror = onError;
 
-		if ( url.indexOf( 'data:' ) === 0 ) {
+		if ( url.indexOf( 'data:' ) === -1 ) {
 
 			image.src = url;
 
