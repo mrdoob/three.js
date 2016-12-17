@@ -1154,6 +1154,8 @@ THREE.GLTFLoader = ( function () {
 				var group = new THREE.Object3D();
 				group.name = mesh.name;
 
+				if ( mesh.extras ) group.userData = mesh.extras;
+
 				var primitives = mesh.primitives;
 
 				for ( var name in primitives ) {
@@ -1226,6 +1228,8 @@ THREE.GLTFLoader = ( function () {
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
 
+						if ( primitive.extras ) meshNode.userData = primitive.extras;
+
 						group.add( meshNode );
 
 					} else {
@@ -1267,12 +1271,16 @@ THREE.GLTFLoader = ( function () {
 				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				_camera.name = camera.name;
 
+				if ( camera.extras ) _camera.userData = camera.extras;
+
 				return _camera;
 
 			} else if ( camera.type == "orthographic" && camera.orthographic ) {
 
 				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
 				_camera.name = camera.name;
+
+				if ( camera.extras ) _camera.userData = camera.extras;
 
 				return _camera;
 
@@ -1390,6 +1398,8 @@ THREE.GLTFLoader = ( function () {
 
 			_node.name = node.name;
 
+			if ( node.extras ) _node.userData = node.extras;
+
 			_node.matrixAutoUpdate = false;
 
 			if ( node.matrix !== undefined ) {
@@ -1451,6 +1461,7 @@ THREE.GLTFLoader = ( function () {
 
 								var originalMaterial = child.material;
 								var originalGeometry = child.geometry;
+								var originalUserData = child.userData;
 
 								var material;
 
@@ -1466,6 +1477,7 @@ THREE.GLTFLoader = ( function () {
 
 								child = new THREE.Mesh( originalGeometry, material );
 								child.castShadow = true;
+								child.userData = originalUserData;
 
 								var skinEntry;
 
@@ -1484,6 +1496,7 @@ THREE.GLTFLoader = ( function () {
 
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
+									child.userData = originalUserData;
 
 									var bones = [];
 									var boneInverses = [];
@@ -1666,6 +1679,8 @@ THREE.GLTFLoader = ( function () {
 
 				var _scene = new THREE.Scene();
 				_scene.name = scene.name;
+
+				if ( scene.extras ) _scene.userData = scene.extras;
 
 				var nodes = scene.nodes;
 
