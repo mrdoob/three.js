@@ -184,11 +184,6 @@ Object.assign( FileLoader.prototype, {
 			if ( this.responseType !== undefined ) request.responseType = this.responseType;
 			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
-			// Setting 'text/plain' as the MIME type for SVG files will cause a
-			// problem when the ImageLoader tries to use it as the src of an image,
-			// so explicitly set the SVG MIME type.
-			if ( /\.svg$/.test( url ) ) this.mimeType = 'image/svg+xml';
-
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
 			request.send( null );
