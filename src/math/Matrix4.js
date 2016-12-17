@@ -835,6 +835,12 @@ Matrix4.prototype = {
 
 	makePerspective: function ( left, right, top, bottom, near, far ) {
 
+		if ( far === undefined ) {
+
+			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.');
+
+		}
+
 		var te = this.elements;
 		var x = 2 * near / ( right - left );
 		var y = 2 * near / ( top - bottom );
