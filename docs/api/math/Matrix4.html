@@ -116,7 +116,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
 		</div>
-		
+
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<div>Creates a new Matrix4 with identical [page:.elements elements] to this one.</div>
@@ -236,9 +236,9 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		</code>
 		</div>
 
-		<h3>[method:Matrix4 makeFrustum]( [page:Float left], [page:Float right], [page:Float bottom], [page:Float top], [page:Float near], [page:Float far] )</h3>
+		<h3>[method:Matrix4 makePerspective]( [page:Float left], [page:Float right], [page:Float top], [page:Float bottom], [page:Float near], [page:Float far] )</h3>
 		<div>
-			Creates a matrix representing a [link:https://en.wikipedia.org/wiki/Frustum frustum].
+			Creates a [link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection] matrix.
 			This is used internally by [page:PerspectiveCamera.updateProjectionMatrix]()
 		</div>
 
@@ -246,15 +246,6 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		<div>
 		Creates an [link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection] matrix.
 		This is used internally by [page:OrthographicCamera.updateProjectionMatrix]().
-		</div>
-
-		<h3>[method:Matrix4 makePerspective]( [page:Float fov], [page:Float aspect], [page:Float near], [page:Float far] )</h3>
-		<div>
-		Creates a [link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection] matrix.
-
-		Internally this calculates the values of [page:Float left], [page:Float right], [page:Float bottom] and [page:Float top],
-		and calls [page:.makeFrustum makeFrustum].
-
 		</div>
 
 		<h3>[method:Matrix4 makeRotationFromEuler]( [page:Euler euler] )</h3>

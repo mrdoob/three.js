@@ -465,6 +465,12 @@ Object.assign( Matrix4.prototype, {
 
 		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 
+	},
+	makeFrustum: function( left, right, bottom, top, near, far ) {
+
+		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
+		return this.makePerspective( left, right, top, bottom, near, far );
+
 	}
 
 } );
