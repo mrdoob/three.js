@@ -26,6 +26,8 @@ var onDocumentLoad = function ( event ) {
 
 	var text = document.body.innerHTML;
 
+
+
 	text = text.replace( /\[name\]/gi, name );
 	text = text.replace( /\[path\]/gi, path );
 	text = text.replace( /\[page:([\w\.]+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
@@ -43,6 +45,11 @@ var onDocumentLoad = function ( event ) {
 	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
 	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
 
+//Extract method return type and add it to the bottom of a method definition, unless it is
+//1: null - do nothing
+//2: this - add "return self (chainable)"
+text = text.replace( /\[method:([\w\_]+)/gi, 'gogogo' );
+//console.log( methodPos );
 
 	document.body.innerHTML = text;
 
