@@ -136,7 +136,6 @@ export { BoxHelper } from './extras/helpers/BoxHelper.js';
 export { ArrowHelper } from './extras/helpers/ArrowHelper.js';
 export { AxisHelper } from './extras/helpers/AxisHelper.js';
 export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
-export { SplineCurve3 } from './extras/curves/SplineCurve3.js';
 export { CubicBezierCurve3 } from './extras/curves/CubicBezierCurve3.js';
 export { QuadraticBezierCurve3 } from './extras/curves/QuadraticBezierCurve3.js';
 export { LineCurve3 } from './extras/curves/LineCurve3.js';
