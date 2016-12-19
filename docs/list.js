@@ -107,8 +107,7 @@ var list = {
 			[ "LineCurve3", "api/extras/curves/LineCurve3" ],
 			[ "QuadraticBezierCurve", "api/extras/curves/QuadraticBezierCurve" ],
 			[ "QuadraticBezierCurve3", "api/extras/curves/QuadraticBezierCurve3" ],
-			[ "SplineCurve", "api/extras/curves/SplineCurve" ],
-			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
+			[ "SplineCurve", "api/extras/curves/SplineCurve" ]
 		],
 
 		"Extras / Helpers": [

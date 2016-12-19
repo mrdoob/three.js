@@ -96,7 +96,7 @@
 
 	function EventDispatcher() {}
 
-	Object.assign( EventDispatcher.prototype, {
+	EventDispatcher.prototype = {
 
 		addEventListener: function ( type, listener ) {
 
@@ -179,7 +179,7 @@
 
 		}
 
-	} );
+	};
 
 	var REVISION = '84dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
@@ -1909,7 +1909,9 @@
 
 	}
 
-	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
+	WebGLRenderTarget.prototype = {
+
+		constructor: WebGLRenderTarget,
 
 		isWebGLRenderTarget: true,
 
@@ -1958,7 +1960,9 @@
 
 		}
 
-	} );
+	};
+
+	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author alteredq / http://alteredqualia.com
@@ -4173,7 +4177,13 @@
 
 		}(),
 
-		makeFrustum: function ( left, right, bottom, top, near, far ) {
+		makePerspective: function ( left, right, top, bottom, near, far ) {
+
+			if ( far === undefined ) {
+
+				console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
+
+			}
 
 			var te = this.elements;
 			var x = 2 * near / ( right - left );
@@ -4190,17 +4200,6 @@
 			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
 
 			return this;
-
-		},
-
-		makePerspective: function ( fov, aspect, near, far ) {
-
-			var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
-			var ymin = - ymax;
-			var xmin = ymin * aspect;
-			var xmax = ymax * aspect;
-
-			return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
 		},
 
@@ -7259,7 +7258,7 @@
 
 					currentValue.set( newValue );
 
-				} else if ( (currentValue && currentValue.isVector3) && (newValue && newValue.isVector3) ) {
+				} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 					currentValue.copy( newValue );
 
@@ -10519,7 +10518,9 @@
 	Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 	Object3D.DefaultMatrixAutoUpdate = true;
 
-	Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+	Object3D.prototype = {
+
+		constructor: Object3D,
 
 		isObject3D: true,
 
@@ -11146,7 +11147,9 @@
 
 		}
 
-	} );
+	};
+
+	Object.assign( Object3D.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -12398,6 +12401,9 @@
 	 * @author bhouston / http://clara.io
 	 */
 
+	var count = 0;
+	function GeometryIdCount() { return count++; }
+
 	function Geometry() {
 
 		Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
@@ -12410,7 +12416,7 @@
 		this.vertices = [];
 		this.colors = [];
 		this.faces = [];
-		this.faceVertexUvs = [ [] ];
+		this.faceVertexUvs = [[]];
 
 		this.morphTargets = [];
 		this.morphNormals = [];
@@ -12435,7 +12441,9 @@
 
 	}
 
-	Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+	Geometry.prototype = {
+
+		constructor: Geometry,
 
 		isGeometry: true,
 
@@ -12687,7 +12695,7 @@
 
 						for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-							addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
+							addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
 						}
 
@@ -13080,7 +13088,7 @@
 
 		merge: function ( geometry, matrix, materialIndexOffset ) {
 
-			if ( (geometry && geometry.isGeometry) === false ) {
+			if ( ( geometry && geometry.isGeometry ) === false ) {
 
 				console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 				return;
@@ -13200,7 +13208,7 @@
 
 		mergeMesh: function ( mesh ) {
 
-			if ( (mesh && mesh.isMesh) === false ) {
+			if ( ( mesh && mesh.isMesh ) === false ) {
 
 				console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 				return;
@@ -13265,15 +13273,12 @@
 
 				indices = [ face.a, face.b, face.c ];
 
-				var dupIndex = - 1;
-
 				// if any duplicate vertices are found in a Face3
 				// we have to remove the face as nothing can be saved
 				for ( var n = 0; n < 3; n ++ ) {
 
 					if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
-						dupIndex = n;
 						faceIndicesToRemove.push( i );
 						break;
 
@@ -13644,10 +13649,9 @@
 
 		}
 
-	} );
+	};
 
-	var count = 0;
-	function GeometryIdCount() { return count++; }
+	Object.assign( Geometry.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -13677,7 +13681,9 @@
 
 	}
 
-	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+	BufferGeometry.prototype = {
+
+		constructor: BufferGeometry,
 
 		isBufferGeometry: true,
 
@@ -14672,9 +14678,11 @@
 
 		}
 
-	} );
+	};
 
 	BufferGeometry.MaxIndex = 65535;
+
+	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -15572,8 +15580,7 @@
 			var skew = this.filmOffset;
 			if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-			this.projectionMatrix.makeFrustum(
-					left, left + width, top - height, top, near, this.far );
+			this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
 
 		},
 
@@ -29487,6 +29494,13 @@
 				loader.setPath( this.path );
 				loader.setResponseType( 'blob' );
 				loader.setWithCredentials( this.withCredentials );
+
+				// By default the FileLoader requests files to be loaded with a MIME
+				// type of `text/plain`. Using `URL.createObjectURL()` with SVGs that
+				// have a MIME type of `text/plain` results in an error, so explicitly
+				// set the SVG MIME type.
+				if ( /\.svg$/.test( url ) ) loader.setMimeType( 'image/svg+xml' );
+
 				loader.load( url, function ( blob ) {
 
 					image.src = URL.createObjectURL( blob );
@@ -37980,12 +37994,14 @@
 
 	}
 
-	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
+	AnimationMixer.prototype = {
+
+		constructor: AnimationMixer,
 
 		// return an action for a clip optionally using a custom root target
 		// object (this method allocates a lot of dynamic memory in case a
 		// previously unknown clip/root combination is specified)
-		clipAction: function( clip, optionalRoot ) {
+		clipAction: function ( clip, optionalRoot ) {
 
 			var root = optionalRoot || this._root,
 				rootUuid = root.uuid,
@@ -38035,7 +38051,7 @@
 		},
 
 		// get an existing action
-		existingAction: function( clip, optionalRoot ) {
+		existingAction: function ( clip, optionalRoot ) {
 
 			var root = optionalRoot || this._root,
 				rootUuid = root.uuid,
@@ -38058,7 +38074,7 @@
 		},
 
 		// deactivates all previously scheduled actions
-		stopAllAction: function() {
+		stopAllAction: function () {
 
 			var actions = this._actions,
 				nActions = this._nActiveActions,
@@ -38085,7 +38101,7 @@
 		},
 
 		// advance the time and update apply the animation
-		update: function( deltaTime ) {
+		update: function ( deltaTime ) {
 
 			deltaTime *= this.timeScale;
 
@@ -38127,14 +38143,14 @@
 		},
 
 		// return this mixer's root target object
-		getRoot: function() {
+		getRoot: function () {
 
 			return this._root;
 
 		},
 
 		// free all resources specific to a particular clip
-		uncacheClip: function( clip ) {
+		uncacheClip: function ( clip ) {
 
 			var actions = this._actions,
 				clipUuid = clip.uuid,
@@ -38176,7 +38192,7 @@
 		},
 
 		// free all resources specific to a particular root target object
-		uncacheRoot: function( root ) {
+		uncacheRoot: function ( root ) {
 
 			var rootUuid = root.uuid,
 				actionsByClip = this._actionsByClip;
@@ -38213,7 +38229,7 @@
 		},
 
 		// remove a targeted clip from the cache
-		uncacheAction: function( clip, optionalRoot ) {
+		uncacheAction: function ( clip, optionalRoot ) {
 
 			var action = this.existingAction( clip, optionalRoot );
 
@@ -38226,13 +38242,13 @@
 
 		}
 
-	} );
+	};
 
 	// Implementation details:
 
 	Object.assign( AnimationMixer.prototype, {
 
-		_bindAction: function( action, prototypeAction ) {
+		_bindAction: function ( action, prototypeAction ) {
 
 			var root = action._localRoot || this._root,
 				tracks = action._clip.tracks,
@@ -38299,7 +38315,7 @@
 
 		},
 
-		_activateAction: function( action ) {
+		_activateAction: function ( action ) {
 
 			if ( ! this._isActiveAction( action ) ) {
 
@@ -38341,7 +38357,7 @@
 
 		},
 
-		_deactivateAction: function( action ) {
+		_deactivateAction: function ( action ) {
 
 			if ( this._isActiveAction( action ) ) {
 
@@ -38369,7 +38385,7 @@
 
 		// Memory manager
 
-		_initMemoryManager: function() {
+		_initMemoryManager: function () {
 
 			this._actions = []; // 'nActiveActions' followed by inactive ones
 			this._nActiveActions = 0;
@@ -38414,14 +38430,14 @@
 
 		// Memory management for AnimationAction objects
 
-		_isActiveAction: function( action ) {
+		_isActiveAction: function ( action ) {
 
 			var index = action._cacheIndex;
 			return index !== null && index < this._nActiveActions;
 
 		},
 
-		_addInactiveAction: function( action, clipUuid, rootUuid ) {
+		_addInactiveAction: function ( action, clipUuid, rootUuid ) {
 
 			var actions = this._actions,
 				actionsByClip = this._actionsByClip,
@@ -38456,7 +38472,7 @@
 
 		},
 
-		_removeInactiveAction: function( action ) {
+		_removeInactiveAction: function ( action ) {
 
 			var actions = this._actions,
 				lastInactiveAction = actions[ actions.length - 1 ],
@@ -38501,7 +38517,7 @@
 
 		},
 
-		_removeInactiveBindingsForAction: function( action ) {
+		_removeInactiveBindingsForAction: function ( action ) {
 
 			var bindings = action._propertyBindings;
 			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
@@ -38518,7 +38534,7 @@
 
 		},
 
-		_lendAction: function( action ) {
+		_lendAction: function ( action ) {
 
 			// [ active actions |  inactive actions  ]
 			// [  active actions >| inactive actions ]
@@ -38541,7 +38557,7 @@
 
 		},
 
-		_takeBackAction: function( action ) {
+		_takeBackAction: function ( action ) {
 
 			// [  active actions  | inactive actions ]
 			// [ active actions |< inactive actions  ]
@@ -38566,7 +38582,7 @@
 
 		// Memory management for PropertyMixer objects
 
-		_addInactiveBinding: function( binding, rootUuid, trackName ) {
+		_addInactiveBinding: function ( binding, rootUuid, trackName ) {
 
 			var bindingsByRoot = this._bindingsByRootAndName,
 				bindingByName = bindingsByRoot[ rootUuid ],
@@ -38587,7 +38603,7 @@
 
 		},
 
-		_removeInactiveBinding: function( binding ) {
+		_removeInactiveBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				propBinding = binding.binding,
@@ -38615,7 +38631,7 @@
 
 		},
 
-		_lendBinding: function( binding ) {
+		_lendBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				prevIndex = binding._cacheIndex,
@@ -38632,7 +38648,7 @@
 
 		},
 
-		_takeBackBinding: function( binding ) {
+		_takeBackBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				prevIndex = binding._cacheIndex,
@@ -38652,7 +38668,7 @@
 
 		// Memory management of Interpolants for weight and time scale
 
-		_lendControlInterpolant: function() {
+		_lendControlInterpolant: function () {
 
 			var interpolants = this._controlInterpolants,
 				lastActiveIndex = this._nActiveControlInterpolants ++,
@@ -38673,7 +38689,7 @@
 
 		},
 
-		_takeBackControlInterpolant: function( interpolant ) {
+		_takeBackControlInterpolant: function ( interpolant ) {
 
 			var interpolants = this._controlInterpolants,
 				prevIndex = interpolant.__cacheIndex,
@@ -38693,6 +38709,8 @@
 		_controlInterpolantsResultBuffer: new Float32Array( 1 )
 
 	} );
+
+	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -42029,6 +42047,12 @@
 
 			console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
 
+		},
+		makeFrustum: function( left, right, bottom, top, near, far ) {
+
+			console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
+			return this.makePerspective( left, right, top, bottom, near, far );
+
 		}
 
 	} );
@@ -42471,25 +42495,6 @@
 		}
 
 	} );
-
-	//
-
-	EventDispatcher.prototype = Object.assign( Object.create( {
-
-		// Note: Extra base ensures these properties are not 'assign'ed.
-
-		constructor: EventDispatcher,
-
-		apply: function ( target ) {
-
-			console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-					"just inherit or Object.assign the prototype to mix-in." );
-
-			Object.assign( target, this );
-
-		}
-
-	} ), EventDispatcher.prototype );
 
 	//
 

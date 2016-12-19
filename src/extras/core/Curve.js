@@ -27,7 +27,7 @@ import { Matrix4 } from '../../math/Matrix4';
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
  * THREE.CubicBezierCurve3
- * THREE.SplineCurve3
+ * THREE.CatmullRomCurve3
  *
  * A series of curves can be represented as a THREE.CurvePath
  *

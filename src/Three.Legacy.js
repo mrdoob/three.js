@@ -19,7 +19,6 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
-import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
@@ -218,6 +217,18 @@ export function ClosedSplineCurve3( points ) {
 
 ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
+//
+
+export function SplineCurve3( points ) {
+
+	console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
+
+	CatmullRomCurve3.call( this, points );
+	this.type = 'catmullrom';
+
+}
+
+SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
 //
 export function BoundingBoxHelper( object, color ) {
@@ -465,6 +476,12 @@ Object.assign( Matrix4.prototype, {
 	applyToVector3Array: function( array, offset, length ) {
 
 		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
+
+	},
+	makeFrustum: function( left, right, bottom, top, near, far ) {
+
+		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
+		return this.makePerspective( left, right, top, bottom, near, far );
 
 	}
 
@@ -908,25 +925,6 @@ Object.defineProperties( ShaderMaterial.prototype, {
 	}
 
 } );
-
-//
-
-EventDispatcher.prototype = Object.assign( Object.create( {
-
-	// Note: Extra base ensures these properties are not 'assign'ed.
-
-	constructor: EventDispatcher,
-
-	apply: function ( target ) {
-
-		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-				"just inherit or Object.assign the prototype to mix-in." );
-
-		Object.assign( target, this );
-
-	}
-
-} ), EventDispatcher.prototype );
 
 //
 
