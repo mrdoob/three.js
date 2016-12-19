@@ -3,7 +3,8 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+			[ "Useful links", "manual/introduction/Useful-links" ]
 		]
 	},
 
