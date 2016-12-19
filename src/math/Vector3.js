@@ -310,14 +310,6 @@ Vector3.prototype = {
 
 	},
 
-	applyProjection: function ( m ) {
-
-		console.warn( 'THREE.Vector3: .applyProjection() is deprecated. Use .applyMatrix4( m ) instead.' );
-
-		return this.applyMatrix4( m );
-
-	},
-
 	applyQuaternion: function ( q ) {
 
 		var x = this.x, y = this.y, z = this.z;
