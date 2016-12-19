@@ -94,7 +94,7 @@
 		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader -
 		<br>
 		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
-		COLLADA duck by Sony - other models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		COLLADA duck by Sony - Cesium models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
 		</div>
 	<div id="container">
 	</div>
@@ -429,6 +429,25 @@
 					addLights:true,
 					addGround:true,
 					shadows:true
+				},
+				{
+					name : "Snowflake",
+					url : "./models/gltf/snowflake/snowFlake.gltf",
+					objectScale: new THREE.Vector3(4, 4, 1),
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(0, 0, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false
+				},
+				{
+					name : "Snowflakes",
+					url : "./models/gltf/snowflakes/snowFlakes.gltf",
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(-1200, -1200, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false
 				}
 			];
 
