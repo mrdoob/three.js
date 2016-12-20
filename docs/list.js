@@ -252,7 +252,6 @@ var list = {
 			[ "Ray", "api/math/Ray" ],
 			[ "Sphere", "api/math/Sphere" ],
 			[ "Spherical", "api/math/Spherical" ],
-			[ "Spline", "api/math/Spline" ],
 			[ "Triangle", "api/math/Triangle" ],
 			[ "Vector2", "api/math/Vector2" ],
 			[ "Vector3", "api/math/Vector3" ],
