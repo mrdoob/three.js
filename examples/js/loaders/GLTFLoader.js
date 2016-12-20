@@ -1207,47 +1207,28 @@ THREE.GLTFLoader = ( function () {
 
 						if ( primitive.indices ) {
 
-							var indexArray = dependencies.accessors[ primitive.indices ];
-
-							geometry.setIndex( indexArray );
-
-							var offset = {
-								start: 0,
-								index: 0,
-								count: indexArray.count
-							};
-
-							geometry.groups.push( offset );
-
-							geometry.computeBoundingSphere();
+							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
 						}
-
 
 						var material = dependencies.materials[ primitive.material ];
 
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
-						
+
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
-						
+
 						group.add( meshNode );
 
-					}
-					
-					else if ( primitive.mode === WEBGL_CONSTANTS.LINES) {
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
 						var geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
-						_each( attributes, function( attributeEntry, attributeId ) {
+						_each( attributes, function ( attributeEntry, attributeId ) {
 
-							if ( !attributeEntry ) {
-
-								return;
-
-							}
+							if ( ! attributeEntry ) return;
 
 							var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
@@ -1256,46 +1237,36 @@ THREE.GLTFLoader = ( function () {
 								case 'POSITION':
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
-									
+
 								case 'COLOR':
-								geometry.addAttribute( 'color', bufferAttribute );
-								break;
-								
+									geometry.addAttribute( 'color', bufferAttribute );
+									break;
+
 							}
 
-						});
+						} );
+
+						var material = dependencies.materials[ primitive.material ];
+
+						var meshNode;
 
 						if ( primitive.indices ) {
 
-							var indexArray = dependencies.accessors[ primitive.indices ];
+							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
-							if(indexArray) {
+							meshNode = new THREE.LineSegments( geometry, material );
 
-								geometry.setIndex(indexArray);
+						} else {
 
-								var offset = {
-									start: 0,
-									index: 0,
-									count: indexArray.count
-								};
+							meshNode = new THREE.Line( geometry, material );
 
-								geometry.groups.push(offset);
-								geometry.computeBoundingSphere();
-							}
 						}
-
-						var material = dependencies.materials[ primitive.material ];
-						
-						var meshNode = new THREE.Line( geometry, material );
-						if ( primitive.indices ) meshNode = new THREE.LineSegments( geometry, material );
 
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
 						group.add( meshNode );
 
-				}
-					
-					else {
+					} else {
 
 						console.warn( "Only triangular and line primitives are supported" );
 
@@ -1537,13 +1508,22 @@ THREE.GLTFLoader = ( function () {
 									material = originalMaterial;
 
 								}
-								if(child.type=="Line") {
-									child = new THREE.Line(originalGeometry, material);
+
+								switch ( child.type ) {
+
+									case 'LineSegments':
+										child = new THREE.LineSegments( originalGeometry, material );
+										break;
+
+									case 'Line':
+										child = new THREE.Line( originalGeometry, material );
+										break;
+
+									default:
+										child = new THREE.Mesh( originalGeometry, material );
+
 								}
-								else if(child.type=="LineSegments") {
-									child = new THREE.LineSegments(originalGeometry, material);
-								}
-								else child = new THREE.Mesh( originalGeometry, material );
+
 								child.castShadow = true;
 								child.userData = originalUserData;
 
