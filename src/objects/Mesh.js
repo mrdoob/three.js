@@ -145,9 +145,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-			vA.fromAttribute( position, a );
-			vB.fromAttribute( position, b );
-			vC.fromAttribute( position, c );
+			vA.fromBufferAttribute( position, a );
+			vB.fromBufferAttribute( position, b );
+			vC.fromBufferAttribute( position, c );
 
 			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
@@ -155,9 +155,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				if ( uv ) {
 
-					uvA.fromAttribute( uv, a );
-					uvB.fromAttribute( uv, b );
-					uvC.fromAttribute( uv, c );
+					uvA.fromBufferAttribute( uv, a );
+					uvB.fromBufferAttribute( uv, b );
+					uvC.fromBufferAttribute( uv, c );
 
 					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
 
