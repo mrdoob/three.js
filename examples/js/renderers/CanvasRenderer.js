@@ -854,51 +854,41 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		var repeatX, repeatY, mirrorX, mirrorY;
-		if (texture.wrapS === THREE.RepeatWrapping) {
-			repeatX = true;
-		}
-		else if (texture.wrapS === THREE.MirroredRepeatWrapping) {
-			repeatX = true;
-			mirrorX = true;
-		}
-		if (texture.wrapT === THREE.RepeatWrapping) {
-			repeatY = true;
-		}
-		else if (texture.wrapT === THREE.MirroredRepeatWrapping) {
-			repeatY = true;
-			mirrorY = true;
-		}
+		var repeatX = texture.wrapS === THREE.RepeatWrapping || texture.wrapS === THREE.MirroredRepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping || texture.wrapT === THREE.MirroredRepeatWrapping;
+
+		var mirrorX = texture.wrapS === THREE.MirroredRepeatWrapping;
+		var mirrorY = texture.wrapT === THREE.MirroredRepeatWrapping;
+
+		//
 
 		var canvas = document.createElement( 'canvas' );
-		if (mirrorX) {
-			canvas.width = image.width * 2;
-		}
-		else {
-			canvas.width = image.width;
-		}
-		if (mirrorY) {
-			canvas.height = image.height * 2;
-		}
-		else {
-			canvas.height = image.height;
-		}
+		canvas.width = image.width * ( mirrorX ? 2 : 1 );
+		canvas.height = image.height * ( mirrorY ? 2 : 1 );
 
 		var context = canvas.getContext( '2d' );
 		context.setTransform( 1, 0, 0, - 1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
-		if (mirrorX) {
-			context.setTransform(-1, 0, 0, -1, image.width, image.height);
-			context.drawImage(image, -image.width, 0);
+		if ( mirrorX === true ) {
+
+			context.setTransform( - 1, 0, 0, - 1, image.width, image.height );
+			context.drawImage( image, - image.width, 0 );
+
 		}
-		if (mirrorY) {
-			context.setTransform(1, 0, 0, 1, 0, 0);
-			context.drawImage(image, 0, image.height);
+
+		if ( mirrorY === true ) {
+
+			context.setTransform( 1, 0, 0, 1, 0, 0 );
+			context.drawImage( image, 0, image.height );
+
 		}
-		if (mirrorX && mirrorY) {
-			context.setTransform(-1, 0, 0, 1, image.width, 0);
-			context.drawImage(image, -image.width, image.height);
+
+		if ( mirrorX === true && mirrorY === true ) {
+
+			context.setTransform( - 1, 0, 0, 1, image.width, 0 );
+			context.drawImage( image, - image.width, image.height );
+
 		}
 
 		var repeat = 'no-repeat';
