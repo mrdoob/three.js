@@ -250,17 +250,17 @@ Object.assign( Spline.prototype, {
 
 	initFromArray: function ( a ) {
 
-		console.warn( 'THREE.Spline: .initFromArray() has been removed.' );
+		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
 
 	},
 	getControlPointsArray: function ( optionalTarget ) {
 
-		console.warn( 'THREE.Spline: .getControlPointsArray() has been removed.' );
+		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
 
 	},
 	reparametrizeByArcLength: function ( samplingCoef ) {
 
-		console.warn( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
+		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
 
 	}
 
