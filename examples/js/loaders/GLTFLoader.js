@@ -301,6 +301,7 @@ THREE.GLTFLoader = ( function () {
 		REPEAT: 10497,
 		SAMPLER_2D: 35678,
 		TRIANGLES: 4,
+		LINES: 1,
 		UNSIGNED_BYTE: 5121,
 		UNSIGNED_SHORT: 5123,
 
@@ -1206,22 +1207,9 @@ THREE.GLTFLoader = ( function () {
 
 						if ( primitive.indices ) {
 
-							var indexArray = dependencies.accessors[ primitive.indices ];
-
-							geometry.setIndex( indexArray );
-
-							var offset = {
-								start: 0,
-								index: 0,
-								count: indexArray.count
-							};
-
-							geometry.groups.push( offset );
-
-							geometry.computeBoundingSphere();
+							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
 						}
-
 
 						var material = dependencies.materials[ primitive.material ];
 
@@ -1232,9 +1220,55 @@ THREE.GLTFLoader = ( function () {
 
 						group.add( meshNode );
 
+					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
+
+						var geometry = new THREE.BufferGeometry();
+
+						var attributes = primitive.attributes;
+
+						_each( attributes, function ( attributeEntry, attributeId ) {
+
+							if ( ! attributeEntry ) return;
+
+							var bufferAttribute = dependencies.accessors[ attributeEntry ];
+
+							switch ( attributeId ) {
+
+								case 'POSITION':
+									geometry.addAttribute( 'position', bufferAttribute );
+									break;
+
+								case 'COLOR':
+									geometry.addAttribute( 'color', bufferAttribute );
+									break;
+
+							}
+
+						} );
+
+						var material = dependencies.materials[ primitive.material ];
+
+						var meshNode;
+
+						if ( primitive.indices ) {
+
+							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
+
+							meshNode = new THREE.LineSegments( geometry, material );
+
+						} else {
+
+							meshNode = new THREE.Line( geometry, material );
+
+						}
+
+						if ( primitive.extras ) meshNode.userData = primitive.extras;
+
+						group.add( meshNode );
+
 					} else {
 
-						console.warn( "Non-triangular primitives are not supported" );
+						console.warn( "Only triangular and line primitives are supported" );
 
 					}
 
@@ -1475,7 +1509,21 @@ THREE.GLTFLoader = ( function () {
 
 								}
 
-								child = new THREE.Mesh( originalGeometry, material );
+								switch ( child.type ) {
+
+									case 'LineSegments':
+										child = new THREE.LineSegments( originalGeometry, material );
+										break;
+
+									case 'Line':
+										child = new THREE.Line( originalGeometry, material );
+										break;
+
+									default:
+										child = new THREE.Mesh( originalGeometry, material );
+
+								}
+
 								child.castShadow = true;
 								child.userData = originalUserData;
 
