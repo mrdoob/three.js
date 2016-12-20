@@ -301,12 +301,7 @@ Vector3.prototype = {
 		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
 		var w = e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ];
 
-		var d = 1 / w; // perspective divide
-		this.x *= d;
-		this.y *= d;
-		this.z *= d;
-
-		return this;
+		return this.divideScalar( 1 / w );
 
 	},
 
