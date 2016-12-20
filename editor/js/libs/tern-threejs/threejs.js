@@ -1431,15 +1431,6 @@
       },
       "!doc": "Alias for [page:EllipseCurve]"
     },
-    "ClosedSplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/ClosedSplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points that loops back onto itself",
-      "!type": "fn(points: [])"
-    },
     "CubicBezierCurve": {
       "!url": "http://threejs.org/docs/#Reference/extras/curves/CubicBezierCurve",
       "prototype": {
@@ -1527,15 +1518,6 @@
         "points": "[]"
       },
       "!doc": "Create a smooth 2d spline curve from a series of points",
-      "!type": "fn(points: [])"
-    },
-    "SplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/SplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points",
       "!type": "fn(points: [])"
     },
     "BoxGeometry": {
