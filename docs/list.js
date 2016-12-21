@@ -7,6 +7,7 @@ var list = {
 			[ "Creating Text", "manual/introduction/Creating-text" ],
 			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
 			[ "Migration Guide", "manual/introduction/Migration-guide" ],
+			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
 		],
 
