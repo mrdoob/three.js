@@ -5,6 +5,8 @@ var list = {
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
 			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
 			[ "Creating Text", "manual/introduction/Creating-text" ],
+			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
+			[ "Migration Guide", "manual/introduction/Migration-guide" ],
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
 		],
 
