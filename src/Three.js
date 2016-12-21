@@ -32,7 +32,7 @@ export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
-export { BinaryTextureLoader, DataTextureLoader } from './loaders/BinaryTextureLoader.js';
+export { DataTextureLoader } from './loaders/DataTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 export { TextureLoader } from './loaders/TextureLoader.js';
 export { ObjectLoader } from './loaders/ObjectLoader.js';
@@ -100,7 +100,6 @@ export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js'
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
-export { Spline } from './math/Spline.js';
 export { _Math as Math } from './math/Math.js';
 export { Spherical } from './math/Spherical.js';
 export { Cylindrical } from './math/Cylindrical.js';

@@ -165,7 +165,7 @@ Box3.prototype = {
 
 							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-								v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 								scope.expandByPoint( v1 );
 

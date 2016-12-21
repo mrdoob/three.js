@@ -242,7 +242,7 @@ function LensFlarePlugin( renderer, flares ) {
 			tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
 			tempPosition.applyMatrix4( camera.matrixWorldInverse );
-			tempPosition.applyProjection( camera.projectionMatrix );
+			tempPosition.applyMatrix4( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 

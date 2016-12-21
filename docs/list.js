@@ -3,8 +3,20 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
+<<<<<<< HEAD
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
 			[ "Useful links", "manual/introduction/Useful-links" ]
+=======
+			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
+			[ "Creating Text", "manual/introduction/Creating-text" ],
+			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
+			[ "Migration Guide", "manual/introduction/Migration-guide" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+		],
+
+		"Build Tools": [
+			[ "Testing with NPM", "manual/buildTools/Testing-with-NPM" ]
+>>>>>>> 56ec5ce2e269d9fdf08ce6b385813c6ce0dc10ed
 		]
 	},
 
@@ -196,7 +208,6 @@ var list = {
 		"Loaders": [
 			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
 			[ "AudioLoader", "api/loaders/AudioLoader" ],
-			[ "BinaryTextureLoader", "api/loaders/BinaryTextureLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "CompressedTextureLoader", "api/loaders/CompressedTextureLoader" ],
@@ -254,7 +265,6 @@ var list = {
 			[ "Ray", "api/math/Ray" ],
 			[ "Sphere", "api/math/Sphere" ],
 			[ "Spherical", "api/math/Spherical" ],
-			[ "Spline", "api/math/Spline" ],
 			[ "Triangle", "api/math/Triangle" ],
 			[ "Vector2", "api/math/Vector2" ],
 			[ "Vector3", "api/math/Vector3" ],

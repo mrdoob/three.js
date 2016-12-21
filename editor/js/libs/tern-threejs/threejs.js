@@ -4215,34 +4215,6 @@
       "!doc": "A geometric sphere defined by a center position and radius.",
       "!type": "fn(center: +THREE.Vector3, radius: number)"
     },
-    "Spline": {
-      "!url": "http://threejs.org/docs/#Reference/math/Spline",
-      "prototype": {
-        "points": "[]",
-        "initFromArray": {
-          "!type": "fn(a: [])",
-          "!doc": "Initialises using the data in the array as a series of points. Each value in *a* must be another array with three values, where a[n] is v, the value for the *nth* point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively."
-        },
-        "getPoint": {
-          "!type": "fn(k: number) -> +THREE.Vector3",
-          "!doc": "Return the interpolated point at *k*."
-        },
-        "getControlPointsArray": {
-          "!type": "fn() -> []",
-          "!doc": "Returns an array with triplets of x, y, z coordinates that correspond to the current control points."
-        },
-        "getLength": {
-          "!type": "fn(nSubDivisions: number) -> object",
-          "!doc": "Returns an object with the two properties. The property .[page:Number total] contains\n\t\t\tthe length of the spline when using nSubDivisions. The property .[page:Array chunkLength]\n\t\t\tcontains an array with the total length from the beginning of the spline to the end of that chunk."
-        },
-        "reparametrizeByArcLength": {
-          "!type": "fn(samplingCoef: number)",
-          "!doc": "This is done by resampling the original spline, with the density of sampling controlled by *samplingCoef*. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature."
-        }
-      },
-      "!doc": "Represents a spline.",
-      "!type": "fn(points: [])"
-    },
     "Triangle": {
       "!url": "http://threejs.org/docs/#Reference/math/Triangle",
       "prototype": {

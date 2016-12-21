@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+<p>There are often times when you might need to use text in your Three.js application. Here's are some options you may consider when you wish to add Text.</p>
+
+<h2>1. DOM + CSS</h2>
+
+<p>Using HTML could simply be the easiest and fastest manner to add text. This is commonly used for descriptive overlays in three.js examples.</p>
+
+<p>You can add content to a
+<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code></p>
+
+<p>and use css markup to position absolutely at a position above all others with a z-index especially if you are running three.js full screen.</p>
+
+<p><code>#info {
+position: absolute;
+top: 10px;
+width: 100%;
+text-align: center;
+z-index: 100;
+display:block;
+}</code></p>
+
+<h2>2. Draw text to canvas and use as Texture</h2>
+
+<p>Use this method if you wish to draw text easily on a plane in your three.js scene. This technique can be seen utilized in the <a href="http://plumegraph.org/">Civilian Casualties in Afghanistan</a> visualization.</p>
+
+<h2>3. Create a 3d model in your 3d application and export to three.js</h2>
+
+<p>Use this method if you prefer working with your 3d applications and importing the models to three.js</p>
+
+<h2>4. Procedural Text Geometry</h2>
+
+<p>Use this method if you prefer to work purely in three.js or create procedural and dynamic 3d text geometries. However, font data files <a href="http://typeface.neocracy.org/fonts.html">http://typeface.neocracy.org/fonts.html</a> in the typeface.js format needs to be loaded.</p>
+
+<p>A Text Geometry can then be created with <code>new THREE.TextGeometry( text, parameters );</code></p>
+
+<p>For examples, see <a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_text.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_text.html</a>, <a href="https://github.com/mrdoob/three.js/blob/master/examples/canvas_geometry_text.html">https://github.com/mrdoob/three.js/blob/master/examples/canvas_geometry_text.html</a> and <a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_shadowmap.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_shadowmap.html</a></p>
+
+<p>If Typeface is down, or you want to use a font that is not there, there's a tutorial with a python script for blender that allows you to export text to Three.js's JSON format: <a href="http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html">http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html</a></p>
+
+
+	</body>
+</html>
