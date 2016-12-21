@@ -424,8 +424,8 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-		return vector.applyProjection( this );
+		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 	multiplyVector4: function ( vector ) {
@@ -592,7 +592,12 @@ Object.assign( Vector3.prototype, {
 		return this.setFromMatrixColumn( matrix, index );
 
 	},
+	applyProjection: function ( m ) {
 
+		console.warn( 'THREE.Vector3: .applyProjection() has been removed. Use .applyMatrix4( m ) instead.' );
+		return this.applyMatrix4( m );
+
+	},
 	fromAttribute: function ( attribute, index, offset ) {
 
 		console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );

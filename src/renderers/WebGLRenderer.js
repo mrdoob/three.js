@@ -1382,7 +1382,7 @@ function WebGLRenderer( parameters ) {
 				if ( _this.sortObjects === true ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _projScreenMatrix );
+					_vector3.applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -1405,7 +1405,7 @@ function WebGLRenderer( parameters ) {
 						if ( _this.sortObjects === true ) {
 
 							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 						}
 

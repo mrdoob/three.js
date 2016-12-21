@@ -119,7 +119,7 @@
 		<h2>Core</h2>
 
 		<h3>[page:EventDispatcher]</h3>
-		<div>EventDispatcher.apply has been has been removed. Inherit or Object.assign the prototype to mix-in instead.</div>
+		<div>EventDispatcher.apply has been removed. Inherit or Object.assign the prototype to mix-in instead.</div>
 
 		<h3>[page:Raycaster]</h3>
 		<div>Raycaster.params.PointCloud has been renamed to [page:Raycaster.params.Points].</div>
@@ -127,9 +127,9 @@
 
 		<h3>[page:Uniform]</h3>
 		<div>
-			Uniform.dynamic has been has been removed. Use object.onBeforeRender() instead.<br /><br />
+			Uniform.dynamic has been removed. Use object.onBeforeRender() instead.<br /><br />
 
-			Uniform.onUpdate has been has been removed. Use object.onBeforeRender() instead.
+			Uniform.onUpdate has been removed. Use object.onBeforeRender() instead.
 		</div>
 
 
@@ -318,8 +318,7 @@
 
 			Matrix4.setRotationFromQuaternion() has been renamed to [page:Matrix4.makeRotationFromQuaternion]( quaternion ).<br /><br />
 
-			Matrix4.multiplyVector3() has been has been removed. Use vector.applyMatrix4( matrix )
-			or vector.applyProjection( matrix ) instead.<br /><br />
+			Matrix4.multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
 
 			Matrix4.multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.<br /><br />
 
@@ -373,6 +372,8 @@
 			Vector3.getScaleFromMatrix() has been renamed to [page:Vector3.setFromMatrixScale]().<br /><br />
 
 			Vector3.getColumnFromMatrix() has been renamed to [page:Vector3.setFromMatrixColumn]().<br /><br />
+
+			Vector3.applyProjection() has been removed. Use [page:Vector3.applyMatrix4]() instead.<br /><br />
 
 			Vector3.fromAttribute() has been renamed to [page:Vector3.fromBufferAttribute]().
 		</div>
