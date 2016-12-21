@@ -3,10 +3,8 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
-<<<<<<< HEAD
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
-			[ "Useful links", "manual/introduction/Useful-links" ]
-=======
+			[ "Useful links", "manual/introduction/Useful-links" ],
 			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
 			[ "Creating Text", "manual/introduction/Creating-text" ],
 			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
@@ -16,7 +14,6 @@ var list = {
 
 		"Build Tools": [
 			[ "Testing with NPM", "manual/buildTools/Testing-with-NPM" ]
->>>>>>> 56ec5ce2e269d9fdf08ce6b385813c6ce0dc10ed
 		]
 	},
 
