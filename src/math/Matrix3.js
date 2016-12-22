@@ -95,30 +95,6 @@ Matrix3.prototype = {
 
 	},
 
-	applyToVector3Array: function () {
-
-		var v1;
-
-		return function applyToVector3Array( array, offset, length ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = array.length;
-
-			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
-
-				v1.fromArray( array, j );
-				v1.applyMatrix3( this );
-				v1.toArray( array, j );
-
-			}
-
-			return array;
-
-		};
-
-	}(),
-
 	applyToBufferAttribute: function () {
 
 		var v1;

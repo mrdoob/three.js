@@ -7,7 +7,7 @@
  *
  */
 
-THREE.PCDLoader = function( manager ) {
+THREE.PCDLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.littleEndian = true;
@@ -15,15 +15,17 @@ THREE.PCDLoader = function( manager ) {
 };
 
 
-Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
+THREE.PCDLoader.prototype = {
 
-	load: function( url, onLoad, onProgress, onError ) {
+	constructor: THREE.PCDLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( data ) {
+		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data, url ) );
 
@@ -31,7 +33,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	binarryToStr: function( data ) {
+	binarryToStr: function ( data ) {
 
 		var text = "";
 		var charArray = new Uint8Array( data );
@@ -44,7 +46,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	parseHeader: function( data ) {
+	parseHeader: function ( data ) {
 
 		var PCDheader = {};
 		var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
@@ -56,47 +58,47 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 		PCDheader.str = PCDheader.str.replace( /\#.*/gi, "" );
 		PCDheader.version = /VERSION (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.version != null )
-		PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
+			PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
 		PCDheader.fields = /FIELDS (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.fields != null )
-		PCDheader.fields = PCDheader.fields[ 1 ].split( " " );
+			PCDheader.fields = PCDheader.fields[ 1 ].split( " " );
 		PCDheader.size = /SIZE (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.size != null )
-			PCDheader.size = PCDheader.size[ 1 ].split( " " ).map( function( x ) {
+			PCDheader.size = PCDheader.size[ 1 ].split( " " ).map( function ( x ) {
 
 				return parseInt( x, 10 );
 
 			} );
 		PCDheader.type = /TYPE (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.type != null )
-		PCDheader.type = PCDheader.type[ 1 ].split( " " );
+			PCDheader.type = PCDheader.type[ 1 ].split( " " );
 		PCDheader.count = /COUNT (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.count != null )
-			PCDheader.count = PCDheader.count[ 1 ].split( " " ).map( function( x ) {
+			PCDheader.count = PCDheader.count[ 1 ].split( " " ).map( function ( x ) {
 
 				return parseInt( x, 10 );
 
 			} );
 		PCDheader.width = /WIDTH (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.width != null )
-		PCDheader.width = parseInt( PCDheader.width[ 1 ] );
+			PCDheader.width = parseInt( PCDheader.width[ 1 ] );
 		PCDheader.height = /HEIGHT (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.height != null )
-		PCDheader.height = parseInt( PCDheader.height[ 1 ] );
+			PCDheader.height = parseInt( PCDheader.height[ 1 ] );
 		PCDheader.viewpoint = /VIEWPOINT (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.viewpoint != null )
-		PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
+			PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
 		PCDheader.points = /POINTS (.*)/i.exec( PCDheader.str );
 		if ( PCDheader.points != null )
-		PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
+			PCDheader.points = parseInt( PCDheader.points[ 1 ], 10 );
 		if ( PCDheader.points == null )
-		PCDheader.points = PCDheader.width * PCDheader.height;
+			PCDheader.points = PCDheader.width * PCDheader.height;
 
 		if ( PCDheader.count == null ) {
 
 			PCDheader.count = [];
 			for ( var i = 0; i < PCDheader.fields; i ++ )
-			PCDheader.count.push( 1 );
+				PCDheader.count.push( 1 );
 
 		}
 
@@ -106,11 +108,11 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 			if ( PCDheader.data == "ascii" ) {
 
-				PCDheader.offset[ PCDheader.fields[ i ]] = i;
+				PCDheader.offset[ PCDheader.fields[ i ] ] = i;
 
 			} else {
 
-				PCDheader.offset[ PCDheader.fields[ i ]] = sizeSum;
+				PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
 				sizeSum += PCDheader.size[ i ];
 
 			}
@@ -123,7 +125,7 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	parse: function( data, url ) {
+	parse: function ( data, url ) {
 
 		var textData = this.binarryToStr( data );
 
@@ -134,13 +136,13 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 		// Parse the data
 		var position = false;
 		if ( PCDheader.offset.x != undefined )
-		position = new Float32Array( PCDheader.points * 3 );
+			position = new Float32Array( PCDheader.points * 3 );
 		var color = false;
-		if ( PCDheader.offset.rgb != undefined)
-		color = new Float32Array( PCDheader.points * 3 );
+		if ( PCDheader.offset.rgb != undefined )
+			color = new Float32Array( PCDheader.points * 3 );
 		var normal = false;
 		if ( PCDheader.offset.normal_x != undefined )
-		normal = new Float32Array( PCDheader.points * 3 );
+			normal = new Float32Array( PCDheader.points * 3 );
 
 		if ( PCDheader.data == "ascii" ) {
 
@@ -160,11 +162,11 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 				}
 				if ( offset.rgb != undefined ) {
 
-					var c = new Float32Array([parseFloat( line[ offset.rgb ] )]);
+					var c = new Float32Array( [ parseFloat( line[ offset.rgb ] ) ] );
 					var dataview = new DataView( c.buffer, 0 );
-					color[ i3 + 0 ] = dataview.getUint8(0)/255.0;
-					color[ i3 + 1 ] = dataview.getUint8(1)/255.0;
-					color[ i3 + 2 ] = dataview.getUint8(2)/255.0;
+					color[ i3 + 0 ] = dataview.getUint8( 0 ) / 255.0;
+					color[ i3 + 1 ] = dataview.getUint8( 1 ) / 255.0;
+					color[ i3 + 2 ] = dataview.getUint8( 2 ) / 255.0;
 
 				}
 				if ( offset.normal_x != undefined ) {
@@ -222,19 +224,18 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		var geometry = new THREE.BufferGeometry();
 		if ( position != false )
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( position, 3 ) );
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( position, 3 ) );
 		if ( color != false )
-		geometry.addAttribute( 'color', new THREE.BufferAttribute( color, 3 ) );
+			geometry.addAttribute( 'color', new THREE.BufferAttribute( color, 3 ) );
 		if ( normal != false )
-		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normal, 3 ) );
+			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normal, 3 ) );
 
 		geometry.computeBoundingSphere();
 
-		var material = new THREE.PointsMaterial( { size: 0.005,
-		vertexColors: !(color == false) } );
+		var material = new THREE.PointsMaterial( { size: 0.005, vertexColors: ! ( color == false ) } );
 		if ( color == false )
 			material.color.setHex( Math.random() * 0xffffff );
-		
+
 		var mesh = new THREE.Points( geometry, material );
 		var name = url.split( '' ).reverse().join( '' );
 		name = /([^\/]*)/.exec( name );
@@ -244,6 +245,6 @@ Object.assign( THREE.PCDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		return mesh;
 
-	},
+	}
 
-} );
+};

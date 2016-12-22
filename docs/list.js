@@ -3,7 +3,20 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "Detecting WebGL and browser compatibility", "manual/introduction/Detecting-WebGL-and-browser-compatibility" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Useful links", "manual/introduction/Useful-links" ],
+			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
+			[ "Creating Text", "manual/introduction/Creating-text" ],
+			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
+			[ "Migration Guide", "manual/introduction/Migration-guide" ],
+			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
+			[ "FAQ", "manual/introduction/FAQ" ]
+		],
+
+		"Build Tools": [
+			[ "Testing with NPM", "manual/buildTools/Testing-with-NPM" ]
 		]
 	},
 
@@ -71,7 +84,7 @@ var list = {
 			[ "Layers", "api/core/Layers" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
-			[ "Uniform", "api/core/Uniform"]
+			[ "Uniform", "api/core/Uniform" ]
 		],
 
 		"Core / BufferAttributes": [
@@ -107,8 +120,7 @@ var list = {
 			[ "LineCurve3", "api/extras/curves/LineCurve3" ],
 			[ "QuadraticBezierCurve", "api/extras/curves/QuadraticBezierCurve" ],
 			[ "QuadraticBezierCurve3", "api/extras/curves/QuadraticBezierCurve3" ],
-			[ "SplineCurve", "api/extras/curves/SplineCurve" ],
-			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
+			[ "SplineCurve", "api/extras/curves/SplineCurve" ]
 		],
 
 		"Extras / Helpers": [
@@ -182,19 +194,20 @@ var list = {
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
 			[ "Light", "api/lights/Light" ],
 			[ "PointLight", "api/lights/PointLight" ],
+			[ "RectAreaLight", "api/lights/RectAreaLight" ],
 			[ "SpotLight", "api/lights/SpotLight" ]
 		],
 
 		"Lights / Shadows": [
 			[ "DirectionalLightShadow", "api/lights/shadows/DirectionalLightShadow" ],
 			[ "LightShadow", "api/lights/shadows/LightShadow" ],
+			[ "RectAreaLightShadow", "api/lights/shadows/RectAreaLightShadow" ],
 			[ "SpotLightShadow", "api/lights/shadows/SpotLightShadow" ]
 		],
 
 		"Loaders": [
 			[ "AnimationLoader", "api/loaders/AnimationLoader" ],
 			[ "AudioLoader", "api/loaders/AudioLoader" ],
-			[ "BinaryTextureLoader", "api/loaders/BinaryTextureLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "CompressedTextureLoader", "api/loaders/CompressedTextureLoader" ],
@@ -211,8 +224,8 @@ var list = {
 		],
 
 		"Loaders / Managers": [
-			[ "DefaultLoadingManager", "api/loaders/DefaultLoadingManager" ],
-			[ "LoadingManager", "api/loaders/LoadingManager" ]
+			[ "DefaultLoadingManager", "api/loaders/managers/DefaultLoadingManager" ],
+			[ "LoadingManager", "api/loaders/managers/LoadingManager" ]
 		],
 
 		"Materials": [
@@ -252,7 +265,6 @@ var list = {
 			[ "Ray", "api/math/Ray" ],
 			[ "Sphere", "api/math/Sphere" ],
 			[ "Spherical", "api/math/Spherical" ],
-			[ "Spline", "api/math/Spline" ],
 			[ "Triangle", "api/math/Triangle" ],
 			[ "Vector2", "api/math/Vector2" ],
 			[ "Vector3", "api/math/Vector3" ],

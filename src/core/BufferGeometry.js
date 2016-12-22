@@ -38,7 +38,9 @@ function BufferGeometry() {
 
 }
 
-Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+BufferGeometry.prototype = {
+
+	constructor: BufferGeometry,
 
 	isBufferGeometry: true,
 
@@ -126,7 +128,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		if ( position !== undefined ) {
 
-			matrix.applyToVector3Array( position.array );
+			matrix.applyToBufferAttribute( position );
 			position.needsUpdate = true;
 
 		}
@@ -137,7 +139,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToVector3Array( normal.array );
+			normalMatrix.applyToBufferAttribute( normal );
 			normal.needsUpdate = true;
 
 		}
@@ -1033,9 +1035,10 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	}
 
-} );
+};
 
 BufferGeometry.MaxIndex = 65535;
 
+Object.assign( BufferGeometry.prototype, EventDispatcher.prototype );
 
 export { BufferGeometry };

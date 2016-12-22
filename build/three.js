@@ -96,7 +96,7 @@
 
 	function EventDispatcher() {}
 
-	Object.assign( EventDispatcher.prototype, {
+	EventDispatcher.prototype = {
 
 		addEventListener: function ( type, listener ) {
 
@@ -179,9 +179,9 @@
 
 		}
 
-	} );
+	};
 
-	var REVISION = '83';
+	var REVISION = '84dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -206,14 +206,6 @@
 	var SubtractiveBlending = 3;
 	var MultiplyBlending = 4;
 	var CustomBlending = 5;
-	var BlendingMode = {
-		NoBlending: NoBlending,
-		NormalBlending: NormalBlending,
-		AdditiveBlending: AdditiveBlending,
-		SubtractiveBlending: SubtractiveBlending,
-		MultiplyBlending: MultiplyBlending,
-		CustomBlending: CustomBlending
-	};
 	var AddEquation = 100;
 	var SubtractEquation = 101;
 	var ReverseSubtractEquation = 102;
@@ -254,38 +246,15 @@
 	var SphericalReflectionMapping = 305;
 	var CubeUVReflectionMapping = 306;
 	var CubeUVRefractionMapping = 307;
-	var TextureMapping = {
-		UVMapping: UVMapping,
-		CubeReflectionMapping: CubeReflectionMapping,
-		CubeRefractionMapping: CubeRefractionMapping,
-		EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-		EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-		SphericalReflectionMapping: SphericalReflectionMapping,
-		CubeUVReflectionMapping: CubeUVReflectionMapping,
-		CubeUVRefractionMapping: CubeUVRefractionMapping
-	};
 	var RepeatWrapping = 1000;
 	var ClampToEdgeWrapping = 1001;
 	var MirroredRepeatWrapping = 1002;
-	var TextureWrapping = {
-		RepeatWrapping: RepeatWrapping,
-		ClampToEdgeWrapping: ClampToEdgeWrapping,
-		MirroredRepeatWrapping: MirroredRepeatWrapping
-	};
 	var NearestFilter = 1003;
 	var NearestMipMapNearestFilter = 1004;
 	var NearestMipMapLinearFilter = 1005;
 	var LinearFilter = 1006;
 	var LinearMipMapNearestFilter = 1007;
 	var LinearMipMapLinearFilter = 1008;
-	var TextureFilter = {
-		NearestFilter: NearestFilter,
-		NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-		NearestMipMapLinearFilter: NearestMipMapLinearFilter,
-		LinearFilter: LinearFilter,
-		LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-		LinearMipMapLinearFilter: LinearMipMapLinearFilter
-	};
 	var UnsignedByteType = 1009;
 	var ByteType = 1010;
 	var ShortType = 1011;
@@ -959,11 +928,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector2: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -1886,11 +1855,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector4: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector4: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -1940,7 +1909,9 @@
 
 	}
 
-	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
+	WebGLRenderTarget.prototype = {
+
+		constructor: WebGLRenderTarget,
 
 		isWebGLRenderTarget: true,
 
@@ -1989,7 +1960,9 @@
 
 		}
 
-	} );
+	};
+
+	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author alteredq / http://alteredqualia.com
@@ -2886,32 +2859,15 @@
 
 		applyMatrix4: function ( m ) {
 
-			// input: THREE.Matrix4 affine matrix
-
 			var x = this.x, y = this.y, z = this.z;
 			var e = m.elements;
 
 			this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
 			this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
 			this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+			var w =  e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ];
 
-			return this;
-
-		},
-
-		applyProjection: function ( m ) {
-
-			// input: THREE.Matrix4 projection matrix
-
-			var x = this.x, y = this.y, z = this.z;
-			var e = m.elements;
-			var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
-
-			this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
-			this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
-			this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
-
-			return this;
+			return this.divideScalar( w );
 
 		},
 
@@ -2946,7 +2902,7 @@
 				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
-				return this.applyProjection( matrix );
+				return this.applyMatrix4( matrix );
 
 			};
 
@@ -2961,7 +2917,7 @@
 				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
-				return this.applyProjection( matrix );
+				return this.applyMatrix4( matrix );
 
 			};
 
@@ -3354,11 +3310,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector3: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector3: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -3819,30 +3775,6 @@
 
 		},
 
-		applyToVector3Array: function () {
-
-			var v1;
-
-			return function applyToVector3Array( array, offset, length ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
-				if ( offset === undefined ) offset = 0;
-				if ( length === undefined ) length = array.length;
-
-				for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
-
-					v1.fromArray( array, j );
-					v1.applyMatrix4( this );
-					v1.toArray( array, j );
-
-				}
-
-				return array;
-
-			};
-
-		}(),
-
 		applyToBufferAttribute: function () {
 
 			var v1;
@@ -4228,7 +4160,13 @@
 
 		}(),
 
-		makeFrustum: function ( left, right, bottom, top, near, far ) {
+		makePerspective: function ( left, right, top, bottom, near, far ) {
+
+			if ( far === undefined ) {
+
+				console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
+
+			}
 
 			var te = this.elements;
 			var x = 2 * near / ( right - left );
@@ -4245,17 +4183,6 @@
 			te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
 
 			return this;
-
-		},
-
-		makePerspective: function ( fov, aspect, near, far ) {
-
-			var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
-			var ymin = - ymax;
-			var xmin = ymin * aspect;
-			var xmax = ymax * aspect;
-
-			return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
 		},
 
@@ -6689,7 +6616,7 @@
 				tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
 				tempPosition.applyMatrix4( camera.matrixWorldInverse );
-				tempPosition.applyProjection( camera.projectionMatrix );
+				tempPosition.applyMatrix4( camera.projectionMatrix );
 
 				// setup arrays for gl programs
 
@@ -7314,7 +7241,7 @@
 
 					currentValue.set( newValue );
 
-				} else if ( (currentValue && currentValue.isVector3) && (newValue && newValue.isVector3) ) {
+				} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 					currentValue.copy( newValue );
 
@@ -7921,7 +7848,7 @@
 
 								for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-									v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+									v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 									scope.expandByPoint( v1 );
 
@@ -8500,30 +8427,6 @@
 			return this;
 
 		},
-
-		applyToVector3Array: function () {
-
-			var v1;
-
-			return function applyToVector3Array( array, offset, length ) {
-
-				if ( v1 === undefined ) v1 = new Vector3();
-				if ( offset === undefined ) offset = 0;
-				if ( length === undefined ) length = array.length;
-
-				for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
-
-					v1.fromArray( array, j );
-					v1.applyMatrix3( this );
-					v1.toArray( array, j );
-
-				}
-
-				return array;
-
-			};
-
-		}(),
 
 		applyToBufferAttribute: function () {
 
@@ -10598,7 +10501,9 @@
 	Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 	Object3D.DefaultMatrixAutoUpdate = true;
 
-	Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+	Object3D.prototype = {
+
+		constructor: Object3D,
 
 		isObject3D: true,
 
@@ -11225,7 +11130,9 @@
 
 		}
 
-	} );
+	};
+
+	Object.assign( Object3D.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -12477,6 +12384,9 @@
 	 * @author bhouston / http://clara.io
 	 */
 
+	var count = 0;
+	function GeometryIdCount() { return count++; }
+
 	function Geometry() {
 
 		Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
@@ -12489,7 +12399,7 @@
 		this.vertices = [];
 		this.colors = [];
 		this.faces = [];
-		this.faceVertexUvs = [ [] ];
+		this.faceVertexUvs = [[]];
 
 		this.morphTargets = [];
 		this.morphNormals = [];
@@ -12514,7 +12424,9 @@
 
 	}
 
-	Object.assign( Geometry.prototype, EventDispatcher.prototype, {
+	Geometry.prototype = {
+
+		constructor: Geometry,
 
 		isGeometry: true,
 
@@ -12766,7 +12678,7 @@
 
 						for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-							addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
+							addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
 						}
 
@@ -13159,7 +13071,7 @@
 
 		merge: function ( geometry, matrix, materialIndexOffset ) {
 
-			if ( (geometry && geometry.isGeometry) === false ) {
+			if ( ( geometry && geometry.isGeometry ) === false ) {
 
 				console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 				return;
@@ -13279,7 +13191,7 @@
 
 		mergeMesh: function ( mesh ) {
 
-			if ( (mesh && mesh.isMesh) === false ) {
+			if ( ( mesh && mesh.isMesh ) === false ) {
 
 				console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 				return;
@@ -13344,15 +13256,12 @@
 
 				indices = [ face.a, face.b, face.c ];
 
-				var dupIndex = - 1;
-
 				// if any duplicate vertices are found in a Face3
 				// we have to remove the face as nothing can be saved
 				for ( var n = 0; n < 3; n ++ ) {
 
 					if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
-						dupIndex = n;
 						faceIndicesToRemove.push( i );
 						break;
 
@@ -13723,10 +13632,9 @@
 
 		}
 
-	} );
+	};
 
-	var count = 0;
-	function GeometryIdCount() { return count++; }
+	Object.assign( Geometry.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author alteredq / http://alteredqualia.com/
@@ -13756,7 +13664,9 @@
 
 	}
 
-	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+	BufferGeometry.prototype = {
+
+		constructor: BufferGeometry,
 
 		isBufferGeometry: true,
 
@@ -13844,7 +13754,7 @@
 
 			if ( position !== undefined ) {
 
-				matrix.applyToVector3Array( position.array );
+				matrix.applyToBufferAttribute( position );
 				position.needsUpdate = true;
 
 			}
@@ -13855,7 +13765,7 @@
 
 				var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
-				normalMatrix.applyToVector3Array( normal.array );
+				normalMatrix.applyToBufferAttribute( normal );
 				normal.needsUpdate = true;
 
 			}
@@ -14751,9 +14661,11 @@
 
 		}
 
-	} );
+	};
 
 	BufferGeometry.MaxIndex = 65535;
+
+	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -14888,23 +14800,23 @@
 
 			}
 
-			function checkBufferGeometryIntersection( object, raycaster, ray, positions, uvs, a, b, c ) {
+			function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-				vA.fromArray( positions, a * 3 );
-				vB.fromArray( positions, b * 3 );
-				vC.fromArray( positions, c * 3 );
+				vA.fromBufferAttribute( position, a );
+				vB.fromBufferAttribute( position, b );
+				vC.fromBufferAttribute( position, c );
 
 				var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 				if ( intersection ) {
 
-					if ( uvs ) {
+					if ( uv ) {
 
-						uvA.fromArray( uvs, a * 2 );
-						uvB.fromArray( uvs, b * 2 );
-						uvC.fromArray( uvs, c * 2 );
+						uvA.fromBufferAttribute( uv, a );
+						uvB.fromBufferAttribute( uv, b );
+						uvC.fromBufferAttribute( uv, c );
 
-						intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
+						intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
 
 					}
 
@@ -14947,32 +14859,27 @@
 
 				}
 
-				var uvs, intersection;
+				var intersection;
 
 				if ( geometry.isBufferGeometry ) {
 
 					var a, b, c;
 					var index = geometry.index;
-					var attributes = geometry.attributes;
-					var positions = attributes.position.array;
-
-					if ( attributes.uv !== undefined ) {
-
-						uvs = attributes.uv.array;
-
-					}
+					var position = geometry.attributes.position;
+					var uv = geometry.attributes.uv;
+					var i, l;
 
 					if ( index !== null ) {
 
-						var indices = index.array;
+						// indexed buffer geometry
 
-						for ( var i = 0, l = indices.length; i < l; i += 3 ) {
+						for ( i = 0, l = index.count; i < l; i += 3 ) {
 
-							a = indices[ i ];
-							b = indices[ i + 1 ];
-							c = indices[ i + 2 ];
+							a = index.getX( i );
+							b = index.getX( i + 1 );
+							c = index.getX( i + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -14985,14 +14892,15 @@
 
 					} else {
 
+						// non-indexed buffer geometry
 
-						for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+						for ( i = 0, l = position.count; i < l; i += 3 ) {
 
-							a = i / 3;
-							b = a + 1;
-							c = a + 2;
+							a = i;
+							b = i + 1;
+							c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -15008,11 +14916,13 @@
 				} else if ( geometry.isGeometry ) {
 
 					var fvA, fvB, fvC;
-					var isFaceMaterial = (material && material.isMultiMaterial);
+					var isFaceMaterial = ( material && material.isMultiMaterial );
 					var materials = isFaceMaterial === true ? material.materials : null;
 
 					var vertices = geometry.vertices;
 					var faces = geometry.faces;
+					var uvs;
+
 					var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 					if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
 
@@ -15651,8 +15561,7 @@
 			var skew = this.filmOffset;
 			if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-			this.projectionMatrix.makeFrustum(
-					left, left + width, top - height, top, near, this.far );
+			this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
 
 		},
 
@@ -20928,7 +20837,7 @@
 					if ( _this.sortObjects === true ) {
 
 						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
+						_vector3.applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -20951,7 +20860,7 @@
 							if ( _this.sortObjects === true ) {
 
 								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyProjection( _projScreenMatrix );
+								_vector3.applyMatrix4( _projScreenMatrix );
 
 							}
 
@@ -25977,80 +25886,7 @@
 
 			return ShapeUtils.area( pts ) < 0;
 
-		},
-
-		// Bezier Curves formulas obtained from
-		// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-		// Quad Bezier Functions
-
-		b2: ( function () {
-
-			function b2p0( t, p ) {
-
-				var k = 1 - t;
-				return k * k * p;
-
-			}
-
-			function b2p1( t, p ) {
-
-				return 2 * ( 1 - t ) * t * p;
-
-			}
-
-			function b2p2( t, p ) {
-
-				return t * t * p;
-
-			}
-
-			return function b2( t, p0, p1, p2 ) {
-
-				return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
-
-			};
-
-		} )(),
-
-		// Cubic Bezier Functions
-
-		b3: ( function () {
-
-			function b3p0( t, p ) {
-
-				var k = 1 - t;
-				return k * k * k * p;
-
-			}
-
-			function b3p1( t, p ) {
-
-				var k = 1 - t;
-				return 3 * k * k * t * p;
-
-			}
-
-			function b3p2( t, p ) {
-
-				var k = 1 - t;
-				return 3 * k * t * t * p;
-
-			}
-
-			function b3p3( t, p ) {
-
-				return t * t * t * p;
-
-			}
-
-			return function b3( t, p0, p1, p2, p3 ) {
-
-				return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
-
-			};
-
-		} )()
+		}
 
 	};
 
@@ -29436,8 +29272,7 @@
 	 * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
 	 */
 
-	var DataTextureLoader = BinaryTextureLoader;
-	function BinaryTextureLoader( manager ) {
+	function DataTextureLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
@@ -29446,7 +29281,7 @@
 
 	}
 
-	Object.assign( BinaryTextureLoader.prototype, {
+	Object.assign( DataTextureLoader.prototype, {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -29533,48 +29368,63 @@
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
+			if ( url === undefined ) url = '';
+
+			if ( this.path !== undefined ) url = this.path + url;
+
 			var scope = this;
 
-			var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-			image.onload = function () {
+			var cached = Cache.get( url );
 
-				image.onload = null;
+			if ( cached !== undefined ) {
 
-				URL.revokeObjectURL( image.src );
+				scope.manager.itemStart( url );
 
-				if ( onLoad ) onLoad( image );
+				setTimeout( function () {
 
-				scope.manager.itemEnd( url );
+					if ( onLoad ) onLoad( cached );
 
-			};
-			image.onerror = onError;
+					scope.manager.itemEnd( url );
 
-			if ( url.indexOf( 'data:' ) === 0 ) {
+				}, 0 );
 
-				image.src = url;
-
-			} else if ( this.crossOrigin !== undefined ) {
-
-				// crossOrigin doesn't work with URL.createObjectURL()?
-
-				image.crossOrigin = this.crossOrigin;
-				image.src = url;
-
-			} else {
-
-				var loader = new FileLoader();
-				loader.setPath( this.path );
-				loader.setResponseType( 'blob' );
-				loader.setWithCredentials( this.withCredentials );
-				loader.load( url, function ( blob ) {
-
-					image.src = URL.createObjectURL( blob );
-
-				}, onProgress, onError );
+				return cached;
 
 			}
 
+			var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+
+			image.addEventListener( 'load', function () {
+
+				THREE.Cache.add( url, this );
+
+				if ( onLoad ) onLoad( this );
+
+				scope.manager.itemEnd( url );
+
+			}, false );
+
+			/*
+			image.addEventListener( 'progress', function ( event ) {
+
+				if ( onProgress ) onProgress( event );
+
+			}, false );
+			*/
+
+			image.addEventListener( 'error', function ( event ) {
+
+				if ( onError ) onError( event );
+
+				scope.manager.itemError( url );
+
+			}, false );
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
 			scope.manager.itemStart( url );
+
+			image.src = url;
 
 			return image;
 
@@ -29583,13 +29433,6 @@
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setWithCredentials: function ( value ) {
-
-			this.withCredentials = value;
 			return this;
 
 		},
@@ -29689,7 +29532,6 @@
 
 			var loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
-			loader.setWithCredentials( this.withCredentials );
 			loader.setPath( this.path );
 			loader.load( url, function ( image ) {
 
@@ -29719,21 +29561,12 @@
 
 		},
 
-		setWithCredentials: function ( value ) {
-
-			this.withCredentials = value;
-			return this;
-
-		},
-
 		setPath: function ( value ) {
 
 			this.path = value;
 			return this;
 
 		}
-
-
 
 	} );
 
@@ -30043,7 +29876,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function DirectionalLightShadow( light ) {
+	function DirectionalLightShadow( ) {
 
 		LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -32174,6 +32007,15 @@
 
 		createMaterial: ( function () {
 
+			var BlendingMode = {
+				NoBlending: NoBlending,
+				NormalBlending: NormalBlending,
+				AdditiveBlending: AdditiveBlending,
+				SubtractiveBlending: SubtractiveBlending,
+				MultiplyBlending: MultiplyBlending,
+				CustomBlending: CustomBlending
+			};
+
 			var color, textureLoader, materialLoader;
 
 			return function createMaterial( m, texturePath, crossOrigin ) {
@@ -32255,6 +32097,7 @@
 					var value = m[ name ];
 
 					switch ( name ) {
+
 						case 'DbgColor':
 						case 'DbgIndex':
 						case 'opticalDensity':
@@ -32400,6 +32243,7 @@
 						default:
 							console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 							break;
+
 					}
 
 				}
@@ -32436,7 +32280,7 @@
 			for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
 
 				var regex = handlers[ i ];
-				var loader  = handlers[ i + 1 ];
+				var loader = handlers[ i + 1 ];
 
 				if ( regex.test( file ) ) {
 
@@ -33371,6 +33215,32 @@
 
 		parseTextures: function ( json, images ) {
 
+			var TextureMapping = {
+				UVMapping: UVMapping,
+				CubeReflectionMapping: CubeReflectionMapping,
+				CubeRefractionMapping: CubeRefractionMapping,
+				EquirectangularReflectionMapping: EquirectangularReflectionMapping,
+				EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+				SphericalReflectionMapping: SphericalReflectionMapping,
+				CubeUVReflectionMapping: CubeUVReflectionMapping,
+				CubeUVRefractionMapping: CubeUVRefractionMapping
+			};
+
+			var TextureWrapping = {
+				RepeatWrapping: RepeatWrapping,
+				ClampToEdgeWrapping: ClampToEdgeWrapping,
+				MirroredRepeatWrapping: MirroredRepeatWrapping
+			};
+
+			var TextureFilter = {
+				NearestFilter: NearestFilter,
+				NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+				NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+				LinearFilter: LinearFilter,
+				LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+				LinearMipMapLinearFilter: LinearMipMapLinearFilter
+			};
+
 			function parseConstant( value, type ) {
 
 				if ( typeof( value ) === 'number' ) return value;
@@ -33684,6 +33554,86 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 *
+	 * Bezier Curves formulas obtained from
+	 * http://en.wikipedia.org/wiki/Bézier_curve
+	 */
+
+	function CatmullRom( t, p0, p1, p2, p3 ) {
+
+		var v0 = ( p2 - p0 ) * 0.5;
+		var v1 = ( p3 - p1 ) * 0.5;
+		var t2 = t * t;
+		var t3 = t * t2;
+		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+	}
+
+	//
+
+	function QuadraticBezierP0( t, p ) {
+
+		var k = 1 - t;
+		return k * k * p;
+
+	}
+
+	function QuadraticBezierP1( t, p ) {
+
+		return 2 * ( 1 - t ) * t * p;
+
+	}
+
+	function QuadraticBezierP2( t, p ) {
+
+		return t * t * p;
+
+	}
+
+	function QuadraticBezier( t, p0, p1, p2 ) {
+
+		return QuadraticBezierP0( t, p0 ) + QuadraticBezierP1( t, p1 ) +
+			QuadraticBezierP2( t, p2 );
+
+	}
+
+	//
+
+	function CubicBezierP0( t, p ) {
+
+		var k = 1 - t;
+		return k * k * k * p;
+
+	}
+
+	function CubicBezierP1( t, p ) {
+
+		var k = 1 - t;
+		return 3 * k * k * t * p;
+
+	}
+
+	function CubicBezierP2( t, p ) {
+
+		return 3 * ( 1 - t ) * t * t * p;
+
+	}
+
+	function CubicBezierP3( t, p ) {
+
+		return t * t * t * p;
+
+	}
+
+	function CubicBezier( t, p0, p1, p2, p3 ) {
+
+		return CubicBezierP0( t, p0 ) + CubicBezierP1( t, p1 ) + CubicBezierP2( t, p2 ) +
+			CubicBezierP3( t, p3 );
+
+	}
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 * Extensible curve object
 	 *
 	 * Some common of Curve methods
@@ -33707,7 +33657,7 @@
 	 * THREE.LineCurve3
 	 * THREE.QuadraticBezierCurve3
 	 * THREE.CubicBezierCurve3
-	 * THREE.SplineCurve3
+	 * THREE.CatmullRomCurve3
 	 *
 	 * A series of curves can be represented as a THREE.CurvePath
 	 *
@@ -34064,28 +34014,6 @@
 
 	};
 
-	// TODO: Transformation for Curves?
-
-	/**************************************************************
-	 *	3D Curves
-	 **************************************************************/
-
-	// A Factory method for creating new curve subclasses
-
-	Curve.create = function ( constructor, getPointFunc ) {
-
-		constructor.prototype = Object.create( Curve.prototype );
-		constructor.prototype.constructor = constructor;
-		constructor.prototype.getPoint = getPointFunc;
-
-		return constructor;
-
-	};
-
-	/**************************************************************
-	 *	Line
-	 **************************************************************/
-
 	function LineCurve( v1, v2 ) {
 
 		this.v1 = v1;
@@ -34121,7 +34049,7 @@
 
 	};
 
-	LineCurve.prototype.getTangent = function( t ) {
+	LineCurve.prototype.getTangent = function ( t ) {
 
 		var tangent = this.v2.clone().sub( this.v1 );
 
@@ -34363,10 +34291,6 @@
 
 	} );
 
-	/**************************************************************
-	 *	Ellipse curve
-	 **************************************************************/
-
 	function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 		this.aX = aX;
@@ -34389,7 +34313,7 @@
 
 	EllipseCurve.prototype.isEllipseCurve = true;
 
-	EllipseCurve.prototype.getPoint = function( t ) {
+	EllipseCurve.prototype.getPoint = function ( t ) {
 
 		var twoPi = Math.PI * 2;
 		var deltaAngle = this.aEndAngle - this.aStartAngle;
@@ -34449,60 +34373,6 @@
 
 	};
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 */
-
-	var CurveUtils = {
-
-		tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
-
-			return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-
-		},
-
-		// Puay Bing, thanks for helping with this derivative!
-
-		tangentCubicBezier: function ( t, p0, p1, p2, p3 ) {
-
-			return - 3 * p0 * ( 1 - t ) * ( 1 - t )  +
-				3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
-				6 * t *  p2 * ( 1 - t ) - 3 * t * t * p2 +
-				3 * t * t * p3;
-
-		},
-
-		tangentSpline: function ( t, p0, p1, p2, p3 ) {
-
-			// To check if my formulas are correct
-
-			var h00 = 6 * t * t - 6 * t; 	// derived from 2t^3 − 3t^2 + 1
-			var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
-			var h01 = - 6 * t * t + 6 * t; 	// − 2t3 + 3t2
-			var h11 = 3 * t * t - 2 * t;	// t3 − t2
-
-			return h00 + h10 + h01 + h11;
-
-		},
-
-		// Catmull-Rom
-
-		interpolate: function( p0, p1, p2, p3, t ) {
-
-			var v0 = ( p2 - p0 ) * 0.5;
-			var v1 = ( p3 - p1 ) * 0.5;
-			var t2 = t * t;
-			var t3 = t * t2;
-			return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-		}
-
-	};
-
-	/**************************************************************
-	 *	Spline curve
-	 **************************************************************/
-
 	function SplineCurve( points /* array of Vector2 */ ) {
 
 		this.points = ( points === undefined ) ? [] : points;
@@ -34527,18 +34397,12 @@
 		var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 		var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-		var interpolate = CurveUtils.interpolate;
-
 		return new Vector2(
-			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
-			interpolate( point0.y, point1.y, point2.y, point3.y, weight )
+			CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
+			CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
 		);
 
 	};
-
-	/**************************************************************
-	 *	Cubic Bezier curve
-	 **************************************************************/
 
 	function CubicBezierCurve( v0, v1, v2, v3 ) {
 
@@ -34554,30 +34418,14 @@
 
 	CubicBezierCurve.prototype.getPoint = function ( t ) {
 
-		var b3 = ShapeUtils.b3;
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
 		return new Vector2(
-			b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-			b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
 		);
 
 	};
-
-	CubicBezierCurve.prototype.getTangent = function( t ) {
-
-		var tangentCubicBezier = CurveUtils.tangentCubicBezier;
-
-		return new Vector2(
-			tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-			tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
-		).normalize();
-
-	};
-
-	/**************************************************************
-	 *	Quadratic Bezier curve
-	 **************************************************************/
-
 
 	function QuadraticBezierCurve( v0, v1, v2 ) {
 
@@ -34590,27 +34438,14 @@
 	QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
 	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
-
 	QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
-		var b2 = ShapeUtils.b2;
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
 		return new Vector2(
-			b2( t, this.v0.x, this.v1.x, this.v2.x ),
-			b2( t, this.v0.y, this.v1.y, this.v2.y )
+			QuadraticBezier( t, v0.x, v1.x, v2.x ),
+			QuadraticBezier( t, v0.y, v1.y, v2.y )
 		);
-
-	};
-
-
-	QuadraticBezierCurve.prototype.getTangent = function( t ) {
-
-		var tangentQuadraticBezier = CurveUtils.tangentQuadraticBezier;
-
-		return new Vector2(
-			tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x ),
-			tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y )
-		).normalize();
 
 	};
 
@@ -34736,6 +34571,27 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Creates free form 2d path using series of points, lines or curves.
+	 **/
+
+	function Path( points ) {
+
+		CurvePath.call( this );
+		this.currentPoint = new Vector2();
+
+		if ( points ) {
+
+			this.fromPoints( points );
+
+		}
+
+	}
+
+	Path.prototype = PathPrototype;
+	PathPrototype.constructor = Path;
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 * Defines a 2d shape plane using paths.
 	 **/
 
@@ -34794,50 +34650,48 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Creates free form 2d path using series of points, lines or curves.
-	 *
+	 * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
 	 **/
 
-	function Path( points ) {
-
-		CurvePath.call( this );
-		this.currentPoint = new Vector2();
-
-		if ( points ) {
-
-			this.fromPoints( points );
-
-		}
-
-	}
-
-	Path.prototype = PathPrototype;
-	PathPrototype.constructor = Path;
-
-
-	// minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
 	function ShapePath() {
+
 		this.subPaths = [];
 		this.currentPath = null;
+
 	}
 
 	ShapePath.prototype = {
+
 		moveTo: function ( x, y ) {
+
 			this.currentPath = new Path();
-			this.subPaths.push(this.currentPath);
+			this.subPaths.push( this.currentPath );
 			this.currentPath.moveTo( x, y );
+
 		},
+
 		lineTo: function ( x, y ) {
+
 			this.currentPath.lineTo( x, y );
+
 		},
+
 		quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+
 			this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
+
 		},
+
 		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+
 			this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
+
 		},
+
 		splineThru: function ( pts ) {
+
 			this.currentPath.splineThru( pts );
+
 		},
 
 		toShapes: function ( isCCW, noHoles ) {
@@ -35066,6 +34920,7 @@
 			return shapes;
 
 		}
+
 	};
 
 	/**
@@ -35114,7 +34969,7 @@
 
 				var path = new ShapePath();
 
-				var pts = [], b2 = ShapeUtils.b2, b3 = ShapeUtils.b3;
+				var pts = [];
 				var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
 
 				if ( glyph.o ) {
@@ -35164,8 +35019,8 @@
 									for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 										var t = i2 / divisions;
-										b2( t, cpx0, cpx1, cpx );
-										b2( t, cpy0, cpy1, cpy );
+										QuadraticBezier( t, cpx0, cpx1, cpx );
+										QuadraticBezier( t, cpy0, cpy1, cpy );
 
 									}
 
@@ -35194,8 +35049,8 @@
 									for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 										var t = i2 / divisions;
-										b3( t, cpx0, cpx1, cpx2, cpx );
-										b3( t, cpy0, cpy1, cpy2, cpy );
+										CubicBezier( t, cpx0, cpx1, cpx2, cpx );
+										CubicBezier( t, cpy0, cpy1, cpy2, cpy );
 
 									}
 
@@ -38022,12 +37877,14 @@
 
 	}
 
-	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
+	AnimationMixer.prototype = {
+
+		constructor: AnimationMixer,
 
 		// return an action for a clip optionally using a custom root target
 		// object (this method allocates a lot of dynamic memory in case a
 		// previously unknown clip/root combination is specified)
-		clipAction: function( clip, optionalRoot ) {
+		clipAction: function ( clip, optionalRoot ) {
 
 			var root = optionalRoot || this._root,
 				rootUuid = root.uuid,
@@ -38077,7 +37934,7 @@
 		},
 
 		// get an existing action
-		existingAction: function( clip, optionalRoot ) {
+		existingAction: function ( clip, optionalRoot ) {
 
 			var root = optionalRoot || this._root,
 				rootUuid = root.uuid,
@@ -38100,7 +37957,7 @@
 		},
 
 		// deactivates all previously scheduled actions
-		stopAllAction: function() {
+		stopAllAction: function () {
 
 			var actions = this._actions,
 				nActions = this._nActiveActions,
@@ -38127,7 +37984,7 @@
 		},
 
 		// advance the time and update apply the animation
-		update: function( deltaTime ) {
+		update: function ( deltaTime ) {
 
 			deltaTime *= this.timeScale;
 
@@ -38169,14 +38026,14 @@
 		},
 
 		// return this mixer's root target object
-		getRoot: function() {
+		getRoot: function () {
 
 			return this._root;
 
 		},
 
 		// free all resources specific to a particular clip
-		uncacheClip: function( clip ) {
+		uncacheClip: function ( clip ) {
 
 			var actions = this._actions,
 				clipUuid = clip.uuid,
@@ -38218,7 +38075,7 @@
 		},
 
 		// free all resources specific to a particular root target object
-		uncacheRoot: function( root ) {
+		uncacheRoot: function ( root ) {
 
 			var rootUuid = root.uuid,
 				actionsByClip = this._actionsByClip;
@@ -38255,7 +38112,7 @@
 		},
 
 		// remove a targeted clip from the cache
-		uncacheAction: function( clip, optionalRoot ) {
+		uncacheAction: function ( clip, optionalRoot ) {
 
 			var action = this.existingAction( clip, optionalRoot );
 
@@ -38268,13 +38125,13 @@
 
 		}
 
-	} );
+	};
 
 	// Implementation details:
 
 	Object.assign( AnimationMixer.prototype, {
 
-		_bindAction: function( action, prototypeAction ) {
+		_bindAction: function ( action, prototypeAction ) {
 
 			var root = action._localRoot || this._root,
 				tracks = action._clip.tracks,
@@ -38341,7 +38198,7 @@
 
 		},
 
-		_activateAction: function( action ) {
+		_activateAction: function ( action ) {
 
 			if ( ! this._isActiveAction( action ) ) {
 
@@ -38383,7 +38240,7 @@
 
 		},
 
-		_deactivateAction: function( action ) {
+		_deactivateAction: function ( action ) {
 
 			if ( this._isActiveAction( action ) ) {
 
@@ -38411,7 +38268,7 @@
 
 		// Memory manager
 
-		_initMemoryManager: function() {
+		_initMemoryManager: function () {
 
 			this._actions = []; // 'nActiveActions' followed by inactive ones
 			this._nActiveActions = 0;
@@ -38456,14 +38313,14 @@
 
 		// Memory management for AnimationAction objects
 
-		_isActiveAction: function( action ) {
+		_isActiveAction: function ( action ) {
 
 			var index = action._cacheIndex;
 			return index !== null && index < this._nActiveActions;
 
 		},
 
-		_addInactiveAction: function( action, clipUuid, rootUuid ) {
+		_addInactiveAction: function ( action, clipUuid, rootUuid ) {
 
 			var actions = this._actions,
 				actionsByClip = this._actionsByClip,
@@ -38498,7 +38355,7 @@
 
 		},
 
-		_removeInactiveAction: function( action ) {
+		_removeInactiveAction: function ( action ) {
 
 			var actions = this._actions,
 				lastInactiveAction = actions[ actions.length - 1 ],
@@ -38543,7 +38400,7 @@
 
 		},
 
-		_removeInactiveBindingsForAction: function( action ) {
+		_removeInactiveBindingsForAction: function ( action ) {
 
 			var bindings = action._propertyBindings;
 			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
@@ -38560,7 +38417,7 @@
 
 		},
 
-		_lendAction: function( action ) {
+		_lendAction: function ( action ) {
 
 			// [ active actions |  inactive actions  ]
 			// [  active actions >| inactive actions ]
@@ -38583,7 +38440,7 @@
 
 		},
 
-		_takeBackAction: function( action ) {
+		_takeBackAction: function ( action ) {
 
 			// [  active actions  | inactive actions ]
 			// [ active actions |< inactive actions  ]
@@ -38608,7 +38465,7 @@
 
 		// Memory management for PropertyMixer objects
 
-		_addInactiveBinding: function( binding, rootUuid, trackName ) {
+		_addInactiveBinding: function ( binding, rootUuid, trackName ) {
 
 			var bindingsByRoot = this._bindingsByRootAndName,
 				bindingByName = bindingsByRoot[ rootUuid ],
@@ -38629,7 +38486,7 @@
 
 		},
 
-		_removeInactiveBinding: function( binding ) {
+		_removeInactiveBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				propBinding = binding.binding,
@@ -38657,7 +38514,7 @@
 
 		},
 
-		_lendBinding: function( binding ) {
+		_lendBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				prevIndex = binding._cacheIndex,
@@ -38674,7 +38531,7 @@
 
 		},
 
-		_takeBackBinding: function( binding ) {
+		_takeBackBinding: function ( binding ) {
 
 			var bindings = this._bindings,
 				prevIndex = binding._cacheIndex,
@@ -38694,7 +38551,7 @@
 
 		// Memory management of Interpolants for weight and time scale
 
-		_lendControlInterpolant: function() {
+		_lendControlInterpolant: function () {
 
 			var interpolants = this._controlInterpolants,
 				lastActiveIndex = this._nActiveControlInterpolants ++,
@@ -38715,7 +38572,7 @@
 
 		},
 
-		_takeBackControlInterpolant: function( interpolant ) {
+		_takeBackControlInterpolant: function ( interpolant ) {
 
 			var interpolants = this._controlInterpolants,
 				prevIndex = interpolant.__cacheIndex,
@@ -38735,6 +38592,8 @@
 		_controlInterpolantsResultBuffer: new Float32Array( 1 )
 
 	} );
+
+	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -39312,183 +39171,6 @@
 		}
 
 	};
-
-	/**
-	 * Spline from Tween.js, slightly optimized (and trashed)
-	 * http://sole.github.com/tween.js/examples/05_spline.html
-	 *
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function Spline( points ) {
-
-		this.points = points;
-
-		var c = [], v3 = { x: 0, y: 0, z: 0 },
-		point, intPoint, weight, w2, w3,
-		pa, pb, pc, pd;
-
-		this.initFromArray = function ( a ) {
-
-			this.points = [];
-
-			for ( var i = 0; i < a.length; i ++ ) {
-
-				this.points[ i ] = { x: a[ i ][ 0 ], y: a[ i ][ 1 ], z: a[ i ][ 2 ] };
-
-			}
-
-		};
-
-		this.getPoint = function ( k ) {
-
-			point = ( this.points.length - 1 ) * k;
-			intPoint = Math.floor( point );
-			weight = point - intPoint;
-
-			c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
-			c[ 1 ] = intPoint;
-			c[ 2 ] = intPoint  > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
-			c[ 3 ] = intPoint  > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
-
-			pa = this.points[ c[ 0 ] ];
-			pb = this.points[ c[ 1 ] ];
-			pc = this.points[ c[ 2 ] ];
-			pd = this.points[ c[ 3 ] ];
-
-			w2 = weight * weight;
-			w3 = weight * w2;
-
-			v3.x = interpolate( pa.x, pb.x, pc.x, pd.x, weight, w2, w3 );
-			v3.y = interpolate( pa.y, pb.y, pc.y, pd.y, weight, w2, w3 );
-			v3.z = interpolate( pa.z, pb.z, pc.z, pd.z, weight, w2, w3 );
-
-			return v3;
-
-		};
-
-		this.getControlPointsArray = function () {
-
-			var i, p, l = this.points.length,
-				coords = [];
-
-			for ( i = 0; i < l; i ++ ) {
-
-				p = this.points[ i ];
-				coords[ i ] = [ p.x, p.y, p.z ];
-
-			}
-
-			return coords;
-
-		};
-
-		// approximate length by summing linear segments
-
-		this.getLength = function ( nSubDivisions ) {
-
-			var i, index, nSamples, position,
-				point = 0, intPoint = 0, oldIntPoint = 0,
-				oldPosition = new Vector3(),
-				tmpVec = new Vector3(),
-				chunkLengths = [],
-				totalLength = 0;
-
-			// first point has 0 length
-
-			chunkLengths[ 0 ] = 0;
-
-			if ( ! nSubDivisions ) nSubDivisions = 100;
-
-			nSamples = this.points.length * nSubDivisions;
-
-			oldPosition.copy( this.points[ 0 ] );
-
-			for ( i = 1; i < nSamples; i ++ ) {
-
-				index = i / nSamples;
-
-				position = this.getPoint( index );
-				tmpVec.copy( position );
-
-				totalLength += tmpVec.distanceTo( oldPosition );
-
-				oldPosition.copy( position );
-
-				point = ( this.points.length - 1 ) * index;
-				intPoint = Math.floor( point );
-
-				if ( intPoint !== oldIntPoint ) {
-
-					chunkLengths[ intPoint ] = totalLength;
-					oldIntPoint = intPoint;
-
-				}
-
-			}
-
-			// last point ends with total length
-
-			chunkLengths[ chunkLengths.length ] = totalLength;
-
-			return { chunks: chunkLengths, total: totalLength };
-
-		};
-
-		this.reparametrizeByArcLength = function ( samplingCoef ) {
-
-			var i, j,
-				index, indexCurrent, indexNext,
-				realDistance,
-				sampling, position,
-				newpoints = [],
-				tmpVec = new Vector3(),
-				sl = this.getLength();
-
-			newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
-
-			for ( i = 1; i < this.points.length; i ++ ) {
-
-				//tmpVec.copy( this.points[ i - 1 ] );
-				//linearDistance = tmpVec.distanceTo( this.points[ i ] );
-
-				realDistance = sl.chunks[ i ] - sl.chunks[ i - 1 ];
-
-				sampling = Math.ceil( samplingCoef * realDistance / sl.total );
-
-				indexCurrent = ( i - 1 ) / ( this.points.length - 1 );
-				indexNext = i / ( this.points.length - 1 );
-
-				for ( j = 1; j < sampling - 1; j ++ ) {
-
-					index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
-
-					position = this.getPoint( index );
-					newpoints.push( tmpVec.copy( position ).clone() );
-
-				}
-
-				newpoints.push( tmpVec.copy( this.points[ i ] ).clone() );
-
-			}
-
-			this.points = newpoints;
-
-		};
-
-		// Catmull-Rom
-
-		function interpolate( p0, p1, p2, p3, t, t2, t3 ) {
-
-			var v0 = ( p2 - p0 ) * 0.5,
-				v1 = ( p3 - p1 ) * 0.5;
-
-			return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-		}
-
-	}
 
 	/**
 	 * @author bhouston / http://clara.io
@@ -41313,25 +40995,20 @@
 	 * curve.tension is used for catmullrom which defaults to 0.5
 	 */
 
-	var CatmullRomCurve3 = ( function() {
 
-		var
-			tmp = new Vector3(),
-			px = new CubicPoly(),
-			py = new CubicPoly(),
-			pz = new CubicPoly();
+	/*
+	Based on an optimized c++ solution in
+	 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+	 - http://ideone.com/NoEbVM
 
-		/*
-		Based on an optimized c++ solution in
-		 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
-		 - http://ideone.com/NoEbVM
+	This CubicPoly class could be used for reusing some variables and calculations,
+	but for three.js curve use, it could be possible inlined and flatten into a single function call
+	which can be placed in CurveUtils.
+	*/
 
-		This CubicPoly class could be used for reusing some variables and calculations,
-		but for three.js curve use, it could be possible inlined and flatten into a single function call
-		which can be placed in CurveUtils.
-		*/
+	function CubicPoly() {
 
-		function CubicPoly() {}
+		var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
 
 		/*
 		 * Compute coefficients for a cubic polynomial
@@ -41341,280 +41018,221 @@
 		 *  and
 		 *   p'(0) = t0, p'(1) = t1.
 		 */
-		CubicPoly.prototype.init = function( x0, x1, t0, t1 ) {
+		function init( x0, x1, t0, t1 ) {
 
-			this.c0 = x0;
-			this.c1 = t0;
-			this.c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
-			this.c3 = 2 * x0 - 2 * x1 + t0 + t1;
+			c0 = x0;
+			c1 = t0;
+			c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
+			c3 = 2 * x0 - 2 * x1 + t0 + t1;
 
-		};
+		}
 
-		CubicPoly.prototype.initNonuniformCatmullRom = function( x0, x1, x2, x3, dt0, dt1, dt2 ) {
+		return {
 
-			// compute tangents when parameterized in [t1,t2]
-			var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
-			var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
+			initCatmullRom: function ( x0, x1, x2, x3, tension ) {
 
-			// rescale tangents for parametrization in [0,1]
-			t1 *= dt1;
-			t2 *= dt1;
-
-			// initCubicPoly
-			this.init( x1, x2, t1, t2 );
-
-		};
-
-		// standard Catmull-Rom spline: interpolate between x1 and x2 with previous/following points x1/x4
-		CubicPoly.prototype.initCatmullRom = function( x0, x1, x2, x3, tension ) {
-
-			this.init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
-
-		};
-
-		CubicPoly.prototype.calc = function( t ) {
-
-			var t2 = t * t;
-			var t3 = t2 * t;
-			return this.c0 + this.c1 * t + this.c2 * t2 + this.c3 * t3;
-
-		};
-
-		// Subclass Three.js curve
-		return Curve.create(
-
-			function ( p /* array of Vector3 */ ) {
-
-				this.points = p || [];
-				this.closed = false;
+				init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
 
 			},
 
-			function ( t ) {
+			initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
 
-				var points = this.points,
-					point, intPoint, weight, l;
+				// compute tangents when parameterized in [t1,t2]
+				var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
+				var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
 
-				l = points.length;
+				// rescale tangents for parametrization in [0,1]
+				t1 *= dt1;
+				t2 *= dt1;
 
-				if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
+				init( x1, x2, t1, t2 );
 
-				point = ( l - ( this.closed ? 0 : 1 ) ) * t;
-				intPoint = Math.floor( point );
-				weight = point - intPoint;
+			},
 
-				if ( this.closed ) {
+			calc: function ( t ) {
 
-					intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
-
-				} else if ( weight === 0 && intPoint === l - 1 ) {
-
-					intPoint = l - 2;
-					weight = 1;
-
-				}
-
-				var p0, p1, p2, p3; // 4 points
-
-				if ( this.closed || intPoint > 0 ) {
-
-					p0 = points[ ( intPoint - 1 ) % l ];
-
-				} else {
-
-					// extrapolate first point
-					tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
-					p0 = tmp;
-
-				}
-
-				p1 = points[ intPoint % l ];
-				p2 = points[ ( intPoint + 1 ) % l ];
-
-				if ( this.closed || intPoint + 2 < l ) {
-
-					p3 = points[ ( intPoint + 2 ) % l ];
-
-				} else {
-
-					// extrapolate last point
-					tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
-					p3 = tmp;
-
-				}
-
-				if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
-
-					// init Centripetal / Chordal Catmull-Rom
-					var pow = this.type === 'chordal' ? 0.5 : 0.25;
-					var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-					var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-					var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
-
-					// safety check for repeated points
-					if ( dt1 < 1e-4 ) dt1 = 1.0;
-					if ( dt0 < 1e-4 ) dt0 = dt1;
-					if ( dt2 < 1e-4 ) dt2 = dt1;
-
-					px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
-					py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
-					pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
-
-				} else if ( this.type === 'catmullrom' ) {
-
-					var tension = this.tension !== undefined ? this.tension : 0.5;
-					px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-					py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-					pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
-
-				}
-
-				var v = new Vector3(
-					px.calc( weight ),
-					py.calc( weight ),
-					pz.calc( weight )
-				);
-
-				return v;
+				var t2 = t * t;
+				var t3 = t2 * t;
+				return c0 + c1 * t + c2 * t2 + c3 * t3;
 
 			}
 
+		};
+
+	}
+
+	//
+
+	var tmp = new Vector3();
+	var px = new CubicPoly();
+	var py = new CubicPoly();
+	var pz = new CubicPoly();
+
+	function CatmullRomCurve3( p /* array of Vector3 */ ) {
+
+		this.points = p || [];
+		this.closed = false;
+
+	}
+
+	CatmullRomCurve3.prototype = Object.create( Curve.prototype );
+	CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
+
+	CatmullRomCurve3.prototype.getPoint = function ( t ) {
+
+		var points = this.points;
+		var l = points.length;
+
+		if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
+
+		var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
+		var intPoint = Math.floor( point );
+		var weight = point - intPoint;
+
+		if ( this.closed ) {
+
+			intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+
+		} else if ( weight === 0 && intPoint === l - 1 ) {
+
+			intPoint = l - 2;
+			weight = 1;
+
+		}
+
+		var p0, p1, p2, p3; // 4 points
+
+		if ( this.closed || intPoint > 0 ) {
+
+			p0 = points[ ( intPoint - 1 ) % l ];
+
+		} else {
+
+			// extrapolate first point
+			tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
+			p0 = tmp;
+
+		}
+
+		p1 = points[ intPoint % l ];
+		p2 = points[ ( intPoint + 1 ) % l ];
+
+		if ( this.closed || intPoint + 2 < l ) {
+
+			p3 = points[ ( intPoint + 2 ) % l ];
+
+		} else {
+
+			// extrapolate last point
+			tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
+			p3 = tmp;
+
+		}
+
+		if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+
+			// init Centripetal / Chordal Catmull-Rom
+			var pow = this.type === 'chordal' ? 0.5 : 0.25;
+			var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
+			var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
+			var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
+
+			// safety check for repeated points
+			if ( dt1 < 1e-4 ) dt1 = 1.0;
+			if ( dt0 < 1e-4 ) dt0 = dt1;
+			if ( dt2 < 1e-4 ) dt2 = dt1;
+
+			px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
+			py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
+			pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
+
+		} else if ( this.type === 'catmullrom' ) {
+
+			var tension = this.tension !== undefined ? this.tension : 0.5;
+			px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
+			py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
+			pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+
+		}
+
+		return new Vector3( px.calc( weight ), py.calc( weight ), pz.calc( weight ) );
+
+	};
+
+	function CubicBezierCurve3( v0, v1, v2, v3 ) {
+
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+		this.v3 = v3;
+
+	}
+
+	CubicBezierCurve3.prototype = Object.create( Curve.prototype );
+	CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
+
+	CubicBezierCurve3.prototype.getPoint = function ( t ) {
+
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
+		return new Vector3(
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
 		);
 
-	} )();
+	};
 
-	/**************************************************************
-	 *	Spline 3D curve
-	 **************************************************************/
+	function QuadraticBezierCurve3( v0, v1, v2 ) {
 
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
 
-	var SplineCurve3 = Curve.create(
+	}
 
-		function ( points /* array of Vector3 */ ) {
+	QuadraticBezierCurve3.prototype = Object.create( Curve.prototype );
+	QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
 
-			console.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
-			this.points = ( points === undefined ) ? [] : points;
+	QuadraticBezierCurve3.prototype.getPoint = function ( t ) {
 
-		},
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-		function ( t ) {
+		return new Vector3(
+			QuadraticBezier( t, v0.x, v1.x, v2.x ),
+			QuadraticBezier( t, v0.y, v1.y, v2.y ),
+			QuadraticBezier( t, v0.z, v1.z, v2.z )
+		);
 
-			var points = this.points;
-			var point = ( points.length - 1 ) * t;
+	};
 
-			var intPoint = Math.floor( point );
-			var weight = point - intPoint;
+	function LineCurve3( v1, v2 ) {
 
-			var point0 = points[ intPoint == 0 ? intPoint : intPoint - 1 ];
-			var point1 = points[ intPoint ];
-			var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-			var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+		this.v1 = v1;
+		this.v2 = v2;
 
-			var interpolate = CurveUtils.interpolate;
+	}
 
-			return new Vector3(
-				interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
-				interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
-				interpolate( point0.z, point1.z, point2.z, point3.z, weight )
-			);
+	LineCurve3.prototype = Object.create( Curve.prototype );
+	LineCurve3.prototype.constructor = LineCurve3;
 
-		}
+	LineCurve3.prototype.getPoint = function ( t ) {
 
-	);
+		if ( t === 1 ) {
 
-	/**************************************************************
-	 *	Cubic Bezier 3D curve
-	 **************************************************************/
-
-	var CubicBezierCurve3 = Curve.create(
-
-		function ( v0, v1, v2, v3 ) {
-
-			this.v0 = v0;
-			this.v1 = v1;
-			this.v2 = v2;
-			this.v3 = v3;
-
-		},
-
-		function ( t ) {
-
-			var b3 = ShapeUtils.b3;
-
-			return new Vector3(
-				b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-				b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y ),
-				b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z )
-			);
+			return this.v2.clone();
 
 		}
 
-	);
+		var vector = new Vector3();
 
-	/**************************************************************
-	 *	Quadratic Bezier 3D curve
-	 **************************************************************/
+		vector.subVectors( this.v2, this.v1 ); // diff
+		vector.multiplyScalar( t );
+		vector.add( this.v1 );
 
-	var QuadraticBezierCurve3 = Curve.create(
+		return vector;
 
-		function ( v0, v1, v2 ) {
-
-			this.v0 = v0;
-			this.v1 = v1;
-			this.v2 = v2;
-
-		},
-
-		function ( t ) {
-
-			var b2 = ShapeUtils.b2;
-
-			return new Vector3(
-				b2( t, this.v0.x, this.v1.x, this.v2.x ),
-				b2( t, this.v0.y, this.v1.y, this.v2.y ),
-				b2( t, this.v0.z, this.v1.z, this.v2.z )
-			);
-
-		}
-
-	);
-
-	/**************************************************************
-	 *	Line3D
-	 **************************************************************/
-
-	var LineCurve3 = Curve.create(
-
-		function ( v1, v2 ) {
-
-			this.v1 = v1;
-			this.v2 = v2;
-
-		},
-
-		function ( t ) {
-
-			if ( t === 1 ) {
-
-				return this.v2.clone();
-
-			}
-
-			var vector = new Vector3();
-
-			vector.subVectors( this.v2, this.v1 ); // diff
-			vector.multiplyScalar( t );
-			vector.add( this.v1 );
-
-			return vector;
-
-		}
-
-	);
-
-	/**************************************************************
-	 *	Arc curve
-	 **************************************************************/
+	};
 
 	function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
@@ -41811,6 +41429,20 @@
 
 	//
 
+	Curve.create = function ( construct, getPoint ) {
+
+		console.log( 'THREE.Curve.create() has been deprecated' );
+
+		construct.prototype = Object.create( Curve.prototype );
+		construct.prototype.constructor = construct;
+		construct.prototype.getPoint = getPoint;
+
+		return construct;
+
+	};
+
+	//
+
 	function ClosedSplineCurve3( points ) {
 
 		console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
@@ -41823,6 +41455,51 @@
 
 	ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
+	//
+
+	function SplineCurve3( points ) {
+
+		console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
+
+		CatmullRomCurve3.call( this, points );
+		this.type = 'catmullrom';
+
+	}
+
+	SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
+
+	//
+
+	function Spline( points ) {
+
+		console.warn( 'THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.' );
+
+		CatmullRomCurve3.call( this, points );
+		this.type = 'catmullrom';
+
+	}
+
+	Spline.prototype = Object.create( CatmullRomCurve3.prototype );
+
+	Object.assign( Spline.prototype, {
+
+		initFromArray: function ( a ) {
+
+			console.error( 'THREE.Spline: .initFromArray() has been removed.' );
+
+		},
+		getControlPointsArray: function ( optionalTarget ) {
+
+			console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
+
+		},
+		reparametrizeByArcLength: function ( samplingCoef ) {
+
+			console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
+
+		}
+
+	} );
 
 	//
 	function BoundingBoxHelper( object, color ) {
@@ -41858,6 +41535,13 @@
 
 		console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
 		return new FileLoader( manager );
+
+	}
+
+	function BinaryTextureLoader( manager ) {
+
+		console.warn( 'THREE.BinaryTextureLoader has been renamed to THREE.DataTextureLoader.' );
+		return new DataTextureLoader( manager );
 
 	}
 
@@ -41964,6 +41648,11 @@
 			console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 			return this.applyToBufferAttribute( buffer );
 
+		},
+		applyToVector3Array: function( array, offset, length ) {
+
+			console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
+
 		}
 
 	} );
@@ -42003,8 +41692,8 @@
 		},
 		multiplyVector3: function ( vector ) {
 
-			console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-			return vector.applyProjection( this );
+			console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+			return vector.applyMatrix4( this );
 
 		},
 		multiplyVector4: function ( vector ) {
@@ -42060,6 +41749,17 @@
 
 			console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 			return this.applyToBufferAttribute( buffer );
+
+		},
+		applyToVector3Array: function( array, offset, length ) {
+
+			console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
+
+		},
+		makeFrustum: function( left, right, bottom, top, near, far ) {
+
+			console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
+			return this.makePerspective( left, right, top, bottom, near, far );
 
 		}
 
@@ -42119,6 +41819,17 @@
 
 	} );
 
+	Object.assign( Vector2.prototype, {
+
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
+
+		}
+
+	} );
+
 	Object.assign( Vector3.prototype, {
 
 		setEulerFromRotationMatrix: function () {
@@ -42147,6 +41858,29 @@
 
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 			return this.setFromMatrixColumn( matrix, index );
+
+		},
+		applyProjection: function ( m ) {
+
+			console.warn( 'THREE.Vector3: .applyProjection() has been removed. Use .applyMatrix4( m ) instead.' );
+			return this.applyMatrix4( m );
+
+		},
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
+
+		}
+
+	} );
+
+	Object.assign( Vector4.prototype, {
+
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
 
 		}
 
@@ -42503,25 +42237,6 @@
 		}
 
 	} );
-
-	//
-
-	EventDispatcher.prototype = Object.assign( Object.create( {
-
-		// Note: Extra base ensures these properties are not 'assign'ed.
-
-		constructor: EventDispatcher,
-
-		apply: function ( target ) {
-
-			console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-					"just inherit or Object.assign the prototype to mix-in." );
-
-			Object.assign( target, this );
-
-		}
-
-	} ), EventDispatcher.prototype );
 
 	//
 
@@ -42986,7 +42701,6 @@
 	exports.DepthTexture = DepthTexture;
 	exports.Texture = Texture;
 	exports.CompressedTextureLoader = CompressedTextureLoader;
-	exports.BinaryTextureLoader = BinaryTextureLoader;
 	exports.DataTextureLoader = DataTextureLoader;
 	exports.CubeTextureLoader = CubeTextureLoader;
 	exports.TextureLoader = TextureLoader;
@@ -43056,7 +42770,6 @@
 	exports.CubicInterpolant = CubicInterpolant;
 	exports.Interpolant = Interpolant;
 	exports.Triangle = Triangle;
-	exports.Spline = Spline;
 	exports.Math = _Math;
 	exports.Spherical = Spherical;
 	exports.Cylindrical = Cylindrical;
@@ -43092,7 +42805,6 @@
 	exports.ArrowHelper = ArrowHelper;
 	exports.AxisHelper = AxisHelper;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;
-	exports.SplineCurve3 = SplineCurve3;
 	exports.CubicBezierCurve3 = CubicBezierCurve3;
 	exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
 	exports.LineCurve3 = LineCurve3;
@@ -43103,14 +42815,13 @@
 	exports.QuadraticBezierCurve = QuadraticBezierCurve;
 	exports.LineCurve = LineCurve;
 	exports.Shape = Shape;
-	exports.ShapePath = ShapePath;
 	exports.Path = Path;
+	exports.ShapePath = ShapePath;
 	exports.Font = Font;
 	exports.CurvePath = CurvePath;
 	exports.Curve = Curve;
 	exports.ShapeUtils = ShapeUtils;
 	exports.SceneUtils = SceneUtils;
-	exports.CurveUtils = CurveUtils;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.ParametricBufferGeometry = ParametricBufferGeometry;
@@ -43203,7 +42914,6 @@
 	exports.SubtractiveBlending = SubtractiveBlending;
 	exports.MultiplyBlending = MultiplyBlending;
 	exports.CustomBlending = CustomBlending;
-	exports.BlendingMode = BlendingMode;
 	exports.AddEquation = AddEquation;
 	exports.SubtractEquation = SubtractEquation;
 	exports.ReverseSubtractEquation = ReverseSubtractEquation;
@@ -43244,18 +42954,15 @@
 	exports.SphericalReflectionMapping = SphericalReflectionMapping;
 	exports.CubeUVReflectionMapping = CubeUVReflectionMapping;
 	exports.CubeUVRefractionMapping = CubeUVRefractionMapping;
-	exports.TextureMapping = TextureMapping;
 	exports.RepeatWrapping = RepeatWrapping;
 	exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 	exports.MirroredRepeatWrapping = MirroredRepeatWrapping;
-	exports.TextureWrapping = TextureWrapping;
 	exports.NearestFilter = NearestFilter;
 	exports.NearestMipMapNearestFilter = NearestMipMapNearestFilter;
 	exports.NearestMipMapLinearFilter = NearestMipMapLinearFilter;
 	exports.LinearFilter = LinearFilter;
 	exports.LinearMipMapNearestFilter = LinearMipMapNearestFilter;
 	exports.LinearMipMapLinearFilter = LinearMipMapLinearFilter;
-	exports.TextureFilter = TextureFilter;
 	exports.UnsignedByteType = UnsignedByteType;
 	exports.ByteType = ByteType;
 	exports.ShortType = ShortType;
@@ -43330,10 +43037,13 @@
 	exports.Float32Attribute = Float32Attribute;
 	exports.Float64Attribute = Float64Attribute;
 	exports.ClosedSplineCurve3 = ClosedSplineCurve3;
+	exports.SplineCurve3 = SplineCurve3;
+	exports.Spline = Spline;
 	exports.BoundingBoxHelper = BoundingBoxHelper;
 	exports.EdgesHelper = EdgesHelper;
 	exports.WireframeHelper = WireframeHelper;
 	exports.XHRLoader = XHRLoader;
+	exports.BinaryTextureLoader = BinaryTextureLoader;
 	exports.GeometryUtils = GeometryUtils;
 	exports.ImageUtils = ImageUtils;
 	exports.Projector = Projector;

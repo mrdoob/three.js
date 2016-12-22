@@ -19,11 +19,11 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
-import { EventDispatcher } from './core/EventDispatcher.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
+import { Curve } from './extras/core/Curve.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { BoxHelper } from './extras/helpers/BoxHelper';
 import { GridHelper } from './extras/helpers/GridHelper.js';
@@ -36,6 +36,7 @@ import { Light } from './lights/Light.js';
 import { FileLoader } from './loaders/FileLoader.js';
 import { AudioLoader } from './loaders/AudioLoader.js';
 import { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
+import { DataTextureLoader } from './loaders/DataTextureLoader.js';
 import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
@@ -53,7 +54,9 @@ import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Ray } from './math/Ray.js';
+import { Vector2 } from './math/Vector2.js';
 import { Vector3 } from './math/Vector3.js';
+import { Vector4 } from './math/Vector4.js';
 import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
@@ -206,6 +209,20 @@ export function Float64Attribute( array, itemSize ) {
 
 //
 
+Curve.create = function ( construct, getPoint ) {
+
+	console.log( 'THREE.Curve.create() has been deprecated' );
+
+	construct.prototype = Object.create( Curve.prototype );
+	construct.prototype.constructor = construct;
+	construct.prototype.getPoint = getPoint;
+
+	return construct;
+
+};
+
+//
+
 export function ClosedSplineCurve3( points ) {
 
 	console.warn( 'THREE.ClosedSplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
@@ -218,6 +235,51 @@ export function ClosedSplineCurve3( points ) {
 
 ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
+//
+
+export function SplineCurve3( points ) {
+
+	console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
+
+	CatmullRomCurve3.call( this, points );
+	this.type = 'catmullrom';
+
+}
+
+SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
+
+//
+
+export function Spline( points ) {
+
+	console.warn( 'THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.' );
+
+	CatmullRomCurve3.call( this, points );
+	this.type = 'catmullrom';
+
+}
+
+Spline.prototype = Object.create( CatmullRomCurve3.prototype );
+
+Object.assign( Spline.prototype, {
+
+	initFromArray: function ( a ) {
+
+		console.error( 'THREE.Spline: .initFromArray() has been removed.' );
+
+	},
+	getControlPointsArray: function ( optionalTarget ) {
+
+		console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
+
+	},
+	reparametrizeByArcLength: function ( samplingCoef ) {
+
+		console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
+
+	}
+
+} );
 
 //
 export function BoundingBoxHelper( object, color ) {
@@ -253,6 +315,13 @@ export function XHRLoader( manager ) {
 
 	console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
 	return new FileLoader( manager );
+
+}
+
+export function BinaryTextureLoader( manager ) {
+
+	console.warn( 'THREE.BinaryTextureLoader has been renamed to THREE.DataTextureLoader.' );
+	return new DataTextureLoader( manager );
 
 }
 
@@ -359,6 +428,11 @@ Object.assign( Matrix3.prototype, {
 		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
 
+	},
+	applyToVector3Array: function( array, offset, length ) {
+
+		console.error( 'THREE.Matrix3: .applyToVector3Array() has been removed.' );
+
 	}
 
 } );
@@ -398,8 +472,8 @@ Object.assign( Matrix4.prototype, {
 	},
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-		return vector.applyProjection( this );
+		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 	multiplyVector4: function ( vector ) {
@@ -455,6 +529,17 @@ Object.assign( Matrix4.prototype, {
 
 		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
 		return this.applyToBufferAttribute( buffer );
+
+	},
+	applyToVector3Array: function( array, offset, length ) {
+
+		console.error( 'THREE.Matrix4: .applyToVector3Array() has been removed.' );
+
+	},
+	makeFrustum: function( left, right, bottom, top, near, far ) {
+
+		console.warn( 'THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.' );
+		return this.makePerspective( left, right, top, bottom, near, far );
 
 	}
 
@@ -514,6 +599,17 @@ Object.assign( Shape.prototype, {
 
 } );
 
+Object.assign( Vector2.prototype, {
+
+	fromAttribute: function ( attribute, index, offset ) {
+
+		console.error( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		return this.fromBufferAttribute( attribute, index, offset );
+
+	}
+
+} );
+
 Object.assign( Vector3.prototype, {
 
 	setEulerFromRotationMatrix: function () {
@@ -542,6 +638,29 @@ Object.assign( Vector3.prototype, {
 
 		console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 		return this.setFromMatrixColumn( matrix, index );
+
+	},
+	applyProjection: function ( m ) {
+
+		console.warn( 'THREE.Vector3: .applyProjection() has been removed. Use .applyMatrix4( m ) instead.' );
+		return this.applyMatrix4( m );
+
+	},
+	fromAttribute: function ( attribute, index, offset ) {
+
+		console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		return this.fromBufferAttribute( attribute, index, offset );
+
+	}
+
+} );
+
+Object.assign( Vector4.prototype, {
+
+	fromAttribute: function ( attribute, index, offset ) {
+
+		console.error( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+		return this.fromBufferAttribute( attribute, index, offset );
 
 	}
 
@@ -898,25 +1017,6 @@ Object.defineProperties( ShaderMaterial.prototype, {
 	}
 
 } );
-
-//
-
-EventDispatcher.prototype = Object.assign( Object.create( {
-
-	// Note: Extra base ensures these properties are not 'assign'ed.
-
-	constructor: EventDispatcher,
-
-	apply: function ( target ) {
-
-		console.warn( "THREE.EventDispatcher: .apply is deprecated, " +
-				"just inherit or Object.assign the prototype to mix-in." );
-
-		Object.assign( target, this );
-
-	}
-
-} ), EventDispatcher.prototype );
 
 //
 

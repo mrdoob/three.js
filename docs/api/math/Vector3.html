@@ -20,7 +20,7 @@
 				A point in 3D space.
 			</li>
 			<li>
-				A direction and length in 3D space. In Three the length will always be the
+				A direction and length in 3D space. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
 				(straight-line distance) from (0, 0, 0) to (x, y, z) and the direction is also
 				measured from (0, 0, 0) towards (x, y, z).
@@ -31,7 +31,7 @@
 		</ul>
 
 		There are other things a 3D vector can be used to represent, such as momentum
-		vectors and so on, however these are the most common uses in Three.
+		vectors and so on, however these are the most common uses in three.js.
 		</div>
 
 
@@ -108,27 +108,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector3 applyMatrix4]( [page:Matrix4 m] )</h3>
 		<div>
-		Multiply this vector by 4 x 3 subset of a [page:Matrix4 m]. If [page:Matrix4 m] is:
-		<code>
-a, b, c, d,
-e, f, g, h,
-i, j, k, l,
-m, n, o, p
-		</code>
-		Then the 4 x 3 matrix will be:
-		<code>
-a, b, c,
-e, f, g,
-i, j, k,
-m, n, o
-		</code>
-		</div>
-
-		<h3>[method:Vector3 applyProjection]( [page:Matrix4 m] )</h3>
-		<div>
-		[page:Matrix4 m] - [page:Matrix4] projection matrix.<br /><br />
-
-		Multiplies this vector and m, and divides by perspective.
+		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</div>
 
 		<h3>[method:Vector3 applyQuaternion]( [page:Quaternion quaternion] )</h3>
@@ -240,11 +220,10 @@ m, n, o
 		and [page:.z z] value to be array[ offset + 2 ].
 		</div>
 
-		<h3>[method:Vector3 fromAttribute]( [page:BufferAttribute attribute], [page:Integer index], [page:Integer offset] )</h3>
+		<h3>[method:Vector3 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
-		[page:Integer offset] - (optional) offset into the attribute. Default is 0.<br /><br />
 
 		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] values from the [page:BufferAttribute attribute].
 		</div>

@@ -20,7 +20,7 @@
 				A point in 4D space.
 			</li>
 			<li>
-				A direction and length in 4D space. In Three the length will always be the
+				A direction and length in 4D space. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
 				(straight-line distance) from (0, 0, 0, 0, 0) to (x, y, z, w) and the direction is also
 				measured from (0, 0, 0, 0) towards (x, y, z, w).
@@ -30,7 +30,7 @@
 			</li>
 		</ul>
 
-		There are other things a 4D vector can be used to represent, however these are the most common uses in Three.
+		There are other things a 4D vector can be used to represent, however these are the most common uses in three.js.
 		</div>
 
 
@@ -157,11 +157,10 @@ var d = a.distanceTo( b );
 		[page:.z z] value to be array[ offset + 2 ] and [page:.w w ] value to be array[ offset + 3 ].
 		</div>
 
-		<h3>[method:Vector4 fromAttribute]( [page:BufferAttribute attribute], [page:Integer index], [page:Integer offset] )</h3>
+		<h3>[method:Vector4 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
-		[page:Integer offset] - (optional) offset into the attribute. Default is 0.<br /><br />
 
 		Sets this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values from the [page:BufferAttribute attribute].
 		</div>

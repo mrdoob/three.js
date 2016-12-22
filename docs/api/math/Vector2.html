@@ -21,7 +21,7 @@
 					A point in 2D space (i.e. a position on a plane).
 				</li>
 				<li>
-					A direction and length across a plane. In Three the length will always be the
+					A direction and length across a plane. In three.js the length will always be the
 					[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
 					(straight-line distance) from (0, 0) to (x, y) and the direction is also
 					measured from (0, 0) towards (x, y).
@@ -32,7 +32,7 @@
 			</ul>
 
 			There are other things a 2D vector can be used to represent, such as momentum
-			vectors, complex numbers and so on,	however these are the most common uses in Three.
+			vectors, complex numbers and so on,	however these are the most common uses in three.js.
 		</div>
 
 		<h2>Example</h2>
@@ -184,11 +184,10 @@
 		Sets this vector's [page:.x x] value to be array[0] and [page:.y y] value to be array[1].
 		</div>
 
-		<h3>[method:Vector2 fromAttribute]( [page:BufferAttribute attribute], [page:Integer index], [page:Integer offset] )</h3>
+		<h3>[method:Vector2 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
 		<div>
 		[page:BufferAttribute attribute] - the source attribute.<br />
 		[page:Integer index] - index in the attribute.<br /><br />
-		[page:Integer offset] - (optional) offset into the attribute. Default is 0.<br /><br />
 
 		Sets this vector's [page:.x x] and [page:.y y] values from the [page:BufferAttribute attribute].
 		</div>

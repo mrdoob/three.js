@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			This is the base class for most objects in Three and provides a set of properties and methods
+			This is the base class for most objects in three.js and provides a set of properties and methods
 			for manipulating objects in 3D space.<br /><br />
 
 			Note that this can be used for grouping objects via the [page:.add]( object ) method
@@ -64,7 +64,7 @@
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrix of position, (rotation or quaternion) and
-		scale every frame and also recalculates the matrixWorld property. Default is *true*.
+		scale every frame and also recalculates the matrixWorld property. Default is [page:Object3D.DefaultMatrixAutoUpdate] (true).
 		</div>
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
@@ -132,7 +132,10 @@
 		</div>
 
 		<h3>[property:Vector3 up]</h3>
-		<div>Up direction. Default is [page:Vector3]( 0, 1, 0 ).</div>
+		<div>
+		This is used by the [page:.lookAt lookAt] method, for example, to determine the orientation of the result.<br />
+		Default is [page:Object3D.DefaultUp] - that is, ( 0, 1, 0 ).
+		</div>
 
 		<h3>[property:object userData]</h3>
 		<div>
@@ -152,7 +155,27 @@
 
 
 
+		<h2>Static Properties</h2>
+		<div>
+			Static properties and methods are defined per class rather than per instance of that class.
+			This means that changing [page:Object3D.DefaultUp] or [page:Object3D.DefaultMatrixAutoUpdate]
+			will change the values of [page:.up up] and [page:.matrixAutoUpdate matrixAutoUpdate] for
+			<em>every</em>	instance of Object3D (or derived classes)	created after the change has
+			been made (already created Object3Ds will not be affected).
+		</div>
 
+		<h3>[property:Vector3 DefaultUp]</h3>
+		<div>
+			The default [page:.up up] direction for objects, also used as the default position for [page:DirectionalLight],
+			[page:HemisphereLight] and [page:Spotlight] (which creates lights shining from the top down).<br />
+			Set to (0, 1, 0) by default.
+		</div>
+
+		<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
+		<div>
+			The default setting for [page.matrixAutoUpdate matrixAutoUpdate] for newly created Object3Ds.<br />
+
+		</div>
 
 
 		<h2>Methods</h2>
