@@ -1,7 +1,7 @@
+import { b3 } from '../core/Bezier';
 import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
 import { CurveUtils } from '../CurveUtils';
-import { ShapeUtils } from '../ShapeUtils';
 
 /**************************************************************
  *	Cubic Bezier curve
@@ -20,8 +20,6 @@ CubicBezierCurve.prototype = Object.create( Curve.prototype );
 CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
 CubicBezierCurve.prototype.getPoint = function ( t ) {
-
-	var b3 = ShapeUtils.b3;
 
 	return new Vector2(
 		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),

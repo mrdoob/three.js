@@ -1,6 +1,6 @@
-import { Vector3 } from '../../math/Vector3';
-import { ShapeUtils } from '../ShapeUtils';
+import { b3 } from '../core/Bezier';
 import { Curve } from '../core/Curve';
+import { Vector3 } from '../../math/Vector3';
 
 /**************************************************************
  *	Cubic Bezier 3D curve
@@ -18,8 +18,6 @@ var CubicBezierCurve3 = Curve.create(
 	},
 
 	function ( t ) {
-
-		var b3 = ShapeUtils.b3;
 
 		return new Vector3(
 			b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),

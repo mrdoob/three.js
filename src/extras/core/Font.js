@@ -1,4 +1,4 @@
-import { ShapeUtils } from '../ShapeUtils';
+import { b2, b3 } from './Bezier';
 import { ShapePath } from './ShapePath';
 
 /**
@@ -47,7 +47,7 @@ Object.assign( Font.prototype, {
 
 			var path = new ShapePath();
 
-			var pts = [], b2 = ShapeUtils.b2, b3 = ShapeUtils.b3;
+			var pts = [];
 			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
 
 			if ( glyph.o ) {

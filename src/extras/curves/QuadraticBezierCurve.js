@@ -1,7 +1,7 @@
+import { b2 } from '../core/Bezier';
 import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
 import { CurveUtils } from '../CurveUtils';
-import { ShapeUtils } from '../ShapeUtils';
 
 /**************************************************************
  *	Quadratic Bezier curve
@@ -21,8 +21,6 @@ QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
 
 QuadraticBezierCurve.prototype.getPoint = function ( t ) {
-
-	var b2 = ShapeUtils.b2;
 
 	return new Vector2(
 		b2( t, this.v0.x, this.v1.x, this.v2.x ),
