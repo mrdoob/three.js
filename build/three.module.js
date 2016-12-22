@@ -34008,28 +34008,6 @@ Curve.prototype = {
 
 };
 
-// TODO: Transformation for Curves?
-
-/**************************************************************
- *	3D Curves
- **************************************************************/
-
-// A Factory method for creating new curve subclasses
-
-Curve.create = function ( constructor, getPointFunc ) {
-
-	constructor.prototype = Object.create( Curve.prototype );
-	constructor.prototype.constructor = constructor;
-	constructor.prototype.getPoint = getPointFunc;
-
-	return constructor;
-
-};
-
-/**************************************************************
- *	Line
- **************************************************************/
-
 function LineCurve( v1, v2 ) {
 
 	this.v1 = v1;
@@ -34307,10 +34285,6 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 } );
 
-/**************************************************************
- *	Ellipse curve
- **************************************************************/
-
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
 	this.aX = aX;
@@ -34393,10 +34367,6 @@ EllipseCurve.prototype.getPoint = function ( t ) {
 
 };
 
-/**************************************************************
- *	Spline curve
- **************************************************************/
-
 function SplineCurve( points /* array of Vector2 */ ) {
 
 	this.points = ( points === undefined ) ? [] : points;
@@ -34428,60 +34398,50 @@ SplineCurve.prototype.getPoint = function ( t ) {
 
 };
 
-/**************************************************************
- *	Cubic Bezier curve
- **************************************************************/
+function CubicBezierCurve( v0, v1, v2, v3 ) {
 
-var CubicBezierCurve = Curve.create(
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
 
-	function ( v0, v1, v2, v3 ) {
+}
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+CubicBezierCurve.prototype = Object.create( Curve.prototype );
+CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
-	},
+CubicBezierCurve.prototype.getPoint = function ( t ) {
 
-	function ( t ) {
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+	return new Vector2(
+		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
+	);
 
-		return new Vector2(
-			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
-		);
+};
 
-	}
+function QuadraticBezierCurve( v0, v1, v2 ) {
 
-);
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
-/**************************************************************
- *	Quadratic Bezier curve
- **************************************************************/
+}
 
-var QuadraticBezierCurve = Curve.create(
+QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
+QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
-	function ( v0, v1, v2 ) {
+QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-	},
+	return new Vector2(
+		QuadraticBezier( t, v0.x, v1.x, v2.x ),
+		QuadraticBezier( t, v0.y, v1.y, v2.y )
+	);
 
-	function ( t ) {
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
-
-		return new Vector2(
-			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y )
-		);
-
-	}
-
-);
+};
 
 var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
@@ -41029,25 +40989,20 @@ AxisHelper.prototype.constructor = AxisHelper;
  * curve.tension is used for catmullrom which defaults to 0.5
  */
 
-var CatmullRomCurve3 = ( function() {
 
-	var
-		tmp = new Vector3(),
-		px = new CubicPoly(),
-		py = new CubicPoly(),
-		pz = new CubicPoly();
+/*
+Based on an optimized c++ solution in
+ - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+ - http://ideone.com/NoEbVM
 
-	/*
-	Based on an optimized c++ solution in
-	 - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
-	 - http://ideone.com/NoEbVM
+This CubicPoly class could be used for reusing some variables and calculations,
+but for three.js curve use, it could be possible inlined and flatten into a single function call
+which can be placed in CurveUtils.
+*/
 
-	This CubicPoly class could be used for reusing some variables and calculations,
-	but for three.js curve use, it could be possible inlined and flatten into a single function call
-	which can be placed in CurveUtils.
-	*/
+function CubicPoly() {
 
-	function CubicPoly() {}
+	var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
 
 	/*
 	 * Compute coefficients for a cubic polynomial
@@ -41057,241 +41012,221 @@ var CatmullRomCurve3 = ( function() {
 	 *  and
 	 *   p'(0) = t0, p'(1) = t1.
 	 */
-	CubicPoly.prototype.init = function( x0, x1, t0, t1 ) {
+	function init( x0, x1, t0, t1 ) {
 
-		this.c0 = x0;
-		this.c1 = t0;
-		this.c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
-		this.c3 = 2 * x0 - 2 * x1 + t0 + t1;
+		c0 = x0;
+		c1 = t0;
+		c2 = - 3 * x0 + 3 * x1 - 2 * t0 - t1;
+		c3 = 2 * x0 - 2 * x1 + t0 + t1;
 
-	};
+	}
 
-	CubicPoly.prototype.initNonuniformCatmullRom = function( x0, x1, x2, x3, dt0, dt1, dt2 ) {
+	return {
 
-		// compute tangents when parameterized in [t1,t2]
-		var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
-		var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
+		initCatmullRom: function ( x0, x1, x2, x3, tension ) {
 
-		// rescale tangents for parametrization in [0,1]
-		t1 *= dt1;
-		t2 *= dt1;
-
-		// initCubicPoly
-		this.init( x1, x2, t1, t2 );
-
-	};
-
-	// standard Catmull-Rom spline: interpolate between x1 and x2 with previous/following points x1/x4
-	CubicPoly.prototype.initCatmullRom = function( x0, x1, x2, x3, tension ) {
-
-		this.init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
-
-	};
-
-	CubicPoly.prototype.calc = function( t ) {
-
-		var t2 = t * t;
-		var t3 = t2 * t;
-		return this.c0 + this.c1 * t + this.c2 * t2 + this.c3 * t3;
-
-	};
-
-	// Subclass Three.js curve
-	return Curve.create(
-
-		function ( p /* array of Vector3 */ ) {
-
-			this.points = p || [];
-			this.closed = false;
+			init( x1, x2, tension * ( x2 - x0 ), tension * ( x3 - x1 ) );
 
 		},
 
-		function ( t ) {
+		initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
 
-			var points = this.points,
-				point, intPoint, weight, l;
+			// compute tangents when parameterized in [t1,t2]
+			var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
+			var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
 
-			l = points.length;
+			// rescale tangents for parametrization in [0,1]
+			t1 *= dt1;
+			t2 *= dt1;
 
-			if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
+			init( x1, x2, t1, t2 );
 
-			point = ( l - ( this.closed ? 0 : 1 ) ) * t;
-			intPoint = Math.floor( point );
-			weight = point - intPoint;
+		},
 
-			if ( this.closed ) {
+		calc: function ( t ) {
 
-				intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
-
-			} else if ( weight === 0 && intPoint === l - 1 ) {
-
-				intPoint = l - 2;
-				weight = 1;
-
-			}
-
-			var p0, p1, p2, p3; // 4 points
-
-			if ( this.closed || intPoint > 0 ) {
-
-				p0 = points[ ( intPoint - 1 ) % l ];
-
-			} else {
-
-				// extrapolate first point
-				tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
-				p0 = tmp;
-
-			}
-
-			p1 = points[ intPoint % l ];
-			p2 = points[ ( intPoint + 1 ) % l ];
-
-			if ( this.closed || intPoint + 2 < l ) {
-
-				p3 = points[ ( intPoint + 2 ) % l ];
-
-			} else {
-
-				// extrapolate last point
-				tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
-				p3 = tmp;
-
-			}
-
-			if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
-
-				// init Centripetal / Chordal Catmull-Rom
-				var pow = this.type === 'chordal' ? 0.5 : 0.25;
-				var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-				var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-				var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
-
-				// safety check for repeated points
-				if ( dt1 < 1e-4 ) dt1 = 1.0;
-				if ( dt0 < 1e-4 ) dt0 = dt1;
-				if ( dt2 < 1e-4 ) dt2 = dt1;
-
-				px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
-				py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
-				pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
-
-			} else if ( this.type === 'catmullrom' ) {
-
-				var tension = this.tension !== undefined ? this.tension : 0.5;
-				px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
-				py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
-				pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
-
-			}
-
-			var v = new Vector3(
-				px.calc( weight ),
-				py.calc( weight ),
-				pz.calc( weight )
-			);
-
-			return v;
+			var t2 = t * t;
+			var t3 = t2 * t;
+			return c0 + c1 * t + c2 * t2 + c3 * t3;
 
 		}
 
+	};
+
+}
+
+//
+
+var tmp = new Vector3();
+var px = new CubicPoly();
+var py = new CubicPoly();
+var pz = new CubicPoly();
+
+function CatmullRomCurve3( p /* array of Vector3 */ ) {
+
+	this.points = p || [];
+	this.closed = false;
+
+}
+
+CatmullRomCurve3.prototype = Object.create( Curve.prototype );
+CatmullRomCurve3.prototype.constructor = CatmullRomCurve3;
+
+CatmullRomCurve3.prototype.getPoint = function ( t ) {
+
+	var points = this.points;
+	var l = points.length;
+
+	if ( l < 2 ) console.log( 'duh, you need at least 2 points' );
+
+	var point = ( l - ( this.closed ? 0 : 1 ) ) * t;
+	var intPoint = Math.floor( point );
+	var weight = point - intPoint;
+
+	if ( this.closed ) {
+
+		intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+
+	} else if ( weight === 0 && intPoint === l - 1 ) {
+
+		intPoint = l - 2;
+		weight = 1;
+
+	}
+
+	var p0, p1, p2, p3; // 4 points
+
+	if ( this.closed || intPoint > 0 ) {
+
+		p0 = points[ ( intPoint - 1 ) % l ];
+
+	} else {
+
+		// extrapolate first point
+		tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );
+		p0 = tmp;
+
+	}
+
+	p1 = points[ intPoint % l ];
+	p2 = points[ ( intPoint + 1 ) % l ];
+
+	if ( this.closed || intPoint + 2 < l ) {
+
+		p3 = points[ ( intPoint + 2 ) % l ];
+
+	} else {
+
+		// extrapolate last point
+		tmp.subVectors( points[ l - 1 ], points[ l - 2 ] ).add( points[ l - 1 ] );
+		p3 = tmp;
+
+	}
+
+	if ( this.type === undefined || this.type === 'centripetal' || this.type === 'chordal' ) {
+
+		// init Centripetal / Chordal Catmull-Rom
+		var pow = this.type === 'chordal' ? 0.5 : 0.25;
+		var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
+		var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
+		var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
+
+		// safety check for repeated points
+		if ( dt1 < 1e-4 ) dt1 = 1.0;
+		if ( dt0 < 1e-4 ) dt0 = dt1;
+		if ( dt2 < 1e-4 ) dt2 = dt1;
+
+		px.initNonuniformCatmullRom( p0.x, p1.x, p2.x, p3.x, dt0, dt1, dt2 );
+		py.initNonuniformCatmullRom( p0.y, p1.y, p2.y, p3.y, dt0, dt1, dt2 );
+		pz.initNonuniformCatmullRom( p0.z, p1.z, p2.z, p3.z, dt0, dt1, dt2 );
+
+	} else if ( this.type === 'catmullrom' ) {
+
+		var tension = this.tension !== undefined ? this.tension : 0.5;
+		px.initCatmullRom( p0.x, p1.x, p2.x, p3.x, tension );
+		py.initCatmullRom( p0.y, p1.y, p2.y, p3.y, tension );
+		pz.initCatmullRom( p0.z, p1.z, p2.z, p3.z, tension );
+
+	}
+
+	return new Vector3( px.calc( weight ), py.calc( weight ), pz.calc( weight ) );
+
+};
+
+function CubicBezierCurve3( v0, v1, v2, v3 ) {
+
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
+
+}
+
+CubicBezierCurve3.prototype = Object.create( Curve.prototype );
+CubicBezierCurve3.prototype.constructor = CubicBezierCurve3;
+
+CubicBezierCurve3.prototype.getPoint = function ( t ) {
+
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
+	return new Vector3(
+		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+		CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
 	);
 
-} )();
+};
 
-/**************************************************************
- *	Cubic Bezier 3D curve
- **************************************************************/
+function QuadraticBezierCurve3( v0, v1, v2 ) {
 
-var CubicBezierCurve3 = Curve.create(
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
-	function ( v0, v1, v2, v3 ) {
+}
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+QuadraticBezierCurve3.prototype = Object.create( Curve.prototype );
+QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
 
-	},
+QuadraticBezierCurve3.prototype.getPoint = function ( t ) {
 
-	function ( t ) {
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+	return new Vector3(
+		QuadraticBezier( t, v0.x, v1.x, v2.x ),
+		QuadraticBezier( t, v0.y, v1.y, v2.y ),
+		QuadraticBezier( t, v0.z, v1.z, v2.z )
+	);
 
-		return new Vector3(
-			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
-			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
-		);
+};
 
-	}
+function LineCurve3( v1, v2 ) {
 
-);
+	this.v1 = v1;
+	this.v2 = v2;
 
-/**************************************************************
- *	Quadratic Bezier 3D curve
- **************************************************************/
+}
 
-var QuadraticBezierCurve3 = Curve.create(
+LineCurve3.prototype = Object.create( Curve.prototype );
+LineCurve3.prototype.constructor = LineCurve3;
 
-	function ( v0, v1, v2 ) {
+LineCurve3.prototype.getPoint = function ( t ) {
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+	if ( t === 1 ) {
 
-	},
-
-	function ( t ) {
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
-
-		return new Vector3(
-			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y ),
-			QuadraticBezier( t, v0.z, v1.z, v2.z )
-		);
+		return this.v2.clone();
 
 	}
 
-);
+	var vector = new Vector3();
 
-/**************************************************************
- *	Line3D
- **************************************************************/
+	vector.subVectors( this.v2, this.v1 ); // diff
+	vector.multiplyScalar( t );
+	vector.add( this.v1 );
 
-var LineCurve3 = Curve.create(
+	return vector;
 
-	function ( v1, v2 ) {
-
-		this.v1 = v1;
-		this.v2 = v2;
-
-	},
-
-	function ( t ) {
-
-		if ( t === 1 ) {
-
-			return this.v2.clone();
-
-		}
-
-		var vector = new Vector3();
-
-		vector.subVectors( this.v2, this.v1 ); // diff
-		vector.multiplyScalar( t );
-		vector.add( this.v1 );
-
-		return vector;
-
-	}
-
-);
-
-/**************************************************************
- *	Arc curve
- **************************************************************/
+};
 
 function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
@@ -41485,6 +41420,20 @@ function Float64Attribute( array, itemSize ) {
 	return new Float64BufferAttribute( array, itemSize );
 
 }
+
+//
+
+Curve.create = function ( construct, getPoint ) {
+
+	console.log( 'THREE.Curve.create() has been deprecated' );
+
+	construct.prototype = Object.create( Curve.prototype );
+	construct.prototype.constructor = construct;
+	construct.prototype.getPoint = getPoint;
+
+	return construct;
+
+};
 
 //
 
