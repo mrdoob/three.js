@@ -1,5 +1,5 @@
 import { Curve } from '../core/Curve';
-import { CatmullRom } from '../core/Bezier';
+import { CatmullRom } from '../core/Interpolations';
 import { Vector2 } from '../../math/Vector2';
 
 /**************************************************************

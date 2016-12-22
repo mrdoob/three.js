@@ -1,5 +1,5 @@
-import { CubicBezier, TangentCubicBezier } from '../core/Bezier';
 import { Curve } from '../core/Curve';
+import { CubicBezier, TangentCubicBezier } from '../core/Interpolations';
 import { Vector2 } from '../../math/Vector2';
 
 /**************************************************************

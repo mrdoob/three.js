@@ -1,5 +1,5 @@
-import { QuadraticBezier, TangentQuadraticBezier } from '../core/Bezier';
 import { Curve } from '../core/Curve';
+import { QuadraticBezier, TangentQuadraticBezier } from '../core/Interpolations';
 import { Vector2 } from '../../math/Vector2';
 
 /**************************************************************

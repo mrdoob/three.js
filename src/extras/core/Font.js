@@ -1,10 +1,11 @@
-import { QuadraticBezier, CubicBezier } from './Bezier';
-import { ShapePath } from './ShapePath';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { QuadraticBezier, CubicBezier } from './Interpolations';
+import { ShapePath } from './ShapePath';
+
 
 function Font( data ) {
 
