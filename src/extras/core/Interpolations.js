@@ -78,20 +78,4 @@ function CubicBezier( t, p0, p1, p2, p3 ) {
 
 }
 
-//
-
-function TangentQuadraticBezier( t, p0, p1, p2 ) {
-
-	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-
-}
-
-function TangentCubicBezier( t, p0, p1, p2, p3 ) {
-
-	var k = 1 - t;
-	return - 3 * p0 * k * k + 3 * p1 * k * k - 6 * t * p1 * k +
-		6 * t * p2 * k - 3 * t * t * p2 + 3 * t * t * p3;
-
-}
-
-export { CatmullRom, QuadraticBezier, CubicBezier, TangentQuadraticBezier, TangentCubicBezier };
+export { CatmullRom, QuadraticBezier, CubicBezier };
