@@ -3697,11 +3697,11 @@ THREE.ColladaLoader = function () {
 						if ( cot.isTexture() ) {
 
 							var samplerId = cot.texture;
-							var surfaceId = this.effect.sampler[samplerId];
+							var sampler = this.effect.sampler[samplerId];
 
-							if ( surfaceId !== undefined && surfaceId.source !== undefined ) {
+							if ( sampler !== undefined && sampler.source !== undefined ) {
 
-								var surface = this.effect.surface[surfaceId.source];
+								var surface = this.effect.surface[sampler.source];
 
 								if ( surface !== undefined ) {
 
@@ -3726,8 +3726,19 @@ THREE.ColladaLoader = function () {
 
 										}
 
-										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+										texture.wrapS = THREE.ClampToEdgeWrapping;
+										if ( sampler.wrap_s === "MIRROR" ) {
+											texture.wrapS = THREE.MirroredRepeatWrapping;
+										} else if ( sampler.wrap_s === "WRAP" || cot.texOpts.wrapU ) {
+											texture.wrapS = THREE.RepeatWrapping;
+										}
+										texture.wrapT = THREE.ClampToEdgeWrapping;
+										if ( sampler.wrap_t === "MIRROR" ) {
+											texture.wrapT = THREE.MirroredRepeatWrapping;
+										} else if ( sampler.wrap_t === "WRAP" || cot.texOpts.wrapV ) {
+											texture.wrapT = THREE.RepeatWrapping;
+										}
+
 										texture.offset.x = cot.texOpts.offsetU;
 										texture.offset.y = cot.texOpts.offsetV;
 										texture.repeat.x = cot.texOpts.repeatU;
