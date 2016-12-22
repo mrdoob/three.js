@@ -928,11 +928,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector2: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -1855,11 +1855,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector4: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector4: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -2859,32 +2859,15 @@
 
 		applyMatrix4: function ( m ) {
 
-			// input: THREE.Matrix4 affine matrix
-
 			var x = this.x, y = this.y, z = this.z;
 			var e = m.elements;
 
 			this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
 			this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
 			this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+			var w =  e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ];
 
-			return this;
-
-		},
-
-		applyProjection: function ( m ) {
-
-			// input: THREE.Matrix4 projection matrix
-
-			var x = this.x, y = this.y, z = this.z;
-			var e = m.elements;
-			var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
-
-			this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
-			this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
-			this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
-
-			return this;
+			return this.divideScalar( w );
 
 		},
 
@@ -2919,7 +2902,7 @@
 				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
-				return this.applyProjection( matrix );
+				return this.applyMatrix4( matrix );
 
 			};
 
@@ -2934,7 +2917,7 @@
 				if ( matrix === undefined ) matrix = new Matrix4();
 
 				matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
-				return this.applyProjection( matrix );
+				return this.applyMatrix4( matrix );
 
 			};
 
@@ -3327,11 +3310,11 @@
 
 		},
 
-		fromAttribute: function ( attribute, index, offset ) {
+		fromBufferAttribute: function ( attribute, index, offset ) {
 
 			if ( offset !== undefined ) {
 
-				console.warn( 'THREE.Vector3: offset has been removed from .fromAttribute().' );
+				console.warn( 'THREE.Vector3: offset has been removed from .fromBufferAttribute().' );
 
 			}
 
@@ -6633,7 +6616,7 @@
 				tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
 				tempPosition.applyMatrix4( camera.matrixWorldInverse );
-				tempPosition.applyProjection( camera.projectionMatrix );
+				tempPosition.applyMatrix4( camera.projectionMatrix );
 
 				// setup arrays for gl programs
 
@@ -7865,7 +7848,7 @@
 
 								for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-									v1.fromAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+									v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 									scope.expandByPoint( v1 );
 
@@ -14817,23 +14800,23 @@
 
 			}
 
-			function checkBufferGeometryIntersection( object, raycaster, ray, positions, uvs, a, b, c ) {
+			function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-				vA.fromArray( positions, a * 3 );
-				vB.fromArray( positions, b * 3 );
-				vC.fromArray( positions, c * 3 );
+				vA.fromBufferAttribute( position, a );
+				vB.fromBufferAttribute( position, b );
+				vC.fromBufferAttribute( position, c );
 
 				var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 				if ( intersection ) {
 
-					if ( uvs ) {
+					if ( uv ) {
 
-						uvA.fromArray( uvs, a * 2 );
-						uvB.fromArray( uvs, b * 2 );
-						uvC.fromArray( uvs, c * 2 );
+						uvA.fromBufferAttribute( uv, a );
+						uvB.fromBufferAttribute( uv, b );
+						uvC.fromBufferAttribute( uv, c );
 
-						intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
+						intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
 
 					}
 
@@ -14876,32 +14859,27 @@
 
 				}
 
-				var uvs, intersection;
+				var intersection;
 
 				if ( geometry.isBufferGeometry ) {
 
 					var a, b, c;
 					var index = geometry.index;
-					var attributes = geometry.attributes;
-					var positions = attributes.position.array;
-
-					if ( attributes.uv !== undefined ) {
-
-						uvs = attributes.uv.array;
-
-					}
+					var position = geometry.attributes.position;
+					var uv = geometry.attributes.uv;
+					var i, l;
 
 					if ( index !== null ) {
 
-						var indices = index.array;
+						// indexed buffer geometry
 
-						for ( var i = 0, l = indices.length; i < l; i += 3 ) {
+						for ( i = 0, l = index.count; i < l; i += 3 ) {
 
-							a = indices[ i ];
-							b = indices[ i + 1 ];
-							c = indices[ i + 2 ];
+							a = index.getX( i );
+							b = index.getX( i + 1 );
+							c = index.getX( i + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -14914,14 +14892,15 @@
 
 					} else {
 
+						// non-indexed buffer geometry
 
-						for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+						for ( i = 0, l = position.count; i < l; i += 3 ) {
 
-							a = i / 3;
-							b = a + 1;
-							c = a + 2;
+							a = i;
+							b = i + 1;
+							c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -14937,11 +14916,13 @@
 				} else if ( geometry.isGeometry ) {
 
 					var fvA, fvB, fvC;
-					var isFaceMaterial = (material && material.isMultiMaterial);
+					var isFaceMaterial = ( material && material.isMultiMaterial );
 					var materials = isFaceMaterial === true ? material.materials : null;
 
 					var vertices = geometry.vertices;
 					var faces = geometry.faces;
+					var uvs;
+
 					var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 					if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
 
@@ -20856,7 +20837,7 @@
 					if ( _this.sortObjects === true ) {
 
 						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
+						_vector3.applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -20879,7 +20860,7 @@
 							if ( _this.sortObjects === true ) {
 
 								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyProjection( _projScreenMatrix );
+								_vector3.applyMatrix4( _projScreenMatrix );
 
 							}
 
@@ -29364,8 +29345,7 @@
 	 * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
 	 */
 
-	var DataTextureLoader = BinaryTextureLoader;
-	function BinaryTextureLoader( manager ) {
+	function DataTextureLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
@@ -29374,7 +29354,7 @@
 
 	}
 
-	Object.assign( BinaryTextureLoader.prototype, {
+	Object.assign( DataTextureLoader.prototype, {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -29461,55 +29441,63 @@
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
+			if ( url === undefined ) url = '';
+
+			if ( this.path !== undefined ) url = this.path + url;
+
 			var scope = this;
 
-			var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-			image.onload = function () {
+			var cached = Cache.get( url );
 
-				image.onload = null;
+			if ( cached !== undefined ) {
 
-				URL.revokeObjectURL( image.src );
+				scope.manager.itemStart( url );
 
-				if ( onLoad ) onLoad( image );
+				setTimeout( function () {
 
-				scope.manager.itemEnd( url );
+					if ( onLoad ) onLoad( cached );
 
-			};
-			image.onerror = onError;
+					scope.manager.itemEnd( url );
 
-			if ( url.indexOf( 'data:' ) === 0 ) {
+				}, 0 );
 
-				image.src = url;
-
-			} else if ( this.crossOrigin !== undefined ) {
-
-				// crossOrigin doesn't work with URL.createObjectURL()?
-
-				image.crossOrigin = this.crossOrigin;
-				image.src = url;
-
-			} else {
-
-				var loader = new FileLoader();
-				loader.setPath( this.path );
-				loader.setResponseType( 'blob' );
-				loader.setWithCredentials( this.withCredentials );
-
-				// By default the FileLoader requests files to be loaded with a MIME
-				// type of `text/plain`. Using `URL.createObjectURL()` with SVGs that
-				// have a MIME type of `text/plain` results in an error, so explicitly
-				// set the SVG MIME type.
-				if ( /\.svg$/.test( url ) ) loader.setMimeType( 'image/svg+xml' );
-
-				loader.load( url, function ( blob ) {
-
-					image.src = URL.createObjectURL( blob );
-
-				}, onProgress, onError );
+				return cached;
 
 			}
 
+			var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
+
+			image.addEventListener( 'load', function () {
+
+				THREE.Cache.add( url, this );
+
+				if ( onLoad ) onLoad( this );
+
+				scope.manager.itemEnd( url );
+
+			}, false );
+
+			/*
+			image.addEventListener( 'progress', function ( event ) {
+
+				if ( onProgress ) onProgress( event );
+
+			}, false );
+			*/
+
+			image.addEventListener( 'error', function ( event ) {
+
+				if ( onError ) onError( event );
+
+				scope.manager.itemError( url );
+
+			}, false );
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
 			scope.manager.itemStart( url );
+
+			image.src = url;
 
 			return image;
 
@@ -29518,13 +29506,6 @@
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setWithCredentials: function ( value ) {
-
-			this.withCredentials = value;
 			return this;
 
 		},
@@ -29624,7 +29605,6 @@
 
 			var loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
-			loader.setWithCredentials( this.withCredentials );
 			loader.setPath( this.path );
 			loader.load( url, function ( image ) {
 
@@ -29654,21 +29634,12 @@
 
 		},
 
-		setWithCredentials: function ( value ) {
-
-			this.withCredentials = value;
-			return this;
-
-		},
-
 		setPath: function ( value ) {
 
 			this.path = value;
 			return this;
 
 		}
-
-
 
 	} );
 
@@ -33679,7 +33650,7 @@
 	 * THREE.LineCurve3
 	 * THREE.QuadraticBezierCurve3
 	 * THREE.CubicBezierCurve3
-	 * THREE.SplineCurve3
+	 * THREE.CatmullRomCurve3
 	 *
 	 * A series of curves can be represented as a THREE.CurvePath
 	 *
@@ -39290,183 +39261,6 @@
 	};
 
 	/**
-	 * Spline from Tween.js, slightly optimized (and trashed)
-	 * http://sole.github.com/tween.js/examples/05_spline.html
-	 *
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function Spline( points ) {
-
-		this.points = points;
-
-		var c = [], v3 = { x: 0, y: 0, z: 0 },
-		point, intPoint, weight, w2, w3,
-		pa, pb, pc, pd;
-
-		this.initFromArray = function ( a ) {
-
-			this.points = [];
-
-			for ( var i = 0; i < a.length; i ++ ) {
-
-				this.points[ i ] = { x: a[ i ][ 0 ], y: a[ i ][ 1 ], z: a[ i ][ 2 ] };
-
-			}
-
-		};
-
-		this.getPoint = function ( k ) {
-
-			point = ( this.points.length - 1 ) * k;
-			intPoint = Math.floor( point );
-			weight = point - intPoint;
-
-			c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
-			c[ 1 ] = intPoint;
-			c[ 2 ] = intPoint  > this.points.length - 2 ? this.points.length - 1 : intPoint + 1;
-			c[ 3 ] = intPoint  > this.points.length - 3 ? this.points.length - 1 : intPoint + 2;
-
-			pa = this.points[ c[ 0 ] ];
-			pb = this.points[ c[ 1 ] ];
-			pc = this.points[ c[ 2 ] ];
-			pd = this.points[ c[ 3 ] ];
-
-			w2 = weight * weight;
-			w3 = weight * w2;
-
-			v3.x = interpolate( pa.x, pb.x, pc.x, pd.x, weight, w2, w3 );
-			v3.y = interpolate( pa.y, pb.y, pc.y, pd.y, weight, w2, w3 );
-			v3.z = interpolate( pa.z, pb.z, pc.z, pd.z, weight, w2, w3 );
-
-			return v3;
-
-		};
-
-		this.getControlPointsArray = function () {
-
-			var i, p, l = this.points.length,
-				coords = [];
-
-			for ( i = 0; i < l; i ++ ) {
-
-				p = this.points[ i ];
-				coords[ i ] = [ p.x, p.y, p.z ];
-
-			}
-
-			return coords;
-
-		};
-
-		// approximate length by summing linear segments
-
-		this.getLength = function ( nSubDivisions ) {
-
-			var i, index, nSamples, position,
-				point = 0, intPoint = 0, oldIntPoint = 0,
-				oldPosition = new Vector3(),
-				tmpVec = new Vector3(),
-				chunkLengths = [],
-				totalLength = 0;
-
-			// first point has 0 length
-
-			chunkLengths[ 0 ] = 0;
-
-			if ( ! nSubDivisions ) nSubDivisions = 100;
-
-			nSamples = this.points.length * nSubDivisions;
-
-			oldPosition.copy( this.points[ 0 ] );
-
-			for ( i = 1; i < nSamples; i ++ ) {
-
-				index = i / nSamples;
-
-				position = this.getPoint( index );
-				tmpVec.copy( position );
-
-				totalLength += tmpVec.distanceTo( oldPosition );
-
-				oldPosition.copy( position );
-
-				point = ( this.points.length - 1 ) * index;
-				intPoint = Math.floor( point );
-
-				if ( intPoint !== oldIntPoint ) {
-
-					chunkLengths[ intPoint ] = totalLength;
-					oldIntPoint = intPoint;
-
-				}
-
-			}
-
-			// last point ends with total length
-
-			chunkLengths[ chunkLengths.length ] = totalLength;
-
-			return { chunks: chunkLengths, total: totalLength };
-
-		};
-
-		this.reparametrizeByArcLength = function ( samplingCoef ) {
-
-			var i, j,
-				index, indexCurrent, indexNext,
-				realDistance,
-				sampling, position,
-				newpoints = [],
-				tmpVec = new Vector3(),
-				sl = this.getLength();
-
-			newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
-
-			for ( i = 1; i < this.points.length; i ++ ) {
-
-				//tmpVec.copy( this.points[ i - 1 ] );
-				//linearDistance = tmpVec.distanceTo( this.points[ i ] );
-
-				realDistance = sl.chunks[ i ] - sl.chunks[ i - 1 ];
-
-				sampling = Math.ceil( samplingCoef * realDistance / sl.total );
-
-				indexCurrent = ( i - 1 ) / ( this.points.length - 1 );
-				indexNext = i / ( this.points.length - 1 );
-
-				for ( j = 1; j < sampling - 1; j ++ ) {
-
-					index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
-
-					position = this.getPoint( index );
-					newpoints.push( tmpVec.copy( position ).clone() );
-
-				}
-
-				newpoints.push( tmpVec.copy( this.points[ i ] ).clone() );
-
-			}
-
-			this.points = newpoints;
-
-		};
-
-		// Catmull-Rom
-
-		function interpolate( p0, p1, p2, p3, t, t2, t3 ) {
-
-			var v0 = ( p2 - p0 ) * 0.5,
-				v1 = ( p3 - p1 ) * 0.5;
-
-			return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-		}
-
-	}
-
-	/**
 	 * @author bhouston / http://clara.io
 	 * @author WestLangley / http://github.com/WestLangley
 	 *
@@ -41460,45 +41254,6 @@
 	} )();
 
 	/**************************************************************
-	 *	Spline 3D curve
-	 **************************************************************/
-
-
-	var SplineCurve3 = Curve.create(
-
-		function ( points /* array of Vector3 */ ) {
-
-			console.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
-			this.points = ( points === undefined ) ? [] : points;
-
-		},
-
-		function ( t ) {
-
-			var points = this.points;
-			var point = ( points.length - 1 ) * t;
-
-			var intPoint = Math.floor( point );
-			var weight = point - intPoint;
-
-			var point0 = points[ intPoint == 0 ? intPoint : intPoint - 1 ];
-			var point1 = points[ intPoint ];
-			var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-			var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
-
-			var interpolate = CurveUtils.interpolate;
-
-			return new Vector3(
-				interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
-				interpolate( point0.y, point1.y, point2.y, point3.y, weight ),
-				interpolate( point0.z, point1.z, point2.z, point3.z, weight )
-			);
-
-		}
-
-	);
-
-	/**************************************************************
 	 *	Cubic Bezier 3D curve
 	 **************************************************************/
 
@@ -41799,6 +41554,51 @@
 
 	ClosedSplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
 
+	//
+
+	function SplineCurve3( points ) {
+
+		console.warn( 'THREE.SplineCurve3 has been deprecated. Use THREE.CatmullRomCurve3 instead.' );
+
+		CatmullRomCurve3.call( this, points );
+		this.type = 'catmullrom';
+
+	}
+
+	SplineCurve3.prototype = Object.create( CatmullRomCurve3.prototype );
+
+	//
+
+	function Spline( points ) {
+
+		console.warn( 'THREE.Spline has been removed. Use THREE.CatmullRomCurve3 instead.' );
+
+		CatmullRomCurve3.call( this, points );
+		this.type = 'catmullrom';
+
+	}
+
+	Spline.prototype = Object.create( CatmullRomCurve3.prototype );
+
+	Object.assign( Spline.prototype, {
+
+		initFromArray: function ( a ) {
+
+			console.error( 'THREE.Spline: .initFromArray() has been removed.' );
+
+		},
+		getControlPointsArray: function ( optionalTarget ) {
+
+			console.error( 'THREE.Spline: .getControlPointsArray() has been removed.' );
+
+		},
+		reparametrizeByArcLength: function ( samplingCoef ) {
+
+			console.error( 'THREE.Spline: .reparametrizeByArcLength() has been removed.' );
+
+		}
+
+	} );
 
 	//
 	function BoundingBoxHelper( object, color ) {
@@ -41834,6 +41634,13 @@
 
 		console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
 		return new FileLoader( manager );
+
+	}
+
+	function BinaryTextureLoader( manager ) {
+
+		console.warn( 'THREE.BinaryTextureLoader has been renamed to THREE.DataTextureLoader.' );
+		return new DataTextureLoader( manager );
 
 	}
 
@@ -41984,8 +41791,8 @@
 		},
 		multiplyVector3: function ( vector ) {
 
-			console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
-			return vector.applyProjection( this );
+			console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+			return vector.applyMatrix4( this );
 
 		},
 		multiplyVector4: function ( vector ) {
@@ -42111,6 +41918,17 @@
 
 	} );
 
+	Object.assign( Vector2.prototype, {
+
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector2: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
+
+		}
+
+	} );
+
 	Object.assign( Vector3.prototype, {
 
 		setEulerFromRotationMatrix: function () {
@@ -42139,6 +41957,29 @@
 
 			console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 			return this.setFromMatrixColumn( matrix, index );
+
+		},
+		applyProjection: function ( m ) {
+
+			console.warn( 'THREE.Vector3: .applyProjection() has been removed. Use .applyMatrix4( m ) instead.' );
+			return this.applyMatrix4( m );
+
+		},
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector3: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
+
+		}
+
+	} );
+
+	Object.assign( Vector4.prototype, {
+
+		fromAttribute: function ( attribute, index, offset ) {
+
+			console.error( 'THREE.Vector4: .fromAttribute() has been renamed to .fromBufferAttribute().' );
+			return this.fromBufferAttribute( attribute, index, offset );
 
 		}
 
@@ -42959,7 +42800,6 @@
 	exports.DepthTexture = DepthTexture;
 	exports.Texture = Texture;
 	exports.CompressedTextureLoader = CompressedTextureLoader;
-	exports.BinaryTextureLoader = BinaryTextureLoader;
 	exports.DataTextureLoader = DataTextureLoader;
 	exports.CubeTextureLoader = CubeTextureLoader;
 	exports.TextureLoader = TextureLoader;
@@ -43029,7 +42869,6 @@
 	exports.CubicInterpolant = CubicInterpolant;
 	exports.Interpolant = Interpolant;
 	exports.Triangle = Triangle;
-	exports.Spline = Spline;
 	exports.Math = _Math;
 	exports.Spherical = Spherical;
 	exports.Cylindrical = Cylindrical;
@@ -43065,7 +42904,6 @@
 	exports.ArrowHelper = ArrowHelper;
 	exports.AxisHelper = AxisHelper;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;
-	exports.SplineCurve3 = SplineCurve3;
 	exports.CubicBezierCurve3 = CubicBezierCurve3;
 	exports.QuadraticBezierCurve3 = QuadraticBezierCurve3;
 	exports.LineCurve3 = LineCurve3;
@@ -43299,10 +43137,13 @@
 	exports.Float32Attribute = Float32Attribute;
 	exports.Float64Attribute = Float64Attribute;
 	exports.ClosedSplineCurve3 = ClosedSplineCurve3;
+	exports.SplineCurve3 = SplineCurve3;
+	exports.Spline = Spline;
 	exports.BoundingBoxHelper = BoundingBoxHelper;
 	exports.EdgesHelper = EdgesHelper;
 	exports.WireframeHelper = WireframeHelper;
 	exports.XHRLoader = XHRLoader;
+	exports.BinaryTextureLoader = BinaryTextureLoader;
 	exports.GeometryUtils = GeometryUtils;
 	exports.ImageUtils = ImageUtils;
 	exports.Projector = Projector;

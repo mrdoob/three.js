@@ -259,11 +259,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var fvA, fvB, fvC;
-				var isFaceMaterial = (material && material.isMultiMaterial);
+				var isFaceMaterial = ( material && material.isMultiMaterial );
 				var materials = isFaceMaterial === true ? material.materials : null;
 
 				var vertices = geometry.vertices;
 				var faces = geometry.faces;
+				var uvs;
+
 				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 				if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
 
