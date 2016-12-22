@@ -19,10 +19,12 @@ var CubicBezierCurve3 = Curve.create(
 
 	function ( t ) {
 
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
 		return new Vector3(
-			CubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-			CubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y ),
-			CubicBezier( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z )
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
 		);
 
 	}

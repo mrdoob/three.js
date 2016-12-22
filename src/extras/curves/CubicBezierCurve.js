@@ -20,18 +20,22 @@ CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
 CubicBezierCurve.prototype.getPoint = function ( t ) {
 
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
 	return new Vector2(
-		CubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-		CubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
 	);
 
 };
 
 CubicBezierCurve.prototype.getTangent = function ( t ) {
 
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+
 	return new Vector2(
-		TangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-		TangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+		TangentCubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		TangentCubicBezier( t, v0.y, v1.y, v2.y, v3.y )
 	).normalize();
 
 };
