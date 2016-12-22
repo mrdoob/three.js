@@ -29949,7 +29949,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function DirectionalLightShadow( light ) {
+	function DirectionalLightShadow( ) {
 
 		LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -34679,6 +34679,27 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
+	 * Creates free form 2d path using series of points, lines or curves.
+	 **/
+
+	function Path( points ) {
+
+		CurvePath.call( this );
+		this.currentPoint = new Vector2();
+
+		if ( points ) {
+
+			this.fromPoints( points );
+
+		}
+
+	}
+
+	Path.prototype = PathPrototype;
+	PathPrototype.constructor = Path;
+
+	/**
+	 * @author zz85 / http://www.lab4games.net/zz85/blog
 	 * Defines a 2d shape plane using paths.
 	 **/
 
@@ -34737,50 +34758,48 @@
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Creates free form 2d path using series of points, lines or curves.
-	 *
+	 * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
 	 **/
 
-	function Path( points ) {
-
-		CurvePath.call( this );
-		this.currentPoint = new Vector2();
-
-		if ( points ) {
-
-			this.fromPoints( points );
-
-		}
-
-	}
-
-	Path.prototype = PathPrototype;
-	PathPrototype.constructor = Path;
-
-
-	// minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
 	function ShapePath() {
+
 		this.subPaths = [];
 		this.currentPath = null;
+
 	}
 
 	ShapePath.prototype = {
+
 		moveTo: function ( x, y ) {
+
 			this.currentPath = new Path();
-			this.subPaths.push(this.currentPath);
+			this.subPaths.push( this.currentPath );
 			this.currentPath.moveTo( x, y );
+
 		},
+
 		lineTo: function ( x, y ) {
+
 			this.currentPath.lineTo( x, y );
+
 		},
+
 		quadraticCurveTo: function ( aCPx, aCPy, aX, aY ) {
+
 			this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
+
 		},
+
 		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
+
 			this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
+
 		},
+
 		splineThru: function ( pts ) {
+
 			this.currentPath.splineThru( pts );
+
 		},
 
 		toShapes: function ( isCCW, noHoles ) {
@@ -35009,6 +35028,7 @@
 			return shapes;
 
 		}
+
 	};
 
 	/**
@@ -42914,8 +42934,8 @@
 	exports.QuadraticBezierCurve = QuadraticBezierCurve;
 	exports.LineCurve = LineCurve;
 	exports.Shape = Shape;
-	exports.ShapePath = ShapePath;
 	exports.Path = Path;
+	exports.ShapePath = ShapePath;
 	exports.Font = Font;
 	exports.CurvePath = CurvePath;
 	exports.Curve = Curve;
