@@ -2,9 +2,6 @@ import { Curve } from '../core/Curve';
 import { CatmullRom } from '../core/Interpolations';
 import { Vector2 } from '../../math/Vector2';
 
-/**************************************************************
- *	Spline curve
- **************************************************************/
 
 function SplineCurve( points /* array of Vector2 */ ) {
 

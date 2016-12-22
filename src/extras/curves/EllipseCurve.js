@@ -1,9 +1,6 @@
 import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
 
-/**************************************************************
- *	Ellipse curve
- **************************************************************/
 
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 

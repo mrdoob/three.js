@@ -23,6 +23,7 @@ import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform';
+import { Curve } from './extras/core/Curve.js';
 import { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
 import { BoxHelper } from './extras/helpers/BoxHelper';
 import { GridHelper } from './extras/helpers/GridHelper.js';
@@ -205,6 +206,20 @@ export function Float64Attribute( array, itemSize ) {
 	return new Float64BufferAttribute( array, itemSize );
 
 }
+
+//
+
+Curve.create = function ( construct, getPoint ) {
+
+	console.log( 'THREE.Curve.create() has been deprecated' );
+
+	construct.prototype = Object.create( Curve.prototype );
+	construct.prototype.constructor = construct;
+	construct.prototype.getPoint = getPoint;
+
+	return construct;
+
+};
 
 //
 

@@ -1,8 +1,5 @@
 import { EllipseCurve } from './EllipseCurve';
 
-/**************************************************************
- *	Arc curve
- **************************************************************/
 
 function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
