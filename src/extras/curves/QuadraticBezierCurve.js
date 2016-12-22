@@ -1,7 +1,6 @@
-import { b2 } from '../core/Bezier';
+import { b2, tangentQuadraticBezier } from '../core/Bezier';
 import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
-import { CurveUtils } from '../CurveUtils';
 
 /**************************************************************
  *	Quadratic Bezier curve
@@ -30,9 +29,7 @@ QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 };
 
 
-QuadraticBezierCurve.prototype.getTangent = function( t ) {
-
-	var tangentQuadraticBezier = CurveUtils.tangentQuadraticBezier;
+QuadraticBezierCurve.prototype.getTangent = function ( t ) {
 
 	return new Vector2(
 		tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x ),
