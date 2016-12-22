@@ -1,4 +1,4 @@
-import { b2, b3 } from './Bezier';
+import { QuadraticBezier, CubicBezier } from './Bezier';
 import { ShapePath } from './ShapePath';
 
 /**
@@ -97,8 +97,8 @@ Object.assign( Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b2( t, cpx0, cpx1, cpx );
-									b2( t, cpy0, cpy1, cpy );
+									QuadraticBezier( t, cpx0, cpx1, cpx );
+									QuadraticBezier( t, cpy0, cpy1, cpy );
 
 								}
 
@@ -127,8 +127,8 @@ Object.assign( Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b3( t, cpx0, cpx1, cpx2, cpx );
-									b3( t, cpy0, cpy1, cpy2, cpy );
+									CubicBezier( t, cpx0, cpx1, cpx2, cpx );
+									CubicBezier( t, cpy0, cpy1, cpy2, cpy );
 
 								}
 
