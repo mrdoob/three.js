@@ -3,6 +3,7 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
+			[ "Detecting WebGL and browser compatibility", "manual/introduction/Detecting-WebGL-and-browser-compatibility" ],
 			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
 			[ "Useful links", "manual/introduction/Useful-links" ],
 			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
