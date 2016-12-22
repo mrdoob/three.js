@@ -19,7 +19,7 @@ var CurveUtils = {
 
 	// Catmull-Rom
 
-	interpolate: function( p0, p1, p2, p3, t ) {
+	interpolate: function ( p0, p1, p2, p3, t ) {
 
 		var v0 = ( p2 - p0 ) * 0.5;
 		var v1 = ( p3 - p1 ) * 0.5;
