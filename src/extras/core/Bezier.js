@@ -76,10 +76,9 @@ function TangentQuadraticBezier( t, p0, p1, p2 ) {
 
 function TangentCubicBezier( t, p0, p1, p2, p3 ) {
 
-	return - 3 * p0 * ( 1 - t ) * ( 1 - t ) +
-		3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
-		6 * t * p2 * ( 1 - t ) - 3 * t * t * p2 +
-		3 * t * t * p3;
+	var k = 1 - t;
+	return - 3 * p0 * k * k + 3 * p1 * k * k - 6 * t * p1 * k +
+		6 * t * p2 * k - 3 * t * t * p2 + 3 * t * t * p3;
 
 }
 
