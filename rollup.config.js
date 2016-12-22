@@ -31,7 +31,7 @@ export default {
 		},
 		{
 			format: 'es',
-			dest: 'build/three.modules.js'
+			dest: 'build/three.module.js'
 		}
 	]
 };

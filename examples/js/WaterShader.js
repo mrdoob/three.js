@@ -9,8 +9,8 @@
 
 THREE.ShaderLib[ 'water' ] = {
 
-	uniforms: Object.assign(
-		 {
+	uniforms: THREE.UniformsUtils.merge( [
+		THREE.UniformsLib[ "fog" ], {
 			"normalSampler":    { value: null },
 			"mirrorSampler":    { value: null },
 			"alpha":            { value: 1.0 },
@@ -22,9 +22,8 @@ THREE.ShaderLib[ 'water' ] = {
 			"sunDirection":     { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
 			"eye":              { value: new THREE.Vector3() },
 			"waterColor":       { value: new THREE.Color( 0x555555 ) }
-		},
-		THREE.UniformsLib[ "fog" ]
-	),
+		}
+	] ),
 
 	vertexShader: [
 		'uniform mat4 textureMatrix;',
@@ -170,7 +169,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.renderTarget2 = new THREE.WebGLRenderTarget( width, height );
 
 	var mirrorShader = THREE.ShaderLib[ "water" ];
-	var mirrorUniforms = Object.assign( {}, mirrorShader.uniforms );
+	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 		fragmentShader: mirrorShader.fragmentShader,

@@ -115,7 +115,7 @@
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
-				var uniformsUV = Object.assign( {}, shader.uniforms );
+				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
 				var textureLoader = new THREE.TextureLoader();
 
@@ -133,10 +133,11 @@
 				uniformsUV[ "uSpecularBrightness" ].value = 0.7;
 
 
-				var uniforms = Object.assign( {}, uniformsUV );
-				uniforms[ "tDiffuse" ] = new THREE.Uniform( uniformsUV[ "tDiffuse" ].value );
-				uniforms[ "tNormal" ] = new THREE.Uniform( uniformsUV[ "tNormal" ].value );
-				uniforms[ "passID" ] = new THREE.Uniform( 1 );
+				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
+				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
+				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
+				uniforms[ "passID" ].value = 1;
+
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
@@ -235,12 +236,12 @@
 
 				//
 
-				uniforms[ "tBlur1" ] = new THREE.Uniform( composerScene.renderTarget2.texture );
-				uniforms[ "tBlur2" ] = new THREE.Uniform( composerUV1.renderTarget2.texture );
-				uniforms[ "tBlur3" ] = new THREE.Uniform( composerUV2.renderTarget2.texture );
-				uniforms[ "tBlur4" ] = new THREE.Uniform( composerUV3.renderTarget2.texture );
+				uniforms[ "tBlur1" ].value = composerScene.renderTarget2.texture;
+				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2.texture;
+				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2.texture;
+				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2.texture;
 
-				uniforms[ "tBeckmann" ] = new THREE.Uniform( composerBeckmann.renderTarget1.texture );
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
 
 				//
 

@@ -800,7 +800,9 @@ UI.Number.prototype.setValue = function ( value ) {
 		if ( value > this.max ) value = this.max;
 
 		this.value = value;
-		this.dom.value = value.toFixed( this.precision ) + ' ' + this.unit;
+		this.dom.value = value.toFixed( this.precision );
+
+		if ( this.unit !== '' ) this.dom.value += ' ' + this.unit;
 
 	}
 

@@ -92,7 +92,7 @@
 				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
 				var shader = THREE.FresnelShader;
-				var uniforms = Object.assign( {}, shader.uniforms );
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tCube" ].value = textureCube;
 

@@ -206,7 +206,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		var currentStencilFunc = null;
 		var currentStencilRef = null;
 		var currentStencilFuncMask = null;
-		var currentStencilFail  = null;
+		var currentStencilFail = null;
 		var currentStencilZFail = null;
 		var currentStencilZPass = null;
 		var currentStencilClear = null;
@@ -244,10 +244,10 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilRef 	!== stencilRef 	||
 				     currentStencilFuncMask !== stencilMask ) {
 
-					gl.stencilFunc( stencilFunc,  stencilRef, stencilMask );
+					gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
 
 					currentStencilFunc = stencilFunc;
-					currentStencilRef  = stencilRef;
+					currentStencilRef = stencilRef;
 					currentStencilFuncMask = stencilMask;
 
 				}
@@ -260,9 +260,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 				     currentStencilZFail !== stencilZFail ||
 				     currentStencilZPass !== stencilZPass ) {
 
-					gl.stencilOp( stencilFail,  stencilZFail, stencilZPass );
+					gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
 
-					currentStencilFail  = stencilFail;
+					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
 					currentStencilZPass = stencilZPass;
 
@@ -341,6 +341,9 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 	var currentScissorTest = null;
 
 	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+
+	var version = parseFloat( /^WebGL\ ([0-9])/.exec( gl.getParameter( gl.VERSION ) )[ 1 ] );
+	var lineWidthAvailable = parseFloat( version ) >= 1.0;
 
 	var currentTextureSlot = null;
 	var currentBoundTextures = {};
@@ -732,7 +735,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		if ( width !== currentLineWidth ) {
 
-			gl.lineWidth( width );
+			if ( lineWidthAvailable ) gl.lineWidth( width );
 
 			currentLineWidth = width;
 

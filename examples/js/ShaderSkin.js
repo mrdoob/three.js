@@ -22,7 +22,10 @@ THREE.ShaderSkin = {
 
 	'skinSimple' : {
 
-		uniforms: Object.assign(
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -48,12 +51,9 @@ THREE.ShaderSkin = {
 
 				"uWrapRGB": { value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
-			},
+			}
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
-
-		),
+		] ),
 
 		fragmentShader: [
 
@@ -305,7 +305,10 @@ THREE.ShaderSkin = {
 
 	'skin' : {
 
-		uniforms: Object.assign(
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -330,12 +333,9 @@ THREE.ShaderSkin = {
 				"uRoughness": 	  		{ value: 0.15 },
 				"uSpecularBrightness": 	{ value: 0.75 }
 
-			},
+			}
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
-
-		),
+		] ),
 
 		fragmentShader: [
 

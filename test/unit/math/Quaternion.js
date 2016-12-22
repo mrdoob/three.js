@@ -240,7 +240,7 @@ function doSlerpObject( aArr, bArr, t ) {
 
 	};
 
-};
+}
 
 function doSlerpArray( a, b, t ) {
 
@@ -285,7 +285,7 @@ function slerpTestSkeleton( doSlerp, maxError ) {
 		0.6753410084407496,
 		0.4087830051091744,
 		0.32856700410659473,
-		0.5185120064806223,
+		0.5185120064806223
 	];
 
 	b = [

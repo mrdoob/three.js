@@ -67,10 +67,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) return true;
-		if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) return true;
-
-		return false;
+		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
+			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
 
 	}
 
@@ -239,8 +237,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
-				var isCompressed = (texture && texture.isCompressedTexture);
-				var isDataTexture = (texture.image[ 0 ] && texture.image[ 0 ].isDataTexture);
+				var isCompressed = ( texture && texture.isCompressedTexture );
+				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 				var cubeImage = [];
 
