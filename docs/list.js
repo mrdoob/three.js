@@ -3,12 +3,16 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
+			[ "Detecting WebGL and browser compatibility", "manual/introduction/Detecting-WebGL-and-browser-compatibility" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Useful links", "manual/introduction/Useful-links" ],
 			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
 			[ "Creating Text", "manual/introduction/Creating-text" ],
 			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
 			[ "Migration Guide", "manual/introduction/Migration-guide" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
-			[ "How to update things", "manual/introduction/How-to-update-things" ]
+			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
+			[ "FAQ", "manual/introduction/FAQ" ]
 		],
 
 		"Build Tools": [
@@ -80,7 +84,7 @@ var list = {
 			[ "Layers", "api/core/Layers" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
-			[ "Uniform", "api/core/Uniform"]
+			[ "Uniform", "api/core/Uniform" ]
 		],
 
 		"Core / BufferAttributes": [
