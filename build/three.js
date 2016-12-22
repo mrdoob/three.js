@@ -33559,6 +33559,18 @@
 	 * http://en.wikipedia.org/wiki/Bézier_curve
 	 */
 
+	function CatmullRom( t, p0, p1, p2, p3 ) {
+
+		var v0 = ( p2 - p0 ) * 0.5;
+		var v1 = ( p3 - p1 ) * 0.5;
+		var t2 = t * t;
+		var t3 = t * t2;
+		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+	}
+
+	//
+
 	function QuadraticBezierP0( t, p ) {
 
 		var k = 1 - t;
@@ -33617,23 +33629,6 @@
 
 		return CubicBezierP0( t, p0 ) + CubicBezierP1( t, p1 ) + CubicBezierP2( t, p2 ) +
 			CubicBezierP3( t, p3 );
-
-	}
-
-	//
-
-	function TangentQuadraticBezier( t, p0, p1, p2 ) {
-
-		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-
-	}
-
-	function TangentCubicBezier( t, p0, p1, p2, p3 ) {
-
-		return - 3 * p0 * ( 1 - t ) * ( 1 - t ) +
-			3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
-			6 * t * p2 * ( 1 - t ) - 3 * t * t * p2 +
-			3 * t * t * p3;
 
 	}
 
@@ -34404,39 +34399,6 @@
 
 	};
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 */
-
-	var CurveUtils = {
-
-		tangentSpline: function ( t, p0, p1, p2, p3 ) {
-
-			// To check if my formulas are correct
-
-			var h00 = 6 * t * t - 6 * t; 	// derived from 2t^3 − 3t^2 + 1
-			var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
-			var h01 = - 6 * t * t + 6 * t; 	// − 2t3 + 3t2
-			var h11 = 3 * t * t - 2 * t;	// t3 − t2
-
-			return h00 + h10 + h01 + h11;
-
-		},
-
-		// Catmull-Rom
-
-		interpolate: function ( p0, p1, p2, p3, t ) {
-
-			var v0 = ( p2 - p0 ) * 0.5;
-			var v1 = ( p3 - p1 ) * 0.5;
-			var t2 = t * t;
-			var t3 = t * t2;
-			return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-		}
-
-	};
-
 	/**************************************************************
 	 *	Spline curve
 	 **************************************************************/
@@ -34465,11 +34427,9 @@
 		var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
 		var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-		var interpolate = CurveUtils.interpolate;
-
 		return new Vector2(
-			interpolate( point0.x, point1.x, point2.x, point3.x, weight ),
-			interpolate( point0.y, point1.y, point2.y, point3.y, weight )
+			CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
+			CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
 		);
 
 	};
@@ -34478,78 +34438,56 @@
 	 *	Cubic Bezier curve
 	 **************************************************************/
 
-	function CubicBezierCurve( v0, v1, v2, v3 ) {
+	var CubicBezierCurve = Curve.create(
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
-		this.v3 = v3;
+		function ( v0, v1, v2, v3 ) {
 
-	}
+			this.v0 = v0;
+			this.v1 = v1;
+			this.v2 = v2;
+			this.v3 = v3;
 
-	CubicBezierCurve.prototype = Object.create( Curve.prototype );
-	CubicBezierCurve.prototype.constructor = CubicBezierCurve;
+		},
 
-	CubicBezierCurve.prototype.getPoint = function ( t ) {
+		function ( t ) {
 
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+			var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
-		return new Vector2(
-			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
-		);
+			return new Vector2(
+				CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+				CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
+			);
 
-	};
+		}
 
-	CubicBezierCurve.prototype.getTangent = function ( t ) {
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
-
-		return new Vector2(
-			TangentCubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-			TangentCubicBezier( t, v0.y, v1.y, v2.y, v3.y )
-		).normalize();
-
-	};
+	);
 
 	/**************************************************************
 	 *	Quadratic Bezier curve
 	 **************************************************************/
 
+	var QuadraticBezierCurve = Curve.create(
 
-	function QuadraticBezierCurve( v0, v1, v2 ) {
+		function ( v0, v1, v2 ) {
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+			this.v0 = v0;
+			this.v1 = v1;
+			this.v2 = v2;
 
-	}
+		},
 
-	QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
-	QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
+		function ( t ) {
 
-	QuadraticBezierCurve.prototype.getPoint = function ( t ) {
+			var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
+			return new Vector2(
+				QuadraticBezier( t, v0.x, v1.x, v2.x ),
+				QuadraticBezier( t, v0.y, v1.y, v2.y )
+			);
 
-		return new Vector2(
-			QuadraticBezier( t, v0.x, v1.x, v2.x ),
-			QuadraticBezier( t, v0.y, v1.y, v2.y )
-		);
+		}
 
-	};
-
-
-	QuadraticBezierCurve.prototype.getTangent = function ( t ) {
-
-		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
-
-		return new Vector2(
-			TangentQuadraticBezier( t, v0.x, v1.x, v2.x ),
-			TangentQuadraticBezier( t, v0.y, v1.y, v2.y )
-		).normalize();
-
-	};
+	);
 
 	var PathPrototype = Object.assign( Object.create( CurvePath.prototype ), {
 
@@ -42935,7 +42873,6 @@
 	exports.Curve = Curve;
 	exports.ShapeUtils = ShapeUtils;
 	exports.SceneUtils = SceneUtils;
-	exports.CurveUtils = CurveUtils;
 	exports.WireframeGeometry = WireframeGeometry;
 	exports.ParametricGeometry = ParametricGeometry;
 	exports.ParametricBufferGeometry = ParametricBufferGeometry;
