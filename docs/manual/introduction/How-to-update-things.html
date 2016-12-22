@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+		<p>All objects by default automatically update their matrices.</p>
+
+		<p>However, if you know object will be static, you can disable this and update transform matrix manually just when needed.</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">object</span>.<span class="pl-smi">matrixAutoUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+		<span class="pl-smi">object</span>.<span class="pl-en">updateMatrix</span>();</pre></div>
+
+		<h2>Geometries</h2>
+
+		<p>You can only update content of buffers, you cannot resize buffers (this is very costly, basically equivalent to creating new geometry). </p>
+
+		<p>You can emulate resizing by pre-allocating larger buffer and then keeping unneeded vertices collapsed / hidden.</p>
+
+		<p>Set flags only for attributes that you need to update, updates are costly. Once buffers change, these flags reset automatically back to <code>false</code>. You need to keep setting them to <code>true</code> if you wanna keep updating buffers.</p>
+
+		<p>r49</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">geometry</span>.<span class="pl-smi">verticesNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">elementsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">morphTargetsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">uvsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">normalsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">colorsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">tangentsNeedUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</pre></div>
+
+		<p>pre-r49</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyVertices</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyMorphTargets</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyElements</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyUvs</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyNormals</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyTangents</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+		<span class="pl-smi">geometry</span>.<span class="pl-smi">__dirtyColors</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</pre></div>
+
+		<p>In versions prior to <a href="https://github.com/mrdoob/three.js/releases/tag/r66">r66</a> meshes additionally need the <code>dynamic</code> flag enabled (to keep internal typed arrays).</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">geometry</span>.<span class="pl-smi">dynamic</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</pre></div>
+
+		<p>Custom attributes (in <code>MeshShaderMaterial</code>):</p>
+
+		<div class="highlight highlight-source-js"><pre>attributes[ <span class="pl-s"><span class="pl-pds">"</span>attributeName<span class="pl-pds">"</span></span> ].<span class="pl-smi">needsUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</pre></div>
+
+		<p>Other objects like <code>ParticleSystem</code>, <code>Ribbon</code>, <code>Line</code> just need "dirty" flags.</p>
+
+		<p>Examples:</p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_dynamic.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_dynamic.html</a></p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_custom_attributes.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_custom_attributes.html</a></p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_custom_attributes_particles.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_custom_attributes_particles.html</a></p>
+
+		<h2>Materials</h2>
+
+		<p>All uniforms values can be changed freely (e.g. colors, textures, opacity, etc), values are sent to shader every frame.</p>
+
+		<p>Also GL state related parameters can change any time (depthTest, blending, polygonOffset, etc).</p>
+
+		<p>Flat / smooth shading is baked into normals. You need to reset normals buffer (see above).</p>
+
+		<p>Properties that can't be easily changed in runtime (once material is rendered at least once):</p>
+
+		<ul>
+		<li>numbers and types of uniforms</li>
+		<li>numbers and types of lights</li>
+		<li>presence or not of
+
+		<ul>
+		<li>texture</li>
+		<li>fog</li>
+		<li>vertex colors</li>
+		<li>skinning</li>
+		<li>morphing</li>
+		<li>shadow map</li>
+		<li>alpha test</li>
+		</ul>
+		</li>
+		</ul>
+
+		<p>Changes in these require building of new shader program. You'll need to set <code>material.needsUpdate</code> flag to <code>true</code>. </p>
+
+		<p>Bear in mind this might be quite slow and induce jerkiness in framerate (especially on Windows, as shader compilation is slower in DirectX than OpenGL).</p>
+
+		<p>For smoother experience you can emulate changes in these features to some degree by having "dummy" values like zero intensity lights, white textures, or zero density fog.</p>
+
+		<p>You can change freely material used for geometry chunk, you cannot change how object is divided into chunks (according to face materials). </p>
+
+		<p>If you need to have different configurations of materials during runtime, if number of materials / chunks is small, you could pre-divide object beforehand (e.g. hair / face / body / upper clothes / trousers for human, front / sides / top / glass / tire / interior for car). </p>
+
+		<p>If number is large (e.g. each face could be potentially different), consider different solution, using attributes / textures to drive different per-face look.</p>
+
+		<p>Examples:</p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_materials_cars.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_materials_cars.html</a></p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_dof.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_dof.html</a></p>
+
+		<h2>Textures</h2>
+
+		<p>Image, canvas, video and data textures need to have flag set:</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">texture</span>.<span class="pl-smi">needsUpdate</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;</pre></div>
+
+		<p>Render targets update automatically.</p>
+
+		<p>Examples:</p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_materials_video.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_materials_video.html</a></p>
+
+		<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/webgl_rtt.html">https://github.com/mrdoob/three.js/blob/master/examples/webgl_rtt.html</a></p>
+
+		<h2>
+		<a id="user-content-cameras" class="anchor" href="#cameras" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Cameras</h2>
+
+		<p>Camera position and target is updated automatically.</p>
+
+		<p>If you need to change <code>fov</code>, <code>aspect</code>, <code>near</code>, <code>far</code> you need to recompute projection matrix:</p>
+
+		<div class="highlight highlight-source-js"><pre><span class="pl-smi">camera</span>.<span class="pl-smi">aspect</span> <span class="pl-k">=</span> <span class="pl-c1">window</span>.<span class="pl-c1">innerWidth</span> <span class="pl-k">/</span> <span class="pl-c1">window</span>.<span class="pl-c1">innerHeight</span>;
+		<span class="pl-smi">camera</span>.<span class="pl-en">updateProjectionMatrix</span>();</pre></div>
+
+	</body>
+</html>
