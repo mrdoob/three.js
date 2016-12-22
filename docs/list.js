@@ -7,7 +7,8 @@ var list = {
 			[ "Creating Text", "manual/introduction/Creating-text" ],
 			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
 			[ "Migration Guide", "manual/introduction/Migration-guide" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+			[ "FAQ", "manual/introduction/FAQ" ]
 		],
 
 		"Build Tools": [
@@ -79,7 +80,7 @@ var list = {
 			[ "Layers", "api/core/Layers" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Raycaster", "api/core/Raycaster" ],
-			[ "Uniform", "api/core/Uniform"]
+			[ "Uniform", "api/core/Uniform" ]
 		],
 
 		"Core / BufferAttributes": [
