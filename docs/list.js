@@ -224,8 +224,8 @@ var list = {
 		],
 
 		"Loaders / Managers": [
-			[ "DefaultLoadingManager", "api/loaders/DefaultLoadingManager" ],
-			[ "LoadingManager", "api/loaders/LoadingManager" ]
+			[ "DefaultLoadingManager", "api/loaders/managers/DefaultLoadingManager" ],
+			[ "LoadingManager", "api/loaders/managers/LoadingManager" ]
 		],
 
 		"Materials": [
