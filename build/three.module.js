@@ -25880,80 +25880,7 @@ var ShapeUtils = {
 
 		return ShapeUtils.area( pts ) < 0;
 
-	},
-
-	// Bezier Curves formulas obtained from
-	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-	// Quad Bezier Functions
-
-	b2: ( function () {
-
-		function b2p0( t, p ) {
-
-			var k = 1 - t;
-			return k * k * p;
-
-		}
-
-		function b2p1( t, p ) {
-
-			return 2 * ( 1 - t ) * t * p;
-
-		}
-
-		function b2p2( t, p ) {
-
-			return t * t * p;
-
-		}
-
-		return function b2( t, p0, p1, p2 ) {
-
-			return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
-
-		};
-
-	} )(),
-
-	// Cubic Bezier Functions
-
-	b3: ( function () {
-
-		function b3p0( t, p ) {
-
-			var k = 1 - t;
-			return k * k * k * p;
-
-		}
-
-		function b3p1( t, p ) {
-
-			var k = 1 - t;
-			return 3 * k * k * t * p;
-
-		}
-
-		function b3p2( t, p ) {
-
-			var k = 1 - t;
-			return 3 * k * t * t * p;
-
-		}
-
-		function b3p3( t, p ) {
-
-			return t * t * t * p;
-
-		}
-
-		return function b3( t, p0, p1, p2, p3 ) {
-
-			return b3p0( t, p0 ) + b3p1( t, p1 ) + b3p2( t, p2 ) + b3p3( t, p3 );
-
-		};
-
-	} )()
+	}
 
 };
 
@@ -33621,6 +33548,91 @@ Object.assign( ObjectLoader.prototype, {
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ *
+ * Bezier Curves formulas obtained from
+ * http://en.wikipedia.org/wiki/Bézier_curve
+ */
+
+function QuadraticBezierP0( t, p ) {
+
+	var k = 1 - t;
+	return k * k * p;
+
+}
+
+function QuadraticBezierP1( t, p ) {
+
+	return 2 * ( 1 - t ) * t * p;
+
+}
+
+function QuadraticBezierP2( t, p ) {
+
+	return t * t * p;
+
+}
+
+function QuadraticBezier( t, p0, p1, p2 ) {
+
+	return QuadraticBezierP0( t, p0 ) + QuadraticBezierP1( t, p1 ) +
+		QuadraticBezierP2( t, p2 );
+
+}
+
+//
+
+function CubicBezierP0( t, p ) {
+
+	var k = 1 - t;
+	return k * k * k * p;
+
+}
+
+function CubicBezierP1( t, p ) {
+
+	var k = 1 - t;
+	return 3 * k * k * t * p;
+
+}
+
+function CubicBezierP2( t, p ) {
+
+	return 3 * ( 1 - t ) * t * t * p;
+
+}
+
+function CubicBezierP3( t, p ) {
+
+	return t * t * t * p;
+
+}
+
+function CubicBezier( t, p0, p1, p2, p3 ) {
+
+	return CubicBezierP0( t, p0 ) + CubicBezierP1( t, p1 ) + CubicBezierP2( t, p2 ) +
+		CubicBezierP3( t, p3 );
+
+}
+
+//
+
+function TangentQuadraticBezier( t, p0, p1, p2 ) {
+
+	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
+
+}
+
+function TangentCubicBezier( t, p0, p1, p2, p3 ) {
+
+	return - 3 * p0 * ( 1 - t ) * ( 1 - t ) +
+		3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
+		6 * t * p2 * ( 1 - t ) - 3 * t * t * p2 +
+		3 * t * t * p3;
+
+}
+
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
  *
  * Some common of Curve methods
@@ -34058,7 +34070,7 @@ LineCurve.prototype.getPointAt = function ( u ) {
 
 };
 
-LineCurve.prototype.getTangent = function( t ) {
+LineCurve.prototype.getTangent = function ( t ) {
 
 	var tangent = this.v2.clone().sub( this.v1 );
 
@@ -34326,7 +34338,7 @@ EllipseCurve.prototype.constructor = EllipseCurve;
 
 EllipseCurve.prototype.isEllipseCurve = true;
 
-EllipseCurve.prototype.getPoint = function( t ) {
+EllipseCurve.prototype.getPoint = function ( t ) {
 
 	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
@@ -34392,23 +34404,6 @@ EllipseCurve.prototype.getPoint = function( t ) {
 
 var CurveUtils = {
 
-	tangentQuadraticBezier: function ( t, p0, p1, p2 ) {
-
-		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-
-	},
-
-	// Puay Bing, thanks for helping with this derivative!
-
-	tangentCubicBezier: function ( t, p0, p1, p2, p3 ) {
-
-		return - 3 * p0 * ( 1 - t ) * ( 1 - t )  +
-			3 * p1 * ( 1 - t ) * ( 1 - t ) - 6 * t * p1 * ( 1 - t ) +
-			6 * t *  p2 * ( 1 - t ) - 3 * t * t * p2 +
-			3 * t * t * p3;
-
-	},
-
 	tangentSpline: function ( t, p0, p1, p2, p3 ) {
 
 		// To check if my formulas are correct
@@ -34424,7 +34419,7 @@ var CurveUtils = {
 
 	// Catmull-Rom
 
-	interpolate: function( p0, p1, p2, p3, t ) {
+	interpolate: function ( p0, p1, p2, p3, t ) {
 
 		var v0 = ( p2 - p0 ) * 0.5;
 		var v1 = ( p3 - p1 ) * 0.5;
@@ -34491,22 +34486,22 @@ CubicBezierCurve.prototype.constructor = CubicBezierCurve;
 
 CubicBezierCurve.prototype.getPoint = function ( t ) {
 
-	var b3 = ShapeUtils.b3;
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
 	return new Vector2(
-		b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-		b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
 	);
 
 };
 
-CubicBezierCurve.prototype.getTangent = function( t ) {
+CubicBezierCurve.prototype.getTangent = function ( t ) {
 
-	var tangentCubicBezier = CurveUtils.tangentCubicBezier;
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
 	return new Vector2(
-		tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-		tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y )
+		TangentCubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+		TangentCubicBezier( t, v0.y, v1.y, v2.y, v3.y )
 	).normalize();
 
 };
@@ -34527,26 +34522,25 @@ function QuadraticBezierCurve( v0, v1, v2 ) {
 QuadraticBezierCurve.prototype = Object.create( Curve.prototype );
 QuadraticBezierCurve.prototype.constructor = QuadraticBezierCurve;
 
-
 QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
-	var b2 = ShapeUtils.b2;
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
 	return new Vector2(
-		b2( t, this.v0.x, this.v1.x, this.v2.x ),
-		b2( t, this.v0.y, this.v1.y, this.v2.y )
+		QuadraticBezier( t, v0.x, v1.x, v2.x ),
+		QuadraticBezier( t, v0.y, v1.y, v2.y )
 	);
 
 };
 
 
-QuadraticBezierCurve.prototype.getTangent = function( t ) {
+QuadraticBezierCurve.prototype.getTangent = function ( t ) {
 
-	var tangentQuadraticBezier = CurveUtils.tangentQuadraticBezier;
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
 	return new Vector2(
-		tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x ),
-		tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y )
+		TangentQuadraticBezier( t, v0.x, v1.x, v2.x ),
+		TangentQuadraticBezier( t, v0.y, v1.y, v2.y )
 	).normalize();
 
 };
@@ -35071,7 +35065,7 @@ Object.assign( Font.prototype, {
 
 			var path = new ShapePath();
 
-			var pts = [], b2 = ShapeUtils.b2, b3 = ShapeUtils.b3;
+			var pts = [];
 			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
 
 			if ( glyph.o ) {
@@ -35121,8 +35115,8 @@ Object.assign( Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b2( t, cpx0, cpx1, cpx );
-									b2( t, cpy0, cpy1, cpy );
+									QuadraticBezier( t, cpx0, cpx1, cpx );
+									QuadraticBezier( t, cpy0, cpy1, cpy );
 
 								}
 
@@ -35151,8 +35145,8 @@ Object.assign( Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b3( t, cpx0, cpx1, cpx2, cpx );
-									b3( t, cpy0, cpy1, cpy2, cpy );
+									CubicBezier( t, cpx0, cpx1, cpx2, cpx );
+									CubicBezier( t, cpy0, cpy1, cpy2, cpy );
 
 								}
 
@@ -41284,12 +41278,12 @@ var CubicBezierCurve3 = Curve.create(
 
 	function ( t ) {
 
-		var b3 = ShapeUtils.b3;
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
 		return new Vector3(
-			b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x ),
-			b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y ),
-			b3( t, this.v0.z, this.v1.z, this.v2.z, this.v3.z )
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y ),
+			CubicBezier( t, v0.z, v1.z, v2.z, v3.z )
 		);
 
 	}
@@ -41312,12 +41306,12 @@ var QuadraticBezierCurve3 = Curve.create(
 
 	function ( t ) {
 
-		var b2 = ShapeUtils.b2;
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
 		return new Vector3(
-			b2( t, this.v0.x, this.v1.x, this.v2.x ),
-			b2( t, this.v0.y, this.v1.y, this.v2.y ),
-			b2( t, this.v0.z, this.v1.z, this.v2.z )
+			QuadraticBezier( t, v0.x, v1.x, v2.x ),
+			QuadraticBezier( t, v0.y, v1.y, v2.y ),
+			QuadraticBezier( t, v0.z, v1.z, v2.z )
 		);
 
 	}
