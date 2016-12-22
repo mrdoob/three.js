@@ -1182,7 +1182,7 @@ THREE.ColladaLoader = function () {
 				if ( num_materials > 1 ) {
 
 					material = new THREE.MultiMaterial( used_materials_array );
-					
+
 					for ( j = 0; j < geom.faces.length; j ++ ) {
 
 						var face = geom.faces[ j ];
@@ -3726,17 +3726,32 @@ THREE.ColladaLoader = function () {
 
 										}
 
-										texture.wrapS = THREE.ClampToEdgeWrapping;
 										if ( sampler.wrap_s === "MIRROR" ) {
+
 											texture.wrapS = THREE.MirroredRepeatWrapping;
+
 										} else if ( sampler.wrap_s === "WRAP" || cot.texOpts.wrapU ) {
+
 											texture.wrapS = THREE.RepeatWrapping;
+
+										} else {
+
+											texture.wrapS = THREE.ClampToEdgeWrapping;
+
 										}
-										texture.wrapT = THREE.ClampToEdgeWrapping;
+
 										if ( sampler.wrap_t === "MIRROR" ) {
+
 											texture.wrapT = THREE.MirroredRepeatWrapping;
+
 										} else if ( sampler.wrap_t === "WRAP" || cot.texOpts.wrapV ) {
+
 											texture.wrapT = THREE.RepeatWrapping;
+
+										} else {
+
+											texture.wrapT = THREE.ClampToEdgeWrapping;
+
 										}
 
 										texture.offset.x = cot.texOpts.offsetU;
