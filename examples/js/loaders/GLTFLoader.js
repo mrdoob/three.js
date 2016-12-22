@@ -1487,6 +1487,13 @@ THREE.GLTFLoader = ( function () {
 							var mesh = node.meshes[ meshId ];
 							var group = dependencies.meshes[ mesh ];
 
+							if ( group === undefined ) {
+
+								console.warn( 'GLTFLoader: Couldn\'t find node "' + mesh + '".' );
+								continue;
+
+							}
+
 							for ( var childrenId in group.children ) {
 
 								var child = group.children[ childrenId ];
