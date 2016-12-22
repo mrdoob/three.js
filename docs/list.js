@@ -3,7 +3,20 @@ var list = {
 	"Manual": {
 		"Introduction": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "Detecting WebGL and browser compatibility", "manual/introduction/Detecting-WebGL-and-browser-compatibility" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Useful links", "manual/introduction/Useful-links" ],
+			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
+			[ "Creating Text", "manual/introduction/Creating-text" ],
+			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
+			[ "Migration Guide", "manual/introduction/Migration-guide" ],
+			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
+			[ "FAQ", "manual/introduction/FAQ" ]
+		],
+
+		"Build Tools": [
+			[ "Testing with NPM", "manual/buildTools/Testing-with-NPM" ]
 		]
 	},
 
