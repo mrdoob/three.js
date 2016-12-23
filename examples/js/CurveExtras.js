@@ -3,12 +3,12 @@
  * @author zz85
  *
  * Formulas collected from various sources
- *	http://mathworld.wolfram.com/HeartCurve.html
- *	http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
- *	http://en.wikipedia.org/wiki/Viviani%27s_curve
- *	http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
- *	http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
- *	http://prideout.net/blog/?p=44
+ *  http://mathworld.wolfram.com/HeartCurve.html
+ *  http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
+ *  http://en.wikipedia.org/wiki/Viviani%27s_curve
+ *  http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
+ *  http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
+ *  http://prideout.net/blog/?p=44
  */
 
 ( function( Curves ) {
@@ -36,7 +36,7 @@
 
   function HeartCurve( s ) {
 
-  	this.scale = ( s === undefined ) ? 5 : s;
+    this.scale = ( s === undefined ) ? 5 : s;
 
   }
 
@@ -45,13 +45,13 @@
 
   HeartCurve.prototype.getPoint = function( t ) {
 
-  	t *= 2 * Math.PI;
+    t *= 2 * Math.PI;
 
-  	var x = 16 * Math.pow( Math.sin( t ), 3 );
-  	var y = 13 * Math.cos( t ) - 5 * Math.cos( 2 * t ) - 2 * Math.cos( 3 * t ) - Math.cos( 4 * t );
+    var x = 16 * Math.pow( Math.sin( t ), 3 );
+    var y = 13 * Math.cos( t ) - 5 * Math.cos( 2 * t ) - 2 * Math.cos( 3 * t ) - Math.cos( 4 * t );
     var z = 0;
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   }
 
@@ -59,7 +59,7 @@
 
   function VivianiCurve( radius ) {
 
-  	this.radius = radius;
+    this.radius = radius;
 
   }
 
@@ -68,10 +68,10 @@
 
   VivianiCurve.prototype.getPoint = function( t ) {
 
-  	t = t * 4 * Math.PI; // normalized to 0..1
-  	var a = this.radius / 2;
+    t = t * 4 * Math.PI; // normalized to 0..1
+    var a = this.radius / 2;
 
-  	var x = a * ( 1 + Math.cos( t ) );
+    var x = a * ( 1 + Math.cos( t ) );
     var y = a * Math.sin( t );
     var z = 2 * a * Math.sin( t / 2 );
 
@@ -88,16 +88,16 @@
 
   KnotCurve.prototype.getPoint = function( t ) {
 
-  	t *= 2 * Math.PI;
+    t *= 2 * Math.PI;
 
-  	var R = 10;
-  	var s = 50;
+    var R = 10;
+    var s = 50;
 
-  	var x = s * Math.sin( t );
+    var x = s * Math.sin( t );
     var y = Math.cos( t ) * ( R + s * Math.cos( t ) );
     var z = Math.sin( t ) * ( R + s * Math.cos( t ) );
 
-  	return new THREE.Vector3( x, y, z );
+    return new THREE.Vector3( x, y, z );
 
   };
 
@@ -110,16 +110,16 @@
 
   HelixCurve.prototype.getPoint = function( t ) {
 
-  	var a = 30; // radius
-  	var b = 150; // height
+    var a = 30; // radius
+    var b = 150; // height
 
-  	var t2 = 2 * Math.PI * t * b / 30;
+    var t2 = 2 * Math.PI * t * b / 30;
 
-  	var x = Math.cos( t2 ) * a;
+    var x = Math.cos( t2 ) * a;
     var y = Math.sin( t2 ) * a;
     var z = b * t;
 
-  	return new THREE.Vector3( x, y, z );
+    return new THREE.Vector3( x, y, z );
 
   };
 
@@ -127,7 +127,7 @@
 
   function TrefoilKnot( s ) {
 
-  	this.scale = ( s === undefined ) ? 10 : s;
+    this.scale = ( s === undefined ) ? 10 : s;
 
   };
 
@@ -136,13 +136,13 @@
 
   TrefoilKnot.prototype.getPoint = function( t ) {
 
-  	t *= Math.PI * 2;
+    t *= Math.PI * 2;
 
-  	var x = ( 2 + Math.cos( 3 * t ) ) * Math.cos( 2 * t );
-  	var y = ( 2 + Math.cos( 3 * t ) ) * Math.sin( 2 * t );
-  	var z = Math.sin( 3 * t );
+    var x = ( 2 + Math.cos( 3 * t ) ) * Math.cos( 2 * t );
+    var y = ( 2 + Math.cos( 3 * t ) ) * Math.sin( 2 * t );
+    var z = Math.sin( 3 * t );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -150,7 +150,7 @@
 
   function TorusKnot( s ) {
 
-  	this.scale = ( s === undefined ) ? 10 : s;
+    this.scale = ( s === undefined ) ? 10 : s;
 
   };
 
@@ -159,16 +159,16 @@
 
   TorusKnot.prototype.getPoint = function( t ) {
 
-  	var p = 3;
+    var p = 3;
     var q = 4;
 
-  	t *= Math.PI * 2;
+    t *= Math.PI * 2;
 
-  	var x = ( 2 + Math.cos( q * t ) ) * Math.cos( p * t );
-  	var y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
-  	var z = Math.sin( q * t );
+    var x = ( 2 + Math.cos( q * t ) ) * Math.cos( p * t );
+    var y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
+    var z = Math.sin( q * t );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -176,7 +176,7 @@
 
   function CinquefoilKnot( s ) {
 
-  	this.scale = ( s === undefined ) ? 10 : s;
+    this.scale = ( s === undefined ) ? 10 : s;
 
   };
 
@@ -185,16 +185,16 @@
 
   CinquefoilKnot.prototype.getPoint = function( t ) {
 
-  	var p = 2;
+    var p = 2;
     var q = 5;
 
-  	t *= Math.PI * 2;
+    t *= Math.PI * 2;
 
-  	var x = ( 2 + Math.cos( q * t ) ) * Math.cos( p * t );
-  	var y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
-  	var z = Math.sin( q * t );
+    var x = ( 2 + Math.cos( q * t ) ) * Math.cos( p * t );
+    var y = ( 2 + Math.cos( q * t ) ) * Math.sin( p * t );
+    var z = Math.sin( q * t );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -202,7 +202,7 @@
 
   function TrefoilPolynomialKnot( s ) {
 
-  	this.scale = ( s === undefined ) ? 10 : s;
+    this.scale = ( s === undefined ) ? 10 : s;
 
   };
 
@@ -211,20 +211,20 @@
 
   TrefoilPolynomialKnot.prototype.getPoint = function( t ) {
 
-  	t = t * 4 - 2;
+    t = t * 4 - 2;
 
-  	var x = Math.pow( t, 3 ) - 3 * t;
+    var x = Math.pow( t, 3 ) - 3 * t;
     var y = Math.pow( t, 4 ) - 4 * t * t;
     var z = 1 / 5 * Math.pow( t, 5 ) - 2 * t;
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
   var scaleTo = function( x, y, t ) {
 
-  	var r = y - x;
-  	return t * r + x;
+    var r = y - x;
+    return t * r + x;
 
   };
 
@@ -232,7 +232,7 @@
 
   function FigureEightPolynomialKnot( s ) {
 
-  	this.scale = ( s === undefined ) ? 1 : s;
+    this.scale = ( s === undefined ) ? 1 : s;
 
   };
 
@@ -241,13 +241,13 @@
 
   FigureEightPolynomialKnot.prototype.getPoint = function( t ) {
 
-  	t = scaleTo( - 4, 4, t );
+    t = scaleTo( - 4, 4, t );
 
-  	var x = 2 / 5 * t * ( t * t - 7 ) * ( t * t - 10 );
-  	var y = Math.pow( t, 4 ) - 13 * t * t;
-  	var z = 1 / 10 * t * ( t * t - 4 ) * ( t * t - 9 ) * ( t * t - 12 );
+    var x = 2 / 5 * t * ( t * t - 7 ) * ( t * t - 10 );
+    var y = Math.pow( t, 4 ) - 13 * t * t;
+    var z = 1 / 10 * t * ( t * t - 4 ) * ( t * t - 9 ) * ( t * t - 12 );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -255,7 +255,7 @@
 
   function DecoratedTorusKnot4a( s ) {
 
-  	this.scale = ( s === undefined ) ? 40 : s;
+    this.scale = ( s === undefined ) ? 40 : s;
 
   };
 
@@ -264,13 +264,13 @@
 
   DecoratedTorusKnot4a.prototype.getPoint = function( t ) {
 
-  	t *= Math.PI * 2;
+    t *= Math.PI * 2;
 
-  	var x = Math.cos( 2 * t ) * ( 1 + 0.6 * ( Math.cos( 5 * t ) + 0.75 * Math.cos( 10 * t ) ) );
+    var x = Math.cos( 2 * t ) * ( 1 + 0.6 * ( Math.cos( 5 * t ) + 0.75 * Math.cos( 10 * t ) ) );
     var y = Math.sin( 2 * t ) * ( 1 + 0.6 * ( Math.cos( 5 * t ) + 0.75 * Math.cos( 10 * t ) ) );
-  	var z = 0.35 * Math.sin( 5 * t );
+    var z = 0.35 * Math.sin( 5 * t );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -278,7 +278,7 @@
 
   function DecoratedTorusKnot4b( s ) {
 
-  	this.scale = ( s === undefined ) ? 40 : s;
+    this.scale = ( s === undefined ) ? 40 : s;
 
   };
 
@@ -287,13 +287,13 @@
 
   DecoratedTorusKnot4b.prototype.getPoint = function( t ) {
 
-  	var fi = t * Math.PI * 2;
+    var fi = t * Math.PI * 2;
 
-  	var x = Math.cos( 2 * fi ) * ( 1 + 0.45 * Math.cos( 3 * fi ) + 0.4 * Math.cos( 9 * fi ) );
-  	var y = Math.sin( 2 * fi ) * ( 1 + 0.45 * Math.cos( 3 * fi ) + 0.4 * Math.cos( 9 * fi ) );
-  	var z = 0.2 * Math.sin( 9 * fi );
+    var x = Math.cos( 2 * fi ) * ( 1 + 0.45 * Math.cos( 3 * fi ) + 0.4 * Math.cos( 9 * fi ) );
+    var y = Math.sin( 2 * fi ) * ( 1 + 0.45 * Math.cos( 3 * fi ) + 0.4 * Math.cos( 9 * fi ) );
+    var z = 0.2 * Math.sin( 9 * fi );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -301,7 +301,7 @@
 
   function DecoratedTorusKnot5a( s ) {
 
-  	this.scale = ( s === undefined ) ? 40 : s;
+    this.scale = ( s === undefined ) ? 40 : s;
 
   };
 
@@ -310,13 +310,13 @@
 
   DecoratedTorusKnot5a.prototype.getPoint = function( t ) {
 
-  	var fi = t * Math.PI * 2;
+    var fi = t * Math.PI * 2;
 
-  	var x = Math.cos( 3 * fi ) * ( 1 + 0.3 * Math.cos( 5 * fi ) + 0.5 * Math.cos( 10 * fi ) );
-  	var y = Math.sin( 3 * fi ) * ( 1 + 0.3 * Math.cos( 5 * fi ) + 0.5 * Math.cos( 10 * fi ) );
-  	var z = 0.2 * Math.sin( 20 * fi );
+    var x = Math.cos( 3 * fi ) * ( 1 + 0.3 * Math.cos( 5 * fi ) + 0.5 * Math.cos( 10 * fi ) );
+    var y = Math.sin( 3 * fi ) * ( 1 + 0.3 * Math.cos( 5 * fi ) + 0.5 * Math.cos( 10 * fi ) );
+    var z = 0.2 * Math.sin( 20 * fi );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
@@ -324,7 +324,7 @@
 
   function DecoratedTorusKnot5c( s ) {
 
-  	this.scale = ( s === undefined ) ? 40 : s;
+    this.scale = ( s === undefined ) ? 40 : s;
 
   };
 
@@ -333,13 +333,13 @@
 
   DecoratedTorusKnot5c.prototype.getPoint = function( t ) {
 
-  	var fi = t * Math.PI * 2;
+    var fi = t * Math.PI * 2;
 
-  	var x = Math.cos( 4 * fi ) * ( 1 + 0.5 * ( Math.cos( 5 * fi ) + 0.4 * Math.cos( 20 * fi ) ) );
-  	var y = Math.sin( 4 * fi ) * ( 1 + 0.5 * ( Math.cos( 5 * fi ) + 0.4 * Math.cos( 20 * fi ) ) );
-  	var z = 0.35 * Math.sin( 15 * fi );
+    var x = Math.cos( 4 * fi ) * ( 1 + 0.5 * ( Math.cos( 5 * fi ) + 0.4 * Math.cos( 20 * fi ) ) );
+    var y = Math.sin( 4 * fi ) * ( 1 + 0.5 * ( Math.cos( 5 * fi ) + 0.4 * Math.cos( 20 * fi ) ) );
+    var z = 0.35 * Math.sin( 15 * fi );
 
-  	return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
+    return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
   };
 
