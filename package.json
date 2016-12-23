@@ -15,8 +15,7 @@
     "build/three.module.js",
     "src",
     "examples/js",
-    "examples/fonts",
-    "bower.json"
+    "examples/fonts"
   ],
   "directories": {
     "doc": "docs",
