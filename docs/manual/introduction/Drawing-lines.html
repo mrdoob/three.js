@@ -9,49 +9,56 @@
 	</head>
 	<body>
 		<h1>[name]</h1>
+		<div>
+			<p>
+				Let's say you want to draw a line or a circle, not a wireframe [page:Mesh].
+				First we need to setup the [page:WebGLRenderer renderer], [page:Scene scene] and camera (see the Creating a scene page).
+			</p>
 
-		<p>Let's say you want to draw a line or a circle, not a wireframe geometry.
-First we need to setup Renderer, Scene and camera (<a href="Getting%20Started">see Getting Started</a>).</p>
+			<p>Here is the code that we will use:</p>
+			<code>
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-<p>Here is the code that we will use:</p>
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+camera.position.set(0, 0, 100);
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-<div class="highlight highlight-source-js"><pre>        <span class="pl-k">var</span> renderer <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.WebGLRenderer</span>();
-		<span class="pl-smi">renderer</span>.<span class="pl-en">setSize</span>(<span class="pl-c1">window</span>.<span class="pl-c1">innerWidth</span>, <span class="pl-c1">window</span>.<span class="pl-c1">innerHeight</span>);
-		<span class="pl-c1">document</span>.<span class="pl-c1">body</span>.<span class="pl-c1">appendChild</span>(<span class="pl-smi">renderer</span>.<span class="pl-smi">domElement</span>);
-		<span class="pl-k">var</span> camera <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.PerspectiveCamera</span>(<span class="pl-c1">45</span>, <span class="pl-c1">window</span>.<span class="pl-c1">innerWidth</span> <span class="pl-k">/</span> <span class="pl-c1">window</span>.<span class="pl-c1">innerHeight</span>, <span class="pl-c1">1</span>, <span class="pl-c1">500</span>);
-		<span class="pl-smi">camera</span>.<span class="pl-smi">position</span>.<span class="pl-c1">set</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">100</span>);
-		<span class="pl-smi">camera</span>.<span class="pl-en">lookAt</span>(<span class="pl-k">new</span> <span class="pl-en">THREE.Vector3</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>));
-		<span class="pl-k">var</span> scene <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.Scene</span>();</pre></div>
+var scene = new THREE.Scene();
+			</code>
+			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] oe [page:LineDashedMaterial].</p>
+			<code>
+//create a blue LineBasicMaterial
+var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+			</code>
 
-<p>Next thing we will do is define a material. For lines we have to use <code>LineBasicMaterial</code>.</p>
+			<p>
+				After material we will need a [page:Geometry] or [page:BufferGeometry] with some vertices
+				(it's reccomended to use a BufferGeometry as it's more performant, however for simplicity we'll use a Geometry here):
+			</p>
 
-<div class="highlight highlight-source-js"><pre>        <span class="pl-k">var</span> material <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.LineBasicMaterial</span>({
-				color<span class="pl-k">:</span> <span class="pl-c1">0x0000ff</span>
-		});
-</pre></div>
+			<code>
+var geometry = new THREE.Geometry();
+geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+geometry.vertices.push(new THREE.Vector3(0, 10, 0));
+geometry.vertices.push(new THREE.Vector3(10, 0, 0));
+			</code>
 
-<p>After material we will need a <code>Geometry</code> with some vertices:</p>
+			<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
 
-<div class="highlight highlight-source-js"><pre>        <span class="pl-k">var</span> geometry <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.Geometry</span>();
-		<span class="pl-smi">geometry</span>.<span class="pl-smi">vertices</span>.<span class="pl-c1">push</span>(<span class="pl-k">new</span> <span class="pl-en">THREE.Vector3</span>(<span class="pl-k">-</span><span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>));
-		<span class="pl-smi">geometry</span>.<span class="pl-smi">vertices</span>.<span class="pl-c1">push</span>(<span class="pl-k">new</span> <span class="pl-en">THREE.Vector3</span>(<span class="pl-c1">0</span>, <span class="pl-c1">10</span>, <span class="pl-c1">0</span>));
-		<span class="pl-smi">geometry</span>.<span class="pl-smi">vertices</span>.<span class="pl-c1">push</span>(<span class="pl-k">new</span> <span class="pl-en">THREE.Vector3</span>(<span class="pl-c1">10</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>));</pre></div>
+			<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
+			<code>
+var line = new THREE.Line(geometry, material);
+			</code>
+			<p>All that's left is to add it to the scene and call [page:WebGLRenderer.render render].</p>
 
-<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
+			<code>
+scene.add(line);
+renderer.render(scene, camera);
+			</code>
 
-<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
-
-<div class="highlight highlight-source-js"><pre>
-		<span class="pl-k">var</span> line <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">THREE.Line</span>(geometry, material);
-</pre></div>
-
-<p>All that's left is to add it to the scene and call <code>render</code>.</p>
-
-<div class="highlight highlight-source-js"><pre>
-		<span class="pl-smi">scene</span>.<span class="pl-c1">add</span>(line);
-		<span class="pl-smi">renderer</span>.<span class="pl-en">render</span>(scene, camera);
-</pre></div>
-
-<p>You should now be seeing a arrow pointing upwards, made from two blue lines.</p>
+			<p>You should now be seeing a arrow pointing upwards, made from two blue lines.</p>
+		</div>
 	</body>
 </html>
