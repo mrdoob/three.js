@@ -44,7 +44,7 @@
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
@@ -78,8 +78,8 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
@@ -92,7 +92,7 @@
 
 				var position, index;
 
-				var spline = new THREE.Spline( points );
+				var spline = new THREE.CatmullRomCurve3( points );
 
 				for ( i = 0; i < points.length * n_sub; i ++ ) {
 
@@ -144,9 +144,7 @@
 
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild(stats.domElement);
+				//container.appendChild(stats.dom);
 
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );

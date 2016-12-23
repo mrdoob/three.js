@@ -15,7 +15,10 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -82,8 +85,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
 
-				var line = new THREE.Line( geometry, material );
-				line.type = THREE.LinePieces;
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Spheres
@@ -92,7 +94,10 @@
 
 				geometry = new THREE.IcosahedronGeometry( 100, 1 );
 
-				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: 0.5 } );
+				var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
+				envMap.mapping = THREE.SphericalReflectionMapping;
+
+				material = new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -131,6 +136,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -148,9 +154,7 @@
 				debugContext.strokeStyle = '#000000';
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );

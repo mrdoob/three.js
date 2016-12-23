@@ -22,7 +22,7 @@ test( "constructor", function() {
 	var a = new THREE.Matrix4();
 	ok( a.determinant() == 1, "Passed!" );
 
-	var b = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	var b = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	ok( b.elements[0] == 0 );
 	ok( b.elements[1] == 4 );
 	ok( b.elements[2] == 8 );
@@ -44,7 +44,7 @@ test( "constructor", function() {
 });
 
 test( "copy", function() {
-	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	var a = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = new THREE.Matrix4().copy( a );
 
 	ok( matrixEquals4( a, b ), "Passed!" );
@@ -78,7 +78,7 @@ test( "set", function() {
 });
 
 test( "identity", function() {
-	var b = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	var b = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	ok( b.elements[0] == 0 );
 	ok( b.elements[1] == 4 );
 	ok( b.elements[2] == 8 );
@@ -104,7 +104,7 @@ test( "identity", function() {
 });
 
 test( "multiplyScalar", function() {
-	var b = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	var b = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	ok( b.elements[0] == 0 );
 	ok( b.elements[1] == 4 );
 	ok( b.elements[2] == 8 );
@@ -160,14 +160,14 @@ test( "getInverse", function() {
 	var identity = new THREE.Matrix4();
 
 	var a = new THREE.Matrix4();
-	var b = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-	var c = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+	var b = new THREE.Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+	var c = new THREE.Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 	ok( ! matrixEquals4( a, b ), "Passed!" );
 	b.getInverse( a, false );
 	ok( matrixEquals4( b, new THREE.Matrix4() ), "Passed!" );
 
-	try { 
+	try {
 		b.getInverse( c, true );
 		ok( false, "Passed!" ); // should never get here.
 	}
@@ -184,8 +184,8 @@ test( "getInverse", function() {
 		new THREE.Matrix4().makeRotationZ( -0.3 ),
 		new THREE.Matrix4().makeScale( 1, 2, 3 ),
 		new THREE.Matrix4().makeScale( 1/8, 1/2, 1/3 ),
-		new THREE.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 1000 ),
-		new THREE.Matrix4().makeFrustum( -16, 16, -9, 9, 0.1, 10000 ),
+		new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 1000 ),
+		new THREE.Matrix4().makePerspective( -16, 16, 9, -9, 0.1, 10000 ),
 		new THREE.Matrix4().makeTranslation( 1, 2, 3 )
 		];
 
@@ -211,20 +211,49 @@ test( "getInverse", function() {
 	}
 });
 
+test( "makeBasis/extractBasis", function() {
+	var identityBasis = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+	var a = new THREE.Matrix4().makeBasis( identityBasis[0], identityBasis[1], identityBasis[2] );
+	var identity = new THREE.Matrix4();
+	ok( matrixEquals4( a, identity ), "Passed!" );
+
+	var testBases = [ [ new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ] ];
+	for( var i = 0; i < testBases.length; i ++ ) {
+		var testBasis = testBases[i];
+		var b = new THREE.Matrix4().makeBasis( testBasis[0], testBasis[1], testBasis[2] );
+		var outBasis = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+		b.extractBasis( outBasis[0], outBasis[1], outBasis[2] );
+		// check what goes in, is what comes out.
+		for( var j = 0; j < outBasis.length; j ++ ) {
+			ok( outBasis[j].equals( testBasis[j] ), "Passed!" );
+		}
+
+		// get the basis out the hard war
+		for( var j = 0; j < identityBasis.length; j ++ ) {
+			outBasis[j].copy( identityBasis[j] );
+			outBasis[j].applyMatrix4( b );
+		}
+		// did the multiply method of basis extraction work?
+		for( var j = 0; j < outBasis.length; j ++ ) {
+			ok( outBasis[j].equals( testBasis[j] ), "Passed!" );
+		}
+	}
+});
+
 test( "transpose", function() {
 	var a = new THREE.Matrix4();
 	var b = a.clone().transpose();
 	ok( matrixEquals4( a, b ), "Passed!" );
 
-	b = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	b = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var c = b.clone().transpose();
-	ok( ! matrixEquals4( b, c ), "Passed!" ); 
+	ok( ! matrixEquals4( b, c ), "Passed!" );
 	c.transpose();
-	ok( matrixEquals4( b, c ), "Passed!" ); 
+	ok( matrixEquals4( b, c ), "Passed!" );
 });
 
 test( "clone", function() {
-	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+	var a = new THREE.Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = a.clone();
 
 	ok( matrixEquals4( a, b ), "Passed!" );
@@ -283,7 +312,7 @@ test( "compose/decompose", function() {
 				m.decompose( t2, r2, s2 );
 
 				var m2 = new THREE.Matrix4().compose( t2, r2, s2 );
-			
+
 				var matrixIsSame = matrixEquals4( m, m2 );
 				/* debug code
 				if( ! matrixIsSame ) {

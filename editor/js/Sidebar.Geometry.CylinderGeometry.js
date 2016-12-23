@@ -1,13 +1,20 @@
-Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-	var container = new UI.Panel();
+Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
+
+	var container = new UI.Row();
 
 	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radiusTop
 
-	var radiusTopRow = new UI.Panel();
-	var radiusTop = new UI.Number( geometry.parameters.radiusTop ).onChange( update );
+	var radiusTopRow = new UI.Row();
+	var radiusTop = new UI.Number( parameters.radiusTop ).onChange( update );
 
 	radiusTopRow.add( new UI.Text( 'Radius top' ).setWidth( '90px' ) );
 	radiusTopRow.add( radiusTop );
@@ -16,8 +23,8 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	// radiusBottom
 
-	var radiusBottomRow = new UI.Panel();
-	var radiusBottom = new UI.Number( geometry.parameters.radiusBottom ).onChange( update );
+	var radiusBottomRow = new UI.Row();
+	var radiusBottom = new UI.Number( parameters.radiusBottom ).onChange( update );
 
 	radiusBottomRow.add( new UI.Text( 'Radius bottom' ).setWidth( '90px' ) );
 	radiusBottomRow.add( radiusBottom );
@@ -26,8 +33,8 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	// height
 
-	var heightRow = new UI.Panel();
-	var height = new UI.Number( geometry.parameters.height ).onChange( update );
+	var heightRow = new UI.Row();
+	var height = new UI.Number( parameters.height ).onChange( update );
 
 	heightRow.add( new UI.Text( 'Height' ).setWidth( '90px' ) );
 	heightRow.add( height );
@@ -36,8 +43,8 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UI.Panel();
-	var radialSegments = new UI.Integer( geometry.parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UI.Row();
+	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -46,8 +53,8 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new UI.Panel();
-	var heightSegments = new UI.Integer( geometry.parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	var heightSegmentsRow = new UI.Row();
+	var heightSegments = new UI.Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -56,8 +63,8 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	// openEnded
 
-	var openEndedRow = new UI.Panel();
-	var openEnded = new UI.Checkbox( geometry.parameters.openEnded ).onChange( update );
+	var openEndedRow = new UI.Row();
+	var openEnded = new UI.Checkbox( parameters.openEnded ).onChange( update );
 
 	openEndedRow.add( new UI.Text( 'Open ended' ).setWidth( '90px' ) );
 	openEndedRow.add( openEnded );
@@ -68,25 +75,19 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.CylinderGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
 			radialSegments.getValue(),
 			heightSegments.getValue(),
 			openEnded.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
+		) ) );
 
 	}
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.CylinderBufferGeometry = Sidebar.Geometry.CylinderGeometry;

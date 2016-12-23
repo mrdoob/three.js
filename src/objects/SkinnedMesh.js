@@ -1,164 +1,190 @@
+import { Mesh } from './Mesh';
+import { Vector4 } from '../math/Vector4';
+import { Skeleton } from './Skeleton';
+import { Bone } from './Bone';
+import { Matrix4 } from '../math/Matrix4';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ * @author ikerr / http://verold.com
  */
 
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
+function SkinnedMesh( geometry, material, useVertexTexture ) {
 
-	THREE.Mesh.call( this, geometry, material );
+	Mesh.call( this, geometry, material );
 
-	this.skeleton = new THREE.Skeleton( this.geometry && this.geometry.bones, useVertexTexture );
+	this.type = 'SkinnedMesh';
 
-  // Add root level bones as children of the mesh
+	this.bindMode = "attached";
+	this.bindMatrix = new Matrix4();
+	this.bindMatrixInverse = new Matrix4();
 
-	for ( var b = 0; b < this.skeleton.bones.length; ++b ) {
+	// init bones
 
-		var bone = this.skeleton.bones[ b ];
+	// TODO: remove bone creation as there is no reason (other than
+	// convenience) for THREE.SkinnedMesh to do this.
 
-		if ( bone.parent === undefined ) {
+	var bones = [];
 
-			this.add( bone );
+	if ( this.geometry && this.geometry.bones !== undefined ) {
+
+		var bone, gbone;
+
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
+
+			gbone = this.geometry.bones[ b ];
+
+			bone = new Bone();
+			bones.push( bone );
+
+			bone.name = gbone.name;
+			bone.position.fromArray( gbone.pos );
+			bone.quaternion.fromArray( gbone.rotq );
+			if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+		}
+
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
+
+			gbone = this.geometry.bones[ b ];
+
+			if ( gbone.parent !== - 1 && gbone.parent !== null &&
+					bones[ gbone.parent ] !== undefined ) {
+
+				bones[ gbone.parent ].add( bones[ b ] );
+
+			} else {
+
+				this.add( bones[ b ] );
+
+			}
 
 		}
 
 	}
-
-	this.identityMatrix = new THREE.Matrix4();
-
-	this.pose();
-
-};
-
-
-THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
-
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
-
-	var offsetMatrix = new THREE.Matrix4();
-
-	return function ( force ) {
-
-		this.matrixAutoUpdate && this.updateMatrix();
-
-		// update matrixWorld
-
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent ) {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-			} else {
-
-				this.matrixWorld.copy( this.matrix );
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			var child = this.children[ i ];
-
-			if ( child instanceof THREE.Bone ) {
-
-				child.update( this.identityMatrix, false );
-
-			} else {
-
-				child.updateMatrixWorld( true );
-
-			}
-
-		}
-
-		// make a snapshot of the bones' rest position
-
-		if ( this.skeleton.boneInverses === undefined ) {
-
-			this.skeleton.calculateInverses();
-
-		}
-
-		// flatten bone matrices to array
-
-		for ( var b = 0, bl = this.skeleton.bones.length; b < bl; b ++ ) {
-
-			// compute the offset between the current and the original transform;
-
-			// TODO: we could get rid of this multiplication step if the skinMatrix
-			// was already representing the offset; however, this requires some
-			// major changes to the animation system
-
-			offsetMatrix.multiplyMatrices( this.skeleton.bones[ b ].skinMatrix, this.skeleton.boneInverses[ b ] );
-			offsetMatrix.flattenToArrayOffset( this.skeleton.boneMatrices, b * 16 );
-
-		}
-
-		if ( this.skeleton.useVertexTexture ) {
-
-			this.skeleton.boneTexture.needsUpdate = true;
-
-		}
-
-	};
-
-}();
-
-THREE.SkinnedMesh.prototype.pose = function () {
-
-	this.updateMatrixWorld( true );
 
 	this.normalizeSkinWeights();
 
-};
+	this.updateMatrixWorld( true );
+	this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
-THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
+}
 
-	if ( this.geometry instanceof THREE.Geometry ) {
 
-		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
+SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
-			var sw = this.geometry.skinWeights[ i ];
+	constructor: SkinnedMesh,
 
-			var scale = 1.0 / sw.lengthManhattan();
+	isSkinnedMesh: true,
 
-			if ( scale !== Infinity ) {
+	bind: function( skeleton, bindMatrix ) {
 
-				sw.multiplyScalar( scale );
+		this.skeleton = skeleton;
 
-			} else {
+		if ( bindMatrix === undefined ) {
 
-				sw.set( 1 ); // this will be normalized by the shader anyway
+			this.updateMatrixWorld( true );
+
+			this.skeleton.calculateInverses();
+
+			bindMatrix = this.matrixWorld;
+
+		}
+
+		this.bindMatrix.copy( bindMatrix );
+		this.bindMatrixInverse.getInverse( bindMatrix );
+
+	},
+
+	pose: function () {
+
+		this.skeleton.pose();
+
+	},
+
+	normalizeSkinWeights: function () {
+
+		if ( this.geometry && this.geometry.isGeometry ) {
+
+			for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
+
+				var sw = this.geometry.skinWeights[ i ];
+
+				var scale = 1.0 / sw.lengthManhattan();
+
+				if ( scale !== Infinity ) {
+
+					sw.multiplyScalar( scale );
+
+				} else {
+
+					sw.set( 1, 0, 0, 0 ); // do something reasonable
+
+				}
+
+			}
+
+		} else if ( this.geometry && this.geometry.isBufferGeometry ) {
+
+			var vec = new Vector4();
+
+			var skinWeight = this.geometry.attributes.skinWeight;
+
+			for ( var i = 0; i < skinWeight.count; i ++ ) {
+
+				vec.x = skinWeight.getX( i );
+				vec.y = skinWeight.getY( i );
+				vec.z = skinWeight.getZ( i );
+				vec.w = skinWeight.getW( i );
+
+				var scale = 1.0 / vec.lengthManhattan();
+
+				if ( scale !== Infinity ) {
+
+					vec.multiplyScalar( scale );
+
+				} else {
+
+					vec.set( 1, 0, 0, 0 ); // do something reasonable
+
+				}
+
+				skinWeight.setXYZW( i, vec.x, vec.y, vec.z, vec.w );
 
 			}
 
 		}
 
-	} else {
+	},
 
-		// skinning weights assumed to be normalized for THREE.BufferGeometry
+	updateMatrixWorld: function( force ) {
+
+		Mesh.prototype.updateMatrixWorld.call( this, true );
+
+		if ( this.bindMode === "attached" ) {
+
+			this.bindMatrixInverse.getInverse( this.matrixWorld );
+
+		} else if ( this.bindMode === "detached" ) {
+
+			this.bindMatrixInverse.getInverse( this.bindMatrix );
+
+		} else {
+
+			console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
+
+		}
+
+	},
+
+	clone: function() {
+
+		return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
 
 	}
 
-};
+} );
 
-THREE.SkinnedMesh.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) {
-
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
-
-	}
-
-	THREE.Mesh.prototype.clone.call( this, object );
-
-	return object;
-
-};
+export { SkinnedMesh };

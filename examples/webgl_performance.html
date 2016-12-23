@@ -16,7 +16,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -50,7 +50,7 @@
 
 				objects = [];
 
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				var material = new THREE.MeshNormalMaterial();
 
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/Suzanne.js', function ( geometry ) {
@@ -77,15 +77,13 @@
 				} );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -135,7 +133,6 @@
 					objects[ i ].rotation.y += 0.02;
 
 				}
-
 
 				renderer.render( scene, camera );
 

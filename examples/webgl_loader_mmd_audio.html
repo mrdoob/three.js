@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - MMD loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #fff;
+				color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #000;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
+		Copyright
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank">Audio Data</a><br />
+		<a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank">Original Camera Data(I've customized this)</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/libs/mmdparser.min.js"></script>
+		<script src="js/libs/ammo.js"></script>
+
+		<script src="js/loaders/TGALoader.js"></script>
+		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/OutlineEffect.js"></script>
+		<script src="js/animation/CCDIKSolver.js"></script>
+		<script src="js/animation/MMDPhysics.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var mesh, camera, scene, renderer, effect;
+			var helper;
+
+			var ready = false;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+
+				var ambient = new THREE.AmbientLight( 0x666666 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				directionalLight.position.set( -1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( new THREE.Color( 0xffffff ) );
+				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
+
+				// model
+
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+
+				var onError = function ( xhr ) {
+				};
+
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				var cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
+				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
+				var audioParams = { delayTime: 160 * 1 / 30 };
+
+				helper = new THREE.MMDHelper();
+
+				var loader = new THREE.MMDLoader();
+
+				loader.load( modelFile, vmdFiles, function ( object ) {
+
+					mesh = object;
+
+					helper.add( mesh );
+					helper.setAnimation( mesh );
+					helper.setPhysics( mesh );
+
+					loader.loadVmds( cameraFiles, function ( vmd ) {
+
+						helper.setCamera( camera );
+
+						loader.pourVmdIntoCamera( camera, vmd );
+						helper.setCameraAnimation( camera );
+
+						loader.loadAudio( audioFile, function ( audio, listener ) {
+
+							listener.position.z = 1;
+
+							helper.setAudio( audio, listener, audioParams );
+
+							/*
+							 * Note: call this method after you set all animations
+							 *       including camera and audio.
+							 */
+							helper.unifyAnimationDuration();
+
+							scene.add( audio );
+							scene.add( listener );
+							scene.add( mesh );
+
+							ready = true;
+
+						}, onProgress, onError );
+
+					}, onProgress, onError );
+
+				}, onProgress, onError );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				if ( ready ) {
+
+					helper.animate( clock.getDelta() );
+
+				}
+
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

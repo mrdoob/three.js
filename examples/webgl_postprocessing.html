@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -13,7 +14,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DotScreenShader.js"></script>
@@ -36,6 +37,7 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -96,14 +98,13 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				var time = Date.now();
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

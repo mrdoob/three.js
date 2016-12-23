@@ -24,8 +24,7 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 5px; width: 100%;
 				z-index:100;
 			}
 
@@ -37,7 +36,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -50,7 +49,7 @@
 
 		<script src="js/Detector.js"></script>
 
-		<video id="video" autoplay loop style="display:none">
+		<video id="video" autoplay loop webkit-playsinline style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
@@ -99,17 +98,16 @@
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
 
-				texture = new THREE.Texture( video );
+				texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
-				texture.generateMipmaps = false;
 
 				//
 
@@ -123,10 +121,7 @@
 				xsize = 480 / xgrid;
 				ysize = 204 / ygrid;
 
-				var parameters = { color: 0xffffff, map: texture },
-					material_base = new THREE.MeshLambertMaterial( parameters );
-
-				renderer.initMaterial( material_base, scene.__lights, scene.fog );
+				var parameters = { color: 0xffffff, map: texture };
 
 				cube_count = 0;
 
@@ -137,7 +132,7 @@
 					oy = j;
 
 					geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
-					
+
 					change_uvs( geometry, ux, uy, ox, oy );
 
 					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
@@ -254,12 +249,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
-
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-					if ( texture ) texture.needsUpdate = true;
-
-				}
 
 				for ( i = 0; i < cube_count; i ++ ) {
 

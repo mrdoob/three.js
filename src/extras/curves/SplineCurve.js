@@ -1,33 +1,37 @@
-/**************************************************************
- *	Spline curve
- **************************************************************/
+import { Curve } from '../core/Curve';
+import { CatmullRom } from '../core/Interpolations';
+import { Vector2 } from '../../math/Vector2';
 
-THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 
-	this.points = (points == undefined) ? [] : points;
+function SplineCurve( points /* array of Vector2 */ ) {
+
+	this.points = ( points === undefined ) ? [] : points;
+
+}
+
+SplineCurve.prototype = Object.create( Curve.prototype );
+SplineCurve.prototype.constructor = SplineCurve;
+
+SplineCurve.prototype.isSplineCurve = true;
+
+SplineCurve.prototype.getPoint = function ( t ) {
+
+	var points = this.points;
+	var point = ( points.length - 1 ) * t;
+
+	var intPoint = Math.floor( point );
+	var weight = point - intPoint;
+
+	var point0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
+	var point1 = points[ intPoint ];
+	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
+	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+
+	return new Vector2(
+		CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
+		CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
+	);
 
 };
 
-THREE.SplineCurve.prototype = Object.create( THREE.Curve.prototype );
-
-THREE.SplineCurve.prototype.getPoint = function ( t ) {
-
-	var v = new THREE.Vector2();
-	var c = [];
-	var points = this.points, point, intPoint, weight;
-	point = ( points.length - 1 ) * t;
-
-	intPoint = Math.floor( point );
-	weight = point - intPoint;
-
-	c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
-	c[ 1 ] = intPoint;
-	c[ 2 ] = intPoint  > points.length - 2 ? points.length -1 : intPoint + 1;
-	c[ 3 ] = intPoint  > points.length - 3 ? points.length -1 : intPoint + 2;
-
-	v.x = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
-	v.y = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
-
-	return v;
-
-};
+export { SplineCurve };

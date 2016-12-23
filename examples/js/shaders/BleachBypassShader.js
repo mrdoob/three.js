@@ -10,8 +10,8 @@ THREE.BleachBypassShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"opacity":  { type: "f", value: 1.0 }
+		"tDiffuse": { value: null },
+		"opacity":  { value: 1.0 }
 
 	},
 
@@ -26,7 +26,7 @@ THREE.BleachBypassShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -59,6 +59,6 @@ THREE.BleachBypassShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

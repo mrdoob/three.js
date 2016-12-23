@@ -16,7 +16,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -51,7 +51,7 @@
 				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -74,16 +74,14 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 			//
 

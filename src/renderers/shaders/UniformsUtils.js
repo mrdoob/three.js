@@ -2,17 +2,17 @@
  * Uniform Utilities
  */
 
-THREE.UniformsUtils = {
+var UniformsUtils = {
 
 	merge: function ( uniforms ) {
 
-		var u, p, tmp, merged = {};
+		var merged = {};
 
-		for ( u = 0; u < uniforms.length; u ++ ) {
+		for ( var u = 0; u < uniforms.length; u ++ ) {
 
-			tmp = this.clone( uniforms[ u ] );
+			var tmp = this.clone( uniforms[ u ] );
 
-			for ( p in tmp ) {
+			for ( var p in tmp ) {
 
 				merged[ p ] = tmp[ p ];
 
@@ -26,26 +26,24 @@ THREE.UniformsUtils = {
 
 	clone: function ( uniforms_src ) {
 
-		var u, p, parameter, parameter_src, uniforms_dst = {};
+		var uniforms_dst = {};
 
-		for ( u in uniforms_src ) {
+		for ( var u in uniforms_src ) {
 
 			uniforms_dst[ u ] = {};
 
-			for ( p in uniforms_src[ u ] ) {
+			for ( var p in uniforms_src[ u ] ) {
 
-				parameter_src = uniforms_src[ u ][ p ];
+				var parameter_src = uniforms_src[ u ][ p ];
 
-				if ( parameter_src instanceof THREE.Color ||
-					 parameter_src instanceof THREE.Vector2 ||
-					 parameter_src instanceof THREE.Vector3 ||
-					 parameter_src instanceof THREE.Vector4 ||
-					 parameter_src instanceof THREE.Matrix4 ||
-					 parameter_src instanceof THREE.Texture ) {
+				if ( parameter_src && ( parameter_src.isColor ||
+					parameter_src.isMatrix3 || parameter_src.isMatrix4 ||
+					parameter_src.isVector2 || parameter_src.isVector3 || parameter_src.isVector4 ||
+					parameter_src.isTexture ) ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 
-				} else if ( parameter_src instanceof Array ) {
+				} else if ( Array.isArray( parameter_src ) ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.slice();
 
@@ -64,3 +62,6 @@ THREE.UniformsUtils = {
 	}
 
 };
+
+
+export { UniformsUtils };

@@ -11,9 +11,9 @@ THREE.HueSaturationShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { type: "t", value: null },
-		"hue":        { type: "f", value: 0 },
-		"saturation": { type: "f", value: 0 }
+		"tDiffuse":   { value: null },
+		"hue":        { value: 0 },
+		"saturation": { value: 0 }
 
 	},
 
@@ -29,7 +29,7 @@ THREE.HueSaturationShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -64,6 +64,6 @@ THREE.HueSaturationShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

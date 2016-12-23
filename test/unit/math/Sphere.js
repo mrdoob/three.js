@@ -69,6 +69,17 @@ test( "intersectsSphere", function() {
 	ok( ! a.intersectsSphere( c ) , "Passed!" );
 });
 
+test( "intersectsPlane", function() {
+	var a = new THREE.Sphere( zero3.clone(), 1 );
+	var b = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 1 );
+	var c = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 1.25 );
+	var d = new THREE.Plane( new THREE.Vector3( 0, -1, 0 ), 1.25 );
+
+	ok( a.intersectsPlane( b ) , "Passed!" );
+	ok( ! a.intersectsPlane( c ) , "Passed!" );
+	ok( ! a.intersectsPlane( d ) , "Passed!" );
+});
+
 test( "clampPoint", function() {
 	var a = new THREE.Sphere( one3.clone(), 1 );
 
@@ -81,7 +92,7 @@ test( "getBoundingBox", function() {
 
 	ok( a.getBoundingBox().equals( new THREE.Box3( zero3, two3 ) ), "Passed!" );
 
-	a.set( zero3, 0 )
+	a.set( zero3, 0 );
 	ok( a.getBoundingBox().equals( new THREE.Box3( zero3, zero3 ) ), "Passed!" );
 });
 

@@ -1,26 +1,32 @@
+import { Texture } from './Texture';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
+function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
-	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
 	this.image = { width: width, height: height };
 	this.mipmaps = mipmaps;
 
-	this.generateMipmaps = false; // WebGL currently can't generate mipmaps for compressed textures, they must be embedded in DDS file
+	// no flipping for cube textures
+	// (also flipping doesn't work for compressed textures )
 
-};
+	this.flipY = false;
 
-THREE.CompressedTexture.prototype = Object.create( THREE.Texture.prototype );
+	// can't generate mipmaps for compressed textures
+	// mips must be embedded in DDS files
 
-THREE.CompressedTexture.prototype.clone = function () {
+	this.generateMipmaps = false;
 
-	var texture = new THREE.CompressedTexture();
+}
 
-	THREE.Texture.prototype.clone.call( this, texture );
+CompressedTexture.prototype = Object.create( Texture.prototype );
+CompressedTexture.prototype.constructor = CompressedTexture;
 
-	return texture;
+CompressedTexture.prototype.isCompressedTexture = true;
 
-};
+
+export { CompressedTexture };

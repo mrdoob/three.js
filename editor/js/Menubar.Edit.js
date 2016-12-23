@@ -1,102 +1,205 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Edit = function ( editor ) {
 
-	// event handlers
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
 
-	// function onUndoOptionClick () {
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'Edit' );
+	container.add( title );
 
-	// 	console.log( 'UNDO not implemented yet' );
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
 
-	// }
+	// Undo
 
-	// function onRedoOptionClick () {
+	var undo = new UI.Row();
+	undo.setClass( 'option' );
+	undo.setTextContent( 'Undo (Ctrl+Z)' );
+	undo.onClick( function () {
 
-	// 	console.log( 'REDO not implemented yet' );
+		editor.undo();
 
-	// }
+	} );
+	options.add( undo );
 
-	function onCloneOptionClick () {
+	// Redo
+
+	var redo = new UI.Row();
+	redo.setClass( 'option' );
+	redo.setTextContent( 'Redo (Ctrl+Shift+Z)' );
+	redo.onClick( function () {
+
+		editor.redo();
+
+	} );
+	options.add( redo );
+
+	// Clear History
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Clear History' );
+	option.onClick( function () {
+
+		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
+
+			editor.history.clear();
+
+		}
+
+	} );
+	options.add( option );
+
+
+	editor.signals.historyChanged.add( function () {
+
+		var history = editor.history;
+
+		undo.setClass( 'option' );
+		redo.setClass( 'option' );
+
+		if ( history.undos.length == 0 ) {
+
+			undo.setClass( 'inactive' );
+
+		}
+
+		if ( history.redos.length == 0 ) {
+
+			redo.setClass( 'inactive' );
+
+		}
+
+	} );
+
+	// ---
+
+	options.add( new UI.HorizontalRule() );
+
+	// Clone
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Clone' );
+	option.onClick( function () {
 
 		var object = editor.selected;
 
-		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+		if ( object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 
-		editor.addObject( object );
-		editor.select( object );
+		editor.execute( new AddObjectCommand( object ) );
 
-	}
+	} );
+	options.add( option );
 
-	function onDeleteOptionClick () {
+	// Delete
 
-		var parent = editor.selected.parent;
-		editor.removeObject( editor.selected );
-		editor.select( parent );
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Delete (Del)' );
+	option.onClick( function () {
 
-	}
-
-	function onConvertOptionClick () {
-
-		// convert to BufferGeometry
-		
 		var object = editor.selected;
-		if ( object.geometry instanceof THREE.Geometry ) {
 
-			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
-			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
+		var parent = object.parent;
+		if ( parent === undefined ) return; // avoid deleting the camera or scene
 
-			delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+		editor.execute( new RemoveObjectCommand( object ) );
 
-			object.geometry = THREE.BufferGeometryUtils.fromGeometry( object.geometry );
+	} );
+	options.add( option );
 
-			editor.signals.objectChanged.dispatch( object );
+	// Minify shaders
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Minify Shaders' );
+	option.onClick( function() {
+
+		var root = editor.selected || editor.scene;
+
+		var errors = [];
+		var nMaterialsChanged = 0;
+
+		var path = [];
+
+		function getPath ( object ) {
+
+			path.length = 0;
+
+			var parent = object.parent;
+			if ( parent !== undefined ) getPath( parent );
+
+			path.push( object.name || object.uuid );
+
+			return path;
+
 		}
 
-	}
+		var cmds = [];
+		root.traverse( function ( object ) {
 
-	function onFlattenOptionClick () {
+			var material = object.material;
 
-		var object = editor.selected;
+			if ( material instanceof THREE.ShaderMaterial ) {
 
-		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+				try {
 
-		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
+					var shader = glslprep.minifyGlsl( [
+							material.vertexShader, material.fragmentShader ] );
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+					cmds.push( new SetMaterialValueCommand( object, 'vertexShader', shader[ 0 ] ) );
+					cmds.push( new SetMaterialValueCommand( object, 'fragmentShader', shader[ 1 ] ) );
 
-		var geometry = object.geometry.clone();
-		geometry.applyMatrix( object.matrix );
+					++nMaterialsChanged;
 
-		object.geometry = geometry;
+				} catch ( e ) {
 
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.scale.set( 1, 1, 1 );
+					var path = getPath( object ).join( "/" );
 
-		editor.signals.objectChanged.dispatch( object );
+					if ( e instanceof glslprep.SyntaxError )
 
-	}
+						errors.push( path + ":" +
+								e.line + ":" + e.column + ": " + e.message );
 
-	// configure menu contents
+					else {
 
-	var createOption = UI.MenubarHelper.createOption;
-	var createDivider = UI.MenubarHelper.createDivider;
+						errors.push( path +
+								": Unexpected error (see console for details)." );
 
-	var menuConfig = [
-		// createOption( 'Undo', onUndoOptionClick ),
-		// createOption( 'Redo', onRedoOptionClick ),
-		// createDivider(),
+						console.error( e.stack || e );
 
-		createOption( 'Clone', onCloneOptionClick ),
-		createOption( 'Delete', onDeleteOptionClick ),
-		createDivider(),
+					}
 
-		createOption( 'Convert', onConvertOptionClick ),
-		createOption( 'Flatten', onFlattenOptionClick )
-	];
+				}
 
-	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+			}
 
-	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
-}
+		} );
+
+		if ( nMaterialsChanged > 0 ) {
+
+			editor.execute( new MultiCmdsCommand( cmds ), 'Minify Shaders' );
+
+		}
+
+		window.alert( nMaterialsChanged +
+				" material(s) were changed.\n" + errors.join( "\n" ) );
+
+	} );
+	options.add( option );
+
+
+	return container;
+
+};

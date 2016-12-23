@@ -1,51 +1,65 @@
+import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D';
+import { SpriteMaterial } from '../materials/SpriteMaterial';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = ( function () {
+function Sprite( material ) {
 
-	var vertices = new THREE.Float32Attribute( 3, 3 );
-	vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	Object3D.call( this );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', vertices );
+	this.type = 'Sprite';
 
-	return function ( material ) {
+	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-		THREE.Object3D.call( this );
+}
 
-		this.geometry = geometry;
-		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	};
+	constructor: Sprite,
 
-} )();
+	isSprite: true,
 
-THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
+	raycast: ( function () {
 
-/*
- * Custom update matrix
- */
+		var matrixPosition = new Vector3();
 
-THREE.Sprite.prototype.updateMatrix = function () {
+		return function raycast( raycaster, intersects ) {
 
-	this.matrix.compose( this.position, this.quaternion, this.scale );
+			matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
-	this.matrixWorldNeedsUpdate = true;
+			var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
+			var guessSizeSq = this.scale.x * this.scale.y / 4;
 
-};
+			if ( distanceSq > guessSizeSq ) {
 
-THREE.Sprite.prototype.clone = function ( object ) {
+				return;
 
-	if ( object === undefined ) object = new THREE.Sprite( this.material );
+			}
 
-	THREE.Object3D.prototype.clone.call( this, object );
+			intersects.push( {
 
-	return object;
+				distance: Math.sqrt( distanceSq ),
+				point: this.position,
+				face: null,
+				object: this
 
-};
+			} );
 
-// Backwards compatibility
+		};
 
-THREE.Particle = THREE.Sprite;
+	}() ),
+
+	clone: function () {
+
+		return new this.constructor( this.material ).copy( this );
+
+	}
+
+} );
+
+
+export { Sprite };

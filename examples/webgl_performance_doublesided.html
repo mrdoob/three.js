@@ -12,16 +12,11 @@
 				font-weight: bold;
 				overflow:hidden;
 			}
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #eee !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -58,6 +53,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( new THREE.AmbientLight( 0x050505 ) );
+
 				var light = new THREE.PointLight( 0x0011ff, 1, 5500 );
 				light.position.set( 4000, 0, 0 );
 				scene.add( light );
@@ -78,12 +75,10 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				reflectionCube.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
-				material.wrapAround = true;
-				material.wrapRGB.set( 0.5, 0.5, 0.5 );
 
 				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
 
@@ -107,7 +102,8 @@
 				}
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x050505, 1 );
+				renderer.setClearColor( 0x050505 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.gammaInput = true;
@@ -116,7 +112,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );

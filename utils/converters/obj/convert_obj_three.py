@@ -15,7 +15,6 @@ Notes:
         -a center|centerxz|top|bottom|none model alignment
         -s smooth|flat			smooth = export vertex normals, flat = no normals (face normals computed in loader)
         -t ascii|binary			export ascii or binary format (ascii has more features, binary just supports vertices, faces, normals, uvs and materials)
-        -d invert|normal		invert transparency
         -b						bake material colors into face colors
         -x 10.0                 scale and truncate
         -f 2                    morph frame sampling step
@@ -23,7 +22,6 @@ Notes:
     - by default:
         use smooth shading (if there were vertex normals in the original model)
         will be in ASCII format
-        original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
         no face colors baking
         no scale and truncate
         morph frame step = 1 (all files will be processed)
@@ -55,7 +53,7 @@ How to use generated JS file in your HTML document
 
         function createScene( geometry, materials ) {
 
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+            var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
 
         }
 
@@ -138,7 +136,6 @@ import glob
 ALIGN = "none"        	# center centerxz bottom top none
 SHADING = "smooth"      # smooth flat
 TYPE = "ascii"          # ascii binary
-TRANSPARENCY = "normal" # normal invert
 
 TRUNCATE = False
 SCALE = 1.0
@@ -362,9 +359,21 @@ def parse_mtl(fname):
 
     materials = {}
 
+    previous_line = ""
     for line in fileinput.input(fname):
-        chunks = line.split()
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
+        # Only split once initially for single-parameter tags that might have additional spaces in
+        # their values (i.e. "newmtl Material with spaces").
+        chunks = line.split(None, 1)
         if len(chunks) > 0:
+
+            if len(chunks) > 1:
+                chunks[1] = chunks[1].strip()
 
             # Material start
             # newmtl identifier
@@ -376,15 +385,35 @@ def parse_mtl(fname):
                 if not identifier in materials:
                     materials[identifier] = {}
 
+            # Diffuse texture
+            # map_Kd texture_diffuse.jpg
+            if chunks[0] == "map_Kd" and len(chunks) == 2:
+                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
+
+            # Specular texture
+            # map_Ks texture_specular.jpg
+            if chunks[0] == "map_Ks" and len(chunks) == 2:
+                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
+
+            # Alpha texture
+            # map_d texture_alpha.png
+            if chunks[0] == "map_d" and len(chunks) == 2:
+                materials[identifier]["transparent"] = True
+                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
+
+            # Bump texture
+            # map_bump texture_bump.jpg or bump texture_bump.jpg
+            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
+                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
+
+            # Split the remaining parameters.
+            if len(chunks) > 1:
+                chunks = [chunks[0]] + chunks[1].split()
+
             # Diffuse color
             # Kd 1.000 1.000 1.000
             if chunks[0] == "Kd" and len(chunks) == 4:
                 materials[identifier]["colorDiffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
-
-            # Ambient color
-            # Ka 1.000 1.000 1.000
-            if chunks[0] == "Ka" and len(chunks) == 4:
-                materials[identifier]["colorAmbient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular color
             # Ks 1.000 1.000 1.000
@@ -396,44 +425,24 @@ def parse_mtl(fname):
             if chunks[0] == "Ns" and len(chunks) == 2:
                 materials[identifier]["specularCoef"] = float(chunks[1])
 
+            # Dissolves
+            # d 0.9
+            if chunks[0] == "d" and len(chunks) == 2:
+                materials[identifier]["opacity"] = float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
+
             # Transparency
-            # Tr 0.9 or d 0.9
-            if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
-                materials[identifier]["transparent"] = True
-                if TRANSPARENCY == "invert":
-                    materials[identifier]["transparency"] = 1.0 - float(chunks[1])
-                else:
-                    materials[identifier]["transparency"] = float(chunks[1])
+            # Tr 0.1
+            if chunks[0] == "Tr" and len(chunks) == 2:
+                materials[identifier]["opacity"] = 1.0 - float(chunks[1])
+                if materials[identifier]["opacity"] < 1.0:
+                    materials[identifier]["transparent"] = True
 
             # Optical density
             # Ni 1.0
             if chunks[0] == "Ni" and len(chunks) == 2:
                 materials[identifier]["opticalDensity"] = float(chunks[1])
-
-            # Diffuse texture
-            # map_Kd texture_diffuse.jpg
-            if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
-
-            # Ambient texture
-            # map_Ka texture_ambient.jpg
-            if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
-
-            # Specular texture
-            # map_Ks texture_specular.jpg
-            if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
-
-            # Alpha texture
-            # map_d texture_alpha.png
-            if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
-
-            # Bump texture
-            # map_bump texture_bump.jpg or bump texture_bump.jpg
-            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
 
             # Illumination
             # illum 2
@@ -505,9 +514,50 @@ def parse_obj(fname):
     object = 0
     smooth = 0
 
+    previous_line = ""
     for line in fileinput.input(fname):
-        chunks = line.split()
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
+        # Only split once initially for single-parameter tags that might have additional spaces in
+        # their values (i.e. "usemtl Material with spaces").
+        chunks = line.split(None, 1)
         if len(chunks) > 0:
+
+            if len(chunks) > 1:
+                chunks[1] = chunks[1].strip()
+
+            # Group
+            if chunks[0] == "g" and len(chunks) == 2:
+                group = chunks[1]
+
+            # Object
+            if chunks[0] == "o" and len(chunks) == 2:
+                object = chunks[1]
+
+            # Materials definition
+            if chunks[0] == "mtllib" and len(chunks) == 2:
+                mtllib = chunks[1]
+
+            # Material
+            if chunks[0] == "usemtl":
+                if len(chunks) > 1:
+                    material = chunks[1]
+                else:
+                    material = ""
+                if not material in materials:
+                    mcurrent = mcounter
+                    materials[material] = mcounter
+                    mcounter += 1
+                else:
+                    mcurrent = materials[material]
+
+            # Split the remaining parameters.
+            if len(chunks) > 1:
+                chunks = [chunks[0]] + chunks[1].split()
 
             # Vertices as (x,y,z) coordinates
             # v 0.123 0.234 0.345
@@ -572,31 +622,6 @@ def parse_obj(fname):
                     'object':object,
                     'smooth':smooth,
                     })
-
-            # Group
-            if chunks[0] == "g" and len(chunks) == 2:
-                group = chunks[1]
-
-            # Object
-            if chunks[0] == "o" and len(chunks) == 2:
-                object = chunks[1]
-
-            # Materials definition
-            if chunks[0] == "mtllib" and len(chunks) == 2:
-                mtllib = chunks[1]
-
-            # Material
-            if chunks[0] == "usemtl":
-                if len(chunks) > 1:
-                    material = chunks[1]
-                else:
-                    material = ""
-                if not material in materials:
-                    mcurrent = mcounter
-                    materials[material] = mcounter
-                    mcounter += 1
-                else:
-                    mcurrent = materials[material]
 
             # Smooth shading
             if chunks[0] == "s" and len(chunks) == 2:
@@ -1512,7 +1537,7 @@ if __name__ == "__main__":
 
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "truncatescale=", "framestep="])
 
     except getopt.GetoptError:
         usage()
@@ -1551,10 +1576,6 @@ if __name__ == "__main__":
             if a in ("binary", "ascii"):
                 TYPE = a
 
-        elif o in ("-d", "--dissolve"):
-            if a in ("normal", "invert"):
-                TRANSPARENCY = a
-
         elif o in ("-b", "--bakecolors"):
             BAKE_COLORS = True
 
@@ -1581,4 +1602,3 @@ if __name__ == "__main__":
         convert_ascii(infile, morphfiles, colorfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
-

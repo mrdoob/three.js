@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 	<head>
 		<title>three.js - ASCII Effect</title>
 		<meta charset="utf-8">
@@ -16,11 +15,13 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
-
 		<script src="js/effects/AsciiEffect.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -69,17 +70,18 @@
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 10 ), new THREE.MeshLambertMaterial( { shading: THREE.FlatShading } ) );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 10 ), new THREE.MeshLambertMaterial() );
 				scene.add( sphere );
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.position.y = - 200;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( width, height );
 				// container.appendChild( renderer.domElement );
 
@@ -88,9 +90,7 @@
 				container.appendChild( effect.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -114,8 +114,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 

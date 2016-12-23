@@ -1,13 +1,20 @@
-Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-	var container = new UI.Panel();
+Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
+
+	var signals = editor.signals;
+
+	var container = new UI.Row();
 
 	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Panel();
-	var radius = new UI.Number( geometry.parameters.radius ).onChange( update );
+	var radiusRow = new UI.Row();
+	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -16,38 +23,38 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	// tube
 
-	var tubeRow = new UI.Panel();
-	var tube = new UI.Number( geometry.parameters.tube ).onChange( update );
+	var tubeRow = new UI.Row();
+	var tube = new UI.Number( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ) );
 	tubeRow.add( tube );
 
 	container.add( tubeRow );
 
-	// radialSegments
-
-	var radialSegmentsRow = new UI.Panel();
-	var radialSegments = new UI.Integer( geometry.parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
-
-	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
-	radialSegmentsRow.add( radialSegments );
-
-	container.add( radialSegmentsRow );
-
 	// tubularSegments
 
-	var tubularSegmentsRow = new UI.Panel();
-	var tubularSegments = new UI.Integer( geometry.parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	var tubularSegmentsRow = new UI.Row();
+	var tubularSegments = new UI.Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
 
+	// radialSegments
+
+	var radialSegmentsRow = new UI.Row();
+	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+
+	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
+	radialSegmentsRow.add( radialSegments );
+
+	container.add( radialSegmentsRow );
+
 	// p
 
-	var pRow = new UI.Panel();
-	var p = new UI.Number( geometry.parameters.p ).onChange( update );
+	var pRow = new UI.Row();
+	var p = new UI.Number( parameters.p ).onChange( update );
 
 	pRow.add( new UI.Text( 'P' ).setWidth( '90px' ) );
 	pRow.add( p );
@@ -56,49 +63,32 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	// q
 
-	var qRow = new UI.Panel();
-	var q = new UI.Number( geometry.parameters.q ).onChange( update );
+	var qRow = new UI.Row();
+	var q = new UI.Number( parameters.q ).onChange( update );
 
 	pRow.add( new UI.Text( 'Q' ).setWidth( '90px' ) );
 	pRow.add( q );
 
 	container.add( qRow );
 
-	// heightScale
-
-	var heightScaleRow = new UI.Panel();
-	var heightScale = new UI.Number( geometry.parameters.heightScale ).onChange( update );
-
-	pRow.add( new UI.Text( 'Height scale' ).setWidth( '90px' ) );
-	pRow.add( heightScale );
-
-	container.add( heightScaleRow );
-
 
 	//
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusKnotGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
-			radialSegments.getValue(),
 			tubularSegments.getValue(),
+			radialSegments.getValue(),
 			p.getValue(),
-			q.getValue(),
-			heightScale.getValue()
-		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
+			q.getValue()
+		) ) );
 
 	}
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.TorusKnotBufferGeometry = Sidebar.Geometry.TorusKnotGeometry;

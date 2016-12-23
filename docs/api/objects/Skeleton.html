@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Use an array of [page:Bone bones] to create a skeleton that can be used by a
+		[page:SkinnedMesh].
+		</div>
+
+		<h2>Example</h2>
+		<div>
+
+<code>
+// Create a simple "arm"
+
+var bones = [];
+
+var shoulder = new THREE.Bone();
+var elbow = new THREE.Bone();
+var hand = new THREE.Bone();
+
+shoulder.add( elbow );
+elbow.add( hand );
+
+bones.push( shoulder );
+bones.push( elbow );
+bones.push( hand );
+
+shoulder.position.y = -5;
+elbow.position.y = 0;
+hand.position.y = 5;
+
+var armSkeleton = new THREE.Skeleton( bones );
+</code>
+			See the [page:SkinnedMesh] page for an example of usage with standard [page:BufferGeometry].
+ 		</div>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Array bones], [page:Array boneInverses], [page:Boolean useVertexTexture]  )</h3>
+		<div>
+		[page:Array bones] - The array of [page:Bone bones]. Default is an empty array.<br/>
+		[page:Array boneInverses] - (optional) An array of [page:Matrix4 Matrix4s].<br/>
+		[page:Boolean useVertexTexture] - (optional) Whether or not to use a vertex texture in the shader.
+		Default is true.<br /><br />
+
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array bones]</h3>
+		<div>
+		The array of [page:bone bones]. Note this is a copy of the original array, not a reference,
+		so you can modify the original array without effecting this one.
+		</div>
+
+		<h3>[property:Array boneInverses]</h3>
+		<div>
+		An array of [page:Matrix4 Matrix4s] that represent the inverse of the [page:Matrix4 matrixWorld]
+		of the individual bones.
+		</div>
+
+		<h3>[property:Float32Array boneMatrices]</h3>
+		<div>
+		The array buffer holding the bone data when using a vertex texture.
+		</div>
+
+		<h3>[property:DataTexture boneTexture]</h3>
+		<div>
+		The [page:DataTexture] holding the bone data when using a vertex texture.
+		</div>
+
+		<h3>[property:Integer boneTextureHeight]</h3>
+		<div>
+		The height of the vertex data texture.
+		</div>
+
+		<h3>[property:Integer boneTextureWidth]</h3>
+		<div>
+		The width of the vertex data texture.
+		</div>
+
+		<h3>[property:Boolean useVertexTexture]</h3>
+		<div>
+		Whether or not to use a vertex texture in the shader, set in the constructor.
+		Not all devices	support floating point pixel textures. If this option is set then
+		the bone matrices will be packed into	a texture and sent to the shader. This method
+		allows a much larger set of bones to be used. Otherwise	the vertex shader will use
+		uniforms, which do not allow for as many bones to be used. The exact numbers vary
+		between devices.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Skeleton clone]()</h3>
+		<div>
+		Returns a clone of this Skeleton object.
+		</div>
+
+
+		<h3>[method:null calculateInverses]()</h3>
+		<div>Generates the [page:.boneInverses boneInverses] array if not provided in the constructor.</div>
+
+
+		<h3>[method:null pose]()</h3>
+		<div>Returns the skeleton to the base pose.</div>
+
+
+		<h3>[method:null update]()</h3>
+		<div>
+		Updates the [page:Float32Array boneMatrices] and [page:DataTexture boneTexture] after changing the bones.
+		This is called automatically by the [page:WebGLRenderer] if the skeleton is used with a [page:SkinnedMesh].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

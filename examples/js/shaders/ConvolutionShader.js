@@ -11,15 +11,15 @@ THREE.ConvolutionShader = {
 	defines: {
 
 		"KERNEL_SIZE_FLOAT": "25.0",
-		"KERNEL_SIZE_INT": "25",
+		"KERNEL_SIZE_INT": "25"
 
 	},
 
 	uniforms: {
 
-		"tDiffuse":        { type: "t", value: null },
-		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
-		"cKernel":         { type: "fv1", value: [] }
+		"tDiffuse":        { value: null },
+		"uImageIncrement": { value: new THREE.Vector2( 0.001953125, 0.0 ) },
+		"cKernel":         { value: [] }
 
 	},
 
@@ -36,7 +36,7 @@ THREE.ConvolutionShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -64,7 +64,7 @@ THREE.ConvolutionShader = {
 		"}"
 
 
-	].join("\n"),
+	].join( "\n" ),
 
 	buildKernel: function ( sigma ) {
 
@@ -83,7 +83,7 @@ THREE.ConvolutionShader = {
 
 		values = new Array( kernelSize );
 		sum = 0.0;
-		for ( i = 0; i < kernelSize; ++i ) {
+		for ( i = 0; i < kernelSize; ++ i ) {
 
 			values[ i ] = gauss( i - halfWidth, sigma );
 			sum += values[ i ];
@@ -92,7 +92,7 @@ THREE.ConvolutionShader = {
 
 		// normalize the kernel
 
-		for ( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
+		for ( i = 0; i < kernelSize; ++ i ) values[ i ] /= sum;
 
 		return values;
 

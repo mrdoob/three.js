@@ -16,7 +16,7 @@ THREE.BasicShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -26,6 +26,6 @@ THREE.BasicShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

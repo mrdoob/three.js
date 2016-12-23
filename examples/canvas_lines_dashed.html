@@ -31,7 +31,10 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
@@ -68,7 +71,7 @@
 
 				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var spline = new THREE.Spline( points );
+				var spline = new THREE.CatmullRomCurve3( points );
 				var geometrySpline = new THREE.Geometry();
 
 				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
@@ -85,27 +88,26 @@
 				geometryCube.computeLineDistances();
 				geometrySpline.computeLineDistances();
 
-				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ), THREE.LineStrip );
+				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 
 				objects.push( object );
 				scene.add( object );
 
-				var object = new THREE.Line( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ), THREE.LinePieces );
+				var object = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
 
 				objects.push( object );
 				scene.add( object );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0x111111, 1 );
+				renderer.setClearColor( 0x111111 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

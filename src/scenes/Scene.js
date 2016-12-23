@@ -1,130 +1,51 @@
+import { Object3D } from '../core/Object3D';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Scene = function () {
+function Scene () {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
+	this.type = 'Scene';
+
+	this.background = null;
 	this.fog = null;
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
-	this.matrixAutoUpdate = false;
 
-	this.__lights = [];
+}
 
-	this.__objectsAdded = [];
-	this.__objectsRemoved = [];
+Scene.prototype = Object.create( Object3D.prototype );
 
-};
+Scene.prototype.constructor = Scene;
 
-THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
+Scene.prototype.copy = function ( source, recursive ) {
 
-THREE.Scene.prototype.__addObject = function ( object ) {
+	Object3D.prototype.copy.call( this, source, recursive );
 
-	if ( object instanceof THREE.Light ) {
+	if ( source.background !== null ) this.background = source.background.clone();
+	if ( source.fog !== null ) this.fog = source.fog.clone();
+	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		if ( this.__lights.indexOf( object ) === - 1 ) {
+	this.autoUpdate = source.autoUpdate;
+	this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-			this.__lights.push( object );
-
-		}
-
-		if ( object.target && object.target.parent === undefined ) {
-
-			this.add( object.target );
-
-		}
-
-	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
-
-		this.__objectsAdded.push( object );
-
-		// check if previously removed
-
-		var i = this.__objectsRemoved.indexOf( object );
-
-		if ( i !== -1 ) {
-
-			this.__objectsRemoved.splice( i, 1 );
-
-		}
-
-	}
-
-	this.dispatchEvent( { type: 'objectAdded', object: object } );
-	object.dispatchEvent( { type: 'addedToScene', scene: this } );
-
-	for ( var c = 0; c < object.children.length; c ++ ) {
-
-		this.__addObject( object.children[ c ] );
-
-	}
+	return this;
 
 };
 
-THREE.Scene.prototype.__removeObject = function ( object ) {
+Scene.prototype.toJSON = function ( meta ) {
 
-	if ( object instanceof THREE.Light ) {
+	var data = Object3D.prototype.toJSON.call( this, meta );
 
-		var i = this.__lights.indexOf( object );
+	if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-		if ( i !== -1 ) {
-
-			this.__lights.splice( i, 1 );
-
-		}
-
-		if ( object.shadowCascadeArray ) {
-
-			for ( var x = 0; x < object.shadowCascadeArray.length; x ++ ) {
-
-				this.__removeObject( object.shadowCascadeArray[ x ] );
-
-			}
-
-		}
-
-	} else if ( !( object instanceof THREE.Camera ) ) {
-
-		this.__objectsRemoved.push( object );
-
-		// check if previously added
-
-		var i = this.__objectsAdded.indexOf( object );
-
-		if ( i !== -1 ) {
-
-			this.__objectsAdded.splice( i, 1 );
-
-		}
-
-	}
-
-	this.dispatchEvent( { type: 'objectRemoved', object: object } );
-	object.dispatchEvent( { type: 'removedFromScene', scene: this } );
-
-	for ( var c = 0; c < object.children.length; c ++ ) {
-
-		this.__removeObject( object.children[ c ] );
-
-	}
+	return data;
 
 };
 
-THREE.Scene.prototype.clone = function ( object ) {
-
-	if ( object === undefined ) object = new THREE.Scene();
-
-	THREE.Object3D.prototype.clone.call(this, object);
-
-	if ( this.fog !== null ) object.fog = this.fog.clone();
-	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();
-
-	object.autoUpdate = this.autoUpdate;
-	object.matrixAutoUpdate = this.matrixAutoUpdate;
-
-	return object;
-
-};
+export { Scene };

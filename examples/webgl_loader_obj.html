@@ -30,15 +30,12 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -58,7 +55,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 100;
+				camera.position.z = 250;
 
 				// scene
 
@@ -81,6 +78,17 @@
 				};
 
 				var texture = new THREE.Texture();
+
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+
+				var onError = function ( xhr ) {
+				};
+
 
 				var loader = new THREE.ImageLoader( manager );
 				loader.load( 'textures/UV_Grid_Sm.jpg', function ( image ) {
@@ -105,14 +113,15 @@
 
 					} );
 
-					object.position.y = - 80;
+					object.position.y = - 95;
 					scene.add( object );
 
-				} );
+				}, onProgress, onError );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

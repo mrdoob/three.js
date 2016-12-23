@@ -8,8 +8,8 @@ THREE.CopyShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"opacity":  { type: "f", value: 1.0 }
+		"tDiffuse": { value: null },
+		"opacity":  { value: 1.0 }
 
 	},
 
@@ -24,7 +24,7 @@ THREE.CopyShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -41,6 +41,6 @@ THREE.CopyShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

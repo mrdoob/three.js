@@ -1,18 +1,21 @@
+import { Box3 } from './Box3';
+import { Vector3 } from './Vector3';
+
 /**
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Sphere = function ( center, radius ) {
+function Sphere( center, radius ) {
 
-	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
+	this.center = ( center !== undefined ) ? center : new Vector3();
 	this.radius = ( radius !== undefined ) ? radius : 0;
 
-};
+}
 
-THREE.Sphere.prototype = {
+Sphere.prototype = {
 
-	constructor: THREE.Sphere,
+	constructor: Sphere,
 
 	set: function ( center, radius ) {
 
@@ -20,14 +23,14 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
-	},
 
+	},
 
 	setFromPoints: function () {
 
-		var box = new THREE.Box3();
+		var box = new Box3();
 
-		return function ( points, optionalCenter )  {
+		return function setFromPoints( points, optionalCenter ) {
 
 			var center = this.center;
 
@@ -37,7 +40,7 @@ THREE.Sphere.prototype = {
 
 			} else {
 
-				box.setFromPoints( points ).center( center );
+				box.setFromPoints( points ).getCenter( center );
 
 			}
 
@@ -51,11 +54,17 @@ THREE.Sphere.prototype = {
 
 			this.radius = Math.sqrt( maxRadiusSq );
 
-			return this;			
- 		
- 		};
+			return this;
+
+		};
 
 	}(),
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
 
 	copy: function ( sphere ) {
 
@@ -92,11 +101,32 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsBox: function ( box ) {
+
+		return box.intersectsSphere( this );
+
+	},
+
+	intersectsPlane: function ( plane ) {
+
+		// We use the following equation to compute the signed distance from
+		// the center of the sphere to the plane.
+		//
+		// distance = q * n - d
+		//
+		// If this distance is greater than the radius of the sphere,
+		// then there is no intersection.
+
+		return Math.abs( this.center.dot( plane.normal ) - plane.constant ) <= this.radius;
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
+
 		result.copy( point );
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
@@ -112,7 +142,7 @@ THREE.Sphere.prototype = {
 
 	getBoundingBox: function ( optionalTarget ) {
 
-		var box = optionalTarget || new THREE.Box3();
+		var box = optionalTarget || new Box3();
 
 		box.set( this.center, this.center );
 		box.expandByScalar( this.radius );
@@ -142,12 +172,9 @@ THREE.Sphere.prototype = {
 
 		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
 
-	},
-
-	clone: function () {
-
-		return new THREE.Sphere().copy( this );
-
 	}
 
 };
+
+
+export { Sphere };

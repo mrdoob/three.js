@@ -37,7 +37,6 @@
 				z-index:100;
 			}
 
-
 			a { color:red }
 
 		</style>
@@ -62,7 +61,7 @@
 		</div>
 
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -106,13 +105,12 @@
 				var light = new THREE.AmbientLight( 0x111111 );
 				scene.add( light );
 
-
 				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
 
 				// construct 8 blend shapes
 
-				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+				for ( var i = 0; i < 8; i ++ ) {
 
 					var vertices = [];
 
@@ -141,7 +139,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x222222, 1 );
+				renderer.setClearColor( 0x222222 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

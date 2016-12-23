@@ -1,9 +1,18 @@
+import { Matrix3 } from '../../math/Matrix3';
+import { Vector3 } from '../../math/Vector3';
+import { LineSegments } from '../../objects/LineSegments';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
+function FaceNormalsHelper( object, size, hex, linewidth ) {
+
+	// FaceNormalsHelper only supports THREE.Geometry
 
 	this.object = object;
 
@@ -13,62 +22,99 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
-	var geometry = new THREE.Geometry();
+	//
 
-	var faces = this.object.geometry.faces;
+	var nNormals = 0;
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	var objGeometry = this.object.geometry;
 
-		geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+	if ( objGeometry && objGeometry.isGeometry ) {
+
+		nNormals = objGeometry.faces.length;
+
+	} else {
+
+		console.warn( 'THREE.FaceNormalsHelper: only THREE.Geometry is supported. Use THREE.VertexNormalsHelper, instead.' );
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	//
+
+	var geometry = new BufferGeometry();
+
+	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
+
+	geometry.addAttribute( 'position', positions );
+
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+
+	//
 
 	this.matrixAutoUpdate = false;
-
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
-};
+}
 
-THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
+FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
 
-THREE.FaceNormalsHelper.prototype.update = function () {
+FaceNormalsHelper.prototype.update = ( function () {
 
-	var vertices = this.geometry.vertices;
+	var v1 = new Vector3();
+	var v2 = new Vector3();
+	var normalMatrix = new Matrix3();
 
-	var object = this.object;
-	var objectVertices = object.geometry.vertices;
-	var objectFaces = object.geometry.faces;
-	var objectWorldMatrix = object.matrixWorld;
+	return function update() {
 
-	object.updateMatrixWorld( true );
+		this.object.updateMatrixWorld( true );
 
-	this.normalMatrix.getNormalMatrix( objectWorldMatrix );
+		normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
-	for ( var i = 0, i2 = 0, l = objectFaces.length; i < l; i ++, i2 += 2 ) {
+		var matrixWorld = this.object.matrixWorld;
 
-		var face = objectFaces[ i ];
+		var position = this.geometry.attributes.position;
 
-		vertices[ i2 ].copy( objectVertices[ face.a ] )
-			.add( objectVertices[ face.b ] )
-			.add( objectVertices[ face.c ] )
-			.divideScalar( 3 )
-			.applyMatrix4( objectWorldMatrix );
+		//
 
-		vertices[ i2 + 1 ].copy( face.normal )
-			.applyMatrix3( this.normalMatrix )
-			.normalize()
-			.multiplyScalar( this.size )
-			.add( vertices[ i2 ] );
+		var objGeometry = this.object.geometry;
 
-	}
+		var vertices = objGeometry.vertices;
 
-	this.geometry.verticesNeedUpdate = true;
+		var faces = objGeometry.faces;
 
-	return this;
+		var idx = 0;
 
-};
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
+			var face = faces[ i ];
+
+			var normal = face.normal;
+
+			v1.copy( vertices[ face.a ] )
+				.add( vertices[ face.b ] )
+				.add( vertices[ face.c ] )
+				.divideScalar( 3 )
+				.applyMatrix4( matrixWorld );
+
+			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+
+			position.setXYZ( idx, v1.x, v1.y, v1.z );
+
+			idx = idx + 1;
+
+			position.setXYZ( idx, v2.x, v2.y, v2.z );
+
+			idx = idx + 1;
+
+		}
+
+		position.needsUpdate = true;
+
+		return this;
+
+	};
+
+}() );
+
+
+export { FaceNormalsHelper };

@@ -11,7 +11,6 @@
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "initialShadingGroup",
-	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.5, 0.5, 0.5],
 	"illumination" : 4,
 	"opticalDensity" : 1.0

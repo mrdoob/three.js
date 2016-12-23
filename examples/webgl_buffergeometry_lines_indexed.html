@@ -23,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -34,7 +33,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - lines - indexed</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -62,14 +61,15 @@
 				scene = new THREE.Scene();
 
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial({ vertexColors: true });
+				var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
 
 				var positions = [];
 				var next_positions_index = 0;
 				var colors = [];
 				var indices_array = [];
 
-				// --------------------------------
+				//
+
 				var iteration_count = 4;
 				var rangle = 60 * Math.PI / 180.0;
 
@@ -158,7 +158,7 @@
 						new THREE.Vector3(0, y+0, 0),
 						new THREE.Vector3(500, y, 0),
 						new THREE.Vector3(500, y+500, 0),
-						new THREE.Vector3(0, y+500, 0),
+						new THREE.Vector3(0, y+500, 0)
 					],
 					true, 600
 				);
@@ -175,18 +175,18 @@
 						new THREE.Vector3(0, y, 0),
 						new THREE.Vector3(250, y+0, 0),
 						new THREE.Vector3(250, y-250, 0),
-						new THREE.Vector3(250, y+0, 0),
+						new THREE.Vector3(250, y+0, 0)
 					],
 					false, 600
 				);
 				// --------------------------------
 
-				geometry.addAttribute( 'index', new Uint16Array( indices_array ), 1 );
-				geometry.addAttribute( 'position', new Float32Array( positions ), 3 );
-				geometry.addAttribute( 'color', new Float32Array( colors ), 3 );
+				geometry.setIndex( new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.Line( geometry, material, THREE.LinePieces );
+				mesh = new THREE.LineSegments( geometry, material );
 				mesh.position.x -= 1200;
 				mesh.position.y -= 1200;
 
@@ -196,6 +196,7 @@
 				scene.add( parent_node );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;
@@ -206,9 +207,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

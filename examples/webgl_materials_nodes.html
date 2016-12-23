@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - node material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+				text-align:center;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Node-Based Material
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src='js/geometries/TeapotBufferGeometry.js'></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<!-- NodeLibrary -->
+		<script src="js/nodes/GLNode.js"></script>
+		<script src="js/nodes/RawNode.js"></script>
+		<script src="js/nodes/TempNode.js"></script>
+		<script src="js/nodes/InputNode.js"></script>
+		<script src="js/nodes/ConstNode.js"></script>
+		<script src="js/nodes/VarNode.js"></script>
+		<script src="js/nodes/FunctionNode.js"></script>
+		<script src="js/nodes/FunctionCallNode.js"></script>
+		<script src="js/nodes/AttributeNode.js"></script>
+		<script src="js/nodes/NodeBuilder.js"></script>
+		<script src="js/nodes/NodeLib.js"></script>
+		<script src="js/nodes/NodeMaterial.js"></script>
+
+		<!-- Accessors -->
+		<script src="js/nodes/accessors/PositionNode.js"></script>
+		<script src="js/nodes/accessors/NormalNode.js"></script>
+		<script src="js/nodes/accessors/UVNode.js"></script>
+		<script src="js/nodes/accessors/ScreenUVNode.js"></script>
+		<script src="js/nodes/accessors/ColorsNode.js"></script>
+		<script src="js/nodes/accessors/CameraNode.js"></script>
+		<script src="js/nodes/accessors/ReflectNode.js"></script>
+		<script src="js/nodes/accessors/LightNode.js"></script>
+
+		<!-- Inputs -->
+		<script src="js/nodes/inputs/IntNode.js"></script>
+		<script src="js/nodes/inputs/FloatNode.js"></script>
+		<script src="js/nodes/inputs/ColorNode.js"></script>
+		<script src="js/nodes/inputs/Vector2Node.js"></script>
+		<script src="js/nodes/inputs/Vector3Node.js"></script>
+		<script src="js/nodes/inputs/Vector4Node.js"></script>
+		<script src="js/nodes/inputs/TextureNode.js"></script>
+		<script src="js/nodes/inputs/CubeTextureNode.js"></script>
+
+		<!-- Math -->
+		<script src="js/nodes/math/Math1Node.js"></script>
+		<script src="js/nodes/math/Math2Node.js"></script>
+		<script src="js/nodes/math/Math3Node.js"></script>
+		<script src="js/nodes/math/OperatorNode.js"></script>
+
+		<!-- Utils -->
+		<script src="js/nodes/utils/SwitchNode.js"></script>
+		<script src="js/nodes/utils/JoinNode.js"></script>
+		<script src="js/nodes/utils/TimerNode.js"></script>
+		<script src="js/nodes/utils/RoughnessToBlinnExponentNode.js"></script>
+		<script src="js/nodes/utils/VelocityNode.js"></script>
+		<script src="js/nodes/utils/LuminanceNode.js"></script>
+		<script src="js/nodes/utils/ColorAdjustmentNode.js"></script>
+		<script src="js/nodes/utils/NoiseNode.js"></script>
+		<script src="js/nodes/utils/ResolutionNode.js"></script>
+		<script src="js/nodes/utils/BumpNode.js"></script>
+		<script src="js/nodes/utils/BlurNode.js"></script>
+
+		<!-- Phong Material -->
+		<script src="js/nodes/materials/PhongNode.js"></script>
+		<script src="js/nodes/materials/PhongNodeMaterial.js"></script>
+
+		<!-- Standard Material -->
+		<script src="js/nodes/materials/StandardNode.js"></script>
+		<script src="js/nodes/materials/StandardNodeMaterial.js"></script>
+
+		<script>
+
+		var container = document.getElementById( 'container' );
+
+		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+		var teapot, mesh;
+		var controls;
+		var move = false;
+		var rtTexture, rtMaterial;
+		var gui, guiElements = [];
+		var textures = {
+			brick : { url : 'textures/brick_diffuse.jpg' },
+			grass : { url : 'textures/terrain/grasslight-big.jpg' },
+			grassNormal : { url : 'textures/terrain/grasslight-big-nm.jpg' },
+			decalDiffuse : { url : 'textures/decal/decal-diffuse.png' },
+			cloud : { url : 'textures/lava/cloud.png' },
+			spherical : { url : 'textures/envmap.png' }
+		};
+
+		var param = { example: 'standard' };
+
+		function getTexture( name ) {
+
+			var texture = textures[ name ].texture;
+
+			if ( ! texture ) {
+
+				texture = textures[ name ].texture = new THREE.TextureLoader().load( textures[ name ].url );
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+			}
+
+			return texture;
+
+		}
+
+		var cubemap = function() {
+
+			var path = "textures/cube/Park2/";
+			var format = '.jpg';
+			var urls = [
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
+				];
+
+			var textureCube = new THREE.CubeTextureLoader().load( urls );
+			textureCube.format = THREE.RGBFormat;
+
+			return textureCube;
+
+		}();
+
+		window.addEventListener( 'load', init );
+
+		function init() {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.x = 50;
+			camera.position.z = - 50;
+			camera.position.y = 30;
+			camera.target = new THREE.Vector3();
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 50;
+			controls.maxDistance = 200;
+
+			scene.add( new THREE.AmbientLight( 0x464646 ) );
+
+			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+			light.position.set( 1, 0.75, 0.5 );
+			scene.add( light );
+
+			var light = new THREE.DirectionalLight( 0xccccff, 1 );
+			light.position.set( - 1, 0.75, - 0.5 );
+			scene.add( light );
+
+			teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+
+			mesh = new THREE.Mesh( teapot );
+			scene.add( mesh );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			updateMaterial();
+
+			onWindowResize();
+			animate();
+
+		}
+
+		function clearGui() {
+
+			if ( gui ) gui.destroy();
+
+			gui = new dat.GUI();
+
+			var example = gui.add( param, 'example', {
+				'basic / standard': 'standard',
+				'basic / physical': 'physical',
+				'basic / phong': 'phong',
+				'basic / layers': 'layers',
+				'basic / rim': 'rim',
+				'basic / color-adjustment': 'color-adjustment',
+				'basic / bump': 'bump',
+				'basic / blur': 'blur',
+				'basic / spherical-reflection': 'spherical-reflection',
+				'adv / fresnel': 'fresnel',
+				'adv / saturation': 'saturation',
+				'adv / top-bottom': 'top-bottom',
+				'adv / skin': 'skin',
+				'adv / skin-phong': 'skin-phong',
+				'adv / caustic': 'caustic',
+				'adv / displace': 'displace',
+				'adv / plush': 'plush',
+				'adv / toon': 'toon',
+				'adv / camera-depth': 'camera-depth',
+				'adv / soft-body': 'soft-body',
+				'adv / wave': 'wave',
+				'adv / triangle-blur' : 'triangle-blur',
+				'adv / expression' : 'expression',
+				'adv / sss' : 'sss',
+				'adv / translucent' : 'translucent',
+				'misc / smoke' : 'smoke',
+				'misc / firefly' : 'firefly',
+				'misc / reserved-keywords' : 'reserved-keywords',
+				'misc / varying' : 'varying',
+				'misc / custom-attribute' : 'custom-attribute'
+			} ).onFinishChange( function() {
+
+				updateMaterial();
+
+			} );
+
+			gui.open();
+
+		}
+
+		function addGui( name, value, callback, isColor, min, max ) {
+
+			var node;
+
+			param[ name ] = value;
+
+			if ( isColor ) {
+
+				node = gui.addColor( param, name ).onChange( function() {
+
+					callback( param[ name ] );
+
+				} );
+
+			} else if ( typeof value == 'object' ) {
+
+				node = gui.add( param, name, value ).onChange( function() {
+
+					callback( param[ name ] );
+
+				} );
+
+			} else {
+
+				node = gui.add( param, name, min, max ).onChange( function() {
+
+					callback( param[ name ] );
+
+				} );
+
+			}
+
+			return node;
+
+		}
+
+		function updateMaterial() {
+
+			move = false;
+
+			if ( mesh.material ) mesh.material.dispose();
+
+			if ( rtTexture ) {
+
+				rtTexture.dispose();
+				rtTexture = null;
+
+			}
+
+			if ( rtMaterial ) {
+
+				rtMaterial.dispose();
+				rtMaterial = null;
+
+			}
+
+			var name = param.example;
+			var mtl;
+
+			clearGui();
+
+			switch ( name ) {
+
+				case 'phong':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					//mtl.color = // albedo (vec3)
+					//mtl.alpha = // opacity (float)
+					//mtl.specular = // specular color (vec3)
+					//mtl.shininess = // shininess (float)
+					//mtl.normal = // normalmap (vec3)
+					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.emissive = // emissive color (vec3)
+					//mtl.ambient = // ambient color (vec3)
+					//mtl.shadow = // shadowmap (vec3)
+					//mtl.light = // custom-light (vec3)
+					//mtl.ao = // ambient occlusion (float)
+					//mtl.light = // input/output light (vec3)
+					//mtl.environment = // reflection/refraction (vec3)
+					//mtl.environmentAlpha = // environment alpha (float)
+					//mtl.transform = // vertex transformation (vec3)
+
+					var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+					mtl.color = new THREE.TextureNode( getTexture( "grass" ) );
+					mtl.specular = new THREE.FloatNode( .5 );
+					mtl.shininess = new THREE.FloatNode( 15 );
+					mtl.environment = new THREE.CubeTextureNode( cubemap );
+					mtl.environmentAlpha = mask;
+					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
+					mtl.normalScale = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
+
+					break;
+
+				case 'standard':
+
+					// MATERIAL
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					//mtl.color = // albedo (vec3)
+					//mtl.alpha = // opacity (float)
+					//mtl.roughness = // roughness (float)
+					//mtl.metalness = // metalness (float)
+					//mtl.normal = // normalmap (vec3)
+					//mtl.normalScale = // normalmap scale (vec2)
+					//mtl.emissive = // emissive color (vec3)
+					//mtl.ambient = // ambient color (vec3)
+					//mtl.shadow = // shadowmap (vec3)
+					//mtl.light = // custom-light (vec3)
+					//mtl.ao = // ambient occlusion (float)
+					//mtl.environment = // reflection/refraction (vec3)
+					//mtl.transform = // vertex transformation (vec3)
+
+					var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+					var normalScale = new THREE.FloatNode( .3 );
+
+					var roughnessA = new THREE.FloatNode( .5 );
+					var metalnessA = new THREE.FloatNode( .5 );
+
+					var roughnessB = new THREE.FloatNode( 0 );
+					var metalnessB = new THREE.FloatNode( 1 );
+
+					var roughness = new THREE.Math3Node(
+						roughnessA,
+						roughnessB,
+						mask,
+						THREE.Math3Node.MIX
+					);
+
+					var metalness = new THREE.Math3Node(
+						metalnessA,
+						metalnessB,
+						mask,
+						THREE.Math3Node.MIX
+					);
+
+					var normalMask = new THREE.OperatorNode(
+						new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
+						normalScale,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = new THREE.ColorNode( 0xEEEEEE );
+					mtl.roughness = roughness;
+					mtl.metalness = metalness;
+					mtl.environment = new THREE.CubeTextureNode( cubemap );
+					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
+					mtl.normalScale = normalMask;
+
+					// GUI
+
+					addGui( 'color', mtl.color.value.getHex(), function( val ) {
+
+						mtl.color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'roughnessA', roughnessA.number, function( val ) {
+
+						 roughnessA.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'metalnessA', metalnessA.number, function( val ) {
+
+						metalnessA.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'roughnessB', roughnessB.number, function( val ) {
+
+						 roughnessB.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'metalnessB', metalnessB.number, function( val ) {
+
+						metalnessB.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'normalScale', normalScale.number, function( val ) {
+
+						normalScale.number = val;
+
+					}, false, 0, 1 );
+
+					break;
+
+					case 'physical':
+
+						// MATERIAL
+
+						mtl = new THREE.StandardNodeMaterial();
+
+						//mtl.color = // albedo (vec3)
+						//mtl.alpha = // opacity (float)
+						//mtl.roughness = // roughness (float)
+						//mtl.metalness = // metalness (float)
+						//mtl.reflectivity = // reflectivity (float)
+						//mtl.clearCoat = // clearCoat (float)
+						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.normal = // normalmap (vec3)
+						//mtl.normalScale = // normalmap scale (vec2)
+						//mtl.emissive = // emissive color (vec3)
+						//mtl.ambient = // ambient color (vec3)
+						//mtl.shadow = // shadowmap (vec3)
+						//mtl.light = // custom-light (vec3)
+						//mtl.ao = // ambient occlusion (float)
+						//mtl.environment = // reflection/refraction (vec3)
+						//mtl.transform = // vertex transformation (vec3)
+
+						var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+						var normalScale = new THREE.FloatNode( .3 );
+
+						var roughnessA = new THREE.FloatNode( .5 );
+						var metalnessA = new THREE.FloatNode( .5 );
+
+						var roughnessB = new THREE.FloatNode( 0 );
+						var metalnessB = new THREE.FloatNode( 1 );
+
+						var reflectivity = new THREE.FloatNode( 0 );
+						var clearCoat = new THREE.FloatNode( 1 );
+						var clearCoatRoughness = new THREE.FloatNode( 1 );
+
+						var roughness = new THREE.Math3Node(
+							roughnessA,
+							roughnessB,
+							mask,
+							THREE.Math3Node.MIX
+						);
+
+						var metalness = new THREE.Math3Node(
+							metalnessA,
+							metalnessB,
+							mask,
+							THREE.Math3Node.MIX
+						);
+
+						var normalMask = new THREE.OperatorNode(
+							new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
+							normalScale,
+							THREE.OperatorNode.MUL
+						);
+
+						mtl.color = new THREE.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.reflectivity = reflectivity;
+						mtl.clearCoat = clearCoat;
+						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.environment = new THREE.CubeTextureNode( cubemap );
+						mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
+						mtl.normalScale = normalMask;
+
+						// GUI
+
+						addGui( 'color', mtl.color.value.getHex(), function( val ) {
+
+							mtl.color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'reflectivity', reflectivity.number, function( val ) {
+
+							 reflectivity.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoat', clearCoat.number, function( val ) {
+
+							 clearCoat.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatRoughness', clearCoatRoughness.number, function( val ) {
+
+							 clearCoatRoughness.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessA', roughnessA.number, function( val ) {
+
+							 roughnessA.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessA', metalnessA.number, function( val ) {
+
+							metalnessA.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessB', roughnessB.number, function( val ) {
+
+							 roughnessB.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessB', metalnessB.number, function( val ) {
+
+							metalnessB.number = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.number, function( val ) {
+
+							normalScale.number = val;
+
+						}, false, 0, 1 );
+
+					break;
+
+				case 'wave':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var time = new THREE.TimerNode();
+					var speed = new THREE.FloatNode( 5 );
+					var scale = new THREE.FloatNode( 1 );
+					var worldScale = new THREE.FloatNode( .4 );
+					var colorA = new THREE.ColorNode( 0xFFFFFF );
+					var colorB = new THREE.ColorNode( 0x0054df );
+
+					var uv = new THREE.UVNode();
+
+					var timeScale = new THREE.OperatorNode(
+						time,
+						speed,
+						THREE.OperatorNode.MUL
+					);
+
+					var worldScl = new THREE.OperatorNode(
+						new THREE.PositionNode(),
+						worldScale,
+						THREE.OperatorNode.MUL
+					);
+
+					var posContinuous = new THREE.OperatorNode(
+						worldScl,
+						timeScale,
+						THREE.OperatorNode.ADD
+					);
+
+					var wave = new THREE.Math1Node( posContinuous, THREE.Math1Node.SIN );
+					wave = new THREE.SwitchNode( wave, 'x' );
+
+					var waveScale = new THREE.OperatorNode(
+						wave,
+						scale,
+						THREE.OperatorNode.MUL
+					);
+
+					var displaceY = new THREE.JoinNode(
+						new THREE.FloatNode(),
+						waveScale,
+						new THREE.FloatNode()
+					);
+
+					var displace = new THREE.OperatorNode(
+						new THREE.NormalNode(),
+						displaceY,
+						THREE.OperatorNode.MUL
+					);
+
+					var blend = new THREE.OperatorNode(
+						new THREE.PositionNode(),
+						displaceY,
+						THREE.OperatorNode.ADD
+					);
+
+					var color = new THREE.Math3Node(
+						colorB,
+						colorA,
+						wave,
+						THREE.Math3Node.MIX
+					);
+
+					mtl.color = color;
+					mtl.transform = blend;
+
+					// GUI
+
+					addGui( 'speed', speed.number, function( val ) {
+
+						speed.number = val;
+
+					}, false, 0, 10 );
+
+					addGui( 'scale', scale.number, function( val ) {
+
+						scale.number = val;
+
+					}, false, 0, 3 );
+
+					addGui( 'worldScale', worldScale.number, function( val ) {
+
+						worldScale.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'colorA', colorA.value.getHex(), function( val ) {
+
+						colorA.value.setHex( val );
+
+					}, true );
+
+					addGui( 'colorB', colorB.value.getHex(), function( val ) {
+
+						colorB.value.setHex( val );
+
+					}, true );
+
+					addGui( 'useNormals', false, function( val ) {
+
+						blend.b = val ? displace : displaceY;
+
+						mtl.build();
+
+					} );
+
+					break;
+
+				case 'rim':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var intensity = 1.3;
+					var power = new THREE.FloatNode( 3 );
+					var color = new THREE.ColorNode( 0xFFFFFF );
+
+					var viewZ = new THREE.Math2Node(
+						new THREE.NormalNode( THREE.NormalNode.VIEW ),
+						new THREE.Vector3Node( 0, 0, - intensity ),
+						THREE.Math2Node.DOT
+					);
+
+					var rim = new THREE.OperatorNode(
+						viewZ,
+						new THREE.FloatNode( intensity ),
+						THREE.OperatorNode.ADD
+					);
+
+					var rimPower = new THREE.Math2Node(
+						rim,
+						power,
+						THREE.Math2Node.POW
+					);
+
+					var rimColor = new THREE.OperatorNode(
+						rimPower,
+						color,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = new THREE.ColorNode( 0x111111 );
+					mtl.emissive = rimColor;
+
+					// GUI
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'intensity', intensity, function( val ) {
+
+						intensity = val;
+
+						viewZ.b.z = - intensity;
+						rim.b.number = intensity;
+
+
+					}, false, 0, 3 );
+
+					addGui( 'power', power.number, function( val ) {
+
+						power.number = val;
+
+					}, false, 0, 6 );
+
+					addGui( 'xray', false, function( val ) {
+
+						if ( val ) {
+
+							mtl.emissive = color;
+							mtl.alpha = rimPower;
+							mtl.blending = THREE.AdditiveBlending;
+							mtl.depthWrite = false;
+
+						}
+						else {
+
+							mtl.emissive = rimColor;
+							mtl.alpha = null;
+							mtl.blending = THREE.NormalBlending;
+							mtl.depthWrite = true;
+
+						}
+
+						mtl.build();
+
+					} );
+
+					break;
+
+				case 'color-adjustment':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var texture = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var hue = new THREE.FloatNode();
+					var sataturation = new THREE.FloatNode( 1 );
+					var vibrance = new THREE.FloatNode();
+					var brightness = new THREE.FloatNode( 0 );
+					var contrast = new THREE.FloatNode( 1 );
+
+					var hueNode = new THREE.ColorAdjustmentNode( texture, hue, THREE.ColorAdjustmentNode.HUE );
+					var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
+					var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
+					var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
+					var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
+
+					mtl.color = contrastNode;
+
+					// GUI
+
+					addGui( 'hue', hue.number, function( val ) {
+
+						hue.number = val;
+
+					}, false, 0, Math.PI * 2 );
+
+					addGui( 'saturation', sataturation.number, function( val ) {
+
+						sataturation.number = val;
+
+					}, false, 0, 2 );
+
+					addGui( 'vibrance', vibrance.number, function( val ) {
+
+						vibrance.number = val;
+
+					}, false, - 1, 1 );
+
+					addGui( 'brightness', brightness.number, function( val ) {
+
+						brightness.number = val;
+
+					}, false, 0, .5 );
+
+					addGui( 'contrast', contrast.number, function( val ) {
+
+						contrast.number = val;
+
+					}, false, 0, 2 );
+
+					break;
+
+				case 'bump':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var bump = new THREE.BumpNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+					bump.scale = new THREE.Vector2Node( - 1.5, - 1.5 );
+
+					mtl.color = diffuse;
+					mtl.normal = bump;
+
+					// GUI
+
+					addGui( 'scaleX', bump.scale.x, function( val ) {
+
+						bump.scale.x = val;
+
+					}, false, - 2, 2 );
+
+					addGui( 'scaleY', bump.scale.y, function( val ) {
+
+						bump.scale.y = val;
+
+					}, false, - 2, 2 );
+
+					addGui( 'color', true, function( val ) {
+
+						mtl.color = val ? diffuse : new THREE.ColorNode( 0xEEEEEE );
+
+						mtl.build();
+
+					} );
+
+					break;
+
+				case 'blur':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var blur = new THREE.BlurNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+
+					mtl.color = blur;
+
+					// GUI
+
+					addGui( 'radiusX', blur.radius.x, function( val ) {
+
+						blur.radius.x = val;
+
+					}, false, 0, 15 );
+
+					addGui( 'radiusY', blur.radius.y, function( val ) {
+
+						blur.radius.y = val;
+
+					}, false, 0, 15 );
+
+					break;
+
+				case 'spherical-reflection':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					mtl.environment = new THREE.TextureNode( getTexture( "spherical" ), new THREE.ReflectNode( THREE.ReflectNode.SPHERE ) );
+
+					break;
+
+				case 'fresnel':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var reflectance = new THREE.FloatNode( 1.3 );
+					var power = new THREE.FloatNode( 1 );
+					var color = new THREE.CubeTextureNode( cubemap );
+
+					var viewZ = new THREE.Math2Node(
+						new THREE.NormalNode( THREE.NormalNode.VIEW ),
+						new THREE.Vector3Node( 0, 0, - 1 ),
+						THREE.Math2Node.DOT
+					);
+
+					var theta = new THREE.OperatorNode(
+						viewZ,
+						new THREE.FloatNode( 1 ),
+						THREE.OperatorNode.ADD
+					);
+
+					var thetaPower = new THREE.Math2Node(
+						theta,
+						power,
+						THREE.Math2Node.POW
+					);
+
+					var fresnel = new THREE.OperatorNode(
+						reflectance,
+						thetaPower,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = new THREE.ColorNode( 0x3399FF );
+					mtl.environment = color;
+					mtl.environmentAlpha = new THREE.Math1Node( fresnel, THREE.Math1Node.SAT );
+
+					// GUI
+
+					addGui( 'reflectance', reflectance.number, function( val ) {
+
+						reflectance.number = val;
+
+					}, false, 0, 3 );
+
+					addGui( 'power', power.number, function( val ) {
+
+						power.number = val;
+
+					}, false, 0, 5 );
+
+					break;
+
+				case 'layers':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var tex1 = new THREE.TextureNode( getTexture( "grass" ) );
+					var tex2 = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var offset = new THREE.FloatNode( 0 );
+					var scale = new THREE.FloatNode( 1 );
+					var uv = new THREE.UVNode();
+
+					var uvOffset = new THREE.OperatorNode(
+						offset,
+						uv,
+						THREE.OperatorNode.ADD
+					);
+
+					var uvScale = new THREE.OperatorNode(
+						uvOffset,
+						scale,
+						THREE.OperatorNode.MUL
+					);
+
+					var mask = new THREE.TextureNode( getTexture( "decalDiffuse" ), uvScale );
+					var maskAlphaChannel = new THREE.SwitchNode( mask, 'w' );
+
+					var blend = new THREE.Math3Node(
+						tex1,
+						tex2,
+						maskAlphaChannel,
+						THREE.Math3Node.MIX
+					);
+
+					mtl.color = blend;
+
+					// GUI
+
+					addGui( 'offset', offset.number, function( val ) {
+
+						offset.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'scale', scale.number, function( val ) {
+
+						scale.number = val;
+
+					}, false, 0, 10 );
+
+					break;
+
+				case 'saturation':
+
+					// MATERIAL
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					var tex = new THREE.TextureNode( getTexture( "brick" ) );
+					var sat = new THREE.FloatNode( 0 );
+
+					var satrgb = new THREE.FunctionNode( [
+					"vec3 satrgb(vec3 rgb, float adjustment) {",
+					//"	const vec3 W = vec3(0.2125, 0.7154, 0.0721);", // LUMA
+					"	vec3 intensity = vec3(dot(rgb, LUMA));",
+					"	return mix(intensity, rgb, adjustment);",
+					"}"
+					].join( "\n" ) );
+
+					var saturation = new THREE.FunctionCallNode( satrgb );
+					saturation.inputs.rgb = tex;
+					saturation.inputs.adjustment = sat;
+
+					// or try
+
+					//saturation.inputs[0] = tex;
+					//saturation.inputs[1] = sat;
+
+					mtl.color = saturation;
+
+					// GUI
+
+					addGui( 'saturation', sat.number, function( val ) {
+
+						sat.number = val;
+
+					}, false, 0, 2 );
+
+					break;
+
+				case 'top-bottom':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var top = new THREE.TextureNode( getTexture( "grass" ) );
+					var bottom = new THREE.TextureNode( getTexture( "brick" ) );
+
+					var normal = new THREE.NormalNode( THREE.NormalNode.WORLD );
+					var normalY = new THREE.SwitchNode( normal, 'y' );
+
+					var hard = new THREE.FloatNode( 9 );
+					var offset = new THREE.FloatNode( - 2.5 );
+
+					var hardClamp = new THREE.OperatorNode(
+						normalY,
+						hard,
+						THREE.OperatorNode.MUL
+					);
+
+					var offsetClamp = new THREE.OperatorNode(
+						hardClamp,
+						offset,
+						THREE.OperatorNode.ADD
+					);
+
+					var clamp0at1 = new THREE.Math1Node( offsetClamp, THREE.Math1Node.SAT );
+
+					var blend = new THREE.Math3Node( top, bottom, clamp0at1, THREE.Math3Node.MIX );
+
+					mtl.color = blend;
+
+					// GUI
+
+					addGui( 'hard', hard.number, function( val ) {
+
+						hard.number = val;
+
+					}, false, 0, 20 );
+
+					addGui( 'offset', offset.number, function( val ) {
+
+						offset.number = val;
+
+					}, false, - 10, 10 );
+
+					break;
+
+				case 'displace':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var time = new THREE.TimerNode();
+					var scale = new THREE.FloatNode( 2 );
+					var speed = new THREE.FloatNode( .2 );
+					var colorA = new THREE.ColorNode( 0xFFFFFF );
+					var colorB = new THREE.ColorNode( 0x0054df );
+
+					var uv = new THREE.UVNode();
+
+					var timeScl = new THREE.OperatorNode(
+						time,
+						speed,
+						THREE.OperatorNode.MUL
+					);
+
+					var displaceOffset = new THREE.OperatorNode(
+						timeScl,
+						uv,
+						THREE.OperatorNode.ADD
+					);
+
+					var tex = new THREE.TextureNode( getTexture( "cloud" ), displaceOffset );
+					var texArea = new THREE.SwitchNode( tex, 'w' );
+
+					var displace = new THREE.OperatorNode(
+						new THREE.NormalNode(),
+						texArea,
+						THREE.OperatorNode.MUL
+					);
+
+					var displaceScale = new THREE.OperatorNode(
+						displace,
+						scale,
+						THREE.OperatorNode.MUL
+					);
+
+					var blend = new THREE.OperatorNode(
+						new THREE.PositionNode(),
+						displaceScale,
+						THREE.OperatorNode.ADD
+					);
+
+					var color = new THREE.Math3Node(
+						colorB,
+						colorA,
+						texArea,
+						THREE.Math3Node.MIX
+					);
+
+					mtl.color = mtl.specular = new THREE.ColorNode( 0 );
+					mtl.emissive = color;
+					mtl.transform = blend;
+
+					// GUI
+
+					addGui( 'speed', speed.number, function( val ) {
+
+						speed.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'scale', scale.number, function( val ) {
+
+						scale.number = val;
+
+					}, false, 0, 10 );
+
+					addGui( 'colorA', colorA.value.getHex(), function( val ) {
+
+						colorA.value.setHex( val );
+
+					}, true );
+
+					addGui( 'colorB', colorB.value.getHex(), function( val ) {
+
+						colorB.value.setHex( val );
+
+					}, true );
+
+					break;
+
+				case 'smoke':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var time = new THREE.TimerNode();
+					var uv = new THREE.UVNode();
+
+					var timeSpeedA = new THREE.OperatorNode(
+						time,
+						new THREE.Vector2Node( 0.3, 0.1 ),
+						THREE.OperatorNode.MUL
+					);
+
+					var timeSpeedB = new THREE.OperatorNode(
+						time,
+						new THREE.Vector2Node( 0.15, 0.4 ),
+						THREE.OperatorNode.MUL
+					);
+
+					var uvOffsetA = new THREE.OperatorNode(
+						timeSpeedA,
+						uv,
+						THREE.OperatorNode.ADD
+					);
+
+					var uvOffsetB = new THREE.OperatorNode(
+						timeSpeedB,
+						uv,
+						THREE.OperatorNode.ADD
+					);
+
+					var cloudA = new THREE.TextureNode( getTexture( "cloud" ), uvOffsetA );
+					var cloudB = new THREE.TextureNode( getTexture( "cloud" ), uvOffsetB );
+
+					var clouds = new THREE.OperatorNode(
+						cloudA,
+						cloudB,
+						THREE.OperatorNode.ADD
+					);
+
+					mtl.environment = new THREE.ColorNode( 0xFFFFFF );
+					mtl.alpha = clouds;
+
+					// GUI
+
+					addGui( 'color', mtl.environment.value.getHex(), function( val ) {
+
+						mtl.environment.value.setHex( val );
+
+					}, true );
+
+					break;
+
+				case 'camera-depth':
+
+					// MATERIAL
+
+					var colorA = new THREE.ColorNode( 0xFFFFFF );
+					var colorB = new THREE.ColorNode( 0x0054df );
+
+					var depth = new THREE.CameraNode( THREE.CameraNode.DEPTH );
+					depth.near.number = 1;
+					depth.far.number = 200;
+
+					var colors = new THREE.Math3Node(
+						colorB,
+						colorA,
+						depth,
+						THREE.Math3Node.MIX
+					);
+
+					mtl = new THREE.PhongNodeMaterial();
+					mtl.color = colors;
+
+					// GUI
+
+					addGui( 'near', depth.near.number, function( val ) {
+
+						depth.near.number = val;
+
+					}, false, 1, 1200 );
+
+					addGui( 'far', depth.far.number, function( val ) {
+
+						depth.far.number = val;
+
+					}, false, 1, 1200 );
+
+					addGui( 'nearColor', colorA.value.getHex(), function( val ) {
+
+						colorA.value.setHex( val );
+
+					}, true );
+
+					addGui( 'farColor', colorB.value.getHex(), function( val ) {
+
+						colorB.value.setHex( val );
+
+					}, true );
+
+					break;
+
+				case 'caustic':
+
+					// MATERIAL
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					var hash2 = new THREE.FunctionNode( [
+					"vec2 hash2(vec2 p) {",
+					"	return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);",
+					"}"
+					].join( "\n" ) );
+
+					var voronoi = new THREE.FunctionNode( [
+					// Based off of iq's described here: http://www.iquilezles.org/www/articles/voronoili
+					"float voronoi(vec2 p, in float time) {",
+					"	vec2 n = floor(p);",
+					"	vec2 f = fract(p);",
+					"	float md = 5.0;",
+					"	vec2 m = vec2(0.0);",
+					"	for (int i = -1; i <= 1; i++) {",
+					"		for (int j = -1; j <= 1; j++) {",
+					"			vec2 g = vec2(i, j);",
+					"			vec2 o = hash2(n + g);",
+					"			o = 0.5 + 0.5 * sin(time + 5.038 * o);",
+					"			vec2 r = g + o - f;",
+					"			float d = dot(r, r);",
+					"			if (d < md) {",
+					"				md = d;",
+					"				m = n+g+o;",
+					"			}",
+					"		}",
+					"	}",
+					"	return md;",
+					"}"
+					].join( "\n" ), [ hash2 ] ); // define hash2 as dependencies
+
+					var voronoiLayers = new THREE.FunctionNode( [
+					// based on https://www.shadertoy.com/view/4tXSDf
+					"float voronoiLayers(vec2 p, in float time) {",
+					"	float v = 0.0;",
+					"	float a = 0.4;",
+					"	for (int i = 0; i < 3; i++) {",
+					"		v += voronoi(p, time) * a;",
+					"		p *= 2.0;",
+					"		a *= 0.5;",
+					"	}",
+					"	return v;",
+					"}"
+					].join( "\n" ), [ voronoi ] ); // define voronoi as dependencies
+
+					var time = new THREE.TimerNode();
+					var timeScale = new THREE.FloatNode( 2 );
+
+					var alpha = new THREE.FloatNode( 1 );
+					var scale = new THREE.FloatNode( .1 );
+					var intensity = new THREE.FloatNode( 1.5 );
+
+					var color = new THREE.ColorNode( 0xFFFFFF );
+					var colorA = new THREE.ColorNode( 0xFFFFFF );
+					var colorB = new THREE.ColorNode( 0x0054df );
+
+					var worldPos = new THREE.PositionNode( THREE.PositionNode.WORLD );
+					var worldPosTop = new THREE.SwitchNode( worldPos, 'xz' );
+
+					var worldNormal = new THREE.NormalNode( THREE.NormalNode.WORLD );
+
+					var mask = new THREE.SwitchNode( worldNormal, 'y' );
+
+					// clamp0at1
+					mask = new THREE.Math1Node( mask, THREE.Math1Node.SAT );
+
+					var timeOffset = new THREE.OperatorNode(
+						time,
+						timeScale,
+						THREE.OperatorNode.MUL
+					);
+
+					var uvPos = new THREE.OperatorNode(
+						worldPosTop,
+						scale,
+						THREE.OperatorNode.MUL
+					);
+
+					var voronoi = new THREE.FunctionCallNode( voronoiLayers );
+					voronoi.inputs.p = uvPos;
+					voronoi.inputs.time = timeOffset;
+
+					var maskCaustic = new THREE.OperatorNode(
+						alpha,
+						mask,
+						THREE.OperatorNode.MUL
+					);
+
+					var voronoiIntensity = new THREE.OperatorNode(
+						voronoi,
+						intensity,
+						THREE.OperatorNode.MUL
+					);
+
+					var voronoiColors = new THREE.Math3Node(
+						colorB,
+						colorA,
+						new THREE.Math1Node( voronoiIntensity, THREE.Math1Node.SAT ), // mix needs clamp
+						THREE.Math3Node.MIX
+					);
+
+					var caustic = new THREE.Math3Node(
+						color,
+						voronoiColors,
+						maskCaustic,
+						THREE.Math3Node.MIX
+					);
+
+					var causticLights = new THREE.OperatorNode(
+						voronoiIntensity,
+						maskCaustic,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = caustic;
+					mtl.ambient = causticLights;
+
+					// GUI
+
+					addGui( 'timeScale', timeScale.number, function( val ) {
+
+						timeScale.number = val;
+
+					}, false, 0, 5 );
+
+					addGui( 'intensity', intensity.number, function( val ) {
+
+						intensity.number = val;
+
+					}, false, 0, 3 );
+
+					addGui( 'scale', scale.number, function( val ) {
+
+						scale.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'alpha', alpha.number, function( val ) {
+
+						alpha.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'colorA', colorA.value.getHex(), function( val ) {
+
+						colorA.value.setHex( val );
+
+					}, true );
+
+					addGui( 'colorB', colorB.value.getHex(), function( val ) {
+
+						colorB.value.setHex( val );
+
+					}, true );
+
+					break;
+
+				case 'soft-body':
+
+					// MATERIAL
+
+					move = true;
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					var scale = new THREE.FloatNode( 2 );
+					var colorA = new THREE.ColorNode( 0xFF6633 );
+					var colorB = new THREE.ColorNode( 0x3366FF );
+
+					var pos = new THREE.PositionNode();
+					var posNorm = new THREE.Math1Node( pos, THREE.Math1Node.NORMALIZE );
+
+					var mask = new THREE.SwitchNode( posNorm, 'y' );
+
+					var velocity = new THREE.VelocityNode( mesh, {
+						type: 'elastic',
+						spring: .8,
+						friction: .9
+					} );
+
+					var velocityArea = new THREE.OperatorNode(
+						mask,
+						scale,
+						THREE.OperatorNode.MUL
+					);
+
+					var softVelocity = new THREE.OperatorNode(
+						velocity,
+						velocityArea,
+						THREE.OperatorNode.MUL
+					);
+
+					var softPosition = new THREE.OperatorNode(
+						new THREE.PositionNode(),
+						softVelocity,
+						THREE.OperatorNode.ADD
+					);
+
+					var colors = new THREE.Math3Node(
+						colorB,
+						colorA,
+						mask,
+						THREE.Math3Node.MIX
+					);
+
+					mtl.color = colors;
+					mtl.transform = softPosition;
+
+					// GUI
+
+					addGui( 'spring', velocity.params.spring, function( val ) {
+
+						velocity.params.spring = val;
+
+					}, false, 0, .9 );
+
+					addGui( 'friction', velocity.params.friction, function( val ) {
+
+						velocity.params.friction = val;
+
+					}, false, 0, .9 );
+
+					addGui( 'scale', scale.number, function( val ) {
+
+						scale.number = val;
+
+					}, false, 0, 3 );
+
+					addGui( 'softBody', colorA.value.getHex(), function( val ) {
+
+						colorA.value.setHex( val );
+
+					}, true );
+
+					addGui( 'rigidBody', colorB.value.getHex(), function( val ) {
+
+						colorB.value.setHex( val );
+
+					}, true );
+
+					break;
+
+				case 'plush':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var color = new THREE.ColorNode( 0x8D8677 );
+					var mildness = new THREE.FloatNode( 1.6 );
+					var fur = new THREE.FloatNode( .5 );
+
+					var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
+					var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+
+					var viewZ = new THREE.Math2Node(
+						posDirection,
+						norDirection,
+						THREE.Math2Node.DOT
+					);
+
+					// without luma correction for now
+					var mildnessColor = new THREE.OperatorNode(
+						color,
+						mildness,
+						THREE.OperatorNode.MUL
+					);
+
+					var furScale = new THREE.OperatorNode(
+						viewZ,
+						fur,
+						THREE.OperatorNode.MUL
+					);
+
+					mtl.color = color;
+					mtl.normal = new THREE.TextureNode( getTexture( "grassNormal" ) );
+					mtl.normalScale = furScale;
+					mtl.environment = mildnessColor;
+					mtl.environmentAlpha = new THREE.Math1Node( viewZ, THREE.Math1Node.INVERT );
+					mtl.shininess = new THREE.FloatNode( 0 );
+
+					// GUI
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'mildness', mildness.number, function( val ) {
+
+						mildness.number = val;
+
+					}, false, 1, 2 );
+
+					addGui( 'fur', fur.number, function( val ) {
+
+						fur.number = val;
+
+					}, false, 0, 2 );
+
+					break;
+
+				case 'skin':
+				case 'skin-phong':
+
+					// MATERIAL
+
+					mtl = name == 'skin' ? new THREE.StandardNodeMaterial() : new THREE.PhongNodeMaterial();
+
+					var skinColor = new THREE.ColorNode( 0xFFC495 );
+					var bloodColor = new THREE.ColorNode( 0x6b0602 );
+					var wrapLight = new THREE.FloatNode( 1.5 );
+					var wrapShadow = new THREE.FloatNode( 0 );
+
+					var directLight = new THREE.LightNode();
+
+					var lightLuminance = new THREE.LuminanceNode( directLight );
+
+					var lightWrap = new THREE.Math3Node(
+						wrapShadow,
+						wrapLight,
+						lightLuminance,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var lightTransition = new THREE.OperatorNode(
+						lightWrap,
+						new THREE.ConstNode( THREE.ConstNode.PI2 ),
+						THREE.OperatorNode.MUL
+					);
+
+					var wrappedLight = new THREE.Math1Node( lightTransition, THREE.Math1Node.SIN );
+
+					var wrappedLightColor = new THREE.OperatorNode(
+						wrappedLight,
+						bloodColor,
+						THREE.OperatorNode.MUL
+					);
+
+					var bloodArea = new THREE.Math1Node( wrappedLightColor, THREE.Math1Node.SAT );
+
+					var totalLight = new THREE.OperatorNode(
+						directLight,
+						bloodArea,
+						THREE.OperatorNode.ADD
+					);
+
+					mtl.color = skinColor;
+					mtl.light = totalLight;
+
+					if ( name == 'skin' ) {
+
+						// StandardNodeMaterial
+
+						mtl.metalness = new THREE.FloatNode( 0 );
+						mtl.roughness = new THREE.FloatNode( 1 );
+						mtl.reflectivity = new THREE.FloatNode( 0 );
+						mtl.clearCoat = new THREE.FloatNode( .2 );
+						mtl.clearCoatRoughness = new THREE.FloatNode( .3 );
+						mtl.environment = new THREE.CubeTextureNode( cubemap );
+
+					} else {
+
+						// PhongNodeMaterial
+
+						mtl.specular = new THREE.ColorNode( 0x2f2e2d );
+						mtl.shininess = new THREE.FloatNode( 15 );
+
+					}
+
+					// GUI
+
+					addGui( 'skinColor', skinColor.value.getHex(), function( val ) {
+
+						skinColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'bloodColor', bloodColor.value.getHex(), function( val ) {
+
+						bloodColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'wrapLight', wrapLight.number, function( val ) {
+
+						wrapLight.number = val;
+
+					}, false, 0, 3 );
+
+					addGui( 'wrapShadow', wrapShadow.number, function( val ) {
+
+						wrapShadow.number = val;
+
+					}, false, - 1, 0 );
+
+					break;
+
+				case 'toon':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var count = new THREE.FloatNode( 3.43 );
+					var sceneDirectLight = new THREE.LightNode();
+					var color = new THREE.ColorNode( 0xAABBFF );
+
+					var lineColor = new THREE.ColorNode( 0xFF0000 );
+					var lineSize = new THREE.FloatNode( 0.23 );
+					var lineInner = new THREE.FloatNode( 0 );
+
+					// CEL
+
+					var lightLuminance = new THREE.LuminanceNode( sceneDirectLight );
+
+					var preCelLight = new THREE.OperatorNode(
+						lightLuminance,
+						count,
+						THREE.OperatorNode.MUL
+					);
+
+					var celLight = new THREE.Math1Node(
+						preCelLight,
+						THREE.Math1Node.CEIL
+					);
+
+					var posCelLight = new THREE.OperatorNode(
+						celLight,
+						count,
+						THREE.OperatorNode.DIV
+					);
+
+					// LINE
+
+					var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
+					var norDirection = new THREE.Math1Node( new THREE.NormalNode( THREE.NormalNode.VIEW ), THREE.Math1Node.NORMALIZE );
+
+					var viewZ = new THREE.Math2Node(
+						posDirection,
+						norDirection,
+						THREE.Math2Node.DOT
+					);
+
+					var lineOutside = new THREE.Math1Node(
+						viewZ,
+						THREE.Math1Node.ABS
+					);
+
+					var line = new THREE.OperatorNode(
+						lineOutside,
+						new THREE.FloatNode( 1 ),
+						THREE.OperatorNode.DIV
+					);
+
+					var lineScaled = new THREE.Math3Node(
+						line,
+						lineSize,
+						lineInner,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var innerContour = new THREE.Math1Node( new THREE.Math1Node( lineScaled, THREE.Math1Node.SAT ), THREE.Math1Node.INVERT );
+
+					// APPLY
+
+					mtl.color = color;
+					mtl.light = posCelLight;
+					mtl.shininess = new THREE.FloatNode( 0 );
+
+					mtl.environment = lineColor;
+					mtl.environmentAlpha = innerContour;
+
+					// GUI
+
+					addGui( 'color', color.value.getHex(), function( val ) {
+
+						color.value.setHex( val );
+
+					}, true );
+
+					addGui( 'lineColor', lineColor.value.getHex(), function( val ) {
+
+						lineColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'count', count.number, function( val ) {
+
+						count.number = val;
+
+					}, false, 1, 8 );
+
+					addGui( 'lineSize', lineSize.number, function( val ) {
+
+						lineSize.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'lineInner', lineInner.number, function( val ) {
+
+						lineInner.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'ignoreIndirectLight', false, function( val ) {
+
+						mtl.ao = val ? new THREE.FloatNode() : undefined;
+
+						mtl.build();
+
+					} );
+
+					break;
+
+				case 'custom-attribute':
+
+					// GEOMETRY
+
+					// add "position" buffer to "custom" attribute
+					teapot.attributes[ 'custom' ] = teapot.attributes[ 'position' ];
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					mtl.color = new THREE.AttributeNode( "custom", 3 );
+
+					// or
+
+					//mtl.color = new THREE.AttributeNode( "custom", "vec3" );
+
+					break;
+
+				case 'expression':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var speed = new THREE.FloatNode( .5 );
+
+					mtl.color = new THREE.FunctionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
+					mtl.color.keywords[ "speed" ] = speed;
+
+					mtl.transform = new THREE.FunctionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
+					mtl.transform.keywords[ "speed" ] = speed;
+
+					// add global keyword ( variable or const )
+					THREE.NodeLib.addKeyword( 'myCustomUv', function( builder ) {
+
+						return new THREE.ReflectNode();
+
+					} );
+
+					// GUI
+
+					addGui( 'speed', speed.number, function( val ) {
+
+						speed.number = val;
+
+					}, false, 0, 1 );
+
+					break;
+
+				case 'reserved-keywords':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var keywordsexample = new THREE.FunctionNode( [
+					// use "uv" reserved keyword
+					"vec4 keywordsexample( sampler2D texture ) {",
+					"	return texture2D( texture, myUV ) + vec4( position * myAlpha, 0.0 );",
+					"}"
+					].join( "\n" ) );
+
+					// add local keyword ( const only )
+					keywordsexample.keywords[ "myAlpha" ] = new THREE.ConstNode( "float myAlpha .05" );
+
+					// add global keyword ( const only )
+					THREE.NodeLib.addKeyword( 'myUV', function( builder ) {
+
+						return new THREE.UVNode();
+
+					} );
+
+					// add global const or function
+					//THREE.NodeLib.add( new THREE.ConstNode("float MY_CONST .05") )
+
+					// reserved keywords
+					console.log( THREE.NodeLib.keywords );
+
+					// keywords conflit? use this to disable:
+					//blurtexture.useKeywords = false; // ( true is default )
+
+					mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
+
+					break;
+
+				case 'varying':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var varying = new THREE.VarNode( "vec3" );
+
+					var setMyVar = new THREE.FunctionNode( [
+					"float setMyVar( vec3 pos ) {",
+					// set "myVar" in vertex shader in this example, 
+					// can be used in fragment shader too or in rest of the current shader
+					"	myVar = pos;",
+					// it is not accept "void" functions for now!
+					"	return 0.;",
+					"}"
+					].join( "\n" ) );
+
+					// add keyword
+					setMyVar.keywords[ "myVar" ] = varying;
+
+					var transform = new THREE.FunctionNode( "setMyVar( position * .1 ) + position", "vec3", [ setMyVar ] );
+					transform.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
+
+					mtl.transform = transform;
+					mtl.color = varying;
+
+					break;
+
+				case 'triangle-blur':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var delta = new THREE.Vector2Node( .5, .25 );
+					var alpha = new THREE.FloatNode( 1 );
+
+					var blurtexture = new THREE.FunctionNode( [
+					// Reference: TriangleBlurShader.js
+					"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {",
+					"	vec4 color = vec4( 0.0 );",
+					"	float total = 0.0;",
+					// randomize the lookup values to hide the fixed number of samples
+					"	float offset = rand( uv );",
+					"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
+					"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
+					"		float weight = 1.0 - abs( percent );",
+					"		color += texture2D( texture, uv + delta * percent ) * weight;",
+					"		total += weight;",
+					"	}",
+					"	return color / total;",
+					"}"
+					].join( "\n" ), [ new THREE.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
+
+					var blurredTexture = new THREE.FunctionCallNode( blurtexture, {
+						texture : new THREE.TextureNode( getTexture( "brick" ) ),
+						delta : delta,
+						uv : new THREE.UVNode()
+					} );
+
+					var color = new THREE.Math3Node(
+						new THREE.TextureNode( getTexture( "brick" ) ),
+						blurredTexture,
+						alpha,
+						THREE.Math3Node.MIX
+					);
+
+					mtl.color = color;
+
+					// GUI
+
+					addGui( 'alpha', alpha.number, function( val ) {
+
+						alpha.number = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'deltaX', delta.x, function( val ) {
+
+						delta.x = val;
+
+					}, false, 0, 1 );
+
+					addGui( 'deltaY', delta.x, function( val ) {
+
+						delta.y = val;
+
+					}, false, 0, 1 );
+
+					break;
+
+				case 'firefly':
+
+					// MATERIAL
+
+					mtl = new THREE.PhongNodeMaterial();
+
+					var time = new THREE.TimerNode();
+					var speed = new THREE.FloatNode( .5 );
+
+					var color = new THREE.ColorNode( 0x98ff00 );
+
+					var timeSpeed = new THREE.OperatorNode(
+						time,
+						speed,
+						THREE.OperatorNode.MUL
+					);
+
+					var sinCycleInSecs = new THREE.OperatorNode(
+						timeSpeed,
+						new THREE.ConstNode( THREE.ConstNode.PI2 ),
+						THREE.OperatorNode.MUL
+					);
+
+					var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+
+					var cycleColor = new THREE.OperatorNode(
+						cycle,
+						color,
+						THREE.OperatorNode.MUL
+					);
+
+					var cos = new THREE.Math1Node( cycleColor, THREE.Math1Node.SIN );
+
+					mtl.color = new THREE.ColorNode( 0 );
+					mtl.emissive = cos;
+
+					// GUI
+
+					addGui( 'speed', speed.number, function( val ) {
+
+						speed.number = val;
+
+					}, false, 0, 3 );
+
+					break;
+
+				case 'sss':
+				case 'translucent':
+
+					// DISTANCE FORMULA
+
+					var modelPos = new THREE.Vector3Node();
+
+					var viewPos = new THREE.PositionNode( THREE.PositionNode.VIEW );
+					var cameraPosition = new THREE.CameraNode( THREE.CameraNode.POSITION );
+
+					var cameraDistance = new THREE.Math2Node(
+						modelPos,
+						cameraPosition,
+						THREE.Math2Node.DISTANCE
+					);
+
+					var viewPosZ = new THREE.SwitchNode( viewPos, 'z' );
+
+					var distance = new THREE.OperatorNode(
+						cameraDistance,
+						viewPosZ,
+						THREE.OperatorNode.SUB
+					);
+
+					var distanceRadius = new THREE.OperatorNode(
+						distance,
+						new THREE.FloatNode( 70 ),
+						THREE.OperatorNode.ADD
+					);
+
+					var objectDepth = new THREE.Math3Node(
+						distanceRadius,
+						new THREE.FloatNode( 0 ),
+						new THREE.FloatNode( 50 ),
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					// RTT ( get back distance )
+
+					rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+
+					var distanceMtl = new THREE.PhongNodeMaterial();
+					distanceMtl.environment = objectDepth;
+					distanceMtl.side = THREE.BackSide;
+					distanceMtl.build();
+
+					rtMaterial = distanceMtl;
+
+					// MATERIAL
+
+					mtl = new THREE.StandardNodeMaterial();
+
+					var backSideDepth = new THREE.TextureNode( rtTexture, new THREE.ScreenUVNode( new THREE.ResolutionNode( renderer ) ) );
+
+					var difference = new THREE.OperatorNode(
+						objectDepth,
+						backSideDepth,
+						THREE.OperatorNode.SUB
+					);
+
+					var sss = new THREE.Math3Node(
+						new THREE.FloatNode( - .1 ),
+						new THREE.FloatNode( .5 ),
+						difference,
+						THREE.Math3Node.SMOOTHSTEP
+					);
+
+					var sssAlpha = new THREE.Math1Node( sss, THREE.Math1Node.SAT );
+
+					var frontColor, backColor;
+
+					if ( name == 'sss' ) {
+
+						var sssOut = new THREE.Math2Node(
+							objectDepth,
+							sssAlpha,
+							THREE.Math2Node.MIN
+						);
+
+						frontColor = new THREE.ColorNode( 0xd4cfbb );
+						backColor = new THREE.ColorNode( 0xd04327 );
+
+						var color = new THREE.Math3Node(
+							backColor,
+							frontColor,
+							sssOut,
+							THREE.Math3Node.MIX
+						);
+
+						var light = new THREE.OperatorNode(
+							new THREE.LightNode(),
+							color,
+							THREE.OperatorNode.ADD
+						);
+
+						mtl.color = frontColor;
+						mtl.roughness = new THREE.FloatNode( .1 );
+						mtl.metalness = new THREE.FloatNode( .5 );
+
+						mtl.light = light;
+						mtl.environment = color;
+
+					} else {
+
+						frontColor = new THREE.ColorNode( 0xd04327 );
+						backColor = new THREE.ColorNode( 0x1a0e14 );
+
+						var color = new THREE.Math3Node(
+							frontColor,
+							backColor,
+							sssAlpha,
+							THREE.Math3Node.MIX
+						);
+
+						var light = new THREE.OperatorNode(
+							new THREE.LightNode(),
+							color,
+							THREE.OperatorNode.ADD
+						);
+
+						mtl.color = new THREE.ColorNode( 0xffffff );
+						mtl.roughness = new THREE.FloatNode( .1 );
+						mtl.metalness = new THREE.FloatNode( .5 );
+
+						mtl.light = light;
+						mtl.environment = color;
+
+					}
+
+					// GUI
+
+					addGui( 'frontColor', frontColor.value.getHex(), function( val ) {
+
+						frontColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'backColor', backColor.value.getHex(), function( val ) {
+
+						backColor.value.setHex( val );
+
+					}, true );
+
+					addGui( 'area', sss.b.number, function( val ) {
+
+						sss.b.number = val;
+
+					}, false, 0, 1 );
+
+					break;
+			}
+
+			// build shader
+			mtl.build();
+
+			// set material
+			mesh.material = mtl;
+
+		}
+
+		function onWindowResize() {
+
+			var width = window.innerWidth, height = window.innerHeight;
+
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( width, height );
+
+			if ( rtTexture ) rtTexture.setSize( width, height );
+
+		}
+
+		function animate() {
+
+			var delta = clock.getDelta();
+
+			if ( move ) {
+
+				var time = Date.now() * 0.005;
+
+				mesh.position.z = Math.cos( time ) * 10;
+				mesh.position.y = Math.sin( time ) * 10;
+
+			} else {
+
+				mesh.position.z = mesh.position.y = 0;
+
+			}
+
+			//mesh.rotation.z += .01;
+
+			// update material animation and/or gpu calcs (pre-renderer)
+			mesh.material.updateFrame( delta );
+
+			// render to texture for sss/translucent material only
+			if ( rtTexture ) {
+
+				scene.overrideMaterial = rtMaterial;
+
+				renderer.render( scene, camera, rtTexture, true );
+
+				scene.overrideMaterial = null;
+
+			}
+
+			renderer.render( scene, camera );
+
+			requestAnimationFrame( animate );
+
+		}
+
+		</script>
+
+	</body>
+</html>

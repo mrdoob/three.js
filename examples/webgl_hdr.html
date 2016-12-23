@@ -5,27 +5,27 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #fff;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-			color:#fff;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
 
-		    }
+			}
 
-		    a { color: red; }
+			a { color: red; }
 
 		</style>
 	</head>
@@ -37,7 +37,7 @@
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -126,36 +126,35 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
+				var texture = new THREE.TextureLoader().load( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { type: "t", value: texture },
-						exposure:  { type: "f", value: 0.125 },
-						brightMax: { type: "f", value: 0.5 }
+						tDiffuse:  { value: texture },
+						exposure:  { value: 0.125 },
+						brightMax: { value: 0.5 }
 						},
 					vertexShader: getText( 'vs-hdr' ),
 					fragmentShader: getText( 'fs-hdr' )
 
 				} );
 
-				var plane = new THREE.PlaneGeometry( 512, 768 );
+				var plane = new THREE.PlaneBufferGeometry( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;
 				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

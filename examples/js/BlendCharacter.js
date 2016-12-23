@@ -4,11 +4,57 @@
 
 THREE.BlendCharacter = function () {
 
-	this.animations = {};
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
-	this.load = function( url, onLoad ) {
+	this.load = function ( url, onLoad ) {
+
+		var scope = this;
+
+		var loader = new THREE.ObjectLoader();
+		loader.load( url, function( loadedObject ) {
+
+			// The exporter does not currently allow exporting a skinned mesh by itself
+			// so we must fish it out of the hierarchy it is embedded in (scene)
+			loadedObject.traverse( function( object ) {
+
+				if ( object instanceof THREE.SkinnedMesh ) {
+
+					scope.skinnedMesh = object;
+
+				}
+
+			} );
+
+			THREE.SkinnedMesh.call( scope, scope.skinnedMesh.geometry, scope.skinnedMesh.material );
+
+			// If we didn't successfully find the mesh, bail out
+			if ( scope.skinnedMesh == undefined ) {
+
+				console.log( 'unable to find skinned mesh in ' + url );
+				return;
+
+			}
+
+			scope.material.skinning = true;
+
+			scope.mixer = new THREE.AnimationMixer( scope );
+
+			// Create the animations
+			for ( var i = 0; i < scope.geometry.animations.length; ++ i ) {
+
+				scope.mixer.clipAction( scope.geometry.animations[ i ] );
+
+			}
+
+			// Loading is complete, fire the callback
+			if ( onLoad !== undefined ) onLoad();
+
+		} );
+
+	};
+
+	this.loadJSON = function ( url, onLoad ) {
 
 		var scope = this;
 
@@ -20,24 +66,15 @@ THREE.BlendCharacter = function () {
 
 			THREE.SkinnedMesh.call( scope, geometry, originalMaterial );
 
+			var mixer = new THREE.AnimationMixer( scope );
+			scope.mixer = mixer;
+
 			// Create the animations
+			for ( var i = 0; i < geometry.animations.length; ++ i ) {
 
-			for ( var i = 0; i < geometry.animations.length; ++i ) {
-
-				THREE.AnimationHandler.add( geometry.animations[ i ] );
-
-				var animName = geometry.animations[ i ].name;
-				scope.animations[ animName ] = new THREE.Animation( scope, animName );
+				mixer.clipAction( geometry.animations[ i ] );
 
 			}
-
-			// Create the debug visualization
-
-			scope.skeletonHelper = new THREE.SkeletonHelper( scope );
-			scope.skeletonHelper.material.linewidth = 3;
-			scope.add( scope.skeletonHelper );
-
-			scope.showSkeleton( false );
 
 			// Loading is complete, fire the callback
 			if ( onLoad !== undefined ) onLoad();
@@ -45,212 +82,84 @@ THREE.BlendCharacter = function () {
 		} );
 
 	};
-
+	
 	this.update = function( dt ) {
 
-		for ( var i = this.weightSchedule.length - 1; i >= 0; --i ) {
-
-			var data = this.weightSchedule[ i ];
-			data.timeElapsed += dt;
-
-			// If the transition is complete, remove it from the schedule
-
-			if ( data.timeElapsed > data.duration ) {
-
-				data.anim.weight = data.endWeight;
-				this.weightSchedule.splice( i, 1 );
-
-				// If we've faded out completely, stop the animation
-
-				if ( data.anim.weight == 0 ) {
-
-					data.anim.stop( 0 );
-
-				}
-
-			} else {
-
-				// interpolate the weight for the current time
-
-				data.anim.weight = data.startWeight + (data.endWeight - data.startWeight) * data.timeElapsed / data.duration;
-
-			}
-
-		}
-
-		this.updateWarps( dt );
-		this.skeletonHelper.update();
+		this.mixer.update( dt );
 
 	};
 
-	this.updateWarps = function( dt ) {
+	this.play = function( animName, weight ) {
 
-		// Warping modifies the time scale over time to make 2 animations of different
-		// lengths match. This is useful for smoothing out transitions that get out of
-		// phase such as between a walk and run cycle
-
-		for ( var i = this.warpSchedule.length - 1; i >= 0; --i ) {
-
-			var data = this.warpSchedule[ i ];
-			data.timeElapsed += dt;
-
-			if ( data.timeElapsed > data.duration ) {
-
-				data.to.weight = 1;
-				data.to.timeScale = 1;
-				data.from.weight = 0;
-				data.from.timeScale = 1;
-				data.from.stop( 0 );
-
-				this.warpSchedule.splice( i, 1 );
-
-			} else {
-
-				var alpha = data.timeElapsed / data.duration;
-
-				var fromLength = data.from.data.length;
-				var toLength = data.to.data.length;
-
-				var fromToRatio = fromLength / toLength;
-				var toFromRatio = toLength / fromLength;
-
-				// scale from each time proportionally to the other animation
-
-				data.from.timeScale = ( 1 - alpha ) + fromToRatio * alpha;
-				data.to.timeScale = alpha + toFromRatio * ( 1 - alpha );
-
-				data.from.weight = 1 - alpha;
-				data.to.weight = alpha;
-
-			}
-
-		}
-
-	}
-
-	this.play = function(animName, weight) {
-
-		this.animations[ animName ].play( 0, weight );
-
+		//console.log("play('%s', %f)", animName, weight);
+		return this.mixer.clipAction( animName ).
+				setEffectiveWeight( weight ).play();
 	};
 
 	this.crossfade = function( fromAnimName, toAnimName, duration ) {
 
-		var fromAnim = this.animations[ fromAnimName ];
-		var toAnim = this.animations[ toAnimName ];
+		this.mixer.stopAllAction();
 
-		fromAnim.play( 0, 1 );
-		toAnim.play( 0, 0 );
+		var fromAction = this.play( fromAnimName, 1 );
+		var toAction = this.play( toAnimName, 1 );
 
-		this.weightSchedule.push( {
-
-			anim: fromAnim,
-			startWeight: 1,
-			endWeight: 0,
-			timeElapsed: 0,
-			duration: duration
-
-		} );
-
-		this.weightSchedule.push( {
-
-			anim: toAnim,
-			startWeight: 0,
-			endWeight: 1,
-			timeElapsed: 0,
-			duration: duration
-
-		} );
+		fromAction.crossFadeTo( toAction, duration, false );
 
 	};
 
 	this.warp = function( fromAnimName, toAnimName, duration ) {
 
-		var fromAnim = this.animations[ fromAnimName ];
-		var toAnim = this.animations[ toAnimName ];
+		this.mixer.stopAllAction();
 
-		fromAnim.play( 0, 1 );
-		toAnim.play( 0, 0 );
+		var fromAction = this.play( fromAnimName, 1 );
+		var toAction = this.play( toAnimName, 1 );
 
-		this.warpSchedule.push( {
-
-			from: fromAnim,
-			to: toAnim,
-			timeElapsed: 0,
-			duration: duration
-
-		} );
+		fromAction.crossFadeTo( toAction, duration, true );
 
 	};
 
-	this.applyWeight = function(animName, weight) {
+	this.applyWeight = function( animName, weight ) {
 
-		this.animations[ animName ].weight = weight;
+		this.mixer.clipAction( animName ).setEffectiveWeight( weight );
+
+	};
+
+	this.getWeight = function( animName ) {
+
+		return this.mixer.clipAction( animName ).getEffectiveWeight();
 
 	};
 
 	this.pauseAll = function() {
 
-		for ( var a in this.animations ) {
-
-			if ( this.animations[ a ].isPlaying ) {
-
-				this.animations[ a ].pause();
-
-			}
-
-		}
+		this.mixer.timeScale = 0;
 
 	};
 
 	this.unPauseAll = function() {
 
-	for ( var a in this.animations ) {
+		this.mixer.timeScale = 1;
 
-	  if ( this.animations[ a ].isPlaying && this.animations[ a ].isPaused ) {
-
-		this.animations[ a ].pause();
-
-	  }
-
-	}
-
-  };
+	};
 
 
 	this.stopAll = function() {
 
-		for ( a in this.animations ) {
+		this.mixer.stopAllAction();
 
-			if ( this.animations[ a ].isPlaying ) {
-				this.animations[ a ].stop(0);
-			}
-
-			this.animations[ a ].weight = 0;
-
-		}
-
-		this.weightSchedule.length = 0;
-		this.warpSchedule.length = 0;
-
-	}
-
-	this.showSkeleton = function( boolean ) {
-
-		this.skeletonHelper.visible = boolean;
-
-	}
+	};
 
 	this.showModel = function( boolean ) {
 
 		this.visible = boolean;
 
-	}
+	};
 
 };
 
 
 THREE.BlendCharacter.prototype = Object.create( THREE.SkinnedMesh.prototype );
+THREE.BlendCharacter.prototype.constructor = THREE.BlendCharacter;
 
 THREE.BlendCharacter.prototype.getForward = function() {
 
@@ -260,12 +169,14 @@ THREE.BlendCharacter.prototype.getForward = function() {
 
 		// pull the character's forward basis vector out of the matrix
 		forward.set(
-			-this.matrix.elements[ 8 ],
-			-this.matrix.elements[ 9 ],
-			-this.matrix.elements[ 10 ]
+			- this.matrix.elements[ 8 ],
+			- this.matrix.elements[ 9 ],
+			- this.matrix.elements[ 10 ]
 		);
 
 		return forward;
+
 	}
-}
+
+};
 

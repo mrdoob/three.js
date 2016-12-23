@@ -14,7 +14,11 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id='container1' style='float: left '></div>
@@ -43,10 +47,11 @@
 
 				scene = new THREE.Scene();
 
+				var textureLoader = new THREE.TextureLoader();
 
 				// MESH - Repeat Pattern
 
-				texture = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 
@@ -59,7 +64,7 @@
 
 				// SPRITES - from Sprite Sheet
 
-				texture1 = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg', undefined, function() {
+				texture1 = textureLoader.load( 'textures/UV_Grid_Sm.jpg', function() {
 
 					texture1.wrapS = THREE.ClampToEdgeWrapping;
 					texture1.wrapT = THREE.ClampToEdgeWrapping;
@@ -76,9 +81,9 @@
 						tex.repeat.y = 0.1 * THREE.Math.randInt( 1, 3 );
 
 						var material = new THREE.SpriteMaterial( { map: tex } );
-						var sprite = new THREE.Sprite( material );
+						material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
 
-						sprite.material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
+						var sprite = new THREE.Sprite( material );
 
 						sprite.position.x = Math.random() * 1000 - 500;
 						sprite.position.y = Math.random() * 1000 - 500;
@@ -95,7 +100,7 @@
 
 				// SPRITES - Repeat Pattern
 
-				texture2 = THREE.ImageUtils.loadTexture( 'textures/sprite0.jpg' );
+				texture2 = textureLoader.load( 'textures/sprite0.jpg' );
 				texture2.wrapS = THREE.RepeatWrapping;
 				texture2.wrapT = THREE.RepeatWrapping;
 
@@ -119,16 +124,16 @@
 
 				// SPRITES - PNG
 
+				texture3 = textureLoader.load( 'textures/sprite1.png' );
+				texture3.wrapS = THREE.ClampToEdgeWrapping;
+				texture3.wrapT = THREE.ClampToEdgeWrapping;
+
 				for ( var i = 0; i < 20; i ++ ) {
 
-					texture3 = THREE.ImageUtils.loadTexture( 'textures/sprite1.png' );
-					texture3.wrapS = THREE.ClampToEdgeWrapping;
-					texture3.wrapT = THREE.ClampToEdgeWrapping;
-
 					var material = new THREE.SpriteMaterial( { map: texture3 } );
-					var sprite = new THREE.Sprite( material );
+					material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
 
-					sprite.material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
+					var sprite = new THREE.Sprite( material );
 
 					sprite.position.x = Math.random() * 1000 - 500;
 					sprite.position.y = Math.random() * 1000 - 500;
@@ -144,20 +149,20 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				var container1 = document.getElementById( 'container1' );
 				container1.appendChild( canvasRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				var container2 = document.getElementById( 'container2' );
 				container2.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				document.body.appendChild( stats.domElement );
+				document.body.appendChild( stats.dom );
 
 				//
 

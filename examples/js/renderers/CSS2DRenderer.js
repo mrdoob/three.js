@@ -15,12 +15,6 @@ THREE.CSS2DObject = function ( element ) {
 
 			this.element.parentNode.removeChild( this.element );
 
-			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-				this.children[ i ].dispatchEvent( event );
-
-			}
-
 		}
 
 	} );
@@ -28,12 +22,13 @@ THREE.CSS2DObject = function ( element ) {
 };
 
 THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 //
 
 THREE.CSS2DRenderer = function () {
 
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -65,7 +60,7 @@ THREE.CSS2DRenderer = function () {
 		if ( object instanceof THREE.CSS2DObject ) {
 
 			vector.setFromMatrixPosition( object.matrixWorld );
-			vector.applyProjection( viewProjectionMatrix );
+			vector.applyMatrix4( viewProjectionMatrix );
 
 			var element = object.element;
 			var style = 'translate(-50%,-50%) translate(' + ( vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - vector.y * _heightHalf + _heightHalf ) + 'px)';
@@ -95,7 +90,7 @@ THREE.CSS2DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

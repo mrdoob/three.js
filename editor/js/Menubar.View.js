@@ -1,37 +1,41 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.View = function ( editor ) {
-	
-	var menuConfig,
-		optionsPanel,
-		createOption,
-		createDivider;
 
-	function onLightThemeOptionClick () {
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
 
-		editor.setTheme( 'css/light.css' );
-		editor.config.setKey( 'theme', 'css/light.css' );
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'View' );
+	container.add( title );
 
-	}
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
 
-	function onDarkThemeOptionClick () {
+	// VR mode
 
-		editor.setTheme( 'css/dark.css' );
-		editor.config.setKey( 'theme', 'css/dark.css' );
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'VR mode' );
+	option.onClick( function () {
 
-	}
-	
+		if ( WEBVR.isAvailable() === true ) {
 
-	// configure menu contents
+			editor.signals.enterVR.dispatch();
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
+		} else {
 
-	menuConfig    = [
-		createOption( 'Light theme', onLightThemeOptionClick ),
-		createOption( 'Dark theme', onDarkThemeOptionClick )
-	];
+			alert( 'WebVR not available' );
 
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+		}
 
-	return UI.MenubarHelper.createMenuContainer( 'Help', optionsPanel );
+	} );
+	options.add( option );
 
-}
+	return container;
+
+};

@@ -1,7 +1,7 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / http://github.com/zz85
- * @author bhouston / http://exocortex.com
+ * @author bhouston / http://clara.io
  *
  * Creates an arrow for visualizing directions
  *
@@ -9,52 +9,62 @@
  *  dir - Vector3
  *  origin - Vector3
  *  length - Number
- *  hex - color in hex value
+ *  color - color in hex value
  *  headLength - Number
  *  headWidth - Number
  */
 
-THREE.ArrowHelper = function ( dir, origin, length, hex, headLength, headWidth ) {
+import { Vector3 } from '../../math/Vector3';
+import { Object3D } from '../../core/Object3D';
+import { CylinderBufferGeometry } from '../../geometries/CylinderBufferGeometry';
+import { Float32BufferAttribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
+import { Mesh } from '../../objects/Mesh';
+import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Line } from '../../objects/Line';
+
+var lineGeometry = new BufferGeometry();
+lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+
+var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+coneGeometry.translate( 0, - 0.5, 0 );
+
+function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	// dir is assumed to be normalized
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
-	if ( hex === undefined ) hex = 0xffff00;
+	if ( color === undefined ) color = 0xffff00;
 	if ( length === undefined ) length = 1;
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.position = origin;
+	this.position.copy( origin );
 
-	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 1, 0 ) );
-
-	this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: hex } ) );
+	this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
-	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
-
-	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
+	this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
 	this.setDirection( dir );
 	this.setLength( length, headLength, headWidth );
 
-};
+}
 
-THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
+ArrowHelper.prototype = Object.create( Object3D.prototype );
+ArrowHelper.prototype.constructor = ArrowHelper;
 
-THREE.ArrowHelper.prototype.setDirection = function () {
+ArrowHelper.prototype.setDirection = ( function () {
 
-	var axis = new THREE.Vector3();
+	var axis = new Vector3();
 	var radians;
 
-	return function ( dir ) {
+	return function setDirection( dir ) {
 
 		// dir is assumed to be normalized
 
@@ -78,14 +88,14 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 	};
 
-}();
+}() );
 
-THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
+ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, length, 1 );
+	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
@@ -94,9 +104,12 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 
 };
 
-THREE.ArrowHelper.prototype.setColor = function ( hex ) {
+ArrowHelper.prototype.setColor = function ( color ) {
 
-	this.line.material.color.setHex( hex );
-	this.cone.material.color.setHex( hex );
+	this.line.material.color.copy( color );
+	this.cone.material.color.copy( color );
 
 };
+
+
+export { ArrowHelper };

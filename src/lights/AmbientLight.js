@@ -1,21 +1,26 @@
+import { Light } from './Light';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( color ) {
+function AmbientLight( color, intensity ) {
 
-	THREE.Light.call( this, color );
+	Light.call( this, color, intensity );
 
-};
+	this.type = 'AmbientLight';
 
-THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
+	this.castShadow = undefined;
 
-THREE.AmbientLight.prototype.clone = function () {
+}
 
-	var light = new THREE.AmbientLight();
+AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	THREE.Light.prototype.clone.call( this, light );
+	constructor: AmbientLight,
 
-	return light;
+	isAmbientLight: true
 
-};
+} );
+
+
+export { AmbientLight };

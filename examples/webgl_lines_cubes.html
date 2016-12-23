@@ -44,7 +44,7 @@
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/geometries/hilbert3D.js"></script>
 
@@ -67,7 +67,7 @@
 
 			function init() {
 
-				var i, material, container;
+				var i, container;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -78,6 +78,7 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -103,7 +104,7 @@
 
 								   [ m1, scale*0.5, [2*d, 0, 0],  g1 ], [ m1, scale*0.5, [-2*d, 0, 0],  g1 ],
 								   [ m1, scale*0.5, [2*d, d, 0],  g1 ], [ m1, scale*0.5, [-2*d, d, 0],  g1 ],
-								   [ m1, scale*0.5, [2*d, -d, 0], g1 ], [ m1, scale*0.5, [-2*d, -d, 0], g1 ],
+								   [ m1, scale*0.5, [2*d, -d, 0], g1 ], [ m1, scale*0.5, [-2*d, -d, 0], g1 ]
 								   ];
 
 				for ( i = 0; i < parameters.length; i ++ ) {

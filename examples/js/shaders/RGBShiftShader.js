@@ -14,9 +14,9 @@ THREE.RGBShiftShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"amount":   { type: "f", value: 0.005 },
-		"angle":    { type: "f", value: 0.0 }
+		"tDiffuse": { value: null },
+		"amount":   { value: 0.005 },
+		"angle":    { value: 0.0 }
 
 	},
 
@@ -31,7 +31,7 @@ THREE.RGBShiftShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -51,6 +51,6 @@ THREE.RGBShiftShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

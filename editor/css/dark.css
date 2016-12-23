@@ -1,113 +1,79 @@
-﻿* {
-	vertical-align: middle;
-}
-
-	/* Webkit micro scrollbars */
-
-	::-webkit-scrollbar {
-		width:9px;
-	}
-
-	::-webkit-scrollbar-track {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.1);
-	}
-
-	::-webkit-scrollbar-thumb {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.2);
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background:rgba(140,140,140,0.4);
-	}
-
-	::-webkit-scrollbar-thumb:window-inactive {
-		background:rgba(140,140,140,0.5);
-	}
-
-body {
-	font-family: Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
-}
-
-hr {
-	border: 0px;
-	border-top: 1px solid #ccc;
-}
-
 button {
-	position: relative;
-}
-
-.Panel {
-
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-}
-
-.CollapsiblePanel .CollapsiblePanelButton {
-	float: left;
-	margin-right: 6px;
-	width: 0px;
-	height: 0px;
-	border: 6px solid transparent;
-}
-
-.CollapsiblePanel.collapsed .CollapsiblePanelButton {
-	margin-top: 2px;
-	border-left-color: #555;
-}
-
-.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
-	margin-top: 6px;
-	border-top-color: #555;
-}
-
-.CollapsiblePanel.collapsed .CollapsibleContent {
-	display: none;
-}
-
-.FancySelect {
-	background: #222;
-	border: 1px solid #3C3C3C;
-	padding: 0;
-	cursor: default;
-	overflow: auto;
+	color: #aaa;
+	background-color: #222;
+	border: 0px;
+	padding: 5px 8px;
+	text-transform: uppercase;
+	cursor: pointer;
 	outline: none;
 }
 
-	.FancySelect .option {
-		padding: 4px;
-		white-space: nowrap;
+	button:hover {
+		color: #ccc;
+		background-color: #444;
 	}
 
-	.FancySelect .option.active {
-		background-color: #153C5E;
+	button.selected {
+		color: #fff;
+		background-color: #08f;
 	}
+
+input, textarea {
+	background-color: #222;
+	border: 1px solid transparent;
+	color: #888;
+}
 
 input.Number {
-	color: #2A75B7;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	color: #08f!important;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
 
+select {
+	color: #aaa;
+	background-color: #222;
+	border: 0px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+	select:hover {
+		color: #ccc;
+		background-color: #444;
+	}
+
+/* UI */
+
 #viewport {
 	position: absolute;
 	top: 32px;
-	left: 0px;
+	left: 0;
+	right: 300px;
+	bottom: 32px;
+}
+
+	#viewport #info {
+		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+		pointer-events: none;
+	}
+
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0;
 	right: 300px;
 	bottom: 32px;
 }
@@ -116,27 +82,39 @@ input.Number {
 	position: absolute;
 	width: 100%;
 	height: 32px;
-	background-color: #111;
-	padding: 0px;
-	margin: 0px;
+	background: #111;
+	padding: 0;
+	margin: 0;
+	right: 0;
+	top: 0;
 }
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
-	#menubar .Panel {
-		color: #888;
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		padding-right: 0;
+		text-align: right;
 	}
+
+		#menubar .menu .title {
+			display: inline-block;
+			color: #888;
+			margin: 0;
+			padding: 8px;
+		}
 
 		#menubar .menu .options {
+			position: absolute;
 			display: none;
-			padding: 5px 0px;
-			background-color: #111;
-			width: 140px;
-			border-top: solid 1px #1D1D1D;
+			padding: 5px 0;
+			background: #111;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {
@@ -144,14 +122,14 @@ input.Number {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #444;
+				border-color: #222;
 			}
 
 			#menubar .menu .options .option {
-				color: #666;
+				color: #888;
 				background-color: transparent;
 				padding: 5px 10px;
-				margin: 0px !important;
+				margin: 0 !important;
 			}
 
 				#menubar .menu .options .option:hover {
@@ -159,59 +137,79 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					background: transparent;
+				}
+
+		#menubar .menu .options .inactive {
+			color: #444;
+			background-color: transparent;
+			padding: 5px 10px;
+			margin: 0 !important;
+		}
 
 #sidebar {
 	position: absolute;
-	right: 0px;
+	right: 0;
 	top: 32px;
-	bottom: 0px;
+	bottom: 0;
 	width: 300px;
 	background-color: #111;
 	overflow: auto;
 }
 
-	#sidebar input,
-	#sidebar textarea,
-	#sidebar select {
-		background: #ccc;
+	#sidebar * {
+		vertical-align: middle;
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #222;
 	}
 
 	#sidebar .Panel.collapsed {
-		margin-bottom: 0px;
-	}
-
-	#sidebar > .Panel {
-		color: #888;
-		padding: 10px;
-		border-top: 1px solid #333;
-	}
-
-	#sidebar #outliner {
-		width: 100%;
-		height: 140px;
-		color: #868686;
-		font-size: 12px;
+		margin-bottom: 0;
 	}
 
 	#sidebar .Panel.Material canvas {
-
 		border: solid 1px #5A5A5A;
+	}
 
+	#sidebar .Row {
+		min-height: 20px;
+		margin-bottom: 10px;
+	}
+
+#tabs {
+	background-color: #1b1b1b;
+	border-top: 1px solid #222;
+}
+
+	#tabs span {
+		color: #555;
+		border-right: 1px solid #222;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #111;
 	}
 
 #toolbar {
 	position: absolute;
-	left: 0px;
+	left: 0;
 	right: 300px;
-	bottom: 0px;
+	bottom: 0;
 	height: 32px;
 	background-color: #111;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;
@@ -222,4 +220,36 @@ input.Number {
 		margin-right: 6px;
 	}
 
+.Outliner {
+	color: #888;
+	background: #222;
+	padding: 0;
+	width: 100%;
+	height: 140px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+	outline: none;
+}
 
+	.Outliner .option {
+		padding: 4px;
+		white-space: nowrap;
+	}
+
+	.Outliner .option:hover {
+		background-color: rgba(21,60,94,0.5);
+	}
+
+
+	.Outliner .option.active {
+		background-color: rgba(21,60,94,1);
+	}
+
+.Panel.Collapsible.collapsed .Static .Button {
+	border-left-color: #444;
+}
+
+.Panel.Collapsible:not(.collapsed) .Static .Button {
+	border-top-color: #444;
+}

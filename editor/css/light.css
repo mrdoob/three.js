@@ -1,87 +1,75 @@
-﻿* {
-	vertical-align: middle;
-}
-
-body {
-	font-family: Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
-}
-
-hr {
-	border: 0px;
-	border-top: 1px solid #ccc;
-}
-
 button {
-	position: relative;
-}
-
-.Panel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-}
-
-.CollapsiblePanel .CollapsiblePanelButton {
-	float: left;
-	margin-right: 6px;
-	width: 0px;
-	height: 0px;
-	border: 6px solid transparent;
-}
-
-.CollapsiblePanel.collapsed .CollapsiblePanelButton {
-	margin-top: 2px;
-	border-left-color: #bbb;
-}
-
-.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
-	margin-top: 6px;
-	border-top-color: #bbb;
-}
-
-.CollapsiblePanel.collapsed .CollapsibleContent {
-	display: none;
-}
-
-.FancySelect {
-	background: #fff;
-	border: 1px solid #ccc;
-	padding: 0;
-	cursor: default;
-	overflow: auto;
+	color: #555;
+	background-color: #ddd;
+	border: 0px;
+	padding: 5px 8px;
+	text-transform: uppercase;
+	cursor: pointer;
 	outline: none;
 }
 
-	.FancySelect .option {
-		padding: 4px;
-		color: #666;
-		white-space: nowrap;
+	button:hover {
+		background-color: #fff;
 	}
 
-	.FancySelect .option.active {
-		background-color: #f8f8f8;
+	button.selected {
+		background-color: #fff;
 	}
+
+input, textarea {
+	border: 1px solid transparent;
+	color: #444;
+}
 
 input.Number {
-	color: #0080f0;
-	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
-	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
-	border: 1px solid transparent;
+	color: #08f!important;
+	font-size: 12px;
+	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
 
+select {
+	color: #666;
+	background-color: #ddd;
+	border: 0px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+	select:hover {
+		background-color: #fff;
+	}
+
+/* UI */
+
 #viewport {
 	position: absolute;
 	top: 32px;
-	left: 0px;
+	left: 0;
+	right: 300px;
+	bottom: 32px;
+}
+
+	#viewport #info {
+		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+		pointer-events: none;
+	}
+
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0;
 	right: 300px;
 	bottom: 32px;
 }
@@ -91,25 +79,38 @@ input.Number {
 	width: 100%;
 	height: 32px;
 	background: #eee;
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
+	right: 0;
+	top: 0;
 }
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
-	#menubar .Panel {
-		color: #888;
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		padding-right: 0;
+		text-align: right;
 	}
+
+		#menubar .menu .title {
+			display: inline-block;
+			color: #888;
+			margin: 0;
+			padding: 8px;
+		}
 
 		#menubar .menu .options {
+			position: absolute;
 			display: none;
-			padding: 5px 0px;
+			padding: 5px 0;
 			background: #eee;
-			width: 140px;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {
@@ -124,7 +125,7 @@ input.Number {
 				color: #666;
 				background-color: transparent;
 				padding: 5px 10px;
-				margin: 0px !important;
+				margin: 0 !important;
 			}
 
 				#menubar .menu .options .option:hover {
@@ -132,53 +133,76 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					color: #666;
+					background: transparent;
+				}
+
+		#menubar .menu .options .inactive {
+			color: #bbb;
+			background-color: transparent;
+			padding: 5px 10px;
+			margin: 0 !important;
+		}
 
 #sidebar {
 	position: absolute;
-	right: 0px;
+	right: 0;
 	top: 32px;
-	bottom: 0px;
+	bottom: 0;
 	width: 300px;
 	background: #eee;
 	overflow: auto;
 }
 
-	#sidebar input,
-	#sidebar textarea,
-	#sidebar select {
-		/* background: #ccc; */
+	#sidebar * {
+		vertical-align: middle;
 	}
 
 	#sidebar .Panel {
-		margin-bottom: 10px;
-	}
-
-	#sidebar .Panel.collapsed {
-		margin-bottom: 0px;
-	}
-
-	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
 		border-top: 1px solid #ccc;
 	}
 
-	#sidebar #outliner {
-		width: 100%;
-		height: 140px;
-		color: #444;
-		font-size: 12px;
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0;
+	}
+
+	#sidebar .Row {
+		min-height: 20px;
+		margin-bottom: 10px;
+	}
+
+#tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	#tabs span {
+		color: #aaa;
+		border-right: 1px solid #ccc;
+		padding: 10px;
+	}
+
+	#tabs span.selected {
+		color: #888;
+		background-color: #eee;
 	}
 
 #toolbar {
 	position: absolute;
-	left: 0px;
+	left: 0;
 	right: 300px;
-	bottom: 0px;
+	bottom: 0;
 	height: 32px;
 	background: #eee;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;
@@ -189,4 +213,28 @@ input.Number {
 		margin-right: 6px;
 	}
 
+.Outliner {
+	color: #444;
+	background-color: #fff;
+	padding: 0;
+	width: 100%;
+	height: 140px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+	outline: none !important;
+}
 
+	.Outliner .option {
+		padding: 4px;
+		color: #666;
+		white-space: nowrap;
+	}
+
+	.Outliner .option:hover {
+		background-color: rgba(0,0,0,0.02);
+	}
+
+	.Outliner .option.active {
+		background-color: rgba(0,0,0,0.04);
+	}

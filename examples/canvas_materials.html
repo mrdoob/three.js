@@ -15,7 +15,10 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -24,7 +27,7 @@
 			var container, stats;
 
 			var camera, scene, renderer, objects;
-			var particleLight, pointLight;
+			var pointLight;
 
 			init();
 			animate();
@@ -57,25 +60,29 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
 
-				var line = new THREE.Line( geometry, material );
-				line.type = THREE.LinePieces;
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 14, 7 );
 
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthTexture = textureLoader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+
+				var envMap = textureLoader.load( 'textures/envmap.png' );
+				envMap.mapping = THREE.SphericalReflectionMapping;
+
 				var materials = [
 
 					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } ),
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: 0.5 } ),
-					new THREE.MeshDepthMaterial( { overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } ),
 					new THREE.MeshNormalMaterial( { overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ), overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalRefractionMapping() ), overdraw: 0.5 } )
+					new THREE.MeshBasicMaterial( { map: earthTexture } ),
+					new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } )
 
 				];
 
@@ -86,7 +93,7 @@
 
 				}
 
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
+				materials.push( new THREE.MultiMaterial( materials ) );
 
 				objects = [];
 
@@ -114,11 +121,7 @@
 					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
-				}
-
-				particleLight = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xffffff, program: program } ) );
-				particleLight.scale.x = particleLight.scale.y = 8;
-				scene.add( particleLight );
+				};
 
 				// Lights
 
@@ -134,7 +137,12 @@
 				pointLight = new THREE.PointLight( 0xffffff, 1 );
 				scene.add( pointLight );
 
+				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xffffff, program: program } ) );
+				sprite.scale.set( 8, 8, 8 );
+				pointLight.add( sprite );
+
 				renderer = new THREE.CanvasRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -152,9 +160,7 @@
 				debugContext.strokeStyle = '#000000';
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild(stats.dom);
 
 				//
 
@@ -174,7 +180,7 @@
 			function loadImage( path ) {
 
 				var image = document.createElement( 'img' );
-				var texture = new THREE.Texture( image, THREE.UVMapping )
+				var texture = new THREE.Texture( image, THREE.UVMapping );
 
 				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;
@@ -211,13 +217,9 @@
 
 				}
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 300;
-				particleLight.position.y = Math.cos( timer * 5 ) * 400;
-				particleLight.position.z = Math.cos( timer * 3 ) * 300;
-
-				pointLight.position.x = particleLight.position.x;
-				pointLight.position.y = particleLight.position.y;
-				pointLight.position.z = particleLight.position.z;
+				pointLight.position.x = Math.sin( timer * 7 ) * 300;
+				pointLight.position.y = Math.cos( timer * 5 ) * 400;
+				pointLight.position.z = Math.cos( timer * 3 ) * 300;
 
 				renderer.render( scene, camera );
 

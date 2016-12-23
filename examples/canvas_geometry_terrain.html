@@ -34,10 +34,14 @@
 		<div id="container"><br /><br /><br /><br /><br />Generating...</div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -65,30 +69,27 @@
 				scene = new THREE.Scene();
 
 				var data = generateHeight( 1024, 1024 );
-				var texture = new THREE.Texture( generateTexture( data, 1024, 1024 ) );
-				texture.needsUpdate = true;
-
+				var texture = new THREE.CanvasTexture( generateTexture( data, 1024, 1024 ) );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var quality = 16, step = 1024 / quality;
 
-				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
-				plane.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var geometry = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
+				geometry.rotateX( - Math.PI / 2 );
 
-				var editor = new THREE.GeometryEditor( plane );
-
-				for ( var i = 0, l = editor.vertices.length; i < l; i ++ ) {
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
 					var x = i % quality, y = Math.floor( i / quality );
-					editor.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
+					geometry.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
 
 				}
 
-				mesh = new THREE.Mesh( plane, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xbfd1e5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -96,9 +97,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

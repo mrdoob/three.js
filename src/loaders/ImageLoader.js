@@ -2,70 +2,77 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
 
-	this.cache = new THREE.Cache();
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-};
+function ImageLoader( manager ) {
 
-THREE.ImageLoader.prototype = {
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-	constructor: THREE.ImageLoader,
+}
+
+Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( url === undefined ) url = '';
+
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
-		var cached = scope.cache.get( url );
+		var cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
-			return;
+			scope.manager.itemStart( url );
 
-		}
+			setTimeout( function () {
 
-		var image = document.createElement( 'img' );
+				if ( onLoad ) onLoad( cached );
 
-		if ( onLoad !== undefined ) {
-
-			image.addEventListener( 'load', function ( event ) {
-
-				scope.cache.add( url, this );
-
-				onLoad( this );
 				scope.manager.itemEnd( url );
 
-			}, false );
+			}, 0 );
+
+			return cached;
 
 		}
 
-		if ( onProgress !== undefined ) {
+		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 
-			image.addEventListener( 'progress', function ( event ) {
+		image.addEventListener( 'load', function () {
 
-				onProgress( event );
+			THREE.Cache.add( url, this );
 
-			}, false );
+			if ( onLoad ) onLoad( this );
 
-		}
+			scope.manager.itemEnd( url );
 
-		if ( onError !== undefined ) {
+		}, false );
 
-			image.addEventListener( 'error', function ( event ) {
+		/*
+		image.addEventListener( 'progress', function ( event ) {
 
-				onError( event );
+			if ( onProgress ) onProgress( event );
 
-			}, false );
+		}, false );
+		*/
 
-		}
+		image.addEventListener( 'error', function ( event ) {
+
+			if ( onError ) onError( event );
+
+			scope.manager.itemError( url );
+
+		}, false );
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		image.src = url;
-
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 
@@ -74,7 +81,18 @@ THREE.ImageLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
-}
+} );
+
+
+export { ImageLoader };

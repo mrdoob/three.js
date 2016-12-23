@@ -1,3 +1,6 @@
+import { Material } from './Material';
+import { Color } from '../math/Color';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -5,27 +8,21 @@
  *  color: <hex>,
  *  opacity: <float>,
  *
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- *  depthWrite: <bool>,
- *
  *  linewidth: <float>,
  *
  *  scale: <float>,
  *  dashSize: <float>,
- *  gapSize: <float>,
- *
- *  vertexColors: <bool>
- *
- *  fog: <bool>
+ *  gapSize: <float>
  * }
  */
 
-THREE.LineDashedMaterial = function ( parameters ) {
+function LineDashedMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
-	this.color = new THREE.Color( 0xffffff );
+	this.type = 'LineDashedMaterial';
+
+	this.color = new Color( 0xffffff );
 
 	this.linewidth = 1;
 
@@ -33,34 +30,32 @@ THREE.LineDashedMaterial = function ( parameters ) {
 	this.dashSize = 3;
 	this.gapSize = 1;
 
-	this.vertexColors = false;
-
-	this.fog = true;
+	this.lights = false;
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
+LineDashedMaterial.prototype = Object.create( Material.prototype );
+LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
-THREE.LineDashedMaterial.prototype.clone = function () {
+LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
-	var material = new THREE.LineDashedMaterial();
+LineDashedMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.clone.call( this, material );
+	Material.prototype.copy.call( this, source );
 
-	material.color.copy( this.color );
+	this.color.copy( source.color );
 
-	material.linewidth = this.linewidth;
+	this.linewidth = source.linewidth;
 
-	material.scale = this.scale;
-	material.dashSize = this.dashSize;
-	material.gapSize = this.gapSize;
+	this.scale = source.scale;
+	this.dashSize = source.dashSize;
+	this.gapSize = source.gapSize;
 
-	material.vertexColors = this.vertexColors;
-
-	material.fog = this.fog;
-
-	return material;
+	return this;
 
 };
+
+
+export { LineDashedMaterial };
