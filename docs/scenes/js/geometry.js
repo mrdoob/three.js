@@ -91,25 +91,24 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-var CustomSinCurve = THREE.Curve.create(
+function CustomSinCurve( scale ){
 
-	function ( scale ) {
+	this.scale = ( scale === undefined ) ? 1 : scale;
 
-		this.scale = ( scale === undefined ) ? 1 : scale;
+}
 
-	},
+CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
+CustomSinCurve.prototype.constructor = CustomSinCurve;
 
-	function ( t ) {
+CustomSinCurve.prototype.getPoint = function ( t ) {
 
-		var tx = t * 3 - 1.5;
-		var ty = Math.sin( 2 * Math.PI * t );
-		var tz = 0;
+	var tx = t * 3 - 1.5;
+	var ty = Math.sin( 2 * Math.PI * t );
+	var tz = 0;
 
-		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
-	}
-
-);
+};
 
 // heart shape
 
