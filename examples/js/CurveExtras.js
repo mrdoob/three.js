@@ -13,9 +13,9 @@
 
 ( function( Curves ) {
 
-// GrannyKnot
+	// GrannyKnot
 
-function GrannyKnot() {}
+	function GrannyKnot() {}
 
 	GrannyKnot.prototype = Object.create( THREE.Curve.prototype );
 	GrannyKnot.prototype.constructor = GrannyKnot;
