@@ -191,11 +191,11 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 
 		var r = 0.5;
 
-		var tx = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t ),
-			ty = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t ),
-			tz = r * Math.sin( q * t );
+		var x = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t );
+		var y = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t );
+		var z = r * Math.sin( q * t );
 
-		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( radius );
+		return new THREE.Vector3( x, y, z ).multiplyScalar( radius );
 
 	};
 
