@@ -14625,6 +14625,23 @@
 
 		copy: function ( source ) {
 
+			var name, i, l;
+
+			// reset
+
+			this.index = null;
+			this.attributes = {};
+			this.morphAttributes = {};
+			this.groups = [];
+			this.boundingBox = null;
+			this.boundingSphere = null;
+
+			// name
+
+			this.name = source.name;
+
+			// index
+
 			var index = source.index;
 
 			if ( index !== null ) {
@@ -14633,23 +14650,71 @@
 
 			}
 
+			// attributes
+
 			var attributes = source.attributes;
 
-			for ( var name in attributes ) {
+			for ( name in attributes ) {
 
 				var attribute = attributes[ name ];
 				this.addAttribute( name, attribute.clone() );
 
 			}
 
+			// morph attributes
+
+			var morphAttributes = source.morphAttributes;
+
+			for ( name in morphAttributes ) {
+
+				var array = [];
+				var morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+
+				for ( i = 0, l = morphAttribute.length; i < l; i ++ ) {
+
+					array.push( morphAttribute[ i ].clone() );
+
+				}
+
+				this.morphAttributes[ name ] = array;
+
+			}
+
+			// groups
+
 			var groups = source.groups;
 
-			for ( var i = 0, l = groups.length; i < l; i ++ ) {
+			for ( i = 0, l = groups.length; i < l; i ++ ) {
 
 				var group = groups[ i ];
 				this.addGroup( group.start, group.count, group.materialIndex );
 
 			}
+
+			// bounding box
+
+			var boundingBox = source.boundingBox;
+
+			if ( boundingBox !== null ) {
+
+				this.boundingBox = boundingBox.clone();
+
+			}
+
+			// bounding sphere
+
+			var boundingSphere = source.boundingSphere;
+
+			if ( boundingSphere !== null ) {
+
+				this.boundingSphere = boundingSphere.clone();
+
+			}
+
+			// draw range
+
+			this.drawRange.start = source.drawRange.start;
+			this.drawRange.count = source.drawRange.count;
 
 			return this;
 
@@ -29396,7 +29461,7 @@
 
 			image.addEventListener( 'load', function () {
 
-				THREE.Cache.add( url, this );
+				Cache.add( url, this );
 
 				if ( onLoad ) onLoad( this );
 
