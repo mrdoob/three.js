@@ -50,7 +50,7 @@ THREE.GLTFLoader = ( function () {
 			var parser = new GLTFParser( json, {
 
 				path: path || this.path,
-				crossOrigin: !! this.crossOrigin
+				crossOrigin: this.crossOrigin
 
 			} );
 
@@ -793,7 +793,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					textureLoader.crossOrigin = options.crossOrigin || false;
+					if ( options.crossOrigin !== undefined ) textureLoader.setCrossOrigin( options.crossOrigin );
 
 					textureLoader.load( resolveURL( source.uri, options.path ), function ( _texture ) {
 
