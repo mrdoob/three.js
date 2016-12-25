@@ -59,6 +59,7 @@ function Material() {
 
 	//Private properties
 	this._alphaTest = 0;
+	this._fog = true;
 	this._needsUpdate = true;
 	this._side = FrontSide;
 
@@ -87,17 +88,17 @@ Material.prototype = {
 
 	},
 
-	get side() {
+	get fog() {
 
-		return this._side;
+		return this._fog;
 
 	},
 
-	set side( value ) {
+	set fog( value ) {
 
-		if ( value !== this._side ) {
+		if ( value !== this._fog ) {
 
-			this._side = value;
+			this._fog = value;
 			this.needsUpdate = true;
 
 		}
@@ -117,6 +118,23 @@ Material.prototype = {
 
 	},
 
+	get side() {
+
+		return this._side;
+
+	},
+
+	set side( value ) {
+
+		if ( value !== this._side ) {
+
+			this._side = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
@@ -128,6 +146,15 @@ Material.prototype = {
 			if ( newValue === undefined ) {
 
 				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				continue;
+
+			}
+
+			//Check if there is a private version of the parameter and if so set that directly.
+			//This is to prevent needsUpdate being set multiple times on material creation
+			if ( this.hasOwnProperty( '_' + key ) ) {
+
+				this[ '_' + key ] = newValue;
 				continue;
 
 			}
@@ -370,6 +397,8 @@ Material.prototype = {
 	},
 
 	update: function () {
+
+		console.log( 'Material update called' );
 
 		this.dispatchEvent( { type: 'update' } );
 
