@@ -793,7 +793,7 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( options.crossOrigin !== undefined ) textureLoader.setCrossOrigin( options.crossOrigin );
+					textureLoader.setCrossOrigin( options.crossOrigin );
 
 					textureLoader.load( resolveURL( source.uri, options.path ), function ( _texture ) {
 
