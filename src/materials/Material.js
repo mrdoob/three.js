@@ -23,7 +23,6 @@ function Material() {
 
 	this.blending = NormalBlending;
 	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
-	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 	this.opacity = 1;
 	this.transparent = false;
@@ -62,6 +61,7 @@ function Material() {
 	this._fog = true;
 	this._needsUpdate = true;
 	this._side = FrontSide;
+	this._vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 }
 
@@ -129,6 +129,23 @@ Material.prototype = {
 		if ( value !== this._side ) {
 
 			this._side = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
+	get vertexColors() {
+
+		return this._vertexColors;
+
+	},
+
+	set vertexColors( value ) {
+
+		if ( value !== this._vertexColors ) {
+
+			this._vertexColors = value;
 			this.needsUpdate = true;
 
 		}
