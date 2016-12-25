@@ -22,7 +22,6 @@ function Material() {
 	this.lights = true;
 
 	this.blending = NormalBlending;
-	this.side = FrontSide;
 	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
 	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
@@ -52,14 +51,16 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
-	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
 
+	//Private properties
+	this._alphaTest = 0;
 	this._needsUpdate = true;
+	this._side = FrontSide;
 
 }
 
@@ -68,6 +69,40 @@ Material.prototype = {
 	constructor: Material,
 
 	isMaterial: true,
+
+	get alphaTest() {
+
+		return this._alphaTest;
+
+	},
+
+	set alphaTest( value ) {
+
+		if ( value !== this._alphaTest ) {
+
+			this._alphaTest = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
+	get side() {
+
+		return this._side;
+
+	},
+
+	set side( value ) {
+
+		if ( value !== this._side ) {
+
+			this._side = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
 
 	get needsUpdate() {
 
