@@ -40,20 +40,13 @@
 			[page:Camera Cameras] have two additional matrix4s:
 			<ul>
 				<li>
-					[page:Object3D.matrixWorldInverse]: The inverse of the [page:Object3D.matrixWorld] descibed above.
+					[page:Object3D.matrixWorldInverse]: The inverse of the [page:Object3D.matrixWorld] described above.
 				</li>
 				<li>
 					[page:Object3D.projectionMatrix]:
 				</li>
 			</ul>
 		</div>
-
-
-		<h2>Example</h2>
-
-		<code>
-var m = new Matrix4();
-		</code>
 
 		<h2>A Note on Row-Major and Column-Major Ordering</h2>
 		<div>
@@ -62,21 +55,25 @@ var m = new Matrix4();
 
 			This means that calling
 		<code>
+var m = new Matrix4();
+
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
-       31, 32, 33, 34 );
+       31, 32, 33, 34,
+       41, 42, 43, 44 );
 
 		</code>
 		will result in the [page:.elements elements] array containing:
 		<code>
 m.elements = [ 11, 21, 31, 41,
                12, 22, 32, 42,
-               13, 23, 33, 43 ];
+               13, 23, 33, 43,
+               14, 24, 34, 44 ];
 		</code>
 		and internally all calculations are performed using column-major ordering. However, as the actual ordering
 		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
 		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the transpose of any matrices outlined here to make sense of the calculations.
+		code, you'll have to take the [link: https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</div>
 
 
