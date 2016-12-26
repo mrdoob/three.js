@@ -4,7 +4,7 @@ import { Object3D } from '../core/Object3D';
 import { Mesh } from '../objects/Mesh';
 import { VertexColors } from '../constants';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronBufferGeometry';
+import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry';
 import { BufferAttribute } from '../core/BufferAttribute';
 
 /**
