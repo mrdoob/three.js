@@ -415,8 +415,6 @@ Material.prototype = {
 
 	update: function () {
 
-		console.log( 'Material update called' );
-
 		this.dispatchEvent( { type: 'update' } );
 
 	},
