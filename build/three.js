@@ -15073,6 +15073,34 @@
 	} );
 
 	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
+	 */
+
+	function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+		Geometry.call( this );
+
+		this.type = 'BoxGeometry';
+
+		this.parameters = {
+			width: width,
+			height: height,
+			depth: depth,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments,
+			depthSegments: depthSegments
+		};
+
+		this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
+		this.mergeVertices();
+
+	}
+
+	BoxGeometry.prototype = Object.create( Geometry.prototype );
+	BoxGeometry.prototype.constructor = BoxGeometry;
+
+	/**
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
@@ -15266,6 +15294,31 @@
 
 	BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
+	 */
+
+	function PlaneGeometry( width, height, widthSegments, heightSegments ) {
+
+		Geometry.call( this );
+
+		this.type = 'PlaneGeometry';
+
+		this.parameters = {
+			width: width,
+			height: height,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments
+		};
+
+		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+
+	}
+
+	PlaneGeometry.prototype = Object.create( Geometry.prototype );
+	PlaneGeometry.prototype.constructor = PlaneGeometry;
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -24020,6 +24073,33 @@
 	WireframeGeometry.prototype.constructor = WireframeGeometry;
 
 	/**
+	 * @author zz85 / https://github.com/zz85
+	 *
+	 * Parametric Surfaces Geometry
+	 * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
+	 */
+
+	function ParametricGeometry( func, slices, stacks ) {
+
+		Geometry.call( this );
+
+		this.type = 'ParametricGeometry';
+
+		this.parameters = {
+			func: func,
+			slices: slices,
+			stacks: stacks
+		};
+
+		this.fromBufferGeometry( new ParametricBufferGeometry( func, slices, stacks ) );
+		this.mergeVertices();
+
+	}
+
+	ParametricGeometry.prototype = Object.create( Geometry.prototype );
+	ParametricGeometry.prototype.constructor = ParametricGeometry;
+
+	/**
 	 * @author Mugen87 / https://github.com/Mugen87
 	 *
 	 * Parametric Surfaces Geometry
@@ -24104,31 +24184,31 @@
 	ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
 
 	/**
-	 * @author zz85 / https://github.com/zz85
-	 *
-	 * Parametric Surfaces Geometry
-	 * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
-	 */
+	 * @author clockworkgeek / https://github.com/clockworkgeek
+	 * @author timothypratley / https://github.com/timothypratley
+	 * @author WestLangley / http://github.com/WestLangley
+	*/
 
-	function ParametricGeometry( func, slices, stacks ) {
+	function PolyhedronGeometry( vertices, indices, radius, detail ) {
 
 		Geometry.call( this );
 
-		this.type = 'ParametricGeometry';
+		this.type = 'PolyhedronGeometry';
 
 		this.parameters = {
-			func: func,
-			slices: slices,
-			stacks: stacks
+			vertices: vertices,
+			indices: indices,
+			radius: radius,
+			detail: detail
 		};
 
-		this.fromBufferGeometry( new ParametricBufferGeometry( func, slices, stacks ) );
+		this.fromBufferGeometry( new PolyhedronBufferGeometry( vertices, indices, radius, detail ) );
 		this.mergeVertices();
 
 	}
 
-	ParametricGeometry.prototype = Object.create( Geometry.prototype );
-	ParametricGeometry.prototype.constructor = ParametricGeometry;
+	PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
+	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -24214,7 +24294,7 @@
 
 			// construct all of the vertices for this subdivision
 
-			for ( i = 0 ; i <= cols; i ++ ) {
+			for ( i = 0; i <= cols; i ++ ) {
 
 				v[ i ] = [];
 
@@ -24241,7 +24321,7 @@
 
 			// construct all of the faces
 
-			for ( i = 0; i < cols ; i ++ ) {
+			for ( i = 0; i < cols; i ++ ) {
 
 				for ( j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
@@ -24390,11 +24470,11 @@
 
 		}
 
-		function correctUV( uv, stride, vector, azimuth  ) {
+		function correctUV( uv, stride, vector, azimuth ) {
 
 			if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) {
 
-				uvBuffer[ stride ] =  uv.x - 1;
+				uvBuffer[ stride ] = uv.x - 1;
 
 			}
 
@@ -24429,6 +24509,29 @@
 	PolyhedronBufferGeometry.prototype.constructor = PolyhedronBufferGeometry;
 
 	/**
+	 * @author timothypratley / https://github.com/timothypratley
+	 */
+
+	function TetrahedronGeometry( radius, detail ) {
+
+		Geometry.call( this );
+
+		this.type = 'TetrahedronGeometry';
+
+		this.parameters = {
+			radius: radius,
+			detail: detail
+		};
+
+		this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
+		this.mergeVertices();
+
+	}
+
+	TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
+	TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+
+	/**
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
@@ -24460,30 +24563,30 @@
 	 * @author timothypratley / https://github.com/timothypratley
 	 */
 
-	function TetrahedronGeometry( radius, detail ) {
+	function OctahedronGeometry( radius, detail ) {
 
 		Geometry.call( this );
 
-		this.type = 'TetrahedronGeometry';
+		this.type = 'OctahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new TetrahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new OctahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
 
-	TetrahedronGeometry.prototype = Object.create( Geometry.prototype );
-	TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
+	OctahedronGeometry.prototype = Object.create( Geometry.prototype );
+	OctahedronGeometry.prototype.constructor = OctahedronGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	function OctahedronBufferGeometry( radius,detail ) {
+	function OctahedronBufferGeometry( radius, detail ) {
 
 		var vertices = [
 			1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
@@ -24511,24 +24614,24 @@
 	 * @author timothypratley / https://github.com/timothypratley
 	 */
 
-	function OctahedronGeometry( radius, detail ) {
+	function IcosahedronGeometry( radius, detail ) {
 
-		Geometry.call( this );
+	 	Geometry.call( this );
 
-		this.type = 'OctahedronGeometry';
+		this.type = 'IcosahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new OctahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new IcosahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
 
-	OctahedronGeometry.prototype = Object.create( Geometry.prototype );
-	OctahedronGeometry.prototype.constructor = OctahedronGeometry;
+	IcosahedronGeometry.prototype = Object.create( Geometry.prototype );
+	IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -24566,27 +24669,27 @@
 	IcosahedronBufferGeometry.prototype.constructor = IcosahedronBufferGeometry;
 
 	/**
-	 * @author timothypratley / https://github.com/timothypratley
+	 * @author Abe Pazos / https://hamoid.com
 	 */
 
-	function IcosahedronGeometry( radius, detail ) {
+	function DodecahedronGeometry( radius, detail ) {
 
-	 	Geometry.call( this );
+		Geometry.call( this );
 
-		this.type = 'IcosahedronGeometry';
+		this.type = 'DodecahedronGeometry';
 
 		this.parameters = {
 			radius: radius,
 			detail: detail
 		};
 
-		this.fromBufferGeometry( new IcosahedronBufferGeometry( radius, detail ) );
+		this.fromBufferGeometry( new DodecahedronBufferGeometry( radius, detail ) );
 		this.mergeVertices();
 
 	}
 
-	IcosahedronGeometry.prototype = Object.create( Geometry.prototype );
-	IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
+	DodecahedronGeometry.prototype = Object.create( Geometry.prototype );
+	DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -24602,8 +24705,8 @@
 			// (±1, ±1, ±1)
 			- 1, - 1, - 1,    - 1, - 1,  1,
 			- 1,  1, - 1,    - 1,  1,  1,
-			 1, - 1, - 1,     1, - 1,  1,
-			 1,  1, - 1,     1,  1,  1,
+			  1, - 1, - 1,     1, - 1,  1,
+			  1,  1, - 1,     1,  1,  1,
 
 			// (0, ±1/φ, ±φ)
 			 0, - r, - t,     0, - r,  t,
@@ -24648,60 +24751,51 @@
 	DodecahedronBufferGeometry.prototype.constructor = DodecahedronBufferGeometry;
 
 	/**
-	 * @author Abe Pazos / https://hamoid.com
+	 * @author oosmoxiecode / https://github.com/oosmoxiecode
+	 * @author WestLangley / https://github.com/WestLangley
+	 * @author zz85 / https://github.com/zz85
+	 * @author miningold / https://github.com/miningold
+	 * @author jonobr1 / https://github.com/jonobr1
+	 *
+	 * Creates a tube which extrudes along a 3d spline.
 	 */
 
-	function DodecahedronGeometry( radius, detail ) {
+	function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
 
 		Geometry.call( this );
 
-		this.type = 'DodecahedronGeometry';
+		this.type = 'TubeGeometry';
 
 		this.parameters = {
+			path: path,
+			tubularSegments: tubularSegments,
 			radius: radius,
-			detail: detail
+			radialSegments: radialSegments,
+			closed: closed
 		};
 
-		this.fromBufferGeometry( new DodecahedronBufferGeometry( radius, detail ) );
+		if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
+
+		var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+
+		// expose internals
+
+		this.tangents = bufferGeometry.tangents;
+		this.normals = bufferGeometry.normals;
+		this.binormals = bufferGeometry.binormals;
+
+		// create geometry
+
+		this.fromBufferGeometry( bufferGeometry );
 		this.mergeVertices();
 
 	}
 
-	DodecahedronGeometry.prototype = Object.create( Geometry.prototype );
-	DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
-
-	/**
-	 * @author clockworkgeek / https://github.com/clockworkgeek
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author WestLangley / http://github.com/WestLangley
-	*/
-
-	function PolyhedronGeometry( vertices, indices, radius, detail ) {
-
-		Geometry.call( this );
-
-		this.type = 'PolyhedronGeometry';
-
-		this.parameters = {
-			vertices: vertices,
-			indices: indices,
-			radius: radius,
-			detail: detail
-		};
-
-		this.fromBufferGeometry( new PolyhedronBufferGeometry( vertices, indices, radius, detail ) );
-		this.mergeVertices();
-
-	}
-
-	PolyhedronGeometry.prototype = Object.create( Geometry.prototype );
-	PolyhedronGeometry.prototype.constructor = PolyhedronGeometry;
+	TubeGeometry.prototype = Object.create( Geometry.prototype );
+	TubeGeometry.prototype.constructor = TubeGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * Creates a tube which extrudes along a 3d spline.
-	 *
 	 */
 
 	function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
@@ -24871,54 +24965,39 @@
 	TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
 
 	/**
-	 * @author oosmoxiecode / https://github.com/oosmoxiecode
-	 * @author WestLangley / https://github.com/WestLangley
-	 * @author zz85 / https://github.com/zz85
-	 * @author miningold / https://github.com/miningold
-	 * @author jonobr1 / https://github.com/jonobr1
-	 *
-	 * Creates a tube which extrudes along a 3d spline.
+	 * @author oosmoxiecode
 	 */
 
-	function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
+	function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
 
 		Geometry.call( this );
 
-		this.type = 'TubeGeometry';
+		this.type = 'TorusKnotGeometry';
 
 		this.parameters = {
-			path: path,
-			tubularSegments: tubularSegments,
 			radius: radius,
+			tube: tube,
+			tubularSegments: tubularSegments,
 			radialSegments: radialSegments,
-			closed: closed
+			p: p,
+			q: q
 		};
 
-		if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
+		if ( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
 
-		var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
-
-		// expose internals
-
-		this.tangents = bufferGeometry.tangents;
-		this.normals = bufferGeometry.normals;
-		this.binormals = bufferGeometry.binormals;
-
-		// create geometry
-
-		this.fromBufferGeometry( bufferGeometry );
+		this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
 		this.mergeVertices();
 
 	}
 
-	TubeGeometry.prototype = Object.create( Geometry.prototype );
-	TubeGeometry.prototype.constructor = TubeGeometry;
+	TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
+	TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
 	 * see: http://www.blackpawn.com/texts/pqtorus/
 	 */
+
 	function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
 		BufferGeometry.call( this );
@@ -24946,7 +25025,7 @@
 		var indexCount = radialSegments * tubularSegments * 2 * 3;
 
 		// buffers
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
 		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
@@ -25039,14 +25118,14 @@
 				var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 				// face one
-				indices.setX( indexOffset, a ); indexOffset++;
-				indices.setX( indexOffset, b ); indexOffset++;
-				indices.setX( indexOffset, d ); indexOffset++;
+				indices.setX( indexOffset, a ); indexOffset ++;
+				indices.setX( indexOffset, b ); indexOffset ++;
+				indices.setX( indexOffset, d ); indexOffset ++;
 
 				// face two
-				indices.setX( indexOffset, b ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
-				indices.setX( indexOffset, d ); indexOffset++;
+				indices.setX( indexOffset, b ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
+				indices.setX( indexOffset, d ); indexOffset ++;
 
 			}
 
@@ -25081,32 +25160,30 @@
 
 	/**
 	 * @author oosmoxiecode
+	 * @author mrdoob / http://mrdoob.com/
+	 * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
 	 */
 
-	function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+	function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 
 		Geometry.call( this );
 
-		this.type = 'TorusKnotGeometry';
+		this.type = 'TorusGeometry';
 
 		this.parameters = {
 			radius: radius,
 			tube: tube,
-			tubularSegments: tubularSegments,
 			radialSegments: radialSegments,
-			p: p,
-			q: q
+			tubularSegments: tubularSegments,
+			arc: arc
 		};
 
-		if( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
-
-		this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
-		this.mergeVertices();
+		this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
 
 	}
 
-	TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
-	TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
+	TorusGeometry.prototype = Object.create( Geometry.prototype );
+	TorusGeometry.prototype.constructor = TorusGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -25234,33 +25311,6 @@
 
 	TorusBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
-
-	/**
-	 * @author oosmoxiecode
-	 * @author mrdoob / http://mrdoob.com/
-	 * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
-	 */
-
-	function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
-
-		Geometry.call( this );
-
-		this.type = 'TorusGeometry';
-
-		this.parameters = {
-			radius: radius,
-			tube: tube,
-			radialSegments: radialSegments,
-			tubularSegments: tubularSegments,
-			arc: arc
-		};
-
-		this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
-
-	}
-
-	TorusGeometry.prototype = Object.create( Geometry.prototype );
-	TorusGeometry.prototype.constructor = TorusGeometry;
 
 	/**
 	 * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -26709,8 +26759,34 @@
 	TextGeometry.prototype.constructor = TextGeometry;
 
 	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
+	function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+
+		Geometry.call( this );
+
+		this.type = 'SphereGeometry';
+
+		this.parameters = {
+			radius: radius,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments,
+			phiStart: phiStart,
+			phiLength: phiLength,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
+
+		this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+
+	}
+
+	SphereGeometry.prototype = Object.create( Geometry.prototype );
+	SphereGeometry.prototype.constructor = SphereGeometry;
+
+	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
-	 * based on THREE.SphereGeometry
 	 */
 
 	function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
@@ -26811,31 +26887,30 @@
 	SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
+	 * @author Kaleb Murphy
 	 */
 
-	function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+	function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
 		Geometry.call( this );
 
-		this.type = 'SphereGeometry';
+		this.type = 'RingGeometry';
 
 		this.parameters = {
-			radius: radius,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			phiStart: phiStart,
-			phiLength: phiLength,
+			innerRadius: innerRadius,
+			outerRadius: outerRadius,
+			thetaSegments: thetaSegments,
+			phiSegments: phiSegments,
 			thetaStart: thetaStart,
 			thetaLength: thetaLength
 		};
 
-		this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+		this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
 
 	}
 
-	SphereGeometry.prototype = Object.create( Geometry.prototype );
-	SphereGeometry.prototype.constructor = SphereGeometry;
+	RingGeometry.prototype = Object.create( Geometry.prototype );
+	RingGeometry.prototype.constructor = RingGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -26870,7 +26945,7 @@
 		var indexCount = thetaSegments * phiSegments * 2 * 3;
 
 		// buffers
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
 		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
 		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
@@ -26907,7 +26982,7 @@
 				uvs.setXY( index, uv.x, uv.y );
 
 				// increase index
-				index++;
+				index ++;
 
 			}
 
@@ -26933,14 +27008,14 @@
 				var d = segment + 1;
 
 				// face one
-				indices.setX( indexOffset, a ); indexOffset++;
-				indices.setX( indexOffset, b ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
+				indices.setX( indexOffset, a ); indexOffset ++;
+				indices.setX( indexOffset, b ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
 
 				// face two
-				indices.setX( indexOffset, a ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
-				indices.setX( indexOffset, d ); indexOffset++;
+				indices.setX( indexOffset, a ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
+				indices.setX( indexOffset, d ); indexOffset ++;
 
 			}
 
@@ -26959,66 +27034,42 @@
 	RingBufferGeometry.prototype.constructor = RingBufferGeometry;
 
 	/**
-	 * @author Kaleb Murphy
+	 * @author astrodud / http://astrodud.isgreat.org/
+	 * @author zz85 / https://github.com/zz85
+	 * @author bhouston / http://clara.io
 	 */
 
-	function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+	// points - to create a closed torus, one must use a set of points
+	//    like so: [ a, b, c, d, a ], see first is the same as last.
+	// segments - the number of circumference segments to create
+	// phiStart - the starting radian
+	// phiLength - the radian (0 to 2PI) range of the lathed section
+	//    2PI is a closed lathe, less than 2PI is a portion.
+
+	function LatheGeometry( points, segments, phiStart, phiLength ) {
 
 		Geometry.call( this );
 
-		this.type = 'RingGeometry';
+		this.type = 'LatheGeometry';
 
 		this.parameters = {
-			innerRadius: innerRadius,
-			outerRadius: outerRadius,
-			thetaSegments: thetaSegments,
-			phiSegments: phiSegments,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
+			points: points,
+			segments: segments,
+			phiStart: phiStart,
+			phiLength: phiLength
 		};
 
-		this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+		this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
+		this.mergeVertices();
 
 	}
 
-	RingGeometry.prototype = Object.create( Geometry.prototype );
-	RingGeometry.prototype.constructor = RingGeometry;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
-	 */
-
-	function PlaneGeometry( width, height, widthSegments, heightSegments ) {
-
-		Geometry.call( this );
-
-		this.type = 'PlaneGeometry';
-
-		this.parameters = {
-			width: width,
-			height: height,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments
-		};
-
-		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
-
-	}
-
-	PlaneGeometry.prototype = Object.create( Geometry.prototype );
-	PlaneGeometry.prototype.constructor = PlaneGeometry;
+	LatheGeometry.prototype = Object.create( Geometry.prototype );
+	LatheGeometry.prototype.constructor = LatheGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
-
-	 // points - to create a closed torus, one must use a set of points
-	 //    like so: [ a, b, c, d, a ], see first is the same as last.
-	 // segments - the number of circumference segments to create
-	 // phiStart - the starting radian
-	 // phiLength - the radian (0 to 2PI) range of the lathed section
-	 //    2PI is a closed lathe, less than 2PI is a portion.
 
 	function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
@@ -27100,14 +27151,14 @@
 				var d = base + 1;
 
 				// face one
-				indices.setX( indexOffset, a ); indexOffset++;
-				indices.setX( indexOffset, b ); indexOffset++;
-				indices.setX( indexOffset, d ); indexOffset++;
+				indices.setX( indexOffset, a ); indexOffset ++;
+				indices.setX( indexOffset, b ); indexOffset ++;
+				indices.setX( indexOffset, d ); indexOffset ++;
 
 				// face two
-				indices.setX( indexOffset, b ); indexOffset++;
-				indices.setX( indexOffset, c ); indexOffset++;
-				indices.setX( indexOffset, d ); indexOffset++;
+				indices.setX( indexOffset, b ); indexOffset ++;
+				indices.setX( indexOffset, c ); indexOffset ++;
+				indices.setX( indexOffset, d ); indexOffset ++;
 
 			}
 
@@ -27126,7 +27177,7 @@
 		// if the geometry is closed, we need to average the normals along the seam.
 		// because the corresponding vertices are identical (but still have different UVs).
 
-		if( phiLength === Math.PI * 2 ) {
+		if ( phiLength === Math.PI * 2 ) {
 
 			var normals = this.attributes.normal.array;
 			var n1 = new Vector3();
@@ -27136,7 +27187,7 @@
 			// this is the buffer offset for the last line of vertices
 			base = segments * points.length * 3;
 
-			for( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+			for ( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
 
 				// select the normal of the vertex in the first line
 				n1.x = normals[ j + 0 ];
@@ -27166,45 +27217,39 @@
 	LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
 
 	/**
-	 * @author astrodud / http://astrodud.isgreat.org/
-	 * @author zz85 / https://github.com/zz85
-	 * @author bhouston / http://clara.io
+	 * @author jonobr1 / http://jonobr1.com
 	 */
 
-	// points - to create a closed torus, one must use a set of points
-	//    like so: [ a, b, c, d, a ], see first is the same as last.
-	// segments - the number of circumference segments to create
-	// phiStart - the starting radian
-	// phiLength - the radian (0 to 2PI) range of the lathed section
-	//    2PI is a closed lathe, less than 2PI is a portion.
-
-	function LatheGeometry( points, segments, phiStart, phiLength ) {
+	function ShapeGeometry( shapes, curveSegments ) {
 
 		Geometry.call( this );
 
-		this.type = 'LatheGeometry';
+		this.type = 'ShapeGeometry';
+
+		if ( typeof curveSegments === 'object' ) {
+
+			console.warn( 'THREE.ShapeGeometry: Options parameter has been removed.' );
+
+			curveSegments = curveSegments.curveSegments;
+
+		}
 
 		this.parameters = {
-			points: points,
-			segments: segments,
-			phiStart: phiStart,
-			phiLength: phiLength
+			shapes: shapes,
+			curveSegments: curveSegments
 		};
 
-		this.fromBufferGeometry( new LatheBufferGeometry( points, segments, phiStart, phiLength ) );
+		this.fromBufferGeometry( new ShapeBufferGeometry( shapes, curveSegments ) );
 		this.mergeVertices();
 
 	}
 
-	LatheGeometry.prototype = Object.create( Geometry.prototype );
-	LatheGeometry.prototype.constructor = LatheGeometry;
+	ShapeGeometry.prototype = Object.create( Geometry.prototype );
+	ShapeGeometry.prototype.constructor = ShapeGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * Creates a one-sided polygonal geometry from one or more shapes.
-	 *
-	 **/
+	 */
 
 	function ShapeBufferGeometry( shapes, curveSegments ) {
 
@@ -27235,7 +27280,7 @@
 
 		} else {
 
-			for ( var i = 0; i < shapes.length; i++ ) {
+			for ( var i = 0; i < shapes.length; i ++ ) {
 
 				addShape( shapes[ i ] );
 
@@ -27336,40 +27381,6 @@
 	ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
 
 	/**
-	 * @author jonobr1 / http://jonobr1.com
-	 *
-	 * Creates a one-sided polygonal geometry from a path shape.
-	 *
-	 **/
-
-	function ShapeGeometry( shapes, curveSegments ) {
-
-		Geometry.call( this );
-
-		this.type = 'ShapeGeometry';
-
-		if ( typeof curveSegments === 'object' ) {
-
-			console.warn( 'THREE.ShapeGeometry: Options parameter has been removed.' );
-
-			curveSegments = curveSegments.curveSegments;
-
-		}
-
-		this.parameters = {
-			shapes: shapes,
-			curveSegments: curveSegments
-		};
-
-		this.fromBufferGeometry( new ShapeBufferGeometry( shapes, curveSegments ) );
-		this.mergeVertices();
-
-	}
-
-	ShapeGeometry.prototype = Object.create( Geometry.prototype );
-	ShapeGeometry.prototype.constructor = ShapeGeometry;
-
-	/**
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
@@ -27466,6 +27477,35 @@
 
 	EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 	EdgesGeometry.prototype.constructor = EdgesGeometry;
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
+	function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+		Geometry.call( this );
+
+		this.type = 'CylinderGeometry';
+
+		this.parameters = {
+			radiusTop: radiusTop,
+			radiusBottom: radiusBottom,
+			height: height,
+			radialSegments: radialSegments,
+			heightSegments: heightSegments,
+			openEnded: openEnded,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
+
+		this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
+		this.mergeVertices();
+
+	}
+
+	CylinderGeometry.prototype = Object.create( Geometry.prototype );
+	CylinderGeometry.prototype.constructor = CylinderGeometry;
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -27786,35 +27826,6 @@
 	CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-	function CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-		Geometry.call( this );
-
-		this.type = 'CylinderGeometry';
-
-		this.parameters = {
-			radiusTop: radiusTop,
-			radiusBottom: radiusBottom,
-			height: height,
-			radialSegments: radialSegments,
-			heightSegments: heightSegments,
-			openEnded: openEnded,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
-		};
-
-		this.fromBufferGeometry( new CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) );
-		this.mergeVertices();
-
-	}
-
-	CylinderGeometry.prototype = Object.create( Geometry.prototype );
-	CylinderGeometry.prototype.constructor = CylinderGeometry;
-
-	/**
 	 * @author abelnation / http://github.com/abelnation
 	 */
 
@@ -27863,6 +27874,30 @@
 
 	ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 	ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
+
+	/**
+	 * @author hughes
+	 */
+
+	function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
+
+		Geometry.call( this );
+
+		this.type = 'CircleGeometry';
+
+		this.parameters = {
+			radius: radius,
+			segments: segments,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
+
+		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+
+	}
+
+	CircleGeometry.prototype = Object.create( Geometry.prototype );
+	CircleGeometry.prototype.constructor = CircleGeometry;
 
 	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
@@ -27932,58 +27967,6 @@
 	CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
-	/**
-	 * @author hughes
-	 */
-
-	function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
-
-		Geometry.call( this );
-
-		this.type = 'CircleGeometry';
-
-		this.parameters = {
-			radius: radius,
-			segments: segments,
-			thetaStart: thetaStart,
-			thetaLength: thetaLength
-		};
-
-		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
-
-	}
-
-	CircleGeometry.prototype = Object.create( Geometry.prototype );
-	CircleGeometry.prototype.constructor = CircleGeometry;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
-	 */
-
-	function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-		Geometry.call( this );
-
-		this.type = 'BoxGeometry';
-
-		this.parameters = {
-			width: width,
-			height: height,
-			depth: depth,
-			widthSegments: widthSegments,
-			heightSegments: heightSegments,
-			depthSegments: depthSegments
-		};
-
-		this.fromBufferGeometry( new BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) );
-		this.mergeVertices();
-
-	}
-
-	BoxGeometry.prototype = Object.create( Geometry.prototype );
-	BoxGeometry.prototype.constructor = BoxGeometry;
-
 
 
 	var Geometries = Object.freeze({
@@ -28007,12 +27990,12 @@
 		TorusGeometry: TorusGeometry,
 		TorusBufferGeometry: TorusBufferGeometry,
 		TextGeometry: TextGeometry,
-		SphereBufferGeometry: SphereBufferGeometry,
 		SphereGeometry: SphereGeometry,
+		SphereBufferGeometry: SphereBufferGeometry,
 		RingGeometry: RingGeometry,
 		RingBufferGeometry: RingBufferGeometry,
-		PlaneBufferGeometry: PlaneBufferGeometry,
 		PlaneGeometry: PlaneGeometry,
+		PlaneBufferGeometry: PlaneBufferGeometry,
 		LatheGeometry: LatheGeometry,
 		LatheBufferGeometry: LatheBufferGeometry,
 		ShapeGeometry: ShapeGeometry,
@@ -28023,10 +28006,10 @@
 		ConeBufferGeometry: ConeBufferGeometry,
 		CylinderGeometry: CylinderGeometry,
 		CylinderBufferGeometry: CylinderBufferGeometry,
-		CircleBufferGeometry: CircleBufferGeometry,
 		CircleGeometry: CircleGeometry,
-		BoxBufferGeometry: BoxBufferGeometry,
-		BoxGeometry: BoxGeometry
+		CircleBufferGeometry: CircleBufferGeometry,
+		BoxGeometry: BoxGeometry,
+		BoxBufferGeometry: BoxBufferGeometry
 	});
 
 	/**
@@ -42907,12 +42890,12 @@
 	exports.TorusGeometry = TorusGeometry;
 	exports.TorusBufferGeometry = TorusBufferGeometry;
 	exports.TextGeometry = TextGeometry;
-	exports.SphereBufferGeometry = SphereBufferGeometry;
 	exports.SphereGeometry = SphereGeometry;
+	exports.SphereBufferGeometry = SphereBufferGeometry;
 	exports.RingGeometry = RingGeometry;
 	exports.RingBufferGeometry = RingBufferGeometry;
-	exports.PlaneBufferGeometry = PlaneBufferGeometry;
 	exports.PlaneGeometry = PlaneGeometry;
+	exports.PlaneBufferGeometry = PlaneBufferGeometry;
 	exports.LatheGeometry = LatheGeometry;
 	exports.LatheBufferGeometry = LatheBufferGeometry;
 	exports.ShapeGeometry = ShapeGeometry;
@@ -42923,10 +42906,10 @@
 	exports.ConeBufferGeometry = ConeBufferGeometry;
 	exports.CylinderGeometry = CylinderGeometry;
 	exports.CylinderBufferGeometry = CylinderBufferGeometry;
-	exports.CircleBufferGeometry = CircleBufferGeometry;
 	exports.CircleGeometry = CircleGeometry;
-	exports.BoxBufferGeometry = BoxBufferGeometry;
+	exports.CircleBufferGeometry = CircleBufferGeometry;
 	exports.BoxGeometry = BoxGeometry;
+	exports.BoxBufferGeometry = BoxBufferGeometry;
 	exports.ShadowMaterial = ShadowMaterial;
 	exports.SpriteMaterial = SpriteMaterial;
 	exports.RawShaderMaterial = RawShaderMaterial;
