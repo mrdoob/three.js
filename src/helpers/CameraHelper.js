@@ -1,11 +1,11 @@
-import { Camera } from '../../cameras/Camera';
-import { Vector3 } from '../../math/Vector3';
-import { LineSegments } from '../../objects/LineSegments';
-import { Color } from '../../math/Color';
-import { FaceColors } from '../../constants';
-import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { Float32BufferAttribute } from '../../core/BufferAttribute';
+import { Camera } from '../cameras/Camera';
+import { Vector3 } from '../math/Vector3';
+import { LineSegments } from '../objects/LineSegments';
+import { Color } from '../math/Color';
+import { FaceColors } from '../constants';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 
 /**
  * @author alteredq / http://alteredqualia.com/

@@ -14,15 +14,15 @@
  *  headWidth - Number
  */
 
-import { Vector3 } from '../../math/Vector3';
-import { Object3D } from '../../core/Object3D';
-import { CylinderBufferGeometry } from '../../geometries/CylinderBufferGeometry';
-import { Float32BufferAttribute } from '../../core/BufferAttribute';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { Mesh } from '../../objects/Mesh';
-import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Line } from '../../objects/Line';
+import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D';
+import { CylinderBufferGeometry } from '../geometries/CylinderBufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
+import { Mesh } from '../objects/Mesh';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { Line } from '../objects/Line';
 
 var lineGeometry = new BufferGeometry();
 lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );

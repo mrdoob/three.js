@@ -1,11 +1,11 @@
-import { Vector3 } from '../../math/Vector3';
-import { Color } from '../../math/Color';
-import { Object3D } from '../../core/Object3D';
-import { Mesh } from '../../objects/Mesh';
-import { VertexColors } from '../../constants';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { OctahedronBufferGeometry } from '../../geometries/OctahedronBufferGeometry';
-import { BufferAttribute } from '../../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+import { Color } from '../math/Color';
+import { Object3D } from '../core/Object3D';
+import { Mesh } from '../objects/Mesh';
+import { VertexColors } from '../constants';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
+import { OctahedronBufferGeometry } from '../geometries/OctahedronBufferGeometry';
+import { BufferAttribute } from '../core/BufferAttribute';
 
 /**
  * @author alteredq / http://alteredqualia.com/

@@ -1,9 +1,9 @@
-import { Vector3 } from '../../math/Vector3';
-import { Object3D } from '../../core/Object3D';
-import { Line } from '../../objects/Line';
-import { Float32BufferAttribute } from '../../core/BufferAttribute';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
+import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D';
+import { Line } from '../objects/Line';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 
 /**
  * @author alteredq / http://alteredqualia.com/

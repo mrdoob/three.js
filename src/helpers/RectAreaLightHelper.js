@@ -3,12 +3,12 @@
  * @author Mugen87 / http://github.com/Mugen87
  */
 
-import { Object3D } from '../../core/Object3D';
-import { Vector3 } from '../../math/Vector3';
-import { Mesh } from '../../objects/Mesh';
-import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { BufferAttribute } from '../../core/BufferAttribute';
+import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3';
+import { Mesh } from '../objects/Mesh';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { BufferAttribute } from '../core/BufferAttribute';
 
 function RectAreaLightHelper( light ) {
 

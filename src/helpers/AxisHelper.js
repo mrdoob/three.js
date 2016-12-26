@@ -1,8 +1,8 @@
-import { LineSegments } from '../../objects/LineSegments';
-import { VertexColors } from '../../constants';
-import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../../core/BufferAttribute';
-import { BufferGeometry } from '../../core/BufferGeometry';
+import { LineSegments } from '../objects/LineSegments';
+import { VertexColors } from '../constants';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { BufferGeometry } from '../core/BufferGeometry';
 
 /**
  * @author sroucheray / http://sroucheray.org/
