@@ -18,7 +18,6 @@ function Material() {
 	this.name = '';
 	this.type = 'Material';
 
-	this.fog = true;
 	this.lights = true;
 
 	this.blending = NormalBlending;
