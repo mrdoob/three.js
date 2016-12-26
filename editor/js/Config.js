@@ -16,9 +16,7 @@ var Config = function ( name ) {
 		'project/editable': false,
 		'project/vr': false,
 
-		'settings/history': false,
-
-		'ui/sidebar/animation/collapsed': true
+		'settings/history': false
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
