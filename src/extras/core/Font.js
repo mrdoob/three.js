@@ -33,13 +33,11 @@ Object.assign( Font.prototype, {
 
 				var char = chars[ i ];
 
-				if(char === "\n")
-				{
+				if(char === "\n") {
 					offsetX = 0;
 					offsetY -= line_height;
 				}
-				else
-				{
+				else {
 					var ret = createPath( char, scale, offsetX, offsetY );
 					offsetX += ret.offsetX;
 					paths.push( ret.path );
