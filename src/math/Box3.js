@@ -58,6 +58,7 @@ Box3.prototype = {
 		this.max.set( maxX, maxY, maxZ );
 
 		return this;
+
 	},
 
 	setFromBufferAttribute: function ( attribute ) {
