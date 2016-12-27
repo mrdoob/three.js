@@ -92,9 +92,9 @@ Box3.prototype = {
 
 	},
 
-	setFromPoints: function ( points ) {
+	setFromPoints: function ( points, makeEmpty ) {
 
-		this.makeEmpty();
+		if (makeEmpty !== false) this.makeEmpty();
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
@@ -130,13 +130,13 @@ Box3.prototype = {
 
 		var v1 = new Vector3();
 
-		return function setFromObject( object ) {
+		return function setFromObject( object, makeEmpty ) {
 
 			var scope = this;
 
 			object.updateMatrixWorld( true );
 
-			this.makeEmpty();
+			if (makeEmpty !== false) this.makeEmpty();
 
 			object.traverse( function ( node ) {
 
