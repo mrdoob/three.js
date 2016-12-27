@@ -100,10 +100,14 @@ Sidebar.Object = function ( editor ) {
 	var objectPositionX = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectPositionY = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectPositionZ = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectPositionReset = new UI.Button('R').setWidth('20px').setPaddingLeft('3px').onClick(function () {
+		editor.execute(new SetPositionCommand(editor.selected,new THREE.Vector3(0,0,0)));
+	});
 
 	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
-
+	objectPositionRow.add(objectPositionReset);
+	
 	container.add( objectPositionRow );
 
 	// rotation
@@ -112,10 +116,14 @@ Sidebar.Object = function ( editor ) {
 	var objectRotationX = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
 	var objectRotationY = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
 	var objectRotationZ = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationReset = new UI.Button('R').setWidth('20px').setPaddingLeft('3px').onClick(function () {
+		editor.execute(new SetRotationCommand(editor.selected,new THREE.Euler(0,0,0)));
+	});
 
 	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
-
+	objectRotationRow.add(objectRotationReset);
+	
 	container.add( objectRotationRow );
 
 	// scale
@@ -125,11 +133,15 @@ Sidebar.Object = function ( editor ) {
 	var objectScaleX = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
 	var objectScaleY = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
 	var objectScaleZ = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleReset = new UI.Button('R').setWidth('20px').setPaddingLeft('3px').onClick(function () {
+		editor.execute(new SetScaleCommand(editor.selected,new THREE.Vector3(1,1,1)));
+	});
 
 	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ) );
 	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
-
+	objectScaleRow.add( objectScaleReset );
+	
 	container.add( objectScaleRow );
 
 	// fov
