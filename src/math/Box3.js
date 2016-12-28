@@ -90,6 +90,8 @@ Box3.prototype = {
 		this.min.set( minX, minY, minZ );
 		this.max.set( maxX, maxY, maxZ );
 
+		return this;
+
 	},
 
 	setFromPoints: function ( points ) {
