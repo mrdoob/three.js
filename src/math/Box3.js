@@ -96,6 +96,8 @@ Box3.prototype = {
 
 	setFromPoints: function ( points ) {
 
+		this.makeEmpty();
+
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
 			this.expandByPoint( points[ i ] );
