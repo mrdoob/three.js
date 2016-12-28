@@ -125,7 +125,7 @@ Box3.prototype = {
 
 		this.makeEmpty();
 
-		this.expandByObject( object );
+		return this.expandByObject( object );
 
 	},
 
