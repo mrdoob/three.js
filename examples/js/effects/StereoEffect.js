@@ -9,6 +9,8 @@ THREE.StereoEffect = function ( renderer ) {
 
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
+	_stereo.cameraL.name = 'L';
+	_stereo.cameraR.name = 'R';
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
