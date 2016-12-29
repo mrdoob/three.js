@@ -39,10 +39,14 @@ THREE.StereoEffect = function ( renderer ) {
 
 		renderer.setScissor( 0, 0, size.width / 2, size.height );
 		renderer.setViewport( 0, 0, size.width / 2, size.height );
+		_stereo.cameraL.updateProjectionMatrix();
+		_stereo.cameraL.position.set( this.eyeSep, 0, 3 );
 		renderer.render( scene, _stereo.cameraL );
 
 		renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
 		renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+		_stereo.cameraR.updateProjectionMatrix();
+		_stereo.cameraR.position.set( this.eyeSep, 0, 3 );
 		renderer.render( scene, _stereo.cameraR );
 
 		renderer.setScissorTest( false );
