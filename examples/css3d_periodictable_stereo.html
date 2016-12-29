@@ -99,11 +99,11 @@
 		</style>
 	</head>
 	<body>
-  <script src="../../node_modules/three/build/three.js"></script>
-  <script src="../../node_modules/three/examples/js/libs/tween.min.js"></script>
-  <script src="../../node_modules/three/examples/js/controls/TrackballControls.js"></script>
-  <script src="../../node_modules/three/examples/js/renderers/CSS3DStereoRenderer.js"></script>
-  <script src="../../node_modules/three/examples/js/effects/StereoEffect.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="js/libs/tween.min.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/renderers/CSS3DStereoRenderer.js"></script>
+	  <script src="js/effects/StereoEffect.js"></script>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank">info</a>.</div>
@@ -248,17 +248,9 @@
 
 			function init() {
 
-//				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-//				camera.position.z = 3000;
-        camera = new THREE.PerspectiveCamera( 45, (window.innerWidth /2) / window.innerHeight, 1, 4000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3000;
         camera.name = "Main";
-//        camera.aspect = 2.3 * 2; //calculate this
-//        camera.zoom = 1;
-//        camera.separation = 3;//0.02;//-0.04300000000000005;
-//        camera.rotate = 0;//0.02;
-        //camera.fov = 40;
-        //camera.position.z = 2;
-        camera.position.set( 5000, -500, 4000 );
 
 				scene = new THREE.Scene();
 
@@ -456,7 +448,6 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				//renderer.setSize( window.innerWidth, window.innerHeight );
         effect.setSize( window.innerWidth , window.innerHeight );
 
 				render();
@@ -475,7 +466,6 @@
 
 			function render() {
 
-				//renderer.render( scene, camera );
         effect.render( scene, camera );
 
 
