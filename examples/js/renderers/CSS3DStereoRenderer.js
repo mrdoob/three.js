@@ -117,12 +117,6 @@ THREE.CSS3DStereoRenderer = function () {
 
 		domElementR.style.left = width + 'px';
 
-		_viewportX = x * 1;
-		_viewportY = y * 1;
-
-		_viewportWidth = width * 1;
-		_viewportHeight = height * 1;
-
 	};
 
 	this.setSize = function ( width, height ) {
