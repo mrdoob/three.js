@@ -23,7 +23,7 @@ Object.assign( Font.prototype, {
 
 			var chars = String( text ).split( '' );
 			var scale = size / data.resolution;
-			var line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale;
+			var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
 			var offsetX = 0, offsetY = 0;
 
@@ -33,15 +33,19 @@ Object.assign( Font.prototype, {
 
 				var char = chars[ i ];
 
-				if(char === "\n") {
+				if ( char === '\n' ) {
+
 					offsetX = 0;
 					offsetY -= line_height;
-				}
-				else {
+
+				} else {
+
 					var ret = createPath( char, scale, offsetX, offsetY );
 					offsetX += ret.offsetX;
 					paths.push( ret.path );
+
 				}
+
 			}
 
 			return paths;
