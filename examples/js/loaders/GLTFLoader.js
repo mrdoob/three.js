@@ -54,12 +54,13 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			parser.parse( function ( scene, cameras, animations ) {
+			parser.parse( function ( scene, scenes, cameras, animations ) {
 
 				console.timeEnd( 'GLTFLoader' );
 
 				var glTF = {
 					"scene": scene,
+					"scenes": scenes,
 					"cameras": cameras,
 					"animations": animations
 				};
@@ -632,6 +633,14 @@ THREE.GLTFLoader = ( function () {
 
 			var scene = dependencies.scenes[ json.scene ];
 
+			var scenes = [];
+
+			for ( var name in dependencies.scenes ) {
+
+				scenes.push( dependencies.scenes[ name ] );
+
+			}
+
 			var cameras = [];
 
 			for ( var name in dependencies.cameras ) {
@@ -649,7 +658,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			callback( scene, cameras, animations );
+			callback( scene, scenes, cameras, animations );
 
 		} );
 

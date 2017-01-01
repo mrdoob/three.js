@@ -250,7 +250,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene;
+					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
 
 					var loadEndTime = Date.now();
 
