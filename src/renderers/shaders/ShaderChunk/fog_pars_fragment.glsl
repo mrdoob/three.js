@@ -11,6 +11,7 @@
 
 		uniform float fogNear;
 		uniform float fogFar;
+
 	#endif
 
 #endif
