@@ -958,8 +958,6 @@ translation 3.48 0 7.8
 # trapbeneden.wrl
 
 
-
-
 DEF trapbeneden Transform {
  children [
   Shape {
@@ -1326,6 +1324,7 @@ translation 0 1.005 0
 ]
 translation 1.38 0 -3.395
 }
+#moved to end
 #ROUTE klikopdeur.touchTime TO TimeSource.startTime
 #ROUTE TimeSource.fraction_changed TO Deuropen.set_fraction
 #ROUTE Deuropen.value_changed TO deur.rotation
@@ -1360,7 +1359,7 @@ translation 0 1.005 0
 translation 3.155 0 -2.96
 rotation 0 1 0 1.5707963
 }
-
+#moved to end
 #ROUTE klikopdeur2.touchTime TO TimeSource2.startTime
 #ROUTE TimeSource2.fraction_changed TO Deuropen2.set_fraction
 #ROUTE Deuropen2.value_changed TO deurkeukengang.rotation
@@ -1395,6 +1394,7 @@ translation 3.59 0 -3.395
 rotation 0 1 0 0
 }#deur3
 
+#moved to end
 #ROUTE klikopdeur3.touchTime TO TimeSource3.startTime
 #ROUTE TimeSource3.fraction_changed TO Deuropen3.set_fraction
 #ROUTE Deuropen3.value_changed TO deurwoonkamergang.rotation
@@ -1453,6 +1453,7 @@ translation 4.395 0 -3.895
 rotation 0 1 0 -1.5707963
 }#deur4
 
+#moved to end
 #ROUTE klikopdeur4.touchTime TO TimeSource4.startTime
 #ROUTE TimeSource4.fraction_changed TO Deuropen4.set_fraction
 #ROUTE Deuropen4.value_changed TO deurwoonkamertrapkast.rotation
@@ -1549,6 +1550,7 @@ translation 4.455 0 -1.92
 rotation 0 1 0 -1.5707963
 }#deur5
 
+#moved to end
 #ROUTE klikopdeur5.touchTime TO TimeSource5.startTime
 #ROUTE TimeSource5.fraction_changed TO Deuropen5.set_fraction
 #ROUTE Deuropen5.value_changed TO deurgangmeterkast.rotation
@@ -1583,6 +1585,7 @@ translation 4.455 0 -1.08
 rotation 0 1 0 -1.5707963
 }#deur6
 
+#moved to end
 #ROUTE klikopdeur6.touchTime TO TimeSource6.startTime
 #ROUTE TimeSource6.fraction_changed TO Deuropen6.set_fraction
 #ROUTE Deuropen6.value_changed TO deurtoiletgang.rotation
@@ -1769,6 +1772,7 @@ translation 0.81 1.24 0
 translation 3.25 0.05 -0.14
 }
 
+#moved to end
 #ROUTE klikopvoordeur.touchTime TO TimeSourcevoor.startTime
 #ROUTE TimeSourcevoor.fraction_changed TO VoorDeuropen.set_fraction
 #ROUTE VoorDeuropen.value_changed TO voordeur.rotation
@@ -2049,6 +2053,7 @@ translation 0.465 1.25 0
 translation 1.26 0.05 -8.86
 }
 
+#moved to end
 #ROUTE klikopachterdeur.touchTime TO TimeSourceachter.startTime
 #ROUTE TimeSourceachter.fraction_changed TO achterDeuropen.set_fraction
 #ROUTE achterDeuropen.value_changed TO achterdeur.rotation
@@ -2088,6 +2093,7 @@ translation 3.53 0.05 6.35
 rotation 0 1 0 1.5707963
 }
 
+#moved to end
 #ROUTE klikopschuurdeur.touchTime TO TimeSourceschuur.startTime
 #ROUTE TimeSourceschuur.fraction_changed TO schuurDeuropen.set_fraction
 #ROUTE schuurDeuropen.value_changed TO schuurdeur.rotation
@@ -3176,6 +3182,7 @@ translation 3.155 2.8 -3.53
 rotation 0 1 0 1.5707963
 }
 
+#moved to end
 #ROUTE klikopdeur7.touchTime TO TimeSource7.startTime
 #ROUTE TimeSource7.fraction_changed TO Deuropen7.set_fraction
 #ROUTE Deuropen7.value_changed TO deuroudersgang.rotation
@@ -3210,6 +3217,7 @@ translation 3.155 2.8 -5.03
 rotation 0 1 0 -1.5707963
 }
 
+#moved to end
 #ROUTE klikopdeur8.touchTime TO TimeSource8.startTime
 #ROUTE TimeSource8.fraction_changed TO Deuropen8.set_fraction
 #ROUTE Deuropen8.value_changed TO deurtweedeslaapkamergang.rotation
@@ -3245,6 +3253,7 @@ translation 3.59 2.8 -5.465
 rotation 0 1 0 3.1415927
 }
 
+#moved to end
 #ROUTE klikopdeur9.touchTime TO TimeSource9.startTime
 #ROUTE TimeSource9.fraction_changed TO Deuropen9.set_fraction
 #ROUTE Deuropen9.value_changed TO deurkinderkamergang.rotation
@@ -3281,7 +3290,7 @@ rotation 0 1 0 0
 }
 
 
-
+#moved to end
 #ROUTE klikopdeur10.touchTime TO TimeSource10.startTime
 #ROUTE TimeSource10.fraction_changed TO Deuropen10.set_fraction
 #ROUTE Deuropen10.value_changed TO deurbadkamergang.rotation
@@ -5156,26 +5165,81 @@ DEF plaats3a PositionInterpolator {
 ]
 }
 
-#ROUTE schuifdak.touchTime TO tijd1.startTime
-#ROUTE tijd1.fraction_changed TO plaats1.set_fraction
-#ROUTE plaats1.value_changed TO dak.translation
+#moved from above
+ROUTE klikopdeur.touchTime TO TimeSource.startTime
+ROUTE TimeSource.fraction_changed TO Deuropen.set_fraction
+ROUTE Deuropen.value_changed TO deur.rotation
 
-#ROUTE schuifzolder.touchTime TO tijd2.startTime
-#ROUTE tijd2.fraction_changed TO plaats2.set_fraction
-#ROUTE plaats2.value_changed TO zolder.translation
+ROUTE klikopdeur2.touchTime TO TimeSource2.startTime
+ROUTE TimeSource2.fraction_changed TO Deuropen2.set_fraction
+ROUTE Deuropen2.value_changed TO deurkeukengang.rotation
 
-#ROUTE schuifboven.touchTime TO tijd3.startTime
-#ROUTE tijd3.fraction_changed TO plaats3.set_fraction
-#ROUTE plaats3.value_changed TO boven.translation
+ROUTE klikopdeur3.touchTime TO TimeSource3.startTime
+ROUTE TimeSource3.fraction_changed TO Deuropen3.set_fraction
+ROUTE Deuropen3.value_changed TO deurwoonkamergang.rotation
 
-#ROUTE schuifdak2.touchTime TO tijd1a.startTime
-#ROUTE tijd1a.fraction_changed TO plaats1a.set_fraction
-#ROUTE plaats1a.value_changed TO dak.translation
+ROUTE klikopdeur4.touchTime TO TimeSource4.startTime
+ROUTE TimeSource4.fraction_changed TO Deuropen4.set_fraction
+ROUTE Deuropen4.value_changed TO deurwoonkamertrapkast.rotation
 
-#ROUTE schuifzolder2.touchTime TO tijd2a.startTime
-#ROUTE tijd2a.fraction_changed TO plaats2a.set_fraction
-#ROUTE plaats2a.value_changed TO zolder.translation
+ROUTE klikopdeur5.touchTime TO TimeSource5.startTime
+ROUTE TimeSource5.fraction_changed TO Deuropen5.set_fraction
+ROUTE Deuropen5.value_changed TO deurgangmeterkast.rotation
 
-#ROUTE schuifboven2.touchTime TO tijd3a.startTime
-#ROUTE tijd3a.fraction_changed TO plaats3a.set_fraction
-#ROUTE plaats3a.value_changed TO boven.translation
+ROUTE klikopdeur6.touchTime TO TimeSource6.startTime
+ROUTE TimeSource6.fraction_changed TO Deuropen6.set_fraction
+ROUTE Deuropen6.value_changed TO deurtoiletgang.rotation
+
+ROUTE klikopvoordeur.touchTime TO TimeSourcevoor.startTime
+ROUTE TimeSourcevoor.fraction_changed TO VoorDeuropen.set_fraction
+ROUTE VoorDeuropen.value_changed TO voordeur.rotation
+
+ROUTE klikopachterdeur.touchTime TO TimeSourceachter.startTime
+ROUTE TimeSourceachter.fraction_changed TO achterDeuropen.set_fraction
+ROUTE achterDeuropen.value_changed TO achterdeur.rotation
+
+ROUTE klikopschuurdeur.touchTime TO TimeSourceschuur.startTime
+ROUTE TimeSourceschuur.fraction_changed TO schuurDeuropen.set_fraction
+ROUTE schuurDeuropen.value_changed TO schuurdeur.rotation
+
+ROUTE klikopdeur7.touchTime TO TimeSource7.startTime
+ROUTE TimeSource7.fraction_changed TO Deuropen7.set_fraction
+ROUTE Deuropen7.value_changed TO deuroudersgang.rotation
+
+ROUTE klikopdeur8.touchTime TO TimeSource8.startTime
+ROUTE TimeSource8.fraction_changed TO Deuropen8.set_fraction
+ROUTE Deuropen8.value_changed TO deurtweedeslaapkamergang.rotation
+
+ROUTE klikopdeur9.touchTime TO TimeSource9.startTime
+ROUTE TimeSource9.fraction_changed TO Deuropen9.set_fraction
+ROUTE Deuropen9.value_changed TO deurkinderkamergang.rotation
+
+ROUTE klikopdeur10.touchTime TO TimeSource10.startTime
+ROUTE TimeSource10.fraction_changed TO Deuropen10.set_fraction
+ROUTE Deuropen10.value_changed TO deurbadkamergang.rotation
+
+
+#uncommented
+ROUTE schuifdak.touchTime TO tijd1.startTime
+ROUTE tijd1.fraction_changed TO plaats1.set_fraction
+ROUTE plaats1.value_changed TO dak.translation
+
+ROUTE schuifzolder.touchTime TO tijd2.startTime
+ROUTE tijd2.fraction_changed TO plaats2.set_fraction
+ROUTE plaats2.value_changed TO zolder.translation
+
+ROUTE schuifboven.touchTime TO tijd3.startTime
+ROUTE tijd3.fraction_changed TO plaats3.set_fraction
+ROUTE plaats3.value_changed TO boven.translation
+
+ROUTE schuifdak2.touchTime TO tijd1a.startTime
+ROUTE tijd1a.fraction_changed TO plaats1a.set_fraction
+ROUTE plaats1a.value_changed TO dak.translation
+
+ROUTE schuifzolder2.touchTime TO tijd2a.startTime
+ROUTE tijd2a.fraction_changed TO plaats2a.set_fraction
+ROUTE plaats2a.value_changed TO zolder.translation
+
+ROUTE schuifboven2.touchTime TO tijd3a.startTime
+ROUTE tijd3a.fraction_changed TO plaats3a.set_fraction
+ROUTE plaats3a.value_changed TO boven.translation
