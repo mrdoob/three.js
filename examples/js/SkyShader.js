@@ -47,16 +47,16 @@ THREE.ShaderLib[ 'sky' ] = {
 		"const float e = 2.71828182845904523536028747135266249775724709369995957;",
 		"const float pi = 3.141592653589793238462643383279502884197169;",
 
-                // wavelength of used primaries, according to preetham
+		// wavelength of used primaries, according to preetham
 		"const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );",
-                // this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function
-                "const vec3 totalRayleigh = vec3( 0.00000580453, 0.00001278534, 0.00002853075 );",
-                
+		// this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function
+		"const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );",
+		
 		// mie stuff
 		// K coefficient for the primaries
 		"const float v = 4.0;",
 		"const vec3 K = vec3( 0.686, 0.678, 0.666 );", 
-                "const vec3 MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K;",
+		"const vec3 MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K;",
 
 		// earth shadow hack
 		"const float cutoffAngle = pi / 1.95;",
@@ -128,9 +128,9 @@ THREE.ShaderLib[ 'sky' ] = {
 		"const vec3 up = vec3( 0.0, 1.0, 0.0 );",
 		// 66 arc seconds -> degrees, and the cosine of that
 		"const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;",
-		
-                "const float THREE_OVER_SIXTEENPI = 3.0 / ( 16.0 * pi );",
-                "const float ONE_OVER_FOURPI = ( 1.0 / ( 4.0 * pi ) );",
+
+		"const float THREE_OVER_SIXTEENPI = 3.0 / ( 16.0 * pi );",
+		"const float ONE_OVER_FOURPI = ( 1.0 / ( 4.0 * pi ) );",
 
 		"float rayleighPhase( float cosTheta )",
 		"{",
@@ -139,8 +139,8 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		"float hgPhase( float cosTheta, float g )",
 		"{",
-                        "float g2 = pow( g, 2.0 );",
-                        "float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );",
+			"float g2 = pow( g, 2.0 );",
+			"float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );",
 			"return ONE_OVER_FOURPI * ( ( 1.0 - g2 ) * inverse );",
 		"}",
 
@@ -165,7 +165,7 @@ THREE.ShaderLib[ 'sky' ] = {
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
 			"float zenithAngle = acos( max( 0.0, dot( up, normalize( vWorldPosition - cameraPos ) ) ) );",
-                        "float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );",
+			"float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );",
 			"float sR = rayleighZenithLength * inverse;",
 			"float sM = mieZenithLength * inverse;",
 
