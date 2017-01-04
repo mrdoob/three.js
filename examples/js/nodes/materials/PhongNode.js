@@ -68,7 +68,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			"#endif",
 
 				THREE.ShaderChunk[ "begin_vertex" ],
-        THREE.ShaderChunk[ "fog_vertex" ]
+				THREE.ShaderChunk[ "fog_vertex" ]
 		];
 
 		if ( transform ) {

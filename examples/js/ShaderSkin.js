@@ -600,7 +600,7 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-        THREE.ShaderChunk[ "fog_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ],
 
 			"}",
 
