@@ -17,6 +17,8 @@ Object.assign( ImageLoader.prototype, {
 
 		var scope = this;
 
+		scope.manager.itemStart( url );
+
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
 		image.onload = function () {
 
@@ -55,8 +57,6 @@ Object.assign( ImageLoader.prototype, {
 			}, onProgress, onError );
 
 		}
-
-		scope.manager.itemStart( url );
 
 		return image;
 
