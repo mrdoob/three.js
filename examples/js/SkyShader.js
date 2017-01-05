@@ -49,17 +49,20 @@ THREE.ShaderLib[ 'sky' ] = {
 
 		// wavelength of used primaries, according to preetham
 		"const vec3 lambda = vec3( 680E-9, 550E-9, 450E-9 );",
-		// this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function
+		// this pre-calcuation replaces older TotalRayleigh(vec3 lambda) function:
+		// (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn))
 		"const vec3 totalRayleigh = vec3( 5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5 );",
 		
 		// mie stuff
 		// K coefficient for the primaries
 		"const float v = 4.0;",
-		"const vec3 K = vec3( 0.686, 0.678, 0.666 );", 
-		"const vec3 MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K;",
+		"const vec3 K = vec3( 0.686, 0.678, 0.666 );",
+		// MieConst = pi * pow( ( 2.0 * pi ) / lambda, vec3( v - 2.0 ) ) * K
+		"const vec3 MieConst = vec3( 1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14 );",
 
 		// earth shadow hack
-		"const float cutoffAngle = pi / 1.95;",
+		// cutoffAngle = pi / 1.95;
+		"const float cutoffAngle = 1.6110731556870734;",
 		"const float steepness = 1.5;",
 		"const float EE = 1000.0;",
 
@@ -129,8 +132,10 @@ THREE.ShaderLib[ 'sky' ] = {
 		// 66 arc seconds -> degrees, and the cosine of that
 		"const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;",
 
-		"const float THREE_OVER_SIXTEENPI = 3.0 / ( 16.0 * pi );",
-		"const float ONE_OVER_FOURPI = ( 1.0 / ( 4.0 * pi ) );",
+		// 3.0 / ( 16.0 * pi )
+		"const float THREE_OVER_SIXTEENPI = 0.05968310365946075;",
+		// 1.0 / ( 4.0 * pi )
+		"const float ONE_OVER_FOURPI = 0.07957747154594767;",
 
 		"float rayleighPhase( float cosTheta )",
 		"{",
