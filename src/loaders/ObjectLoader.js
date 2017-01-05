@@ -99,16 +99,9 @@ Object.assign( ObjectLoader.prototype, {
 	parse: function ( json, onLoad ) {
 
 		var geometries = this.parseGeometries( json.geometries );
-
-		var images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
-
+		var images = this.parseImages( json.images );
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
-
 		var object = this.parseObject( json.object, geometries, materials );
 
 		if ( json.animations ) {
@@ -117,11 +110,7 @@ Object.assign( ObjectLoader.prototype, {
 
 		}
 
-		if ( json.images === undefined || json.images.length === 0 ) {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		}
+		if ( onLoad !== undefined ) onLoad( object );
 
 		return object;
 
