@@ -124,6 +124,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
@@ -231,7 +232,7 @@ THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.proto
 			uniforms: {
 				"colorTexture": { value: null },
 				"texSize": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
-				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) },
+				"direction": 				{ value: new THREE.Vector2( 0.5, 0.5 ) }
 			},
 
 			vertexShader:

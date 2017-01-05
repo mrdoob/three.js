@@ -27,7 +27,7 @@ import { Matrix4 } from '../../math/Matrix4';
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
  * THREE.CubicBezierCurve3
- * THREE.SplineCurve3
+ * THREE.CatmullRomCurve3
  *
  * A series of curves can be represented as a THREE.CurvePath
  *
@@ -383,24 +383,5 @@ Curve.prototype = {
 	}
 
 };
-
-// TODO: Transformation for Curves?
-
-/**************************************************************
- *	3D Curves
- **************************************************************/
-
-// A Factory method for creating new curve subclasses
-
-Curve.create = function ( constructor, getPointFunc ) {
-
-	constructor.prototype = Object.create( Curve.prototype );
-	constructor.prototype.constructor = constructor;
-	constructor.prototype.getPoint = getPointFunc;
-
-	return constructor;
-
-};
-
 
 export { Curve };

@@ -6,26 +6,13 @@
 		<meta name="generator" content="Three.js Editor">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		body {
-			font-family: Helvetica, Arial, sans-serif;
-			font-size: 12px;
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#edit {
-			position: absolute;
-			bottom: 20px;
-			right: 20px;
-			padding: 8px;
-			color: #555;
-			background-color: #fff;
-			opacity: 0.5;
-		}
-		#edit:hover {
-			cursor: pointer;
-			opacity: 1;
-		}
+			body {
+				font-family: Helvetica, Arial, sans-serif;
+				font-size: 12px;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 		</style>
 	</head>
 	<body ontouchstart="">
@@ -37,29 +24,12 @@
 			var loader = new THREE.FileLoader();
 			loader.load( 'app.json', function ( text ) {
 
-				var json = JSON.parse( text );
-
 				var player = new APP.Player();
-				player.load( json );
+				player.load( JSON.parse( text ) );
 				player.setSize( window.innerWidth, window.innerHeight );
 				player.play();
 
 				document.body.appendChild( player.dom );
-
-				if ( json.project.editable === true ) {
-
-					var button = document.createElement( 'div' );
-					button.id = 'edit';
-					button.textContent = 'EDIT';
-					button.addEventListener( 'click', function ( event ) {
-
-						var url = location.href.split( '/' ).slice( 0, - 1 ).join( '/' );
-						window.open( 'http://threejs.org/editor/#file=' + url + '/app.json' );
-
-					}, false );
-					document.body.appendChild( button );
-
-				}
 
 				window.addEventListener( 'resize', function () {
 					player.setSize( window.innerWidth, window.innerHeight );

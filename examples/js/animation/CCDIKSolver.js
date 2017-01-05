@@ -69,7 +69,27 @@ THREE.CCDIKSolver.prototype = {
 
 	},
 
-	update: function () {
+	/*
+	 * save the bone matrices before solving IK.
+	 * they're used for generating VMD and VPD.
+	 */
+	_saveOriginalBonesInfo: function () {
+
+		var bones = this.mesh.skeleton.bones;
+
+		for ( var i = 0, il = bones.length; i < il; i ++ ) {
+
+			var bone = bones[ i ];
+
+			if ( bone.userData.ik === undefined ) bone.userData.ik = {};
+
+			bone.userData.ik.originalMatrix = bone.matrix.toArray();
+
+		}
+
+	},
+
+	update: function ( saveOriginalBones ) {
 
 		var q = new THREE.Quaternion();
 
@@ -79,6 +99,7 @@ THREE.CCDIKSolver.prototype = {
 		var effectorVec = new THREE.Vector3();
 		var linkPos = new THREE.Vector3();
 		var invLinkQ = new THREE.Quaternion();
+		var linkScale = new THREE.Vector3();
 		var axis = new THREE.Vector3();
 
 		var bones = this.mesh.skeleton.bones;
@@ -90,6 +111,8 @@ THREE.CCDIKSolver.prototype = {
 		var math = Math;
 
 		this.mesh.updateMatrixWorld( true );
+
+		if ( saveOriginalBones === true ) this._saveOriginalBonesInfo();
 
 		for ( var i = 0, il = iks.length; i < il; i++ ) {
 
@@ -120,8 +143,8 @@ THREE.CCDIKSolver.prototype = {
 
 					// don't use getWorldPosition/Quaternion() here for the performance
 					// because they call updateMatrixWorld( true ) inside.
-					linkPos.setFromMatrixPosition( link.matrixWorld );
-					invLinkQ.setFromRotationMatrix( link.matrixWorld ).inverse();
+					link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
+					invLinkQ.inverse();
 					effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 					// work in link world

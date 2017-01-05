@@ -91,25 +91,24 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-var CustomSinCurve = THREE.Curve.create(
+function CustomSinCurve( scale ){
 
-	function ( scale ) {
+	this.scale = ( scale === undefined ) ? 1 : scale;
 
-		this.scale = ( scale === undefined ) ? 1 : scale;
+}
 
-	},
+CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
+CustomSinCurve.prototype.constructor = CustomSinCurve;
 
-	function ( t ) {
+CustomSinCurve.prototype.getPoint = function ( t ) {
 
-		var tx = t * 3 - 1.5;
-		var ty = Math.sin( 2 * Math.PI * t );
-		var tz = 0;
+	var tx = t * 3 - 1.5;
+	var ty = Math.sin( 2 * Math.PI * t );
+	var tz = 0;
 
-		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
-	}
-
-);
+};
 
 // heart shape
 
@@ -205,7 +204,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -251,7 +250,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -296,7 +295,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -339,7 +338,7 @@ var guis = {
 			heightSegments : 1,
 			openEnded : false,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -380,7 +379,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -410,7 +409,7 @@ var guis = {
 			radius : 10,
 			segments : 32,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -438,7 +437,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -464,7 +463,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -490,7 +489,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -516,7 +515,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -551,7 +550,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -587,7 +586,7 @@ var guis = {
 		var data = {
 			segments : 12,
 			phiStart : 0,
-			phiLength : twoPi,
+			phiLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -614,7 +613,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -640,7 +639,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -730,7 +729,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -764,7 +763,7 @@ var guis = {
 			thetaSegments : 8,
 			phiSegments : 8,
 			thetaStart : 0,
-			thetaLength : twoPi,
+			thetaLength : twoPi
 		};
 
 		function generateGeometry() {
@@ -799,7 +798,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -835,7 +834,7 @@ var guis = {
 			phiStart : 0,
 			phiLength : twoPi,
 			thetaStart : 0,
-			thetaLength : Math.PI,
+			thetaLength : Math.PI
 		};
 
 		function generateGeometry() {
@@ -866,7 +865,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {
@@ -892,7 +891,7 @@ var guis = {
 
 		var data = {
 			radius : 10,
-			detail : 0,
+			detail : 0
 		};
 
 		function generateGeometry() {

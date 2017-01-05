@@ -92,7 +92,8 @@ AnimationObjectGroup.prototype = {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
-				index = indicesByUUID[ uuid ];
+				index = indicesByUUID[ uuid ],
+				knownObject = undefined;
 
 			if ( index === undefined ) {
 
@@ -114,7 +115,7 @@ AnimationObjectGroup.prototype = {
 
 			} else if ( index < nCachedObjects ) {
 
-				var knownObject = objects[ index ];
+				knownObject = objects[ index ];
 
 				// move existing object to the ACTIVE region
 

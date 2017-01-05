@@ -1,6 +1,6 @@
 The files under this directory are NOT under MIT license, but other licenses.
-If you want to use them in your work, get original data, read readme, and follow
-their licenses.
+If you want to use them in your work, get original archive file, read readme,
+and follow their licenses.
 
 
 1. Vocaloid stuffs
@@ -14,17 +14,17 @@ For detail, see http://piapro.net/en_for_creators.html
 
 2. MMD stuffs
 
-In MMD, there is no unified license. If you want to use MMD works (models,
-songs, dances, and so on), read readme included in archive file and follow the
-license the author set.
+In MMD, there is no unified license. If you want to use MMD assets (models,
+songs, dances, and so on), read readme included in the original archive file
+and follow the license the author set.
 
-If the works are fan works, you must follow the original work's license. (For
+If the assets are fan works, you must follow the original work's license. (For
 example, you also need to follow the license set by Crypton, not only the
-license the author set, to use a Miku MMD model)
+license the author set, to use a fan Miku MMD model)
 
-For your information, generally MMD works are very restricted to use.
+For your information, generally MMD assets are very restricted to use.
 
-Most MMD works are NOT allowed for
+Most MMD assets are NOT allowed for
 - redistribution
 - porn use
 - commercial use

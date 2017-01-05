@@ -1,4 +1,4 @@
-export var REVISION = '83dev';
+export var REVISION = '84dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;
@@ -23,14 +23,6 @@ export var AdditiveBlending = 2;
 export var SubtractiveBlending = 3;
 export var MultiplyBlending = 4;
 export var CustomBlending = 5;
-export var BlendingMode = {
-	NoBlending: NoBlending,
-	NormalBlending: NormalBlending,
-	AdditiveBlending: AdditiveBlending,
-	SubtractiveBlending: SubtractiveBlending,
-	MultiplyBlending: MultiplyBlending,
-	CustomBlending: CustomBlending
-};
 export var AddEquation = 100;
 export var SubtractEquation = 101;
 export var ReverseSubtractEquation = 102;
@@ -71,38 +63,15 @@ export var EquirectangularRefractionMapping = 304;
 export var SphericalReflectionMapping = 305;
 export var CubeUVReflectionMapping = 306;
 export var CubeUVRefractionMapping = 307;
-export var TextureMapping = {
-	UVMapping: UVMapping,
-	CubeReflectionMapping: CubeReflectionMapping,
-	CubeRefractionMapping: CubeRefractionMapping,
-	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	SphericalReflectionMapping: SphericalReflectionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping,
-	CubeUVRefractionMapping: CubeUVRefractionMapping
-};
 export var RepeatWrapping = 1000;
 export var ClampToEdgeWrapping = 1001;
 export var MirroredRepeatWrapping = 1002;
-export var TextureWrapping = {
-	RepeatWrapping: RepeatWrapping,
-	ClampToEdgeWrapping: ClampToEdgeWrapping,
-	MirroredRepeatWrapping: MirroredRepeatWrapping
-};
 export var NearestFilter = 1003;
 export var NearestMipMapNearestFilter = 1004;
 export var NearestMipMapLinearFilter = 1005;
 export var LinearFilter = 1006;
 export var LinearMipMapNearestFilter = 1007;
 export var LinearMipMapLinearFilter = 1008;
-export var TextureFilter = {
-	NearestFilter: NearestFilter,
-	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
-	LinearFilter: LinearFilter,
-	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter: LinearMipMapLinearFilter
-};
 export var UnsignedByteType = 1009;
 export var ByteType = 1010;
 export var ShortType = 1011;

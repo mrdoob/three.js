@@ -59,6 +59,37 @@ Box3.prototype = {
 
 	},
 
+	setFromBufferAttribute: function ( attribute ) {
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+
+			var x = attribute.getX( i );
+			var y = attribute.getY( i );
+			var z = attribute.getZ( i );
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		this.makeEmpty();
@@ -107,6 +138,8 @@ Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
+				var i, l;
+
 				var geometry = node.geometry;
 
 				if ( geometry !== undefined ) {
@@ -115,7 +148,7 @@ Box3.prototype = {
 
 						var vertices = geometry.vertices;
 
-						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+						for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 							v1.copy( vertices[ i ] );
 							v1.applyMatrix4( node.matrixWorld );
@@ -130,26 +163,9 @@ Box3.prototype = {
 
 						if ( attribute !== undefined ) {
 
-							var array, offset, stride;
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-							if ( attribute.isInterleavedBufferAttribute ) {
-
-								array = attribute.data.array;
-								offset = attribute.offset;
-								stride = attribute.data.stride;
-
-							} else {
-
-								array = attribute.array;
-								offset = 0;
-								stride = 3;
-
-							}
-
-							for ( var i = offset, il = array.length; i < il; i += stride ) {
-
-								v1.fromArray( array, i );
-								v1.applyMatrix4( node.matrixWorld );
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
 								scope.expandByPoint( v1 );
 
@@ -244,29 +260,17 @@ Box3.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( point.x < this.min.x || point.x > this.max.x ||
-				 point.y < this.min.y || point.y > this.max.y ||
-				 point.z < this.min.z || point.z > this.max.z ) {
-
-			return false;
-
-		}
-
-		return true;
+		return point.x < this.min.x || point.x > this.max.x ||
+			point.y < this.min.y || point.y > this.max.y ||
+			point.z < this.min.z || point.z > this.max.z ? false : true;
 
 	},
 
 	containsBox: function ( box ) {
 
-		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
-
-			return true;
-
-		}
-
-		return false;
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y &&
+			this.min.z <= box.min.z && box.max.z <= this.max.z;
 
 	},
 
@@ -288,16 +292,9 @@ Box3.prototype = {
 	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-
-		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-				 box.max.y < this.min.y || box.min.y > this.max.y ||
-				 box.max.z < this.min.z || box.min.z > this.max.z ) {
-
-			return false;
-
-		}
-
-		return true;
+		return box.max.x < this.min.x || box.min.x > this.max.x ||
+			box.max.y < this.min.y || box.min.y > this.max.y ||
+			box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
 
 	},
 

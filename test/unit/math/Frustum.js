@@ -7,14 +7,14 @@ module( "Frustum" );
 var unit3 = new THREE.Vector3( 1, 0, 0 );
 
 var planeEquals = function ( a, b, tolerance ) {
+
 	tolerance = tolerance || 0.0001;
-	if( a.normal.distanceTo( b.normal ) > tolerance ) {
-		return false;
-	}
-	if( Math.abs( a.constant - b.constant ) > tolerance ) {
-		return false;
-	}
+
+	if ( a.normal.distanceTo( b.normal ) > tolerance ) return false;
+	if ( Math.abs( a.constant - b.constant ) > tolerance ) return false;
+
 	return true;
+
 };
 
 test( "constructor", function() {
@@ -68,7 +68,7 @@ test( "copy", function() {
 });
 
 test( "setFromMatrix/makeOrthographic/containsPoint", function() {
-	var m = new THREE.Matrix4().makeOrthographic( -1, 1, -1, 1, 1, 100 )
+	var m = new THREE.Matrix4().makeOrthographic( -1, 1, -1, 1, 1, 100 );
 	var a = new THREE.Frustum().setFromMatrix( m );
 
 	ok( ! a.containsPoint( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
@@ -87,8 +87,8 @@ test( "setFromMatrix/makeOrthographic/containsPoint", function() {
 
 });
 
-test( "setFromMatrix/makeFrustum/containsPoint", function() {
-	var m = new THREE.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 100 )
+test( "setFromMatrix/makePerspective/containsPoint", function() {
+	var m = new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 100 );
 	var a = new THREE.Frustum().setFromMatrix( m );
 
 	ok( ! a.containsPoint( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
@@ -106,8 +106,8 @@ test( "setFromMatrix/makeFrustum/containsPoint", function() {
 	ok( ! a.containsPoint( new THREE.Vector3( 0, 0, -101 ) ), "Passed!" );
 });
 
-test( "setFromMatrix/makeFrustum/intersectsSphere", function() {
-	var m = new THREE.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 100 )
+test( "setFromMatrix/makePerspective/intersectsSphere", function() {
+	var m = new THREE.Matrix4().makePerspective( -1, 1, 1, -1, 1, 100 );
 	var a = new THREE.Frustum().setFromMatrix( m );
 
 	ok( ! a.intersectsSphere( new THREE.Sphere( new THREE.Vector3( 0, 0, 0 ), 0 ) ), "Passed!" );

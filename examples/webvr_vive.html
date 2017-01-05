@@ -30,12 +30,7 @@
 
 		<script>
 
-const VIVE_CENTER_OFFSET = new THREE.Vector3(0, -0.02774, -0.02872)
-const VIVE_CENTER_OFFSET_DIRECTION = VIVE_CENTER_OFFSET.clone().normalize()
-const VIVE_CENTER_OFFSET_DISTANCE = VIVE_CENTER_OFFSET.length()
-const ball = new THREE.Mesh(new THREE.SphereGeometry(0.001, 32, 24), new THREE.MeshNormalMaterial())
-
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -171,14 +166,13 @@ const ball = new THREE.Mesh(new THREE.SphereGeometry(0.001, 32, 24), new THREE.M
 				container.appendChild( renderer.domElement );
 
 				controls = new THREE.VRControls( camera );
-				// controls.standing = true;
+				controls.standing = true;
 
 				// controllers
 
 				controller1 = new THREE.ViveController( 0 );
 				controller1.standingMatrix = controls.getStandingMatrix();
 				scene.add( controller1 );
-				scene.add( ball );
 
 				controller2 = new THREE.ViveController( 1 );
 				controller2.standingMatrix = controls.getStandingMatrix();
@@ -273,11 +267,6 @@ const ball = new THREE.Mesh(new THREE.SphereGeometry(0.001, 32, 24), new THREE.M
 					cube.rotation.x += 0.01 * delta;
 
 				}
-    let position = controller1.position.clone()
-    console.log(position.x)
-    let quaternion = controller1.quaternion.clone()
-    position.add(VIVE_CENTER_OFFSET_DIRECTION.clone().applyQuaternion(quaternion).multiplyScalar(VIVE_CENTER_OFFSET_DISTANCE))
-    ball.position.copy(position)
 
 				effect.render( scene, camera );
 

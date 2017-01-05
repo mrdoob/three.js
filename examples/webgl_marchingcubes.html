@@ -421,25 +421,8 @@
 					m_s.setValue( mat.s );
 					m_l.setValue( mat.l );
 
-					if ( current_material === "textured" ) {
-
-						effect.enableUvs = true;
-
-					} else {
-
-						effect.enableUvs = false;
-
-					}
-
-					if ( current_material === "colors" ) {
-
-						effect.enableColors = true;
-
-					} else {
-
-						effect.enableColors = false;
-
-					}
+					effect.enableUvs = (current_material === "textured") ? true : false;
+					effect.enableColors = (current_material === "colors") ? true : false;
 
 				};
 
