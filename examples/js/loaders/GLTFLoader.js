@@ -1224,6 +1224,7 @@ THREE.GLTFLoader = ( function () {
 
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
+						meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
@@ -1270,6 +1271,8 @@ THREE.GLTFLoader = ( function () {
 							meshNode = new THREE.Line( geometry, material );
 
 						}
+
+						meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
@@ -1512,6 +1515,7 @@ THREE.GLTFLoader = ( function () {
 								var originalMaterial = child.material;
 								var originalGeometry = child.geometry;
 								var originalUserData = child.userData;
+								var originalName = child.name;
 
 								var material;
 
@@ -1542,6 +1546,7 @@ THREE.GLTFLoader = ( function () {
 
 								child.castShadow = true;
 								child.userData = originalUserData;
+								child.name = originalName;
 
 								var skinEntry;
 
@@ -1561,6 +1566,7 @@ THREE.GLTFLoader = ( function () {
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
 									child.userData = originalUserData;
+									child.name = originalName;
 
 									var bones = [];
 									var boneInverses = [];
