@@ -262,7 +262,7 @@ Editor.prototype = {
 
 			} else if ( object instanceof THREE.RectAreaLight ) {
 
-				helper = new THREE.RectAreaLightHelper( object );
+				helper = new THREE.PointLightHelper( object, 1 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
