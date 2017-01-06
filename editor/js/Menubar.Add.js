@@ -325,7 +325,6 @@ Menubar.Add = function ( editor ) {
 		var height = 5;
 
 		var light = new THREE.RectAreaLight( color, intensity, width, height );
-		light.matrixAutoUpdate = true;
 		light.name = 'AreaLight ' + ( ++ lightCount );
 
 		editor.execute( new AddObjectCommand( light ) );
