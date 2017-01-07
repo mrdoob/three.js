@@ -237,7 +237,7 @@ PropertyBinding.prototype = {
 
 			this.resolvedProperty = nodeProperty;
 
-		} else if ( nodeProperty.length !== undefined ) {
+		} else if ( nodeProperty.length !== undefined &&typeof nodeProperty!="string") {
 
 			bindingType = this.BindingType.EntireArray;
 
