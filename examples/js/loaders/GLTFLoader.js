@@ -271,7 +271,9 @@ THREE.GLTFLoader = ( function () {
 			interp.target.updateMatrix();
 			interp.target.matrixAutoUpdate = true;
 
-			tracks.push( new THREE.KeyframeTrack(
+			var trackType = /\.quaternion/.test( interp.name ) ? 'QuaternionKeyframeTrack' : 'VectorKeyframeTrack';
+
+			tracks.push( new THREE[ trackType ](
 				interp.name,
 				interp.times,
 				interp.values,
