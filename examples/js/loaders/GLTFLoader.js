@@ -1142,7 +1142,7 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				var _material = new materialType( materialParams );
-				_material.name = material.name;
+				if ( material.name !== undefined ) _material.name = material.name;
 
 				return _material;
 
@@ -1166,7 +1166,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( json.meshes, function ( mesh ) {
 
 				var group = new THREE.Object3D();
-				group.name = mesh.name;
+				if ( mesh.name !== undefined ) group.name = mesh.name;
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
@@ -1316,7 +1316,7 @@ THREE.GLTFLoader = ( function () {
 				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
 
 				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
-				_camera.name = camera.name;
+				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
 
@@ -1325,7 +1325,7 @@ THREE.GLTFLoader = ( function () {
 			} else if ( camera.type == "orthographic" && camera.orthographic ) {
 
 				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
-				_camera.name = camera.name;
+				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
 
@@ -1435,15 +1435,15 @@ THREE.GLTFLoader = ( function () {
 			if ( node.jointName ) {
 
 				_node = new THREE.Bone();
+				_node.name = node.name !== undefined ? node.name : node.jointName;
 				_node.jointName = node.jointName;
 
 			} else {
 
 				_node = new THREE.Object3D();
+				if ( node.name !== undefined ) _node.name = node.name;
 
 			}
-
-			_node.name = node.name;
 
 			if ( node.extras ) _node.userData = node.extras;
 
@@ -1743,7 +1743,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( json.scenes, function ( scene ) {
 
 				var _scene = new THREE.Scene();
-				_scene.name = scene.name;
+				if ( scene.name !== undefined ) _scene.name = scene.name;
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
