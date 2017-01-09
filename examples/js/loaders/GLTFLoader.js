@@ -694,7 +694,7 @@ THREE.GLTFLoader = ( function () {
 
 		return _each( json.buffers, function ( buffer ) {
 
-			if ( buffer.type === 'arraybuffer' ) {
+			if ( buffer.type === 'arraybuffer' || buffer.type === undefined ) {
 
 				return new Promise( function ( resolve ) {
 
@@ -707,6 +707,10 @@ THREE.GLTFLoader = ( function () {
 					} );
 
 				} );
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
