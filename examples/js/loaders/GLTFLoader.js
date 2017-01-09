@@ -1397,12 +1397,14 @@ THREE.GLTFLoader = ( function () {
 
 						if ( node ) {
 
+							var targetName = node.name ? node.name : node.uuid;
+
 							var interp = {
 								times: inputAccessor.array,
 								values: outputAccessor.array,
 								target: node,
 								type: INTERPOLATION[ sampler.interpolation ],
-								name: node.name + '.' + PATH_PROPERTIES[ target.path ]
+								name: targetName + '.' + PATH_PROPERTIES[ target.path ]
 							};
 
 							interps.push( interp );
