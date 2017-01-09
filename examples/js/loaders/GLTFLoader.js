@@ -1447,8 +1447,6 @@ THREE.GLTFLoader = ( function () {
 
 			if ( node.extras ) _node.userData = node.extras;
 
-			_node.matrixAutoUpdate = false;
-
 			if ( node.matrix !== undefined ) {
 
 				matrix.fromArray( node.matrix );
