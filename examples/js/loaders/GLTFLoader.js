@@ -968,7 +968,9 @@ THREE.GLTFLoader = ( function () {
 							if ( WEBGL_TYPE[ ptype ] ) {
 
 								var pcount = shaderParam.count;
-								var value = material.values[ pname ];
+								var value;
+
+								if ( material.values !== undefined ) value = material.values[ pname ];
 
 								var uvalue = new WEBGL_TYPE[ ptype ]();
 								var usemantic = shaderParam.semantic;
@@ -1065,7 +1067,19 @@ THREE.GLTFLoader = ( function () {
 
 									case WEBGL_CONSTANTS.SAMPLER_2D:
 
-										uvalue = value ? dependencies.textures[ value ] : null;
+										if ( value !== undefined ) {
+
+											uvalue = dependencies.textures[ value ];
+
+										} else if ( shaderParam.value !== undefined ) {
+
+											uvalue = dependencies.textures[ shaderParam.value ];
+
+										} else {
+
+											uvalue = null;
+
+										}
 
 										break;
 
