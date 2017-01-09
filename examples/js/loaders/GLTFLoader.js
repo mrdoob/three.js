@@ -1180,6 +1180,7 @@ THREE.GLTFLoader = ( function () {
 
 						materialParams.depthTest = enableDepthTest;
 						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
+						materialParams.depthWrite = functions.depthMask !== undefined ? functions.depthMask[ 0 ] : true;
 
 						materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
 						materialParams.transparent = enableBlend;
