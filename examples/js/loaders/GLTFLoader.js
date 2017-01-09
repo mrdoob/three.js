@@ -1397,12 +1397,12 @@ THREE.GLTFLoader = ( function () {
 					var channel = animation.channels[ channelId ];
 					var sampler = animation.samplers[ channel.sampler ];
 
-					if ( sampler && animation.parameters ) {
+					if ( sampler ) {
 
 						var target = channel.target;
 						var name = target.id;
-						var input = animation.parameters[ sampler.input ];
-						var output = animation.parameters[ sampler.output ];
+						var input = animation.parameters !== undefined ? animation.parameters[ sampler.input ] : sampler.input;
+						var output = animation.parameters !== undefined ? animation.parameters[ sampler.output ] : sampler.output;
 
 						var inputAccessor = dependencies.accessors[ input ];
 						var outputAccessor = dependencies.accessors[ output ];
