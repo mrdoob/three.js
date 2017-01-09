@@ -254,36 +254,6 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	function createAnimation( name, interps ) {
-
-		var tracks = [];
-
-		for ( var i = 0, len = interps.length; i < len; i ++ ) {
-
-			var interp = interps[ i ];
-
-			// KeyframeTrack.optimize() will modify given 'times' and 'values'
-			// buffers before creating a truncated copy to keep. Because buffers may
-			// be reused by other tracks, make copies here.
-			interp.times = THREE.AnimationUtils.arraySlice( interp.times, 0 );
-			interp.values = THREE.AnimationUtils.arraySlice( interp.values, 0 );
-
-			interp.target.updateMatrix();
-			interp.target.matrixAutoUpdate = true;
-
-			tracks.push( new THREE.KeyframeTrack(
-				interp.name,
-				interp.times,
-				interp.values,
-				interp.type
-			) );
-
-		}
-
-		return new THREE.AnimationClip( name, undefined, tracks );
-
-	}
-
 	/*********************************/
 	/********** INTERNALS ************/
 	/*********************************/
@@ -1372,7 +1342,7 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.animations, function ( animation, animationId ) {
 
-				var interps = [];
+				var tracks = [];
 
 				for ( var channelId in animation.channels ) {
 
@@ -1393,15 +1363,22 @@ THREE.GLTFLoader = ( function () {
 
 						if ( node ) {
 
-							var interp = {
-								times: inputAccessor.array,
-								values: outputAccessor.array,
-								target: node,
-								type: INTERPOLATION[ sampler.interpolation ],
-								name: node.name + '.' + PATH_PROPERTIES[ target.path ]
-							};
+							node.updateMatrix();
+							node.matrixAutoUpdate = true;
 
-							interps.push( interp );
+							var TypedKeyframeTrack = PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.rotation
+								? THREE.QuaternionKeyframeTrack
+								: THREE.VectorKeyframeTrack;
+
+							// KeyframeTrack.optimize() will modify given 'times' and 'values'
+							// buffers before creating a truncated copy to keep. Because buffers may
+							// be reused by other tracks, make copies here.
+							tracks.push( new TypedKeyframeTrack(
+								node.name + '.' + PATH_PROPERTIES[ target.path ],
+								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
+								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
+								INTERPOLATION[ sampler.interpolation ]
+							) );
 
 						}
 
@@ -1409,7 +1386,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return createAnimation( "animation_" + animationId, interps );
+				return new THREE.AnimationClip( "animation_" + animationId, undefined, tracks );
 
 			} );
 
