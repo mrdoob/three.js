@@ -674,7 +674,7 @@ THREE.GLTFLoader = ( function () {
 			return new Promise( function ( resolve ) {
 
 				var loader = new THREE.FileLoader();
-				loader.responseType = 'text';
+				loader.setResponseType( 'text' );
 				loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
 					resolve( shaderText );
@@ -699,7 +699,7 @@ THREE.GLTFLoader = ( function () {
 				return new Promise( function ( resolve ) {
 
 					var loader = new THREE.FileLoader();
-					loader.responseType = 'arraybuffer';
+					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
 						resolve( buffer );
