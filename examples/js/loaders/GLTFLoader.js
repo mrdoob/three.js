@@ -1590,7 +1590,6 @@ THREE.GLTFLoader = ( function () {
 
 										if ( jointNode ) {
 
-											jointNode.skin = child;
 											bones.push( jointNode );
 
 											var m = skinEntry.inverseBindMatrices.array;
