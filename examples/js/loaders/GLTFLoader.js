@@ -1241,7 +1241,9 @@ THREE.GLTFLoader = ( function () {
 
 						var attributes = primitive.attributes;
 
-						_each( attributes, function( attributeEntry, attributeId ) {
+						for ( var attributeId in attributes ) {
+
+							var attributeEntry = attributes[ attributeId ];
 
 							if ( !attributeEntry ) {
 
@@ -1257,13 +1259,15 @@ THREE.GLTFLoader = ( function () {
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
 									
+								case 'COLOR_0':
+								case 'COLOR0':
 								case 'COLOR':
 								geometry.addAttribute( 'color', bufferAttribute );
 								break;
 								
 							}
 
-						});
+						};
 
 						if ( primitive.indices ) {
 
