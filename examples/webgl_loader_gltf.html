@@ -250,7 +250,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene;
+					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
 
 					var loadEndTime = Date.now();
 
@@ -541,11 +541,11 @@
 
 			function toggleAnimations() {
 
-				var i, len = gltf.clips.length;
+				var i, len = gltf.animations.length;
 
 				for (i = 0; i < len; i++) {
 
-					var clip = gltf.clips[i];
+					var clip = gltf.animations[i];
 					var action = mixer.existingAction( clip );
 
 					if (action.isRunning()) {

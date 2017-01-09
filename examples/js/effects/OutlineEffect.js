@@ -80,7 +80,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		"vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {",
 
 		"	float thickness = outlineThickness;",
-		"	float ratio = 1.0;", // TODO: support outline thickness ratio for each vertex
+		"	const float ratio = 1.0;", // TODO: support outline thickness ratio for each vertex
 		"	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + objectNormal, 1.0 );",
 		// NOTE: subtract pos2 from pos because BackSide objectNormal is negative
 		"	vec4 norm = normalize( pos - pos2 );",
@@ -103,6 +103,10 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		"	#endif",
 
+		"#endif",
+
+		"#ifdef DECLARE_TRANSFORMED",
+		"	vec3 transformed = vec3( position );",
 		"#endif",
 
 		"#ifdef USE_SKINNING",
@@ -143,6 +147,21 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 			originalUniforms = shader.uniforms;
 			originalVertexShader = shader.vertexShader;
 
+		} else if ( originalMaterial.isRawShaderMaterial === true ) {
+
+			originalUniforms = originalMaterial.uniforms;
+			originalVertexShader = originalMaterial.vertexShader;
+
+			if ( ! /attribute\s+vec3\s+position\s*;/.test( originalVertexShader ) ||
+			     ! /attribute\s+vec3\s+normal\s*;/.test( originalVertexShader ) ) {
+
+				console.warn( 'THREE.OutlineEffect requires both vec3 position and normal attributes in vertex shader, ' +
+				              'does not draw outline for ' + originalMaterial.name + '(uuid:' + originalMaterial.uuid + ') material.' );
+
+				return invisibleMaterial;
+
+			}
+
 		} else if ( originalMaterial.isShaderMaterial === true ) {
 
 			originalUniforms = originalMaterial.uniforms;
@@ -167,7 +186,13 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 					// TODO: consider safer way
 					.replace( /#include\s+<[\w_]*light[\w_]*>/g, '' );
 
+		var defines = {};
+
+		if ( ! /vec3\s+transformed\s*=/.test( originalVertexShader ) &&
+		     ! /#include\s+<begin_vertex>/.test( originalVertexShader ) ) defines.DECLARE_TRANSFORMED = true;
+
 		var material = new THREE.ShaderMaterial( {
+			defines: defines,
 			uniforms: uniforms,
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
@@ -219,7 +244,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		var outlineMaterial = data.material;
 		data.used = true;
 
-		var uuid= outlineMaterial !== invisibleMaterial ? outlineMaterial.uuid : object.uuid;
+		var uuid = outlineMaterial !== invisibleMaterial ? outlineMaterial.uuid : object.uuid;
 		originalMaterials[ uuid ] = object.material;
 
 		if ( object.material.isMultiMaterial === true ) {

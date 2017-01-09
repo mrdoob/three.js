@@ -24,7 +24,7 @@
 		<h2>A Note about Position, Target and rotation</h2>
 		<div>
 			A common point of confusion for directional lights is that setting the rotation has no effect.
-			This is because Three's DirectionalLight is the equivalent to what is often called a 'Target
+			This is because three.js's DirectionalLight is the equivalent to what is often called a 'Target
 			Direct Light' in other applications.<br /><br />
 
 			This means that its direction is calculated as pointing
@@ -54,7 +54,6 @@
 		<code>
 // White directional light at half intensity shining from the top.
 var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-directionalLight.position.set( 0, 1, 0 );
 scene.add( directionalLight );
 	</code>
 

@@ -30,10 +30,12 @@
 
 	#endif
 
-    #if NUM_RECT_AREA_LIGHTS > 0
+	/*
+	#if NUM_RECT_AREA_LIGHTS > 0
 
-    // TODO (abelnation): update vAreaShadowCoord with area light info
+		// TODO (abelnation): update vAreaShadowCoord with area light info
 
-    #endif
+	#endif
+	*/
 
 #endif

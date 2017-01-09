@@ -143,23 +143,23 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkBufferGeometryIntersection( object, raycaster, ray, positions, uvs, a, b, c ) {
+		function checkBufferGeometryIntersection( object, raycaster, ray, position, uv, a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+			vA.fromBufferAttribute( position, a );
+			vB.fromBufferAttribute( position, b );
+			vC.fromBufferAttribute( position, c );
 
 			var intersection = checkIntersection( object, raycaster, ray, vA, vB, vC, intersectionPoint );
 
 			if ( intersection ) {
 
-				if ( uvs ) {
+				if ( uv ) {
 
-					uvA.fromArray( uvs, a * 2 );
-					uvB.fromArray( uvs, b * 2 );
-					uvC.fromArray( uvs, c * 2 );
+					uvA.fromBufferAttribute( uv, a );
+					uvB.fromBufferAttribute( uv, b );
+					uvC.fromBufferAttribute( uv, c );
 
-					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC,  uvA, uvB, uvC );
+					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
 
 				}
 
@@ -202,32 +202,27 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			}
 
-			var uvs, intersection;
+			var intersection;
 
 			if ( geometry.isBufferGeometry ) {
 
 				var a, b, c;
 				var index = geometry.index;
-				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
-
-				if ( attributes.uv !== undefined ) {
-
-					uvs = attributes.uv.array;
-
-				}
+				var position = geometry.attributes.position;
+				var uv = geometry.attributes.uv;
+				var i, l;
 
 				if ( index !== null ) {
 
-					var indices = index.array;
+					// indexed buffer geometry
 
-					for ( var i = 0, l = indices.length; i < l; i += 3 ) {
+					for ( i = 0, l = index.count; i < l; i += 3 ) {
 
-						a = indices[ i ];
-						b = indices[ i + 1 ];
-						c = indices[ i + 2 ];
+						a = index.getX( i );
+						b = index.getX( i + 1 );
+						c = index.getX( i + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 						if ( intersection ) {
 
@@ -240,14 +235,15 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				} else {
 
+					// non-indexed buffer geometry
 
-					for ( var i = 0, l = positions.length; i < l; i += 9 ) {
+					for ( i = 0, l = position.count; i < l; i += 3 ) {
 
-						a = i / 3;
-						b = a + 1;
-						c = a + 2;
+						a = i;
+						b = i + 1;
+						c = i + 2;
 
-						intersection = checkBufferGeometryIntersection( this, raycaster, ray, positions, uvs, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, raycaster, ray, position, uv, a, b, c );
 
 						if ( intersection ) {
 
@@ -263,11 +259,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var fvA, fvB, fvC;
-				var isFaceMaterial = (material && material.isMultiMaterial);
+				var isFaceMaterial = ( material && material.isMultiMaterial );
 				var materials = isFaceMaterial === true ? material.materials : null;
 
 				var vertices = geometry.vertices;
 				var faces = geometry.faces;
+				var uvs;
+
 				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 				if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
 
