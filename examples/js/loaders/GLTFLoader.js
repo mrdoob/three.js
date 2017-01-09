@@ -1044,7 +1044,7 @@ THREE.GLTFLoader = ( function () {
 
 											}
 
-										}	else {
+										} else {
 
 											if ( shaderParam && shaderParam.value ) {
 
