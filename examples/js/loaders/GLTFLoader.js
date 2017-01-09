@@ -534,6 +534,20 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	function createDefaultMaterial() {
+
+		return new THREE.MeshPhongMaterial( {
+			color: 0x00000,
+			emissive: 0x888888,
+			specular: 0x000000,
+			shininess: 0,
+			transparent: false,
+			depthTest: true,
+			side: THREE.FrontSide
+		} );
+
+	};
+
 	// Deferred constructor for RawShaderMaterial types
 	function DeferredShaderMaterial( params ) {
 
