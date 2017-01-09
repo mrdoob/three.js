@@ -1676,7 +1676,7 @@ THREE.GLTFLoader = ( function () {
 								lightNode = new THREE.PointLight( color );
 								break;
 
-							case "spot ":
+							case "spot":
 								lightNode = new THREE.SpotLight( color );
 								lightNode.position.set( 0, 0, 1 );
 								break;
