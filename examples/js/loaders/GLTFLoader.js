@@ -1572,6 +1572,22 @@ THREE.GLTFLoader = ( function () {
 								// Replace Mesh with SkinnedMesh in library
 								if ( skinEntry ) {
 
+									var getJointNode = function ( jointId ) {
+
+										var keys = Object.keys( __nodes );
+
+										for ( var i = 0, il = keys.length; i < il; i ++ ) {
+
+											var n = __nodes[ keys[ i ] ];
+
+											if ( n.jointName === jointId ) return n;
+
+										}
+
+										return null;
+
+									}
+
 									var geometry = originalGeometry;
 									var material = originalMaterial;
 									material.skinning = true;
@@ -1583,26 +1599,10 @@ THREE.GLTFLoader = ( function () {
 									var bones = [];
 									var boneInverses = [];
 
-									var keys = Object.keys( __nodes );
-
 									for ( var i = 0, l = skinEntry.jointNames.length; i < l; i ++ ) {
 
 										var jointId = skinEntry.jointNames[ i ];
-
-										var jointNode;
-
-										for ( var j = 0, jl = keys.length; j < jl; j ++ ) {
-
-											var n = __nodes[ keys[ j ] ];
-
-											if ( n.jointName === jointId ) {
-
-												jointNode = n;
-												break;
-
-											}
-
-										}
+										var jointNode = getJointNode( jointId );
 
 										if ( jointNode ) {
 
