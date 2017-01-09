@@ -53,7 +53,7 @@
 
 		return new THREE.Vector3( x, y, z ).multiplyScalar( this.scale );
 
-	}
+	};
 
 	// Viviani's Curve
 
@@ -129,7 +129,7 @@
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
-	};
+	}
 
 	TrefoilKnot.prototype = Object.create( THREE.Curve.prototype );
 	TrefoilKnot.prototype.constructor = TrefoilKnot;
@@ -152,7 +152,7 @@
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
-	};
+	}
 
 	TorusKnot.prototype = Object.create( THREE.Curve.prototype );
 	TorusKnot.prototype.constructor = TorusKnot;
@@ -178,7 +178,7 @@
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
-	};
+	}
 
 	CinquefoilKnot.prototype = Object.create( THREE.Curve.prototype );
 	CinquefoilKnot.prototype.constructor = CinquefoilKnot;
@@ -204,7 +204,7 @@
 
 		this.scale = ( s === undefined ) ? 10 : s;
 
-	};
+	}
 
 	TrefoilPolynomialKnot.prototype = Object.create( THREE.Curve.prototype );
 	TrefoilPolynomialKnot.prototype.constructor = TrefoilPolynomialKnot;
@@ -234,7 +234,7 @@
 
 		this.scale = ( s === undefined ) ? 1 : s;
 
-	};
+	}
 
 	FigureEightPolynomialKnot.prototype = Object.create( THREE.Curve.prototype );
 	FigureEightPolynomialKnot.prototype.constructor = FigureEightPolynomialKnot;
@@ -257,7 +257,7 @@
 
 		this.scale = ( s === undefined ) ? 40 : s;
 
-	};
+	}
 
 	DecoratedTorusKnot4a.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot4a.prototype.constructor = DecoratedTorusKnot4a;
@@ -280,7 +280,7 @@
 
 		this.scale = ( s === undefined ) ? 40 : s;
 
-	};
+	}
 
 	DecoratedTorusKnot4b.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot4b.prototype.constructor = DecoratedTorusKnot4b;
@@ -303,7 +303,7 @@
 
 		this.scale = ( s === undefined ) ? 40 : s;
 
-	};
+	}
 
 	DecoratedTorusKnot5a.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot5a.prototype.constructor = DecoratedTorusKnot5a;
@@ -326,7 +326,7 @@
 
 		this.scale = ( s === undefined ) ? 40 : s;
 
-	};
+	}
 
 	DecoratedTorusKnot5c.prototype = Object.create( THREE.Curve.prototype );
 	DecoratedTorusKnot5c.prototype.constructor = DecoratedTorusKnot5c;
