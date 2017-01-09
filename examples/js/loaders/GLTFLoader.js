@@ -1238,7 +1238,7 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						var material = dependencies.materials[ primitive.material ];
+						var material = dependencies.materials !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
