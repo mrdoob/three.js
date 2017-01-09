@@ -1150,6 +1150,101 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
+						var states = technique.states || {};
+						var enables = states.enable || [];
+						var functions = states.functions || {};
+
+						var enableCullFace = false;
+						var enableDepthTest = false;
+						var enableBlend = false;
+
+						for ( var i = 0, il = enables.length; i < il; i ++ ) {
+
+							var enable = enables[ i ];
+
+							switch( STATES_ENABLES[ enable ] ) {
+
+								case 'CULL_FACE':
+
+									enableCullFace = true;
+
+									break;
+
+								case 'DEPTH_TEST':
+
+									enableDepthTest = true;
+
+									break;
+
+								case 'BLEND':
+
+									enableBlend = true;
+
+									break;
+
+								// TODO: implement
+								case 'SCISSOR_TEST':
+								case 'POLYGON_OFFSET_FILL':
+								case 'SAMPLE_ALPHA_TO_COVERAGE':
+
+									break;
+
+								default:
+
+									throw new Error( "Unknown technique.states.enable: " + enable );
+
+							}
+
+						}
+
+						if ( enableCullFace ) {
+
+							materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : THREE.FrontSide;
+
+						} else {
+
+							materialParams.side = THREE.DoubleSide;
+
+						}
+
+						materialParams.depthTest = enableDepthTest;
+						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
+
+						materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
+						materialParams.transparent = enableBlend;
+
+						var blendEquationSeparate = functions.blendEquationSeparate;
+
+						if ( blendEquationSeparate !== undefined ) {
+
+							materialParams.blendEquation = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 0 ] ];
+							materialParams.blendEquationAlpha = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 1 ] ];
+
+						} else {
+
+							materialParams.blendEquation = THREE.AddEquation;
+							materialParams.blendEquationAlpha = THREE.AddEquation;
+
+						}
+
+						var blendFuncSeparate = functions.blendFuncSeparate;
+
+						if ( blendFuncSeparate !== undefined ) {
+
+							materialParams.blendSrc = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 0 ] ];
+							materialParams.blendDst = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 1 ] ];
+							materialParams.blendSrcAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 2 ] ];
+							materialParams.blendDstAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 3 ] ];
+
+						} else {
+
+							materialParams.blendSrc = THREE.OneFactor;
+							materialParams.blendDst = THREE.ZeroFactor;
+							materialParams.blendSrcAlpha = THREE.OneFactor;
+							materialParams.blendDstAlpha = THREE.ZeroFactor;
+
+						}
+
 					}
 
 				}
