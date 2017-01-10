@@ -150,9 +150,11 @@ Object3D.prototype = {
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
 
-		var q1 = new Quaternion();
+		var q1 = undefined;
 
 		return function rotateOnAxis( axis, angle ) {
+
+			if ( q1 === undefined ) q1 = new Quaternion();
 
 			q1.setFromAxisAngle( axis, angle );
 
@@ -166,9 +168,11 @@ Object3D.prototype = {
 
 	rotateX: function () {
 
-		var v1 = new Vector3( 1, 0, 0 );
+		var v1 = undefined;
 
 		return function rotateX( angle ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 1, 0, 0 );
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -178,9 +182,11 @@ Object3D.prototype = {
 
 	rotateY: function () {
 
-		var v1 = new Vector3( 0, 1, 0 );
+		var v1 = undefined;
 
 		return function rotateY( angle ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 0, 1, 0 );
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -190,9 +196,11 @@ Object3D.prototype = {
 
 	rotateZ: function () {
 
-		var v1 = new Vector3( 0, 0, 1 );
+		var v1 = undefined;
 
 		return function rotateZ( angle ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 0, 0, 1 );
 
 			return this.rotateOnAxis( v1, angle );
 
@@ -205,9 +213,11 @@ Object3D.prototype = {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function translateOnAxis( axis, distance ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			v1.copy( axis ).applyQuaternion( this.quaternion );
 
@@ -221,9 +231,11 @@ Object3D.prototype = {
 
 	translateX: function () {
 
-		var v1 = new Vector3( 1, 0, 0 );
+		var v1 = undefined;
 
 		return function translateX( distance ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 1, 0, 0 );
 
 			return this.translateOnAxis( v1, distance );
 
@@ -233,9 +245,11 @@ Object3D.prototype = {
 
 	translateY: function () {
 
-		var v1 = new Vector3( 0, 1, 0 );
+		var v1 = undefined;
 
 		return function translateY( distance ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 0, 1, 0 );
 
 			return this.translateOnAxis( v1, distance );
 
@@ -245,9 +259,11 @@ Object3D.prototype = {
 
 	translateZ: function () {
 
-		var v1 = new Vector3( 0, 0, 1 );
+		var v1 = undefined;
 
 		return function translateZ( distance ) {
+
+			if ( v1 === undefined ) v1 = new Vector3( 0, 0, 1 );
 
 			return this.translateOnAxis( v1, distance );
 
@@ -263,9 +279,11 @@ Object3D.prototype = {
 
 	worldToLocal: function () {
 
-		var m1 = new Matrix4();
+		var m1 = undefined;
 
 		return function worldToLocal( vector ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			return vector.applyMatrix4( m1.getInverse( this.matrixWorld ) );
 
@@ -277,9 +295,11 @@ Object3D.prototype = {
 
 		// This routine does not support objects with rotated and/or translated parent(s)
 
-		var m1 = new Matrix4();
+		var m1 = undefined;
 
 		return function lookAt( vector ) {
+
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.lookAt( vector, this.position, this.up );
 
@@ -404,10 +424,13 @@ Object3D.prototype = {
 
 	getWorldQuaternion: function () {
 
-		var position = new Vector3();
-		var scale = new Vector3();
+		var position = undefined;
+		var scale = undefined;
 
 		return function getWorldQuaternion( optionalTarget ) {
+
+			if ( position === undefined ) position = new Vector3();
+			if ( scale === undefined ) scale = new Vector3();
 
 			var result = optionalTarget || new Quaternion();
 
@@ -423,9 +446,11 @@ Object3D.prototype = {
 
 	getWorldRotation: function () {
 
-		var quaternion = new Quaternion();
+		var quaternion = undefined;
 
 		return function getWorldRotation( optionalTarget ) {
+
+			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			var result = optionalTarget || new Euler();
 
@@ -439,10 +464,13 @@ Object3D.prototype = {
 
 	getWorldScale: function () {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
+		var position = undefined;
+		var quaternion = undefined;
 
 		return function getWorldScale( optionalTarget ) {
+
+			if ( position === undefined ) position = new Vector3();
+			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			var result = optionalTarget || new Vector3();
 
@@ -458,9 +486,11 @@ Object3D.prototype = {
 
 	getWorldDirection: function () {
 
-		var quaternion = new Quaternion();
+		var quaternion = undefined;
 
 		return function getWorldDirection( optionalTarget ) {
+
+			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			var result = optionalTarget || new Vector3();
 
