@@ -17417,7 +17417,6 @@ function WebGLObjects( gl, properties, info ) {
 
 		if ( index !== null ) {
 
-			var edges = {};
 			var array = index.array;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
@@ -34986,16 +34985,28 @@ Object.assign( Font.prototype, {
 
 			var chars = String( text ).split( '' );
 			var scale = size / data.resolution;
-			var offset = 0;
+			var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+
+			var offsetX = 0, offsetY = 0;
 
 			var paths = [];
 
 			for ( var i = 0; i < chars.length; i ++ ) {
 
-				var ret = createPath( chars[ i ], scale, offset );
-				offset += ret.offset;
+				var char = chars[ i ];
 
-				paths.push( ret.path );
+				if ( char === '\n' ) {
+
+					offsetX = 0;
+					offsetY -= line_height;
+
+				} else {
+
+					var ret = createPath( char, scale, offsetX, offsetY );
+					offsetX += ret.offsetX;
+					paths.push( ret.path );
+
+				}
 
 			}
 
@@ -35003,7 +35014,7 @@ Object.assign( Font.prototype, {
 
 		}
 
-		function createPath( c, scale, offset ) {
+		function createPath( c, scale, offsetX, offsetY ) {
 
 			var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
 
@@ -35026,8 +35037,8 @@ Object.assign( Font.prototype, {
 
 						case 'm': // moveTo
 
-							x = outline[ i ++ ] * scale + offset;
-							y = outline[ i ++ ] * scale;
+							x = outline[ i ++ ] * scale + offsetX;
+							y = outline[ i ++ ] * scale + offsetY;
 
 							path.moveTo( x, y );
 
@@ -35035,8 +35046,8 @@ Object.assign( Font.prototype, {
 
 						case 'l': // lineTo
 
-							x = outline[ i ++ ] * scale + offset;
-							y = outline[ i ++ ] * scale;
+							x = outline[ i ++ ] * scale + offsetX;
+							y = outline[ i ++ ] * scale + offsetY;
 
 							path.lineTo( x, y );
 
@@ -35044,10 +35055,10 @@ Object.assign( Font.prototype, {
 
 						case 'q': // quadraticCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offset;
-							cpy  = outline[ i ++ ] * scale;
-							cpx1 = outline[ i ++ ] * scale + offset;
-							cpy1 = outline[ i ++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offsetX;
+							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx1 = outline[ i ++ ] * scale + offsetX;
+							cpy1 = outline[ i ++ ] * scale + offsetY;
 
 							path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
@@ -35072,12 +35083,12 @@ Object.assign( Font.prototype, {
 
 						case 'b': // bezierCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offset;
-							cpy  = outline[ i ++ ] * scale;
-							cpx1 = outline[ i ++ ] * scale + offset;
-							cpy1 = outline[ i ++ ] * scale;
-							cpx2 = outline[ i ++ ] * scale + offset;
-							cpy2 = outline[ i ++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offsetX;
+							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx1 = outline[ i ++ ] * scale + offsetX;
+							cpy1 = outline[ i ++ ] * scale + offsetY;
+							cpx2 = outline[ i ++ ] * scale + offsetX;
+							cpy2 = outline[ i ++ ] * scale + offsetY;
 
 							path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
@@ -35106,7 +35117,7 @@ Object.assign( Font.prototype, {
 
 			}
 
-			return { offset: glyph.ha * scale, path: path };
+			return { offsetX: glyph.ha * scale, path: path };
 
 		}
 
