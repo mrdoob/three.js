@@ -164,7 +164,7 @@ BufferGeometry.prototype = {
 
 		// rotate geometry around world x-axis
 
-		var m1;
+		var m1 = undefined;
 
 		return function rotateX( angle ) {
 
@@ -184,7 +184,7 @@ BufferGeometry.prototype = {
 
 		// rotate geometry around world y-axis
 
-		var m1;
+		var m1 = undefined;
 
 		return function rotateY( angle ) {
 
@@ -204,7 +204,7 @@ BufferGeometry.prototype = {
 
 		// rotate geometry around world z-axis
 
-		var m1;
+		var m1 = undefined;
 
 		return function rotateZ( angle ) {
 
@@ -224,7 +224,7 @@ BufferGeometry.prototype = {
 
 		// translate geometry
 
-		var m1;
+		var m1 = undefined;
 
 		return function translate( x, y, z ) {
 
@@ -244,7 +244,7 @@ BufferGeometry.prototype = {
 
 		// scale geometry
 
-		var m1;
+		var m1 = undefined;
 
 		return function scale( x, y, z ) {
 
@@ -262,7 +262,7 @@ BufferGeometry.prototype = {
 
 	lookAt: function () {
 
-		var obj;
+		var obj = undefined;
 
 		return function lookAt( vector ) {
 
@@ -603,10 +603,13 @@ BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		var box = new Box3();
-		var vector = new Vector3();
+		var box = undefined;
+		var vector = undefined;
 
 		return function computeBoundingSphere() {
+
+			if ( box === undefined ) box = new Box3();
+			if ( vector === undefined ) vector = new Vector3();
 
 			if ( this.boundingSphere === null ) {
 
