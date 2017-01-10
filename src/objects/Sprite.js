@@ -25,9 +25,11 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var matrixPosition = new Vector3();
+		var matrixPosition = undefined;
 
 		return function raycast( raycaster, intersects ) {
+
+			if ( matrixPosition === undefined ) matrixPosition = new Vector3();
 
 			matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
