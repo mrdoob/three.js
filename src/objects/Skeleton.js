@@ -149,9 +149,11 @@ Object.assign( Skeleton.prototype, {
 
 	update: ( function () {
 
-		var offsetMatrix = new Matrix4();
+		var offsetMatrix = undefined;
 
 		return function update() {
+
+			if ( offsetMatrix === undefined ) offsetMatrix = new Matrix4();
 
 			// flatten bone matrices to array
 
