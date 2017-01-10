@@ -148,7 +148,7 @@ def buffer_position(mesh):
 
         for vertex_index in face.vertices:
             vertex = mesh.vertices[vertex_index]
-            vector = (vertex.co.x, vertex.co.y, vertex.co.z)
+            vector = (vertex.co.x, vertex.co.z, -vertex.co.y)
             position.extend(vector)
 
     return position
@@ -763,7 +763,7 @@ def vertices(mesh):
     vertices_ = []
 
     for vertex in mesh.vertices:
-        vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
+        vertices_.extend((vertex.co.x, vertex.co.z, -vertex.co.y))
 
     return vertices_
 
