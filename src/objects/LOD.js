@@ -89,9 +89,11 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var matrixPosition = new Vector3();
+		var matrixPosition = undefined;
 
 		return function raycast( raycaster, intersects ) {
+
+			if ( matrixPosition === undefined ) matrixPosition = new Vector3();
 
 			matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
@@ -105,10 +107,13 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	update: function () {
 
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+		var v1 = undefined;
+		var v2 = undefined;
 
 		return function update( camera ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
+			if ( v2 === undefined ) v2 = new Vector3();
 
 			var levels = this.levels;
 
