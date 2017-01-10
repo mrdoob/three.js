@@ -522,9 +522,11 @@ Object.assign( ObjectLoader.prototype, {
 
 	parseObject: function () {
 
-		var matrix = new Matrix4();
+		var matrix = undefined;
 
 		return function parseObject( data, geometries, materials ) {
+
+			if ( matrix === undefined ) matrix = new Matrix4();
 
 			var object;
 
