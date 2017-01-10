@@ -59,11 +59,15 @@ VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
 
 VertexNormalsHelper.prototype.update = ( function () {
 
-	var v1 = new Vector3();
-	var v2 = new Vector3();
-	var normalMatrix = new Matrix3();
+	var v1 = undefined;
+	var v2 = undefined;
+	var normalMatrix = undefined;
 
 	return function update() {
+
+		if ( v1 === undefined ) v1 = new Vector3();
+		if ( v2 === undefined ) v2 = new Vector3();
+		if ( normalMatrix === undefined ) normalMatrix = new Matrix3();
 
 		var keys = [ 'a', 'b', 'c' ];
 
