@@ -538,6 +538,13 @@ THREE.GLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'COLOR_0':
+				case 'COLOR0':
+				case 'COLOR':
+
+					shaderText = shaderText.replace( regEx, 'color' );
+					break;
+
 				case "WEIGHT":
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );
@@ -1385,7 +1392,10 @@ THREE.GLTFLoader = ( function () {
 
 						var attributes = primitive.attributes;
 
-						_each( attributes, function ( attributeEntry, attributeId ) {
+
+						for ( var attributeId in attributes ) {
+
+							var attributeEntry = attributes[ attributeId ];
 
 							if ( ! attributeEntry ) return;
 
@@ -1396,14 +1406,15 @@ THREE.GLTFLoader = ( function () {
 								case 'POSITION':
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
-
+				
+								case 'COLOR_0':
+								case 'COLOR0':
 								case 'COLOR':
 									geometry.addAttribute( 'color', bufferAttribute );
 									break;
 
 							}
-
-						} );
+						};
 
 						var material = dependencies.materials[ primitive.material ];
 
