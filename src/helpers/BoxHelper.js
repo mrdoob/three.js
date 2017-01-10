@@ -34,9 +34,11 @@ BoxHelper.prototype.constructor = BoxHelper;
 
 BoxHelper.prototype.update = ( function () {
 
-	var box = new Box3();
+	var box = undefined;
 
 	return function update( object ) {
+
+		if ( box === undefined ) box = new Box3();
 
 		if ( object && object.isBox3 ) {
 
