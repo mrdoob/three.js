@@ -108,6 +108,15 @@ THREE.GLTFLoader = ( function () {
 
 			update: function ( scene, camera ) {
 
+				// update scene graph
+
+				scene.updateMatrixWorld();
+
+				// update camera matrices and frustum
+
+				camera.updateMatrixWorld();
+				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
 				for ( var name in objects ) {
 
 					var object = objects[ name ];
@@ -174,15 +183,6 @@ THREE.GLTFLoader = ( function () {
 
 	// Update - update all the uniform values
 	GLTFShader.prototype.update = function ( scene, camera ) {
-
-		// update scene graph
-
-		scene.updateMatrixWorld();
-
-		// update camera matrices and frustum
-
-		camera.updateMatrixWorld();
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var boundUniforms = this.boundUniforms;
 
