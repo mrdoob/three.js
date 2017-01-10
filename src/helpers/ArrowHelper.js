@@ -61,10 +61,12 @@ ArrowHelper.prototype.constructor = ArrowHelper;
 
 ArrowHelper.prototype.setDirection = ( function () {
 
-	var axis = new Vector3();
+	var axis = undefined;
 	var radians;
 
 	return function setDirection( dir ) {
+
+		if ( axis === undefined ) axis = new Vector3();
 
 		// dir is assumed to be normalized
 
