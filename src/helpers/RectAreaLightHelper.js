@@ -58,10 +58,13 @@ RectAreaLightHelper.prototype.dispose = function () {
 
 RectAreaLightHelper.prototype.update = function () {
 
-	var vector1 = new Vector3();
-	var vector2 = new Vector3();
+	var vector1 = undefined;
+	var vector2 = undefined;
 
 	return function update() {
+
+		if ( vector1 === undefined ) vector1 = new Vector3();
+		if ( vector2 === undefined ) vector2 = new Vector3();
 
 		var mesh1 = this.children[ 0 ];
 		var mesh2 = this.children[ 1 ];
