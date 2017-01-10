@@ -486,6 +486,13 @@ THREE.GLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'COLOR_0':
+				case 'COLOR0':
+				case 'COLOR':
+
+					shaderText = shaderText.replace( regEx, 'color' );
+					break;
+
 				case "WEIGHT":
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );

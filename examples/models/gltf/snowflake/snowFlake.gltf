@@ -158,8 +158,8 @@
       },
       "program": "meshProgram",
       "uniforms": {
-        "modelViewMatrix": "modelViewMatrixParameter",
-        "projectionMatrix": "projectionMatrixParameter"
+        "u_modelViewMatrix": "modelViewMatrixParameter",
+        "u_projectionMatrix": "projectionMatrixParameter"
       },
       "states": {
         "enable": [
