@@ -32,7 +32,7 @@ Sphere.prototype = {
 
 		return function setFromPoints( points, optionalCenter ) {
 
-			box = box || new Box3();
+			if ( box === undefined ) box = new Box3(); // see #10547
 
 			var center = this.center;
 
