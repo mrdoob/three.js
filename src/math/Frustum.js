@@ -84,9 +84,11 @@ Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var sphere = new Sphere();
+		var sphere = undefined;
 
 		return function intersectsObject( object ) {
+
+			if ( sphere === undefined ) sphere = new Sphere();
 
 			var geometry = object.geometry;
 
@@ -104,9 +106,11 @@ Frustum.prototype = {
 
 	intersectsSprite: function () {
 
-		var sphere = new Sphere();
+		var sphere = undefined;
 
 		return function intersectsSprite( sprite ) {
+
+			if ( sphere === undefined ) sphere = new Sphere();
 
 			sphere.center.set( 0, 0, 0 );
 			sphere.radius = 0.7071067811865476;
@@ -142,10 +146,13 @@ Frustum.prototype = {
 
 	intersectsBox: function () {
 
-		var p1 = new Vector3(),
-			p2 = new Vector3();
+		var p1 = undefined;
+		var p2 = undefined;
 
 		return function intersectsBox( box ) {
+
+			if ( p1 === undefined ) p1 = new Vector3();
+			if ( p2 === undefined ) p2 = new Vector3();
 
 			var planes = this.planes;
 
