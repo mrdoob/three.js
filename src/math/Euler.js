@@ -237,7 +237,7 @@ Euler.prototype = {
 
 	setFromQuaternion: function () {
 
-		var matrix;
+		var matrix = undefined;
 
 		return function setFromQuaternion( q, order, update ) {
 
@@ -261,9 +261,11 @@ Euler.prototype = {
 
 		// WARNING: this discards revolution information -bhouston
 
-		var q = new Quaternion();
+		var q = undefined;
 
 		return function reorder( newOrder ) {
+
+			if ( q === undefined ) q = new Quaternion();
 
 			q.setFromEuler( this );
 
