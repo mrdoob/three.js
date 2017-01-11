@@ -360,7 +360,7 @@ var list = {
 
 	"Developer Reference": {
 		"Polyfills": [
-			[ "Polyfills", "api/polyfills" ]
+			[ "Polyfills", "api/Polyfills" ]
 		],
 
 		"WebGLRenderer": [
