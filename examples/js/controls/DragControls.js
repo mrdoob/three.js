@@ -52,8 +52,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
-		_mouse.x = ( event.clientX / _domElement.width ) * 2 - 1;
-		_mouse.y = - ( event.clientY / _domElement.height ) * 2 + 1;
+		_mouse.x = ( (event.clientX-_domElement.offsetLeft) / _domElement.width ) * 2 - 1;
+		_mouse.y = - ((event.clientY-_domElement.offsetTop)/ _domElement.height ) * 2 + 1;
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -73,7 +73,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var intersects = _raycaster.intersectObjects( _objects );
+		var intersects = _raycaster.intersectObjects( _objects, true );
 
 		if ( intersects.length > 0 ) {
 
@@ -111,7 +111,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var intersects = _raycaster.intersectObjects( _objects );
+		var intersects = _raycaster.intersectObjects( _objects, true );
 
 		if ( intersects.length > 0 ) {
 
