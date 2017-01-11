@@ -106,9 +106,11 @@ Box3.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function setFromCenterAndSize( center, size ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -126,9 +128,11 @@ Box3.prototype = {
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function setFromObject( object ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var scope = this;
 
@@ -300,7 +304,7 @@ Box3.prototype = {
 
 	intersectsSphere: ( function () {
 
-		var closestPoint;
+		var closestPoint = undefined;
 
 		return function intersectsSphere( sphere ) {
 
@@ -372,9 +376,11 @@ Box3.prototype = {
 
 	distanceToPoint: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function distanceToPoint( point ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -385,9 +391,11 @@ Box3.prototype = {
 
 	getBoundingSphere: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function getBoundingSphere( optionalTarget ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var result = optionalTarget || new Sphere();
 
