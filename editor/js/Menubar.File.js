@@ -356,6 +356,16 @@ for(var myfile in zip.files){
 
 	}
 
+function JSON_stringify( text,re ){
+    re || (re = /[\n\t]+([\d\.e\-\[\]]+)/g);
+    try {    
+      text = JSON.stringify( text, null, '\t' );
+      text = text.replace( re, '$1' );
+    } catch ( e ) {
+      text = JSON.stringify( text,2,2 );
+    }
+    return text;
+  }
 	return container;
 
 };
