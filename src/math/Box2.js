@@ -40,9 +40,11 @@ Box2.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = new Vector2();
+		var v1 = undefined;
 
 		return function setFromCenterAndSize( center, size ) {
+
+			if ( v1 === undefined ) v1 = new Vector2();
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 			this.min.copy( center ).sub( halfSize );
@@ -172,9 +174,11 @@ Box2.prototype = {
 
 	distanceToPoint: function () {
 
-		var v1 = new Vector2();
+		var v1 = undefined;
 
 		return function distanceToPoint( point ) {
+
+			if ( v1 === undefined ) v1 = new Vector2();
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
