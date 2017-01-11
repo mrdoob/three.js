@@ -296,7 +296,7 @@ Menubar.File = function ( editor ) {
 
 		}
 
-	} );
+	
 	files = [];
 for(var myfile in zip.files){
 	if(zip.files.hasOwnProperty(myfile)){
