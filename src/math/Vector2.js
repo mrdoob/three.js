@@ -269,7 +269,8 @@ Vector2.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = undefined;
+		var max = undefined;
 
 		return function clampScalar( minVal, maxVal ) {
 
