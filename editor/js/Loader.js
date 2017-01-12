@@ -155,6 +155,7 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'glb':
 			case 'gltf':
 
 				reader.addEventListener( 'load', function ( event ) {
