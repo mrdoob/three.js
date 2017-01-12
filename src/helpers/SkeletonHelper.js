@@ -85,16 +85,18 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 SkeletonHelper.prototype.update = function () {
 
 	var vector = undefined;
-
 	var boneMatrix = undefined;
 	var matrixWorldInv = undefined;
 
 	return function update() {
 
-		if ( vector === undefined ) vector = new Vector3();
-
-		if ( boneMatrix === undefined ) boneMatrix = new Matrix4();
-		if ( matrixWorldInv === undefined ) matrixWorldInv = new Matrix4();
+		if ( vector === undefined ) {
+			
+			vector = new Vector3();
+			boneMatrix = new Matrix4();
+			matrixWorldInv = new Matrix4();
+			
+		}
 
 		var geometry = this.geometry;
 		var position = geometry.getAttribute( 'position' );
