@@ -151,8 +151,12 @@ Frustum.prototype = {
 
 		return function intersectsBox( box ) {
 
-			if ( p1 === undefined ) p1 = new Vector3();
-			if ( p2 === undefined ) p2 = new Vector3();
+			if ( p1 === undefined ) {
+				
+				p1 = new Vector3();
+				p2 = new Vector3();
+				
+			}
 
 			var planes = this.planes;
 
