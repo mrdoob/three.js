@@ -97,7 +97,7 @@ Matrix3.prototype = {
 
 	applyToBufferAttribute: function () {
 
-		var v1;
+		var v1 = undefined;
 
 		return function applyToBufferAttribute( attribute ) {
 
