@@ -608,8 +608,12 @@ BufferGeometry.prototype = {
 
 		return function computeBoundingSphere() {
 
-			if ( box === undefined ) box = new Box3();
-			if ( vector === undefined ) vector = new Vector3();
+			if ( box === undefined ) {
+				
+				box = new Box3();
+				vector = new Vector3();
+				
+			}
 
 			if ( this.boundingSphere === null ) {
 
