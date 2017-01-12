@@ -81,9 +81,13 @@ Loader.prototype = {
 
 		return function createMaterial( m, texturePath, crossOrigin ) {
 
-			if ( color === undefined ) color = new Color();
-			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
-			if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
+			if ( color === undefined ) {
+				
+				color = new Color();
+				textureLoader = new TextureLoader();
+				materialLoader = new MaterialLoader();
+				
+			}
 
 			// convert from old material format
 
