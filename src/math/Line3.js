@@ -81,8 +81,12 @@ Line3.prototype = {
 
 		return function closestPointToPointParameter( point, clampToLine ) {
 
-			if ( startP === undefined ) startP = new Vector3();
-			if ( startEnd === undefined ) startEnd = new Vector3();
+			if ( startP === undefined ) {
+				
+				startP = new Vector3();
+				startEnd = new Vector3();
+				
+			}
 
 			startP.subVectors( point, this.start );
 			startEnd.subVectors( this.end, this.start );
