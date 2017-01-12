@@ -7,16 +7,32 @@
       "componentType": 5126,
       "count": 1376,
       "type": "VEC3",
+      "max": [
+        2300.0,
+        2450.0,
+        0.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        0.0
+      ],
       "name": "VertexAccessor"
     },
-    "TriangleAccessor": {
-      "bufferView": "Lines",
+    "LineAccessor": {
+      "bufferView": "LineView",
       "byteOffset": 0,
       "byteStride": 2,
       "componentType": 5123,
       "count": 2720,
       "type": "SCALAR",
-      "name": "TriangleAccessor"
+      "max": [
+        1374.0
+      ],
+      "min": [
+        0.0
+      ],
+      "name": "LineAccessor"
     },
     "ColorAccessor": {
       "bufferView": "ColorView",
@@ -25,8 +41,21 @@
       "componentType": 5126,
       "count": 1376,
       "type": "VEC3",
+      "max": [
+        0.999963164,
+        0.999615431,
+        1.0
+      ],
+      "min": [
+        0.500137746,
+        0.5002869,
+        1.0
+      ],
       "name": "ColorAccessor"
     }
+  },
+  "asset": {
+    "version": "1.1"
   },
   "buffers": {
     "Buffer": {
@@ -45,12 +74,12 @@
       "target": 34962,
       "name": "VertexBuffer"
     },
-    "Lines": {
+    "LineView": {
       "buffer": "Buffer",
       "byteOffset": 16512,
       "byteLength": 5440,
-      "target": 34962,
-      "name": "Lines"
+      "target": 34963,
+      "name": "LineView"
     },
     "ColorView": {
       "buffer": "Buffer",
@@ -74,9 +103,9 @@
         {
           "attributes": {
             "POSITION": "VertexAccessor",
-            "COLOR": "ColorAccessor"
+            "COLOR_0": "ColorAccessor"
           },
-          "indices": "TriangleAccessor",
+          "indices": "LineAccessor",
           "material": "meshMaterial",
           "mode": 1
         }
@@ -96,8 +125,8 @@
   "programs": {
     "meshProgram": {
       "attributes": [
-        "VertexAccessor",
-        "ColorAccessor"
+        "a_position",
+        "a_color"
       ],
       "fragmentShader": "fragmentShader",
       "vertexShader": "vertexShader",
@@ -129,14 +158,32 @@
   "techniques": {
     "meshTechnique": {
       "parameters": {
+        "modelViewMatrixParameter": {
+          "type": 35676,
+          "semantic": "MODELVIEW"
+        },
+        "projectionMatrixParameter": {
+          "type": 35676,
+          "semantic": "PROJECTION"
+        },
+        "position": {
+          "type": 35665,
+          "semantic": "POSITION"
+        },
         "color": {
           "type": 35665,
-          "semantic": "color"
+          "semantic": "COLOR_0"
         }
       },
-      "attributes": {},
+      "attributes": {
+        "a_position": "position",
+        "a_color": "color"
+      },
       "program": "meshProgram",
-      "uniforms": {},
+      "uniforms": {
+        "u_modelViewMatrix": "modelViewMatrixParameter",
+        "u_projectionMatrix": "projectionMatrixParameter"
+      },
       "states": {
         "enable": [
           3042,

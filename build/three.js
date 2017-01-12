@@ -5107,7 +5107,7 @@
 
 	var meshphysical_vert = "#define PHYSICAL\nvarying vec3 vViewPosition;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n}\n";
 
-	var normal_frag = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n\t#include <premultiplied_alpha_fragment>\n\t#include <encodings_fragment>\n}\n";
+	var normal_frag = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\t#include <normal_flip>\n\t#include <normal_fragment>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n}\n";
 
 	var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n#endif\n\t#include <begin_vertex>\n\t#include <displacementmap_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}\n";
 
@@ -12019,7 +12019,7 @@
 
 		clone: function () {
 
-			return new this.constructor().copy( this );
+			return new this.constructor( this.array, this.itemSize ).copy( this );
 
 		}
 
@@ -17423,7 +17423,6 @@
 
 			if ( index !== null ) {
 
-				var edges = {};
 				var array = index.array;
 
 				for ( var i = 0, l = array.length; i < l; i += 3 ) {
@@ -33745,7 +33744,7 @@
 
 		getPoints: function ( divisions ) {
 
-			if ( ! divisions ) divisions = 5;
+			if ( isNaN( divisions ) ) divisions = 5;
 
 			var points = [];
 
@@ -33763,7 +33762,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( ! divisions ) divisions = 5;
+			if ( isNaN( divisions ) ) divisions = 5;
 
 			var points = [];
 
@@ -33790,7 +33789,7 @@
 
 		getLengths: function ( divisions ) {
 
-			if ( ! divisions ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+			if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 			if ( this.cacheArcLengths
 				&& ( this.cacheArcLengths.length === divisions + 1 )
@@ -34241,7 +34240,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( ! divisions ) divisions = 40;
+			if ( isNaN( divisions ) ) divisions = 40;
 
 			var points = [];
 
@@ -34992,16 +34991,28 @@
 
 				var chars = String( text ).split( '' );
 				var scale = size / data.resolution;
-				var offset = 0;
+				var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+
+				var offsetX = 0, offsetY = 0;
 
 				var paths = [];
 
 				for ( var i = 0; i < chars.length; i ++ ) {
 
-					var ret = createPath( chars[ i ], scale, offset );
-					offset += ret.offset;
+					var char = chars[ i ];
 
-					paths.push( ret.path );
+					if ( char === '\n' ) {
+
+						offsetX = 0;
+						offsetY -= line_height;
+
+					} else {
+
+						var ret = createPath( char, scale, offsetX, offsetY );
+						offsetX += ret.offsetX;
+						paths.push( ret.path );
+
+					}
 
 				}
 
@@ -35009,7 +35020,7 @@
 
 			}
 
-			function createPath( c, scale, offset ) {
+			function createPath( c, scale, offsetX, offsetY ) {
 
 				var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
 
@@ -35032,8 +35043,8 @@
 
 							case 'm': // moveTo
 
-								x = outline[ i ++ ] * scale + offset;
-								y = outline[ i ++ ] * scale;
+								x = outline[ i ++ ] * scale + offsetX;
+								y = outline[ i ++ ] * scale + offsetY;
 
 								path.moveTo( x, y );
 
@@ -35041,8 +35052,8 @@
 
 							case 'l': // lineTo
 
-								x = outline[ i ++ ] * scale + offset;
-								y = outline[ i ++ ] * scale;
+								x = outline[ i ++ ] * scale + offsetX;
+								y = outline[ i ++ ] * scale + offsetY;
 
 								path.lineTo( x, y );
 
@@ -35050,10 +35061,10 @@
 
 							case 'q': // quadraticCurveTo
 
-								cpx  = outline[ i ++ ] * scale + offset;
-								cpy  = outline[ i ++ ] * scale;
-								cpx1 = outline[ i ++ ] * scale + offset;
-								cpy1 = outline[ i ++ ] * scale;
+								cpx  = outline[ i ++ ] * scale + offsetX;
+								cpy  = outline[ i ++ ] * scale + offsetY;
+								cpx1 = outline[ i ++ ] * scale + offsetX;
+								cpy1 = outline[ i ++ ] * scale + offsetY;
 
 								path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
@@ -35078,12 +35089,12 @@
 
 							case 'b': // bezierCurveTo
 
-								cpx  = outline[ i ++ ] * scale + offset;
-								cpy  = outline[ i ++ ] * scale;
-								cpx1 = outline[ i ++ ] * scale + offset;
-								cpy1 = outline[ i ++ ] * scale;
-								cpx2 = outline[ i ++ ] * scale + offset;
-								cpy2 = outline[ i ++ ] * scale;
+								cpx  = outline[ i ++ ] * scale + offsetX;
+								cpy  = outline[ i ++ ] * scale + offsetY;
+								cpx1 = outline[ i ++ ] * scale + offsetX;
+								cpy1 = outline[ i ++ ] * scale + offsetY;
+								cpx2 = outline[ i ++ ] * scale + offsetX;
+								cpy2 = outline[ i ++ ] * scale + offsetY;
 
 								path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
@@ -35112,7 +35123,7 @@
 
 				}
 
-				return { offset: glyph.ha * scale, path: path };
+				return { offsetX: glyph.ha * scale, path: path };
 
 			}
 

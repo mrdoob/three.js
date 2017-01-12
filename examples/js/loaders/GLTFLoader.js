@@ -2,6 +2,7 @@
  * @author Rich Tibbett / https://github.com/richtr
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
+ * @author Takahiro / https://github.com/takahirox
  */
 
 THREE.GLTFLoader = ( function () {
@@ -107,6 +108,15 @@ THREE.GLTFLoader = ( function () {
 
 			update: function ( scene, camera ) {
 
+				// update scene graph
+
+				scene.updateMatrixWorld();
+
+				// update camera matrices and frustum
+
+				camera.updateMatrixWorld();
+				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
 				for ( var name in objects ) {
 
 					var object = objects[ name ];
@@ -173,15 +183,6 @@ THREE.GLTFLoader = ( function () {
 
 	// Update - update all the uniform values
 	GLTFShader.prototype.update = function ( scene, camera ) {
-
-		// update scene graph
-
-		scene.updateMatrixWorld();
-
-		// update camera matrices and frustum
-
-		camera.updateMatrixWorld();
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var boundUniforms = this.boundUniforms;
 
@@ -315,6 +316,48 @@ THREE.GLTFLoader = ( function () {
 		10497: THREE.RepeatWrapping
 	};
 
+	var WEBGL_SIDES = {
+		1028: THREE.BackSide,  // Culling front
+		1029: THREE.FrontSide  // Culling back
+		//1032: THREE.NoSide   // Culling front and back, what to do?
+	};
+
+	var WEBGL_DEPTH_FUNCS = {
+		512: THREE.NeverDepth,
+		513: THREE.LessDepth,
+		514: THREE.EqualDepth,
+		515: THREE.LessEqualDepth,
+		516: THREE.GreaterEqualDepth,
+		517: THREE.NotEqualDepth,
+		518: THREE.GreaterEqualDepth,
+		519: THREE.AlwaysDepth
+	};
+
+	var WEBGL_BLEND_EQUATIONS = {
+		32774: THREE.AddEquation,
+		32778: THREE.SubtractEquation,
+		32779: THREE.ReverseSubtractEquation
+	};
+
+	var WEBGL_BLEND_FUNCS = {
+		0: THREE.ZeroFactor,
+		1: THREE.OneFactor,
+		768: THREE.SrcColorFactor,
+		769: THREE.OneMinusSrcColorFactor,
+		770: THREE.SrcAlphaFactor,
+		771: THREE.OneMinusSrcAlphaFactor,
+		772: THREE.DstAlphaFactor,
+		773: THREE.OneMinusDstAlphaFactor,
+		774: THREE.DstColorFactor,
+		775: THREE.OneMinusDstColorFactor,
+		776: THREE.SrcAlphaSaturateFactor
+		// The followings are not supported by Three.js yet
+		//32769: CONSTANT_COLOR,
+		//32770: ONE_MINUS_CONSTANT_COLOR,
+		//32771: CONSTANT_ALPHA,
+		//32772: ONE_MINUS_CONSTANT_COLOR
+	};
+
 	var WEBGL_TYPE_SIZES = {
 		'SCALAR': 1,
 		'VEC2': 2,
@@ -334,6 +377,15 @@ THREE.GLTFLoader = ( function () {
 	var INTERPOLATION = {
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
+	};
+
+	var STATES_ENABLES = {
+		2884: 'CULL_FACE',
+		2929: 'DEPTH_TEST',
+		3042: 'BLEND',
+		3089: 'SCISSOR_TEST',
+		32823: 'POLYGON_OFFSET_FILL',
+		32926: 'SAMPLE_ALPHA_TO_COVERAGE'
 	};
 
 	/* UTILITY FUNCTIONS */
@@ -486,6 +538,13 @@ THREE.GLTFLoader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'COLOR_0':
+				case 'COLOR0':
+				case 'COLOR':
+
+					shaderText = shaderText.replace( regEx, 'color' );
+					break;
+
 				case "WEIGHT":
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );
@@ -503,6 +562,20 @@ THREE.GLTFLoader = ( function () {
 		return shaderText;
 
 	}
+
+	function createDefaultMaterial() {
+
+		return new THREE.MeshPhongMaterial( {
+			color: 0x00000,
+			emissive: 0x888888,
+			specular: 0x000000,
+			shininess: 0,
+			transparent: false,
+			depthTest: true,
+			side: THREE.FrontSide
+		} );
+
+	};
 
 	// Deferred constructor for RawShaderMaterial types
 	function DeferredShaderMaterial( params ) {
@@ -644,7 +717,7 @@ THREE.GLTFLoader = ( function () {
 			return new Promise( function ( resolve ) {
 
 				var loader = new THREE.FileLoader();
-				loader.responseType = 'text';
+				loader.setResponseType( 'text' );
 				loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
 					resolve( shaderText );
@@ -664,12 +737,12 @@ THREE.GLTFLoader = ( function () {
 
 		return _each( json.buffers, function ( buffer ) {
 
-			if ( buffer.type === 'arraybuffer' ) {
+			if ( buffer.type === 'arraybuffer' || buffer.type === undefined ) {
 
 				return new Promise( function ( resolve ) {
 
 					var loader = new THREE.FileLoader();
-					loader.responseType = 'arraybuffer';
+					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
 						resolve( buffer );
@@ -677,6 +750,10 @@ THREE.GLTFLoader = ( function () {
 					} );
 
 				} );
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
@@ -920,7 +997,9 @@ THREE.GLTFLoader = ( function () {
 							if ( WEBGL_TYPE[ ptype ] ) {
 
 								var pcount = shaderParam.count;
-								var value = material.values[ pname ];
+								var value;
+
+								if ( material.values !== undefined ) value = material.values[ pname ];
 
 								var uvalue = new WEBGL_TYPE[ ptype ]();
 								var usemantic = shaderParam.semantic;
@@ -996,7 +1075,7 @@ THREE.GLTFLoader = ( function () {
 
 											}
 
-										}	else {
+										} else {
 
 											if ( shaderParam && shaderParam.value ) {
 
@@ -1017,7 +1096,19 @@ THREE.GLTFLoader = ( function () {
 
 									case WEBGL_CONSTANTS.SAMPLER_2D:
 
-										uvalue = value ? dependencies.textures[ value ] : null;
+										if ( value !== undefined ) {
+
+											uvalue = dependencies.textures[ value ];
+
+										} else if ( shaderParam.value !== undefined ) {
+
+											uvalue = dependencies.textures[ shaderParam.value ];
+
+										} else {
+
+											uvalue = null;
+
+										}
 
 										break;
 
@@ -1034,6 +1125,102 @@ THREE.GLTFLoader = ( function () {
 								throw new Error( "Unknown shader uniform param type: " + ptype );
 
 							}
+
+						}
+
+						var states = technique.states || {};
+						var enables = states.enable || [];
+						var functions = states.functions || {};
+
+						var enableCullFace = false;
+						var enableDepthTest = false;
+						var enableBlend = false;
+
+						for ( var i = 0, il = enables.length; i < il; i ++ ) {
+
+							var enable = enables[ i ];
+
+							switch( STATES_ENABLES[ enable ] ) {
+
+								case 'CULL_FACE':
+
+									enableCullFace = true;
+
+									break;
+
+								case 'DEPTH_TEST':
+
+									enableDepthTest = true;
+
+									break;
+
+								case 'BLEND':
+
+									enableBlend = true;
+
+									break;
+
+								// TODO: implement
+								case 'SCISSOR_TEST':
+								case 'POLYGON_OFFSET_FILL':
+								case 'SAMPLE_ALPHA_TO_COVERAGE':
+
+									break;
+
+								default:
+
+									throw new Error( "Unknown technique.states.enable: " + enable );
+
+							}
+
+						}
+
+						if ( enableCullFace ) {
+
+							materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : THREE.FrontSide;
+
+						} else {
+
+							materialParams.side = THREE.DoubleSide;
+
+						}
+
+						materialParams.depthTest = enableDepthTest;
+						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
+						materialParams.depthWrite = functions.depthMask !== undefined ? functions.depthMask[ 0 ] : true;
+
+						materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
+						materialParams.transparent = enableBlend;
+
+						var blendEquationSeparate = functions.blendEquationSeparate;
+
+						if ( blendEquationSeparate !== undefined ) {
+
+							materialParams.blendEquation = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 0 ] ];
+							materialParams.blendEquationAlpha = WEBGL_BLEND_EQUATIONS[ blendEquationSeparate[ 1 ] ];
+
+						} else {
+
+							materialParams.blendEquation = THREE.AddEquation;
+							materialParams.blendEquationAlpha = THREE.AddEquation;
+
+						}
+
+						var blendFuncSeparate = functions.blendFuncSeparate;
+
+						if ( blendFuncSeparate !== undefined ) {
+
+							materialParams.blendSrc = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 0 ] ];
+							materialParams.blendDst = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 1 ] ];
+							materialParams.blendSrcAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 2 ] ];
+							materialParams.blendDstAlpha = WEBGL_BLEND_FUNCS[ blendFuncSeparate[ 3 ] ];
+
+						} else {
+
+							materialParams.blendSrc = THREE.OneFactor;
+							materialParams.blendDst = THREE.ZeroFactor;
+							materialParams.blendSrcAlpha = THREE.OneFactor;
+							materialParams.blendDstAlpha = THREE.ZeroFactor;
 
 						}
 
@@ -1108,7 +1295,7 @@ THREE.GLTFLoader = ( function () {
 				}
 
 				var _material = new materialType( materialParams );
-				_material.name = material.name;
+				if ( material.name !== undefined ) _material.name = material.name;
 
 				return _material;
 
@@ -1132,7 +1319,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( json.meshes, function ( mesh ) {
 
 				var group = new THREE.Object3D();
-				group.name = mesh.name;
+				if ( mesh.name !== undefined ) group.name = mesh.name;
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
@@ -1172,6 +1359,12 @@ THREE.GLTFLoader = ( function () {
 									geometry.addAttribute( 'uv', bufferAttribute );
 									break;
 
+								case 'COLOR_0':
+								case 'COLOR0':
+								case 'COLOR':
+									geometry.addAttribute( 'color', bufferAttribute );
+									break;
+
 								case 'WEIGHT':
 									geometry.addAttribute( 'skinWeight', bufferAttribute );
 									break;
@@ -1190,10 +1383,11 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						var material = dependencies.materials[ primitive.material ];
+						var material = dependencies.materials !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
 						var meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
+						meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
@@ -1205,7 +1399,10 @@ THREE.GLTFLoader = ( function () {
 
 						var attributes = primitive.attributes;
 
-						_each( attributes, function ( attributeEntry, attributeId ) {
+
+						for ( var attributeId in attributes ) {
+
+							var attributeEntry = attributes[ attributeId ];
 
 							if ( ! attributeEntry ) return;
 
@@ -1216,14 +1413,15 @@ THREE.GLTFLoader = ( function () {
 								case 'POSITION':
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
-
+				
+								case 'COLOR_0':
+								case 'COLOR0':
 								case 'COLOR':
 									geometry.addAttribute( 'color', bufferAttribute );
 									break;
 
 							}
-
-						} );
+						};
 
 						var material = dependencies.materials[ primitive.material ];
 
@@ -1240,6 +1438,8 @@ THREE.GLTFLoader = ( function () {
 							meshNode = new THREE.Line( geometry, material );
 
 						}
+
+						meshNode.name = ( name === "0" ? group.name : group.name + name );
 
 						if ( primitive.extras ) meshNode.userData = primitive.extras;
 
@@ -1282,7 +1482,7 @@ THREE.GLTFLoader = ( function () {
 				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
 
 				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
-				_camera.name = camera.name;
+				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
 
@@ -1291,7 +1491,7 @@ THREE.GLTFLoader = ( function () {
 			} else if ( camera.type == "orthographic" && camera.orthographic ) {
 
 				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
-				_camera.name = camera.name;
+				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
 
@@ -1349,12 +1549,12 @@ THREE.GLTFLoader = ( function () {
 					var channel = animation.channels[ channelId ];
 					var sampler = animation.samplers[ channel.sampler ];
 
-					if ( sampler && animation.parameters ) {
+					if ( sampler ) {
 
 						var target = channel.target;
 						var name = target.id;
-						var input = animation.parameters[ sampler.input ];
-						var output = animation.parameters[ sampler.output ];
+						var input = animation.parameters !== undefined ? animation.parameters[ sampler.input ] : sampler.input;
+						var output = animation.parameters !== undefined ? animation.parameters[ sampler.output ] : sampler.output;
 
 						var inputAccessor = dependencies.accessors[ input ];
 						var outputAccessor = dependencies.accessors[ output ];
@@ -1370,11 +1570,13 @@ THREE.GLTFLoader = ( function () {
 								? THREE.QuaternionKeyframeTrack
 								: THREE.VectorKeyframeTrack;
 
+							var targetName = node.name ? node.name : node.uuid;
+
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
 							// be reused by other tracks, make copies here.
 							tracks.push( new TypedKeyframeTrack(
-								node.name + '.' + PATH_PROPERTIES[ target.path ],
+								targetName + '.' + PATH_PROPERTIES[ target.path ],
 								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
 								INTERPOLATION[ sampler.interpolation ]
@@ -1408,19 +1610,17 @@ THREE.GLTFLoader = ( function () {
 			if ( node.jointName ) {
 
 				_node = new THREE.Bone();
+				_node.name = node.name !== undefined ? node.name : node.jointName;
 				_node.jointName = node.jointName;
 
 			} else {
 
 				_node = new THREE.Object3D();
+				if ( node.name !== undefined ) _node.name = node.name;
 
 			}
 
-			_node.name = node.name;
-
 			if ( node.extras ) _node.userData = node.extras;
-
-			_node.matrixAutoUpdate = false;
 
 			if ( node.matrix !== undefined ) {
 
@@ -1489,6 +1689,7 @@ THREE.GLTFLoader = ( function () {
 								var originalMaterial = child.material;
 								var originalGeometry = child.geometry;
 								var originalUserData = child.userData;
+								var originalName = child.name;
 
 								var material;
 
@@ -1519,6 +1720,7 @@ THREE.GLTFLoader = ( function () {
 
 								child.castShadow = true;
 								child.userData = originalUserData;
+								child.name = originalName;
 
 								var skinEntry;
 
@@ -1531,6 +1733,22 @@ THREE.GLTFLoader = ( function () {
 								// Replace Mesh with SkinnedMesh in library
 								if ( skinEntry ) {
 
+									var getJointNode = function ( jointId ) {
+
+										var keys = Object.keys( __nodes );
+
+										for ( var i = 0, il = keys.length; i < il; i ++ ) {
+
+											var n = __nodes[ keys[ i ] ];
+
+											if ( n.jointName === jointId ) return n;
+
+										}
+
+										return null;
+
+									}
+
 									var geometry = originalGeometry;
 									var material = originalMaterial;
 									material.skinning = true;
@@ -1538,34 +1756,18 @@ THREE.GLTFLoader = ( function () {
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
 									child.userData = originalUserData;
+									child.name = originalName;
 
 									var bones = [];
 									var boneInverses = [];
 
-									var keys = Object.keys( __nodes );
-
 									for ( var i = 0, l = skinEntry.jointNames.length; i < l; i ++ ) {
 
 										var jointId = skinEntry.jointNames[ i ];
-
-										var jointNode;
-
-										for ( var j = 0, jl = keys.length; j < jl; j ++ ) {
-
-											var n = __nodes[ keys[ j ] ];
-
-											if ( n.jointName === jointId ) {
-
-												jointNode = n;
-												break;
-
-											}
-
-										}
+										var jointNode = getJointNode( jointId );
 
 										if ( jointNode ) {
 
-											jointNode.skin = child;
 											bones.push( jointNode );
 
 											var m = skinEntry.inverseBindMatrices.array;
@@ -1581,6 +1783,31 @@ THREE.GLTFLoader = ( function () {
 									}
 
 									child.bind( new THREE.Skeleton( bones, boneInverses, false ), skinEntry.bindShapeMatrix );
+
+									var buildBoneGraph = function ( parentJson, parentObject, property ) {
+
+										var children = parentJson[ property ];
+
+										if ( children === undefined ) return;
+
+										for ( var i = 0, il = children.length; i < il; i ++ ) {
+
+											var nodeId = children[ i ];
+											var bone = __nodes[ nodeId ];
+											var boneJson = json.nodes[ nodeId ];
+
+											if ( bone !== undefined && bone.isBone === true && boneJson !== undefined ) {
+
+												parentObject.add( bone );
+												buildBoneGraph( boneJson, bone, 'children' );
+
+											}
+
+										}
+
+									}
+
+									buildBoneGraph( node, child, 'skeletons' );
 
 								}
 
@@ -1653,7 +1880,7 @@ THREE.GLTFLoader = ( function () {
 								lightNode = new THREE.PointLight( color );
 								break;
 
-							case "spot ":
+							case "spot":
 								lightNode = new THREE.SpotLight( color );
 								lightNode.position.set( 0, 0, 1 );
 								break;
@@ -1719,7 +1946,7 @@ THREE.GLTFLoader = ( function () {
 			return _each( json.scenes, function ( scene ) {
 
 				var _scene = new THREE.Scene();
-				_scene.name = scene.name;
+				if ( scene.name !== undefined ) _scene.name = scene.name;
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
