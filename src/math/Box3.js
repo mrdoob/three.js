@@ -175,6 +175,12 @@ Box3.prototype = {
 
 					}
 
+				} else if ( node.isSprite ) {
+
+					v1.setFromMatrixPosition( node.matrixWorld );
+
+					scope.expandByPoint( v1 );
+
 				}
 
 			} );
