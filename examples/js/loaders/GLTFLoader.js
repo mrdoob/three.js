@@ -29,7 +29,7 @@ THREE.GLTFLoader = ( function () {
 
 			loader.load( url, function ( data ) {
 
-				scope.parse( data , onLoad, path );
+				scope.parse( data, onLoad, path );
 
 			}, onProgress, onError );
 
@@ -49,8 +49,7 @@ THREE.GLTFLoader = ( function () {
 
 		parse: function ( data, callback, path ) {
 
-			var json;
-
+			var content;
 			var extensions = {};
 
 			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
@@ -58,16 +57,15 @@ THREE.GLTFLoader = ( function () {
 			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
 
 				extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
-
-				json = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+				content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
 
 			} else {
 
-				json = convertUint8ArrayToString( new Uint8Array( data ) );
+				content = convertUint8ArrayToString( new Uint8Array( data ) );
 
 			}
 
-			json = JSON.parse( json );
+			var json = JSON.parse( content );
 
 			if ( json.extensionsUsed && json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
 
@@ -295,7 +293,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* MATERIALS COMMON EXTENSION */
 
-	function GLTFMaterialsCommonExtension ( json ) {
+	function GLTFMaterialsCommonExtension( json ) {
 
 		this.name = EXTENSIONS.KHR_MATERIALS_COMMON;
 
@@ -351,7 +349,7 @@ THREE.GLTFLoader = ( function () {
 
 	var BINARY_EXTENSION_HEADER_LENGTH = 20;
 
-	function GLTFBinaryExtension ( data ) {
+	function GLTFBinaryExtension( data ) {
 
 		this.name = EXTENSIONS.KHR_BINARY_GLTF;
 
@@ -622,16 +620,18 @@ THREE.GLTFLoader = ( function () {
 
 	// Avoid the String.fromCharCode.apply(null, array) shortcut, which
 	// throws a "maximum call stack size exceeded" error for large arrays.
-	function convertUint8ArrayToString ( array ) {
+	function convertUint8ArrayToString( array ) {
+
 		var s = '';
 
-		for ( var i = 0; i < array.length; i++ ) {
+		for ( var i = 0; i < array.length; i ++ ) {
 
 			s += String.fromCharCode( array[ i ] );
 
 		}
 
 		return s;
+
 	}
 
 	// Three.js seems too dependent on attribute names so globally
@@ -738,7 +738,7 @@ THREE.GLTFLoader = ( function () {
 			side: THREE.FrontSide
 		} );
 
-	};
+	}
 
 	// Deferred constructor for RawShaderMaterial types
 	function DeferredShaderMaterial( params ) {
@@ -1035,7 +1035,7 @@ THREE.GLTFLoader = ( function () {
 						var source = json.images[ texture.source ];
 						var sourceUri = source.uri;
 
-						if (source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ]) {
+						if ( source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
 
 							sourceUri = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadTextureSourceUri( source, dependencies.bufferViews );
 
@@ -1342,7 +1342,7 @@ THREE.GLTFLoader = ( function () {
 
 							var enable = enables[ i ];
 
-							switch( STATES_ENABLES[ enable ] ) {
+							switch ( STATES_ENABLES[ enable ] ) {
 
 								case 'CULL_FACE':
 
@@ -1623,7 +1623,8 @@ THREE.GLTFLoader = ( function () {
 									break;
 
 							}
-						};
+
+						}
 
 						var material = dependencies.materials[ primitive.material ];
 
@@ -1949,7 +1950,7 @@ THREE.GLTFLoader = ( function () {
 
 										return null;
 
-									}
+									};
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
@@ -2007,7 +2008,7 @@ THREE.GLTFLoader = ( function () {
 
 										}
 
-									}
+									};
 
 									buildBoneGraph( node, child, 'skeletons' );
 
