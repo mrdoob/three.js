@@ -2079,9 +2079,11 @@ THREE.MMDGrantSolver.prototype = {
 
 	update: function () {
 
-		var q = new THREE.Quaternion();
+		var q;
 
 		return function () {
+
+			if (q === undefined) q = new THREE.Quaternion();
 
 			for ( var i = 0; i < this.mesh.geometry.grants.length; i ++ ) {
 
