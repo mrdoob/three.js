@@ -429,8 +429,12 @@ Object3D.prototype = {
 
 		return function getWorldQuaternion( optionalTarget ) {
 
-			if ( position === undefined ) position = new Vector3();
-			if ( scale === undefined ) scale = new Vector3();
+			if ( position === undefined ) {
+				
+				position = new Vector3();
+				scale = new Vector3();
+				
+			}
 
 			var result = optionalTarget || new Quaternion();
 
@@ -469,9 +473,13 @@ Object3D.prototype = {
 
 		return function getWorldScale( optionalTarget ) {
 
-			if ( position === undefined ) position = new Vector3();
-			if ( quaternion === undefined ) quaternion = new Quaternion();
-
+			if ( position === undefined ) {
+				
+				position = new Vector3();
+				quaternion = new Quaternion();
+				
+			}
+			
 			var result = optionalTarget || new Vector3();
 
 			this.updateMatrixWorld( true );
