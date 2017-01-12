@@ -128,8 +128,8 @@ CameraHelper.prototype.update = function () {
 
 	var geometry, pointMap;
 
-	var vector = new Vector3();
-	var camera = new Camera();
+	var vector = undefined;
+	var camera = undefined;
 
 	function setPoint( point, x, y, z ) {
 
@@ -153,6 +153,9 @@ CameraHelper.prototype.update = function () {
 
 	return function update() {
 
+		if ( vector === undefined ) vector = new Vector3();
+		if ( camera === undefined ) camera = new Camera();
+		
 		geometry = this.geometry;
 		pointMap = this.pointMap;
 
