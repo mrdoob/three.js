@@ -52,9 +52,13 @@ Triangle.barycoordFromPoint = function () {
 
 	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
-		if ( v0 === undefined ) v0 = new Vector3();
-		if ( v1 === undefined ) v1 = new Vector3();
-		if ( v2 === undefined ) v2 = new Vector3();
+		if ( v0 === undefined ) {
+			
+			v0 = new Vector3();
+			v1 = new Vector3();
+			v2 = new Vector3();
+			
+		}
 
 		v0.subVectors( c, a );
 		v1.subVectors( b, a );
@@ -153,8 +157,12 @@ Triangle.prototype = {
 
 		return function area() {
 
-			if ( v0 === undefined ) v0 = new Vector3();
-			if ( v1 === undefined ) v1 = new Vector3();
+			if ( v0 === undefined ) {
+				
+				v0 = new Vector3();
+				v1 = new Vector3();
+				
+			}
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
