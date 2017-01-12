@@ -1,129 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - loaders - vrml loader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
-	</head>
+<head>
+    <title>VRML loading with ThreeJs and VrmlParser</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0px;
+            overflow: hidden;
+        }
 
-	<body>
-		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> -
-		vrml format loader test -
-		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank">VRML 2.0 Tutorial</a>,-->
-		</div>
+        #info {
+            color: #fff;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+        }
 
-		<script src="../build/three.js"></script>
+        #info a, .button {
+            color: #f00;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer
+        }
 
-		<script src="js/controls/OrbitControls.js"></script>
+        #viewpoints {
+            background-color: gray;
+            z-index: 101;
+            position: absolute;
+            width: 140px;
+            top: 10px;
+            left: 10px;
+            padding: 2px;
+            border: 1px solid white;
+        }
 
-		<script src="js/loaders/VRMLLoader.js"></script>
+        #viewpoints div {
+            width: inherit;
+        }
+    </style>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+</head>
 
-		<script>
+<body>
+<div id="info">
+    <a href="http://threejs.org" target="_blank">three.js / VrmlParser</a> -
+    vrml format loader test using VrmlParser -
+</div>
+<div id="viewpoints">
+    <h4>Viewpoints from the VRML file</h4>
+</div>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+<script src="../build/three.min.js"></script>
+<script src="js/libs/vrml.min.js"></script>
 
-			var container, stats;
+<script src="js/loaders/VRMLLoader.js"></script>
+<script src="js/renderers/Projector.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+<script src="js/controls/FlyControls.js"></script>
+<script src="js/controls/FirstPersonControls.js"></script>
+<script src="js/controls/TrackballControls.js"></script>
 
-			var camera, controls, scene, renderer;
+<script>
 
-			var cross;
+	var camera, controls, scene, renderer, dirLight;
 
-			init();
-			animate();
+	var animation;
 
-			function init() {
+	// setup a clock
+	var clock = new THREE.Clock();
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-				camera.position.z = 6;
+	init();
+	animate();
 
-				controls = new THREE.OrbitControls( camera );
+	function init() {
+		camera            = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1e5);
+		camera.position.z = 4;
+		camera.position.y = 3;
+		camera.position.x = 0;
 
-				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
+		scene = new THREE.Scene();
 
-				scene = new THREE.Scene();
-				scene.add( camera );
+		scene.fog = new THREE.Fog(0xffffff, 1, 5000);
+		scene.fog.color.setHSL(0.6, 0, 1);
 
-				// light
+		scene.add(camera);
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+		var debug = true;
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+		// renderer
+		renderer                   = new THREE.WebGLRenderer({ antialias: true });
+		renderer.shadowMap.enabled = true;
+		renderer.setClearColor(0x000000, 1);
+		renderer.setSize(window.innerWidth, window.innerHeight);
 
-				var loader = new THREE.VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
+		// add support for animation and interaction
+		animation = new VrmlParser.Renderer.ThreeJs.Animation(debug);
+		animation.addClickSupport(camera, renderer);
 
-					scene.add( object );
+		var vrmlLoader = new THREE.VRMLLoader(new THREE.LoadingManager(), camera, controls, 'viewpoints', true);
+		vrmlLoader.load('models/vrml/house.wrl');
 
-				} );
+		window.addEventListener('resize', onWindowResize, false);
+	}
 
-				// renderer
+	function onWindowResize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	}
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	function animate() {
+		requestAnimationFrame(animate);
+		var delta = clock.getDelta();
+		if ( undefined !== controls ) {
+			controls.update(delta);
+		}
+		animation.update(delta);
+		renderer.render(scene, camera);
+	}
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+</script>
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				controls.handleResize();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				controls.update();
-				renderer.render( scene, camera );
-
-				stats.update();
-
-			}
-
-		</script>
-
-	</body>
+</body>
 </html>
