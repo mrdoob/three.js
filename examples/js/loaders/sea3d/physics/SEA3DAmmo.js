@@ -302,12 +302,18 @@ SEA3D.AMMO = {
 	},
 	getMatrixFromTransform: function ( transform ) {
 
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-		var scale = new THREE.Vector3( 1, 1, 1 );
+		var position, quaternion, scale;
 
 		return function ( transform, matrix ) {
 
+			if (position === undefined) {
+
+				position = new THREE.Vector3();
+				quaternion = new THREE.Quaternion();
+				scale = new THREE.Vector3( 1, 1, 1 );
+
+			}
+			
 			matrix = matrix || new THREE.Matrix4();
 
 			var pos = transform.getOrigin(),
@@ -326,14 +332,22 @@ SEA3D.AMMO = {
 
 	updateTargetTransform: function () {
 
-		var matrix = new THREE.Matrix4();
+		var matrix;
 
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-		var scale = new THREE.Vector3( 1, 1, 1 );
+		var position, quaternion, scale;
 
 		return function ( obj3d, transform, offset ) {
 
+			if (matrix === undefined) {
+
+				matrix = new THREE.Matrix4();
+				
+				position = new THREE.Vector3();
+				quaternion = new THREE.Quaternion();
+				scale = new THREE.Vector3( 1, 1, 1 );
+
+			}
+			
 			var pos = transform.getOrigin(),
 				quat = transform.getRotation();
 
