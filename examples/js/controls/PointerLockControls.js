@@ -51,10 +51,16 @@ THREE.PointerLockControls = function ( camera ) {
 
 		// assumes the camera itself is not rotated
 
-		var direction = new THREE.Vector3( 0, 0, - 1 );
-		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
+		var direction, rotation;
 
 		return function( v ) {
+
+			if (direction === undefined) {
+
+				direction = new THREE.Vector3( 0, 0, - 1 );
+				rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
+
+			}
 
 			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
 
