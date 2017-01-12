@@ -52,16 +52,18 @@ HemisphereLightHelper.prototype.dispose = function () {
 HemisphereLightHelper.prototype.update = function () {
 
 	var vector = undefined;
-
 	var color1 = undefined;
 	var color2 = undefined;
 
 	return function update() {
 
-		if ( vector === undefined ) vector = new Vector3();
+		if ( vector === undefined ) {
 
-		if ( color1 === undefined ) color1 = new Color();
-		if ( color2 === undefined ) color2 = new Color();
+			vector = new Vector3();
+			color1 = new Color();
+			color2 = new Color();
+			
+		}
 
 		var mesh = this.children[ 0 ];
 
