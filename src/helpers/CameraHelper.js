@@ -153,8 +153,12 @@ CameraHelper.prototype.update = function () {
 
 	return function update() {
 
-		if ( vector === undefined ) vector = new Vector3();
-		if ( camera === undefined ) camera = new Camera();
+		if ( vector === undefined ) {
+
+			vector = new Vector3();
+			camera = new Camera();
+			
+		}
 		
 		geometry = this.geometry;
 		pointMap = this.pointMap;
