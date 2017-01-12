@@ -37,16 +37,19 @@ THREE.DeviceOrientationControls = function( object ) {
 
 	var setObjectQuaternion = function() {
 
-		var zee = new THREE.Vector3( 0, 0, 1 );
-
-		var euler = new THREE.Euler();
-
-		var q0 = new THREE.Quaternion();
-
-		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+		var zee, euler, q0, q1; 
 
 		return function( quaternion, alpha, beta, gamma, orient ) {
 
+			if (zee === undefined) {
+
+				zee = new THREE.Vector3( 0, 0, 1 );
+				euler = new THREE.Euler();
+				q0 = new THREE.Quaternion();
+				q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+
+			}
+			
 			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
 
 			quaternion.setFromEuler( euler ); // orient the device
