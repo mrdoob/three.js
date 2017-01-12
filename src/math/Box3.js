@@ -432,18 +432,22 @@ Box3.prototype = {
 
 	applyMatrix4: function () {
 
-		var points = [
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
-		];
+		var points = undefined;
 
 		return function applyMatrix4( matrix ) {
+
+			if ( points === undefined ) {
+				points = [
+					new Vector3(),
+					new Vector3(),
+					new Vector3(),
+					new Vector3(),
+					new Vector3(),
+					new Vector3(),
+					new Vector3(),
+					new Vector3()
+				];
+			}
 
 			// transform of empty box is an empty box.
 			if( this.isEmpty() ) return this;
