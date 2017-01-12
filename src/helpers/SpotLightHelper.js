@@ -71,8 +71,12 @@ SpotLightHelper.prototype.update = function () {
 
 	return function update() {
 
-		if ( vector === undefined ) vector = new Vector3();
-		if ( vector2 === undefined ) vector2 = new Vector3();
+		if ( vector === undefined ) {
+			
+			vector = new Vector3();
+			vector2 = new Vector3();
+			
+		}
 
 		var coneLength = this.light.distance ? this.light.distance : 1000;
 		var coneWidth = coneLength * Math.tan( this.light.angle );
