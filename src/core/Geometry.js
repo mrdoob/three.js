@@ -112,7 +112,7 @@ Geometry.prototype = {
 
 		// rotate geometry around world x-axis
 
-		var m1 = undefined;
+		var m1;
 
 		return function rotateX( angle ) {
 
@@ -132,7 +132,7 @@ Geometry.prototype = {
 
 		// rotate geometry around world y-axis
 
-		var m1 = undefined;
+		var m1;
 
 		return function rotateY( angle ) {
 
@@ -152,7 +152,7 @@ Geometry.prototype = {
 
 		// rotate geometry around world z-axis
 
-		var m1 = undefined;
+		var m1;
 
 		return function rotateZ( angle ) {
 
@@ -172,7 +172,7 @@ Geometry.prototype = {
 
 		// translate geometry
 
-		var m1 = undefined;
+		var m1;
 
 		return function translate( x, y, z ) {
 
@@ -192,7 +192,7 @@ Geometry.prototype = {
 
 		// scale geometry
 
-		var m1 = undefined;
+		var m1;
 
 		return function scale( x, y, z ) {
 
@@ -210,7 +210,7 @@ Geometry.prototype = {
 
 	lookAt: function () {
 
-		var obj = undefined;
+		var obj;
 
 		return function lookAt( vector ) {
 

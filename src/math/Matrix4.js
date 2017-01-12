@@ -119,7 +119,7 @@ Matrix4.prototype = {
 
 	extractRotation: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function extractRotation( m ) {
 
@@ -317,9 +317,7 @@ Matrix4.prototype = {
 
 	lookAt: function () {
 
-		var x = undefined;
-		var y = undefined;
-		var z = undefined;
+		var x, y, z;
 
 		return function lookAt( eye, target, up ) {
 
@@ -452,7 +450,7 @@ Matrix4.prototype = {
 
 	applyToBufferAttribute: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function applyToBufferAttribute( attribute ) {
 
@@ -774,8 +772,7 @@ Matrix4.prototype = {
 
 	decompose: function () {
 
-		var vector = undefined;
-		var matrix = undefined;
+		var vector, matrix;
 
 		return function decompose( position, quaternion, scale ) {
 

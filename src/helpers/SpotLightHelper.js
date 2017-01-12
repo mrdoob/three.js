@@ -66,8 +66,7 @@ SpotLightHelper.prototype.dispose = function () {
 
 SpotLightHelper.prototype.update = function () {
 
-	var vector = undefined;
-	var vector2 = undefined;
+	var vector, vector2;
 
 	return function update() {
 

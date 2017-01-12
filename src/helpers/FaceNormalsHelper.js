@@ -60,9 +60,7 @@ FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
 
 FaceNormalsHelper.prototype.update = ( function () {
 
-	var v1 = undefined;
-	var v2 = undefined;
-	var normalMatrix = undefined;
+	var v1, v2, normalMatrix;
 
 	return function update() {
 

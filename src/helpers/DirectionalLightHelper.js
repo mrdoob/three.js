@@ -62,9 +62,7 @@ DirectionalLightHelper.prototype.dispose = function () {
 
 DirectionalLightHelper.prototype.update = function () {
 
-	var v1 = undefined;
-	var v2 = undefined;
-	var v3 = undefined;
+	var v1, v2, v3;
 
 	return function update() {
 

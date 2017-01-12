@@ -29,9 +29,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var inverseMatrix = undefined;
-		var ray = undefined;
-		var sphere = undefined;
+		var inverseMatrix, ray, sphere;
 
 		return function raycast( raycaster, intersects ) {
 

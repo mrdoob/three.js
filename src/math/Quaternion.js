@@ -259,7 +259,8 @@ Quaternion.prototype = {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1 = undefined;
+		var v1;
+		
 		var r;
 
 		var EPS = 0.000001;

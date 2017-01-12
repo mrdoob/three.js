@@ -28,8 +28,7 @@ Object.assign( StereoCamera.prototype, {
 
 	update: ( function () {
 
-		var eyeRight = undefined;
-		var eyeLeft = undefined;
+		var eyeRight, eyeLeft;
 
 		var instance, focus, fov, aspect, near, far, zoom;
 

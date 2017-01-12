@@ -58,8 +58,7 @@ RectAreaLightHelper.prototype.dispose = function () {
 
 RectAreaLightHelper.prototype.update = function () {
 
-	var vector1 = undefined;
-	var vector2 = undefined;
+	var vector1, vector2;
 
 	return function update() {
 

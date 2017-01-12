@@ -84,10 +84,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	updateMatrixWorld: ( function () {
 
-		var position = undefined;
-		var quaternion = undefined;
-		var scale = undefined;
-		var orientation = undefined;
+		var position, quaternion, scale, orientation;
 
 		return function updateMatrixWorld( force ) {
 

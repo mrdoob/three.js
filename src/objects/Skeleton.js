@@ -149,7 +149,7 @@ Object.assign( Skeleton.prototype, {
 
 	update: ( function () {
 
-		var offsetMatrix = undefined;
+		var offsetMatrix;
 
 		return function update() {
 

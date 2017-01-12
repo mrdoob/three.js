@@ -84,9 +84,7 @@ SkeletonHelper.prototype.getBoneList = function( object ) {
 
 SkeletonHelper.prototype.update = function () {
 
-	var vector = undefined;
-	var boneMatrix = undefined;
-	var matrixWorldInv = undefined;
+	var vector, boneMatrix, matrixWorldInv;
 
 	return function update() {
 

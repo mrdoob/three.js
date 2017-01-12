@@ -57,7 +57,7 @@ Ray.prototype = {
 
 	recast: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function recast( t ) {
 
@@ -95,7 +95,7 @@ Ray.prototype = {
 
 	distanceSqToPoint: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function distanceSqToPoint( point ) {
 
@@ -121,9 +121,7 @@ Ray.prototype = {
 
 	distanceSqToSegment: function () {
 
-		var segCenter = undefined;
-		var segDir = undefined;
-		var diff = undefined;
+		var segCenter, segDir, diff;
 
 		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
@@ -256,7 +254,7 @@ Ray.prototype = {
 
 	intersectSphere: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function intersectSphere( sphere, optionalTarget ) {
 
@@ -438,7 +436,7 @@ Ray.prototype = {
 
 	intersectsBox: ( function () {
 
-		var v = undefined;
+		var v;
 
 		return function intersectsBox( box ) {
 
@@ -453,10 +451,7 @@ Ray.prototype = {
 	intersectTriangle: function () {
 
 		// Compute the offset origin, edges, and normal.
-		var diff = undefined;
-		var edge1 = undefined;
-		var edge2 = undefined;
-		var normal = undefined;
+		var diff, edge1, edge2, normal;
 
 		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 

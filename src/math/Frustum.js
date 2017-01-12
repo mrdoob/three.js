@@ -84,7 +84,7 @@ Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var sphere = undefined;
+		var sphere;
 
 		return function intersectsObject( object ) {
 
@@ -106,7 +106,7 @@ Frustum.prototype = {
 
 	intersectsSprite: function () {
 
-		var sphere = undefined;
+		var sphere;
 
 		return function intersectsSprite( sprite ) {
 
@@ -146,8 +146,7 @@ Frustum.prototype = {
 
 	intersectsBox: function () {
 
-		var p1 = undefined;
-		var p2 = undefined;
+		var p1, p2;
 
 		return function intersectsBox( box ) {
 

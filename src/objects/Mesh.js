@@ -76,26 +76,17 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var inverseMatrix = undefined;
-		var ray = undefined;
-		var sphere = undefined;
+		var inverseMatrix, ray, sphere;
 
-		var vA = undefined;
-		var vB = undefined;
-		var vC = undefined;
+		var vA, vB, vC;
 
-		var tempA = undefined;
-		var tempB = undefined;
-		var tempC = undefined;
+		var tempA, tempB, tempC;
 
-		var uvA = undefined;
-		var uvB = undefined;
-		var uvC = undefined;
+		var uvA, uvB, uvC;
 
-		var barycoord = undefined;
+		var barycoord;
 
-		var intersectionPoint = undefined;
-		var intersectionPointWorld = undefined;
+		var intersectionPoint, intersectionPointWorld;
 
 		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
 

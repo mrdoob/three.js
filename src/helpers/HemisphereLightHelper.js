@@ -51,9 +51,8 @@ HemisphereLightHelper.prototype.dispose = function () {
 
 HemisphereLightHelper.prototype.update = function () {
 
-	var vector = undefined;
-	var color1 = undefined;
-	var color2 = undefined;
+	var vector;
+	var color1, color2;
 
 	return function update() {
 

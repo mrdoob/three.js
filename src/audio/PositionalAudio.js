@@ -75,7 +75,7 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	updateMatrixWorld: ( function () {
 
-		var position = undefined;
+		var position;
 
 		return function updateMatrixWorld( force ) {
 

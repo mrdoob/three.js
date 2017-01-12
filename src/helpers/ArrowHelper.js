@@ -61,7 +61,7 @@ ArrowHelper.prototype.constructor = ArrowHelper;
 
 ArrowHelper.prototype.setDirection = ( function () {
 
-	var axis = undefined;
+	var axis;
 	var radians;
 
 	return function setDirection( dir ) {

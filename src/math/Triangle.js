@@ -17,7 +17,7 @@ function Triangle( a, b, c ) {
 
 Triangle.normal = function () {
 
-	var v0 = undefined;
+	var v0;
 
 	return function normal( a, b, c, optionalTarget ) {
 
@@ -46,9 +46,7 @@ Triangle.normal = function () {
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 Triangle.barycoordFromPoint = function () {
 
-	var v0 = undefined;
-	var v1 = undefined;
-	var v2 = undefined;
+	var v0, v1, v2;
 
 	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
@@ -96,7 +94,7 @@ Triangle.barycoordFromPoint = function () {
 
 Triangle.containsPoint = function () {
 
-	var v1 = undefined;
+	var v1;
 
 	return function containsPoint( point, a, b, c ) {
 
@@ -152,8 +150,7 @@ Triangle.prototype = {
 
 	area: function () {
 
-		var v0 = undefined;
-		var v1 = undefined;
+		var v0, v1;
 
 		return function area() {
 
@@ -208,10 +205,7 @@ Triangle.prototype = {
 
 	closestPointToPoint: function () {
 
-		var plane = undefined;
-		var edgeList = undefined;
-		var projectedPoint = undefined;
-		var closestPoint = undefined;
+		var plane, edgeList, projectedPoint, closestPoint;
 
 		return function closestPointToPoint( point, optionalTarget ) {
 

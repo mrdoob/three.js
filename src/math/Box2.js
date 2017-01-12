@@ -40,7 +40,7 @@ Box2.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function setFromCenterAndSize( center, size ) {
 
@@ -174,7 +174,7 @@ Box2.prototype = {
 
 	distanceToPoint: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function distanceToPoint( point ) {
 

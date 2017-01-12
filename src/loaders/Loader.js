@@ -75,9 +75,7 @@ Loader.prototype = {
 			CustomBlending: CustomBlending
 		};
 
-		var color = undefined;
-		var textureLoader = undefined;
-		var materialLoader = undefined;
+		var color, textureLoader, materialLoader;
 
 		return function createMaterial( m, texturePath, crossOrigin ) {
 

@@ -150,7 +150,7 @@ Object3D.prototype = {
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
 
-		var q1 = undefined;
+		var q1;
 
 		return function rotateOnAxis( axis, angle ) {
 
@@ -168,7 +168,7 @@ Object3D.prototype = {
 
 	rotateX: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function rotateX( angle ) {
 
@@ -182,7 +182,7 @@ Object3D.prototype = {
 
 	rotateY: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function rotateY( angle ) {
 
@@ -196,7 +196,7 @@ Object3D.prototype = {
 
 	rotateZ: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function rotateZ( angle ) {
 
@@ -213,7 +213,7 @@ Object3D.prototype = {
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
 
-		var v1 = undefined;
+		var v1;
 
 		return function translateOnAxis( axis, distance ) {
 
@@ -231,7 +231,7 @@ Object3D.prototype = {
 
 	translateX: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function translateX( distance ) {
 
@@ -245,7 +245,7 @@ Object3D.prototype = {
 
 	translateY: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function translateY( distance ) {
 
@@ -259,7 +259,7 @@ Object3D.prototype = {
 
 	translateZ: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function translateZ( distance ) {
 
@@ -279,7 +279,7 @@ Object3D.prototype = {
 
 	worldToLocal: function () {
 
-		var m1 = undefined;
+		var m1;
 
 		return function worldToLocal( vector ) {
 
@@ -295,7 +295,7 @@ Object3D.prototype = {
 
 		// This routine does not support objects with rotated and/or translated parent(s)
 
-		var m1 = undefined;
+		var m1;
 
 		return function lookAt( vector ) {
 
@@ -424,8 +424,7 @@ Object3D.prototype = {
 
 	getWorldQuaternion: function () {
 
-		var position = undefined;
-		var scale = undefined;
+		var position, scale;
 
 		return function getWorldQuaternion( optionalTarget ) {
 
@@ -450,7 +449,7 @@ Object3D.prototype = {
 
 	getWorldRotation: function () {
 
-		var quaternion = undefined;
+		var quaternion;
 
 		return function getWorldRotation( optionalTarget ) {
 
@@ -468,8 +467,7 @@ Object3D.prototype = {
 
 	getWorldScale: function () {
 
-		var position = undefined;
-		var quaternion = undefined;
+		var position, quaternion;
 
 		return function getWorldScale( optionalTarget ) {
 
@@ -494,7 +492,7 @@ Object3D.prototype = {
 
 	getWorldDirection: function () {
 
-		var quaternion = undefined;
+		var quaternion;
 
 		return function getWorldDirection( optionalTarget ) {
 

@@ -28,7 +28,7 @@ Sphere.prototype = {
 
 	setFromPoints: function () {
 
-		var box = undefined;
+		var box;
 
 		return function setFromPoints( points, optionalCenter ) {
 

@@ -76,8 +76,7 @@ Line3.prototype = {
 
 	closestPointToPointParameter: function () {
 
-		var startP = undefined;
-		var startEnd = undefined;
+		var startP, startEnd;
 
 		return function closestPointToPointParameter( point, clampToLine ) {
 

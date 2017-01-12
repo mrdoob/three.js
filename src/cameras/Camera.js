@@ -27,7 +27,7 @@ Camera.prototype.isCamera = true;
 
 Camera.prototype.getWorldDirection = function () {
 
-	var quaternion = undefined;
+	var quaternion;
 
 	return function getWorldDirection( optionalTarget ) {
 
@@ -47,7 +47,7 @@ Camera.prototype.lookAt = function () {
 
 	// This routine does not support cameras with rotated and/or translated parent(s)
 
-	var m1 = undefined;
+	var m1;
 
 	return function lookAt( vector ) {
 

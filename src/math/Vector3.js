@@ -246,7 +246,7 @@ Vector3.prototype = {
 
 	applyEuler: function () {
 
-		var quaternion = undefined;
+		var quaternion;
 
 		return function applyEuler( euler ) {
 
@@ -266,7 +266,7 @@ Vector3.prototype = {
 
 	applyAxisAngle: function () {
 
-		var quaternion = undefined;
+		var quaternion;
 
 		return function applyAxisAngle( axis, angle ) {
 
@@ -329,7 +329,7 @@ Vector3.prototype = {
 
 	project: function () {
 
-		var matrix = undefined;
+		var matrix;
 
 		return function project( camera ) {
 
@@ -344,7 +344,7 @@ Vector3.prototype = {
 
 	unproject: function () {
 
-		var matrix = undefined;
+		var matrix;
 
 		return function unproject( camera ) {
 
@@ -423,8 +423,7 @@ Vector3.prototype = {
 
 	clampScalar: function () {
 
-		var min = undefined;
-		var max = undefined;
+		var min, max;
 		
 		return function clampScalar( minVal, maxVal ) {
 
@@ -596,7 +595,7 @@ Vector3.prototype = {
 
 	projectOnPlane: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function projectOnPlane( planeNormal ) {
 
@@ -615,7 +614,7 @@ Vector3.prototype = {
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1 = undefined;
+		var v1;
 
 		return function reflect( normal ) {
 

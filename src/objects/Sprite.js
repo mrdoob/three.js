@@ -25,7 +25,7 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var matrixPosition = undefined;
+		var matrixPosition;
 
 		return function raycast( raycaster, intersects ) {
 

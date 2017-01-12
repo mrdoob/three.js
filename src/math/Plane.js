@@ -45,8 +45,7 @@ Plane.prototype = {
 
 	setFromCoplanarPoints: function () {
 
-		var v1 = undefined;
-		var v2 = undefined;
+		var v1, v2;
 
 		return function setFromCoplanarPoints( a, b, c ) {
 
@@ -134,7 +133,7 @@ Plane.prototype = {
 
 	intersectLine: function () {
 
-		var v1 = undefined;
+		var v1;
 
 		return function intersectLine( line, optionalTarget ) {
 
@@ -206,8 +205,7 @@ Plane.prototype = {
 
 	applyMatrix4: function () {
 
-		var v1 = undefined;
-		var m1 = undefined;
+		var v1, m1;
 
 		return function applyMatrix4( matrix, optionalNormalMatrix ) {
 
