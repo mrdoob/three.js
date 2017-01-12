@@ -174,26 +174,30 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function raycast( raycaster, intersects ) {
 
-			if ( inverseMatrix === undefined ) inverseMatrix = new Matrix4();
-			if ( ray === undefined ) ray = new Ray();
-			if ( sphere === undefined ) sphere = new Sphere();
+			if ( inverseMatrix === undefined ) {
+				
+				inverseMatrix = new Matrix4();
+				ray = new Ray();
+				sphere = new Sphere();
 
-			if ( vA === undefined ) vA = new Vector3();
-			if ( vB === undefined ) vB = new Vector3();
-			if ( vC === undefined ) vC = new Vector3();
+				vA = new Vector3();
+				vB = new Vector3();
+				vC = new Vector3();
 
-			if ( tempA === undefined ) tempA = new Vector3();
-			if ( tempB === undefined ) tempB = new Vector3();
-			if ( tempC === undefined ) tempC = new Vector3();
-			
-			if ( uvA === undefined ) uvA = new Vector2();
-			if ( uvB === undefined ) uvB = new Vector2();
-			if ( uvC === undefined ) uvC = new Vector2();
+				tempA = new Vector3();
+				tempB = new Vector3();
+				tempC = new Vector3();
 
-			if ( barycoord === undefined ) barycoord = new Vector3();
-			
-			if ( intersectionPoint === undefined ) intersectionPoint = new Vector3();
-			if ( intersectionPointWorld === undefined ) intersectionPointWorld = new Vector3();
+				uvA = new Vector2();
+				uvB = new Vector2();
+				uvC = new Vector2();
+
+				barycoord = new Vector3();
+
+				intersectionPoint = new Vector3();
+				intersectionPointWorld = new Vector3();
+				
+			}
 			
 			var geometry = this.geometry;
 			var material = this.material;
