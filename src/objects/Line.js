@@ -43,9 +43,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function raycast( raycaster, intersects ) {
 
-			if ( inverseMatrix === undefined ) inverseMatrix = new Matrix4();
-			if ( ray === undefined ) ray = new Ray();
-			if ( sphere === undefined ) sphere = new Sphere();
+			if ( inverseMatrix === undefined ) {
+				
+				inverseMatrix = new Matrix4();
+				ray = new Ray();
+				sphere = new Sphere();
+				
+			}
 
 			var precision = raycaster.linePrecision;
 			var precisionSq = precision * precision;
