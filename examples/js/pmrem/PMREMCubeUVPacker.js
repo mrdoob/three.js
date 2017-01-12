@@ -156,17 +156,17 @@ THREE.PMREMCubeUVPacker.prototype = {
 					uv = uv * 2.0 - 1.0;\
 					uv.y *= -1.0;\
 					if(faceIndex == 0) {\
-						sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
+						sampleDirection = normalize(vec3(-1.0, uv.y, -uv.x));\
 					} else if(faceIndex == 1) {\
-						sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
+						sampleDirection = normalize(vec3(-uv.x, 1.0, uv.y));\
 					} else if(faceIndex == 2) {\
-						sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
+						sampleDirection = normalize(vec3(-uv.x, uv.y, 1.0));\
 					} else if(faceIndex == 3) {\
-						sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
+						sampleDirection = normalize(vec3(1.0, uv.y, uv.x));\
 					} else if(faceIndex == 4) {\
-						sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
+						sampleDirection = normalize(vec3(-uv.x, -1.0, -uv.y));\
 					} else {\
-						sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
+						sampleDirection = normalize(vec3(uv.x, uv.y, -1.0));\
 					}\
 					vec4 color = envMapTexelToLinear( textureCube( envMap, sampleDirection ) );\
 					gl_FragColor = linearToOutputTexel( color );\
