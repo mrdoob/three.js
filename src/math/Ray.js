@@ -134,9 +134,13 @@ Ray.prototype = {
 			// - The closest point on the ray
 			// - The closest point on the segment
 
-			if ( segCenter === undefined ) segCenter = new Vector3();
-			if ( segDir === undefined ) segDir = new Vector3();
-			if ( diff === undefined ) diff = new Vector3();
+			if ( segCenter === undefined ) {
+				
+				segCenter = new Vector3();
+				segDir = new Vector3();
+				diff = new Vector3();
+				
+			}
 
 			segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
 			segDir.copy( v1 ).sub( v0 ).normalize();
@@ -458,10 +462,14 @@ Ray.prototype = {
 
 			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
-			if ( diff === undefined ) diff = new Vector3();
-			if ( edge1 === undefined ) edge1 = new Vector3();
-			if ( edge2 === undefined ) edge2 = new Vector3();
-			if ( normal === undefined ) normal = new Vector3();
+			if ( diff === undefined ) {
+				
+				diff = new Vector3();
+				edge1 = new Vector3();
+				edge2 = new Vector3();
+				normal = new Vector3();
+				
+			}
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
