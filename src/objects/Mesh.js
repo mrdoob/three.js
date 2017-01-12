@@ -76,26 +76,26 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var inverseMatrix = new Matrix4();
-		var ray = new Ray();
-		var sphere = new Sphere();
+		var inverseMatrix = undefined;
+		var ray = undefined;
+		var sphere = undefined;
 
-		var vA = new Vector3();
-		var vB = new Vector3();
-		var vC = new Vector3();
+		var vA = undefined;
+		var vB = undefined;
+		var vC = undefined;
 
-		var tempA = new Vector3();
-		var tempB = new Vector3();
-		var tempC = new Vector3();
+		var tempA = undefined;
+		var tempB = undefined;
+		var tempC = undefined;
 
-		var uvA = new Vector2();
-		var uvB = new Vector2();
-		var uvC = new Vector2();
+		var uvA = undefined;
+		var uvB = undefined;
+		var uvC = undefined;
 
-		var barycoord = new Vector3();
+		var barycoord = undefined;
 
-		var intersectionPoint = new Vector3();
-		var intersectionPointWorld = new Vector3();
+		var intersectionPoint = undefined;
+		var intersectionPointWorld = undefined;
 
 		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
 
@@ -174,6 +174,27 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function raycast( raycaster, intersects ) {
 
+			if ( inverseMatrix === undefined ) inverseMatrix = new Matrix4();
+			if ( ray === undefined ) ray = new Ray();
+			if ( sphere === undefined ) sphere = new Sphere();
+
+			if ( vA === undefined ) vA = new Vector3();
+			if ( vB === undefined ) vB = new Vector3();
+			if ( vC === undefined ) vC = new Vector3();
+
+			if ( tempA === undefined ) tempA = new Vector3();
+			if ( tempB === undefined ) tempB = new Vector3();
+			if ( tempC === undefined ) tempC = new Vector3();
+			
+			if ( uvA === undefined ) uvA = new Vector2();
+			if ( uvB === undefined ) uvB = new Vector2();
+			if ( uvC === undefined ) uvC = new Vector2();
+
+			if ( barycoord === undefined ) barycoord = new Vector3();
+			
+			if ( intersectionPoint === undefined ) intersectionPoint = new Vector3();
+			if ( intersectionPointWorld === undefined ) intersectionPointWorld = new Vector3();
+			
 			var geometry = this.geometry;
 			var material = this.material;
 			var matrixWorld = this.matrixWorld;
