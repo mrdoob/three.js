@@ -63,8 +63,12 @@ RectAreaLightHelper.prototype.update = function () {
 
 	return function update() {
 
-		if ( vector1 === undefined ) vector1 = new Vector3();
-		if ( vector2 === undefined ) vector2 = new Vector3();
+		if ( vector1 === undefined ) {
+
+			vector1 = new Vector3();
+			vector2 = new Vector3();
+			
+		}
 
 		var mesh1 = this.children[ 0 ];
 		var mesh2 = this.children[ 1 ];
