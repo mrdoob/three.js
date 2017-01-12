@@ -160,10 +160,9 @@ var Loader = function ( editor ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
-					var json = JSON.parse( contents );
 
 					var loader = new THREE.GLTFLoader();
-					loader.parse( json, function ( result ) {
+					loader.parse( contents, function ( result ) {
 
 						result.scene.name = filename;
 						editor.execute( new AddObjectCommand( result.scene ) );
@@ -171,7 +170,7 @@ var Loader = function ( editor ) {
 					} );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
