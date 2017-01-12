@@ -65,9 +65,13 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 	return function update() {
 
-		if ( v1 === undefined ) v1 = new Vector3();
-		if ( v2 === undefined ) v2 = new Vector3();
-		if ( normalMatrix === undefined ) normalMatrix = new Matrix3();
+		if ( v1 === undefined ) {
+			
+			v1 = new Vector3();
+			v2 = new Vector3();
+			normalMatrix = new Matrix3();
+			
+		}
 
 		var keys = [ 'a', 'b', 'c' ];
 
