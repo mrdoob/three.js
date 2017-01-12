@@ -32,9 +32,11 @@ THREE.GeometryUtils = {
 
 	randomPointInTriangle: function () {
 
-		var vector = new THREE.Vector3();
+		var vector;
 
 		return function ( vectorA, vectorB, vectorC ) {
+
+			if (vector === undefined) vector = new THREE.Vector3();
 
 			var point = new THREE.Vector3();
 
@@ -276,10 +278,16 @@ THREE.GeometryUtils = {
 
 	triangleArea: function () {
 
-		var vector1 = new THREE.Vector3();
-		var vector2 = new THREE.Vector3();
+		var vector1, vector2;
 
 		return function ( vectorA, vectorB, vectorC ) {
+
+			if (vector1 === undefined) {
+
+				vector1 = new THREE.Vector3();
+				vector2 = new THREE.Vector3();
+				
+			}
 
 			vector1.subVectors( vectorB, vectorA );
 			vector2.subVectors( vectorC, vectorA );
