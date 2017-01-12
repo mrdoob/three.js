@@ -112,8 +112,12 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function update( camera ) {
 
-			if ( v1 === undefined ) v1 = new Vector3();
-			if ( v2 === undefined ) v2 = new Vector3();
+			if ( v1 === undefined ) {
+				
+				v1 = new Vector3();
+				v2 = new Vector3();
+				
+			}
 
 			var levels = this.levels;
 
