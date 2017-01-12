@@ -132,9 +132,7 @@ THREE.Animation.prototype = {
 	update: ( function() {
 
 		var points = [];
-		var target = new THREE.Vector3();
-		var newVector = new THREE.Vector3();
-		var newQuat = new THREE.Quaternion();
+		var target, newVector, newQuat;
 
 		// Catmull-Rom spline
 
@@ -180,6 +178,14 @@ THREE.Animation.prototype = {
 
 		return function ( delta ) {
 
+			if (target === undefined) {
+
+				target = new THREE.Vector3();
+				newVector = new THREE.Vector3();
+				newQuat = new THREE.Quaternion();
+
+			}
+			
 			if ( this.isPlaying === false ) return;
 
 			this.currentTime += delta * this.timeScale;
