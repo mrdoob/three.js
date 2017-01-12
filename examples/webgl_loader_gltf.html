@@ -79,7 +79,7 @@
 				top:72px;
 			}
 
-			#materials_extension_control {
+			#extensions_control {
 				position:absolute;
 				top:104px;
 			}
@@ -116,10 +116,14 @@
 		Animations
 		<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
 		</div>
-		<div class="control" id="materials_extension_control">
-			Shaders
+		<div class="control" id="extensions_control">
+			Extension
 			<div class="controlValue">
-			<input type="checkbox" id="materials_extension_checkbox" checked onclick="toggleMaterialsExtension();">Use built-in</input>
+				<select id="extensions_list" onchange="selectExtension();">
+					<option value="glTF">None</option>
+					<option value="glTF-MaterialsCommon">Built-in shaders</option>
+					<option value="glTF-Binary">Binary</option>
+				</select>
 			</div>
 		</div>
 
@@ -238,10 +242,22 @@
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
 				status.innerHTML = "Loading...";
+
+				for (var i = 0; i < extensionSelect.children.length; i++) {
+					var child = extensionSelect.children[i];
+					child.disabled = sceneInfo.extensions.indexOf(child.value) === -1;
+					if (child.disabled && child.selected) {
+						extensionSelect.value = extension = 'glTF';
+					}
+				}
+
 				var url = sceneInfo.url;
 				var r = eval("/" + '\%s' + "/g");
-				var dir = useMaterialsExtension ? 'glTF-MaterialsCommon' :  'glTF';
-				url = url.replace(r, dir);
+				url = url.replace(r, extension);
+
+				if (extension === 'glTF-Binary') {
+					url = url.replace('.gltf', '.glb');
+				}
 
 				var loadStartTime = Date.now();
 				var status = document.getElementById("status");
@@ -405,14 +421,16 @@
 					animationTime: 3,
 					addLights:true,
 					shadows:true,
-					addGround:true
+					addGround:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Duck", url : "./models/gltf/duck/%s/duck.gltf",
 					cameraPos: new THREE.Vector3(0, 3, 5),
 					addLights:true,
 					addGround:true,
-					shadows:true
+					shadows:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/Cesium_Man.gltf",
@@ -420,7 +438,8 @@
 					 objectRotation: new THREE.Euler(0, 0, 0),
 					 addLights:true,
 					 addGround:true,
-					 shadows:true
+					 shadows:true,
+					 extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Cesium Milk Truck",
@@ -428,7 +447,8 @@
 					cameraPos: new THREE.Vector3(0, 3, 10),
 					addLights:true,
 					addGround:true,
-					shadows:true
+					shadows:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Snowflake",
@@ -438,7 +458,8 @@
 					objectPosition: new THREE.Vector3(0, 0, 0),
 					addLights:false,
 					addGround:false,
-					shadows:false
+					shadows:false,
+					extensions: ["glTF"]
 				},
 				{
 					name : "Snowflakes",
@@ -447,7 +468,8 @@
 					objectPosition: new THREE.Vector3(-1200, -1200, 0),
 					addLights:false,
 					addGround:false,
-					shadows:false
+					shadows:false,
+					extensions: ["glTF"]
 				}
 			];
 
@@ -558,14 +580,13 @@
 
 			}
 
-			var useextmaterials = document.getElementById("materials_extension_checkbox");
-			var useMaterialsExtension = useextmaterials.hasAttribute("checked");
-			function toggleMaterialsExtension()
+			var extensionSelect = document.getElementById("extensions_list");
+			var extension = extensionSelect.value;
+			function selectExtension()
 			{
-				useMaterialsExtension = !useMaterialsExtension;
+				extension = extensionSelect.value;
 				selectScene();
 			}
-
 
 			function cleanup() {
 
