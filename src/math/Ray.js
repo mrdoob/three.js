@@ -57,9 +57,11 @@ Ray.prototype = {
 
 	recast: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function recast( t ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			this.origin.copy( this.at( t, v1 ) );
 
@@ -93,9 +95,11 @@ Ray.prototype = {
 
 	distanceSqToPoint: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function distanceSqToPoint( point ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
@@ -117,9 +121,9 @@ Ray.prototype = {
 
 	distanceSqToSegment: function () {
 
-		var segCenter = new Vector3();
-		var segDir = new Vector3();
-		var diff = new Vector3();
+		var segCenter = undefined;
+		var segDir = undefined;
+		var diff = undefined;
 
 		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
@@ -129,6 +133,10 @@ Ray.prototype = {
 			// It can also set two optional targets :
 			// - The closest point on the ray
 			// - The closest point on the segment
+
+			if ( segCenter === undefined ) segCenter = new Vector3();
+			if ( segDir === undefined ) segDir = new Vector3();
+			if ( diff === undefined ) diff = new Vector3();
 
 			segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
 			segDir.copy( v1 ).sub( v0 ).normalize();
@@ -244,9 +252,11 @@ Ray.prototype = {
 
 	intersectSphere: function () {
 
-		var v1 = new Vector3();
+		var v1 = undefined;
 
 		return function intersectSphere( sphere, optionalTarget ) {
+
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			v1.subVectors( sphere.center, this.origin );
 			var tca = v1.dot( this.direction );
@@ -424,9 +434,11 @@ Ray.prototype = {
 
 	intersectsBox: ( function () {
 
-		var v = new Vector3();
+		var v = undefined;
 
 		return function intersectsBox( box ) {
+
+			if ( v === undefined ) v = new Vector3();
 
 			return this.intersectBox( box, v ) !== null;
 
@@ -437,14 +449,19 @@ Ray.prototype = {
 	intersectTriangle: function () {
 
 		// Compute the offset origin, edges, and normal.
-		var diff = new Vector3();
-		var edge1 = new Vector3();
-		var edge2 = new Vector3();
-		var normal = new Vector3();
+		var diff = undefined;
+		var edge1 = undefined;
+		var edge2 = undefined;
+		var normal = undefined;
 
 		return function intersectTriangle( a, b, c, backfaceCulling, optionalTarget ) {
 
 			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+
+			if ( diff === undefined ) diff = new Vector3();
+			if ( edge1 === undefined ) edge1 = new Vector3();
+			if ( edge2 === undefined ) edge2 = new Vector3();
+			if ( normal === undefined ) normal = new Vector3();
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
