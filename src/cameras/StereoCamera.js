@@ -28,15 +28,19 @@ Object.assign( StereoCamera.prototype, {
 
 	update: ( function () {
 
-		var instance, focus, fov, aspect, near, far, zoom;
-
 		var eyeRight = undefined;
 		var eyeLeft = undefined;
 
+		var instance, focus, fov, aspect, near, far, zoom;
+
 		return function update( camera ) {
 
-			if ( eyeRight === undefined ) eyeRight = new Matrix4();
-			if ( eyeLeft === undefined ) eyeLeft = new Matrix4();
+			if ( eyeRight === undefined ) {
+				
+				eyeRight = new Matrix4();
+				eyeLeft = new Matrix4();
+				
+			}
 
 			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
 												aspect !== camera.aspect * this.aspect || near !== camera.near ||
