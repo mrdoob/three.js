@@ -17,9 +17,11 @@ function Triangle( a, b, c ) {
 
 Triangle.normal = function () {
 
-	var v0 = new Vector3();
+	var v0 = undefined;
 
 	return function normal( a, b, c, optionalTarget ) {
+
+		if ( v0 === undefined ) v0 = new Vector3();
 
 		var result = optionalTarget || new Vector3();
 
@@ -44,11 +46,15 @@ Triangle.normal = function () {
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 Triangle.barycoordFromPoint = function () {
 
-	var v0 = new Vector3();
-	var v1 = new Vector3();
-	var v2 = new Vector3();
+	var v0 = undefined;
+	var v1 = undefined;
+	var v2 = undefined;
 
 	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+
+		if ( v0 === undefined ) v0 = new Vector3();
+		if ( v1 === undefined ) v1 = new Vector3();
+		if ( v2 === undefined ) v2 = new Vector3();
 
 		v0.subVectors( c, a );
 		v1.subVectors( b, a );
@@ -86,9 +92,11 @@ Triangle.barycoordFromPoint = function () {
 
 Triangle.containsPoint = function () {
 
-	var v1 = new Vector3();
+	var v1 = undefined;
 
 	return function containsPoint( point, a, b, c ) {
+
+		if ( v1 === undefined ) v1 = new Vector3();
 
 		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
@@ -140,10 +148,13 @@ Triangle.prototype = {
 
 	area: function () {
 
-		var v0 = new Vector3();
-		var v1 = new Vector3();
+		var v0 = undefined;
+		var v1 = undefined;
 
 		return function area() {
+
+			if ( v0 === undefined ) v0 = new Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			v0.subVectors( this.c, this.b );
 			v1.subVectors( this.a, this.b );
@@ -189,7 +200,10 @@ Triangle.prototype = {
 
 	closestPointToPoint: function () {
 
-		var plane, edgeList, projectedPoint, closestPoint;
+		var plane = undefined;
+		var edgeList = undefined;
+		var projectedPoint = undefined;
+		var closestPoint = undefined;
 
 		return function closestPointToPoint( point, optionalTarget ) {
 
