@@ -49,13 +49,15 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 		stacks: stacks
 	};
 
-	// generate vertices and uvs
+	// buffers
 
 	var vertices = [];
 	var uvs = [];
 
 	var i, j, p;
 	var u, v;
+
+	// generate vertices and uvs
 
 	var sliceCount = slices + 1;
 

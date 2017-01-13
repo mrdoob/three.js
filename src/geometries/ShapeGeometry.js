@@ -52,10 +52,14 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	curveSegments = curveSegments || 12;
 
+	// buffers
+
+	var indices = [];
 	var vertices = [];
 	var normals = [];
 	var uvs = [];
-	var indices = [];
+
+	// helper variables
 
 	var groupStart = 0;
 	var groupCount = 0;
