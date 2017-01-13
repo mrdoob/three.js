@@ -149,6 +149,8 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 		}
 
+		// indices
+
 		// 1. you need three indices to draw a single face
 		// 2. a single segment consists of two faces
 		// 3. so we need to generate six (2*3) indices per segment
@@ -157,7 +159,6 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 			for ( ix = 0; ix < gridX; ix ++ ) {
 
-				// indices
 				var a = numberOfVertices + ix + gridX1 * iy;
 				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
 				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
@@ -168,7 +169,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 				indices.push( a, b, d );
 				indices.push( b, c, d );
 
-				// update counter
+				// increase counter
 
 				groupCount += 6;
 

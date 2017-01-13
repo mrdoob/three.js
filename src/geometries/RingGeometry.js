@@ -97,6 +97,7 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 			normals.push( 0, 0, 1 );
 
 			// uv
+			
 			uv.x = ( vertex.x / outerRadius + 1 ) / 2;
 			uv.y = ( vertex.y / outerRadius + 1 ) / 2;
 
