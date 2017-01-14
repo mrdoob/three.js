@@ -500,11 +500,11 @@ class Geometry(base_classes.BaseNode):
         """Parse the geometry to Three.Geometry specs"""
         if self.options.get(constants.VERTICES):
             logger.info("Parsing %s", constants.VERTICES)
-            self[constants.VERTICES] = api.mesh.vertices(self.node) or []
+            self[constants.VERTICES] = api.mesh.vertices(self.node, self.options) or []
 
         if self.options.get(constants.NORMALS):
             logger.info("Parsing %s", constants.NORMALS)
-            self[constants.NORMALS] = api.mesh.normals(self.node) or []
+            self[constants.NORMALS] = api.mesh.normals(self.node, self.options) or []
 
         if self.options.get(constants.COLORS):
             logger.info("Parsing %s", constants.COLORS)
