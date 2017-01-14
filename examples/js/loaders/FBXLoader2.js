@@ -28,7 +28,7 @@
 
 			var resourceDirectory = url.split( /[\\\/]/ );
 			resourceDirectory.pop();
-			resourceDirectory = "".concat( resourceDirectory );
+			resourceDirectory = resourceDirectory.join( '/' );
 
 			this.fileLoader.load( url, function ( text ) {
 
@@ -86,8 +86,8 @@
 
 						}
 
-						var relationship = { ID: connection[ 1 ], relationship: connection[ 2 ] };
-						connectionMap.get( connection[ 0 ] ).parents.push( relationship );
+						var parentRelationship = { ID: connection[ 1 ], relationship: connection[ 2 ] };
+						connectionMap.get( connection[ 0 ] ).parents.push( parentRelationship );
 
 						if ( ! connectionMap.has( connection[ 1 ] ) ) {
 
@@ -98,8 +98,8 @@
 
 						}
 
-						relationship.ID = connection[ 0 ];
-						connectionMap.get( connection[ 1 ] ).children.push( relationship );
+						var childRelationship = { ID: connection[ 0 ], relationship: connection[ 2 ] };
+						connectionMap.get( connection[ 1 ] ).children.push( childRelationship );
 
 					} );
 
@@ -144,6 +144,7 @@
 						var fileName = filePath;
 
 					}
+					debugger;
 					var texture = loader.textureLoader.load( resourceDirectory + '/' + fileName );
 					texture.name = name;
 					texture.FBX_ID = FBX_ID;
@@ -287,6 +288,8 @@
 
 			var deformerMap = parseDeformers( FBXTree, connections );
 
+			console.log( deformerMap );
+
 			/**
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 * @returns {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>}
@@ -305,6 +308,7 @@
 
 							var conns = connections.get( parseInt( nodeID ) );
 							var skeleton = parseSkeleton( deformerNode, conns, DeformerNodes );
+							skeleton.FBX_ID = parseInt( nodeID );
 							skeletonMap.set( parseInt( nodeID ), skeleton );
 
 						}
@@ -342,7 +346,7 @@
 					return {
 						map: subDeformers,
 						array: subDeformerArray,
-						skeleton: null
+						bones: []
 					};
 
 				}
@@ -350,6 +354,8 @@
 			}
 
 			var geometryMap = parseGeometries( FBXTree, connections, deformerMap );
+
+			console.log( geometryMap );
 
 			/**
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
@@ -452,7 +458,7 @@
 
 								var endOfFace;
 								var vertexIndex = indexBuffer[ polygonVertexIndex ];
-								if ( indexBuffer[ polygonVertexIndex ] < - 1 ) {
+								if ( indexBuffer[ polygonVertexIndex ] < 0 ) {
 
 									vertexIndex = vertexIndex ^ - 1;
 									endOfFace = true;
@@ -557,6 +563,7 @@
 
 							}
 
+							debugger;
 							/**
 							 * @type {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 							 */
@@ -589,7 +596,7 @@
 
 							var prevMaterialIndex = bufferInfo.materialIndexBuffer[ 0 ];
 							var startIndex = 0;
-							for ( var materialBufferIndex = 0; i < bufferInfo.materialIndexBuffer.length; ++ materialBufferIndex ) {
+							for ( var materialBufferIndex = 0; materialBufferIndex < bufferInfo.materialIndexBuffer.length; ++ materialBufferIndex ) {
 
 								if ( bufferInfo.materialIndexBuffer[ materialBufferIndex ] !== prevMaterialIndex ) {
 
@@ -608,7 +615,7 @@
 							 */
 							function getNormals( geometryNode ) {
 
-								var NormalNode = geometryNode.subNodes.LayerElementNormal;
+								var NormalNode = geometryNode.subNodes.LayerElementNormal[ 0 ];
 
 								var mappingType = NormalNode.properties.MappingInformationType;
 								var referenceType = NormalNode.properties.ReferenceInformationType;
@@ -635,7 +642,7 @@
 							 */
 							function getUVs( geometryNode ) {
 
-								var UVNode = geometryNode.subNodes.LayerElementUV;
+								var UVNode = geometryNode.subNodes.LayerElementUV[ 0 ];
 
 								var mappingType = UVNode.properties.MappingInformationType;
 								var referenceType = UVNode.properties.ReferenceInformationType;
@@ -662,8 +669,8 @@
 							 */
 							function getMaterials( geometryNode ) {
 
-								var MaterialNode = geometryNode.subNodes.LayerElementMaterial;
-								var mappingType = MaterialNode.properties.mappingInformationType;
+								var MaterialNode = geometryNode.subNodes.LayerElementMaterial[ 0 ];
+								var mappingType = MaterialNode.properties.MappingInformationType;
 								var referenceType = MaterialNode.properties.ReferenceInformationType;
 								var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
 
@@ -799,29 +806,45 @@
 
 			var sceneGraph = parseScene( FBXTree, connections, deformerMap, geometryMap, materials );
 
+			console.log( sceneGraph );
+
+			return sceneGraph;
+
 			/**
+			 * Finally generates Scene graph and Scene graph Objects.
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformerMap
 			 * @param {Map<number, THREE.BufferGeometry>} geometryMap
 			 * @param {Map<number, THREE.Material>} materialMap
+			 * @returns {THREE.Group}
 			 */
 			function parseScene( FBXTree, connections, deformerMap, geometryMap, materialMap ) {
 
 				var sceneGraph = new THREE.Group();
 
 				var ModelNode = FBXTree.Objects.subNodes.Model;
-				var models = [];
+
+				/**
+				 * @type {Array.<THREE.Object3D>}
+				 */
+				var modelArray = [];
+
+				/**
+				 * @type {Map.<number, THREE.Object3D>}
+				 */
+				var modelMap = new Map();
+
 				for ( var nodeID in ModelNode ) {
 
 					var id = parseInt( nodeID );
 					var node = ModelNode[ nodeID ];
 					var conns = connections.get( id );
-					var model;
+					var model = null;
 					for ( var i = 0; i < conns.parents.length; ++ i ) {
 
 						deformerMap.forEach( function ( deformer ) {
 
-							if ( deformer.map.has( conns.parents[ i ] ) ) {
+							if ( deformer.map.has( conns.parents[ i ].ID ) ) {
 
 								model = new THREE.Bone();
 								var index = deformer.array.findIndex( function ( subDeformer ) {
@@ -829,7 +852,7 @@
 									return subDeformer.FBX_ID === conns.parents[ i ].ID;
 
 								} );
-								deformer.skeleton.bones[ index ] = model;
+								deformer.bones[ index ] = model;
 
 							}
 
@@ -841,9 +864,21 @@
 						switch ( node.attrType ) {
 
 							case "Mesh":
-								var geometry;
-								var material;
-								var materials;
+								/**
+								 * @type {?THREE.BufferGeometry}
+								 */
+								var geometry = null;
+
+								/**
+								 * @type {THREE.MultiMaterial|THREE.Material}
+								 */
+								var material = null;
+
+								/**
+								 * @type {Array.<THREE.Material>}
+								 */
+								var materials = [];
+
 								conns.children.forEach( function ( child ) {
 
 									if ( geometryMap.has( child.ID ) ) {
@@ -872,7 +907,15 @@
 									material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
 
 								}
-								model = new THREE.Mesh( geometry, material );
+								if ( geometry.FBX_Deformer ) {
+
+									model = new THREE.SkinnedMesh( geometry, material );
+
+								} else {
+
+									model = new THREE.Mesh( geometry, material );
+
+								}
 								break;
 
 							default:
@@ -910,20 +953,21 @@
 
 					}
 
-					models.push( model );
+					modelArray.push( model );
+					modelMap.set( id, model );
 
 				}
 
-				models.forEach( function ( model ) {
+				modelArray.forEach( function ( model ) {
 
 					var conns = connections.get( model.FBX_ID );
 					conns.parents.forEach( function ( parent ) {
 
-						for ( var i = 0; i < models.length; ++ i ) {
+						for ( var i = 0; i < modelArray.length; ++ i ) {
 
-							if ( models[ i ].FBX_ID === parent.ID ) {
+							if ( modelArray[ i ].FBX_ID === parent.ID ) {
 
-								models[ i ].add( model );
+								modelArray[ i ].add( model );
 								return;
 
 							}
@@ -941,6 +985,39 @@
 
 				} );
 
+
+				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
+				sceneGraph.updateMatrixWorld( true );
+
+				deformerMap.forEach( function ( deformer, FBX_ID ) {
+
+					deformer.skeleton = new THREE.Skeleton( deformer.bones );
+					var conns = connections.get( FBX_ID );
+					conns.parents.forEach( function ( parent ) {
+
+						if ( geometryMap.has( parent.ID ) ) {
+
+							var geoID = parent.ID;
+							var geoConns = connections.get( geoID );
+							for ( var i = 0; i < geoConns.parents.length; ++ i ) {
+
+								if ( modelMap.has( geoConns.parents[ i ].ID ) ) {
+
+									var model = modelMap.get( geoConns.parents[ i ].ID );
+									//ASSERT model typeof SkinnedMesh
+									model.bind( deformer.skeleton, model.matrixWorld );
+									break;
+
+								}
+
+							}
+
+						}
+
+					} );
+
+				} );
+
 				return sceneGraph;
 
 			}
@@ -948,12 +1025,22 @@
 
 
 			// UTILS
+			/**
+			 * Parses Vector3 property from FBXTree.  Property is given as .value.x, .value.y, etc.
+			 * @param {{value: { x: string, y: string, z: string }}} property - Property to parse as Vector3.
+			 * @returns {THREE.Vector3}
+			 */
 			function parseVector3( property ) {
 
 				return new THREE.Vector3( parseFloat( property.value.x ), parseFloat( property.value.y ), parseFloat( property.value.z ) );
 
 			}
 
+			/**
+			 * Parses Color property from FBXTree.  Property is given as .value.x, .value.y, etc.
+			 * @param {{value: { x: string, y: string, z: string }}} property - Property to parse as Color.
+			 * @returns {THREE.Color}
+			 */
 			function parseColor( property ) {
 
 				return new THREE.Color().fromArray( parseVector3( property ).toArray() );
@@ -1077,11 +1164,11 @@
 			this.vertices.forEach( function ( vertex ) {
 
 				var flatVertex = vertex.flattenToBuffers();
-				vertexBuffer.push( flatVertex.vertexBuffer );
-				normalBuffer.push( flatVertex.normalBuffer );
-				uvBuffer.push( flatVertex.uvBuffer );
-				skinIndexBuffer.push( flatVertex.skinIndexBuffer );
-				skinWeightBuffer.push( flatVertex.skinWeightBuffer );
+				vertexBuffer = vertexBuffer.concat( flatVertex.vertexBuffer );
+				normalBuffer = normalBuffer.concat( flatVertex.normalBuffer );
+				uvBuffer = uvBuffer.concat( flatVertex.uvBuffer );
+				skinIndexBuffer = skinIndexBuffer.concat( flatVertex.skinIndexBuffer );
+				skinWeightBuffer = skinWeightBuffer.concat( flatVertex.skinWeightBuffer );
 
 			} );
 
@@ -1152,15 +1239,17 @@
 
 			var materialIndexBuffer = [];
 
+			var materialIndex = this.materialIndex;
+
 			this.triangles.forEach( function ( triangle ) {
 
 				var flatTriangle = triangle.flattenToBuffers();
-				vertexBuffer.push( flatTriangle.vertexBuffer );
-				normalBuffer.push( flatTriangle.normalBuffer );
-				uvBuffer.push( flatTriangle.uvBuffer );
-				skinIndexBuffer.push( flatTriangle.skinIndexBuffer );
-				skinWeightBuffer.push( flatTriangle.skinWeightBuffer );
-				materialIndexBuffer.push( [ this.materialIndex, this.materialIndex, this.materialIndex ] );
+				vertexBuffer = vertexBuffer.concat( flatTriangle.vertexBuffer );
+				normalBuffer = normalBuffer.concat( flatTriangle.normalBuffer );
+				uvBuffer = uvBuffer.concat( flatTriangle.uvBuffer );
+				skinIndexBuffer = skinIndexBuffer.concat( flatTriangle.skinIndexBuffer );
+				skinWeightBuffer = skinWeightBuffer.concat( flatTriangle.skinWeightBuffer );
+				materialIndexBuffer = materialIndexBuffer.concat( [ materialIndex, materialIndex, materialIndex ] );
 
 			} );
 
@@ -1188,7 +1277,7 @@
 		this.faces = [ ];
 
 		/**
-		 * @type {null|THREE.Skeleton}
+		 * @type {{}|THREE.Skeleton}
 		 */
 		this.skeleton = null;
 
@@ -1212,12 +1301,12 @@
 			this.faces.forEach( function ( face ) {
 
 				var flatFace = face.flattenToBuffers();
-				vertexBuffer.push( flatFace.vertexBuffer );
-				normalBuffer.push( flatFace.normalBuffer );
-				uvBuffer.push( flatFace.uvBuffer );
-				skinIndexBuffer.push( flatFace.skinIndexBuffer );
-				skinWeightBuffer.push( flatFace.skinWeightBuffer );
-				materialIndexBuffer.push( face.materialIndexBuffer );
+				vertexBuffer = vertexBuffer.concat( flatFace.vertexBuffer );
+				normalBuffer = normalBuffer.concat( flatFace.normalBuffer );
+				uvBuffer = uvBuffer.concat( flatFace.uvBuffer );
+				skinIndexBuffer = skinIndexBuffer.concat( flatFace.skinIndexBuffer );
+				skinWeightBuffer = skinWeightBuffer.concat( flatFace.skinWeightBuffer );
+				materialIndexBuffer = materialIndexBuffer.concat( flatFace.materialIndexBuffer );
 
 			} );
 
