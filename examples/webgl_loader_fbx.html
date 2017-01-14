@@ -36,7 +36,7 @@
 
 		<script src="js/curves/NURBSCurve.js"></script>
 		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/loaders/FBXLoader2.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -95,29 +95,30 @@
 				};
 
 				var loader = new THREE.FBXLoader( manager );
-				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
+				debugger;
+				loader.load( 'models/fbx/xsi_man.fbx', function( object ) {
 
 					object.traverse( function( child ) {
 
-						if ( child instanceof THREE.Mesh ) {
+						// if ( child instanceof THREE.Mesh ) {
 
-							// pass
+						// 	// pass
 
-						}
+						// }
 
-						if ( child instanceof THREE.SkinnedMesh ) {
+						// if ( child instanceof THREE.SkinnedMesh ) {
 
-							if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
+						// 	if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
 
-								child.mixer = new THREE.AnimationMixer( child );
-								mixers.push( child.mixer );
+						// 		child.mixer = new THREE.AnimationMixer( child );
+						// 		mixers.push( child.mixer );
 
-								var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
-								action.play();
+						// 		var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
+						// 		action.play();
 
-							}
+						// 	}
 
-						}
+						// }
 
 					} );
 
