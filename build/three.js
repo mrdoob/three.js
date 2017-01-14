@@ -4770,7 +4770,7 @@
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-		for ( var i = 0; i !== n; ++ i ) {
+		for ( var i = 0; i < n; ++ i ) {
 
 			var info = gl.getActiveUniform( program, i ),
 				path = info.name,
@@ -15311,30 +15311,25 @@
 		var scope = this;
 
 		// segments
+
 		widthSegments = Math.floor( widthSegments ) || 1;
 		heightSegments = Math.floor( heightSegments ) || 1;
 		depthSegments = Math.floor( depthSegments ) || 1;
 
-		// these are used to calculate buffer length
-		var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
-		var indexCount = calculateIndexCount( widthSegments, heightSegments, depthSegments );
-
 		// buffers
-		var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
-		var vertices = new Float32Array( vertexCount * 3 );
-		var normals = new Float32Array( vertexCount * 3 );
-		var uvs = new Float32Array( vertexCount * 2 );
 
-		// offset variables
-		var vertexBufferOffset = 0;
-		var uvBufferOffset = 0;
-		var indexBufferOffset = 0;
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+
+		// helper variables
+
 		var numberOfVertices = 0;
-
-		// group variables
 		var groupStart = 0;
 
 		// build each side of the box geometry
+
 		buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
 		buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
 		buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
@@ -15343,38 +15338,11 @@
 		buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
 
 		// build geometry
-		this.setIndex( new BufferAttribute( indices, 1 ) );
-		this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
-		// helper functions
-
-		function calculateVertexCount( w, h, d ) {
-
-			var vertices = 0;
-
-			// calculate the amount of vertices for each side (plane)
-			vertices += (w + 1) * (h + 1) * 2; // xy
-			vertices += (w + 1) * (d + 1) * 2; // xz
-			vertices += (d + 1) * (h + 1) * 2; // zy
-
-			return vertices;
-
-		}
-
-		function calculateIndexCount( w, h, d ) {
-
-			var index = 0;
-
-			// calculate the amount of squares for each side
-			index += w * h * 2; // xy
-			index += w * d * 2; // xz
-			index += d * h * 2; // zy
-
-			return index * 6; // two triangles per square => six vertices per square
-
-		}
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
@@ -15391,50 +15359,54 @@
 			var vertexCounter = 0;
 			var groupCount = 0;
 
+			var ix, iy;
+
 			var vector = new Vector3();
 
 			// generate vertices, normals and uvs
 
-			for ( var iy = 0; iy < gridY1; iy ++ ) {
+			for ( iy = 0; iy < gridY1; iy ++ ) {
 
 				var y = iy * segmentHeight - heightHalf;
 
-				for ( var ix = 0; ix < gridX1; ix ++ ) {
+				for ( ix = 0; ix < gridX1; ix ++ ) {
 
 					var x = ix * segmentWidth - widthHalf;
 
 					// set values to correct vector component
+
 					vector[ u ] = x * udir;
 					vector[ v ] = y * vdir;
 					vector[ w ] = depthHalf;
 
 					// now apply vector to vertex buffer
-					vertices[ vertexBufferOffset ] = vector.x;
-					vertices[ vertexBufferOffset + 1 ] = vector.y;
-					vertices[ vertexBufferOffset + 2 ] = vector.z;
+
+					vertices.push( vector.x, vector.y, vector.z );
 
 					// set values to correct vector component
+
 					vector[ u ] = 0;
 					vector[ v ] = 0;
 					vector[ w ] = depth > 0 ? 1 : - 1;
 
 					// now apply vector to normal buffer
-					normals[ vertexBufferOffset ] = vector.x;
-					normals[ vertexBufferOffset + 1 ] = vector.y;
-					normals[ vertexBufferOffset + 2 ] = vector.z;
+
+					normals.push( vector.x, vector.y, vector.z );
 
 					// uvs
-					uvs[ uvBufferOffset ] = ix / gridX;
-					uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
 
-					// update offsets and counters
-					vertexBufferOffset += 3;
-					uvBufferOffset += 2;
+					uvs.push( ix / gridX );
+					uvs.push( 1 - ( iy / gridY ) );
+
+					// counters
+
 					vertexCounter += 1;
 
 				}
 
 			}
+
+			// indices
 
 			// 1. you need three indices to draw a single face
 			// 2. a single segment consists of two faces
@@ -15444,24 +15416,18 @@
 
 				for ( ix = 0; ix < gridX; ix ++ ) {
 
-					// indices
 					var a = numberOfVertices + ix + gridX1 * iy;
 					var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
 					var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
 					var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
 
-					// face one
-					indices[ indexBufferOffset ] = a;
-					indices[ indexBufferOffset + 1 ] = b;
-					indices[ indexBufferOffset + 2 ] = d;
+					// faces
 
-					// face two
-					indices[ indexBufferOffset + 3 ] = b;
-					indices[ indexBufferOffset + 4 ] = c;
-					indices[ indexBufferOffset + 5 ] = d;
+					indices.push( a, b, d );
+					indices.push( b, c, d );
 
-					// update offsets and counters
-					indexBufferOffset += 6;
+					// increase counter
+
 					groupCount += 6;
 
 				}
@@ -15469,12 +15435,15 @@
 			}
 
 			// add a group to the geometry. this will ensure multi material support
+
 			scope.addGroup( groupStart, groupCount, materialIndex );
 
 			// calculate new start value for groups
+
 			groupStart += groupCount;
 
 			// update total number of vertices
+
 			numberOfVertices += vertexCounter;
 
 		}
@@ -15511,6 +15480,8 @@
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
+	 * @author Mugen87 / https://github.com/Mugen87
+	 *
 	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
 	 */
 
@@ -15539,67 +15510,62 @@
 		var segment_width = width / gridX;
 		var segment_height = height / gridY;
 
-		var vertices = new Float32Array( gridX1 * gridY1 * 3 );
-		var normals = new Float32Array( gridX1 * gridY1 * 3 );
-		var uvs = new Float32Array( gridX1 * gridY1 * 2 );
+		var ix, iy;
 
-		var offset = 0;
-		var offset2 = 0;
+		// buffers
 
-		for ( var iy = 0; iy < gridY1; iy ++ ) {
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+
+		// generate vertices, normals and uvs
+
+		for ( iy = 0; iy < gridY1; iy ++ ) {
 
 			var y = iy * segment_height - height_half;
 
-			for ( var ix = 0; ix < gridX1; ix ++ ) {
+			for ( ix = 0; ix < gridX1; ix ++ ) {
 
 				var x = ix * segment_width - width_half;
 
-				vertices[ offset ] = x;
-				vertices[ offset + 1 ] = - y;
+				vertices.push( x, - y, 0 );
 
-				normals[ offset + 2 ] = 1;
+				normals.push( 0, 0, 1 );
 
-				uvs[ offset2 ] = ix / gridX;
-				uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
-
-				offset += 3;
-				offset2 += 2;
+				uvs.push( ix / gridX );
+				uvs.push( 1 - ( iy / gridY ) );
 
 			}
 
 		}
 
-		offset = 0;
+		// indices
 
-		var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+		for ( iy = 0; iy < gridY; iy ++ ) {
 
-		for ( var iy = 0; iy < gridY; iy ++ ) {
-
-			for ( var ix = 0; ix < gridX; ix ++ ) {
+			for ( ix = 0; ix < gridX; ix ++ ) {
 
 				var a = ix + gridX1 * iy;
 				var b = ix + gridX1 * ( iy + 1 );
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				indices[ offset ] = a;
-				indices[ offset + 1 ] = b;
-				indices[ offset + 2 ] = d;
+				// faces
 
-				indices[ offset + 3 ] = b;
-				indices[ offset + 4 ] = c;
-				indices[ offset + 5 ] = d;
-
-				offset += 6;
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
 		}
 
-		this.setIndex( new BufferAttribute( indices, 1 ) );
-		this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+		// build geometry
+
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
@@ -24310,13 +24276,15 @@
 			stacks: stacks
 		};
 
-		// generate vertices and uvs
+		// buffers
 
 		var vertices = [];
 		var uvs = [];
 
 		var i, j, p;
 		var u, v;
+
+		// generate vertices and uvs
 
 		var sliceCount = slices + 1;
 
@@ -25212,18 +25180,16 @@
 		p = p || 2;
 		q = q || 3;
 
-		// used to calculate buffer length
-		var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-		var indexCount = radialSegments * tubularSegments * 2 * 3;
-
 		// buffers
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
 		// helper variables
-		var i, j, index = 0, indexOffset = 0;
+
+		var i, j;
 
 		var vertex = new Vector3();
 		var normal = new Vector3();
@@ -25278,20 +25244,18 @@
 				vertex.y = P1.y + ( cx * N.y + cy * B.y );
 				vertex.z = P1.z + ( cx * N.z + cy * B.z );
 
-				// vertex
-				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
+
 				normal.subVectors( vertex, P1 ).normalize();
-				normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+				normals.push( normal.x, normal.y, normal.z );
 
 				// uv
-				uv.x = i / tubularSegments;
-				uv.y = j / radialSegments;
-				uvs.setXY( index, uv.x, uv.y );
 
-				// increase index
-				index ++;
+				uvs.push( i / tubularSegments );
+				uvs.push( j / radialSegments );
 
 			}
 
@@ -25304,20 +25268,16 @@
 			for ( i = 1; i <= radialSegments; i ++ ) {
 
 				// indices
+
 				var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
 				var b = ( radialSegments + 1 ) * j + ( i - 1 );
 				var c = ( radialSegments + 1 ) * j + i;
 				var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
-				// face one
-				indices.setX( indexOffset, a ); indexOffset ++;
-				indices.setX( indexOffset, b ); indexOffset ++;
-				indices.setX( indexOffset, d ); indexOffset ++;
+				// faces
 
-				// face two
-				indices.setX( indexOffset, b ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
-				indices.setX( indexOffset, d ); indexOffset ++;
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
@@ -25325,10 +25285,10 @@
 
 		// build geometry
 
-		this.setIndex( indices );
-		this.addAttribute( 'position', vertices );
-		this.addAttribute( 'normal', normals );
-		this.addAttribute( 'uv', uvs );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		// this function calculates the current position on the torus curve
 
@@ -25401,22 +25361,15 @@
 		tubularSegments = Math.floor( tubularSegments ) || 6;
 		arc = arc || Math.PI * 2;
 
-		// used to calculate buffer length
-		var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-		var indexCount = radialSegments * tubularSegments * 2 * 3;
-
 		// buffers
-		var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
-		var vertices = new Float32Array( vertexCount * 3 );
-		var normals = new Float32Array( vertexCount * 3 );
-		var uvs = new Float32Array( vertexCount * 2 );
 
-		// offset variables
-		var vertexBufferOffset = 0;
-		var uvBufferOffset = 0;
-		var indexBufferOffset = 0;
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
 		// helper variables
+
 		var center = new Vector3();
 		var vertex = new Vector3();
 		var normal = new Vector3();
@@ -25433,32 +25386,25 @@
 				var v = j / radialSegments * Math.PI * 2;
 
 				// vertex
+
 				vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
 				vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
 				vertex.z = tube * Math.sin( v );
 
-				vertices[ vertexBufferOffset ] = vertex.x;
-				vertices[ vertexBufferOffset + 1 ] = vertex.y;
-				vertices[ vertexBufferOffset + 2 ] = vertex.z;
-
-				// this vector is used to calculate the normal
-				center.x = radius * Math.cos( u );
-				center.y = radius * Math.sin( u );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal
+
+				center.x = radius * Math.cos( u );
+				center.y = radius * Math.sin( u );
 				normal.subVectors( vertex, center ).normalize();
 
-				normals[ vertexBufferOffset ] = normal.x;
-				normals[ vertexBufferOffset + 1 ] = normal.y;
-				normals[ vertexBufferOffset + 2 ] = normal.z;
+				normals.push( normal.x, normal.y, normal.z );
 
 				// uv
-				uvs[ uvBufferOffset ] = i / tubularSegments;
-				uvs[ uvBufferOffset + 1 ] = j / radialSegments;
 
-				// update offsets
-				vertexBufferOffset += 3;
-				uvBufferOffset += 2;
+				uvs.push( i / tubularSegments );
+				uvs.push( j / radialSegments );
 
 			}
 
@@ -25471,33 +25417,27 @@
 			for ( i = 1; i <= tubularSegments; i ++ ) {
 
 				// indices
+
 				var a = ( tubularSegments + 1 ) * j + i - 1;
 				var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
 				var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
 				var d = ( tubularSegments + 1 ) * j + i;
 
-				// face one
-				indices[ indexBufferOffset ] = a;
-				indices[ indexBufferOffset + 1 ] = b;
-				indices[ indexBufferOffset + 2 ] = d;
+				// faces
 
-				// face two
-				indices[ indexBufferOffset + 3 ] = b;
-				indices[ indexBufferOffset + 4 ] = c;
-				indices[ indexBufferOffset + 5 ] = d;
-
-				// update offset
-				indexBufferOffset += 6;
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
 		}
 
 		// build geometry
-		this.setIndex( new BufferAttribute( indices, 1 ) );
-		this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
@@ -26979,6 +26919,7 @@
 
 	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
 	function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
@@ -27010,68 +26951,82 @@
 
 		var thetaEnd = thetaStart + thetaLength;
 
-		var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
+		var ix, iy;
 
-		var positions = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+		var index = 0;
+		var grid = [];
 
-		var index = 0, vertices = [], normal = new Vector3();
+		var vertex = new Vector3();
+		var normal = new Vector3();
 
-		for ( var y = 0; y <= heightSegments; y ++ ) {
+		// buffers
+
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+
+		// generate vertices, normals and uvs
+
+		for ( iy = 0; iy <= heightSegments; iy ++ ) {
 
 			var verticesRow = [];
 
-			var v = y / heightSegments;
+			var v = iy / heightSegments;
 
-			for ( var x = 0; x <= widthSegments; x ++ ) {
+			for ( ix = 0; ix <= widthSegments; ix ++ ) {
 
-				var u = x / widthSegments;
+				var u = ix / widthSegments;
 
-				var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-				var py = radius * Math.cos( thetaStart + v * thetaLength );
-				var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+				// vertex
 
-				normal.set( px, py, pz ).normalize();
+				vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+				vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
+				vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
-				positions.setXYZ( index, px, py, pz );
-				normals.setXYZ( index, normal.x, normal.y, normal.z );
-				uvs.setXY( index, u, 1 - v );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-				verticesRow.push( index );
+				// normal
 
-				index ++;
+				normal.set( vertex.x, vertex.y, vertex.z ).normalize();
+				normals.push( normal.x, normal.y, normal.z );
 
-			}
+				// uv
 
-			vertices.push( verticesRow );
+				uvs.push( u, 1 - v );
 
-		}
-
-		var indices = [];
-
-		for ( var y = 0; y < heightSegments; y ++ ) {
-
-			for ( var x = 0; x < widthSegments; x ++ ) {
-
-				var v1 = vertices[ y ][ x + 1 ];
-				var v2 = vertices[ y ][ x ];
-				var v3 = vertices[ y + 1 ][ x ];
-				var v4 = vertices[ y + 1 ][ x + 1 ];
-
-				if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
-				if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
+				verticesRow.push( index ++ );
 
 			}
 
+			grid.push( verticesRow );
+
 		}
 
-		this.setIndex( new ( positions.count > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
-		this.addAttribute( 'position', positions );
-		this.addAttribute( 'normal', normals );
-		this.addAttribute( 'uv', uvs );
+		// indices
 
-		this.boundingSphere = new Sphere( new Vector3(), radius );
+		for ( iy = 0; iy < heightSegments; iy ++ ) {
+
+			for ( ix = 0; ix < widthSegments; ix ++ ) {
+
+				var a = grid[ iy ][ ix + 1 ];
+				var b = grid[ iy ][ ix ];
+				var c = grid[ iy + 1 ][ ix ];
+				var d = grid[ iy + 1 ][ ix + 1 ];
+
+				if ( iy !== 0 || thetaStart > 0 ) indices.push( a, b, d );
+				if ( iy !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( b, c, d );
+
+			}
+
+		}
+
+		// build geometry
+
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
@@ -27132,18 +27087,16 @@
 		thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
 		phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 1;
 
-		// these are used to calculate buffer length
-		var vertexCount = ( thetaSegments + 1 ) * ( phiSegments + 1 );
-		var indexCount = thetaSegments * phiSegments * 2 * 3;
-
 		// buffers
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
 		// some helper variables
-		var index = 0, indexOffset = 0, segment;
+
+		var segment;
 		var radius = innerRadius;
 		var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
 		var vertex = new Vector3();
@@ -27152,38 +27105,41 @@
 
 		// generate vertices, normals and uvs
 
-		// values are generate from the inside of the ring to the outside
-
 		for ( j = 0; j <= phiSegments; j ++ ) {
 
 			for ( i = 0; i <= thetaSegments; i ++ ) {
 
+				// values are generate from the inside of the ring to the outside
+
 				segment = thetaStart + i / thetaSegments * thetaLength;
 
 				// vertex
+
 				vertex.x = radius * Math.cos( segment );
 				vertex.y = radius * Math.sin( segment );
-				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal
-				normals.setXYZ( index, 0, 0, 1 );
+
+				normals.push( 0, 0, 1 );
 
 				// uv
+				
 				uv.x = ( vertex.x / outerRadius + 1 ) / 2;
 				uv.y = ( vertex.y / outerRadius + 1 ) / 2;
-				uvs.setXY( index, uv.x, uv.y );
 
-				// increase index
-				index ++;
+				uvs.push( uv.x, uv.y );
 
 			}
 
 			// increase the radius for next row of vertices
+
 			radius += radiusStep;
 
 		}
 
-		// generate indices
+		// indices
 
 		for ( j = 0; j < phiSegments; j ++ ) {
 
@@ -27193,21 +27149,15 @@
 
 				segment = i + thetaSegmentLevel;
 
-				// indices
 				var a = segment;
 				var b = segment + thetaSegments + 1;
 				var c = segment + thetaSegments + 2;
 				var d = segment + 1;
 
-				// face one
-				indices.setX( indexOffset, a ); indexOffset ++;
-				indices.setX( indexOffset, b ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
+				// faces
 
-				// face two
-				indices.setX( indexOffset, a ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
-				indices.setX( indexOffset, d ); indexOffset ++;
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
@@ -27215,10 +27165,10 @@
 
 		// build geometry
 
-		this.setIndex( indices );
-		this.addAttribute( 'position', vertices );
-		this.addAttribute( 'normal', normals );
-		this.addAttribute( 'uv', uvs );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
@@ -27281,19 +27231,19 @@
 		phiLength = phiLength || Math.PI * 2;
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
+		
 		phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
 
-		// these are used to calculate buffer length
-		var vertexCount = ( segments + 1 ) * points.length;
-		var indexCount = segments * points.length * 2 * 3;
 
 		// buffers
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+		var indices = [];
+		var vertices = [];
+		var uvs = [];
 
 		// helper variables
-		var index = 0, indexOffset = 0, base;
+
+		var base;
 		var inverseSegments = 1.0 / segments;
 		var vertex = new Vector3();
 		var uv = new Vector2();
@@ -27311,24 +27261,26 @@
 			for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
 
 				// vertex
+
 				vertex.x = points[ j ].x * sin;
 				vertex.y = points[ j ].y;
 				vertex.z = points[ j ].x * cos;
-				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// uv
+
 				uv.x = i / segments;
 				uv.y = j / ( points.length - 1 );
-				uvs.setXY( index, uv.x, uv.y );
 
-				// increase index
-				index ++;
+				uvs.push( uv.x, uv.y );
+
 
 			}
 
 		}
 
-		// generate indices
+		// indices
 
 		for ( i = 0; i < segments; i ++ ) {
 
@@ -27336,21 +27288,15 @@
 
 				base = j + i * points.length;
 
-				// indices
 				var a = base;
 				var b = base + points.length;
 				var c = base + points.length + 1;
 				var d = base + 1;
 
-				// face one
-				indices.setX( indexOffset, a ); indexOffset ++;
-				indices.setX( indexOffset, b ); indexOffset ++;
-				indices.setX( indexOffset, d ); indexOffset ++;
+				// faces
 
-				// face two
-				indices.setX( indexOffset, b ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
-				indices.setX( indexOffset, d ); indexOffset ++;
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
 			}
 
@@ -27358,9 +27304,9 @@
 
 		// build geometry
 
-		this.setIndex( indices );
-		this.addAttribute( 'position', vertices );
-		this.addAttribute( 'uv', uvs );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		// generate normals
 
@@ -27377,29 +27323,34 @@
 			var n = new Vector3();
 
 			// this is the buffer offset for the last line of vertices
+
 			base = segments * points.length * 3;
 
 			for ( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
 
 				// select the normal of the vertex in the first line
+
 				n1.x = normals[ j + 0 ];
 				n1.y = normals[ j + 1 ];
 				n1.z = normals[ j + 2 ];
 
 				// select the normal of the vertex in the last line
+
 				n2.x = normals[ base + j + 0 ];
 				n2.y = normals[ base + j + 1 ];
 				n2.z = normals[ base + j + 2 ];
 
 				// average normals
+
 				n.addVectors( n1, n2 ).normalize();
 
 				// assign the new values to both normals
+
 				normals[ j + 0 ] = normals[ base + j + 0 ] = n.x;
 				normals[ j + 1 ] = normals[ base + j + 1 ] = n.y;
 				normals[ j + 2 ] = normals[ base + j + 2 ] = n.z;
 
-			} // next row
+			}
 
 		}
 
@@ -27456,10 +27407,14 @@
 
 		curveSegments = curveSegments || 12;
 
+		// buffers
+
+		var indices = [];
 		var vertices = [];
 		var normals = [];
 		var uvs = [];
-		var indices = [];
+
+		// helper variables
 
 		var groupStart = 0;
 		var groupCount = 0;
@@ -27733,35 +27688,19 @@
 		thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
 		thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
 
-		// used to calculate buffer length
-
-		var nbCap = 0;
-
-		if ( openEnded === false ) {
-
-			if ( radiusTop > 0 ) nbCap ++;
-			if ( radiusBottom > 0 ) nbCap ++;
-
-		}
-
-		var vertexCount = calculateVertexCount();
-		var indexCount = calculateIndexCount();
-
 		// buffers
 
-		var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-		var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-		var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
 		// helper variables
 
-		var index = 0,
-		    indexOffset = 0,
-		    indexArray = [],
-		    halfHeight = height / 2;
-
-		// group variables
+		var index = 0;
+		var indexOffset = 0;
+		var indexArray = [];
+		var halfHeight = height / 2;
 		var groupStart = 0;
 
 		// generate geometry
@@ -27777,40 +27716,10 @@
 
 		// build geometry
 
-		this.setIndex( indices );
-		this.addAttribute( 'position', vertices );
-		this.addAttribute( 'normal', normals );
-		this.addAttribute( 'uv', uvs );
-
-		// helper functions
-
-		function calculateVertexCount() {
-
-			var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
-
-			if ( openEnded === false ) {
-
-				count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
-
-			}
-
-			return count;
-
-		}
-
-		function calculateIndexCount() {
-
-			var count = radialSegments * heightSegments * 2 * 3;
-
-			if ( openEnded === false ) {
-
-				count += radialSegments * nbCap * 3;
-
-			}
-
-			return count;
-
-		}
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		function generateTorso() {
 
@@ -27832,6 +27741,7 @@
 				var v = y / heightSegments;
 
 				// calculate the radius of the current row
+
 				var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
 				for ( x = 0; x <= radialSegments; x ++ ) {
@@ -27844,27 +27754,29 @@
 					var cosTheta = Math.cos( theta );
 
 					// vertex
+
 					vertex.x = radius * sinTheta;
 					vertex.y = - v * height + halfHeight;
 					vertex.z = radius * cosTheta;
-					vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
 					// normal
+
 					normal.set( sinTheta, slope, cosTheta ).normalize();
-					normals.setXYZ( index, normal.x, normal.y, normal.z );
+					normals.push( normal.x, normal.y, normal.z );
 
 					// uv
-					uvs.setXY( index, u, 1 - v );
+
+					uvs.push( u, 1 - v );
 
 					// save index of vertex in respective row
-					indexRow.push( index );
 
-					// increase index
-					index ++;
+					indexRow.push( index ++ );
 
 				}
 
 				// now save vertices of the row in our index array
+
 				indexArray.push( indexRow );
 
 			}
@@ -27876,22 +27788,19 @@
 				for ( y = 0; y < heightSegments; y ++ ) {
 
 					// we use the index array to access the correct indices
-					var i1 = indexArray[ y ][ x ];
-					var i2 = indexArray[ y + 1 ][ x ];
-					var i3 = indexArray[ y + 1 ][ x + 1 ];
-					var i4 = indexArray[ y ][ x + 1 ];
 
-					// face one
-					indices.setX( indexOffset, i1 ); indexOffset ++;
-					indices.setX( indexOffset, i2 ); indexOffset ++;
-					indices.setX( indexOffset, i4 ); indexOffset ++;
+					var a = indexArray[ y ][ x ];
+					var b = indexArray[ y + 1 ][ x ];
+					var c = indexArray[ y + 1 ][ x + 1 ];
+					var d = indexArray[ y ][ x + 1 ];
 
-					// face two
-					indices.setX( indexOffset, i2 ); indexOffset ++;
-					indices.setX( indexOffset, i3 ); indexOffset ++;
-					indices.setX( indexOffset, i4 ); indexOffset ++;
+					// faces
 
-					// update counters
+					indices.push( a, b, d );
+					indices.push( b, c, d );
+
+					// update group counter
+
 					groupCount += 6;
 
 				}
@@ -27899,9 +27808,11 @@
 			}
 
 			// add a group to the geometry. this will ensure multi material support
+
 			scope.addGroup( groupStart, groupCount, 0 );
 
 			// calculate new start value for groups
+
 			groupStart += groupCount;
 
 		}
@@ -27928,23 +27839,25 @@
 			for ( x = 1; x <= radialSegments; x ++ ) {
 
 				// vertex
-				vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+				vertices.push( 0, halfHeight * sign, 0 );
 
 				// normal
-				normals.setXYZ( index, 0, sign, 0 );
+
+				normals.push( 0, sign, 0 );
 
 				// uv
-				uv.x = 0.5;
-				uv.y = 0.5;
 
-				uvs.setXY( index, uv.x, uv.y );
+				uvs.push( 0.5, 0.5 );
 
 				// increase index
+
 				index ++;
 
 			}
 
 			// save the index of the last center vertex
+
 			centerIndexEnd = index;
 
 			// now we generate the surrounding vertices, normals and uvs
@@ -27958,20 +27871,24 @@
 				var sinTheta = Math.sin( theta );
 
 				// vertex
+
 				vertex.x = radius * sinTheta;
 				vertex.y = halfHeight * sign;
 				vertex.z = radius * cosTheta;
-				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal
-				normals.setXYZ( index, 0, sign, 0 );
+
+				normals.push( 0, sign, 0 );
 
 				// uv
+
 				uv.x = ( cosTheta * 0.5 ) + 0.5;
 				uv.y = ( sinTheta * 0.5 * sign ) + 0.5;
-				uvs.setXY( index, uv.x, uv.y );
+				uvs.push( uv.x, uv.y );
 
 				// increase index
+
 				index ++;
 
 			}
@@ -27986,28 +27903,27 @@
 				if ( top === true ) {
 
 					// face top
-					indices.setX( indexOffset, i ); indexOffset ++;
-					indices.setX( indexOffset, i + 1 ); indexOffset ++;
-					indices.setX( indexOffset, c ); indexOffset ++;
+
+					indices.push( i, i + 1, c );
 
 				} else {
 
 					// face bottom
-					indices.setX( indexOffset, i + 1 ); indexOffset ++;
-					indices.setX( indexOffset, i ); indexOffset ++;
-					indices.setX( indexOffset, c ); indexOffset ++;
+
+					indices.push( i + 1, i, c );
 
 				}
 
-				// update counters
 				groupCount += 3;
 
 			}
 
 			// add a group to the geometry. this will ensure multi material support
+
 			scope.addGroup( groupStart, groupCount, top === true ? 1 : 2 );
 
 			// calculate new start value for groups
+
 			groupStart += groupCount;
 
 		}
@@ -28093,6 +28009,7 @@
 
 	/**
 	 * @author benaadams / https://twitter.com/ben_a_adams
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
 	function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
@@ -28114,45 +28031,63 @@
 		thetaStart = thetaStart !== undefined ? thetaStart : 0;
 		thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
-		var vertices = segments + 2;
+		// buffers
 
-		var positions = new Float32Array( vertices * 3 );
-		var normals = new Float32Array( vertices * 3 );
-		var uvs = new Float32Array( vertices * 2 );
+		var indices = [];
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
 
-		// center data is already zero, but need to set a few extras
-		normals[ 2 ] = 1.0;
-		uvs[ 0 ] = 0.5;
-		uvs[ 1 ] = 0.5;
+		// helper variables
 
-		for ( var s = 0, i = 3, ii = 2 ; s <= segments; s ++, i += 3, ii += 2 ) {
+		var i, s;
+		var vertex = new Vector3();
+		var uv = new Vector2();
+
+		// center point
+
+		vertices.push( 0, 0, 0 );
+		normals.push( 0, 0, 1 );
+		uvs.push( 0.5, 0.5 );
+
+		for ( s = 0, i = 3; s <= segments; s ++, i += 3 ) {
 
 			var segment = thetaStart + s / segments * thetaLength;
 
-			positions[ i ] = radius * Math.cos( segment );
-			positions[ i + 1 ] = radius * Math.sin( segment );
+			// vertex
 
-			normals[ i + 2 ] = 1; // normal z
+			vertex.x = radius * Math.cos( segment );
+			vertex.y = radius * Math.sin( segment );
 
-			uvs[ ii ] = ( positions[ i ] / radius + 1 ) / 2;
-			uvs[ ii + 1 ] = ( positions[ i + 1 ] / radius + 1 ) / 2;
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+			// normal
+
+			normals.push( 0, 0, 1 );
+
+			// uvs
+
+			uv.x = ( vertices[ i ] / radius + 1 ) / 2;
+			uv.y = ( vertices[ i + 1 ] / radius + 1 ) / 2;
+
+			uvs.push( uv.x, uv.y );
 
 		}
 
-		var indices = [];
+		// indices
 
-		for ( var i = 1; i <= segments; i ++ ) {
+		for ( i = 1; i <= segments; i ++ ) {
 
 			indices.push( i, i + 1, 0 );
 
 		}
 
-		this.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
-		this.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-		this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-		this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+		// build geometry
 
-		this.boundingSphere = new Sphere( new Vector3(), radius );
+		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
