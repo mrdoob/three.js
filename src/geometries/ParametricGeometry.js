@@ -51,11 +51,11 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// buffers
 
+	var indices = [];
 	var vertices = [];
 	var uvs = [];
 
-	var i, j, p;
-	var u, v;
+	var i, j;
 
 	// generate vertices and uvs
 
@@ -63,13 +63,13 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	for ( i = 0; i <= stacks; i ++ ) {
 
-		v = i / stacks;
+		var v = i / stacks;
 
 		for ( j = 0; j <= slices; j ++ ) {
 
-			u = j / slices;
+			var u = j / slices;
 
-			p = func( u, v );
+			var p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
 
 			uvs.push( u, v );
@@ -80,17 +80,14 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate indices
 
-	var indices = [];
-	var a, b, c, d;
-
 	for ( i = 0; i < stacks; i ++ ) {
 
 		for ( j = 0; j < slices; j ++ ) {
 
-			a = i * sliceCount + j;
-			b = i * sliceCount + j + 1;
-			c = ( i + 1 ) * sliceCount + j + 1;
-			d = ( i + 1 ) * sliceCount + j;
+			var a = i * sliceCount + j;
+			var b = i * sliceCount + j + 1;
+			var c = ( i + 1 ) * sliceCount + j + 1;
+			var d = ( i + 1 ) * sliceCount + j;
 
 			// faces one and two
 

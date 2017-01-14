@@ -89,7 +89,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-		var segmentWidth	= width / gridX;
+		var segmentWidth = width / gridX;
 		var segmentHeight = height / gridY;
 
 		var widthHalf = width / 2;
