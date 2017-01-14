@@ -144,7 +144,6 @@
 						var fileName = filePath;
 
 					}
-					debugger;
 					var texture = loader.textureLoader.load( resourceDirectory + '/' + fileName );
 					texture.name = name;
 					texture.FBX_ID = FBX_ID;
@@ -563,7 +562,6 @@
 
 							}
 
-							debugger;
 							/**
 							 * @type {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 							 */
@@ -800,6 +798,62 @@
 
 					}
 
+					/**
+					 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
+					 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap
+					 */
+					function parseNurbsGeometry( geometryNode, relationships, deformerMap ) {
+
+						if ( THREE.NURBSCurve === undefined ) {
+
+							console.error( "THREE.FBXLoader relies on THREE.NURBSCurve for any nurbs present in the model.  Nurbs will show up as empty geometry." );
+							return new Geometry();
+
+						}
+
+						var order = parseInt( geometryNode.properties.Order );
+
+						if ( isNaN( order ) ) {
+
+							console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
+							return new Geometry();
+
+						}
+
+						var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
+						var controlPoints = [];
+						var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
+
+						for ( var i = 0; i < pointsValues.length; i += 4 ) {
+
+							controlPoints.push( new THREE.Vector4( pointsValues[ i ], pointsValues[ i + 1 ], pointsValues[ i + 2 ], pointsValues[ i + 3 ] ) );
+
+						}
+
+						if ( geometryNode.properties.Form === 'Closed' ) {
+
+							controlPoints.push( controlPoints[ 0 ] );
+
+						}
+
+						var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
+						var vertices = curve.getPoints( controlPoints.length * 1.5 );
+
+						var vertexBuffer = [];
+						vertices.forEach( function ( position ) {
+
+							var array = position.toArray();
+							vertexBuffer = vertexBuffer.concat( array );
+
+						} );
+
+						var geometry = new THREE.BufferGeometry();
+						geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertexBuffer ), 3 ) );
+
+						return geometry;
+
+					}
+
 				}
 
 			}
@@ -909,6 +963,11 @@
 								}
 								if ( geometry.FBX_Deformer ) {
 
+									// materials.forEach( function ( material ) {
+
+									// 	material.skinning = true;
+
+									// } );
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {
@@ -916,6 +975,22 @@
 									model = new THREE.Mesh( geometry, material );
 
 								}
+								break;
+
+							case "NurbsCurve":
+								var geometry = null;
+
+								conns.children.forEach( function ( child ) {
+
+									if ( geometryMap.has( child.ID ) ) {
+
+										geometry = geometryMap.get( child.ID );
+
+									}
+
+								} );
+								
+								model = new THREE.Line( geometry );
 								break;
 
 							default:
