@@ -134,10 +134,10 @@
 						if ( child instanceof THREE.Line ) {
 
 							child.material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 5 } );
-							// Generate a more detailed geometry
-							var nurbsGeometry = new THREE.Geometry();
-							nurbsGeometry.vertices = child.userData.curve.getPoints( 100 );
-							child.geometry = nurbsGeometry;
+							// // Generate a more detailed geometry
+							// var nurbsGeometry = new THREE.Geometry();
+							// nurbsGeometry.vertices = child.userData.curve.getPoints( 100 );
+							// child.geometry = nurbsGeometry;
 
 						}
 

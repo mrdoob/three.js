@@ -521,10 +521,17 @@
 
 									}
 
+									for ( var i = weights.length; i < 4; i ++ ) {
+
+										weights[ i ] = 0;
+										weightIndices[ i ] = 0;
+
+									}
+
 									vertex.skinWeights.fromArray( weights );
 									vertex.skinIndices.fromArray( weightIndices );
 
-									vertex.skinWeights.normalize();
+									//vertex.skinWeights.normalize();
 
 								}
 
@@ -963,11 +970,11 @@
 								}
 								if ( geometry.FBX_Deformer ) {
 
-									// materials.forEach( function ( material ) {
+									materials.forEach( function ( material ) {
 
-									// 	material.skinning = true;
+										material.skinning = true;
 
-									// } );
+									} );
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {
@@ -1154,13 +1161,13 @@
 		 * Indices of the bones vertex is influenced by.
 		 * @type {THREE.Vector4}
 		 */
-		this.skinIndices = new THREE.Vector4( );
+		this.skinIndices = new THREE.Vector4( 0, 0, 0, 0 );
 
 		/**
 		 * Weights that each bone influences the vertex.
 		 * @type {THREE.Vector4}
 		 */
-		this.skinWeights = new THREE.Vector4( );
+		this.skinWeights = new THREE.Vector4( 0, 0, 0, 0 );
 
 	}
 
