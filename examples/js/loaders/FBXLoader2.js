@@ -460,6 +460,7 @@
 								if ( indexBuffer[ polygonVertexIndex ] < 0 ) {
 
 									vertexIndex = vertexIndex ^ - 1;
+									indexBuffer[ polygonVertexIndex ] = vertexIndex;
 									endOfFace = true;
 
 								}
@@ -520,6 +521,8 @@
 										weights = Weight;
 
 									}
+
+									if ( weights.length === 0 ) { debugger; }
 
 									for ( var i = weights.length; i < 4; i ++ ) {
 
@@ -1012,6 +1015,15 @@
 					model.name = node.attrName.replace( /:/, '' ).replace( /_/, '' ).replace( /-/, '' );
 					model.FBX_ID = id;
 
+					modelArray.push( model );
+					modelMap.set( id, model );
+
+				}
+
+				modelArray.forEach( function ( model ) {
+
+					var node = ModelNode[ model.FBX_ID ];
+
 					if ( 'Lcl_Translation' in node.properties ) {
 
 						model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
@@ -1036,44 +1048,82 @@
 
 					}
 
-					modelArray.push( model );
-					modelMap.set( id, model );
-
-				}
-
-				modelArray.forEach( function ( model ) {
-
 					var conns = connections.get( model.FBX_ID );
-					conns.parents.forEach( function ( parent ) {
+					for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
 
-						for ( var i = 0; i < modelArray.length; ++ i ) {
+						var pIndex = modelArray.findIndex( function ( mod ) {
 
-							if ( modelArray[ i ].FBX_ID === parent.ID ) {
+							return mod.FBX_ID === conns.parents[ parentIndex ].ID;
 
-								modelArray[ i ].add( model );
-								return;
+						} );
+						if ( pIndex > -1 ) {
 
-							}
-
-						}
-
-						//Parent not found, root node?
-						if ( parent.ID === 0 ) {
-
-							sceneGraph.add( model );
+							modelArray[ pIndex ].add( model );
+							break;
 
 						}
 
-					} );
+					}
+					if ( model.parent === null ) {
+
+						sceneGraph.add( model );
+
+					}
 
 				} );
+
+				debugger;
 
 
 				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
 				sceneGraph.updateMatrixWorld( true );
 
+				// Put skeleton into bind pose.
+				var BindPoseNode = FBXTree.Objects.subNodes.Pose;
+				for ( var nodeID in BindPoseNode ) {
+
+					if ( BindPoseNode[ nodeID ].attrType === 'BindPose' ) {
+
+						BindPoseNode = BindPoseNode[ nodeID ];
+						break;
+
+					}
+
+				}
+				if ( BindPoseNode ) {
+
+					var PoseNode = BindPoseNode.subNodes.PoseNode;
+					var worldMatrices = new Map();
+
+					PoseNode.forEach( function ( node ) {
+
+						var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
+
+						worldMatrices.set( parseInt( node.id ), rawMatWrd );
+
+					} );
+
+				}
+
 				deformerMap.forEach( function ( deformer, FBX_ID ) {
 
+					deformer.array.forEach( function ( subDeformer, subDeformerIndex ) {
+
+						/**
+						 * @type {THREE.Bone}
+						 */
+						var bone = deformer.bones[ subDeformerIndex ];
+						if ( ! worldMatrices.has( bone.FBX_ID ) ) {
+
+							return;
+
+						}
+						var mat = worldMatrices.get( bone.FBX_ID );
+						bone.matrixWorld.copy( mat );
+
+					} );
+
+					// Now that skeleton is in bind pose, bind to model.
 					deformer.skeleton = new THREE.Skeleton( deformer.bones );
 					var conns = connections.get( FBX_ID );
 					conns.parents.forEach( function ( parent ) {
@@ -1101,14 +1151,44 @@
 
 				} );
 
+				// Skeleton is now bound, we are now free to set up the
+				// scene graph.
+				modelArray.forEach( function ( model ) {
+
+					var node = ModelNode[ model.FBX_ID ];
+
+					if ( 'Lcl_Translation' in node.properties ) {
+
+						model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
+
+					}
+
+					if ( 'Lcl_Rotation' in node.properties ) {
+
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
+
+							return value * Math.PI / 180;
+
+						} );
+						rotation.push( 'ZYX' );
+						model.rotation.fromArray( rotation );
+
+					}
+
+					if ( 'Lcl_Scaling' in node.properties ) {
+
+						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+				} );
+
 				// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
 				// to attach animations to, since FBXs treat animations as animations for the entire scene,
 				// not just for individual objects.
 				sceneGraph.skeleton = {
 					bones: modelArray
 				};
-
-				debugger;
 
 				var animations = parseAnimations( FBXTree, connections, sceneGraph );
 
