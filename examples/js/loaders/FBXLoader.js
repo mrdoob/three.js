@@ -27,7 +27,7 @@
 
 	};
 
-	Object.assign( THREE.FBXLoader.prototype, THREE.Loader.prototype );
+	THREE.FBXLoader.prototype = Object.create( THREE.Loader.prototype );
 
 	THREE.FBXLoader.prototype.constructor = THREE.FBXLoader;
 
@@ -149,6 +149,17 @@
 
 				container.add( meshes[ i ] );
 
+				//wireframe = new THREE.WireframeHelper( geometries[i], 0x00ff00 );
+				//container.add( wireframe );
+
+				//vnh = new THREE.VertexNormalsHelper( geometries[i], 0.6 );
+				//container.add( vnh );
+
+				//skh = new THREE.SkeletonHelper( geometries[i] );
+				//container.add( skh );
+
+				// container.add( new THREE.BoxHelper( geometries[i] ) );
+
 			}
 
 			console.timeEnd( 'FBXLoader' );
@@ -236,17 +247,31 @@
 
 				var tmpGeo = new THREE.BufferGeometry();
 				tmpGeo.name = geoNode.name;
-				tmpGeo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geoNode.positionBuffer ), 3 ) );
+				tmpGeo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geoNode.vertices ), 3 ) );
 
-				if ( geoNode.normalBuffer !== undefined && geoNode.normalBuffer.length > 0 ) {
+				if ( geoNode.normals !== undefined && geoNode.normals.length > 0 ) {
 
-					tmpGeo.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geoNode.normalBuffer ), 3 ) );
+					tmpGeo.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geoNode.normals ), 3 ) );
 
 				}
 
-				if ( geoNode.uvBuffer !== undefined && geoNode.uvBuffer.length > 0 ) {
+				if ( geoNode.uvs !== undefined && geoNode.uvs.length > 0 ) {
 
-					tmpGeo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geoNode.uvBuffer ), 2 ) );
+					tmpGeo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geoNode.uvs ), 2 ) );
+
+				}
+
+				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
+
+					if ( geoNode.indices.length > 65535 ) {
+
+						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint32Array( geoNode.indices ), 1 ) );
+
+					} else {
+
+						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint16Array( geoNode.indices ), 1 ) );
+
+					}
 
 				}
 
@@ -255,16 +280,16 @@
 				tmpGeo.computeBoundingBox();
 
 				//Material groupings
-				if ( geoNode.materialBuffer.length > 1 ) {
+				if ( geoNode.materialIndices.length > 1 ) {
 
 					tmpGeo.groups = [];
 
-					for ( var i = 0, prevIndex = - 1; i < geoNode.materialBuffer.length; ++ i ) {
+					for ( var i = 0, prevIndex = - 1; i < geoNode.materialIndices.length; ++ i ) {
 
-						if ( geoNode.materialBuffer[ i ] !== prevIndex ) {
+						if ( geoNode.materialIndices[ i ] !== prevIndex ) {
 
-							tmpGeo.groups.push( { start: i * 3, count: 0, materialIndex: geoNode.materialBuffer[ i ] } );
-							prevIndex = geoNode.materialBuffer[ i ];
+							tmpGeo.groups.push( { start: i * 3, count: 0, materialIndex: geoNode.materialIndices[ i ] } );
+							prevIndex = geoNode.materialIndices[ i ];
 
 						}
 
@@ -274,7 +299,7 @@
 
 				}
 
-				this.geometry_cache[ geoNode.id ] = tmpGeo;
+				this.geometry_cache[ geoNode.id ] = new THREE.Geometry().fromBufferGeometry( tmpGeo );
 				this.geometry_cache[ geoNode.id ].bones = geoNode.bones;
 				this.geometry_cache[ geoNode.id ].skinIndices = this.weights.skinIndices;
 				this.geometry_cache[ geoNode.id ].skinWeights = this.weights.skinWeights;
@@ -1708,506 +1733,19 @@
 
 	function Geometry() {
 
-		this.fbxNode = null;
-		this.name = '';
-		this.fbxID = - 1;
+		this.node = null;
+		this.name = null;
+		this.id = null;
 
-		this.positionBuffer = [];
-		this.normalBuffer = [];
-		this.uvBuffer = [];
-		this.materialBuffer = [];
+		this.vertices = [];
+		this.indices = [];
+		this.normals = [];
+		this.uvs = [];
 
 		this.bones = [];
 
 	}
 
-	Object.assign( Geometry.prototype, {
-
-		parse: function ( geoNode ) {
-
-			this.fbxNode = geoNode;
-			this.name = geoNode.attrName;
-			this.fbxID = geoNode.id;
-
-			var vertexInfo = getVertices( geoNode );
-
-			if ( vertexInfo.buffer.length > 0 ) {
-
-				console.log( 'FBXLoader: Geometry for ID: ' + geoNode.id + ' has no vertices.' );
-				return;
-
-			}
-
-			var uvInfo = getUVs( geoNode );
-			var normalInfo = getNormals( geoNode );
-			var materialInfo = getMaterials( geoNode );
-
-			//Now lets create the non-indexed buffers.
-			var vertexBuffer = [];
-			var normalBuffer = [];
-			var uvBuffer = [];
-			var materialBuffer = [];
-
-			for ( var faceIndex = 0; faceIndex < vertexInfo.verticesPerFace.length; ++ faceIndex ) {
-
-				for ( var polygonVertexIndex = 0; polygonVertexIndex < vertexInfo.verticesPerFace[ faceIndex ]; ++ polygonVertexIndex ) {
-
-					var vertex;
-					if ( polygonVertexIndex > 2 ) {
-
-						//Add material for previous Tri before beginning new tri.
-						materialBuffer.push( getData( polygonVertexIndex, faceIndex, 1, vertexInfo.verticesPerFace, materialInfo ) );
-
-						//Re-add vertex 0 and n-1 to triangulate mesh.
-						vertex = getVertex( 0, faceIndex, vertexInfo, normalInfo, uvInfo );
-						vertexBuffer.push( vertex.position );
-						normalBuffer.push( vertex.normal );
-						uvBuffer.push( vertex.uv );
-
-						vertex = getVertex( polygonVertexIndex - 1, faceIndex, vertexInfo, normalInfo, uvInfo );
-						vertexBuffer.push( vertex.position );
-						normalBuffer.push( vertex.normal );
-						uvBuffer.push( vertex.uv );
-
-					}
-					vertex = getVertex( polygonVertexIndex, faceIndex, vertexInfo, normalInfo, uvInfo );
-					vertexBuffer.push( vertex.position );
-					normalBuffer.push( vertex.normal );
-					uvBuffer.push( vertex.uv );
-
-				}
-
-				materialBuffer.push( getData( 0, faceIndex, 1, vertexInfo.verticesPerFace, materialInfo ) );
-
-			}
-
-			this.positionBuffer = vertexBuffer;
-			this.normalBuffer = normalBuffer;
-			this.uvBuffer = uvBuffer;
-			this.materialBuffer = materialBuffer;
-
-			/**
-			 * Pushes vertex data into appropriate buffers based on given info.
-			 * @param {number} polyVertexIndex - Index of vertex within polygon.
-			 * @param {number} polyIndex - Index of polygon within geometry.
-			 * @param {{buffer: number[], indices: number[], mappingType: string, referenceType: string, maxNGon: number, verticesPerFace: number[]}} positionInfo
-			 * @param {{buffer: number[], indices: number[], mappingType: string, referenceType: string}} normalInfo
-			 * @param {{buffer: number[], indices: number[], mappingType: string, referenceType: string}} uvInfo
-			 * @returns {{ position: number[], normal: number[], uv: number[] }}
-			 */
-			function getVertex( polyVertexIndex, polyIndex, positionInfo, normalInfo, uvInfo ) {
-
-				/**
-				 * Describes which vertex index we are looking at.
-				 */
-				var positionIndexIndex = 0;
-				for ( var i = 0; i < polyIndex; ++ i ) {
-
-					positionIndexIndex += positionInfo.verticesPerFace[ i ];
-
-				}
-
-				var positionIndex = positionInfo.indices[ positionIndexIndex ];
-				var position = [
-					positionInfo.buffer[ ( positionIndex * 3 ) ],
-					positionInfo.buffer[ ( positionIndex * 3 ) + 1 ],
-					positionInfo.buffer[ ( positionIndex * 3 ) + 2 ] ];
-
-				var normal = getData( polyVertexIndex, polyIndex, 3, positionInfo.verticesPerFace, normalInfo );
-				var uvs = getData( polyVertexIndex, polyIndex, 2, positionInfo.verticesPerFace, uvInfo );
-
-				return {
-					position: position,
-					normal: normal,
-					uv: uvs
-				};
-
-			}
-
-			/**
-			 * Grabs data based on mapping and reference type of data and returns data buffer.
-			 * @param {number} polyVertexIndex - Index of vertex within polygon.
-			 * @param {number} polyIndex - Index of polygon within geometry.
-			 * @param {number} dataSize - Number of data values per vertex for this type of data.
-			 * @param {number[]} verticesPerFace - Number of vertices per polygon face.
-			 * @param {{buffer: number[], indices: number[], mappingType: string, referenceType: string}} infoObject - Object holding info for data.
-			 * @returns {number[]}
-			 */
-			function getData( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject ) {
-
-				var GetData = {
-
-					ByPolygonVertex: {
-
-						/**
-						 * Grabs data mapped by polygon vertex and referenced directly and returns the data for
-						 * the specific instance based on the polygon vertex index and polygon index.
-						 * @param {number} polyVertexIndex - Index of vertex within polygon.
-						 * @param {number} polyIndex - Index of polygon within geometry.
-						 * @param {number} dataSize - Number of data values per vertex for given data type.
-						 * @param {number[]} verticesPerFace - Number of polygon vertices per face.
-						 * @param {{buffer: number[], indices: number[]}} infoObject - Object containing buffer and index buffer data.
-						 * @returns {number[]} - Buffer for specific vertex instance, length of dataSize.
-						 */
-						Direct: function ( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject ) {
-
-							var dataIndex = 0;
-							for ( var i = 0; i < polyIndex; ++ i ) {
-
-								dataIndex += verticesPerFace[ i ];
-
-							}
-
-							dataIndex += polyVertexIndex;
-
-							var returnBuffer = [];
-							for ( var i = 0; i < dataSize; ++ i ) {
-
-								returnBuffer.push( infoObject.buffer[ ( dataIndex * dataSize ) + i ] );
-
-							}
-							return returnBuffer;
-
-						},
-
-						/**
-						 * Grabs data mapped by polygon vertex and referenced via index buffer and returns the data for
-						 * the specific instance based on the polygon vertex index and polygon index.
-						 * @param {number} polyVertexIndex - Index of vertex within polygon.
-						 * @param {number} polyIndex - Index of polygon within geometry.
-						 * @param {number} dataSize - Number of data values per vertex for given data type.
-						 * @param {number[]} verticesPerFace - Number of polygon vertices per face.
-						 * @param {{buffer: number[], indices: number[]}} infoObject - Object containing buffer and index buffer data.
-						 * @returns {number[]} - Buffer for specific vertex instance, length of dataSize.
-						 */
-						IndexToDirect: function ( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject ) {
-
-							var dataIndexIndex = 0;
-							for ( var i = 0; i < polyIndex; ++ i ) {
-
-								dataIndexIndex += verticesPerFace[ i ];
-
-							}
-							dataIndexIndex += polyVertexIndex;
-
-							var dataIndex = infoObject.indices[ dataIndexIndex ];
-							var returnBuffer = [];
-							for ( var i = 0; i < dataSize; ++ i ) {
-
-								returnBuffer.push( infoObject.buffer[ ( dataIndex * dataSize ) + i ] );
-
-							}
-							return returnBuffer;
-
-						}
-
-					},
-
-					ByPolygon: {
-
-						/**
-						 * Grabs data mapped by polygon and referenced directly and returns the data for
-						 * the specific instance based on the polygon index.
-						 * @param {number} polyVertexIndex - Index of vertex within polygon (Ignored for this function).
-						 * @param {number} polyIndex - Index of polygon within geometry.
-						 * @param {number} dataSize - Number of data values per vertex for given data type.
-						 * @param {number[]} verticesPerFace - Number of polygon vertices per face (Ignored for this function).
-						 * @param {{buffer: number[], indices: number[]}} infoObject - Object containing buffer and index buffer data.
-						 * @returns {number[]} - Buffer for specific vertex instance, length of dataSize.
-						 */
-						Direct: function ( polyVertexIndex, polyIndex, dataSize, vericesPerFace, infoObject ) {
-
-							var returnBuffer = [];
-							for ( var i = 0; i < dataSize; ++ i ) {
-
-								returnBuffer.push( infoObject.buffer[ ( polyIndex * dataSize ) + i ] );
-
-							}
-							return returnBuffer;
-
-						},
-
-						/**
-						 * Grabs data mapped by polygon and referenced via index buffer and returns the data for
-						 * the specific instance based on the polygon index.
-						 * @param {number} polyVertexIndex - Index of vertex within polygon (Ignored for this function).
-						 * @param {number} polyIndex - Index of polygon within geometry.
-						 * @param {number} dataSize - Number of data values per vertex for given data type.
-						 * @param {number[]} verticesPerFace - Number of polygon vertices per face (Ignored for this function).
-						 * @param {{buffer: number[], indices: number[]}} infoObject - Object containing buffer and index buffer data.
-						 * @returns {number[]} - Buffer for specific vertex instance, length of dataSize.
-						 */
-						IndexToDirect: function ( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject ) {
-
-							var index = infoObject.indices[ polyIndex ];
-							var returnBuffer = [];
-							for ( var i = 0; i < dataSize; ++ i ) {
-
-								returnBuffer.push( infoObject.buffer[ ( index * dataSize ) + i ] );
-
-							}
-							return returnBuffer;
-
-						}
-
-					},
-
-					AllSame: {
-
-						/**
-						 * Grabs data mapped all the same and referenced via index buffer and returns the data for
-						 * the specific instance based on the polygon vertex index and polygon index.
-						 * @param {number} polyVertexIndex - Index of vertex within polygon (Ignored in this function).
-						 * @param {number} polyIndex - Index of polygon within geometry (Ignored in this function).
-						 * @param {number} dataSize - Number of data values per vertex for given data type.
-						 * @param {number[]} verticesPerFace - Number of polygon vertices per face (Ignored in this function).
-						 * @param {{buffer: number[], indices: number[]}} infoObject - Object containing buffer and index buffer data.
-						 * @returns {number[]} - Buffer for specific vertex instance, length of dataSize.
-						 */
-						IndexToDirect: function ( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject ) {
-
-							var returnBuffer;
-							for ( var i = 0; i < dataSize; ++ i ) {
-
-								returnBuffer.push( infoObject.buffer[ ( infoObject.indices[ 0 ] * dataSize ) + i ] );
-
-							}
-							return returnBuffer;
-
-						}
-
-					}
-
-				};
-
-				return GetData[ infoObject.mappingType ][ infoObject.referenceType ]( polyVertexIndex, polyIndex, dataSize, verticesPerFace, infoObject );
-
-			}
-
-
-			/**
-			 * Extracts vertex array and returns array of floats
-			 * representing vertex position data.
-			 * @param {Object} geoNode - Parsed FBX node for geometry.
-			 * @returns {{buffer: number[], indices: number[], mappingType: string, referenceType: string, maxNGon: number, verticesPerFace: number[]}}
-			 */
-			function getVertices( geoNode ) {
-
-				if ( geoNode.subNodes.Vertices === undefined ) {
-
-					console.warn( 'Geo Node ' + geoNode.attrName + "(" + geoNode.id + ") does not define vertices." );
-					return {
-						buffer: [],
-						indices: [],
-						mappingType: 'ByPolygonVertex',
-						referenceType: 'IndexToDirect',
-						maxNGon: 3,
-						verticesPerFace: []
-					};
-
-				}
-
-				var buffer = parseArrayToFloat( geoNode.subNodes.Vertices.properties.a );
-				var indices = parseArrayToInt( geoNode.subNodes.PolygonVertexIndex.properties.a );
-				var currentNumVerticesThisFace = 1;
-				var maxVerticesOnAFace = 0;
-				var verticesPerFace = [];
-
-				// The indices that make up the polygon are in order.  A negative index means
-				// that it's the last index of the polygon.  That index needs to be made positive
-				// and subtract 1 from it.
-				for ( var i = 0; i < indices.length; ++ i ) {
-
-					var index = indices[ i ];
-					if ( index < 0 ) {
-
-						if ( currentNumVerticesThisFace > maxVerticesOnAFace ) {
-
-							maxVerticesOnAFace = currentNumVerticesThisFace;
-
-						}
-
-						indices[ i ] = index ^ - 1;
-						verticesPerFace.push( currentNumVerticesThisFace );
-						currentNumVerticesThisFace = 1;
-
-					} else {
-
-						currentNumVerticesThisFace ++;
-
-					}
-
-				}
-
-				if ( maxVerticesOnAFace === 0 ) {
-
-					console.warn( 'FBXLoader: Max vertices on a face not found: ' + geoNode.attrName );
-					maxVerticesOnAFace = 3;
-
-				}
-
-				return {
-					buffer: buffer,
-					indices: indices,
-					mappingType: 'ByPolygonVertex',
-					referenceType: 'IndexToDirect',
-					maxNGon: maxVerticesOnAFace,
-					verticesPerFace: verticesPerFace
-				};
-
-			}
-
-			/**
-			 * Extracts UV information and returns object describing UVs.
-			 * @param {Object} geoNode - Parsed FBX node for geometry.
-			 * @returns {{buffer: number[], indices: number[], mappingType: string, referenceType: string}}
-			 */
-			function getUVs( geoNode ) {
-
-				if ( ! ( 'LayerElementUV' in geoNode.subNodes ) ) {
-
-					// No UVs defined.  Nothing to do here.
-					return {
-						buffer: [],
-						indices: [],
-						mappingType: 'AllSame',
-						referenceType: 'IndexToDirect'
-					};
-
-				}
-				var UVNode = geoNode.subNodes.LayerElementUV;
-				if ( UVNode === undefined ) {
-
-					// No UV information.
-					return [];
-
-				}
-
-				for ( var node in UVNode ) {
-
-					if ( node.match( /^\d+$/ ) ) {
-
-						console.warn( 'multi UV is not supported.' );
-						UVNode = UVNode[ node ];
-						break;
-
-					}
-
-				}
-
-				var rawUVBuffer = UVNode.subNodes.UV.properties.a;
-				var mappingType = UVNode.properties.MappingInformationType;
-				var refType = UVNode.properties.ReferenceInformationType;
-				var UVBuffer = parseArrayToFloat( rawUVBuffer );
-
-				var IndexBuffer = [];
-				if ( mappingType === 'IndexToDirect' ) {
-
-					var rawIndexBuffer = UVNode.subNodes.UVIndex.properties.a;
-					IndexBuffer = parseArrayToInt( rawIndexBuffer );
-
-				}
-
-				return {
-					buffer: UVBuffer,
-					indices: IndexBuffer,
-					mappingType: mappingType,
-					referenceType: refType
-				};
-
-			}
-
-			/**
-			 * Extracts normal information and returns object describing normals.
-			 * @param {Object} geoNode - Parsed FBX node for geometry.
-			 * @returns {{buffer: number[], indices: number[], mappingType: string, referenceType: string}}
-			 */
-			function getNormals( geoNode ) {
-
-				var NormalNode = geoNode.subNodes.LayerElementNormal;
-				if ( NormalNode === undefined ) {
-
-					console.warn( 'Node: ' + geoNode.attrName + "(" + geoNode.id + ") does not have Normals defined." );
-					return {
-						buffer: [],
-						indices: [],
-						mappingType: 'AllSame',
-						referenceType: 'IndexToDirect'
-					};
-
-				}
-
-				var mappingType = NormalNode.properties.MappingInformationType;
-				var referenceType = NormalNode.properties.ReferenceInformationType;
-				var normalBuffer = parseArrayToFloat( NormalNode.subNodes.Normals.properties.a );
-
-				var indexBuffer = [];
-				if ( referenceType === 'IndexToDirect' ) {
-
-					var rawIndexBuffer = NormalNode.subNodes.NormalIndex.properties.a;
-					indexBuffer = parseArrayToInt( rawIndexBuffer );
-
-				}
-
-				return {
-					buffer: normalBuffer,
-					indices: indexBuffer,
-					mappingType: mappingType,
-					referenceType: referenceType
-				};
-
-			}
-
-			/**
-			 * Extracts material index information and returns object describing material assignment.
-			 * @param {Object} geoNode - Parsed FBX node for geometry.
-			 * @returns {{buffer: number[], mappingType: string, referenceType: string}}
-			 */
-			function getMaterials( geoNode ) {
-
-				if ( ! ( 'LayerElementMaterial' in geoNode.subNodes ) ) {
-
-					// No material info.
-					return {
-						buffer: [ 0 ],
-						indices: [ 0 ],
-						mappingType: 'AllSame',
-						referenceType: 'IndexToDirect'
-					};
-
-				}
-
-				var indexNode = geoNode.subNodes.LayerElementMaterial;
-				var mapType = indexNode.properties.MappingInformationType;
-				var refType = indexNode.properties.ReferenceInformationType;
-				var matBuffer = parseArrayToInt( indexNode.subNodes.Materials.properties.a );
-				var matIndexes = [];
-				matBuffer.forEach( function ( materialIndex, index ) {
-
-					matIndexes.push( index );
-
-				} );
-
-				return {
-					buffer: matBuffer,
-					indices: matIndexes,
-					mappingType: mapType,
-					referenceType: refType
-				};
-
-			}
-
-		},
-
-		addBones: function ( bones ) {
-
-			this.bones = bones;
-
-		}
-
-	} );
-
-	/**
 	Geometry.prototype.parse = function ( geoNode ) {
 
 		this.node = geoNode;
@@ -2935,7 +2473,6 @@
 		},
 
 	} );
-	*/
 
 	function AnimationCurve() {
 
@@ -3672,12 +3209,6 @@
 
 	}
 
-	/**
-	 * Parses a string of comma separated ints and returns
-	 * an array of ints.
-	 * @param {string} string - String comtaining comma separated float values.
-	 * @returns {number[]}
-	 */
 	function parseArrayToInt( string ) {
 
 		return string.split( ',' ).map( function ( element ) {
@@ -3688,12 +3219,6 @@
 
 	}
 
-	/**
-	 * Parses a string of comma separated floats and returns
-	 * an array of floats.
-	 * @param {string} string - String containing comma separated float values.
-	 * @returns {number[]}
-	 */
 	function parseArrayToFloat( string ) {
 
 		return string.split( ',' ).map( function ( element ) {
