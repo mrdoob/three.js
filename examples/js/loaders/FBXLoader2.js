@@ -975,6 +975,7 @@
 										material.skinning = true;
 
 									} );
+									material.skinning = true;
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {
@@ -1100,7 +1101,1570 @@
 
 				} );
 
+				// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
+				// to attach animations to, since FBXs treat animations as animations for the entire scene,
+				// not just for individual objects.
+				sceneGraph.skeleton = {
+					bones: modelArray
+				};
+
+				debugger;
+
+				var animations = parseAnimations( FBXTree, connections, sceneGraph );
+
+				addAnimations( sceneGraph, animations );
+
 				return sceneGraph;
+
+			}
+
+			/**
+			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+			 */
+			function parseAnimations( FBXTree, connections, sceneGraph ) {
+
+				var rawNodes = FBXTree.Objects.subNodes.AnimationCurveNode;
+				var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
+				var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
+				var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+
+				/**
+				 * @type {{
+				     curves: Map<number, {
+						 T: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						},
+						 R: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						},
+						 S: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						}
+					 }>,
+					 layers: Map<number, { 
+					 	T: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						R: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						S: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						}
+						}[]>,
+					 stacks: Map<number, {
+						 name: string,
+						 layers: {
+							T: {
+								id: number;
+								attr: string;
+								internalID: number;
+								attrX: boolean;
+								attrY: boolean;
+								attrZ: boolean;
+								containerBoneID: number;
+								containerID: number;
+								curves: {
+									x: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									y: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									z: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+								};
+							};
+							R: {
+								id: number;
+								attr: string;
+								internalID: number;
+								attrX: boolean;
+								attrY: boolean;
+								attrZ: boolean;
+								containerBoneID: number;
+								containerID: number;
+								curves: {
+									x: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									y: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									z: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+								};
+							};
+							S: {
+								id: number;
+								attr: string;
+								internalID: number;
+								attrX: boolean;
+								attrY: boolean;
+								attrZ: boolean;
+								containerBoneID: number;
+								containerID: number;
+								curves: {
+									x: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									y: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+									z: {
+										version: any;
+										id: number;
+										internalID: number;
+										times: number[];
+										values: number[];
+										attrFlag: number[];
+										attrData: number[];
+									};
+								};
+							};
+						}[][],
+					 length: number,
+					 frames: number }>,
+					 length: number,
+					 fps: number,
+					 frames: number
+				 }}
+				 */
+				var returnObject = {
+					/**
+					 * @type {Map.<number, any>}
+					 */
+					curves: new Map(),
+
+					/**
+					 * @type {Map<number, { 
+					 	T: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						R: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						S: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						}
+						}[]>}
+					 */
+					layers: new Map(),
+
+					/**
+					 * @type {Map.<number, any>}
+					 */
+					stacks: new Map(),
+					length: 0,
+					fps: 30,
+					frames: 0
+				};
+
+				/**
+				 * @type {Array.<{
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+					}>}
+				 */
+				var animationCurveNodes = [];
+				for ( var nodeID in rawNodes ) {
+
+					if ( nodeID.match( /\d+/ ) ) {
+
+						var animationNode = parseAnimationNode( FBXTree, rawNodes[ nodeID ], connections, sceneGraph );
+						animationCurveNodes.push( animationNode );
+
+					}
+
+				}
+
+				/**
+				 * @type {Map.<number, {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+							x: {
+								version: any,
+								id: number,
+								internalID: number,
+								times: number[],
+								values: number[],
+								attrFlag: number[],
+								attrData: number[],
+							},
+							y: {
+								version: any,
+								id: number,
+								internalID: number,
+								times: number[],
+								values: number[],
+								attrFlag: number[],
+								attrData: number[],
+							},
+							z: {
+								version: any,
+								id: number,
+								internalID: number,
+								times: number[],
+								values: number[],
+								attrFlag: number[],
+								attrData: number[],
+							}
+						}
+					}>}
+				 */
+				var tmpMap = new Map();
+				for ( var animationCurveNodeIndex = 0; animationCurveNodeIndex < animationCurveNodes.length; ++ animationCurveNodeIndex ) {
+
+					if ( animationCurveNodes[ animationCurveNodeIndex ] === null ) {
+
+						continue;
+
+					}
+					tmpMap.set( animationCurveNodes[ animationCurveNodeIndex ].id, animationCurveNodes[ animationCurveNodeIndex ] );
+
+				}
+
+
+				/**
+				 * @type {{
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+					}[]}
+				 */
+				var animationCurves = [];
+				for ( nodeID in rawCurves ) {
+
+					if ( nodeID.match( /\d+/ ) ) {
+
+						var animationCurve = parseAnimationCurve( rawCurves[ nodeID ] );
+						animationCurves.push( animationCurve );
+
+						var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
+						var firstParentID = firstParentConn.ID
+						var firstParentRelationship = firstParentConn.relationship;
+						var axis = '';
+
+						if ( firstParentRelationship.match( /X/ ) ) {
+
+							axis = 'x';
+
+						} else if ( firstParentRelationship.match( /Y/ ) ) {
+
+							axis = 'y';
+
+						} else if ( firstParentRelationship.match( /Z/ ) ) {
+
+							axis = 'z';
+
+						} else {
+
+							continue;
+
+						}
+
+						tmpMap.get( firstParentID ).curves[ axis ] = animationCurve;
+
+					}
+
+				}
+
+				tmpMap.forEach( function ( curveNode ) {
+
+					var id = curveNode.containerBoneID;
+					if ( ! returnObject.curves.has( id ) ) {
+
+						returnObject.curves.set( id, { T: null, R: null, S: null } );
+
+					}
+					returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+
+				} );
+
+				for ( var nodeID in rawLayers ) {
+
+					/**
+					 * @type {{ 
+					 	T: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						R: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						},
+						S: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							},
+						}
+						}[]}
+					 */
+					var layer = [];
+					var children = connections.get( parseInt( nodeID ) ).children;
+					for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
+
+						// Skip lockInfluenceWeights
+						if ( tmpMap.has( children[ childIndex ].ID ) ) {
+
+							var curveNode = tmpMap.get( children[ childIndex ].ID );
+							var boneID = curveNode.containerBoneID;
+							if ( layer[ boneID ] === undefined ) {
+
+								layer[ boneID ] = {
+									T: null,
+									R: null,
+									S: null
+								};
+
+							}
+
+							layer[ boneID ][ curveNode.attr ] = curveNode;
+
+						}
+
+					}
+
+					returnObject.layers.set( parseInt( nodeID ), layer );
+
+				}
+
+				for ( var nodeID in rawStacks ) {
+
+					var layers = [];
+					var children = connections.get( parseInt( nodeID ) ).children;
+					var maxTimeStamp = 0;
+					var minTimeStamp = Number.MAX_VALUE;
+					for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
+
+						if ( returnObject.layers.has( children[ childIndex ].ID ) ) {
+
+							var currentLayer = returnObject.layers.get( children[ childIndex ].ID );
+							layers.push( currentLayer );
+
+							for ( var curveIndex = 0; curveIndex < currentLayer.length; ++ curveIndex ) {
+
+								function getLayerMaxMinTimeStamps( layer ) {
+
+									function getCurveMaxMinTimeStamp( crv ) {
+
+										function getCurveAxisMaxMinTimeStamps( axis ) {
+
+											maxTimeStamp = axis.times[ axis.times.length - 1 ] > maxTimeStamp ? axis.times[ axis.times.length - 1 ] : maxTimeStamp;
+											minTimeStamp = axis.times[ 0 ] < minTimeStamp ? axis.times[ 0 ] : minTimeStamp;
+
+										}
+
+										if ( crv.x ) {
+
+											getCurveAxisMaxMinTimeStamps( crv.x );
+
+										}
+										if ( crv.y ) {
+
+											getCurveAxisMaxMinTimeStamps( crv.y );
+
+										}
+										if ( crv.z ) {
+
+											getCurveAxisMaxMinTimeStamps( crv.z );
+
+										}
+
+									}
+
+									if ( layer.R ) {
+
+										getCurveMaxMinTimeStamp( layer.R.curves );
+
+									}
+									if ( layer.S ) {
+
+										getCurveMaxMinTimeStamp( layer.S.curves );
+
+									}
+									if ( layer.T ) {
+
+										getCurveMaxMinTimeStamp( layer.T.curves );
+
+									}
+
+								}
+
+								var layer = currentLayer[ curveIndex ];
+								if ( layer ) {
+
+									getLayerMaxMinTimeStamps( layer );
+
+								}
+
+							}
+
+						}
+
+					}
+
+					// Do we have an animation clip with actual length?
+					if ( maxTimeStamp > minTimeStamp ) {
+
+						returnObject.stacks.set( parseInt( nodeID ), {
+							name: rawStacks[ nodeID ].attrName,
+							layers: layers,
+							length: maxTimeStamp - minTimeStamp,
+							frames: ( maxTimeStamp - minTimeStamp ) * 30
+						} );
+
+					}
+
+				}
+
+				return returnObject;
+
+				/**
+				 * @param {Object} FBXTree
+				 * @param {{id: number, attrName: string, properties: Object<string, any>}} animationCurveNode
+				 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+				 * @param {{skeleton: {bones: {FBX_ID: number}[]}}} sceneGraph
+				 */
+				function parseAnimationNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
+
+					var returnObject = {
+						/**
+						 * @type {number}
+						 */
+						id: animationCurveNode.id,
+
+						/**
+						 * @type {string}
+						 */
+						attr: animationCurveNode.attrName,
+
+						/**
+						 * @type {number}
+						 */
+						internalID: animationCurveNode.id,
+
+						/**
+						 * @type {boolean}
+						 */
+						attrX: false,
+
+						/**
+						 * @type {boolean}
+						 */
+						attrY: false,
+
+						/**
+						 * @type {boolean}
+						 */
+						attrZ: false,
+
+						/**
+						 * @type {number}
+						 */
+						containerBoneID: -1,
+
+						/**
+						 * @type {number}
+						 */
+						containerID: -1,
+
+						curves: {
+							x: null,
+							y: null,
+							z: null
+						}
+					};
+
+					if ( returnObject.attr.match( /S|R|T/ ) ) {
+
+						for ( var attributeKey in animationCurveNode.properties ) {
+
+							if ( attributeKey.match( /X/ ) ) {
+
+								returnObject.attrX = true;
+
+							}
+							if ( attributeKey.match( /Y/ ) ) {
+
+								returnObject.attrY = true;
+
+							}
+							if ( attributeKey.match( /Z/ ) ) {
+
+								returnObject.attrZ = true;
+
+							}
+
+						}
+
+					} else {
+
+						return null;
+
+					}
+
+					var conns = connections.get( returnObject.id );
+					var containerIndices = conns.parents;
+
+					for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
+
+						var boneID = sceneGraph.skeleton.bones.findIndex( function( bone ) {
+
+							return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+
+						} );
+						if ( boneID > -1 ) {
+
+							returnObject.containerBoneID = boneID;
+							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+							break;
+
+						}
+
+					}
+
+					return returnObject;
+
+				}
+
+				/**
+				 * @param {{id: number, subNodes: {KeyTime: {properties: {a: string}}, KeyValueFloat: {properties: {a: string}}, KeyAttrFlags: {properties: {a: string}}, KeyAttrDataFloat: {properties: {a: string}}}}} animationCurve
+				 */
+				function parseAnimationCurve( animationCurve ) {
+
+					return {
+						version: null,
+						id: animationCurve.id,
+						internalID: animationCurve.id,
+						times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( function ( time ) {
+
+							return ConvertFBXTimeToSeconds( time );
+
+						} ),
+						values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+
+						attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
+						attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+					};
+
+				}
+
+			}
+
+			/**
+			 * @param {{
+				curves: Map<number, {
+					T: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					R: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					S: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+				}>;
+				layers: Map<number, {
+					T: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					R: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+					S: {
+						id: number;
+						attr: string;
+						internalID: number;
+						attrX: boolean;
+						attrY: boolean;
+						attrZ: boolean;
+						containerBoneID: number;
+						containerID: number;
+						curves: {
+							x: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							y: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+							z: {
+								version: any;
+								id: number;
+								internalID: number;
+								times: number[];
+								values: number[];
+								attrFlag: number[];
+								attrData: number[];
+							};
+						};
+					};
+				}[]>;
+				stacks: Map<number, {
+					name: string;
+					layers: {
+						T: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						};
+						R: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						};
+						S: {
+							id: number;
+							attr: string;
+							internalID: number;
+							attrX: boolean;
+							attrY: boolean;
+							attrZ: boolean;
+							containerBoneID: number;
+							containerID: number;
+							curves: {
+								x: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								y: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+								z: {
+									version: any;
+									id: number;
+									internalID: number;
+									times: number[];
+									values: number[];
+									attrFlag: number[];
+									attrData: number[];
+								};
+							};
+						};
+					}[][];
+					length: number;
+					frames: number;
+				}>;
+				length: number;
+				fps: number;
+				frames: number;
+			}} animations,
+			 * @param {{skeleton: { bones: THREE.Bone[]}}} group
+			 */
+			function addAnimations( group, animations ) {
+
+				if ( group.animations === undefined ) {
+
+					group.animations = [];
+
+				}
+
+				animations.stacks.forEach( function ( stack ) {
+
+					var animationData = {
+						name: stack.name,
+						fps: 30,
+						length: stack.length,
+						hierarchy: []
+					}
+
+					var bones = group.skeleton.bones;
+
+					bones.forEach( function ( bone ) {
+
+						var name = bone.name.replace( /.*:/, '' );
+						var parentIndex = bones.findIndex( function ( parentBone ) {
+
+							return bone.parent === parentBone;
+
+						} );
+						animationData.hierarchy.push( { parent: parentIndex, name: name, keys: [] } );
+
+					} );
+
+					for ( var frame = 0; frame < stack.frames; frame ++ ) {
+
+						bones.forEach( function ( bone, boneIndex ) {
+
+							var animationNode = stack.layers[ 0 ][ boneIndex ];
+
+							animationData.hierarchy.forEach( function ( node ) {
+
+								if ( node.name === bone.name ) {
+
+									node.keys.push( generateKey( animationNode, bone, frame ) );
+
+								}
+
+							} );
+
+						} );
+
+					}
+
+					group.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
+
+
+					/**
+					 * @param {THREE.Bone} bone
+					 */
+					function generateKey( animationNode, bone, frame ) {
+
+						var key = {
+							time: frame / animations.fps,
+							pos: bone.position.toArray(),
+							rot: bone.quaternion.toArray(),
+							scl: bone.scale.toArray()
+						};
+
+						if ( animationNode === undefined ) {
+
+							return key;
+
+						}
+
+						try {
+
+							if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
+
+							key.pos = [ animationNode.T.curves.x.values[ frame ], animationNode.T.curves.y.values[ frame ], animationNode.T.curves.z.values[ frame ] ];
+
+							}
+
+							if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
+
+								var rotationX = degreeToRadian( animationNode.R.curves.x.values[ frame ] );
+								var rotationY = degreeToRadian( animationNode.R.curves.y.values[ frame ] );
+								var rotationZ = degreeToRadian( animationNode.R.curves.z.values[ frame ] );
+								var euler = new THREE.Euler( rotationX, rotationY, rotationZ, 'ZYX' );
+								key.rot = new THREE.Quaternion().setFromEuler( euler ).toArray();
+
+							}
+
+							if ( hasCurve( animationNode, 'S' ) && hasKeyOnFrame( animationNode.S, frame ) ) {
+
+								key.scl = [ animationNode.S.curves.x.values[ frame ], animationNode.S.curves.y.values[ frame ], animationNode.S.curves.z.values[ frame ] ];
+
+							}
+
+						} catch ( error ) {
+
+							// Curve is not fully plotted.
+							console.log( bone );
+							console.log( error );
+
+						}
+
+						return key;
+
+						function hasCurve( animationNode, attribute ) {
+
+							if ( animationNode === undefined ) {
+
+								return false;
+
+							}
+
+							var attributeNode = animationNode[ attribute ];
+							if ( ! attributeNode ) {
+
+								return false;
+
+							}
+
+							return [ 'x', 'y', 'z' ].every( function ( key ) {
+
+								return attributeNode.curves[ key ] !== undefined;
+
+							} );
+
+						}
+
+						function hasKeyOnFrame( attributeNode, frame ) {
+
+							return [ 'x', 'y', 'z' ].every( function ( key ) {
+
+								return isKeyExistOnFrame( attributeNode.curves[ key ], frame );
+
+								function isKeyExistOnFrame( curve, frame ) {
+
+									return curve.values[ frame ] !== undefined;
+
+								}
+
+							} );
+
+						}
+
+					}
+
+				} );
 
 			}
 
@@ -1996,6 +3560,18 @@
 	}
 
 	/**
+	 * Converts FBX ticks into real time seconds.
+	 * @param {number} time - FBX tick timestamp to convert.
+	 * @returns {number} - FBX tick in real world time.
+	 */
+	function ConvertFBXTimeToSeconds( time ) {
+
+		// Constant is FBX ticks per second.
+		return time / 46186158000;
+
+	}
+
+	/**
 	 * Parses comma separated list of float numbers and returns them in an array.
 	 * @example
 	 * // Returns [ 5.6, 9.4, 2.5, 1.4 ]
@@ -2032,6 +3608,17 @@
 	function parseMatrixArray( floatString ) {
 
 		return new THREE.Matrix4().fromArray( parseFloatArray( floatString ) );
+
+	}
+
+	/**
+	 * Converts number from degrees into radians.
+	 * @param {number} value
+	 * @returns {number}
+	 */
+	function degreeToRadian( value ) {
+
+		return value * Math.PI / 180;
 
 	}
 
