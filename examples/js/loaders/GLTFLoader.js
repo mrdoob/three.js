@@ -1107,10 +1107,6 @@ THREE.GLTFLoader = ( function () {
 
 					khr_material = material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
 
-				} else if ( json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
-
-					khr_material = json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
-
 				}
 
 				if ( khr_material ) {
