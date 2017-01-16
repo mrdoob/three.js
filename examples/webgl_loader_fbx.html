@@ -95,32 +95,13 @@
 				};
 
 				var loader = new THREE.FBXLoader( manager );
-				debugger;
-				loader.load( 'models/fbx/xsi_man.fbx', function( object ) {
+				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
 
-					object.traverse( function( child ) {
+					object.mixer = new THREE.AnimationMixer( object );
+					mixers.push( object.mixer );
 
-						// if ( child instanceof THREE.Mesh ) {
-
-						// 	// pass
-
-						// }
-
-						// if ( child instanceof THREE.SkinnedMesh ) {
-
-						// 	if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
-
-						// 		child.mixer = new THREE.AnimationMixer( child );
-						// 		mixers.push( child.mixer );
-
-						// 		var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
-						// 		action.play();
-
-						// 	}
-
-						// }
-
-					} );
+					var action = object.mixer.clipAction( object.animations[ 0 ] );
+					action.play();
 
 					scene.add( object );
 
@@ -128,20 +109,6 @@
 				}, onProgress, onError );
 
 				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
-
-					object.traverse( function( child ) {
-
-						if ( child instanceof THREE.Line ) {
-
-							child.material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 5 } );
-							// // Generate a more detailed geometry
-							// var nurbsGeometry = new THREE.Geometry();
-							// nurbsGeometry.vertices = child.userData.curve.getPoints( 100 );
-							// child.geometry = nurbsGeometry;
-
-						}
-
-					} );
 
 					scene.add( object );
 

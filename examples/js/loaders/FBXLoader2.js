@@ -3,10 +3,28 @@
  *
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII format.
+ *
+ * Supports:
+ * 	Mesh Generation (Positional Data)
+ * 	Normal Data (Per Vertex Drawing Instance)
+ *  UV Data (Per Vertex Drawing Instance)
+ *  Skinning
+ *  Animation
+ * 	- Separated Animations based on stacks.
+ * 	- Skeletal & Non-Skeletal Animations
+ *
+ * Needs Support:
+ * 	Indexed Buffers
+ * 	PreRotation support.
  */
 
 ( function () {
 
+	/**
+	 * Generates a loader for loading FBX files from URL and parsing into
+	 * a THREE.Group.
+	 * @param {THREE.LoadingManager} manager - Loading Manager for loader to use.
+	 */
 	THREE.FBXLoader = function ( manager ) {
 
 		THREE.Loader.call( this );
@@ -22,6 +40,15 @@
 
 	Object.assign( THREE.FBXLoader.prototype, {
 
+		/**
+		 * Loads an ASCII FBX file from URL and parses into a THREE.Group.
+		 * THREE.Group will have an animations property of AnimationClips
+		 * of the different animations exported with the FBX.
+		 * @param {string} url - URL of the FBX file.
+		 * @param {function(THREE.Group):void} onLoad - Callback for when FBX file is loaded and parsed.
+		 * @param {function(ProgressEvent):void} onProgress - Callback fired periodically when file is being retrieved from server.
+		 * @param {function(Event):void} onError - Callback fired when error occurs (Currently only with retrieving file, not with parsing errors).
+		 */
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var self = this;
@@ -35,12 +62,14 @@
 				if ( ! isFbxFormatASCII( text ) ) {
 
 					console.error( 'FBXLoader: FBX Binary format not supported.' );
+					self.manager.itemError( url );
 					return;
 
 				}
 				if ( getFbxVersion( text ) < 7000 ) {
 
 					console.error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
+					self.manager.itemError( url );
 					return;
 
 				}
@@ -52,6 +81,14 @@
 
 		},
 
+		/**
+		 * Parses an ASCII FBX file and returns a THREE.Group.
+		 * THREE.Group will have an animations property of AnimationClips
+		 * of the different animations within the FBX file.
+		 * @param {string} FBXText - Contents of FBX file to parse.
+		 * @param {string} resourceDirectory - Directory to load external assets (e.g. textures ) from.
+		 * @returns {THREE.Group}
+		 */
 		parse: function ( FBXText, resourceDirectory ) {
 
 			var loader = this;
@@ -62,17 +99,77 @@
 
 			var connections = parseConnections( FBXTree );
 
+			var textures = parseTextures( FBXTree );
+
+			var materials = parseMaterials( FBXTree, textures, connections );
+
+			var deformerMap = parseDeformers( FBXTree, connections );
+
+			var geometryMap = parseGeometries( FBXTree, connections, deformerMap );
+
+			console.log( geometryMap );
+
+			var sceneGraph = parseScene( FBXTree, connections, deformerMap, geometryMap, materials );
+
+			console.log( sceneGraph );
+
+			return sceneGraph;
+
+
 			/**
+			 * @typedef {{value: number}} FBXValue
+			 */
+			/**
+			 * @typedef {{value: {x: string, y: string, z: string}}} FBXVector3
+			 */
+			/**
+			 * @typedef {{properties: {a: string}}} FBXArrayNode
+			 */
+			/**
+			 * @typedef {{properties: {MappingInformationType: string, ReferenceInformationType: string }, subNodes: Object<string, FBXArrayNode>}} FBXMappedArrayNode
+			 */
+			/**
+			 * @typedef {{id: number, name: string, properties: {FileName: string}}} FBXTextureNode
+			 */
+			/**
+			 * @typedef {{id: number, attrName: string, properties: {ShadingModel: string, Diffuse: FBXVector3, Specular: FBXVector3, Shininess: FBXValue, Emissive: FBXVector3, EmissiveFactor: FBXValue, Opacity: FBXValue}}} FBXMaterialNode
+			 */
+			/**
+			 * @typedef {{subNodes: {Indexes: FBXArrayNode, Weights: FBXArrayNode, Transform: FBXArrayNode, TransformLink: FBXArrayNode}, properties: { Mode: string }}} FBXSubDeformerNode
+			 */
+			/**
+			 * @typedef {{id: number, attrName: string, attrType: string, subNodes: {Vertices: FBXArrayNode, PolygonVertexIndex: FBXArrayNode, LayerElementNormal: FBXMappedArrayNode[], LayerElementMaterial: FBXMappedArrayNode[], LayerElementUV: FBXMappedArrayNode[]}}} FBXGeometryNode
+			 */
+			/**
+			 * @typedef {{id: number, attrName: string, attrType: string, properties: {Lcl_Translation: FBXValue, Lcl_Rotation: FBXValue, Lcl_Scaling: FBXValue}}} FBXModelNode
+			 */
+			/**
+			 * @typedef {{}}
+			 */
+
+
+
+
+
+
+
+
+			/**
+			 * Parses map of relationships between objects.
+			 * @param {{Connections: { properties: { connections: [number, number, string][]}}}} FBXTree
 			 * @returns {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>}
 			 */
 			function parseConnections( FBXTree ) {
 
+				/**
+				 * @type {Map<number, { parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>}
+				 */
 				var connectionMap = new Map();
 
 				if ( 'Connections' in FBXTree ) {
 
 					/**
-					 * @type {number[]}
+					 * @type {[number, number, string][]}
 					 */
 					var connectionArray = FBXTree.Connections.properties.connections;
 					connectionArray.forEach( function ( connection ) {
@@ -109,10 +206,16 @@
 
 			}
 
-			var textures = parseTextures( FBXTree );
-
+			/**
+			 * Parses map of textures referenced in FBXTree.
+			 * @param {{Objects: {subNodes: {Texture: Object.<string, FBXTextureNode>}}}} FBXTree
+			 * @returns {Map<number, THREE.Texture>}
+			 */
 			function parseTextures( FBXTree ) {
 
+				/**
+				 * @type {Map<number, THREE.Texture>}
+				 */
 				var textureMap = new Map();
 
 				if ( 'Texture' in FBXTree.Objects.subNodes ) {
@@ -129,6 +232,10 @@
 
 				return textureMap;
 
+				/**
+				 * @param {textureNode} textureNode - Node to get texture information from.
+				 * @returns {THREE.Texture}
+				 */
 				function parseTexture( textureNode ) {
 
 					var FBX_ID = textureNode.id;
@@ -144,6 +251,9 @@
 						var fileName = filePath;
 
 					}
+					/**
+					 * @type {THREE.Texture}
+					 */
 					var texture = loader.textureLoader.load( resourceDirectory + '/' + fileName );
 					texture.name = name;
 					texture.FBX_ID = FBX_ID;
@@ -154,10 +264,12 @@
 
 			}
 
-			var materials = parseMaterials( FBXTree, textures, connections );
-
 			/**
+			 * Parses map of Material information.
+			 * @param {{Objects: {subNodes: {Material: Object.<number, FBXMaterialNode>}}}} FBXTree
+			 * @param {Map<number, THREE.Texture>} textureMap
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+			 * @returns {Map<number, THREE.Material>}
 			 */
 			function parseMaterials( FBXTree, textureMap, connections ) {
 
@@ -178,7 +290,11 @@
 				return materialMap;
 
 				/**
+				 * Takes information from Material node and returns a generated THREE.Material
+				 * @param {FBXMaterialNode} materialNode
+				 * @param {Map<number, THREE.Texture>} textureMap
 				 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+				 * @returns {THREE.Material}
 				 */
 				function parseMaterial( materialNode, textureMap, connections ) {
 
@@ -212,7 +328,16 @@
 					return material;
 
 					/**
+					 * @typedef {{Diffuse: FBXVector3, Specular: FBXVector3, Shininess: FBXValue, Emissive: FBXVector3, EmissiveFactor: FBXValue, Opacity: FBXValue}} FBXMaterialProperties
+					 */
+					/**
+					 * @typedef {{color: THREE.Color=, specular: THREE.Color=, shininess: number=, emissive: THREE.Color=, emissiveIntensity: number=, opacity: number=, transparent: boolean=, map: THREE.Texture=}} THREEMaterialParameterPack
+					 */
+					/**
+					 * @param {FBXMaterialProperties} properties
+					 * @param {Map<number, THREE.Texture>} textureMap
 					 * @param {{ID: number, relationship: string}[]} childrenRelationships
+					 * @returns {THREEMaterialParameterPack}
 					 */
 					function parseParameters( properties, textureMap, childrenRelationships ) {
 
@@ -283,13 +408,9 @@
 
 			}
 
-			console.log( materials );
-
-			var deformerMap = parseDeformers( FBXTree, connections );
-
-			console.log( deformerMap );
-
 			/**
+			 * Generates map of Skeleton-like objects for use later when generating and binding skeletons.
+			 * @param {{Objects: {subNodes: {Deformer: Object.<number, FBXSubDeformerNode>}}}} FBXTree
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 * @returns {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>}
 			 */
@@ -306,7 +427,7 @@
 						if ( deformerNode.attrType === 'Skin' ) {
 
 							var conns = connections.get( parseInt( nodeID ) );
-							var skeleton = parseSkeleton( deformerNode, conns, DeformerNodes );
+							var skeleton = parseSkeleton( conns, DeformerNodes );
 							skeleton.FBX_ID = parseInt( nodeID );
 							skeletonMap.set( parseInt( nodeID ), skeleton );
 
@@ -319,10 +440,12 @@
 				return skeletonMap;
 
 				/**
+				 * Generates a "Skeleton Representation" of FBX nodes based on an FBX Skin Deformer's connections and an object containing SubDeformer nodes.
 				 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} connections
+				 * @param {Object.<number, FBXSubDeformerNode>} DeformerNodes
 				 * @returns {{map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}}
 				 */
-				function parseSkeleton( deformerNode, connections, DeformerNodes ) {
+				function parseSkeleton( connections, DeformerNodes ) {
 
 					var subDeformers = new Map();
 					var subDeformerArray = [];
@@ -352,11 +475,9 @@
 
 			}
 
-			var geometryMap = parseGeometries( FBXTree, connections, deformerMap );
-
-			console.log( geometryMap );
-
 			/**
+			 * Generates Buffer geometries from geometry information in FBXTree, and generates map of THREE.BufferGeometries
+			 * @param {{Objects: {subNodes: {Geometry: Object.<number, FBXGeometryNode}}}} FBXTree
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformerMap
 			 * @returns {Map<number, THREE.BufferGeometry>}
@@ -381,8 +502,11 @@
 				return geometryMap;
 
 				/**
+				 * Generates BufferGeometry from FBXGeometryNode.
+				 * @param {FBXGeometryNode} geometryNode
 				 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
 				 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap
+				 * @returns {THREE.BufferGeometry}
 				 */
 				function parseGeometry( geometryNode, relationships, deformerMap ) {
 
@@ -399,8 +523,11 @@
 					}
 
 					/**
-					 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
-					 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap
+					 * Specialty function for parsing Mesh based Geometry Nodes.
+					 * @param {FBXGeometryNode} geometryNode
+					 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships - Object representing relationships between specific geometry node and other nodes.
+					 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap - Map object of deformers and subDeformers by ID.
+					 * @returns {THREE.BufferGeometry}
 					 */
 					function parseMeshGeometry( geometryNode, relationships, deformerMap ) {
 
@@ -422,7 +549,7 @@
 						return geometry;
 
 						/**
-						 * @param {{map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}} deformer
+						 * @param {{map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}} deformer - Skeleton representation for geometry instance.
 						 * @returns {THREE.BufferGeometry}
 						 */
 						function genGeometry( geometryNode, deformer ) {
@@ -469,6 +596,9 @@
 								var weights = [];
 								vertex.position.fromArray( vertexBuffer, vertexIndex * 3 );
 
+								// If we have a deformer for this geometry, get the skinIndex and skinWeights for this object.
+								// They are stored as vertex indices on each deformer, and we need them as deformer indices
+								// for each vertex.
 								if ( deformer ) {
 
 									for ( var j = 0; j < deformer.array.length; ++ j ) {
@@ -521,8 +651,6 @@
 										weights = Weight;
 
 									}
-
-									if ( weights.length === 0 ) { debugger; }
 
 									for ( var i = weights.length; i < 4; i ++ ) {
 
@@ -602,6 +730,7 @@
 
 							}
 
+							// Convert the material indices of each vertex into rendering groups on the geometry.
 							var prevMaterialIndex = bufferInfo.materialIndexBuffer[ 0 ];
 							var startIndex = 0;
 							for ( var materialBufferIndex = 0; materialBufferIndex < bufferInfo.materialIndexBuffer.length; ++ materialBufferIndex ) {
@@ -619,6 +748,8 @@
 							return geo;
 
 							/**
+							 * Parses normal information for geometry.
+							 * @param {FBXGeometryNode} geometryNode
 							 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 							 */
 							function getNormals( geometryNode ) {
@@ -646,6 +777,8 @@
 							}
 
 							/**
+							 * Parses UV information for geometry.
+							 * @param {FBXGeometryNode} geometryNode
 							 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 							 */
 							function getUVs( geometryNode ) {
@@ -673,6 +806,8 @@
 							}
 
 							/**
+							 * Parses material application information for geometry.
+							 * @param {FBXGeometryNode}
 							 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 							 */
 							function getMaterials( geometryNode ) {
@@ -809,15 +944,17 @@
 					}
 
 					/**
+					 * Specialty function for parsing NurbsCurve based Geometry Nodes.
+					 * @param {FBXGeometryNode} geometryNode
 					 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
-					 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap
+					 * @returns {THREE.BufferGeometry}
 					 */
-					function parseNurbsGeometry( geometryNode, relationships, deformerMap ) {
+					function parseNurbsGeometry( geometryNode, relationships ) {
 
 						if ( THREE.NURBSCurve === undefined ) {
 
 							console.error( "THREE.FBXLoader relies on THREE.NURBSCurve for any nurbs present in the model.  Nurbs will show up as empty geometry." );
-							return new Geometry();
+							return new THREE.BufferGeometry();
 
 						}
 
@@ -826,7 +963,7 @@
 						if ( isNaN( order ) ) {
 
 							console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
-							return new Geometry();
+							return new THREE.BufferGeometry();
 
 						}
 
@@ -868,14 +1005,9 @@
 
 			}
 
-			var sceneGraph = parseScene( FBXTree, connections, deformerMap, geometryMap, materials );
-
-			console.log( sceneGraph );
-
-			return sceneGraph;
-
 			/**
 			 * Finally generates Scene graph and Scene graph Objects.
+			 * @param {{Objects: {subNodes: {Model: Object.<number, FBXModelNode>}}}} FBXTree
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformerMap
 			 * @param {Map<number, THREE.BufferGeometry>} geometryMap
@@ -1000,8 +1132,10 @@
 									}
 
 								} );
-								
-								model = new THREE.Line( geometry );
+
+								// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
+								material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 5 } );
+								model = new THREE.Line( geometry, material );
 								break;
 
 							default:
@@ -1056,7 +1190,7 @@
 							return mod.FBX_ID === conns.parents[ parentIndex ].ID;
 
 						} );
-						if ( pIndex > -1 ) {
+						if ( pIndex > - 1 ) {
 
 							modelArray[ pIndex ].add( model );
 							break;
@@ -1071,8 +1205,6 @@
 					}
 
 				} );
-
-				debugger;
 
 
 				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
@@ -1199,6 +1331,8 @@
 			}
 
 			/**
+			 * Parses animation information from FBXTree and generates an AnimationInfoObject.
+			 * @param {{Objects: {subNodes: {AnimationCurveNode: any, AnimationCurve: any, AnimationLayer: any, AnimationStack: any}}}} FBXTree
 			 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
 			 */
 			function parseAnimations( FBXTree, connections, sceneGraph ) {
@@ -1329,7 +1463,7 @@
 							};
 						}
 					 }>,
-					 layers: Map<number, { 
+					 layers: Map<number, {
 					 	T: {
 							id: number;
 							attr: string;
@@ -1577,137 +1711,8 @@
 				 }}
 				 */
 				var returnObject = {
-					/**
-					 * @type {Map.<number, any>}
-					 */
 					curves: new Map(),
-
-					/**
-					 * @type {Map<number, { 
-					 	T: {
-							id: number;
-							attr: string;
-							internalID: number;
-							attrX: boolean;
-							attrY: boolean;
-							attrZ: boolean;
-							containerBoneID: number;
-							containerID: number;
-							curves: {
-								x: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								y: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								z: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-							},
-						},
-						R: {
-							id: number;
-							attr: string;
-							internalID: number;
-							attrX: boolean;
-							attrY: boolean;
-							attrZ: boolean;
-							containerBoneID: number;
-							containerID: number;
-							curves: {
-								x: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								y: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								z: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-							},
-						},
-						S: {
-							id: number;
-							attr: string;
-							internalID: number;
-							attrX: boolean;
-							attrY: boolean;
-							attrZ: boolean;
-							containerBoneID: number;
-							containerID: number;
-							curves: {
-								x: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								y: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-								z: {
-									version: any;
-									id: number;
-									internalID: number;
-									times: number[];
-									values: number[];
-									attrFlag: number[];
-									attrData: number[];
-								};
-							},
-						}
-						}[]>}
-					 */
 					layers: new Map(),
-
-					/**
-					 * @type {Map.<number, any>}
-					 */
 					stacks: new Map(),
 					length: 0,
 					fps: 30,
@@ -1812,7 +1817,7 @@
 						animationCurves.push( animationCurve );
 
 						var firstParentConn = connections.get( animationCurve.id ).parents[ 0 ];
-						var firstParentID = firstParentConn.ID
+						var firstParentID = firstParentConn.ID;
 						var firstParentRelationship = firstParentConn.relationship;
 						var axis = '';
 
@@ -1855,7 +1860,7 @@
 				for ( var nodeID in rawLayers ) {
 
 					/**
-					 * @type {{ 
+					 * @type {{
 					 	T: {
 							id: number;
 							attr: string;
@@ -2017,12 +2022,178 @@
 							var currentLayer = returnObject.layers.get( children[ childIndex ].ID );
 							layers.push( currentLayer );
 
-							for ( var curveIndex = 0; curveIndex < currentLayer.length; ++ curveIndex ) {
+							currentLayer.forEach( function ( layer ) {
 
-								function getLayerMaxMinTimeStamps( layer ) {
+								if ( layer ) {
 
-									function getCurveMaxMinTimeStamp( crv ) {
+									getCurveNodeMaxMinTimeStamps( layer );
 
+								}
+
+								/**
+								 * Sets the maxTimeStamp and minTimeStamp variables if it has timeStamps that are either larger or smaller
+								 * than the max or min respectively.
+								 * @param {{
+											T: {
+													id: number,
+													attr: string,
+													internalID: number,
+													attrX: boolean,
+													attrY: boolean,
+													attrZ: boolean,
+													containerBoneID: number,
+													containerID: number,
+													curves: {
+															x: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															y: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															z: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+													},
+											},
+											R: {
+													id: number,
+													attr: string,
+													internalID: number,
+													attrX: boolean,
+													attrY: boolean,
+													attrZ: boolean,
+													containerBoneID: number,
+													containerID: number,
+													curves: {
+															x: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															y: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															z: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+													},
+											},
+											S: {
+													id: number,
+													attr: string,
+													internalID: number,
+													attrX: boolean,
+													attrY: boolean,
+													attrZ: boolean,
+													containerBoneID: number,
+													containerID: number,
+													curves: {
+															x: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															y: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+															z: {
+																	version: any,
+																	id: number,
+																	internalID: number,
+																	times: number[],
+																	values: number[],
+																	attrFlag: number[],
+																	attrData: number[],
+															},
+													},
+											},
+									}} layer
+								 */
+								function getCurveNodeMaxMinTimeStamps( layer ) {
+
+									/**
+									 * Sets the maxTimeStamp and minTimeStamp if one of the curve's time stamps
+									 * exceeds the maximum or minimum.
+									 * @param {{
+												x: {
+														version: any,
+														id: number,
+														internalID: number,
+														times: number[],
+														values: number[],
+														attrFlag: number[],
+														attrData: number[],
+												},
+												y: {
+														version: any,
+														id: number,
+														internalID: number,
+														times: number[],
+														values: number[],
+														attrFlag: number[],
+														attrData: number[],
+												},
+												z: {
+														version: any,
+														id: number,
+														internalID: number,
+														times: number[],
+														values: number[],
+														attrFlag: number[],
+														attrData: number[],
+												}
+										}} curve
+									 */
+									function getCurveMaxMinTimeStamp( curve ) {
+
+										/**
+										 * Sets the maxTimeStamp and minTimeStamp if one of its timestamps exceeds the maximum or minimum.
+										 * @param {{times: number[]}} axis
+										 */
 										function getCurveAxisMaxMinTimeStamps( axis ) {
 
 											maxTimeStamp = axis.times[ axis.times.length - 1 ] > maxTimeStamp ? axis.times[ axis.times.length - 1 ] : maxTimeStamp;
@@ -2030,19 +2201,19 @@
 
 										}
 
-										if ( crv.x ) {
+										if ( curve.x ) {
 
-											getCurveAxisMaxMinTimeStamps( crv.x );
-
-										}
-										if ( crv.y ) {
-
-											getCurveAxisMaxMinTimeStamps( crv.y );
+											getCurveAxisMaxMinTimeStamps( curve.x );
 
 										}
-										if ( crv.z ) {
+										if ( curve.y ) {
 
-											getCurveAxisMaxMinTimeStamps( crv.z );
+											getCurveAxisMaxMinTimeStamps( curve.y );
+
+										}
+										if ( curve.z ) {
+
+											getCurveAxisMaxMinTimeStamps( curve.z );
 
 										}
 
@@ -2066,14 +2237,7 @@
 
 								}
 
-								var layer = currentLayer[ curveIndex ];
-								if ( layer ) {
-
-									getLayerMaxMinTimeStamps( layer );
-
-								}
-
-							}
+							} );
 
 						}
 
@@ -2137,12 +2301,12 @@
 						/**
 						 * @type {number}
 						 */
-						containerBoneID: -1,
+						containerBoneID: - 1,
 
 						/**
 						 * @type {number}
 						 */
-						containerID: -1,
+						containerID: - 1,
 
 						curves: {
 							x: null,
@@ -2184,12 +2348,12 @@
 
 					for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
 
-						var boneID = sceneGraph.skeleton.bones.findIndex( function( bone ) {
+						var boneID = sceneGraph.skeleton.bones.findIndex( function ( bone ) {
 
 							return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
 
 						} );
-						if ( boneID > -1 ) {
+						if ( boneID > - 1 ) {
 
 							returnObject.containerBoneID = boneID;
 							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
@@ -2612,7 +2776,7 @@
 						fps: 30,
 						length: stack.length,
 						hierarchy: []
-					}
+					};
 
 					var bones = group.skeleton.bones;
 
@@ -2673,7 +2837,7 @@
 
 							if ( hasCurve( animationNode, 'T' ) && hasKeyOnFrame( animationNode.T, frame ) ) {
 
-							key.pos = [ animationNode.T.curves.x.values[ frame ], animationNode.T.curves.y.values[ frame ], animationNode.T.curves.z.values[ frame ] ];
+								key.pos = [ animationNode.T.curves.x.values[ frame ], animationNode.T.curves.y.values[ frame ], animationNode.T.curves.z.values[ frame ] ];
 
 							}
 
@@ -2753,7 +2917,7 @@
 			// UTILS
 			/**
 			 * Parses Vector3 property from FBXTree.  Property is given as .value.x, .value.y, etc.
-			 * @param {{value: { x: string, y: string, z: string }}} property - Property to parse as Vector3.
+			 * @param {FBXVector3} property - Property to parse as Vector3.
 			 * @returns {THREE.Vector3}
 			 */
 			function parseVector3( property ) {
@@ -2764,7 +2928,7 @@
 
 			/**
 			 * Parses Color property from FBXTree.  Property is given as .value.x, .value.y, etc.
-			 * @param {{value: { x: string, y: string, z: string }}} property - Property to parse as Color.
+			 * @param {FBXVector3} property - Property to parse as Color.
 			 * @returns {THREE.Color}
 			 */
 			function parseColor( property ) {
