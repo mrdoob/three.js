@@ -18,7 +18,7 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 	var center = divisions / 2;
 	var step = size / divisions;
-	var halfSize = size * 0.5;
+	var halfSize = size / 2;
 
 	var vertices = [], colors = [];
 
