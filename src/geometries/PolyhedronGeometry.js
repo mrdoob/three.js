@@ -35,7 +35,6 @@ import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
-import { Sphere } from '../math/Sphere';
 
 function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
@@ -76,8 +75,6 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 	this.normalizeNormals();
-
-	this.boundingSphere = new Sphere( new Vector3(), radius );
 
 	// helper functions
 

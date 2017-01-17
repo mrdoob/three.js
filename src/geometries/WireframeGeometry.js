@@ -9,13 +9,9 @@ function WireframeGeometry( geometry ) {
 
 	BufferGeometry.call( this );
 
+	this.type = 'WireframeGeometry';
+
 	var edge = [ 0, 0 ], hash = {};
-
-	function sortFunction( a, b ) {
-
-		return a - b;
-
-	}
 
 	var keys = [ 'a', 'b', 'c' ];
 
@@ -176,6 +172,14 @@ function WireframeGeometry( geometry ) {
 			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
 
 		}
+
+	}
+
+	// custom array sort function
+
+	function sortFunction( a, b ) {
+
+		return a - b;
 
 	}
 
