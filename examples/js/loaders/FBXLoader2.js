@@ -95,8 +95,6 @@
 
 			var FBXTree = new TextParser().parse( FBXText );
 
-			console.log( FBXTree );
-
 			var connections = parseConnections( FBXTree );
 
 			var textures = parseTextures( FBXTree );
@@ -107,11 +105,7 @@
 
 			var geometryMap = parseGeometries( FBXTree, connections, deformerMap );
 
-			console.log( geometryMap );
-
 			var sceneGraph = parseScene( FBXTree, connections, deformerMap, geometryMap, materials );
-
-			console.log( sceneGraph );
 
 			return sceneGraph;
 
@@ -142,9 +136,6 @@
 			 */
 			/**
 			 * @typedef {{id: number, attrName: string, attrType: string, properties: {Lcl_Translation: FBXValue, Lcl_Rotation: FBXValue, Lcl_Scaling: FBXValue}}} FBXModelNode
-			 */
-			/**
-			 * @typedef {{}}
 			 */
 
 
