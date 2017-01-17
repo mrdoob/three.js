@@ -27,7 +27,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	// helper variables
 
 	var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
-	var edge = [ 0, 0 ], hash = {};
+	var edge = [ 0, 0 ], edges = {};
 	var key, keys = [ 'a', 'b', 'c' ];
 
 	// prepare source geometry
@@ -51,7 +51,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	var sourceVertices = geometry2.vertices;
 	var faces = geometry2.faces;
 
-	// now create a data structure (hash) where each entry represents an edge with its adjoining faces
+	// now create a data structure where each entry represents an edge with its adjoining faces
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -65,13 +65,13 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 			key = edge.toString();
 
-			if ( hash[ key ] === undefined ) {
+			if ( edges[ key ] === undefined ) {
 
-				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
+				edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ], face1: i, face2: undefined };
 
 			} else {
 
-				hash[ key ].face2 = i;
+				edges[ key ].face2 = i;
 
 			}
 
@@ -81,18 +81,18 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	// generate vertices
 
-	for ( key in hash ) {
+	for ( key in edges ) {
 
-		var h = hash[ key ];
+		var e = edges[ key ];
 
 		// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
-		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
+		if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
 
-			var vertex = sourceVertices[ h.vert1 ];
+			var vertex = sourceVertices[ e.index1 ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
-			vertex = sourceVertices[ h.vert2 ];
+			vertex = sourceVertices[ e.index2 ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
 		}
