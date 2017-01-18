@@ -125,7 +125,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 		}
 
-		geometry.setIndex( new ( vertices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( indices, 1 ) );
+		geometry.setIndex( new ( Math.max.apply( Math, indices ) > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( indices, 1 ) );
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		if ( normals.length > 0 ) {

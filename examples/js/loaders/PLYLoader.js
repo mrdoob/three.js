@@ -313,7 +313,7 @@ THREE.PLYLoader.prototype = {
 			// mandatory buffer data
 
 			if ( buffer.indices.length > 0 ) {
-				geometry.setIndex( new ( buffer.vertices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
+				geometry.setIndex( new ( Math.max.apply( Math, buffer.indices ) > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
 			}
 			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
 
