@@ -235,7 +235,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		// console.timeEnd( 'wireframe' );
 
-		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
+		var TypeArray = Math.max.apply( Math, indices ) > 65535 ? Uint32Array : Uint16Array;
 		var attribute = new BufferAttribute( new TypeArray( indices ), 1 );
 
 		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );

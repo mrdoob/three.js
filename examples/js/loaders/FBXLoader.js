@@ -263,7 +263,7 @@
 
 				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
 
-					if ( geoNode.indices.length > 65535 ) {
+					if ( Math.max.apply( Math, geoNode.indices ) > 65535 ) {
 
 						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint32Array( geoNode.indices ), 1 ) );
 
