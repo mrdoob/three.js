@@ -219,6 +219,12 @@ Interpolant.prototype = {
 			stride = this.valueSize,
 			offset = index * stride;
 
+		if ( !Array.isArray( result ) || !Array.isArray( values ) ) {
+			
+			return [];
+
+		}
+
 		for ( var i = 0; i !== stride; ++ i ) {
 
 			result[ i ] = values[ offset + i ];

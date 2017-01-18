@@ -70,6 +70,10 @@ test( "copySampleValue_", function() {
 	deepEqual( interpolant.copySampleValue_( 1 ), [ 2, 22 ], "sample fetch (1)" );
 	deepEqual( interpolant.copySampleValue_( 2 ), [ 3, 33 ], "first sample (2)" );
 
+	interpolant = new Mock( [ 11, 22, 33 ], null, 1, null );
+
+	deepEqual( interpolant.copySampleValue_( 0 ), [ ], "first sample (0) with no result buffer" );
+	
 } );
 
 test( "evaluate -> intervalChanged_ / interpolate_", function() {
