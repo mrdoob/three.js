@@ -257,9 +257,9 @@ URL = 'url'
 WRAP = 'wrap'
 REPEAT = 'repeat'
 WRAPPING = type('Wrapping', (), {
-    'REPEAT': 'RepeatWrapping',
-    'CLAMP': 'ClampToEdgeWrapping',
-    'MIRROR': 'MirroredRepeatWrapping'
+    'REPEAT': 'repeat',
+    'CLAMP': 'clamp',
+    'MIRROR': 'mirror'
 })
 ANISOTROPY = 'anisotropy'
 MAG_FILTER = 'magFilter'
