@@ -15340,7 +15340,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 	function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-		var segmentWidth	= width / gridX;
+		var segmentWidth = width / gridX;
 		var segmentHeight = height / gridY;
 
 		var widthHalf = width / 2;
@@ -24049,13 +24049,9 @@ function WireframeGeometry( geometry ) {
 
 	BufferGeometry.call( this );
 
+	this.type = 'WireframeGeometry';
+
 	var edge = [ 0, 0 ], hash = {};
-
-	function sortFunction( a, b ) {
-
-		return a - b;
-
-	}
 
 	var keys = [ 'a', 'b', 'c' ];
 
@@ -24219,6 +24215,14 @@ function WireframeGeometry( geometry ) {
 
 	}
 
+	// custom array sort function
+
+	function sortFunction( a, b ) {
+
+		return a - b;
+
+	}
+
 }
 
 WireframeGeometry.prototype = Object.create( BufferGeometry.prototype );
@@ -24272,11 +24276,11 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// buffers
 
+	var indices = [];
 	var vertices = [];
 	var uvs = [];
 
-	var i, j, p;
-	var u, v;
+	var i, j;
 
 	// generate vertices and uvs
 
@@ -24284,13 +24288,13 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	for ( i = 0; i <= stacks; i ++ ) {
 
-		v = i / stacks;
+		var v = i / stacks;
 
 		for ( j = 0; j <= slices; j ++ ) {
 
-			u = j / slices;
+			var u = j / slices;
 
-			p = func( u, v );
+			var p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
 
 			uvs.push( u, v );
@@ -24301,17 +24305,14 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate indices
 
-	var indices = [];
-	var a, b, c, d;
-
 	for ( i = 0; i < stacks; i ++ ) {
 
 		for ( j = 0; j < slices; j ++ ) {
 
-			a = i * sliceCount + j;
-			b = i * sliceCount + j + 1;
-			c = ( i + 1 ) * sliceCount + j + 1;
-			d = ( i + 1 ) * sliceCount + j;
+			var a = i * sliceCount + j;
+			var b = i * sliceCount + j + 1;
+			var c = ( i + 1 ) * sliceCount + j + 1;
+			var d = ( i + 1 ) * sliceCount + j;
 
 			// faces one and two
 
@@ -24407,8 +24408,6 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 	this.normalizeNormals();
-
-	this.boundingSphere = new Sphere( new Vector3(), radius );
 
 	// helper functions
 
@@ -27523,25 +27522,32 @@ ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
 
 /**
  * @author WestLangley / http://github.com/WestLangley
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 function EdgesGeometry( geometry, thresholdAngle ) {
 
 	BufferGeometry.call( this );
 
+	this.type = 'EdgesGeometry';
+
+	this.parameters = {
+		thresholdAngle: thresholdAngle
+	};
+
 	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
+	// buffer
+
+	var vertices = [];
+
+	// helper variables
+
 	var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
-
 	var edge = [ 0, 0 ], hash = {};
+	var key, keys = [ 'a', 'b', 'c' ];
 
-	function sortFunction( a, b ) {
-
-		return a - b;
-
-	}
-
-	var keys = [ 'a', 'b', 'c' ];
+	// prepare source geometry
 
 	var geometry2;
 
@@ -27559,8 +27565,10 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	geometry2.mergeVertices();
 	geometry2.computeFaceNormals();
 
-	var vertices = geometry2.vertices;
+	var sourceVertices = geometry2.vertices;
 	var faces = geometry2.faces;
+
+	// now create a data structure (hash) where each entry represents an edge with its adjoining faces
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -27572,7 +27580,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 			edge.sort( sortFunction );
 
-			var key = edge.toString();
+			key = edge.toString();
 
 			if ( hash[ key ] === undefined ) {
 
@@ -27588,31 +27596,37 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	}
 
-	var coords = [];
+	// generate vertices
 
-	for ( var key in hash ) {
+	for ( key in hash ) {
 
 		var h = hash[ key ];
 
-		// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+		// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
 		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
-			var vertex = vertices[ h.vert1 ];
-			coords.push( vertex.x );
-			coords.push( vertex.y );
-			coords.push( vertex.z );
+			var vertex = sourceVertices[ h.vert1 ];
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
-			vertex = vertices[ h.vert2 ];
-			coords.push( vertex.x );
-			coords.push( vertex.y );
-			coords.push( vertex.z );
+			vertex = sourceVertices[ h.vert2 ];
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 		}
 
 	}
 
-	this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
+	// build geometry
+
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+	// custom array sort function
+
+	function sortFunction( a, b ) {
+
+		return a - b;
+
+	}
 
 }
 
