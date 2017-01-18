@@ -9,9 +9,9 @@
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
 //
-//	  Orbit - left mouse / touch: one finger move
-//	  Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
-//	  Pan - right mouse, or arrow keys / touch: three finger swipe, or two fingers combined with zoom
+//    Orbit - left mouse / touch: one finger move
+//    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
+//    Pan - right mouse, or arrow keys / touch: three finger swipe, or two fingers combined with zoom
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -266,15 +266,23 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
+	function getDomElement() {
+
+		return scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+	}
+
 	function getAutoRotationAngle() {
 
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
 
 	}
 
-	function getZoomScale() {
+	function getZoomScale( speedMultiplier ) {
 
-		return Math.pow( 0.95, scope.zoomSpeed );
+		speedMultiplier = speedMultiplier || 1.0;
+
+		return Math.pow( 0.95, scope.zoomSpeed * speedMultiplier );
 
 	}
 
@@ -327,7 +335,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		return function pan( deltaX, deltaY ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = getDomElement();
 
 			if ( scope.object instanceof THREE.PerspectiveCamera ) {
 
@@ -438,7 +446,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		rotateEnd.set( event.clientX, event.clientY );
 		rotateDelta.subVectors( rotateEnd, rotateStart );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = getDomElement();
 
 		// rotating across whole screen goes 360 degrees around
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
@@ -460,13 +468,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
+		// Adjust the dolly speed based on the amount moved, where 1% of the DOM element height per
+		// update is the normal speed.
+		var element = getDomElement();
+		var speedMultiplier = Math.abs( dollyDelta.y ) / ( 0.01 * element.clientHeight );
+
 		if ( dollyDelta.y > 0 ) {
 
-			dollyIn( getZoomScale() );
+			dollyIn( getZoomScale( speedMultiplier ) );
 
 		} else if ( dollyDelta.y < 0 ) {
 
-			dollyOut( getZoomScale() );
+			dollyOut( getZoomScale( speedMultiplier ) );
 
 		}
 
@@ -603,7 +616,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 		rotateDelta.subVectors( rotateEnd, rotateStart );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = getDomElement();
 
 		// rotating across whole screen goes 360 degrees around
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
@@ -630,13 +643,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.subVectors( dollyEnd, dollyStart );
 
+		// Adjust the dolly speed based on the amount moved, where 1% of the DOM element height per
+		// update is the normal speed.
+		var element = getDomElement();
+		var speedMultiplier = Math.abs( dollyDelta.y ) / ( 0.01 * element.clientHeight );
+
 		if ( dollyDelta.y > 0 ) {
 
-			dollyOut( getZoomScale() );
+			dollyOut( getZoomScale( speedMultiplier ) );
 
 		} else if ( dollyDelta.y < 0 ) {
 
-			dollyIn( getZoomScale() );
+			dollyIn( getZoomScale( speedMultiplier ) );
 
 		}
 
@@ -861,7 +879,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			case 3: // three-fingered touch: pan
 
 				if ( scope.enablePan === false ) return;
-				if ( scope.enableTwoFingerDollyPan === true ) return;
+				if ( scope.enableTwoFingerZoomPan === true ) return;
 
 				handleTouchStartPan( event );
 
