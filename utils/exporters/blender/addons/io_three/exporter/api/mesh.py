@@ -16,12 +16,27 @@ from .. import constants, utilities, logger, exceptions
 
 #TODO: add these strings into constants.py
 
-def flip_axes (v, dir="XYZ"):
+XZ_Y = "XZ_Y"
+X_ZY = "X_ZY"
+XYZ = "XYZ"
+_XY_Z = "_XY_Z"
 
-    if dir == "XZ_Y":
-        v = (v.x, v.z, -v.y)
 
-    return v
+def flip_axes (a, dir=XYZ):
+
+    # if dir == XZ_Y:
+    #     v = (v.x, v.z, -v.y)
+    # elif dir == X_ZY:
+    #     v = (v.x, -v.z, v.y)
+
+    if dir == XZ_Y:
+        a = (a[0], a[2], -a[1])
+    elif dir == X_ZY:
+        a = (a[0], -a[2], a[1])
+    elif dir == _XY_Z:
+        a = (-a[0], -a[1], a[2])
+
+    return (a[0], a[1], a[2])
 
 
 def _mesh(func):
@@ -139,7 +154,7 @@ def buffer_normal(mesh, options):
         
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.z, -normal.y) if face.use_smooth else (face.normal.x, face.normal.z, -face.normal.y)
+                vector = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
                 normals_.extend(vector)
 
         # using Object Loader with static mesh
@@ -147,7 +162,7 @@ def buffer_normal(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal, _XY_Z) if face.use_smooth else flip_axes(face.normal, _XY_Z)
                 normals_.extend(vector)
 
         # using JSON Loader with skinned mesh
@@ -155,7 +170,7 @@ def buffer_normal(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
                 normals_.extend(vector)
 
         # using JSON Loader with static mesh
@@ -163,7 +178,7 @@ def buffer_normal(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
                 normals_.extend(vector)
 
     return normals_
@@ -190,7 +205,7 @@ def buffer_position(mesh):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = (vertex.co.x, vertex.co.z, -vertex.co.y)
+                vector = flip_axes(vertex.co, XZ_Y)
                 position.extend(vector)
 
         # using Object Loader with static mesh
@@ -198,7 +213,7 @@ def buffer_position(mesh):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = (vertex.co.x, vertex.co.y, vertex.co.z)
+                vector = flip_axes(vertex.co, _XY_Z)
                 position.extend(vector)
 
         # using JSON Loader with skinned mesh
@@ -206,7 +221,7 @@ def buffer_position(mesh):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = (vertex.co.x, vertex.co.y, vertex.co.z)
+                vector = flip_axes(vertex.co)
                 position.extend(vector)
 
         # using JSON Loader with static mesh
@@ -214,7 +229,7 @@ def buffer_position(mesh):
 
             for vertex_index in face.vertices:
                 vertex = mesh.vertices[vertex_index]
-                vector = (vertex.co.x, vertex.co.y, vertex.co.z)
+                vector = flip_axes(vertex.co)
                 position.extend(vector)
 
     return position
@@ -371,6 +386,8 @@ def faces(mesh, options, material_list=None):
             colour_indices[str(colour)] = index
 
     normal_indices = {}
+
+    print (vertex_normals)
     if vertex_normals:
         logger.debug("Indexing normals")
 
@@ -378,29 +395,32 @@ def faces(mesh, options, material_list=None):
         if options.get(constants.SCENE, True) and _armature(mesh):
 
             for index, normal in enumerate(vertex_normals):
-                normal = (normal[0], -normal[2], normal[1])
+                normal = flip_axes(normal, XYZ)
                 normal_indices[str(normal)] = index
 
         # using Object Loader with static mesh
         elif options.get(constants.SCENE, True) and not _armature(mesh):
 
             for index, normal in enumerate(vertex_normals):
-                normal = (normal[0], normal[1], normal[2])
+                normal = flip_axes(normal, XYZ)
                 normal_indices[str(normal)] = index
 
         # using JSON Loader with skinned mesh
         elif not options.get(constants.SCENE, True) and _armature(mesh):
 
             for index, normal in enumerate(vertex_normals):
-                normal = (normal[0], normal[1], normal[2])
+                normal = flip_axes(normal)
                 normal_indices[str(normal)] = index
 
         # using JSON Loader with static mesh
         else:
 
             for index, normal in enumerate(vertex_normals):
-                normal = (normal[0], normal[1], normal[2])
+                normal = flip_axes(normal)
                 normal_indices[str(normal)] = index
+
+    for k,v in normal_indices.items():
+        print(str(v) + ": " + str(k))
 
     logger.info("Parsing %d faces", len(mesh.tessfaces))
     for face in mesh.tessfaces:
@@ -452,8 +472,7 @@ def faces(mesh, options, material_list=None):
 
                 for vertex in face.vertices:
                     normal = mesh.vertices[vertex].normal
-                    normal = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
-
+                    normal = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
                     face_data.append(normal_indices[str(normal)])
                     mask[constants.NORMALS] = True
 
@@ -462,8 +481,7 @@ def faces(mesh, options, material_list=None):
 
                 for vertex in face.vertices:
                     normal = mesh.vertices[vertex].normal
-                    normal = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
-
+                    normal = flip_axes(normal, _XY_Z) if face.use_smooth else flip_axes(face.normal, _XY_Z)
                     face_data.append(normal_indices[str(normal)])
                     mask[constants.NORMALS] = True
 
@@ -472,8 +490,7 @@ def faces(mesh, options, material_list=None):
 
                 for vertex in face.vertices:
                     normal = mesh.vertices[vertex].normal
-                    normal = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
-
+                    normal = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
                     face_data.append(normal_indices[str(normal)])
                     mask[constants.NORMALS] = True
 
@@ -482,10 +499,10 @@ def faces(mesh, options, material_list=None):
 
                 for vertex in face.vertices:
                     normal = mesh.vertices[vertex].normal
-                    normal = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
-
+                    normal = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
                     face_data.append(normal_indices[str(normal)])
                     mask[constants.NORMALS] = True
+            
 
         if vertex_colours:
             colours = mesh.tessface_vertex_colors.active.data[face.index]
@@ -533,25 +550,25 @@ def morph_targets(mesh, options):
         if options.get(constants.SCENE, True) and _armature(mesh):
 
             for vertex in vertices_:
-                morphs[-1].extend([vertex.co.x, vertex.co.z, -vertex.co.y])
+                morphs[-1].extend(flip_axes(vertex.co, XZ_Y))
 
         # using Object Loader with static mesh
         elif options.get(constants.SCENE, True) and not _armature(mesh):
 
             for vertex in vertices_:
-                morphs[-1].extend([vertex.co.x, vertex.co.y, vertex.co.z])
+                morphs[-1].extend(flip_axes(vertex.co, _XY_Z))
 
         # using JSON Loader with skinned mesh
         elif not options.get(constants.SCENE, True) and _armature(mesh):
 
             for vertex in vertices_:
-                morphs[-1].extend([vertex.co.x, vertex.co.y, vertex.co.z])
+                morphs[-1].extend(flip_axes(vertex.co))
 
         # using JSON Loader with static mesh
         else:
 
             for vertex in vertices_:
-                morphs[-1].extend([vertex.co.x, vertex.co.y, vertex.co.z])
+                morphs[-1].extend(flip_axes(vertex.co))
 
     context.scene.frame_set(original_frame, 0.0)
     morphs_detected = False
@@ -913,25 +930,25 @@ def vertices(mesh, options):
     if options.get(constants.SCENE, True) and _armature(mesh):
 
         for vertex in mesh.vertices:
-            vertices_.extend((vertex.co.x, vertex.co.z, -vertex.co.y))
+            vertices_.extend(flip_axes(vertex.co, XZ_Y))
 
     # using Object Loader with static mesh
     elif options.get(constants.SCENE, True) and not _armature(mesh):
 
         for vertex in mesh.vertices:
-            vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
+            vertices_.extend(flip_axes(vertex.co, _XY_Z))
 
     # using JSON Loader with skinned mesh
     elif not options.get(constants.SCENE, True) and _armature(mesh):
 
         for vertex in mesh.vertices:
-            vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
+            vertices_.extend(flip_axes(vertex.co))
 
     # using JSON Loader with static mesh
     else:
 
         for vertex in mesh.vertices:
-            vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
+            vertices_.extend(flip_axes(vertex.co))
 
     return vertices_
 
@@ -1076,7 +1093,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.z, -normal.y) if face.use_smooth else (face.normal.x, face.normal.z, -face.normal.y)
+                vector = flip_axes(normal, XZ_Y) if face.use_smooth else flip_axes(face.normal, XZ_Y)
 
                 str_vec = str(vector)
                 try:
@@ -1089,7 +1106,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal,_XY_Z) if face.use_smooth else flip_axes(face.normal,_XY_Z)
 
                 str_vec = str(vector)
                 try:
@@ -1102,7 +1119,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
 
                 str_vec = str(vector)
                 try:
@@ -1115,7 +1132,7 @@ def _normals(mesh, options):
 
             for vertex_index in face.vertices:
                 normal = mesh.vertices[vertex_index].normal
-                vector = (normal.x, normal.y, normal.z) if face.use_smooth else (face.normal.x, face.normal.y, face.normal.z)
+                vector = flip_axes(normal) if face.use_smooth else flip_axes(face.normal)
 
                 str_vec = str(vector)
                 try:
