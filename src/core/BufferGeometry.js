@@ -1,7 +1,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Box3 } from '../math/Box3';
 import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32BufferAttribute } from './BufferAttribute';
+import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute';
 import { Sphere } from '../math/Sphere';
 import { DirectGeometry } from './DirectGeometry';
 import { Object3D } from './Object3D';
@@ -53,6 +53,12 @@ BufferGeometry.prototype = {
 	setIndex: function ( index ) {
 
 		this.index = index;
+
+	},
+
+	setIndexArray: function ( indices ) {
+
+		this.index = new ( _Math.arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 	},
 
