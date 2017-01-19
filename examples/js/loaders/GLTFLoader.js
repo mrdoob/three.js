@@ -1070,6 +1070,8 @@ THREE.GLTFLoader = ( function () {
 
 							_texture.flipY = false;
 
+							if ( texture.name !== undefined ) _texture.name = texture.name;
+
 							if ( texture.sampler ) {
 
 								var sampler = json.samplers[ texture.sampler ];
