@@ -13899,13 +13899,15 @@ BufferGeometry.prototype = {
 
 	setIndex: function ( index ) {
 
-		this.index = index;
+		if ( Array.isArray( index ) ) {
 
-	},
+			this.index = new ( _Math.arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
-	setIndexArray: function ( indices ) {
+		} else {
 
-		this.index = new ( _Math.arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+			this.index = index;
+
+		}
 
 	},
 
@@ -15377,7 +15379,7 @@ function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments,
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -15600,7 +15602,7 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -24360,7 +24362,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -25034,7 +25036,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25313,7 +25315,7 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25462,7 +25464,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27051,7 +27053,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27193,7 +27195,7 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27332,7 +27334,7 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -27470,7 +27472,7 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27759,7 +27761,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -28127,7 +28129,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );

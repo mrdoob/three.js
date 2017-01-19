@@ -13905,13 +13905,15 @@
 
 		setIndex: function ( index ) {
 
-			this.index = index;
+			if ( Array.isArray( index ) ) {
 
-		},
+				this.index = new ( _Math.arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
-		setIndexArray: function ( indices ) {
+			} else {
 
-			this.index = new ( _Math.arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+				this.index = index;
+
+			}
 
 		},
 
@@ -15383,7 +15385,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -15606,7 +15608,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -24366,7 +24368,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -25040,7 +25042,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25319,7 +25321,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25468,7 +25470,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27057,7 +27059,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27199,7 +27201,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27338,7 +27340,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -27476,7 +27478,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27765,7 +27767,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -28133,7 +28135,7 @@
 
 		// build geometry
 
-		this.setIndexArray( indices );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
