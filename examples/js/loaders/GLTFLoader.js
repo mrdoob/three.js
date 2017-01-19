@@ -1072,6 +1072,15 @@ THREE.GLTFLoader = ( function () {
 
 							if ( texture.name !== undefined ) _texture.name = texture.name;
 
+							_texture.format = texture.format !== undefined ? WEBGL_TEXTURE_FORMATS[ texture.format ] : THREE.RGBAFormat;
+
+							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
+
+								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								              'internalFormat will be forced to be the same value as format.' );
+
+							}
+
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_TYPES[ texture.type ] : THREE.UnsignedByteType;
 
 							if ( texture.sampler ) {
