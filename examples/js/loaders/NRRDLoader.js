@@ -1,19 +1,21 @@
-THREE.NRRDLoader = function( manager ) {
+THREE.NRRDLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 
 };
 
-Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
+THREE.NRRDLoader.prototype = {
 
-	load: function( url, onLoad, onProgress, onError ) {
+	constructor: THREE.NRRDLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function( data ) {
+		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data ) );
 
@@ -21,9 +23,9 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	//this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
-	parse: function( data ) {
+	parse: function ( data ) {
 
+		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
 
 		var _data = data;
 
@@ -32,10 +34,6 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 		var _nativeLittleEndian = new Int8Array( new Int16Array( [ 1 ] ).buffer )[ 0 ] > 0;
 
 		var _littleEndian = true;
-
-		var _lastMin = - Infinity;
-
-		var _lastMax = Infinity;
 
 		var headerObject = {};
 
@@ -206,10 +204,9 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 			var number = '';
 			start = start || 0;
 			end = end || data.length;
-			var lastSpace = start;
 			var value;
 			//length of the result is the product of the sizes
-			var lengthOfTheResult = headerObject.sizes.reduce( function( previous, current ) {
+			var lengthOfTheResult = headerObject.sizes.reduce( function ( previous, current ) {
 
 				return previous * current;
 
@@ -238,8 +235,7 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 					number += String.fromCharCode( value );
 
-				}
-				else {
+				} else {
 
 					if ( number !== '' ) {
 
@@ -292,20 +288,23 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 			var inflate = new Zlib.Gunzip( new Uint8Array( _data ) );
 			_data = inflate.decompress();
 
-		}
-		else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
+		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
 			_data = parseDataAsText( _data );
 
-		}
-		else if (headerObject.encoding === 'raw')
-		{
+		} else if ( headerObject.encoding === 'raw' ) {
+
 			//we need to copy the array to create a new array buffer, else we retrieve the original arraybuffer with the header
-			var _copy = new Uint8Array(_data.length);
-			for (var i = 0; i < _data.length; i++) {
-				_copy[i] = _data[i];
+			var _copy = new Uint8Array( _data.length );
+
+			for ( var i = 0; i < _data.length; i ++ ) {
+
+				_copy[ i ] = _data[ i ];
+
 			}
+
 			_data = _copy;
+
 		}
 		// .. let's use the underlying array buffer
 		_data = _data.buffer;
@@ -351,10 +350,9 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 			_spaceX = - 1;
 			_spaceY = - 1;
 
-		}
-		else if ( headerObject.space === 'left-anterior-superior' ) {
+		} else if ( headerObject.space === 'left-anterior-superior' ) {
 
-			_spaceX = - 1
+			_spaceX = - 1;
 
 		}
 
@@ -366,8 +364,7 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 			0, 0, _spaceZ, 0,
 			0, 0, 0, 1 );
 
-		}
-		else {
+		} else {
 
 			var v = headerObject.vectors;
 			var origin = headerObject.space_origin;
@@ -406,7 +403,7 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	},
 
-	parseChars: function( array, start, end ) {
+	parseChars: function ( array, start, end ) {
 
 		// without borders, use the whole array
 		if ( start === undefined ) {
@@ -435,9 +432,10 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	fieldFunctions: {
 
-		type: function( data ) {
+		type: function ( data ) {
 
 			switch ( data ) {
+
 				case 'uchar':
 				case 'unsigned char':
 				case 'uint8':
@@ -484,33 +482,35 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 					break;
 				default:
 					throw new Error( 'Unsupported NRRD data type: ' + data );
+
 			}
+
 			return this.type = data;
 
 		},
 
-		endian: function( data ) {
+		endian: function ( data ) {
 
 			return this.endian = data;
 
 		},
 
-		encoding: function( data ) {
+		encoding: function ( data ) {
 
 			return this.encoding = data;
 
 		},
 
-		dimension: function( data ) {
+		dimension: function ( data ) {
 
 			return this.dim = parseInt( data, 10 );
 
 		},
 
-		sizes: function( data ) {
+		sizes: function ( data ) {
 
 			var i;
-			return this.sizes = ( function() {
+			return this.sizes = ( function () {
 
 				var _i, _len, _ref, _results;
 				_ref = data.split( /\s+/ );
@@ -527,30 +527,30 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		},
 
-		space: function( data ) {
+		space: function ( data ) {
 
 			return this.space = data;
 
 		},
 
-		'space origin' : function( data ) {
+		'space origin': function ( data ) {
 
 			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
 
 		},
 
-		'space directions' : function( data ) {
+		'space directions': function ( data ) {
 
 			var f, parts, v;
 			parts = data.match( /\(.*?\)/g );
-			return this.vectors = ( function() {
+			return this.vectors = ( function () {
 
 				var _i, _len, _results;
 				_results = [];
 				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 					v = parts[ _i ];
-					_results.push( ( function() {
+					_results.push( ( function () {
 
 						var _j, _len2, _ref, _results2;
 						_ref = v.slice( 1, - 1 ).split( /,/ );
@@ -572,14 +572,14 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		},
 
-		spacings: function( data ) {
+		spacings: function ( data ) {
 
 			var f, parts;
 			parts = data.split( /\s+/ );
-			return this.spacings = ( function() {
+			return this.spacings = ( function () {
 
-				var _i, _len, _results;
-				_results = [];
+				var _i, _len, _results = [];
+
 				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 					f = parts[ _i ];
@@ -593,4 +593,4 @@ Object.assign( THREE.NRRDLoader.prototype, THREE.EventDispatcher.prototype, {
 		}
 	}
 
-} );
+};

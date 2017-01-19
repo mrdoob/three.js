@@ -32,12 +32,17 @@ THREE.ShaderLib[ 'water' ] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 
+		THREE.ShaderChunk[ "fog_pars_vertex"],
+
 		'void main()',
 		'{',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+		THREE.ShaderChunk[ "fog_vertex"],
+
 		'}'
 	].join( '\n' ),
 

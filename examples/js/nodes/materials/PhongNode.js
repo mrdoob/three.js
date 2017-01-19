@@ -46,6 +46,7 @@ THREE.PhongNode.prototype.build = function( builder ) {
 			"#endif",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "fog_parse_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -66,7 +67,8 @@ THREE.PhongNode.prototype.build = function( builder ) {
 
 			"#endif",
 
-				THREE.ShaderChunk[ "begin_vertex" ]
+				THREE.ShaderChunk[ "begin_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ]
 		];
 
 		if ( transform ) {

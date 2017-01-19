@@ -10,22 +10,24 @@
 	<body>
 		<h1>[name]</h1><br />
 		<p>
-			Even those this is becming less and less of a problem, some devices or browsers may not support WebGL.
-			Here is how to check if it is supported and display a warning to the user if it is not.
+			Even though this is becoming less and less of a problem, some devices or browsers may still not support WebGL.
+			The following method allows you to check if it is supported and display a message to the user if it is not.
 		</p>
 
-		<h2>A solution</h2>
+		<p>
+			Add	[link:https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js]
+			to your javascript and run the following before attempting to render anything.
+		</p>
 
-		<p>In order to detect webgl compatibility and gracefully inform the user you can add <a href="https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js">https://github.com/mrdoob/three.js/blob/master/examples/js/Detector.js</a> to your javascript and use this example to avoid even attempting to render anything:</p>
-
-		<pre><code>if (Detector.webgl) {
-		    init();
-		    animate();
-		} else {
-		    var warning = Detector.getWebGLErrorMessage();
-		    document.getElementById('container').appendChild(warning);
-		}
-		</code></pre>
+<code>
+if (Detector.webgl) {
+    init();
+    animate();
+} else {
+    var warning = Detector.getWebGLErrorMessage();
+    document.getElementById('container').appendChild(warning);
+}
+</code>
 
 
 	</body>

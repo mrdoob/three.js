@@ -263,15 +263,7 @@
 
 				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
 
-					if ( geoNode.indices.length > 65535 ) {
-
-						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint32Array( geoNode.indices ), 1 ) );
-
-					} else {
-
-						tmpGeo.setIndex( new THREE.BufferAttribute( new Uint16Array( geoNode.indices ), 1 ) );
-
-					}
+					tmpGeo.setIndex( geoNode.indices );
 
 				}
 

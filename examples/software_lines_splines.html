@@ -94,7 +94,7 @@
 
 				var position, index;
 
-				var spline = new THREE.Spline( points );
+				var spline = new THREE.CatmullRomCurve3( points );
 
 				for ( i = 0; i < points.length * n_sub; i ++ ) {
 
