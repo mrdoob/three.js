@@ -348,44 +348,6 @@ var _Math = {
 
 	}(),
 
-	// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
-
-	arrayMin: function ( array ) {
-
-		var length = array.length, min = Infinity;
-
-		while ( length -- ) {
-
-			if ( array[ length ] < min ) {
-
-				min = array[ length ];
-
-			}
-
-		}
-
-		return min;
-
-	},
-
-	arrayMax: function ( array ) {
-
-		var length = array.length, max = - Infinity;
-
-		while ( length -- ) {
-
-			if ( array[ length ] > max ) {
-
-				max = array[ length ];
-
-			}
-
-		}
-
-		return max;
-
-	},
-
 	clamp: function ( value, min, max ) {
 
 		return Math.max( min, Math.min( max, value ) );
@@ -12425,6 +12387,26 @@ Object.assign( DirectGeometry.prototype, {
 
 } );
 
+// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
+
+function arrayMax( array ) {
+
+	var length = array.length, max = - Infinity;
+
+	while ( length -- ) {
+
+		if ( array[ length ] > max ) {
+
+			max = array[ length ];
+
+		}
+
+	}
+
+	return max;
+
+}
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
@@ -13901,7 +13883,7 @@ BufferGeometry.prototype = {
 
 		if ( Array.isArray( index ) ) {
 
-			this.index = new ( _Math.arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+			this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
 		} else {
 
@@ -14363,7 +14345,7 @@ BufferGeometry.prototype = {
 
 		if ( geometry.indices.length > 0 ) {
 
-			var TypeArray = _Math.arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
+			var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
 			this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
@@ -17652,7 +17634,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		// console.timeEnd( 'wireframe' );
 
-		var attribute = new ( _Math.arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
