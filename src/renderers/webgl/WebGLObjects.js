@@ -3,7 +3,7 @@
  */
 
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute';
-import { _Math } from '../../math/Math';
+import { arrayMax } from '../../utils';
 import { WebGLGeometries } from './WebGLGeometries';
 
 function WebGLObjects( gl, properties, info ) {
@@ -235,7 +235,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		// console.timeEnd( 'wireframe' );
 
-		var attribute = new ( _Math.arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 

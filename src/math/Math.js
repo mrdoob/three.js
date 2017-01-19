@@ -45,44 +45,6 @@ var _Math = {
 
 	}(),
 
-	// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
-
-	arrayMin: function ( array ) {
-
-		var length = array.length, min = Infinity;
-
-		while ( length -- ) {
-
-			if ( array[ length ] < min ) {
-
-				min = array[ length ];
-
-			}
-
-		}
-
-		return min;
-
-	},
-
-	arrayMax: function ( array ) {
-
-		var length = array.length, max = - Infinity;
-
-		while ( length -- ) {
-
-			if ( array[ length ] > max ) {
-
-				max = array[ length ];
-
-			}
-
-		}
-
-		return max;
-
-	},
-
 	clamp: function ( value, min, max ) {
 
 		return Math.max( min, Math.min( max, value ) );
