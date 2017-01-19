@@ -1072,6 +1072,8 @@ THREE.GLTFLoader = ( function () {
 
 							if ( texture.name !== undefined ) _texture.name = texture.name;
 
+							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_TYPES[ texture.type ] : THREE.UnsignedByteType;
+
 							if ( texture.sampler ) {
 
 								var sampler = json.samplers[ texture.sampler ];
