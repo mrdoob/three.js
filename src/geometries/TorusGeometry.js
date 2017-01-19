@@ -31,7 +31,7 @@ TorusGeometry.prototype.constructor = TorusGeometry;
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 
@@ -128,7 +128,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// build geometry
 
-	this.setIndex( new ( Math.max.apply( Math, indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+	this.setIndexArray( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );

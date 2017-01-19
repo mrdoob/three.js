@@ -35,7 +35,7 @@ ParametricGeometry.prototype.constructor = ParametricGeometry;
  */
 
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 
 function ParametricBufferGeometry( func, slices, stacks ) {
 
@@ -100,7 +100,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// build geometry
 
-	this.setIndex( new ( Math.max.apply( Math, indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+	this.setIndexArray( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 

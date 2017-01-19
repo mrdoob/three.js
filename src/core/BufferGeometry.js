@@ -514,7 +514,7 @@ BufferGeometry.prototype = {
 
 		if ( geometry.indices.length > 0 ) {
 
-			var TypeArray = Math.max.apply( Math, geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
+			var TypeArray = _Math.arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
 			this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
