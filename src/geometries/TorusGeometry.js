@@ -128,7 +128,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// build geometry
 
-	this.setIndexArray( indices );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );

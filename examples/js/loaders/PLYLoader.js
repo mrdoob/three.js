@@ -314,7 +314,7 @@ THREE.PLYLoader.prototype = {
 
 			if ( buffer.indices.length > 0 ) {
 
-				geometry.setIndexArray( buffer.indices );
+				geometry.setIndex( buffer.indices );
 
 			}
 

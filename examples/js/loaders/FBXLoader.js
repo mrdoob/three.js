@@ -263,7 +263,7 @@
 
 				if ( geoNode.indices !== undefined && geoNode.indices.length > 0 ) {
 
-					tmpGeo.setIndexArray( geoNode.indices );
+					tmpGeo.setIndex( geoNode.indices );
 
 				}
 
