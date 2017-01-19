@@ -471,7 +471,7 @@ THREE.GLTFLoader = ( function () {
 		6410: THREE.LuminanceAlphaFormat
 	};
 
-	var WEBGL_TEXTURE_TYPES = {
+	var WEBGL_TEXTURE_DATATYPES = {
 		5121: THREE.UnsignedByteType,
 		32819: THREE.UnsignedShort4444Type,
 		32820: THREE.UnsignedShort5551Type,
@@ -1081,7 +1081,7 @@ THREE.GLTFLoader = ( function () {
 
 							}
 
-							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_TYPES[ texture.type ] : THREE.UnsignedByteType;
+							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
 							if ( texture.sampler ) {
 
