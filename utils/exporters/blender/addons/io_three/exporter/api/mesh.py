@@ -23,11 +23,11 @@ _XY_Z = "_XY_Z"
 
 
 def flip_axes (a, dir=XYZ):
+    """
 
-    # if dir == XZ_Y:
-    #     v = (v.x, v.z, -v.y)
-    # elif dir == X_ZY:
-    #     v = (v.x, -v.z, v.y)
+    :function to swap vectors:
+
+    """
 
     if dir == XZ_Y:
         a = (a[0], a[2], -a[1])
