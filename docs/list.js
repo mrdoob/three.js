@@ -174,7 +174,7 @@ var list = {
 			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
 		],
 
-		"Extras / Helpers": [
+		"Helpers": [
 			[ "ArrowHelper", "api/helpers/ArrowHelper" ],
 			[ "AxisHelper", "api/helpers/AxisHelper" ],
 			[ "BoxHelper", "api/helpers/BoxHelper" ],
