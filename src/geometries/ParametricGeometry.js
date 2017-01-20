@@ -35,7 +35,7 @@ ParametricGeometry.prototype.constructor = ParametricGeometry;
  */
 
 import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 
 function ParametricBufferGeometry( func, slices, stacks ) {
 
@@ -49,25 +49,27 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 		stacks: stacks
 	};
 
-	// generate vertices and uvs
+	// buffers
 
+	var indices = [];
 	var vertices = [];
 	var uvs = [];
 
-	var i, j, p;
-	var u, v;
+	var i, j;
+
+	// generate vertices and uvs
 
 	var sliceCount = slices + 1;
 
 	for ( i = 0; i <= stacks; i ++ ) {
 
-		v = i / stacks;
+		var v = i / stacks;
 
 		for ( j = 0; j <= slices; j ++ ) {
 
-			u = j / slices;
+			var u = j / slices;
 
-			p = func( u, v );
+			var p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
 
 			uvs.push( u, v );
@@ -78,17 +80,14 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate indices
 
-	var indices = [];
-	var a, b, c, d;
-
 	for ( i = 0; i < stacks; i ++ ) {
 
 		for ( j = 0; j < slices; j ++ ) {
 
-			a = i * sliceCount + j;
-			b = i * sliceCount + j + 1;
-			c = ( i + 1 ) * sliceCount + j + 1;
-			d = ( i + 1 ) * sliceCount + j;
+			var a = i * sliceCount + j;
+			var b = i * sliceCount + j + 1;
+			var c = ( i + 1 ) * sliceCount + j + 1;
+			var d = ( i + 1 ) * sliceCount + j;
 
 			// faces one and two
 
@@ -101,7 +100,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// build geometry
 
-	this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 

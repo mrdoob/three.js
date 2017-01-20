@@ -1,13 +1,14 @@
 import { Vector3 } from '../math/Vector3';
 import { Box3 } from '../math/Box3';
 import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32BufferAttribute } from './BufferAttribute';
+import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute';
 import { Sphere } from '../math/Sphere';
 import { DirectGeometry } from './DirectGeometry';
 import { Object3D } from './Object3D';
 import { Matrix4 } from '../math/Matrix4';
 import { Matrix3 } from '../math/Matrix3';
 import { _Math } from '../math/Math';
+import { arrayMax } from '../utils';
 import { GeometryIdCount } from './Geometry';
 
 /**
@@ -52,7 +53,15 @@ BufferGeometry.prototype = {
 
 	setIndex: function ( index ) {
 
-		this.index = index;
+		if ( Array.isArray( index ) ) {
+
+			this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+
+		} else {
+
+			this.index = index;
+
+		}
 
 	},
 
@@ -508,7 +517,7 @@ BufferGeometry.prototype = {
 
 		if ( geometry.indices.length > 0 ) {
 
-			var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
+			var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
 			var indices = new TypeArray( geometry.indices.length * 3 );
 			this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 

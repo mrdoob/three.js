@@ -48,7 +48,7 @@ TubeGeometry.prototype.constructor = TubeGeometry;
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
@@ -101,7 +101,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	// build geometry
 
-	this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );

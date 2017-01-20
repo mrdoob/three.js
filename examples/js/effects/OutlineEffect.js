@@ -75,6 +75,8 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	var vertexShaderChunk = [
 
+		"#include <fog_pars_vertex>",
+
 		"uniform float outlineThickness;",
 
 		"vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {",
@@ -113,7 +115,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		"	gl_Position = calculateOutline( gl_Position, objectNormal, skinned );",
 		"#else",
 		"	gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
-		"#endif"
+		"#endif",
+
+		"#include <fog_vertex>"
 
 	].join( "\n" );
 

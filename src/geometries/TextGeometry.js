@@ -26,7 +26,7 @@ function TextGeometry( text, parameters ) {
 
 	var font = parameters.font;
 
-	if ( (font && font.isFont) === false ) {
+	if ( ( font && font.isFont ) === false ) {
 
 		console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
 		return new Geometry();
