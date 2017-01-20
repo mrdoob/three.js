@@ -39,7 +39,8 @@ THREE.ShaderLib[ 'water' ] = {
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		'   vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
+		'	gl_Position = projectionMatrix * mvPosition;',
 
 		THREE.ShaderChunk[ "fog_vertex"],
 
@@ -109,8 +110,10 @@ THREE.ShaderLib[ 'water' ] = {
 		'	vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;',
 		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
 		'	vec3 outgoingLight = albedo;',
-			THREE.ShaderChunk[ "fog_fragment" ],
 		'	gl_FragColor = vec4( outgoingLight, alpha );',
+
+			THREE.ShaderChunk[ "fog_fragment" ],
+
 		'}'
 	].join( '\n' )
 
