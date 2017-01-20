@@ -28,7 +28,4 @@ void main() {
 
 	gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
 
-	#include <premultiplied_alpha_fragment>
-	#include <encodings_fragment>
-
 }
