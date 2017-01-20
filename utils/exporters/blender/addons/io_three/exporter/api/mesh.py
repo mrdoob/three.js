@@ -185,7 +185,7 @@ def buffer_normal(mesh, options):
 
 
 @_mesh
-def buffer_position(mesh):
+def buffer_position(mesh, options):
     """
 
     :param mesh:

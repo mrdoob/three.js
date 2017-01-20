@@ -373,13 +373,13 @@ class Geometry(base_classes.BaseNode):
         option_index_type = self.options.get(constants.INDEX_TYPE)
 
         pos_tuple = (constants.POSITION, options_vertices,
-                     api.mesh.buffer_position, 3)
+                     lambda m: api.mesh.buffer_position(m, self.options), 3)
         uvs_tuple = (constants.UV, option_uvs,
                      api.mesh.buffer_uv, 2)
         uvs2_tuple = (constants.UV2, option_uvs,
                      lambda m: api.mesh.buffer_uv(m, layer=1), 2)
         normals_tuple = (constants.NORMAL, option_normals,
-                         api.mesh.buffer_normal, 3)
+                         lambda m: api.mesh.buffer_normal(m, self.options), 3)
         dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple)
 
         for key, option, func, size in dispatch:
