@@ -299,7 +299,8 @@ THREE.GLTFLoader = ( function () {
 
 		this.lights = {};
 
-		var lights = json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
+		var exts = json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
+		var lights = ( exts && exts.lights ) || {};
 
 		for ( var lightId in lights ) {
 
