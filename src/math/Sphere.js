@@ -13,7 +13,7 @@ function Sphere( center, radius ) {
 
 }
 
-Sphere.prototype = {
+Object.assign( Sphere.prototype, {
 
 	constructor: Sphere,
 
@@ -176,7 +176,7 @@ Sphere.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Sphere };
