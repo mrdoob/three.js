@@ -1822,7 +1822,9 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return new THREE.AnimationClip( "animation_" + animationId, undefined, tracks );
+				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
+
+				return new THREE.AnimationClip( name, undefined, tracks );
 
 			} );
 
