@@ -112,11 +112,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world x-axis
 
-		var m1;
+		var m1 = new Matrix4();
 
 		return function rotateX( angle ) {
-
-			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -132,11 +130,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world y-axis
 
-		var m1;
+		var m1 = new Matrix4();
 
 		return function rotateY( angle ) {
-
-			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -152,11 +148,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// rotate geometry around world z-axis
 
-		var m1;
+		var m1 = new Matrix4();
 
 		return function rotateZ( angle ) {
-
-			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -172,11 +166,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// translate geometry
 
-		var m1;
+		var m1 = new Matrix4();
 
 		return function translate( x, y, z ) {
-
-			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -192,11 +184,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		// scale geometry
 
-		var m1;
+		var m1 = new Matrix4();
 
 		return function scale( x, y, z ) {
-
-			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -210,11 +200,9 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	lookAt: function () {
 
-		var obj;
+		var obj = new Object3D();
 
 		return function lookAt( vector ) {
-
-			if ( obj === undefined ) obj = new Object3D();
 
 			obj.lookAt( vector );
 
