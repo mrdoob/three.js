@@ -38,7 +38,9 @@ function BufferGeometry() {
 
 }
 
-BufferGeometry.prototype = {
+BufferGeometry.MaxIndex = 65535;
+
+Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	constructor: BufferGeometry,
 
@@ -970,28 +972,28 @@ BufferGeometry.prototype = {
 	clone: function () {
 
 		/*
-		// Handle primitives
+		 // Handle primitives
 
-		var parameters = this.parameters;
+		 var parameters = this.parameters;
 
-		if ( parameters !== undefined ) {
+		 if ( parameters !== undefined ) {
 
-			var values = [];
+		 var values = [];
 
-			for ( var key in parameters ) {
+		 for ( var key in parameters ) {
 
-				values.push( parameters[ key ] );
+		 values.push( parameters[ key ] );
 
-			}
+		 }
 
-			var geometry = Object.create( this.constructor.prototype );
-			this.constructor.apply( geometry, values );
-			return geometry;
+		 var geometry = Object.create( this.constructor.prototype );
+		 this.constructor.apply( geometry, values );
+		 return geometry;
 
-		}
+		 }
 
-		return new this.constructor().copy( this );
-		*/
+		 return new this.constructor().copy( this );
+		 */
 
 		return new BufferGeometry().copy( this );
 
@@ -1100,10 +1102,7 @@ BufferGeometry.prototype = {
 
 	}
 
-};
+} );
 
-BufferGeometry.MaxIndex = 65535;
-
-Object.assign( BufferGeometry.prototype, EventDispatcher.prototype );
 
 export { BufferGeometry };
