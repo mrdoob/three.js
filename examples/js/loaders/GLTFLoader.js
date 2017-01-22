@@ -2118,7 +2118,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
-				var nodes = scene.nodes;
+				var nodes = scene.nodes || [];
 
 				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 
