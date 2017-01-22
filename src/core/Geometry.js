@@ -59,7 +59,7 @@ function Geometry() {
 
 }
 
-Geometry.prototype = {
+Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	constructor: Geometry,
 
@@ -714,15 +714,15 @@ Geometry.prototype = {
 		}
 
 		var normalMatrix,
-		vertexOffset = this.vertices.length,
-		vertices1 = this.vertices,
-		vertices2 = geometry.vertices,
-		faces1 = this.faces,
-		faces2 = geometry.faces,
-		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ],
-		colors1 = this.colors,
-		colors2 = geometry.colors;
+			vertexOffset = this.vertices.length,
+			vertices1 = this.vertices,
+			vertices2 = geometry.vertices,
+			faces1 = this.faces,
+			faces2 = geometry.faces,
+			uvs1 = this.faceVertexUvs[ 0 ],
+			uvs2 = geometry.faceVertexUvs[ 0 ],
+			colors1 = this.colors,
+			colors2 = geometry.colors;
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
@@ -759,8 +759,8 @@ Geometry.prototype = {
 		for ( i = 0, il = faces2.length; i < il; i ++ ) {
 
 			var face = faces2[ i ], faceCopy, normal, color,
-			faceVertexNormals = face.vertexNormals,
-			faceVertexColors = face.vertexColors;
+				faceVertexNormals = face.vertexNormals,
+				faceVertexColors = face.vertexColors;
 
 			faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
@@ -1171,28 +1171,28 @@ Geometry.prototype = {
 	clone: function () {
 
 		/*
-		// Handle primitives
+		 // Handle primitives
 
-		var parameters = this.parameters;
+		 var parameters = this.parameters;
 
-		if ( parameters !== undefined ) {
+		 if ( parameters !== undefined ) {
 
-			var values = [];
+		 var values = [];
 
-			for ( var key in parameters ) {
+		 for ( var key in parameters ) {
 
-				values.push( parameters[ key ] );
+		 values.push( parameters[ key ] );
 
-			}
+		 }
 
-			var geometry = Object.create( this.constructor.prototype );
-			this.constructor.apply( geometry, values );
-			return geometry;
+		 var geometry = Object.create( this.constructor.prototype );
+		 this.constructor.apply( geometry, values );
+		 return geometry;
 
-		}
+		 }
 
-		return new this.constructor().copy( this );
-		*/
+		 return new this.constructor().copy( this );
+		 */
 
 		return new Geometry().copy( this );
 
@@ -1267,8 +1267,7 @@ Geometry.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Geometry.prototype, EventDispatcher.prototype );
 
 export { GeometryIdCount, Geometry };
