@@ -175,7 +175,7 @@ EventDispatcher.prototype = {
 
 };
 
-var REVISION = '84';
+var REVISION = '85dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -1027,6 +1027,8 @@ Texture.prototype = {
 	},
 
 	copy: function ( source ) {
+
+		this.name = source.name;
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
@@ -9232,6 +9234,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+				shadow.map.texture.name = light.name + ".shadowMap";
 
 				shadowCamera.updateProjectionMatrix();
 
@@ -9244,7 +9247,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			}
 
 			// TODO (abelnation / sam-g-steel): is this needed?
-			if (shadow && shadow.isRectAreaLightShadow ) {
+			if ( shadow && shadow.isRectAreaLightShadow ) {
 
 				shadow.update( light );
 
@@ -9349,8 +9352,8 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		}
 
 		// Restore GL state.
-		var clearColor = _renderer.getClearColor(),
-		clearAlpha = _renderer.getClearAlpha();
+		var clearColor = _renderer.getClearColor();
+		var clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
 
 		scope.needsUpdate = false;
@@ -35612,6 +35615,7 @@ function CubeCamera( near, far, cubeResolution ) {
 	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
+	this.renderTarget.texture.name = "CubeCamera";
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
@@ -36650,7 +36654,7 @@ PropertyBinding.prototype = {
 
 			this.resolvedProperty = nodeProperty;
 
-		} else if ( nodeProperty.length !== undefined ) {
+		} else if ( Array.isArray( nodeProperty ) ) {
 
 			bindingType = this.BindingType.EntireArray;
 
