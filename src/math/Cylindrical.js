@@ -15,7 +15,7 @@ function Cylindrical( radius, theta, y ) {
 
 }
 
-Cylindrical.prototype = {
+Object.assign( Cylindrical.prototype, {
 
 	constructor: Cylindrical,
 
@@ -55,7 +55,7 @@ Cylindrical.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Cylindrical };
