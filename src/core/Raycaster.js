@@ -59,9 +59,7 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 }
 
-//
-
-Raycaster.prototype = {
+Object.assign( Raycaster.prototype, {
 
 	constructor: Raycaster,
 
@@ -130,7 +128,7 @@ Raycaster.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Raycaster };
