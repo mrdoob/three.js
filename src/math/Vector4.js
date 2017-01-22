@@ -450,16 +450,10 @@ Object.assign( Vector4.prototype, {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector4();
+		var max = new Vector4();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new Vector4();
-				max = new Vector4();
-
-			}
 
 			min.set( minVal, minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal, maxVal );
