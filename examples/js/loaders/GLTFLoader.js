@@ -1800,6 +1800,7 @@ THREE.GLTFLoader = ( function () {
 								: THREE.VectorKeyframeTrack;
 
 							var targetName = node.name ? node.name : node.uuid;
+							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
@@ -1808,7 +1809,7 @@ THREE.GLTFLoader = ( function () {
 								targetName + '.' + PATH_PROPERTIES[ target.path ],
 								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
-								INTERPOLATION[ sampler.interpolation ]
+								interpolation
 							) );
 
 						}
