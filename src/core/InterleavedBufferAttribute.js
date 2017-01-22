@@ -16,8 +16,7 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 }
 
-
-InterleavedBufferAttribute.prototype = {
+Object.assign( InterleavedBufferAttribute.prototype, {
 
 	constructor: InterleavedBufferAttribute,
 
@@ -127,7 +126,7 @@ InterleavedBufferAttribute.prototype = {
 
 	}
 
-};
+} );
 
 
 export { InterleavedBufferAttribute };
