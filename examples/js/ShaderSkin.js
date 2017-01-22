@@ -22,7 +22,10 @@ THREE.ShaderSkin = {
 
 	'skinSimple' : {
 
-		uniforms: Object.assign(
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -48,12 +51,9 @@ THREE.ShaderSkin = {
 
 				"uWrapRGB": { value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
-			},
+			}
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
-
-		),
+		] ),
 
 		fragmentShader: [
 
@@ -266,6 +266,7 @@ THREE.ShaderSkin = {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
 
@@ -281,6 +282,7 @@ THREE.ShaderSkin = {
 				"gl_Position = projectionMatrix * mvPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ],
 
 			"}"
 
@@ -305,7 +307,10 @@ THREE.ShaderSkin = {
 
 	'skin' : {
 
-		uniforms: Object.assign(
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ],
 
 			{
 
@@ -330,12 +335,9 @@ THREE.ShaderSkin = {
 				"uRoughness": 	  		{ value: 0.15 },
 				"uSpecularBrightness": 	{ value: 0.75 }
 
-			},
+			}
 
-			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "lights" ]
-
-		),
+		] ),
 
 		fragmentShader: [
 
@@ -569,6 +571,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
 
@@ -597,7 +600,10 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-			"}"
+				THREE.ShaderChunk[ "fog_vertex" ],
+
+			"}",
+
 
 		].join( "\n" ),
 

@@ -121,7 +121,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		var bokeh_shader = THREE.BokehShader;
 
-		this.postprocessing.bokeh_uniforms = Object.assign( {}, bokeh_shader.uniforms );
+		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
 		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
 		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;

@@ -1,14 +1,15 @@
 import { REVISION, MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, BackSide, DoubleSide, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
 import { Matrix4 } from '../math/Matrix4';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
+import { UniformsUtils } from './shaders/UniformsUtils';
 import { ShaderLib } from './shaders/ShaderLib';
 import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
 import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
 import { Mesh } from '../objects/Mesh';
-import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
-import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
@@ -162,7 +163,7 @@ function WebGLRenderer( parameters ) {
 		_projScreenMatrix = new Matrix4(),
 
 		_vector3 = new Vector3(),
-		_matrix4 = new Matrix4(), 
+		_matrix4 = new Matrix4(),
 		_matrix42 = new Matrix4(),
 
 		// light arrays cache
@@ -296,25 +297,8 @@ function WebGLRenderer( parameters ) {
 
 	//
 
-	var backgroundCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var backgroundCamera2 = new PerspectiveCamera();
-	var backgroundPlaneMesh = new Mesh(
-		new PlaneBufferGeometry( 2, 2 ),
-		new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-	);
-	var backgroundBoxShader = ShaderLib[ 'cube' ];
-	var backgroundBoxMesh = new Mesh(
-		new BoxBufferGeometry( 5, 5, 5 ),
-		new ShaderMaterial( {
-			uniforms: backgroundBoxShader.uniforms,
-			vertexShader: backgroundBoxShader.vertexShader,
-			fragmentShader: backgroundBoxShader.fragmentShader,
-			side: BackSide,
-			depthTest: false,
-			depthWrite: false,
-			fog: false
-		} )
-	);
+	var backgroundPlaneCamera, backgroundPlaneMesh;
+	var backgroundBoxCamera, backgroundBoxMesh;
 
 	//
 
@@ -624,6 +608,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( ! material.isMeshPhongMaterial &&
 				! material.isMeshStandardMaterial &&
+				! material.isMeshNormalMaterial &&
 				material.shading === FlatShading ) {
 
 				for ( var i = 0, l = object.count * 3; i < l; i += 9 ) {
@@ -1184,25 +1169,56 @@ function WebGLRenderer( parameters ) {
 
 		if ( background && background.isCubeTexture ) {
 
-			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
+			if ( backgroundBoxCamera === undefined ) {
 
-			backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
-			backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
+				backgroundBoxCamera = new PerspectiveCamera();
+
+				backgroundBoxMesh = new Mesh(
+					new BoxBufferGeometry( 5, 5, 5 ),
+					new ShaderMaterial( {
+						uniforms: ShaderLib.cube.uniforms,
+						vertexShader: ShaderLib.cube.vertexShader,
+						fragmentShader: ShaderLib.cube.fragmentShader,
+						side: BackSide,
+						depthTest: false,
+						depthWrite: false,
+						fog: false
+					} )
+				);
+
+			}
+
+			backgroundBoxCamera.projectionMatrix.copy( camera.projectionMatrix );
+
+			backgroundBoxCamera.matrixWorld.extractRotation( camera.matrixWorld );
+			backgroundBoxCamera.matrixWorldInverse.getInverse( backgroundBoxCamera.matrixWorld );
+
 
 			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
-			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
+			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundBoxCamera.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
 
 			objects.update( backgroundBoxMesh );
 
-			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
+			_this.renderBufferDirect( backgroundBoxCamera, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
 
 		} else if ( background && background.isTexture ) {
+
+			if ( backgroundPlaneCamera === undefined ) {
+
+				backgroundPlaneCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+				backgroundPlaneMesh = new Mesh(
+					new PlaneBufferGeometry( 2, 2 ),
+					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
+				);
+
+			}
 
 			backgroundPlaneMesh.material.map = background;
 
 			objects.update( backgroundPlaneMesh );
 
-			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
+			_this.renderBufferDirect( backgroundPlaneCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
 
 		}
 
@@ -1380,7 +1396,7 @@ function WebGLRenderer( parameters ) {
 				if ( _this.sortObjects === true ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _projScreenMatrix );
+					_vector3.applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -1403,7 +1419,7 @@ function WebGLRenderer( parameters ) {
 						if ( _this.sortObjects === true ) {
 
 							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 						}
 
@@ -1536,7 +1552,7 @@ function WebGLRenderer( parameters ) {
 
 				materialProperties.__webglShader = {
 					name: material.type,
-					uniforms: Object.assign( {}, shader.uniforms ),
+					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -1863,6 +1879,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
+				material.isMeshNormalMaterial ||
 				material.isMeshDepthMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
@@ -1916,9 +1933,15 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( material.isMeshNormalMaterial ) {
 
-				m_uniforms.opacity.value = material.opacity;
+				refreshUniformsNormal( m_uniforms, material );
 
 			}
+
+			// RectAreaLight Texture
+			// TODO (mrdoob): Find a nicer implementation
+
+			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = THREE.UniformsLib.LTC_MAT_TEXTURE;
+			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = THREE.UniformsLib.LTC_MAG_TEXTURE;
 
 			WebGLUniforms.upload(
 				_gl, materialProperties.uniformsList, m_uniforms, _this );
@@ -2214,6 +2237,32 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
 		refreshUniformsStandard( uniforms, material );
+
+	}
+
+	function refreshUniformsNormal( uniforms, material ) {
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpMap.value = material.bumpMap;
+			uniforms.bumpScale.value = material.bumpScale;
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
+
+		}
 
 	}
 

@@ -370,7 +370,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material === undefined ) return;
 
-		var originalMaterial = _originalMaterialsTable[ object.uuid ]
+		var originalMaterial = _originalMaterialsTable[ object.uuid ];
 		var material = getNormalDepthMaterial( originalMaterial );
 
 		_originalMaterialsTable[ material.uuid ] = originalMaterial;
@@ -451,7 +451,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material === undefined ) return;
 
-		var originalMaterial = _originalMaterialsTable[ object.uuid ]
+		var originalMaterial = _originalMaterialsTable[ object.uuid ];
 		var material = getColorMaterial( originalMaterial );
 
 		_originalMaterialsTable[ material.uuid ] = originalMaterial;

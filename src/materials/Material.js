@@ -110,7 +110,7 @@ Material.prototype = {
 
 				currentValue.set( newValue );
 
-			} else if ( (currentValue && currentValue.isVector3) && (newValue && newValue.isVector3) ) {
+			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 				currentValue.copy( newValue );
 

@@ -58,7 +58,7 @@ THREE.SMAAPass = function ( width, height ) {
 		console.error( "THREE.SMAAPass relies on THREE.SMAAShader" );
 	}
 
-	this.uniformsEdges = Object.assign( {}, THREE.SMAAShader[0].uniforms );
+	this.uniformsEdges = THREE.UniformsUtils.clone( THREE.SMAAShader[0].uniforms );
 
 	this.uniformsEdges[ "resolution" ].value.set( 1 / width, 1 / height );
 
@@ -71,7 +71,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	// materials - pass 2
 
-	this.uniformsWeights = Object.assign( {}, THREE.SMAAShader[1].uniforms );
+	this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAShader[1].uniforms );
 
 	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
@@ -87,7 +87,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	// materials - pass 3
 
-	this.uniformsBlend = Object.assign( {}, THREE.SMAAShader[2].uniforms );
+	this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAAShader[2].uniforms );
 
 	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;
@@ -104,6 +104,7 @@ THREE.SMAAPass = function ( width, height ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

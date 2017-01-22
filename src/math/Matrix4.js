@@ -448,53 +448,27 @@ Matrix4.prototype = {
 
 	},
 
-	applyToVector3Array: function () {
+	applyToBufferAttribute: function () {
 
 		var v1;
 
-		return function applyToVector3Array( array, offset, length ) {
+		return function applyToBufferAttribute( attribute ) {
 
 			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.fromArray( array, j );
-				v1.applyMatrix4( this );
-				v1.toArray( array, j );
-
-			}
-
-			return array;
-
-		};
-
-	}(),
-
-	applyToBuffer: function () {
-
-		var v1;
-
-		return function applyToBuffer( buffer, offset, length ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
-
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
-
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix4( this );
 
-				buffer.setXYZ( j, v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
-			return buffer;
+			return attribute;
 
 		};
 
@@ -859,7 +833,13 @@ Matrix4.prototype = {
 
 	}(),
 
-	makeFrustum: function ( left, right, bottom, top, near, far ) {
+	makePerspective: function ( left, right, top, bottom, near, far ) {
+
+		if ( far === undefined ) {
+
+			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
+
+		}
 
 		var te = this.elements;
 		var x = 2 * near / ( right - left );
@@ -876,17 +856,6 @@ Matrix4.prototype = {
 		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
 
 		return this;
-
-	},
-
-	makePerspective: function ( fov, aspect, near, far ) {
-
-		var ymax = near * Math.tan( _Math.DEG2RAD * fov * 0.5 );
-		var ymin = - ymax;
-		var xmin = ymin * aspect;
-		var xmax = ymax * aspect;
-
-		return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
 	},
 

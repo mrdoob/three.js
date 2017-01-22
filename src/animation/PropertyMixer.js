@@ -20,14 +20,18 @@ function PropertyMixer( binding, typeName, valueSize ) {
 
 	switch ( typeName ) {
 
-		case 'quaternion':			mixFunction = this._slerp;		break;
+		case 'quaternion':
+			mixFunction = this._slerp;
+			break;
 
 		case 'string':
 		case 'bool':
+			bufferType = Array;
+			mixFunction = this._select;
+			break;
 
-			bufferType = Array,		mixFunction = this._select;		break;
-
-		default:					mixFunction = this._lerp;
+		default:
+			mixFunction = this._lerp;
 
 	}
 

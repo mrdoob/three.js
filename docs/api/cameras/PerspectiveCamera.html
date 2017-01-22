@@ -54,7 +54,11 @@ scene.add( camera );</code>
 		<div>Camera frustum aspect ratio, usually the canvas width / canvas height. Default is *1* (square canvas).</div>
 
 		<h3>[property:Float far]</h3>
-		<div>Camera frustum far plane. Default is *2000*.</div>
+		<div>
+			Camera frustum far plane. Default is *2000*.<br /><br />
+
+			The valid range is between the current value of the [page:.near near] plane and infinity.
+		</div>
 
 		<h3>[property:Float filmGauge]</h3>
 		<div>Film size used for the larger axis. Default is 35 (millimeters). This parameter does not influence the projection matrix unless .filmOffset is set to a nonzero value.</div>
@@ -80,7 +84,13 @@ scene.add( camera );</code>
 
 
 		<h3>[property:Float near]</h3>
-		<div>Camera frustum near plane. Default is *0.1*.</div>
+		<div>
+			Camera frustum near plane. Default is *0.1*.<br /><br />
+
+			The valid range is greater than 0 and less than the current value of the [page:.far far] plane.
+			Note that, unlike for the [page:OrthographicCamera], *0* is <em>not</em> a valid value
+			for a PerspectiveCamera's near plane.
+		</div>
 
 		<h3>[property:Object view]</h3>
 		<div>

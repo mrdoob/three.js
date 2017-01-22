@@ -87,7 +87,7 @@ Vector2.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
-		
+
 		return this;
 
 	},
@@ -453,14 +453,16 @@ Vector2.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
 
 		return this;
 

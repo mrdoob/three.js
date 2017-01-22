@@ -11,7 +11,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 	var shader = THREE.FilmShader;
 
-	this.uniforms = Object.assign( {}, shader.uniforms );
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -21,18 +21,16 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 	} );
 
-	this.uniforms[ "tDiffuse" ] = new THREE.Uniform();
-	this.uniforms[ "time" ] = new THREE.Uniform( 0 );
-
-	if ( grayscale !== undefined )	this.uniforms.grayscale = new THREE.Uniform( grayscale );
-	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity = new THREE.Uniform( noiseIntensity );
-	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity = new THREE.Uniform( scanlinesIntensity );
-	if ( scanlinesCount !== undefined ) this.uniforms.sCount = new THREE.Uniform( scanlinesCount );
+	if ( grayscale !== undefined )	this.uniforms.grayscale.value = grayscale;
+	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
+	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
+	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
