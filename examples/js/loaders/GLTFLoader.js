@@ -1705,9 +1705,6 @@ THREE.GLTFLoader = ( function () {
 				// aspectRatio = xfov / yfov
 				var xfov = yfov * aspectRatio;
 
-				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
 				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
