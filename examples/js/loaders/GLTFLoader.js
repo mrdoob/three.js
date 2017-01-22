@@ -1551,7 +1551,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
-				var primitives = mesh.primitives;
+				var primitives = mesh.primitives || [];
 
 				for ( var name in primitives ) {
 
