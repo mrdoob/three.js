@@ -13,18 +13,18 @@ THREE.SMAAPass = function ( width, height ) {
 		stencilBuffer: false,
 		generateMipmaps: false,
 		minFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat,
-		name: "SMAAPass.edges"
+		format: THREE.RGBFormat
 	} );
+	this.edgesRT.texture.name = "SMAAPass.edges";
 
 	this.weightsRT = new THREE.WebGLRenderTarget( width, height, {
 		depthBuffer: false,
 		stencilBuffer: false,
 		generateMipmaps: false,
 		minFilter: THREE.LinearFilter,
-		format: THREE.RGBAFormat,
-		name: "SMAAPass.weights"
+		format: THREE.RGBAFormat
 	} );
+	this.weightsRT.texture.name = "SMAAPass.weights";
 
 	// textures
 

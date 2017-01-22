@@ -187,9 +187,10 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			if ( shadow.map === null ) {
 
-				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat, name: ( light.name + ".shadowMap" ) };
+				var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+				shadow.map.texture.name = light.name + ".shadowMap";
 
 				shadowCamera.updateProjectionMatrix();
 
@@ -202,7 +203,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			}
 
 			// TODO (abelnation / sam-g-steel): is this needed?
-			if (shadow && shadow.isRectAreaLightShadow ) {
+			if ( shadow && shadow.isRectAreaLightShadow ) {
 
 				shadow.update( light );
 
@@ -307,8 +308,8 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		}
 
 		// Restore GL state.
-		var clearColor = _renderer.getClearColor(),
-		clearAlpha = _renderer.getClearAlpha();
+		var clearColor = _renderer.getClearColor();
+		var clearAlpha = _renderer.getClearAlpha();
 		_renderer.setClearColor( clearColor, clearAlpha );
 
 		scope.needsUpdate = false;

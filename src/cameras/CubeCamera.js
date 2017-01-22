@@ -49,9 +49,10 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter, name: "cubeCamera" };
+	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
+	this.renderTarget.texture.name = "CubeCamera";
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
