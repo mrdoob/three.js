@@ -19,7 +19,7 @@ function Vector3( x, y, z ) {
 
 }
 
-Vector3.prototype = {
+Object.assign( Vector3.prototype, {
 
 	constructor: Vector3,
 
@@ -760,7 +760,7 @@ Vector3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Vector3 };
