@@ -1744,8 +1744,12 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.skins, function ( skin ) {
 
+				var bindShapeMatrix = new THREE.Matrix4();
+
+				if ( skin.bindShapeMatrix !== undefined ) bindShapeMatrix.fromArray( skin.bindShapeMatrix );
+
 				var _skin = {
-					bindShapeMatrix: new THREE.Matrix4().fromArray( skin.bindShapeMatrix ),
+					bindShapeMatrix: bindShapeMatrix,
 					jointNames: skin.jointNames,
 					inverseBindMatrices: dependencies.accessors[ skin.inverseBindMatrices ]
 				};
