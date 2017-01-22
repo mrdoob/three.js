@@ -1699,12 +1699,11 @@ THREE.GLTFLoader = ( function () {
 			if ( camera.type == "perspective" && camera.perspective ) {
 
 				var yfov = camera.perspective.yfov;
-				var xfov = camera.perspective.xfov;
 				var aspectRatio = camera.perspective.aspectRatio !== undefined ? camera.perspective.aspectRatio : 1;
 
 				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				xfov = ( xfov === undefined && yfov ) ? yfov * aspect_ratio : xfov;
+				// aspectRatio = xfov / yfov
+				var xfov = yfov * aspectRatio;
 
 				// According to COLLADA spec...
 				// aspect_ratio = xfov / yfov
