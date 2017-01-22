@@ -33,7 +33,7 @@ function Matrix4() {
 
 }
 
-Matrix4.prototype = {
+Object.assign( Matrix4.prototype, {
 
 	constructor: Matrix4,
 
@@ -939,7 +939,7 @@ Matrix4.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Matrix4 };
