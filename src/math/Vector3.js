@@ -246,7 +246,7 @@ Object.assign( Vector3.prototype, {
 
 	applyEuler: function () {
 
-		var quaternion;
+		var quaternion = new Quaternion();
 
 		return function applyEuler( euler ) {
 
@@ -256,8 +256,6 @@ Object.assign( Vector3.prototype, {
 
 			}
 
-			if ( quaternion === undefined ) quaternion = new Quaternion();
-
 			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 		};
@@ -266,11 +264,9 @@ Object.assign( Vector3.prototype, {
 
 	applyAxisAngle: function () {
 
-		var quaternion;
+		var quaternion = new Quaternion();
 
 		return function applyAxisAngle( axis, angle ) {
-
-			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -329,11 +325,9 @@ Object.assign( Vector3.prototype, {
 
 	project: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function project( camera ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 			return this.applyMatrix4( matrix );
@@ -344,11 +338,9 @@ Object.assign( Vector3.prototype, {
 
 	unproject: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function unproject( camera ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 			return this.applyMatrix4( matrix );
@@ -423,16 +415,10 @@ Object.assign( Vector3.prototype, {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector3();
+		var max = new Vector3();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new Vector3();
-				max = new Vector3();
-
-			}
 
 			min.set( minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal );
@@ -595,11 +581,9 @@ Object.assign( Vector3.prototype, {
 
 	projectOnPlane: function () {
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function projectOnPlane( planeNormal ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			v1.copy( this ).projectOnVector( planeNormal );
 
@@ -614,11 +598,9 @@ Object.assign( Vector3.prototype, {
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function reflect( normal ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
