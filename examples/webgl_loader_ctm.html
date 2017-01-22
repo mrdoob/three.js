@@ -24,11 +24,6 @@
 			}
 
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -42,7 +37,7 @@
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
@@ -66,6 +61,9 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			var textureLoader = new THREE.TextureLoader();
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
 
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
@@ -92,21 +90,20 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube = cubeTextureLoader.load( urls );
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x080808 );
-				//scene.add( ambient );
+				var ambient = new THREE.AmbientLight( 0x040404 );
+				scene.add( ambient );
 
-				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI/2, 3 );
+				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI / 6 );
 				light.position.set( 0, -100, 500 );
 
 				light.castShadow = true;
-				light.shadowMapWidth = 2048;
-				light.shadowMapHeight = 2048;
-				light.shadowCameraFov = 45;
-				//light.shadowCameraVisible = true;
+				light.shadow.mapWidth = 1024;
+				light.shadow.mapHeight = 1024;
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				scene.add( light );
 
@@ -130,7 +127,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -157,7 +154,7 @@
 
 				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
@@ -183,9 +180,9 @@
 
 						specular: 0x303030,
 						shininess: 50,
-						map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
-						specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
-						normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+						map: textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" ),
+						specularMap: textureLoader.load( "obj/leeperrysmith/Map-SPEC.jpg" ),
+						normalMap: textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
 					} );

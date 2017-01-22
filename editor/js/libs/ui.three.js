@@ -10,6 +10,8 @@ UI.Texture = function ( mapping ) {
 
 	var dom = document.createElement( 'span' );
 
+	var form = document.createElement( 'form' );
+
 	var input = document.createElement( 'input' );
 	input.type = 'file';
 	input.addEventListener( 'change', function ( event ) {
@@ -17,6 +19,7 @@ UI.Texture = function ( mapping ) {
 		loadFile( event.target.files[ 0 ] );
 
 	} );
+	form.appendChild( input );
 
 	var canvas = document.createElement( 'canvas' );
 	canvas.width = 32;
@@ -44,19 +47,20 @@ UI.Texture = function ( mapping ) {
 	name.style.border = '1px solid #ccc';
 	dom.appendChild( name );
 
-	var loadFile = function ( file ) {
+	function loadFile( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
 
 			var reader = new FileReader();
-			reader.addEventListener( 'load', function ( event ) {
 
-				var image = document.createElement( 'img' );
-				image.addEventListener( 'load', function( event ) {
+			if ( file.type === 'image/targa' ) {
 
-					var texture = new THREE.Texture( this, mapping );
+				reader.addEventListener( 'load', function ( event ) {
+
+					var canvas = new THREE.TGALoader().parse( event.target.result );
+
+					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
-					texture.needsUpdate = true;
 
 					scope.setValue( texture );
 
@@ -64,15 +68,38 @@ UI.Texture = function ( mapping ) {
 
 				}, false );
 
-				image.src = event.target.result;
+				reader.readAsArrayBuffer( file );
 
-			}, false );
+			} else {
 
-			reader.readAsDataURL( file );
+				reader.addEventListener( 'load', function ( event ) {
+
+					var image = document.createElement( 'img' );
+					image.addEventListener( 'load', function( event ) {
+
+						var texture = new THREE.Texture( this, mapping );
+						texture.sourceFile = file.name;
+						texture.needsUpdate = true;
+
+						scope.setValue( texture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+					}, false );
+
+					image.src = event.target.result;
+
+				}, false );
+
+				reader.readAsDataURL( file );
+
+			}
 
 		}
 
-	};
+		form.reset();
+
+	}
 
 	this.dom = dom;
 	this.texture = null;
@@ -118,7 +145,14 @@ UI.Texture.prototype.setValue = function ( texture ) {
 	} else {
 
 		name.value = '';
-		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		if ( context !== null ) {
+
+			// Seems like context can be null if the canvas is not visible
+
+			context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		}
 
 	}
 
@@ -146,33 +180,8 @@ UI.Outliner = function ( editor ) {
 	dom.className = 'Outliner';
 	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
-	var scene = editor.scene;
-
-	var sortable = Sortable.create( dom, {
-		draggable: '.draggable',
-		onUpdate: function ( event ) {
-
-			var item = event.item;
-
-			var object = scene.getObjectById( item.value );
-
-			if ( item.nextSibling === null ) {
-
-				editor.execute( new MoveObjectCommand( object, editor.scene ) );
-
-			} else {
-
-				var nextObject = scene.getObjectById( item.nextSibling.value );
-				editor.execute( new MoveObjectCommand( object, nextObject.parent, nextObject ) );
-
-			}
-
-		}
-	} );
-
-	// Broadcast for object selection after arrow navigation
-	var changeEvent = document.createEvent( 'HTMLEvents' );
-	changeEvent.initEvent( 'change', true, true );
+	// hack
+	this.scene = editor.scene;
 
 	// Prevent native scroll behavior
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -190,26 +199,12 @@ UI.Outliner = function ( editor ) {
 	// Keybindings to support arrow navigation
 	dom.addEventListener( 'keyup', function ( event ) {
 
-		function select( index ) {
-
-			if ( index >= 0 && index < scope.options.length ) {
-
-				scope.selectedIndex = index;
-
-				// Highlight selected dom elem and scroll parent if needed
-				scope.setValue( scope.options[ index ].value );
-				scope.dom.dispatchEvent( changeEvent );
-
-			}
-
-		}
-
 		switch ( event.keyCode ) {
 			case 38: // up
-				select( scope.selectedIndex - 1 );
+				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
-				select( scope.selectedIndex + 1 );
+				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
 		}
 
@@ -228,12 +223,23 @@ UI.Outliner = function ( editor ) {
 UI.Outliner.prototype = Object.create( UI.Element.prototype );
 UI.Outliner.prototype.constructor = UI.Outliner;
 
+UI.Outliner.prototype.selectIndex = function ( index ) {
+
+	if ( index >= 0 && index < this.options.length ) {
+
+		this.setValue( this.options[ index ].value );
+
+		var changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+		this.dom.dispatchEvent( changeEvent );
+
+	}
+
+};
+
 UI.Outliner.prototype.setOptions = function ( options ) {
 
 	var scope = this;
-
-	var changeEvent = document.createEvent( 'HTMLEvents' );
-	changeEvent.initEvent( 'change', true, true );
 
 	while ( scope.dom.children.length > 0 ) {
 
@@ -241,26 +247,139 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	}
 
+	function onClick() {
+
+		scope.setValue( this.value );
+
+		var changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+		scope.dom.dispatchEvent( changeEvent );
+
+	}
+
+	// Drag
+
+	var currentDrag;
+
+	function onDrag( event ) {
+
+		currentDrag = this;
+
+	}
+
+	function onDragStart( event ) {
+
+		event.dataTransfer.setData( 'text', 'foo' );
+
+	}
+
+	function onDragOver( event ) {
+
+		if ( this === currentDrag ) return;
+
+		var area = event.offsetY / this.clientHeight;
+
+		if ( area < 0.25 ) {
+
+			this.className = 'option dragTop';
+
+		} else if ( area > 0.75 ) {
+
+			this.className = 'option dragBottom';
+
+		} else {
+
+			this.className = 'option drag';
+
+		}
+
+	}
+
+	function onDragLeave() {
+
+		if ( this === currentDrag ) return;
+
+		this.className = 'option';
+
+	}
+
+	function onDrop( event ) {
+
+		if ( this === currentDrag ) return;
+
+		this.className = 'option';
+
+		var scene = scope.scene;
+		var object = scene.getObjectById( currentDrag.value );
+
+		var area = event.offsetY / this.clientHeight;
+
+		if ( area < 0.25 ) {
+
+			var nextObject = scene.getObjectById( this.value );
+			moveObject( object, nextObject.parent, nextObject );
+
+		} else if ( area > 0.75 ) {
+
+			var nextObject = scene.getObjectById( this.nextSibling.value );
+			moveObject( object, nextObject.parent, nextObject );
+
+		} else {
+
+			var parentObject = scene.getObjectById( this.value );
+			moveObject( object, parentObject );
+
+		}
+
+	}
+
+	function moveObject( object, newParent, nextObject ) {
+
+		if ( nextObject === null ) nextObject = undefined;
+
+		var newParentIsChild = false;
+
+		object.traverse( function ( child ) {
+
+			if ( child === newParent ) newParentIsChild = true;
+
+		} );
+
+		if ( newParentIsChild ) return;
+
+		editor.execute( new MoveObjectCommand( object, newParent, nextObject ) );
+
+		var changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+		scope.dom.dispatchEvent( changeEvent );
+
+	}
+
+	//
+
 	scope.options = [];
 
 	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = options[ i ];
-
-		var div = document.createElement( 'div' );
-		div.className = 'option ' + ( option.static === true ? '' : 'draggable' );
-		div.innerHTML = option.html;
-		div.value = option.value;
+		var div = options[ i ];
+		div.className = 'option';
 		scope.dom.appendChild( div );
 
 		scope.options.push( div );
 
-		div.addEventListener( 'click', function ( event ) {
+		div.addEventListener( 'click', onClick, false );
 
-			scope.setValue( this.value );
-			scope.dom.dispatchEvent( changeEvent );
+		if ( div.draggable === true ) {
 
-		}, false );
+			div.addEventListener( 'drag', onDrag, false );
+			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this
+
+			div.addEventListener( 'dragover', onDragOver, false );
+			div.addEventListener( 'dragleave', onDragLeave, false );
+			div.addEventListener( 'drop', onDrop, false );
+
+		}
+
 
 	}
 

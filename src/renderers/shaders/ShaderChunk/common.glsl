@@ -1,5 +1,6 @@
-#define PI 3.14159
-#define PI2 6.28318
+#define PI 3.14159265359
+#define PI2 6.28318530718
+#define PI_HALF 1.5707963267949
 #define RECIPROCAL_PI 0.31830988618
 #define RECIPROCAL_PI2 0.15915494
 #define LOG2 1.442695
@@ -8,13 +9,22 @@
 #define saturate(a) clamp( a, 0.0, 1.0 )
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
-float square( const in float x ) { return x*x; }
+float pow2( const in float x ) { return x*x; }
+float pow3( const in float x ) { return x*x*x; }
+float pow4( const in float x ) { float x2 = x*x; return x2*x2; }
 float average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }
-
+// expects values in the range of [0,1]x[0,1], returns values in the [0,1] range.
+// do not collapse into a single function per: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
+highp float rand( const in vec2 uv ) {
+	const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
+	return fract(sin(sn) * c);
+}
 
 struct IncidentLight {
 	vec3 color;
 	vec3 direction;
+	bool visible;
 };
 
 struct ReflectedLight {
@@ -29,7 +39,6 @@ struct GeometricContext {
 	vec3 normal;
 	vec3 viewDir;
 };
-
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
@@ -64,30 +73,13 @@ vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 poi
 
 }
 
-vec3 inputToLinear( in vec3 a ) {
+mat3 transpose( const in mat3 v ) {
 
-	#ifdef GAMMA_INPUT
+	mat3 tmp;
+	tmp[0] = vec3(v[0].x, v[1].x, v[2].x);
+	tmp[1] = vec3(v[0].y, v[1].y, v[2].y);
+	tmp[2] = vec3(v[0].z, v[1].z, v[2].z);
 
-		return pow( a, vec3( float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
-
-}
-
-vec3 linearToOutput( in vec3 a ) {
-
-	#ifdef GAMMA_OUTPUT
-
-		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
-
-	#else
-
-		return a;
-
-	#endif
+	return tmp;
 
 }

@@ -219,15 +219,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 				_eye.multiplyScalar( factor );
 
-				if ( _this.staticMoving ) {
+			}
 
-					_zoomStart.copy( _zoomEnd );
+			if ( _this.staticMoving ) {
 
-				} else {
+				_zoomStart.copy( _zoomEnd );
 
-					_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
+			} else {
 
-				}
+				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
 
 			}
 
@@ -356,6 +356,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
+		window.removeEventListener( 'keydown', keydown );
+
 		_prevState = _state;
 
 		if ( _state !== STATE.NONE ) {
@@ -384,11 +386,16 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_state = _prevState;
 
+		window.addEventListener( 'keydown', keydown, false );
+
 	}
 
 	function mousedown( event ) {
 
 		if ( _this.enabled === false ) return;
+
+		event.preventDefault();
+		event.stopPropagation();
 
 		if ( _state === STATE.NONE ) {
 
@@ -424,6 +431,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
+		event.preventDefault();
+		event.stopPropagation();
+
 		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
 
 			_movePrev.copy( _moveCurr );
@@ -445,6 +455,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
+		event.preventDefault();
+		event.stopPropagation();
+
 		_state = STATE.NONE;
 
 		document.removeEventListener( 'mousemove', mousemove );
@@ -457,23 +470,28 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		var delta = 0;
+		event.preventDefault();
+		event.stopPropagation();
 
-		if ( event.wheelDelta ) {
+		switch ( event.deltaMode ) {
 
-			// WebKit / Opera / Explorer 9
+                        case 2:
+                                // Zoom in pages
+                                _zoomStart.y -= event.deltaY * 0.025;
+                                break;
 
-			delta = event.wheelDelta / 40;
+			case 1:
+                                // Zoom in lines
+				_zoomStart.y -= event.deltaY * 0.01;
+				break;
 
-		} else if ( event.detail ) {
-
-			// Firefox
-
-			delta = - event.detail / 3;
+			default:
+				// undefined, 0, assume pixels
+				_zoomStart.y -= event.deltaY * 0.00025;
+				break;
 
 		}
 
-		_zoomStart.y += delta * 0.01;
 		_this.dispatchEvent( startEvent );
 		_this.dispatchEvent( endEvent );
 
@@ -512,6 +530,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function touchmove( event ) {
 
 		if ( _this.enabled === false ) return;
+
+		event.preventDefault();
+		event.stopPropagation();
 
 		switch ( event.touches.length ) {
 
@@ -566,8 +587,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		this.domElement.removeEventListener( 'mousedown', mousedown, false );
-		this.domElement.removeEventListener( 'mousewheel', mousewheel, false );
-		this.domElement.removeEventListener( 'MozMousePixelScroll', mousewheel, false ); // firefox
+		this.domElement.removeEventListener( 'wheel', mousewheel, false );
 
 		this.domElement.removeEventListener( 'touchstart', touchstart, false );
 		this.domElement.removeEventListener( 'touchend', touchend, false );
@@ -579,12 +599,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 		window.removeEventListener( 'keydown', keydown, false );
 		window.removeEventListener( 'keyup', keyup, false );
 
-	}
+	};
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
-	this.domElement.addEventListener( 'mousewheel', mousewheel, false );
-	this.domElement.addEventListener( 'MozMousePixelScroll', mousewheel, false ); // firefox
+	this.domElement.addEventListener( 'wheel', mousewheel, false );
 
 	this.domElement.addEventListener( 'touchstart', touchstart, false );
 	this.domElement.addEventListener( 'touchend', touchend, false );

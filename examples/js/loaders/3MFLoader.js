@@ -12,7 +12,7 @@ THREE.ThreeMFLoader.prototype = {
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( text ) {
 
@@ -235,7 +235,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			for ( var i = 0; i < triangleNodes.length; i++ ) {
 
-				triangleNode = triangleNodes[ i ];
+				var triangleNode = triangleNodes[ i ];
 				var v1 = triangleNode.getAttribute( 'v1' );
 				var v2 = triangleNode.getAttribute( 'v2' );
 				var v3 = triangleNode.getAttribute( 'v3' );

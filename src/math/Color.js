@@ -1,28 +1,33 @@
+import { _Math } from './Math';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( color ) {
+function Color( r, g, b ) {
 
-	if ( arguments.length === 3 ) {
+	if ( g === undefined && b === undefined ) {
 
-		return this.fromArray( arguments );
+		// r is THREE.Color, hex or string
+		return this.set( r );
 
 	}
 
-	return this.set( color );
+	return this.setRGB( r, g, b );
 
-};
+}
 
-THREE.Color.prototype = {
+Color.prototype = {
 
-	constructor: THREE.Color,
+	constructor: Color,
+
+	isColor: true,
 
 	r: 1, g: 1, b: 1,
 
 	set: function ( value ) {
 
-		if ( value instanceof THREE.Color ) {
+		if ( value && value.isColor ) {
 
 			this.copy( value );
 
@@ -45,6 +50,8 @@ THREE.Color.prototype = {
 		this.r = scalar;
 		this.g = scalar;
 		this.b = scalar;
+
+		return this;
 
 	},
 
@@ -83,12 +90,12 @@ THREE.Color.prototype = {
 
 		}
 
-		return function ( h, s, l ) {
+		return function setHSL( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
-			h = THREE.Math.euclideanModulo( h, 1 );
-			s = THREE.Math.clamp( s, 0, 1 );
-			l = THREE.Math.clamp( l, 0, 1 );
+			h = _Math.euclideanModulo( h, 1 );
+			s = _Math.clamp( s, 0, 1 );
+			l = _Math.clamp( l, 0, 1 );
 
 			if ( s === 0 ) {
 
@@ -221,7 +228,7 @@ THREE.Color.prototype = {
 		if ( style && style.length > 0 ) {
 
 			// color keywords
-			var hex = THREE.ColorKeywords[ style ];
+			var hex = ColorKeywords[ style ];
 
 			if ( hex !== undefined ) {
 
@@ -410,6 +417,16 @@ THREE.Color.prototype = {
 
 	},
 
+	sub: function( color ) {
+
+		this.r = Math.max( 0, this.r - color.r );
+		this.g = Math.max( 0, this.g - color.g );
+		this.b = Math.max( 0, this.b - color.b );
+
+		return this;
+
+	},
+
 	multiply: function ( color ) {
 
 		this.r *= color.r;
@@ -469,11 +486,17 @@ THREE.Color.prototype = {
 
 		return array;
 
+	},
+
+	toJSON: function () {
+
+		return this.getHex();
+
 	}
 
 };
 
-THREE.ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
 'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
@@ -497,3 +520,6 @@ THREE.ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua':
 'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
 'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
+
+
+export { Color };

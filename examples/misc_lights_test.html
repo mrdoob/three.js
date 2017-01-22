@@ -25,7 +25,7 @@
 
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -42,7 +42,7 @@
 
 			var camera, scene, canvasRenderer, webglRenderer;
 
-			var mesh, zmesh, geometry;
+			var mesh, zmesh, geometry, material;
 
 			var directionalLight, pointLight;
 
@@ -70,8 +70,8 @@
 
 				// Spheres
 
-				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
+				geometry = new THREE.SphereGeometry( 100, 16, 8 );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5, shininess: 0 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -86,8 +86,7 @@
 
 				// Torus
 
-				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
+				geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -108,9 +107,9 @@
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				scene.add( pointLight );
 
-				var geometry = new THREE.SphereGeometry( 100, 8, 4 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				geometry = new THREE.SphereGeometry( 100, 8, 4 );
+				material = new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
@@ -129,10 +128,7 @@
 
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 

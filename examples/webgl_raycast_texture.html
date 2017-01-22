@@ -67,7 +67,7 @@
 				Y <input type="number" value="1" step="0.1" onchange="setRepeatV(this)" />
 			</div>
 		</fieldset>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script>
 
 			CanvasTexture = function ( parentTexture ) {
@@ -103,7 +103,7 @@
 
 				this._draw();
 
-			}
+			};
 
 
 			CanvasTexture.prototype = {
@@ -146,7 +146,7 @@
 
 					if ( ! this._context2D ) return;
 
-					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height )
+					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height );
 
 					// Background.
 					this._context2D.drawImage( this._background, 0, 0 );
@@ -214,6 +214,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( new THREE.Color( 0xEEEEEE, 1.0 ) );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
@@ -289,7 +290,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			};
+			}
 
 			function onMouseMove( evt ) {
 
@@ -308,7 +309,7 @@
 
 				}
 
-			};
+			}
 
 			var getMousePosition = function ( dom, x, y ) {
 
@@ -332,45 +333,45 @@
 				requestAnimationFrame( render );
 				renderer.render( scene, camera );
 
-			};
+			}
 
 			function setwrapS( that ) {
 
 				circleTexture.wrapS = THREE[ that.value ];
 				circleTexture.needsUpdate = true;
 
-			};
+			}
 
 			function setwrapT( that ) {
 
 				circleTexture.wrapT = THREE[ that.value ];
 				circleTexture.needsUpdate = true;
 
-			};
+			}
 
 			function setOffsetU( that ) {
 
 				circleTexture.offset.x = parseFloat( that.value );
 
-			};
+			}
 
 			function setOffsetV( that ) {
 
 				circleTexture.offset.y = parseFloat( that.value );
 
-			};
+			}
 
 			function setRepeatU( that ) {
 
 				circleTexture.repeat.x = parseFloat( that.value );
 
-			};
+			}
 
 			function setRepeatV( that ) {
 
 				circleTexture.repeat.y = parseFloat( that.value );
 
-			};
+			}
 
 		</script>
 	</body>

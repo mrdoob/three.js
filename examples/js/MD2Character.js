@@ -80,21 +80,6 @@ THREE.MD2Character = function () {
 				scope.weapons[ index ] = mesh;
 				scope.meshWeapon = mesh;
 
-
-				// the animation system requires unique names, so append the
-				// uuid of the source geometry:
-
-				var geometry = mesh.geometry,
-					animations = geometry.animations;
-
-				for ( var i = 0, n = animations.length; i !== n; ++ i ) {
-
-					var animation = animations[ i ];
-					animation.name += geometry.uuid;
-
-				}
-
-
 				checkLoadingComplete();
 
 			}
@@ -172,11 +157,10 @@ THREE.MD2Character = function () {
 				this.meshBody.activeAction = null;
 			}
 
-			var clip = THREE.AnimationClip.findByName( this.meshBody.geometry.animations, clipName );
-			if( clip ) {
+			var action = this.mixer.clipAction( clipName, this.meshBody );
+			if( action ) {
 
-				this.meshBody.activeAction =
-						this.mixer.clipAction( clip, this.meshBody ).play();
+				this.meshBody.activeAction = action.play();
 
 			}
 
@@ -202,17 +186,16 @@ THREE.MD2Character = function () {
 			var geometry = this.meshWeapon.geometry,
 				animations = geometry.animations;
 
-			var clip = THREE.AnimationClip.findByName( animations, clipName + geometry.uuid );
-			if( clip ) {
+			var action = this.mixer.clipAction( clipName, this.meshWeapon );
+			if( action ) {
 
 				this.meshWeapon.activeAction =
-						this.mixer.clipAction( clip, this.meshWeapon ).
-							syncWith( this.meshBody.activeAction ).play();
+						action.syncWith( this.meshBody.activeAction ).play();
 
 			}
 
 		}
-			
+
 	}
 
 	this.update = function ( delta ) {
@@ -223,12 +206,13 @@ THREE.MD2Character = function () {
 
 	function loadTextures( baseUrl, textureUrls ) {
 
-		var mapping = THREE.UVMapping;
+		var textureLoader = new THREE.TextureLoader();
 		var textures = [];
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {
 
-			textures[ i ] = THREE.ImageUtils.loadTexture( baseUrl + textureUrls[ i ], mapping, checkLoadingComplete );
+			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
 
 		}
@@ -254,7 +238,7 @@ THREE.MD2Character = function () {
 
 		mesh.materialTexture = materialTexture;
 		mesh.materialWireframe = materialWireframe;
-	
+
 		return mesh;
 
 	}

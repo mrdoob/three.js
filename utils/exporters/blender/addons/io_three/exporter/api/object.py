@@ -9,6 +9,7 @@ from .constants import (
     EMPTY,
     ARMATURE,
     LAMP,
+    AREA,
     SPOT,
     SUN,
     POINT,
@@ -20,6 +21,7 @@ from .constants import (
     NO_SHADOW,
     ZYX
 )
+# TODO: RectAreaLight support
 
 
 # Blender doesn't seem to have a good way to link a mesh back to the
@@ -174,8 +176,12 @@ EXPORTED_TRACKABLE_FIELDS = [ "location", "scale", "rotation_quaternion" ]
 
 @_object
 def animated_xform(obj, options):
+    if obj.animation_data is None:
+        return []
     fcurves = obj.animation_data
     if not fcurves:
+        return []
+    if fcurves.action is None:
         return []
     fcurves = fcurves.action.fcurves
 
@@ -214,6 +220,10 @@ def animated_xform(obj, options):
     track_loc = track_loc[0]
     use_inverted = options.get(constants.HIERARCHY, False) and obj.parent
 
+    if times == None:
+        logger.info("In animated xform: Unable to extract trackable fields from %s", objName)
+        return tracks
+
     # for each frame
     inverted_fallback = mathutils.Matrix() if use_inverted else None
     convert_matrix = AXIS_CONVERSION    # matrix to convert the exported matrix
@@ -230,6 +240,19 @@ def animated_xform(obj, options):
 
     # TODO: remove duplicated key frames
     return tracks
+
+@_object
+def custom_properties(obj):
+    """
+
+    :param obj:
+
+    """
+    logger.debug('object.custom_properties(%s)', obj)
+    # Grab any properties except those marked private (by underscore
+    # prefix) or those with types that would be rejected by the JSON
+    # serializer object model.
+    return {K: obj[K] for K in obj.keys() if K[:1] != '_' and isinstance(obj[K], constants.VALID_DATA_TYPES)}  # 'Empty' Blender objects do not use obj.data.items() for custom properties, using obj.keys()
 
 @_object
 def mesh(obj, options):
@@ -285,11 +308,13 @@ def node_type(obj):
     elif obj.type == EMPTY:
         return constants.OBJECT.title()
 
+    # TODO: RectAreaLight support
     dispatch = {
         LAMP: {
             POINT: constants.POINT_LIGHT,
             SUN: constants.DIRECTIONAL_LIGHT,
             SPOT: constants.SPOT_LIGHT,
+            AREA: constants.RECT_AREA_LIGHT,
             HEMI: constants.HEMISPHERE_LIGHT
         },
         CAMERA: {
@@ -463,6 +488,19 @@ def extract_mesh(obj, options, recalculate=False):
         obj.data = original_mesh
         obj.select = False
         obj.hide = hidden_state
+
+    # split sharp edges
+    original_mesh = obj.data
+    obj.data = mesh_node
+    obj.select = True
+
+    bpy.ops.object.modifier_add(type='EDGE_SPLIT')
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_angle = False
+    bpy.context.object.modifiers['EdgeSplit'].use_edge_sharp = True
+    bpy.ops.object.modifier_apply(apply_as='DATA', modifier='EdgeSplit')
+
+    obj.select = False
+    obj.data = original_mesh
 
     # recalculate the normals to face outwards, this is usually
     # best after applying a modifiers, especialy for something

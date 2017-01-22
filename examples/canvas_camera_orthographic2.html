@@ -20,7 +20,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/cameras/CombinedCamera.js"></script>
 
@@ -143,7 +143,7 @@
 				// Cubes
 
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -185,9 +185,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -208,8 +206,9 @@
 
 				requestAnimationFrame( animate );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 

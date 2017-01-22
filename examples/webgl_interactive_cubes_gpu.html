@@ -35,7 +35,7 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -86,7 +86,7 @@
 				var geometry = new THREE.Geometry(),
 				pickingGeometry = new THREE.Geometry(),
 				pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
-				defaultMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors	} );
+				defaultMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0	} );
 
 				function applyVertexColors( g, c ) {
 
@@ -171,9 +171,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
 

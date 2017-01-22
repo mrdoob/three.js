@@ -2,14 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DirectGeometry = function () {
+import { Vector2 } from '../math/Vector2';
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
-
-	this.uuid = THREE.Math.generateUUID();
-
-	this.name = '';
-	this.type = 'DirectGeometry';
+function DirectGeometry() {
 
 	this.indices = [];
 	this.vertices = [];
@@ -38,32 +33,15 @@ THREE.DirectGeometry = function () {
 	this.uvsNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
-THREE.DirectGeometry.prototype = {
-
-	constructor: THREE.DirectGeometry,
-
-	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
-	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
-
-	computeFaceNormals: function () {
-
-		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
-
-	},
-
-	computeVertexNormals: function () {
-
-		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
-
-	},
+Object.assign( DirectGeometry.prototype, {
 
 	computeGroups: function ( geometry ) {
 
 		var group;
 		var groups = [];
-		var materialIndex;
+		var materialIndex = undefined;
 
 		var faces = geometry.faces;
 
@@ -209,7 +187,7 @@ THREE.DirectGeometry.prototype = {
 
 					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
 
-					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -227,7 +205,7 @@ THREE.DirectGeometry.prototype = {
 
 					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
 
-					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+					this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
@@ -277,14 +255,9 @@ THREE.DirectGeometry.prototype = {
 
 		return this;
 
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
 	}
 
-};
+} );
 
-THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );
+
+export { DirectGeometry };

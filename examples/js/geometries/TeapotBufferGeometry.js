@@ -415,8 +415,8 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	lid = lid === undefined ? true : lid;
 	body = body === undefined ? true : body;
 
-	// Should the lid be snug? It's not traditional, so off by default
-	fitLid = fitLid === undefined ? false : fitLid;
+	// Should the lid be snug? It's not traditional, but we make it snug by default
+	fitLid = fitLid === undefined ? true : fitLid;
 
 	// Jim Blinn scaled the teapot down in size by about 1.3 for
 	// some rendering tests. He liked the new proportions that he kept
@@ -481,7 +481,9 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var sstep, tstep;
 	var vertPerRow, eps;
 
-	var s, t, sval, tval, p, dsval, dtval;
+	var s, t, sval, tval, p;
+	var dsval = 0;
+	var dtval = 0;
 
 	var normOut = new THREE.Vector3();
 	var v1, v2, v3, v4;

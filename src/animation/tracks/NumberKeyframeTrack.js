@@ -1,3 +1,6 @@
+import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
+import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+
 /**
  *
  * A Track of numeric keyframe values.
@@ -7,21 +10,24 @@
  * @author tschw
  */
 
-THREE.NumberKeyframeTrack = function ( name, times, values, interpolation ) {
+function NumberKeyframeTrack( name, times, values, interpolation ) {
 
-	THREE.KeyframeTrack.call( this, name, times, values, interpolation );
+	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
 
-};
+}
 
-THREE.NumberKeyframeTrack.prototype =
-		Object.assign( Object.create( THREE.KeyframeTrack.prototype ), {
+NumberKeyframeTrack.prototype =
+		Object.assign( Object.create( KeyframeTrackPrototype ), {
 
-	constructor: THREE.NumberKeyframeTrack,
+	constructor: NumberKeyframeTrack,
 
-	ValueTypeName: 'number',
+	ValueTypeName: 'number'
 
 	// ValueBufferType is inherited
 
 	// DefaultInterpolation is inherited
 
 } );
+
+
+export { NumberKeyframeTrack };

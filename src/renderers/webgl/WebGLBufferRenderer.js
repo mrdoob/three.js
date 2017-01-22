@@ -1,8 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
+function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
 
@@ -14,11 +14,12 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	function render( start, count ) {
 
-		_gl.drawArrays( mode, start, count );
+		gl.drawArrays( mode, start, count );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
 
 	}
 
@@ -35,20 +36,36 @@ THREE.WebGLBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		var position = geometry.attributes.position;
 
-		if ( position instanceof THREE.InterleavedBufferAttribute ) {
+		var count = 0;
 
-			extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount );
+		if ( position.isInterleavedBufferAttribute ) {
+
+			count = position.data.count;
+
+			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
 
 		} else {
 
-			extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount );
+			count = position.count;
+
+			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
 
 		}
 
+		infoRender.calls ++;
+		infoRender.vertices += count * geometry.maxInstancedCount;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+
 	}
 
-	this.setMode = setMode;
-	this.render = render;
-	this.renderInstances = renderInstances;
+	return {
+		setMode: setMode,
+		render: render,
+		renderInstances: renderInstances
+	};
 
-};
+}
+
+
+export { WebGLBufferRenderer };

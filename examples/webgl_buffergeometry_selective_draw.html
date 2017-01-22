@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 	<title>three.js - BufferGeometry selectively drawn using attributes and a shader</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta content="initial-scale=1.0, maximum-scale=1.0" name="viewport">
-	<meta name="Generator" content="https://callum.com">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
 		body {
 			background-color: #000;
@@ -39,7 +38,7 @@
         	background-color: rgba(64,96,64,0.6);
 		}
 	</style>
-	<script type="text/javascript" src="../build/three.min.js"></script>
+	<script type="text/javascript" src="../build/three.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
 	<script type="text/javascript" src="js/libs/stats.min.js"></script>
 
@@ -110,9 +109,7 @@
 			scene.add( new THREE.AmbientLight( 0x444444 ) );
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '40px';
-			document.body.appendChild( stats.domElement );
+			document.body.appendChild( stats.dom );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

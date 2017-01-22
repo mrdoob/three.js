@@ -2,26 +2,23 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Uniform = function ( type, value ) {
+function Uniform( value ) {
 
-	this.type = type;
-	this.value = value;
+	if ( typeof value === 'string' ) {
 
-	this.dynamic = false;
-
-};
-
-THREE.Uniform.prototype = {
-
-	constructor: THREE.Uniform,
-
-	onUpdate: function ( callback ) {
-
-		this.dynamic = true;
-		this.onUpdateCallback = callback;
-
-		return this;
+		console.warn( 'THREE.Uniform: Type parameter is no longer needed.' );
+		value = arguments[ 1 ];
 
 	}
 
+	this.value = value;
+
+}
+
+Uniform.prototype.clone = function () {
+
+	return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
+
 };
+
+export { Uniform };

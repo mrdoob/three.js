@@ -11,9 +11,9 @@ THREE.BrightnessContrastShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { type: "t", value: null },
-		"brightness": { type: "f", value: 0 },
-		"contrast":   { type: "f", value: 0 }
+		"tDiffuse":   { value: null },
+		"brightness": { value: 0 },
+		"contrast":   { value: 0 }
 
 	},
 

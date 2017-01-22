@@ -38,7 +38,7 @@
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -67,7 +67,10 @@
 
 					geometry.computeVertexNormals();
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', THREE.SphericalReflectionMapping ), overdraw: 0.5 } ) );
+					var envMap = new THREE.TextureLoader().load( 'textures/metal.jpg' );
+					envMap.mapping = THREE.SphericalReflectionMapping;
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: envMap, overdraw: 0.5 } ) );
 					scene.add( mesh );
 
 				} );

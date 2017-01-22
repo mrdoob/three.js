@@ -34,7 +34,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple views - webgl</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -207,7 +207,7 @@
 
 				var materials = [
 
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, shininess: 0 } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 				];
@@ -233,9 +233,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -286,7 +284,7 @@
 					var height = Math.floor( windowHeight * view.height );
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
-					renderer.enableScissorTest ( true );
+					renderer.setScissorTest( true );
 					renderer.setClearColor( view.background );
 
 					camera.aspect = width / height;

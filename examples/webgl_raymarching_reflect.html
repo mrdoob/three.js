@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - raymarching - reflect</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style type="text/css">
+			body {
+				background-color: black;
+				margin: 0;
+				padding: 0;
+			}
+
+			a { color: skyblue }
+
+			canvas {
+				display: block;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				margin: auto;
+			}
+
+			#info {
+				color: white;
+				font-size: 13px;
+				position: absolute;
+				bottom: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl raymarching example -
+			reflect by <a href="https://github.com/gam0022" target="_blank">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank">article in Japanese</a>)
+		</div>
+
+		<script id="fragment_shader" type="x-shader/x-fragment">
+
+			precision highp float;
+
+			uniform vec2 resolution;
+			uniform vec3 cameraPos;
+			uniform vec3 cameraDir;
+
+			const float EPS = 0.01;
+			const float OFFSET = EPS * 100.0;
+			const vec3 lightDir = vec3( -0.48666426339228763, 0.8111071056538127, -0.3244428422615251 );
+
+			// distance functions
+			vec3 onRep( vec3 p, float interval ) {
+
+				vec2 q = mod( p.xz, interval ) - interval * 0.5;
+				return vec3( q.x, p.y, q.y );
+
+			}
+
+			float sphereDist( vec3 p, float r ) {
+
+				return length( onRep( p, 3.0 ) ) - r;
+
+			}
+
+			float floorDist( vec3 p ){
+
+				return dot(p, vec3( 0.0, 1.0, 0.0 ) ) + 1.0;
+
+			}
+
+			vec4 minVec4( vec4 a, vec4 b ) {
+
+				return ( a.a < b.a ) ? a : b;
+
+			}
+
+			float checkeredPattern( vec3 p ) {
+
+				float u = 1.0 - floor( mod( p.x, 2.0 ) );
+				float v = 1.0 - floor( mod( p.z, 2.0 ) );
+
+				if ( ( u == 1.0 && v < 1.0 ) || ( u < 1.0 && v == 1.0 ) ) {
+
+					return 0.2;
+
+				} else {
+
+					return 1.0;
+
+				}
+
+			}
+
+			vec3 hsv2rgb( vec3 c ) {
+
+				vec4 K = vec4( 1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0 );
+				vec3 p = abs( fract( c.xxx + K.xyz ) * 6.0 - K.www );
+				return c.z * mix( K.xxx, clamp( p - K.xxx, 0.0, 1.0 ), c.y );
+
+			}
+
+			float sceneDist( vec3 p ) {
+
+				return min(
+					sphereDist( p, 1.0 ),
+					floorDist( p )
+				);
+
+			}
+
+			vec4 sceneColor( vec3 p ) {
+
+				return minVec4(
+					// 3 * 6 / 2 = 9
+					vec4( hsv2rgb(vec3( ( p.z + p.x ) / 9.0, 1.0, 1.0 ) ), sphereDist( p, 1.0 ) ),
+					vec4( vec3( 0.5 ) * checkeredPattern( p ), floorDist( p ) )
+				);
+
+			}
+
+			vec3 getNormal( vec3 p ) {
+
+				return normalize(vec3(
+					sceneDist(p + vec3( EPS, 0.0, 0.0 ) ) - sceneDist(p + vec3( -EPS, 0.0, 0.0 ) ),
+					sceneDist(p + vec3( 0.0, EPS, 0.0 ) ) - sceneDist(p + vec3( 0.0, -EPS, 0.0 ) ),
+					sceneDist(p + vec3( 0.0, 0.0, EPS ) ) - sceneDist(p + vec3( 0.0, 0.0, -EPS ) )
+				));
+
+			}
+
+			float getShadow( vec3 ro, vec3 rd ) {
+
+				float h = 0.0;
+				float c = 0.0;
+				float r = 1.0;
+				float shadowCoef = 0.5;
+
+				for ( float t = 0.0; t < 50.0; t++ ) {
+
+					h = sceneDist( ro + rd * c );
+
+					if ( h < EPS ) return shadowCoef;
+
+					r = min( r, h * 16.0 / c );
+					c += h;
+
+				}
+
+				return 1.0 - shadowCoef + r * shadowCoef;
+
+			}
+
+			vec3 getRayColor( vec3 origin, vec3 ray, out vec3 p, out vec3 normal, out bool hit ) {
+
+				// marching loop
+				float dist;
+				float depth = 0.0;
+				p = origin;
+
+				for ( int i = 0; i < 64; i++ ){
+
+					dist = sceneDist( p );
+					depth += dist;
+					p = origin + depth * ray;
+
+					if ( abs(dist) < EPS ) break;
+
+				}
+
+				// hit check and calc color
+				vec3 color;
+
+				if ( abs(dist) < EPS ) {
+
+					normal = getNormal(p);
+					float diffuse = clamp( dot( lightDir, normal ), 0.1, 1.0 );
+					float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 );
+					float shadow = getShadow( p + normal * OFFSET, lightDir );
+					color = ( sceneColor( p ).rgb * diffuse + vec3( 0.8 ) * specular ) * max( 0.5, shadow );
+
+					hit = true;
+
+				} else {
+
+					color = vec3( 0.0 );
+
+				}
+
+				return color - pow( clamp( 0.05 * depth, 0.0, 0.6 ), 2.0 );
+
+			}
+
+			void main(void) {
+
+				// fragment position
+				vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
+
+				// camera and ray
+				vec3 cPos  = cameraPos;
+				vec3 cDir  = cameraDir;
+				vec3 cSide = normalize( cross( cDir, vec3( 0.0, 1.0 ,0.0 ) ) );
+				vec3 cUp   = normalize( cross( cSide, cDir ) );
+				float targetDepth = 1.3;
+				vec3 ray = normalize( cSide * p.x + cUp * p.y + cDir * targetDepth );
+
+				vec3 color = vec3( 0.0 );
+				vec3 q, normal;
+				bool hit;
+				float alpha = 1.0;
+
+				for ( int i = 0; i < 3; i++ ) {
+
+					color += alpha * getRayColor( cPos, ray, q, normal, hit );
+					alpha *= 0.3;
+					ray = normalize( reflect( ray, normal ) );
+					cPos = q + normal * OFFSET;
+
+					if ( !hit ) break;
+
+				}
+
+				gl_FragColor = vec4(color, 1.0);
+
+			}
+
+		</script>
+
+		<script id="vertex_shader" type="x-shader/x-vertex">
+
+			attribute vec3 position;
+
+			void main(void) {
+
+				gl_Position = vec4(position, 1.0);
+
+			}
+
+		</script>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/FlyControls.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			var camera, dummyCamera, scene, controls, renderer;
+			var geometry, material, mesh;
+			var mouse = new THREE.Vector2( 0.5, 0.5 );
+			var canvas;
+			var stats;
+
+			var clock = new THREE.Clock();
+
+			var config = {
+				saveImage: function() {
+
+					renderer.render( scene, dummyCamera );
+					window.open( canvas.toDataURL() );
+
+				},
+				freeCamera: false,
+				resolution: '512'
+			};
+
+			init();
+			render();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				camera = new THREE.Camera();
+				dummyCamera = new THREE.Camera();
+				camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ) );
+
+				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
+				material = new THREE.RawShaderMaterial( {
+					uniforms: {
+						resolution: { value: new THREE.Vector2( 512, 512 ) },
+						cameraPos:  { value: camera.getWorldPosition() },
+						cameraDir:  { value: camera.getWorldDirection() }
+					},
+					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( 512, 512 );
+
+				canvas = renderer.domElement;
+				canvas.addEventListener( 'mousemove', onMouseMove );
+				window.addEventListener( 'resize', onWindowResize );
+				document.body.appendChild( canvas );
+
+				controls = new THREE.FlyControls( camera, canvas );
+
+				controls.autoForward = true;
+				controls.dragToLook = false;
+				controls.rollSpeed = Math.PI / 12;
+				controls.movementSpeed = 0.5;
+
+				var gui = new dat.GUI();
+				gui.add( config, 'saveImage' ).name( 'Save Image' );
+				gui.add( config, 'freeCamera' ).name( 'Free Camera' );
+				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( function( value ) {
+
+					if ( value !== 'full' ) {
+
+						canvas.width = value;
+						canvas.height = value;
+
+					}
+					onWindowResize();
+
+				} );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+			}
+
+			function render( timestamp ) {
+
+				var delta = clock.getDelta();
+
+				stats.begin();
+
+				if ( config.freeCamera ) {
+
+					controls.update( delta );
+
+				} else {
+
+					camera.position.set( mouse.x - 0.5, mouse.y * 4, timestamp * 0.001 );
+					camera.lookAt( new THREE.Vector3( 0.0, -0.3, 1.0 ).add( camera.position ) );
+
+				}
+
+				if ( camera.position.y < 0 ) camera.position.y = 0;
+
+				material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
+				material.uniforms.cameraPos.value = camera.getWorldPosition();
+				material.uniforms.cameraDir.value = camera.getWorldDirection();
+				renderer.render( scene, dummyCamera );
+
+				stats.end();
+				requestAnimationFrame( render );
+
+			}
+
+			function onMouseMove( e ) {
+
+				mouse.x = e.offsetX / canvas.width;
+				mouse.y = e.offsetY / canvas.height;
+
+			}
+
+			function onWindowResize( e ) {
+
+				if ( config.resolution === 'full' ) {
+
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+
+				}
+
+				renderer.setSize( canvas.width, canvas.height );
+
+			}
+
+		</script>
+
+	</body>
+</html>

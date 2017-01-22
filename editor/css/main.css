@@ -94,6 +94,29 @@ textarea, input { outline: none; } /* osx */
 
 /* outliner */
 
+#outliner .option {
+
+	border: 1px solid transparent;
+}
+
+#outliner .option.drag {
+
+	border: 1px dashed #999;
+
+}
+
+#outliner .option.dragTop {
+
+	border-top: 1px dashed #999;
+
+}
+
+#outliner .option.dragBottom {
+
+	border-bottom: 1px dashed #999;
+
+}
+
 #outliner .type {
 	position:relative;
 	top:-2px;

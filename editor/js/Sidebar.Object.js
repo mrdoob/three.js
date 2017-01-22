@@ -65,8 +65,8 @@ Sidebar.Object = function ( editor ) {
 	// uuid
 
 	var objectUUIDRow = new UI.Row();
-	var objectUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
-	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var objectUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var objectUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
 
@@ -94,18 +94,6 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectNameRow );
 
-	/*
-	// parent
-
-	var objectParentRow = new UI.Row();
-	var objectParent = new UI.Select().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
-
-	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
-	objectParentRow.add( objectParent );
-
-	container.add( objectParentRow );
-	*/
-
 	// position
 
 	var objectPositionRow = new UI.Row();
@@ -121,9 +109,9 @@ Sidebar.Object = function ( editor ) {
 	// rotation
 
 	var objectRotationRow = new UI.Row();
-	var objectRotationX = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectRotationY = new UI.Number().setWidth( '50px' ).onChange( update );
-	var objectRotationZ = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectRotationX = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UI.Number().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
 
 	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
@@ -224,15 +212,15 @@ Sidebar.Object = function ( editor ) {
 
 	container.add( objectAngleRow );
 
-	// exponent
+	// penumbra
 
-	var objectExponentRow = new UI.Row();
-	var objectExponent = new UI.Number().setRange( 0, Infinity ).onChange( update );
+	var objectPenumbraRow = new UI.Row();
+	var objectPenumbra = new UI.Number().setRange( 0, 1 ).onChange( update );
 
-	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ) );
-	objectExponentRow.add( objectExponent );
+	objectPenumbraRow.add( new UI.Text( 'Penumbra' ).setWidth( '90px' ) );
+	objectPenumbraRow.add( objectPenumbra );
 
-	container.add( objectExponentRow );
+	container.add( objectPenumbraRow );
 
 	// decay
 
@@ -255,6 +243,9 @@ Sidebar.Object = function ( editor ) {
 
 	var objectReceiveShadow = new UI.THREE.Boolean( false, 'receive' ).onChange( update );
 	objectShadowRow.add( objectReceiveShadow );
+
+	var objectShadowRadius = new UI.Number( 1 ).onChange( update );
+	objectShadowRow.add( objectShadowRadius );
 
 	container.add( objectShadowRow );
 
@@ -357,20 +348,6 @@ Sidebar.Object = function ( editor ) {
 
 		if ( object !== null ) {
 
-			/*
-			if ( object.parent !== null ) {
-
-				var newParentId = parseInt( objectParent.getValue() );
-
-				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
-
-					editor.execute( new MoveObjectCommand( object, editor.scene.getObjectById( newParentId ) ) );
-
-				}
-
-			}
-			*/
-
 			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
 			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
@@ -378,7 +355,7 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			var newRotation = new THREE.Euler( objectRotationX.getValue(), objectRotationY.getValue(), objectRotationZ.getValue() );
+			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
 				editor.execute( new SetRotationCommand( object, newRotation ) );
@@ -441,9 +418,9 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			if ( object.exponent !== undefined && Math.abs( object.exponent - objectExponent.getValue() ) >= 0.01 ) {
+			if ( object.penumbra !== undefined && Math.abs( object.penumbra - objectPenumbra.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'exponent', objectExponent.getValue() ) );
+				editor.execute( new SetValueCommand( object, 'penumbra', objectPenumbra.getValue() ) );
 
 			}
 
@@ -459,18 +436,24 @@ Sidebar.Object = function ( editor ) {
 
 			}
 
-			if ( object.castShadow !== objectCastShadow.getValue() ) {
+			if ( object.castShadow !== undefined && object.castShadow !== objectCastShadow.getValue() ) {
 
 				editor.execute( new SetValueCommand( object, 'castShadow', objectCastShadow.getValue() ) );
 
 			}
 
-			if ( object.receiveShadow !== undefined ) {
+			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
-				if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
+				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
+				object.material.needsUpdate = true;
 
-					editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
-					object.material.needsUpdate = true;
+			}
+
+			if ( object.shadow !== undefined ) {
+
+				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
+
+					editor.execute( new SetValueCommand( object.shadow, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
@@ -498,7 +481,6 @@ Sidebar.Object = function ( editor ) {
 	function updateRows( object ) {
 
 		var properties = {
-			// 'parent': objectParentRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -507,10 +489,11 @@ Sidebar.Object = function ( editor ) {
 			'groundColor': objectGroundColorRow,
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
-			'exponent' : objectExponentRow,
+			'penumbra' : objectPenumbraRow,
 			'decay' : objectDecayRow,
 			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadow
+			'receiveShadow' : objectReceiveShadow,
+			'shadow': objectShadowRadius
 		};
 
 		for ( var property in properties ) {
@@ -557,23 +540,6 @@ Sidebar.Object = function ( editor ) {
 
 	} );
 
-	/*
-	signals.sceneGraphChanged.add( function () {
-
-		var scene = editor.scene;
-		var options = {};
-
-		scene.traverse( function ( object ) {
-
-			options[ object.id ] = object.name;
-
-		} );
-
-		objectParent.setOptions( options );
-
-	} );
-	*/
-
 	signals.objectChanged.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
@@ -597,21 +563,13 @@ Sidebar.Object = function ( editor ) {
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
-		/*
-		if ( object.parent !== null ) {
-
-			objectParent.setValue( object.parent.id );
-
-		}
-		*/
-
 		objectPositionX.setValue( object.position.x );
 		objectPositionY.setValue( object.position.y );
 		objectPositionZ.setValue( object.position.z );
 
-		objectRotationX.setValue( object.rotation.x );
-		objectRotationY.setValue( object.rotation.y );
-		objectRotationZ.setValue( object.rotation.z );
+		objectRotationX.setValue( object.rotation.x * THREE.Math.RAD2DEG );
+		objectRotationY.setValue( object.rotation.y * THREE.Math.RAD2DEG );
+		objectRotationZ.setValue( object.rotation.z * THREE.Math.RAD2DEG );
 
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );
@@ -665,9 +623,9 @@ Sidebar.Object = function ( editor ) {
 
 		}
 
-		if ( object.exponent !== undefined ) {
+		if ( object.penumbra !== undefined ) {
 
-			objectExponent.setValue( object.exponent );
+			objectPenumbra.setValue( object.penumbra );
 
 		}
 
@@ -686,6 +644,12 @@ Sidebar.Object = function ( editor ) {
 		if ( object.receiveShadow !== undefined ) {
 
 			objectReceiveShadow.setValue( object.receiveShadow );
+
+		}
+
+		if ( object.shadow !== undefined ) {
+
+			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
 

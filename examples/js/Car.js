@@ -299,8 +299,8 @@ THREE.Car = function () {
 			var s = scope.modelScale,
 				delta = new THREE.Vector3();
 
-			var bodyFaceMaterial = new THREE.MeshFaceMaterial( scope.bodyMaterials );
-			var wheelFaceMaterial = new THREE.MeshFaceMaterial( scope.wheelMaterials );
+			var bodyFaceMaterial = new THREE.MultiMaterial( scope.bodyMaterials );
+			var wheelFaceMaterial = new THREE.MultiMaterial( scope.wheelMaterials );
 
 			// body
 

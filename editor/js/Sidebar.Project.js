@@ -57,8 +57,7 @@ Sidebar.Project = function ( editor ) {
 
 	// antialiasing
 
-	var rendererPropertiesRow = new UI.Row();
-	rendererPropertiesRow.add( new UI.Text( '' ).setWidth( '90px' ) );
+	var rendererPropertiesRow = new UI.Row().setMarginLeft( '90px' );
 
 	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
 
@@ -77,6 +76,28 @@ Sidebar.Project = function ( editor ) {
 
 	} );
 	rendererPropertiesRow.add( rendererShadows );
+
+	rendererPropertiesRow.add( new UI.Break() );
+
+	// gamma input
+
+	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'γ input' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaInput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaInput );
+
+	// gamma output
+
+	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'γ output' ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaOutput );
 
 	container.add( rendererPropertiesRow );
 
@@ -99,11 +120,11 @@ Sidebar.Project = function ( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows ) {
+	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
 
 		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
 
@@ -113,14 +134,22 @@ Sidebar.Project = function ( editor ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
-		if ( shadows && renderer.shadowMap ) renderer.shadowMap.enabled = true;
+		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
+		renderer.gammaInput = gammaIn;
+		renderer.gammaOutput = gammaOut;
+		if ( shadows && renderer.shadowMap ) {
+
+			renderer.shadowMap.enabled = true;
+			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		}
+
 		signals.rendererChanged.dispatch( renderer );
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
 
 	return container;
 
-}
+};

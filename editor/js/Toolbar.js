@@ -14,26 +14,49 @@ var Toolbar = function ( editor ) {
 
 	// translate / rotate / scale
 
-	var translate = new UI.Button( 'translate' ).onClick( function () {
+	var translate = new UI.Button( 'translate' );
+	translate.dom.title = 'W';
+	translate.dom.className = 'Button selected';
+	translate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
 	buttons.add( translate );
 
-	var rotate = new UI.Button( 'rotate' ).onClick( function () {
+	var rotate = new UI.Button( 'rotate' );
+	rotate.dom.title = 'E';
+	rotate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
 	buttons.add( rotate );
 
-	var scale = new UI.Button( 'scale' ).onClick( function () {
+	var scale = new UI.Button( 'scale' );
+	scale.dom.title = 'R';
+	scale.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'scale' );
 
 	} );
 	buttons.add( scale );
+
+	signals.transformModeChanged.add( function ( mode ) {
+
+		translate.dom.classList.remove( 'selected' );
+		rotate.dom.classList.remove( 'selected' );
+		scale.dom.classList.remove( 'selected' );
+
+		switch ( mode ) {
+
+			case 'translate': translate.dom.classList.add( 'selected' ); break;
+			case 'rotate': rotate.dom.classList.add( 'selected' ); break;
+			case 'scale': scale.dom.classList.add( 'selected' ); break;
+
+		}
+
+	} );
 
 	// grid
 
@@ -60,4 +83,4 @@ var Toolbar = function ( editor ) {
 
 	return container;
 
-}
+};

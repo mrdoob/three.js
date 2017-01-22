@@ -30,7 +30,7 @@ THREE.VRMLLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new THREE.FileLoader( this.manager );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -203,6 +203,8 @@ THREE.VRMLLoader.prototype = {
 
 			};
 
+			var index = [];
+
 			var parseProperty = function ( node, line ) {
 
 				var parts = [], part, property = {}, fieldName;
@@ -213,7 +215,7 @@ THREE.VRMLLoader.prototype = {
 				 */
 				var regex = /[^\s,\[\]]+/g;
 
-				var point, index, angles, colors;
+				var point, angles, colors;
 
 				while ( null != ( part = regex.exec( line ) ) ) {
 
@@ -255,8 +257,6 @@ THREE.VRMLLoader.prototype = {
 					// the parts hold the indexes as strings
 					if ( parts.length > 0 ) {
 
-						index = [];
-
 						for ( var ind = 0; ind < parts.length; ind ++ ) {
 
 							// the part should either be positive integer or -1
@@ -290,6 +290,15 @@ THREE.VRMLLoader.prototype = {
 
 					// end
 					if ( /]/.exec( line ) ) {
+
+						if ( index.length > 0 ) {
+
+							this.indexes.push( index );
+
+						}
+
+						// start new one
+						index = [];
 
 						this.isRecordingFaces = false;
 						node[this.recordingFieldname] = this.indexes;
@@ -406,7 +415,9 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-
+							
+						case 'location':
+						case 'direction':
 						case 'translation':
 						case 'scale':
 						case 'size':
@@ -425,6 +436,8 @@ THREE.VRMLLoader.prototype = {
 
 							break;
 
+						case 'intensity':				
+						case 'cutOffAngle':
 						case 'radius':
 						case 'topRadius':
 						case 'bottomRadius':
@@ -459,7 +472,8 @@ THREE.VRMLLoader.prototype = {
 							};
 
 							break;
-
+							
+						case 'on':
 						case 'ccw':
 						case 'solid':
 						case 'colorPerVertex':
@@ -573,7 +587,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /USE/.exec( data ) ) {
 
-						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
+						var defineKey = /USE\s+?([^\s]+)/.exec( data )[ 1 ];
 
 						if ( undefined == defines[ defineKey ] ) {
 
@@ -614,13 +628,92 @@ THREE.VRMLLoader.prototype = {
 
 				var object = parent;
 
+				if(data.string.indexOf("AmbientLight")>-1 && data.nodeType=='PointLight'){
+					//wenn im Namen "AmbientLight" vorkommt und es ein PointLight ist, 
+					//diesen Typ in 'AmbientLight' ändern
+					data.nodeType='AmbientLight';	
+				}
+				
+				l_visible=data.on;
+				if(l_visible==undefined)l_visible=true;
+				l_intensity=data.intensity;
+				if(l_intensity==undefined)l_intensity=true;
+				if(data.color!=undefined)
+					l_color= new THREE.Color(data.color.r, data.color.g,data.color.b );
+					else
+					l_color= new THREE.Color(0, 0,0);
+				
+				
+				
+				if('AmbientLight' === data.nodeType){
+					object=new THREE.AmbientLight( 
+								l_color.getHex(), 
+								l_intensity
+								);
+					object.visible=l_visible;
+					
+					parent.add( object );
+					
+				}
+				else
+				if('PointLight' === data.nodeType){
+						l_distance =0;	//0="unendlich" ...1000
+						l_decay=0;		//-1.. ?
+						
+						if(data.radius!=undefined && data.radius<1000){
+							//l_radius=data.radius;
+							l_distance=data.radius;
+							l_decay=1;
+						}
+						object=new THREE.PointLight( 
+								l_color.getHex(), 
+								l_intensity, 
+								l_distance);
+						object.visible=l_visible;
+						
+						parent.add( object );
+				}
+				else
+				if('SpotLight' === data.nodeType){						
+						l_intensity=1;
+						l_distance =0;//0="unendlich"=1000
+						l_angle=Math.PI/3;
+						l_penumbra=0.0;//0..1
+						l_decay=0;//-1.. ?
+						l_visible=true;
+						
+						if(data.radius!=undefined && data.radius<1000){
+							//l_radius=data.radius;
+							l_distance=data.radius;
+							l_decay=1;
+						}
+						if(data.cutOffAngle!=undefined)l_angle=data.cutOffAngle;
+						
+						object = new THREE.SpotLight(
+									l_color.getHex(),
+									l_intensity,
+									l_distance,
+									l_angle,
+									l_penumbra,
+									l_decay
+									);
+						object.visible=l_visible;						
+						parent.add( object );
+						/*
+						var lightHelper = new THREE.SpotLightHelper( object );
+						parent.parent.add( lightHelper );
+						lightHelper.update();
+						*/
+				}
+				else				
+				
 				if ( 'Transform' === data.nodeType || 'Group' === data.nodeType ) {
 
 					object = new THREE.Object3D();
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
 
 					}
@@ -657,7 +750,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+([^\s]+)/.exec( data.string )[ 1 ];
 
 						defines[ object.name ] = object;
 
@@ -763,7 +856,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'DEF' ) > -1 ) {
 
-									var name = /DEF\s+(\w+)/.exec( child.string )[ 1 ];
+									var name = /DEF\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									defines[ name ] = geometry.vertices;
 
@@ -771,7 +864,7 @@ THREE.VRMLLoader.prototype = {
 
 								if ( child.string.indexOf ( 'USE' ) > -1 ) {
 
-									var defineKey = /USE\s+(\w+)/.exec( child.string )[ 1 ];
+									var defineKey = /USE\s+([^\s]+)/.exec( child.string )[ 1 ];
 
 									geometry.vertices = defines[ defineKey ];
 								}
@@ -853,7 +946,7 @@ THREE.VRMLLoader.prototype = {
 						// see if it's a define
 						if ( /DEF/.exec( data.string ) ) {
 
-							geometry.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+							geometry.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 							defines[ geometry.name ] = geometry;
 
 						}
@@ -911,7 +1004,7 @@ THREE.VRMLLoader.prototype = {
 
 							if ( /DEF/.exec( data.string ) ) {
 
-								material.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+								material.name = /DEF ([^\s]+)/.exec( data.string )[ 1 ];
 
 								defines[ material.name ] = material;
 

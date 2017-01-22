@@ -5,7 +5,6 @@
  *
  */
 
-
 THREE.ParametricGeometries = {
 
 	klein: function ( v, u ) {
@@ -112,7 +111,7 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 		cx, cy, pos, pos2 = new THREE.Vector3(),
 		i, j, ip, jp, a, b, c, d, uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
+	var frames = path.computeFrenetFrames( segments, closed ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -170,45 +169,41 @@ THREE.ParametricGeometries.TubeGeometry.prototype.constructor = THREE.Parametric
   * Parametric Replacement for TorusKnotGeometry
   *
   *********************************************/
-THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
+THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, segmentsR, p, q ) {
 
 	var scope = this;
 
 	this.radius = radius || 200;
 	this.tube = tube || 40;
-	this.segmentsR = segmentsR || 64;
-	this.segmentsT = segmentsT || 8;
+	this.segmentsT = segmentsT || 64;
+	this.segmentsR = segmentsR || 8;
 	this.p = p || 2;
 	this.q = q || 3;
-	this.heightScale = heightScale || 1;
 
+	function TorusKnotCurve() {}
 
-	var TorusKnotCurve = THREE.Curve.create(
+	TorusKnotCurve.prototype = Object.create( THREE.Curve.prototype );
+	TorusKnotCurve.prototype.constructor = TorusKnotCurve;
 
-		function() {
-		},
+	TorusKnotCurve.prototype.getPoint = function( t ){
 
-		function( t ) {
+		t *= Math.PI * 2;
 
-			t *= Math.PI * 2;
+		var r = 0.5;
 
-			var r = 0.5;
+		var x = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t );
+		var y = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t );
+		var z = r * Math.sin( q * t );
 
-			var tx = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t ),
-				ty = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t ),
-				tz = r * Math.sin( q * t );
+		return new THREE.Vector3( x, y, z ).multiplyScalar( radius );
 
-			return new THREE.Vector3( tx, ty * heightScale, tz ).multiplyScalar( radius );
+	};
 
-		}
-
-	);
-	var segments = segmentsR;
-	var radiusSegments = segmentsT;
+	var segments = segmentsT;
+	var radiusSegments = segmentsR;
 	var extrudePath = new TorusKnotCurve();
 
 	THREE.ParametricGeometries.TubeGeometry.call( this, extrudePath, segments, tube, radiusSegments, true, false );
-
 
 };
 

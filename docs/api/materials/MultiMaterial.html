@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		A Material to define multiple materials for the same geometry.
+		The geometry decides which material is used for which faces by the [page:Face3 faces materialindex].
+		The material index corresponds with the index of the material in the [page:.materials] array.
+		</div>
+
+		<h2>Examples</h2>
+		<div>
+			[example:webgl_animation_skinning_morph WebGL / animation / skinning / morph]<br />
+			[example:webgl_effects_parallaxbarrier WebGL / effect / parallaxbarrier]<br />
+			[example:webgl_geometry_colors_blender WebGL / geometry / colors / blender]<br />
+			[example:webgl_geometry_text_earcut WebGL / geometry / text / earcut]<br />
+			[example:webgl_geometry_text_pnltri WebGL / geometry / text / pnltri]<br />
+			[example:webgl_geometry_text WebGL / geometry / text]<br />
+			[example:webgl_loader_ctm_materials WebGL / loader / ctm / materials]<br />
+			[example:webgl_loader_json_blender WebGL / loader / json / blender]<br />
+			[example:webgl_loader_json_objconverter WebGL / loader / json / objconverter]<br />
+			[example:webgl_loader_mmd WebGL / loader / mmd]<br />
+			[example:webgl_materials_cars WebGL / materials / cars]<br />
+			[example:webgl_materials_lightmap  WebGL / materials / lightmap]<br />
+			[example:webgl_materials WebGL / materials /  / ]<br />
+			[example:webgl_nearestneighbour WebGL / nearestneighbour]<br />
+			[example:webgl_objects_update WebGL / objects / update]<br />
+			[example:webgl_panorama_cube WebGL / panorama / cube]<br />
+			[example:webgl_skinning_simple WebGL / skinning / simple]
+
+		</div>
+
+		<code>
+//The following will create a cube with a different material applied to each side
+var materials = [
+
+    new THREE.MeshBasicMaterial( { color: 0xff0000 } ), // right
+    new THREE.MeshBasicMaterial( { color: 0x0000ff } ), // left
+    new THREE.MeshBasicMaterial( { color: 0x00ff00 } ), // top
+    new THREE.MeshBasicMaterial( { color: 0xffff00 } ), // bottom
+    new THREE.MeshBasicMaterial( { color: 0x00ffff } ), // back
+    new THREE.MeshBasicMaterial( { color: 0xff00ff } )  // front
+
+];
+
+var cubeSidesMaterial = new THREE.MultiMaterial( materials );
+
+var cubeGeometry = new THREE.BoxBufferGeometry( 100, 100, 100, 1, 1, 1 );
+
+var cubeMesh = new THREE.Mesh( cubeGeometry, cubeSidesMaterial );
+
+scene.add( cubeMesh );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Array materials] )</h3>
+		<div>
+		[page:Array materials] -- an array of [page:Material Materials] to be used in the MultiMaterial.<br /><br />
+
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean isMultiMaterial]</h3>
+		<div>
+			Used to check whether this or derived classes are multi materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
+		<h3>[property:Array materials]</h3>
+		<div>An array containing the materials being used by the MultiMaterial.</div>
+
+		<h3>[property:String uuid]</h3>
+		<div>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this material instance.
+		This gets automatically assigned, so this shouldn't be edited.
+		</div>
+
+		<h3>[property:Array visible]</h3>
+		<div>Whether or not [page:Mesh meshes] using this material should be rendered.</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:MultiMaterial clone]()</h3>
+		<div>Return a clone of this MultiMaterial.</div>
+
+		<h3>[method:null toJSON]( [page:object meta] )</h3>
+		<div>
+		meta -- object containing metadata such as textures or images for the material.<br />
+		Convert the material to three.js JSON format.
+		</div>
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

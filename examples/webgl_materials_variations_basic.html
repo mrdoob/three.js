@@ -5,13 +5,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-					body {
+			body {
 				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #fff;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -28,11 +28,8 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Basic Material Variantions by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/geometries/TextGeometry.js"></script>
-		<script src="js/utils/FontUtils.js"></script>
-		<script src="fonts/gentilis_regular.typeface.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -43,13 +40,18 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, objects = [];
+			var camera, scene, renderer, controls;
 			var particleLight;
 
-			init();
-			animate();
+			var loader = new THREE.FontLoader();
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
-			function init() {
+				init( font );
+				animate();
+
+			} );
+
+			function init( font ) {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -57,11 +59,19 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
+				//
+
+				var reflectionCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/SwedishRoyalCastle/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				reflectionCube.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = reflectionCube;
 
 				// Materials
 
-				var imgTexture = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
@@ -70,17 +80,6 @@
 
 				var materials = [];
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
-				reflectionCube.format = THREE.RGBFormat;
-
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -88,23 +87,21 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				for( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
+				for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
 
-					var baseColor = new THREE.Color().setHSL( alpha, 0.5, 0.5 );
+					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-					if( alpha >= 0.5 ) {
-						reflectionCube = null;
-					}
+						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
 
-						var reflectivity = beta;
-
-						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
-
-							var diffuseColor = baseColor.clone().multiplyScalar( gamma );
-
-							var material = new THREE.MeshBasicMaterial( { map: imgTexture, color: diffuseColor, reflectivity: reflectivity, shading: THREE.SmoothShading, envMap: reflectionCube } )
+							var material = new THREE.MeshBasicMaterial( {
+								map: imgTexture,
+								color: diffuseColor,
+								reflectivity: beta,
+								shading: THREE.SmoothShading,
+								envMap: alpha < 0.5 ? reflectionCube : null
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -112,26 +109,23 @@
 							mesh.position.y = beta * 400 - 200;
 							mesh.position.z = gamma * 400 - 200;
 
-							objects.push( mesh );
-
 							scene.add( mesh );
+
 						}
+
 					}
+
 				}
-	
+
 				function addLabel( name, location ) {
+
 					var textGeo = new THREE.TextGeometry( name, {
 
+						font: font,
+
 						size: 20,
-						height: 5,
-						curveSegments: 10,
-
-						font: 'gentilis',
-						weight: 'normal',
-						style: 'normal',
-
-						material: 0,
-						extrudeMaterial: 1
+						height: 1,
+						curveSegments: 1
 
 					});
 
@@ -139,6 +133,7 @@
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
+
 				}
 
 				addLabel( "+hue", new THREE.Vector3( -350, 0, 0 ) );
@@ -170,11 +165,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x0a0a0a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
@@ -183,10 +175,7 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );
@@ -224,14 +213,6 @@
 				//camera.position.z = Math.sin( timer ) * 800;
 
 				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-
-					object.rotation.y += 0.005;
-
-				}
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

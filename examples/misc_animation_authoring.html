@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js webgl - animation authoring</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				margin: 0px;
@@ -56,14 +57,15 @@
 				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 500, 100 ) );
+				scene.add( new THREE.GridHelper( 1000, 10 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', THREE.UVMapping, render );
+				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.mapping = THREE.UVMapping;
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxGeometry( 200, 200, 200 );

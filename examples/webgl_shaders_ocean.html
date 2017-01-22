@@ -31,7 +31,7 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean demo</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Mirror.js"></script>
@@ -79,6 +79,7 @@
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2(0xaabbbb, 0.0001);
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
 				camera.position.set( 2000, 750, 2000 );
@@ -88,7 +89,7 @@
 				controls.minDistance = 1000.0;
 				controls.maxDistance = 5000.0;
 				controls.maxPolarAngle = Math.PI * 0.495;
-				controls.center.set( 0, 500, 0 );
+				controls.target.set( 0, 500, 0 );
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
@@ -97,7 +98,7 @@
 				scene.add( light );
 
 
-				waterNormals = new THREE.ImageUtils.loadTexture( 'textures/waternormals.jpg' );
+				waterNormals = new THREE.TextureLoader().load( 'textures/waternormals.jpg' );
 				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
 				water = new THREE.Water( renderer, camera, scene, {
@@ -109,6 +110,7 @@
 					sunColor: 0xffffff,
 					waterColor: 0x001e0f,
 					distortionScale: 50.0,
+					fog: scene.fog != undefined
 				} );
 
 

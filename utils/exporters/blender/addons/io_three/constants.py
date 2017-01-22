@@ -93,11 +93,13 @@ LIGHTS = 'lights'
 HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
-COPY_TEXTURES = 'copyTextures'
+EXPORT_TEXTURES = 'exportTextures'
+EMBED_TEXTURES = 'embedTextures'
 TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
+CUSTOM_PROPERTIES = 'customProperties'
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
 OFF = 'off'
@@ -153,14 +155,16 @@ EXPORT_OPTIONS = {
     CAMERAS: False,
     LIGHTS: False,
     HIERARCHY: False,
-    COPY_TEXTURES: True,
+    EXPORT_TEXTURES: True,
+    EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
-    ENABLE_PRECISION: True,
+    ENABLE_PRECISION: False,
     PRECISION: DEFAULT_PRECISION,
+    CUSTOM_PROPERTIES: False,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
-    GEOMETRY_TYPE: GEOMETRY,
+    GEOMETRY_TYPE: BUFFER_GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
     INDENT: True
 }
@@ -200,7 +204,10 @@ AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
+# TODO (abelnation): confirm this is correct area light string for exporter
+RECT_AREA_LIGHT = 'RectAreaLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
+# TODO: RectAreaLight support
 MESH = 'Mesh'
 EMPTY = 'Empty'
 SPRITE = 'Sprite'
@@ -220,6 +227,7 @@ ROTATION = 'rotation'
 SCALE = 'scale'
 
 UV = 'uv'
+UV2 = 'uv2'
 ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
@@ -249,9 +257,9 @@ URL = 'url'
 WRAP = 'wrap'
 REPEAT = 'repeat'
 WRAPPING = type('Wrapping', (), {
-    'REPEAT': 'RepeatWrapping',
-    'CLAMP': 'ClampToEdgeWrapping',
-    'MIRROR': 'MirroredRepeatWrapping'
+    'REPEAT': 'repeat',
+    'CLAMP': 'clamp',
+    'MIRROR': 'mirror'
 })
 ANISOTROPY = 'anisotropy'
 MAG_FILTER = 'magFilter'

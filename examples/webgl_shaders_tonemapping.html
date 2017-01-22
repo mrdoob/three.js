@@ -37,7 +37,7 @@
 			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -94,7 +94,7 @@
 					middleGrey: 0.04,
 					maxLuminance: 16,
 
-					adaptionRate: 2.0,
+					adaptionRate: 2.0
 				};
 
 				container = document.createElement( 'div' );
@@ -138,12 +138,12 @@
 					uniforms: THREE.UniformsUtils.merge( [
 
 						THREE.UniformsLib[ "common" ],
-						THREE.UniformsLib[ "lights" ],
+						THREE.UniformsLib[ "lights" ]
+
 					] ),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
 						"varying vec3 vNormal;",
-						THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 						"void main() {",
 							THREE.ShaderChunk[ "beginnormal_vertex" ],
 							THREE.ShaderChunk[ "defaultnormal_vertex" ],
@@ -190,7 +190,7 @@
 
 						"}"
 
-					].join("\n"),
+					].join("\n")
 				};
 
 				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -200,16 +200,18 @@
 					shininess: 200
 				} );
 
-				var earthDiffuse = THREE.ImageUtils.loadTexture( 'textures/planets/earth_atmos_4096.jpg', undefined, function( tex ) {
+				var textureLoader = new THREE.TextureLoader();
+
+				var earthDiffuse = textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function( tex ) {
 					earthMat.map = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthSpecular = THREE.ImageUtils.loadTexture( 'textures/planets/earth_specular_2048.jpg', undefined, function( tex ) {
+				var earthSpecular = textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function( tex ) {
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
 
-				// var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth-new-normal-2048.jpg', undefined, function( tex ) {
+				// var earthNormal = textureLoader.load( 'textures/planets/earth-new-normal-2048.jpg', function( tex ) {
 				// 	earthMat.normalMap = tex;
 				// 	earthMat.needsUpdate = true;
 				// } );
@@ -221,7 +223,7 @@
 					depthTest: false
 				} );
 
-				var earthLights = THREE.ImageUtils.loadTexture( 'textures/planets/earth_lights_2048.png', undefined, function( tex ) {
+				var earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png', function( tex ) {
 					earthLightsMat.map = tex;
 					earthLightsMat.needsUpdate = true;
 				} );
@@ -233,7 +235,7 @@
 					depthTest: false
 				} );
 
-				var earthClouds = THREE.ImageUtils.loadTexture( 'textures/planets/earth_clouds_2048.png', undefined, function( tex ) {
+				var earthClouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png', function( tex ) {
 					earthCloudsMat.map = tex;
 					earthCloudsMat.needsUpdate = true;
 				} );
@@ -281,7 +283,7 @@
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -292,11 +294,11 @@
 
 				currentLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
-					depthTest: false,
+					depthTest: false
 					// color: 0xffffff
 					// blending: THREE.NoBlending
 				} );
@@ -318,7 +320,7 @@
 							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				var skyboxShader = THREE.ShaderLib[ "cube" ];
 				skyboxShader.uniforms[ "tCube" ].value = textureCube;
@@ -348,8 +350,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
@@ -357,7 +357,7 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
 
-				if ( extensions.get('OES_texture_half_float_linear') ) {
+				if ( renderer.extensions.get('OES_texture_half_float_linear') ) {
 					parameters.type = THREE.FloatType;
 				}
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );

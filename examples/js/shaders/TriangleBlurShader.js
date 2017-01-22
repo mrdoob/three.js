@@ -14,8 +14,8 @@ THREE.TriangleBlurShader = {
 
 	uniforms : {
 
-		"texture": { type: "t", value: null },
-		"delta":   { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		"texture": { value: null },
+		"delta":   { value: new THREE.Vector2( 1, 1 ) }
 
 	},
 
@@ -34,20 +34,14 @@ THREE.TriangleBlurShader = {
 
 	fragmentShader: [
 
+		"#include <common>",
+
 		"#define ITERATIONS 10.0",
 
 		"uniform sampler2D texture;",
 		"uniform vec2 delta;",
 
 		"varying vec2 vUv;",
-
-		"float random( vec3 scale, float seed ) {",
-
-			// use the fragment position for a different seed per-pixel
-
-			"return fract( sin( dot( gl_FragCoord.xyz + seed, scale ) ) * 43758.5453 + seed );",
-
-		"}",
 
 		"void main() {",
 
@@ -57,7 +51,7 @@ THREE.TriangleBlurShader = {
 
 			// randomize the lookup values to hide the fixed number of samples
 
-			"float offset = random( vec3( 12.9898, 78.233, 151.7182 ), 0.0 );",
+			"float offset = rand( vUv );",
 
 			"for ( float t = -ITERATIONS; t <= ITERATIONS; t ++ ) {",
 
