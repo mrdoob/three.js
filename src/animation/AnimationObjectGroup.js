@@ -71,7 +71,7 @@ function AnimationObjectGroup( var_args ) {
 
 }
 
-AnimationObjectGroup.prototype = {
+Object.assign( AnimationObjectGroup.prototype, {
 
 	constructor: AnimationObjectGroup,
 
@@ -371,8 +371,7 @@ AnimationObjectGroup.prototype = {
 
 	}
 
-};
-
+} );
 
 
 export { AnimationObjectGroup };
