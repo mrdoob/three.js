@@ -59,7 +59,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Object.assign( Texture.prototype, EventDispatcher.prototype, {
+Texture.prototype = {
 
 	constructor: Texture,
 
@@ -285,7 +285,8 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	}
 
-} );
+};
 
+Object.assign( Texture.prototype, EventDispatcher.prototype );
 
 export { Texture };

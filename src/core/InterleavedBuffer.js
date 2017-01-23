@@ -21,7 +21,7 @@ function InterleavedBuffer( array, stride ) {
 
 }
 
-Object.assign( InterleavedBuffer.prototype, {
+InterleavedBuffer.prototype = {
 
 	constructor: InterleavedBuffer,
 
@@ -104,7 +104,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	}
 
-} );
+};
 
 
 export { InterleavedBuffer };

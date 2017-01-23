@@ -14,7 +14,7 @@ function Clock( autoStart ) {
 
 }
 
-Object.assign( Clock.prototype, {
+Clock.prototype = {
 
 	constructor: Clock,
 
@@ -67,7 +67,7 @@ Object.assign( Clock.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Clock };

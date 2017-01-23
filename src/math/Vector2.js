@@ -12,7 +12,7 @@ function Vector2( x, y ) {
 
 }
 
-Object.assign( Vector2.prototype, {
+Vector2.prototype = {
 
 	constructor: Vector2,
 
@@ -269,10 +269,16 @@ Object.assign( Vector2.prototype, {
 
 	clampScalar: function () {
 
-		var min = new Vector2();
-		var max = new Vector2();
+		var min, max;
 
 		return function clampScalar( minVal, maxVal ) {
+
+			if ( min === undefined ) {
+
+				min = new Vector2();
+				max = new Vector2();
+
+			}
 
 			min.set( minVal, minVal );
 			max.set( maxVal, maxVal );
@@ -476,7 +482,7 @@ Object.assign( Vector2.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Vector2 };

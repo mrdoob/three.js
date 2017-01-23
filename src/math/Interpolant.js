@@ -20,7 +20,8 @@
  * @author tschw
  */
 
-function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+function Interpolant(
+		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	this.parameterPositions = parameterPositions;
 	this._cachedIndex = 0;
@@ -32,15 +33,9 @@ function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer
 
 }
 
-Object.assign( Interpolant.prototype, {
+Interpolant.prototype = {
 
 	constructor: Interpolant,
-
-	beforeStart_: //( 0, t, t0 ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_,
-
-	afterEnd_: //( N-1, tN-1, t ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_,
 
 	evaluate: function( t ) {
 
@@ -57,10 +52,10 @@ Object.assign( Interpolant.prototype, {
 				var right;
 
 				linear_scan: {
-					//- See http://jsperf.com/comparison-to-undefined/3
-					//- slower code:
-					//-
-					//- 				if ( t >= t1 || t1 === undefined ) {
+//- See http://jsperf.com/comparison-to-undefined/3
+//- slower code:
+//-
+//- 				if ( t >= t1 || t1 === undefined ) {
 					forward_scan: if ( ! ( t < t1 ) ) {
 
 						for ( var giveUpAt = i1 + 2; ;) {
@@ -97,8 +92,8 @@ Object.assign( Interpolant.prototype, {
 
 					}
 
-					//- slower code:
-					//-					if ( t < t0 || t0 === undefined ) {
+//- slower code:
+//-					if ( t < t0 || t0 === undefined ) {
 					if ( ! ( t >= t0 ) ) {
 
 						// looping?
@@ -248,6 +243,16 @@ Object.assign( Interpolant.prototype, {
 		// empty
 
 	}
+
+};
+
+Object.assign( Interpolant.prototype, {
+
+	beforeStart_: //( 0, t, t0 ), returns this.resultBuffer
+		Interpolant.prototype.copySampleValue_,
+
+	afterEnd_: //( N-1, tN-1, t ), returns this.resultBuffer
+		Interpolant.prototype.copySampleValue_
 
 } );
 

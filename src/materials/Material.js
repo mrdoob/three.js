@@ -63,7 +63,7 @@ function Material() {
 
 }
 
-Object.assign( Material.prototype, EventDispatcher.prototype, {
+Material.prototype = {
 
 	constructor: Material,
 
@@ -346,7 +346,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	}
 
-} );
+};
 
+Object.assign( Material.prototype, EventDispatcher.prototype );
 
 export { Material };

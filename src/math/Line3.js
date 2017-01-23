@@ -12,7 +12,7 @@ function Line3( start, end ) {
 
 }
 
-Object.assign( Line3.prototype, {
+Line3.prototype = {
 
 	constructor: Line3,
 
@@ -126,7 +126,7 @@ Object.assign( Line3.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Line3 };

@@ -32,7 +32,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-Object.assign( BufferAttribute.prototype, {
+BufferAttribute.prototype = {
 
 	constructor: BufferAttribute,
 
@@ -335,7 +335,7 @@ Object.assign( BufferAttribute.prototype, {
 
 	}
 
-} );
+};
 
 //
 
