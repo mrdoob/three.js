@@ -32,6 +32,7 @@ var files = {
 		"webgl_geometry_hierarchy2",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_minecraft_ao",
+		"webgl_geometry_multimaterial",
 		"webgl_geometry_normals",
 		"webgl_geometry_nurbs",
 		"webgl_geometry_shapes",
