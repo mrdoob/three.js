@@ -256,4 +256,5 @@ Object.assign( Interpolant.prototype, {
 
 } );
 
+
 export { Interpolant };

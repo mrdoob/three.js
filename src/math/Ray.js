@@ -325,8 +325,6 @@ Object.assign( Ray.prototype, {
 
 	},
 
-
-
 	intersectsPlane: function ( plane ) {
 
 		// check if the ray lies on the plane first

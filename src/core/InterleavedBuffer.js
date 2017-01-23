@@ -23,7 +23,11 @@ function InterleavedBuffer( array, stride ) {
 
 Object.defineProperty( InterleavedBuffer.prototype, "needsUpdate", {
 
-	set: function(value) { if ( value === true ) this.version ++; }
+	set: function(value) { 
+		
+		if ( value === true ) this.version ++; 
+	
+	}
 
 });
 

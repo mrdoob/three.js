@@ -70,6 +70,7 @@ Object.defineProperty( Material.prototype, "needsUpdate", {
 		return this._needsUpdate;
 
 	},
+	
 	set: function(value) {
 
 		if ( value === true ) this.update();

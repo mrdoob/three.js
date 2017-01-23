@@ -61,7 +61,11 @@ Texture.DEFAULT_MAPPING = UVMapping;
 
 Object.defineProperty( Texture.prototype, "needsUpdate", {
 
-	set: function(value) { if ( value === true ) this.version ++; }
+	set: function(value) { 
+		
+		if ( value === true ) this.version ++; 
+	
+	}
 
 });
 

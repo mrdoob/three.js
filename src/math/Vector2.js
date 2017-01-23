@@ -15,17 +15,38 @@ function Vector2( x, y ) {
 Object.defineProperties( Vector2.prototype, {
 
 	"width" : {
-		get: function () { return this.x; },
-		set: function ( value ) { this.x = value; }
+		
+		get: function () { 
+			
+			return this.x; 
+		
+		},
+		
+		set: function ( value ) { 
+			
+			this.x = value; 
+		
+		}
+		
 	},
 
 	"height" : {
-		get: function () { return this.y; },
-		set: function ( value ) { this.y = value; }
+		
+		get: function () { 
+			
+			return this.y; 
+		
+		},
+		
+		set: function ( value ) { 
+			
+			this.y = value; 
+		
+		}
+		
 	}
 
 } );
-
 
 Object.assign( Vector2.prototype, {
 

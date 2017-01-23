@@ -178,8 +178,7 @@ Object.assign( Frustum.prototype, {
 		};
 
 	}(),
-
-
+	
 	containsPoint: function ( point ) {
 
 		var planes = this.planes;
