@@ -25,17 +25,18 @@ THREE.PaintViveController = function ( id ) {
 		var context = canvas.getContext( '2d' );
 		var imageData = context.getImageData( 0, 0, 256, 256 );
 		var data = imageData.data;
+		var swatchColor = new THREE.Color();
 
 		for ( var i = 0, j = 0; i < data.length; i += 4, j ++ ) {
 
 			var x = ( ( j % 256 ) / 256 ) - 0.5;
 			var y = ( Math.floor( j / 256 ) / 256 ) - 0.5;
 
-			color.setHSL( Math.atan2( y, x ) / PI2, 1,( 0.5 - Math.sqrt( x * x + y * y ) ) * 2.0 );
+			swatchColor.setHSL( Math.atan2( y, x ) / PI2, 1,( 0.5 - Math.sqrt( x * x + y * y ) ) * 2.0 );
 
-			data[ i + 0 ] = color.r * 256;
-			data[ i + 1 ] = color.g * 256;
-			data[ i + 2 ] = color.b * 256;
+			data[ i + 0 ] = swatchColor.r * 256;
+			data[ i + 1 ] = swatchColor.g * 256;
+			data[ i + 2 ] = swatchColor.b * 256;
 			data[ i + 3 ] = 256;
 
 		}
