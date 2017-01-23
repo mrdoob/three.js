@@ -36,12 +36,6 @@ Object.assign( Interpolant.prototype, {
 
 	constructor: Interpolant,
 
-	beforeStart_: //( 0, t, t0 ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_,
-
-	afterEnd_: //( N-1, tN-1, t ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_,
-
 	evaluate: function( t ) {
 
 		var pp = this.parameterPositions,
@@ -251,5 +245,15 @@ Object.assign( Interpolant.prototype, {
 
 } );
 
+//!\ DECLARE ALIAS AFTER assign prototype !
+Object.assign( Interpolant.prototype, {
+
+	//( 0, t, t0 ), returns this.resultBuffer
+	beforeStart_: Interpolant.prototype.copySampleValue_,
+
+	//( N-1, tN-1, t ), returns this.resultBuffer
+	afterEnd_: Interpolant.prototype.copySampleValue_,
+
+} );
 
 export { Interpolant };
