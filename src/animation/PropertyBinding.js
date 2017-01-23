@@ -232,10 +232,6 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	_getValue_unavailable: function() {},
 	_setValue_unavailable: function() {},
 
-	// initial state of these methods that calls 'bind'
-	_getValue_unbound: PropertyBinding.prototype.getValue,
-	_setValue_unbound: PropertyBinding.prototype.setValue,
-
 	BindingType: {
 		Direct: 0,
 		EntireArray: 1,
@@ -647,5 +643,13 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 } );
 
+//!\ DECLARE ALIAS AFTER assign prototype !
+Object.assign( PropertyBinding.prototype, {
+
+	// initial state of these methods that calls 'bind'
+	_getValue_unbound: PropertyBinding.prototype.getValue,
+	_setValue_unbound: PropertyBinding.prototype.setValue,
+
+} );
 
 export { PropertyBinding };
