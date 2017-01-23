@@ -387,7 +387,6 @@ def faces(mesh, options, material_list=None):
 
     normal_indices = {}
 
-    print (vertex_normals)
     if vertex_normals:
         logger.debug("Indexing normals")
 
@@ -418,9 +417,6 @@ def faces(mesh, options, material_list=None):
             for index, normal in enumerate(vertex_normals):
                 normal = flip_axes(normal)
                 normal_indices[str(normal)] = index
-
-    for k,v in normal_indices.items():
-        print(str(v) + ": " + str(k))
 
     logger.info("Parsing %d faces", len(mesh.tessfaces))
     for face in mesh.tessfaces:
