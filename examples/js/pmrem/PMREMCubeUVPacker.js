@@ -31,7 +31,13 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 		encoding: sourceTexture.encoding
 	};
 
+	if( sourceTexture.encoding === THREE.RGBM16Encoding ) {
+		params.magFilter = THREE.LinearFilter;
+		params.minFilter = THREE.LinearFilter;
+	}
+
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size, params );
+	this.CubeUVRenderTarget.texture.name = "PMREMCubeUVPacker.cubeUv";
 	this.CubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
 
@@ -53,7 +59,7 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 
 	var offset2 = 0;
 	var c = 4.0;
-	this.numLods = Math.log2( cubeTextureLods[ 0 ].width ) - 2;
+	this.numLods = Math.log( cubeTextureLods[ 0 ].width ) / Math.log( 2 ) - 2; // IE11 doesn't support Math.log2
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
 		var offset1 = ( textureResolution - textureResolution / c ) * 0.5;
@@ -156,17 +162,17 @@ THREE.PMREMCubeUVPacker.prototype = {
 					uv = uv * 2.0 - 1.0;\
 					uv.y *= -1.0;\
 					if(faceIndex == 0) {\
-						sampleDirection = normalize(vec3(-1.0, uv.y, -uv.x));\
+						sampleDirection = normalize(vec3(1.0, uv.y, -uv.x));\
 					} else if(faceIndex == 1) {\
-						sampleDirection = normalize(vec3(-uv.x, 1.0, uv.y));\
+						sampleDirection = normalize(vec3(uv.x, 1.0, uv.y));\
 					} else if(faceIndex == 2) {\
-						sampleDirection = normalize(vec3(-uv.x, uv.y, 1.0));\
+						sampleDirection = normalize(vec3(uv.x, uv.y, 1.0));\
 					} else if(faceIndex == 3) {\
-						sampleDirection = normalize(vec3(1.0, uv.y, uv.x));\
+						sampleDirection = normalize(vec3(-1.0, uv.y, uv.x));\
 					} else if(faceIndex == 4) {\
-						sampleDirection = normalize(vec3(-uv.x, -1.0, -uv.y));\
+						sampleDirection = normalize(vec3(uv.x, -1.0, -uv.y));\
 					} else {\
-						sampleDirection = normalize(vec3(uv.x, uv.y, -1.0));\
+						sampleDirection = normalize(vec3(-uv.x, uv.y, -1.0));\
 					}\
 					vec4 color = envMapTexelToLinear( textureCube( envMap, sampleDirection ) );\
 					gl_FragColor = linearToOutputTexel( color );\

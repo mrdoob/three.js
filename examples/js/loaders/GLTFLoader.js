@@ -463,6 +463,21 @@ THREE.GLTFLoader = ( function () {
 		10497: THREE.RepeatWrapping
 	};
 
+	var WEBGL_TEXTURE_FORMATS = {
+		6406: THREE.AlphaFormat,
+		6407: THREE.RGBFormat,
+		6408: THREE.RGBAFormat,
+		6409: THREE.LuminanceFormat,
+		6410: THREE.LuminanceAlphaFormat
+	};
+
+	var WEBGL_TEXTURE_DATATYPES = {
+		5121: THREE.UnsignedByteType,
+		32819: THREE.UnsignedShort4444Type,
+		32820: THREE.UnsignedShort5551Type,
+		33635: THREE.UnsignedShort565Type
+	};
+
 	var WEBGL_SIDES = {
 		1028: THREE.BackSide,  // Culling front
 		1029: THREE.FrontSide  // Culling back
@@ -961,7 +976,9 @@ THREE.GLTFLoader = ( function () {
 
 				var arraybuffer = dependencies.buffers[ bufferView.buffer ];
 
-				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+				var byteLength = bufferView.byteLength !== undefined ? bufferView.byteLength : 0;
+
+				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + byteLength );
 
 			} );
 
@@ -1055,6 +1072,19 @@ THREE.GLTFLoader = ( function () {
 
 							_texture.flipY = false;
 
+							if ( texture.name !== undefined ) _texture.name = texture.name;
+
+							_texture.format = texture.format !== undefined ? WEBGL_TEXTURE_FORMATS[ texture.format ] : THREE.RGBAFormat;
+
+							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
+
+								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								              'internalFormat will be forced to be the same value as format.' );
+
+							}
+
+							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
+
 							if ( texture.sampler ) {
 
 								var sampler = json.samplers[ texture.sampler ];
@@ -1106,10 +1136,6 @@ THREE.GLTFLoader = ( function () {
 				if ( material.extensions && material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
 
 					khr_material = material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
-
-				} else if ( json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
-
-					khr_material = json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
 
 				}
 
@@ -1525,7 +1551,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
-				var primitives = mesh.primitives;
+				var primitives = mesh.primitives || [];
 
 				for ( var name in primitives ) {
 
@@ -1673,18 +1699,13 @@ THREE.GLTFLoader = ( function () {
 			if ( camera.type == "perspective" && camera.perspective ) {
 
 				var yfov = camera.perspective.yfov;
-				var xfov = camera.perspective.xfov;
-				var aspect_ratio = camera.perspective.aspect_ratio || 1;
+				var aspectRatio = camera.perspective.aspectRatio !== undefined ? camera.perspective.aspectRatio : 1;
 
 				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				xfov = ( xfov === undefined && yfov ) ? yfov * aspect_ratio : xfov;
+				// aspectRatio = xfov / yfov
+				var xfov = yfov * aspectRatio;
 
-				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
-
-				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
@@ -1718,8 +1739,12 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.skins, function ( skin ) {
 
+				var bindShapeMatrix = new THREE.Matrix4();
+
+				if ( skin.bindShapeMatrix !== undefined ) bindShapeMatrix.fromArray( skin.bindShapeMatrix );
+
 				var _skin = {
-					bindShapeMatrix: new THREE.Matrix4().fromArray( skin.bindShapeMatrix ),
+					bindShapeMatrix: bindShapeMatrix,
 					jointNames: skin.jointNames,
 					inverseBindMatrices: dependencies.accessors[ skin.inverseBindMatrices ]
 				};
@@ -1774,6 +1799,7 @@ THREE.GLTFLoader = ( function () {
 								: THREE.VectorKeyframeTrack;
 
 							var targetName = node.name ? node.name : node.uuid;
+							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
@@ -1782,7 +1808,7 @@ THREE.GLTFLoader = ( function () {
 								targetName + '.' + PATH_PROPERTIES[ target.path ],
 								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
-								INTERPOLATION[ sampler.interpolation ]
+								interpolation
 							) );
 
 						}
@@ -1791,7 +1817,9 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return new THREE.AnimationClip( "animation_" + animationId, undefined, tracks );
+				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
+
+				return new THREE.AnimationClip( name, undefined, tracks );
 
 			} );
 
@@ -2092,7 +2120,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
-				var nodes = scene.nodes;
+				var nodes = scene.nodes || [];
 
 				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 

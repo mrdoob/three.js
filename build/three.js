@@ -181,7 +181,7 @@
 
 	};
 
-	var REVISION = '84dev';
+	var REVISION = '85dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 	var CullFaceNone = 0;
 	var CullFaceBack = 1;
@@ -1033,6 +1033,8 @@
 		},
 
 		copy: function ( source ) {
+
+			this.name = source.name;
 
 			this.image = source.image;
 			this.mipmaps = source.mipmaps.slice( 0 );
@@ -9238,6 +9240,7 @@
 					var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+					shadow.map.texture.name = light.name + ".shadowMap";
 
 					shadowCamera.updateProjectionMatrix();
 
@@ -9250,7 +9253,7 @@
 				}
 
 				// TODO (abelnation / sam-g-steel): is this needed?
-				if (shadow && shadow.isRectAreaLightShadow ) {
+				if ( shadow && shadow.isRectAreaLightShadow ) {
 
 					shadow.update( light );
 
@@ -9355,8 +9358,8 @@
 			}
 
 			// Restore GL state.
-			var clearColor = _renderer.getClearColor(),
-			clearAlpha = _renderer.getClearAlpha();
+			var clearColor = _renderer.getClearColor();
+			var clearAlpha = _renderer.getClearAlpha();
 			_renderer.setClearColor( clearColor, clearAlpha );
 
 			scope.needsUpdate = false;
@@ -12393,6 +12396,26 @@
 
 	} );
 
+	// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
+
+	function arrayMax( array ) {
+
+		var length = array.length, max = - Infinity;
+
+		while ( length -- ) {
+
+			if ( array[ length ] > max ) {
+
+				max = array[ length ];
+
+			}
+
+		}
+
+		return max;
+
+	}
+
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author kile / http://kile.stravaganza.org/
@@ -13867,7 +13890,15 @@
 
 		setIndex: function ( index ) {
 
-			this.index = index;
+			if ( Array.isArray( index ) ) {
+
+				this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+
+			} else {
+
+				this.index = index;
+
+			}
 
 		},
 
@@ -14323,7 +14354,7 @@
 
 			if ( geometry.indices.length > 0 ) {
 
-				var TypeArray = geometry.vertices.length > 65535 ? Uint32Array : Uint16Array;
+				var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
 				var indices = new TypeArray( geometry.indices.length * 3 );
 				this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
@@ -15339,14 +15370,14 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-			var segmentWidth	= width / gridX;
+			var segmentWidth = width / gridX;
 			var segmentHeight = height / gridY;
 
 			var widthHalf = width / 2;
@@ -15562,7 +15593,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -16013,9 +16044,10 @@
 				size = 2;
 
 			} else {
-				
+
 				type = gl.UNSIGNED_BYTE;
 				size = 1;
+
 			}
 
 		}
@@ -17576,7 +17608,6 @@
 
 			var index = geometry.index;
 			var attributes = geometry.attributes;
-			var position = attributes.position;
 
 			// console.time( 'wireframe' );
 
@@ -17612,8 +17643,7 @@
 
 			// console.timeEnd( 'wireframe' );
 
-			var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-			var attribute = new BufferAttribute( new TypeArray( indices ), 1 );
+			var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 			updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
@@ -20028,25 +20058,8 @@
 
 		//
 
-		var backgroundCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-		var backgroundCamera2 = new PerspectiveCamera();
-		var backgroundPlaneMesh = new Mesh(
-			new PlaneBufferGeometry( 2, 2 ),
-			new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-		);
-		var backgroundBoxShader = ShaderLib[ 'cube' ];
-		var backgroundBoxMesh = new Mesh(
-			new BoxBufferGeometry( 5, 5, 5 ),
-			new ShaderMaterial( {
-				uniforms: backgroundBoxShader.uniforms,
-				vertexShader: backgroundBoxShader.vertexShader,
-				fragmentShader: backgroundBoxShader.fragmentShader,
-				side: BackSide,
-				depthTest: false,
-				depthWrite: false,
-				fog: false
-			} )
-		);
+		var backgroundPlaneCamera, backgroundPlaneMesh;
+		var backgroundBoxCamera, backgroundBoxMesh;
 
 		//
 
@@ -20917,25 +20930,56 @@
 
 			if ( background && background.isCubeTexture ) {
 
-				backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
+				if ( backgroundBoxCamera === undefined ) {
 
-				backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
-				backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
+					backgroundBoxCamera = new PerspectiveCamera();
+
+					backgroundBoxMesh = new Mesh(
+						new BoxBufferGeometry( 5, 5, 5 ),
+						new ShaderMaterial( {
+							uniforms: ShaderLib.cube.uniforms,
+							vertexShader: ShaderLib.cube.vertexShader,
+							fragmentShader: ShaderLib.cube.fragmentShader,
+							side: BackSide,
+							depthTest: false,
+							depthWrite: false,
+							fog: false
+						} )
+					);
+
+				}
+
+				backgroundBoxCamera.projectionMatrix.copy( camera.projectionMatrix );
+
+				backgroundBoxCamera.matrixWorld.extractRotation( camera.matrixWorld );
+				backgroundBoxCamera.matrixWorldInverse.getInverse( backgroundBoxCamera.matrixWorld );
+
 
 				backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
-				backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
+				backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundBoxCamera.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
 
 				objects.update( backgroundBoxMesh );
 
-				_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
+				_this.renderBufferDirect( backgroundBoxCamera, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
 
 			} else if ( background && background.isTexture ) {
+
+				if ( backgroundPlaneCamera === undefined ) {
+
+					backgroundPlaneCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+					backgroundPlaneMesh = new Mesh(
+						new PlaneBufferGeometry( 2, 2 ),
+						new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
+					);
+
+				}
 
 				backgroundPlaneMesh.material.map = background;
 
 				objects.update( backgroundPlaneMesh );
 
-				_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
+				_this.renderBufferDirect( backgroundPlaneCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
 
 			}
 
@@ -24049,49 +24093,49 @@
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
 	function WireframeGeometry( geometry ) {
 
 		BufferGeometry.call( this );
 
-		var edge = [ 0, 0 ], hash = {};
+		this.type = 'WireframeGeometry';
 
-		function sortFunction( a, b ) {
+		// buffer
 
-			return a - b;
+		var vertices = [];
 
-		}
+		// helper variables
 
-		var keys = [ 'a', 'b', 'c' ];
+		var i, j, l, o, ol;
+		var edge = [ 0, 0 ], edges = {}, e;
+		var key, keys = [ 'a', 'b', 'c' ];
+		var vertex;
+
+		// different logic for Geometry and BufferGeometry
 
 		if ( geometry && geometry.isGeometry ) {
 
-			var vertices = geometry.vertices;
+			// create a data structure that contains all edges without duplicates
+
 			var faces = geometry.faces;
-			var numEdges = 0;
 
-			// allocate maximal size
-			var edges = new Uint32Array( 6 * faces.length );
-
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+			for ( i = 0, l = faces.length; i < l; i ++ ) {
 
 				var face = faces[ i ];
 
-				for ( var j = 0; j < 3; j ++ ) {
+				for ( j = 0; j < 3; j ++ ) {
 
 					edge[ 0 ] = face[ keys[ j ] ];
 					edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-					edge.sort( sortFunction );
+					edge.sort( sortFunction ); // sorting prevents duplicates
 
-					var key = edge.toString();
+					key = edge.toString();
 
-					if ( hash[ key ] === undefined ) {
+					if ( edges[ key ] === undefined ) {
 
-						edges[ 2 * numEdges ] = edge[ 0 ];
-						edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-						hash[ key ] = true;
-						numEdges ++;
+						edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
 
 					}
 
@@ -24099,68 +24143,64 @@
 
 			}
 
-			var coords = new Float32Array( numEdges * 2 * 3 );
+			// generate vertices
 
-			for ( var i = 0, l = numEdges; i < l; i ++ ) {
+			for ( key in edges ) {
 
-				for ( var j = 0; j < 2; j ++ ) {
+				e = edges[ key ];
 
-					var vertex = vertices[ edges [ 2 * i + j ] ];
+				vertex = geometry.vertices[ e.index1 ];
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-					var index = 6 * i + 3 * j;
-					coords[ index + 0 ] = vertex.x;
-					coords[ index + 1 ] = vertex.y;
-					coords[ index + 2 ] = vertex.z;
-
-				}
+				vertex = geometry.vertices[ e.index2 ];
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 			}
 
-			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
 		} else if ( geometry && geometry.isBufferGeometry ) {
+
+			var position, indices, groups;
+			var group, start, count;
+			var index1, index2;
+
+			vertex = new Vector3();
 
 			if ( geometry.index !== null ) {
 
-				// Indexed BufferGeometry
+				// indexed BufferGeometry
 
-				var indices = geometry.index.array;
-				var vertices = geometry.attributes.position;
-				var groups = geometry.groups;
-				var numEdges = 0;
+				position = geometry.attributes.position;
+				indices = geometry.index;
+				groups = geometry.groups;
 
 				if ( groups.length === 0 ) {
 
-					geometry.addGroup( 0, indices.length );
+					geometry.addGroup( 0, indices.count );
 
 				}
 
-				// allocate maximal size
-				var edges = new Uint32Array( 2 * indices.length );
+				// create a data structure that contains all eges without duplicates
 
-				for ( var o = 0, ol = groups.length; o < ol; ++ o ) {
+				for ( o = 0, ol = groups.length; o < ol; ++ o ) {
 
-					var group = groups[ o ];
+					group = groups[ o ];
 
-					var start = group.start;
-					var count = group.count;
+					start = group.start;
+					count = group.count;
 
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
+					for ( i = start, l = ( start + count ); i < l; i += 3 ) {
 
-						for ( var j = 0; j < 3; j ++ ) {
+						for ( j = 0; j < 3; j ++ ) {
 
-							edge[ 0 ] = indices[ i + j ];
-							edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
-							edge.sort( sortFunction );
+							edge[ 0 ] = indices.getX( i + j );
+							edge[ 1 ] = indices.getX( i + ( j + 1 ) % 3 );
+							edge.sort( sortFunction ); // sorting prevents duplicates
 
-							var key = edge.toString();
+							key = edge.toString();
 
-							if ( hash[ key ] === undefined ) {
+							if ( edges[ key ] === undefined ) {
 
-								edges[ 2 * numEdges ] = edge[ 0 ];
-								edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-								hash[ key ] = true;
-								numEdges ++;
+								edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
 
 							}
 
@@ -24170,58 +24210,58 @@
 
 				}
 
-				var coords = new Float32Array( numEdges * 2 * 3 );
+				// generate vertices
 
-				for ( var i = 0, l = numEdges; i < l; i ++ ) {
+				for ( key in edges ) {
 
-					for ( var j = 0; j < 2; j ++ ) {
+					e = edges[ key ];
 
-						var index = 6 * i + 3 * j;
-						var index2 = edges[ 2 * i + j ];
+					vertex.fromBufferAttribute( position, e.index1 );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
-						coords[ index + 0 ] = vertices.getX( index2 );
-						coords[ index + 1 ] = vertices.getY( index2 );
-						coords[ index + 2 ] = vertices.getZ( index2 );
-
-					}
+					vertex.fromBufferAttribute( position, e.index2 );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
 				}
-
-				this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
 
 			} else {
 
 				// non-indexed BufferGeometry
 
-				var vertices = geometry.attributes.position.array;
-				var numEdges = vertices.length / 3;
-				var numTris = numEdges / 3;
+				position = geometry.attributes.position;
 
-				var coords = new Float32Array( numEdges * 2 * 3 );
+				for ( i = 0, l = ( position.count / 3 ); i < l; i ++ ) {
 
-				for ( var i = 0, l = numTris; i < l; i ++ ) {
+					for ( j = 0; j < 3; j ++ ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
+						// three edges per triangle, an edge is represented as (index1, index2)
+						// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
 
-						var index = 18 * i + 6 * j;
+						index1 = 3 * i + j;
+						vertex.fromBufferAttribute( position, index1 );
+						vertices.push( vertex.x, vertex.y, vertex.z );
 
-						var index1 = 9 * i + 3 * j;
-						coords[ index + 0 ] = vertices[ index1 ];
-						coords[ index + 1 ] = vertices[ index1 + 1 ];
-						coords[ index + 2 ] = vertices[ index1 + 2 ];
-
-						var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
-						coords[ index + 3 ] = vertices[ index2 ];
-						coords[ index + 4 ] = vertices[ index2 + 1 ];
-						coords[ index + 5 ] = vertices[ index2 + 2 ];
+						index2 = 3 * i + ( ( j + 1 ) % 3 );
+						vertex.fromBufferAttribute( position, index2 );
+						vertices.push( vertex.x, vertex.y, vertex.z );
 
 					}
 
 				}
 
-				this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
 			}
+
+		}
+
+		// build geometry
+
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+		// custom array sort function
+
+		function sortFunction( a, b ) {
+
+			return a - b;
 
 		}
 
@@ -24278,11 +24318,11 @@
 
 		// buffers
 
+		var indices = [];
 		var vertices = [];
 		var uvs = [];
 
-		var i, j, p;
-		var u, v;
+		var i, j;
 
 		// generate vertices and uvs
 
@@ -24290,13 +24330,13 @@
 
 		for ( i = 0; i <= stacks; i ++ ) {
 
-			v = i / stacks;
+			var v = i / stacks;
 
 			for ( j = 0; j <= slices; j ++ ) {
 
-				u = j / slices;
+				var u = j / slices;
 
-				p = func( u, v );
+				var p = func( u, v );
 				vertices.push( p.x, p.y, p.z );
 
 				uvs.push( u, v );
@@ -24307,17 +24347,14 @@
 
 		// generate indices
 
-		var indices = [];
-		var a, b, c, d;
-
 		for ( i = 0; i < stacks; i ++ ) {
 
 			for ( j = 0; j < slices; j ++ ) {
 
-				a = i * sliceCount + j;
-				b = i * sliceCount + j + 1;
-				c = ( i + 1 ) * sliceCount + j + 1;
-				d = ( i + 1 ) * sliceCount + j;
+				var a = i * sliceCount + j;
+				var b = i * sliceCount + j + 1;
+				var c = ( i + 1 ) * sliceCount + j + 1;
+				var d = ( i + 1 ) * sliceCount + j;
 
 				// faces one and two
 
@@ -24330,7 +24367,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -24413,8 +24450,6 @@
 		this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 		this.normalizeNormals();
-
-		this.boundingSphere = new Sphere( new Vector3(), radius );
 
 		// helper functions
 
@@ -25006,7 +25041,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25285,7 +25320,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -25434,7 +25469,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -26862,7 +26897,7 @@
 
 		var font = parameters.font;
 
-		if ( (font && font.isFont) === false ) {
+		if ( ( font && font.isFont ) === false ) {
 
 			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
 			return new Geometry();
@@ -27023,7 +27058,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27125,7 +27160,7 @@
 				normals.push( 0, 0, 1 );
 
 				// uv
-				
+
 				uv.x = ( vertex.x / outerRadius + 1 ) / 2;
 				uv.y = ( vertex.y / outerRadius + 1 ) / 2;
 
@@ -27165,7 +27200,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27231,7 +27266,7 @@
 		phiLength = phiLength || Math.PI * 2;
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
-		
+
 		phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
 
 
@@ -27304,7 +27339,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
@@ -27442,7 +27477,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -27529,25 +27564,32 @@
 
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
+	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
 	function EdgesGeometry( geometry, thresholdAngle ) {
 
 		BufferGeometry.call( this );
 
+		this.type = 'EdgesGeometry';
+
+		this.parameters = {
+			thresholdAngle: thresholdAngle
+		};
+
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
+		// buffer
+
+		var vertices = [];
+
+		// helper variables
+
 		var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
+		var edge = [ 0, 0 ], edges = {};
+		var key, keys = [ 'a', 'b', 'c' ];
 
-		var edge = [ 0, 0 ], hash = {};
-
-		function sortFunction( a, b ) {
-
-			return a - b;
-
-		}
-
-		var keys = [ 'a', 'b', 'c' ];
+		// prepare source geometry
 
 		var geometry2;
 
@@ -27565,8 +27607,10 @@
 		geometry2.mergeVertices();
 		geometry2.computeFaceNormals();
 
-		var vertices = geometry2.vertices;
+		var sourceVertices = geometry2.vertices;
 		var faces = geometry2.faces;
+
+		// now create a data structure where each entry represents an edge with its adjoining faces
 
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -27578,15 +27622,15 @@
 				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 				edge.sort( sortFunction );
 
-				var key = edge.toString();
+				key = edge.toString();
 
-				if ( hash[ key ] === undefined ) {
+				if ( edges[ key ] === undefined ) {
 
-					hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
+					edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ], face1: i, face2: undefined };
 
 				} else {
 
-					hash[ key ].face2 = i;
+					edges[ key ].face2 = i;
 
 				}
 
@@ -27594,31 +27638,37 @@
 
 		}
 
-		var coords = [];
+		// generate vertices
 
-		for ( var key in hash ) {
+		for ( key in edges ) {
 
-			var h = hash[ key ];
+			var e = edges[ key ];
 
-			// An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+			// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
-			if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
+			if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
 
-				var vertex = vertices[ h.vert1 ];
-				coords.push( vertex.x );
-				coords.push( vertex.y );
-				coords.push( vertex.z );
+				var vertex = sourceVertices[ e.index1 ];
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-				vertex = vertices[ h.vert2 ];
-				coords.push( vertex.x );
-				coords.push( vertex.y );
-				coords.push( vertex.z );
+				vertex = sourceVertices[ e.index2 ];
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 			}
 
 		}
 
-		this.addAttribute( 'position', new Float32BufferAttribute( coords, 3 ) );
+		// build geometry
+
+		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+		// custom array sort function
+
+		function sortFunction( a, b ) {
+
+			return a - b;
+
+		}
 
 	}
 
@@ -27716,7 +27766,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -28084,7 +28134,7 @@
 
 		// build geometry
 
-		this.setIndex( new ( indices.length > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 ) );
+		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
@@ -33044,7 +33094,10 @@
 
 				} catch ( error ) {
 
+					if ( onError !== undefined ) onError( error );
+
 					console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+
 					return;
 
 				}
@@ -35568,6 +35621,7 @@
 		var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
 		this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
+		this.renderTarget.texture.name = "CubeCamera";
 
 		this.updateCubeMap = function ( renderer, scene ) {
 
@@ -36606,7 +36660,7 @@
 
 				this.resolvedProperty = nodeProperty;
 
-			} else if ( nodeProperty.length !== undefined ) {
+			} else if ( Array.isArray( nodeProperty ) ) {
 
 				bindingType = this.BindingType.EntireArray;
 
@@ -41052,11 +41106,8 @@
 	 *  headWidth - Number
 	 */
 
-	var lineGeometry = new BufferGeometry();
-	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
-
-	var coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-	coneGeometry.translate( 0, - 0.5, 0 );
+	var lineGeometry;
+	var coneGeometry;
 
 	function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -41068,6 +41119,16 @@
 		if ( length === undefined ) length = 1;
 		if ( headLength === undefined ) headLength = 0.2 * length;
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+
+		if ( lineGeometry === undefined ) {
+
+			lineGeometry = new BufferGeometry();
+			lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+
+			coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+			coneGeometry.translate( 0, - 0.5, 0 );
+
+		}
 
 		this.position.copy( origin );
 

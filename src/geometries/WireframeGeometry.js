@@ -1,51 +1,52 @@
 import { BufferGeometry } from '../core/BufferGeometry';
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 function WireframeGeometry( geometry ) {
 
 	BufferGeometry.call( this );
 
-	var edge = [ 0, 0 ], hash = {};
+	this.type = 'WireframeGeometry';
 
-	function sortFunction( a, b ) {
+	// buffer
 
-		return a - b;
+	var vertices = [];
 
-	}
+	// helper variables
 
-	var keys = [ 'a', 'b', 'c' ];
+	var i, j, l, o, ol;
+	var edge = [ 0, 0 ], edges = {}, e;
+	var key, keys = [ 'a', 'b', 'c' ];
+	var vertex;
+
+	// different logic for Geometry and BufferGeometry
 
 	if ( geometry && geometry.isGeometry ) {
 
-		var vertices = geometry.vertices;
+		// create a data structure that contains all edges without duplicates
+
 		var faces = geometry.faces;
-		var numEdges = 0;
 
-		// allocate maximal size
-		var edges = new Uint32Array( 6 * faces.length );
-
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		for ( i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
 
-			for ( var j = 0; j < 3; j ++ ) {
+			for ( j = 0; j < 3; j ++ ) {
 
 				edge[ 0 ] = face[ keys[ j ] ];
 				edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
-				edge.sort( sortFunction );
+				edge.sort( sortFunction ); // sorting prevents duplicates
 
-				var key = edge.toString();
+				key = edge.toString();
 
-				if ( hash[ key ] === undefined ) {
+				if ( edges[ key ] === undefined ) {
 
-					edges[ 2 * numEdges ] = edge[ 0 ];
-					edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-					hash[ key ] = true;
-					numEdges ++;
+					edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
 
 				}
 
@@ -53,68 +54,64 @@ function WireframeGeometry( geometry ) {
 
 		}
 
-		var coords = new Float32Array( numEdges * 2 * 3 );
+		// generate vertices
 
-		for ( var i = 0, l = numEdges; i < l; i ++ ) {
+		for ( key in edges ) {
 
-			for ( var j = 0; j < 2; j ++ ) {
+			e = edges[ key ];
 
-				var vertex = vertices[ edges [ 2 * i + j ] ];
+			vertex = geometry.vertices[ e.index1 ];
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
-				var index = 6 * i + 3 * j;
-				coords[ index + 0 ] = vertex.x;
-				coords[ index + 1 ] = vertex.y;
-				coords[ index + 2 ] = vertex.z;
-
-			}
+			vertex = geometry.vertices[ e.index2 ];
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 		}
 
-		this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
 	} else if ( geometry && geometry.isBufferGeometry ) {
+
+		var position, indices, groups;
+		var group, start, count;
+		var index1, index2;
+
+		vertex = new Vector3();
 
 		if ( geometry.index !== null ) {
 
-			// Indexed BufferGeometry
+			// indexed BufferGeometry
 
-			var indices = geometry.index.array;
-			var vertices = geometry.attributes.position;
-			var groups = geometry.groups;
-			var numEdges = 0;
+			position = geometry.attributes.position;
+			indices = geometry.index;
+			groups = geometry.groups;
 
 			if ( groups.length === 0 ) {
 
-				geometry.addGroup( 0, indices.length );
+				geometry.addGroup( 0, indices.count );
 
 			}
 
-			// allocate maximal size
-			var edges = new Uint32Array( 2 * indices.length );
+			// create a data structure that contains all eges without duplicates
 
-			for ( var o = 0, ol = groups.length; o < ol; ++ o ) {
+			for ( o = 0, ol = groups.length; o < ol; ++ o ) {
 
-				var group = groups[ o ];
+				group = groups[ o ];
 
-				var start = group.start;
-				var count = group.count;
+				start = group.start;
+				count = group.count;
 
-				for ( var i = start, il = start + count; i < il; i += 3 ) {
+				for ( i = start, l = ( start + count ); i < l; i += 3 ) {
 
-					for ( var j = 0; j < 3; j ++ ) {
+					for ( j = 0; j < 3; j ++ ) {
 
-						edge[ 0 ] = indices[ i + j ];
-						edge[ 1 ] = indices[ i + ( j + 1 ) % 3 ];
-						edge.sort( sortFunction );
+						edge[ 0 ] = indices.getX( i + j );
+						edge[ 1 ] = indices.getX( i + ( j + 1 ) % 3 );
+						edge.sort( sortFunction ); // sorting prevents duplicates
 
-						var key = edge.toString();
+						key = edge.toString();
 
-						if ( hash[ key ] === undefined ) {
+						if ( edges[ key ] === undefined ) {
 
-							edges[ 2 * numEdges ] = edge[ 0 ];
-							edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-							hash[ key ] = true;
-							numEdges ++;
+							edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
 
 						}
 
@@ -124,58 +121,58 @@ function WireframeGeometry( geometry ) {
 
 			}
 
-			var coords = new Float32Array( numEdges * 2 * 3 );
+			// generate vertices
 
-			for ( var i = 0, l = numEdges; i < l; i ++ ) {
+			for ( key in edges ) {
 
-				for ( var j = 0; j < 2; j ++ ) {
+				e = edges[ key ];
 
-					var index = 6 * i + 3 * j;
-					var index2 = edges[ 2 * i + j ];
+				vertex.fromBufferAttribute( position, e.index1 );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-					coords[ index + 0 ] = vertices.getX( index2 );
-					coords[ index + 1 ] = vertices.getY( index2 );
-					coords[ index + 2 ] = vertices.getZ( index2 );
-
-				}
+				vertex.fromBufferAttribute( position, e.index2 );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 			}
-
-			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
 
 		} else {
 
 			// non-indexed BufferGeometry
 
-			var vertices = geometry.attributes.position.array;
-			var numEdges = vertices.length / 3;
-			var numTris = numEdges / 3;
+			position = geometry.attributes.position;
 
-			var coords = new Float32Array( numEdges * 2 * 3 );
+			for ( i = 0, l = ( position.count / 3 ); i < l; i ++ ) {
 
-			for ( var i = 0, l = numTris; i < l; i ++ ) {
+				for ( j = 0; j < 3; j ++ ) {
 
-				for ( var j = 0; j < 3; j ++ ) {
+					// three edges per triangle, an edge is represented as (index1, index2)
+					// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
 
-					var index = 18 * i + 6 * j;
+					index1 = 3 * i + j;
+					vertex.fromBufferAttribute( position, index1 );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
-					var index1 = 9 * i + 3 * j;
-					coords[ index + 0 ] = vertices[ index1 ];
-					coords[ index + 1 ] = vertices[ index1 + 1 ];
-					coords[ index + 2 ] = vertices[ index1 + 2 ];
-
-					var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
-					coords[ index + 3 ] = vertices[ index2 ];
-					coords[ index + 4 ] = vertices[ index2 + 1 ];
-					coords[ index + 5 ] = vertices[ index2 + 2 ];
+					index2 = 3 * i + ( ( j + 1 ) % 3 );
+					vertex.fromBufferAttribute( position, index2 );
+					vertices.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
 			}
 
-			this.addAttribute( 'position', new BufferAttribute( coords, 3 ) );
-
 		}
+
+	}
+
+	// build geometry
+
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+	// custom array sort function
+
+	function sortFunction( a, b ) {
+
+		return a - b;
 
 	}
 
