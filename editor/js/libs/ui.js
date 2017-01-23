@@ -862,10 +862,11 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setStep = function ( step ) {
+UI.Integer.prototype.setStep = function ( step ) {
 
-	this.step = step;
-
+	step = Math.max(step, Math.floor(step)); // Checks that step is an integer
+	this.step = step; 
+	
 	return this;
 
 };
