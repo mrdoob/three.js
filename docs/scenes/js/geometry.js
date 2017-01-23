@@ -924,7 +924,8 @@ var guis = {
 			weight : "regular",
 			bevelEnabled : false,
 			bevelThickness : 1,
-			bevelSize : 0.5
+			bevelSize : 0.5,
+			bevelSegments : 3
 		};
 
 		var fonts = [
@@ -950,7 +951,8 @@ var guis = {
 					curveSegments: data.curveSegments,
 					bevelEnabled: data.bevelEnabled,
 					bevelThickness: data.bevelThickness,
-					bevelSize: data.bevelSize
+					bevelSize: data.bevelSize,
+					bevelSegments: data.bevelSegments
 				} );
 				geometry.center();
 
@@ -974,6 +976,7 @@ var guis = {
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

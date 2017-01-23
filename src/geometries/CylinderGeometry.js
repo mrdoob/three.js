@@ -33,10 +33,10 @@ CylinderGeometry.prototype.constructor = CylinderGeometry;
  * @author Mugen87 / https://github.com/Mugen87
  */
 
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
-import { BufferAttribute } from '../core/BufferAttribute';
 
 function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -68,35 +68,19 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 	thetaStart = thetaStart !== undefined ? thetaStart : 0.0;
 	thetaLength = thetaLength !== undefined ? thetaLength : 2.0 * Math.PI;
 
-	// used to calculate buffer length
-
-	var nbCap = 0;
-
-	if ( openEnded === false ) {
-
-		if ( radiusTop > 0 ) nbCap ++;
-		if ( radiusBottom > 0 ) nbCap ++;
-
-	}
-
-	var vertexCount = calculateVertexCount();
-	var indexCount = calculateIndexCount();
-
 	// buffers
 
-	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ), 1 );
-	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var normals = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+	var indices = [];
+	var vertices = [];
+	var normals = [];
+	var uvs = [];
 
 	// helper variables
 
-	var index = 0,
-	    indexOffset = 0,
-	    indexArray = [],
-	    halfHeight = height / 2;
-
-	// group variables
+	var index = 0;
+	var indexOffset = 0;
+	var indexArray = [];
+	var halfHeight = height / 2;
 	var groupStart = 0;
 
 	// generate geometry
@@ -113,39 +97,9 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 	// build geometry
 
 	this.setIndex( indices );
-	this.addAttribute( 'position', vertices );
-	this.addAttribute( 'normal', normals );
-	this.addAttribute( 'uv', uvs );
-
-	// helper functions
-
-	function calculateVertexCount() {
-
-		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
-
-		if ( openEnded === false ) {
-
-			count += ( ( radialSegments + 1 ) * nbCap ) + ( radialSegments * nbCap );
-
-		}
-
-		return count;
-
-	}
-
-	function calculateIndexCount() {
-
-		var count = radialSegments * heightSegments * 2 * 3;
-
-		if ( openEnded === false ) {
-
-			count += radialSegments * nbCap * 3;
-
-		}
-
-		return count;
-
-	}
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	function generateTorso() {
 
@@ -167,6 +121,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 			var v = y / heightSegments;
 
 			// calculate the radius of the current row
+
 			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
 			for ( x = 0; x <= radialSegments; x ++ ) {
@@ -179,27 +134,29 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 				var cosTheta = Math.cos( theta );
 
 				// vertex
+
 				vertex.x = radius * sinTheta;
 				vertex.y = - v * height + halfHeight;
 				vertex.z = radius * cosTheta;
-				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 				// normal
+
 				normal.set( sinTheta, slope, cosTheta ).normalize();
-				normals.setXYZ( index, normal.x, normal.y, normal.z );
+				normals.push( normal.x, normal.y, normal.z );
 
 				// uv
-				uvs.setXY( index, u, 1 - v );
+
+				uvs.push( u, 1 - v );
 
 				// save index of vertex in respective row
-				indexRow.push( index );
 
-				// increase index
-				index ++;
+				indexRow.push( index ++ );
 
 			}
 
 			// now save vertices of the row in our index array
+
 			indexArray.push( indexRow );
 
 		}
@@ -211,22 +168,19 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 			for ( y = 0; y < heightSegments; y ++ ) {
 
 				// we use the index array to access the correct indices
-				var i1 = indexArray[ y ][ x ];
-				var i2 = indexArray[ y + 1 ][ x ];
-				var i3 = indexArray[ y + 1 ][ x + 1 ];
-				var i4 = indexArray[ y ][ x + 1 ];
 
-				// face one
-				indices.setX( indexOffset, i1 ); indexOffset ++;
-				indices.setX( indexOffset, i2 ); indexOffset ++;
-				indices.setX( indexOffset, i4 ); indexOffset ++;
+				var a = indexArray[ y ][ x ];
+				var b = indexArray[ y + 1 ][ x ];
+				var c = indexArray[ y + 1 ][ x + 1 ];
+				var d = indexArray[ y ][ x + 1 ];
 
-				// face two
-				indices.setX( indexOffset, i2 ); indexOffset ++;
-				indices.setX( indexOffset, i3 ); indexOffset ++;
-				indices.setX( indexOffset, i4 ); indexOffset ++;
+				// faces
 
-				// update counters
+				indices.push( a, b, d );
+				indices.push( b, c, d );
+
+				// update group counter
+
 				groupCount += 6;
 
 			}
@@ -234,9 +188,11 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		}
 
 		// add a group to the geometry. this will ensure multi material support
+
 		scope.addGroup( groupStart, groupCount, 0 );
 
 		// calculate new start value for groups
+
 		groupStart += groupCount;
 
 	}
@@ -263,23 +219,25 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		for ( x = 1; x <= radialSegments; x ++ ) {
 
 			// vertex
-			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+			vertices.push( 0, halfHeight * sign, 0 );
 
 			// normal
-			normals.setXYZ( index, 0, sign, 0 );
+
+			normals.push( 0, sign, 0 );
 
 			// uv
-			uv.x = 0.5;
-			uv.y = 0.5;
 
-			uvs.setXY( index, uv.x, uv.y );
+			uvs.push( 0.5, 0.5 );
 
 			// increase index
+
 			index ++;
 
 		}
 
 		// save the index of the last center vertex
+
 		centerIndexEnd = index;
 
 		// now we generate the surrounding vertices, normals and uvs
@@ -293,20 +251,24 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 			var sinTheta = Math.sin( theta );
 
 			// vertex
+
 			vertex.x = radius * sinTheta;
 			vertex.y = halfHeight * sign;
 			vertex.z = radius * cosTheta;
-			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			// normal
-			normals.setXYZ( index, 0, sign, 0 );
+
+			normals.push( 0, sign, 0 );
 
 			// uv
+
 			uv.x = ( cosTheta * 0.5 ) + 0.5;
 			uv.y = ( sinTheta * 0.5 * sign ) + 0.5;
-			uvs.setXY( index, uv.x, uv.y );
+			uvs.push( uv.x, uv.y );
 
 			// increase index
+
 			index ++;
 
 		}
@@ -321,28 +283,27 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 			if ( top === true ) {
 
 				// face top
-				indices.setX( indexOffset, i ); indexOffset ++;
-				indices.setX( indexOffset, i + 1 ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
+
+				indices.push( i, i + 1, c );
 
 			} else {
 
 				// face bottom
-				indices.setX( indexOffset, i + 1 ); indexOffset ++;
-				indices.setX( indexOffset, i ); indexOffset ++;
-				indices.setX( indexOffset, c ); indexOffset ++;
+
+				indices.push( i + 1, i, c );
 
 			}
 
-			// update counters
 			groupCount += 3;
 
 		}
 
 		// add a group to the geometry. this will ensure multi material support
+
 		scope.addGroup( groupStart, groupCount, top === true ? 1 : 2 );
 
 		// calculate new start value for groups
+
 		groupStart += groupCount;
 
 	}

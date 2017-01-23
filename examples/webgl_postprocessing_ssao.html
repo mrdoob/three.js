@@ -180,6 +180,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				depthRenderTarget.texture.name = "SSAOShader.rt";
 
 				// Setup SSAO pass
 				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );

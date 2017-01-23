@@ -24,9 +24,12 @@ THREE.GLTFLoader = ( function () {
 			var path = this.path && ( typeof this.path === "string" ) ? this.path : THREE.Loader.prototype.extractUrlBase( url );
 
 			var loader = new THREE.FileLoader( scope.manager );
-			loader.load( url, function ( text ) {
 
-				scope.parse( JSON.parse( text ), onLoad, path );
+			loader.setResponseType( 'arraybuffer' );
+
+			loader.load( url, function ( data ) {
+
+				scope.parse( data, onLoad, path );
 
 			}, onProgress, onError );
 
@@ -44,11 +47,35 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		parse: function ( json, callback, path ) {
+		parse: function ( data, callback, path ) {
+
+			var content;
+			var extensions = {};
+
+			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
+
+			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
+
+				extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
+				content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+
+			} else {
+
+				content = convertUint8ArrayToString( new Uint8Array( data ) );
+
+			}
+
+			var json = JSON.parse( content );
+
+			if ( json.extensionsUsed && json.extensionsUsed.indexOf( EXTENSIONS.KHR_MATERIALS_COMMON ) >= 0 ) {
+
+				extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] = new GLTFMaterialsCommonExtension( json );
+
+			}
 
 			console.time( 'GLTFLoader' );
 
-			var parser = new GLTFParser( json, {
+			var parser = new GLTFParser( json, extensions, {
 
 				path: path || this.path,
 				crossOrigin: this.crossOrigin
@@ -256,6 +283,126 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	/*********************************/
+	/********** EXTENSIONS ***********/
+	/*********************************/
+
+	var EXTENSIONS = {
+		KHR_BINARY_GLTF: 'KHR_binary_glTF',
+		KHR_MATERIALS_COMMON: 'KHR_materials_common'
+	};
+
+	/* MATERIALS COMMON EXTENSION */
+
+	function GLTFMaterialsCommonExtension( json ) {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_COMMON;
+
+		this.lights = {};
+
+		var lights = json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
+
+		for ( var lightId in lights ) {
+
+			var light = lights[ lightId ];
+			var lightNode;
+
+			var lightParams = light[ light.type ];
+			var color = new THREE.Color().fromArray( lightParams.color );
+
+			switch ( light.type ) {
+
+				case "directional":
+					lightNode = new THREE.DirectionalLight( color );
+					lightNode.position.set( 0, 0, 1 );
+					break;
+
+				case "point":
+					lightNode = new THREE.PointLight( color );
+					break;
+
+				case "spot":
+					lightNode = new THREE.SpotLight( color );
+					lightNode.position.set( 0, 0, 1 );
+					break;
+
+				case "ambient":
+					lightNode = new THREE.AmbientLight( color );
+					break;
+
+			}
+
+			if ( lightNode ) {
+
+				this.lights[ lightId ] = lightNode;
+
+			}
+
+		}
+
+	}
+
+	/* BINARY EXTENSION */
+
+	var BINARY_EXTENSION_BUFFER_NAME = 'binary_glTF';
+
+	var BINARY_EXTENSION_HEADER_DEFAULTS = { magic: 'glTF', version: 1, contentFormat: 0 };
+
+	var BINARY_EXTENSION_HEADER_LENGTH = 20;
+
+	function GLTFBinaryExtension( data ) {
+
+		this.name = EXTENSIONS.KHR_BINARY_GLTF;
+
+		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
+
+		var header = {
+			magic: convertUint8ArrayToString( new Uint8Array( data.slice( 0, 4 ) ) ),
+			version: headerView.getUint32( 4, true ),
+			length: headerView.getUint32( 8, true ),
+			contentLength: headerView.getUint32( 12, true ),
+			contentFormat: headerView.getUint32( 16, true )
+		};
+
+		for ( var key in BINARY_EXTENSION_HEADER_DEFAULTS ) {
+
+			var value = BINARY_EXTENSION_HEADER_DEFAULTS[ key ];
+
+			if ( header[ key ] !== value ) {
+
+				throw new Error( 'Unsupported glTF-Binary header: Expected "%s" to be "%s".', key, value );
+
+			}
+
+		}
+
+		var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH, header.contentLength );
+
+		this.header = header;
+		this.content = convertUint8ArrayToString( contentArray );
+		this.body = data.slice( BINARY_EXTENSION_HEADER_LENGTH + header.contentLength, header.length );
+
+	}
+
+	GLTFBinaryExtension.prototype.loadShader = function ( shader, bufferViews ) {
+
+		var bufferView = bufferViews[ shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].bufferView ];
+		var array = new Uint8Array( bufferView );
+
+		return convertUint8ArrayToString( array );
+
+	};
+
+	GLTFBinaryExtension.prototype.loadTextureSourceUri = function ( source, bufferViews ) {
+
+		var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
+		var bufferView = bufferViews[ metadata.bufferView ];
+		var stringData = convertUint8ArrayToString( new Uint8Array( bufferView ) );
+
+		return 'data:' + metadata.mimeType + ';base64,' + btoa( stringData );
+
+	};
+
+	/*********************************/
 	/********** INTERNALS ************/
 	/*********************************/
 
@@ -314,6 +461,21 @@ THREE.GLTFLoader = ( function () {
 		33071: THREE.ClampToEdgeWrapping,
 		33648: THREE.MirroredRepeatWrapping,
 		10497: THREE.RepeatWrapping
+	};
+
+	var WEBGL_TEXTURE_FORMATS = {
+		6406: THREE.AlphaFormat,
+		6407: THREE.RGBFormat,
+		6408: THREE.RGBAFormat,
+		6409: THREE.LuminanceFormat,
+		6410: THREE.LuminanceAlphaFormat
+	};
+
+	var WEBGL_TEXTURE_DATATYPES = {
+		5121: THREE.UnsignedByteType,
+		32819: THREE.UnsignedShort4444Type,
+		32820: THREE.UnsignedShort5551Type,
+		33635: THREE.UnsignedShort565Type
 	};
 
 	var WEBGL_SIDES = {
@@ -471,6 +633,22 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	// Avoid the String.fromCharCode.apply(null, array) shortcut, which
+	// throws a "maximum call stack size exceeded" error for large arrays.
+	function convertUint8ArrayToString( array ) {
+
+		var s = '';
+
+		for ( var i = 0; i < array.length; i ++ ) {
+
+			s += String.fromCharCode( array[ i ] );
+
+		}
+
+		return s;
+
+	}
+
 	// Three.js seems too dependent on attribute names so globally
 	// replace those in the shader code
 	function replaceTHREEShaderAttributes( shaderText, technique ) {
@@ -575,7 +753,7 @@ THREE.GLTFLoader = ( function () {
 			side: THREE.FrontSide
 		} );
 
-	};
+	}
 
 	// Deferred constructor for RawShaderMaterial types
 	function DeferredShaderMaterial( params ) {
@@ -614,9 +792,10 @@ THREE.GLTFLoader = ( function () {
 
 	/* GLTF PARSER */
 
-	function GLTFParser( json, options ) {
+	function GLTFParser( json, extensions, options ) {
 
 		this.json = json || {};
+		this.extensions = extensions || {};
 		this.options = options || {};
 
 		// loader object cache
@@ -710,17 +889,32 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadShaders = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 		var options = this.options;
 
-		return _each( json.shaders, function ( shader ) {
+		return this._withDependencies( [
 
-			return new Promise( function ( resolve ) {
+			"bufferViews"
 
-				var loader = new THREE.FileLoader();
-				loader.setResponseType( 'text' );
-				loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
+		] ).then( function ( dependencies ) {
 
-					resolve( shaderText );
+			return _each( json.shaders, function ( shader ) {
+
+				if ( shader.extensions && shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
+
+					return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadShader( shader, dependencies.bufferViews );
+
+				}
+
+				return new Promise( function ( resolve ) {
+
+					var loader = new THREE.FileLoader();
+					loader.setResponseType( 'text' );
+					loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
+
+						resolve( shaderText );
+
+					} );
 
 				} );
 
@@ -733,9 +927,16 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadBuffers = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 		var options = this.options;
 
-		return _each( json.buffers, function ( buffer ) {
+		return _each( json.buffers, function ( buffer, name ) {
+
+			if ( name === BINARY_EXTENSION_BUFFER_NAME ) {
+
+				return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].body;
+
+			}
 
 			if ( buffer.type === 'arraybuffer' || buffer.type === undefined ) {
 
@@ -775,7 +976,9 @@ THREE.GLTFLoader = ( function () {
 
 				var arraybuffer = dependencies.buffers[ bufferView.buffer ];
 
-				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+				var byteLength = bufferView.byteLength !== undefined ? bufferView.byteLength : 0;
+
+				return arraybuffer.slice( bufferView.byteOffset, bufferView.byteOffset + byteLength );
 
 			} );
 
@@ -831,52 +1034,81 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadTextures = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 		var options = this.options;
 
-		return _each( json.textures, function ( texture ) {
+		return this._withDependencies( [
 
-			if ( texture.source ) {
+			"bufferViews"
 
-				return new Promise( function ( resolve ) {
+		] ).then( function ( dependencies ) {
 
-					var source = json.images[ texture.source ];
+			return _each( json.textures, function ( texture ) {
 
-					var textureLoader = THREE.Loader.Handlers.get( source.uri );
+				if ( texture.source ) {
 
-					if ( textureLoader === null ) {
+					return new Promise( function ( resolve ) {
 
-						textureLoader = new THREE.TextureLoader();
+						var source = json.images[ texture.source ];
+						var sourceUri = source.uri;
 
-					}
+						if ( source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
 
-					textureLoader.setCrossOrigin( options.crossOrigin );
-
-					textureLoader.load( resolveURL( source.uri, options.path ), function ( _texture ) {
-
-						_texture.flipY = false;
-
-						if ( texture.sampler ) {
-
-							var sampler = json.samplers[ texture.sampler ];
-
-							_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
-							_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
-							_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
-							_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
+							sourceUri = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadTextureSourceUri( source, dependencies.bufferViews );
 
 						}
 
-						resolve( _texture );
+						var textureLoader = THREE.Loader.Handlers.get( sourceUri );
 
-					}, undefined, function () {
+						if ( textureLoader === null ) {
 
-						resolve();
+							textureLoader = new THREE.TextureLoader();
+
+						}
+
+						textureLoader.setCrossOrigin( options.crossOrigin );
+
+						textureLoader.load( resolveURL( sourceUri, options.path ), function ( _texture ) {
+
+							_texture.flipY = false;
+
+							if ( texture.name !== undefined ) _texture.name = texture.name;
+
+							_texture.format = texture.format !== undefined ? WEBGL_TEXTURE_FORMATS[ texture.format ] : THREE.RGBAFormat;
+
+							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
+
+								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								              'internalFormat will be forced to be the same value as format.' );
+
+							}
+
+							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
+
+							if ( texture.sampler ) {
+
+								var sampler = json.samplers[ texture.sampler ];
+
+								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
+								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
+								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
+
+							}
+
+							resolve( _texture );
+
+						}, undefined, function () {
+
+							resolve();
+
+						} );
 
 					} );
 
-				} );
+				}
 
-			}
+			} );
 
 		} );
 
@@ -901,13 +1133,9 @@ THREE.GLTFLoader = ( function () {
 
 				var khr_material;
 
-				if ( material.extensions && material.extensions.KHR_materials_common ) {
+				if ( material.extensions && material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) {
 
-					khr_material = material.extensions.KHR_materials_common;
-
-				} else if ( json.extensions && json.extensions.KHR_materials_common ) {
-
-					khr_material = json.extensions.KHR_materials_common;
+					khr_material = material.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ];
 
 				}
 
@@ -1140,7 +1368,7 @@ THREE.GLTFLoader = ( function () {
 
 							var enable = enables[ i ];
 
-							switch( STATES_ENABLES[ enable ] ) {
+							switch ( STATES_ENABLES[ enable ] ) {
 
 								case 'CULL_FACE':
 
@@ -1323,7 +1551,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( mesh.extras ) group.userData = mesh.extras;
 
-				var primitives = mesh.primitives;
+				var primitives = mesh.primitives || [];
 
 				for ( var name in primitives ) {
 
@@ -1413,7 +1641,7 @@ THREE.GLTFLoader = ( function () {
 								case 'POSITION':
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
-				
+
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
@@ -1421,7 +1649,8 @@ THREE.GLTFLoader = ( function () {
 									break;
 
 							}
-						};
+
+						}
 
 						var material = dependencies.materials[ primitive.material ];
 
@@ -1470,18 +1699,13 @@ THREE.GLTFLoader = ( function () {
 			if ( camera.type == "perspective" && camera.perspective ) {
 
 				var yfov = camera.perspective.yfov;
-				var xfov = camera.perspective.xfov;
-				var aspect_ratio = camera.perspective.aspect_ratio || 1;
+				var aspectRatio = camera.perspective.aspectRatio !== undefined ? camera.perspective.aspectRatio : 1;
 
 				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				xfov = ( xfov === undefined && yfov ) ? yfov * aspect_ratio : xfov;
+				// aspectRatio = xfov / yfov
+				var xfov = yfov * aspectRatio;
 
-				// According to COLLADA spec...
-				// aspect_ratio = xfov / yfov
-				// yfov = ( yfov === undefined && xfov ) ? xfov / aspect_ratio : yfov;
-
-				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspect_ratio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
@@ -1515,8 +1739,12 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.skins, function ( skin ) {
 
+				var bindShapeMatrix = new THREE.Matrix4();
+
+				if ( skin.bindShapeMatrix !== undefined ) bindShapeMatrix.fromArray( skin.bindShapeMatrix );
+
 				var _skin = {
-					bindShapeMatrix: new THREE.Matrix4().fromArray( skin.bindShapeMatrix ),
+					bindShapeMatrix: bindShapeMatrix,
 					jointNames: skin.jointNames,
 					inverseBindMatrices: dependencies.accessors[ skin.inverseBindMatrices ]
 				};
@@ -1571,6 +1799,7 @@ THREE.GLTFLoader = ( function () {
 								: THREE.VectorKeyframeTrack;
 
 							var targetName = node.name ? node.name : node.uuid;
+							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
 
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
@@ -1579,7 +1808,7 @@ THREE.GLTFLoader = ( function () {
 								targetName + '.' + PATH_PROPERTIES[ target.path ],
 								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
 								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
-								INTERPOLATION[ sampler.interpolation ]
+								interpolation
 							) );
 
 						}
@@ -1588,7 +1817,9 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return new THREE.AnimationClip( "animation_" + animationId, undefined, tracks );
+				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
+
+				return new THREE.AnimationClip( name, undefined, tracks );
 
 			} );
 
@@ -1599,6 +1830,7 @@ THREE.GLTFLoader = ( function () {
 	GLTFParser.prototype.loadNodes = function () {
 
 		var json = this.json;
+		var extensions = this.extensions;
 		var scope = this;
 
 		return _each( json.nodes, function ( node ) {
@@ -1657,8 +1889,7 @@ THREE.GLTFLoader = ( function () {
 
 				"meshes",
 				"skins",
-				"cameras",
-				"extensions"
+				"cameras"
 
 			] ).then( function ( dependencies ) {
 
@@ -1747,7 +1978,7 @@ THREE.GLTFLoader = ( function () {
 
 										return null;
 
-									}
+									};
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
@@ -1805,7 +2036,7 @@ THREE.GLTFLoader = ( function () {
 
 										}
 
-									}
+									};
 
 									buildBoneGraph( node, child, 'skeletons' );
 
@@ -1827,9 +2058,12 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					if ( node.extensions && node.extensions.KHR_materials_common && node.extensions.KHR_materials_common.light ) {
+					if ( node.extensions
+							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ]
+							 && node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ) {
 
-						var light = dependencies.extensions.KHR_materials_common.lights[ node.extensions.KHR_materials_common.light ];
+						var extensionLights = extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
+						var light = extensionLights[ node.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].light ];
 
 						_node.add( light );
 
@@ -1840,70 +2074,6 @@ THREE.GLTFLoader = ( function () {
 				} );
 
 			} );
-
-		} );
-
-	};
-
-	GLTFParser.prototype.loadExtensions = function () {
-
-		var json = this.json;
-
-		return _each( json.extensions, function ( extension, extensionId ) {
-
-			switch ( extensionId ) {
-
-				case "KHR_materials_common":
-
-					var extensionNode = {
-						lights: {}
-					};
-
-					var lights = extension.lights;
-
-					for ( var lightId in lights ) {
-
-						var light = lights[ lightId ];
-						var lightNode;
-
-						var lightParams = light[ light.type ];
-						var color = new THREE.Color().fromArray( lightParams.color );
-
-						switch ( light.type ) {
-
-							case "directional":
-								lightNode = new THREE.DirectionalLight( color );
-								lightNode.position.set( 0, 0, 1 );
-								break;
-
-							case "point":
-								lightNode = new THREE.PointLight( color );
-								break;
-
-							case "spot":
-								lightNode = new THREE.SpotLight( color );
-								lightNode.position.set( 0, 0, 1 );
-								break;
-
-							case "ambient":
-								lightNode = new THREE.AmbientLight( color );
-								break;
-
-						}
-
-						if ( lightNode ) {
-
-							extensionNode.lights[ lightId ] = lightNode;
-
-						}
-
-					}
-
-					return extensionNode;
-
-					break;
-
-			}
 
 		} );
 
@@ -1950,7 +2120,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( scene.extras ) _scene.userData = scene.extras;
 
-				var nodes = scene.nodes;
+				var nodes = scene.nodes || [];
 
 				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
 

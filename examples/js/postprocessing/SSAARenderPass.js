@@ -52,7 +52,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 	constructor: THREE.SSAARenderPass,
 
-	dispose: function() {
+	dispose: function () {
 
 		if ( this.sampleRenderTarget ) {
 
@@ -69,12 +69,12 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 	},
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer ) {
 
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height,
-				{ minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+			this.sampleRenderTarget.texture.name = "SSAARenderPass.sample";
 
 		}
 
@@ -95,29 +95,40 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
 
-			var jitterOffset = jitterOffsets[i];
+			var jitterOffset = jitterOffsets[ i ];
+
 			if ( this.camera.setViewOffset ) {
+
 				this.camera.setViewOffset( width, height,
 					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 					width, height );
+
 			}
 
 			var sampleWeight = baseSampleWeight;
-			if( this.unbiased ) {
+
+			if ( this.unbiased ) {
+
 				// the theory is that equal weights for each sample lead to an accumulation of rounding errors.
 				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
 				// across a range of values whose rounding errors cancel each other out.
-				var uniformCenteredDistribution = ( -0.5 + ( i + 0.5 ) / jitterOffsets.length );
+
+				var uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
 				sampleWeight += roundingRange * uniformCenteredDistribution;
+
 			}
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
-			if (i === 0) {
+
+			if ( i === 0 ) {
+
 				renderer.setClearColor( 0x000000, 0.0 );
+
 			}
-			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, (i === 0) );
+
+			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, ( i === 0 ) );
 
 		}
 
