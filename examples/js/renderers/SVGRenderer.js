@@ -225,7 +225,7 @@ THREE.SVGRenderer = function () {
 			 if ( object instanceof THREE.SVGObject ) {
 
 				_vector3.setFromMatrixPosition( object.matrixWorld );
-				_vector3.applyProjection( _viewProjectionMatrix );
+				_vector3.applyMatrix4( _viewProjectionMatrix );
 
 				var x =   _vector3.x * _svgWidthHalf;
 				var y = - _vector3.y * _svgHeightHalf;

@@ -2,7 +2,7 @@
 
 uniform float opacity;
 
-#if defined( FLAT_SHADED  ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )
+#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )
 
 	varying vec3 vViewPosition;
 
@@ -27,8 +27,5 @@ void main() {
 	#include <normal_fragment>
 
 	gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
-
-	#include <premultiplied_alpha_fragment>
-	#include <encodings_fragment>
 
 }

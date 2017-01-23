@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.83.0",
+  "version": "0.84.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
@@ -15,8 +15,7 @@
     "build/three.module.js",
     "src",
     "examples/js",
-    "examples/fonts",
-    "bower.json"
+    "examples/fonts"
   ],
   "directories": {
     "doc": "docs",

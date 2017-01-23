@@ -1,0 +1,197 @@
+{
+  "accessors": {
+    "VertexAccessor": {
+      "bufferView": "VertexBuffer",
+      "byteOffset": 0,
+      "byteStride": 12,
+      "componentType": 5126,
+      "count": 1376,
+      "type": "VEC3",
+      "max": [
+        2300.0,
+        2450.0,
+        0.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "VertexAccessor"
+    },
+    "LineAccessor": {
+      "bufferView": "LineView",
+      "byteOffset": 0,
+      "byteStride": 2,
+      "componentType": 5123,
+      "count": 2720,
+      "type": "SCALAR",
+      "max": [
+        1374.0
+      ],
+      "min": [
+        0.0
+      ],
+      "name": "LineAccessor"
+    },
+    "ColorAccessor": {
+      "bufferView": "ColorView",
+      "byteOffset": 0,
+      "byteStride": 12,
+      "componentType": 5126,
+      "count": 1376,
+      "type": "VEC3",
+      "max": [
+        0.999963164,
+        0.999615431,
+        1.0
+      ],
+      "min": [
+        0.500137746,
+        0.5002869,
+        1.0
+      ],
+      "name": "ColorAccessor"
+    }
+  },
+  "asset": {
+    "version": "1.1"
+  },
+  "buffers": {
+    "Buffer": {
+      "uri": "snowFlakes.bin",
+      "byteLength": 38464,
+      "type": "arraybuffer",
+      "name": "Buffer",
+      "extensions": {}
+    }
+  },
+  "bufferViews": {
+    "VertexBuffer": {
+      "buffer": "Buffer",
+      "byteOffset": 0,
+      "byteLength": 16512,
+      "target": 34962,
+      "name": "VertexBuffer"
+    },
+    "LineView": {
+      "buffer": "Buffer",
+      "byteOffset": 16512,
+      "byteLength": 5440,
+      "target": 34963,
+      "name": "LineView"
+    },
+    "ColorView": {
+      "buffer": "Buffer",
+      "byteOffset": 21952,
+      "byteLength": 16512,
+      "target": 34962,
+      "name": "ColorView"
+    }
+  },
+  "images": {},
+  "materials": {
+    "meshMaterial": {
+      "technique": "meshTechnique",
+      "values": {},
+      "name": "meshMaterial"
+    }
+  },
+  "meshes": {
+    "mesh": {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": "VertexAccessor",
+            "COLOR_0": "ColorAccessor"
+          },
+          "indices": "LineAccessor",
+          "material": "meshMaterial",
+          "mode": 1
+        }
+      ],
+      "name": "mesh"
+    }
+  },
+  "nodes": {
+    "node1": {
+      "children": [],
+      "meshes": [
+        "mesh"
+      ],
+      "name": "node1"
+    }
+  },
+  "programs": {
+    "meshProgram": {
+      "attributes": [
+        "a_position",
+        "a_color"
+      ],
+      "fragmentShader": "fragmentShader",
+      "vertexShader": "vertexShader",
+      "name": "shader"
+    }
+  },
+  "samplers": {},
+  "scene": "default scene",
+  "scenes": {
+    "default scene": {
+      "nodes": [
+        "node1"
+      ],
+      "name": "default scene"
+    }
+  },
+  "shaders": {
+    "fragmentShader": {
+      "uri": "line_frag.glsl",
+      "type": 35632,
+      "name": "fragmentShader"
+    },
+    "vertexShader": {
+      "uri": "line_vert.glsl",
+      "type": 35633,
+      "name": "vertexShader"
+    }
+  },
+  "techniques": {
+    "meshTechnique": {
+      "parameters": {
+        "modelViewMatrixParameter": {
+          "type": 35676,
+          "semantic": "MODELVIEW"
+        },
+        "projectionMatrixParameter": {
+          "type": 35676,
+          "semantic": "PROJECTION"
+        },
+        "position": {
+          "type": 35665,
+          "semantic": "POSITION"
+        },
+        "color": {
+          "type": 35665,
+          "semantic": "COLOR_0"
+        }
+      },
+      "attributes": {
+        "a_position": "position",
+        "a_color": "color"
+      },
+      "program": "meshProgram",
+      "uniforms": {
+        "u_modelViewMatrix": "modelViewMatrixParameter",
+        "u_projectionMatrix": "projectionMatrixParameter"
+      },
+      "states": {
+        "enable": [
+          3042,
+          2929
+        ]
+      },
+      "name": "meshTechnique"
+    }
+  },
+  "textures": {}
+}
