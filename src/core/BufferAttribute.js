@@ -32,6 +32,12 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
+Object.defineProperty( BufferAttribute.prototype, "needsUpdate", {
+
+	set: function(value) { if ( value === true ) this.version ++; }
+
+});
+
 Object.assign( BufferAttribute.prototype, {
 
 	constructor: BufferAttribute,
