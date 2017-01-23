@@ -126,23 +126,6 @@ var list = {
 			[ "SplineCurve", "api/extras/curves/SplineCurve" ]
 		],
 
-		"Extras / Helpers": [
-			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
-			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
-			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
-			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
-			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
-			[ "GridHelper", "api/extras/helpers/GridHelper" ],
-			[ "PolarGridHelper", "api/extras/helpers/PolarGridHelper"],
-			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
-			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
-			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
-			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
-			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
-		],
-
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
@@ -189,6 +172,23 @@ var list = {
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
 			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
 			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
+		],
+
+		"Helpers": [
+			[ "ArrowHelper", "api/helpers/ArrowHelper" ],
+			[ "AxisHelper", "api/helpers/AxisHelper" ],
+			[ "BoxHelper", "api/helpers/BoxHelper" ],
+			[ "CameraHelper", "api/helpers/CameraHelper" ],
+			[ "DirectionalLightHelper", "api/helpers/DirectionalLightHelper" ],
+			[ "FaceNormalsHelper", "api/helpers/FaceNormalsHelper" ],
+			[ "GridHelper", "api/helpers/GridHelper" ],
+			[ "PolarGridHelper", "api/helpers/PolarGridHelper" ],
+			[ "HemisphereLightHelper", "api/helpers/HemisphereLightHelper" ],
+			[ "PointLightHelper", "api/helpers/PointLightHelper" ],
+			[ "RectAreaLightHelper", "api/helpers/RectAreaLightHelper" ],
+			[ "SkeletonHelper", "api/helpers/SkeletonHelper" ],
+			[ "SpotLightHelper", "api/helpers/SpotLightHelper" ],
+			[ "VertexNormalsHelper", "api/helpers/VertexNormalsHelper" ]
 		],
 
 		"Lights": [

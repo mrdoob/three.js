@@ -31,7 +31,7 @@ TorusGeometry.prototype.constructor = TorusGeometry;
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { BufferAttribute } from '../core/BufferAttribute';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 
@@ -55,22 +55,15 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 	tubularSegments = Math.floor( tubularSegments ) || 6;
 	arc = arc || Math.PI * 2;
 
-	// used to calculate buffer length
-	var vertexCount = ( ( radialSegments + 1 ) * ( tubularSegments + 1 ) );
-	var indexCount = radialSegments * tubularSegments * 2 * 3;
-
 	// buffers
-	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
-	var vertices = new Float32Array( vertexCount * 3 );
-	var normals = new Float32Array( vertexCount * 3 );
-	var uvs = new Float32Array( vertexCount * 2 );
 
-	// offset variables
-	var vertexBufferOffset = 0;
-	var uvBufferOffset = 0;
-	var indexBufferOffset = 0;
+	var indices = [];
+	var vertices = [];
+	var normals = [];
+	var uvs = [];
 
 	// helper variables
+
 	var center = new Vector3();
 	var vertex = new Vector3();
 	var normal = new Vector3();
@@ -87,32 +80,25 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 			var v = j / radialSegments * Math.PI * 2;
 
 			// vertex
+
 			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
 			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
 			vertex.z = tube * Math.sin( v );
 
-			vertices[ vertexBufferOffset ] = vertex.x;
-			vertices[ vertexBufferOffset + 1 ] = vertex.y;
-			vertices[ vertexBufferOffset + 2 ] = vertex.z;
-
-			// this vector is used to calculate the normal
-			center.x = radius * Math.cos( u );
-			center.y = radius * Math.sin( u );
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			// normal
+
+			center.x = radius * Math.cos( u );
+			center.y = radius * Math.sin( u );
 			normal.subVectors( vertex, center ).normalize();
 
-			normals[ vertexBufferOffset ] = normal.x;
-			normals[ vertexBufferOffset + 1 ] = normal.y;
-			normals[ vertexBufferOffset + 2 ] = normal.z;
+			normals.push( normal.x, normal.y, normal.z );
 
 			// uv
-			uvs[ uvBufferOffset ] = i / tubularSegments;
-			uvs[ uvBufferOffset + 1 ] = j / radialSegments;
 
-			// update offsets
-			vertexBufferOffset += 3;
-			uvBufferOffset += 2;
+			uvs.push( i / tubularSegments );
+			uvs.push( j / radialSegments );
 
 		}
 
@@ -125,33 +111,27 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 		for ( i = 1; i <= tubularSegments; i ++ ) {
 
 			// indices
+
 			var a = ( tubularSegments + 1 ) * j + i - 1;
 			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
 			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
 			var d = ( tubularSegments + 1 ) * j + i;
 
-			// face one
-			indices[ indexBufferOffset ] = a;
-			indices[ indexBufferOffset + 1 ] = b;
-			indices[ indexBufferOffset + 2 ] = d;
+			// faces
 
-			// face two
-			indices[ indexBufferOffset + 3 ] = b;
-			indices[ indexBufferOffset + 4 ] = c;
-			indices[ indexBufferOffset + 5 ] = d;
-
-			// update offset
-			indexBufferOffset += 6;
+			indices.push( a, b, d );
+			indices.push( b, c, d );
 
 		}
 
 	}
 
 	// build geometry
-	this.setIndex( new BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 }
 

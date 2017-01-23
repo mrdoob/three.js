@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<base href="../../../" />
+		<base href="../../" />
 		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
@@ -24,8 +24,7 @@
 
 		<code>
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-var helper = new THREE.CameraHelper( cameraPerspective );
+var helper = new THREE.CameraHelper( camera );
 scene.add( helper );
 		</code>
 

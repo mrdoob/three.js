@@ -17,13 +17,15 @@ function GridHelper( size, divisions, color1, color2 ) {
 	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
 	var center = divisions / 2;
-	var step = ( size * 2 ) / divisions;
+	var step = size / divisions;
+	var halfSize = size / 2;
+
 	var vertices = [], colors = [];
 
-	for ( var i = 0, j = 0, k = - size; i <= divisions; i ++, k += step ) {
+	for ( var i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
 
-		vertices.push( - size, 0, k, size, 0, k );
-		vertices.push( k, 0, - size, k, 0, size );
+		vertices.push( - halfSize, 0, k, halfSize, 0, k );
+		vertices.push( k, 0, - halfSize, k, 0, halfSize );
 
 		var color = i === center ? color1 : color2;
 

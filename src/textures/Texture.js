@@ -79,6 +79,8 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	copy: function ( source ) {
 
+		this.name = source.name;
+
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
 

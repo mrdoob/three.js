@@ -84,7 +84,10 @@ Object.assign( ObjectLoader.prototype, {
 
 			} catch ( error ) {
 
+				if ( onError !== undefined ) onError( error );
+
 				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+
 				return;
 
 			}

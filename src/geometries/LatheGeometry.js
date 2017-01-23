@@ -34,10 +34,10 @@ function LatheGeometry( points, segments, phiStart, phiLength ) {
 LatheGeometry.prototype = Object.create( Geometry.prototype );
 LatheGeometry.prototype.constructor = LatheGeometry;
 
+import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
 import { Vector2 } from '../math/Vector2';
-import { BufferAttribute } from '../core/BufferAttribute';
 import { _Math } from '../math/Math';
 
 /**
@@ -62,19 +62,19 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 	phiLength = phiLength || Math.PI * 2;
 
 	// clamp phiLength so it's in range of [ 0, 2PI ]
+
 	phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
 
-	// these are used to calculate buffer length
-	var vertexCount = ( segments + 1 ) * points.length;
-	var indexCount = segments * points.length * 2 * 3;
 
 	// buffers
-	var indices = new BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
-	var vertices = new BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
-	var uvs = new BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	var indices = [];
+	var vertices = [];
+	var uvs = [];
 
 	// helper variables
-	var index = 0, indexOffset = 0, base;
+
+	var base;
 	var inverseSegments = 1.0 / segments;
 	var vertex = new Vector3();
 	var uv = new Vector2();
@@ -92,24 +92,26 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
 
 			// vertex
+
 			vertex.x = points[ j ].x * sin;
 			vertex.y = points[ j ].y;
 			vertex.z = points[ j ].x * cos;
-			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			// uv
+
 			uv.x = i / segments;
 			uv.y = j / ( points.length - 1 );
-			uvs.setXY( index, uv.x, uv.y );
 
-			// increase index
-			index ++;
+			uvs.push( uv.x, uv.y );
+
 
 		}
 
 	}
 
-	// generate indices
+	// indices
 
 	for ( i = 0; i < segments; i ++ ) {
 
@@ -117,21 +119,15 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 			base = j + i * points.length;
 
-			// indices
 			var a = base;
 			var b = base + points.length;
 			var c = base + points.length + 1;
 			var d = base + 1;
 
-			// face one
-			indices.setX( indexOffset, a ); indexOffset ++;
-			indices.setX( indexOffset, b ); indexOffset ++;
-			indices.setX( indexOffset, d ); indexOffset ++;
+			// faces
 
-			// face two
-			indices.setX( indexOffset, b ); indexOffset ++;
-			indices.setX( indexOffset, c ); indexOffset ++;
-			indices.setX( indexOffset, d ); indexOffset ++;
+			indices.push( a, b, d );
+			indices.push( b, c, d );
 
 		}
 
@@ -140,8 +136,8 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 	// build geometry
 
 	this.setIndex( indices );
-	this.addAttribute( 'position', vertices );
-	this.addAttribute( 'uv', uvs );
+	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	// generate normals
 
@@ -158,29 +154,34 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 		var n = new Vector3();
 
 		// this is the buffer offset for the last line of vertices
+
 		base = segments * points.length * 3;
 
 		for ( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
 
 			// select the normal of the vertex in the first line
+
 			n1.x = normals[ j + 0 ];
 			n1.y = normals[ j + 1 ];
 			n1.z = normals[ j + 2 ];
 
 			// select the normal of the vertex in the last line
+
 			n2.x = normals[ base + j + 0 ];
 			n2.y = normals[ base + j + 1 ];
 			n2.z = normals[ base + j + 2 ];
 
 			// average normals
+
 			n.addVectors( n1, n2 ).normalize();
 
 			// assign the new values to both normals
+
 			normals[ j + 0 ] = normals[ base + j + 0 ] = n.x;
 			normals[ j + 1 ] = normals[ base + j + 1 ] = n.y;
 			normals[ j + 2 ] = normals[ base + j + 2 ] = n.z;
 
-		} // next row
+		}
 
 	}
 
