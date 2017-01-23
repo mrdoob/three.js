@@ -89,61 +89,81 @@ Object.assign( Quaternion, {
 
 } );
 
+Object.defineProperties( Quaternion.prototype, {
+
+	"x" : {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	"y" : {
+
+		get: function () {
+
+			return this._y;
+
+		},
+
+		set: function ( value ) {
+
+			this._y = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	"z" : {
+
+		get: function () {
+
+			return this._z;
+
+		},
+
+		set: function ( value ) {
+
+			this._z = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	"w" : {
+
+		get: function () {
+
+			return this._w;
+
+		},
+
+		set: function ( value ) {
+
+			this._w = value;
+			this.onChangeCallback();
+
+		}
+
+	}
+
+});
+
 Object.assign( Quaternion.prototype, {
 
 	constructor: Quaternion,
-
-	get x () {
-
-		return this._x;
-
-	},
-
-	set x ( value ) {
-
-		this._x = value;
-		this.onChangeCallback();
-
-	},
-
-	get y () {
-
-		return this._y;
-
-	},
-
-	set y ( value ) {
-
-		this._y = value;
-		this.onChangeCallback();
-
-	},
-
-	get z () {
-
-		return this._z;
-
-	},
-
-	set z ( value ) {
-
-		this._z = value;
-		this.onChangeCallback();
-
-	},
-
-	get w () {
-
-		return this._w;
-
-	},
-
-	set w ( value ) {
-
-		this._w = value;
-		this.onChangeCallback();
-
-	},
 
 	set: function ( x, y, z, w ) {
 
