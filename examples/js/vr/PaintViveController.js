@@ -75,7 +75,7 @@ THREE.PaintViveController = function ( id ) {
 		}
 
 		if ( mode === MODES.SIZE ) {
-			size = y + 1;
+			size = (0.5 - y) * 2;
 		}
 
 	}
