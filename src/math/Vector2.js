@@ -12,37 +12,26 @@ function Vector2( x, y ) {
 
 }
 
+Object.defineProperties( Vector2.prototype, {
+
+	"width" : {
+		get: function () { return this.x; },
+		set: function ( value ) { this.x = value; }
+	},
+
+	"height" : {
+		get: function () { return this.y; },
+		set: function ( value ) { this.y = value; }
+	}
+
+} );
+
+
 Object.assign( Vector2.prototype, {
 
 	constructor: Vector2,
 
 	isVector2: true,
-
-	get width() {
-
-		return this.x;
-
-	},
-
-	set width( value ) {
-
-		this.x = value;
-
-	},
-
-	get height() {
-
-		return this.y;
-
-	},
-
-	set height( value ) {
-
-		this.y = value;
-
-	},
-
-	//
 
 	set: function ( x, y ) {
 
