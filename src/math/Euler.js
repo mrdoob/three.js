@@ -22,7 +22,7 @@ Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 Euler.DefaultOrder = 'XYZ';
 
-Euler.prototype = {
+Object.assign( Euler.prototype, {
 
 	constructor: Euler,
 
@@ -237,11 +237,9 @@ Euler.prototype = {
 
 	setFromQuaternion: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function setFromQuaternion( q, order, update ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.makeRotationFromQuaternion( q );
 
@@ -330,7 +328,7 @@ Euler.prototype = {
 
 	onChangeCallback: function () {}
 
-};
+} );
 
 
 export { Euler };
