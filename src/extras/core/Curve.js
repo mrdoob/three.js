@@ -39,7 +39,7 @@ import { Matrix4 } from '../../math/Matrix4';
 
 function Curve() {}
 
-Object.assign( Curve.prototype, {
+Curve.prototype = {
 
 	constructor: Curve,
 
@@ -382,7 +382,6 @@ Object.assign( Curve.prototype, {
 
 	}
 
-} );
-
+};
 
 export { Curve };

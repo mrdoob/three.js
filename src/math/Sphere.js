@@ -13,7 +13,7 @@ function Sphere( center, radius ) {
 
 }
 
-Object.assign( Sphere.prototype, {
+Sphere.prototype = {
 
 	constructor: Sphere,
 
@@ -28,9 +28,11 @@ Object.assign( Sphere.prototype, {
 
 	setFromPoints: function () {
 
-		var box = new Box3();
+		var box;
 
 		return function setFromPoints( points, optionalCenter ) {
+
+			if ( box === undefined ) box = new Box3(); // see #10547
 
 			var center = this.center;
 
@@ -174,7 +176,7 @@ Object.assign( Sphere.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Sphere };

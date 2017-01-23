@@ -8,7 +8,7 @@ function Layers() {
 
 }
 
-Object.assign( Layers.prototype, {
+Layers.prototype = {
 
 	constructor: Layers,
 
@@ -42,7 +42,7 @@ Object.assign( Layers.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Layers };

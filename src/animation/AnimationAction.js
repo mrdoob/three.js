@@ -76,7 +76,7 @@ function AnimationAction( mixer, clip, localRoot ) {
 
 }
 
-Object.assign( AnimationAction.prototype, {
+AnimationAction.prototype = {
 
 	constructor: AnimationAction,
 
@@ -651,7 +651,7 @@ Object.assign( AnimationAction.prototype, {
 
 	}
 
-} );
+};
 
 
 export { AnimationAction };
