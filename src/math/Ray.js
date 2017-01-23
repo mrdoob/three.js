@@ -11,7 +11,7 @@ function Ray( origin, direction ) {
 
 }
 
-Object.assign( Ray.prototype, {
+Ray.prototype = {
 
 	constructor: Ray,
 
@@ -534,7 +534,7 @@ Object.assign( Ray.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Ray };

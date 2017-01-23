@@ -16,19 +16,24 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 }
 
-Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
-	"count" : { get: function () { return this.data.count; } },
-
-	"array" : { get: function () { return this.data.array; } }
-
-} );
-
-Object.assign( InterleavedBufferAttribute.prototype, {
+InterleavedBufferAttribute.prototype = {
 
 	constructor: InterleavedBufferAttribute,
 
 	isInterleavedBufferAttribute: true,
+
+	get count() {
+
+		return this.data.count;
+
+	},
+
+	get array() {
+
+		return this.data.array;
+
+	},
 
 	setX: function ( index, x ) {
 
@@ -122,7 +127,7 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	}
 
-} );
+};
 
 
 export { InterleavedBufferAttribute };

@@ -15,94 +15,90 @@ function Triangle( a, b, c ) {
 
 }
 
-Object.assign( Triangle, {
+Triangle.normal = function () {
 
-	normal: function () {
+	var v0 = new Vector3();
 
-		var v0 = new Vector3();
+	return function normal( a, b, c, optionalTarget ) {
 
-		return function normal( a, b, c, optionalTarget ) {
+		var result = optionalTarget || new Vector3();
 
-			var result = optionalTarget || new Vector3();
+		result.subVectors( c, b );
+		v0.subVectors( a, b );
+		result.cross( v0 );
 
-			result.subVectors( c, b );
-			v0.subVectors( a, b );
-			result.cross( v0 );
+		var resultLengthSq = result.lengthSq();
+		if ( resultLengthSq > 0 ) {
 
-			var resultLengthSq = result.lengthSq();
-			if ( resultLengthSq > 0 ) {
+			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
-				return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+		}
 
-			}
+		return result.set( 0, 0, 0 );
 
-			return result.set( 0, 0, 0 );
+	};
 
-		};
+}();
 
-	}(),
+// static/instance method to calculate barycentric coordinates
+// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+Triangle.barycoordFromPoint = function () {
 
-	// static/instance method to calculate barycentric coordinates
-	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-	barycoordFromPoint: function () {
+	var v0 = new Vector3();
+	var v1 = new Vector3();
+	var v2 = new Vector3();
 
-		var v0 = new Vector3();
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
-		return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+		v0.subVectors( c, a );
+		v1.subVectors( b, a );
+		v2.subVectors( point, a );
 
-			v0.subVectors( c, a );
-			v1.subVectors( b, a );
-			v2.subVectors( point, a );
+		var dot00 = v0.dot( v0 );
+		var dot01 = v0.dot( v1 );
+		var dot02 = v0.dot( v2 );
+		var dot11 = v1.dot( v1 );
+		var dot12 = v1.dot( v2 );
 
-			var dot00 = v0.dot( v0 );
-			var dot01 = v0.dot( v1 );
-			var dot02 = v0.dot( v2 );
-			var dot11 = v1.dot( v1 );
-			var dot12 = v1.dot( v2 );
+		var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-			var denom = ( dot00 * dot11 - dot01 * dot01 );
+		var result = optionalTarget || new Vector3();
 
-			var result = optionalTarget || new Vector3();
+		// collinear or singular triangle
+		if ( denom === 0 ) {
 
-			// collinear or singular triangle
-			if ( denom === 0 ) {
+			// arbitrary location outside of triangle?
+			// not sure if this is the best idea, maybe should be returning undefined
+			return result.set( - 2, - 1, - 1 );
 
-				// arbitrary location outside of triangle?
-				// not sure if this is the best idea, maybe should be returning undefined
-				return result.set( - 2, - 1, - 1 );
+		}
 
-			}
+		var invDenom = 1 / denom;
+		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-			var invDenom = 1 / denom;
-			var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-			var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+		// barycentric coordinates must always sum to 1
+		return result.set( 1 - u - v, v, u );
 
-			// barycentric coordinates must always sum to 1
-			return result.set( 1 - u - v, v, u );
+	};
 
-		};
+}();
 
-	}(),
+Triangle.containsPoint = function () {
 
-	containsPoint: function () {
+	var v1 = new Vector3();
 
-		var v1 = new Vector3();
+	return function containsPoint( point, a, b, c ) {
 
-		return function containsPoint( point, a, b, c ) {
+		var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
-			var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
+		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
 
-			return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+	};
 
-		};
+}();
 
-	}()
-
-} );
-
-Object.assign( Triangle.prototype, {
+Triangle.prototype = {
 
 	constructor: Triangle,
 
@@ -193,12 +189,18 @@ Object.assign( Triangle.prototype, {
 
 	closestPointToPoint: function () {
 
-		var plane = new Plane();
-		var edgeList = [ new Line3(), new Line3(), new Line3() ];
-		var projectedPoint = new Vector3();
-		var closestPoint = new Vector3();
+		var plane, edgeList, projectedPoint, closestPoint;
 
 		return function closestPointToPoint( point, optionalTarget ) {
+
+			if ( plane === undefined ) {
+
+				plane = new Plane();
+				edgeList = [ new Line3(), new Line3(), new Line3() ];
+				projectedPoint = new Vector3();
+				closestPoint = new Vector3();
+
+			}
 
 			var result = optionalTarget || new Vector3();
 			var minDistance = Infinity;
@@ -254,7 +256,7 @@ Object.assign( Triangle.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Triangle };

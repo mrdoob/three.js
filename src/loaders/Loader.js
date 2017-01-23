@@ -32,40 +32,7 @@ function Loader() {
 
 }
 
-Loader.Handlers = {
-
-	handlers: [],
-
-	add: function ( regex, loader ) {
-
-		this.handlers.push( regex, loader );
-
-	},
-
-	get: function ( file ) {
-
-		var handlers = this.handlers;
-
-		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
-
-			var regex = handlers[ i ];
-			var loader = handlers[ i + 1 ];
-
-			if ( regex.test( file ) ) {
-
-				return loader;
-
-			}
-
-		}
-
-		return null;
-
-	}
-
-};
-
-Object.assign( Loader.prototype, {
+Loader.prototype = {
 
 	constructor: Loader,
 
@@ -108,11 +75,13 @@ Object.assign( Loader.prototype, {
 			CustomBlending: CustomBlending
 		};
 
-		var color = new Color();
-		var textureLoader = new TextureLoader();
-		var materialLoader = new MaterialLoader();
+		var color, textureLoader, materialLoader;
 
 		return function createMaterial( m, texturePath, crossOrigin ) {
+
+			if ( color === undefined ) color = new Color();
+			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
+			if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
 
 			// convert from old material format
 
@@ -351,7 +320,40 @@ Object.assign( Loader.prototype, {
 
 	} )()
 
-} );
+};
+
+Loader.Handlers = {
+
+	handlers: [],
+
+	add: function ( regex, loader ) {
+
+		this.handlers.push( regex, loader );
+
+	},
+
+	get: function ( file ) {
+
+		var handlers = this.handlers;
+
+		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			var regex = handlers[ i ];
+			var loader = handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+};
 
 
 export { Loader };

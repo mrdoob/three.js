@@ -20,7 +20,7 @@ function Spherical( radius, phi, theta ) {
 
 }
 
-Object.assign( Spherical.prototype, {
+Spherical.prototype = {
 
 	constructor: Spherical,
 
@@ -80,7 +80,7 @@ Object.assign( Spherical.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Spherical };

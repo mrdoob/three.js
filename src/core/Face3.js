@@ -22,7 +22,7 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 
 }
 
-Object.assign( Face3.prototype, {
+Face3.prototype = {
 
 	constructor: Face3,
 
@@ -59,7 +59,7 @@ Object.assign( Face3.prototype, {
 
 	}
 
-} );
+};
 
 
 export { Face3 };

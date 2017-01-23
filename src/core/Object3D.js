@@ -101,7 +101,7 @@ function Object3D() {
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+Object3D.prototype = {
 
 	constructor: Object3D,
 
@@ -730,7 +730,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	}
 
-} );
+};
 
+Object.assign( Object3D.prototype, EventDispatcher.prototype );
 
 export { Object3D };
