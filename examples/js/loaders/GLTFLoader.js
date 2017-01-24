@@ -1940,6 +1940,10 @@ THREE.GLTFLoader = ( function () {
 										child = new THREE.LineSegments( originalGeometry, material );
 										break;
 
+									case 'LineLoop':
+										child = new THREE.LineLoop( originalGeometry, material );
+										break;
+
 									case 'Line':
 										child = new THREE.Line( originalGeometry, material );
 										break;

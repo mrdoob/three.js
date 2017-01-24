@@ -286,6 +286,7 @@ var list = {
 			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
+			[ "LineLoop", "api/objects/LineLoop" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
