@@ -154,7 +154,8 @@ AnimationMixer.prototype = {
 
 			if ( action.enabled ) {
 
-				action._update( time, deltaTime, timeDirection, accuIndex );
+			    action._update( time, deltaTime, timeDirection, accuIndex );
+			    if ( action.onUpdate ) action.onUpdate();
 
 			}
 
