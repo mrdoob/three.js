@@ -18,13 +18,10 @@ function Material() {
 	this.name = '';
 	this.type = 'Material';
 
-	this.fog = true;
 	this.lights = true;
 
 	this.blending = NormalBlending;
-	this.side = FrontSide;
 	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
-	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 	this.opacity = 1;
 	this.transparent = false;
@@ -52,14 +49,18 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
-	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
 
+	//Private properties
+	this._alphaTest = 0;
+	this._fog = true;
 	this._needsUpdate = true;
+	this._side = FrontSide;
+	this._vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
 }
 
@@ -68,6 +69,40 @@ Material.prototype = {
 	constructor: Material,
 
 	isMaterial: true,
+
+	get alphaTest() {
+
+		return this._alphaTest;
+
+	},
+
+	set alphaTest( value ) {
+
+		if ( value !== this._alphaTest ) {
+
+			this._alphaTest = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
+	get fog() {
+
+		return this._fog;
+
+	},
+
+	set fog( value ) {
+
+		if ( value !== this._fog ) {
+
+			this._fog = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
 
 	get needsUpdate() {
 
@@ -82,6 +117,40 @@ Material.prototype = {
 
 	},
 
+	get side() {
+
+		return this._side;
+
+	},
+
+	set side( value ) {
+
+		if ( value !== this._side ) {
+
+			this._side = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
+	get vertexColors() {
+
+		return this._vertexColors;
+
+	},
+
+	set vertexColors( value ) {
+
+		if ( value !== this._vertexColors ) {
+
+			this._vertexColors = value;
+			this.needsUpdate = true;
+
+		}
+
+	},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
@@ -93,6 +162,15 @@ Material.prototype = {
 			if ( newValue === undefined ) {
 
 				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				continue;
+
+			}
+
+			//Check if there is a private version of the parameter and if so set that directly.
+			//This is to prevent needsUpdate being set multiple times on material creation
+			if ( this.hasOwnProperty( '_' + key ) ) {
+
+				this[ '_' + key ] = newValue;
 				continue;
 
 			}
