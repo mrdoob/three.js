@@ -70,11 +70,6 @@ THREE.CSS3DRenderer = function () {
 	cameraElement.style.oTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
 
-	cameraElement.style.WebkitTransformOrigin = '0 0';
-	cameraElement.style.MozTransformOrigin = '0 0';
-	cameraElement.style.oTransformOrigin = '0 0';
-	cameraElement.style.transformOrigin = '0 0';
-
 	domElement.appendChild( cameraElement );
 
 	this.setClearColor = function () {};
