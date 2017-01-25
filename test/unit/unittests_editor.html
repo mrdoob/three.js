@@ -3,11 +3,16 @@
 <head>
   <meta charset="utf-8">
   <title>ThreeJS Unit Tests - Using Files in /editor</title>
-  <link rel="stylesheet" href="qunit-1.18.0.css">
+  <link rel="stylesheet" href="../../node_modules/qunitjs/qunit/qunit.css">
 </head>
 <body>
-<div id="qunit"></div>
-<script src="../unit/qunit-1.18.0.js"></script>
+
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+
+  <script src="../../node_modules/qunitjs/qunit/qunit.js"></script>
+  <script src="qunit-utils.js"></script>
+  <script src="SmartComparer.js"></script>
 
 <!-- add sources to test below -->
 <script src="../../build/three.min.js"></script>
