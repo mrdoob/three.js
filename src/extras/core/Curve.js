@@ -67,7 +67,7 @@ Curve.prototype = {
 
 	getPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( typeof divisions !== 'number' ) divisions = 5;
 
 		var points = [];
 
@@ -85,7 +85,7 @@ Curve.prototype = {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( typeof divisions !== 'number' ) divisions = 5;
 
 		var points = [];
 
@@ -112,7 +112,7 @@ Curve.prototype = {
 
 	getLengths: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( typeof divisions !== 'number' ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 		if ( this.cacheArcLengths
 			&& ( this.cacheArcLengths.length === divisions + 1 )
