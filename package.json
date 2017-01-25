@@ -48,6 +48,7 @@
   "devDependencies": {
     "eslint": "^3.10.1",
     "eslint-config-mdcs": "^4.2.2",
+    "qunitjs": "^2.1.1",
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
