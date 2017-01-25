@@ -78,8 +78,6 @@ function AnimationAction( mixer, clip, localRoot ) {
 
 Object.assign( AnimationAction.prototype, {
 
-	constructor: AnimationAction,
-
 	// State & Scheduling
 
 	play: function() {

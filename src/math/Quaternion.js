@@ -163,8 +163,6 @@ Object.defineProperties( Quaternion.prototype, {
 
 Object.assign( Quaternion.prototype, {
 
-	constructor: Quaternion,
-
 	set: function ( x, y, z, w ) {
 
 		this._x = x;

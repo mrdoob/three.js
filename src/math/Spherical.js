@@ -22,8 +22,6 @@ function Spherical( radius, phi, theta ) {
 
 Object.assign( Spherical.prototype, {
 
-	constructor: Spherical,
-
 	set: function ( radius, phi, theta ) {
 
 		this.radius = radius;

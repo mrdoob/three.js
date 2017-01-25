@@ -50,8 +50,6 @@ Object.defineProperties( Vector2.prototype, {
 
 Object.assign( Vector2.prototype, {
 
-	constructor: Vector2,
-
 	isVector2: true,
 
 	set: function ( x, y ) {

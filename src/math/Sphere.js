@@ -15,8 +15,6 @@ function Sphere( center, radius ) {
 
 Object.assign( Sphere.prototype, {
 
-	constructor: Sphere,
-
 	set: function ( center, radius ) {
 
 		this.center.copy( center );

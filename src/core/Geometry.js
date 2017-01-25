@@ -61,8 +61,6 @@ function Geometry() {
 
 Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
-	constructor: Geometry,
-
 	isGeometry: true,
 
 	applyMatrix: function ( matrix ) {

@@ -58,8 +58,6 @@ function PropertyMixer( binding, typeName, valueSize ) {
 
 Object.assign( PropertyMixer.prototype, {
 
-	constructor: PropertyMixer,
-
 	// accumulate data in the 'incoming' region into 'accu<i>'
 	accumulate: function( accuIndex, weight ) {
 

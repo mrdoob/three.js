@@ -310,8 +310,6 @@ Object.assign( AnimationClip, {
 
 Object.assign( AnimationClip.prototype, {
 
-	constructor: AnimationClip,
-
 	resetDuration: function() {
 
 		var tracks = this.tracks,

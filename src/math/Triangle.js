@@ -104,8 +104,6 @@ Object.assign( Triangle, {
 
 Object.assign( Triangle.prototype, {
 
-	constructor: Triangle,
-
 	set: function ( a, b, c ) {
 
 		this.a.copy( a );

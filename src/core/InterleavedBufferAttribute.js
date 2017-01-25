@@ -42,8 +42,6 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
 Object.assign( InterleavedBufferAttribute.prototype, {
 
-	constructor: InterleavedBufferAttribute,
-
 	isInterleavedBufferAttribute: true,
 
 	setX: function ( index, x ) {

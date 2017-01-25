@@ -16,8 +16,6 @@ function Clock( autoStart ) {
 
 Object.assign( Clock.prototype, {
 
-	constructor: Clock,
-
 	start: function () {
 
 		this.startTime = ( performance || Date ).now();

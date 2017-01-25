@@ -67,8 +67,6 @@ Loader.Handlers = {
 
 Object.assign( Loader.prototype, {
 
-	constructor: Loader,
-
 	crossOrigin: undefined,
 
 	extractUrlBase: function ( url ) {

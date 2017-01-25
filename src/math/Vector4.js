@@ -17,8 +17,6 @@ function Vector4( x, y, z, w ) {
 
 Object.assign( Vector4.prototype, {
 
-	constructor: Vector4,
-
 	isVector4: true,
 
 	set: function ( x, y, z, w ) {

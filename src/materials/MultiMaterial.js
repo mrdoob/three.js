@@ -18,8 +18,6 @@ function MultiMaterial( materials ) {
 
 Object.assign( MultiMaterial.prototype, {
 
-	constructor: MultiMaterial,
-
 	isMultiMaterial: true,
 
 	toJSON: function ( meta ) {

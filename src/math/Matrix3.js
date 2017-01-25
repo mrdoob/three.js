@@ -27,8 +27,6 @@ function Matrix3() {
 
 Object.assign( Matrix3.prototype, {
 
-	constructor: Matrix3,
-
 	isMatrix3: true,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
