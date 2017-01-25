@@ -48,12 +48,6 @@ Object.assign( BufferAttribute.prototype, {
 
 	isBufferAttribute: true,
 
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
-
 	setArray: function ( array ) {
 
 		if ( Array.isArray( array ) ) {
