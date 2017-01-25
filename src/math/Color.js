@@ -44,8 +44,6 @@ function Color( r, g, b ) {
 
 Object.assign( Color.prototype, {
 
-	constructor: Color,
-
 	isColor: true,
 
 	r: 1, g: 1, b: 1,

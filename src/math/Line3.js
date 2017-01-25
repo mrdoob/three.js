@@ -14,8 +14,6 @@ function Line3( start, end ) {
 
 Object.assign( Line3.prototype, {
 
-	constructor: Line3,
-
 	set: function ( start, end ) {
 
 		this.start.copy( start );

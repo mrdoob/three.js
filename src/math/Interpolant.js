@@ -34,8 +34,6 @@ function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer
 
 Object.assign( Interpolant.prototype, {
 
-	constructor: Interpolant,
-
 	evaluate: function( t ) {
 
 		var pp = this.parameterPositions,

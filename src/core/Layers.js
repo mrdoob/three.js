@@ -10,8 +10,6 @@ function Layers() {
 
 Object.assign( Layers.prototype, {
 
-	constructor: Layers,
-
 	set: function ( channel ) {
 
 		this.mask = 1 << channel;

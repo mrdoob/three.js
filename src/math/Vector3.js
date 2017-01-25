@@ -21,8 +21,6 @@ function Vector3( x, y, z ) {
 
 Object.assign( Vector3.prototype, {
 
-	constructor: Vector3,
-
 	isVector3: true,
 
 	set: function ( x, y, z ) {

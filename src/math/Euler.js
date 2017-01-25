@@ -96,8 +96,6 @@ Object.defineProperties( Euler.prototype, {
 
 Object.assign( Euler.prototype, {
 
-	constructor: Euler,
-
 	isEuler: true,
 
 	set: function ( x, y, z, order ) {

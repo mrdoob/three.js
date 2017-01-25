@@ -73,8 +73,6 @@ function AnimationObjectGroup( var_args ) {
 
 Object.assign( AnimationObjectGroup.prototype, {
 
-	constructor: AnimationObjectGroup,
-
 	isAnimationObjectGroup: true,
 
 	add: function( var_args ) {
