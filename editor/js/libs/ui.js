@@ -863,9 +863,8 @@ UI.Integer.prototype.setValue = function ( value ) {
 };
 
 UI.Integer.prototype.setStep = function ( step ) {
-
-	step = Math.max(step, Math.floor(step)); // Checks that step is an integer
-	this.step = step; 
+	
+	this.step = parseInt( step ); 
 	
 	return this;
 
