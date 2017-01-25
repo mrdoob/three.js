@@ -29,6 +29,7 @@ export default {
 	plugins: [
 		glsl()
 	],
+	intro: '/** @license threejs.org/license */',
 	// sourceMap: true,
 	targets: [
 		{
