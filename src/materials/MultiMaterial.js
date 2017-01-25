@@ -16,7 +16,7 @@ function MultiMaterial( materials ) {
 
 }
 
-MultiMaterial.prototype = {
+Object.assign( MultiMaterial.prototype, {
 
 	constructor: MultiMaterial,
 
@@ -68,7 +68,7 @@ MultiMaterial.prototype = {
 
 	}
 
-};
+} );
 
 
 export { MultiMaterial };
