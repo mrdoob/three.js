@@ -10,7 +10,7 @@ THREE.CSS3DObject = function ( element ) {
 	this.element = element;
 	this.element.style.position = 'absolute';
 
-	this.addEventListener( 'removed', function ( event ) {
+	this.addEventListener( 'removed', function () {
 
 		if ( this.element.parentNode !== null ) {
 
@@ -79,7 +79,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.setClearColor = function () {};
 
-	this.getSize = function() {
+	this.getSize = function () {
 
 		return {
 			width: _width,
@@ -98,13 +98,13 @@ THREE.CSS3DRenderer = function () {
 
 	};
 
-	var epsilon = function ( value ) {
+	function epsilon( value ) {
 
 		return Math.abs( value ) < Number.EPSILON ? 0 : value;
 
-	};
+	}
 
-	var getCameraCSSMatrix = function ( matrix ) {
+	function getCameraCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 
@@ -127,9 +127,9 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-	};
+	}
 
-	var getObjectCSSMatrix = function ( matrix ) {
+	function getObjectCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 
@@ -152,9 +152,9 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-	};
+	}
 
-	var renderObject = function ( object, camera ) {
+	function renderObject( object, camera ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
 
@@ -210,7 +210,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-	};
+	}
 
 	this.render = function ( scene, camera ) {
 
