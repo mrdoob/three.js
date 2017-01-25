@@ -1,4 +1,4 @@
-import './polyfills.js';
+import '../src/polyfills.js';
 
 export * from './constants.js';
 export * from './Three.Legacy.js';

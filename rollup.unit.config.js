@@ -24,7 +24,7 @@ function glsl() {
 }
 
 export default {
-	entry: 'src/Three.Unit.js',
+	entry: 'test/Three.Unit.js',
 	indent: '\t',
 	plugins: [
 		glsl()
