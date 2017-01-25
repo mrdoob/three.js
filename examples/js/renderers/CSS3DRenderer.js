@@ -41,7 +41,6 @@ THREE.CSS3DRenderer = function () {
 	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
-	var _widthHalf, _heightHalf;
 
 	var matrix = new THREE.Matrix4();
 
@@ -62,10 +61,19 @@ THREE.CSS3DRenderer = function () {
 
 	var cameraElement = document.createElement( 'div' );
 
+	cameraElement.style.position = 'absolute';
+	cameraElement.style.left = '50%';
+	cameraElement.style.top = '50%';
+
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.MozTransformStyle = 'preserve-3d';
 	cameraElement.style.oTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+
+	cameraElement.style.WebkitTransformOrigin = '0 0';
+	cameraElement.style.MozTransformOrigin = '0 0';
+	cameraElement.style.oTransformOrigin = '0 0';
+	cameraElement.style.transformOrigin = '0 0';
 
 	domElement.appendChild( cameraElement );
 
@@ -85,14 +93,8 @@ THREE.CSS3DRenderer = function () {
 		_width = width;
 		_height = height;
 
-		_widthHalf = _width / 2;
-		_heightHalf = _height / 2;
-
 		domElement.style.width = width + 'px';
 		domElement.style.height = height + 'px';
-
-		cameraElement.style.width = width + 'px';
-		cameraElement.style.height = height + 'px';
 
 	};
 
@@ -231,8 +233,7 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +
-			" translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
+		var style = 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		if ( cache.camera.style !== style ) {
 
