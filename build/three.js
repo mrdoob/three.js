@@ -525,8 +525,6 @@
 
 	Object.assign( Vector2.prototype, {
 
-		constructor: Vector2,
-
 		isVector2: true,
 
 		set: function ( x, y ) {
@@ -1269,8 +1267,6 @@
 
 	Object.assign( Vector4.prototype, {
 
-		constructor: Vector4,
-
 		isVector4: true,
 
 		set: function ( x, y, z, w ) {
@@ -1913,8 +1909,6 @@
 
 	Object.assign( WebGLRenderTarget.prototype, EventDispatcher.prototype, {
 
-		constructor: WebGLRenderTarget,
-
 		isWebGLRenderTarget: true,
 
 		setSize: function ( width, height ) {
@@ -2144,8 +2138,6 @@
 	});
 
 	Object.assign( Quaternion.prototype, {
-
-		constructor: Quaternion,
 
 		set: function ( x, y, z, w ) {
 
@@ -2607,8 +2599,6 @@
 	}
 
 	Object.assign( Vector3.prototype, {
-
-		constructor: Vector3,
 
 		isVector3: true,
 
@@ -3364,8 +3354,6 @@
 	}
 
 	Object.assign( Matrix4.prototype, {
-
-		constructor: Matrix4,
 
 		isMatrix4: true,
 
@@ -5266,8 +5254,6 @@
 
 	Object.assign( Color.prototype, {
 
-		constructor: Color,
-
 		isColor: true,
 
 		r: 1, g: 1, b: 1,
@@ -6163,8 +6149,6 @@
 	}
 
 	Object.assign( Box2.prototype, {
-
-		constructor: Box2,
 
 		set: function ( min, max ) {
 
@@ -7206,8 +7190,6 @@
 
 	Object.assign( Material.prototype, EventDispatcher.prototype, {
 
-		constructor: Material,
-
 		isMaterial: true,
 
 		setValues: function ( values ) {
@@ -7693,8 +7675,6 @@
 
 	Object.assign( Box3.prototype, {
 
-		constructor: Box3,
-
 		isBox3: true,
 
 		set: function ( min, max ) {
@@ -8175,8 +8155,6 @@
 
 	Object.assign( Sphere.prototype, {
 
-		constructor: Sphere,
-
 		set: function ( center, radius ) {
 
 			this.center.copy( center );
@@ -8362,8 +8340,6 @@
 	}
 
 	Object.assign( Matrix3.prototype, {
-
-		constructor: Matrix3,
 
 		isMatrix3: true,
 
@@ -8623,8 +8599,6 @@
 
 	Object.assign( Plane.prototype, {
 
-		constructor: Plane,
-
 		set: function ( normal, constant ) {
 
 			this.normal.copy( normal );
@@ -8865,8 +8839,6 @@
 	}
 
 	Object.assign( Frustum.prototype, {
-
-		constructor: Frustum,
 
 		set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -9510,8 +9482,6 @@
 
 	Object.assign( Ray.prototype, {
 
-		constructor: Ray,
-
 		set: function ( origin, direction ) {
 
 			this.origin.copy( origin );
@@ -10124,8 +10094,6 @@
 
 	Object.assign( Euler.prototype, {
 
-		constructor: Euler,
-
 		isEuler: true,
 
 		set: function ( x, y, z, order ) {
@@ -10390,8 +10358,6 @@
 
 	Object.assign( Layers.prototype, {
 
-		constructor: Layers,
-
 		set: function ( channel ) {
 
 			this.mask = 1 << channel;
@@ -10519,8 +10485,6 @@
 	Object3D.DefaultMatrixAutoUpdate = true;
 
 	Object.assign( Object3D.prototype, EventDispatcher.prototype, {
-
-		constructor: Object3D,
 
 		isObject3D: true,
 
@@ -11162,8 +11126,6 @@
 
 	Object.assign( Line3.prototype, {
 
-		constructor: Line3,
-
 		set: function ( start, end ) {
 
 			this.start.copy( start );
@@ -11378,8 +11340,6 @@
 
 	Object.assign( Triangle.prototype, {
 
-		constructor: Triangle,
-
 		set: function ( a, b, c ) {
 
 			this.a.copy( a );
@@ -11552,8 +11512,6 @@
 	}
 
 	Object.assign( Face3.prototype, {
-
-		constructor: Face3,
 
 		clone: function () {
 
@@ -11745,15 +11703,7 @@
 
 	Object.assign( BufferAttribute.prototype, {
 
-		constructor: BufferAttribute,
-
 		isBufferAttribute: true,
-
-		set needsUpdate( value ) {
-
-			if ( value === true ) this.version ++;
-
-		},
 
 		setArray: function ( array ) {
 
@@ -12468,8 +12418,6 @@
 	}
 
 	Object.assign( Geometry.prototype, EventDispatcher.prototype, {
-
-		constructor: Geometry,
 
 		isGeometry: true,
 
@@ -13867,8 +13815,6 @@
 	BufferGeometry.MaxIndex = 65535;
 
 	Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
-
-		constructor: BufferGeometry,
 
 		isBufferGeometry: true,
 
@@ -22958,7 +22904,6 @@
 
 	}
 
-
 	LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		constructor: LOD,
@@ -23378,7 +23323,6 @@
 		this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 	}
-
 
 	SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
@@ -28237,8 +28181,6 @@
 
 	Object.assign( MultiMaterial.prototype, {
 
-		constructor: MultiMaterial,
-
 		isMultiMaterial: true,
 
 		toJSON: function ( meta ) {
@@ -30345,8 +30287,6 @@
 
 	Object.assign( Interpolant.prototype, {
 
-		constructor: Interpolant,
-
 		evaluate: function( t ) {
 
 			var pp = this.parameterPositions,
@@ -30577,8 +30517,7 @@
 	 * @author tschw
 	 */
 
-	function CubicInterpolant(
-			parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 		Interpolant.call(
 				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -30590,8 +30529,7 @@
 
 	}
 
-	CubicInterpolant.prototype =
-			Object.assign( Object.create( Interpolant.prototype ), {
+	CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
 		constructor: CubicInterpolant,
 
@@ -30724,16 +30662,13 @@
 	 * @author tschw
 	 */
 
-	function LinearInterpolant(
-			parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-		Interpolant.call(
-				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	}
 
-	LinearInterpolant.prototype =
-			Object.assign( Object.create( Interpolant.prototype ), {
+	LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
 		constructor: LinearInterpolant,
 
@@ -30771,16 +30706,13 @@
 	 * @author tschw
 	 */
 
-	function DiscreteInterpolant(
-			parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	function DiscreteInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-		Interpolant.call(
-				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	}
 
-	DiscreteInterpolant.prototype =
-			Object.assign( Object.create( Interpolant.prototype ), {
+	DiscreteInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
 		constructor: DiscreteInterpolant,
 
@@ -31205,16 +31137,13 @@
 	 * @author tschw
 	 */
 
-	function QuaternionLinearInterpolant(
-			parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-		Interpolant.call(
-				this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	}
 
-	QuaternionLinearInterpolant.prototype =
-			Object.assign( Object.create( Interpolant.prototype ), {
+	QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
 		constructor: QuaternionLinearInterpolant,
 
@@ -31855,8 +31784,6 @@
 
 	Object.assign( AnimationClip.prototype, {
 
-		constructor: AnimationClip,
-
 		resetDuration: function() {
 
 			var tracks = this.tracks,
@@ -32202,8 +32129,6 @@
 	};
 
 	Object.assign( Loader.prototype, {
-
-		constructor: Loader,
 
 		crossOrigin: undefined,
 
@@ -33866,8 +33791,6 @@
 	function Curve() {}
 
 	Object.assign( Curve.prototype, {
-
-		constructor: Curve,
 
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
@@ -36038,8 +35961,7 @@
 			return this.gain.gain.value;
 
 		},
-
-
+		
 		setVolume: function ( value ) {
 
 			this.gain.gain.value = value;
@@ -36239,8 +36161,6 @@
 
 	Object.assign( PropertyMixer.prototype, {
 
-		constructor: PropertyMixer,
-
 		// accumulate data in the 'incoming' region into 'accu<i>'
 		accumulate: function( accuIndex, weight ) {
 
@@ -36409,8 +36329,6 @@
 	}
 
 	Object.assign( Composite.prototype, {
-
-		constructor: Composite,
 
 		getValue: function( array, offset ) {
 
@@ -36616,8 +36534,6 @@
 	} );
 
 	Object.assign( PropertyBinding.prototype, { // prototype, continued
-
-		constructor: PropertyBinding,
 
 		// these are used to "bind" a nonexistent property
 		_getValue_unavailable: function() {},
@@ -37115,8 +37031,6 @@
 
 	Object.assign( AnimationObjectGroup.prototype, {
 
-		constructor: AnimationObjectGroup,
-
 		isAnimationObjectGroup: true,
 
 		add: function( var_args ) {
@@ -37492,8 +37406,6 @@
 	}
 
 	Object.assign( AnimationAction.prototype, {
-
-		constructor: AnimationAction,
 
 		// State & Scheduling
 
@@ -38091,8 +38003,6 @@
 	}
 
 	Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
-
-		constructor: AnimationMixer,
 
 		_bindAction: function ( action, prototypeAction ) {
 
@@ -38927,8 +38837,6 @@
 
 	Object.assign( InterleavedBufferAttribute.prototype, {
 
-		constructor: InterleavedBufferAttribute,
-
 		isInterleavedBufferAttribute: true,
 
 		setX: function ( index, x ) {
@@ -39057,8 +38965,6 @@
 	});
 
 	Object.assign( InterleavedBuffer.prototype, {
-
-		constructor: InterleavedBuffer,
 
 		isInterleavedBuffer: true,
 
@@ -39250,8 +39156,6 @@
 
 	Object.assign( Raycaster.prototype, {
 
-		constructor: Raycaster,
-
 		linePrecision: 1,
 
 		set: function ( origin, direction ) {
@@ -39337,8 +39241,6 @@
 
 	Object.assign( Clock.prototype, {
 
-		constructor: Clock,
-
 		start: function () {
 
 			this.startTime = ( performance || Date ).now();
@@ -39411,8 +39313,6 @@
 	}
 
 	Object.assign( Spherical.prototype, {
-
-		constructor: Spherical,
 
 		set: function ( radius, phi, theta ) {
 
@@ -39490,8 +39390,6 @@
 	}
 
 	Object.assign( Cylindrical.prototype, {
-
-		constructor: Cylindrical,
 
 		set: function ( radius, theta, y ) {
 
