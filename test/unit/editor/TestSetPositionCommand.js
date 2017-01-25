@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetPositionCommand" );
+QUnit.module( "SetPositionCommand" );
 
-test( "Test SetPositionCommand (Undo and Redo)", function() {
+QUnit.test( "Test SetPositionCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 	var box = aBox();
@@ -29,20 +29,20 @@ test( "Test SetPositionCommand (Undo and Redo)", function() {
 
 	} );
 
-	ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful" );
-	ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful" );
-	ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful" );
+	assert.ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful" );
+	assert.ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful" );
+	assert.ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful" );
 
 
 	editor.undo();
-	ok( box.position.x == positions[ positions.length - 2 ].x, "OK, changing X position was successful (after undo)" );
-	ok( box.position.y == positions[ positions.length - 2 ].y, "OK, changing Y position was successful (after undo)" );
-	ok( box.position.z == positions[ positions.length - 2 ].z, "OK, changing Z position was successful (after undo)" );
+	assert.ok( box.position.x == positions[ positions.length - 2 ].x, "OK, changing X position was successful (after undo)" );
+	assert.ok( box.position.y == positions[ positions.length - 2 ].y, "OK, changing Y position was successful (after undo)" );
+	assert.ok( box.position.z == positions[ positions.length - 2 ].z, "OK, changing Z position was successful (after undo)" );
 
 	editor.redo();
-	ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful (after redo)" );
-	ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful (after redo)" );
-	ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful (after redo)" );
+	assert.ok( box.position.x == positions[ positions.length - 1 ].x, "OK, changing X position was successful (after redo)" );
+	assert.ok( box.position.y == positions[ positions.length - 1 ].y, "OK, changing Y position was successful (after redo)" );
+	assert.ok( box.position.z == positions[ positions.length - 1 ].z, "OK, changing Z position was successful (after redo)" );
 
 
 } );

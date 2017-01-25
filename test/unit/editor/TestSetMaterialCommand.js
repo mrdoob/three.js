@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetMaterialCommand" );
+QUnit.module( "SetMaterialCommand" );
 
-test( "Test for SetMaterialCommand (Undo and Redo)", function() {
+QUnit.test( "Test for SetMaterialCommand (Undo and Redo)", function( assert ) {
 
 	// setup
 	var editor = new Editor();
@@ -38,7 +38,7 @@ test( "Test for SetMaterialCommand (Undo and Redo)", function() {
 	var i = materialClasses.length - 1;
 
 	// initial test
-	ok( box.material.type == materialClasses[ i ],
+	assert.ok( box.material.type == materialClasses[ i ],
 		"OK, initial material type was set correctly (expected: '" + materialClasses[ i ] + "', actual: '" + box.material.type + "')" );
 
 
@@ -48,7 +48,7 @@ test( "Test for SetMaterialCommand (Undo and Redo)", function() {
 
 		editor.undo();
 		-- i;
-		ok( box.material.type == materialClasses[ i ],
+		assert.ok( box.material.type == materialClasses[ i ],
 			"OK, material type was set correctly after undo (expected: '" + materialClasses[ i ] + "', actual: '" + box.material.type + "')" );
 
 	}
@@ -58,7 +58,7 @@ test( "Test for SetMaterialCommand (Undo and Redo)", function() {
 
 		editor.redo();
 		++ i;
-		ok( box.material.type == materialClasses[ i ],
+		assert.ok( box.material.type == materialClasses[ i ],
 			"OK, material type was set correctly after redo (expected: '" + materialClasses[ i ] + "', actual: '" + box.material.type + "')" );
 
 	}

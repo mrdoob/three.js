@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "MultiCmdsCommand" );
+QUnit.module( "MultiCmdsCommand" );
 
-test( "Test MultiCmdsCommand (Undo and Redo)", function() {
+QUnit.test( "Test MultiCmdsCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 	var box = aBox( 'Multi Command Box' );
@@ -60,21 +60,21 @@ test( "Test MultiCmdsCommand (Undo and Redo)", function() {
 
 
 	// test one modified value for each command
-	ok( box.geometry.parameters.widthSegments == 7, "OK, widthSegments has been modified accordingly after two multi executes (expected: 7, actual: " + box.geometry.parameters.widthSegments + ")" );
-	ok( box.position.y == 5, "OK, y position has been modified accordingly after two multi executes (expected: 5, actual: " + box.position.y + ")" );
-	ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
-	ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
+	assert.ok( box.geometry.parameters.widthSegments == 7, "OK, widthSegments has been modified accordingly after two multi executes (expected: 7, actual: " + box.geometry.parameters.widthSegments + ")" );
+	assert.ok( box.position.y == 5, "OK, y position has been modified accordingly after two multi executes (expected: 5, actual: " + box.position.y + ")" );
+	assert.ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
+	assert.ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
 
 	editor.undo();
-	ok( box.geometry.parameters.widthSegments == 2, "OK, widthSegments has been modified accordingly after undo (expected: 2, actual: " + box.geometry.parameters.widthSegments + ")" );
-	ok( box.position.y == 2, "OK, y position has been modified accordingly after undo (expected: 2, actual: " + box.position.y + ")" );
-	ok( box.rotation.x == 0.1, "OK, x rotation has been modified accordingly after undo (expected: 0.1, actual: " + box.rotation.x + ")" );
-	ok( box.scale.z == 1.3, "OK, z scale has been modified accordingly after undo (expected: 1.3, actual: " + box.scale.z + ")" );
+	assert.ok( box.geometry.parameters.widthSegments == 2, "OK, widthSegments has been modified accordingly after undo (expected: 2, actual: " + box.geometry.parameters.widthSegments + ")" );
+	assert.ok( box.position.y == 2, "OK, y position has been modified accordingly after undo (expected: 2, actual: " + box.position.y + ")" );
+	assert.ok( box.rotation.x == 0.1, "OK, x rotation has been modified accordingly after undo (expected: 0.1, actual: " + box.rotation.x + ")" );
+	assert.ok( box.scale.z == 1.3, "OK, z scale has been modified accordingly after undo (expected: 1.3, actual: " + box.scale.z + ")" );
 
 	editor.redo();
-	ok( box.geometry.parameters.widthSegments == 7, "OK, widthSegments has been modified accordingly after two multi executes (expected: 7, actual: " + box.geometry.parameters.widthSegments + ")" );
-	ok( box.position.y == 5, "OK, y position has been modified accordingly after two multi executes (expected: 5, actual: " + box.position.y + ")" );
-	ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
-	ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
+	assert.ok( box.geometry.parameters.widthSegments == 7, "OK, widthSegments has been modified accordingly after two multi executes (expected: 7, actual: " + box.geometry.parameters.widthSegments + ")" );
+	assert.ok( box.position.y == 5, "OK, y position has been modified accordingly after two multi executes (expected: 5, actual: " + box.position.y + ")" );
+	assert.ok( box.rotation.x == 0.4, "OK, x rotation has been modified accordingly after two multi executes (expected: 0.4, actual: " + box.rotation.x + ") " );
+	assert.ok( box.scale.z == 1.6, "OK, z scale has been modified accordingly after two multi executes (expected: 1.6, actual: " + box.scale.z + ")" );
 
 } );
