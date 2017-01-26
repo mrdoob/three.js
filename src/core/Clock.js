@@ -4,64 +4,75 @@
 
 function Clock( autoStart ) {
 
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+	var autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
 	this.startTime = 0;
 	this.oldTime = 0;
 	this.elapsedTime = 0;
+	this.delta = 0;
 
 	this.running = false;
 
+	if(autoStart) {
+		
+		this.start();
+		
+	}
 }
 
 Object.assign( Clock.prototype, {
 
 	start: function () {
 
-		this.startTime = ( performance || Date ).now();
+		if ( this.running ) {
 
-		this.oldTime = this.startTime;
+			console.warn("Clock already running.");
+			return;
+
+		}
+
+		this.startTime   = ( performance || Date ).now();
+		this.oldTime     = this.startTime;
 		this.elapsedTime = 0;
+		this.delta = 0;
+
 		this.running = true;
 
 	},
 
 	stop: function () {
 
-		this.getElapsedTime();
+		this._update();
 		this.running = false;
 
 	},
 
 	getElapsedTime: function () {
 
-		this.getDelta();
+		this._update();
 		return this.elapsedTime;
 
 	},
 
 	getDelta: function () {
 
-		var diff = 0;
+		this._update();
+		return this.delta;
 
-		if ( this.autoStart && ! this.running ) {
+	},
 
-			this.start();
-
-		}
+	_update: function () {
 
 		if ( this.running ) {
 
 			var newTime = ( performance || Date ).now();
 
-			diff = ( newTime - this.oldTime ) / 1000;
+			this.delta = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
 
-			this.elapsedTime += diff;
+			this.elapsedTime += this.delta;
 
 		}
-
-		return diff;
 
 	}
 
