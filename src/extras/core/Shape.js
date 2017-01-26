@@ -1,4 +1,3 @@
-import { PathPrototype } from './PathPrototype';
 import { Path } from './Path';
 
 /**
@@ -20,7 +19,7 @@ function Shape() {
 
 }
 
-Shape.prototype = Object.assign( Object.create( PathPrototype ), {
+Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	constructor: Shape,
 
