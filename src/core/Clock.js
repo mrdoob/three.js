@@ -5,7 +5,7 @@
 
 function Clock( forceRunning, autoStart ) {
 
-	this.forceRunning = ( forceRunning !== undefined ) ? forceRunning : true;
+	this.unstopable = ( unstopable !== undefined ) ? unstopable : false;
 
 	this.startTime = 0;
 	this.oldTime = 0;
@@ -43,9 +43,9 @@ Object.assign( Clock.prototype, {
 
 	stop: function () {
 
-		if( this.forceRunning ) {
+		if( this.unstopable ) {
 
-			console.warn("Unable to stop clock in force running mode")
+			console.warn("Unable to stop clock in unstopable mode")
 			return;
 
 		}
@@ -71,7 +71,7 @@ Object.assign( Clock.prototype, {
 
 	_update: function () {
 
-		if ( this.running || this.forceRunning ) {
+		if ( this.running || this.unstopable ) {
 
 			var newTime = ( performance || Date ).now();
 
