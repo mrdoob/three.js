@@ -3,8 +3,9 @@
  * @author TristanVALCKE / https://github.com/TristanVALCKE
  */
 
-function Clock( forceRunning, autoStart ) {
+function Clock( autoStart, unstopable ) {
 
+	var _autoStart = ( autoStart !== undefined ) ? autoStart : true;
 	this.unstopable = ( unstopable !== undefined ) ? unstopable : false;
 
 	this.startTime = 0;
@@ -14,7 +15,7 @@ function Clock( forceRunning, autoStart ) {
 
 	this.running = false;
 
-	if(autoStart) {
+	if(_autoStart) {
 		
 		this.start();
 		
