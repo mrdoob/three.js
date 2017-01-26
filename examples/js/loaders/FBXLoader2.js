@@ -571,11 +571,10 @@
 
 							var faceVertexBuffer = [];
 							var polygonIndex = 0;
-							for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; ++ polygonVertexIndex ) {
+							indexBuffer.forEach( function ( vertexIndex, polygonVertexIndex, indexBuffer ) {
 
-								var endOfFace;
-								var vertexIndex = indexBuffer[ polygonVertexIndex ];
-								if ( indexBuffer[ polygonVertexIndex ] < 0 ) {
+								var endOfFace = false;
+								if ( vertexIndex < 0 ) {
 
 									vertexIndex = vertexIndex ^ - 1;
 									indexBuffer[ polygonVertexIndex ] = vertexIndex;
@@ -587,27 +586,24 @@
 								var weights = [];
 								vertex.position.fromArray( vertexBuffer, vertexIndex * 3 );
 
-								// If we have a deformer for this geometry, get the skinIndex and skinWeights for this object.
-								// They are stored as vertex indices on each deformer, and we need them as deformer indices
-								// for each vertex.
 								if ( deformer ) {
 
-									for ( var j = 0; j < deformer.array.length; ++ j ) {
+									deformer.array.forEach( function ( subDeformer, subDeformerIndex ) {
 
-										var index = deformer.array[ j ].indices.findIndex( function ( index ) {
+										var index = subDeformer.indices.findIndex( function ( indx ) {
 
-											return index === indexBuffer[ polygonVertexIndex ];
+											return indx === vertexIndex;
 
 										} );
 
 										if ( index !== - 1 ) {
 
-											weights.push( deformer.array[ j ].weights[ index ] );
-											weightIndices.push( j );
+											weights.push( subDeformer.weights[ index ] );
+											weightIndices.push( subDeformerIndex );
 
 										}
 
-									}
+									} );
 
 									if ( weights.length > 4 ) {
 
@@ -616,34 +612,33 @@
 										var WIndex = [ 0, 0, 0, 0 ];
 										var Weight = [ 0, 0, 0, 0 ];
 
-										for ( var polygonVertexIndex = 0; polygonVertexIndex < weights.length; ++ polygonVertexIndex ) {
+										weights.forEach( function ( weight, weightIndex ) {
 
-											var currentWeight = weights[ polygonVertexIndex ];
-											var currentIndex = weightIndices[ polygonVertexIndex ];
-											for ( var j = 0; j < Weight.length; ++ j ) {
+											var currentWeight = weight;
+											var currentIndex = weightIndices[ weightIndex ];
+											Weight.forEach( function ( comparedWeight, comparedWeightIndex, comparedWeightArray ) {
 
-												if ( currentWeight > Weight[ j ] ) {
+												if ( currentWeight > comparedWeight ) {
 
-													var tmp = Weight[ j ];
-													Weight[ j ] = currentWeight;
-													currentWeight = tmp;
+													comparedWeightArray[ comparedWeightIndex ] = currentWeight;
+													currentWeight = comparedWeight;
 
-													tmp = WIndex[ j ];
-													WIndex[ j ] = currentIndex;
+													var tmp = WIndex[ comparedWeightIndex ];
+													WIndex[ comparedWeightIndex ] = currentIndex;
 													currentIndex = tmp;
 
 												}
 
-											}
+											} );
 
-										}
+										} );
 
 										weightIndices = WIndex;
 										weights = Weight;
 
 									}
 
-									for ( var i = weights.length; i < 4; i ++ ) {
+									for ( var i = weights.length; i < 4; ++ i ) {
 
 										weights[ i ] = 0;
 										weightIndices[ i ] = 0;
@@ -652,8 +647,6 @@
 
 									vertex.skinWeights.fromArray( weights );
 									vertex.skinIndices.fromArray( weightIndices );
-
-									//vertex.skinWeights.normalize();
 
 								}
 
@@ -669,13 +662,8 @@
 
 								}
 
-
-
-								//Add vertex to face buffer.
 								faceVertexBuffer.push( vertex );
 
-								// If index was negative to start with, we have finished this individual face
-								// and can generate the face data to the geometry.
 								if ( endOfFace ) {
 
 									var face = new Face();
@@ -689,7 +677,7 @@
 
 								}
 
-							}
+							} );
 
 							/**
 							 * @type {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
@@ -2762,6 +2750,23 @@
 
 				animations.stacks.forEach( function ( stack ) {
 
+					/**
+					 * @type {{
+					 * name: string,
+					 * fps: number,
+					 * length: number,
+					 * hierarchy: Array.<{
+					 * 	parent: number,
+					 * 	name: string,
+					 * 	keys: Array.<{
+					 * 		time: number,
+					 * 		pos: Array.<number>,
+					 * 		rot: Array.<number>,
+					 * 		scl: Array.<number>
+					 * 	}>
+					 * }>
+					 * }}
+					 */
 					var animationData = {
 						name: stack.name,
 						fps: 30,
@@ -2875,7 +2880,7 @@
 
 							return [ 'x', 'y', 'z' ].every( function ( key ) {
 
-								return attributeNode.curves[ key ] !== undefined;
+								return attributeNode.curves[ key ] !== null;
 
 							} );
 
