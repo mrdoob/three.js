@@ -42,6 +42,13 @@ Object.assign( Clock.prototype, {
 
 	stop: function () {
 
+		if( this.forceRunning ) {
+
+			console.warn("Unable to stop clock in force running mode")
+			return;
+
+		}
+
 		this._update();
 		this.running = false;
 
