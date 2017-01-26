@@ -7,7 +7,6 @@ import { CubicBezierCurve } from '../curves/CubicBezierCurve';
 import { CurvePath } from './CurvePath';
 import { EllipseCurve } from '../curves/EllipseCurve';
 import { LineCurve } from '../curves/LineCurve';
-import { PathPrototype } from './PathPrototype';
 import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve';
 import { SplineCurve } from '../curves/SplineCurve';
 import { Vector2 } from '../../math/Vector2';
