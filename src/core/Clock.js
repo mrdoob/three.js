@@ -2,9 +2,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-function Clock( autoStart ) {
+function Clock( forceRunning, autoStart ) {
 
-	var autoStart = ( autoStart !== undefined ) ? autoStart : true;
+	this.forceRunning = ( forceRunning !== undefined ) ? forceRunning : true;
 
 	this.startTime = 0;
 	this.oldTime = 0;
@@ -63,7 +63,7 @@ Object.assign( Clock.prototype, {
 
 	_update: function () {
 
-		if ( this.running ) {
+		if ( this.running || this.forceRunning ) {
 
 			var newTime = ( performance || Date ).now();
 
