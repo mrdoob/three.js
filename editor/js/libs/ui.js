@@ -862,10 +862,10 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setStep = function ( step ) {
-
-	this.step = step;
-
+UI.Integer.prototype.setStep = function ( step ) {
+	
+	this.step = parseInt( step ); 
+	
 	return this;
 
 };
