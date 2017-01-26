@@ -1,5 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author TristanVALCKE / https://github.com/TristanVALCKE
  */
 
 function Clock( forceRunning, autoStart ) {
