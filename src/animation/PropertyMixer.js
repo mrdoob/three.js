@@ -56,9 +56,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 
 }
 
-PropertyMixer.prototype = {
-
-	constructor: PropertyMixer,
+Object.assign( PropertyMixer.prototype, {
 
 	// accumulate data in the 'incoming' region into 'accu<i>'
 	accumulate: function( accuIndex, weight ) {
@@ -118,7 +116,7 @@ PropertyMixer.prototype = {
 			var originalValueOffset = stride * 3;
 
 			this._mixBufferRegion(
-					buffer, offset, originalValueOffset, 1 - weight, stride );
+				buffer, offset, originalValueOffset, 1 - weight, stride );
 
 		}
 
@@ -188,7 +186,7 @@ PropertyMixer.prototype = {
 	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
 
 		Quaternion.slerpFlat( buffer, dstOffset,
-				buffer, dstOffset, buffer, srcOffset, t );
+			buffer, dstOffset, buffer, srcOffset, t );
 
 	},
 
@@ -206,7 +204,7 @@ PropertyMixer.prototype = {
 
 	}
 
-};
+} );
 
 
 export { PropertyMixer };

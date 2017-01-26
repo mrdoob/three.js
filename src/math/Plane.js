@@ -12,9 +12,7 @@ function Plane( normal, constant ) {
 
 }
 
-Plane.prototype = {
-
-	constructor: Plane,
+Object.assign( Plane.prototype, {
 
 	set: function ( normal, constant ) {
 
@@ -232,7 +230,7 @@ Plane.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Plane };

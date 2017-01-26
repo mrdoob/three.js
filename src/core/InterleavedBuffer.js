@@ -21,17 +21,19 @@ function InterleavedBuffer( array, stride ) {
 
 }
 
-InterleavedBuffer.prototype = {
+Object.defineProperty( InterleavedBuffer.prototype, "needsUpdate", {
 
-	constructor: InterleavedBuffer,
+	set: function(value) { 
+		
+		if ( value === true ) this.version ++; 
+	
+	}
+
+});
+
+Object.assign( InterleavedBuffer.prototype, {
 
 	isInterleavedBuffer: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	setArray: function ( array ) {
 
@@ -104,7 +106,7 @@ InterleavedBuffer.prototype = {
 
 	}
 
-};
+} );
 
 
 export { InterleavedBuffer };
