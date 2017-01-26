@@ -3,22 +3,22 @@
  * @author TristanVALCKE / https://github.com/TristanVALCKE
  */
 
-function Clock( autoStart, unstopable ) {
+function Clock ( autoStart, unstopable ) {
 
-	var _autoStart = ( autoStart !== undefined ) ? autoStart : true;
+	var _autoStart  = ( autoStart !== undefined ) ? autoStart : true;
 	this.unstopable = ( unstopable !== undefined ) ? unstopable : false;
 
-	this.startTime = 0;
-	this.oldTime = 0;
+	this.startTime   = 0;
+	this.oldTime     = 0;
 	this.elapsedTime = 0;
-	this.delta = 0;
+	this.delta       = 0;
 
 	this.running = false;
 
-	if(_autoStart) {
-		
+	if ( _autoStart ) {
+
 		this.start();
-		
+
 	}
 }
 
@@ -28,7 +28,7 @@ Object.assign( Clock.prototype, {
 
 		if ( this.running ) {
 
-			console.warn("Clock already running.");
+			console.warn( "Clock already running." );
 			return;
 
 		}
@@ -36,7 +36,7 @@ Object.assign( Clock.prototype, {
 		this.startTime   = ( performance || Date ).now();
 		this.oldTime     = this.startTime;
 		this.elapsedTime = 0;
-		this.delta = 0;
+		this.delta       = 0;
 
 		this.running = true;
 
@@ -44,9 +44,9 @@ Object.assign( Clock.prototype, {
 
 	stop: function () {
 
-		if( this.unstopable ) {
+		if ( this.unstopable ) {
 
-			console.warn("Unable to stop clock in unstopable mode")
+			console.warn( "Unable to stop clock in unstopable mode" )
 			return;
 
 		}
@@ -76,7 +76,7 @@ Object.assign( Clock.prototype, {
 
 			var newTime = ( performance || Date ).now();
 
-			this.delta = ( newTime - this.oldTime ) / 1000;
+			this.delta   = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
 
 			this.elapsedTime += this.delta;
@@ -86,6 +86,5 @@ Object.assign( Clock.prototype, {
 	}
 
 } );
-
 
 export { Clock };
