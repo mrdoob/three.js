@@ -53,7 +53,6 @@ THREE.VREffect = function( renderer, onError ) {
 	//
 
 	this.isPresenting = false;
-	this.scale = 1;
 
 	var scope = this;
 
@@ -307,11 +306,13 @@ THREE.VREffect = function( renderer, onError ) {
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
-			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
+			
+			cameraR.position.copy(cameraL.position);
+			cameraR.quaternion.copy(cameraL.quaternion);
+			cameraR.scale.copy(cameraL.scale);
 
-			var scale = this.scale;
-			cameraL.translateOnAxis( eyeTranslationL, scale );
-			cameraR.translateOnAxis( eyeTranslationR, scale );
+			cameraL.translateOnAxis( eyeTranslationL, cameraL.scale.x );
+			cameraR.translateOnAxis( eyeTranslationR, cameraR.scale.x );
 
 			if ( vrDisplay.getFrameData ) {
 
@@ -454,7 +455,6 @@ THREE.VREffect = function( renderer, onError ) {
 		m[ 3 * 4 + 3 ] = 0.0;
 
 		mobj.transpose();
-
 		return mobj;
 
 	}
