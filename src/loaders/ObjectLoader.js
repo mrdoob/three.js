@@ -666,6 +666,12 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'LineLoop':
+
+					object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
 				case 'LineSegments':
 
 					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
