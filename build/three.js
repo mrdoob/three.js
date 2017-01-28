@@ -20536,6 +20536,10 @@
 
 					renderer.setMode( _gl.LINES );
 
+				} else if ( object.isLineLoop ) {
+
+					renderer.setMode( _gl.LINE_LOOP );
+
 				} else {
 
 					renderer.setMode( _gl.LINE_STRIP );
@@ -23691,6 +23695,26 @@
 		constructor: LineSegments,
 
 		isLineSegments: true
+
+	} );
+
+	/**
+	 * @author mgreter / http://github.com/mgreter
+	 */
+
+	function LineLoop( geometry, material ) {
+
+		Line.call( this, geometry, material );
+
+		this.type = 'LineLoop';
+
+	}
+
+	LineLoop.prototype = Object.assign( Object.create( Line.prototype ), {
+
+		constructor: LineLoop,
+
+		isLineLoop: true,
 
 	} );
 
@@ -33569,6 +33593,12 @@
 
 						break;
 
+					case 'LineLoop':
+
+						object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+						break;
+
 					case 'LineSegments':
 
 						object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
@@ -42815,6 +42845,7 @@
 	exports.Bone = Bone;
 	exports.Mesh = Mesh;
 	exports.LineSegments = LineSegments;
+	exports.LineLoop = LineLoop;
 	exports.Line = Line;
 	exports.Points = Points;
 	exports.Group = Group;
