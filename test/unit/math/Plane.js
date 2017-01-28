@@ -195,3 +195,64 @@ test( "applyMatrix4/translate", function() {
 	m.makeTranslation( 1, 1, 1 );
 	ok( comparePlane( a.clone().applyMatrix4( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });
+
+test( "threePlaneIntersectionPoint", function() {
+	// These three planes intersect at the origin:
+	var plane1 = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+	var plane2 = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 );
+	var plane3 = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
+
+	var computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+	ok ( computedIntersection.length() == 0 , "Passed!" );
+
+	// Now we shift the x-y plane up 1 unit:
+	plane3 = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), -1 );
+
+	computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+	ok ( computedIntersection.x == 0, "Passed!" );
+	ok ( computedIntersection.y == 0, "Passed!" );
+	ok ( computedIntersection.z == 1, "Passed!" );
+
+	plane3 = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), -15 );
+
+
+	computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+	ok ( computedIntersection.x ==  0, "Passed!" );
+	ok ( computedIntersection.y ==  0, "Passed!" );
+	ok ( computedIntersection.z == 15, "Passed!" );
+
+
+	plane1 = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -12 );
+	plane2 = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -8 );
+	plane3 = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), -7 );
+
+	computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+	ok ( computedIntersection.x == 12, "Passed!" );
+	ok ( computedIntersection.y ==  8, "Passed!" );
+	ok ( computedIntersection.z ==  7, "Passed!" );
+
+
+	// plane1 and plane2 are parallel, so this should return undefined.
+	plane1 = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -12 );
+	plane2 = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -8 );
+	plane3 = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), -7 );
+
+	computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+
+	ok ( computedIntersection === undefined, "Passed!" );
+
+	var expectedIntersection = new THREE.Vector3( 1, 0, 0 );
+	var b = new THREE.Vector3( 0, 8, 0 );
+	var c = new THREE.Vector3( 0, 0, -9 );
+	plane1 = new THREE.Plane().setFromCoplanarPoints( expectedIntersection, b, c );
+	plane2 = new THREE.Plane().setFromCoplanarPoints( expectedIntersection, b, c.multiplyScalar(-1) );
+	plane3 = new THREE.Plane().setFromCoplanarPoints( expectedIntersection, b.multiplyScalar(-1), c );
+
+
+	computedIntersection = plane1.threePlaneIntersectionPoint( plane2, plane3 );
+
+	ok ( computedIntersection.x == expectedIntersection.x, "Passed!" );
+	ok ( computedIntersection.y == expectedIntersection.y, "Passed!" );
+	ok ( computedIntersection.z == expectedIntersection.z, "Passed!" );
+
+});
