@@ -4,16 +4,13 @@ import { Interpolant } from '../Interpolant';
  * @author tschw
  */
 
-function LinearInterpolant(
-		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	Interpolant.call(
-			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 }
 
-LinearInterpolant.prototype =
-		Object.assign( Object.create( Interpolant.prototype ), {
+LinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
 	constructor: LinearInterpolant,
 

@@ -17,8 +17,6 @@ function Cylindrical( radius, theta, y ) {
 
 Object.assign( Cylindrical.prototype, {
 
-	constructor: Cylindrical,
-
 	set: function ( radius, theta, y ) {
 
 		this.radius = radius;

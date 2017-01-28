@@ -104,8 +104,6 @@ Object3D.DefaultMatrixAutoUpdate = true;
 
 Object.assign( Object3D.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
-	constructor: Object3D,
-
 	isObject3D: true,
 
 	applyMatrix: function ( matrix ) {

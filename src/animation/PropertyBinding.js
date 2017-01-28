@@ -19,8 +19,6 @@ function Composite ( targetGroup, path, optionalParsedPath ) {
 
 Object.assign( Composite.prototype, {
 
-	constructor: Composite,
-
 	getValue: function( array, offset ) {
 
 		this.bind(); // bind all binding
@@ -225,8 +223,6 @@ Object.assign( PropertyBinding, {
 } );
 
 Object.assign( PropertyBinding.prototype, { // prototype, continued
-
-	constructor: PropertyBinding,
 
 	// these are used to "bind" a nonexistent property
 	_getValue_unavailable: function() {},

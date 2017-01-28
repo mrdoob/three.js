@@ -84,8 +84,6 @@ Object.defineProperty( Material.prototype, "needsUpdate", {
 
 Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
-	constructor: Material,
-
 	isMaterial: true,
 
 	setValues: function ( values ) {

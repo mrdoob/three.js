@@ -15,8 +15,6 @@ function Box3( min, max ) {
 
 Object.assign( Box3.prototype, {
 
-	constructor: Box3,
-
 	isBox3: true,
 
 	set: function ( min, max ) {

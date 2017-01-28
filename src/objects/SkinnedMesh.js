@@ -72,7 +72,6 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 
 }
 
-
 SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	constructor: SkinnedMesh,

@@ -44,15 +44,7 @@ Object.defineProperty( BufferAttribute.prototype, "needsUpdate", {
 
 Object.assign( BufferAttribute.prototype, {
 
-	constructor: BufferAttribute,
-
 	isBufferAttribute: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	setArray: function ( array ) {
 

@@ -33,8 +33,6 @@ Object.defineProperty( InterleavedBuffer.prototype, "needsUpdate", {
 
 Object.assign( InterleavedBuffer.prototype, {
 
-	constructor: InterleavedBuffer,
-
 	isInterleavedBuffer: true,
 
 	setArray: function ( array ) {
