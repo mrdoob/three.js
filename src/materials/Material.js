@@ -65,24 +65,28 @@ function Material() {
 
 }
 
-Material.prototype = {
+Object.defineProperty( Material.prototype, "needsUpdate", {
 
-	constructor: Material,
-
-	isMaterial: true,
-
-	get needsUpdate() {
+	get: function() {
 
 		return this._needsUpdate;
 
 	},
-
-	set needsUpdate( value ) {
+	
+	set: function(value) {
 
 		if ( value === true ) this.update();
 		this._needsUpdate = value;
 
-	},
+	}
+
+});
+
+Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
+
+	constructor: Material,
+
+	isMaterial: true,
 
 	setValues: function ( values ) {
 
@@ -348,8 +352,6 @@ Material.prototype = {
 
 	}
 
-};
-
-Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype );
+} );
 
 export { Material };

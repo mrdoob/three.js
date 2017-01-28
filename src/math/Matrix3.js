@@ -25,7 +25,7 @@ function Matrix3() {
 
 }
 
-Matrix3.prototype = {
+Object.assign( Matrix3.prototype, {
 
 	constructor: Matrix3,
 
@@ -97,11 +97,9 @@ Matrix3.prototype = {
 
 	applyToBufferAttribute: function () {
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function applyToBufferAttribute( attribute ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -274,7 +272,7 @@ Matrix3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Matrix3 };
