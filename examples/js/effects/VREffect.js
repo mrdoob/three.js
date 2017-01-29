@@ -6,10 +6,9 @@
  *
  * Firefox: http://mozvr.com/downloads/
  * Chromium: https://webvr.info/get-chrome
- *
  */
 
-THREE.VREffect = function( renderer, onError ) {
+THREE.VREffect = function ( renderer, onError ) {
 
 	var vrDisplay, vrDisplays;
 	var eyeTranslationL = new THREE.Vector3();
@@ -42,7 +41,7 @@ THREE.VREffect = function( renderer, onError ) {
 
 	if ( navigator.getVRDisplays ) {
 
-		navigator.getVRDisplays().then( gotVRDisplays ).catch( function() {
+		navigator.getVRDisplays().then( gotVRDisplays ).catch( function () {
 
 			console.warn( 'THREE.VREffect: Unable to get VR Displays' );
 
@@ -60,26 +59,26 @@ THREE.VREffect = function( renderer, onError ) {
 	var rendererUpdateStyle = false;
 	var rendererPixelRatio = renderer.getPixelRatio();
 
-	this.getVRDisplay = function() {
+	this.getVRDisplay = function () {
 
 		return vrDisplay;
 
 	};
 
-	this.setVRDisplay = function( value ) {
+	this.setVRDisplay = function ( value ) {
 
 		vrDisplay = value;
 
 	};
 
-	this.getVRDisplays = function() {
+	this.getVRDisplays = function () {
 
 		console.warn( 'THREE.VREffect: getVRDisplays() is being deprecated.' );
 		return vrDisplays;
 
 	};
 
-	this.setSize = function( width, height, updateStyle ) {
+	this.setSize = function ( width, height, updateStyle ) {
 
 		rendererSize = { width: width, height: height };
 		rendererUpdateStyle = updateStyle;
@@ -137,9 +136,9 @@ THREE.VREffect = function( renderer, onError ) {
 
 	window.addEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
-	this.setFullScreen = function( boolean ) {
+	this.setFullScreen = function ( boolean ) {
 
-		return new Promise( function( resolve, reject ) {
+		return new Promise( function ( resolve, reject ) {
 
 			if ( vrDisplay === undefined ) {
 
@@ -169,19 +168,19 @@ THREE.VREffect = function( renderer, onError ) {
 
 	};
 
-	this.requestPresent = function() {
+	this.requestPresent = function () {
 
 		return this.setFullScreen( true );
 
 	};
 
-	this.exitPresent = function() {
+	this.exitPresent = function () {
 
 		return this.setFullScreen( false );
 
 	};
 
-	this.requestAnimationFrame = function( f ) {
+	this.requestAnimationFrame = function ( f ) {
 
 		if ( vrDisplay !== undefined ) {
 
@@ -195,7 +194,7 @@ THREE.VREffect = function( renderer, onError ) {
 
 	};
 
-	this.cancelAnimationFrame = function( h ) {
+	this.cancelAnimationFrame = function ( h ) {
 
 		if ( vrDisplay !== undefined ) {
 
@@ -209,7 +208,7 @@ THREE.VREffect = function( renderer, onError ) {
 
 	};
 
-	this.submitFrame = function() {
+	this.submitFrame = function () {
 
 		if ( vrDisplay !== undefined && scope.isPresenting ) {
 
@@ -229,7 +228,7 @@ THREE.VREffect = function( renderer, onError ) {
 	var cameraR = new THREE.PerspectiveCamera();
 	cameraR.layers.enable( 2 );
 
-	this.render = function( scene, camera, renderTarget, forceClear ) {
+	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( vrDisplay && scope.isPresenting ) {
 
@@ -306,10 +305,10 @@ THREE.VREffect = function( renderer, onError ) {
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
-			
-			cameraR.position.copy(cameraL.position);
-			cameraR.quaternion.copy(cameraL.quaternion);
-			cameraR.scale.copy(cameraL.scale);
+
+			cameraR.position.copy( cameraL.position );
+			cameraR.quaternion.copy( cameraL.quaternion );
+			cameraR.scale.copy( cameraL.scale );
 
 			cameraL.translateOnAxis( eyeTranslationL, cameraL.scale.x );
 			cameraR.translateOnAxis( eyeTranslationR, cameraR.scale.x );
@@ -395,7 +394,7 @@ THREE.VREffect = function( renderer, onError ) {
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange, false );
 
