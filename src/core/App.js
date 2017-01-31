@@ -43,6 +43,7 @@ function App( parameters ) {
 	} else {
 
 		this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas } );
+		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
 
 	}
