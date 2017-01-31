@@ -21,7 +21,7 @@ function App( parameters ) {
 
 	if ( parameters.canvas !== undefined ) {
 
-	  this.canvas = parameters.canvas;
+		this.canvas = parameters.canvas;
 
 	} else {
 
@@ -36,12 +36,12 @@ function App( parameters ) {
 
 	if ( parameters.renderer !== undefined ) {
 
-	  this.renderer = parameters.renderer;
+		this.renderer = parameters.renderer;
 
 	} else {
 
-	  this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas } );
-	  this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight );
+		this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas } );
+		this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight );
 
 	}
 
@@ -51,7 +51,7 @@ Object.assign( App.prototype, {
 
 	animate: function () {
 
-	  var self = this;
+		var self = this;
 
 		function animationHandler() {
 
@@ -61,15 +61,15 @@ Object.assign( App.prototype, {
 
 			self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler() } );
 
-	  }
+		}
 
-	  animationHandler();
+		animationHandler();
 
 	},
 
 	stopAnimation: function () {
 
-	  cancelAnimationFrame( this.currentAnimationFrameID );
+		cancelAnimationFrame( this.currentAnimationFrameID );
 
 	},
 
