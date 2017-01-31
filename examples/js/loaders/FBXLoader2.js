@@ -163,7 +163,9 @@
 					 * @type {[number, number, string][]}
 					 */
 					var connectionArray = FBXTree.Connections.properties.connections;
-					connectionArray.forEach( function ( connection ) {
+					for ( var connectionArrayIndex = 0, connectionArrayLength = connectionArray.length; connectionArrayIndex < connectionArrayLength; ++ connectionArrayIndex ) {
+
+						var connection = connectionArray[ connectionArrayIndex ];
 
 						if ( ! connectionMap.has( connection[ 0 ] ) ) {
 
@@ -189,7 +191,7 @@
 						var childRelationship = { ID: connection[ 0 ], relationship: connection[ 2 ] };
 						connectionMap.get( connection[ 1 ] ).children.push( childRelationship );
 
-					} );
+					}
 
 				}
 
@@ -370,7 +372,9 @@
 
 						}
 
-						childrenRelationships.forEach( function ( relationship ) {
+						for ( var childrenRelationshipsIndex = 0, childrenRelationshipsLength = childrenRelationships.length; childrenRelationshipsIndex < childrenRelationshipsLength; ++ childrenRelationshipsIndex ) {
+
+							var relationship = childrenRelationships[ childrenRelationshipsIndex ];
 
 							var type = relationship.relationship;
 							switch ( type ) {
@@ -389,7 +393,7 @@
 
 							}
 
-						} );
+						}
 
 						return parameters;
 
@@ -440,7 +444,9 @@
 
 					var subDeformers = new Map();
 					var subDeformerArray = [];
-					connections.children.forEach( function ( child ) {
+					for ( var childrenIndex = 0, childrenLength = connections.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+						var child = connections.children[ childrenIndex ];
 
 						var subDeformerNode = DeformerNodes[ child.ID ];
 						var subDeformer = {
@@ -454,7 +460,7 @@
 						subDeformers.set( child.ID, subDeformer );
 						subDeformerArray.push( subDeformer );
 
-					} );
+					}
 
 					return {
 						map: subDeformers,
@@ -571,11 +577,10 @@
 
 							var faceVertexBuffer = [];
 							var polygonIndex = 0;
-							for ( var polygonVertexIndex = 0; polygonVertexIndex < indexBuffer.length; ++ polygonVertexIndex ) {
+							indexBuffer.forEach( function ( vertexIndex, polygonVertexIndex, indexBuffer ) {
 
-								var endOfFace;
-								var vertexIndex = indexBuffer[ polygonVertexIndex ];
-								if ( indexBuffer[ polygonVertexIndex ] < 0 ) {
+								var endOfFace = false;
+								if ( vertexIndex < 0 ) {
 
 									vertexIndex = vertexIndex ^ - 1;
 									indexBuffer[ polygonVertexIndex ] = vertexIndex;
@@ -587,27 +592,24 @@
 								var weights = [];
 								vertex.position.fromArray( vertexBuffer, vertexIndex * 3 );
 
-								// If we have a deformer for this geometry, get the skinIndex and skinWeights for this object.
-								// They are stored as vertex indices on each deformer, and we need them as deformer indices
-								// for each vertex.
 								if ( deformer ) {
 
-									for ( var j = 0; j < deformer.array.length; ++ j ) {
+									deformer.array.forEach( function ( subDeformer, subDeformerIndex ) {
 
-										var index = deformer.array[ j ].indices.findIndex( function ( index ) {
+										var index = subDeformer.indices.findIndex( function ( indx ) {
 
-											return index === indexBuffer[ polygonVertexIndex ];
+											return indx === vertexIndex;
 
 										} );
 
 										if ( index !== - 1 ) {
 
-											weights.push( deformer.array[ j ].weights[ index ] );
-											weightIndices.push( j );
+											weights.push( subDeformer.weights[ index ] );
+											weightIndices.push( subDeformerIndex );
 
 										}
 
-									}
+									} );
 
 									if ( weights.length > 4 ) {
 
@@ -616,34 +618,33 @@
 										var WIndex = [ 0, 0, 0, 0 ];
 										var Weight = [ 0, 0, 0, 0 ];
 
-										for ( var polygonVertexIndex = 0; polygonVertexIndex < weights.length; ++ polygonVertexIndex ) {
+										weights.forEach( function ( weight, weightIndex ) {
 
-											var currentWeight = weights[ polygonVertexIndex ];
-											var currentIndex = weightIndices[ polygonVertexIndex ];
-											for ( var j = 0; j < Weight.length; ++ j ) {
+											var currentWeight = weight;
+											var currentIndex = weightIndices[ weightIndex ];
+											Weight.forEach( function ( comparedWeight, comparedWeightIndex, comparedWeightArray ) {
 
-												if ( currentWeight > Weight[ j ] ) {
+												if ( currentWeight > comparedWeight ) {
 
-													var tmp = Weight[ j ];
-													Weight[ j ] = currentWeight;
-													currentWeight = tmp;
+													comparedWeightArray[ comparedWeightIndex ] = currentWeight;
+													currentWeight = comparedWeight;
 
-													tmp = WIndex[ j ];
-													WIndex[ j ] = currentIndex;
+													var tmp = WIndex[ comparedWeightIndex ];
+													WIndex[ comparedWeightIndex ] = currentIndex;
 													currentIndex = tmp;
 
 												}
 
-											}
+											} );
 
-										}
+										} );
 
 										weightIndices = WIndex;
 										weights = Weight;
 
 									}
 
-									for ( var i = weights.length; i < 4; i ++ ) {
+									for ( var i = weights.length; i < 4; ++ i ) {
 
 										weights[ i ] = 0;
 										weightIndices[ i ] = 0;
@@ -652,8 +653,6 @@
 
 									vertex.skinWeights.fromArray( weights );
 									vertex.skinIndices.fromArray( weightIndices );
-
-									//vertex.skinWeights.normalize();
 
 								}
 
@@ -669,13 +668,8 @@
 
 								}
 
-
-
-								//Add vertex to face buffer.
 								faceVertexBuffer.push( vertex );
 
-								// If index was negative to start with, we have finished this individual face
-								// and can generate the face data to the geometry.
 								if ( endOfFace ) {
 
 									var face = new Face();
@@ -689,7 +683,7 @@
 
 								}
 
-							}
+							} );
 
 							/**
 							 * @type {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
@@ -812,11 +806,11 @@
 								// we expect.  So we create an intermediate buffer that points to the index in the buffer,
 								// for conforming with the other functions we've written for other data.
 								var materialIndices = [];
-								materialIndexBuffer.forEach( function ( materialIndex, index ) {
+								for ( var materialIndexBufferIndex = 0, materialIndexBufferLength = materialIndexBuffer.length; materialIndexBufferIndex < materialIndexBufferLength; ++ materialIndexBufferIndex ) {
 
-									materialIndices.push( index );
+									materialIndices.push( materialIndexBufferIndex );
 
-								} );
+								}
 
 								return {
 									dataSize: 1,
@@ -978,12 +972,14 @@
 						var vertices = curve.getPoints( controlPoints.length * 1.5 );
 
 						var vertexBuffer = [];
-						vertices.forEach( function ( position ) {
+						for ( var verticesIndex = 0, verticesLength = vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {
+
+							var position = vertices[ verticesIndex ];
 
 							var array = position.toArray();
 							vertexBuffer = vertexBuffer.concat( array );
 
-						} );
+						}
 
 						var geometry = new THREE.BufferGeometry();
 						geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertexBuffer ), 3 ) );
@@ -1066,7 +1062,9 @@
 								 */
 								var materials = [];
 
-								conns.children.forEach( function ( child ) {
+								for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+									var child = conns.children[ childrenIndex ];
 
 									if ( geometryMap.has( child.ID ) ) {
 
@@ -1080,7 +1078,7 @@
 
 									}
 
-								} );
+								}
 								if ( materials.length > 1 ) {
 
 									material = new THREE.MultiMaterial( materials );
@@ -1096,11 +1094,13 @@
 								}
 								if ( geometry.FBX_Deformer ) {
 
-									materials.forEach( function ( material ) {
+									for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
+
+										var material = materials[ materialsIndex ];
 
 										material.skinning = true;
 
-									} );
+									}
 									material.skinning = true;
 									model = new THREE.SkinnedMesh( geometry, material );
 
@@ -1114,7 +1114,9 @@
 							case "NurbsCurve":
 								var geometry = null;
 
-								conns.children.forEach( function ( child ) {
+								for ( var childrenIndex = 0, childrenLength = conns.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+
+									var child = conns.children[ childrenIndex ];
 
 									if ( geometryMap.has( child.ID ) ) {
 
@@ -1122,7 +1124,7 @@
 
 									}
 
-								} );
+								}
 
 								// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
 								material = new THREE.LineBasicMaterial( { color: 0x3300ff, linewidth: 5 } );
@@ -1145,7 +1147,9 @@
 
 				}
 
-				modelArray.forEach( function ( model ) {
+				for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
+
+					var model = modelArray[ modelArrayIndex ];
 
 					var node = ModelNode[ model.FBX_ID ];
 
@@ -1195,7 +1199,7 @@
 
 					}
 
-				} );
+				}
 
 
 				// Now with the bones created, we can update the skeletons and bind them to the skinned meshes.
@@ -1218,19 +1222,24 @@
 					var PoseNode = BindPoseNode.subNodes.PoseNode;
 					var worldMatrices = new Map();
 
-					PoseNode.forEach( function ( node ) {
+					for ( var PoseNodeIndex = 0, PoseNodeLength = PoseNode.length; PoseNodeIndex < PoseNodeLength; ++ PoseNodeIndex ) {
+
+						var node = PoseNode[ PoseNodeIndex ];
 
 						var rawMatWrd = parseMatrixArray( node.subNodes.Matrix.properties.a );
 
 						worldMatrices.set( parseInt( node.id ), rawMatWrd );
 
-					} );
+					}
 
 				}
 
 				deformerMap.forEach( function ( deformer, FBX_ID ) {
 
-					deformer.array.forEach( function ( subDeformer, subDeformerIndex ) {
+					for ( var deformerArrayIndex = 0, deformerArrayLength = deformer.array.length; deformerArrayIndex < deformerArrayLength; ++ deformerArrayIndex ) {
+
+						//var subDeformer = deformer.array[ deformerArrayIndex ];
+						var subDeformerIndex = deformerArrayIndex;
 
 						/**
 						 * @type {THREE.Bone}
@@ -1238,18 +1247,20 @@
 						var bone = deformer.bones[ subDeformerIndex ];
 						if ( ! worldMatrices.has( bone.FBX_ID ) ) {
 
-							return;
+							break;
 
 						}
 						var mat = worldMatrices.get( bone.FBX_ID );
 						bone.matrixWorld.copy( mat );
 
-					} );
+					}
 
 					// Now that skeleton is in bind pose, bind to model.
 					deformer.skeleton = new THREE.Skeleton( deformer.bones );
 					var conns = connections.get( FBX_ID );
-					conns.parents.forEach( function ( parent ) {
+					for ( var parentsIndex = 0, parentsLength = conns.parents.length; parentsIndex < parentsLength; ++ parentsIndex ) {
+
+						var parent = conns.parents[ parentsIndex ];
 
 						if ( geometryMap.has( parent.ID ) ) {
 
@@ -1270,13 +1281,15 @@
 
 						}
 
-					} );
+					}
 
 				} );
 
 				// Skeleton is now bound, we are now free to set up the
 				// scene graph.
-				modelArray.forEach( function ( model ) {
+				for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
+
+					var model = modelArray[ modelArrayIndex ];
 
 					var node = ModelNode[ model.FBX_ID ];
 
@@ -1304,7 +1317,7 @@
 
 					}
 
-				} );
+				}
 
 				// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
 				// to attach animations to, since FBXs treat animations as animations for the entire scene,
@@ -2013,7 +2026,9 @@
 							var currentLayer = returnObject.layers.get( children[ childIndex ].ID );
 							layers.push( currentLayer );
 
-							currentLayer.forEach( function ( layer ) {
+							for ( var currentLayerIndex = 0, currentLayerLength = currentLayer.length; currentLayerIndex < currentLayerLength; ++ currentLayerIndex ) {
+
+								var layer = currentLayer[ currentLayerIndex ];
 
 								if ( layer ) {
 
@@ -2228,7 +2243,7 @@
 
 								}
 
-							} );
+							}
 
 						}
 
@@ -2762,6 +2777,23 @@
 
 				animations.stacks.forEach( function ( stack ) {
 
+					/**
+					 * @type {{
+					 * name: string,
+					 * fps: number,
+					 * length: number,
+					 * hierarchy: Array.<{
+					 * 	parent: number,
+					 * 	name: string,
+					 * 	keys: Array.<{
+					 * 		time: number,
+					 * 		pos: Array.<number>,
+					 * 		rot: Array.<number>,
+					 * 		scl: Array.<number>
+					 * 	}>
+					 * }>
+					 * }}
+					 */
 					var animationData = {
 						name: stack.name,
 						fps: 30,
@@ -2771,7 +2803,9 @@
 
 					var bones = group.skeleton.bones;
 
-					bones.forEach( function ( bone ) {
+					for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+
+						var bone = bones[ bonesIndex ];
 
 						var name = bone.name.replace( /.*:/, '' );
 						var parentIndex = bones.findIndex( function ( parentBone ) {
@@ -2781,15 +2815,20 @@
 						} );
 						animationData.hierarchy.push( { parent: parentIndex, name: name, keys: [] } );
 
-					} );
+					}
 
 					for ( var frame = 0; frame < stack.frames; frame ++ ) {
 
-						bones.forEach( function ( bone, boneIndex ) {
+						for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
+
+							var bone = bones[ bonesIndex ];
+							var boneIndex = bonesIndex;
 
 							var animationNode = stack.layers[ 0 ][ boneIndex ];
 
-							animationData.hierarchy.forEach( function ( node ) {
+							for ( var hierarchyIndex = 0, hierarchyLength = animationData.hierarchy.length; hierarchyIndex < hierarchyLength; ++ hierarchyIndex ) {
+
+								var node = animationData.hierarchy[ hierarchyIndex ];
 
 								if ( node.name === bone.name ) {
 
@@ -2797,9 +2836,9 @@
 
 								}
 
-							} );
+							}
 
-						} );
+						}
 
 					}
 
@@ -2875,7 +2914,7 @@
 
 							return [ 'x', 'y', 'z' ].every( function ( key ) {
 
-								return attributeNode.curves[ key ] !== undefined;
+								return attributeNode.curves[ key ] !== null;
 
 							} );
 
@@ -3042,7 +3081,9 @@
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
 
-			this.vertices.forEach( function ( vertex ) {
+			for ( var verticesIndex = 0, verticesLength = this.vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {
+
+				var vertex = this.vertices[ verticesIndex ];
 
 				var flatVertex = vertex.flattenToBuffers();
 				vertexBuffer = vertexBuffer.concat( flatVertex.vertexBuffer );
@@ -3051,7 +3092,7 @@
 				skinIndexBuffer = skinIndexBuffer.concat( flatVertex.skinIndexBuffer );
 				skinWeightBuffer = skinWeightBuffer.concat( flatVertex.skinWeightBuffer );
 
-			} );
+			}
 
 			return {
 				vertexBuffer: vertexBuffer,
@@ -3122,8 +3163,9 @@
 
 			var materialIndex = this.materialIndex;
 
-			this.triangles.forEach( function ( triangle ) {
+			for ( var triangleIndex = 0, triangleLength = this.triangles.length; triangleIndex < triangleLength; ++ triangleIndex ) {
 
+				var triangle = this.triangles[ triangleIndex ];
 				var flatTriangle = triangle.flattenToBuffers();
 				vertexBuffer = vertexBuffer.concat( flatTriangle.vertexBuffer );
 				normalBuffer = normalBuffer.concat( flatTriangle.normalBuffer );
@@ -3132,7 +3174,7 @@
 				skinWeightBuffer = skinWeightBuffer.concat( flatTriangle.skinWeightBuffer );
 				materialIndexBuffer = materialIndexBuffer.concat( [ materialIndex, materialIndex, materialIndex ] );
 
-			} );
+			}
 
 			return {
 				vertexBuffer: vertexBuffer,
@@ -3179,8 +3221,9 @@
 
 			var materialIndexBuffer = [];
 
-			this.faces.forEach( function ( face ) {
+			for ( var faceIndex = 0, faceLength = this.faces.length; faceIndex < faceLength; ++ faceIndex ) {
 
+				var face = this.faces[ faceIndex ];
 				var flatFace = face.flattenToBuffers();
 				vertexBuffer = vertexBuffer.concat( flatFace.vertexBuffer );
 				normalBuffer = normalBuffer.concat( flatFace.normalBuffer );
@@ -3189,7 +3232,7 @@
 				skinWeightBuffer = skinWeightBuffer.concat( flatFace.skinWeightBuffer );
 				materialIndexBuffer = materialIndexBuffer.concat( flatFace.materialIndexBuffer );
 
-			} );
+			}
 
 			return {
 				vertexBuffer: vertexBuffer,
