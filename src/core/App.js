@@ -11,6 +11,7 @@
  *
  *  renderer: new THREE.WebGLRenderer( ... )
  *
+ *  autoResize: <bool>
  *
  * }
  */
@@ -45,6 +46,9 @@ function App( parameters ) {
 
 	}
 
+	this.autoResize = ( parameters.autoResize !== undefined ) ? parameters.autoResize : true;
+	window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
+
 }
 
 Object.assign( App.prototype, {
@@ -74,6 +78,26 @@ Object.assign( App.prototype, {
 	},
 
 	onUpdate: function () {},
+
+	onWindowResize:	function () {
+
+		if ( ! this.autoResize ) return;
+
+		if ( this.camera.type !== 'PerspectiveCamera' ) {
+
+			console.warn( 'THREE.APP: AutoResize only works with PerspectiveCamera' );
+			return;
+
+		}
+
+		var newWidth = this.canvas.clientWidth;
+		var newHeight = this.canvas.clientHeight;
+
+		this.camera.aspect = newWidth / newHeight;
+		this.camera.updateProjectionMatrix();
+		this.renderer.setSize( newWidth, newHeight );
+
+	},
 
 } );
 
