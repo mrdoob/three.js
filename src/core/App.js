@@ -55,9 +55,9 @@ Object.assign( App.prototype, {
 
 		function animationHandler() {
 
-	    self.onUpdate();
+			self.onUpdate();
 
-	    self.renderer.render( self.scene, self.camera );
+			self.renderer.render( self.scene, self.camera );
 
 			self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler() } );
 
