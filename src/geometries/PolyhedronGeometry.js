@@ -77,6 +77,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 	this.normalizeNormals();
 
 	// add a group to the geometry. this will ensure multi material support
+
 	this.addGroup( 0, vertexBuffer.length / 3 );
 
 	// helper functions

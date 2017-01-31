@@ -134,6 +134,7 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	// add a group to the geometry. this will ensure multi material support
+
 	this.addGroup( 0, indices.length );
 
 }
