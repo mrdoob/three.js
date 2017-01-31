@@ -188,6 +188,15 @@ Object.assign( ShapePath.prototype, {
 
 			} else {
 
+				if ( ! tmpPoints.length ) {
+
+					// If tmpPoints is empty, the point ('p'-property) in the object
+					// added to newShapeHoles will be undefined.
+					// This causes an error in inPointInsidePolygon() further down.
+					continue;
+
+				}
+
 				newShapeHoles[ mainIdx ].push( { h: tmpPath, p: tmpPoints[ 0 ] } );
 
 				//console.log('ccw', i);
