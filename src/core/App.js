@@ -27,6 +27,7 @@ function App( parameters ) {
 	} else {
 
 		this.canvas = document.body.appendChild( document.createElement( 'canvas' ) );
+		this.canvas.style.position = 'absolute';
 		this.canvas.style.width = this.canvas.style.height = '100%';
 
 	}
@@ -42,7 +43,7 @@ function App( parameters ) {
 	} else {
 
 		this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas } );
-		this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight );
+		this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
 
 	}
 
@@ -95,7 +96,7 @@ Object.assign( App.prototype, {
 
 		this.camera.aspect = newWidth / newHeight;
 		this.camera.updateProjectionMatrix();
-		this.renderer.setSize( newWidth, newHeight );
+		this.renderer.setSize( newWidth, newHeight, false );
 
 	},
 
