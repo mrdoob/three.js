@@ -197,6 +197,13 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
+	updateBasedOnRenderSize: function ( width, height ) {
+
+		this.aspect = width / height;
+		this.updateProjectionMatrix();
+
+	},
+
 	toJSON: function ( meta ) {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
