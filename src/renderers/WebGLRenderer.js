@@ -1434,14 +1434,44 @@ function WebGLRenderer( parameters ) {
 							var groups = geometry.groups;
 							var materials = material.materials;
 
+							// there must be at least one group if a MultiMaterial is used
+
+							if ( groups.length === 0 ) {
+
+								if ( geometry.index !== undefined ) {
+
+									// indexed geometry
+
+									geometry.addGroup( 0, geometry.index.count );
+
+								} else {
+
+									// non-indexed geometry
+
+									geometry.addGroup( 0, geometry.position.count / 3 );
+
+								}
+
+							}
+
+							// push a render item for each group of the geometry
+
 							for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 								var group = groups[ i ];
 								var groupMaterial = materials[ group.materialIndex ];
 
-								if ( groupMaterial.visible === true ) {
+								if ( groupMaterial === undefined ) {
 
-									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+									console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
+
+								} else {
+
+									if ( groupMaterial.visible === true ) {
+
+										pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+									}
 
 								}
 
