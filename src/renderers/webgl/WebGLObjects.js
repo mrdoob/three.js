@@ -190,7 +190,10 @@ function WebGLObjects( gl, properties, info ) {
 
 		var property = properties.get( geometry );
 
-		if ( property.wireframe !== undefined ) {
+		var numberOfPoints = geometry.attributes.position.array/3;
+
+		if ( property.wireframe !== undefined &&
+		   property.wireframe.count/2 == numberOfPoints ) {
 
 			return property.wireframe;
 
