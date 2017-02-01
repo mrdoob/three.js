@@ -1438,7 +1438,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groups.length === 0 ) {
 
-								if ( geometry.index !== undefined ) {
+								if ( geometry.index !== null ) {
 
 									// indexed geometry
 
@@ -1448,7 +1448,7 @@ function WebGLRenderer( parameters ) {
 
 									// non-indexed geometry
 
-									geometry.addGroup( 0, geometry.position.count / 3 );
+									geometry.addGroup( 0, geometry.attributes.position.count );
 
 								}
 
