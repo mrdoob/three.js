@@ -275,6 +275,8 @@ function WebGLRenderer( parameters ) {
 	extensions.get( 'OES_standard_derivatives' );
 	extensions.get( 'ANGLE_instanced_arrays' );
 
+	var DrawBuffersEXT = extensions.get( 'WEBGL_draw_buffers' );
+
 	if ( extensions.get( 'OES_element_index_uint' ) ) {
 
 		BufferGeometry.MaxIndex = 4294967296;
@@ -294,6 +296,8 @@ function WebGLRenderer( parameters ) {
 
 	var bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 	var indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
+	var defaultAttachments = [ _gl.COLOR_ATTACHMENT0 ];
+	var defaultBackAttachment = [ _gl.BACK ];
 
 	//
 
@@ -2630,11 +2634,11 @@ function WebGLRenderer( parameters ) {
 		}
 
 		var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
-		var framebuffer;
+		var framebuffer, renderTargetProperties;
 
 		if ( renderTarget ) {
 
-			var renderTargetProperties = properties.get( renderTarget );
+			renderTargetProperties = properties.get( renderTarget );
 
 			if ( isCube ) {
 
@@ -2666,6 +2670,24 @@ function WebGLRenderer( parameters ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_currentFramebuffer = framebuffer;
+
+			if ( DrawBuffersEXT ) {
+
+				if ( renderTargetProperties && renderTargetProperties.__webglAttachments ) {
+
+					DrawBuffersEXT.drawBuffersWEBGL( renderTargetProperties.__webglAttachments );
+
+				} else if ( renderTarget ) {
+
+					DrawBuffersEXT.drawBuffersWEBGL( defaultAttachments );
+
+				} else {
+
+					DrawBuffersEXT.drawBuffersWEBGL( defaultBackAttachment );
+
+				}
+
+			}
 
 		}
 
