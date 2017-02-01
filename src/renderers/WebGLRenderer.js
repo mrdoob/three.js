@@ -1447,13 +1447,9 @@ function WebGLRenderer( parameters ) {
 
 										console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
 
-									} else {
+									} else if ( groupMaterial.visible === true ) {
 
-										if ( groupMaterial.visible === true ) {
-
-											pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-										}
+										pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 									}
 
