@@ -295,6 +295,13 @@
 					var name = materialNode.attrName;
 					var type = materialNode.properties.ShadingModel;
 
+					//Case where FBXs wrap shading model in property object.
+					if ( typeof type === 'object' ) {
+
+						type = type.value;
+
+					}
+
 					var children = connections.get( FBX_ID ).children;
 
 					var parameters = parseParameters( materialNode.properties, textureMap, children );
@@ -451,12 +458,18 @@
 						var subDeformerNode = DeformerNodes[ child.ID ];
 						var subDeformer = {
 							FBX_ID: child.ID,
-							indices: parseIntArray( subDeformerNode.subNodes.Indexes.properties.a ),
-							weights: parseFloatArray( subDeformerNode.subNodes.Weights.properties.a ),
+							indices: [],
+							weights: [],
 							transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
 							transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 							linkMode: subDeformerNode.properties.Mode
 						};
+						if ( 'Indexes' in subDeformerNode.subNodes ) {
+
+							subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
+							subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
+
+						}
 						subDeformers.set( child.ID, subDeformer );
 						subDeformerArray.push( subDeformer );
 
