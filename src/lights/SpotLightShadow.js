@@ -1,31 +1,43 @@
+import { LightShadow } from './LightShadow';
+import { _Math } from '../math/Math';
+import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SpotLightShadow = function () {
+function SpotLightShadow() {
 
-	THREE.LightShadow.call( this, new THREE.PerspectiveCamera( 50, 1, 0.5, 500 ) );
+	LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
-};
+}
 
-THREE.SpotLightShadow.prototype = Object.create( THREE.LightShadow.prototype );
-THREE.SpotLightShadow.prototype.constructor = THREE.SpotLightShadow;
+SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
-THREE.SpotLightShadow.prototype.update = function ( light ) {
+	constructor: SpotLightShadow,
 
-	var fov = THREE.Math.RAD2DEG * 2 * light.angle;
-	var aspect = this.mapSize.width / this.mapSize.height;
-	var far = light.distance || 500;
+	isSpotLightShadow: true,
 
-	var camera = this.camera;
+	update: function ( light ) {
 
-	if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
+		var fov = _Math.RAD2DEG * 2 * light.angle;
+		var aspect = this.mapSize.width / this.mapSize.height;
+		var far = light.distance || 500;
 
-		camera.fov = fov;
-		camera.aspect = aspect;
-		camera.far = far;
-		camera.updateProjectionMatrix();
+		var camera = this.camera;
+
+		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
+
+			camera.fov = fov;
+			camera.aspect = aspect;
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
 
 	}
 
-};
+} );
+
+
+export { SpotLightShadow };

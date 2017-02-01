@@ -30,13 +30,12 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
 
-THREE.FilmPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.FilmPass.prototype = {
+THREE.FilmPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.FilmPass,
 
@@ -59,4 +58,4 @@ THREE.FilmPass.prototype = {
 
 	}
 
-};
+} );

@@ -5,42 +5,52 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-THREE.Vector2 = function ( x, y ) {
+function Vector2( x, y ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 
-};
+}
 
-THREE.Vector2.prototype = {
+Object.defineProperties( Vector2.prototype, {
 
-	constructor: THREE.Vector2,
-
-	get width() {
-
-		return this.x;
-
+	"width" : {
+		
+		get: function () { 
+			
+			return this.x; 
+		
+		},
+		
+		set: function ( value ) { 
+			
+			this.x = value; 
+		
+		}
+		
 	},
 
-	set width( value ) {
+	"height" : {
+		
+		get: function () { 
+			
+			return this.y; 
+		
+		},
+		
+		set: function ( value ) { 
+			
+			this.y = value; 
+		
+		}
+		
+	}
 
-		this.x = value;
+} );
 
-	},
+Object.assign( Vector2.prototype, {
 
-	get height() {
-
-		return this.y;
-
-	},
-
-	set height( value ) {
-
-		this.y = value;
-
-	},
-
-	//
+	isVector2: true,
 
 	set: function ( x, y ) {
 
@@ -85,6 +95,8 @@ THREE.Vector2.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
+
+		return this;
 
 	},
 
@@ -265,16 +277,10 @@ THREE.Vector2.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector2();
+		var max = new Vector2();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new THREE.Vector2();
-				max = new THREE.Vector2();
-
-			}
 
 			min.set( minVal, minVal );
 			max.set( maxVal, maxVal );
@@ -393,6 +399,12 @@ THREE.Vector2.prototype = {
 
 	},
 
+	distanceToManhattan: function ( v ) {
+
+		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
+
+	},
+
 	setLength: function ( length ) {
 
 		return this.multiplyScalar( length / this.length() );
@@ -443,14 +455,16 @@ THREE.Vector2.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
 
 		return this;
 
@@ -470,4 +484,7 @@ THREE.Vector2.prototype = {
 
 	}
 
-};
+} );
+
+
+export { Vector2 };

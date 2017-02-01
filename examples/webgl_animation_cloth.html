@@ -30,7 +30,7 @@
 
 	<body>
 		<div id="info">Simple Cloth Simulation<br/>
-			Verlet integration with Constrains relaxation<br/>
+			Verlet integration with relaxed constraints<br/>
 			<a onclick="wind = !wind;">Wind</a> |
 			<a onclick="sphere.visible = !sphere.visible;">Ball</a> |
 			<a onclick="togglePins();">Pins</a>
@@ -182,7 +182,7 @@
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
 				clothGeometry.dynamic = true;
 
-				var uniforms = { texture:  { type: "t", value: clothTexture } };
+				var uniforms = { texture:  { value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShaderDepth' ).textContent;
 
@@ -295,7 +295,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				sphere.visible = ! true
+				sphere.visible = ! true;
 
 			}
 

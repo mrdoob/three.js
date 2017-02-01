@@ -1,157 +1,178 @@
+import { Vector4 } from '../../math/Vector4';
+import { Color } from '../../math/Color';
+import { Vector2 } from '../../math/Vector2';
+import { DataTexture } from '../../textures/DataTexture';
+
 /**
  * Uniforms library for shared webgl shaders
  */
 
-THREE.UniformsLib = {
+var UniformsLib = {
 
 	common: {
 
-		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "1f", value: 1.0 },
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
 
-		"map": { type: "t", value: null },
-		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+		map: { value: null },
+		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) },
 
-		"specularMap": { type: "t", value: null },
-		"alphaMap": { type: "t", value: null },
+		specularMap: { value: null },
+		alphaMap: { value: null },
 
-		"envMap": { type: "t", value: null },
-		"flipEnvMap": { type: "1f", value: - 1 },
-		"reflectivity": { type: "1f", value: 1.0 },
-		"refractionRatio": { type: "1f", value: 0.98 }
+		envMap: { value: null },
+		flipEnvMap: { value: - 1 },
+		reflectivity: { value: 1.0 },
+		refractionRatio: { value: 0.98 }
 
 	},
 
 	aomap: {
 
-		"aoMap": { type: "t", value: null },
-		"aoMapIntensity": { type: "1f", value: 1 }
+		aoMap: { value: null },
+		aoMapIntensity: { value: 1 }
 
 	},
 
 	lightmap: {
 
-		"lightMap": { type: "t", value: null },
-		"lightMapIntensity": { type: "1f", value: 1 }
+		lightMap: { value: null },
+		lightMapIntensity: { value: 1 }
 
 	},
 
 	emissivemap: {
 
-		"emissiveMap": { type: "t", value: null }
+		emissiveMap: { value: null }
 
 	},
 
 	bumpmap: {
 
-		"bumpMap": { type: "t", value: null },
-		"bumpScale": { type: "1f", value: 1 }
+		bumpMap: { value: null },
+		bumpScale: { value: 1 }
 
 	},
 
 	normalmap: {
 
-		"normalMap": { type: "t", value: null },
-		"normalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+		normalMap: { value: null },
+		normalScale: { value: new Vector2( 1, 1 ) }
 
 	},
 
 	displacementmap: {
 
-		"displacementMap": { type: "t", value: null },
-		"displacementScale": { type: "1f", value: 1 },
-		"displacementBias": { type: "1f", value: 0 }
+		displacementMap: { value: null },
+		displacementScale: { value: 1 },
+		displacementBias: { value: 0 }
 
 	},
 
 	roughnessmap: {
 
-		"roughnessMap": { type: "t", value: null }
+		roughnessMap: { value: null }
 
 	},
 
 	metalnessmap: {
 
-		"metalnessMap": { type: "t", value: null }
+		metalnessMap: { value: null }
+
+	},
+
+	gradientmap: {
+
+		gradientMap: { value: null }
 
 	},
 
 	fog: {
 
-		"fogDensity": { type: "1f", value: 0.00025 },
-		"fogNear": { type: "1f", value: 1 },
-		"fogFar": { type: "1f", value: 2000 },
-		"fogColor": { type: "c", value: new THREE.Color( 0xffffff ) }
+		fogDensity: { value: 0.00025 },
+		fogNear: { value: 1 },
+		fogFar: { value: 2000 },
+		fogColor: { value: new Color( 0xffffff ) }
 
 	},
 
 	lights: {
 
-		"ambientLightColor": { type: "3fv", value: [] },
+		ambientLightColor: { value: [] },
 
-		"directionalLights": { type: "sa", value: [], properties: {
-			"direction": { type: "v3" },
-			"color": { type: "c" },
+		directionalLights: { value: [], properties: {
+			direction: {},
+			color: {},
 
-			"shadow": { type: "1i" },
-			"shadowBias": { type: "1f" },
-			"shadowRadius": { type: "1f" },
-			"shadowMapSize": { type: "v2" }
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"directionalShadowMap": { type: "tv", value: [] },
-		"directionalShadowMatrix": { type: "m4v", value: [] },
+		directionalShadowMap: { value: [] },
+		directionalShadowMatrix: { value: [] },
 
-		"spotLights": { type: "sa", value: [], properties: {
-			"color": { type: "c" },
-			"position": { type: "v3" },
-			"direction": { type: "v3" },
-			"distance": { type: "1f" },
-			"coneCos": { type: "1f" },
-			"penumbraCos": { type: "1f" },
-			"decay": { type: "1f" },
+		spotLights: { value: [], properties: {
+			color: {},
+			position: {},
+			direction: {},
+			distance: {},
+			coneCos: {},
+			penumbraCos: {},
+			decay: {},
 
-			"shadow": { type: "1i" },
-			"shadowBias": { type: "1f" },
-			"shadowRadius": { type: "1f" },
-			"shadowMapSize": { type: "v2" }
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"spotShadowMap": { type: "tv", value: [] },
-		"spotShadowMatrix": { type: "m4v", value: [] },
+		spotShadowMap: { value: [] },
+		spotShadowMatrix: { value: [] },
 
-		"pointLights": { type: "sa", value: [], properties: {
-			"color": { type: "c" },
-			"position": { type: "v3" },
-			"decay": { type: "1f" },
-			"distance": { type: "1f" },
+		pointLights: { value: [], properties: {
+			color: {},
+			position: {},
+			decay: {},
+			distance: {},
 
-			"shadow": { type: "1i" },
-			"shadowBias": { type: "1f" },
-			"shadowRadius": { type: "1f" },
-			"shadowMapSize": { type: "v2" }
+			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
 		} },
 
-		"pointShadowMap": { type: "tv", value: [] },
-		"pointShadowMatrix": { type: "m4v", value: [] },
+		pointShadowMap: { value: [] },
+		pointShadowMatrix: { value: [] },
 
-		"hemisphereLights": { type: "sa", value: [], properties: {
-			"direction": { type: "v3" },
-			"skyColor": { type: "c" },
-			"groundColor": { type: "c" }
+		hemisphereLights: { value: [], properties: {
+			direction: {},
+			skyColor: {},
+			groundColor: {}
+		} },
+
+		// TODO (abelnation): RectAreaLight BRDF data needs to be moved from example to main src
+		rectAreaLights: { value: [], properties: {
+			color: {},
+			position: {},
+			width: {},
+			height: {}
 		} }
 
 	},
 
 	points: {
 
-		"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-		"opacity": { type: "1f", value: 1.0 },
-		"size": { type: "1f", value: 1.0 },
-		"scale": { type: "1f", value: 1.0 },
-		"map": { type: "t", value: null },
-		"offsetRepeat": { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
+		diffuse: { value: new Color( 0xeeeeee ) },
+		opacity: { value: 1.0 },
+		size: { value: 1.0 },
+		scale: { value: 1.0 },
+		map: { value: null },
+		offsetRepeat: { value: new Vector4( 0, 0, 1, 1 ) }
 
 	}
 
 };
+
+export { UniformsLib };

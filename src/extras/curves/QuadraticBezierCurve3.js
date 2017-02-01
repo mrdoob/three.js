@@ -1,27 +1,30 @@
-/**************************************************************
- *	Quadratic Bezier 3D curve
- **************************************************************/
+import { Curve } from '../core/Curve';
+import { QuadraticBezier } from '../core/Interpolations';
+import { Vector3 } from '../../math/Vector3';
 
-THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
-	function ( v0, v1, v2 ) {
+function QuadraticBezierCurve3( v0, v1, v2 ) {
 
-		this.v0 = v0;
-		this.v1 = v1;
-		this.v2 = v2;
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
 
-	},
+}
 
-	function ( t ) {
+QuadraticBezierCurve3.prototype = Object.create( Curve.prototype );
+QuadraticBezierCurve3.prototype.constructor = QuadraticBezierCurve3;
 
-		var b2 = THREE.ShapeUtils.b2;		
+QuadraticBezierCurve3.prototype.getPoint = function ( t ) {
 
-		return new THREE.Vector3(
-			b2( t, this.v0.x, this.v1.x, this.v2.x ),
-			b2( t, this.v0.y, this.v1.y, this.v2.y ),
-			b2( t, this.v0.z, this.v1.z, this.v2.z )
-		);
+	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
-	}
+	return new Vector3(
+		QuadraticBezier( t, v0.x, v1.x, v2.x ),
+		QuadraticBezier( t, v0.y, v1.y, v2.y ),
+		QuadraticBezier( t, v0.z, v1.z, v2.z )
+	);
 
-);
+};
+
+
+export { QuadraticBezierCurve3 };

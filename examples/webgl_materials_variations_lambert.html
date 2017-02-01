@@ -40,11 +40,11 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, objects = [];
+			var camera, scene, renderer, controls;
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/gentilis_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -59,7 +59,15 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
+				//
+
+				var reflectionCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/SwedishRoyalCastle/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				reflectionCube.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = reflectionCube;
 
 				// Materials
 
@@ -72,17 +80,6 @@
 
 				var materials = [];
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
-
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -90,29 +87,20 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+				for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
 
-					var baseColor = new THREE.Color().setHSL( alpha, 0.5, 0.5 );
+					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-					if( alpha >= 0.5 ) {
-						reflectionCube = null;
-					}
+						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-					for( var beta = 0, betaIndex = 0; beta <= 1.0; beta += stepSize, betaIndex ++ ) {
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
 
-						var reflectivity = beta;
-
-						var side = THREE.FrontSide;
-						if( ( betaIndex % 2 ) === 0 ) {
-							side = THREE.DoubleSide;
-						}
-
-						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
-
-							var diffuseColor = baseColor.clone().multiplyScalar( gamma );
-
-							var material = new THREE.MeshLambertMaterial( { map: imgTexture, color: diffuseColor,
-								 reflectivity: reflectivity, envMap: reflectionCube, side: side } )
+							var material = new THREE.MeshLambertMaterial( {
+								map: imgTexture,
+								color: diffuseColor,
+								reflectivity: beta,
+								envMap: alpha < 0.5 ? reflectionCube : null
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -120,14 +108,16 @@
 							mesh.position.y = beta * 400 - 200;
 							mesh.position.z = gamma * 400 - 200;
 
-							objects.push( mesh );
-
 							scene.add( mesh );
+
 						}
+
 					}
+
 				}
 
 				function addLabel( name, location ) {
+
 					var textGeo = new THREE.TextGeometry( name, {
 
 						font: font,
@@ -142,6 +132,7 @@
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
+
 				}
 
 				addLabel( "+hue", new THREE.Vector3( -350, 0, 0 ) );
@@ -173,11 +164,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x0a0a0a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
@@ -224,14 +212,6 @@
 				//camera.position.z = Math.sin( timer ) * 800;
 
 				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-
-					object.rotation.y += 0.005;
-
-				}
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

@@ -27,6 +27,7 @@ THREE.GlitchPass = function ( dt_size ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 	this.goWild = false;
@@ -35,9 +36,7 @@ THREE.GlitchPass = function ( dt_size ) {
 
 };
 
-THREE.GlitchPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.GlitchPass.prototype = {
+THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.GlitchPass,
 
@@ -114,4 +113,4 @@ THREE.GlitchPass.prototype = {
 
 	}
 
-};
+} );

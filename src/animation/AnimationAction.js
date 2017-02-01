@@ -1,3 +1,5 @@
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat } from '../constants';
+
 /**
  *
  * Action provided by AnimationMixer for scheduling clip playback on specific
@@ -9,15 +11,7 @@
  *
  */
 
-THREE.AnimationAction = function() {
-
-	throw new Error( "THREE.AnimationAction: " +
-			"Use mixer.clipAction for construction." );
-
-};
-
-THREE.AnimationAction._new =
-		function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
@@ -28,8 +22,8 @@ THREE.AnimationAction._new =
 		interpolants = new Array( nTracks );
 
 	var interpolantSettings = {
-			endingStart: 	THREE.ZeroCurvatureEnding,
-			endingEnd:		THREE.ZeroCurvatureEnding
+			endingStart: 	ZeroCurvatureEnding,
+			endingEnd:		ZeroCurvatureEnding
 	};
 
 	for ( var i = 0; i !== nTracks; ++ i ) {
@@ -53,7 +47,7 @@ THREE.AnimationAction._new =
 	this._timeScaleInterpolant = null;
 	this._weightInterpolant = null;
 
-	this.loop = THREE.LoopRepeat;
+	this.loop = LoopRepeat;
 	this._loopCount = -1;
 
 	// global mixer time when the action is to be started
@@ -80,11 +74,9 @@ THREE.AnimationAction._new =
 	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
 	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
 
-};
+}
 
-THREE.AnimationAction._new.prototype = {
-
-	constructor: THREE.AnimationAction._new,
+Object.assign( AnimationAction.prototype, {
 
 	// State & Scheduling
 
@@ -118,8 +110,6 @@ THREE.AnimationAction._new.prototype = {
 	},
 
 	isRunning: function() {
-
-		var start = this._startTime;
 
 		return this.enabled && ! this.paused && this.timeScale !== 0 &&
 				this._startTime === null && this._mixer._isActiveAction( this );
@@ -186,8 +176,6 @@ THREE.AnimationAction._new.prototype = {
 	},
 
 	crossFadeFrom: function( fadeOutAction, duration, warp ) {
-
-		var mixer = this._mixer;
 
 		fadeOutAction.fadeOut( duration );
 		this.fadeIn( duration );
@@ -270,7 +258,7 @@ THREE.AnimationAction._new.prototype = {
 
 	halt: function( duration ) {
 
-		return this.warp( this._currentTimeScale, 0, duration );
+		return this.warp( this._effectiveTimeScale, 0, duration );
 
 	},
 
@@ -283,7 +271,7 @@ THREE.AnimationAction._new.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._timeScaleInterpolant = interpolant;
 
 		}
@@ -447,7 +435,7 @@ THREE.AnimationAction._new.prototype = {
 					if ( timeScale === 0 ) {
 
 						// motion has halted, pause
-						this.pause = true;
+						this.paused = true;
 
 					} else {
 
@@ -478,12 +466,12 @@ THREE.AnimationAction._new.prototype = {
 			loop = this.loop,
 			loopCount = this._loopCount;
 
-		if ( loop === THREE.LoopOnce ) {
+		if ( loop === LoopOnce ) {
 
 			if ( loopCount === -1 ) {
 				// just started
 
-				this.loopCount = 0;
+				this._loopCount = 0;
 				this._setEndings( true, true, false );
 
 			}
@@ -500,7 +488,7 @@ THREE.AnimationAction._new.prototype = {
 
 				} else break handle_stop;
 
-				if ( this.clampWhenFinished ) this.pause = true;
+				if ( this.clampWhenFinished ) this.paused = true;
 				else this.enabled = false;
 
 				this._mixer.dispatchEvent( {
@@ -512,7 +500,7 @@ THREE.AnimationAction._new.prototype = {
 
 		} else { // repetitive Repeat or PingPong
 
-			var pingPong = ( loop === THREE.LoopPingPong );
+			var pingPong = ( loop === LoopPingPong );
 
 			if ( loopCount === -1 ) {
 				// just started
@@ -606,8 +594,8 @@ THREE.AnimationAction._new.prototype = {
 
 		if ( pingPong ) {
 
-			settings.endingStart 	= THREE.ZeroSlopeEnding;
-			settings.endingEnd		= THREE.ZeroSlopeEnding;
+			settings.endingStart 	= ZeroSlopeEnding;
+			settings.endingEnd		= ZeroSlopeEnding;
 
 		} else {
 
@@ -616,22 +604,22 @@ THREE.AnimationAction._new.prototype = {
 			if ( atStart ) {
 
 				settings.endingStart = this.zeroSlopeAtStart ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+						ZeroSlopeEnding : ZeroCurvatureEnding;
 
 			} else {
 
-				settings.endingStart = THREE.WrapAroundEnding;
+				settings.endingStart = WrapAroundEnding;
 
 			}
 
 			if ( atEnd ) {
 
 				settings.endingEnd = this.zeroSlopeAtEnd ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
+						ZeroSlopeEnding : ZeroCurvatureEnding;
 
 			} else {
 
-				settings.endingEnd 	 = THREE.WrapAroundEnding;
+				settings.endingEnd 	 = WrapAroundEnding;
 
 			}
 
@@ -646,7 +634,7 @@ THREE.AnimationAction._new.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._weightInterpolant = interpolant;
 
 		}
@@ -661,5 +649,7 @@ THREE.AnimationAction._new.prototype = {
 
 	}
 
-};
+} );
 
+
+export { AnimationAction };

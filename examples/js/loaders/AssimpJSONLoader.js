@@ -27,7 +27,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 		this.texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : this.extractUrlBase( url );
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new THREE.FileLoader( this.manager );
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text ), scene, metadata;
@@ -105,112 +105,47 @@ THREE.AssimpJSONLoader.prototype = {
 
 	parseMesh : function( json ) {
 
-		var vertex, geometry, i, e, in_data, src;
+		var geometry = new THREE.BufferGeometry();
 
+		var i, l, face;
 
-		geometry = new THREE.Geometry();
+		var indices = [];
 
-		// read vertex positions
-		for ( in_data = json.vertices, i = 0, e = in_data.length; i < e; ) {
+		var vertices = json.vertices || [];
+		var normals = json.normals || [];
+		var uvs = json.texturecoords || [];
+		var colors = json.colors || [];
 
-			geometry.vertices.push( new THREE.Vector3( in_data[ i ++ ], in_data[ i ++ ], in_data[ i ++ ] ) );
+		uvs = uvs[ 0 ] || []; // only support for a single set of uvs
 
-		}
+		for ( i = 0, l = json.faces.length; i < l; i ++ ) {
 
-		// read faces
-		var cnt = 0;
-		for ( in_data = json.faces, i = 0, e = in_data.length; i < e; ++ i ) {
-
-			src = in_data[ i ];
-			face = new THREE.Face3( src[ 0 ], src[ 1 ], src[ 2 ] );
-			geometry.faces.push( face );
+			face = json.faces[ i ];
+			indices.push( face[ 0 ], face[ 1 ], face[ 2 ] );
 
 		}
 
-		// read texture coordinates - three.js attaches them to its faces
-		json.texturecoords = json.texturecoords || [];
-		for ( i = 0, e = json.texturecoords.length; i < e; ++ i ) {
+		geometry.setIndex( indices );
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-			function convertTextureCoords( in_uv, out_faces, out_vertex_uvs ) {
+		if ( normals.length > 0 ) {
 
-				var i, e, face, a, b, c;
-
-				for ( i = 0, e = out_faces.length; i < e; ++ i ) {
-
-					face = out_faces[ i ];
-					a = face.a * 2;
-					b = face.b * 2;
-					c = face.c * 2;
-					out_vertex_uvs.push( [
-						new THREE.Vector2( in_uv[ a ], in_uv[ a + 1 ] ),
-						new THREE.Vector2( in_uv[ b ], in_uv[ b + 1 ] ),
-						new THREE.Vector2( in_uv[ c ], in_uv[ c + 1 ] )
-					] );
-
-				}
-
-			}
-
-			convertTextureCoords( json.texturecoords[ i ], geometry.faces, geometry.faceVertexUvs[ i ] );
+			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 		}
 
-		// read normals - three.js also attaches them to its faces
-		if ( json.normals ) {
+		if ( uvs.length > 0 ) {
 
-			function convertNormals( in_nor, out_faces ) {
-
-				var i, e, face, a, b, c;
-
-				for ( i = 0, e = out_faces.length; i < e; ++ i ) {
-
-					face = out_faces[ i ];
-					a = face.a * 3;
-					b = face.b * 3;
-					c = face.c * 3;
-					face.vertexNormals = [
-						new THREE.Vector3( in_nor[ a ], in_nor[ a + 1 ], in_nor[ a + 2 ] ),
-						new THREE.Vector3( in_nor[ b ], in_nor[ b + 1 ], in_nor[ b + 2 ] ),
-						new THREE.Vector3( in_nor[ c ], in_nor[ c + 1 ], in_nor[ c + 2 ] )
-					];
-
-				}
-
-			}
-
-			convertNormals( json.normals, geometry.faces );
+			geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 		}
 
-		// read vertex colors - three.js also attaches them to its faces
-		if ( json.colors && json.colors[ 0 ] ) {
+		if ( colors.length > 0 ) {
 
-			function convertColors( in_color, out_faces ) {
-
-				for ( var i = 0, e = out_faces.length; i < e; ++ i ) {
-
-					var face = out_faces[ i ];
-					var a = face.a * 4;
-					var b = face.b * 4;
-					var c = face.c * 4;
-
-					face.vertexColors = [
-						new THREE.Color().fromArray( a ),
-						new THREE.Color().fromArray( b ),
-						new THREE.Color().fromArray( c )
-					];
-
-				}
-
-			}
-
-			convertColors( json.colors[ 0 ], geometry.faces );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 		}
 
-
-		//geometry.computeFaceNormals();
-		//geometry.computeVertexNormals();
 		geometry.computeBoundingSphere();
 
 		return geometry;
@@ -219,8 +154,9 @@ THREE.AssimpJSONLoader.prototype = {
 
 	parseMaterial : function( json ) {
 
-		var mat = null,
-		scope = this, i, prop, has_textures = [],
+		var mat = null;
+		var scope = this;
+		var i, prop, has_textures = [],
 
 		init_props = {
 			shading : THREE.SmoothShading
@@ -243,7 +179,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 		}
 
-		for ( var i in json.properties ) {
+		for ( i in json.properties ) {
 
 			prop = json.properties[ i ];
 
@@ -357,10 +293,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 	parseObject : function( json, node, meshes, materials ) {
 
-		var obj = new THREE.Object3D()
-		,	i
-		,	idx
-		;
+		var obj = new THREE.Object3D(),	i, idx;
 
 		obj.name = node.name || "";
 		obj.matrix = new THREE.Matrix4().fromArray( node.transformation ).transpose();
@@ -381,5 +314,5 @@ THREE.AssimpJSONLoader.prototype = {
 
 		return obj;
 
-	},
+	}
 };

@@ -1,24 +1,25 @@
+import { Matrix4 } from '../math/Matrix4';
+import { Vector2 } from '../math/Vector2';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LightShadow = function ( camera ) {
+function LightShadow( camera ) {
 
 	this.camera = camera;
 
 	this.bias = 0;
 	this.radius = 1;
 
-	this.mapSize = new THREE.Vector2( 512, 512 );
+	this.mapSize = new Vector2( 512, 512 );
 
 	this.map = null;
-	this.matrix = new THREE.Matrix4();
+	this.matrix = new Matrix4();
 
-};
+}
 
-THREE.LightShadow.prototype = {
-
-	constructor: THREE.LightShadow,
+Object.assign( LightShadow.prototype, {
 
 	copy: function ( source ) {
 
@@ -37,6 +38,24 @@ THREE.LightShadow.prototype = {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	toJSON: function () {
+
+		var object = {};
+
+		if ( this.bias !== 0 ) object.bias = this.bias;
+		if ( this.radius !== 1 ) object.radius = this.radius;
+		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+
+		object.camera = this.camera.toJSON( false ).object;
+		delete object.camera.matrix;
+
+		return object;
+
 	}
 
-};
+} );
+
+
+export { LightShadow };

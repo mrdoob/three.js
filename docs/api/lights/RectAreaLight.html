@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			This light gets emitted uniformly across the face a rectangular plane. This can be
+			used to simulate things like bright windows or strip lighting.<br /><br />
+
+			This light can cast shadows - see the [page:RectAreaLightShadow] page for details.<br /><br />
+
+			<em>NOTE:</em> this class is currently under active development and is probably not
+			production ready yet (as of r83). Check back in a month or two! And feel free to try it out in the meantime.
+		</div>
+
+
+
+
+		<h2>Examples</h2>
+
+		<div>
+			[example:webgl_lights_arealight WebGL / arealight ]<br />
+			[example:webgl_lights_rectarealight WebGL / rectarealight ]
+
+			<code>
+var width = 2;
+var height = 10;
+var rectLight = new THREE.RectAreaLight( 0xffffff, undefined,  width, height );
+rectLight.matrixAutoUpdate = true;
+rectLight.intensity = 70.0;
+rectLight.position.set( 5, 5, 0 );
+rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+rectLight.add( rectLightHelper );
+
+scene.add(rectLight)
+			</code>
+		</div>
+
+
+
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Integer color], [page:Float intensity], [page:Float width], [page:Float height] )</h3>
+		<div>
+			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br />
+			[page:Float width] - (optional) width of the light. Default is 10.<br />
+			[page:Float height] - (optional) height of the light. Default is 10.<br /><br />
+
+			Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+		<div>
+			See the base [page:Light Light] class for common properties.
+		</div>
+
+
+		<h3>[property:Boolean castShadow]</h3>
+		<div>
+			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and
+			requires tweaking to get shadows looking right. See the [page:RectAreaLightShadow] for details.
+			The default is *false*.<br /><br />
+
+			<em>Note:</em> this is not yet implemented for this light type! (r83)
+		</div>
+
+		<h3>[property:Float decay]</h3>
+		<div>
+			The amount the light dims along the distance of the light.<br />
+			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, decay = 2 leads to
+			physically realistic light falloff. The default is *1*.<br /><br />
+
+			<em>Note:</em> this is not yet implemented for this light type! (r83)
+		</div>
+
+		<h3>[property:Float distance]</h3>
+		<div>
+			If non-zero, light will attenuate linearly from maximum intensity at the light's
+			position down to zero at this distance from the light. Default is *0.0*.<br /><br />
+
+			<em>Note:</em> this is not yet implemented for this light type! (r83)
+		</div>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<div>
+			Used to check whether this or derived classes are RectAreaLights. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
+		<h3>[property:Vector3 position]</h3>
+		<div>
+			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+		</div>
+
+		<h3>[property:RectAreaLightShadow shadow]</h3>
+		<div>
+			A [page:RectAreaLightShadow] used to calculate shadows for this light.<br /><br />
+
+			<em>Note:</em> this is not yet implemented for this light type! (r83)
+		</div>
+
+
+		<h3>[property:Object3D target]</h3>
+		<div>
+			The RectAreaLight points from its [page:.position position] to target.position. The default
+			position of the target is *(0, 0, 0)*.<br />
+
+			*Note*: For the the target's position to be changed to anything other than the default,
+			it must be added to the [page:Scene scene] using
+			<code>
+				scene.add( light.target );
+			</code>
+
+			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
+			updated each frame.<br /><br />
+
+			It is also possible to set the target to be another object in the scene (anything with a
+			[page:Object3D.position position] property), like so:
+			<code>
+var targetObject = new THREE.Object3D();
+scene.add(targetObject);
+
+light.target = targetObject;
+			</code>
+			The RectAreaLight will now track the target object.
+		</div>
+
+
+		<h2>Methods</h2>
+		<div>
+			See the base [page:Light Light] class for common methods.
+		</div>
+
+
+		<h3>[method:RectAreaLight copy]( [page:RectAreaLight source] )</h3>
+		<div>
+		Copies value of all the properties from the [page:RectAreaLight source] to this
+		RectAreaLight.
+		</div>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -13,7 +13,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		An abstract base class further extending [page:Curve]. A CurvePath is simply an array of connected curves,
+		An abstract base class extending [page:Curve]. A CurvePath is simply an array of connected curves,
 		but retains the api of a curve.
 		</div>
 
@@ -28,112 +28,53 @@
 
 
 		<h2>Properties</h2>
-
+		<div>See the base [page:Curve] class for common properties.</div>
 
 		<h3>[property:array curves]</h3>
-		<div>
-		The array of [page:Curve]s
-		</div>
-
-		<h3>[property:array bends]</h3>
-		<div>
-		An array of [page:Curve]s used to transform and bend the curve using [page:CurvePath.getWrapPoints].
-		</div>
+		<div>The array of [page:Curve Curves].</div>
 
 		<h3>[property:boolean autoClose]</h3>
-		<div>
-		Whether or not to automatically close the path.
-		</div>
+		<div>Whether or not to automatically close the path.</div>
+
+
+
+
 
 		<h2>Methods</h2>
+		<div>See the base [page:Curve] class for common methods.</div>
 
+		<h3>[method:null add]( [page:Curve curve] )</h3>
+		<div>Add a curve to the [page:.curves] array.</div>
 
-		<h3>[method:Array getWrapPoints]([page:Array vertices], [page:Curve curve])</h3>
-		<div>
-		vertices -- An array of [page:Vector2]s to modify<br />
-		curve -- An array of 2d [page:Curve]s
-		</div>
-		<div>
-		Modifies the array of vertices by warping it by the curve. The curve parameter also accepts objects with similar
-		interfaces such as [page:CurvePath], [page:Path], [page:SplineCurve], etc. Returns the original vertices after
-		modification.
-		</div>
+		<h3>[method:null closePath]()</h3>
+		<div>Adds a [page:LineCurve lineCurve] to close the path.</div>
 
-		<h3>[method:null addWrapPath]([page:Curve curve])</h3>
+		<h3>[method:Geometry createGeometry]( [page:Vector3 points] )</h3>
 		<div>
-		curve -- A [page:Curve] or object with a similar interface.
-		</div>
-		<div>
-		Pushes a curve onto the bends array.
-		</div>
+		points -- An array of [page:Vector3 Vector3s]<br /><br />
 
-		<h3>[method:Geometry createGeometry]([page:Vector3 points])</h3>
-		<div>
-		points -- An array of [page:Vector3]s
-		</div>
-		<div>
 		Creates a geometry from points
 		</div>
 
-		<h3>[method:Geometry createPointsGeometry]([page:Integer divisions])</h3>
+		<h3>[method:Geometry createPointsGeometry]( [page:Integer divisions] )</h3>
 		<div>
-		divisions -- How many segments to create with [page:Vector3]s. Defaults to 12.
-		</div>
-		<div>
-		Creates a [page:Geometry] object comprised of [page:Vector3]s
+		divisions -- How many segments to create. Defaults to *12*.<br /><br />
+
+		Creates a [page:Geometry] object comprised of [page:Vector3 Vector3s], for example
+		to be used with [page:Line] or [page:Points]. Uses [page:Curve.getPoints]() for the division.
 		</div>
 
-		<h3>[method:Geometry createSpacedPointsGeometry]([page:Integer divisions])</h3>
+		<h3>[method:Geometry createSpacedPointsGeometry]( [page:Integer divisions] )</h3>
 		<div>
-		divisions -- How many segments to create with [page:Vector3]s. Defaults to 12.
-		</div>
-		<div>
-		Creates a [page:Geometry] object comprised of [page:Vector3]s that are equidistant.
-		</div>
+		divisions -- How many segments to create. Defaults to *12*.<br /><br />
 
-
-		<h3>[method:null add]([page:Curve curve])</h3>
-		<div>
-		curve -- The [page:Curve curve] to add
-		</div>
-		<div>
-		Pushes a curve onto the curves array.
-		</div>
-
-		<h3>[method:null closePath]()</h3>
-		<div>
-		Adds a curve to close the path.
-		</div>
-
-		<h3>[method:Object getBoundingBox]()</h3>
-		<div>
-		Returns an object with the keys minX, minY, maxX, maxY, (if 3d: maxZ, minZ)
+		Creates a [page:Geometry] object comprised of [page:Vector3]s that are equidistant, for example
+		to be used with [page:Line] or [page:Points].	Uses [page:Curve.getSpacedPoints]() for the division.
 		</div>
 
 		<h3>[method:Float getCurveLengths]()</h3>
-		<div>
-		Adds together the length of the curves
-		</div>
+		<div>Adds together the lengths of the curves in the [page:.curves] array.</div>
 
-		<h3>[method:Array getTransformedPoints]([page:Integer segments], [page:Array bends])</h3>
-		<div>
-		segments -- The number of segments to create using the getPoints()<br />
-		bends -- (optional) An array of [page:Curve]s used to transform the points. Defaults to this.bends if blank.
-		</div>
-		<div>
-		Uses this CurvePath to generate a series of points transformed by the curves in the bends array. Returns an
-		array of [page:Vector2]s.
-		</div>
-
-		<h3>[method:Array getTransformedSpacedPoints]([page:Integer segments], [page:Array bends])</h3>
-		<div>
-		segments -- The number of segments to create using the getPoints()<br />
-		bends -- (optional) Defaults to this.bends if blank. An array of [page:Curve]s used to transform the points.
-		</div>
-		<div>
-		Uses this CurvePath to generate a series equidistant points that are then transformed by the curves in the bends.
-	    Returns an array of [page:Vector2]s.
-		</div>
 
 		<h2>Source</h2>
 

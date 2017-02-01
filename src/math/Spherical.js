@@ -1,3 +1,5 @@
+import { _Math } from './Math';
+
 /**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
@@ -8,7 +10,7 @@
  * The equator starts at positive z.
  */
 
-THREE.Spherical = function ( radius, phi, theta ) {
+function Spherical( radius, phi, theta ) {
 
 	this.radius = ( radius !== undefined ) ? radius : 1.0;
 	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
@@ -16,11 +18,9 @@ THREE.Spherical = function ( radius, phi, theta ) {
 
 	return this;
 
-};
+}
 
-THREE.Spherical.prototype = {
-
-	constructor: THREE.Spherical,
+Object.assign( Spherical.prototype, {
 
 	set: function ( radius, phi, theta ) {
 
@@ -40,9 +40,9 @@ THREE.Spherical.prototype = {
 
 	copy: function ( other ) {
 
-		this.radius.copy( other.radius );
-		this.phi.copy( other.phi );
-		this.theta.copy( other.theta );
+		this.radius = other.radius;
+		this.phi = other.phi;
+		this.theta = other.theta;
 
 		return this;
 
@@ -70,12 +70,15 @@ THREE.Spherical.prototype = {
 		} else {
 
 			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-			this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+			this.phi = Math.acos( _Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
 
 		}
 
 		return this;
 
-	},
+	}
 
-};
+} );
+
+
+export { Spherical };

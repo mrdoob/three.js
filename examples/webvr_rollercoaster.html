@@ -23,13 +23,13 @@
 
 		<script src="js/RollerCoaster.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -103,13 +103,13 @@
 
 					getPointAt: function ( t ) {
 
-						t = t * PI2;
+						t *= Math.PI;
 
-						var x = Math.sin( t * 3 ) * Math.cos( t * 4 ) * 50;
-						var y = Math.cos( t * 8 ) * 4 + Math.cos( t * 17 ) + 5;
-						var z = Math.sin( t ) * Math.sin( t * 4 ) * 50;
+						var x = Math.sin(t * 4) * Math.cos(t * 6) * 1000;
+						var y = Math.cos(t * 8) * 80 + Math.cos(t * 20 * Math.sin(t)) * 40 + 200;
+						var z = Math.sin(t * 5) * Math.sin(t * 3) * 1000;
 
-						return vector.set( x, y, z ).multiplyScalar( 20 );
+						return vector.set( x, y, z );
 
 					},
 
@@ -204,9 +204,13 @@
 			var velocity = 0;
 			var progress = 0;
 
+			var clock = new THREE.Clock();
+
 			function animate( time ) {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
+
+				var delta = clock.getDelta() * 60;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
 
@@ -216,7 +220,7 @@
 
 				//
 
-				progress += velocity;
+				progress += velocity * delta;
 				progress = progress % 1;
 
 				position.copy( curve.getPointAt( progress ) );
@@ -226,7 +230,7 @@
 
 				tangent.copy( curve.getTangentAt( progress ) );
 
-				velocity -= tangent.y * 0.0000015;
+				velocity -= tangent.y * 0.0000015 * delta;
 				velocity = Math.max( velocity, 0.00004 );
 
 				train.lookAt( lookAt.copy( position ).sub( tangent ) );
@@ -237,9 +241,9 @@
 
 				effect.render( scene, camera );
 
-			};
+			}
 
-			requestAnimationFrame( animate );
+			effect.requestAnimationFrame( animate );
 
 		</script>
 

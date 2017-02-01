@@ -1,9 +1,12 @@
+import { Material } from './Material';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
  *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { type: "1f", value: 1.0 }, "parameter2": { type: "1i" value2: 2 } },
+ *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
  *
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
@@ -19,9 +22,9 @@
  * }
  */
 
-THREE.ShaderMaterial = function ( parameters ) {
+function ShaderMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.type = 'ShaderMaterial';
 
@@ -73,19 +76,21 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	}
 
-};
+}
 
-THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
+ShaderMaterial.prototype = Object.create( Material.prototype );
+ShaderMaterial.prototype.constructor = ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.copy = function ( source ) {
+ShaderMaterial.prototype.isShaderMaterial = true;
 
-	THREE.Material.prototype.copy.call( this, source );
+ShaderMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
 
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
+	this.uniforms = UniformsUtils.clone( source.uniforms );
 
 	this.defines = source.defines;
 
@@ -106,9 +111,9 @@ THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
 };
 
-THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
+ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Material.prototype.toJSON.call( this, meta );
+	var data = Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
 	data.vertexShader = this.vertexShader;
@@ -117,3 +122,6 @@ THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+
+export { ShaderMaterial };

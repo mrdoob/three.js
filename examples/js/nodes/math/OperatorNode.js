@@ -22,25 +22,35 @@ THREE.OperatorNode.prototype.constructor = THREE.OperatorNode;
 
 THREE.OperatorNode.prototype.getType = function( builder ) {
 
-	// use the greater length vector
-	if ( builder.getFormatLength( this.b.getType( builder ) ) > builder.getFormatLength( this.a.getType( builder ) ) ) {
+	var a = this.a.getType( builder );
+	var b = this.b.getType( builder );
 
-		return this.b.getType( builder );
+	if ( builder.isFormatMatrix( a ) ) {
+
+		return 'v4';
+
+	} else if ( builder.getFormatLength( b ) > builder.getFormatLength( a ) ) {
+
+		// use the greater length vector
+
+		return b;
 
 	}
 
-	return this.a.getType( builder );
+	return a;
 
 };
 
 THREE.OperatorNode.prototype.generate = function( builder, output ) {
 
-	var material = builder.material;
-	var data = material.getDataNode( this.uuid );
+	var material = builder.material,
+		data = material.getDataNode( this.uuid );
 
-	var a = this.a.build( builder, output );
-	var b = this.b.build( builder, output );
+	var type = this.getType( builder );
 
-	return '(' + a + this.op + b + ')';
+	var a = this.a.build( builder, type );
+	var b = this.b.build( builder, type );
+
+	return builder.format( '(' + a + this.op + b + ')', type, output );
 
 };

@@ -6,27 +6,28 @@ var APP = {
 
 	Player: function () {
 
-		var scope = this;
-
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var vr, controls, effect;
+		var controls, effect, cameraVR, isVR;
 
 		var events = {};
 
-		this.dom = undefined;
+		this.dom = document.createElement( 'div' );
 
 		this.width = 500;
 		this.height = 500;
 
 		this.load = function ( json ) {
 
-			vr = json.project.vr;
+			isVR = json.project.vr;
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+
+			if ( json.project.gammaInput ) renderer.gammaInput = true;
+			if ( json.project.gammaOutput ) renderer.gammaOutput = true;
 
 			if ( json.project.shadows ) {
 
@@ -35,7 +36,7 @@ var APP = {
 
 			}
 
-			this.dom = renderer.domElement;
+			this.dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -115,39 +116,26 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-			if ( vr === true ) {
+			if ( isVR === true ) {
 
-				if ( camera.parent === null ) {
+				cameraVR = new THREE.PerspectiveCamera();
+				cameraVR.projectionMatrix = camera.projectionMatrix;
+				camera.add( cameraVR );
 
-					// camera needs to be in the scene so camera2 matrix updates
+				controls = new THREE.VRControls( cameraVR );
+				effect = new THREE.VREffect( renderer );
 
-					scene.add( camera );
+				if ( WEBVR.isAvailable() === true ) {
+
+					this.dom.appendChild( WEBVR.getButton( effect ) );
 
 				}
 
-				var camera2 = camera.clone();
-				camera.add( camera2 );
+				if ( WEBVR.isLatestAvailable() === false ) {
 
-				camera = camera2;
+					this.dom.appendChild( WEBVR.getMessage() );
 
-				controls = new THREE.VRControls( camera );
-				effect = new THREE.VREffect( renderer );
-
-				document.addEventListener( 'keyup', function ( event ) {
-
-					switch ( event.keyCode ) {
-						case 90:
-							controls.zeroSensor();
-							break;
-					}
-
-				} );
-
-				this.dom.addEventListener( 'dblclick', function () {
-
-					effect.setFullScreen( true );
-
-				} );
+				}
 
 			}
 
@@ -161,15 +149,21 @@ var APP = {
 
 		this.setSize = function ( width, height ) {
 
-			if ( renderer._fullScreen ) return;
-
 			this.width = width;
 			this.height = height;
 
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			if ( camera ) {
 
-			renderer.setSize( width, height );
+				camera.aspect = this.width / this.height;
+				camera.updateProjectionMatrix();
+
+			}
+
+			if ( renderer ) {
+
+				renderer.setSize( width, height );
+
+			}
 
 		};
 
@@ -199,10 +193,12 @@ var APP = {
 
 			}
 
-			if ( vr === true ) {
+			if ( isVR === true ) {
+
+				camera.updateMatrixWorld();
 
 				controls.update();
-				effect.render( scene, camera );
+				effect.render( scene, cameraVR );
 
 			} else {
 
@@ -246,6 +242,22 @@ var APP = {
 			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
+
+		};
+
+		this.dispose = function () {
+
+			while ( this.dom.children.length ) {
+
+				this.dom.removeChild( this.dom.firstChild );
+
+			}
+
+			renderer.dispose();
+
+			camera = undefined;
+			scene = undefined;
+			renderer = undefined;
 
 		};
 

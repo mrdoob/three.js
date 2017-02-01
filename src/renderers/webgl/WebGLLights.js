@@ -1,80 +1,102 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-THREE.WebGLLights = function () {
+import { Color } from '../../math/Color';
+import { Vector3 } from '../../math/Vector3';
+import { Vector2 } from '../../math/Vector2';
+import { Matrix4 } from '../../math/Matrix4';
+
+function WebGLLights() {
 
 	var lights = {};
 
-	this.get = function ( light ) {
+	return {
 
-		if ( lights[ light.id ] !== undefined ) {
+		get: function ( light ) {
 
-			return lights[ light.id ];
+			if ( lights[ light.id ] !== undefined ) {
+
+				return lights[ light.id ];
+
+			}
+
+			var uniforms;
+
+			switch ( light.type ) {
+
+				case 'DirectionalLight':
+					uniforms = {
+						direction: new Vector3(),
+						color: new Color(),
+
+						shadow: false,
+						shadowBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
+
+				case 'SpotLight':
+					uniforms = {
+						position: new Vector3(),
+						direction: new Vector3(),
+						color: new Color(),
+						distance: 0,
+						coneCos: 0,
+						penumbraCos: 0,
+						decay: 0,
+
+						shadow: false,
+						shadowBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
+
+				case 'PointLight':
+					uniforms = {
+						position: new Vector3(),
+						color: new Color(),
+						distance: 0,
+						decay: 0,
+
+						shadow: false,
+						shadowBias: 0,
+						shadowRadius: 1,
+						shadowMapSize: new Vector2()
+					};
+					break;
+
+				case 'HemisphereLight':
+					uniforms = {
+						direction: new Vector3(),
+						skyColor: new Color(),
+						groundColor: new Color()
+					};
+					break;
+
+				case 'RectAreaLight':
+					uniforms = {
+						color: new Color(),
+						position: new Vector3(),
+						halfWidth: new Vector3(),
+						halfHeight: new Vector3()
+						// TODO (abelnation): set RectAreaLight shadow uniforms
+					};
+					break;
+
+			}
+
+			lights[ light.id ] = uniforms;
+
+			return uniforms;
 
 		}
-
-		var uniforms;
-
-		switch ( light.type ) {
-
-			case 'DirectionalLight':
-				uniforms = {
-					direction: new THREE.Vector3(),
-					color: new THREE.Color(),
-
-					shadow: false,
-					shadowBias: 0,
-					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2()
-				};
-				break;
-
-			case 'SpotLight':
-				uniforms = {
-					position: new THREE.Vector3(),
-					direction: new THREE.Vector3(),
-					color: new THREE.Color(),
-					distance: 0,
-					coneCos: 0,
-					penumbraCos: 0,
-					decay: 0,
-
-					shadow: false,
-					shadowBias: 0,
-					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2()
-				};
-				break;
-
-			case 'PointLight':
-				uniforms = {
-					position: new THREE.Vector3(),
-					color: new THREE.Color(),
-					distance: 0,
-					decay: 0,
-
-					shadow: false,
-					shadowBias: 0,
-					shadowRadius: 1,
-					shadowMapSize: new THREE.Vector2()
-				};
-				break;
-
-			case 'HemisphereLight':
-				uniforms = {
-					direction: new THREE.Vector3(),
-					skyColor: new THREE.Color(),
-					groundColor: new THREE.Color()
-				};
-				break;
-
-		}
-
-		lights[ light.id ] = uniforms;
-
-		return uniforms;
 
 	};
 
-};
+}
+
+
+export { WebGLLights };

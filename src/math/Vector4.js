@@ -6,18 +6,18 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Vector4 = function ( x, y, z, w ) {
+function Vector4( x, y, z, w ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
 	this.w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
-THREE.Vector4.prototype = {
+Object.assign( Vector4.prototype, {
 
-	constructor: THREE.Vector4,
+	isVector4: true,
 
 	set: function ( x, y, z, w ) {
 
@@ -84,6 +84,8 @@ THREE.Vector4.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
+
+		return this;
 
 	},
 
@@ -446,16 +448,10 @@ THREE.Vector4.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector4();
+		var max = new Vector4();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new THREE.Vector4();
-				max = new THREE.Vector4();
-
-			}
 
 			min.set( minVal, minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal, maxVal );
@@ -607,19 +603,24 @@ THREE.Vector4.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector4: offset has been removed from .fromBufferAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
-		this.w = attribute.array[ index + 3 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
+		this.z = attribute.getZ( index );
+		this.w = attribute.getW( index );
 
 		return this;
 
 	}
 
-};
+} );
+
+
+export { Vector4 };

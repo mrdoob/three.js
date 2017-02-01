@@ -21,11 +21,12 @@ FLOAT_PRECISION = 8
 class ThreeJsWriter(object):
     def __init__(self):
         self.componentKeys = ['vertices', 'normals', 'colors', 'uvs', 'faces',
-                'materials', 'diffuseMaps', 'specularMaps', 'bumpMaps', 'copyTextures',
+                'materials', 'colorMaps', 'specularMaps', 'bumpMaps', 'copyTextures',
                 'bones', 'skeletalAnim', 'bakeAnimations', 'prettyOutput']
 
     def write(self, path, optionString, accessMode):
         self.path = path
+        self.accessMode = accessMode
         self._parseOptions(optionString)
 
         self.verticeOffset = 0
@@ -42,25 +43,27 @@ class ThreeJsWriter(object):
         self.skinIndices = []
         self.skinWeights = []
 
-        if self.options["bakeAnimations"]:
-            print("exporting animations")
-            self._exportAnimations()
-            self._goToFrame(self.options["startFrame"])
+        print("exporting meshes")
+        self._exportMeshes()
         if self.options["materials"]:
             print("exporting materials")
             self._exportMaterials()
-        if self.options["bones"]:
-            print("exporting bones")
-            select(map(lambda m: m.getParent(), ls(type='mesh')))
-            runtime.GoToBindPose()
-            self._exportBones()
-            print("exporting skins")
-            self._exportSkins()
-        print("exporting meshes")
-        self._exportMeshes()
-        if self.options["skeletalAnim"]:
-            print("exporting keyframe animations")
-            self._exportKeyframeAnimations()
+        if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
+			if self.options["bakeAnimations"]:
+				print("exporting animations")
+				self._exportAnimations()
+				self._goToFrame(self.options["startFrame"])
+			if self.options["bones"]:
+				print("exporting bones")
+				select(map(lambda m: m.getParent(), ls(type='mesh')))
+				runtime.GoToBindPose()
+				self._exportBones()
+				print("exporting skins")
+				self._exportSkins()
+			if self.options["skeletalAnim"]:
+				print("exporting keyframe animations")
+				self._exportKeyframeAnimations()
+        
 
         print("writing file")
         output = {
@@ -76,27 +79,32 @@ class ThreeJsWriter(object):
             'materials': self.materials,
         }
 
-        if self.options['bakeAnimations']:
-            output['morphTargets'] = self.morphTargets
+        if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
+			if self.options['bakeAnimations']:
+				output['morphTargets'] = self.morphTargets
 
-        if self.options['bones']:
-            output['bones'] = self.bones
-            output['skinIndices'] = self.skinIndices
-            output['skinWeights'] = self.skinWeights
-            output['influencesPerVertex'] = self.options["influencesPerVertex"]
+			if self.options['bones']:
+				output['bones'] = self.bones
+				output['skinIndices'] = self.skinIndices
+				output['skinWeights'] = self.skinWeights
+				output['influencesPerVertex'] = self.options["influencesPerVertex"]
 
-        if self.options['skeletalAnim']:
-            output['animations'] = self.animations
+			if self.options['skeletalAnim']:
+				output['animations'] = self.animations
 
         with file(path, 'w') as f:
             if self.options['prettyOutput']:
-                f.write(json.dumps(output, sort_keys=True, indent=4, separators=(',', ': ')))
+                f.write(json.dumps(output, indent=4, separators=(", ", ": ")))
             else:
                 f.write(json.dumps(output, separators=(",",":")))
 
     def _allMeshes(self):
-        if not hasattr(self, '__allMeshes'):
+        if not self.accessMode == MPxFileTranslator.kExportActiveAccessMode :
+            print("*** Exporting ALL (NEW) ***")
             self.__allMeshes = filter(lambda m: len(m.listConnections()) > 0, ls(type='mesh'))
+        else :
+            print("### Exporting SELECTED ###")
+            self.__allMeshes = ls(selection=True)
         return self.__allMeshes
 
     def _parseOptions(self, optionsString):
@@ -225,7 +233,10 @@ class ThreeJsWriter(object):
         return bitmask
 
     def _exportMaterials(self):
-        for mat in ls(type='lambert'):
+    	hist = listHistory( self._allMeshes(), f=1 )
+    	mats = listConnections( hist, type='lambert' )
+        for mat in mats:
+            print("material: " + mat)
             self.materials.append(self._exportMaterial(mat))
 
     def _exportMaterial(self, mat):
@@ -236,8 +247,8 @@ class ThreeJsWriter(object):
             "depthTest": True,
             "depthWrite": True,
             "shading": mat.__class__.__name__,
-            "opacity": mat.getTransparency().a,
-            "transparent": mat.getTransparency().a != 1.0,
+            "opacity": mat.getTransparency().r,
+            "transparent": mat.getTransparency().r != 1.0,
             "vertexColors": False
         }
         if isinstance(mat, nodetypes.Phong):
@@ -248,8 +259,8 @@ class ThreeJsWriter(object):
                 self._exportSpecularMap(result, mat)
         if self.options["bumpMaps"]:
             self._exportBumpMap(result, mat)
-        if self.options["diffuseMaps"]:
-            self._exportDiffuseMap(result, mat)
+        if self.options["colorMaps"]:
+            self._exportColorMap(result, mat)
 
         return result
 
@@ -259,7 +270,7 @@ class ThreeJsWriter(object):
                 result["mapNormalFactor"] = 1
                 self._exportFile(result, f, "Normal")
 
-    def _exportDiffuseMap(self, result, mat):
+    def _exportColorMap(self, result, mat):
         for f in mat.attr('color').inputs():
             result["colorDiffuse"] = f.attr('defaultColor').get()
             self._exportFile(result, f, "Diffuse")
@@ -281,7 +292,9 @@ class ThreeJsWriter(object):
         result["map" + mapType + "Anisotropy"] = 4
 
     def _exportBones(self):
-        for joint in ls(type='joint'):
+    	hist = listHistory( self._allMeshes(), f=1 )
+    	joints = listConnections( hist, type="joint")
+        for joint in joints:
             if joint.getParent():
                 parentIndex = self._indexOfJoint(joint.getParent().name())
             else:
@@ -309,7 +322,9 @@ class ThreeJsWriter(object):
         hierarchy = []
         i = -1
         frameRate = FramesPerSecond(currentUnit(query=True, time=True)).value()
-        for joint in ls(type='joint'):
+        hist = listHistory( self._allMeshes(), f=1 )
+    	joints = listConnections( hist, type="joint")
+        for joint in joints:
             hierarchy.append({
                 "parent": i,
                 "keys": self._getKeyframes(joint, frameRate)
@@ -356,7 +371,8 @@ class ThreeJsWriter(object):
     def _exportSkins(self):
         for mesh in self._allMeshes():
             print("exporting skins for mesh: " + mesh.name())
-            skins = filter(lambda skin: mesh in skin.getOutputGeometry(), ls(type='skinCluster'))
+            hist = listHistory( mesh, f=1 )
+            skins = listConnections( hist, type='skinCluster')
             if len(skins) > 0:
                 print("mesh has " + str(len(skins)) + " skins")
                 skin = skins[0]
@@ -394,10 +410,10 @@ class ThreeJsTranslator(MPxFileTranslator):
         return True
 
     def filter(self):
-        return '*.js'
+        return '*.json'
 
     def defaultExtension(self):
-        return 'js'
+        return 'json'
 
     def writer(self, fileObject, optionString, accessMode):
         path = fileObject.fullName()
@@ -443,3 +459,206 @@ class FramesPerSecond(object):
             return FramesPerSecond.MAYA_VALUES[self.fpsString]
         else:
             return int(filter(lambda c: c.isdigit(), self.fpsString))
+
+###################################################################
+## The code below was taken from the Blender 3JS Exporter 
+## It's purpose is to fix the JSON output so that it does not
+## put each array value on it's own line, which is ridiculous 
+## for this type of output.
+###################################################################
+
+ROUND = 6
+
+## THREE override function
+def _json_floatstr(o):
+    if ROUND is not None:
+        o = round(o, ROUND)
+        
+    return '%g' % o
+
+
+def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+        _key_separator, _item_separator, _sort_keys, _skipkeys, _one_shot,
+        ## HACK: hand-optimized bytecode; turn globals into locals
+        ValueError=ValueError,
+        basestring=basestring,
+        dict=dict,
+        float=float,
+        id=id,
+        int=int,
+        isinstance=isinstance,
+        list=list,
+        long=long,
+        str=str,
+        tuple=tuple,
+    ):
+
+    def _iterencode_list(lst, _current_indent_level):
+        if not lst:
+            yield '[]'
+            return
+        if markers is not None:
+            markerid = id(lst)
+            if markerid in markers:
+                raise ValueError("Circular reference detected")
+            markers[markerid] = lst
+        buf = '['
+    	#if _indent is not None:
+        #    _current_indent_level += 1
+        #    newline_indent = '\n' + (' ' * (_indent * _current_indent_level))
+        #    separator = _item_separator + newline_indent
+        #    buf += newline_indent
+        #else:
+        newline_indent = None
+        separator = _item_separator
+        first = True
+        for value in lst:
+            if first:
+                first = False
+            else:
+                buf = separator
+            if isinstance(value, basestring):
+                yield buf + _encoder(value)
+            elif value is None:
+                yield buf + 'null'
+            elif value is True:
+                yield buf + 'true'
+            elif value is False:
+                yield buf + 'false'
+            elif isinstance(value, (int, long)):
+                yield buf + str(value)
+            elif isinstance(value, float):
+                yield buf + _floatstr(value)
+            else:
+                yield buf
+                if isinstance(value, (list, tuple)):
+                    chunks = _iterencode_list(value, _current_indent_level)
+                elif isinstance(value, dict):
+                    chunks = _iterencode_dict(value, _current_indent_level)
+                else:
+                    chunks = _iterencode(value, _current_indent_level)
+                for chunk in chunks:
+                    yield chunk
+        if newline_indent is not None:
+            _current_indent_level -= 1
+            yield '\n' + (' ' * (_indent * _current_indent_level))
+        yield ']'
+        if markers is not None:
+            del markers[markerid]
+
+    def _iterencode_dict(dct, _current_indent_level):
+        if not dct:
+            yield '{}'
+            return
+        if markers is not None:
+            markerid = id(dct)
+            if markerid in markers:
+                raise ValueError("Circular reference detected")
+            markers[markerid] = dct
+        yield '{'
+        if _indent is not None:
+            _current_indent_level += 1
+            newline_indent = '\n' + (' ' * (_indent * _current_indent_level))
+            item_separator = _item_separator + newline_indent
+            yield newline_indent
+        else:
+            newline_indent = None
+            item_separator = _item_separator
+        first = True
+        if _sort_keys:
+            items = sorted(dct.items(), key=lambda kv: kv[0])
+        else:
+            items = dct.iteritems()
+        for key, value in items:
+            if isinstance(key, basestring):
+                pass
+            # JavaScript is weakly typed for these, so it makes sense to
+            # also allow them.  Many encoders seem to do something like this.
+            elif isinstance(key, float):
+                key = _floatstr(key)
+            elif key is True:
+                key = 'true'
+            elif key is False:
+                key = 'false'
+            elif key is None:
+                key = 'null'
+            elif isinstance(key, (int, long)):
+                key = str(key)
+            elif _skipkeys:
+                continue
+            else:
+                raise TypeError("key " + repr(key) + " is not a string")
+            if first:
+                first = False
+            else:
+                yield item_separator
+            yield _encoder(key)
+            yield _key_separator
+            if isinstance(value, basestring):
+                yield _encoder(value)
+            elif value is None:
+                yield 'null'
+            elif value is True:
+                yield 'true'
+            elif value is False:
+                yield 'false'
+            elif isinstance(value, (int, long)):
+                yield str(value)
+            elif isinstance(value, float):
+                yield _floatstr(value)
+            else:
+                if isinstance(value, (list, tuple)):
+                    chunks = _iterencode_list(value, _current_indent_level)
+                elif isinstance(value, dict):
+                    chunks = _iterencode_dict(value, _current_indent_level)
+                else:
+                    chunks = _iterencode(value, _current_indent_level)
+                for chunk in chunks:
+                    yield chunk
+        if newline_indent is not None:
+            _current_indent_level -= 1
+            yield '\n' + (' ' * (_indent * _current_indent_level))
+        yield '}'
+        if markers is not None:
+            del markers[markerid]
+
+    def _iterencode(o, _current_indent_level):
+        if isinstance(o, basestring):
+            yield _encoder(o)
+        elif o is None:
+            yield 'null'
+        elif o is True:
+            yield 'true'
+        elif o is False:
+            yield 'false'
+        elif isinstance(o, (int, long)):
+            yield str(o)
+        elif isinstance(o, float):
+            yield _floatstr(o)
+        elif isinstance(o, (list, tuple)):
+            for chunk in _iterencode_list(o, _current_indent_level):
+                yield chunk
+        elif isinstance(o, dict):
+            for chunk in _iterencode_dict(o, _current_indent_level):
+                yield chunk
+        else:
+            if markers is not None:
+                markerid = id(o)
+                if markerid in markers:
+                    raise ValueError("Circular reference detected")
+                markers[markerid] = o
+            o = _default(o)
+            for chunk in _iterencode(o, _current_indent_level):
+                yield chunk
+            if markers is not None:
+                del markers[markerid]
+
+    return _iterencode
+
+
+
+# override the encoder
+json.encoder._make_iterencode = _make_iterencode 
+
+
+

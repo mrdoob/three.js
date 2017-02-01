@@ -75,7 +75,7 @@ var constants = {
 
 	}
 
-}
+};
 
 function getObjectsKeys( obj ) {
 
@@ -180,8 +180,6 @@ function generateMorphTargets ( mesh, geometry ) {
 
 	geometry.morphTargets.push( { name: "target1", vertices: vertices } );
 
-	geometry.update
-
 }
 
 function handleColorChange ( color ) {
@@ -214,7 +212,7 @@ function needsUpdate ( material, geometry ) {
 
 	};
 
-};
+}
 
 function updateMorphs ( torus, material ) {
 
@@ -245,7 +243,7 @@ function guiScene ( gui, scene ) {
 	var data = {
 		background : "#000000",
 		"ambient light" : ambientLight.color.getHex()
-	}
+	};
 
 	var color = new THREE.Color();
 	var colorConvert = handleColorChange( color );
@@ -258,7 +256,7 @@ function guiScene ( gui, scene ) {
 
 	} );
 
-	folder.addColor( data, "ambient light" ).onChange( handleColorChange( ambientLight.color ) )
+	folder.addColor( data, "ambient light" ).onChange( handleColorChange( ambientLight.color ) );
 
 	guiSceneFog( folder, scene );
 

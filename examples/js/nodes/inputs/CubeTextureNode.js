@@ -4,7 +4,7 @@
 
 THREE.CubeTextureNode = function( value, coord, bias ) {
 
-	THREE.InputNode.call( this, 'v4' );
+	THREE.InputNode.call( this, 'v4', { shared : true } );
 
 	this.value = value;
 	this.coord = coord || new THREE.ReflectNode();
@@ -23,6 +23,12 @@ THREE.CubeTextureNode.prototype.getTexture = function( builder, output ) {
 
 THREE.CubeTextureNode.prototype.generate = function( builder, output ) {
 
+	if ( output === 'samplerCube' ) {
+
+		return this.getTexture( builder, output );
+
+	}
+
 	var cubetex = this.getTexture( builder, output );
 	var coord = this.coord.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'fv1' ) : undefined;
@@ -35,8 +41,22 @@ THREE.CubeTextureNode.prototype.generate = function( builder, output ) {
 
 	var code;
 
-	if ( bias ) code = 'textureCube(' + cubetex + ',' + coord + ',' + bias + ')';
-	else code = 'textureCube(' + cubetex + ',' + coord + ')';
+	if ( bias ) code = 'texCubeBias(' + cubetex + ',' + coord + ',' + bias + ')';
+	else code = 'texCube(' + cubetex + ',' + coord + ')';
+
+	if ( builder.isSlot( 'color' ) ) {
+
+		code = 'mapTexelToLinear(' + code + ')';
+
+	} else if ( builder.isSlot( 'emissive' ) ) {
+
+		code = 'emissiveMapTexelToLinear(' + code + ')';
+
+	} else if ( builder.isSlot( 'environment' ) ) {
+
+		code = 'envMapTexelToLinear(' + code + ')';
+
+	}
 
 	return builder.format( code, this.type, output );
 

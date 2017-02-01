@@ -16,8 +16,8 @@ THREE.SMAAShader = [ {
 
 	uniforms: {
 
-		"tDiffuse":		{ type: "t", value: null },
-		"resolution":	{ type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"tDiffuse":		{ value: null },
+		"resolution":	{ value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -126,10 +126,10 @@ THREE.SMAAShader = [ {
 
 	uniforms: {
 
-		"tDiffuse":		{ type: "t", value: null },
-		"tArea":		{ type: "t", value: null },
-		"tSearch":		{ type: "t", value: null },
-		"resolution":	{ type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"tDiffuse":		{ value: null },
+		"tArea":		{ value: null },
+		"tSearch":		{ value: null },
+		"resolution":	{ value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -371,9 +371,9 @@ THREE.SMAAShader = [ {
 
 	uniforms: {
 
-		"tDiffuse":		{ type: "t", value: null },
-		"tColor":		{ type: "t", value: null },
-		"resolution":	{ type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"tDiffuse":		{ value: null },
+		"tColor":		{ value: null },
+		"resolution":	{ value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 

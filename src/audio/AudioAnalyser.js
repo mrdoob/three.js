@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AudioAnalyser = function ( audio, fftSize ) {
+function AudioAnalyser( audio, fftSize ) {
 
 	this.analyser = audio.context.createAnalyser();
 	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
@@ -11,17 +11,32 @@ THREE.AudioAnalyser = function ( audio, fftSize ) {
 
 	audio.getOutput().connect( this.analyser );
 
-};
+}
 
-THREE.AudioAnalyser.prototype = {
+Object.assign( AudioAnalyser.prototype, {
 
-	constructor: THREE.AudioAnalyser,
-
-	getData: function () {
+	getFrequencyData: function () {
 
 		this.analyser.getByteFrequencyData( this.data );
+
 		return this.data;
+
+	},
+
+	getAverageFrequency: function () {
+
+		var value = 0, data = this.getFrequencyData();
+
+		for ( var i = 0; i < data.length; i ++ ) {
+
+			value += data[ i ];
+
+		}
+
+		return value / data.length;
 
 	}
 
-};
+} );
+
+export { AudioAnalyser };

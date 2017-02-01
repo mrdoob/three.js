@@ -82,7 +82,7 @@
 		var object, uniforms;
 
 		var loader = new THREE.FontLoader();
-		loader.load( 'fonts/helvetiker_bold.typeface.js', function ( font ) {
+		loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 			init( font );
 			animate();
@@ -98,9 +98,9 @@
 
 			uniforms = {
 
-				amplitude: { type: "f", value: 5.0 },
-				opacity:   { type: "f", value: 0.3 },
-				color:     { type: "c", value: new THREE.Color( 0xff0000 ) }
+				amplitude: { value: 5.0 },
+				opacity:   { value: 0.3 },
+				color:     { value: new THREE.Color( 0xff0000 ) }
 
 			};
 
@@ -139,13 +139,13 @@
 
 			var buffergeometry = new THREE.BufferGeometry();
 
-			var position = new THREE.Float32Attribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
-			buffergeometry.addAttribute( 'position', position )
+			var position = new THREE.Float32BufferAttribute( vertices.length * 3, 3 ).copyVector3sArray( vertices );
+			buffergeometry.addAttribute( 'position', position );
 
-			var displacement = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var displacement = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'displacement', displacement );
 
-			var customColor = new THREE.Float32Attribute( vertices.length * 3, 3 );
+			var customColor = new THREE.Float32BufferAttribute( vertices.length * 3, 3 );
 			buffergeometry.addAttribute( 'customColor', customColor );
 
 			var color = new THREE.Color( 0xffffff );

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d</title>
+		<title>three.js webgl - sea3d / sound</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -67,7 +67,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>
 		</div>
 
 		<div id="blocker">
@@ -92,9 +92,6 @@
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
 
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -106,17 +103,16 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+
 			var container, raycaster, stats;
 
 			var camera, scene, renderer, composer, controls, velocity;
 			var blocker, instructions;
 			var moveLeft, moveForward, moveBackward, moveRight;
-
-			initKeyDown
-
 			var loader;
-			var audioListener, soundFilter;
-			var soundArea, collisionArea;
+			var audioListener, soundFilter, soundAreaAnalyser, soundOutsideAnalyser;
+			var soundArea, collisionArea, lightArea, lightOutside;
 
 			// Initialize Three.JS
 
@@ -139,12 +135,27 @@
 
 				audioListener = loader.audioListener;
 
+				// sound filter
+
 				soundFilter = audioListener.context.createBiquadFilter();
 				soundFilter.type = 'lowpass';
 				soundFilter.Q.value = 10;
 				soundFilter.frequency.value = 440;
 
+				// sound asset 1
+
+				lightOutside = loader.getLight("Light1");
+
+				soundOutside = loader.getSound3D("Point001");
+				soundOutsideAnalyser = new THREE.AudioAnalyser( soundOutside, 32 );
+
+				// sound asset 2 + area
+
+				lightArea = loader.getLight("Light2");
+
 				soundArea = loader.getSound3D("Point002");
+				soundAreaAnalyser = new THREE.AudioAnalyser( soundArea, 512 );
+
 				collisionArea = loader.getMesh("Torus003");
 
 				animate();
@@ -212,33 +223,7 @@
 
 						// Ask the browser to lock the pointer
 						element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-						if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-							var fullscreenchange = function ( event ) {
-
-								if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-									document.removeEventListener( 'fullscreenchange', fullscreenchange );
-									document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-									element.requestPointerLock();
-								}
-
-							};
-
-							document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-							document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-							element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-							element.requestFullscreen();
-
-						} else {
-
-							element.requestPointerLock();
-
-						}
+						element.requestPointerLock();
 
 					}, false );
 
@@ -278,7 +263,7 @@
 
 					}
 
-				};
+				}
 
 				function onKeyUp( event ) {
 
@@ -306,7 +291,7 @@
 
 					}
 
-				};
+				}
 
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
@@ -405,23 +390,23 @@
 			var audioPos = new THREE.Vector3();
 			var audioRot = new THREE.Euler();
 
-			function updateSoundFilter( collision, sound3d ) {
+			function updateSoundFilter() {
 
 				// difference position between sound and listener
-				var difPos = new THREE.Vector3().setFromMatrixPosition( sound3d.matrixWorld ).sub(audioPos);
+				var difPos = new THREE.Vector3().setFromMatrixPosition( soundArea.matrixWorld ).sub(audioPos);
 				var length = difPos.length();
 
 				// pick a vector from camera to sound
 				raycaster.set( audioPos, difPos.normalize() );
 
 				// intersecting sound1
-				if ( length > 50 && raycaster.intersectObjects( [collision] ).length ) {
+				if ( length > 50 && raycaster.intersectObjects( [collisionArea] ).length ) {
 
-					if ( sound3d.getFilter() !== soundFilter ) sound3d.setFilter( soundFilter );
+					if ( soundArea.getFilters()[0] !== soundFilter ) soundArea.setFilters( [ soundFilter ] );
 
-				} else if ( sound3d.getFilter() !== undefined ) {
+				} else if ( soundArea.getFilters()[0] === soundFilter ) {
 
-					sound3d.setFilter();
+					soundArea.setFilters( [] );
 
 				}
 
@@ -440,7 +425,11 @@
 				loader.audioListener.rotation.copy( audioRot.setFromRotationMatrix( camera.matrixWorld ) );
 
 				// Update sound filter from raycaster intersecting
-				updateSoundFilter( collisionArea, soundArea );
+				updateSoundFilter();
+
+				// light intensity from sound amplitude
+				lightOutside.intensity = soundOutsideAnalyser.getAverageFrequency() / 100;
+				lightArea.intensity = soundAreaAnalyser.getAverageFrequency() / 50;
 
 				// Update SEA3D Animations
 				THREE.SEA3D.AnimationHandler.update( delta );

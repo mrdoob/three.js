@@ -13,6 +13,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.enabled = true;
 	this.center = new THREE.Vector3();
+	this.panSpeed = 0.001;
+	this.zoomSpeed = 0.001;
+	this.rotationSpeed = 0.005;
 
 	// internals
 
@@ -32,23 +35,10 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var changeEvent = { type: 'change' };
 
-	this.focus = function ( target, frame ) {
+	this.focus = function ( target ) {
 
-		var scale = new THREE.Vector3();
-		target.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
-
-		if ( frame && target.geometry ) {
-
-			scale = ( scale.x + scale.y + scale.z ) / 3;
-			center.add( target.geometry.boundingSphere.center.clone().multiplyScalar( scale ) );
-			var radius = target.geometry.boundingSphere.radius * ( scale );
-			var pos = object.position.clone().sub( center ).normalize().multiplyScalar( radius * 2 );
-			object.position.copy( center ).add( pos );
-
-		}
-
-		object.lookAt( center );
-
+		var box = new THREE.Box3().setFromObject( target );
+		object.lookAt( center.copy( box.getCenter() ) );
 		scope.dispatchEvent( changeEvent );
 
 	};
@@ -57,7 +47,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * 0.001 );
+		delta.multiplyScalar( distance * scope.panSpeed );
 		delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
 
 		object.position.add( delta );
@@ -71,7 +61,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * 0.001 );
+		delta.multiplyScalar( distance * scope.zoomSpeed );
 
 		if ( delta.length() > distance ) return;
 
@@ -144,7 +134,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * 0.005, - movementY * 0.005, 0 ) );
+			scope.rotate( new THREE.Vector3( - movementX * scope.rotationSpeed, - movementY * scope.rotationSpeed, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
@@ -177,23 +167,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		// if ( scope.enabled === false ) return;
 
-		var delta = 0;
-
-		if ( event.wheelDelta ) {
-
-			// WebKit / Opera / Explorer 9
-
-			delta = - event.wheelDelta;
-
-		} else if ( event.detail ) {
-
-			// Firefox
-
-			delta = event.detail * 10;
-
-		}
-
-		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
 
 	}
 
@@ -207,8 +181,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
-		domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
 		domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		domElement.removeEventListener( 'mouseup', onMouseUp, false );
@@ -218,12 +191,11 @@ THREE.EditorControls = function ( object, domElement ) {
 		domElement.removeEventListener( 'touchstart', touchStart, false );
 		domElement.removeEventListener( 'touchmove', touchMove, false );
 
-	}
+	};
 
 	domElement.addEventListener( 'contextmenu', contextmenu, false );
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
-	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+	domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	// touch
 
@@ -285,7 +257,7 @@ THREE.EditorControls = function ( object, domElement ) {
 			case 1:
 				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
 				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 0.005 ) );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - scope.rotationSpeed ) );
 				break;
 
 			case 2:

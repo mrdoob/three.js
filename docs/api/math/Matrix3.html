@@ -10,15 +10,45 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A 3x3 matrix.</div>
+		<div class="desc">
+			A class representing a 3x3 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].
+		</div>
 
+		<h2>Example</h2>
+		<code>
+var m = new Matrix3();
+		</code>
+
+		<h2>A Note on Row-Major and Column-Major Ordering</h2>
+		<div>
+			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
+			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
+
+			This means that calling
+		<code>
+m.set( 11, 12, 13,
+       21, 22, 23,
+       31, 32, 33 );
+		</code>
+		will result in the [page:.elements elements] array containing:
+		<code>
+m.elements = [ 11, 21, 31,
+              12, 22, 32,
+              13, 23, 33 ];
+		</code>
+		and internally all calculations are performed using column-major ordering. However, as the actual ordering
+		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
+		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
+		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		</div>
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
 		<div>
-		Creates and initializes the 3x3 matrix to the identity matrix.
+		Creates and initializes the [name] to the 3x3
+		[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</div>
 
 
@@ -27,116 +57,124 @@
 
 		<h3>[property:Float32Array elements]</h3>
 		<div>
-		A column-major list of matrix values.
+		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]
+		 list of matrix values.
 		</div>
+
+		<h3>[property:Boolean isMatrix3]</h3>
+		<div>
+			Used to check whether this or derived classes are Matrix3s. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</div>
+
 
 
 		<h2>Methods</h2>
 
-		<h3>[method:Matrix3 set]( [page:Float n11], [page:Float n12], [page:Float n13], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n31], [page:Float n32], [page:Float n33] ) [page:Matrix3 this]</h3>
+		<h3>[method:Array applyToBufferAttribute]( [page:BufferAttribute attribute] )</h3>
 		<div>
-		n11 -- [page:Float] <br />
-		n12 -- [page:Float] <br />
-		n13 -- [page:Float] <br />
-		n21 -- [page:Float] <br />
-		n22 -- [page:Float] <br />
-		n23 -- [page:Float] <br />
-		n31 -- [page:Float] <br />
-		n32 -- [page:Float] <br />
-		n33 -- [page:Float]
-		</div>
-		<div>
-		Sets the 3x3 matrix values to the given row-major sequence of values.
+		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
+
+		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
 		</div>
 
-		<h3>[method:Matrix3 copy]( [page:Matrix3 m] ) [page:Matrix3 this]</h3>
+
+		<h3>[method:Matrix3 clone]()</h3>
+		<div>Creates a new Matrix3 and with identical elements to this one.</div>
+
+		<h3>[method:Matrix3 copy]( [page:Matrix3 m] )</h3>
+		<div>Copies the elements of matrix [page:Matrix3 m] into this matrix.</div>
+
+		<h3>[method:Float determinant]()</h3>
 		<div>
-		m -- [page:Matrix4]
-		</div>
-		<div>
-		Copies the values of matrix *m* into this matrix.
+		Computes and returns the
+		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
 		</div>
 
-		<h3>[method:Matrix3 fromArray]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 fromArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		array -- [page:Array] The array to read the elements from.
-		</div>
-		<div>
-		Sets the elements of this matrix based on an array in column-major format.
+		[page:Array array] - the array to read the elements from.<br />
+		[page:Integer offset] - (optional) index of first element in the array. Default is 0.<br /><br />
+
+		Sets the elements of this matrix based on an array in
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</div>
 
-		<h3>[method:Matrix3 transpose]() [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 getInverse]( [page:Matrix3 m], [page:Boolean throwOnDegenerate] )</h3>
 		<div>
-		Transposes this matrix in place.
+		[page:Matrix3 m] - the matrix to take the inverse of.<br />
+		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
+
+		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
+		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
+
+		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 3x3 identity matrix.
 		</div>
 
-		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] )</h3>
 		<div>
-		array -- [page:Array] <br />
-		</div>
-		<div>
-		Transposes this matrix into the supplied array, and returns itself unchanged.
+		[page:Matrix4 m] - [page:Matrix4]<br /><br />
+
+		Sets this matrix as the upper left 3x3 of the [link:https://en.wikipedia.org/wiki/Normal_matrix normal matrix]
+		of the passed [page:Matrix4 matrix4]. The normal matrix is the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] [link:https://en.wikipedia.org/wiki/Transpose transpose]
+	  of the matrix [page:Matrix4 m].
 		</div>
 
-		<h3>[method:Float determinant]() [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 identity]()</h3>
 		<div>
-		Computes and returns the determinant of this matrix.
+		Resets this matrix to the 3x3 identity matrix:
+		<code>
+1, 0, 0
+0, 1, 0
+0, 0, 1
+		</code>
+
 		</div>
 
-		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] ) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 multiplyScalar]( [page:Float s] )</h3>
+		<div>Multiplies every component of the matrix by the scalar value *s*.</div>
+
+		<h3>
+			[method:Matrix3 set](
+			[page:Float n11], [page:Float n12], [page:Float n13],
+			[page:Float n21], [page:Float n22], [page:Float n23],
+			[page:Float n31], [page:Float n32], [page:Float n33] )
+		</h3>
 		<div>
-		scalar -- [page:Float]
-		</div>
-		<div>
-		Multiplies every component of the matrix by the scalar value *s*.
+		[page:Float n11] - value to put in row 1, col 1.<br />
+		[page:Float n12] - value to put in row 1, col 2.<br />
+		...<br />
+		...<br />
+		[page:Float n32] - value to put in row 3, col 2.<br />
+		[page:Float n33] - value to put in row 3, col 3.<br /><br />
+
+		Sets the 3x3 matrix values to the given
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
+		sequence of values.
 		</div>
 
-		<h3>[method:Array applyToVector3Array]( [page:Array array] ) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 setFromMatrix4]( [page:Matrix4 m] )</h3>
+		<div>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</div>
+
+		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
-		</div>
-		<div>
-		Multiplies (applies) this matrix to every vector3 in the array.
+		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />
+		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
+
+		Writes the elements of this matrix to an array in
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</div>
 
-		<h3>[method:Matrix3 getNormalMatrix]( [page:Matrix4 m] ) [page:Matrix3 this]</h3>
-		<div>
-		m -- [page:Matrix4]
-		</div>
-		<div>
-		Sets this matrix as the normal matrix (upper left 3x3)of the passed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix *m*.
-		</div>
+		<h3>[method:Matrix3 transpose]()</h3>
+		<div>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</div>
 
-		<h3>[method:Matrix3 getInverse]( [page:Matrix4 m], [page:Boolean throwOnDegenerate] ) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
 		<div>
-		m -- [page:Matrix4]<br />
-		throwOnDegenerate -- [Page:Boolean] If true, throw an error if the matrix is degenerate (not invertible).
-		</div>
-		<div>
-		Set this matrix to the inverse of the passed matrix.
-		</div>
+		[page:Array array] -  array to store the resulting vector in.<br /><br />
 
-		<h3>[method:Matrix3 identity]() [page:Matrix3 this]</h3>
-		<div>
-		Resets this matrix to identity.<br/><br/>
-
-		1, 0, 0<br/>
-		0, 1, 0<br/>
-		0, 0, 1<br/>
-		</div>
-
-		<h3>[method:Matrix3 clone]() [page:Matrix3 this]</h3>
-		<div>
-		Creates a copy of this matrix.
-		</div>
-
-		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] ) [page:Matrix3 this]</h3>
-		<div>
-		array -- [page:Array] optional array to store the vector <br />
-		offset -- [page:Integer] optional offset into the array
-		</div>
-		<div>
-		Writes the elements of this matrix to an array in column-major format.
+		[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix into the supplied array,
+		and returns itself unchanged.
 		</div>
 
 		<h2>Source</h2>

@@ -15,7 +15,7 @@ THREE.ResolutionNode = function( renderer ) {
 THREE.ResolutionNode.prototype = Object.create( THREE.Vector2Node.prototype );
 THREE.ResolutionNode.prototype.constructor = THREE.ResolutionNode;
 
-THREE.ResolutionNode.prototype.updateAnimation = function( delta ) {
+THREE.ResolutionNode.prototype.updateFrame = function( delta ) {
 
 	var size = this.renderer.getSize();
 

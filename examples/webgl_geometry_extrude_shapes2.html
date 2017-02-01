@@ -44,7 +44,7 @@ const DIGIT_0 = 48, DIGIT_9 = 57, COMMA = 44, SPACE = 32, PERIOD = 46, MINUS = 4
 
 exports.transformSVGPath =
 function transformSVGPath(pathStr) {
-	var path = new THREE.Shape();
+	var path = new THREE.ShapePath();
 
 	var idx = 1, len = pathStr.length, activeCmd,
 		x = 0, y = 0, nx = 0, ny = 0, firstX = null, firstY = null,
@@ -289,10 +289,10 @@ var addGeoObject = function( group, svgObject ) {
 	len = thePaths.length;
 	for (i = 0; i < len; ++i) {
 		path = $d3g.transformSVGPath( thePaths[i] );
-		color = new THREE.Color( theColors[i] ); 
+		color = new THREE.Color( theColors[i] );
 		material = new THREE.MeshLambertMaterial({
 			color: color,
-			emissive: color,
+			emissive: color
 		});
 		amount = theAmounts[i];
 		simpleShapes = path.toShapes(true);
@@ -342,7 +342,7 @@ var init3d = function(){
 	scene.add( ambientLight );
 
 	/// backgroup grids
-	var helper = new THREE.GridHelper( 80, 10 );
+	var helper = new THREE.GridHelper( 160, 10 );
 	helper.rotation.x = Math.PI / 2;
 	group.add( helper );
 
@@ -371,7 +371,7 @@ var initSVGObject = function() {
 		"L350.9772,115.1221 L354.5759,112.5371 L354.5667,110.6949 L357.4098,105.7489 L362.3963,101.8443 " +
 		"L364.4415,101.0819 L364.5314,101.0828 L364.6209,101.1230 L364.7698,101.2029 L368.1221,101.5115 " +
 		"L371.7216,104.1338 L372.2958,106.7261 L375.5949,109.6971 L377.0415,108.8875 L377.0737,108.6526 " +
-		"L377.4037,108.6165 L376.8840,109.7091 L376.7323,109.9037 L377.9416,112.0705 L371.7970,114.8736 " + 
+		"L377.4037,108.6165 L376.8840,109.7091 L376.7323,109.9037 L377.9416,112.0705 L371.7970,114.8736 " +
 		"L374.0935,119.4031 L380.7848,122.7963 L382.6529,121.9897 L381.5792,117.8256 L385.0339,117.3069 " +
 		"L385.4082,115.6247 L388.7014,116.3969 L389.8697,116.6024 L390.0206,116.4860 L391.0396,116.6118 " +
 		"L394.6665,116.9929 L394.4694,119.2255 L394.3172,119.4987 L395.3792,121.8977 L395.2728,124.0526 " +

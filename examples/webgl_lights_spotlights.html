@@ -33,210 +33,159 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank">Master James</a><br />
-			Orbit Controls are available to navigate. Click to set random color CTRL-Click for White.<br />
+			Orbit Controls are available to navigate.<br />
 			Where the lights converge to make white light the shadows will appear as C M Y from light color pairing.
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/Detector.js"></script>
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
-
 		<script>
-			var stats, container = document.getElementById( 'container' );
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var rnd = new THREE.WebGLRenderer();
-			var cam = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 20000);
-			var orb = new THREE.OrbitControls(cam, rnd.domElement);
+			var renderer = new THREE.WebGLRenderer();
 
-			var scn = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
+
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+			var scene = new THREE.Scene();
+
 			var matFloor = new THREE.MeshPhongMaterial();
-			var matBox = new THREE.MeshPhongMaterial();
-			var geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
-			var geoBox = new THREE.BoxGeometry(Math.PI, Math.sqrt(2), Math.E);
-			var mshFloor = new THREE.Mesh(geoFloor, matFloor);
-			var mshBox = new THREE.Mesh(geoBox, matBox);
-			var amb = new THREE.AmbientLight(0x121422);
-			var spt1 = createSpotlight( 0xFF7F00 );
-			var spt2 = createSpotlight( 0x00FF7F );
-			var spt3 = createSpotlight( 0x7F00FF );
+			var matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
+
+			var geoFloor = new THREE.BoxGeometry( 2000, 1, 2000 );
+			var geoBox = new THREE.BoxGeometry( 3, 1, 2 );
+
+			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+			var mshBox = new THREE.Mesh( geoBox, matBox );
+
+			var ambient = new THREE.AmbientLight( 0x111111 );
+
+			var spotLight1 = createSpotlight( 0xFF7F00 );
+			var spotLight2 = createSpotlight( 0x00FF7F );
+			var spotLight3 = createSpotlight( 0x7F00FF );
+
 			var lightHelper1, lightHelper2, lightHelper3;
-			var ray = new THREE.Raycaster();
-			var mouseDown = new THREE.Vector2();
-			var mouse = new THREE.Vector2();
 
 			function init() {
 
-				rnd.shadowMap.enabled = true;
-				rnd.shadowMap.type = THREE.PCFSoftShadowMap;
-				rnd.gammaInput = true;
-				rnd.gammaOutput = true;
-				rnd.antialias = true;
-				rnd.domElement.addEventListener('mousedown', onDocumentClick);
-				rnd.domElement.addEventListener('mouseup', onDocumentClick);
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-				cam.position.set(38, 20, -32);
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
 
-				spt1.position.set(15, 40, 45);
-				spt2.position.set(0, 40, 35);
-				spt3.position.set(-15, 40, 45);
+				camera.position.set( 46, 22, - 21 );
 
-				lightHelper1 = new THREE.SpotLightHelper( spt1 );
-				lightHelper2 = new THREE.SpotLightHelper( spt2 );
-				lightHelper3 = new THREE.SpotLightHelper( spt3 );
+				spotLight1.position.set( 15, 40, 45 );
+				spotLight2.position.set( 0, 40, 35 );
+				spotLight3.position.set( - 15, 40, 45 );
+
+				lightHelper1 = new THREE.SpotLightHelper( spotLight1 );
+				lightHelper2 = new THREE.SpotLightHelper( spotLight2 );
+				lightHelper3 = new THREE.SpotLightHelper( spotLight3 );
 
 				matFloor.color.set( 0x808080 );
 
 				mshFloor.receiveShadow = true;
-				mshFloor.position.set(0, -0.05, 0);
+				mshFloor.position.set( 0, - 0.05, 0 );
 
-				randomColor( matBox );
-				matBox.opacity = 0.8;
 				mshBox.castShadow = true;
 				mshBox.receiveShadow = true;
-				mshBox.position.set(0, 5, 0);
+				mshBox.position.set( 0, 5, 0 );
 
-				scn.add(cam);
-				scn.add(mshFloor);
-				scn.add(mshBox);
-				scn.add(amb);
-				scn.add( spt1 );
-				scn.add( spt1.shadowCameraHelper );
-				scn.add( spt2 );
-				scn.add( spt2.shadowCameraHelper );
-				scn.add( spt3 );
-				scn.add( spt3.shadowCameraHelper );
-				scn.add( new THREE.AxisHelper( 7 ) );
-				scn.add( lightHelper1, lightHelper2, lightHelper3 );
+				scene.add( mshFloor );
+				scene.add( mshBox );
+				scene.add( ambient );
+				scene.add( spotLight1, spotLight2, spotLight3 );
+				scene.add( lightHelper1, lightHelper2, lightHelper3 );
 
-				document.body.appendChild(rnd.domElement);
+				document.body.appendChild( renderer.domElement );
 				onResize();
-				window.addEventListener('resize', onResize, false);
+				window.addEventListener( 'resize', onResize, false );
 
-				orb.addEventListener('change', render);
-				orb.object.position.set(46, 22, -21);
-				orb.target.set(-6, 7, 2);
-				orb.maxPolarAngle = (Math.PI / 2);
-				orb.update();
-			};
+				controls.target.set( 0, 7, 0 );
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.update();
+
+			}
 
 			function createSpotlight( color ) {
+
 				var newObj = new THREE.SpotLight( color, 2 );
+
 				newObj.castShadow = true;
 				newObj.angle = 0.3;
 				newObj.penumbra = 0.2;
 				newObj.decay = 2;
 				newObj.distance = 50;
+
 				newObj.shadow.mapSize.width = 1024;
 				newObj.shadow.mapSize.height = 1024;
 
 				return newObj;
-			};
+
+			}
 
 			function onResize() {
-				rnd.setSize(window.innerWidth, window.innerHeight);
-				cam.aspect = (window.innerWidth / window.innerHeight);
-				cam.updateProjectionMatrix();
-			};
 
-			function animate(rate) {
-				rate = rate || 6;
-				if ( rate < 0.01 ) rate = 0.01;
-				else if ( rate > 1000 ) rate = 1000;
-				var targ1 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				TweenMax.to(spt1.position, rate / 3, targ1);
-				TweenMax.to(spt1, rate / 2, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ1 } );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var targ2 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				TweenMax.to(spt2.position, rate, targ2);
-				TweenMax.to(spt2, rate / 3, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ2 } );
+			}
 
-				var targ3 = { x: ((Math.random() * 30) - 15), y: ((Math.random() * 10) + 15), z: ((Math.random() * 30) - 15) };
-				TweenMax.to(spt3.position, rate / 2, targ3);
-				TweenMax.to(spt3, rate, { angle: ( (Math.random() * 0.7) + 0.1 ), penumbra: ( Math.random() + 1 ), position: targ3 } );
+			function tween( light ) {
 
-				setTimeout(function() { animate(rate); }, rate * 1000);
-			};
+				new TWEEN.Tween( light ).to( {
+					angle: ( Math.random() * 0.7 ) + 0.1,
+					penumbra: Math.random() + 1
+				}, Math.random() * 3000 + 2000 )
+				.easing( TWEEN.Easing.Quadratic.Out ).start();
 
-			function render( /* time */ ) {
+				new TWEEN.Tween( light.position ).to( {
+					x: ( Math.random() * 30 ) - 15,
+					y: ( Math.random() * 10 ) + 15,
+					z: ( Math.random() * 30 ) - 15
+				}, Math.random() * 3000 + 2000 )
+				.easing( TWEEN.Easing.Quadratic.Out ).start();
+
+			}
+
+			function animate() {
+
+				tween( spotLight1 );
+				tween( spotLight2 );
+				tween( spotLight3 );
+
+				setTimeout( animate, 5000 );
+
+			}
+
+			function render() {
+
+				TWEEN.update();
+
 				if ( lightHelper1 ) lightHelper1.update();
 				if ( lightHelper2 ) lightHelper2.update();
 				if ( lightHelper3 ) lightHelper3.update();
 
-				rnd.render(scn, cam);
+				renderer.render( scene, camera );
 
-				window.requestAnimationFrame(render);
-
-			};
-
-			function onDocumentClick( event ) {
-
-				event.preventDefault();
-
-				var rndDom = rnd.domElement;
-
-				if( event.type === 'mousedown' ) {
-
-					mouseDown.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
-
-					mouseDown.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
-
-				}
-				else {
-
-					mouse.x = ( event.clientX / rndDom.clientWidth ) * 2 - 1;
-
-					mouse.y = - ( event.clientY / rndDom.clientHeight ) * 2 + 1;
-
-					if (mouseDown.distanceTo(mouse) < 0.0075) {
-
-						ray.setFromCamera( mouse, cam );
-
-						var found = ray.intersectObjects( [ mshBox, mshFloor ] );
-
-						if ( found.length > 0 ) {
-
-							if( event.ctrlKey === false ) randomColor( found[0].object );
-
-							else found[0].object.material.color.set( 0xffffff );
-
-							render();
-
-						}
-
-					}
-
-				}
-
-			}
-
-			function randomColor( target ) {
-
-				if ( target !== undefined ) {
-
-					if ( target.material !== undefined ) target = target.material;
-
-					if ( target.color !== undefined ) {
-
-						target.color.setHex( 0xffffff * Math.random() );
-
-					}
-				}
+				requestAnimationFrame( render );
 
 			}
 
 			init();
-
 			render();
-
-			animate(4.5);
+			animate();
 
 		</script>
 	</body>

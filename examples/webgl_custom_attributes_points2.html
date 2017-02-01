@@ -145,9 +145,9 @@
 			var material = new THREE.ShaderMaterial( {
 
 				uniforms: {
-					amplitude: { type: "f", value: 1.0 },
-					color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-					texture:   { type: "t", value: texture }
+					amplitude: { value: 1.0 },
+					color:     { value: new THREE.Color( 0xffffff ) },
+					texture:   { value: texture }
 				},
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -226,7 +226,7 @@
 			for ( var i = 0; i < length; i ++ ) {
 
 				vector.fromArray( positions, i * 3 );
-				vector.applyProjection( matrix );
+				vector.applyMatrix4( matrix );
 
 				sortArray.push( [ vector.z, i ] );
 

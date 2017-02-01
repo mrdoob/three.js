@@ -339,32 +339,40 @@ THREE.Projector = function () {
 		_renderData.objects.length = 0;
 		_renderData.lights.length = 0;
 
+		function addObject( object ) {
+
+			_object = getNextObjectInPool();
+			_object.id = object.id;
+			_object.object = object;
+
+			_vector3.setFromMatrixPosition( object.matrixWorld );
+			_vector3.applyMatrix4( _viewProjectionMatrix );
+			_object.z = _vector3.z;
+			_object.renderOrder = object.renderOrder;
+
+			_renderData.objects.push( _object );
+
+		}
+
 		scene.traverseVisible( function ( object ) {
 
 			if ( object instanceof THREE.Light ) {
 
 				_renderData.lights.push( object );
 
-			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line ) {
 
-				var material = object.material;
+				if ( object.material.visible === false ) return;
+				if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
 
-				if ( material.visible === false ) return;
+				addObject( object );
 
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+			} else if ( object instanceof THREE.Sprite ) {
 
-					_object = getNextObjectInPool();
-					_object.id = object.id;
-					_object.object = object;
+				if ( object.material.visible === false ) return;
+				if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
 
-					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _viewProjectionMatrix );
-					_object.z = _vector3.z;
-					_object.renderOrder = object.renderOrder;
-
-					_renderData.objects.push( _object );
-
-				}
+				addObject( object );
 
 			}
 
@@ -436,9 +444,9 @@ THREE.Projector = function () {
 
 						if ( groups.length > 0 ) {
 
-							for ( var o = 0; o < groups.length; o ++ ) {
+							for ( var g = 0; g < groups.length; g ++ ) {
 
-								var group = groups[ o ];
+								var group = groups[ g ];
 
 								for ( var i = group.start, l = group.start + group.count; i < l; i += 3 ) {
 

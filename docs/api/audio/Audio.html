@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Create a non-positional ( global ) audio object.<br /><br />
+
+			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<div>[example:misc_sound misc / sound ]</div>
+		<code>
+		//Create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create a global audio source
+		var sound = new THREE.Audio( listener );
+
+		var audioLoader = new THREE.AudioLoader();
+
+		//Load a sound and set it as the Audio object's buffer
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+		});
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:AudioListener listener] )</h3>
+		<div>
+		listener — (required) [page:AudioListener AudioListener] instance.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean autoplay]</h3>
+		<div>Whether to start playback automatically. Default is *false*.</div>
+
+		<h3>[property:AudioContext context]</h3>
+		<div>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</div>
+
+		<h3>[property:Array filters]</h3>
+		<div>Whether the audio is currently playing. Default is empty array.</div>
+
+		<h3>[property:GainNode gain]</h3>
+		<div>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</div>
+
+		<h3>[property:Boolean hasPlaybackControl]</h3>
+		<div>Whether playback can be controlled using the [page:Audio.play play](),
+			[page:Audio.pause pause]() etc. methods. Default is *true*.</div>
+
+		<h3>[property:Number playbackRate]</h3>
+		<div>Speed of playback. Default is *1*.</div>
+
+		<h3>[property:Boolean isPlaying]</h3>
+		<div>Whether the audio is currently playing.</div>
+
+		<h3>[property:Number startTime]</h3>
+		<div>Point at which to start playback. Default is *0*.</div>
+
+		<h3>[property:String source]</h3>
+		<div>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createBufferSource AudioContext.createBufferSource]().</div>
+
+		<h3>[property:String sourceType]</h3>
+		<div>Type of the audio source. Default is string 'empty'.</div>
+
+		<h3>[property:String type]</h3>
+		<div>String denoting the type, set to 'Audio'.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null connect]()</h3>
+		<div>
+		Connect to the [page:Audio.source]. This is used internally on initialisation and when
+		setting / removing filters.
+		</div>
+
+		<h3>[method:null disconnect]()</h3>
+		<div>
+		Disconnect from the [page:Audio.source]. This is used internally when
+		setting / removing filters.
+		</div>
+
+		<h3>[method:Array getFilter]()</h3>
+		<div>
+		Returns the first element of the [page:Audio.filters filters] array.
+		</div>
+
+		<h3>[method:null getFilters]()</h3>
+		<div>
+		Returns the [page:Audio.filters filters] array.
+		</div>
+
+		<h3>[method:Boolean getLoop]()</h3>
+		<div>
+		Return the value of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop]
+		 (whether playback should loop).
+		</div>
+
+		<h3>[method:GainNode getOutput]()</h3>
+		<div>
+		Return the [page:Audio.gain gainNode].
+		</div>
+
+		<h3>[method:Number getPlaybackRate]()</h3>
+		<div>
+		Return the value of [page:Audio.playbackRate playbackRate].
+		</div>
+
+		<h3>[method:Number getVolume]( value )</h3>
+		<div>
+		Return the current volume.
+		</div>
+
+		<h3>[method:null play]()</h3>
+		<div>
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, starts playback.
+		</div>
+
+		<h3>[method:null pause]()</h3>
+		<div>
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, pauses playback.
+		</div>
+
+		<h3>[method:null onEnded]()</h3>
+		<div>
+		Called automatically when playback finished. Sets If [page:Audio.isPlaying isPlaying] to false.
+		</div>
+
+		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
+		<div>
+		Setup the [page:Audio.source source] to the audioBuffer, and sets [page:Audio.sourceType sourceType] to 'buffer'.<br />
+		If [page:Audio.autoplay autoplay], also starts playback.
+		</div>
+
+		<h3>[method:null setFilter]( filter )</h3>
+		<div>
+		Add the filter to the [page:Audio.filters filters] array.
+		</div>
+
+		<h3>[method:Audio setFilters]( [page:Array value] )</h3>
+		<div>
+		value - arrays of filters.<br />
+		Set the [page:Audio.filters filters] array to *value*.
+		</div>
+
+		<h3>[method:null setLoop]( [page:Boolean value] )</h3>
+		<div>
+		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] to *value*
+		(whether playback should loop).
+		</div>
+
+		<h3>[method:null setNodeSource]( audioNode )</h3>
+		<div>
+		Setup the [page:Audio.source source] to the audioBuffer, and sets [page:Audio.sourceType sourceType] to 'audioNode'.<br />
+		Also sets [page:Audio.hasPlaybackControl hasPlaybackControl] to false.
+
+		</div>
+
+		<h3>[method:null setPlaybackRate]( [page:Number value] )</h3>
+		<div>
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, set the [page:Audio.playbackRate playbackRate] to *value*.
+		</div>
+
+		<h3>[method:null setVolume]( [page:Number value] )</h3>
+		<div>
+		Set the volume.
+		</div>
+
+		<h3>[method:null stop]()</h3>
+		<div>
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, stops playback,
+		resets [page:Audio.startTime startTime] to *0* and sets [page:Audio.isPlaying isPlaying] to false.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,21 +1,21 @@
+import { Interpolant } from '../Interpolant';
+import { Quaternion } from '../Quaternion';
+
 /**
  * Spherical linear unit quaternion interpolant.
  *
  * @author tschw
  */
 
-THREE.QuaternionLinearInterpolant = function(
-		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	THREE.Interpolant.call(
-			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-};
+}
 
-THREE.QuaternionLinearInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+QuaternionLinearInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
 
-	constructor: THREE.QuaternionLinearInterpolant,
+	constructor: QuaternionLinearInterpolant,
 
 	interpolate_: function( i1, t0, t, t1 ) {
 
@@ -29,7 +29,7 @@ THREE.QuaternionLinearInterpolant.prototype =
 
 		for ( var end = offset + stride; offset !== end; offset += 4 ) {
 
-			THREE.Quaternion.slerpFlat( result, 0,
+			Quaternion.slerpFlat( result, 0,
 					values, offset - stride, values, offset, alpha );
 
 		}
@@ -39,3 +39,6 @@ THREE.QuaternionLinearInterpolant.prototype =
 	}
 
 } );
+
+
+export { QuaternionLinearInterpolant };

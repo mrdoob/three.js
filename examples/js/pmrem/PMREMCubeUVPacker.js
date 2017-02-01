@@ -31,7 +31,13 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 		encoding: sourceTexture.encoding
 	};
 
+	if( sourceTexture.encoding === THREE.RGBM16Encoding ) {
+		params.magFilter = THREE.LinearFilter;
+		params.minFilter = THREE.LinearFilter;
+	}
+
 	this.CubeUVRenderTarget = new THREE.WebGLRenderTarget( size, size, params );
+	this.CubeUVRenderTarget.texture.name = "PMREMCubeUVPacker.cubeUv";
 	this.CubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 	this.camera = new THREE.OrthographicCamera( - size * 0.5, size * 0.5, - size * 0.5, size * 0.5, 0.0, 1000 );
 
@@ -53,7 +59,7 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 
 	var offset2 = 0;
 	var c = 4.0;
-	this.numLods = Math.log2( cubeTextureLods[ 0 ].width ) - 2;
+	this.numLods = Math.log( cubeTextureLods[ 0 ].width ) / Math.log( 2 ) - 2; // IE11 doesn't support Math.log2
 	for ( var i = 0; i < this.numLods; i ++ ) {
 
 		var offset1 = ( textureResolution - textureResolution / c ) * 0.5;
@@ -128,10 +134,10 @@ THREE.PMREMCubeUVPacker.prototype = {
 		var shaderMaterial = new THREE.ShaderMaterial( {
 
 			uniforms: {
-				"faceIndex": { type: 'i', value: 0 },
-				"mapSize": { type: 'f', value: 0 },
-				"envMap": { type: 't', value: null },
-				"testColor": { type: 'v3', value: new THREE.Vector3( 1, 1, 1 ) }
+				"faceIndex": { value: 0 },
+				"mapSize": { value: 0 },
+				"envMap": { value: null },
+				"testColor": { value: new THREE.Vector3( 1, 1, 1 ) }
 			},
 
 			vertexShader:

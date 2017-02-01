@@ -12,7 +12,9 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Abstract base class for cameras. This class should always be inherited when you build a new camera.</div>
+		<div class="desc">
+			Abstract base class for cameras. This class should always be inherited when you build a new camera.
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -20,44 +22,67 @@
 
 		<h3>[name]()</h3>
 		<div>
-			This constructor sets the following properties to the correct type: matrixWorldInverse and projectionMatrix.
-
+			Creates a new [name]. Note that this class is not intended to be called directly;
+			you probably want a [page:PerspectiveCamera] or [page:OrthographicCamera] instead.
 		</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Object3D] class for common properties.</div>
+
+		<h3>[property:Boolean isCamera]</h3>
+		<div>
+			Used to check whether this or derived classes are cameras. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally by the renderer for optimisation.
+		</div>
+
+		<h3>[property:Layers layers]</h3>
+		<div>
+		The [page:Layers layers] that the camera is a member of. This is an inherited
+		property from [page:Object3D].<br /><br />
+
+		Objects must share at least one layer with the camera to be seen
+		when the camera's viewpoint is rendered.
+		</div>
 
 		<h3>[property:Matrix4 matrixWorldInverse]</h3>
-		<div>This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.</div>
+		<div>
+			This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has
+			the world transform of the Camera.
+		</div>
 
 		<h3>[property:Matrix4 projectionMatrix]</h3>
 		<div>This is the matrix which contains the projection.</div>
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:Object3D] class for common methods.</div>
 
-		<h3>[method:Vector3 getWorldDirection]([page:Vector3 vector])</h3>
+		<h3>[method:Camera clone]( )</h3>
 		<div>
-		vector — (optional)<br />
-		<br />
-		It returns a vector representing the direction in which the camera is looking, in world space.
+			Return a new camera with the same properties as this one.
 		</div>
 
-
-		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
+		<h3>[method:Camera copy]( [page:Camera source] )</h3>
 		<div>
-		vector — point to look at<br />
-		<br />
-		This makes the camera look at the vector position in the global space as long as the parent of this camera is the scene or at position (0,0,0).
+		Copy the properties from the source camera into this one.
 		</div>
 
-		<h3>[method:Camera clone]( [page:Camera camera] )</h3>
+		<h3>[method:Vector3 getWorldDirection]( [page:Vector3 optionalTarget] )</h3>
 		<div>
-		camera — camera to clone<br />
-		<br />
-		It returns a clone of camera.
+		Returns a vector representing the direction in which the camera is looking,
+		in world space. If the [page:Vector3 optionalTarget] is set, returns a vector representing the direction
+		from the camera's position to the [page:Vector3 optionalTarget].
 		</div>
 
+		<h3>[method:null lookAt]( [page:Vector3 target] )</h3>
+		<div>
+		target — position in 3D space for the camera to point towards<br /><br />
+
+		This makes the camera look at the vector position in the global space as long as
+		the parent of this camera is the scene or at position (0,0,0).
+		</div>
 
 		<h2>Source</h2>
 

@@ -4,6 +4,16 @@
 
 Menubar.File = function ( editor ) {
 
+	var NUMBER_PRECISION = 6;
+
+	function parseNumber( key, value ) {
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+
+	}
+
+	//
+
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
@@ -89,7 +99,7 @@ Menubar.File = function ( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, null, '\t' );
+			output = JSON.stringify( output, parseNumber, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -123,7 +133,7 @@ Menubar.File = function ( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, null, '\t' );
+			output = JSON.stringify( output, parseNumber, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -148,7 +158,7 @@ Menubar.File = function ( editor ) {
 
 		try {
 
-			output = JSON.stringify( output, null, '\t' );
+			output = JSON.stringify( output, parseNumber, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} catch ( e ) {
@@ -218,7 +228,9 @@ Menubar.File = function ( editor ) {
 		output.metadata.type = 'App';
 		delete output.history;
 
-		output = JSON.stringify( output, null, '\t' );
+		var vr = output.project.vr;
+
+		output = JSON.stringify( output, parseNumber, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		zip.file( 'app.json', output );
@@ -231,8 +243,20 @@ Menubar.File = function ( editor ) {
 
 		} );
 
-		var loader = new THREE.XHRLoader( manager );
+		var loader = new THREE.FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
+
+			var includes = [];
+
+			if ( vr ) {
+
+				includes.push( '<script src="js/VRControls.js"></script>' );
+				includes.push( '<script src="js/VREffect.js"></script>' );
+				includes.push( '<script src="js/WebVR.js"></script>' );
+
+			}
+
+			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
 
 			zip.file( 'index.html', content );
 
@@ -247,6 +271,28 @@ Menubar.File = function ( editor ) {
 			zip.file( 'js/three.min.js', content );
 
 		} );
+
+		if ( vr ) {
+
+			loader.load( '../examples/js/controls/VRControls.js', function ( content ) {
+
+				zip.file( 'js/VRControls.js', content );
+
+			} );
+
+			loader.load( '../examples/js/effects/VREffect.js', function ( content ) {
+
+				zip.file( 'js/VREffect.js', content );
+
+			} );
+
+			loader.load( '../examples/js/WebVR.js', function ( content ) {
+
+				zip.file( 'js/WebVR.js', content );
+
+			} );
+
+		}
 
 	} );
 	options.add( option );

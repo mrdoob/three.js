@@ -179,10 +179,10 @@ def hasUniqueName(o, class_id):
     object_name = o.GetName()
     object_id = o.GetUniqueID()
 
-    object_count = scene.GetSrcObjectCount(class_id)
+    object_count = scene.GetSrcObjectCount(FbxCriteria.ObjectType(class_id))
 
     for i in range(object_count):
-        other = scene.GetSrcObject(class_id, i)
+        other = scene.GetSrcObject(FbxCriteria.ObjectType(class_id), i)
         other_id = other.GetUniqueID()
         other_name = other.GetName()
 
@@ -258,7 +258,7 @@ def triangulate_node_hierarchy(node):
            node_attribute.GetAttributeType() == FbxNodeAttribute.eNurbs or \
            node_attribute.GetAttributeType() == FbxNodeAttribute.eNurbsSurface or \
            node_attribute.GetAttributeType() == FbxNodeAttribute.ePatch:
-            converter.TriangulateInPlace(node);
+            converter.Triangulate(node.GetNodeAttribute(), True);
 
         child_count = node.GetChildCount()
         for i in range(child_count):
@@ -297,21 +297,21 @@ def generate_texture_bindings(material_property, material_params):
 
     if material_property.IsValid():
         #Here we have to check if it's layeredtextures, or just textures:
-        layered_texture_count = material_property.GetSrcObjectCount(FbxLayeredTexture.ClassId)
+        layered_texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
         if layered_texture_count > 0:
             for j in range(layered_texture_count):
-                layered_texture = material_property.GetSrcObject(FbxLayeredTexture.ClassId, j)
-                texture_count = layered_texture.GetSrcObjectCount(FbxTexture.ClassId)
+                layered_texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), j)
+                texture_count = layered_texture.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
                 for k in range(texture_count):
-                    texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
+                    texture = layered_texture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),k)
                     if texture:
                         texture_id = getTextureName(texture, True)
                         material_params[binding_types[str(material_property.GetName())]] = texture_id
         else:
             # no layered texture simply get on the property
-            texture_count = material_property.GetSrcObjectCount(FbxTexture.ClassId)
+            texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
             for j in range(texture_count):
-                texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
+                texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),j)
                 if texture:
                     texture_id = getTextureName(texture, True)
                     material_params[binding_types[str(material_property.GetName())]] = texture_id
@@ -385,7 +385,7 @@ def generate_material_object(material):
         }
 
     else:
-        print "Unknown type of Material", getMaterialName(material)
+        print ("Unknown type of Material"), getMaterialName(material)
 
     # default to Lambert Material if the current Material type cannot be handeled
     if not material_type:
@@ -481,9 +481,9 @@ def generate_material_dict(scene):
     material_dict = {}
 
     # generate all materials for this scene
-    material_count = scene.GetSrcObjectCount(FbxSurfaceMaterial.ClassId)
+    material_count = scene.GetSrcObjectCount(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId))
     for i in range(material_count):
-        material = scene.GetSrcObject(FbxSurfaceMaterial.ClassId, i)
+        material = scene.GetSrcObject(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId), i)
         material_object = generate_material_object(material)
         material_name = getMaterialName(material)
         material_dict[material_name] = material_object
@@ -565,22 +565,22 @@ def replace_OutFolder2inFolder(url):
 def extract_material_textures(material_property, texture_dict):
     if material_property.IsValid():
         #Here we have to check if it's layeredtextures, or just textures:
-        layered_texture_count = material_property.GetSrcObjectCount(FbxLayeredTexture.ClassId)
+        layered_texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId))
         if layered_texture_count > 0:
             for j in range(layered_texture_count):
-                layered_texture = material_property.GetSrcObject(FbxLayeredTexture.ClassId, j)
-                texture_count = layered_texture.GetSrcObjectCount(FbxTexture.ClassId)
+                layered_texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxLayeredTexture.ClassId), j)
+                texture_count = layered_texture.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
                 for k in range(texture_count):
-                    texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
+                    texture = layered_texture.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),k)
                     if texture:
                         texture_object = generate_texture_object(texture)
                         texture_name = getTextureName( texture, True )
                         texture_dict[texture_name] = texture_object
         else:
             # no layered texture simply get on the property
-            texture_count = material_property.GetSrcObjectCount(FbxTexture.ClassId)
+            texture_count = material_property.GetSrcObjectCount(FbxCriteria.ObjectType(FbxTexture.ClassId))
             for j in range(texture_count):
-                texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
+                texture = material_property.GetSrcObject(FbxCriteria.ObjectType(FbxTexture.ClassId),j)
                 if texture:
                     texture_object = generate_texture_object(texture)
                     texture_name = getTextureName( texture, True )
@@ -591,9 +591,9 @@ def extract_textures_from_node(node, texture_dict):
     mesh = node.GetNodeAttribute()
 
     #for all materials attached to this mesh
-    material_count = mesh.GetNode().GetSrcObjectCount(FbxSurfaceMaterial.ClassId)
+    material_count = mesh.GetNode().GetSrcObjectCount(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId))
     for material_index in range(material_count):
-        material = mesh.GetNode().GetSrcObject(FbxSurfaceMaterial.ClassId, material_index)
+        material = mesh.GetNode().GetSrcObject(FbxCriteria.ObjectType(FbxSurfaceMaterial.ClassId), material_index)
 
         #go through all the possible textures types
         if material:
@@ -1505,7 +1505,8 @@ def generate_non_scene_output(scene):
       'normals' : [] if nnormals <= 0 else normal_values,
       'colors' : [] if ncolors <= 0 else color_values,
       'uvs' : uv_values,
-      'faces' : faces
+      'faces' : faces,
+      'textures': {}
     }
 
     if option_pretty_print:
@@ -1526,7 +1527,7 @@ def generate_mesh_list_from_hierarchy(node, mesh_list):
            attribute_type == FbxNodeAttribute.ePatch:
 
             if attribute_type != FbxNodeAttribute.eMesh:
-                converter.TriangulateInPlace(node);
+                converter.Triangulate(node.GetNodeAttribute(), True);
 
             mesh_list.append(node.GetNodeAttribute())
 
@@ -1555,7 +1556,7 @@ def generate_embed_dict_from_hierarchy(node, embed_dict):
            attribute_type == FbxNodeAttribute.ePatch:
 
             if attribute_type != FbxNodeAttribute.eMesh:
-                converter.TriangulateInPlace(node);
+                converter.Triangulate(node.GetNodeAttribute(), True);
 
             embed_object = generate_scene_output(node)
             embed_name = getPrefixedName(node, 'Embed')
@@ -1684,6 +1685,8 @@ def generate_light_object(node):
           'target': getObjectName( node.GetTarget() )
 
         }
+
+    # TODO (abelnation): handle area lights
 
     return output
 
@@ -2063,7 +2066,7 @@ def copy_textures(textures):
             shutil.copyfile(url, saveFilename)
             texture_dict[url] = True
         except IOError as e:
-            print "I/O error({0}): {1} {2}".format(e.errno, e.strerror, url)
+            print ("I/O error({0}): {1} {2}").format(e.errno, e.strerror, url)
 
 def findFilesWithExt(directory, ext, include_path = True):
     ext = ext.lower()

@@ -2,21 +2,21 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-THREE.FunctionCallNode = function( value ) {
+THREE.FunctionCallNode = function( func, inputs ) {
 
 	THREE.TempNode.call( this );
 
-	this.setFunction( value );
+	this.setFunction( func, inputs );
 
 };
 
 THREE.FunctionCallNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.FunctionCallNode.prototype.constructor = THREE.FunctionCallNode;
 
-THREE.FunctionCallNode.prototype.setFunction = function( val ) {
+THREE.FunctionCallNode.prototype.setFunction = function( func, inputs ) {
 
-	this.inputs = [];
-	this.value = val;
+	this.value = func;
+	this.inputs = inputs || [];
 
 };
 
@@ -39,9 +39,7 @@ THREE.FunctionCallNode.prototype.generate = function( builder, output ) {
 	var type = this.getType( builder );
 	var func = this.value;
 
-	builder.include( func );
-
-	var code = func.name + '(';
+	var code = func.build( builder, output ) + '(';
 	var params = [];
 
 	for ( var i = 0; i < func.inputs.length; i ++ ) {
@@ -49,7 +47,7 @@ THREE.FunctionCallNode.prototype.generate = function( builder, output ) {
 		var inpt = func.inputs[ i ];
 		var param = this.inputs[ i ] || this.inputs[ inpt.name ];
 
-		params.push( param.build( builder, builder.getType( inpt.type ) ) );
+		params.push( param.build( builder, builder.getTypeByFormat( inpt.type ) ) );
 
 	}
 

@@ -8,11 +8,17 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Line] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A series of lines drawn between pairs of vertices.</div>
+		<div class="desc">
+			A series of lines drawn between pairs of vertices.<br /><br />
+
+			This is nearly the same	as [page:Line]; the only difference is that it is rendered using
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
+			instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP].
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -20,41 +26,26 @@
 		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 
 		<div>
-		geometry — Pair(s) of vertices representing each line segment(s).<br />
-		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
+		[page:Geometry geometry] — Pair(s) of vertices representing each line segment(s).<br />
+		[page:Material material] — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
 		</div>
 
 		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Line] class for common properties.</div>
 
-		<h3>[property:Geometry geometry]</h3>
+		<h3>[property:Boolean isLineSegments]</h3>
 		<div>
-		Pair(s) of vertices representing the line segment(s).
-		</div>
+			Used to check whether this or derived classes are line segments. Default is *true*.<br /><br />
 
-		<h3>[property:Material material]</h3>
-		<div>
-		Material for the line.
+			You should not change this, as it used internally for optimisation.
 		</div>
 
 
 		<h2>Methods</h2>
-
-		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
-		<div>
-		Get intersections between a casted ray and this Line. [page:Raycaster.intersectObject] will call this method.
-		</div>
-		
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
-		<div>
-		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned LineSegments Object.
-		</div>
-		<div>
-		Clone a LineSegments Object.
-		</div>
-
+		<div>See the base [page:Line] class for common methods.</div>
 
 		<h2>Source</h2>
 

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Create a non-positional ( global ) audio object.<br /><br />
+
+			This uses the [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+
+		</div>
+
+
+		<h2>Example</h2>
+
+		<div>[example:misc_sound misc / sound ]</div>
+		<code>
+		//Create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create a global audio source
+		var sound = new THREE.Audio( listener );
+
+		var audioLoader = new THREE.AudioLoader();
+
+		//Load a sound and set it as the Audio object's buffer
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+		});
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name](  )</h3>
+		<div>
+		Create a new AudioListener.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:AudioContext context]</h3>
+		<div>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</div>
+
+		<h3>[property:GainNode gain]</h3>
+		<div>A [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] created
+		using [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]().</div>
+
+		<h3>[property:AudioNode filter]</h3>
+		<div>Default is *null*.</div>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>[method:GainNode getInput]()</h3>
+		<div>
+		Return the [page:AudioListener.gain gainNode].
+		</div>
+
+		<h3>[method:null removeFilter]()</h3>
+		<div>
+		Set the [page:AudioListener.filter filter] property to *null*.
+		</div>
+
+		<h3>[method:AudioNode getFilter]()</h3>
+		<div>
+		Returns the value of the [page:AudioListener.filter filter] property.
+		</div>
+
+		<h3>[method:null setFilter]( [page:AudioNode value] )</h3>
+		<div>
+		Set the [page:AudioListener.filter filter] property to *value*.
+		</div>
+
+		<h3>[method:Number getMasterVolume]()</h3>
+		<div>
+		Return the volume.
+		</div>
+
+		<h3>[method:null setMasterVolume]( [page:Number value] )</h3>
+		<div>
+		Set the volume.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
