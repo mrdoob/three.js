@@ -39126,6 +39126,115 @@
 	};
 
 	/**
+	 * @author Lewy Blue / https://github.com/looeee
+	 *
+	 * parameters = {
+	 *
+	 *  canvas: <canvas> DOM element,
+	 *
+	 *  scene: new THREE.Scene(),
+	 *
+	 *  camera: new THREE.Camera( ... )
+	 *
+	 *  renderer: new THREE.WebGLRenderer( ... )
+	 *
+	 *  autoResize: <bool>
+	 *
+	 *  autoRender: <bool> //setting this to false will prevent calling renderer.render automatically; users can call it manually in the onUpate function instead
+	 *
+	 * }
+	 */
+
+	function App( parameters ) {
+
+		parameters = parameters || {};
+
+		if ( parameters.canvas !== undefined ) {
+
+			this.canvas = parameters.canvas;
+
+		} else {
+
+			this.canvas = document.body.appendChild( document.createElement( 'canvas' ) );
+			this.canvas.style.position = 'absolute';
+			this.canvas.style.width = this.canvas.style.height = '100%';
+
+		}
+
+		this.scene = ( parameters.scene !== undefined ) ? parameters.scene : new THREE.Scene();
+
+		this.camera = ( parameters.camera !== undefined ) ? parameters.camera : new THREE.PerspectiveCamera( 75, this.canvas.clientWidth / this.canvas.clientHeight, 1, 1000 );
+
+		if ( parameters.renderer !== undefined ) {
+
+			this.renderer = parameters.renderer;
+
+		} else {
+
+			this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
+			this.renderer.setPixelRatio( window.devicePixelRatio );
+			this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
+
+		}
+
+		this.autoResize = ( parameters.autoResize !== undefined ) ? parameters.autoResize : true;
+		window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
+
+		this.autoRender = ( parameters.autoRender !== undefined ) ? parameters.autoRender : true;
+
+	}
+
+	Object.assign( App.prototype, {
+
+		animate: function () {
+
+			var self = this;
+
+			function animationHandler() {
+
+				self.onUpdate();
+
+				if ( self.autoRender ) self.renderer.render( self.scene, self.camera );
+
+				self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler(); } );
+
+			}
+
+			animationHandler();
+
+		},
+
+		stopAnimation: function () {
+
+			cancelAnimationFrame( this.currentAnimationFrameID );
+
+		},
+
+		onUpdate: function () {},
+
+		onWindowResize:	function () {
+
+			if ( ! this.autoResize ) return;
+
+			if ( this.camera.type !== 'PerspectiveCamera' ) {
+
+				console.warn( 'THREE.APP: AutoResize only works with PerspectiveCamera' );
+				return;
+
+			}
+
+			var newWidth = this.canvas.clientWidth;
+			var newHeight = this.canvas.clientHeight;
+
+			this.camera.aspect = newWidth / newHeight;
+			this.camera.updateProjectionMatrix();
+			this.renderer.setSize( newWidth, newHeight, false );
+
+		},
+
+	} );
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author bhouston / http://clara.io/
 	 * @author stephomi / http://stephaneginier.com/
@@ -42914,6 +43023,7 @@
 	exports.InstancedInterleavedBuffer = InstancedInterleavedBuffer;
 	exports.InterleavedBuffer = InterleavedBuffer;
 	exports.InstancedBufferAttribute = InstancedBufferAttribute;
+	exports.App = App;
 	exports.Face3 = Face3;
 	exports.Object3D = Object3D;
 	exports.Raycaster = Raycaster;
