@@ -13,6 +13,8 @@
  *
  *  autoResize: <bool>
  *
+ *  autoRender: <bool> //setting this to false will prevent calling renderer.render automatically; users can call it manually in the onUpate function instead
+ *
  * }
  */
 
@@ -51,6 +53,8 @@ function App( parameters ) {
 	this.autoResize = ( parameters.autoResize !== undefined ) ? parameters.autoResize : true;
 	window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
 
+	this.autoRender = ( parameters.autoRender !== undefined ) ? parameters.autoRender : true;
+
 }
 
 Object.assign( App.prototype, {
@@ -63,7 +67,7 @@ Object.assign( App.prototype, {
 
 			self.onUpdate();
 
-			self.renderer.render( self.scene, self.camera );
+			if ( self.autoRender ) self.renderer.render( self.scene, self.camera );
 
 			self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler() } );
 
