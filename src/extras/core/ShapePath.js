@@ -1,12 +1,11 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
- **/
-
 import { Path } from './Path';
 import { Shape } from './Shape';
 import { ShapeUtils } from '../ShapeUtils';
 
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
+ * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
+ **/
 
 function ShapePath() {
 
@@ -15,7 +14,7 @@ function ShapePath() {
 
 }
 
-ShapePath.prototype = {
+Object.assign( ShapePath.prototype, {
 
 	moveTo: function ( x, y ) {
 
@@ -276,6 +275,7 @@ ShapePath.prototype = {
 
 	}
 
-};
+} );
+
 
 export { ShapePath };

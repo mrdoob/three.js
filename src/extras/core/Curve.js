@@ -39,9 +39,7 @@ import { Matrix4 } from '../../math/Matrix4';
 
 function Curve() {}
 
-Curve.prototype = {
-
-	constructor: Curve,
+Object.assign( Curve.prototype, {
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
@@ -382,6 +380,7 @@ Curve.prototype = {
 
 	}
 
-};
+} );
+
 
 export { Curve };

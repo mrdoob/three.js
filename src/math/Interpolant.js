@@ -20,8 +20,7 @@
  * @author tschw
  */
 
-function Interpolant(
-		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 	this.parameterPositions = parameterPositions;
 	this._cachedIndex = 0;
@@ -33,9 +32,7 @@ function Interpolant(
 
 }
 
-Interpolant.prototype = {
-
-	constructor: Interpolant,
+Object.assign( Interpolant.prototype, {
 
 	evaluate: function( t ) {
 
@@ -52,10 +49,10 @@ Interpolant.prototype = {
 				var right;
 
 				linear_scan: {
-//- See http://jsperf.com/comparison-to-undefined/3
-//- slower code:
-//-
-//- 				if ( t >= t1 || t1 === undefined ) {
+					//- See http://jsperf.com/comparison-to-undefined/3
+					//- slower code:
+					//-
+					//- 				if ( t >= t1 || t1 === undefined ) {
 					forward_scan: if ( ! ( t < t1 ) ) {
 
 						for ( var giveUpAt = i1 + 2; ;) {
@@ -92,8 +89,8 @@ Interpolant.prototype = {
 
 					}
 
-//- slower code:
-//-					if ( t < t0 || t0 === undefined ) {
+					//- slower code:
+					//-					if ( t < t0 || t0 === undefined ) {
 					if ( ! ( t >= t0 ) ) {
 
 						// looping?
@@ -244,15 +241,16 @@ Interpolant.prototype = {
 
 	}
 
-};
+} );
 
+//!\ DECLARE ALIAS AFTER assign prototype !
 Object.assign( Interpolant.prototype, {
 
-	beforeStart_: //( 0, t, t0 ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_,
+	//( 0, t, t0 ), returns this.resultBuffer
+	beforeStart_: Interpolant.prototype.copySampleValue_,
 
-	afterEnd_: //( N-1, tN-1, t ), returns this.resultBuffer
-		Interpolant.prototype.copySampleValue_
+	//( N-1, tN-1, t ), returns this.resultBuffer
+	afterEnd_: Interpolant.prototype.copySampleValue_,
 
 } );
 

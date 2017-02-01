@@ -859,6 +859,10 @@ function WebGLRenderer( parameters ) {
 
 				renderer.setMode( _gl.LINES );
 
+			} else if ( object.isLineLoop ) {
+
+				renderer.setMode( _gl.LINE_LOOP );
+
 			} else {
 
 				renderer.setMode( _gl.LINE_STRIP );
@@ -2905,5 +2909,6 @@ function WebGLRenderer( parameters ) {
 	}
 
 }
+
 
 export { WebGLRenderer };

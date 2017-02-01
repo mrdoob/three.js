@@ -32,17 +32,19 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-BufferAttribute.prototype = {
+Object.defineProperty( BufferAttribute.prototype, "needsUpdate", {
 
-	constructor: BufferAttribute,
+	set: function(value) { 
+		
+		if ( value === true ) this.version ++;
+	
+	}
+
+});
+
+Object.assign( BufferAttribute.prototype, {
 
 	isBufferAttribute: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	setArray: function ( array ) {
 
@@ -335,7 +337,7 @@ BufferAttribute.prototype = {
 
 	}
 
-};
+} );
 
 //
 

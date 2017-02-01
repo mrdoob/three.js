@@ -191,14 +191,17 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.luminanceRT.texture.name = "AdaptiveToneMappingPass.l";
 		this.luminanceRT.texture.generateMipmaps = false;
 
 		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT.texture.name = "AdaptiveToneMappingPass.pl";
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
 
 		if ( this.adaptive ) {
 
