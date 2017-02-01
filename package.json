@@ -8,6 +8,7 @@
   "module": "build/three.module.js",
   "files": [
     "package.json",
+    "bower.json",
     "LICENSE",
     "README.md",
     "build/three.js",
