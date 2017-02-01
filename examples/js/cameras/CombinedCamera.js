@@ -9,16 +9,22 @@
  */
 
 
-THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar ) {
+THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar, setSize ) {
 
 	THREE.Camera.call( this );
 
 	this.fov = fov;
+	this.far = far;
+	this.near = near;
 
 	this.left = - width / 2;
 	this.right = width / 2;
 	this.top = height / 2;
 	this.bottom = - height / 2;
+	this.orthoNear = orthoNear;
+	this.orthoFar = orthoFar;
+
+	this.aspect =  width / height;
 
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
@@ -26,6 +32,8 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 	this.cameraP = new THREE.PerspectiveCamera( fov, width / height, near, far );
 
 	this.zoom = 1;
+	this.view = null;
+	this.setSize = setSize !== undefined ? setSize : true;
 
 	this.toPerspective();
 
