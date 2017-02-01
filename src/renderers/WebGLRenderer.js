@@ -1434,23 +1434,9 @@ function WebGLRenderer( parameters ) {
 							var groups = geometry.groups;
 							var materials = material.materials;
 
-							// there must be at least one group if a MultiMaterial is used
-
 							if ( groups.length === 0 ) {
 
-								if ( geometry.index !== null ) {
-
-									// indexed geometry
-
-									geometry.addGroup( 0, geometry.index.count );
-
-								} else {
-
-									// non-indexed geometry
-
-									geometry.addGroup( 0, geometry.attributes.position.count );
-
-								}
+								console.warn( 'THREE.WebGLRenderer: MultiMaterial can not be used without groups.' );
 
 							}
 
