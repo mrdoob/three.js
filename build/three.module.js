@@ -3337,14 +3337,14 @@ Vector3.prototype = {
 
 function Matrix4() {
 
-	this.elements = new Float32Array( [
+	this.elements = [
 
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 
-	] );
+	];
 
 	if ( arguments.length > 0 ) {
 
@@ -3396,7 +3396,7 @@ Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		this.elements.set( m.elements );
+		this.elements = m.emements.slice();
 
 		return this;
 
@@ -4124,7 +4124,7 @@ Matrix4.prototype = {
 
 			// scale the rotation part
 
-			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
+			matrix.elements = this.elements.slice(); // at this point matrix is incomplete so we can't use .copy()
 
 			var invSX = 1 / sx;
 			var invSY = 1 / sy;
@@ -4476,8 +4476,9 @@ function setValue3fm( gl, v ) {
 
 function setValue4fm( gl, v ) {
 
-	gl.uniformMatrix4fv( this.addr, false, v.elements || v );
-
+	if ( v.elements === undefined ) { gl.uniformMatrix4fv( this.addr, false, v ); }
+	else { gl.uniformMatrix4fv( this.addr, false, new Float32Array(v.elements) ); }
+	
 }
 
 // Single texture (2D / Cube)
@@ -4764,7 +4765,7 @@ function WebGLUniforms( gl, program, renderer ) {
 
 	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-	for ( var i = 0; i !== n; ++ i ) {
+	for ( var i = 0; i < n; ++ i ) {
 
 		var info = gl.getActiveUniform( program, i ),
 			path = info.name,

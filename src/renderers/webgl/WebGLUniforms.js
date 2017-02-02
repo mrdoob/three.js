@@ -179,8 +179,9 @@ function setValue3fm( gl, v ) {
 
 function setValue4fm( gl, v ) {
 
-	gl.uniformMatrix4fv( this.addr, false, v.elements || v );
-
+	if ( v.elements === undefined ) { gl.uniformMatrix4fv( this.addr, false, v ); }
+	else { gl.uniformMatrix4fv( this.addr, false, new Float32Array(v.elements) ); }
+	
 }
 
 // Single texture (2D / Cube)
