@@ -48,7 +48,7 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 	this.cameraP.near = this.near;
 	this.cameraP.far = this.far;
-
+	this.cameraP.aspect = this.aspect;
 	this.cameraP.fov =  this.fov / this.zoom ;
 
 	this.cameraP.updateProjectionMatrix();
