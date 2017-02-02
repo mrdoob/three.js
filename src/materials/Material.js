@@ -63,22 +63,22 @@ function Material() {
 
 }
 
-Object.defineProperty( Material.prototype, "needsUpdate", {
+Object.defineProperty( Material.prototype, 'needsUpdate', {
 
-	get: function() {
+	get: function () {
 
 		return this._needsUpdate;
 
 	},
-	
-	set: function(value) {
+
+	set: function ( value ) {
 
 		if ( value === true ) this.update();
 		this._needsUpdate = value;
 
 	}
 
-});
+} );
 
 Object.assign( Material.prototype, EventDispatcher.prototype, {
 
