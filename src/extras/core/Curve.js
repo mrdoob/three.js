@@ -65,7 +65,7 @@ Object.assign( Curve.prototype, {
 
 	getPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -83,7 +83,7 @@ Object.assign( Curve.prototype, {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -110,7 +110,7 @@ Object.assign( Curve.prototype, {
 
 	getLengths: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 		if ( this.cacheArcLengths
 			&& ( this.cacheArcLengths.length === divisions + 1 )
