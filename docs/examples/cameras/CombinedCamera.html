@@ -28,7 +28,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Number width], [page:Number height], [page:Number fov], [page:Number near], [page:Number far], [page:Number orthoNear], [page:Number orthoFar])</h3>
+		<h3>[name]([page:Number width], [page:Number height], [page:Number fov], [page:Number near], [page:Number far], [page:Number orthoNear], [page:Number orthoFar], [page:Number scaledByNearFarPlane])</h3>
 		<div>
 		width -- Camera frustum width.<br />
 		height -- Camera frustum height.<br />
@@ -36,7 +36,8 @@
 		near — Camera frustum near plane in perspective view.<br />
 		far — Camera frustum far plane in perspective view.<br />
 		orthoNear — Camera frustum near plane in orthographic view.<br />
-		orthoFar — Camera frustum far plane in orthographic view.
+		orthoFar — Camera frustum far plane in orthographic view.<br />
+		scaledByNearFarPlane — Set the size of image plane with the mid plane of the viewing frustum.
 		</div>
 		<div>
 		Creates a [name]. This initializes 2 cameras, an OrthographicCamera and a PerspectiveCamera. The default is the perspective Camera.
@@ -79,12 +80,22 @@
 
 		<h3>[property:number near]</h3>
 		<div>
-		Gets camera frustum near plane.
+		Gets cameraP frustum near plane.
 		</div>
 
 		<h3>[property:number far]</h3>
 		<div>
-		Gets camera frustum far plane.
+		Gets cameraP frustum far plane.
+		</div>
+
+		<h3>[property:number orthoNear]</h3>
+		<div>
+		Gets cameraO frustum near plane.
+		</div>
+
+		<h3>[property:number orthoFar]</h3>
+		<div>
+		Gets cameraO frustum far plane.
 		</div>
 
 		<h3>[property:Matrix4 projectionMatrix]</h3>
@@ -191,6 +202,31 @@
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<div>
 		Updates the ProjectionMatrix.
+		</div>
+
+		<h3>[method:Camera copy]( [page:Camera source] )</h3>
+		<div>
+		Copy the properties from the source camera into this one.
+		</div>
+
+		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
+		<div>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera<br /><br />
+
+			Sets an offset in a larger [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+			This is useful for multi-window or multi-monitor/multi-machine setups.
+			For an example on how to use it see [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</div>
+
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<div>
+		Removes any offset set by the .setViewOffset method.
 		</div>
 
 		<h2>Source</h2>
