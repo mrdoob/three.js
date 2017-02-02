@@ -379,11 +379,10 @@
 
 			var v = filterInput.value;
 			if( v !== '' ) {
-				window.history.replaceState( {} , '', '?q=' + v );
+				window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
 			} else {
-				window.history.replaceState( {} , '', window.location.pathname );
+				window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
 			}
-			if( selected ) window.location.hash = selected;
 
 			var exp = new RegExp( v, 'gi' );
 
