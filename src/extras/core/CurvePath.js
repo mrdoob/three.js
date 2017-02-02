@@ -139,7 +139,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( isNaN( divisions ) ) divisions = 40;
+		if ( typeof divisions !== 'number' ) divisions = 40;
 
 		var points = [];
 
