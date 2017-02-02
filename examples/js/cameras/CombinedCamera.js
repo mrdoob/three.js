@@ -1,7 +1,7 @@
 /**
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *
- *	A general perpose camera, for setting FOV, Lens Focal Length,
+ *		A general perpose camera, for setting FOV, Lens Focal Length,
  *		and switching between perspective and orthographic views easily.
  *		Use this only if you do not wish to manage
  *		both a Orthographic and Perspective Camera
@@ -9,14 +9,14 @@
  */
 
 
-THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar, setSize ) {
+THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar, scaledByNearFarPlane ) {
 
 	THREE.Camera.call( this );
-
+	// perspective
 	this.fov = fov;
 	this.far = far;
 	this.near = near;
-
+	//orthographic
 	this.left = - width / 2;
 	this.right = width / 2;
 	this.top = height / 2;
@@ -28,12 +28,12 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
-	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
+	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, orthoNear, orthoFar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width / height, near, far );
 
 	this.zoom = 1;
 	this.view = null;
-	this.setSize = setSize !== undefined ? setSize : true;
+	this.scaledByNearFarPlane = scaledByNearFarPlane !== undefined ? scaledByNearFarPlane : true;
 
 	this.toPerspective();
 
@@ -46,8 +46,8 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 	// Switches to the Perspective Camera
 
-	this.near = this.cameraP.near;
-	this.far = this.cameraP.far;
+	this.cameraP.near = this.near;
+	this.cameraP.far = this.far;
 
 	this.cameraP.fov =  this.fov / this.zoom ;
 
@@ -65,39 +65,25 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	// Switches to the Orthographic camera estimating viewport from Perspective
 
 	var fov = this.fov;
-	var aspect = this.cameraP.aspect;
-	var near = this.cameraP.near;
-	var far = this.cameraP.far;
+	var aspect = this.aspect;
+	var scaledByNearFarPlane = this.scaledByNearFarPlane;
 
-	// The size that we set is the mid plane of the viewing frustum
-
-	var hyperfocus = ( near + far ) / 2;
-
-	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
+	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 );
+	// if sized equal true, we set size using the mid plane of the viewing frustum
+	if ( scaledByNearFarPlane ) halfHeight *= ( this.cameraP.far + this.cameraO.near ) / 2;
 	var halfWidth = halfHeight * aspect;
 
-	halfHeight /= this.zoom;
-	halfWidth /= this.zoom;
+	this.cameraO.near = this.orthoNear;
+	this.cameraO.far = this.orthoFar;
 
 	this.cameraO.left = - halfWidth;
 	this.cameraO.right = halfWidth;
 	this.cameraO.top = halfHeight;
 	this.cameraO.bottom = - halfHeight;
 
-	// this.cameraO.left = -farHalfWidth;
-	// this.cameraO.right = farHalfWidth;
-	// this.cameraO.top = farHalfHeight;
-	// this.cameraO.bottom = -farHalfHeight;
-
-	// this.cameraO.left = this.left / this.zoom;
-	// this.cameraO.right = this.right / this.zoom;
-	// this.cameraO.top = this.top / this.zoom;
-	// this.cameraO.bottom = this.bottom / this.zoom;
-
+	this.cameraO.zoom = this.zoom;
 	this.cameraO.updateProjectionMatrix();
 
-	this.near = this.cameraO.near;
-	this.far = this.cameraO.far;
 	this.projectionMatrix = this.cameraO.projectionMatrix;
 
 	this.inPerspectiveMode = false;
@@ -133,6 +119,67 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 };
 
+THREE.CombinedCamera.prototype.copy = function ( source ) {
+
+	THREE.Camera.prototype.copy.call( this, source );
+
+	this.fov = source.fov;
+	this.far = source.far;
+	this.near = source.near;
+
+	this.left = source.left;
+	this.right = source.right;
+	this.top = source.top;
+	this.bottom = source.bottom;
+	this.orthoNear = source.orthoNear;
+	this.orthoFar = source.orthoFar;
+
+	this.zoom = source.zoom;
+	this.view = source.view === null ? null : Object.assign( {}, source.view );
+	this.aspect = source.aspect;
+	this.setSize = source.setSize;
+
+	this.cameraO = new THREE.OrthographicCamera( source.left, source.right, source.top, source.bottom, source.orthoNear, source.orthoFar );
+	this.cameraP = new THREE.PerspectiveCamera( source.fov, source.width / source.height, source.near, source.far );
+
+	this.inOrthographicMode = source.inOrthographicMode;
+	this.inPerspectiveMode = source.inPerspectiveMode;
+
+	return this;
+
+};
+
+THREE.CombinedCamera.prototype.setViewOffset = function( fullWidth, fullHeight, x, y, width, height ) {
+
+	this.view = {
+		fullWidth: fullWidth,
+		fullHeight: fullHeight,
+		offsetX: x,
+		offsetY: y,
+		width: width,
+		height: height
+	};
+
+	if ( this.inPerspectiveMode ) {
+
+		this.aspect = fullWidth / fullHeight;
+
+		this.toPerspective();
+
+	} else {
+
+		this.toOrthographic();
+
+	}
+
+};
+
+THREE.CombinedCamera.prototype.clearViewOffset = function() {
+
+	this.view = null;
+	this.updateProjectionMatrix();
+
+};
 // For maintaining similar API with PerspectiveCamera
 
 THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
