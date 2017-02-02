@@ -28,25 +28,6 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	this.clipPlane = new THREE.Vector4();
 
-	// For debug only, show the normal and plane of the mirror
-	var debugMode = options.debugMode !== undefined ? options.debugMode : false;
-
-	if ( debugMode ) {
-
-		var arrow = new THREE.ArrowHelper( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 0, 0, 0 ), 10, 0xffff80 );
-		var planeGeometry = new THREE.Geometry();
-		planeGeometry.vertices.push( new THREE.Vector3( - 10, - 10, 0 ) );
-		planeGeometry.vertices.push( new THREE.Vector3( 10, - 10, 0 ) );
-		planeGeometry.vertices.push( new THREE.Vector3( 10, 10, 0 ) );
-		planeGeometry.vertices.push( new THREE.Vector3( - 10, 10, 0 ) );
-		planeGeometry.vertices.push( planeGeometry.vertices[ 0 ] );
-		var plane = new THREE.Line( planeGeometry, new THREE.LineBasicMaterial( { color: 0xffff80 } ) );
-
-		this.add( arrow );
-		this.add( plane );
-
-	}
-
 	if ( camera instanceof THREE.PerspectiveCamera ) {
 
 		this.camera = camera;
