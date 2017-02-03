@@ -3402,7 +3402,7 @@
 
 		copy: function ( m ) {
 
-			this.elements = m.emements.slice();
+			this.elements = m.elements.slice();
 
 			return this;
 
