@@ -50,6 +50,7 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 	this.cameraP.far = this.far;
 	this.cameraP.aspect = this.aspect;
 	this.cameraP.fov =  this.fov / this.zoom ;
+	this.cameraP.view = this.view;
 
 	this.cameraP.updateProjectionMatrix();
 
@@ -82,6 +83,8 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	this.cameraO.bottom = - halfHeight;
 
 	this.cameraO.zoom = this.zoom;
+	this.cameraO.view = this.view;
+
 	this.cameraO.updateProjectionMatrix();
 
 	this.projectionMatrix = this.cameraO.projectionMatrix;
