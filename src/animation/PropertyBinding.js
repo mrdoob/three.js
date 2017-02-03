@@ -8,7 +8,7 @@
  * @author tschw
  */
 
-function Composite ( targetGroup, path, optionalParsedPath ) {
+function Composite( targetGroup, path, optionalParsedPath ) {
 
 	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
@@ -19,7 +19,7 @@ function Composite ( targetGroup, path, optionalParsedPath ) {
 
 Object.assign( Composite.prototype, {
 
-	getValue: function( array, offset ) {
+	getValue: function ( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -31,7 +31,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	setValue: function( array, offset ) {
+	setValue: function ( array, offset ) {
 
 		var bindings = this._bindings;
 
@@ -44,7 +44,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	bind: function() {
+	bind: function () {
 
 		var bindings = this._bindings;
 
@@ -57,7 +57,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	unbind: function() {
+	unbind: function () {
 
 		var bindings = this._bindings;
 
@@ -88,7 +88,7 @@ Object.assign( PropertyBinding, {
 
 	Composite: Composite,
 
-	create: function( root, path, parsedPath ) {
+	create: function ( root, path, parsedPath ) {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
@@ -102,7 +102,7 @@ Object.assign( PropertyBinding, {
 
 	},
 
-	parseTrackName: function( trackName ) {
+	parseTrackName: function ( trackName ) {
 
 		// matches strings in the form of:
 		//    nodeName.property
@@ -144,9 +144,9 @@ Object.assign( PropertyBinding, {
 
 	},
 
-	findNode: function( root, nodeName ) {
+	findNode: function ( root, nodeName ) {
 
-		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 			return root;
 
@@ -155,9 +155,9 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var searchSkeleton = function( skeleton ) {
+			var searchSkeleton = function ( skeleton ) {
 
-				for( var i = 0; i < skeleton.bones.length; i ++ ) {
+				for ( var i = 0; i < skeleton.bones.length; i ++ ) {
 
 					var bone = skeleton.bones[ i ];
 
@@ -166,6 +166,7 @@ Object.assign( PropertyBinding, {
 						return bone;
 
 					}
+
 				}
 
 				return null;
@@ -179,14 +180,15 @@ Object.assign( PropertyBinding, {
 				return bone;
 
 			}
+
 		}
 
 		// search into node subtree.
 		if ( root.children ) {
 
-			var searchNodeSubtree = function( children ) {
+			var searchNodeSubtree = function ( children ) {
 
-				for( var i = 0; i < children.length; i ++ ) {
+				for ( var i = 0; i < children.length; i ++ ) {
 
 					var childNode = children[ i ];
 
@@ -225,8 +227,8 @@ Object.assign( PropertyBinding, {
 Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	// these are used to "bind" a nonexistent property
-	_getValue_unavailable: function() {},
-	_setValue_unavailable: function() {},
+	_getValue_unavailable: function () {},
+	_setValue_unavailable: function () {},
 
 	BindingType: {
 		Direct: 0,
@@ -417,7 +419,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	},
 
 	// create getter / setter pair for a property in the scene graph
-	bind: function() {
+	bind: function () {
 
 		var targetObject = this.node,
 			parsedPath = this.parsedPath,
@@ -563,9 +565,11 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		var bindingType = this.BindingType.Direct;
 
 		if ( propertyIndex !== undefined ) {
+
 			// access a sub element of the property array (only primitives are supported right now)
 
 			if ( propertyName === "morphTargetInfluences" ) {
+
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 
 				// support resolving morphTarget names into indices.
@@ -602,6 +606,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 			this.propertyIndex = propertyIndex;
 
 		} else if ( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
+
 			// must use copy for Object3D.Euler/Quaternion
 
 			bindingType = this.BindingType.HasFromToArray;
@@ -609,7 +614,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 			this.resolvedProperty = nodeProperty;
 
 		} else if ( Array.isArray( nodeProperty ) ) {
-      
+
 			bindingType = this.BindingType.EntireArray;
 
 			this.resolvedProperty = nodeProperty;
@@ -626,7 +631,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	},
 
-	unbind: function() {
+	unbind: function () {
 
 		this.node = null;
 

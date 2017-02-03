@@ -284,7 +284,7 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 
 
 		var actionByRoot = actionsForClip.actionByRoot,
-			rootUuid = ( actions._localRoot || this._root ).uuid;
+			rootUuid = ( action._localRoot || this._root ).uuid;
 
 		delete actionByRoot[ rootUuid ];
 

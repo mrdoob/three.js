@@ -995,7 +995,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
@@ -1012,13 +1011,13 @@ Texture.DEFAULT_MAPPING = UVMapping;
 
 Object.defineProperty( Texture.prototype, "needsUpdate", {
 
-	set: function(value) { 
-		
-		if ( value === true ) this.version ++; 
-	
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
 	}
 
-});
+} );
 
 Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
@@ -4980,7 +4979,7 @@ var map_particle_fragment = "#ifdef USE_MAP\n\tvec4 mapTexel = texture2D( map, v
 
 var map_particle_pars_fragment = "#ifdef USE_MAP\n\tuniform vec4 offsetRepeat;\n\tuniform sampler2D map;\n#endif\n";
 
-var metalnessmap_fragment = "float metalnessFactor = metalness;\n#ifdef USE_METALNESSMAP\n\tvec4 texelMetalness = texture2D( metalnessMap, vUv );\n\tmetalnessFactor *= texelMetalness.r;\n#endif\n";
+var metalnessmap_fragment = "float metalnessFactor = metalness;\n#ifdef USE_METALNESSMAP\n\tvec4 texelMetalness = texture2D( metalnessMap, vUv );\n\tmetalnessFactor *= texelMetalness.b;\n#endif\n";
 
 var metalnessmap_pars_fragment = "#ifdef USE_METALNESSMAP\n\tuniform sampler2D metalnessMap;\n#endif";
 
@@ -5002,7 +5001,7 @@ var premultiplied_alpha_fragment = "#ifdef PREMULTIPLIED_ALPHA\n\tgl_FragColor.r
 
 var project_vertex = "#ifdef USE_SKINNING\n\tvec4 mvPosition = modelViewMatrix * skinned;\n#else\n\tvec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );\n#endif\ngl_Position = projectionMatrix * mvPosition;\n";
 
-var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUGHNESSMAP\n\tvec4 texelRoughness = texture2D( roughnessMap, vUv );\n\troughnessFactor *= texelRoughness.r;\n#endif\n";
+var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUGHNESSMAP\n\tvec4 texelRoughness = texture2D( roughnessMap, vUv );\n\troughnessFactor *= texelRoughness.g;\n#endif\n";
 
 var roughnessmap_pars_fragment = "#ifdef USE_ROUGHNESSMAP\n\tuniform sampler2D roughnessMap;\n#endif";
 
@@ -7165,22 +7164,22 @@ function Material() {
 
 }
 
-Object.defineProperty( Material.prototype, "needsUpdate", {
+Object.defineProperty( Material.prototype, 'needsUpdate', {
 
-	get: function() {
+	get: function () {
 
 		return this._needsUpdate;
 
 	},
-	
-	set: function(value) {
+
+	set: function ( value ) {
 
 		if ( value === true ) this.update();
 		this._needsUpdate = value;
 
 	}
 
-});
+} );
 
 Object.assign( Material.prototype, EventDispatcher.prototype, {
 
@@ -11685,15 +11684,15 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-Object.defineProperty( BufferAttribute.prototype, "needsUpdate", {
+Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 
-	set: function(value) { 
-		
+	set: function ( value ) {
+
 		if ( value === true ) this.version ++;
-	
+
 	}
 
-});
+} );
 
 Object.assign( BufferAttribute.prototype, {
 
@@ -21109,16 +21108,30 @@ function WebGLRenderer( parameters ) {
 							var groups = geometry.groups;
 							var materials = material.materials;
 
-							for ( var i = 0, l = groups.length; i < l; i ++ ) {
+							if ( groups.length > 0 ) {
 
-								var group = groups[ i ];
-								var groupMaterial = materials[ group.materialIndex ];
+								// push a render item for each group of the geometry
 
-								if ( groupMaterial.visible === true ) {
+								for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+									var group = groups[ i ];
+									var groupMaterial = materials[ group.materialIndex ];
+
+									if ( groupMaterial === undefined ) {
+
+										console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
+
+									} else if ( groupMaterial.visible === true ) {
+
+										pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+									}
 
 								}
+
+							} else {
+
+								console.warn( 'THREE.WebGLRenderer: MultiMaterial can not be used without groups.' );
 
 							}
 
@@ -24111,7 +24124,7 @@ function WireframeGeometry( geometry ) {
 
 			if ( groups.length === 0 ) {
 
-				geometry.addGroup( 0, indices.count );
+				groups = [ { start: 0, count: indices.count, materialIndex: 0 } ];
 
 			}
 
@@ -31509,7 +31522,7 @@ function AnimationClip( name, duration, tracks ) {
 
 	this.name = name;
 	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : -1;
+	this.duration = ( duration !== undefined ) ? duration : - 1;
 
 	this.uuid = _Math.generateUUID();
 
@@ -31526,7 +31539,7 @@ function AnimationClip( name, duration, tracks ) {
 
 Object.assign( AnimationClip, {
 
-	parse: function( json ) {
+	parse: function ( json ) {
 
 		var tracks = [],
 			jsonTracks = json.tracks,
@@ -31541,8 +31554,8 @@ Object.assign( AnimationClip, {
 		return new AnimationClip( json.name, json.duration, tracks );
 
 	},
-	
-	toJSON: function( clip ) {
+
+	toJSON: function ( clip ) {
 
 		var tracks = [],
 			clipTracks = clip.tracks;
@@ -31564,8 +31577,8 @@ Object.assign( AnimationClip, {
 		return json;
 
 	},
-	
-	CreateFromMorphTargetSequence: function( name, morphTargetSequence, fps, noLoop ) {
+
+	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
 
 		var numMorphTargets = morphTargetSequence.length;
 		var tracks = [];
@@ -31600,13 +31613,14 @@ Object.assign( AnimationClip, {
 						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
 						times, values
 					).scale( 1.0 / fps ) );
+
 		}
 
-		return new AnimationClip( name, -1, tracks );
+		return new AnimationClip( name, - 1, tracks );
 
 	},
 
-	findByName: function( objectOrClipArray, name ) {
+	findByName: function ( objectOrClipArray, name ) {
 
 		var clipArray = objectOrClipArray;
 
@@ -31624,13 +31638,14 @@ Object.assign( AnimationClip, {
 				return clipArray[ i ];
 
 			}
+
 		}
 
 		return null;
 
 	},
 
-	CreateClipsFromMorphTargetSequences: function( morphTargets, fps, noLoop ) {
+	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
 
 		var animationToMorphTargets = {};
 
@@ -31675,7 +31690,7 @@ Object.assign( AnimationClip, {
 	},
 
 	// parse the animation.hierarchy format
-	parseAnimation: function( animation, bones ) {
+	parseAnimation: function ( animation, bones ) {
 
 		if ( ! animation ) {
 
@@ -31684,8 +31699,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var addNonemptyTrack = function(
-				trackType, trackName, animationKeys, propertyName, destTracks ) {
+		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
 			if ( animationKeys.length !== 0 ) {
@@ -31693,8 +31707,7 @@ Object.assign( AnimationClip, {
 				var times = [];
 				var values = [];
 
-				AnimationUtils.flattenJSON(
-						animationKeys, times, values, propertyName );
+				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
 				// empty keys are filtered out, so check again
 				if ( times.length !== 0 ) {
@@ -31711,7 +31724,7 @@ Object.assign( AnimationClip, {
 
 		var clipName = animation.name || 'default';
 		// automatic length determination in AnimationClip.
-		var duration = animation.length || -1;
+		var duration = animation.length || - 1;
 		var fps = animation.fps || 30;
 
 		var hierarchyTracks = animation.hierarchy || [];
@@ -31725,17 +31738,19 @@ Object.assign( AnimationClip, {
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
-			if ( animationKeys[0].morphTargets ) {
+			if ( animationKeys[ 0 ].morphTargets ) {
 
 				// figure out all morph targets used in this track
 				var morphTargetNames = {};
+
 				for ( var k = 0; k < animationKeys.length; k ++ ) {
 
-					if ( animationKeys[k].morphTargets ) {
+					if ( animationKeys[ k ].morphTargets ) {
 
-						for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
-							morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
+							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+
 						}
 
 					}
@@ -31750,22 +31765,23 @@ Object.assign( AnimationClip, {
 					var times = [];
 					var values = [];
 
-					for ( var m = 0; m !== animationKeys[k].morphTargets.length; ++ m ) {
+					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
 
-						var animationKey = animationKeys[k];
+						var animationKey = animationKeys[ k ];
 
 						times.push( animationKey.time );
 						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
 
 					}
 
-					tracks.push( new NumberKeyframeTrack('.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 				}
 
 				duration = morphTargetNames.length * ( fps || 1.0 );
 
 			} else {
+
 				// ...assume skeletal animation
 
 				var boneName = '.bones[' + bones[ h ].name + ']';
@@ -31802,10 +31818,9 @@ Object.assign( AnimationClip, {
 
 Object.assign( AnimationClip.prototype, {
 
-	resetDuration: function() {
+	resetDuration: function () {
 
-		var tracks = this.tracks,
-			duration = 0;
+		var tracks = this.tracks, duration = 0;
 
 		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
 
@@ -31819,7 +31834,7 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
-	trim: function() {
+	trim: function () {
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
@@ -31831,7 +31846,7 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
-	optimize: function() {
+	optimize: function () {
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
 
@@ -36186,7 +36201,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 Object.assign( PropertyMixer.prototype, {
 
 	// accumulate data in the 'incoming' region into 'accu<i>'
-	accumulate: function( accuIndex, weight ) {
+	accumulate: function ( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
@@ -36224,7 +36239,7 @@ Object.assign( PropertyMixer.prototype, {
 	},
 
 	// apply the state of 'accu<i>' to the binding when accus differ
-	apply: function( accuIndex ) {
+	apply: function ( accuIndex ) {
 
 		var stride = this.valueSize,
 			buffer = this.buffer,
@@ -36263,7 +36278,7 @@ Object.assign( PropertyMixer.prototype, {
 	},
 
 	// remember the state of the bound property and copy it to both accus
-	saveOriginalState: function() {
+	saveOriginalState: function () {
 
 		var binding = this.binding;
 
@@ -36286,7 +36301,7 @@ Object.assign( PropertyMixer.prototype, {
 	},
 
 	// apply the state previously taken via 'saveOriginalState' to the binding
-	restoreOriginalState: function() {
+	restoreOriginalState: function () {
 
 		var originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
@@ -36296,7 +36311,7 @@ Object.assign( PropertyMixer.prototype, {
 
 	// mix functions
 
-	_select: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_select: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 		if ( t >= 0.5 ) {
 
@@ -36310,14 +36325,13 @@ Object.assign( PropertyMixer.prototype, {
 
 	},
 
-	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_slerp: function ( buffer, dstOffset, srcOffset, t ) {
 
-		Quaternion.slerpFlat( buffer, dstOffset,
-			buffer, dstOffset, buffer, srcOffset, t );
+		Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t );
 
 	},
 
-	_lerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+	_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 		var s = 1 - t;
 
@@ -36343,7 +36357,7 @@ Object.assign( PropertyMixer.prototype, {
  * @author tschw
  */
 
-function Composite ( targetGroup, path, optionalParsedPath ) {
+function Composite( targetGroup, path, optionalParsedPath ) {
 
 	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
@@ -36354,7 +36368,7 @@ function Composite ( targetGroup, path, optionalParsedPath ) {
 
 Object.assign( Composite.prototype, {
 
-	getValue: function( array, offset ) {
+	getValue: function ( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -36366,7 +36380,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	setValue: function( array, offset ) {
+	setValue: function ( array, offset ) {
 
 		var bindings = this._bindings;
 
@@ -36379,7 +36393,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	bind: function() {
+	bind: function () {
 
 		var bindings = this._bindings;
 
@@ -36392,7 +36406,7 @@ Object.assign( Composite.prototype, {
 
 	},
 
-	unbind: function() {
+	unbind: function () {
 
 		var bindings = this._bindings;
 
@@ -36423,7 +36437,7 @@ Object.assign( PropertyBinding, {
 
 	Composite: Composite,
 
-	create: function( root, path, parsedPath ) {
+	create: function ( root, path, parsedPath ) {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
@@ -36437,7 +36451,7 @@ Object.assign( PropertyBinding, {
 
 	},
 
-	parseTrackName: function( trackName ) {
+	parseTrackName: function ( trackName ) {
 
 		// matches strings in the form of:
 		//    nodeName.property
@@ -36479,9 +36493,9 @@ Object.assign( PropertyBinding, {
 
 	},
 
-	findNode: function( root, nodeName ) {
+	findNode: function ( root, nodeName ) {
 
-		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 			return root;
 
@@ -36490,9 +36504,9 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var searchSkeleton = function( skeleton ) {
+			var searchSkeleton = function ( skeleton ) {
 
-				for( var i = 0; i < skeleton.bones.length; i ++ ) {
+				for ( var i = 0; i < skeleton.bones.length; i ++ ) {
 
 					var bone = skeleton.bones[ i ];
 
@@ -36501,6 +36515,7 @@ Object.assign( PropertyBinding, {
 						return bone;
 
 					}
+
 				}
 
 				return null;
@@ -36514,14 +36529,15 @@ Object.assign( PropertyBinding, {
 				return bone;
 
 			}
+
 		}
 
 		// search into node subtree.
 		if ( root.children ) {
 
-			var searchNodeSubtree = function( children ) {
+			var searchNodeSubtree = function ( children ) {
 
-				for( var i = 0; i < children.length; i ++ ) {
+				for ( var i = 0; i < children.length; i ++ ) {
 
 					var childNode = children[ i ];
 
@@ -36560,8 +36576,8 @@ Object.assign( PropertyBinding, {
 Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	// these are used to "bind" a nonexistent property
-	_getValue_unavailable: function() {},
-	_setValue_unavailable: function() {},
+	_getValue_unavailable: function () {},
+	_setValue_unavailable: function () {},
 
 	BindingType: {
 		Direct: 0,
@@ -36752,7 +36768,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	},
 
 	// create getter / setter pair for a property in the scene graph
-	bind: function() {
+	bind: function () {
 
 		var targetObject = this.node,
 			parsedPath = this.parsedPath,
@@ -36898,9 +36914,11 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		var bindingType = this.BindingType.Direct;
 
 		if ( propertyIndex !== undefined ) {
+
 			// access a sub element of the property array (only primitives are supported right now)
 
 			if ( propertyName === "morphTargetInfluences" ) {
+
 				// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 
 				// support resolving morphTarget names into indices.
@@ -36937,6 +36955,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 			this.propertyIndex = propertyIndex;
 
 		} else if ( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
+
 			// must use copy for Object3D.Euler/Quaternion
 
 			bindingType = this.BindingType.HasFromToArray;
@@ -36944,7 +36963,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 			this.resolvedProperty = nodeProperty;
 
 		} else if ( Array.isArray( nodeProperty ) ) {
-      
+
 			bindingType = this.BindingType.EntireArray;
 
 			this.resolvedProperty = nodeProperty;
@@ -36961,7 +36980,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	},
 
-	unbind: function() {
+	unbind: function () {
 
 		this.node = null;
 
@@ -37044,7 +37063,7 @@ function AnimationObjectGroup( var_args ) {
 
 		objects: {
 			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_;  }
+			get inUse() { return this.total - scope.nCachedObjects_; }
 		},
 
 		get bindingsPerObject() { return scope._bindings.length; }
@@ -37133,7 +37152,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				}
 
-			} else if ( objects[ index ] !== knownObject) {
+			} else if ( objects[ index ] !== knownObject ) {
 
 				console.error( "Different objects with the same UUID " +
 						"detected. Clean the caches or recreate your " +
@@ -37281,7 +37300,8 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_: function( path, parsedPath ) {
+	subscribe_: function ( path, parsedPath ) {
+
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
 
@@ -37306,13 +37326,10 @@ Object.assign( AnimationObjectGroup.prototype, {
 		parsedPaths.push( parsedPath );
 		bindings.push( bindingsForPath );
 
-		for ( var i = nCachedObjects,
-				n = objects.length; i !== n; ++ i ) {
+		for ( var i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
 
 			var object = objects[ i ];
-
-			bindingsForPath[ i ] =
-					new PropertyBinding( object, path, parsedPath );
+			bindingsForPath[ i ] = new PropertyBinding( object, path, parsedPath );
 
 		}
 
@@ -37320,7 +37337,8 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	},
 
-	unsubscribe_: function( path ) {
+	unsubscribe_: function ( path ) {
+
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
 
@@ -38283,7 +38301,7 @@ Object.assign( AnimationMixer.prototype, EventDispatcher.prototype, {
 
 
 		var actionByRoot = actionsForClip.actionByRoot,
-			rootUuid = ( actions._localRoot || this._root ).uuid;
+			rootUuid = ( action._localRoot || this._root ).uuid;
 
 		delete actionByRoot[ rootUuid ];
 
@@ -38978,15 +38996,15 @@ function InterleavedBuffer( array, stride ) {
 
 }
 
-Object.defineProperty( InterleavedBuffer.prototype, "needsUpdate", {
+Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 
-	set: function(value) { 
-		
-		if ( value === true ) this.version ++; 
-	
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
 	}
 
-});
+} );
 
 Object.assign( InterleavedBuffer.prototype, {
 
