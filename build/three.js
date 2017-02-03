@@ -33840,7 +33840,7 @@
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
 
-		getPoint: function ( t ) {
+		getPoint: function () {
 
 			console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
 			return null;
@@ -33861,7 +33861,7 @@
 
 		getPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 5;
+			if ( divisions === undefined ) divisions = 5;
 
 			var points = [];
 
@@ -33879,7 +33879,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 5;
+			if ( divisions === undefined ) divisions = 5;
 
 			var points = [];
 
@@ -33906,7 +33906,7 @@
 
 		getLengths: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+			if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 			if ( this.cacheArcLengths
 				&& ( this.cacheArcLengths.length === divisions + 1 )
@@ -33927,7 +33927,7 @@
 
 			for ( p = 1; p <= divisions; p ++ ) {
 
-				current = this.getPoint ( p / divisions );
+				current = this.getPoint( p / divisions );
 				sum += current.distanceTo( last );
 				cache.push( sum );
 				last = current;
@@ -33940,7 +33940,7 @@
 
 		},
 
-		updateArcLengths: function() {
+		updateArcLengths: function () {
 
 			this.needsUpdate = true;
 			this.getLengths();
@@ -34033,7 +34033,7 @@
 		// 2 points a small delta apart will be used to find its gradient
 		// which seems to give a reasonable approximation
 
-		getTangent: function( t ) {
+		getTangent: function ( t ) {
 
 			var delta = 0.0001;
 			var t1 = t - delta;
@@ -34357,7 +34357,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 40;
+			if ( divisions === undefined ) divisions = 40;
 
 			var points = [];
 
