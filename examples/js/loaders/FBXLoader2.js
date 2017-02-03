@@ -760,7 +760,15 @@
 								var indexBuffer = [];
 								if ( referenceType === 'IndexToDirect' ) {
 
-									indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+									if ( 'NormalIndex' in NormalNode.subNodes ) {
+
+										indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+
+									} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
+
+										indexBuffer = parseIntArray( NormalNode.subNodes.NormalsIndex.properties.a );
+
+									}
 
 								}
 
@@ -813,6 +821,17 @@
 								var MaterialNode = geometryNode.subNodes.LayerElementMaterial[ 0 ];
 								var mappingType = MaterialNode.properties.MappingInformationType;
 								var referenceType = MaterialNode.properties.ReferenceInformationType;
+								if ( mappingType === 'NoMappingInformation' ) {
+
+									return {
+										dataSize: 1,
+										buffer: [ 0 ],
+										indices: [ 0 ],
+										mappingType: 'AllSame',
+										referenceType: referenceType
+									};
+
+								}
 								var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
 
 								// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
