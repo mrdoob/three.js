@@ -47,57 +47,35 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var stats, clock;
 			var scene, camera, renderer;
-			var clock = new THREE.Clock();
 
-			var init = function(){
-
-				container = document.getElementById( 'container' );
-
-				camera = new THREE.PerspectiveCamera( 53, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.x = 0;
-				camera.position.y = 0;
-				camera.position.z = 100;
-				camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x555555 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				window.addEventListener( 'resize', onWindowResize, false );
-			};
-
-			var onWindowResize = function () {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			};
-
-			var createScene = function(){
+			function init() {
 
 				scene = new THREE.Scene();
 
-				var axisHelper = new THREE.AxisHelper( 1 );
+				var container = document.getElementById( 'container' );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 50, 50, 100 );
+				camera.lookAt( scene.position );
+
+				//
+
+				var axisHelper = new THREE.AxisHelper( 10 );
 				scene.add( axisHelper );
 
-				// SphereGeometry
-				var sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-				var sphereMesh = new THREE.Mesh( sphereGeometry, material );
+				//
 
-				// Setup animation
+				var geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
 				var animationData = {
 					"name"      : "Action",
 					"fps"       : 25,
@@ -107,19 +85,20 @@
 							"parent" : -1, //root
 							"keys"   : [
 								{
-									"time":0,
-									"pos" :[0,0,0],
-									"rot" :[0,0,0],
-									"scl" :[1,1,1]
+									"time": 0,
+									"pos" : [ 0, 0, 0 ],
+									"rot" : [ 0, 0, 0, 0 ],
+									"scl" : [ 1, 1, 1 ]
 								},
 								{
-									"time":1.0,
-									"pos" :[30,0,0]
+									"time": 1.0,
+									"pos" : [ 30, 0, 0 ],
+									"scl" : [ 2, 2, 2 ]
 								}
 								,
 								{
-									"time":2.0,
-									"pos" :[0,0,0]
+									"time": 2.0,
+									"pos" : [ 0, 0, 0 ]
 								}
 							]
 						}
@@ -128,10 +107,38 @@
 
 				ensureLoop( animationData );
 
-				var sphereMeshAnimation = new THREE.Animation( sphereMesh, animationData );
-				sphereMeshAnimation.play();
+				var animation = new THREE.Animation( mesh, animationData );
+				animation.play();
 
-				scene.add( sphereMesh );
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x555555 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				clock = new THREE.Clock()
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			};
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			};
 
@@ -152,7 +159,8 @@
 
 			};
 
-			var animate = function () {
+			function animate() {
+
 				requestAnimationFrame( animate );
 
 				var delta = clock.getDelta();
@@ -160,15 +168,17 @@
 				THREE.AnimationHandler.update( delta );
 
 				render();
+
 			};
 
-			var render = function () {
+			function render() {
+
 				renderer.render( scene, camera );
 				stats.update();
+
 			};
 
 			init();
-			createScene();
 			animate();
 
 		</script>
