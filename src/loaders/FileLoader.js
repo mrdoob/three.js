@@ -186,6 +186,21 @@ Object.assign( FileLoader.prototype, {
 
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
+			if ( this.requestHeader !== undefined ) {
+
+				var keys = Object.keys( this.requestHeader );
+
+				for ( var i = 0, il = keys.length; i < il; i ++ ) {
+
+					var header = keys[ i ];
+					var value = this.requestHeader[ header ];
+
+					request.setRequestHeader( header, value );
+
+				}
+
+			}
+
 			request.send( null );
 
 		}
@@ -220,6 +235,13 @@ Object.assign( FileLoader.prototype, {
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	},
+
+	setRequestHeader: function ( value ) {
+
+		this.requestHeader = value;
 		return this;
 
 	}
