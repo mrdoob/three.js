@@ -1,65 +1,121 @@
+import { Time } from './Time.js';
+
 /**
  * @author Lewy Blue / https://github.com/looeee
  *
- * parameters = {
- *
- *  canvas: <canvas> DOM element,
- *
- *  scene: new THREE.Scene(),
- *
- *  camera: new THREE.Camera( ... )
- *
- *  renderer: new THREE.WebGLRenderer( ... )
- *
- *  autoResize: <bool>
- *
- *  autoRender: <bool> //setting this to false will prevent calling renderer.render automatically; users can call it manually in the onUpate function instead
- *
- * }
  */
 
-function App( parameters ) {
+function App( canvas ) {
 
-	parameters = parameters || {};
+	var _canvas, _scene, _camera, _renderer;
 
-	if ( parameters.canvas !== undefined ) {
+	var _currentAnimationFrameID;
 
-		this.canvas = parameters.canvas;
+	if ( canvas !== undefined ) this.canvas = canvas;
 
-	} else {
+	this.autoRender = true;
 
-		this.canvas = document.body.appendChild( document.createElement( 'canvas' ) );
-		this.canvas.style.position = 'absolute';
-		this.canvas.style.width = this.canvas.style.height = '100%';
+	this.autoResize = true;
 
-	}
+	this.time = new Time();
 
-	this.scene = ( parameters.scene !== undefined ) ? parameters.scene : new THREE.Scene();
+	Object.defineProperties( this, {
 
-	this.camera = ( parameters.camera !== undefined ) ? parameters.camera : new THREE.PerspectiveCamera( 75, this.canvas.clientWidth / this.canvas.clientHeight, 1, 1000 );
+		'canvas': {
 
-	if ( parameters.renderer !== undefined ) {
+			get: function () {
 
-		this.renderer = parameters.renderer;
+				if ( _canvas === undefined ) {
 
-	} else {
+					_canvas = document.body.appendChild( document.createElement( 'canvas' ) );
+					_canvas.style.position = 'absolute';
+					_canvas.style.width = _canvas.style.height = '100%';
 
-		this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
+				}
 
-	}
+				return _canvas;
 
-	this.autoResize = ( parameters.autoResize !== undefined ) ? parameters.autoResize : true;
-	window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
+			},
 
-	this.autoRender = ( parameters.autoRender !== undefined ) ? parameters.autoRender : true;
+			set: function ( canvas ) {
 
-}
+				_canvas = canvas;
 
-Object.assign( App.prototype, {
+			},
+		},
 
-	animate: function () {
+		'camera': {
+
+			get: function () {
+
+				if ( _camera === undefined ) {
+
+					_camera = new THREE.PerspectiveCamera( 75, this.canvas.clientWidth / this.canvas.clientHeight, 1, 1000 );
+
+				}
+
+				return _camera;
+
+			},
+
+			set: function ( camera ) {
+
+				_camera = camera;
+
+			},
+		},
+
+		'scene': {
+
+			get: function () {
+
+				if ( _scene === undefined ) {
+
+					_scene = new THREE.Scene();
+
+				}
+
+				return _scene;
+
+			},
+
+			set: function ( scene ) {
+
+				_scene = scene;
+
+			},
+		},
+
+		'renderer': {
+
+			get: function () {
+
+				if ( _renderer === undefined ) {
+
+					_renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
+					_renderer.setPixelRatio( window.devicePixelRatio );
+					_renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
+					_renderer.setSize( window.innerWidth, window.innerHeight, false );
+
+				}
+
+				return _renderer;
+
+			},
+
+			set: function ( renderer ) {
+
+				_renderer = renderer;
+
+			},
+
+		},
+
+	} );
+
+	this.animate = function () {
+
+		this.time.start();
 
 		var self = this;
 
@@ -75,17 +131,17 @@ Object.assign( App.prototype, {
 
 		animationHandler();
 
-	},
+	};
 
-	stopAnimation: function () {
+	this.stopAnimation = function () {
 
-		cancelAnimationFrame( this.currentAnimationFrameID );
+		cancelAnimationFrame( _currentAnimationFrameID );
 
-	},
+	};
 
-	onUpdate: function () {},
+	this.onUpdate = function () {};
 
-	onWindowResize:	function () {
+	this.onWindowResize =	function () {
 
 		if ( ! this.autoResize ) return;
 
@@ -103,9 +159,10 @@ Object.assign( App.prototype, {
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize( newWidth, newHeight, false );
 
-	},
+	};
 
-} );
+	window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
 
+}
 
 export { App };
