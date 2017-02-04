@@ -1340,45 +1340,9 @@
 
 				} );
 
-				// Skeleton is now bound, we are now free to set up the
-				// scene graph.
-				for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
-
-					var model = modelArray[ modelArrayIndex ];
-
-					var node = ModelNode[ model.FBX_ID ];
-
-					if ( 'Lcl_Translation' in node.properties ) {
-
-						model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
-
-					}
-
-					if ( 'Lcl_Rotation' in node.properties ) {
-
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
-						rotation.push( 'ZYX' );
-						model.rotation.fromArray( rotation );
-
-					}
-
-					if ( 'Lcl_Scaling' in node.properties ) {
-
-						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
-
-					}
-
-					if ( 'PreRotation' in node.properties ) {
-
-						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
-						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
-						preRotations.multiply( currentRotation );
-						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
-
-					}
-
-				}
+				//Skeleton is now bound, return objects to starting
+				//world positions.
+				sceneGraph.updateMatrixWorld( true );
 
 				// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
 				// to attach animations to, since FBXs treat animations as animations for the entire scene,
