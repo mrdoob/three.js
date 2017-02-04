@@ -59,23 +59,22 @@
 
 			this.fileLoader.load( url, function ( text ) {
 
-				if ( ! isFbxFormatASCII( text ) ) {
+				try {
 
-					console.error( 'FBXLoader: FBX Binary format not supported.' );
-					self.manager.itemError( url );
-					return;
+					var scene = self.parse( text, resourceDirectory );
+					onLoad( scene );
+
+				} catch ( error ) {
+
+					window.setTimeout( function () {
+
+						if ( onError ) onError( error );
+
+						self.manager.itemError( url );
+
+					}, 0 );
 
 				}
-				if ( getFbxVersion( text ) < 7000 ) {
-
-					console.error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
-					self.manager.itemError( url );
-					return;
-
-				}
-
-				var scene = self.parse( text, resourceDirectory );
-				onLoad( scene );
 
 			}, onProgress, onError );
 
@@ -92,6 +91,24 @@
 		parse: function ( FBXText, resourceDirectory ) {
 
 			var loader = this;
+
+			if ( ! isFbxFormatASCII( FBXText ) ) {
+
+				throw new Error( 'FBXLoader: FBX Binary format not supported.' );
+				self.manager.itemError( url );
+				return;
+
+				//TODO: Support Binary parsing.  Hopefully in the future,
+				//we call var FBXTree = new BinaryParser().parse( FBXText );
+
+			}
+			if ( getFbxVersion( FBXText ) < 7000 ) {
+
+				throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
+				self.manager.itemError( url );
+				return;
+
+			}
 
 			var FBXTree = new TextParser().parse( FBXText );
 
@@ -1193,11 +1210,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
 						rotation.push( 'ZYX' );
 						model.rotation.fromArray( rotation );
 
@@ -1206,6 +1219,16 @@
 					if ( 'Lcl_Scaling' in node.properties ) {
 
 						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+					if ( 'PreRotation' in node.properties ) {
+
+						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+						preRotations.multiply( currentRotation );
+						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
 
 					}
 
@@ -1333,11 +1356,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
 						rotation.push( 'ZYX' );
 						model.rotation.fromArray( rotation );
 
@@ -1346,6 +1365,16 @@
 					if ( 'Lcl_Scaling' in node.properties ) {
 
 						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+					if ( 'PreRotation' in node.properties ) {
+
+						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+						preRotations.multiply( currentRotation );
+						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
 
 					}
 
@@ -1377,6 +1406,7 @@
 				var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
 				var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 				var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+				var rawModels = FBXTree.Objects.subNodes.Model;
 
 				/**
 				 * @type {{
@@ -1890,6 +1920,33 @@
 
 					}
 					returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+					if ( curveNode.attr === 'R' ) {
+
+						var curves = curveNode.curves;
+						curves.x.values = curves.x.values.map( degreeToRadian );
+						curves.y.values = curves.y.values.map( degreeToRadian );
+						curves.z.values = curves.z.values.map( degreeToRadian );
+
+						if ( curveNode.preRotations !== null ) {
+
+							var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+							preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+							var frameRotation = new THREE.Euler();
+							var frameRotationQuaternion = new THREE.Quaternion();
+							for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
+
+								frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
+								frameRotationQuaternion.setFromEuler( frameRotation ).premultiply( preRotations );
+								frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
+								curves.x.values[ frame ] = frameRotation.x;
+								curves.y.values[ frame ] = frameRotation.y;
+								curves.z.values[ frame ] = frameRotation.z;
+
+							}
+
+						}
+
+					}
 
 				} );
 
@@ -2350,7 +2407,12 @@
 							x: null,
 							y: null,
 							z: null
-						}
+						},
+
+						/**
+						 * @type {number[]}
+						 */
+						preRotations: null
 					};
 
 					if ( returnObject.attr.match( /S|R|T/ ) ) {
@@ -2395,6 +2457,12 @@
 
 							returnObject.containerBoneID = boneID;
 							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+							var model = rawModels[ returnObject.containerID.toString() ];
+							if ( 'PreRotation' in model.properties ) {
+
+								returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+
+							}
 							break;
 
 						}
@@ -2905,9 +2973,9 @@
 
 							if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-								var rotationX = degreeToRadian( animationNode.R.curves.x.values[ frame ] );
-								var rotationY = degreeToRadian( animationNode.R.curves.y.values[ frame ] );
-								var rotationZ = degreeToRadian( animationNode.R.curves.z.values[ frame ] );
+								var rotationX = animationNode.R.curves.x.values[ frame ];
+								var rotationY = animationNode.R.curves.y.values[ frame ];
+								var rotationZ = animationNode.R.curves.z.values[ frame ];
 								var euler = new THREE.Euler( rotationX, rotationY, rotationZ, 'ZYX' );
 								key.rot = new THREE.Quaternion().setFromEuler( euler ).toArray();
 
