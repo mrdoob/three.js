@@ -82,13 +82,16 @@
 					mesh.rotation.x += 0.0005 * delta;
 					mesh.rotation.y += 0.001 * delta;
 
-					updateStatistics();
+					updateStatistics( delta );
 
 					stats.update();
 
 				};
 
 			}
+
+			var minFrame = 1000000;
+			var maxFrame = 0;
 
 			function updateStatistics( delta ) {
 
