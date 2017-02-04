@@ -1210,11 +1210,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
 						rotation.push( 'ZYX' );
 						model.rotation.fromArray( rotation );
 
@@ -1360,11 +1356,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
 						rotation.push( 'ZYX' );
 						model.rotation.fromArray( rotation );
 
@@ -1928,22 +1920,52 @@
 
 					}
 					returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
-					// if ( curveNode.preRotations !== null && curveNode.attr === 'R' ) {
+					if ( curveNode.attr === 'R' ) {
 
-					// 	//Need to apply pre-rotations to animation frames.
-					// 	['x', 'y', 'z'].forEach( function ( key ) {
+						var curves = curveNode.curves;
+						curves.x.values = curves.x.values.map( degreeToRadian );
+						curves.y.values = curves.y.values.map( degreeToRadian );
+						curves.z.values = curves.z.values.map( degreeToRadian );
 
-					// 		curveNode.curves[ key ].values = curveNode.curves[ key ].values.map( function ( val ) {
+						if ( curveNode.preRotations !== null ) {
 
-					// 			return val + curveNode.preRotations[ key ];
+							var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+							preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+							var frameRotation = new THREE.Euler();
+							var frameRotationQuaternion = new THREE.Quaternion();
+							for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
 
-					// 		} );
+								frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
+								frameRotationQuaternion.setFromEuler( frameRotation ).premultiply( preRotations );
+								frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
+								curves.x.values[ frame ] = frameRotation.x;
+								curves.y.values[ frame ] = frameRotation.y;
+								curves.z.values[ frame ] = frameRotation.z;
 
-					// 		debugger;
+							}
 
-					// 	} );
+						}
 
-					// }
+					}
+					if ( curveNode.preRotations !== null && curveNode.attr === 'R' ) {
+
+						var curves = curveNode.curves;
+						var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var frameRotation = new THREE.Euler();
+						var frameRotationQuaternion = new THREE.Quaternion();
+						for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
+
+							frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
+							frameRotationQuaternion.setFromEuler( frameRotation ).normalize().premultiply( preRotations ).normalize();
+							frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
+							curves.x.values[ frame ] = frameRotation.x;
+							curves.y.values[ frame ] = frameRotation.y;
+							curves.z.values[ frame ] = frameRotation.z;
+
+						}
+
+					}
 
 				} );
 
@@ -2454,12 +2476,12 @@
 
 							returnObject.containerBoneID = boneID;
 							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
-							// var model = rawModels[ returnObject.containerID.toString() ];
-							// if ( 'PreRotation' in model.properties ) {
+							var model = rawModels[ returnObject.containerID.toString() ];
+							if ( 'PreRotation' in model.properties ) {
 
-							// 	returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+								returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
 
-							// }
+							}
 							break;
 
 						}
@@ -2970,9 +2992,9 @@
 
 							if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-								var rotationX = degreeToRadian( animationNode.R.curves.x.values[ frame ] );
-								var rotationY = degreeToRadian( animationNode.R.curves.y.values[ frame ] );
-								var rotationZ = degreeToRadian( animationNode.R.curves.z.values[ frame ] );
+								var rotationX = animationNode.R.curves.x.values[ frame ];
+								var rotationY = animationNode.R.curves.y.values[ frame ];
+								var rotationZ = animationNode.R.curves.z.values[ frame ];
 								var euler = new THREE.Euler( rotationX, rotationY, rotationZ, 'ZYX' );
 								key.rot = new THREE.Quaternion().setFromEuler( euler ).toArray();
 
