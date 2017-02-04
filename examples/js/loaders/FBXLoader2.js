@@ -1210,7 +1210,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value, index ) {
 
 							return value * Math.PI / 180;
 
@@ -1223,6 +1223,15 @@
 					if ( 'Lcl_Scaling' in node.properties ) {
 
 						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+					if ( 'PreRotation' in node.properties ) {
+
+						var preRotations = parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+						model.rotation.x += preRotations.x;
+						model.rotation.y += preRotations.y;
+						model.rotation.z += preRotations.z;
 
 					}
 
@@ -1363,6 +1372,15 @@
 					if ( 'Lcl_Scaling' in node.properties ) {
 
 						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+					if ( 'PreRotation' in node.properties ) {
+
+						var preRotations = parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+						model.rotation.x += preRotations.x;
+						model.rotation.y += preRotations.y;
+						model.rotation.z += preRotations.z;
 
 					}
 
