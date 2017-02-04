@@ -1947,25 +1947,6 @@
 						}
 
 					}
-					if ( curveNode.preRotations !== null && curveNode.attr === 'R' ) {
-
-						var curves = curveNode.curves;
-						var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
-						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
-						var frameRotation = new THREE.Euler();
-						var frameRotationQuaternion = new THREE.Quaternion();
-						for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
-
-							frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
-							frameRotationQuaternion.setFromEuler( frameRotation ).normalize().premultiply( preRotations ).normalize();
-							frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
-							curves.x.values[ frame ] = frameRotation.x;
-							curves.y.values[ frame ] = frameRotation.y;
-							curves.z.values[ frame ] = frameRotation.z;
-
-						}
-
-					}
 
 				} );
 
