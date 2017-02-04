@@ -1,4 +1,3 @@
-import { _Math } from './Math';
 import { Vector3 } from './Vector3';
 
 /**
