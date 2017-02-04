@@ -19,7 +19,10 @@ function Time() {
 	this.paused = false;
 
 	//The scale at which the time is passing. This can be used for slow motion effects.
-	this.timeScale = 1.0;
+	var _timeScale = 1.0;
+	//Keep track of scaled time across scale changes
+	var _totalTimeAtLastScaleChange = 0;
+	var _timeAtLastScaleChange = 0;
 
 	Object.defineProperties( this, {
 
@@ -30,6 +33,24 @@ function Time() {
 				return ( performance || Date ).now();
 
 			}
+
+		},
+
+		"timeScale": {
+
+			get: function () {
+
+				return _timeScale;
+
+			},
+
+			set: function ( value ) {
+
+				_totalTimeAtLastScaleChange = this.totalTime;
+				_timeAtLastScaleChange = this.now;
+				_timeScale = value;
+
+			},
 
 		},
 
@@ -47,7 +68,9 @@ function Time() {
 
 			get: function () {
 
-				return this.unscaledTotalTime * this.timeScale;
+				var diff = ( this.now - _timeAtLastScaleChange ) * this.timeScale;
+
+				return ( this.running ) ? _totalTimeAtLastScaleChange + diff : 0;
 
 			}
 
@@ -82,9 +105,21 @@ function Time() {
 
 	this.start = function () {
 
-		if ( this.paused ) _startTime = _startTime - ( ( this.now - _pauseTime ) * this.timeScale );
+		if ( this.paused ) {
 
-		else if ( ! this.running ) _startTime = _lastDelta = this.now;
+			var diff = ( this.now - _pauseTime );
+
+			_startTime += diff;
+			_lastDelta += diff;
+			_timeAtLastScaleChange += diff;
+
+		}	else if ( ! this.running ) {
+
+			_startTime = _lastDelta = _timeAtLastScaleChange = this.now;
+
+			_totalTimeAtLastScaleChange = 0;
+
+		}
 
 		this.running = true;
 		this.paused = false;
@@ -95,6 +130,7 @@ function Time() {
 	this.stop = function () {
 
 		_startTime = 0;
+		_totalTimeAtLastScaleChange = 0;
 
 		this.running = false;
 
@@ -102,7 +138,7 @@ function Time() {
 
 	this.pause = function () {
 
-		_pauseTime = this.totalTime;
+		_pauseTime = this.now;
 
 		this.paused = true;
 
