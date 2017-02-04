@@ -59,23 +59,22 @@
 
 			this.fileLoader.load( url, function ( text ) {
 
-				if ( ! isFbxFormatASCII( text ) ) {
+				try {
 
-					console.error( 'FBXLoader: FBX Binary format not supported.' );
-					self.manager.itemError( url );
-					return;
+					var scene = self.parse( text, resourceDirectory );
+					onLoad( scene );
+
+				} catch ( error ) {
+
+					window.setTimeout( function () {
+
+						if ( onError ) onError( error );
+
+						self.manager.itemError( url );
+
+					}, 0 );
 
 				}
-				if ( getFbxVersion( text ) < 7000 ) {
-
-					console.error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
-					self.manager.itemError( url );
-					return;
-
-				}
-
-				var scene = self.parse( text, resourceDirectory );
-				onLoad( scene );
 
 			}, onProgress, onError );
 
@@ -92,6 +91,24 @@
 		parse: function ( FBXText, resourceDirectory ) {
 
 			var loader = this;
+
+			if ( ! isFbxFormatASCII( FBXText ) ) {
+
+				throw new Error( 'FBXLoader: FBX Binary format not supported.' );
+				self.manager.itemError( url );
+				return;
+
+				//TODO: Support Binary parsing.  Hopefully in the future,
+				//we call var FBXTree = new BinaryParser().parse( FBXText );
+
+			}
+			if ( getFbxVersion( FBXText ) < 7000 ) {
+
+				throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
+				self.manager.itemError( url );
+				return;
+
+			}
 
 			var FBXTree = new TextParser().parse( FBXText );
 
