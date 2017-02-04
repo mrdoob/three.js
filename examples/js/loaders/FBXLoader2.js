@@ -1210,7 +1210,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value, index ) {
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
 
 							return value * Math.PI / 180;
 
@@ -1228,10 +1228,11 @@
 
 					if ( 'PreRotation' in node.properties ) {
 
-						var preRotations = parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
-						model.rotation.x += preRotations.x;
-						model.rotation.y += preRotations.y;
-						model.rotation.z += preRotations.z;
+						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+						preRotations.multiply( currentRotation );
+						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
 
 					}
 
@@ -1377,10 +1378,11 @@
 
 					if ( 'PreRotation' in node.properties ) {
 
-						var preRotations = parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
-						model.rotation.x += preRotations.x;
-						model.rotation.y += preRotations.y;
-						model.rotation.z += preRotations.z;
+						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+						preRotations.multiply( currentRotation );
+						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
 
 					}
 
@@ -1412,6 +1414,7 @@
 				var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
 				var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 				var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+				var rawModels = FBXTree.Objects.subNodes.Model;
 
 				/**
 				 * @type {{
@@ -1925,6 +1928,22 @@
 
 					}
 					returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+					// if ( curveNode.preRotations !== null && curveNode.attr === 'R' ) {
+
+					// 	//Need to apply pre-rotations to animation frames.
+					// 	['x', 'y', 'z'].forEach( function ( key ) {
+
+					// 		curveNode.curves[ key ].values = curveNode.curves[ key ].values.map( function ( val ) {
+
+					// 			return val + curveNode.preRotations[ key ];
+
+					// 		} );
+
+					// 		debugger;
+
+					// 	} );
+
+					// }
 
 				} );
 
@@ -2385,7 +2404,12 @@
 							x: null,
 							y: null,
 							z: null
-						}
+						},
+
+						/**
+						 * @type {number[]}
+						 */
+						preRotations: null
 					};
 
 					if ( returnObject.attr.match( /S|R|T/ ) ) {
@@ -2430,6 +2454,12 @@
 
 							returnObject.containerBoneID = boneID;
 							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+							// var model = rawModels[ returnObject.containerID.toString() ];
+							// if ( 'PreRotation' in model.properties ) {
+
+							// 	returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+
+							// }
 							break;
 
 						}
