@@ -1090,10 +1090,10 @@ THREE.GLTFLoader = ( function () {
 
 								var sampler = json.samplers[ texture.sampler ];
 
-								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
-								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
-								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
+								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter || 9729 ];
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter || 9986 ];
+								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS || 10497 ];
+								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT || 10497 ];
 
 							}
 
