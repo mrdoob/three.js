@@ -39127,92 +39127,318 @@
 
 	/**
 	 * @author Lewy Blue / https://github.com/looeee
-	 *
-	 * parameters = {
-	 *
-	 *  canvas: <canvas> DOM element,
-	 *
-	 *  scene: new THREE.Scene(),
-	 *
-	 *  camera: new THREE.Camera( ... )
-	 *
-	 *  renderer: new THREE.WebGLRenderer( ... )
-	 *
-	 *  autoResize: <bool>
-	 *
-	 *  autoRender: <bool> //setting this to false will prevent calling renderer.render automatically; users can call it manually in the onUpate function instead
-	 *
-	 * }
 	 */
 
-	function App( parameters ) {
+	function Time() {
 
-		parameters = parameters || {};
+		//Keep track of time when pause() was called
+		var _pauseTime;
 
-		if ( parameters.canvas !== undefined ) {
+		//Keep track of time when delta was last checked
+		var _lastDelta = 0;
 
-			this.canvas = parameters.canvas;
+		//Hold the time when start() was called
+		//There is no point in exposing this as it's essentially a random number
+		//and will be different depending on whether performance.now or Date.now is used
+		var _startTime = 0;
 
-		} else {
+		this.running = false;
+		this.paused = false;
 
-			this.canvas = document.body.appendChild( document.createElement( 'canvas' ) );
-			this.canvas.style.position = 'absolute';
-			this.canvas.style.width = this.canvas.style.height = '100%';
+		//The scale at which the time is passing. This can be used for slow motion effects.
+		var _timeScale = 1.0;
+		//Keep track of scaled time across scale changes
+		var _totalTimeAtLastScaleChange = 0;
+		var _timeAtLastScaleChange = 0;
 
-		}
+		Object.defineProperties( this, {
 
-		this.scene = ( parameters.scene !== undefined ) ? parameters.scene : new THREE.Scene();
+			"now": {
 
-		this.camera = ( parameters.camera !== undefined ) ? parameters.camera : new THREE.PerspectiveCamera( 75, this.canvas.clientWidth / this.canvas.clientHeight, 1, 1000 );
+				get: function () {
 
-		if ( parameters.renderer !== undefined ) {
+					return ( performance || Date ).now();
 
-			this.renderer = parameters.renderer;
+				}
 
-		} else {
+			},
 
-			this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
-			this.renderer.setPixelRatio( window.devicePixelRatio );
-			this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
+			"timeScale": {
 
-		}
+				get: function () {
 
-		this.autoResize = ( parameters.autoResize !== undefined ) ? parameters.autoResize : true;
-		window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
+					return _timeScale;
 
-		this.autoRender = ( parameters.autoRender !== undefined ) ? parameters.autoRender : true;
+				},
+
+				set: function ( value ) {
+
+					_totalTimeAtLastScaleChange = this.totalTime;
+					_timeAtLastScaleChange = this.now;
+					_timeScale = value;
+
+				},
+
+			},
+
+			"unscaledTotalTime": {
+
+				get: function () {
+
+					return ( this.running ) ? this.now - _startTime : 0;
+
+				}
+
+			},
+
+			"totalTime": {
+
+				get: function () {
+
+					var diff = ( this.now - _timeAtLastScaleChange ) * this.timeScale;
+
+					return ( this.running ) ? _totalTimeAtLastScaleChange + diff : 0;
+
+				}
+
+			},
+
+			//Unscaled time since delta was last checked
+			"unscaledDelta": {
+
+				get: function () {
+
+					var diff = this.now - _lastDelta;
+					_lastDelta = this.now;
+
+					return diff;
+
+				}
+
+			},
+
+			//Scaled time since delta was last checked
+			"delta": {
+
+				get: function () {
+
+					return this.unscaledDelta * this.timeScale;
+
+				}
+
+			}
+
+		} );
+
+		this.start = function () {
+
+			if ( this.paused ) {
+
+				var diff = ( this.now - _pauseTime );
+
+				_startTime += diff;
+				_lastDelta += diff;
+				_timeAtLastScaleChange += diff;
+
+			}	else if ( ! this.running ) {
+
+				_startTime = _lastDelta = _timeAtLastScaleChange = this.now;
+
+				_totalTimeAtLastScaleChange = 0;
+
+			}
+
+			this.running = true;
+			this.paused = false;
+
+		};
+
+		//Reset and stop clock
+		this.stop = function () {
+
+			_startTime = 0;
+			_totalTimeAtLastScaleChange = 0;
+
+			this.running = false;
+
+		};
+
+		this.pause = function () {
+
+			_pauseTime = this.now;
+
+			this.paused = true;
+
+		};
 
 	}
 
-	Object.assign( App.prototype, {
+	/**
+	 * @author Lewy Blue / https://github.com/looeee
+	 *
+	 */
 
-		animate: function () {
+	function App( canvas ) {
+
+		var _canvas, _scene, _camera, _renderer;
+
+		var _currentAnimationFrameID;
+
+		if ( canvas !== undefined ) this.canvas = canvas;
+
+		this.autoRender = true;
+
+		this.autoResize = true;
+
+		this.frameCount = 0;
+
+		this.time = new Time();
+
+		Object.defineProperties( this, {
+
+			'canvas': {
+
+				get: function () {
+
+					if ( _canvas === undefined ) {
+
+						_canvas = document.body.appendChild( document.createElement( 'canvas' ) );
+						_canvas.style.position = 'absolute';
+						_canvas.style.width = _canvas.style.height = '100%';
+
+					}
+
+					return _canvas;
+
+				},
+
+				set: function ( canvas ) {
+
+					_canvas = canvas;
+
+				},
+			},
+
+			'camera': {
+
+				get: function () {
+
+					if ( _camera === undefined ) {
+
+						_camera = new THREE.PerspectiveCamera( 75, this.canvas.clientWidth / this.canvas.clientHeight, 1, 1000 );
+
+					}
+
+					return _camera;
+
+				},
+
+				set: function ( camera ) {
+
+					_camera = camera;
+
+				},
+			},
+
+			'scene': {
+
+				get: function () {
+
+					if ( _scene === undefined ) {
+
+						_scene = new THREE.Scene();
+
+					}
+
+					return _scene;
+
+				},
+
+				set: function ( scene ) {
+
+					_scene = scene;
+
+				},
+			},
+
+			'renderer': {
+
+				get: function () {
+
+					if ( _renderer === undefined ) {
+
+						_renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
+						_renderer.setPixelRatio( window.devicePixelRatio );
+						_renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
+
+					}
+
+					return _renderer;
+
+				},
+
+				set: function ( renderer ) {
+
+					_renderer = renderer;
+
+				},
+
+			},
+
+			"averageFrameTime": {
+
+				get: function () {
+
+					return ( this.frameCount !== 0 ) ? this.time.unscaledTotalTime / this.frameCount : 0;
+
+				}
+
+			}
+
+		} );
+
+		this.play = function () {
+
+			this.time.start();
 
 			var self = this;
 
 			function animationHandler() {
 
+				self.frameCount ++;
+
 				self.onUpdate();
 
 				if ( self.autoRender ) self.renderer.render( self.scene, self.camera );
 
-				self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler(); } );
+				_currentAnimationFrameID = requestAnimationFrame( function () { animationHandler(); } );
 
 			}
 
 			animationHandler();
 
-		},
+		};
 
-		stopAnimation: function () {
+		this.pause = function () {
 
-			cancelAnimationFrame( this.currentAnimationFrameID );
+			this.time.pause();
 
-		},
+			cancelAnimationFrame( _currentAnimationFrameID );
 
-		onUpdate: function () {},
+		};
 
-		onWindowResize:	function () {
+		this.stop = function () {
+
+			this.time.stop();
+			this.frameCount = 0;
+
+			cancelAnimationFrame( _currentAnimationFrameID );
+
+		};
+
+		this.onUpdate = function () {};
+
+		this.onWindowResize =	function () {
 
 			if ( ! this.autoResize ) return;
 
@@ -39230,9 +39456,11 @@
 			this.camera.updateProjectionMatrix();
 			this.renderer.setSize( newWidth, newHeight, false );
 
-		},
+		};
 
-	} );
+		window.addEventListener( 'resize', this.onWindowResize.bind( this ), false );
+
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
