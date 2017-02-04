@@ -17,6 +17,8 @@ function App( canvas ) {
 
 	this.autoResize = true;
 
+	this.frameCount = 0;
+
 	this.time = new Time();
 
 	Object.defineProperties( this, {
@@ -95,7 +97,6 @@ function App( canvas ) {
 					_renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
 					_renderer.setPixelRatio( window.devicePixelRatio );
 					_renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false );
-					_renderer.setSize( window.innerWidth, window.innerHeight, false );
 
 				}
 
@@ -111,9 +112,19 @@ function App( canvas ) {
 
 		},
 
+		"averageFrameTime": {
+
+			get: function () {
+
+				return ( this.frameCount !== 0 ) ? this.time.unscaledTotalTime / this.frameCount : 0;
+
+			}
+
+		}
+
 	} );
 
-	this.animate = function () {
+	this.play = function () {
 
 		this.time.start();
 
@@ -121,11 +132,13 @@ function App( canvas ) {
 
 		function animationHandler() {
 
+			self.frameCount ++;
+
 			self.onUpdate();
 
 			if ( self.autoRender ) self.renderer.render( self.scene, self.camera );
 
-			self.currentAnimationFrameID = requestAnimationFrame( function () { animationHandler() } );
+			_currentAnimationFrameID = requestAnimationFrame( function () { animationHandler() } );
 
 		}
 
@@ -133,7 +146,18 @@ function App( canvas ) {
 
 	};
 
-	this.stopAnimation = function () {
+	this.pause = function () {
+
+		this.time.pause();
+
+		cancelAnimationFrame( _currentAnimationFrameID );
+
+	}
+
+	this.stop = function () {
+
+		this.time.stop();
+		this.frameCount = 0;
 
 		cancelAnimationFrame( _currentAnimationFrameID );
 
