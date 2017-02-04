@@ -186,18 +186,9 @@ Object.assign( FileLoader.prototype, {
 
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
-			if ( this.requestHeader !== undefined ) {
+			for ( var header in this.requestHeader ) {
 
-				var keys = Object.keys( this.requestHeader );
-
-				for ( var i = 0, il = keys.length; i < il; i ++ ) {
-
-					var header = keys[ i ];
-					var value = this.requestHeader[ header ];
-
-					request.setRequestHeader( header, value );
-
-				}
+				request.setRequestHeader( header, this.requestHeader[ header ] );
 
 			}
 
