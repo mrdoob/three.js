@@ -403,14 +403,13 @@
 							var type = relationship.relationship;
 							switch ( type ) {
 
-								case " \"AmbientColor":
-									//TODO: Support AmbientColor textures
-									break;
-
 								case " \"DiffuseColor":
 									parameters.map = textureMap.get( relationship.ID );
 									break;
 
+								case " \"AmbientColor":
+								case " \"Bump":
+								case " \"EmissiveColor":
 								default:
 									console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
 									break;
@@ -949,6 +948,16 @@
 
 									},
 
+									ByVertice: {
+
+										Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+											return infoObject.buffer.slice( ( vertexIndex * infoObject.dataSize ), ( vertexIndex * infoObject.dataSize ) + infoObject.dataSize );
+
+										}
+
+									},
+
 									AllSame: {
 
 										/**
@@ -998,6 +1007,16 @@
 
 							console.error( "FBXLoader: Invalid Order " + geometryNode.properties.Order + " given for geometry ID: " + geometryNode.id );
 							return new THREE.BufferGeometry();
+
+						}
+
+						if ( geometryNode.properties.Form === 'Periodic' ) {
+
+							console.error( "FBXLoader: Currently no support for Periodic Nurbs Curves for geometry ID: " + geometryNode.id + ", using empty geometry buffer." );
+							return new THREE.BufferGeometry();
+
+							//TODO: Support Periodic NURBS curves.
+							//Info Link: https://knowledge.autodesk.com/support/maya/learn-explore/caas/CloudHelp/cloudhelp/2015/ENU/Maya/files/NURBS-overview-Periodic-closed-and-open-geometry-htm.html
 
 						}
 
