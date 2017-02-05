@@ -18,7 +18,7 @@ function Time() {
 	this.running = false;
 	this.paused = false;
 
-	//The scale at which the time is passing. This can be used for slow motion effects.
+
 	var _timeScale = 1.0;
 	//Keep track of scaled time across scale changes
 	var _totalTimeAtLastScaleChange = 0;
@@ -36,6 +36,7 @@ function Time() {
 
 		},
 
+		//The scale at which the time is passing. This can be used for slow motion effects.
 		"timeScale": {
 
 			get: function () {
