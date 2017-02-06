@@ -52,6 +52,9 @@
 		Gets or sets the camera frustum vertical field of view in perspective view.
 		</div>
 
+		<h3>[property:Float aspect]</h3>
+		<div>Camera frustum aspect ratio, usually the canvas width / canvas height.</div>
+
 		<h3>[property:number left]</h3>
 		<div>
 		Gets or sets the camera frustum left plane in orthographic view.
@@ -85,6 +88,13 @@
 		<h3>[property:number far]</h3>
 		<div>
 		Gets camera frustum far plane.
+		</div>
+
+		<h3>[property:Object view]</h3>
+		<div>
+			Frustum window specification or null.
+			This is set using the [page:CombinedCamera.setViewOffset .setViewOffset] method
+			and cleared using [page:CombinedCamera.clearViewOffset .clearViewOffset].
 		</div>
 
 		<h3>[property:Matrix4 projectionMatrix]</h3>
@@ -193,6 +203,30 @@
 		Updates the ProjectionMatrix.
 		</div>
 
+		<h3>[method:Camera copy]( [page:Camera source] )</h3>
+		<div>
+		Copy the properties from the source camera into this one.
+		</div>
+
+		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
+		<div>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera<br /><br />
+
+			Sets an offset in a larger [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+			This is useful for multi-window or multi-monitor/multi-machine setups.
+			For an example on how to use it see [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</div>
+
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<div>
+		Removes any offset set by the .setViewOffset method.
+		</div>
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/cameras/CombinedCamera.js examples/cameras/CombinedCamera.js]
