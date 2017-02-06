@@ -41,6 +41,7 @@ NUMERIC = {
     'SphericalReflectionMapping': 305,
 
     'RepeatWrapping': 1000,
+    'repeat': 1000,
     'ClampToEdgeWrapping': 1001,
     'MirroredRepeatWrapping': 1002,
 
@@ -257,9 +258,9 @@ URL = 'url'
 WRAP = 'wrap'
 REPEAT = 'repeat'
 WRAPPING = type('Wrapping', (), {
-    'REPEAT': 'RepeatWrapping',
-    'CLAMP': 'ClampToEdgeWrapping',
-    'MIRROR': 'MirroredRepeatWrapping'
+    'REPEAT': 'repeat',
+    'CLAMP': 'clamp',
+    'MIRROR': 'mirror'
 })
 ANISOTROPY = 'anisotropy'
 MAG_FILTER = 'magFilter'

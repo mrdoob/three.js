@@ -52,12 +52,12 @@ scene.add(rectLight)
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Integer color], [page:Float intensity], [page:Float distance], [page:Radians angle], [page:Float penumbra], [page:Float decay] )</h3>
+		<h3>[name]( [page:Integer color], [page:Float intensity], [page:Float width], [page:Float height] )</h3>
 		<div>
 			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
-			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br />
 			[page:Float width] - (optional) width of the light. Default is 10.<br />
-			[page:Float height] - (optional) height of the light. Default is 10.
+			[page:Float height] - (optional) height of the light. Default is 10.<br /><br />
 
 			Creates a new [name].
 		</div>
@@ -96,7 +96,7 @@ scene.add(rectLight)
 
 		<h3>[property:Boolean isRectAreaLight]</h3>
 		<div>
-			Used to check whether this or derived classes are spot lights. Default is *true*.<br /><br />
+			Used to check whether this or derived classes are RectAreaLights. Default is *true*.<br /><br />
 
 			You should not change this, as it used internally for optimisation.
 		</div>

@@ -25,17 +25,18 @@ THREE.PaintViveController = function ( id ) {
 		var context = canvas.getContext( '2d' );
 		var imageData = context.getImageData( 0, 0, 256, 256 );
 		var data = imageData.data;
+		var swatchColor = new THREE.Color();
 
 		for ( var i = 0, j = 0; i < data.length; i += 4, j ++ ) {
 
 			var x = ( ( j % 256 ) / 256 ) - 0.5;
 			var y = ( Math.floor( j / 256 ) / 256 ) - 0.5;
 
-			color.setHSL( Math.atan2( y, x ) / PI2, 1,( 0.5 - Math.sqrt( x * x + y * y ) ) * 2.0 );
+			swatchColor.setHSL( Math.atan2( y, x ) / PI2, 1,( 0.5 - Math.sqrt( x * x + y * y ) ) * 2.0 );
 
-			data[ i + 0 ] = color.r * 256;
-			data[ i + 1 ] = color.g * 256;
-			data[ i + 2 ] = color.b * 256;
+			data[ i + 0 ] = swatchColor.r * 256;
+			data[ i + 1 ] = swatchColor.g * 256;
+			data[ i + 2 ] = swatchColor.b * 256;
 			data[ i + 3 ] = 256;
 
 		}
@@ -46,19 +47,53 @@ THREE.PaintViveController = function ( id ) {
 
 	}
 
+	// COLOR UI
+
 	var geometry = new THREE.CircleGeometry( 1, 32 );
 	var material = new THREE.MeshBasicMaterial( { map: generateHueTexture() } );
-	var mesh = new THREE.Mesh( geometry, material );
-	mesh.position.set( 0, 0.005, 0.0495 );
-	mesh.rotation.x = - 1.45;
-	mesh.scale.setScalar( 0.02 );
-	this.add( mesh );
+	var colorUI = new THREE.Mesh( geometry, material );
+	colorUI.position.set( 0, 0.005, 0.0495 );
+	colorUI.rotation.x = - 1.45;
+	colorUI.scale.setScalar( 0.02 );
+	this.add( colorUI );
 
 	var geometry = new THREE.IcosahedronGeometry( 0.1, 2 );
 	var material = new THREE.MeshBasicMaterial();
 	material.color = color;
 	var ball = new THREE.Mesh( geometry, material );
-	mesh.add( ball );
+	colorUI.add( ball );
+
+
+	// SIZE UI
+	var sizeUI = new THREE.Group();
+	sizeUI.position.set( 0, 0.005, 0.0495 );
+	sizeUI.rotation.x = - 1.45;
+	sizeUI.scale.setScalar( 0.02 );
+	this.add( sizeUI );
+
+	var triangleShape = new THREE.Shape();
+	triangleShape.moveTo( 0, -1 );
+	triangleShape.lineTo( 1, 1 );
+	triangleShape.lineTo( -1, 1 );
+
+	var geometry = new THREE.ShapeGeometry( triangleShape );
+	var material = new THREE.MeshBasicMaterial( { color: 0x222222, wireframe:true } );
+	var sizeUIOutline = new THREE.Mesh( geometry, material ) ;
+	sizeUIOutline.position.z = 0.001;
+	resizeTriangleGeometry(sizeUIOutline.geometry, 1.0);
+	sizeUI.add( sizeUIOutline );
+
+	var geometry = new THREE.ShapeGeometry( triangleShape );
+	var material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide } );
+	material.color = color;
+	var sizeUIFill = new THREE.Mesh( geometry, material ) ;
+	sizeUIFill.position.z = 0.0011;
+	resizeTriangleGeometry(sizeUIFill.geometry, 0.5);
+	sizeUI.add( sizeUIFill );
+
+	sizeUI.visible = false;
+
+
 
 	function onAxisChanged( event ) {
 
@@ -69,13 +104,36 @@ THREE.PaintViveController = function ( id ) {
 
 		if ( mode === MODES.COLOR ) {
 			color.setHSL( Math.atan2( y, x ) / PI2, 1, ( 0.5 - Math.sqrt( x * x + y * y ) ) * 2.0 );
-			ball.position.x = event.axes[ 0 ];
-			ball.position.y = event.axes[ 1 ];
+
+			ball.position.set(event.axes[ 0 ], event.axes[ 1 ], 0);
 		}
 
 		if ( mode === MODES.SIZE ) {
-			size = y + 1;
+			var ratio = (0.5 - y);
+			size = ratio * 2;
+
+			resizeTriangleGeometry(sizeUIFill.geometry, ratio);
 		}
+
+	}
+
+	function resizeTriangleGeometry(geometry, ratio) {
+
+
+
+		var x = 0, y =0;
+		var fullWidth = 0.75; fullHeight = 1.5;
+		var angle = Math.atan((fullWidth/2)/fullHeight);
+
+		var bottomY = y - fullHeight/2;
+		var height = fullHeight * ratio;
+		var width = (Math.tan(angle) * height) * 2;
+
+		geometry.vertices[0].set( x, bottomY, 0);
+		geometry.vertices[1].set( x + width/2, bottomY + height, 0 );
+		geometry.vertices[2].set( x - width/2, bottomY + height, 0  );
+
+		geometry.verticesNeedUpdate = true;
 
 	}
 
@@ -83,13 +141,15 @@ THREE.PaintViveController = function ( id ) {
 
 		if ( mode === MODES.COLOR ) {
 			mode = MODES.SIZE;
-			mesh.visible = false;
+			colorUI.visible = false;
+			sizeUI.visible = true;
 			return;
 		}
 
 		if ( mode === MODES.SIZE ) {
 			mode = MODES.COLOR;
-			mesh.visible = true;
+			colorUI.visible = true;
+			sizeUI.visible = false;
 			return;
 		}
 

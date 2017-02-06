@@ -114,7 +114,7 @@
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 10, 40, 0x111111, 0x111111 ) );
+				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
@@ -174,7 +174,7 @@
 
 					// var pivot = new THREE.Group();
 					// var pivot = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.002, 2 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
 					pivot.position.y = -0.016;
 					pivot.position.z = -0.043;
@@ -249,28 +249,31 @@
 				scene.add( line );
 
 				// Shapes
+				shapes[ 'tube' ] = getTubeShapes(1.0);
+			}
+
+			function getTubeShapes(size) {
 
 				var PI2 = Math.PI * 2;
 
 				var sides = 10;
 				var array = [];
-
-				for ( var i = 0; i < sides; i ++ ) {
+				var radius = 0.01 * size;
+				for( var i = 0; i < sides; i ++ ){
 
 					var angle = ( i / sides ) * PI2;
-					array.push( new THREE.Vector3( Math.sin( angle ) * 0.01, Math.cos( angle ) * 0.01, 0 ) );
-
+					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
 				}
 
-				shapes[ 'tube' ] = array;
-
+				return array;
 			}
+
 
 			function stroke( controller, point1, point2, matrix1, matrix2 ) {
 
 				var color = controller.getColor();
 
-				var shape = shapes[ 'tube' ];
+				var shapes = getTubeShapes( controller.getSize() );
 
 				var geometry = line.geometry;
 				var attributes = geometry.attributes;
@@ -280,10 +283,10 @@
 				var normals = attributes.normal.array;
 				var colors = attributes.color.array;
 
-				for ( var j = 0, jl = shape.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = shapes.length; j < jl; j ++ ) {
 
-					var vertex1 = shape[ j ];
-					var vertex2 = shape[ ( j + 1 ) % jl ];
+					var vertex1 = shapes[ j ];
+					var vertex2 = shapes[ ( j + 1 ) % jl ];
 
 					// positions
 
@@ -406,6 +409,7 @@
 				if ( pivot ) {
 
 					pivot.material.color.copy( controller.getColor() );
+					pivot.scale.setScalar(controller.getSize());
 
 					var matrix = pivot.matrixWorld;
 

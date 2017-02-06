@@ -20,7 +20,7 @@ THREE.OBJExporter.prototype = {
 		var normal = new THREE.Vector3();
 		var uv = new THREE.Vector2();
 
-		var i, j, l, m, face = [];
+		var i, j, k, l, m, face = [];
 
 		var parseMesh = function ( mesh ) {
 

@@ -1,18 +1,21 @@
 var list = {
 
 	"Manual": {
-		"Introduction": [
+		"Getting Started": [
 			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
 			[ "Detecting WebGL and browser compatibility", "manual/introduction/Detecting-WebGL-and-browser-compatibility" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
-			[ "How to update things", "manual/introduction/How-to-update-things" ],
-			[ "Useful links", "manual/introduction/Useful-links" ],
+			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
 			[ "Drawing Lines", "manual/introduction/Drawing-lines" ],
 			[ "Creating Text", "manual/introduction/Creating-text" ],
-			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
 			[ "Migration Guide", "manual/introduction/Migration-guide" ],
-			[ "How to run things locally", "manual/introduction/How-to-run-thing-locally" ],
-			[ "FAQ", "manual/introduction/FAQ" ]
+			[ "Code Style Guide", "manual/introduction/Code-style-guide" ],
+			[ "FAQ", "manual/introduction/FAQ" ],
+			[ "Useful links", "manual/introduction/Useful-links" ]
+		],
+
+		"Next Steps": [
+				[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
 		],
 
 		"Build Tools": [
@@ -123,23 +126,6 @@ var list = {
 			[ "SplineCurve", "api/extras/curves/SplineCurve" ]
 		],
 
-		"Extras / Helpers": [
-			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
-			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
-			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
-			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
-			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
-			[ "GridHelper", "api/extras/helpers/GridHelper" ],
-			[ "PolarGridHelper", "api/extras/helpers/PolarGridHelper"],
-			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
-			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
-			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
-			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
-			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
-		],
-
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
@@ -186,6 +172,23 @@ var list = {
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
 			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
 			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
+		],
+
+		"Helpers": [
+			[ "ArrowHelper", "api/helpers/ArrowHelper" ],
+			[ "AxisHelper", "api/helpers/AxisHelper" ],
+			[ "BoxHelper", "api/helpers/BoxHelper" ],
+			[ "CameraHelper", "api/helpers/CameraHelper" ],
+			[ "DirectionalLightHelper", "api/helpers/DirectionalLightHelper" ],
+			[ "FaceNormalsHelper", "api/helpers/FaceNormalsHelper" ],
+			[ "GridHelper", "api/helpers/GridHelper" ],
+			[ "PolarGridHelper", "api/helpers/PolarGridHelper" ],
+			[ "HemisphereLightHelper", "api/helpers/HemisphereLightHelper" ],
+			[ "PointLightHelper", "api/helpers/PointLightHelper" ],
+			[ "RectAreaLightHelper", "api/helpers/RectAreaLightHelper" ],
+			[ "SkeletonHelper", "api/helpers/SkeletonHelper" ],
+			[ "SpotLightHelper", "api/helpers/SpotLightHelper" ],
+			[ "VertexNormalsHelper", "api/helpers/VertexNormalsHelper" ]
 		],
 
 		"Lights": [
@@ -283,6 +286,7 @@ var list = {
 			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
+			[ "LineLoop", "api/objects/LineLoop" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
@@ -357,7 +361,7 @@ var list = {
 
 	"Developer Reference": {
 		"Polyfills": [
-			[ "Polyfills", "api/polyfills" ]
+			[ "Polyfills", "api/Polyfills" ]
 		],
 
 		"WebGLRenderer": [
