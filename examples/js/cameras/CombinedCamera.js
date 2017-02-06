@@ -97,7 +97,32 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 };
 
+THREE.CombinedCamera.prototype.copy = function ( source ) {
 
+	THREE.Camera.prototype.copy.call( this, source );
+
+	this.fov = source.fov;
+	this.far = source.far;
+	this.near = source.near;
+
+	this.left = source.left;
+	this.right = source.right;
+	this.top = source.top;
+	this.bottom = source.bottom;
+
+	this.zoom = source.zoom;
+	this.view = source.view === null ? null : Object.assign( {}, source.view );
+	this.aspect = source.aspect;
+
+	this.cameraO = source.cameraO.copy();
+	this.cameraP = source.cameraP.copy();
+
+	this.inOrthographicMode = source.inOrthographicMode;
+	this.inPerspectiveMode = source.inPerspectiveMode;
+
+	return this;
+
+};
 THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 
 	this.cameraP.aspect = width / height;
