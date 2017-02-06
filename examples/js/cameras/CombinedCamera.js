@@ -123,6 +123,39 @@ THREE.CombinedCamera.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+THREE.CombinedCamera.prototype.setViewOffset = function( fullWidth, fullHeight, x, y, width, height ) {
+
+	this.view = {
+		fullWidth: fullWidth,
+		fullHeight: fullHeight,
+		offsetX: x,
+		offsetY: y,
+		width: width,
+		height: height
+	};
+
+	if ( this.inPerspectiveMode ) {
+
+		this.aspect = fullWidth / fullHeight;
+
+		this.toPerspective();
+
+	} else {
+
+		this.toOrthographic();
+
+	}
+
+};
+
+THREE.CombinedCamera.prototype.clearViewOffset = function() {
+
+	this.view = null;
+	this.updateProjectionMatrix();
+
+};
+
 THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 
 	this.cameraP.aspect = width / height;
