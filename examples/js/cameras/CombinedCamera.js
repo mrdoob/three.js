@@ -9,7 +9,7 @@
  */
 
 
-THREE.CombinedCamera = function ( width, height, fov, near, far, hyperfocusOffser, hyperfocusScale ) {
+THREE.CombinedCamera = function ( width, height, fov, near, far, hyperfocusOffset, hyperfocusScale ) {
 
 	THREE.Camera.call( this );
 	// perspective
@@ -31,7 +31,7 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, hyperfocusOffse
 
 	this.zoom = 1;
 	this.view = null;
-	this.hyperfocusOffser = hyperfocusOffser;
+	this.hyperfocusOffset = hyperfocusOffset;
 	this.hyperfocusScale = hyperfocusScale;
 
 	this.toPerspective();
@@ -67,7 +67,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	var fov = this.fov;
 	var aspect = this.aspect;
 
-	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * (this.hyperfocusOffser + this.hyperfocusScale * ( this.near + this.far ));
+	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * (this.hyperfocusOffset + this.hyperfocusScale * ( this.near + this.far ));
 	var halfWidth = halfHeight * aspect;
 
 	this.cameraO.near = this.near;
