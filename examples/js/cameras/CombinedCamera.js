@@ -237,6 +237,9 @@ THREE.CombinedCamera.prototype.toFrontView = function() {
 	this.rotation.y = 0;
 	this.rotation.z = 0;
 
+	this.position.x = 0;
+	this.position.y = 0;
+	this.position.z = -15;
 	// should we be modifing the matrix instead?
 
 };
@@ -247,6 +250,10 @@ THREE.CombinedCamera.prototype.toBackView = function() {
 	this.rotation.y = Math.PI;
 	this.rotation.z = 0;
 
+	this.position.x = 0;
+	this.position.y = 0;
+	this.position.z = 15;
+
 };
 
 THREE.CombinedCamera.prototype.toLeftView = function() {
@@ -254,6 +261,10 @@ THREE.CombinedCamera.prototype.toLeftView = function() {
 	this.rotation.x = 0;
 	this.rotation.y = - Math.PI / 2;
 	this.rotation.z = 0;
+
+	this.position.x = -15;
+	this.position.y = 0;
+	this.position.z = 0;
 
 };
 
@@ -263,6 +274,10 @@ THREE.CombinedCamera.prototype.toRightView = function() {
 	this.rotation.y = Math.PI / 2;
 	this.rotation.z = 0;
 
+	this.position.x = 15;
+	this.position.y = 0;
+	this.position.z = 0;
+
 };
 
 THREE.CombinedCamera.prototype.toTopView = function() {
@@ -270,6 +285,10 @@ THREE.CombinedCamera.prototype.toTopView = function() {
 	this.rotation.x = - Math.PI / 2;
 	this.rotation.y = 0;
 	this.rotation.z = 0;
+
+	this.position.x = 0;
+	this.position.y = 15;
+	this.position.z = 0;
 
 };
 
@@ -279,4 +298,9 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 	this.rotation.y = 0;
 	this.rotation.z = 0;
 
+	this.position.x = 0;
+	this.position.y = -15;
+	this.position.z = 0;
+
+};
 };
