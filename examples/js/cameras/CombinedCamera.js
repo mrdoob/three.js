@@ -303,4 +303,15 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 	this.position.z = 0;
 
 };
+
+THREE.CombinedCamera.prototype.toPerspectiveView = function() {
+
+	this.rotation.x = - Math.PI / 4;
+	this.rotation.y = - Math.PI / 4;
+	this.rotation.z = 0;
+
+	this.position.x = 4;
+	this.position.y = 4;
+	this.position.z = 4;
+
 };
