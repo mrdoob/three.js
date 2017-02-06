@@ -100,6 +100,8 @@
 
 				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
+				console.log( scene );
+
 				// Geometry
 				var geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
 				var material = new THREE.MeshPhongMaterial( {
@@ -109,8 +111,66 @@
 					shading: THREE.SmoothShading
 				} );
 
-				torusKnot = new THREE.Mesh( geometry, material );
-				torusKnot.scale.multiplyScalar( 1 / 18 );
+
+				var bg = new THREE.BoxBufferGeometry(1,1,1);
+
+					var group = new THREE.Group();
+
+					// group.position.multiplyScalar( 2 );
+					// group.position.sub( new THREE.Vector3(1,1,0) );
+
+					// group.position.multiplyScalar( 2000 );
+
+
+					// materialColors.forEach( function(m){
+
+
+						var cluster = new THREE.InstancedMesh( 
+							
+							bg , 
+							
+							new THREE.MeshPhongMaterial( {
+								color: 0xa0adaf,
+								shininess: 150,
+								specular: 0xffffff,
+								shading: THREE.SmoothShading
+							} ), 
+							
+							function( object , i ){
+
+								object.position.x = Math.random() * 2 - 1;
+								object.position.y = Math.random() * 2 - 1;
+								object.position.z = Math.random() * 2 - 1;
+
+
+								// object.rotation.x = Math.random() * 2 * Math.PI;
+								// object.rotation.y = Math.random() * 2 * Math.PI;
+								// object.rotation.z = Math.random() * 2 * Math.PI;
+
+								// object.scale.multiplyScalar( geometryScales[i % 4] ).multiplyScalar( Math.random() + 0.5 );
+
+								var scale = 2.1;
+
+								object.scale.x = scale * ( Math.random() + 0.5);
+								object.scale.y = scale * ( Math.random() + 0.5);
+								object.scale.z = scale * ( Math.random() + 0.5);
+
+							},
+
+							1000
+						);
+
+						cluster.castShadow = false;
+						cluster.receiveShadow = true;
+						group.add( cluster );
+
+					// })
+
+				 	scene.add( group );
+
+
+				torusKnot = cluster;
+				// torusKnot.scale.multiplyScalar( 1 / 18 );
 				torusKnot.position.y = 3;
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
@@ -212,7 +272,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				var delta = clock.getDelta()*0.02;
 
 				renderScene();
 				renderShadowMapViewers();

@@ -61,6 +61,8 @@ function Material() {
 
 	this._needsUpdate = true;
 
+	this.instanceTransform = false; //trigger define for instance transform
+
 }
 
 Object.defineProperty( Material.prototype, 'needsUpdate', {

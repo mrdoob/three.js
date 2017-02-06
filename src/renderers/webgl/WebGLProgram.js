@@ -343,6 +343,8 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
+			parameters.instanceTransform ? '#define INSTANCE_TRANSFORM' : '', 
+
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.skinning ? '#define USE_SKINNING' : '',
@@ -379,6 +381,20 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			'	attribute vec3 color;',
 
 			'#endif',
+
+			'#ifdef INSTANCE_TRANSFORM',
+
+			'	attribute vec4 aNRM0;',
+			'	attribute vec4 aNRM1;',
+			'	attribute vec4 aNRM2;',
+
+			'	attribute vec4 aTRS0;',
+			'	attribute vec4 aTRS1;',
+			'	attribute vec4 aTRS2;',
+			'	attribute vec4 aTRS3;',
+
+			'#endif',
+
 
 			'#ifdef USE_MORPHTARGETS',
 
