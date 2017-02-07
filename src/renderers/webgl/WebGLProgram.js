@@ -385,10 +385,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 			'#ifdef INSTANCE_TRANSFORM',
 
-			'	attribute vec4 aNRM0;',
-			'	attribute vec4 aNRM1;',
-			'	attribute vec4 aNRM2;',
-
 			'	attribute vec4 aTRS0;',
 			'	attribute vec4 aTRS1;',
 			'	attribute vec4 aTRS2;',

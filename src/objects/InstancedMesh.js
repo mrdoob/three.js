@@ -70,13 +70,6 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 )
 		];
 
-		//one can fit above?
-		var normalMatrices = [
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 3 ), 3, 1 ),
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 3 ), 3, 1 ),
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 3 ), 3, 1 ),
-		];
-
 		for ( var clone = 0 ; clone < numCopies ; clone ++ ){
 
 			helperObject.matrixWorld.identity();
@@ -91,23 +84,13 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 
 			helperObject.updateMatrixWorld();
 
-			rotationMatrix.extractRotation( helperObject.matrixWorld );
-
 			_copyMat4IntoAttributes( clone , helperObject.matrixWorld , orientationMatrices );
-
-			_copyMat3IntoAttributes( clone , normalMatrix.setFromMatrix4( rotationMatrix ) , normalMatrices );
 
 		}
 
 		for ( var i = 0 ; i < 4 ; i ++ ){
 
 			this.addAttribute( 'aTRS' + i , orientationMatrices[i] );
-
-		}
-
-		for ( var i = 0 ; i < 3 ; i ++ ){
-
-			this.addAttribute( 'aNRM' + i , normalMatrices[i] );
 
 		}
 
@@ -127,27 +110,6 @@ function _copyMat4IntoAttributes( index , mat4 , attributeArray ){
 		for ( var c = 0 ; c < 4 ; c ++ ){
 			
 			attributeArray[r].array[ index + c ] = mat4.elements[ row + c ];
-
-		}
-
-	}
-
-}
-
-/**
- * copies mat4 values into an attribute buffer at an offset
- **/
-function _copyMat3IntoAttributes( index , mat3 , attributeArray ){
-
-	index = index * 3;
-
-	for ( var r = 0 ; r < 3 ; r ++ ){
-
-		var row = r * 3;
-
-		for ( var c = 0 ; c < 3 ; c ++ ){
-			
-			attributeArray[r].array[ index + c ] = mat3.elements[ row + c ];
 
 		}
 
