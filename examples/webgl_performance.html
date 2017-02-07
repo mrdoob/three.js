@@ -57,21 +57,22 @@
 
 					geometry.computeVertexNormals();
 
-					for ( var i = 0; i < 5000; i ++ ) {
+					for ( var i = 0; i < 20; i ++ ) {
+						for ( var j = 0; j < 20; j ++ ) {
+							for ( var k = 0; k < 20; k ++ ) {
 
-						var mesh = new THREE.Mesh( geometry, material );
+								var mesh = new THREE.Mesh( geometry, material );
 
-						mesh.position.x = Math.random() * 8000 - 4000;
-						mesh.position.y = Math.random() * 8000 - 4000;
-						mesh.position.z = Math.random() * 8000 - 4000;
-						mesh.rotation.x = Math.random() * 2 * Math.PI;
-						mesh.rotation.y = Math.random() * 2 * Math.PI;
-						mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
+								mesh.position.x = (i / 20) * 8000 - 4000;
+								mesh.position.y = (j / 20) * 8000 - 4000;
+								mesh.position.z = (k / 20) * 8000 - 4000;
+								mesh.scale.x = mesh.scale.y = mesh.scale.z = 50 + 100;
 
-						objects.push( mesh );
+								objects.push( mesh );
 
-						scene.add( mesh );
-
+								scene.add( mesh );
+							}
+						}
 					}
 
 				} );
@@ -123,8 +124,8 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				// camera.position.x += ( mouseX - camera.position.x ) * .05;
+				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
 				for ( var i = 0, il = objects.length; i < il; i ++ ) {
@@ -141,4 +142,4 @@
 		</script>
 
 	</body>
-</html>
+</html
