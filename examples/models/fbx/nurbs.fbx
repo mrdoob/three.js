@@ -8,123 +8,11 @@ FBXHeaderExtension:  {
 	FBXVersion: 7200
 }
 
-; Object definitions
-;------------------------------------------------------------------
-
-Definitions:  {
-	Version: 100
-	Count: 51
-	ObjectType: "Model" {
-		Count: 25
-		PropertyTemplate: "KFbxNode" {
-			Properties70:  {
-				P: "QuaternionInterpolate", "enum", "", "",0
-				P: "RotationOffset", "Vector3D", "Vector", "",0,0,0
-				P: "RotationPivot", "Vector3D", "Vector", "",0,0,0
-				P: "ScalingOffset", "Vector3D", "Vector", "",0,0,0
-				P: "ScalingPivot", "Vector3D", "Vector", "",0,0,0
-				P: "TranslationActive", "bool", "", "",0
-				P: "TranslationMin", "Vector3D", "Vector", "",0,0,0
-				P: "TranslationMax", "Vector3D", "Vector", "",0,0,0
-				P: "TranslationMinX", "bool", "", "",0
-				P: "TranslationMinY", "bool", "", "",0
-				P: "TranslationMinZ", "bool", "", "",0
-				P: "TranslationMaxX", "bool", "", "",0
-				P: "TranslationMaxY", "bool", "", "",0
-				P: "TranslationMaxZ", "bool", "", "",0
-				P: "RotationOrder", "enum", "", "",0
-				P: "RotationSpaceForLimitOnly", "bool", "", "",0
-				P: "RotationStiffnessX", "double", "Number", "",0
-				P: "RotationStiffnessY", "double", "Number", "",0
-				P: "RotationStiffnessZ", "double", "Number", "",0
-				P: "AxisLen", "double", "Number", "",10
-				P: "PreRotation", "Vector3D", "Vector", "",0,0,0
-				P: "PostRotation", "Vector3D", "Vector", "",0,0,0
-				P: "RotationActive", "bool", "", "",0
-				P: "RotationMin", "Vector3D", "Vector", "",0,0,0
-				P: "RotationMax", "Vector3D", "Vector", "",0,0,0
-				P: "RotationMinX", "bool", "", "",0
-				P: "RotationMinY", "bool", "", "",0
-				P: "RotationMinZ", "bool", "", "",0
-				P: "RotationMaxX", "bool", "", "",0
-				P: "RotationMaxY", "bool", "", "",0
-				P: "RotationMaxZ", "bool", "", "",0
-				P: "InheritType", "enum", "", "",0
-				P: "ScalingActive", "bool", "", "",0
-				P: "ScalingMin", "Vector3D", "Vector", "",0,0,0
-				P: "ScalingMax", "Vector3D", "Vector", "",1,1,1
-				P: "ScalingMinX", "bool", "", "",0
-				P: "ScalingMinY", "bool", "", "",0
-				P: "ScalingMinZ", "bool", "", "",0
-				P: "ScalingMaxX", "bool", "", "",0
-				P: "ScalingMaxY", "bool", "", "",0
-				P: "ScalingMaxZ", "bool", "", "",0
-				P: "GeometricTranslation", "Vector3D", "Vector", "",0,0,0
-				P: "GeometricRotation", "Vector3D", "Vector", "",0,0,0
-				P: "GeometricScaling", "Vector3D", "Vector", "",1,1,1
-				P: "MinDampRangeX", "double", "Number", "",0
-				P: "MinDampRangeY", "double", "Number", "",0
-				P: "MinDampRangeZ", "double", "Number", "",0
-				P: "MaxDampRangeX", "double", "Number", "",0
-				P: "MaxDampRangeY", "double", "Number", "",0
-				P: "MaxDampRangeZ", "double", "Number", "",0
-				P: "MinDampStrengthX", "double", "Number", "",0
-				P: "MinDampStrengthY", "double", "Number", "",0
-				P: "MinDampStrengthZ", "double", "Number", "",0
-				P: "MaxDampStrengthX", "double", "Number", "",0
-				P: "MaxDampStrengthY", "double", "Number", "",0
-				P: "MaxDampStrengthZ", "double", "Number", "",0
-				P: "PreferedAngleX", "double", "Number", "",0
-				P: "PreferedAngleY", "double", "Number", "",0
-				P: "PreferedAngleZ", "double", "Number", "",0
-				P: "LookAtProperty", "object", "", ""
-				P: "UpVectorProperty", "object", "", ""
-				P: "Show", "bool", "", "",1
-				P: "NegativePercentShapeSupport", "bool", "", "",1
-				P: "DefaultAttributeIndex", "int", "Integer", "",-1
-				P: "Freeze", "bool", "", "",0
-				P: "LODBox", "bool", "", "",0
-				P: "Lcl Translation", "Lcl Translation", "", "A",0,0,0
-				P: "Lcl Rotation", "Lcl Rotation", "", "A",0,0,0
-				P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
-				P: "Visibility", "Visibility", "", "A",1
-				P: "Visibility Inheritance", "Visibility Inheritance", "", "",1
-			}
-		}
-	}
-	ObjectType: "NodeAttribute" {
-		Count: 2
-		PropertyTemplate: "KFbxNull" {
-			Properties70:  {
-				P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
-				P: "Size", "double", "Number", "",100
-				P: "Look", "enum", "", "",1
-			}
-		}
-	}
-	ObjectType: "Geometry" {
-		Count: 23
-		PropertyTemplate: "KFbxNurbsCurve" {
-			Properties70:  {
-				P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
-				P: "BBoxMin", "Vector3D", "Vector", "",0,0,0
-				P: "BBoxMax", "Vector3D", "Vector", "",0,0,0
-			}
-		}
-	}
-}
-
 ; Object properties
 ;------------------------------------------------------------------
 
 Objects:  {
-	NodeAttribute: 211671216, "NodeAttribute::Default", "Null" {
-		TypeFlags: "Null"
-	}
-	NodeAttribute: 211674096, "NodeAttribute::Layer 01", "Null" {
-		TypeFlags: "Null"
-	}
-	Geometry: 211707024, "Geometry::", "NurbsCurve" {
+	Geometry: 1000, "Geometry::", "NurbsCurve" {
 		GeometryVersion: 124
 		Type: "NurbsCurve"
 		NurbsCurveVersion: 100
@@ -132,45 +20,91 @@ Objects:  {
 		Dimension: 3
 		Form: "Open"
 		Rational: 1
-		Points: *12 {
-			a: 0,10,-20,1,15,15,0,1,0,0,15,1
+		Points: *32 {
+			a: 10,20,0,1, 10,20,10,1, 0,20,10,1, -10,20,10,1, -10,20,0,1, -10,20,-10,1, 0,20,-10,1, 10,22,-10,1
 		}
-		KnotVector: *6 {
-			a: -0,-0,-0,1,1,1
+		KnotVector: *11 {
+			a: 0,0,0,0.17,0.33,0.5,0.67,0.83,1,1,1
 		}
 	}
-	Model: 211686688, "Model::Default", "Null" {
-		Version: 232
-		Properties70:  {
-			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
-			P: "DefaultAttributeIndex", "int", "Integer", "",0
+	Geometry: 1001, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Closed"
+		Rational: 1
+		Points: *32 {
+			a: 10,15,0,1, 10,15,10,1, 0,15,10,1, -10,15,10,1, -10,15,0,1, -10,15,-10,1, 0,15,-10,1, 10,17,-10,1
 		}
-		MultiLayer: 0
-		MultiTake: 1
-		Shading: Y
-		Culling: "CullingOff"
+		KnotVector: *12 {
+			a: 0,0,0,0.14,0.29,0.43,0.57,0.71,0.86,1,1,1
+		}
 	}
-	Model: 211700960, "Model::Layer 01", "Null" {
-		Version: 232
-		Properties70:  {
-			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
-			P: "DefaultAttributeIndex", "int", "Integer", "",0
+	Geometry: 1003, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Open"
+		Rational: 0
+		Points: *28 {
+			a: -7.88491751885913,0,-6.3416140214512,1,-7.55614153653084,0,-2.14888095861657,1,-6.89858957187424,0,6.23658516705268,1,6.75015994493138,0,6.91307446273969,1,8.41087276805083,0,-7.08434013027703,1,4.56806678889053,0,-9.8832858634819,1,-2.6353540655343,1.51455220168221,-9.66990979123821,1
 		}
-		MultiLayer: 0
-		MultiTake: 1
-		Shading: Y
-		Culling: "CullingOff"
+		KnotVector: *10 {
+			a: 0,0,0,1,2,3,4,5,5,5
+		}
 	}
-	Model: 211707328, "Model::Object_1", "NurbsCurve" {
-		Version: 232
-		Properties70:  {
-			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
-			P: "DefaultAttributeIndex", "int", "Integer", "",0
+	Geometry: 1004, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 3
+		Dimension: 3
+		Form: "Periodic"
+		Rational: 0
+		Points: *28 {
+			a: -7.98766001333675,-5.56797696184566e-17,-7.65184310358704,1,-7.55614153653083,9.29849790468227e-18,-2.14888095861657,1,-6.89858957187424,-5.31636952823902e-17,6.23658516705267,1,6.75015994493138,0,6.91307446273969,1,8.41087276805082,4.96506830649454e-16,-7.08434013027705,1,4.56806678889055,-2.91370319417538e-16,-9.8832858634819,1,-4.88642308254206,1.9878497647079,-9.60322976866206,1
 		}
-		MultiLayer: 0
-		MultiTake: 1
-		Shading: Y
-		Culling: "CullingOff"
+		KnotVector: *12 {
+			a: -0.625,-0.3125,0,1,2,3,4,5,5.3125,5.625,6.625,7.625
+		}
+	}
+	Geometry: 1005, "Geometry::", "NurbsCurve" {
+		GeometryVersion: 124
+		Type: "NurbsCurve"
+		NurbsCurveVersion: 100
+		Order: 4
+		Dimension: 3
+		Form: "Periodic"
+		Rational: 0
+		Points: *32 {
+			a: 0.783611624891225,4.79823734098847e-17,-0.783611624891224,1,-1.26431706078293e-16,6.78573232311091e-17,-1.10819418755439,1,-0.783611624891224,4.79823734098847e-17,-0.783611624891224,1,-1.10819418755439,1.96633546161879e-32,-3.21126950723723e-16,1,-0.783611624891224,-4.79823734098847e-17,0.783611624891224,1,-3.33920536359052e-16,-6.78573232311091e-17,1.10819418755439,1,0.783611624891224,-4.79823734098847e-17,0.783611624891224,1,1.10819418755439,-3.64463006790479e-32,5.95213259928059e-16,1
+		}
+		KnotVector: *15 {
+			a: -3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11
+		}
+	}
+	Model: 10, "Model::Layer 01", "Null" {
+	}
+	Model: 100, "Model::Object_1", "NurbsCurve" {
+	}
+	Model: 101, "Model::Object_2", "NurbsCurve" {
+	}
+	Model: 103, "Model::Object_4", "NurbsCurve" {
+	}
+	Model: 104, "Model::Object_5", "NurbsCurve" {
+		Properties70:  {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,3.38368368081907,0
+		}
+	}
+	Model: 105, "Model::Object_6", "NurbsCurve" {
+		Properties70:  {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0.000265865200637982,2.121861293983,0.0232605698569328
+			P: "Lcl Scaling", "Lcl Scaling", "", "A",9.95283433152597,1,9.95283433152597
+		}
 	}
 }
 
@@ -178,28 +112,36 @@ Objects:  {
 ;------------------------------------------------------------------
 
 Connections:  {
-
-	;Model::Default, Model::RootNode
-	C: "OO",211686688,0
-
 	;Model::Layer 01, Model::RootNode
-	C: "OO",211700960,0
-
-	;NodeAttribute::Default, Model::Default
-	C: "OO",211671216,211686688
-
-	;NodeAttribute::Layer 01, Model::Layer 01
-	C: "OO",211674096,211700960
+	C: "OO",10,0
 
 	;Model::Object_1, Model::Layer 01
-	C: "OO",211707328,211700960
+	C: "OO",100,10
 
 	;Geometry::, Model::Object_1
-	C: "OO",211707024,211707328
-}
-;Takes section
-;----------------------------------------------------
+	C: "OO",1000,100
 
-Takes:  {
-	Current: ""
+	;Model::Object_2, Model::Layer 01
+	C: "OO",101,10
+
+	;Geometry::, Model::Object_2
+	C: "OO",1001,101
+
+	;Model::Object_4, Model::Layer 01
+	C: "OO",103,10
+
+	;Geometry::, Model::Object_4
+	C: "OO",1003,103
+
+	;Model::Object_5, Model::Layer 01
+	C: "OO",104,10
+
+	;Geometry::, Model::Object_5
+	C: "OO",1004,104
+
+	;Model::Object_6, Model::Layer 01
+	C: "OO",105,10
+
+	;Geometry::, Model::Object_6
+	C: "OO",1005,105
 }
