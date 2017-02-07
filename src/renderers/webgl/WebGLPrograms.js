@@ -34,7 +34,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking",
-		"instanceTransform"
+		"instanceTransform", "instanceUniform"
 	];
 
 
@@ -202,7 +202,8 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
 
-			instanceTransform: !!material.instanceTransform
+			instanceTransform: !!material.instanceTransform,
+			instanceUniform: !!material.instanceUniform
 
 		};
 

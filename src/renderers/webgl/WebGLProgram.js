@@ -344,6 +344,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
 			parameters.instanceTransform ? '#define INSTANCE_TRANSFORM' : '', 
+			parameters.instanceUniform ? '	#define INSTANCE_UNIFORM' : '', 
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 

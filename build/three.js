@@ -4919,7 +4919,7 @@
 
 	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\r\n\r\n#define cubeUV_textureSize (1024.0)\r\n\r\nint getFaceFromDirection(vec3 direction) {\r\n\tvec3 absDirection = abs(direction);\r\n\tint face = -1;\r\n\tif( absDirection.x > absDirection.z ) {\r\n\t\tif(absDirection.x > absDirection.y )\r\n\t\t\tface = direction.x > 0.0 ? 0 : 3;\r\n\t\telse\r\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\r\n\t}\r\n\telse {\r\n\t\tif(absDirection.z > absDirection.y )\r\n\t\t\tface = direction.z > 0.0 ? 2 : 5;\r\n\t\telse\r\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\r\n\t}\r\n\treturn face;\r\n}\r\n#define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)\r\n#define cubeUV_rangeClamp (exp2((6.0 - 1.0) * 2.0))\r\n\r\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\r\n\tfloat scale = exp2(cubeUV_maxLods1 - roughnessLevel);\r\n\tfloat dxRoughness = dFdx(roughness);\r\n\tfloat dyRoughness = dFdy(roughness);\r\n\tvec3 dx = dFdx( vec * scale * dxRoughness );\r\n\tvec3 dy = dFdy( vec * scale * dyRoughness );\r\n\tfloat d = max( dot( dx, dx ), dot( dy, dy ) );\r\n\t// Clamp the value to the max mip level counts. hard coded to 6 mips\r\n\td = clamp(d, 1.0, cubeUV_rangeClamp);\r\n\tfloat mipLevel = 0.5 * log2(d);\r\n\treturn vec2(floor(mipLevel), fract(mipLevel));\r\n}\r\n\r\n#define cubeUV_maxLods2 (log2(cubeUV_textureSize*0.25) - 2.0)\r\n#define cubeUV_rcpTextureSize (1.0 / cubeUV_textureSize)\r\n\r\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\r\n\tmipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\r\n\tfloat a = 16.0 * cubeUV_rcpTextureSize;\r\n\r\n\tvec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\r\n\tvec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\r\n\t// float powScale = exp2(roughnessLevel + mipLevel);\r\n\tfloat powScale = exp2_packed.x * exp2_packed.y;\r\n\t// float scale =  1.0 / exp2(roughnessLevel + 2.0 + mipLevel);\r\n\tfloat scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\r\n\t// float mipOffset = 0.75*(1.0 - 1.0/exp2(mipLevel))/exp2(roughnessLevel);\r\n\tfloat mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\r\n\r\n\tbool bRes = mipLevel == 0.0;\r\n\tscale =  bRes && (scale < a) ? a : scale;\r\n\r\n\tvec3 r;\r\n\tvec2 offset;\r\n\tint face = getFaceFromDirection(direction);\r\n\r\n\tfloat rcpPowScale = 1.0 / powScale;\r\n\r\n\tif( face == 0) {\r\n\t\tr = vec3(direction.x, -direction.z, direction.y);\r\n\t\toffset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\r\n\t}\r\n\telse if( face == 1) {\r\n\t\tr = vec3(direction.y, direction.x, direction.z);\r\n\t\toffset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\r\n\t}\r\n\telse if( face == 2) {\r\n\t\tr = vec3(direction.z, direction.x, direction.y);\r\n\t\toffset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\r\n\t}\r\n\telse if( face == 3) {\r\n\t\tr = vec3(direction.x, direction.z, direction.y);\r\n\t\toffset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\r\n\t}\r\n\telse if( face == 4) {\r\n\t\tr = vec3(direction.y, direction.x, -direction.z);\r\n\t\toffset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\r\n\t}\r\n\telse {\r\n\t\tr = vec3(direction.z, -direction.x, direction.y);\r\n\t\toffset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\r\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\r\n\t}\r\n\tr = normalize(r);\r\n\tfloat texelOffset = 0.5 * cubeUV_rcpTextureSize;\r\n\tvec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\r\n\tvec2 base = offset + vec2( texelOffset );\r\n\treturn base + s * ( scale - 2.0 * texelOffset );\r\n}\r\n\r\n#define cubeUV_maxLods3 (log2(cubeUV_textureSize*0.25) - 3.0)\r\n\r\nvec4 textureCubeUV(vec3 reflectedDirection, float roughness ) {\r\n\tfloat roughnessVal = roughness* cubeUV_maxLods3;\r\n\tfloat r1 = floor(roughnessVal);\r\n\tfloat r2 = r1 + 1.0;\r\n\tfloat t = fract(roughnessVal);\r\n\tvec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\r\n\tfloat s = mipInfo.y;\r\n\tfloat level0 = mipInfo.x;\r\n\tfloat level1 = level0 + 1.0;\r\n\tlevel1 = level1 > 5.0 ? 5.0 : level1;\r\n\r\n\t// round to nearest mipmap if we are not interpolating.\r\n\tlevel0 += min( floor( s + 0.5 ), 5.0 );\r\n\r\n\t// Tri linear interpolation.\r\n\tvec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\r\n\tvec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\r\n\r\n\tvec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\r\n\tvec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\r\n\r\n\tvec4 result = mix(color10, color20, t);\r\n\r\n\treturn vec4(result.rgb, 1.0);\r\n}\r\n\r\n#endif\r\n";
 
-	var defaultnormal_vertex = "#ifdef FLIP_SIDED\r\n\r\n\tobjectNormal = -objectNormal;\r\n\r\n#endif\r\n\r\n#ifndef INSTANCE_TRANSFORM\r\n\r\nvec3 transformedNormal = normalMatrix * objectNormal;\r\n\r\n#else\r\n\r\n// mat4 aNormalMatrix = mat4(\r\n// \tvec4( aNRM0.x , aNRM0.y , aNRM0.z, 0. ),\r\n// \tvec4( aNRM1.x , aNRM1.y , aNRM1.z, 0. ),\r\n// \tvec4( aNRM2.x , aNRM2.y , aNRM2.z, 0. ),\r\n// \tvec4( 0., 0. , 0. , 1. )\r\n// );\r\nmat4 aNormalMatrix = mat4(\r\n\tvec4( aNRM0.x , aNRM0.y , aNRM0.z, 0. ),\r\n\tvec4( aNRM1.x , aNRM1.y , aNRM1.z, 0. ),\r\n\tvec4( aNRM2.x , aNRM2.y , aNRM2.z, 0. ),\r\n\tvec4( 0., 0. , 0. , 1. )\r\n);\r\n\r\n#ifndef INSTANCE_TRANSFORM_DEFINED\r\n\r\nmat4 aTRS = mat4(\r\n\taTRS0,aTRS1,aTRS2,aTRS3\r\n);\r\n\r\n#define INSTANCE_TRANSFORM_DEFINED\r\n\r\n#endif\r\n\r\nmat4 nMat = viewMatrix * aTRS; \r\n\r\nvec3 transformedNormal =  transpose( inverse( mat3( nMat ) ) ) * objectNormal ;\r\n\r\n#endif";
+	var defaultnormal_vertex = "#ifdef FLIP_SIDED\r\n\r\n\tobjectNormal = -objectNormal;\r\n\r\n#endif\r\n\r\n#ifndef INSTANCE_TRANSFORM\r\n\r\nvec3 transformedNormal = normalMatrix * objectNormal;\r\n\r\n#else\r\n\r\n#ifndef INSTANCE_TRANSFORM_DEFINED\r\n\r\nmat4 aTRS = mat4(\r\n\taTRS0,aTRS1,aTRS2,aTRS3\r\n);\r\n\r\n#define INSTANCE_TRANSFORM_DEFINED\r\n\r\n#endif\r\n\r\n#ifndef INSTANCE_UNIFORM\r\n\t\r\nvec3 transformedNormal =  transpose( inverse( mat3( modelViewMatrix * aTRS ) ) ) * objectNormal ;\r\n\r\n#else\r\n\r\nvec3 transformedNormal = ( modelViewMatrix * aTRS * vec4( objectNormal , 0.0 ) ).xyz;\r\n\r\n#endif\r\n\r\n#endif";
 
 	var displacementmap_pars_vertex = "#ifdef USE_DISPLACEMENTMAP\r\n\r\n\tuniform sampler2D displacementMap;\r\n\tuniform float displacementScale;\r\n\tuniform float displacementBias;\r\n\r\n#endif\r\n";
 
@@ -16572,6 +16572,7 @@
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
 				parameters.instanceTransform ? '#define INSTANCE_TRANSFORM' : '', 
+				parameters.instanceUniform ? '	#define INSTANCE_UNIFORM' : '', 
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -16948,7 +16949,7 @@
 			"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 			"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 			"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking",
-			"instanceTransform"
+			"instanceTransform", "instanceUniform"
 		];
 
 
@@ -17116,7 +17117,8 @@
 
 				depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
 
-				instanceTransform: !!material.instanceTransform
+				instanceTransform: !!material.instanceTransform,
+				instanceUniform: !!material.instanceUniform
 
 			};
 
@@ -23573,11 +23575,18 @@
 
 	};
 
-	function InstancedMesh ( geometry , material , distributeFunction , numCopies , disposeRegular ) {
+	/**
+	 * @pailhead
+	 */
+
+
+	function InstancedMesh ( geometry , material , distributeFunction , numCopies , uniformScale , disposeRegular ) {
 
 		Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
 
 		this.material.instanceTransform = true;
+
+		this.material.instanceUniform = undefined !== uniformScale ? uniformScale : false;
 
 		this.frustumCulled = false;
 

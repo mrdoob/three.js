@@ -1,7 +1,7 @@
 var files = {
 	"webgl": [
 
-		"webgl_mesh_instancing",
+		"webgl_instanced_mesh",
 		"webgl_animation_cloth",
 		"webgl_animation_scene",
 		"webgl_animation_skinning_blending",

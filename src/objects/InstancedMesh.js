@@ -1,3 +1,8 @@
+/**
+ * @pailhead
+ */
+
+
 import { Mesh } from './Mesh';
 import { Object3D } from '../core/Object3D';
 import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
@@ -5,11 +10,13 @@ import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute';
 import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
 
-function InstancedMesh ( geometry , material , distributeFunction , numCopies , disposeRegular ) {
+function InstancedMesh ( geometry , material , distributeFunction , numCopies , uniformScale , disposeRegular ) {
 
 	Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
 
 	this.material.instanceTransform = true;
+
+	this.material.instanceUniform = undefined !== uniformScale ? uniformScale : false;
 
 	this.frustumCulled = false;
 
