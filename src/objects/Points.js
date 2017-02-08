@@ -46,7 +46,8 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
-
+			sphere.radius = Math.max( sphere.radius, threshold );
+			
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
 			//
