@@ -382,8 +382,8 @@ Matrix4.prototype = {
 
 	multiplyMatrices: function ( a, b ) {
 
-		var ae = a.elements;
-		var be = b.elements;
+		var ae = (a == this) ? a.elements.slice() : a.elements;
+		var be = (b == this) ? b.elements.slice() : b.elements;
 		var te = this.elements;
 
 		te[ 0 ] = ae[ 0 ] * be[ 0 ] + ae[ 4 ] * be[ 1 ] + ae[ 8 ] * be[ 2 ] + ae[ 12 ] * be[ 3 ];
