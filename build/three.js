@@ -3689,44 +3689,46 @@
 
 		},
 
-		multiplyMatrices: ( function () {
-		
-			var e = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-			
-			return function ( a, b ) {
-				
-				var ae = a.elements;
-				var be = b.elements;
-				var te = this.elements;
-				
-				e[ 0 ] = ae[ 0 ] * be[ 0 ] + ae[ 4 ] * be[ 1 ] + ae[ 8 ] * be[ 2 ] + ae[ 12 ] * be[ 3 ];
-				e[ 4 ] = ae[ 0 ] * be[ 4 ] + ae[ 4 ] * be[ 5 ] + ae[ 8 ] * be[ 6 ] + ae[ 12 ] * be[ 7 ];
-				e[ 8 ] = ae[ 0 ] * be[ 8 ] + ae[ 4 ] * be[ 9 ] + ae[ 8 ] * be[ 10 ] + ae[ 12 ] * be[ 11 ];
-				e[ 12 ] = ae[ 0 ] * be[ 12 ] + ae[ 4 ] * be[ 13 ] + ae[ 8 ] * be[ 14 ] + ae[ 12 ] * be[ 15 ];
-				
-				e[ 1 ] = ae[ 1 ] * be[ 0 ] + ae[ 5 ] * be[ 1 ] + ae[ 9 ] * be[ 2 ] + ae[ 13 ] * be[ 3 ];
-				e[ 5 ] = ae[ 1 ] * be[ 4 ] + ae[ 5 ] * be[ 5 ] + ae[ 9 ] * be[ 6 ] + ae[ 13 ] * be[ 7 ];
-				e[ 9 ] = ae[ 1 ] * be[ 8 ] + ae[ 5 ] * be[ 9 ] + ae[ 9 ] * be[ 10 ] + ae[ 13 ] * be[ 11 ];
-				e[ 13 ] = ae[ 1 ] * be[ 12 ] + ae[ 5 ] * be[ 13 ] + ae[ 9 ] * be[ 14 ] + ae[ 13 ] * be[ 15 ];
-				
-				e[ 2 ] = ae[ 2 ] * be[ 0 ] + ae[ 6 ] * be[ 1 ] + ae[ 10 ] * be[ 2 ] + ae[ 14 ] * be[ 3 ];
-				e[ 6 ] = ae[ 2 ] * be[ 4 ] + ae[ 6 ] * be[ 5 ] + ae[ 10 ] * be[ 6 ] + ae[ 14 ] * be[ 7 ];
-				e[ 10 ] = ae[ 2 ] * be[ 8 ] + ae[ 6 ] * be[ 9 ] + ae[ 10 ] * be[ 10 ] + ae[ 14 ] * be[ 11 ];
-				e[ 14 ] = ae[ 2 ] * be[ 12 ] + ae[ 6 ] * be[ 13 ] + ae[ 10 ] * be[ 14 ] + ae[ 14 ] * be[ 15 ];
-				
-				e[ 3 ] = ae[ 3 ] * be[ 0 ] + ae[ 7 ] * be[ 1 ] + ae[ 11 ] * be[ 2 ] + ae[ 15 ] * be[ 3 ];
-				e[ 7 ] = ae[ 3 ] * be[ 4 ] + ae[ 7 ] * be[ 5 ] + ae[ 11 ] * be[ 6 ] + ae[ 15 ] * be[ 7 ];
-				e[ 11 ] = ae[ 3 ] * be[ 8 ] + ae[ 7 ] * be[ 9 ] + ae[ 11 ] * be[ 10 ] + ae[ 15 ] * be[ 11 ];
-				e[ 15 ] = ae[ 3 ] * be[ 12 ] + ae[ 7 ] * be[ 13 ] + ae[ 11 ] * be[ 14 ] + ae[ 15 ] * be[ 15 ];
-				
-				for ( var i = 0; i < 16; i ++ ) te[ i ] = e[ i ];
-				
-				return this;
-				
-			};
-			
-		} )(),
-		
+		multiplyMatrices: function ( a, b ) {
+
+			var ae = a.elements;
+			var be = b.elements;
+			var te = this.elements;
+
+			var a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[ 8 ], a14 = ae[ 12 ];
+			var a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[ 9 ], a24 = ae[ 13 ];
+			var a31 = ae[ 2 ], a32 = ae[ 6 ], a33 = ae[ 10 ], a34 = ae[ 14 ];
+			var a41 = ae[ 3 ], a42 = ae[ 7 ], a43 = ae[ 11 ], a44 = ae[ 15 ];
+
+			var b11 = be[ 0 ], b12 = be[ 4 ], b13 = be[ 8 ], b14 = be[ 12 ];
+			var b21 = be[ 1 ], b22 = be[ 5 ], b23 = be[ 9 ], b24 = be[ 13 ];
+			var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
+			var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
+
+			te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+			te[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+			te[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+			te[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+			te[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+			te[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+			te[ 9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+			te[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+			te[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+			te[ 6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+			te[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+			te[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+			te[ 3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+			te[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+			te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+			te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+			return this;
+
+		},
+
 		multiplyToArray: function ( a, b, r ) {
 
 			var te = this.elements;
@@ -4345,7 +4347,7 @@
 
 	// Float32Array cache used for uploading Matrix4 uniform
 
-	var mat4array = new Float32Array(16);
+	var mat4array = new Float32Array( 16 );
 
 	// Flattening for arrays of vectors and matrices
 
@@ -4458,17 +4460,16 @@
 	function setValue4fm( gl, v ) {
 
 		if ( v.elements === undefined ) {
-			
+
 			gl.uniformMatrix4fv( this.addr, false, v );
-			
-		}
-		else {
-			
-			mat4array.set(v.elements);
+
+		} else {
+
+			mat4array.set( v.elements );
 			gl.uniformMatrix4fv( this.addr, false, mat4array );
-			
+
 		}
-		
+
 	}
 
 	// Single texture (2D / Cube)
@@ -4657,7 +4658,7 @@
 
 	}
 
-	StructuredUniform.prototype.setValue = function( gl, value ) {
+	StructuredUniform.prototype.setValue = function ( gl, value ) {
 
 		// Note: Don't need an extra 'renderer' parameter, since samplers
 		// are not allowed in structured uniforms.
@@ -4703,7 +4704,7 @@
 		// reset RegExp object, because of the early exit of a previous run
 		RePathPart.lastIndex = 0;
 
-		for (; ;) {
+		for ( ; ; ) {
 
 			var match = RePathPart.exec( path ),
 				matchEnd = RePathPart.lastIndex,
@@ -4714,8 +4715,8 @@
 
 			if ( idIsIndex ) id = id | 0; // convert to integer
 
-			if ( subscript === undefined ||
-					subscript === '[' && matchEnd + 2 === pathLength ) {
+			if ( subscript === undefined || subscript === '[' && matchEnd + 2 === pathLength ) {
+
 				// bare name or "pure" bottom-level array "[0]" suffix
 
 				addUniform( container, subscript === undefined ?
@@ -4725,10 +4726,10 @@
 				break;
 
 			} else {
+
 				// step into inner node / create it in case it doesn't exist
 
-				var map = container.map,
-					next = map[ id ];
+				var map = container.map, next = map[ id ];
 
 				if ( next === undefined ) {
 
@@ -4767,7 +4768,7 @@
 
 	}
 
-	WebGLUniforms.prototype.setValue = function( gl, name, value ) {
+	WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 		var u = this.map[ name ];
 
@@ -4775,7 +4776,7 @@
 
 	};
 
-	WebGLUniforms.prototype.set = function( gl, object, name ) {
+	WebGLUniforms.prototype.set = function ( gl, object, name ) {
 
 		var u = this.map[ name ];
 
@@ -4783,7 +4784,7 @@
 
 	};
 
-	WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
+	WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 		var v = object[ name ];
 
@@ -4794,7 +4795,7 @@
 
 	// Static interface
 
-	WebGLUniforms.upload = function( gl, seq, values, renderer ) {
+	WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 
 		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -4802,8 +4803,8 @@
 				v = values[ u.id ];
 
 			if ( v.needsUpdate !== false ) {
-				// note: always updating when .needsUpdate is undefined
 
+				// note: always updating when .needsUpdate is undefined
 				u.setValue( gl, v.value, renderer );
 
 			}
@@ -4812,7 +4813,7 @@
 
 	};
 
-	WebGLUniforms.seqWithValue = function( seq, values ) {
+	WebGLUniforms.seqWithValue = function ( seq, values ) {
 
 		var r = [];
 
