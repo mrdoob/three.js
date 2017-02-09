@@ -90,7 +90,15 @@ function generateExtensions( extensions, parameters, rendererExtensions ) {
 		( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
 	];
 
-	return chunks.filter( filterEmptyLine ).join( '\n' );
+	var joined = chunks.filter( filterEmptyLine ).join( '\n' );
+
+	if ( '' !== joined ) {
+
+		joined += '\n';
+
+	}
+
+	return joined;
 
 }
 
@@ -108,7 +116,15 @@ function generateDefines( defines ) {
 
 	}
 
-	return chunks.join( '\n' );
+	var joined = chunks.join( '\n' );
+
+	if ( '' !== joined ) {
+
+		joined += '\n';
+
+	}
+
+	return joined;
 
 }
 
@@ -294,16 +310,12 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 			customDefines,
 
-			'\n'
-
 		].filter( filterEmptyLine ).join( '\n' );
 
 		prefixFragment = [
 
 			customExtensions,
 			customDefines,
-
-			'\n'
 
 		].filter( filterEmptyLine ).join( '\n' );
 
