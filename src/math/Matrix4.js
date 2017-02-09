@@ -75,7 +75,7 @@ Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		this.elements = m.elements.slice();
+		for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
 
 		return this;
 
@@ -800,8 +800,7 @@ Matrix4.prototype = {
 			position.z = te[ 14 ];
 
 			// scale the rotation part
-
-			matrix.elements = this.elements.slice(); // at this point matrix is incomplete so we can't use .copy()
+			for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
 
 			var invSX = 1 / sx;
 			var invSY = 1 / sy;
