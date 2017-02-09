@@ -90,28 +90,19 @@
 
 					if ( attributes.color === undefined ) {
 
-						var colors = new Float32Array( positions.length )
-						geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+						var colors = new Float32Array( positions.length );
+						geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
 
 					}
 
 					var colors = attributes.color.array;
 
+					var startVertex = currentVertex;
 					var totalVertex = positions.length / 3;
 
 					for ( var i = 0; i < 32; i ++ ) {
 
-						if ( currentVertex >= totalVertex ) {
-
-							clone = scene.clone();
-							clone.autoUpdate = false;
-
-							bounces ++
-							currentVertex = 0;
-
-							break;
-
-						}
+						if ( currentVertex >= totalVertex ) break;
 
 						position.fromArray( positions, currentVertex * 3 );
 						position.applyMatrix4( object.matrixWorld );
@@ -142,9 +133,21 @@
 						colors[ currentVertex * 3 + 1 ] = color[ 1 ] / ( SIZE2 * 255 );
 						colors[ currentVertex * 3 + 2 ] = color[ 2 ] / ( SIZE2 * 255 );
 
-						attributes.color.needsUpdate = true;
-
 						currentVertex ++;
+
+					}
+
+					attributes.color.updateRange.offset = startVertex * 3;
+					attributes.color.updateRange.count = ( currentVertex - startVertex ) * 3;
+					attributes.color.needsUpdate = true;
+
+					if ( currentVertex >= totalVertex ) {
+
+						clone = scene.clone();
+						clone.autoUpdate = false;
+
+						bounces ++
+						currentVertex = 0;
 
 					}
 
