@@ -48,7 +48,7 @@
 
 			//
 
-			var GI = function ( renderer, scene ) {
+			var SimpleGI = function ( renderer, scene ) {
 
 				var SIZE = 32, SIZE2 = SIZE * SIZE;
 
@@ -66,7 +66,7 @@
 					depthBuffer: true
 				} );
 
-				var rotationMatrix = new THREE.Matrix4();
+				var normalMatrix = new THREE.Matrix3();
 
 				var position = new THREE.Vector3();
 				var normal = new THREE.Vector3();
@@ -117,7 +117,7 @@
 						position.applyMatrix4( object.matrixWorld );
 
 						normal.fromArray( normals, currentVertex * 3 );
-						normal.applyMatrix4( rotationMatrix.extractRotation( object.matrixWorld ) );
+						normal.applyMatrix3( normalMatrix.getNormalMatrix( object.matrixWorld ) ).normalize();
 
 						camera.position.copy( position );
 						camera.lookAt( position.add( normal ) );
@@ -220,7 +220,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				new GI( renderer, scene );
+				new SimpleGI( renderer, scene );
 
 				controls = new THREE.OrbitControls( camera );
 
