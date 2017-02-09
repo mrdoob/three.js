@@ -71,7 +71,7 @@ var arrayCacheI32 = [];
 
 // Float32Array cache used for uploading Matrix4 uniform
 
-var mat4array = new Float32Array(16);
+var mat4array = new Float32Array( 16 );
 
 // Flattening for arrays of vectors and matrices
 
@@ -137,8 +137,8 @@ function allocTexUnits( renderer, n ) {
 
 // Single scalar
 
-function setValue1f( gl, v ) { gl.uniform1f( this.addr, v ); }
-function setValue1i( gl, v ) { gl.uniform1i( this.addr, v ); }
+function setValue1f( gl, v ) { gl.uniform1f( this.addr, v ) }
+function setValue1i( gl, v ) { gl.uniform1i( this.addr, v ) }
 
 // Single float vector (from flat array or THREE.VectorN)
 
@@ -184,17 +184,16 @@ function setValue3fm( gl, v ) {
 function setValue4fm( gl, v ) {
 
 	if ( v.elements === undefined ) {
-		
+
 		gl.uniformMatrix4fv( this.addr, false, v );
-		
-	}
-	else {
-		
-		mat4array.set(v.elements);
+
+	} else {
+
+		mat4array.set( v.elements );
 		gl.uniformMatrix4fv( this.addr, false, mat4array );
-		
+
 	}
-	
+
 }
 
 // Single texture (2D / Cube)
@@ -217,9 +216,9 @@ function setValueT6( gl, v, renderer ) {
 
 // Integer / Boolean vectors or arrays thereof (always flat arrays)
 
-function setValue2iv( gl, v ) { gl.uniform2iv( this.addr, v ); }
-function setValue3iv( gl, v ) { gl.uniform3iv( this.addr, v ); }
-function setValue4iv( gl, v ) { gl.uniform4iv( this.addr, v ); }
+function setValue2iv( gl, v ) { gl.uniform2iv( this.addr, v ) }
+function setValue3iv( gl, v ) { gl.uniform3iv( this.addr, v ) }
+function setValue4iv( gl, v ) { gl.uniform4iv( this.addr, v ) }
 
 // Helper to pick the right setter for the singular case
 
@@ -250,8 +249,8 @@ function getSingularSetter( type ) {
 
 // Array of scalars
 
-function setValue1fv( gl, v ) { gl.uniform1fv( this.addr, v ); }
-function setValue1iv( gl, v ) { gl.uniform1iv( this.addr, v ); }
+function setValue1fv( gl, v ) { gl.uniform1fv( this.addr, v ) }
+function setValue1iv( gl, v ) { gl.uniform1iv( this.addr, v ) }
 
 // Array of vectors (flat or from THREE classes)
 
@@ -383,7 +382,7 @@ function StructuredUniform( id ) {
 
 }
 
-StructuredUniform.prototype.setValue = function( gl, value ) {
+StructuredUniform.prototype.setValue = function ( gl, value ) {
 
 	// Note: Don't need an extra 'renderer' parameter, since samplers
 	// are not allowed in structured uniforms.
@@ -429,7 +428,7 @@ function parseUniform( activeInfo, addr, container ) {
 	// reset RegExp object, because of the early exit of a previous run
 	RePathPart.lastIndex = 0;
 
-	for (; ;) {
+	for ( ; ; ) {
 
 		var match = RePathPart.exec( path ),
 			matchEnd = RePathPart.lastIndex,
@@ -440,8 +439,8 @@ function parseUniform( activeInfo, addr, container ) {
 
 		if ( idIsIndex ) id = id | 0; // convert to integer
 
-		if ( subscript === undefined ||
-				subscript === '[' && matchEnd + 2 === pathLength ) {
+		if ( subscript === undefined || subscript === '[' && matchEnd + 2 === pathLength ) {
+
 			// bare name or "pure" bottom-level array "[0]" suffix
 
 			addUniform( container, subscript === undefined ?
@@ -451,10 +450,10 @@ function parseUniform( activeInfo, addr, container ) {
 			break;
 
 		} else {
+
 			// step into inner node / create it in case it doesn't exist
 
-			var map = container.map,
-				next = map[ id ];
+			var map = container.map, next = map[ id ];
 
 			if ( next === undefined ) {
 
@@ -493,7 +492,7 @@ function WebGLUniforms( gl, program, renderer ) {
 
 }
 
-WebGLUniforms.prototype.setValue = function( gl, name, value ) {
+WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 	var u = this.map[ name ];
 
@@ -501,7 +500,7 @@ WebGLUniforms.prototype.setValue = function( gl, name, value ) {
 
 };
 
-WebGLUniforms.prototype.set = function( gl, object, name ) {
+WebGLUniforms.prototype.set = function ( gl, object, name ) {
 
 	var u = this.map[ name ];
 
@@ -509,7 +508,7 @@ WebGLUniforms.prototype.set = function( gl, object, name ) {
 
 };
 
-WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
+WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 	var v = object[ name ];
 
@@ -520,7 +519,7 @@ WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
 
 // Static interface
 
-WebGLUniforms.upload = function( gl, seq, values, renderer ) {
+WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -528,8 +527,8 @@ WebGLUniforms.upload = function( gl, seq, values, renderer ) {
 			v = values[ u.id ];
 
 		if ( v.needsUpdate !== false ) {
-			// note: always updating when .needsUpdate is undefined
 
+			// note: always updating when .needsUpdate is undefined
 			u.setValue( gl, v.value, renderer );
 
 		}
@@ -538,7 +537,7 @@ WebGLUniforms.upload = function( gl, seq, values, renderer ) {
 
 };
 
-WebGLUniforms.seqWithValue = function( seq, values ) {
+WebGLUniforms.seqWithValue = function ( seq, values ) {
 
 	var r = [];
 
