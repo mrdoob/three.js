@@ -12,6 +12,7 @@
  *  Animation
  * 	- Separated Animations based on stacks.
  * 	- Skeletal & Non-Skeletal Animations
+ *  NURBS (Open, Closed and Periodic forms)
  *
  * Needs Support:
  * 	Indexed Buffers
@@ -1010,15 +1011,7 @@
 
 						}
 
-						if ( geometryNode.properties.Form === 'Periodic' ) {
-
-							console.error( "FBXLoader: Currently no support for Periodic Nurbs Curves for geometry ID: " + geometryNode.id + ", using empty geometry buffer." );
-							return new THREE.BufferGeometry();
-
-							//TODO: Support Periodic NURBS curves.
-							//Info Link: https://knowledge.autodesk.com/support/maya/learn-explore/caas/CloudHelp/cloudhelp/2015/ENU/Maya/files/NURBS-overview-Periodic-closed-and-open-geometry-htm.html
-
-						}
+						var degree = order - 1;
 
 						var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
 						var controlPoints = [];
@@ -1030,14 +1023,27 @@
 
 						}
 
+						var startKnot, endKnot;
+
 						if ( geometryNode.properties.Form === 'Closed' ) {
 
 							controlPoints.push( controlPoints[ 0 ] );
 
+						} else if ( geometryNode.properties.Form === 'Periodic' ) {
+
+							startKnot = degree;
+							endKnot = knots.length - 1 - startKnot;
+
+							for ( var i = 0; i < degree; ++ i ) {
+
+								controlPoints.push( controlPoints[ i ] );
+
+							}
+
 						}
 
-						var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
-						var vertices = curve.getPoints( controlPoints.length * 1.5 );
+						var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+						var vertices = curve.getPoints( controlPoints.length * 7 );
 
 						var vertexBuffer = [];
 						for ( var verticesIndex = 0, verticesLength = vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {

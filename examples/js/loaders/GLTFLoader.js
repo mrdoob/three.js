@@ -1160,7 +1160,18 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					Object.assign( materialValues, khr_material.values );
+					// don't copy over unused values to avoid material warning spam
+					var c = ['ambient', 'transparent', 'transparency', 'doubleSided'];
+					var allowedValues = {
+						'CONSTANT': c.concat('emission'),
+						'LAMBERT':  c.concat('emission', 'diffuse'),
+						'BLINN':    c.concat('emission', 'diffuse', 'specular', 'shininess'),
+						'PHONG':    c.concat('emission', 'diffuse', 'specular', 'shininess')
+					};
+
+					allowedValues[khr_material.technique].forEach(function(v){
+						materialValues[v] = khr_material.values[v];
+					});
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
