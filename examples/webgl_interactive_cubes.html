@@ -25,8 +25,7 @@
 			var camera, scene, raycaster, renderer;
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
-                        var radius = 1, theta = 0;
-                        var offset = new THREE.Vector3(100000, 100000, 100000);
+			var radius = 100, theta = 0;
 
 			init();
 			animate();
@@ -44,7 +43,7 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, .1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
 
@@ -52,24 +51,25 @@
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( .001, .1, .1 );
+				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 
-				for ( var j = 0; j < 10; j ++ ) {
-					for ( var k = 0; k < 10; k ++ ) {
+				for ( var i = 0; i < 2000; i ++ ) {
 
-						var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-						var position = new THREE.Vector3( 0, j/10, k/10 );
-						position.add( offset );
+					object.position.x = Math.random() * 800 - 400;
+					object.position.y = Math.random() * 800 - 400;
+					object.position.z = Math.random() * 800 - 400;
 
-						var scale = new THREE.Vector3( 0.1, 1, 1 );
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
 
-						object.matrixAutoUpdate = false;
-						object.matrix.setPosition( position );
-						object.matrix.scale( scale );
+					object.scale.x = Math.random() + 0.5;
+					object.scale.y = Math.random() + 0.5;
+					object.scale.z = Math.random() + 0.5;
 
-						scene.add( object );
-					}
+					scene.add( object );
 
 				}
 
@@ -124,14 +124,11 @@
 
 			function render() {
 
-				theta = 20;
+				theta += 0.1;
 
 				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
 				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-
-				camera.position.add( offset );
-
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();
