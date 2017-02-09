@@ -33,7 +33,8 @@ function WebGLPrograms( renderer, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking",
+		"instanceTransform", "instanceUniform"
 	];
 
 
@@ -199,7 +200,10 @@ function WebGLPrograms( renderer, capabilities ) {
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
+			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+
+			instanceTransform: !!material.instanceTransform,
+			instanceUniform: !!material.instanceUniform
 
 		};
 

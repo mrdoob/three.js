@@ -18,6 +18,7 @@ export { SkinnedMesh } from './objects/SkinnedMesh.js';
 export { Skeleton } from './objects/Skeleton.js';
 export { Bone } from './objects/Bone.js';
 export { Mesh } from './objects/Mesh.js';
+export { InstancedMesh } from './objects/InstancedMesh.js';
 export { LineSegments } from './objects/LineSegments.js';
 export { LineLoop } from './objects/LineLoop.js';
 export { Line } from './objects/Line.js';
