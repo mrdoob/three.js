@@ -3707,36 +3707,44 @@
 
 		},
 
-		multiplyMatrices: function ( a, b ) {
-
-			var ae = (a === this) ? a.elements.slice() : a.elements;
-			var be = (b === this) ? b.elements.slice() : b.elements;
-			var te = this.elements;
-
-			te[ 0 ] = ae[ 0 ] * be[ 0 ] + ae[ 4 ] * be[ 1 ] + ae[ 8 ] * be[ 2 ] + ae[ 12 ] * be[ 3 ];
-			te[ 4 ] = ae[ 0 ] * be[ 4 ] + ae[ 4 ] * be[ 5 ] + ae[ 8 ] * be[ 6 ] + ae[ 12 ] * be[ 7 ];
-			te[ 8 ] = ae[ 0 ] * be[ 8 ] + ae[ 4 ] * be[ 9 ] + ae[ 8 ] * be[ 10 ] + ae[ 12 ] * be[ 11 ];
-			te[ 12 ] = ae[ 0 ] * be[ 12 ] + ae[ 4 ] * be[ 13 ] + ae[ 8 ] * be[ 14 ] + ae[ 12 ] * be[ 15 ];
-
-			te[ 1 ] = ae[ 1 ] * be[ 0 ] + ae[ 5 ] * be[ 1 ] + ae[ 9 ] * be[ 2 ] + ae[ 13 ] * be[ 3 ];
-			te[ 5 ] = ae[ 1 ] * be[ 4 ] + ae[ 5 ] * be[ 5 ] + ae[ 9 ] * be[ 6 ] + ae[ 13 ] * be[ 7 ];
-			te[ 9 ] = ae[ 1 ] * be[ 8 ] + ae[ 5 ] * be[ 9 ] + ae[ 9 ] * be[ 10 ] + ae[ 13 ] * be[ 11 ];
-			te[ 13 ] = ae[ 1 ] * be[ 12 ] + ae[ 5 ] * be[ 13 ] + ae[ 9 ] * be[ 14 ] + ae[ 13 ] * be[ 15 ];
-
-			te[ 2 ] = ae[ 2 ] * be[ 0 ] + ae[ 6 ] * be[ 1 ] + ae[ 10 ] * be[ 2 ] + ae[ 14 ] * be[ 3 ];
-			te[ 6 ] = ae[ 2 ] * be[ 4 ] + ae[ 6 ] * be[ 5 ] + ae[ 10 ] * be[ 6 ] + ae[ 14 ] * be[ 7 ];
-			te[ 10 ] = ae[ 2 ] * be[ 8 ] + ae[ 6 ] * be[ 9 ] + ae[ 10 ] * be[ 10 ] + ae[ 14 ] * be[ 11 ];
-			te[ 14 ] = ae[ 2 ] * be[ 12 ] + ae[ 6 ] * be[ 13 ] + ae[ 10 ] * be[ 14 ] + ae[ 14 ] * be[ 15 ];
-
-			te[ 3 ] = ae[ 3 ] * be[ 0 ] + ae[ 7 ] * be[ 1 ] + ae[ 11 ] * be[ 2 ] + ae[ 15 ] * be[ 3 ];
-			te[ 7 ] = ae[ 3 ] * be[ 4 ] + ae[ 7 ] * be[ 5 ] + ae[ 11 ] * be[ 6 ] + ae[ 15 ] * be[ 7 ];
-			te[ 11 ] = ae[ 3 ] * be[ 8 ] + ae[ 7 ] * be[ 9 ] + ae[ 11 ] * be[ 10 ] + ae[ 15 ] * be[ 11 ];
-			te[ 15 ] = ae[ 3 ] * be[ 12 ] + ae[ 7 ] * be[ 13 ] + ae[ 11 ] * be[ 14 ] + ae[ 15 ] * be[ 15 ];
-
-			return this;
-
-		},
-
+		multiplyMatrices: ( function () {
+		
+			var e = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+			
+			return function ( a, b ) {
+				
+				var ae = a.elements;
+				var be = b.elements;
+				var te = this.elements;
+				
+				e[ 0 ] = ae[ 0 ] * be[ 0 ] + ae[ 4 ] * be[ 1 ] + ae[ 8 ] * be[ 2 ] + ae[ 12 ] * be[ 3 ];
+				e[ 4 ] = ae[ 0 ] * be[ 4 ] + ae[ 4 ] * be[ 5 ] + ae[ 8 ] * be[ 6 ] + ae[ 12 ] * be[ 7 ];
+				e[ 8 ] = ae[ 0 ] * be[ 8 ] + ae[ 4 ] * be[ 9 ] + ae[ 8 ] * be[ 10 ] + ae[ 12 ] * be[ 11 ];
+				e[ 12 ] = ae[ 0 ] * be[ 12 ] + ae[ 4 ] * be[ 13 ] + ae[ 8 ] * be[ 14 ] + ae[ 12 ] * be[ 15 ];
+				
+				e[ 1 ] = ae[ 1 ] * be[ 0 ] + ae[ 5 ] * be[ 1 ] + ae[ 9 ] * be[ 2 ] + ae[ 13 ] * be[ 3 ];
+				e[ 5 ] = ae[ 1 ] * be[ 4 ] + ae[ 5 ] * be[ 5 ] + ae[ 9 ] * be[ 6 ] + ae[ 13 ] * be[ 7 ];
+				e[ 9 ] = ae[ 1 ] * be[ 8 ] + ae[ 5 ] * be[ 9 ] + ae[ 9 ] * be[ 10 ] + ae[ 13 ] * be[ 11 ];
+				e[ 13 ] = ae[ 1 ] * be[ 12 ] + ae[ 5 ] * be[ 13 ] + ae[ 9 ] * be[ 14 ] + ae[ 13 ] * be[ 15 ];
+				
+				e[ 2 ] = ae[ 2 ] * be[ 0 ] + ae[ 6 ] * be[ 1 ] + ae[ 10 ] * be[ 2 ] + ae[ 14 ] * be[ 3 ];
+				e[ 6 ] = ae[ 2 ] * be[ 4 ] + ae[ 6 ] * be[ 5 ] + ae[ 10 ] * be[ 6 ] + ae[ 14 ] * be[ 7 ];
+				e[ 10 ] = ae[ 2 ] * be[ 8 ] + ae[ 6 ] * be[ 9 ] + ae[ 10 ] * be[ 10 ] + ae[ 14 ] * be[ 11 ];
+				e[ 14 ] = ae[ 2 ] * be[ 12 ] + ae[ 6 ] * be[ 13 ] + ae[ 10 ] * be[ 14 ] + ae[ 14 ] * be[ 15 ];
+				
+				e[ 3 ] = ae[ 3 ] * be[ 0 ] + ae[ 7 ] * be[ 1 ] + ae[ 11 ] * be[ 2 ] + ae[ 15 ] * be[ 3 ];
+				e[ 7 ] = ae[ 3 ] * be[ 4 ] + ae[ 7 ] * be[ 5 ] + ae[ 11 ] * be[ 6 ] + ae[ 15 ] * be[ 7 ];
+				e[ 11 ] = ae[ 3 ] * be[ 8 ] + ae[ 7 ] * be[ 9 ] + ae[ 11 ] * be[ 10 ] + ae[ 15 ] * be[ 11 ];
+				e[ 15 ] = ae[ 3 ] * be[ 12 ] + ae[ 7 ] * be[ 13 ] + ae[ 11 ] * be[ 14 ] + ae[ 15 ] * be[ 15 ];
+				
+				for ( var i = 0; i < 16; i ++ ) te[ i ] = e[ i ];
+				
+				return this;
+				
+			};
+			
+		} )(),
+		
 		multiplyToArray: function ( a, b, r ) {
 
 			var te = this.elements;
