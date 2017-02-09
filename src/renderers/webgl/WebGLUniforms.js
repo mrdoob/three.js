@@ -69,6 +69,10 @@ function UniformContainer() {
 var arrayCacheF32 = [];
 var arrayCacheI32 = [];
 
+// Float32Array cache used for uploading Matrix4 uniform
+
+var mat4array = new Float32Array(16);
+
 // Flattening for arrays of vectors and matrices
 
 function flatten( array, nBlocks, blockSize ) {
@@ -179,8 +183,18 @@ function setValue3fm( gl, v ) {
 
 function setValue4fm( gl, v ) {
 
-	gl.uniformMatrix4fv( this.addr, false, v.elements || v );
-
+	if ( v.elements === undefined ) {
+		
+		gl.uniformMatrix4fv( this.addr, false, v );
+		
+	}
+	else {
+		
+		mat4array.set(v.elements);
+		gl.uniformMatrix4fv( this.addr, false, mat4array );
+		
+	}
+	
 }
 
 // Single texture (2D / Cube)
@@ -467,7 +481,7 @@ function WebGLUniforms( gl, program, renderer ) {
 
 	var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-	for ( var i = 0; i < n; ++ i ) {
+	for ( var i = 0; i !== n; ++ i ) {
 
 		var info = gl.getActiveUniform( program, i ),
 			path = info.name,
