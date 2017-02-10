@@ -115,8 +115,7 @@ Object.assign( PropertyMixer.prototype, {
 
 			var originalValueOffset = stride * 3;
 
-			this._mixBufferRegion(
-				buffer, offset, originalValueOffset, 1 - weight, stride );
+			this._mixBufferRegion( buffer, offset, originalValueOffset, 1 - weight, stride );
 
 		}
 
