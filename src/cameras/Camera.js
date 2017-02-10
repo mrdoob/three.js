@@ -1,13 +1,13 @@
 import { Matrix4 } from '../math/Matrix4';
-import { Quaternion } from '../math/Quaternion';
 import { Object3D } from '../core/Object3D';
+import { Quaternion } from '../math/Quaternion';
 import { Vector3 } from '../math/Vector3';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author WestLangley / http://github.com/WestLangley
-*/
+ */
 
 function Camera() {
 
@@ -20,59 +20,61 @@ function Camera() {
 
 }
 
-Camera.prototype = Object.create( Object3D.prototype );
-Camera.prototype.constructor = Camera;
+Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Camera.prototype.isCamera = true;
+	constructor: Camera,
 
-Camera.prototype.getWorldDirection = function () {
+	isCamera: true,
 
-	var quaternion = new Quaternion();
+	getWorldDirection: function () {
 
-	return function getWorldDirection( optionalTarget ) {
+		var quaternion = new Quaternion();
 
-		var result = optionalTarget || new Vector3();
+		return function getWorldDirection( optionalTarget ) {
 
-		this.getWorldQuaternion( quaternion );
+			var result = optionalTarget || new Vector3();
 
-		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+			this.getWorldQuaternion( quaternion );
 
-	};
+			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-}();
+		};
 
-Camera.prototype.lookAt = function () {
+	}(),
 
-	// This routine does not support cameras with rotated and/or translated parent(s)
+	lookAt: function () {
 
-	var m1 = new Matrix4();
+		// This routine does not support cameras with rotated and/or translated parent(s)
 
-	return function lookAt( vector ) {
+		var m1 = new Matrix4();
 
-		m1.lookAt( this.position, vector, this.up );
+		return function lookAt( vector ) {
 
-		this.quaternion.setFromRotationMatrix( m1 );
+			m1.lookAt( this.position, vector, this.up );
 
-	};
+			this.quaternion.setFromRotationMatrix( m1 );
 
-}();
+		};
 
-Camera.prototype.clone = function () {
+	}(),
 
-	return new this.constructor().copy( this );
+	clone: function () {
 
-};
+		return new this.constructor().copy( this );
 
-Camera.prototype.copy = function ( source ) {
+	},
 
-	Object3D.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.matrixWorldInverse.copy( source.matrixWorldInverse );
-	this.projectionMatrix.copy( source.projectionMatrix );
+		Object3D.prototype.copy.call( this, source );
 
-	return this;
+		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+		this.projectionMatrix.copy( source.projectionMatrix );
 
-};
+		return this;
 
+	}
+
+} );
 
 export { Camera };
