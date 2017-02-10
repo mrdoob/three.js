@@ -33594,6 +33594,10 @@
 
 						break;
 
+					case 'SkinnedMesh':
+
+						console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+
 					case 'Mesh':
 
 						var geometry = getGeometry( data.geometry );
@@ -33653,10 +33657,6 @@
 						object = new Group();
 
 						break;
-
-					case 'SkinnedMesh':
-
-						console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh type. Instantiates Object3D instead.' );
 
 					default:
 
