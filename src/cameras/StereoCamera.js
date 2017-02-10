@@ -1,5 +1,5 @@
-import { Matrix4 } from '../math/Matrix4';
 import { _Math } from '../math/Math';
+import { Matrix4 } from '../math/Matrix4';
 import { PerspectiveCamera } from './PerspectiveCamera';
 
 /**
@@ -36,8 +36,8 @@ Object.assign( StereoCamera.prototype, {
 		return function update( camera ) {
 
 			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
-												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-												far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
+				aspect !== camera.aspect * this.aspect || near !== camera.near ||
+				far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
 
 			if ( needsUpdate ) {
 
@@ -93,6 +93,5 @@ Object.assign( StereoCamera.prototype, {
 	} )()
 
 } );
-
 
 export { StereoCamera };
