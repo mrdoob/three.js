@@ -1212,7 +1212,7 @@
 									material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
 
 								}
-								if ( 'color' in geometry.attributes && geometry.attributes.color.count > 0 ) {
+								if ( 'color' in geometry.attributes ) {
 
 									material.vertexColors = THREE.VertexColors;
 
