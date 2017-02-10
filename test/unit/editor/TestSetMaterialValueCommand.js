@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetMaterialValueCommand" );
+QUnit.module( "SetMaterialValueCommand" );
 
-test( "Test for SetMaterialValueCommand (Undo and Redo)", function() {
+QUnit.test( "Test for SetMaterialValueCommand (Undo and Redo)", function( assert ) {
 
 	// setup scene
 	var editor = new Editor();
@@ -46,15 +46,15 @@ test( "Test for SetMaterialValueCommand (Undo and Redo)", function() {
 		} );
 
 		var length = testData[ attributeName ].length;
-		ok( box.material[ attributeName ] == testData[ attributeName ][ length - 1 ],
+		assert.ok( box.material[ attributeName ] == testData[ attributeName ][ length - 1 ],
 			"OK, " + attributeName + " was set correctly to the last value (expected: '" + testData[ attributeName ][ length - 1 ] + "', actual: '" + box.material[ attributeName ] + "')" );
 
 		editor.undo();
-		ok( box.material[ attributeName ] == testData[ attributeName ][ length - 2 ],
+		assert.ok( box.material[ attributeName ] == testData[ attributeName ][ length - 2 ],
 			"OK, " + attributeName + " was set correctly to the second to the last value after undo (expected: '" + testData[ attributeName ][ length - 2 ] + "', actual: '" + box.material[ attributeName ] + "')" );
 
 		editor.redo();
-		ok( box.material[ attributeName ] == testData[ attributeName ][ length - 1 ],
+		assert.ok( box.material[ attributeName ] == testData[ attributeName ][ length - 1 ],
 			"OK, " + attributeName + " was set correctly to the last value again after redo (expected: '" + testData[ attributeName ][ length - 1 ] + "', actual: '" + box.material[ attributeName ] + "')" );
 
 	} );

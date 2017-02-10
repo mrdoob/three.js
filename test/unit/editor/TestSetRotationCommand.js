@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetRotationCommand" );
+QUnit.module( "SetRotationCommand" );
 
-test( "Test SetRotationCommand (Undo and Redo)", function() {
+QUnit.test( "Test SetRotationCommand (Undo and Redo)", function( assert ) {
 
 	// setup
 	var editor = new Editor();
@@ -32,19 +32,19 @@ test( "Test SetRotationCommand (Undo and Redo)", function() {
 	} );
 
 
-	ok( box.rotation.x == rotations[ rotations.length - 1 ].x, "OK, changing X rotation was successful" );
-	ok( box.rotation.y == rotations[ rotations.length - 1 ].y, "OK, changing Y rotation was successful" );
-	ok( box.rotation.z == rotations[ rotations.length - 1 ].z, "OK, changing Z rotation was successful" );
+	assert.ok( box.rotation.x == rotations[ rotations.length - 1 ].x, "OK, changing X rotation was successful" );
+	assert.ok( box.rotation.y == rotations[ rotations.length - 1 ].y, "OK, changing Y rotation was successful" );
+	assert.ok( box.rotation.z == rotations[ rotations.length - 1 ].z, "OK, changing Z rotation was successful" );
 
 	editor.undo();
-	ok( box.rotation.x == rotations[ rotations.length - 2 ].x, "OK, changing X rotation was successful (after undo)" );
-	ok( box.rotation.y == rotations[ rotations.length - 2 ].y, "OK, changing Y rotation was successful (after undo)" );
-	ok( box.rotation.z == rotations[ rotations.length - 2 ].z, "OK, changing Z rotation was successful (after undo)" );
+	assert.ok( box.rotation.x == rotations[ rotations.length - 2 ].x, "OK, changing X rotation was successful (after undo)" );
+	assert.ok( box.rotation.y == rotations[ rotations.length - 2 ].y, "OK, changing Y rotation was successful (after undo)" );
+	assert.ok( box.rotation.z == rotations[ rotations.length - 2 ].z, "OK, changing Z rotation was successful (after undo)" );
 
 	editor.redo();
-	ok( box.rotation.x == rotations[ rotations.length - 1 ].x, "OK, changing X rotation was successful (after redo)" );
-	ok( box.rotation.y == rotations[ rotations.length - 1 ].y, "OK, changing Y rotation was successful (after redo)" );
-	ok( box.rotation.z == rotations[ rotations.length - 1 ].z, "OK, changing Z rotation was successful (after redo)" );
+	assert.ok( box.rotation.x == rotations[ rotations.length - 1 ].x, "OK, changing X rotation was successful (after redo)" );
+	assert.ok( box.rotation.y == rotations[ rotations.length - 1 ].y, "OK, changing Y rotation was successful (after redo)" );
+	assert.ok( box.rotation.z == rotations[ rotations.length - 1 ].z, "OK, changing Z rotation was successful (after redo)" );
 
 
 

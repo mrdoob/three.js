@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "RemoveScriptCommand" );
+QUnit.module( "RemoveScriptCommand" );
 
-test( "Test RemoveScriptCommand (Undo and Redo)", function() {
+QUnit.test( "Test RemoveScriptCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 
@@ -24,7 +24,7 @@ test( "Test RemoveScriptCommand (Undo and Redo)", function() {
 		editor.execute( new AddObjectCommand( item ) );
 
 	} );
-	ok( editor.scene.children.length == 2, "OK, the box and the sphere have been added" );
+	assert.ok( editor.scene.children.length == 2, "OK, the box and the sphere have been added" );
 
 	// add scripts to the objects
 	for ( var i = 0; i < scripts.length; i ++ ) {
@@ -42,23 +42,23 @@ test( "Test RemoveScriptCommand (Undo and Redo)", function() {
 		editor.execute( cmd );
 
 	}
-	ok( getScriptCount( editor ) == 0, "OK, all scripts have been removed" );
+	assert.ok( getScriptCount( editor ) == 0, "OK, all scripts have been removed" );
 
 	scripts.map( function() {
 
 		editor.undo();
 
 	} );
-	ok( getScriptCount( editor ) == scripts.length, "OK, all scripts have been added again by undo(s)" );
+	assert.ok( getScriptCount( editor ) == scripts.length, "OK, all scripts have been added again by undo(s)" );
 
 	var scriptsKeys = Object.keys( editor.scripts );
 	for ( var i = 0; i < scriptsKeys.length; i ++ ) {
 
-		ok( editor.scripts[ scriptsKeys[ i ] ][ 0 ] == scripts[ i ], "OK, script #" + i + " is still assigned correctly" );
+		assert.ok( editor.scripts[ scriptsKeys[ i ] ][ 0 ] == scripts[ i ], "OK, script #" + i + " is still assigned correctly" );
 
 	}
 
 	editor.redo();
-	ok( getScriptCount( editor ) == scripts.length - 1, "OK, one script has been removed again by redo" );
+	assert.ok( getScriptCount( editor ) == scripts.length - 1, "OK, one script has been removed again by redo" );
 
 } );
