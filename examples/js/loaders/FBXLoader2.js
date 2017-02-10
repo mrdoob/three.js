@@ -1,22 +1,22 @@
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
+ * @author @jonobr1 / http://jonobr1.com/
  *
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII format.
  *
  * Supports:
- * 	Mesh Generation (Positional Data)
- * 	Normal Data (Per Vertex Drawing Instance)
+ *  Mesh Generation (Positional Data)
+ *  Normal Data (Per Vertex Drawing Instance)
  *  UV Data (Per Vertex Drawing Instance)
  *  Skinning
  *  Animation
- * 	- Separated Animations based on stacks.
- * 	- Skeletal & Non-Skeletal Animations
- *  NURBS (Open, Closed and Periodic forms)
+ *  - Separated Animations based on stacks.
+ *  - Skeletal & Non-Skeletal Animations
  *
  * Needs Support:
- * 	Indexed Buffers
- * 	PreRotation support.
+ *  Indexed Buffers
+ *  PreRotation support.
  */
 
 ( function () {
@@ -599,6 +599,12 @@
 
 							}
 
+							if ( 'LayerElementColor' in geometryNode.subNodes ) {
+
+								var colorInfo = getColors( geometryNode );
+
+							}
+
 							if ( 'LayerElementMaterial' in geometryNode.subNodes ) {
 
 								var materialInfo = getMaterials( geometryNode );
@@ -698,6 +704,12 @@
 
 								}
 
+								if ( colorInfo ) {
+
+									vertex.color.fromArray( getData( polygonVertexIndex, polygonIndex, vertexIndex, colorInfo ) );
+
+								}
+
 								faceVertexBuffer.push( vertex );
 
 								if ( endOfFace ) {
@@ -734,6 +746,13 @@
 								geo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( bufferInfo.uvBuffer ), 2 ) );
 
 							}
+							if ( bufferInfo.colorsBuffer.length > 0 ) {
+
+								geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorsBuffer ), 4 ) );
+
+							}
+							// console.log(geometry, geometryNode, bufferInfo);
+							// if ( bufferInfo.)
 
 							if ( deformer ) {
 
@@ -820,6 +839,30 @@
 
 								return {
 									dataSize: 2,
+									buffer: buffer,
+									indices: indexBuffer,
+									mappingType: mappingType,
+									referenceType: referenceType
+								};
+
+							}
+
+							function getColors( geometryNode ) {
+
+								var ColorNode = geometryNode.subNodes.LayerElementColor[ 0 ];
+
+								var mappingType = ColorNode.properties.MappingInformationType;
+								var referenceType = ColorNode.properties.ReferenceInformationType;
+								var buffer = parseFloatArray( ColorNode.subNodes.Colors.properties.a );
+								var indexBuffer = [];
+								if ( referenceType === 'IndexToDirect' ) {
+
+									indexBuffer = parseFloatArray( ColorNode.subNodes.ColorIndex.properties.a );
+
+								}
+
+								return {
+									dataSize: 4,
 									buffer: buffer,
 									indices: indexBuffer,
 									mappingType: mappingType,
@@ -1011,7 +1054,15 @@
 
 						}
 
-						var degree = order - 1;
+						if ( geometryNode.properties.Form === 'Periodic' ) {
+
+							console.error( "FBXLoader: Currently no support for Periodic Nurbs Curves for geometry ID: " + geometryNode.id + ", using empty geometry buffer." );
+							return new THREE.BufferGeometry();
+
+							//TODO: Support Periodic NURBS curves.
+							//Info Link: https://knowledge.autodesk.com/support/maya/learn-explore/caas/CloudHelp/cloudhelp/2015/ENU/Maya/files/NURBS-overview-Periodic-closed-and-open-geometry-htm.html
+
+						}
 
 						var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
 						var controlPoints = [];
@@ -1023,27 +1074,14 @@
 
 						}
 
-						var startKnot, endKnot;
-
 						if ( geometryNode.properties.Form === 'Closed' ) {
 
 							controlPoints.push( controlPoints[ 0 ] );
 
-						} else if ( geometryNode.properties.Form === 'Periodic' ) {
-
-							startKnot = degree;
-							endKnot = knots.length - 1 - startKnot;
-
-							for ( var i = 0; i < degree; ++ i ) {
-
-								controlPoints.push( controlPoints[ i ] );
-
-							}
-
 						}
 
-						var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
-						var vertices = curve.getPoints( controlPoints.length * 7 );
+						var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
+						var vertices = curve.getPoints( controlPoints.length * 1.5 );
 
 						var vertexBuffer = [];
 						for ( var verticesIndex = 0, verticesLength = vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {
@@ -1399,7 +1437,7 @@
 
 				/**
 				 * @type {{
-				     curves: Map<number, {
+						 curves: Map<number, {
 						 T: {
 							id: number;
 							attr: string;
@@ -1519,7 +1557,7 @@
 						}
 					 }>,
 					 layers: Map<number, {
-					 	T: {
+						T: {
 							id: number;
 							attr: string;
 							internalID: number;
@@ -1943,7 +1981,7 @@
 
 					/**
 					 * @type {{
-					 	T: {
+						T: {
 							id: number;
 							attr: string;
 							internalID: number;
@@ -2872,14 +2910,14 @@
 					 * fps: number,
 					 * length: number,
 					 * hierarchy: Array.<{
-					 * 	parent: number,
-					 * 	name: string,
-					 * 	keys: Array.<{
-					 * 		time: number,
-					 * 		pos: Array.<number>,
-					 * 		rot: Array.<number>,
-					 * 		scl: Array.<number>
-					 * 	}>
+					 *  parent: number,
+					 *  name: string,
+					 *  keys: Array.<{
+					 *    time: number,
+					 *    pos: Array.<number>,
+					 *    rot: Array.<number>,
+					 *    scl: Array.<number>
+					 *  }>
 					 * }>
 					 * }}
 					 */
@@ -3085,6 +3123,12 @@
 		this.uv = new THREE.Vector2( );
 
 		/**
+		 * Color of the vertex
+		 * @type {THREE.Vector4}
+		 */
+		this.color = new THREE.Vector4();
+
+		/**
 		 * Indices of the bones vertex is influenced by.
 		 * @type {THREE.Vector4}
 		 */
@@ -3119,6 +3163,7 @@
 			var vertexBuffer = this.position.toArray();
 			var normalBuffer = this.normal.toArray();
 			var uvBuffer = this.uv.toArray();
+			var colorsBuffer = this.color.toArray();
 			var skinIndexBuffer = this.skinIndices.toArray();
 			var skinWeightBuffer = this.skinWeights.toArray();
 
@@ -3126,6 +3171,7 @@
 				vertexBuffer: vertexBuffer,
 				normalBuffer: normalBuffer,
 				uvBuffer: uvBuffer,
+				colorsBuffer: colorsBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
 			};
@@ -3167,6 +3213,7 @@
 			var vertexBuffer = [];
 			var normalBuffer = [];
 			var uvBuffer = [];
+			var colorsBuffer = [];
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
 
@@ -3178,6 +3225,7 @@
 				vertexBuffer = vertexBuffer.concat( flatVertex.vertexBuffer );
 				normalBuffer = normalBuffer.concat( flatVertex.normalBuffer );
 				uvBuffer = uvBuffer.concat( flatVertex.uvBuffer );
+				colorsBuffer = colorsBuffer.concat( flatVertex.colorsBuffer );
 				skinIndexBuffer = skinIndexBuffer.concat( flatVertex.skinIndexBuffer );
 				skinWeightBuffer = skinWeightBuffer.concat( flatVertex.skinWeightBuffer );
 
@@ -3187,6 +3235,7 @@
 				vertexBuffer: vertexBuffer,
 				normalBuffer: normalBuffer,
 				uvBuffer: uvBuffer,
+				colorsBuffer: colorsBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
 			};
@@ -3245,6 +3294,7 @@
 			var vertexBuffer = [];
 			var normalBuffer = [];
 			var uvBuffer = [];
+			var colorsBuffer = [];
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
 
@@ -3259,6 +3309,7 @@
 				vertexBuffer = vertexBuffer.concat( flatTriangle.vertexBuffer );
 				normalBuffer = normalBuffer.concat( flatTriangle.normalBuffer );
 				uvBuffer = uvBuffer.concat( flatTriangle.uvBuffer );
+				colorsBuffer = colorsBuffer.concat( flatTriangle.colorsBuffer );
 				skinIndexBuffer = skinIndexBuffer.concat( flatTriangle.skinIndexBuffer );
 				skinWeightBuffer = skinWeightBuffer.concat( flatTriangle.skinWeightBuffer );
 				materialIndexBuffer = materialIndexBuffer.concat( [ materialIndex, materialIndex, materialIndex ] );
@@ -3269,6 +3320,7 @@
 				vertexBuffer: vertexBuffer,
 				normalBuffer: normalBuffer,
 				uvBuffer: uvBuffer,
+				colorsBuffer: colorsBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
 				materialIndexBuffer: materialIndexBuffer
@@ -3298,13 +3350,14 @@
 	Object.assign( Geometry.prototype, {
 
 		/**
-		 * @returns	{{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
+		 * @returns {{vertexBuffer: number[], normalBuffer: number[], uvBuffer: number[], skinIndexBuffer: number[], skinWeightBuffer: number[], materialIndexBuffer: number[]}}
 		 */
 		flattenToBuffers: function () {
 
 			var vertexBuffer = [];
 			var normalBuffer = [];
 			var uvBuffer = [];
+			var colorsBuffer = [];
 			var skinIndexBuffer = [];
 			var skinWeightBuffer = [];
 
@@ -3317,6 +3370,7 @@
 				vertexBuffer = vertexBuffer.concat( flatFace.vertexBuffer );
 				normalBuffer = normalBuffer.concat( flatFace.normalBuffer );
 				uvBuffer = uvBuffer.concat( flatFace.uvBuffer );
+				colorsBuffer = colorsBuffer.concat( flatFace.colorsBuffer );
 				skinIndexBuffer = skinIndexBuffer.concat( flatFace.skinIndexBuffer );
 				skinWeightBuffer = skinWeightBuffer.concat( flatFace.skinWeightBuffer );
 				materialIndexBuffer = materialIndexBuffer.concat( flatFace.materialIndexBuffer );
@@ -3327,6 +3381,7 @@
 				vertexBuffer: vertexBuffer,
 				normalBuffer: normalBuffer,
 				uvBuffer: uvBuffer,
+				colorsBuffer: colorsBuffer,
 				skinIndexBuffer: skinIndexBuffer,
 				skinWeightBuffer: skinWeightBuffer,
 				materialIndexBuffer: materialIndexBuffer
@@ -3446,8 +3501,8 @@
 
 				// for special case,
 				//
-				//	  Vertices: *8670 {
-				//		  a: 0.0356229953467846,13.9599733352661,-0.399196773.....(snip)
+				//    Vertices: *8670 {
+				//      a: 0.0356229953467846,13.9599733352661,-0.399196773.....(snip)
 				// -0.0612030513584614,13.960485458374,-0.409748703241348,-0.10.....
 				// 0.12490539252758,13.7450733184814,-0.454119384288788,0.09272.....
 				// 0.0836158767342567,13.5432004928589,-0.435397416353226,0.028.....
@@ -3527,7 +3582,7 @@
 
 			}
 
-			// for this		  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+			// for this     ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 			// NodeAttribute: 1001463072, "NodeAttribute::", "LimbNode" {
 			if ( nodeAttrs ) {
 
@@ -3724,7 +3779,7 @@
 		},
 
 		/* ---------------------------------------------------------------- */
-		/*		util													  */
+		/*    util                            */
 		isFlattenNode: function ( node ) {
 
 			return ( 'subNodes' in node && 'properties' in node ) ? true : false;
