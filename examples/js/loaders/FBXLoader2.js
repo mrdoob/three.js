@@ -748,7 +748,7 @@
 							}
 							if ( 'LayerElementColor' in geometryNode.subNodes ) {
 
-								geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorsBuffer ), 4 ) );
+								geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorsBuffer ), 3 ) );
 
 							}
 
@@ -3137,9 +3137,9 @@
 
 		/**
 		 * Color of the vertex
-		 * @type {THREE.Vector4}
+		 * @type {THREE.Vector3}
 		 */
-		this.color = new THREE.Vector4();
+		this.color = new THREE.Vector3();
 
 		/**
 		 * Indices of the bones vertex is influenced by.
