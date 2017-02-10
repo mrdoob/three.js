@@ -453,8 +453,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function mouseup( event ) {
 
-		if ( _this.enabled === false ) return;
-
 		event.preventDefault();
 		event.stopPropagation();
 
