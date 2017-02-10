@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetGeometryCommand" );
+QUnit.module( "SetGeometryCommand" );
 
-test( "Test SetGeometryCommand (Undo and Redo)", function() {
+QUnit.test( "Test SetGeometryCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 
@@ -30,34 +30,34 @@ test( "Test SetGeometryCommand (Undo and Redo)", function() {
 		var actualParams = box.geometry.parameters;
 		var expectedParams = geometryParams[ i ].geometry.parameters;
 
-		ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry"  + ( i + 1 ) );
-		ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry" + ( i + 1 ) );
-		ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry"  + ( i + 1 ) );
-		ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
-		ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
-		ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
+		assert.ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry"  + ( i + 1 ) );
+		assert.ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry" + ( i + 1 ) );
+		assert.ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry"  + ( i + 1 ) );
+		assert.ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
+		assert.ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
+		assert.ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry"  + ( i + 1 ) );
 
 	}
 
 	editor.undo();
 	var actualParams = box.geometry.parameters;
 	var expectedParams = geometryParams[ 0 ].geometry.parameters;
-	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry1 (after undo)" );
-	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry1 (after undo)" );
-	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry1 (after undo)" );
-	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry1 (after undo)" );
-	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry1 (after undo)" );
-	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry1 (after undo)" );
+	assert.ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry1 (after undo)" );
 
 	editor.redo();
 	var actualParams = box.geometry.parameters;
 	var expectedParams = geometryParams[ 1 ].geometry.parameters;
-	ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry2 (after redo)" );
-	ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry2 (after redo)" );
-	ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry2 (after redo)" );
-	ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry2 (after redo)" );
-	ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry2 (after redo)" );
-	ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.width == expectedParams.width, "OK, box width matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.height == expectedParams.height, "OK, box height matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.depth == expectedParams.depth, "OK, box depth matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.widthSegments == expectedParams.widthSegments, "OK, box widthSegments matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.heightSegments == expectedParams.heightSegments, "OK, box heightSegments matches the corresponding value from boxGeometry2 (after redo)" );
+	assert.ok( actualParams.depthSegments == expectedParams.depthSegments, "OK, box depthSegments matches the corresponding value from boxGeometry2 (after redo)" );
 
 
 } );

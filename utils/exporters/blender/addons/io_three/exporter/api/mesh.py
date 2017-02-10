@@ -706,6 +706,7 @@ def materials(mesh, options):
             constants.BLENDING: material.blending(mat),
             constants.DEPTH_TEST: material.depth_test(mat),
             constants.DEPTH_WRITE: material.depth_write(mat),
+            constants.DOUBLE_SIDED: material.double_sided(mat),
             constants.DBG_NAME: mat.name,
             constants.DBG_COLOR: dbg_color,
             constants.DBG_INDEX: index

@@ -12,6 +12,7 @@
  *  Animation
  * 	- Separated Animations based on stacks.
  * 	- Skeletal & Non-Skeletal Animations
+ *  NURBS (Open, Closed and Periodic forms)
  *
  * Needs Support:
  * 	Indexed Buffers
@@ -59,23 +60,22 @@
 
 			this.fileLoader.load( url, function ( text ) {
 
-				if ( ! isFbxFormatASCII( text ) ) {
+				try {
 
-					console.error( 'FBXLoader: FBX Binary format not supported.' );
-					self.manager.itemError( url );
-					return;
+					var scene = self.parse( text, resourceDirectory );
+					onLoad( scene );
+
+				} catch ( error ) {
+
+					window.setTimeout( function () {
+
+						if ( onError ) onError( error );
+
+						self.manager.itemError( url );
+
+					}, 0 );
 
 				}
-				if ( getFbxVersion( text ) < 7000 ) {
-
-					console.error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
-					self.manager.itemError( url );
-					return;
-
-				}
-
-				var scene = self.parse( text, resourceDirectory );
-				onLoad( scene );
 
 			}, onProgress, onError );
 
@@ -92,6 +92,24 @@
 		parse: function ( FBXText, resourceDirectory ) {
 
 			var loader = this;
+
+			if ( ! isFbxFormatASCII( FBXText ) ) {
+
+				throw new Error( 'FBXLoader: FBX Binary format not supported.' );
+				self.manager.itemError( url );
+				return;
+
+				//TODO: Support Binary parsing.  Hopefully in the future,
+				//we call var FBXTree = new BinaryParser().parse( FBXText );
+
+			}
+			if ( getFbxVersion( FBXText ) < 7000 ) {
+
+				throw new Error( 'FBXLoader: FBX version not supported for file at ' + url + ', FileVersion: ' + getFbxVersion( text ) );
+				self.manager.itemError( url );
+				return;
+
+			}
 
 			var FBXTree = new TextParser().parse( FBXText );
 
@@ -295,6 +313,13 @@
 					var name = materialNode.attrName;
 					var type = materialNode.properties.ShadingModel;
 
+					//Case where FBXs wrap shading model in property object.
+					if ( typeof type === 'object' ) {
+
+						type = type.value;
+
+					}
+
 					var children = connections.get( FBX_ID ).children;
 
 					var parameters = parseParameters( materialNode.properties, textureMap, children );
@@ -379,14 +404,13 @@
 							var type = relationship.relationship;
 							switch ( type ) {
 
-								case " \"AmbientColor":
-									//TODO: Support AmbientColor textures
-									break;
-
 								case " \"DiffuseColor":
 									parameters.map = textureMap.get( relationship.ID );
 									break;
 
+								case " \"AmbientColor":
+								case " \"Bump":
+								case " \"EmissiveColor":
 								default:
 									console.warn( 'Unknown texture application of type ' + type + ', skipping texture' );
 									break;
@@ -451,12 +475,18 @@
 						var subDeformerNode = DeformerNodes[ child.ID ];
 						var subDeformer = {
 							FBX_ID: child.ID,
-							indices: parseIntArray( subDeformerNode.subNodes.Indexes.properties.a ),
-							weights: parseFloatArray( subDeformerNode.subNodes.Weights.properties.a ),
+							indices: [],
+							weights: [],
 							transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
 							transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 							linkMode: subDeformerNode.properties.Mode
 						};
+						if ( 'Indexes' in subDeformerNode.subNodes ) {
+
+							subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
+							subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
+
+						}
 						subDeformers.set( child.ID, subDeformer );
 						subDeformerArray.push( subDeformer );
 
@@ -747,7 +777,15 @@
 								var indexBuffer = [];
 								if ( referenceType === 'IndexToDirect' ) {
 
-									indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+									if ( 'NormalIndex' in NormalNode.subNodes ) {
+
+										indexBuffer = parseIntArray( NormalNode.subNodes.NormalIndex.properties.a );
+
+									} else if ( 'NormalsIndex' in NormalNode.subNodes ) {
+
+										indexBuffer = parseIntArray( NormalNode.subNodes.NormalsIndex.properties.a );
+
+									}
 
 								}
 
@@ -800,6 +838,17 @@
 								var MaterialNode = geometryNode.subNodes.LayerElementMaterial[ 0 ];
 								var mappingType = MaterialNode.properties.MappingInformationType;
 								var referenceType = MaterialNode.properties.ReferenceInformationType;
+								if ( mappingType === 'NoMappingInformation' ) {
+
+									return {
+										dataSize: 1,
+										buffer: [ 0 ],
+										indices: [ 0 ],
+										mappingType: 'AllSame',
+										referenceType: referenceType
+									};
+
+								}
 								var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
 
 								// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
@@ -900,6 +949,16 @@
 
 									},
 
+									ByVertice: {
+
+										Direct: function ( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
+
+											return infoObject.buffer.slice( ( vertexIndex * infoObject.dataSize ), ( vertexIndex * infoObject.dataSize ) + infoObject.dataSize );
+
+										}
+
+									},
+
 									AllSame: {
 
 										/**
@@ -952,6 +1011,8 @@
 
 						}
 
+						var degree = order - 1;
+
 						var knots = parseFloatArray( geometryNode.subNodes.KnotVector.properties.a );
 						var controlPoints = [];
 						var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
@@ -962,14 +1023,27 @@
 
 						}
 
+						var startKnot, endKnot;
+
 						if ( geometryNode.properties.Form === 'Closed' ) {
 
 							controlPoints.push( controlPoints[ 0 ] );
 
+						} else if ( geometryNode.properties.Form === 'Periodic' ) {
+
+							startKnot = degree;
+							endKnot = knots.length - 1 - startKnot;
+
+							for ( var i = 0; i < degree; ++ i ) {
+
+								controlPoints.push( controlPoints[ i ] );
+
+							}
+
 						}
 
-						var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
-						var vertices = curve.getPoints( controlPoints.length * 1.5 );
+						var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+						var vertices = curve.getPoints( controlPoints.length * 7 );
 
 						var vertexBuffer = [];
 						for ( var verticesIndex = 0, verticesLength = vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {
@@ -1161,11 +1235,7 @@
 
 					if ( 'Lcl_Rotation' in node.properties ) {
 
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
+						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( degreeToRadian );
 						rotation.push( 'ZYX' );
 						model.rotation.fromArray( rotation );
 
@@ -1174,6 +1244,16 @@
 					if ( 'Lcl_Scaling' in node.properties ) {
 
 						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
+
+					}
+
+					if ( 'PreRotation' in node.properties ) {
+
+						var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+						preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+						var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
+						preRotations.multiply( currentRotation );
+						model.rotation.setFromQuaternion( preRotations, 'ZYX' );
 
 					}
 
@@ -1285,39 +1365,9 @@
 
 				} );
 
-				// Skeleton is now bound, we are now free to set up the
-				// scene graph.
-				for ( var modelArrayIndex = 0, modelArrayLength = modelArray.length; modelArrayIndex < modelArrayLength; ++ modelArrayIndex ) {
-
-					var model = modelArray[ modelArrayIndex ];
-
-					var node = ModelNode[ model.FBX_ID ];
-
-					if ( 'Lcl_Translation' in node.properties ) {
-
-						model.position.fromArray( parseFloatArray( node.properties.Lcl_Translation.value ) );
-
-					}
-
-					if ( 'Lcl_Rotation' in node.properties ) {
-
-						var rotation = parseFloatArray( node.properties.Lcl_Rotation.value ).map( function ( value ) {
-
-							return value * Math.PI / 180;
-
-						} );
-						rotation.push( 'ZYX' );
-						model.rotation.fromArray( rotation );
-
-					}
-
-					if ( 'Lcl_Scaling' in node.properties ) {
-
-						model.scale.fromArray( parseFloatArray( node.properties.Lcl_Scaling.value ) );
-
-					}
-
-				}
+				//Skeleton is now bound, return objects to starting
+				//world positions.
+				sceneGraph.updateMatrixWorld( true );
 
 				// Silly hack with the animation parsing.  We're gonna pretend the scene graph has a skeleton
 				// to attach animations to, since FBXs treat animations as animations for the entire scene,
@@ -1345,6 +1395,7 @@
 				var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
 				var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 				var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
+				var rawModels = FBXTree.Objects.subNodes.Model;
 
 				/**
 				 * @type {{
@@ -1858,6 +1909,33 @@
 
 					}
 					returnObject.curves.get( id )[ curveNode.attr ] = curveNode;
+					if ( curveNode.attr === 'R' ) {
+
+						var curves = curveNode.curves;
+						curves.x.values = curves.x.values.map( degreeToRadian );
+						curves.y.values = curves.y.values.map( degreeToRadian );
+						curves.z.values = curves.z.values.map( degreeToRadian );
+
+						if ( curveNode.preRotations !== null ) {
+
+							var preRotations = new THREE.Euler().setFromVector3( curveNode.preRotations, 'ZYX' );
+							preRotations = new THREE.Quaternion().setFromEuler( preRotations );
+							var frameRotation = new THREE.Euler();
+							var frameRotationQuaternion = new THREE.Quaternion();
+							for ( var frame = 0; frame < curves.x.times.length; ++ frame ) {
+
+								frameRotation.set( curves.x.values[ frame ], curves.y.values[ frame ], curves.z.values[ frame ], 'ZYX' );
+								frameRotationQuaternion.setFromEuler( frameRotation ).premultiply( preRotations );
+								frameRotation.setFromQuaternion( frameRotationQuaternion, 'ZYX' );
+								curves.x.values[ frame ] = frameRotation.x;
+								curves.y.values[ frame ] = frameRotation.y;
+								curves.z.values[ frame ] = frameRotation.z;
+
+							}
+
+						}
+
+					}
 
 				} );
 
@@ -2318,7 +2396,12 @@
 							x: null,
 							y: null,
 							z: null
-						}
+						},
+
+						/**
+						 * @type {number[]}
+						 */
+						preRotations: null
 					};
 
 					if ( returnObject.attr.match( /S|R|T/ ) ) {
@@ -2363,6 +2446,12 @@
 
 							returnObject.containerBoneID = boneID;
 							returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+							var model = rawModels[ returnObject.containerID.toString() ];
+							if ( 'PreRotation' in model.properties ) {
+
+								returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+
+							}
 							break;
 
 						}
@@ -2873,9 +2962,9 @@
 
 							if ( hasCurve( animationNode, 'R' ) && hasKeyOnFrame( animationNode.R, frame ) ) {
 
-								var rotationX = degreeToRadian( animationNode.R.curves.x.values[ frame ] );
-								var rotationY = degreeToRadian( animationNode.R.curves.y.values[ frame ] );
-								var rotationZ = degreeToRadian( animationNode.R.curves.z.values[ frame ] );
+								var rotationX = animationNode.R.curves.x.values[ frame ];
+								var rotationY = animationNode.R.curves.y.values[ frame ];
+								var rotationZ = animationNode.R.curves.z.values[ frame ];
 								var euler = new THREE.Euler( rotationX, rotationY, rotationZ, 'ZYX' );
 								key.rot = new THREE.Quaternion().setFromEuler( euler ).toArray();
 

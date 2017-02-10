@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "AddScriptCommand" );
+QUnit.module( "AddScriptCommand" );
 
-test( "Test AddScriptCommand (Undo and Redo)", function() {
+QUnit.test( "Test AddScriptCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 
@@ -24,7 +24,7 @@ test( "Test AddScriptCommand (Undo and Redo)", function() {
 		editor.execute( new AddObjectCommand( item ) );
 
 	} );
-	ok( editor.scene.children.length == 2, "OK, the box and the sphere have been added" );
+	assert.ok( editor.scene.children.length == 2, "OK, the box and the sphere have been added" );
 
 	// add scripts to the objects
 	for ( var i = 0; i < scripts.length; i ++ ) {
@@ -36,24 +36,24 @@ test( "Test AddScriptCommand (Undo and Redo)", function() {
 	}
 
 	var scriptsKeys = Object.keys( editor.scripts );
-	ok( getScriptCount( editor ) == scripts.length, "OK, correct number of scripts have been added" );
+	assert.ok( getScriptCount( editor ) == scripts.length, "OK, correct number of scripts have been added" );
 
 	for ( var i = 0; i < objects.length; i ++ ) {
 
-		ok( objects[ i ].uuid == scriptsKeys[ i ], "OK, script key #" + i + " matches the object's UUID" );
+		assert.ok( objects[ i ].uuid == scriptsKeys[ i ], "OK, script key #" + i + " matches the object's UUID" );
 
 	}
 
 	editor.undo();
-	ok( getScriptCount( editor ) == scripts.length - 1, "OK, one script has been removed by undo" );
+	assert.ok( getScriptCount( editor ) == scripts.length - 1, "OK, one script has been removed by undo" );
 
 	editor.redo();
-	ok( getScriptCount( editor ) == scripts.length, "OK, one script has been added again by redo" );
+	assert.ok( getScriptCount( editor ) == scripts.length, "OK, one script has been added again by redo" );
 
 
 	for ( var i = 0; i < scriptsKeys.length; i ++ ) {
 
-		ok( editor.scripts[ scriptsKeys[ i ] ][ 0 ] == scripts[ i ], "OK, script #" + i + " is still assigned correctly" );
+		assert.ok( editor.scripts[ scriptsKeys[ i ] ][ 0 ] == scripts[ i ], "OK, script #" + i + " is still assigned correctly" );
 
 	}
 

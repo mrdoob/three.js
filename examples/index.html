@@ -232,7 +232,7 @@
 				<span></span>
 			</a>
 			<div class="filterBlock" >
-				<input type="text" id="filterInput" placeholder="Type to filter"/>
+				<input type="text" id="filterInput" placeholder="Type to filter" autofocus/>
 				<a href="#" id="clearFilterButton" >x</a>
 			</div>
 			<div id="content"></div>
@@ -379,11 +379,10 @@
 
 			var v = filterInput.value;
 			if( v !== '' ) {
-				window.history.replaceState( {} , '', '?q=' + v );
+				window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
 			} else {
-				window.history.replaceState( {} , '', window.location.pathname );
+				window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
 			}
-			if( selected ) window.location.hash = selected;
 
 			var exp = new RegExp( v, 'gi' );
 

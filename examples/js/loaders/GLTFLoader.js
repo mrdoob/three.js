@@ -299,7 +299,8 @@ THREE.GLTFLoader = ( function () {
 
 		this.lights = {};
 
-		var lights = json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ].lights;
+		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_MATERIALS_COMMON ] ) || {};
+		var lights = extension.lights || {};
 
 		for ( var lightId in lights ) {
 
@@ -566,18 +567,31 @@ THREE.GLTFLoader = ( function () {
 			results = [];
 
 			var length = object.length;
+
 			for ( var idx = 0; idx < length; idx ++ ) {
+
 				var value = callback.call( thisObj || this, object[ idx ], idx );
+
 				if ( value ) {
+
 					fns.push( value );
+
 					if ( value instanceof Promise ) {
+
 						value.then( function( key, value ) {
+
 							results[ idx ] = value;
+
 						}.bind( this, key ));
+
 					} else {
+
 						results[ idx ] = value;
+
 					}
+
 				}
+
 			}
 
 		} else {
@@ -585,25 +599,41 @@ THREE.GLTFLoader = ( function () {
 			results = {};
 
 			for ( var key in object ) {
+
 				if ( object.hasOwnProperty( key ) ) {
+
 					var value = callback.call( thisObj || this, object[ key ], key );
+
 					if ( value ) {
+
 						fns.push( value );
+
 						if ( value instanceof Promise ) {
+
 							value.then( function( key, value ) {
+
 								results[ key ] = value;
+
 							}.bind( this, key ));
+
 						} else {
+
 							results[ key ] = value;
+
 						}
+
 					}
+
 				}
+
 			}
 
 		}
 
 		return Promise.all( fns ).then( function() {
+
 			return results;
+
 		});
 
 	}
@@ -1089,10 +1119,10 @@ THREE.GLTFLoader = ( function () {
 
 								var sampler = json.samplers[ texture.sampler ];
 
-								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ];
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ];
-								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ];
-								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ];
+								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
+								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
+								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
 							}
 
@@ -1141,15 +1171,20 @@ THREE.GLTFLoader = ( function () {
 
 				if ( khr_material ) {
 
+					// don't copy over unused values to avoid material warning spam
+					var keys = [ 'ambient', 'emission', 'transparent', 'transparency', 'doubleSided' ];
+
 					switch ( khr_material.technique ) {
 
 						case 'BLINN' :
 						case 'PHONG' :
 							materialType = THREE.MeshPhongMaterial;
+							keys.push( 'diffuse', 'specular', 'shininess' );
 							break;
 
 						case 'LAMBERT' :
 							materialType = THREE.MeshLambertMaterial;
+							keys.push( 'diffuse' );
 							break;
 
 						case 'CONSTANT' :
@@ -1159,7 +1194,11 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					Object.assign( materialValues, khr_material.values );
+					keys.forEach( function( v ) {
+
+						if ( khr_material.values[ v ] !== undefined ) materialValues[ v ] = khr_material.values[ v ];
+
+					} );
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
@@ -1626,7 +1665,6 @@ THREE.GLTFLoader = ( function () {
 						var geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
-
 
 						for ( var attributeId in attributes ) {
 

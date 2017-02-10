@@ -1001,7 +1001,6 @@
 		this.flipY = true;
 		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-
 		// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 		//
 		// Also changing the encoding after already used by a Material will not automatically make the Material
@@ -1018,13 +1017,13 @@
 
 	Object.defineProperty( Texture.prototype, "needsUpdate", {
 
-		set: function(value) { 
-			
-			if ( value === true ) this.version ++; 
-		
+		set: function ( value ) {
+
+			if ( value === true ) this.version ++;
+
 		}
 
-	});
+	} );
 
 	Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
@@ -3336,14 +3335,14 @@
 
 	function Matrix4() {
 
-		this.elements = new Float32Array( [
+		this.elements = [
 
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1
 
-		] );
+		];
 
 		if ( arguments.length > 0 ) {
 
@@ -3393,7 +3392,7 @@
 
 		copy: function ( m ) {
 
-			this.elements.set( m.elements );
+			for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
 
 			return this;
 
@@ -4104,8 +4103,7 @@
 				position.z = te[ 14 ];
 
 				// scale the rotation part
-
-				matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
+				for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
 
 				var invSX = 1 / sx;
 				var invSY = 1 / sy;
@@ -4347,6 +4345,10 @@
 	var arrayCacheF32 = [];
 	var arrayCacheI32 = [];
 
+	// Float32Array cache used for uploading Matrix4 uniform
+
+	var mat4array = new Float32Array( 16 );
+
 	// Flattening for arrays of vectors and matrices
 
 	function flatten( array, nBlocks, blockSize ) {
@@ -4457,7 +4459,16 @@
 
 	function setValue4fm( gl, v ) {
 
-		gl.uniformMatrix4fv( this.addr, false, v.elements || v );
+		if ( v.elements === undefined ) {
+
+			gl.uniformMatrix4fv( this.addr, false, v );
+
+		} else {
+
+			mat4array.set( v.elements );
+			gl.uniformMatrix4fv( this.addr, false, mat4array );
+
+		}
 
 	}
 
@@ -4647,7 +4658,7 @@
 
 	}
 
-	StructuredUniform.prototype.setValue = function( gl, value ) {
+	StructuredUniform.prototype.setValue = function ( gl, value ) {
 
 		// Note: Don't need an extra 'renderer' parameter, since samplers
 		// are not allowed in structured uniforms.
@@ -4693,7 +4704,7 @@
 		// reset RegExp object, because of the early exit of a previous run
 		RePathPart.lastIndex = 0;
 
-		for (; ;) {
+		for ( ; ; ) {
 
 			var match = RePathPart.exec( path ),
 				matchEnd = RePathPart.lastIndex,
@@ -4704,8 +4715,8 @@
 
 			if ( idIsIndex ) id = id | 0; // convert to integer
 
-			if ( subscript === undefined ||
-					subscript === '[' && matchEnd + 2 === pathLength ) {
+			if ( subscript === undefined || subscript === '[' && matchEnd + 2 === pathLength ) {
+
 				// bare name or "pure" bottom-level array "[0]" suffix
 
 				addUniform( container, subscript === undefined ?
@@ -4715,10 +4726,10 @@
 				break;
 
 			} else {
+
 				// step into inner node / create it in case it doesn't exist
 
-				var map = container.map,
-					next = map[ id ];
+				var map = container.map, next = map[ id ];
 
 				if ( next === undefined ) {
 
@@ -4757,7 +4768,7 @@
 
 	}
 
-	WebGLUniforms.prototype.setValue = function( gl, name, value ) {
+	WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 		var u = this.map[ name ];
 
@@ -4765,7 +4776,7 @@
 
 	};
 
-	WebGLUniforms.prototype.set = function( gl, object, name ) {
+	WebGLUniforms.prototype.set = function ( gl, object, name ) {
 
 		var u = this.map[ name ];
 
@@ -4773,7 +4784,7 @@
 
 	};
 
-	WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
+	WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 		var v = object[ name ];
 
@@ -4784,7 +4795,7 @@
 
 	// Static interface
 
-	WebGLUniforms.upload = function( gl, seq, values, renderer ) {
+	WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 
 		for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -4792,8 +4803,8 @@
 				v = values[ u.id ];
 
 			if ( v.needsUpdate !== false ) {
-				// note: always updating when .needsUpdate is undefined
 
+				// note: always updating when .needsUpdate is undefined
 				u.setValue( gl, v.value, renderer );
 
 			}
@@ -4802,7 +4813,7 @@
 
 	};
 
-	WebGLUniforms.seqWithValue = function( seq, values ) {
+	WebGLUniforms.seqWithValue = function ( seq, values ) {
 
 		var r = [];
 
@@ -4986,7 +4997,7 @@
 
 	var map_particle_pars_fragment = "#ifdef USE_MAP\n\tuniform vec4 offsetRepeat;\n\tuniform sampler2D map;\n#endif\n";
 
-	var metalnessmap_fragment = "float metalnessFactor = metalness;\n#ifdef USE_METALNESSMAP\n\tvec4 texelMetalness = texture2D( metalnessMap, vUv );\n\tmetalnessFactor *= texelMetalness.r;\n#endif\n";
+	var metalnessmap_fragment = "float metalnessFactor = metalness;\n#ifdef USE_METALNESSMAP\n\tvec4 texelMetalness = texture2D( metalnessMap, vUv );\n\tmetalnessFactor *= texelMetalness.b;\n#endif\n";
 
 	var metalnessmap_pars_fragment = "#ifdef USE_METALNESSMAP\n\tuniform sampler2D metalnessMap;\n#endif";
 
@@ -5008,7 +5019,7 @@
 
 	var project_vertex = "#ifdef USE_SKINNING\n\tvec4 mvPosition = modelViewMatrix * skinned;\n#else\n\tvec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );\n#endif\ngl_Position = projectionMatrix * mvPosition;\n";
 
-	var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUGHNESSMAP\n\tvec4 texelRoughness = texture2D( roughnessMap, vUv );\n\troughnessFactor *= texelRoughness.r;\n#endif\n";
+	var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUGHNESSMAP\n\tvec4 texelRoughness = texture2D( roughnessMap, vUv );\n\troughnessFactor *= texelRoughness.g;\n#endif\n";
 
 	var roughnessmap_pars_fragment = "#ifdef USE_ROUGHNESSMAP\n\tuniform sampler2D roughnessMap;\n#endif";
 
@@ -7171,22 +7182,22 @@
 
 	}
 
-	Object.defineProperty( Material.prototype, "needsUpdate", {
+	Object.defineProperty( Material.prototype, 'needsUpdate', {
 
-		get: function() {
+		get: function () {
 
 			return this._needsUpdate;
 
 		},
-		
-		set: function(value) {
+
+		set: function ( value ) {
 
 			if ( value === true ) this.update();
 			this._needsUpdate = value;
 
 		}
 
-	});
+	} );
 
 	Object.assign( Material.prototype, EventDispatcher.prototype, {
 
@@ -8391,7 +8402,7 @@
 
 		},
 
-		setFromMatrix4: function( m ) {
+		setFromMatrix4: function ( m ) {
 
 			var me = m.elements;
 
@@ -8491,6 +8502,7 @@
 				}
 
 				return this.identity();
+
 			}
 
 			var detInv = 1 / det;
@@ -8551,7 +8563,7 @@
 
 			if ( offset === undefined ) offset = 0;
 
-			for( var i = 0; i < 9; i ++ ) {
+			for ( var i = 0; i < 9; i ++ ) {
 
 				this.elements[ i ] = array[ i + offset ];
 
@@ -8578,7 +8590,7 @@
 
 			array[ offset + 6 ] = te[ 6 ];
 			array[ offset + 7 ] = te[ 7 ];
-			array[ offset + 8 ]  = te[ 8 ];
+			array[ offset + 8 ] = te[ 8 ];
 
 			return array;
 
@@ -11691,15 +11703,15 @@
 
 	}
 
-	Object.defineProperty( BufferAttribute.prototype, "needsUpdate", {
+	Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
 
-		set: function(value) { 
-			
+		set: function ( value ) {
+
 			if ( value === true ) this.version ++;
-		
+
 		}
 
-	});
+	} );
 
 	Object.assign( BufferAttribute.prototype, {
 
@@ -15021,7 +15033,7 @@
 						uvB.fromBufferAttribute( uv, b );
 						uvC.fromBufferAttribute( uv, c );
 
-						intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
+						intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
 
 					}
 
@@ -21115,16 +21127,30 @@
 								var groups = geometry.groups;
 								var materials = material.materials;
 
-								for ( var i = 0, l = groups.length; i < l; i ++ ) {
+								if ( groups.length > 0 ) {
 
-									var group = groups[ i ];
-									var groupMaterial = materials[ group.materialIndex ];
+									// push a render item for each group of the geometry
 
-									if ( groupMaterial.visible === true ) {
+									for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-										pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+										var group = groups[ i ];
+										var groupMaterial = materials[ group.materialIndex ];
+
+										if ( groupMaterial === undefined ) {
+
+											console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
+
+										} else if ( groupMaterial.visible === true ) {
+
+											pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+
+										}
 
 									}
+
+								} else {
+
+									console.warn( 'THREE.WebGLRenderer: MultiMaterial can not be used without groups.' );
 
 								}
 
@@ -22654,35 +22680,37 @@
 
 	}
 
-	Scene.prototype = Object.create( Object3D.prototype );
+	Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	Scene.prototype.constructor = Scene;
+		constructor: Scene,
 
-	Scene.prototype.copy = function ( source, recursive ) {
+		copy: function ( source, recursive ) {
 
-		Object3D.prototype.copy.call( this, source, recursive );
+			Object3D.prototype.copy.call( this, source, recursive );
 
-		if ( source.background !== null ) this.background = source.background.clone();
-		if ( source.fog !== null ) this.fog = source.fog.clone();
-		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+			if ( source.background !== null ) this.background = source.background.clone();
+			if ( source.fog !== null ) this.fog = source.fog.clone();
+			if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
-		this.matrixAutoUpdate = source.matrixAutoUpdate;
+			this.autoUpdate = source.autoUpdate;
+			this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-		return this;
+			return this;
 
-	};
+		},
 
-	Scene.prototype.toJSON = function ( meta ) {
+		toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+			var data = Object3D.prototype.toJSON.call( this, meta );
 
-		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+			if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+			if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-		return data;
+			return data;
 
-	};
+		}
+
+	} );
 
 	/**
 	 * @author mikael emtinger / http://gomo.se/
@@ -24117,7 +24145,7 @@
 
 				if ( groups.length === 0 ) {
 
-					geometry.addGroup( 0, indices.count );
+					groups = [ { start: 0, count: indices.count, materialIndex: 0 } ];
 
 				}
 
@@ -31515,7 +31543,7 @@
 
 		this.name = name;
 		this.tracks = tracks;
-		this.duration = ( duration !== undefined ) ? duration : -1;
+		this.duration = ( duration !== undefined ) ? duration : - 1;
 
 		this.uuid = _Math.generateUUID();
 
@@ -31532,7 +31560,7 @@
 
 	Object.assign( AnimationClip, {
 
-		parse: function( json ) {
+		parse: function ( json ) {
 
 			var tracks = [],
 				jsonTracks = json.tracks,
@@ -31547,8 +31575,8 @@
 			return new AnimationClip( json.name, json.duration, tracks );
 
 		},
-		
-		toJSON: function( clip ) {
+
+		toJSON: function ( clip ) {
 
 			var tracks = [],
 				clipTracks = clip.tracks;
@@ -31570,8 +31598,8 @@
 			return json;
 
 		},
-		
-		CreateFromMorphTargetSequence: function( name, morphTargetSequence, fps, noLoop ) {
+
+		CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
 
 			var numMorphTargets = morphTargetSequence.length;
 			var tracks = [];
@@ -31606,13 +31634,14 @@
 							'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
 							times, values
 						).scale( 1.0 / fps ) );
+
 			}
 
-			return new AnimationClip( name, -1, tracks );
+			return new AnimationClip( name, - 1, tracks );
 
 		},
 
-		findByName: function( objectOrClipArray, name ) {
+		findByName: function ( objectOrClipArray, name ) {
 
 			var clipArray = objectOrClipArray;
 
@@ -31630,13 +31659,14 @@
 					return clipArray[ i ];
 
 				}
+
 			}
 
 			return null;
 
 		},
 
-		CreateClipsFromMorphTargetSequences: function( morphTargets, fps, noLoop ) {
+		CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
 
 			var animationToMorphTargets = {};
 
@@ -31681,7 +31711,7 @@
 		},
 
 		// parse the animation.hierarchy format
-		parseAnimation: function( animation, bones ) {
+		parseAnimation: function ( animation, bones ) {
 
 			if ( ! animation ) {
 
@@ -31690,8 +31720,7 @@
 
 			}
 
-			var addNonemptyTrack = function(
-					trackType, trackName, animationKeys, propertyName, destTracks ) {
+			var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 				// only return track if there are actually keys.
 				if ( animationKeys.length !== 0 ) {
@@ -31699,8 +31728,7 @@
 					var times = [];
 					var values = [];
 
-					AnimationUtils.flattenJSON(
-							animationKeys, times, values, propertyName );
+					AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
 					// empty keys are filtered out, so check again
 					if ( times.length !== 0 ) {
@@ -31717,7 +31745,7 @@
 
 			var clipName = animation.name || 'default';
 			// automatic length determination in AnimationClip.
-			var duration = animation.length || -1;
+			var duration = animation.length || - 1;
 			var fps = animation.fps || 30;
 
 			var hierarchyTracks = animation.hierarchy || [];
@@ -31731,17 +31759,19 @@
 
 				// process morph targets in a way exactly compatible
 				// with AnimationHandler.init( animation )
-				if ( animationKeys[0].morphTargets ) {
+				if ( animationKeys[ 0 ].morphTargets ) {
 
 					// figure out all morph targets used in this track
 					var morphTargetNames = {};
+
 					for ( var k = 0; k < animationKeys.length; k ++ ) {
 
-						if ( animationKeys[k].morphTargets ) {
+						if ( animationKeys[ k ].morphTargets ) {
 
-							for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+							for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
-								morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
+								morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+
 							}
 
 						}
@@ -31756,22 +31786,23 @@
 						var times = [];
 						var values = [];
 
-						for ( var m = 0; m !== animationKeys[k].morphTargets.length; ++ m ) {
+						for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
 
-							var animationKey = animationKeys[k];
+							var animationKey = animationKeys[ k ];
 
 							times.push( animationKey.time );
 							values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
 
 						}
 
-						tracks.push( new NumberKeyframeTrack('.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+						tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 					}
 
 					duration = morphTargetNames.length * ( fps || 1.0 );
 
 				} else {
+
 					// ...assume skeletal animation
 
 					var boneName = '.bones[' + bones[ h ].name + ']';
@@ -31808,10 +31839,9 @@
 
 	Object.assign( AnimationClip.prototype, {
 
-		resetDuration: function() {
+		resetDuration: function () {
 
-			var tracks = this.tracks,
-				duration = 0;
+			var tracks = this.tracks, duration = 0;
 
 			for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
 
@@ -31825,7 +31855,7 @@
 
 		},
 
-		trim: function() {
+		trim: function () {
 
 			for ( var i = 0; i < this.tracks.length; i ++ ) {
 
@@ -31837,7 +31867,7 @@
 
 		},
 
-		optimize: function() {
+		optimize: function () {
 
 			for ( var i = 0; i < this.tracks.length; i ++ ) {
 
@@ -33825,7 +33855,7 @@
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
 
-		getPoint: function ( t ) {
+		getPoint: function () {
 
 			console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
 			return null;
@@ -33846,7 +33876,7 @@
 
 		getPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 5;
+			if ( divisions === undefined ) divisions = 5;
 
 			var points = [];
 
@@ -33864,7 +33894,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 5;
+			if ( divisions === undefined ) divisions = 5;
 
 			var points = [];
 
@@ -33891,7 +33921,7 @@
 
 		getLengths: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+			if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 			if ( this.cacheArcLengths
 				&& ( this.cacheArcLengths.length === divisions + 1 )
@@ -33912,7 +33942,7 @@
 
 			for ( p = 1; p <= divisions; p ++ ) {
 
-				current = this.getPoint ( p / divisions );
+				current = this.getPoint( p / divisions );
 				sum += current.distanceTo( last );
 				cache.push( sum );
 				last = current;
@@ -33925,7 +33955,7 @@
 
 		},
 
-		updateArcLengths: function() {
+		updateArcLengths: function () {
 
 			this.needsUpdate = true;
 			this.getLengths();
@@ -34018,7 +34048,7 @@
 		// 2 points a small delta apart will be used to find its gradient
 		// which seems to give a reasonable approximation
 
-		getTangent: function( t ) {
+		getTangent: function ( t ) {
 
 			var delta = 0.0001;
 			var t1 = t - delta;
@@ -34342,7 +34372,7 @@
 
 		getSpacedPoints: function ( divisions ) {
 
-			if ( isNaN( divisions ) ) divisions = 40;
+			if ( divisions === undefined ) divisions = 40;
 
 			var points = [];
 
@@ -35428,7 +35458,7 @@
 
 		update: ( function () {
 
-			var instance, focus, fov, aspect, near, far, zoom;
+			var instance, focus, fov, aspect, near, far, zoom, eyeSep;
 
 			var eyeRight = new Matrix4();
 			var eyeLeft = new Matrix4();
@@ -35437,7 +35467,7 @@
 
 				var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
 													aspect !== camera.aspect * this.aspect || near !== camera.near ||
-													far !== camera.far || zoom !== camera.zoom;
+													far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
 
 				if ( needsUpdate ) {
 
@@ -35453,7 +35483,7 @@
 					// http://paulbourke.net/stereographics/stereorender/
 
 					var projectionMatrix = camera.projectionMatrix.clone();
-					var eyeSep = this.eyeSep / 2;
+					eyeSep = this.eyeSep / 2;
 					var eyeSepOnProjection = eyeSep * near / focus;
 					var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
 					var xmin, xmax;
@@ -36192,7 +36222,7 @@
 	Object.assign( PropertyMixer.prototype, {
 
 		// accumulate data in the 'incoming' region into 'accu<i>'
-		accumulate: function( accuIndex, weight ) {
+		accumulate: function ( accuIndex, weight ) {
 
 			// note: happily accumulating nothing when weight = 0, the caller knows
 			// the weight and shouldn't have made the call in the first place
@@ -36230,7 +36260,7 @@
 		},
 
 		// apply the state of 'accu<i>' to the binding when accus differ
-		apply: function( accuIndex ) {
+		apply: function ( accuIndex ) {
 
 			var stride = this.valueSize,
 				buffer = this.buffer,
@@ -36269,7 +36299,7 @@
 		},
 
 		// remember the state of the bound property and copy it to both accus
-		saveOriginalState: function() {
+		saveOriginalState: function () {
 
 			var binding = this.binding;
 
@@ -36292,7 +36322,7 @@
 		},
 
 		// apply the state previously taken via 'saveOriginalState' to the binding
-		restoreOriginalState: function() {
+		restoreOriginalState: function () {
 
 			var originalValueOffset = this.valueSize * 3;
 			this.binding.setValue( this.buffer, originalValueOffset );
@@ -36302,7 +36332,7 @@
 
 		// mix functions
 
-		_select: function( buffer, dstOffset, srcOffset, t, stride ) {
+		_select: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 			if ( t >= 0.5 ) {
 
@@ -36316,14 +36346,13 @@
 
 		},
 
-		_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+		_slerp: function ( buffer, dstOffset, srcOffset, t ) {
 
-			Quaternion.slerpFlat( buffer, dstOffset,
-				buffer, dstOffset, buffer, srcOffset, t );
+			Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t );
 
 		},
 
-		_lerp: function( buffer, dstOffset, srcOffset, t, stride ) {
+		_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 			var s = 1 - t;
 
@@ -36349,7 +36378,7 @@
 	 * @author tschw
 	 */
 
-	function Composite ( targetGroup, path, optionalParsedPath ) {
+	function Composite( targetGroup, path, optionalParsedPath ) {
 
 		var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
@@ -36360,7 +36389,7 @@
 
 	Object.assign( Composite.prototype, {
 
-		getValue: function( array, offset ) {
+		getValue: function ( array, offset ) {
 
 			this.bind(); // bind all binding
 
@@ -36372,7 +36401,7 @@
 
 		},
 
-		setValue: function( array, offset ) {
+		setValue: function ( array, offset ) {
 
 			var bindings = this._bindings;
 
@@ -36385,7 +36414,7 @@
 
 		},
 
-		bind: function() {
+		bind: function () {
 
 			var bindings = this._bindings;
 
@@ -36398,7 +36427,7 @@
 
 		},
 
-		unbind: function() {
+		unbind: function () {
 
 			var bindings = this._bindings;
 
@@ -36429,7 +36458,7 @@
 
 		Composite: Composite,
 
-		create: function( root, path, parsedPath ) {
+		create: function ( root, path, parsedPath ) {
 
 			if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
@@ -36443,7 +36472,7 @@
 
 		},
 
-		parseTrackName: function( trackName ) {
+		parseTrackName: function ( trackName ) {
 
 			// matches strings in the form of:
 			//    nodeName.property
@@ -36485,9 +36514,9 @@
 
 		},
 
-		findNode: function( root, nodeName ) {
+		findNode: function ( root, nodeName ) {
 
-			if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+			if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 				return root;
 
@@ -36496,9 +36525,9 @@
 			// search into skeleton bones.
 			if ( root.skeleton ) {
 
-				var searchSkeleton = function( skeleton ) {
+				var searchSkeleton = function ( skeleton ) {
 
-					for( var i = 0; i < skeleton.bones.length; i ++ ) {
+					for ( var i = 0; i < skeleton.bones.length; i ++ ) {
 
 						var bone = skeleton.bones[ i ];
 
@@ -36507,6 +36536,7 @@
 							return bone;
 
 						}
+
 					}
 
 					return null;
@@ -36520,14 +36550,15 @@
 					return bone;
 
 				}
+
 			}
 
 			// search into node subtree.
 			if ( root.children ) {
 
-				var searchNodeSubtree = function( children ) {
+				var searchNodeSubtree = function ( children ) {
 
-					for( var i = 0; i < children.length; i ++ ) {
+					for ( var i = 0; i < children.length; i ++ ) {
 
 						var childNode = children[ i ];
 
@@ -36566,8 +36597,8 @@
 	Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		// these are used to "bind" a nonexistent property
-		_getValue_unavailable: function() {},
-		_setValue_unavailable: function() {},
+		_getValue_unavailable: function () {},
+		_setValue_unavailable: function () {},
 
 		BindingType: {
 			Direct: 0,
@@ -36758,7 +36789,7 @@
 		},
 
 		// create getter / setter pair for a property in the scene graph
-		bind: function() {
+		bind: function () {
 
 			var targetObject = this.node,
 				parsedPath = this.parsedPath,
@@ -36904,9 +36935,11 @@
 			var bindingType = this.BindingType.Direct;
 
 			if ( propertyIndex !== undefined ) {
+
 				// access a sub element of the property array (only primitives are supported right now)
 
 				if ( propertyName === "morphTargetInfluences" ) {
+
 					// potential optimization, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
 
 					// support resolving morphTarget names into indices.
@@ -36943,6 +36976,7 @@
 				this.propertyIndex = propertyIndex;
 
 			} else if ( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
+
 				// must use copy for Object3D.Euler/Quaternion
 
 				bindingType = this.BindingType.HasFromToArray;
@@ -36950,7 +36984,7 @@
 				this.resolvedProperty = nodeProperty;
 
 			} else if ( Array.isArray( nodeProperty ) ) {
-	      
+
 				bindingType = this.BindingType.EntireArray;
 
 				this.resolvedProperty = nodeProperty;
@@ -36967,7 +37001,7 @@
 
 		},
 
-		unbind: function() {
+		unbind: function () {
 
 			this.node = null;
 
@@ -37050,7 +37084,7 @@
 
 			objects: {
 				get total() { return scope._objects.length; },
-				get inUse() { return this.total - scope.nCachedObjects_;  }
+				get inUse() { return this.total - scope.nCachedObjects_; }
 			},
 
 			get bindingsPerObject() { return scope._bindings.length; }
@@ -37139,7 +37173,7 @@
 
 					}
 
-				} else if ( objects[ index ] !== knownObject) {
+				} else if ( objects[ index ] !== knownObject ) {
 
 					console.error( "Different objects with the same UUID " +
 							"detected. Clean the caches or recreate your " +
@@ -37287,7 +37321,8 @@
 
 		// Internal interface used by befriended PropertyBinding.Composite:
 
-		subscribe_: function( path, parsedPath ) {
+		subscribe_: function ( path, parsedPath ) {
+
 			// returns an array of bindings for the given path that is changed
 			// according to the contained objects in the group
 
@@ -37312,13 +37347,10 @@
 			parsedPaths.push( parsedPath );
 			bindings.push( bindingsForPath );
 
-			for ( var i = nCachedObjects,
-					n = objects.length; i !== n; ++ i ) {
+			for ( var i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
 
 				var object = objects[ i ];
-
-				bindingsForPath[ i ] =
-						new PropertyBinding( object, path, parsedPath );
+				bindingsForPath[ i ] = new PropertyBinding( object, path, parsedPath );
 
 			}
 
@@ -37326,7 +37358,8 @@
 
 		},
 
-		unsubscribe_: function( path ) {
+		unsubscribe_: function ( path ) {
+
 			// tells the group to forget about a property path and no longer
 			// update the array previously obtained with 'subscribe_'
 
@@ -38289,7 +38322,7 @@
 
 
 			var actionByRoot = actionsForClip.actionByRoot,
-				rootUuid = ( actions._localRoot || this._root ).uuid;
+				rootUuid = ( action._localRoot || this._root ).uuid;
 
 			delete actionByRoot[ rootUuid ];
 
@@ -38984,15 +39017,15 @@
 
 	}
 
-	Object.defineProperty( InterleavedBuffer.prototype, "needsUpdate", {
+	Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 
-		set: function(value) { 
-			
-			if ( value === true ) this.version ++; 
-		
+		set: function ( value ) {
+
+			if ( value === true ) this.version ++;
+
 		}
 
-	});
+	} );
 
 	Object.assign( InterleavedBuffer.prototype, {
 
