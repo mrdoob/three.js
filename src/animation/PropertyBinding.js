@@ -27,7 +27,11 @@ Object.assign( Composite.prototype, {
 			binding = this._bindings[ firstValidIndex ];
 
 		// and only call .getValue on the first
-		if ( binding !== undefined ) binding.getValue( array, offset );
+		if ( binding !== undefined ) {
+
+			binding.getValue( array, offset );
+
+		}
 
 	},
 
@@ -35,8 +39,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].setValue( array, offset );
 
@@ -48,8 +51,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].bind();
 
@@ -61,8 +63,7 @@ Object.assign( Composite.prototype, {
 
 		var bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_,
-				  n = bindings.length; i !== n; ++ i ) {
+		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].unbind();
 
@@ -71,7 +72,6 @@ Object.assign( Composite.prototype, {
 	}
 
 } );
-
 
 function PropertyBinding( rootNode, path, parsedPath ) {
 
@@ -200,7 +200,11 @@ Object.assign( PropertyBinding, {
 
 					var result = searchNodeSubtree( childNode.children );
 
-					if ( result ) return result;
+					if ( result ) {
+
+						return result;
+
+					}
 
 				}
 
@@ -227,8 +231,10 @@ Object.assign( PropertyBinding, {
 Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	// these are used to "bind" a nonexistent property
-	_getValue_unavailable: function () {},
-	_setValue_unavailable: function () {},
+	_getValue_unavailable: function () {
+	},
+	_setValue_unavailable: function () {
+	},
 
 	BindingType: {
 		Direct: 0,
@@ -430,8 +436,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		if ( ! targetObject ) {
 
-			targetObject = PropertyBinding.findNode(
-					this.rootNode, parsedPath.nodeName ) || this.rootNode;
+			targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName ) || this.rootNode;
 
 			this.node = targetObject;
 
@@ -517,7 +522,6 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			}
 
-
 			if ( objectIndex !== undefined ) {
 
 				if ( targetObject[ objectIndex ] === undefined ) {
@@ -540,8 +544,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			var nodeName = parsedPath.nodeName;
 
-			console.error( "  trying to update property for track: " + nodeName +
-				'.' + propertyName + " but it wasn't found.", targetObject );
+			console.error( "  trying to update property for track: " + nodeName + '.' + propertyName + " but it wasn't found.", targetObject );
 			return;
 
 		}
@@ -644,7 +647,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+//!\ DECLARE ALIAS AFTER assign prototype, else they don't be bind !
 Object.assign( PropertyBinding.prototype, {
 
 	// initial state of these methods that calls 'bind'
