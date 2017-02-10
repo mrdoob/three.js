@@ -9,13 +9,13 @@ import { Vector3 } from './Vector3';
 
 function Matrix3() {
 
-	this.elements = new Float32Array( [
+	this.elements = [
 
 		1, 0, 0,
 		0, 1, 0,
 		0, 0, 1
 
-	] );
+	];
 
 	if ( arguments.length > 0 ) {
 
