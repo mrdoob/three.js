@@ -3329,14 +3329,14 @@ Object.assign( Vector3.prototype, {
 
 function Matrix4() {
 
-	this.elements = new Float32Array( [
+	this.elements = [
 
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 
-	] );
+	];
 
 	if ( arguments.length > 0 ) {
 
@@ -3386,7 +3386,7 @@ Object.assign( Matrix4.prototype, {
 
 	copy: function ( m ) {
 
-		this.elements.set( m.elements );
+		for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
 
 		return this;
 
@@ -4097,8 +4097,7 @@ Object.assign( Matrix4.prototype, {
 			position.z = te[ 14 ];
 
 			// scale the rotation part
-
-			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
+			for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
 
 			var invSX = 1 / sx;
 			var invSY = 1 / sy;
@@ -4340,6 +4339,10 @@ function UniformContainer() {
 var arrayCacheF32 = [];
 var arrayCacheI32 = [];
 
+// Float32Array cache used for uploading Matrix4 uniform
+
+var mat4array = new Float32Array( 16 );
+
 // Flattening for arrays of vectors and matrices
 
 function flatten( array, nBlocks, blockSize ) {
@@ -4450,7 +4453,16 @@ function setValue3fm( gl, v ) {
 
 function setValue4fm( gl, v ) {
 
-	gl.uniformMatrix4fv( this.addr, false, v.elements || v );
+	if ( v.elements === undefined ) {
+
+		gl.uniformMatrix4fv( this.addr, false, v );
+
+	} else {
+
+		mat4array.set( v.elements );
+		gl.uniformMatrix4fv( this.addr, false, mat4array );
+
+	}
 
 }
 
@@ -4640,7 +4652,7 @@ function StructuredUniform( id ) {
 
 }
 
-StructuredUniform.prototype.setValue = function( gl, value ) {
+StructuredUniform.prototype.setValue = function ( gl, value ) {
 
 	// Note: Don't need an extra 'renderer' parameter, since samplers
 	// are not allowed in structured uniforms.
@@ -4686,7 +4698,7 @@ function parseUniform( activeInfo, addr, container ) {
 	// reset RegExp object, because of the early exit of a previous run
 	RePathPart.lastIndex = 0;
 
-	for (; ;) {
+	for ( ; ; ) {
 
 		var match = RePathPart.exec( path ),
 			matchEnd = RePathPart.lastIndex,
@@ -4697,8 +4709,8 @@ function parseUniform( activeInfo, addr, container ) {
 
 		if ( idIsIndex ) id = id | 0; // convert to integer
 
-		if ( subscript === undefined ||
-				subscript === '[' && matchEnd + 2 === pathLength ) {
+		if ( subscript === undefined || subscript === '[' && matchEnd + 2 === pathLength ) {
+
 			// bare name or "pure" bottom-level array "[0]" suffix
 
 			addUniform( container, subscript === undefined ?
@@ -4708,10 +4720,10 @@ function parseUniform( activeInfo, addr, container ) {
 			break;
 
 		} else {
+
 			// step into inner node / create it in case it doesn't exist
 
-			var map = container.map,
-				next = map[ id ];
+			var map = container.map, next = map[ id ];
 
 			if ( next === undefined ) {
 
@@ -4750,7 +4762,7 @@ function WebGLUniforms( gl, program, renderer ) {
 
 }
 
-WebGLUniforms.prototype.setValue = function( gl, name, value ) {
+WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 	var u = this.map[ name ];
 
@@ -4758,7 +4770,7 @@ WebGLUniforms.prototype.setValue = function( gl, name, value ) {
 
 };
 
-WebGLUniforms.prototype.set = function( gl, object, name ) {
+WebGLUniforms.prototype.set = function ( gl, object, name ) {
 
 	var u = this.map[ name ];
 
@@ -4766,7 +4778,7 @@ WebGLUniforms.prototype.set = function( gl, object, name ) {
 
 };
 
-WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
+WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 	var v = object[ name ];
 
@@ -4777,7 +4789,7 @@ WebGLUniforms.prototype.setOptional = function( gl, object, name ) {
 
 // Static interface
 
-WebGLUniforms.upload = function( gl, seq, values, renderer ) {
+WebGLUniforms.upload = function ( gl, seq, values, renderer ) {
 
 	for ( var i = 0, n = seq.length; i !== n; ++ i ) {
 
@@ -4785,8 +4797,8 @@ WebGLUniforms.upload = function( gl, seq, values, renderer ) {
 			v = values[ u.id ];
 
 		if ( v.needsUpdate !== false ) {
-			// note: always updating when .needsUpdate is undefined
 
+			// note: always updating when .needsUpdate is undefined
 			u.setValue( gl, v.value, renderer );
 
 		}
@@ -4795,7 +4807,7 @@ WebGLUniforms.upload = function( gl, seq, values, renderer ) {
 
 };
 
-WebGLUniforms.seqWithValue = function( seq, values ) {
+WebGLUniforms.seqWithValue = function ( seq, values ) {
 
 	var r = [];
 
@@ -8384,7 +8396,7 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
-	setFromMatrix4: function( m ) {
+	setFromMatrix4: function ( m ) {
 
 		var me = m.elements;
 
@@ -8484,6 +8496,7 @@ Object.assign( Matrix3.prototype, {
 			}
 
 			return this.identity();
+
 		}
 
 		var detInv = 1 / det;
@@ -8544,7 +8557,7 @@ Object.assign( Matrix3.prototype, {
 
 		if ( offset === undefined ) offset = 0;
 
-		for( var i = 0; i < 9; i ++ ) {
+		for ( var i = 0; i < 9; i ++ ) {
 
 			this.elements[ i ] = array[ i + offset ];
 
@@ -8571,7 +8584,7 @@ Object.assign( Matrix3.prototype, {
 
 		array[ offset + 6 ] = te[ 6 ];
 		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ]  = te[ 8 ];
+		array[ offset + 8 ] = te[ 8 ];
 
 		return array;
 
@@ -15014,7 +15027,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					uvB.fromBufferAttribute( uv, b );
 					uvC.fromBufferAttribute( uv, c );
 
-					intersection.uv = uvIntersection( intersectionPoint,  vA, vB, vC, uvA, uvB, uvC );
+					intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
 
 				}
 
@@ -22661,35 +22674,37 @@ function Scene () {
 
 }
 
-Scene.prototype = Object.create( Object3D.prototype );
+Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Scene.prototype.constructor = Scene;
+	constructor: Scene,
 
-Scene.prototype.copy = function ( source, recursive ) {
+	copy: function ( source, recursive ) {
 
-	Object3D.prototype.copy.call( this, source, recursive );
+		Object3D.prototype.copy.call( this, source, recursive );
 
-	if ( source.background !== null ) this.background = source.background.clone();
-	if ( source.fog !== null ) this.fog = source.fog.clone();
-	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+		if ( source.background !== null ) this.background = source.background.clone();
+		if ( source.fog !== null ) this.fog = source.fog.clone();
+		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-	this.autoUpdate = source.autoUpdate;
-	this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.autoUpdate = source.autoUpdate;
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-	return this;
+		return this;
 
-};
+	},
 
-Scene.prototype.toJSON = function ( meta ) {
+	toJSON: function ( meta ) {
 
-	var data = Object3D.prototype.toJSON.call( this, meta );
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
-	if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-	return data;
+		return data;
 
-};
+	}
+
+} );
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -33573,6 +33588,10 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+
 				case 'Mesh':
 
 					var geometry = getGeometry( data.geometry );
@@ -33632,10 +33651,6 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Group();
 
 					break;
-
-				case 'SkinnedMesh':
-
-					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh type. Instantiates Object3D instead.' );
 
 				default:
 
@@ -35437,7 +35452,7 @@ Object.assign( StereoCamera.prototype, {
 
 	update: ( function () {
 
-		var instance, focus, fov, aspect, near, far, zoom;
+		var instance, focus, fov, aspect, near, far, zoom, eyeSep;
 
 		var eyeRight = new Matrix4();
 		var eyeLeft = new Matrix4();
@@ -35446,7 +35461,7 @@ Object.assign( StereoCamera.prototype, {
 
 			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
 												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-												far !== camera.far || zoom !== camera.zoom;
+												far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
 
 			if ( needsUpdate ) {
 
@@ -35462,7 +35477,7 @@ Object.assign( StereoCamera.prototype, {
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				var eyeSep = this.eyeSep / 2;
+				eyeSep = this.eyeSep / 2;
 				var eyeSepOnProjection = eyeSep * near / focus;
 				var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
 				var xmin, xmax;

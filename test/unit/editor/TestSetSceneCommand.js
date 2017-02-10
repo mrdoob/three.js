@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "TestCmdSetScene" );
+QUnit.module( "TestCmdSetScene" );
 
-test( "Test for SetSceneCommand (Undo and Redo)", function() {
+QUnit.test( "Test for SetSceneCommand (Undo and Redo)", function( assert ) {
 
 	// setup
 	var editor = new Editor();
@@ -36,13 +36,13 @@ test( "Test for SetSceneCommand (Undo and Redo)", function() {
 	} );
 
 	// tests
-	ok( editor.scene.children.length = scenes.length,
+	assert.ok( editor.scene.children.length = scenes.length,
 		"OK, all scenes have been merged" );
 
 	var i = 0;
 	while ( i < editor.scene.children.length ) {
 
-		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
+		assert.ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
 			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name" );
 		i ++;
 
@@ -52,7 +52,7 @@ test( "Test for SetSceneCommand (Undo and Redo)", function() {
 	var i = 0;
 	while ( i < editor.scene.children.length ) {
 
-		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
+		assert.ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
 			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after undo" );
 		i ++;
 
@@ -63,7 +63,7 @@ test( "Test for SetSceneCommand (Undo and Redo)", function() {
 	var i = 0;
 	while ( i < editor.scene.children.length ) {
 
-		ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
+		assert.ok( editor.scene.children[ i ].name == scenes[ i ].obj.name,
 			"OK, editor.scene.children[ " + i + " ].name matches scenes[ " + i + " ].obj.name after redo" );
 		i ++;
 

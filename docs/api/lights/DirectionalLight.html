@@ -13,7 +13,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			A light that gets emitted in a specific direction. This light will behave	as though it is
+			A light that gets emitted in a specific direction. This light will behave as though it is
 			infinitely far away and the rays produced from it are all parallel. The common use case
 			for this is to simulate daylight; the sun is far enough away that its position can be
 			considered to be infinite, and all light rays coming from it are parallel.<br /><br />
@@ -29,7 +29,7 @@
 
 			This means that its direction is calculated as pointing
 			from the light's [page:Object3D.position position] to	the [page:.target target]'s position
-			(as opposed to a a 'Free Direct Light' that just has a rotation component).<br /><br />
+			(as opposed to a 'Free Direct Light' that just has a rotation component).<br /><br />
 
 			The reason for this is to allow the light to cast shadows - the [page:.shadow shadow]
 			camera needs a position to calculate shadows from.<br /><br />
@@ -81,9 +81,9 @@ scene.add( directionalLight );
 
 		<h3>[property:Boolean isDirectionalLight]</h3>
 		<div>
-			Used to check whether this or derived classes are dircrectional lights. Default is *true*.<br /><br />
+			Used to check whether this or derived classes are directional lights. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 
@@ -102,7 +102,7 @@ scene.add( directionalLight );
 			The DirectionalLight points from its [page:.position position] to target.position. The default
 			position of the target is *(0, 0, 0)*.<br />
 
-			*Note*: For the the target's position to be changed to anything other than the default,
+			*Note*: For the target's position to be changed to anything other than the default,
 			it must be added to the [page:Scene scene] using
 			<code>
 				scene.add( light.target );
