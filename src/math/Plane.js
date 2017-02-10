@@ -228,6 +228,46 @@ Object.assign( Plane.prototype, {
 
 		return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
 
+	},
+
+	// Returns the point of intersection of three planes.
+	// Taken from "Graphics Gems", "Intersection of Three Planes", p 305.
+	// Returns the point of intersection of the three planes as a THREE.Vector3
+	// If the three planes do not intersect, returns 'undefined'.
+	// The first plane is 'this'.
+	threePlaneIntersectionPoint: function( plane2, plane3 ) {
+
+		var v2xv3 = new THREE.Vector3().crossVectors( plane2.normal, plane3.normal );
+
+		var normalVolume = this.normal.dot( v2xv3 );
+
+		// If the signed volume of the three normals is zero,
+		// then the planes do not intersect at a point.
+		// Since the normals are unit vectors, this comparison is unconditionally reasonable.
+		if ( Math.abs(normalVolume) < Number.EPSILON ) {
+
+			return undefined;
+
+		}
+
+		var v1xv2 = new THREE.Vector3().crossVectors( this.normal, plane2.normal );
+
+		var v3xv1 = new THREE.Vector3().crossVectors( plane3.normal, this.normal );
+
+		var p1v1 = this.coplanarPoint().dot( this.normal );
+
+		var p2v2 = plane2.coplanarPoint().dot( plane2.normal );
+
+		var p3v3 = plane3.coplanarPoint().dot( plane3.normal );
+
+		var intersectionPoint = v2xv3.multiplyScalar( p1v1 );
+
+		intersectionPoint.addScaledVector( v3xv1, p2v2 );
+
+		intersectionPoint.addScaledVector( v1xv2, p3v3 );
+
+		return intersectionPoint.divideScalar( normalVolume );
+
 	}
 
 } );
