@@ -746,7 +746,7 @@
 								geo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( bufferInfo.uvBuffer ), 2 ) );
 
 							}
-							if ( bufferInfo.colorsBuffer.length > 0 ) {
+							if ( 'LayerElementColor' in geometryNode.subNodes ) {
 
 								geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorsBuffer ), 4 ) );
 
