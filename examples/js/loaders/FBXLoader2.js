@@ -1210,11 +1210,16 @@
 								} else {
 
 									material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+									materials.push( material );
 
 								}
 								if ( 'color' in geometry.attributes ) {
 
-									material.vertexColors = THREE.VertexColors;
+									for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+
+										materials[ materialIndex ].vertexColors = THREE.VertexColors;
+
+									}
 
 								}
 								if ( geometry.FBX_Deformer ) {
