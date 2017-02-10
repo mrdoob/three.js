@@ -1226,12 +1226,9 @@
 
 									for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
 
-										var material = materials[ materialsIndex ];
-
-										material.skinning = true;
+										materials[ materialsIndex ].skinning = true;
 
 									}
-									material.skinning = true;
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {
