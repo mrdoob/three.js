@@ -27,7 +27,7 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 var scene = new THREE.Scene();
 			</code>
-			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] oe [page:LineDashedMaterial].</p>
+			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] or [page:LineDashedMaterial].</p>
 			<code>
 //create a blue LineBasicMaterial
 var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
@@ -35,7 +35,7 @@ var material = new THREE.LineBasicMaterial({ color: 0x0000ff });
 
 			<p>
 				After material we will need a [page:Geometry] or [page:BufferGeometry] with some vertices
-				(it's reccomended to use a BufferGeometry as it's more performant, however for simplicity we'll use a Geometry here):
+				(it's recommended to use a BufferGeometry as it's more performant, however for simplicity we'll use a Geometry here):
 			</p>
 
 			<code>
@@ -58,7 +58,7 @@ scene.add(line);
 renderer.render(scene, camera);
 			</code>
 
-			<p>You should now be seeing a arrow pointing upwards, made from two blue lines.</p>
+			<p>You should now be seeing an arrow pointing upwards, made from two blue lines.</p>
 		</div>
 	</body>
 </html>

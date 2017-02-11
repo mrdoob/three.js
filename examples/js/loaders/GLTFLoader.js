@@ -567,18 +567,31 @@ THREE.GLTFLoader = ( function () {
 			results = [];
 
 			var length = object.length;
+
 			for ( var idx = 0; idx < length; idx ++ ) {
+
 				var value = callback.call( thisObj || this, object[ idx ], idx );
+
 				if ( value ) {
+
 					fns.push( value );
+
 					if ( value instanceof Promise ) {
+
 						value.then( function( key, value ) {
+
 							results[ idx ] = value;
+
 						}.bind( this, key ));
+
 					} else {
+
 						results[ idx ] = value;
+
 					}
+
 				}
+
 			}
 
 		} else {
@@ -586,25 +599,41 @@ THREE.GLTFLoader = ( function () {
 			results = {};
 
 			for ( var key in object ) {
+
 				if ( object.hasOwnProperty( key ) ) {
+
 					var value = callback.call( thisObj || this, object[ key ], key );
+
 					if ( value ) {
+
 						fns.push( value );
+
 						if ( value instanceof Promise ) {
+
 							value.then( function( key, value ) {
+
 								results[ key ] = value;
+
 							}.bind( this, key ));
+
 						} else {
+
 							results[ key ] = value;
+
 						}
+
 					}
+
 				}
+
 			}
 
 		}
 
 		return Promise.all( fns ).then( function() {
+
 			return results;
+
 		});
 
 	}
@@ -1142,15 +1171,20 @@ THREE.GLTFLoader = ( function () {
 
 				if ( khr_material ) {
 
+					// don't copy over unused values to avoid material warning spam
+					var keys = [ 'ambient', 'emission', 'transparent', 'transparency', 'doubleSided' ];
+
 					switch ( khr_material.technique ) {
 
 						case 'BLINN' :
 						case 'PHONG' :
 							materialType = THREE.MeshPhongMaterial;
+							keys.push( 'diffuse', 'specular', 'shininess' );
 							break;
 
 						case 'LAMBERT' :
 							materialType = THREE.MeshLambertMaterial;
+							keys.push( 'diffuse' );
 							break;
 
 						case 'CONSTANT' :
@@ -1160,7 +1194,11 @@ THREE.GLTFLoader = ( function () {
 
 					}
 
-					Object.assign( materialValues, khr_material.values );
+					keys.forEach( function( v ) {
+
+						if ( khr_material.values[ v ] !== undefined ) materialValues[ v ] = khr_material.values[ v ];
+
+					} );
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
@@ -1627,7 +1665,6 @@ THREE.GLTFLoader = ( function () {
 						var geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
-
 
 						for ( var attributeId in attributes ) {
 

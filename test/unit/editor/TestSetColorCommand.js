@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetColorCommand" );
+QUnit.module( "SetColorCommand" );
 
-test( "Test SetColorCommand (Undo and Redo)", function() {
+QUnit.test( "Test SetColorCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 	var pointLight = aPointlight( "The light Light" );
@@ -25,15 +25,15 @@ test( "Test SetColorCommand (Undo and Redo)", function() {
 
 	} );
 
-	ok( pointLight.color.getHex() == colors[ colors.length - 1 ],
+	assert.ok( pointLight.color.getHex() == colors[ colors.length - 1 ],
 		"OK, color has been set successfully (expected: '" + colors[ colors.length - 1 ] + "', actual: '" + pointLight.color.getHex() + "')" );
 
 	editor.undo();
-	ok( pointLight.color.getHex() == colors[ colors.length - 2 ],
+	assert.ok( pointLight.color.getHex() == colors[ colors.length - 2 ],
 		"OK, color has been set successfully after undo (expected: '" + colors[ colors.length - 2 ] + "', actual: '" + pointLight.color.getHex() + "')" );
 
 	editor.redo();
-	ok( pointLight.color.getHex() == colors[ colors.length - 1 ],
+	assert.ok( pointLight.color.getHex() == colors[ colors.length - 1 ],
 		"OK, color has been set successfully after redo (expected: '" + colors[ colors.length - 1 ] + "', actual: '" + pointLight.color.getHex() + "')" );
 
 

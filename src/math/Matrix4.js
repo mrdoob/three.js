@@ -15,14 +15,14 @@ import { Vector3 } from './Vector3';
 
 function Matrix4() {
 
-	this.elements = new Float32Array( [
+	this.elements = [
 
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 
-	] );
+	];
 
 	if ( arguments.length > 0 ) {
 
@@ -72,7 +72,7 @@ Object.assign( Matrix4.prototype, {
 
 	copy: function ( m ) {
 
-		this.elements.set( m.elements );
+		for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
 
 		return this;
 
@@ -783,8 +783,7 @@ Object.assign( Matrix4.prototype, {
 			position.z = te[ 14 ];
 
 			// scale the rotation part
-
-			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
+			for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
 
 			var invSX = 1 / sx;
 			var invSY = 1 / sy;
