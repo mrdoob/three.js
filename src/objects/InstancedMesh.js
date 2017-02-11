@@ -9,13 +9,21 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute';
 import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
+import { Matrix4 } from '../math/Matrix4';
+
+import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
+import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
+import { RGBADepthPacking } from '../constants';
+import { ShaderMaterial } from '../materials/ShaderMaterial';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
+import { ShaderLib } from '../renderers/shaders/ShaderLib';
 
 
 //custom depth and distance material to be attached to meshes
 
-var depthMaterialTemplate = new THREE.MeshDepthMaterial();
+var depthMaterialTemplate = new MeshDepthMaterial();
 
-depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
+depthMaterialTemplate.depthPacking = RGBADepthPacking;
 
 depthMaterialTemplate.clipping = true;
 
@@ -27,9 +35,9 @@ depthMaterialTemplate.defines = {
 
 var 
 	
-	distanceShader = THREE.ShaderLib[ "distanceRGBA" ],
-	distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms ),
-	distanceMaterialTemplate = new THREE.ShaderMaterial( {
+	distanceShader = ShaderLib[ "distanceRGBA" ],
+	distanceUniforms = UniformsUtils.clone( distanceShader.uniforms ),
+	distanceMaterialTemplate = new ShaderMaterial( {
 		defines: {
 			'USE_SHADOWMAP': '',
 			'INSTANCE_TRANSFORM': ''
@@ -44,7 +52,7 @@ var
 
 function InstancedMesh ( geometry , material , distributeFunction , numCopies , uniformScale , disposeRegular ) {
 
-	THREE.Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
+	Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
 
 	//trigger this material to be instanced
 	this.material.defines = {
