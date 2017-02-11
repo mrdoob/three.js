@@ -1,6 +1,6 @@
 import { _Math } from '../../math/Math';
-import { Vector3 } from '../../math/Vector3';
 import { Matrix4 } from '../../math/Matrix4';
+import { Vector3 } from '../../math/Vector3';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -34,7 +34,7 @@ import { Matrix4 } from '../../math/Matrix4';
  **/
 
 /**************************************************************
- *	Abstract Curve base class
+ *    Abstract Curve base class
  **************************************************************/
 
 function Curve() {}
@@ -65,7 +65,11 @@ Object.assign( Curve.prototype, {
 
 	getPoints: function ( divisions ) {
 
-		if ( divisions === undefined ) divisions = 5;
+		if ( divisions === undefined ) {
+
+			divisions = 5;
+
+		}
 
 		var points = [];
 
@@ -83,7 +87,11 @@ Object.assign( Curve.prototype, {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( divisions === undefined ) divisions = 5;
+		if ( divisions === undefined ) {
+
+			divisions = 5;
+
+		}
 
 		var points = [];
 
@@ -110,7 +118,11 @@ Object.assign( Curve.prototype, {
 
 	getLengths: function ( divisions ) {
 
-		if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( divisions === undefined ) {
+
+			divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+
+		}
 
 		if ( this.cacheArcLengths
 			&& ( this.cacheArcLengths.length === divisions + 1 )
@@ -245,8 +257,16 @@ Object.assign( Curve.prototype, {
 
 		// Capping in case of danger
 
-		if ( t1 < 0 ) t1 = 0;
-		if ( t2 > 1 ) t2 = 1;
+		if ( t1 < 0 ) {
+
+			t1 = 0;
+
+		}
+		if ( t2 > 1 ) {
+
+			t2 = 1;
+
+		}
 
 		var pt1 = this.getPoint( t1 );
 		var pt2 = this.getPoint( t2 );
@@ -324,7 +344,6 @@ Object.assign( Curve.prototype, {
 		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
 		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
 
-
 		// compute the slowly-varying normal and binormal vectors for each segment on the curve
 
 		for ( i = 1; i <= segments; i ++ ) {
@@ -381,6 +400,5 @@ Object.assign( Curve.prototype, {
 	}
 
 } );
-
 
 export { Curve };
