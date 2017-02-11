@@ -95,16 +95,30 @@
  * Added a few improvements:
  * 1. Render variables individually instead of all at once.
  * 2. Different resolution textures for different variables (problem with textures of mixed resolution?)
- *
+ * 3. Initialize variables with shader.
  * @param {int} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {int} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {WebGLRenderer} renderer The renderer
   */
 
-function GPUComputationRenderer( sizeX, sizeY, renderer ) {
+function GPUComputationRenderer( renderer ) {
 
+	// check for basic support
 	this.renderer = renderer;
 
+	if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
+
+		return "No OES_texture_float support for float textures.";
+
+	}
+
+	if ( renderer.capabilities.maxVertexTextures === 0 ) {
+
+		return "No support for vertex shader textures.";
+
+	}
+
+	// a list of the variables in the computation
 	this.variables = [];
 
 	// setup the scene for rendering
@@ -120,31 +134,27 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader( sizeX, sizeY ), passThruUniforms );
 
+	// TODO: move this to use the first variables shader. No need for a default shader
 	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
-	this.magFilter = THREE.NearestFilter;
-	this.minFilter = THREE.NearestFilter;
+	
 
+	// TODO: Move to the code that actually needs this kind of interpolation.
 	if ( renderer.extensions.get( 'OES_texture_float_linear' ) ) {
 
 		// use bilinear interpolation if it is available
 		this.magFilter = THREE.LinearFilter;
+	}
+	this.addVariable = function(variable) {
+		variable.computationRenderer = this;
 
+		this.variables.push(variable);
 	}
 
-	this.addVariable = function ( variableName, computeFragmentShader, initialValueTexture ) {
-
-		var material = this.createShaderMaterial( computeFragmentShader, {}, initialValueTexture.image.width, initialValueTexture.image.height );
-
-		var passThruUniforms = {
-			texture: { value: null }
-		};
-
 		var variable = {
-			name: variableName,
 			initialValueTexture: initialValueTexture,
-			material: material,
+			material: this.createShaderMaterial( computeFragmentShader, {}, sizeX, sizeY ),
 			dependencies: null,
 			renderTargets: [],
 			wrapS: null,
@@ -152,8 +162,12 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			currentTextureIndex: 0,
-			sizeX: initialValueTexture.image.width,
-			sizeY: initialValueTexture.image.height
+			sizeX: sizeX,
+			sizeY: sizeY
+		};
+
+		var passThruUniforms = {
+			texture: { value: null }
 		};
 
 		variable.passThruShader = createShaderMaterial(
@@ -168,27 +182,9 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 
 
-	this.setVariableDependencies = function ( variable, dependencies ) {
-
-		variable.dependencies = dependencies;
-
-	};
-
 	this.init = function () {
 
-
-
-		if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
-
-			return "No OES_texture_float support for float textures.";
-
-		}
-
-		if ( renderer.capabilities.maxVertexTextures === 0 ) {
-
-			return "No support for vertex shader textures.";
-
-		}
+		
 
 		for ( var i = 0; i < this.variables.length; i ++ ) {
 
@@ -197,20 +193,16 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 			// make sure we are rendering the proper buffer
 			variable.currentTextureIndex = 0;
 
-			// Creates rendertargets and initializes the two buffers with input texture
-
+			// Creates rendertargets and initializes the two buffers with input texture or shader
 			for ( var k = 0; k < 2; k ++ ) {
-
-				variable.renderTargets[ k ] = this.createRenderTarget( variable.sizeX, variable.sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter );
-				this.renderTexture( variable.initialValueTexture, variable.renderTargets[ k ], variable.passThruShader );
-
+				variable.renderTargets[ k ] = this.createRenderTarget( variable );
+				this.renderInitialTexture( variable, k );
 			}
 
 
 			// Adds dependencies uniforms to the ShaderMaterial
 			var material = variable.material;
 			var uniforms = material.uniforms;
-
 
 
 			if ( variable.dependencies !== null ) {
@@ -307,14 +299,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
-	function getResolutionDefineString( w, h ) {
-
-		return "\n#define resolution vec2(" + w.toFixed( 1 ) + ", " + h.toFixed( 1 ) + ")\n";
-
-	}
-
-	this.getResolutionDefineString = getResolutionDefineString;
-
+	
 	// The following functions can be used to compute things manually
 
 	function createShaderMaterial( computeFragmentShader, uniforms, sizeVariableX, sizeVariableY ) {
@@ -340,16 +325,16 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	this.createShaderMaterial = createShaderMaterial;
 
-	this.createRenderTarget = function ( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
+	this.createRenderTarget = function ( variable ) {
 
-		sizeXTexture = sizeXTexture || sizeX;
-		sizeYTexture = sizeYTexture || sizeY;
+		sizeXTexture = variable.sizeXTexture || sizeX;
+		sizeYTexture = variable.sizeYTexture || sizeY;
 
-		wrapS = wrapS || THREE.ClampToEdgeWrapping;
-		wrapT = wrapT || THREE.ClampToEdgeWrapping;
+		wrapS = variable.wrapS || THREE.ClampToEdgeWrapping;
+		wrapT = variable.wrapT || THREE.ClampToEdgeWrapping;
 
-		minFilter = minFilter || this.magFilter;
-		magFilter = magFilter || this.magFilter;
+		minFilter = variable.minFilter || this.magFilter;
+		magFilter = variable.magFilter || this.magFilter;
 
 		var renderTarget = new THREE.WebGLRenderTarget( sizeXTexture, sizeYTexture, {
 			wrapS: wrapS,
@@ -391,19 +376,30 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.renderTexture = function ( input, output, passThruShader ) {
+	/** Renders the initial texture.
+	* @param variable The variable to render
+	* @param renderTargeIndex which of the two render targets to render into.
+	*/
+	this.renderInitialTexture = function ( variable, renderTargetIndex ) {
 
-		// Takes a texture, and render out in rendertarget
-		// input = Texture
-		// output = RenderTarget
-		// passThruShader is what we se to render the texture
-		mesh.material = passThruShader;
+		// decide if we are are rendering a texture or if we are rendering a shader
+		if (this.isInitialShader(variable.initialValueTexture)) {
+			// we will use a shader to construct the initial value texture
+			mesh.material = this.createShaderMaterial( 
+				variable.initialValueTexture, 
+				uniforms, 
+				variable.sizeX, 
+				variable.sizeY ) 
+		} else {
+			// just render the texture directly
+			mesh.material = variable.passThruShader;	
 
-		passThruShader.uniforms.texture.value = input;
+			variable.passThruShader.uniforms.texture.value = variable.initialValueTexture;
+		}
+		
+		this.doRenderTarget( mesh.material, variable.renderTargets[ renderTargetIndex ] );
 
-		this.doRenderTarget( passThruShader, output );
-
-		passThruShader.uniforms.texture.value = null;
+		variable.passThruShader.uniforms.texture.value = null;
 
 	};
 
@@ -416,29 +412,7 @@ function GPUComputationRenderer( sizeX, sizeY, renderer ) {
 
 	// Shaders
 
-	function getPassThroughVertexShader() {
-
-		return	"void main()	{\n" +
-				"\n" +
-				"	gl_Position = vec4( position, 1.0 );\n" +
-				"\n" +
-				"}\n";
-
-	}
-
-	function getPassThroughFragmentShader( w, h ) {
-
-		return	getResolutionDefineString( w, h ) +
-				"\nuniform sampler2D texture;\n\n" +
-				"void main() {\n" +
-				"\n" +
-				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
-				"\n" +
-				"	gl_FragColor = texture2D(texture, uv);\n" +
-				"\n" +
-				"}\n";
-
-	}
+	
 
 }
 

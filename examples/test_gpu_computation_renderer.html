@@ -45,63 +45,6 @@
 
 		<script src="js/GPUComputationRenderer.js"></script>
 
-		<!-- Fragment shader for filling initial velocity field -->
-		<script id="initialVelocity" type="x-shader/x-fragment">
-
-			uniform float maxVel;
-			uniform float velExponent;
-			uniform float randVel;
-			uniform float maxMass;
-
-			uniform sampler2D initialPosition;
-			// the initial SimplexNoise random data bound to range [-1, 1] for first three coordinates
-			// and the range [0, 1] for the last coordinate
-			uniform sampler2D randomSeed;
-
-			void main() {
-
-				// Velocity
-				float rr = pow(initialPosition.x, 2) + pow(initialPosition.y, 2);
-
-				float vel = maxVel * pow( rr, velExponent );
-
-				// fill with the three random coordinates and 'mass' in the final coordinate
-				gl_FragColor = vec4(
-					vel * z + randomSeed.x * randVel,
-					randomSeed.y * randVel * 0.05,
-					- vel * x + randomSeed.z * randVel,
-					randomSeed.w * maxMass + 1
-					);
-			}
-
-		</script>
-
-		<!-- Fragment shader for filling initial position field -->
-		<script id="initialPosition" type="x-shader/x-fragment">
-			uniform float radius;
-			uniform float exponent;
-			uniform float height;
-
-			// the points x,z sampled in a disk so radius will be less than one.
-			// point y in range [-1, 1] and w doesn't matter.
-			uniform sampler2D randomSeed;
-
-			void main() {
-				x = randomSeed.x;
-				z = randomSeed.z;
-				rr = x * x + z * z;
-
-				rr = Math.sqrt( rr );
-
-				var rExp = radius * Math.pow( rr, exponent );
-
-				x *= rExp;
-				z *= rExp;
-				y = randomSeed.y * height;
-
-				gl_FragColor = vec4(x, y, z, 1);
-			}
-		</script>
 
 		<!-- Fragment shader for protoplanet's position -->
 		<script id="computeShaderPosition" type="x-shader/x-fragment">
@@ -413,40 +356,17 @@
 
 			}
 
-			function generateVelocityRandomSeedTexture() {
-
-			}
-
-			function generatePositionRandomSeedTexture() {
-
-			}
-
 			function initComputeRenderer() {
 
-    			gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+    				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-    			// use the shaders to setup the initial distribution of positions and velocities.
-    			// Easier than creating and filling textures.
-				
+				var dtPosition = gpuCompute.createTexture();
+				var dtVelocity = gpuCompute.createTexture();
 
-				positionVariable = gpuCompute.addVariable( "texturePosition", 
-					document.getElementById( 'computeShaderPosition' ).textContent, 
-					{
-						shader: document.getElementById( 'initialPosition' ).textContent,
-						width: WIDTH,
-						height: HEIGHT
-					});
+				fillTextures( dtPosition, dtVelocity );
 
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", 
-					document.getElementById( 'computeShaderVelocity' ).textContent, 
-					{
-						shader: document.getElementById( 'initialVelocity' ).textContent,
-						uniforms: {
-							initialPosition:
-						}
-						width: WIDTH,
-						height: HEIGHT
-					} );
+				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
+				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
 
 				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
@@ -466,10 +386,15 @@
 
 			function restartSimulation() {
 
-				gpuCompute.renderInitialTexture( positionVariable, 0 );
-				gpuCompute.renderInitialTexture( positionVariable, 1 );
-				gpuCompute.renderInitialTexture( velocityVariable, 0 );
-				gpuCompute.renderInitialTexture( velocityVariable, 1 );
+				var dtPosition = gpuCompute.createTexture();
+				var dtVelocity = gpuCompute.createTexture();
+
+				fillTextures( dtPosition, dtVelocity );
+
+				gpuCompute.renderTexture( dtPosition, positionVariable.renderTargets[ 0 ] );
+				gpuCompute.renderTexture( dtPosition, positionVariable.renderTargets[ 1 ] );
+				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 0 ] );
+				gpuCompute.renderTexture( dtVelocity, velocityVariable.renderTargets[ 1 ] );
 
 			}
 
@@ -526,7 +451,6 @@
 
 			function fillTextures( texturePosition, textureVelocity ) {
 
-				// TODO: pass these into the initial shader
 				var posArray = texturePosition.image.data;
 				var velArray = textureVelocity.image.data;
 
@@ -537,6 +461,47 @@
 				var maxVel = effectController.velocity;
 				var velExponent = effectController.velocityExponent;
 				var randVel = effectController.randVelocity;
+
+				for ( var k = 0, kl = posArray.length; k < kl; k += 4 ) {
+
+					// Position
+					var x, y, z, rr;
+
+					do {
+						x = ( Math.random() * 2 - 1 );
+						z = ( Math.random() * 2 - 1 );
+						rr = x * x + z * z;
+					} while ( rr > 1 );
+
+					rr = Math.sqrt( rr );
+
+					var rExp = radius * Math.pow( rr, exponent );
+
+					// Velocity
+					var vel = maxVel * Math.pow( rr, velExponent );
+
+					var vx = vel * z + ( Math.random() * 2 - 1 ) * randVel;
+					var vy = ( Math.random() * 2 - 1 ) * randVel * 0.05;
+					var vz = - vel * x + ( Math.random() * 2 - 1 ) * randVel;
+
+					x *= rExp;
+					z *= rExp;
+					y = ( Math.random() * 2 - 1 ) * height;
+
+					var mass = Math.random() * maxMass + 1;
+
+					// Fill in texture values
+					posArray[ k + 0 ] = x;
+					posArray[ k + 1 ] = y;
+					posArray[ k + 2 ] = z;
+					posArray[ k + 3 ] = 1;
+
+					velArray[ k + 0 ] = vx;
+					velArray[ k + 1 ] = vy;
+					velArray[ k + 2 ] = vz;
+					velArray[ k + 3 ] = mass;
+
+				}
 
 			}
 
