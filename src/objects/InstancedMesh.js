@@ -11,7 +11,6 @@ import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
 
 import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
-import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
 import { RGBADepthPacking } from '../constants';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
 import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
