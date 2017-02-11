@@ -67,7 +67,7 @@ function InstancedMesh ( geometry , material , distributeFunction , numCopies , 
 	//work with depth effects
 	this.customDepthMaterial = depthMaterialTemplate; 
 
-	this.customDistanceMaterial = distanceMaterial;
+	this.customDistanceMaterial = distanceMaterialTemplate;
 
 }
 
