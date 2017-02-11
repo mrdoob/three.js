@@ -140,7 +140,7 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 
 		}
 
-		for ( var i = 0 ; i < 4 ; i ++ ){
+		for ( var i = 0 ; i < 3 ; i ++ ){
 
 			this.addAttribute( 'aTRS' + i , orientationMatrices[i] );
 
