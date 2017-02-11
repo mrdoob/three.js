@@ -13,10 +13,12 @@ function ImmediateRenderObject( material ) {
 
 }
 
-ImmediateRenderObject.prototype = Object.create( Object3D.prototype );
-ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
+ImmediateRenderObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-ImmediateRenderObject.prototype.isImmediateRenderObject = true;
+	constructor: ImmediateRenderObject,
 
+	isImmediateRenderObject: true
+
+} );
 
 export { ImmediateRenderObject };
