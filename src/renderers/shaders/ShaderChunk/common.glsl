@@ -83,4 +83,3 @@ mat3 transpose( const in mat3 v ) {
 	return tmp;
 
 }
-
