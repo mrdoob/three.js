@@ -1,7 +1,7 @@
 import { Curve } from './Curve';
-import { Vector3 } from '../../math/Vector3';
 import { Geometry } from '../../core/Geometry';
 import { LineCurve } from '../curves/LineCurve';
+import { Vector3 } from '../../math/Vector3';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -9,7 +9,7 @@ import { LineCurve } from '../curves/LineCurve';
  **/
 
 /**************************************************************
- *	Curved Path - a curve path is simply a array of connected
+ *    Curved Path - a curve path is simply a array of connected
  *  curves, but retains the api of a curve
  **************************************************************/
 
@@ -139,7 +139,11 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( divisions === undefined ) divisions = 40;
+		if ( divisions === undefined ) {
+
+			divisions = 40;
+
+		}
 
 		var points = [];
 
@@ -168,18 +172,22 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 		for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
 			var curve = curves[ i ];
-			var resolution = (curve && curve.isEllipseCurve) ? divisions * 2
-				: (curve && curve.isLineCurve) ? 1
-				: (curve && curve.isSplineCurve) ? divisions * curve.points.length
+			var resolution = ( curve && curve.isEllipseCurve ) ? divisions * 2
+				: ( curve && curve.isLineCurve ) ? 1
+				: ( curve && curve.isSplineCurve ) ? divisions * curve.points.length
 				: divisions;
 
 			var pts = curve.getPoints( resolution );
 
-			for ( var j = 0; j < pts.length; j++ ) {
+			for ( var j = 0; j < pts.length; j ++ ) {
 
 				var point = pts[ j ];
 
-				if ( last && last.equals( point ) ) continue; // ensures no consecutive points are duplicates
+				if ( last && last.equals( point ) ) {
+
+					continue;
+
+				} // ensures no consecutive points are duplicates
 
 				points.push( point );
 				last = point;
@@ -188,7 +196,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 
 		}
 
-		if ( this.autoClose && points.length > 1 && !points[ points.length - 1 ].equals( points[ 0 ] ) ) {
+		if ( this.autoClose && points.length > 1 && ! points[ points.length - 1 ].equals( points[ 0 ] ) ) {
 
 			points.push( points[ 0 ] );
 
@@ -199,7 +207,7 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 	},
 
 	/**************************************************************
-	 *	Create Geometries Helpers
+	 *    Create Geometries Helpers
 	 **************************************************************/
 
 	/// Generate geometry from path points (for Line or Points objects)
@@ -236,6 +244,5 @@ CurvePath.prototype = Object.assign( Object.create( Curve.prototype ), {
 	}
 
 } );
-
 
 export { CurvePath };
