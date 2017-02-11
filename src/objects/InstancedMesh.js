@@ -9,7 +9,6 @@ import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute';
 import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
-import { Matrix4 } from '../math/Matrix4';
 
 import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
 import { MeshDepthMaterial } from '../materials/MeshDepthMaterial';
