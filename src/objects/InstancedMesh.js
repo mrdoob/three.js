@@ -1,5 +1,5 @@
 /**
- * @pailhead
+ * @pailhead www.dusanbosnjak.com
  */
 
 
@@ -10,21 +10,68 @@ import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute';
 import { Matrix3 } from '../math/Matrix3';
 import { Matrix4 } from '../math/Matrix4';
 
+
+//custom depth and distance material to be attached to meshes
+
+var depthMaterialTemplate = new THREE.MeshDepthMaterial();
+
+depthMaterialTemplate.depthPacking = THREE.RGBADepthPacking;
+
+depthMaterialTemplate.clipping = true;
+
+depthMaterialTemplate.defines = {
+
+	INSTANCE_TRANSFORM: ''
+
+};
+
+var 
+	
+	distanceShader = THREE.ShaderLib[ "distanceRGBA" ],
+	distanceUniforms = THREE.UniformsUtils.clone( distanceShader.uniforms ),
+	distanceMaterialTemplate = new THREE.ShaderMaterial( {
+		defines: {
+			'USE_SHADOWMAP': '',
+			'INSTANCE_TRANSFORM': ''
+		},
+		uniforms: distanceUniforms,
+		vertexShader: distanceShader.vertexShader,
+		fragmentShader: distanceShader.fragmentShader,
+		clipping: true
+	})
+;
+
+
 function InstancedMesh ( geometry , material , distributeFunction , numCopies , uniformScale , disposeRegular ) {
 
-	Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
+	THREE.Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
 
-	this.material.instanceTransform = true;
+	//trigger this material to be instanced
+	this.material.defines = {
 
-	this.material.instanceUniform = undefined !== uniformScale ? uniformScale : false;
+		INSTANCE_TRANSFORM: ''
 
-	this.frustumCulled = false;
+	};
+ 	
+ 	if( undefined !== uniformScale && uniformScale )
+		this.material.defines.INSTANCE_UNIFORM = true;
+
+	this.frustumCulled = false; //you can uncheck this if you generate your own bounding info
+
+	//work with depth effects
+	this.customDepthMaterial = depthMaterialTemplate; 
+
+	this.customDistanceMaterial = distanceMaterial;
 
 }
 
 InstancedMesh.prototype = Object.create( Mesh.prototype );
 
 InstancedMesh.constructor = InstancedMesh;
+
+
+//helper interface to InstancedBufferGeometry, needs the method to pack TRS into 3 x v4 atts
+//could add a per instance color attribute
 
 function InstancedDistributedGeometry (
 	regularGeometry , 							//regular buffer geometry, the geometry to be instanced
@@ -66,7 +113,6 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 		var orientationMatrices = [
 			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
 			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
 			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 )
 		];
 
@@ -96,25 +142,32 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 
 }
 
+
 /**
  * copies mat4 values into an attribute buffer at an offset
+ * packs T column into the empty row below RS
  **/
 function _copyMat4IntoAttributes( index , mat4 , attributeArray ){
 
 	index = index << 2;
 
-	for ( var r = 0 ; r < 4 ; r ++ ){
+	for ( var r = 0 ; r < 3 ; r ++ ){
 
 		var row = r << 2;
 
-		for ( var c = 0 ; c < 4 ; c ++ ){
+		for ( var c = 0 ; c < 3 ; c ++ ){
 			
 			attributeArray[r].array[ index + c ] = mat4.elements[ row + c ];
 
 		}
 
+		row = 3 << 2;
+
+		attributeArray[r].array[ index + 3 ] = mat4.elements[ row + r ]; //read last row as column
+
 	}
 
 }
+
 
 export { InstancedMesh };
