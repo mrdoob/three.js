@@ -13,7 +13,10 @@ function InterleavedBuffer( array, stride ) {
 	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.dynamic = false;
-	this.updateRange = { offset: 0, count: - 1 };
+	this.updateRange = {
+		offset: 0,
+		count: - 1
+	};
 
 	this.onUploadCallback = function () {};
 
@@ -25,7 +28,11 @@ Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 
 	set: function ( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) {
+
+			++ this.version;
+
+		}
 
 	}
 
@@ -84,7 +91,11 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	set: function ( value, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) {
+
+			offset = 0;
+
+		}
 
 		this.array.set( value, offset );
 
@@ -107,6 +118,5 @@ Object.assign( InterleavedBuffer.prototype, {
 	}
 
 } );
-
 
 export { InterleavedBuffer };
