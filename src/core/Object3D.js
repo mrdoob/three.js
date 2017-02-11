@@ -98,8 +98,13 @@ function Object3D() {
 
 }
 
-Object3D.DefaultUp = new Vector3( 0, 1, 0 );
-Object3D.DefaultMatrixAutoUpdate = true;
+Object.assign( Object3D, {
+
+	DefaultUp: new Vector3( 0, 1, 0 ),
+
+	DefaultMatrixAutoUpdate: true
+
+} );
 
 Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
@@ -371,7 +376,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	getObjectByProperty: function ( name, value ) {
 
-		if ( this[ name ] === value ) return this;
+		if ( this[ name ] === value ) {
+
+			return this;
+
+		}
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
@@ -470,7 +479,8 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	}(),
 
-	raycast: function () {},
+	raycast: function () {
+	},
 
 	traverse: function ( callback ) {
 
@@ -488,7 +498,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	traverseVisible: function ( callback ) {
 
-		if ( this.visible === false ) return;
+		if ( this.visible === false ) {
+
+			return;
+
+		}
 
 		callback( this );
 
@@ -526,7 +540,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) {
+
+			this.updateMatrix();
+
+		}
 
 		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
@@ -593,11 +611,31 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		object.uuid = this.uuid;
 		object.type = this.type;
 
-		if ( this.name !== '' ) object.name = this.name;
-		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
-		if ( this.castShadow === true ) object.castShadow = true;
-		if ( this.receiveShadow === true ) object.receiveShadow = true;
-		if ( this.visible === false ) object.visible = false;
+		if ( this.name !== '' ) {
+
+			object.name = this.name;
+
+		}
+		if ( JSON.stringify( this.userData ) !== '{}' ) {
+
+			object.userData = this.userData;
+
+		}
+		if ( this.castShadow === true ) {
+
+			object.castShadow = true;
+
+		}
+		if ( this.receiveShadow === true ) {
+
+			object.receiveShadow = true;
+
+		}
+		if ( this.visible === false ) {
+
+			object.visible = false;
+
+		}
 
 		object.matrix = this.matrix.toArray();
 
@@ -648,10 +686,26 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			var textures = extractFromCache( meta.textures );
 			var images = extractFromCache( meta.images );
 
-			if ( geometries.length > 0 ) output.geometries = geometries;
-			if ( materials.length > 0 ) output.materials = materials;
-			if ( textures.length > 0 ) output.textures = textures;
-			if ( images.length > 0 ) output.images = images;
+			if ( geometries.length > 0 ) {
+
+				output.geometries = geometries;
+
+			}
+			if ( materials.length > 0 ) {
+
+				output.materials = materials;
+
+			}
+			if ( textures.length > 0 ) {
+
+				output.textures = textures;
+
+			}
+			if ( images.length > 0 ) {
+
+				output.images = images;
+
+			}
 
 		}
 
@@ -686,7 +740,11 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	copy: function ( source, recursive ) {
 
-		if ( recursive === undefined ) recursive = true;
+		if ( recursive === undefined ) {
+
+			recursive = true;
+
+		}
 
 		this.name = source.name;
 
@@ -729,6 +787,5 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 	}
 
 } );
-
 
 export { Object3D };
