@@ -15,10 +15,14 @@ function Uniform( value ) {
 
 }
 
-Uniform.prototype.clone = function () {
+Object.assign( Uniform.prototype, {
 
-	return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
+	clone: function () {
 
-};
+		return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
+
+	}
+
+} );
 
 export { Uniform };
