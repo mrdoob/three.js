@@ -61,9 +61,6 @@ function Material() {
 
 	this._needsUpdate = true;
 
-	this.instanceTransform = false; //trigger define for instance transform
-	this.instanceUniform = false;	//if its uniformly scaled use lighter computation
-
 }
 
 Object.defineProperty( Material.prototype, 'needsUpdate', {
