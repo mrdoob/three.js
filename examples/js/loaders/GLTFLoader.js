@@ -2049,7 +2049,7 @@ THREE.GLTFLoader = ( function () {
 
 										} else {
 
-											console.warn( "WARNING: joint: ''" + jointId + "' could not be found" );
+											console.warn( "WARNING: joint: '" + jointId + "' could not be found" );
 
 										}
 
