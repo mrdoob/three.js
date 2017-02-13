@@ -446,7 +446,7 @@ THREE.SEA3D.prototype.updateTransform = function () {
 
 		if ( this.isLegacy( sea ) ) {
 
-			if ( sea.transform ) buf1.elements.set( sea.transform );
+			if ( sea.transform ) buf1.fromArray( sea.transform );
 			else buf1.makeTranslation( sea.position.x, sea.position.y, sea.position.z );
 
 			this.flipScaleMatrix(

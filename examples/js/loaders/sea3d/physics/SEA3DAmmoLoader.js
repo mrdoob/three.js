@@ -185,7 +185,7 @@ THREE.SEA3D.prototype.readRigidBodyBase = function ( sea ) {
 		if ( sea.offset ) {
 
 			var offset = new THREE.Matrix4();
-			offset.elements.set( sea.offset );
+			offset.fromArray( sea.offset );
 
 			target.physics.offset = offset;
 
