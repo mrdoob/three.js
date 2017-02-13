@@ -69,9 +69,10 @@ function UniformContainer() {
 var arrayCacheF32 = [];
 var arrayCacheI32 = [];
 
-// Float32Array cache used for uploading Matrix4 uniform
+// Float32Array caches used for uploading Matrix uniforms
 
 var mat4array = new Float32Array( 16 );
+var mat3array = new Float32Array( 9 );
 
 // Flattening for arrays of vectors and matrices
 
@@ -177,7 +178,16 @@ function setValue2fm( gl, v ) {
 
 function setValue3fm( gl, v ) {
 
-	gl.uniformMatrix3fv( this.addr, false, v.elements || v );
+	if ( v.elements === undefined ) {
+
+		gl.uniformMatrix3fv( this.addr, false, v );
+
+	} else {
+
+		mat3array.set( v.elements );
+		gl.uniformMatrix3fv( this.addr, false, mat3array );
+
+	}
 
 }
 
