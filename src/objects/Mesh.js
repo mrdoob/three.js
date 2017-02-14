@@ -26,7 +26,7 @@ function Mesh( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.drawMode = TrianglesDrawMode;
+	this.drawMode = undefined;
 
 	this.updateMorphTargets();
 
@@ -37,6 +37,8 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Mesh,
 
 	isMesh: true,
+
+	// Deprecated
 
 	setDrawMode: function ( value ) {
 

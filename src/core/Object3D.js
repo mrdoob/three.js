@@ -93,8 +93,8 @@ function Object3D() {
 
 	this.userData = {};
 
-	this.onBeforeRender = function () {};
-	this.onAfterRender = function () {};
+	this.onBeforeRender = null;
+	this.onAfterRender = null;
 
 }
 

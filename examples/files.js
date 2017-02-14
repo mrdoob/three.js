@@ -243,6 +243,7 @@ var files = {
 		"webgl_video_panorama_equirectangular"
 	],
 	"webgl / advanced": [
+		"webgl_autoinstancing",
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",

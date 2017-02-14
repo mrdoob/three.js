@@ -10,6 +10,7 @@ uniform float scale;
 
 void main() {
 
+	#include <common_vertex>
 	#include <color_vertex>
 	#include <begin_vertex>
 	#include <project_vertex>

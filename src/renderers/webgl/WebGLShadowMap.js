@@ -268,7 +268,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
 					var object = _renderList[ j ];
-					var geometry = _objects.update( object );
+					var geometry = _objects.updateObject( object );
 					var material = object.material;
 
 					if ( material && material.isMultiMaterial ) {

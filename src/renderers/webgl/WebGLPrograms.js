@@ -3,7 +3,7 @@
  */
 
 import { WebGLProgram } from './WebGLProgram';
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
+import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, AutoInstancingDisabled } from '../../constants';
 
 function WebGLPrograms( renderer, capabilities ) {
 
@@ -24,7 +24,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
+		"instancingMode", "precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
@@ -112,7 +112,10 @@ function WebGLPrograms( renderer, capabilities ) {
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		var maxBones = allocateBones( object );
+		var instancing = Array.isArray( object );
+
+		var maxBones = instancing ? 0 : allocateBones( object );
+
 		var precision = renderer.getPrecision();
 
 		if ( material.precision !== null ) {
@@ -127,11 +130,39 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		var shadowMapEnabled = false;
+
+		if ( renderer.shadowMap.enabled && lights.shadows.length > 0 ) {
+
+			if ( instancing ) {
+
+				for ( var i = 0, l = object.length; i < l; i++ ) {
+
+					if ( object[ i ].receiveShadow ) {
+
+						shadowMapEnabled = true;
+						break;
+
+					}
+
+				}
+
+			} else if ( object.receiveShadow ) {
+
+				shadowMapEnabled = true;
+
+			}
+
+		}
+
 		var currentRenderTarget = renderer.getCurrentRenderTarget();
 
 		var parameters = {
 
 			shaderID: shaderID,
+
+			instancingMode: instancing ? renderer.getAutoInstancingMode() : AutoInstancingDisabled,
+			maxInstances: renderer.getAutoInstancingMaxBatchSize(),
 
 			precision: precision,
 			supportsVertexTextures: capabilities.vertexTextures,
@@ -171,7 +202,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			skinning: ( object && object.isSkinnedMesh ),
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.floatVertexTextures && object.skeleton && object.skeleton.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -187,7 +218,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			numClippingPlanes: nClipPlanes,
 			numClipIntersection: nClipIntersection,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && lights.shadows.length > 0,
+			shadowMapEnabled: shadowMapEnabled,
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: renderer.toneMapping,

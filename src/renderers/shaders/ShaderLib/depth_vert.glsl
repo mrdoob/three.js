@@ -8,6 +8,7 @@
 
 void main() {
 
+	#include <common_vertex>
 	#include <uv_vertex>
 
 	#include <skinbase_vertex>

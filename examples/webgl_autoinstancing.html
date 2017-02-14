@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - automatic geometry instancing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+			var camera, scene, renderer;
+			var radius = 800, theta = 0;
+			var groups = [];
+
+			var geometries = [
+				new THREE.BoxBufferGeometry( 10, 10, 10 ),
+				new THREE.BoxBufferGeometry( 5, 5, 5 ),
+				new THREE.BoxBufferGeometry( 15, 15, 15 ),
+				new THREE.BoxBufferGeometry( 2, 2, 2 )
+			];
+			var materials = [
+				new THREE.MeshLambertMaterial( {color: 0xcc0000} ),
+				new THREE.MeshLambertMaterial( {color: 0x00cc00} ),
+				new THREE.MeshLambertMaterial( {color: 0x0000cc} )
+			];
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - autoInstancing: ' +
+					'<form id="controls" style="float:right; text-align:left; padding:1em; background:#fff;">' +
+						'<p><label><input type="radio" name="autoInstancingMode" value="1" checked onclick="changeAutoInstancing(event)" /> AutoInstancingAttributes</label></p>' +
+						'<p><label><input type="radio" name="autoInstancingMode" value="2" onclick="changeAutoInstancing(event)" /> AutoInstancingTexture</label></p>' +
+						'<p><label><input type="radio" name="autoInstancingMode" value="0" onclick="changeAutoInstancing(event)" /> AutoInstancingDisabled</label></p>' +
+						'<p><label><input type="checkbox" checked onchange="toggleInstancable(event)" /> instanceable objects?</label></p>' +
+					'</form>'
+				container.appendChild( info );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
+				scene.add( new THREE.AmbientLight( 0x999999 ) )
+
+				for ( var g = 0; g < 9; g++ ) {
+					var group = new THREE.Group();
+					group.position.x = 300 * (g % 3) - 300;
+					group.position.y = 300 * Math.floor(g / 3) - 300;
+
+					for ( var i = 0; i < 1000; i ++ ) {
+
+						var object = new THREE.Mesh( geometries[i % 4], materials[i % 3] );
+
+						object.position.x = Math.random() * 200 - 100;
+						object.position.y = Math.random() * 200 - 100;
+						object.position.z = Math.random() * 200 - 100;
+
+						object.rotation.x = Math.random() * 2 * Math.PI;
+						object.rotation.y = Math.random() * 2 * Math.PI;
+						object.rotation.z = Math.random() * 2 * Math.PI;
+
+						object.scale.x = Math.random() + 0.5;
+						object.scale.y = Math.random() + 0.5;
+						object.scale.z = Math.random() + 0.5;
+
+						group.add( object );
+					}
+					scene.add( group );
+					groups.push( group );
+				}
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild(renderer.domElement);
+
+				stats = new Stats();
+				stats.showPanel( 1 );
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function changeAutoInstancing(e) {
+				renderer.configAutoInstancing(+e.target.form.autoInstancingMode.value);
+			}
+
+			function toggleInstancable(e) {
+				var instanceable = e.target.checked
+				groups.forEach(function (group) {
+					group.children.forEach(function (obj, i) {
+						obj.material = instanceable ? materials[i % 3] : materials[i % 3].clone()
+					})
+				})
+			}
+
+			function render() {
+
+				theta += 0.5;
+				var angle = THREE.Math.degToRad( theta )
+
+				camera.position.x = radius * Math.sin( angle );
+				camera.position.y = radius * Math.sin( angle );
+				camera.position.z = radius * Math.cos( angle );
+				camera.lookAt( scene.position );
+
+				for (var g = groups.length; g--;) {
+					var group = groups[g];
+					group.rotation.x = angle;
+					group.rotation.y = angle;
+					for (var i = group.children.length; i--;) {
+						group.children[i].rotation.z += 0.1;
+					}
+				}
+
+				camera.updateMatrixWorld();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -20,19 +20,9 @@
 
 void main() {
 
-	#include <uv_vertex>
+	#include <common_vertex>
 
-	#include <beginnormal_vertex>
-	#include <morphnormal_vertex>
-	#include <skinbase_vertex>
-	#include <skinnormal_vertex>
-	#include <defaultnormal_vertex>
-
-#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
-
-	vNormal = normalize( transformedNormal );
-
-#endif
+	vNormal = normalize( normalMatrix * normal );
 
 	#include <begin_vertex>
 	#include <displacementmap_vertex>

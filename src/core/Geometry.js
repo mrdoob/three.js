@@ -1,5 +1,6 @@
 import { EventDispatcher } from './EventDispatcher';
 import { Face3 } from './Face3';
+import { TrianglesDrawMode } from '../constants';
 import { Matrix3 } from '../math/Matrix3';
 import { Sphere } from '../math/Sphere';
 import { Box3 } from '../math/Box3';
@@ -47,6 +48,8 @@ function Geometry() {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.drawMode = TrianglesDrawMode;
+
 	// update flags
 
 	this.elementsNeedUpdate = false;
@@ -62,6 +65,12 @@ function Geometry() {
 Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	isGeometry: true,
+
+	setDrawMode: function ( value ) {
+
+		this.drawMode = value;
+
+	},
 
 	applyMatrix: function ( matrix ) {
 
@@ -1413,6 +1422,10 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		this.colorsNeedUpdate = source.colorsNeedUpdate;
 		this.lineDistancesNeedUpdate = source.lineDistancesNeedUpdate;
 		this.groupsNeedUpdate = source.groupsNeedUpdate;
+
+		// draw mode
+
+		this.drawMode = source.drawMode;
 
 		return this;
 

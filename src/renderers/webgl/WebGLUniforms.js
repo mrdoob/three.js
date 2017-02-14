@@ -49,6 +49,7 @@
 
 import { CubeTexture } from '../../textures/CubeTexture';
 import { Texture } from '../../textures/Texture';
+import { _Math } from '../../math/Math';
 
 var emptyTexture = new Texture();
 var emptyCubeTexture = new CubeTexture();
@@ -78,6 +79,7 @@ var mat3array = new Float32Array( 9 );
 
 function flatten( array, nBlocks, blockSize ) {
 
+	nBlocks = Math.min( nBlocks, array.length );
 	var firstElem = array[ 0 ];
 
 	if ( firstElem <= 0 || firstElem > 0 ) return array;
@@ -113,7 +115,7 @@ function flatten( array, nBlocks, blockSize ) {
 
 // Texture unit allocation
 
-function allocTexUnits( renderer, n ) {
+function allocTexUnits( renderer, uuid, n ) {
 
 	var r = arrayCacheI32[ n ];
 
@@ -125,7 +127,7 @@ function allocTexUnits( renderer, n ) {
 	}
 
 	for ( var i = 0; i !== n; ++ i )
-		r[ i ] = renderer.allocTextureUnit();
+		r[ i ] = renderer.allocTextureUnit( uuid + n );
 
 	return r;
 
@@ -210,7 +212,7 @@ function setValue4fm( gl, v ) {
 
 function setValueT1( gl, v, renderer ) {
 
-	var unit = renderer.allocTextureUnit();
+	var unit = renderer.allocTextureUnit( this.uuid );
 	gl.uniform1i( this.addr, unit );
 	renderer.setTexture2D( v || emptyTexture, unit );
 
@@ -218,7 +220,7 @@ function setValueT1( gl, v, renderer ) {
 
 function setValueT6( gl, v, renderer ) {
 
-	var unit = renderer.allocTextureUnit();
+	var unit = renderer.allocTextureUnit( this.uuid );
 	gl.uniform1i( this.addr, unit );
 	renderer.setTextureCube( v || emptyCubeTexture, unit );
 
@@ -307,7 +309,7 @@ function setValueM4a( gl, v ) {
 function setValueT1a( gl, v, renderer ) {
 
 	var n = v.length,
-		units = allocTexUnits( renderer, n );
+		units = allocTexUnits( renderer, this.uuid, n );
 
 	gl.uniform1iv( this.addr, units );
 
@@ -322,7 +324,7 @@ function setValueT1a( gl, v, renderer ) {
 function setValueT6a( gl, v, renderer ) {
 
 	var n = v.length,
-		units = allocTexUnits( renderer, n );
+		units = allocTexUnits( renderer, this.uuid, n );
 
 	gl.uniform1iv( this.addr, units );
 
@@ -365,6 +367,7 @@ function getPureArraySetter( type ) {
 
 function SingleUniform( id, activeInfo, addr ) {
 
+	this.uuid = _Math.generateUUID();
 	this.id = id;
 	this.addr = addr;
 	this.setValue = getSingularSetter( activeInfo.type );
@@ -375,6 +378,7 @@ function SingleUniform( id, activeInfo, addr ) {
 
 function PureArrayUniform( id, activeInfo, addr ) {
 
+	this.uuid = _Math.generateUUID();
 	this.id = id;
 	this.addr = addr;
 	this.size = activeInfo.size;
@@ -386,6 +390,7 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 function StructuredUniform( id ) {
 
+	this.uuid = _Math.generateUUID();
 	this.id = id;
 
 	UniformContainer.call( this ); // mix-in

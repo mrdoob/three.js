@@ -12,7 +12,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	//
 
-	function update( object ) {
+	function updateObject( object ) {
 
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
@@ -251,7 +251,8 @@ function WebGLObjects( gl, properties, info ) {
 		getAttributeProperties: getAttributeProperties,
 		getWireframeAttribute: getWireframeAttribute,
 
-		update: update
+		updateAttribute: updateAttribute,
+		updateObject: updateObject
 
 	};
 

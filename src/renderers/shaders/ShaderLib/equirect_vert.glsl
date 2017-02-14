@@ -4,9 +4,11 @@ varying vec3 vWorldPosition;
 
 void main() {
 
+	#include <common_vertex>
+	#include <begin_vertex>
+
 	vWorldPosition = transformDirection( position, modelMatrix );
 
-	#include <begin_vertex>
 	#include <project_vertex>
 
 }
