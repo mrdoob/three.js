@@ -958,6 +958,20 @@ Object.defineProperties( Uniform.prototype, {
 
 Object.defineProperties( Material.prototype, {
 
+	skinning: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .skinning has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .skinning has been removed.' );
+
+		}
+
+	},
+
 	wrapAround: {
 		get: function () {
 
