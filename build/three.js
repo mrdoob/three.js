@@ -3392,7 +3392,10 @@
 
 		copy: function ( m ) {
 
-			for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
+			var te = this.elements;
+			var me = m.elements;
+
+			for ( var i = 0; i < 16; i ++ ) te[ i ] = me[ i ];
 
 			return this;
 
@@ -3400,8 +3403,7 @@
 
 		copyPosition: function ( m ) {
 
-			var te = this.elements;
-			var me = m.elements;
+			var te = this.elements, me = m.elements;
 
 			te[ 12 ] = me[ 12 ];
 			te[ 13 ] = me[ 13 ];
@@ -3467,7 +3469,7 @@
 
 		makeRotationFromEuler: function ( euler ) {
 
-			if ( (euler && euler.isEuler) === false ) {
+			if ( ( euler && euler.isEuler ) === false ) {
 
 				console.error( 'THREE.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
@@ -3724,21 +3726,6 @@
 			te[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
 			te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
 			te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-
-			return this;
-
-		},
-
-		multiplyToArray: function ( a, b, r ) {
-
-			var te = this.elements;
-
-			this.multiplyMatrices( a, b );
-
-			r[ 0 ] = te[ 0 ]; r[ 1 ] = te[ 1 ]; r[ 2 ] = te[ 2 ]; r[ 3 ] = te[ 3 ];
-			r[ 4 ] = te[ 4 ]; r[ 5 ] = te[ 5 ]; r[ 6 ] = te[ 6 ]; r[ 7 ] = te[ 7 ];
-			r[ 8 ]  = te[ 8 ]; r[ 9 ]  = te[ 9 ]; r[ 10 ] = te[ 10 ]; r[ 11 ] = te[ 11 ];
-			r[ 12 ] = te[ 12 ]; r[ 13 ] = te[ 13 ]; r[ 14 ] = te[ 14 ]; r[ 15 ] = te[ 15 ];
 
 			return this;
 
@@ -8391,15 +8378,10 @@
 
 		copy: function ( m ) {
 
+			var te = this.elements;
 			var me = m.elements;
 
-			this.set(
-
-				me[ 0 ], me[ 3 ], me[ 6 ],
-				me[ 1 ], me[ 4 ], me[ 7 ],
-				me[ 2 ], me[ 5 ], me[ 8 ]
-
-			);
+			for ( var i = 0; i < 9; i ++ ) te[ i ] = me[ i ];
 
 			return this;
 
@@ -41856,6 +41838,11 @@
 
 			console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 			return this.makeRotationFromQuaternion( q );
+
+		},
+		multiplyToArray: function () {
+
+			console.warn( 'THREE.Matrix4: .multiplyToArray() has been removed.' );
 
 		},
 		multiplyVector3: function ( vector ) {
