@@ -138,137 +138,21 @@ function GPUComputationRenderer( renderer ) {
 	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
-	
 
 	// TODO: Move to the code that actually needs this kind of interpolation.
 	if ( renderer.extensions.get( 'OES_texture_float_linear' ) ) {
-
 		// use bilinear interpolation if it is available
 		this.magFilter = THREE.LinearFilter;
 	}
+
 	this.addVariable = function(variable) {
 		variable.computationRenderer = this;
 
 		this.variables.push(variable);
 	}
 
-		var variable = {
-			initialValueTexture: initialValueTexture,
-			material: this.createShaderMaterial( computeFragmentShader, {}, sizeX, sizeY ),
-			dependencies: null,
-			renderTargets: [],
-			wrapS: null,
-			wrapT: null,
-			minFilter: this.minFilter,
-			magFilter: this.magFilter,
-			currentTextureIndex: 0,
-			sizeX: sizeX,
-			sizeY: sizeY
-		};
-
-		var passThruUniforms = {
-			texture: { value: null }
-		};
-
-		variable.passThruShader = createShaderMaterial(
-			getPassThroughFragmentShader( variable.sizeX, variable.sizeY ),
-			passThruUniforms );
-
-		this.variables.push( variable );
-
-		return variable;
-
-	};
-
-
-
-	this.init = function () {
-
-		
-
-		for ( var i = 0; i < this.variables.length; i ++ ) {
-
-			var variable = this.variables[ i ];
-
-			// make sure we are rendering the proper buffer
-			variable.currentTextureIndex = 0;
-
-			// Creates rendertargets and initializes the two buffers with input texture or shader
-			for ( var k = 0; k < 2; k ++ ) {
-				variable.renderTargets[ k ] = this.createRenderTarget( variable );
-				this.renderInitialTexture( variable, k );
-			}
-
-
-			// Adds dependencies uniforms to the ShaderMaterial
-			var material = variable.material;
-			var uniforms = material.uniforms;
-
-
-			if ( variable.dependencies !== null ) {
-
-				for ( var d = 0; d < variable.dependencies.length; d ++ ) {
-
-					var depVar = variable.dependencies[ d ];
-
-					if ( depVar.name !== variable.name ) {
-
-						// Checks if variable exists
-						var found = false;
-						for ( var j = 0; j < this.variables.length; j ++ ) {
-
-							if ( depVar.name === this.variables[ j ].name ) {
-
-								found = true;
-								break;
-
-							}
-
-						}
-						if ( ! found ) {
-
-							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
-
-						}
-
-					}
-
-					uniforms[ depVar.name ] = { value: null };
-
-					// add the default variables
-					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
-
-				}
-
-			}
-
-		}
-
-		return null;
-
-	};
-
 	this.computeVariable = function ( variable ) {
 
-		// flip between the two buffers for the variable
-		var currentTextureIndex = variable.currentTextureIndex;
-		var nextTextureIndex = variable.currentTextureIndex === 0 ? 1 : 0;
-
-		// Sets texture dependencies uniforms
-		// TODO: force recompute all dependencies?
-		if ( variable.dependencies !== null ) {
-
-			var uniforms = variable.material.uniforms;
-
-			for ( var d = 0, dl = variable.dependencies.length; d < dl; d ++ ) {
-
-				var depVar = variable.dependencies[ d ];
-
-				uniforms[ depVar.name ].value = depVar.renderTargets[ currentTextureIndex ].texture;
-
-			}
-
-		}
 
 		// Performs the computation for this variable
 		this.doRenderTarget( variable.material, variable.renderTargets[ nextTextureIndex ] );
@@ -282,71 +166,7 @@ function GPUComputationRenderer( renderer ) {
 		for ( var i = 0, il = this.variables.length; i < il; i ++ ) {
 
 			this.computeVariable( this.variables[ i ] );
-
 		}
-
-	};
-
-	this.getCurrentRenderTarget = function ( variable ) {
-
-		return variable.renderTargets[ variable.currentTextureIndex ];
-
-	};
-
-	this.getAlternateRenderTarget = function ( variable ) {
-
-		return variable.renderTargets[ variable.currentTextureIndex === 0 ? 1 : 0 ];
-
-	};
-
-	
-	// The following functions can be used to compute things manually
-
-	function createShaderMaterial( computeFragmentShader, uniforms, sizeVariableX, sizeVariableY ) {
-
-		uniforms = uniforms || {};
-
-		// set the proper resolution for the fragment shader
-		sizeVariableX = sizeVariableX || sizeX;
-		sizeVariableY = sizeVariableY || sizeY;
-
-		// add the resolution parameter
-		computeFragmentShader = getResolutionDefineString( sizeVariableX, sizeVariableY ) + computeFragmentShader;
-
-		var material = new THREE.ShaderMaterial( {
-			uniforms: uniforms,
-			vertexShader: getPassThroughVertexShader(),
-			fragmentShader: computeFragmentShader
-		} );
-
-		return material;
-
-	}
-
-	this.createShaderMaterial = createShaderMaterial;
-
-	this.createRenderTarget = function ( variable ) {
-
-		sizeXTexture = variable.sizeXTexture || sizeX;
-		sizeYTexture = variable.sizeYTexture || sizeY;
-
-		wrapS = variable.wrapS || THREE.ClampToEdgeWrapping;
-		wrapT = variable.wrapT || THREE.ClampToEdgeWrapping;
-
-		minFilter = variable.minFilter || this.magFilter;
-		magFilter = variable.magFilter || this.magFilter;
-
-		var renderTarget = new THREE.WebGLRenderTarget( sizeXTexture, sizeYTexture, {
-			wrapS: wrapS,
-			wrapT: wrapT,
-			minFilter: minFilter,
-			magFilter: magFilter,
-			format: THREE.RGBAFormat,
-			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? THREE.HalfFloatType : THREE.FloatType,
-			stencilBuffer: false
-		} );
-
-		return renderTarget;
 
 	};
 
@@ -376,41 +196,10 @@ function GPUComputationRenderer( renderer ) {
 
 	};
 
-	/** Renders the initial texture.
-	* @param variable The variable to render
-	* @param renderTargeIndex which of the two render targets to render into.
-	*/
-	this.renderInitialTexture = function ( variable, renderTargetIndex ) {
-
-		// decide if we are are rendering a texture or if we are rendering a shader
-		if (this.isInitialShader(variable.initialValueTexture)) {
-			// we will use a shader to construct the initial value texture
-			mesh.material = this.createShaderMaterial( 
-				variable.initialValueTexture, 
-				uniforms, 
-				variable.sizeX, 
-				variable.sizeY ) 
-		} else {
-			// just render the texture directly
-			mesh.material = variable.passThruShader;	
-
-			variable.passThruShader.uniforms.texture.value = variable.initialValueTexture;
-		}
-		
-		this.doRenderTarget( mesh.material, variable.renderTargets[ renderTargetIndex ] );
-
-		variable.passThruShader.uniforms.texture.value = null;
-
+	this.renderVariable = function ( variable ) {
+		mesh.material = variable.material;
+		this.renderer.render( scene, camera, variable.buffers[ variable.currentBufferIndex ]);
 	};
-
-	this.doRenderTarget = function ( material, output ) {
-
-		mesh.material = material;
-		this.renderer.render( scene, camera, output );
-
-	};
-
-	// Shaders
 
 	
 
