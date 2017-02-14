@@ -1,11 +1,12 @@
 function GPUComputationRendererVariable(sizeX, sizeY, name) {
-
+	this.name = name;
 	this.sizeX = sizeX;
 	this.sizeY = sizeY;
 	this.magFilter = THREE.NearestFilter;
 	this.minFilter = THREE.NearestFilter;
 	this.wrapS = THREE.ClampToEdgeWrapping;
 	this.wrapT = THREE.ClampToEdgeWrapping;
+
 	// we need to initialize the uniforms in case another 
 	// user wants to add properties (they will be left untouched)
 	this.material = { uniforms: {} }; 
@@ -24,7 +25,7 @@ function GPUComputationRendererVariable(sizeX, sizeY, name) {
 	this.dependenciesVariables = [];
 
 	this.currentBufferIndex = 0;
-	this.buffers = { null, null };
+	this.buffers = [ null, null ]
 
 	this.initializeRenderers = function() {
 		// create the two render targets for buffering
@@ -32,8 +33,8 @@ function GPUComputationRendererVariable(sizeX, sizeY, name) {
 		this.buffers[1] = this.renderTargets[0].copy();
 	}
 
-	this.initializeWithShader = function(initialShader) {
-		this.material = this.compileShaderIntoMaterial(initialShader);
+	this.initializeWithShader = function(initialShader, uniforms) {
+		this.material = this.compileShaderIntoMaterial(initialShader, uniforms);
 
 		this.computationRenderer.renderVariable( this );
 	}
@@ -48,10 +49,10 @@ function GPUComputationRendererVariable(sizeX, sizeY, name) {
 	}
 
 	/** Sets the shader we use for computing this variable. */
-	this.setComputeVariable = function(computeVariable) {
-		this.computeVariable = computeVariable;
+	this.setComputeShader = function(computeShader) {
+		this.computeShader = computeShader;
 
-		this.material = this.compileShaderIntoMaterial(computeVariable);
+		this.material = this.compileShaderIntoMaterial(computeShader);
 	}
 
 	this.addDependency = function(variable) {
@@ -96,23 +97,24 @@ function GPUComputationRendererVariable(sizeX, sizeY, name) {
 	/////// Internal functions ///////
 	//////////////////////////////////////////
 	/** generates the list of texture variables that we need to expose to this renderer */
-	function generateDependentVariableHeader() {
-		var header = "";
+	this.generateDependentVariableHeader = function() {
+		var header =  "uniform sampler2D " + this.name + ";\n";
+
 		for (var i = 0; i < this.dependenciesVariables.length; i++) {
-			header += "uniform sampler2D " + this.dependenciesVariables[i].name + ";";
+			header += "uniform sampler2D " + this.dependenciesVariables[i].name + ";\n";
 		}
 	}
 
-	function getResolutionDefineString() {
+	this.getResolutionDefineString = function() {
 		return "\n#define resolution vec2(" + this.sizeX.toFixed( 1 ) + ", " + this.sizeY.toFixed( 1 ) + ")\n";
 	}
 
-	function setDependentVariablesAsUniforms(uniforms) {
+	this.setDependentVariablesAsUniforms = function(uniforms) {
 
 		for (var i = 0; i < this.dependenciesVariables.length; i++) {
 			var variable = this.dependenciesVariables[i];
 
-			uniforms[variable] = { value: variable.getRenderedOutput() };
+			uniforms[variable.name] = { value: variable.getRenderedOutput() };
 		}
 
 		return uniforms;
@@ -121,13 +123,18 @@ function GPUComputationRendererVariable(sizeX, sizeY, name) {
 	/** Appends the variables and resolution then compiles into a material.
 	* In Three.js, the compilation probably happens later.
 	*/
-	function compileShaderIntoMaterial(shader) {
+	this.compileShaderIntoMaterial = function(shader, uniforms) {
 		shader = [this.getResolutionDefineString(), this.generateDependentVariableHeader(), shader].join("\n");
 
+		// the user might want custom uniforms
+		if (uniforms === null) {
+			uniforms = {};
+		}
+
 		return new THREE.ShaderMaterial( {
-			uniforms: this.setDependentVariablesAsUniforms(this.material.uniforms), // Grab the output of the other variables
-			vertexShader: this.getPassThroughVertexShader(), // dummy vertex shader
-			fragmentShader: computeFragmentShader
+			uniforms: this.setDependentVariablesAsUniforms(uniforms), // add the output of other variables
+			vertexShader: getPassThroughVertexShader(), // dummy vertex shader
+			fragmentShader: shader
 		} );
 
 	}

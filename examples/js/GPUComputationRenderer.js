@@ -132,10 +132,7 @@ function GPUComputationRenderer( renderer ) {
 		texture: { value: null }
 	};
 
-	var passThruShader = createShaderMaterial( getPassThroughFragmentShader( sizeX, sizeY ), passThruUniforms );
-
-	// TODO: move this to use the first variables shader. No need for a default shader
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), new THREE.MeshBasicMaterial() );
 	scene.add( mesh );
 
 
@@ -152,8 +149,6 @@ function GPUComputationRenderer( renderer ) {
 	}
 
 	this.computeVariable = function ( variable ) {
-
-
 		// Performs the computation for this variable
 		this.doRenderTarget( variable.material, variable.renderTargets[ nextTextureIndex ] );
 

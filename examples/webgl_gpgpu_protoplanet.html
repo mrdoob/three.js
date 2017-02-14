@@ -41,10 +41,11 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/RandomNoiseTexture.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/GPUComputationRenderer.js"></script>
-
+		<script src="js/GPUComputationRendererVariable.js"></script>
 		<!-- Fragment shader for filling initial velocity field -->
 		<script id="initialVelocity" type="x-shader/x-fragment">
 
@@ -54,23 +55,27 @@
 			uniform float maxMass;
 
 			uniform sampler2D initialPosition;
-			// the initial SimplexNoise random data bound to range [-1, 1] for first three coordinates
-			// and the range [0, 1] for the last coordinate
 			uniform sampler2D randomSeed;
 
 			void main() {
+
+				vec2 uv = gl_FragCoord.xy / resolution.xy;
+				vec4 random = texture2D(randomSeed, uv);
 
 				// Velocity
 				float rr = pow(initialPosition.x, 2) + pow(initialPosition.y, 2);
 
 				float vel = maxVel * pow( rr, velExponent );
 
+				// put in the range [-1, 1]
+				random.xyz = (2 * random.xyz - 1);
+
 				// fill with the three random coordinates and 'mass' in the final coordinate
 				gl_FragColor = vec4(
-					vel * z + randomSeed.x * randVel,
-					randomSeed.y * randVel * 0.05,
-					- vel * x + randomSeed.z * randVel,
-					randomSeed.w * maxMass + 1
+					vel * z + random.x * randVel,
+					random.y * randVel * 0.05,
+					- vel * x + random.z * randVel,
+					random.w * maxMass + 1
 					);
 			}
 
@@ -87,17 +92,18 @@
 			uniform sampler2D randomSeed;
 
 			void main() {
-				x = randomSeed.x;
-				z = randomSeed.z;
-				rr = x * x + z * z;
+				vec2 uv = gl_FragCoord.xy / resolution.xy;
 
-				rr = Math.sqrt( rr );
+				float x = texture2D(randomSeed, uv).x;
+				float z = texture2D(randomSeed, uv).z;
+				float rr = sqrt( x * x + z * z );
 
-				var rExp = radius * Math.pow( rr, exponent );
+
+				float rExp = radius * pow( rr, exponent );
 
 				x *= rExp;
 				z *= rExp;
-				y = randomSeed.y * height;
+				float y = texture2D(randomSeed, uv).y * height;
 
 				gl_FragColor = vec4(x, y, z, 1);
 			}
@@ -355,9 +361,8 @@
 			var gpuCompute;
 			var velocityVariable;
 			var positionVariable;
-			var positionUniforms;
-			var velocityUniforms;
 			var particleUniforms;
+
 			var effectController;
 
 			init();
@@ -386,7 +391,6 @@
 					// Can be changed dynamically
 					gravityConstant: 100.0,
 					density: 0.45,
-
 					// Must restart simulation
 					radius: 300,
 					height: 8,
@@ -395,7 +399,6 @@
 					velocity: 70,
 					velocityExponent: 0.2,
 					randVelocity: 0.001
-
 				};
 
 				initComputeRenderer();
@@ -413,64 +416,61 @@
 
 			}
 
-			function generateVelocityRandomSeedTexture() {
-
-			}
-
-			function generatePositionRandomSeedTexture() {
-
-			}
-
 			function initComputeRenderer() {
 
-    			gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+    			gpuCompute = new GPUComputationRenderer( renderer );
 
+    			var initialPositionShader = document.getElementById( 'initialPosition' ).textContent;
+    			var initialVelocityShader = document.getElementById( 'initialVelocity' ).textContent;
+
+    			var positionShader = document.getElementById( 'computeShaderPosition' ).textContent
+    			var velocityShader = document.getElementById( 'computeShaderVelocity' ).textContent
     			// use the shaders to setup the initial distribution of positions and velocities.
     			// Easier than creating and filling textures.
+    			// create the position field
+				positionVariable = new GPUComputationRendererVariable( WIDTH, WIDTH, 'positionVariable');
+				gpuCompute.addVariable(positionVariable);
 				
+				var uniforms = {
+					radius: { value: effectController.radius},
+					exponent: { value: effectController.exponent},
+					height: { value: effectController.height },
+					randomSeed: { value: randomNoiseTexture(WIDTH, WIDTH) }
+				};
 
-				positionVariable = gpuCompute.addVariable( "texturePosition", 
-					document.getElementById( 'computeShaderPosition' ).textContent, 
-					{
-						shader: document.getElementById( 'initialPosition' ).textContent,
-						width: WIDTH,
-						height: HEIGHT
-					});
+				positionVariable.initializeWithShader(initialPositionShader, uniforms);
 
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", 
-					document.getElementById( 'computeShaderVelocity' ).textContent, 
-					{
-						shader: document.getElementById( 'initialVelocity' ).textContent,
-						uniforms: {
-							initialPosition:
-						}
-						width: WIDTH,
-						height: HEIGHT
-					} );
+				// create the velocity field
+				velocityVariable = new GPUComputationRendererVariable( WIDTH, WIDTH, 'velocityVariable');
+				gpuCompute.addVariable(velocityVariable);
 
-				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
-				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
+				var uniforms = {
+					gravityConstant: { value: 0.0 },
+					density: { value: 0.0 },
+					maxVel: { value: effectController.velocity},
+					valExponent: { value: effectController.velocityExponent },
+					randVel: { value: effectController.randVelocity},
+					maxMass: { value: effectController.maxMass * 1024 / PARTICLES },
+					randomSeed: { value: randomNoiseTexture(WIDTH, WIDTH)  }
+				};
 
-				positionUniforms = positionVariable.material.uniforms;
-				velocityUniforms = velocityVariable.material.uniforms;
+				// add the already calculated position variable.
+				velocityVariable.addDependency(positionVariable);
 
-				velocityUniforms.gravityConstant = { value: 0.0 };
-				velocityUniforms.density = { value: 0.0 };
+				positionVariable.initializeWithShader(initialVelocityShader, uniforms);
+				// setup the dependencies among the variables *after* initialization to avoid annoying cycles.
+				positionVariable.addDependency(velocityVariable);
 
-				var error = gpuCompute.init();
-				if ( error !== null ) {
-				    console.error( error );
-				}
+				positionVariable.setComputeShader(positionShader);
+				velocityVariable.setComputeShader(velocityShader);
 
+				
 			}
 
 			function restartSimulation() {
+				initComputeRenderer();
 
-				gpuCompute.renderInitialTexture( positionVariable, 0 );
-				gpuCompute.renderInitialTexture( positionVariable, 1 );
-				gpuCompute.renderInitialTexture( velocityVariable, 0 );
-				gpuCompute.renderInitialTexture( velocityVariable, 1 );
-
+				initProtoplanets();
 			}
 
 			function initProtoplanets() {
@@ -499,11 +499,11 @@
 				}
 
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+				geometry.addAttribute( 'uv', 	   new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
-					texturePosition: { value: null },
-					textureVelocity: { value: null },
+					texturePosition: { value: positionVariable.getRenderedOutput() },
+					textureVelocity: { value: velocityVariable.getRenderedOutput() },
 					cameraConstant: { value: getCameraConstant( camera ) },
 					density: { value: 0.0 }
 				};
@@ -514,6 +514,7 @@
 					vertexShader:   document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
+
 				material.extensions.drawBuffers = true;
 
 				var particles = new THREE.Points( geometry, material );
@@ -521,22 +522,6 @@
 				particles.updateMatrix();
 
 				scene.add( particles );
-
-			}
-
-			function fillTextures( texturePosition, textureVelocity ) {
-
-				// TODO: pass these into the initial shader
-				var posArray = texturePosition.image.data;
-				var velArray = textureVelocity.image.data;
-
-				var radius = effectController.radius;
-				var height = effectController.height;
-				var exponent = effectController.exponent;
-				var maxMass = effectController.maxMass * 1024 / PARTICLES;
-				var maxVel = effectController.velocity;
-				var velExponent = effectController.velocityExponent;
-				var randVel = effectController.randVelocity;
 
 			}
 
@@ -553,9 +538,9 @@
 
 			function dynamicValuesChanger() {
 
-				velocityUniforms.gravityConstant.value = effectController.gravityConstant;
-				velocityUniforms.density.value = effectController.density;
-				particleUniforms.density.value = effectController.density;
+				velocityVariable.material.uniforms.gravityConstant.value = effectController.gravityConstant;
+				velocityVariable.material.uniforms.density.value 		 = effectController.density;
+				particleUniforms.density.value 							 = effectController.density;
 
 			}
 
@@ -616,8 +601,9 @@
 
 				gpuCompute.compute();
 
-				particleUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				// update the particle locations.
+				particleUniforms.texturePosition = positionVariable.getRenderedOutput();
+				particleUniforms.textureVelocity = velocityVariable.getRenderedOutput();
 
 				renderer.render( scene, camera );
 
