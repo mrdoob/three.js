@@ -109,23 +109,7 @@
 
       function init() {
 
-        var canvas = document.querySelector('canvas');
-        var gl;
-        try {
-
-          gl = canvas.getContext('webgl2');
-
-        } catch (err) {
-
-          console.error(err);
-
-        }
-        var isWebGL2 = Boolean(gl);
-
-        renderer = new THREE.WebGLRenderer( {
-          canvas: canvas,
-          context: gl
-        } );
+        renderer = new THREE.WebGLRenderer( { canvas: document.querySelector('canvas') } );
 
         if ( !renderer.extensions.get('WEBGL_depth_texture') ) {
           supportsExtension = false;
@@ -155,7 +139,7 @@
         target.stencilBuffer = false;
         target.depthBuffer = true;
         target.depthTexture = new THREE.DepthTexture();
-        target.depthTexture.type = isWebGL2 ? THREE.FloatType : THREE.UnsignedShortType;
+        target.depthTexture.type = THREE.UnsignedShortType;
 
         // Our scene
         scene = new THREE.Scene();
