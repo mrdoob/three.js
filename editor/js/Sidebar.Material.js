@@ -229,16 +229,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
-	// skinning
-
-	var materialSkinningRow = new UI.Row();
-	var materialSkinning = new UI.Checkbox( false ).onChange( update );
-
-	materialSkinningRow.add( new UI.Text( 'Skinning' ).setWidth( '90px' ) );
-	materialSkinningRow.add( materialSkinning );
-
-	container.add( materialSkinningRow );
-
 	// map
 
 	var materialMapRow = new UI.Row();
@@ -578,12 +568,6 @@ Sidebar.Material = function ( editor ) {
 					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors ) );
 
 				}
-
-			}
-
-			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
-
-				editor.execute( new SetMaterialValueCommand( currentObject, 'skinning', materialSkinning.getValue() ) );
 
 			}
 
@@ -954,7 +938,6 @@ Sidebar.Material = function ( editor ) {
 			'clearCoatRoughness': materialClearCoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
-			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
@@ -1058,12 +1041,6 @@ Sidebar.Material = function ( editor ) {
 		if ( material.vertexColors !== undefined ) {
 
 			materialVertexColors.setValue( material.vertexColors );
-
-		}
-
-		if ( material.skinning !== undefined ) {
-
-			materialSkinning.setValue( material.skinning );
 
 		}
 

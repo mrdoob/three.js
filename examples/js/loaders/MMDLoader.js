@@ -1118,7 +1118,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			if ( p.name !== undefined ) m.name = p.name;
 
-			m.skinning = geometry.bones.length > 0 ? true : false;
 			m.morphTargets = geometry.morphTargets.length > 0 ? true : false;
 			m.lights = true;
 			m.side = ( model.metadata.format === 'pmx' && ( p2.flag & 0x1 ) === 1 ) ? THREE.DoubleSide : p.side;

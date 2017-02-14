@@ -27,24 +27,6 @@ Sidebar.Animation = function ( editor ) {
 
 		object.traverse( function ( child ) {
 
-			if ( child instanceof THREE.SkinnedMesh ) {
-
-				var material = child.material;
-
-				if ( material instanceof THREE.MultiMaterial ) {
-
-					for ( var i = 0; i < material.materials.length; i ++ ) {
-
-						material.materials[ i ].skinning = true;
-
-					}
-
-				} else {
-
-					child.material.skinning = true;
-
-				}
-
 				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
 
 			} else if ( child instanceof THREE.MorphAnimMesh ) {

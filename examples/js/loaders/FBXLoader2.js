@@ -1224,11 +1224,6 @@
 								}
 								if ( geometry.FBX_Deformer ) {
 
-									for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
-
-										materials[ materialsIndex ].skinning = true;
-
-									}
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {

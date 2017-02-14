@@ -420,7 +420,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	function updateDeferredNormalDepthMaterial( material, originalMaterial ) {
 
-		if ( originalMaterial.skinning !== undefined ) material.skinning = originalMaterial.skinning;
 		if ( originalMaterial.morphTargets !== undefined ) material.morphTargets = originalMaterial.morphTargets;
 
 		if ( originalMaterial.visible === true ) {
@@ -506,7 +505,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	function updateDeferredColorMaterial( material, originalMaterial ) {
 
 		if ( originalMaterial.map !== undefined ) material.map = originalMaterial.map;
-		if ( originalMaterial.skinning !== undefined ) material.skinning = originalMaterial.skinning;
 		if ( originalMaterial.morphTargets !== undefined ) material.morphTargets = originalMaterial.morphTargets;
 
 		if ( originalMaterial.visible === true ) {
