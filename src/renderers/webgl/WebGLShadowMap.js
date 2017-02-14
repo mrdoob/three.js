@@ -350,7 +350,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			var useSkinning = object.isSkinnedMesh && material.skinning;
+			var useSkinning = object.isSkinnedMesh;
 
 			var variantIndex = 0;
 
