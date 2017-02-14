@@ -72,7 +72,10 @@ Object.assign( Matrix4.prototype, {
 
 	copy: function ( m ) {
 
-		for ( var i = 0; i < 16; i ++ ) this.elements[ i ] = m.elements[ i ];
+		var te = this.elements;
+		var me = m.elements;
+
+		for ( var i = 0; i < 16; i ++ ) te[ i ] = me[ i ];
 
 		return this;
 
@@ -80,8 +83,7 @@ Object.assign( Matrix4.prototype, {
 
 	copyPosition: function ( m ) {
 
-		var te = this.elements;
-		var me = m.elements;
+		var te = this.elements, me = m.elements;
 
 		te[ 12 ] = me[ 12 ];
 		te[ 13 ] = me[ 13 ];
@@ -147,7 +149,7 @@ Object.assign( Matrix4.prototype, {
 
 	makeRotationFromEuler: function ( euler ) {
 
-		if ( (euler && euler.isEuler) === false ) {
+		if ( ( euler && euler.isEuler ) === false ) {
 
 			console.error( 'THREE.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 

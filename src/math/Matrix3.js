@@ -63,15 +63,10 @@ Object.assign( Matrix3.prototype, {
 
 	copy: function ( m ) {
 
+		var te = this.elements;
 		var me = m.elements;
 
-		this.set(
-
-			me[ 0 ], me[ 3 ], me[ 6 ],
-			me[ 1 ], me[ 4 ], me[ 7 ],
-			me[ 2 ], me[ 5 ], me[ 8 ]
-
-		);
+		for ( var i = 0; i < 9; i ++ ) te[ i ] = me[ i ];
 
 		return this;
 
