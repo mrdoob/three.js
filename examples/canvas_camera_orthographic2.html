@@ -50,13 +50,13 @@
 					<a href="#" onclick="camera.setZoom(2);return false;">2x</a> |
 
 				<br/>
-			Views: <a href="#" onclick="camera.toTopView();lookAtScene=false;return false;">Top view</a> |
-				<a href="#" onclick="camera.toBottomView();lookAtScene=false;return false;">Bottom view</a> |
-				<a href="#" onclick="camera.toLeftView();lookAtScene=false;return false;">Left view</a> |
-				<a href="#" onclick="camera.toRightView();lookAtScene=false;return false;">Right view</a> |
-				<a href="#" onclick="camera.toFrontView();lookAtScene=false;return false;">Front view</a> |
-				<a href="#" onclick="camera.toBackView();lookAtScene=false;return false;">Back view</a> |
-				<a href="#" onclick="lookAtScene=true;return false;">Look at Scene</a>
+			Views: <a href="#" onclick="camera.toTopView();cameraCheck();lookAtScene=false;return false;">Top view</a> |
+				<a href="#" onclick="camera.toBottomView();cameraCheck();lookAtScene=false;return false;">Bottom view</a> |
+				<a href="#" onclick="camera.toLeftView();cameraCheck();lookAtScene=false;return false;">Left view</a> |
+				<a href="#" onclick="camera.toRightView();cameraCheck();lookAtScene=false;return false;">Right view</a> |
+				<a href="#" onclick="camera.toFrontView();cameraCheck();lookAtScene=false;return false;">Front view</a> |
+				<a href="#" onclick="camera.toBackView();cameraCheck();lookAtScene=false;return false;">Back view</a> |
+				<a href="#" onclick="cameraToPerspectiveView()">Look at Scene</a>
 				<br/>
 			<div id="fov"></div>
 		</div>
@@ -71,7 +71,21 @@
 
 			init();
 			animate();
-
+			function cameraToPerspectiveView() {
+				camera.toPerspectiveView();
+				camera.position.x = 700;
+				camera.position.y = 200;
+				camera.position.z = 700;
+				lookAtScene=true;
+				return false;
+			}
+			function cameraCheck() {
+				if(camera.inPerspectiveMode) {
+					camera.position.x *= 30;
+					camera.position.y *= 30;
+					camera.position.z *= 30;
+				}
+			}
 			function setFov( fov ) {
 
 				camera.setFov( fov );
@@ -91,7 +105,7 @@
 			}
 
 			function setOrthographic() {
-
+				camera.near = -500;
 				camera.toOrthographic();
 
 				document.getElementById('fov').innerHTML = 'Orthographic mode' ;
@@ -99,7 +113,7 @@
 			}
 
 			function setPerspective() {
-
+				camera.near = 0.1;
 				camera.toPerspective();
 
 				document.getElementById('fov').innerHTML = 'Perspective mode' ;
@@ -111,11 +125,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000 );
+				camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 0.1, 5000, 0, 0.5 );
 
-				camera.position.x = 200;
-				camera.position.y = 100;
-				camera.position.z = 200;
+				camera.position.x = 700;
+				camera.position.y = 200;
+				camera.position.z = 700;
 
 				scene = new THREE.Scene();
 
@@ -204,7 +218,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				requestAnimationFrame( animate )
 
 				stats.begin();
 				render();
@@ -216,10 +230,11 @@
 
 				var timer = Date.now() * 0.0001;
 
-				camera.position.x = Math.cos( timer ) * 200;
-				camera.position.z = Math.sin( timer ) * 200;
-				if ( lookAtScene ) camera.lookAt( scene.position );
+				camera.position.x = Math.cos( timer ) * 700;
+				camera.position.z = Math.sin( timer ) * 700;
 
+
+				if ( lookAtScene ) camera.lookAt( scene.position );
 				renderer.render( scene, camera );
 
 			}

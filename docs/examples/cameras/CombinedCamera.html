@@ -22,21 +22,21 @@
 		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
 
 		<code>//Create combined camera
-		camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000 );
+		camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 0.1, 1000, 0, 0.5 );
 		</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Number width], [page:Number height], [page:Number fov], [page:Number near], [page:Number far], [page:Number orthoNear], [page:Number orthoFar])</h3>
+		<h3>[name]([page:Number width], [page:Number height], [page:Number fov], [page:Number near], [page:Number far], [page:Number scaledByNearFarPlane], [page:Number hyperfocusOffset], [page:Number hyperfocusScale])</h3>
 		<div>
 		width -- Camera frustum width.<br />
 		height -- Camera frustum height.<br />
 		fov — Camera frustum vertical field of view in perspective view.<br />
 		near — Camera frustum near plane in perspective view.<br />
 		far — Camera frustum far plane in perspective view.<br />
-		orthoNear — Camera frustum near plane in orthographic view.<br />
-		orthoFar — Camera frustum far plane in orthographic view.
+		hyperfocusOffset — For calculate the frustum size of orthographic camera, OrthoCameraFrustumHeight = hyperfocusOffset + hyperfocusScale * ( far + near )<br />
+		hyperfocusScale — For calculate the frustum size of orthographic camera, OrthoCameraFrustumHeight = hyperfocusOffset + hyperfocusScale * ( far + near )
 		</div>
 		<div>
 		Creates a [name]. This initializes 2 cameras, an OrthographicCamera and a PerspectiveCamera. The default is the perspective Camera.
@@ -169,6 +169,11 @@
 		Sets the camera to view the bottom.
 		</div>
 
+		<h3>[method:null toPerspectiveView]()</h3>
+		<div>
+		Sets the camera to perspective view.
+		</div>
+
 		<h3>[method:null setSize]([page:Number width], [page:Number height])</h3>
 		<div>
 		width -- The width of the orthographic view.<br />
@@ -191,6 +196,31 @@
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<div>
 		Updates the ProjectionMatrix.
+		</div>
+
+		<h3>[method:Camera copy]( [page:Camera source] )</h3>
+		<div>
+		Copy the properties from the source camera into this one.
+		</div>
+
+		<h3>[method:null setViewOffset]( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
+		<div>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera<br /><br />
+
+			Sets an offset in a larger [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+			This is useful for multi-window or multi-monitor/multi-machine setups.
+			For an example on how to use it see [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</div>
+
+
+		<h3>[method:null clearViewOffset]()</h3>
+		<div>
+		Removes any offset set by the .setViewOffset method.
 		</div>
 
 		<h2>Source</h2>
