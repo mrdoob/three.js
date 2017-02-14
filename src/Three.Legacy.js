@@ -470,6 +470,11 @@ Object.assign( Matrix4.prototype, {
 		return this.makeRotationFromQuaternion( q );
 
 	},
+	multiplyToArray: function () {
+
+		console.warn( 'THREE.Matrix4: .multiplyToArray() has been removed.' );
+
+	},
 	multiplyVector3: function ( vector ) {
 
 		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) instead.' );

@@ -411,21 +411,6 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	multiplyToArray: function ( a, b, r ) {
-
-		var te = this.elements;
-
-		this.multiplyMatrices( a, b );
-
-		r[ 0 ] = te[ 0 ]; r[ 1 ] = te[ 1 ]; r[ 2 ] = te[ 2 ]; r[ 3 ] = te[ 3 ];
-		r[ 4 ] = te[ 4 ]; r[ 5 ] = te[ 5 ]; r[ 6 ] = te[ 6 ]; r[ 7 ] = te[ 7 ];
-		r[ 8 ]  = te[ 8 ]; r[ 9 ]  = te[ 9 ]; r[ 10 ] = te[ 10 ]; r[ 11 ] = te[ 11 ];
-		r[ 12 ] = te[ 12 ]; r[ 13 ] = te[ 13 ]; r[ 14 ] = te[ 14 ]; r[ 15 ] = te[ 15 ];
-
-		return this;
-
-	},
-
 	multiplyScalar: function ( s ) {
 
 		var te = this.elements;
