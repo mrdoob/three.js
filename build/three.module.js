@@ -7355,7 +7355,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
 		// TODO: Copied from Object3D.toJSON
@@ -7488,7 +7487,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
  *
  *  lights: <bool>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -7515,7 +7513,6 @@ function ShaderMaterial( parameters ) {
 	this.lights = false; // set to use scene lights
 	this.clipping = false; // set to use user-defined clipping planes
 
-	this.skinning = false; // set to use skinning attribute streams
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
@@ -7572,8 +7569,6 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.lights = source.lights;
 	this.clipping = source.clipping;
 
-	this.skinning = source.skinning;
-
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
@@ -7626,7 +7621,6 @@ function MeshDepthMaterial( parameters ) {
 
 	this.depthPacking = BasicDepthPacking;
 
-	this.skinning = false;
 	this.morphTargets = false;
 
 	this.map = null;
@@ -7658,7 +7652,6 @@ MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	this.depthPacking = source.depthPacking;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 
 	this.map = source.map;
@@ -9051,9 +9044,8 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	_renderList = [],
 
 	_MorphingFlag = 1,
-	_SkinningFlag = 2,
 
-	_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
+	_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
 
 	_depthMaterials = new Array( _NumberOfMaterialVariants ),
 	_distanceMaterials = new Array( _NumberOfMaterialVariants ),
@@ -9087,11 +9079,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
 		var useMorphing = ( i & _MorphingFlag ) !== 0;
-		var useSkinning = ( i & _SkinningFlag ) !== 0;
 
 		var depthMaterial = depthMaterialTemplate.clone();
 		depthMaterial.morphTargets = useMorphing;
-		depthMaterial.skinning = useSkinning;
 
 		_depthMaterials[ i ] = depthMaterial;
 
@@ -9103,7 +9093,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			vertexShader: distanceShader.vertexShader,
 			fragmentShader: distanceShader.fragmentShader,
 			morphTargets: useMorphing,
-			skinning: useSkinning,
 			clipping: true
 		} );
 
@@ -9368,12 +9357,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			var useSkinning = object.isSkinnedMesh && material.skinning;
-
 			var variantIndex = 0;
 
 			if ( useMorphing ) variantIndex |= _MorphingFlag;
-			if ( useSkinning ) variantIndex |= _SkinningFlag;
 
 			result = materialVariants[ variantIndex ];
 
@@ -9384,7 +9370,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		}
 
 		if ( _renderer.localClippingEnabled &&
-			 material.clipShadows === true &&
+				material.clipShadows === true &&
 				material.clippingPlanes.length !== 0 ) {
 
 			// in this case we need a unique material instance reflecting the
@@ -11595,7 +11581,6 @@ Object.assign( Face3.prototype, {
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>
  * }
  */
@@ -11630,7 +11615,6 @@ function MeshBasicMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.skinning = false;
 	this.morphTargets = false;
 
 	this.lights = false;
@@ -11672,7 +11656,6 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 
 	return this;
@@ -16962,7 +16945,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			var maxBones = nVertexMatrices;
 
-			if ( object !== undefined && (object && object.isSkinnedMesh) ) {
+			if ( object && object.isSkinnedMesh ) {
 
 				maxBones = Math.min( object.skeleton.bones.length, maxBones );
 
@@ -17067,14 +17050,14 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			fog: !! fog,
 			useFog: material.fog,
-			fogExp: (fog && fog.isFogExp2),
+			fogExp: ( fog && fog.isFogExp2 ),
 
 			flatShading: material.shading === FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: material.skinning,
+			skinning: ( object && object.isSkinnedMesh ),
 			maxBones: maxBones,
 			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
@@ -21434,7 +21417,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
+				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
@@ -21525,7 +21508,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
 				material.isShaderMaterial ||
-				material.skinning ) {
+				object.isSkinnedMesh ) {
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -21540,7 +21523,7 @@ function WebGLRenderer( parameters ) {
 		// auto-setting of texture unit for bone texture must go before other textures
 		// not sure why, but otherwise weird things happen
 
-		if ( material.skinning ) {
+		if ( object.isSkinnedMesh ) {
 
 			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
 			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
@@ -23366,7 +23349,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	isSkinnedMesh: true,
 
-	bind: function( skeleton, bindMatrix ) {
+	bind: function ( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
 
@@ -23446,7 +23429,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	updateMatrixWorld: function( force ) {
+	updateMatrixWorld: function () {
 
 		Mesh.prototype.updateMatrixWorld.call( this, true );
 
@@ -23466,7 +23449,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	clone: function() {
+	clone: function () {
 
 		return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
 
@@ -28332,7 +28315,6 @@ Object.assign( MultiMaterial.prototype, {
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -28388,7 +28370,6 @@ function MeshStandardMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -28449,7 +28430,6 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
@@ -28546,7 +28526,6 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -28598,7 +28577,6 @@ function MeshPhongMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -28655,7 +28633,6 @@ MeshPhongMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
@@ -28720,7 +28697,6 @@ MeshToonMaterial.prototype.copy = function ( source ) {
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -28748,7 +28724,6 @@ function MeshNormalMaterial( parameters ) {
 	this.fog = false;
 	this.lights = false;
 
-	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -28778,7 +28753,6 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
@@ -28818,7 +28792,6 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -28858,7 +28831,6 @@ function MeshLambertMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -28903,7 +28875,6 @@ MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
-	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 
@@ -31963,7 +31934,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
-		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 
 		// for PointsMaterial
@@ -42370,22 +42340,36 @@ Object.defineProperties( Uniform.prototype, {
 
 Object.defineProperties( Material.prototype, {
 
-	wrapAround: {
+	skinning: {
 		get: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+			console.warn( 'THREE.Material: .skinning has been removed.' );
 
 		},
 		set: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapAround has been removed.' );
+			console.warn( 'THREE.Material: .skinning has been removed.' );
+
+		}
+
+	},
+
+	wrapAround: {
+		get: function () {
+
+			console.warn( 'THREE.Material: .wrapAround has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Material: .wrapAround has been removed.' );
 
 		}
 	},
 	wrapRGB: {
 		get: function () {
 
-			console.warn( 'THREE.' + this.type + ': .wrapRGB has been removed.' );
+			console.warn( 'THREE.Material: .wrapRGB has been removed.' );
 			return new Color();
 
 		}
