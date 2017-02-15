@@ -64,6 +64,7 @@ function WebGLPrograms( renderer, capabilities ) {
 				if ( maxBones < object.skeleton.bones.length ) {
 
 					console.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
+					return 0;
 
 				}
 
@@ -169,7 +170,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: ( object && object.isSkinnedMesh ),
+			skinning: ( object && object.isSkinnedMesh ) && maxBones > 0,
 			maxBones: maxBones,
 			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
