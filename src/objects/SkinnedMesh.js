@@ -77,6 +77,16 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	isSkinnedMesh: true,
 
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.bind( source.skeleton.clone(), this.matrixWorld );
+
+		return this;
+
+	},
+
 	bind: function ( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
