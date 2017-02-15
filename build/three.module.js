@@ -9425,7 +9425,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera );
+			renderObject( children[ i ], camera, shadowCamera, isPointLight );
 
 		}
 
