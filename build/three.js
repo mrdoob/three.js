@@ -9029,8 +9029,6 @@
 		_lookTarget = new Vector3(),
 		_lightPositionWorld = new Vector3(),
 
-		_renderList = [],
-
 		_MorphingFlag = 1,
 
 		_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
@@ -9257,46 +9255,7 @@
 
 					// set object matrices & frustum culling
 
-					_renderList.length = 0;
-
-					projectObject( scene, camera, shadowCamera );
-
-					// render shadow map
-					// render regular objects
-
-					for ( var j = 0, jl = _renderList.length; j < jl; j ++ ) {
-
-						var object = _renderList[ j ];
-						var geometry = _objects.update( object );
-						var material = object.material;
-
-						if ( material && material.isMultiMaterial ) {
-
-							var groups = geometry.groups;
-							var materials = material.materials;
-
-							for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
-
-								var group = groups[ k ];
-								var groupMaterial = materials[ group.materialIndex ];
-
-								if ( groupMaterial.visible === true ) {
-
-									var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
-									_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
-
-								}
-
-							}
-
-						} else {
-
-							var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
-							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
-
-						}
-
-					}
+					renderObject( scene, camera, shadowCamera, isPointLight );
 
 				}
 
@@ -9424,7 +9383,7 @@
 
 		}
 
-		function projectObject( object, camera, shadowCamera ) {
+		function renderObject( object, camera, shadowCamera, isPointLight ) {
 
 			if ( object.visible === false ) return;
 
@@ -9434,12 +9393,33 @@
 
 				if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
+					object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+
+					var geometry = _objects.update( object );
 					var material = object.material;
 
-					if ( material.visible === true ) {
+					if ( Array.isArray( material ) ) {
 
-						object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-						_renderList.push( object );
+						var groups = geometry.groups;
+
+						for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
+
+							var group = groups[ k ];
+							var groupMaterial = material[ group.materialIndex ];
+
+							if ( groupMaterial && groupMaterial.visible === true ) {
+
+								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
+								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+							}
+
+						}
+
+					} else if ( material.visible === true ) {
+
+						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 					}
 
@@ -9451,7 +9431,7 @@
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				projectObject( children[ i ], camera, shadowCamera );
+				renderObject( children[ i ], camera, shadowCamera );
 
 			}
 
@@ -15108,8 +15088,7 @@
 				} else if ( geometry.isGeometry ) {
 
 					var fvA, fvB, fvC;
-					var isFaceMaterial = ( material && material.isMultiMaterial );
-					var materials = isFaceMaterial === true ? material.materials : null;
+					var isMultiMaterial = Array.isArray( material );
 
 					var vertices = geometry.vertices;
 					var faces = geometry.faces;
@@ -15121,7 +15100,7 @@
 					for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 						var face = faces[ f ];
-						var faceMaterial = isFaceMaterial === true ? materials[ face.materialIndex ] : material;
+						var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
 
 						if ( faceMaterial === undefined ) continue;
 
@@ -21084,56 +21063,36 @@
 
 					if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
 
+						if ( _this.sortObjects === true ) {
+
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyMatrix4( _projScreenMatrix );
+
+						}
+
+						var geometry = objects.update( object );
 						var material = object.material;
 
-						if ( material.visible === true ) {
+						if ( Array.isArray( material ) ) {
 
-							if ( _this.sortObjects === true ) {
+							var groups = geometry.groups;
 
-								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyMatrix4( _projScreenMatrix );
+							for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-							}
+								var group = groups[ i ];
+								var groupMaterial = material[ group.materialIndex ];
 
-							var geometry = objects.update( object );
+								if ( groupMaterial && groupMaterial.visible === true ) {
 
-							if ( material.isMultiMaterial ) {
-
-								var groups = geometry.groups;
-								var materials = material.materials;
-
-								if ( groups.length > 0 ) {
-
-									// push a render item for each group of the geometry
-
-									for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-										var group = groups[ i ];
-										var groupMaterial = materials[ group.materialIndex ];
-
-										if ( groupMaterial === undefined ) {
-
-											console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
-
-										} else if ( groupMaterial.visible === true ) {
-
-											pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-										}
-
-									}
-
-								} else {
-
-									console.warn( 'THREE.WebGLRenderer: MultiMaterial can not be used without groups.' );
+									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 								}
 
-							} else {
-
-								pushRenderItem( object, geometry, material, _vector3.z, null );
-
 							}
+
+						} else if ( material.visible === true ) {
+
+							pushRenderItem( object, geometry, material, _vector3.z, null );
 
 						}
 
@@ -28191,74 +28150,6 @@
 	RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-	function MultiMaterial( materials ) {
-
-		this.uuid = _Math.generateUUID();
-
-		this.type = 'MultiMaterial';
-
-		this.materials = Array.isArray( materials ) ? materials : [];
-
-		this.visible = true;
-
-	}
-
-	Object.assign( MultiMaterial.prototype, {
-
-		isMultiMaterial: true,
-
-		toJSON: function ( meta ) {
-
-			var output = {
-				metadata: {
-					version: 4.2,
-					type: 'material',
-					generator: 'MaterialExporter'
-				},
-				uuid: this.uuid,
-				type: this.type,
-				materials: []
-			};
-
-			var materials = this.materials;
-
-			for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-				var material = materials[ i ].toJSON( meta );
-				delete material.metadata;
-
-				output.materials.push( material );
-
-			}
-
-			output.visible = this.visible;
-
-			return output;
-
-		},
-
-		clone: function () {
-
-			var material = new this.constructor();
-
-			for ( var i = 0; i < this.materials.length; i ++ ) {
-
-				material.materials.push( this.materials[ i ].clone() );
-
-			}
-
-			material.visible = this.visible;
-
-			return material;
-
-		}
-
-	} );
-
-	/**
 	 * @author WestLangley / http://github.com/WestLangley
 	 *
 	 * parameters = {
@@ -28934,7 +28825,6 @@
 		RawShaderMaterial: RawShaderMaterial,
 		ShaderMaterial: ShaderMaterial,
 		PointsMaterial: PointsMaterial,
-		MultiMaterial: MultiMaterial,
 		MeshPhysicalMaterial: MeshPhysicalMaterial,
 		MeshStandardMaterial: MeshStandardMaterial,
 		MeshPhongMaterial: MeshPhongMaterial,
@@ -41451,8 +41341,24 @@
 
 	function MeshFaceMaterial( materials ) {
 
-		console.warn( 'THREE.MeshFaceMaterial has been renamed to THREE.MultiMaterial.' );
-		return new MultiMaterial( materials );
+		console.warn( 'THREE.MeshFaceMaterial has been removed. Use an Array instead.' );
+		return materials;
+
+	}
+
+	function MultiMaterial( materials ) {
+
+		if ( materials === undefined ) materials = [];
+
+		console.warn( 'THREE.MultiMaterial has been removed. Use an Array instead.' );
+		materials.isMultiMaterial = true;
+		materials.materials = materials;
+		materials.clone = function () {
+
+			return materials.slice();
+
+		};
+		return materials;
 
 	}
 
@@ -43037,7 +42943,6 @@
 	exports.RawShaderMaterial = RawShaderMaterial;
 	exports.ShaderMaterial = ShaderMaterial;
 	exports.PointsMaterial = PointsMaterial;
-	exports.MultiMaterial = MultiMaterial;
 	exports.MeshPhysicalMaterial = MeshPhysicalMaterial;
 	exports.MeshStandardMaterial = MeshStandardMaterial;
 	exports.MeshPhongMaterial = MeshPhongMaterial;
@@ -43189,6 +43094,7 @@
 	exports.LineStrip = LineStrip;
 	exports.LinePieces = LinePieces;
 	exports.MeshFaceMaterial = MeshFaceMaterial;
+	exports.MultiMaterial = MultiMaterial;
 	exports.PointCloud = PointCloud;
 	exports.Particle = Particle;
 	exports.ParticleSystem = ParticleSystem;
