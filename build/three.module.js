@@ -15139,7 +15139,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					if ( intersection ) {
 
-						if ( uvs ) {
+						if ( uvs && uvs[ f ] ) {
 
 							var uvs_f = uvs[ f ];
 							uvA.copy( uvs_f[ 0 ] );
@@ -29132,6 +29132,12 @@ Object.assign( FileLoader.prototype, {
 
 			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
 
+			for ( var header in this.requestHeader ) {
+
+				request.setRequestHeader( header, this.requestHeader[ header ] );
+
+			}
+
 			request.send( null );
 
 		}
@@ -29166,6 +29172,13 @@ Object.assign( FileLoader.prototype, {
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	},
+
+	setRequestHeader: function ( value ) {
+
+		this.requestHeader = value;
 		return this;
 
 	}
@@ -29460,7 +29473,11 @@ Object.assign( ImageLoader.prototype, {
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+		if ( url.substr( 0, 5 ) !== 'data:' ) {
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+		}
 
 		scope.manager.itemStart( url );
 
