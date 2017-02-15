@@ -1,5 +1,6 @@
 uniform float size;
-uniform float scale;
+uniform float height;
+uniform float pixelRatio;
 
 #include <common>
 #include <color_pars_vertex>
@@ -15,9 +16,9 @@ void main() {
 	#include <project_vertex>
 
 	#ifdef USE_SIZEATTENUATION
-		gl_PointSize = size * ( scale / - mvPosition.z );
+		gl_PointSize = size * pixelRatio * ( height * 0.5 / - mvPosition.z );
 	#else
-		gl_PointSize = size;
+		gl_PointSize = size * pixelRatio;
 	#endif
 
 	#include <logdepthbuf_vertex>

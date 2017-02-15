@@ -43,7 +43,10 @@ function MeshBasicMaterial( parameters ) {
 
 	this.type = 'MeshBasicMaterial';
 
-	this.color = new Color( 0xffffff ); // emissive
+	this.addParameters( [ 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity',
+		'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
+
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // emissive
 
 	this.map = null;
 
@@ -53,11 +56,12 @@ function MeshBasicMaterial( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
-	this.specularMap = null;
+	this.specularMap =  null;
 
-	this.alphaMap = null;
+	this.alphaMap =  null;
 
 	this.envMap = null;
+
 	this.combine = MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
@@ -79,6 +83,7 @@ MeshBasicMaterial.prototype = Object.create( Material.prototype );
 MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
 
 MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
+MeshBasicMaterial.prototype.isExperimentalMaterial = true;
 
 MeshBasicMaterial.prototype.copy = function ( source ) {
 

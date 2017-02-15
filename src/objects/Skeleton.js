@@ -2,6 +2,8 @@ import { Matrix4 } from '../math/Matrix4';
 import { FloatType, RGBAFormat } from '../constants';
 import { DataTexture } from '../textures/DataTexture';
 import { _Math } from '../math/Math';
+import { ParameterSource } from '../core/ParameterSource';
+
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -38,15 +40,15 @@ function Skeleton( bones, boneInverses, useVertexTexture ) {
 		size = _Math.nextPowerOfTwo( Math.ceil( size ) );
 		size = Math.max( size, 4 );
 
-		this.boneTextureWidth = size;
-		this.boneTextureHeight = size;
+		this.addParameter( 'boneTextureWidth', size );
+		this.addParameter( 'boneTextureHeight', size );
 
-		this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
-		this.boneTexture = new DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, RGBAFormat, FloatType );
+		this.addParameter( 'boneMatrices', new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ) ); // 4 floats per RGBA pixel
+		this.addParameter( 'boneTexture', new DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, RGBAFormat, FloatType ) );
 
 	} else {
 
-		this.boneMatrices = new Float32Array( 16 * this.bones.length );
+		this.addParameter( 'boneMatrices', new Float32Array( 16 * this.bones.length ) );
 
 	}
 
@@ -182,7 +184,7 @@ Object.assign( Skeleton.prototype, {
 
 	}
 
-} );
+}, ParameterSource.prototype );
 
 
 export { Skeleton };

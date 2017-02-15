@@ -58,9 +58,13 @@ function MeshPhongMaterial( parameters ) {
 
 	this.type = 'MeshPhongMaterial';
 
-	this.color = new Color( 0xffffff ); // diffuse
+	this.addParameters( [ 'specular', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissiveIntensity', 'bumpMap', 'bumpScale',
+		'normalMap', 'NormalScale', 'displacementMap', 'displacementScale', 'displacementBias', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
+
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
+	this.addParameter( 'shininess', 30, null, function ( parent, value ) { return Math.max( value, 1e-4 ) } );
+
 	this.specular = new Color( 0x111111 );
-	this.shininess = 30;
 
 	this.map = null;
 
@@ -73,6 +77,8 @@ function MeshPhongMaterial( parameters ) {
 	this.emissive = new Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
+
+	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( parent, value ) { return value.copy( parent.emissive ).multiplyScalar( parent.emissiveIntensity ) } );
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -89,7 +95,9 @@ function MeshPhongMaterial( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
+
 	this.combine = MultiplyOperation;
+
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
@@ -109,6 +117,7 @@ MeshPhongMaterial.prototype = Object.create( Material.prototype );
 MeshPhongMaterial.prototype.constructor = MeshPhongMaterial;
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
+MeshPhongMaterial.prototype.isExperimentalMaterial = true;
 
 MeshPhongMaterial.prototype.copy = function ( source ) {
 

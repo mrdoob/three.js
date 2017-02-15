@@ -16,6 +16,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.type = 'MeshPhysicalMaterial';
 
+	this.addParameters( [ 'reflectivity', 'clearCoat', 'clearCoatRoughness' ] );
+
 	this.reflectivity = 0.5; // maps to F0 = 0.04
 
 	this.clearCoat = 0.0;

@@ -373,6 +373,8 @@ function SingleUniform( id, activeInfo, addr ) {
 
 }
 
+SingleUniform.prototype.isSimpleUniform = true;
+
 function PureArrayUniform( id, activeInfo, addr ) {
 
 	this.id = id;
@@ -383,6 +385,8 @@ function PureArrayUniform( id, activeInfo, addr ) {
 	// this.path = activeInfo.name; // DEBUG
 
 }
+
+PureArrayUniform.prototype.isSimpleUniform = true;
 
 function StructuredUniform( id ) {
 

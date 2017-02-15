@@ -60,7 +60,11 @@ function MeshStandardMaterial( parameters ) {
 
 	this.type = 'MeshStandardMaterial';
 
-	this.color = new Color( 0xffffff ); // diffuse
+	this.addParameters( [ 'roughness', 'metalness', 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'emissiveMap',
+		' bumpMap', 'bumpScale','normalMap', 'NormalScale', 'displacementMap', 'displacementScale', 'displacementBias', 'roughnessMap', 'metalnessMap', 'alphaMap',
+		'envMap', 'envMapIntensity', 'refractionRatio' ] );
+
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
 	this.roughness = 0.5;
 	this.metalness = 0.5;
 
@@ -75,6 +79,8 @@ function MeshStandardMaterial( parameters ) {
 	this.emissive = new Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
+
+	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( parent, value ) { return value.copy( parent.emissive ).multiplyScalar( parent.emissiveIntensity ) } );
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -93,6 +99,7 @@ function MeshStandardMaterial( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
+
 	this.envMapIntensity = 1.0;
 
 	this.refractionRatio = 0.98;
@@ -113,6 +120,7 @@ MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
+MeshStandardMaterial.prototype.isExperimentalMaterial = true;
 
 MeshStandardMaterial.prototype.copy = function ( source ) {
 

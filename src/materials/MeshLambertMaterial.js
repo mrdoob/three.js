@@ -45,7 +45,10 @@ function MeshLambertMaterial( parameters ) {
 
 	this.type = 'MeshLambertMaterial';
 
-	this.color = new Color( 0xffffff ); // diffuse
+	this.addParameters( [ 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'bumpMap', 'bumpScale',
+		'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio' ] );
+
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' ); // diffuse
 
 	this.map = null;
 
@@ -59,11 +62,14 @@ function MeshLambertMaterial( parameters ) {
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
+	this.addParameter( 'emissiveColor', new Color(), 'emissive', function ( parent, value ) { return value.copy( parent.emissive ).multiplyScalar( parent.emissiveIntensity ) } );
+
 	this.specularMap = null;
 
 	this.alphaMap = null;
 
 	this.envMap = null;
+
 	this.combine = MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
@@ -80,10 +86,12 @@ function MeshLambertMaterial( parameters ) {
 
 }
 
+
 MeshLambertMaterial.prototype = Object.create( Material.prototype );
 MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
+MeshLambertMaterial.prototype.isExperimentalMaterial = true;
 
 MeshLambertMaterial.prototype.copy = function ( source ) {
 

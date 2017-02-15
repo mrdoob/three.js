@@ -21,7 +21,7 @@ function LineBasicMaterial( parameters ) {
 
 	this.type = 'LineBasicMaterial';
 
-	this.color = new Color( 0xffffff );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
 	this.linewidth = 1;
 	this.linecap = 'round';
@@ -37,6 +37,7 @@ LineBasicMaterial.prototype = Object.create( Material.prototype );
 LineBasicMaterial.prototype.constructor = LineBasicMaterial;
 
 LineBasicMaterial.prototype.isLineBasicMaterial = true;
+LineBasicMaterial.prototype.isExperimentalMaterial = true;
 
 LineBasicMaterial.prototype.copy = function ( source ) {
 

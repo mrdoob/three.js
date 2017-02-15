@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler';
 import { Layers } from './Layers';
 import { Matrix3 } from '../math/Matrix3';
 import { _Math } from '../math/Math';
+import { ParameterSource } from './ParameterSource';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -101,7 +102,7 @@ function Object3D() {
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype, {
+Object.assign( Object3D.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
 	isObject3D: true,
 
@@ -728,7 +729,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	}
 
-} );
 
+} );
 
 export { Object3D };

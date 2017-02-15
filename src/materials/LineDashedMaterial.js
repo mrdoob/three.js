@@ -22,13 +22,16 @@ function LineDashedMaterial( parameters ) {
 
 	this.type = 'LineDashedMaterial';
 
-	this.color = new Color( 0xffffff );
+	this.addParameter( 'color', new Color( 0xffffff ), 'diffuse' );
 
 	this.linewidth = 1;
 
-	this.scale = 1;
-	this.dashSize = 3;
+	this.addParameter( 'scale', 1 );
+	this.addParameter( 'dashSize', 3 );
+
 	this.gapSize = 1;
+
+	this.addParameter( 'totalSize', 4, 'totalSize', function ( parent, value ) { return parent.dashSize + parent.gapSize} );
 
 	this.lights = false;
 
@@ -40,6 +43,7 @@ LineDashedMaterial.prototype = Object.create( Material.prototype );
 LineDashedMaterial.prototype.constructor = LineDashedMaterial;
 
 LineDashedMaterial.prototype.isLineDashedMaterial = true;
+LineDashedMaterial.prototype.isExperimentalMaterial = true;
 
 LineDashedMaterial.prototype.copy = function ( source ) {
 

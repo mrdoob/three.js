@@ -606,34 +606,22 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
-			function updateColor( object, material, camera ) {
-
-				this.value.setHex( object.userData.color );
-
-			}
-
 			var material = new THREE.RawShaderMaterial( {
 				vertexShader: vert,
-				fragmentShader: frag,
-				uniforms: {
-					color: new THREE.Uniform( new THREE.Color() ).onUpdate( updateColor )
-				}
+				fragmentShader: frag
 			} );
+
+			material.isExperimentalMaterial = true;
+
 			materialList.push( material );
-
-			function updatePickingColor( object, camera ) {
-
-				this.value.setHex( object.userData.pickingColor );
-
-			}
 
 			var pickingMaterial = new THREE.RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
-				uniforms: {
-					pickingColor: new THREE.Uniform( new THREE.Color() ).onUpdate( updatePickingColor )
-				}
 			} );
+
+			pickingMaterial.isExperimentalMaterial = true;
+
 			materialList.push( pickingMaterial );
 
 			if ( useOverrideMaterial ) {
@@ -651,11 +639,13 @@
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
 				var object = new THREE.Mesh( geo, material );
+
 				objectCount ++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
 
 				var pickingObject;
+
 				if ( ! useOverrideMaterial ) {
 
 					pickingObject = object.clone();
@@ -664,16 +654,20 @@
 				}
 
 				object.material = material;
-				object.userData[ "color" ] = Math.random() * 0xffffff;
+
+				object.addParameter( "color", new THREE.Color( Math.random() * 0xffffff ) );
 
 				if ( useOverrideMaterial ) {
 
-					object.userData[ "pickingColor" ] = i + 1;
+					object.addParameter( "pickingColor", new THREE.Color() );
+					object.pickingColor.setHex( i + 1 );
 
-				}else {
+
+				} else {
 
 					pickingObject.material = pickingMaterial;
-					pickingObject.userData[ "pickingColor" ] = i + 1;
+					pickingObject.addParameter( "pickingColor", new THREE.Color() );
+					pickingObject.pickingColor.setHex( i + 1 );
 
 				}
 

@@ -1,4 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher';
+import { ParameterSource } from '../core/ParameterSource';
 import { NoColors, FrontSide, SmoothShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants';
 import { _Math } from '../math/Math';
 
@@ -26,7 +27,8 @@ function Material() {
 	this.shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading
 	this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
 
-	this.opacity = 1;
+	this.addParameter( 'opacity', 1 );
+
 	this.transparent = false;
 
 	this.blendSrc = SrcAlphaFactor;
@@ -80,7 +82,7 @@ Object.defineProperty( Material.prototype, 'needsUpdate', {
 
 } );
 
-Object.assign( Material.prototype, EventDispatcher.prototype, {
+Object.assign( Material.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
 	isMaterial: true,
 
@@ -348,6 +350,5 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 	}
 
 } );
-
 
 export { Material };

@@ -3,6 +3,8 @@ import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
 import { _Math } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
+import { Vector4 } from '../math/Vector4';
+import { ParameterSource } from '../core/ParameterSource';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -36,8 +38,17 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.format = format !== undefined ? format : RGBAFormat;
 	this.type = type !== undefined ? type : UnsignedByteType;
 
+	function getOffsetRepeat ( parent, value ) {
+
+		return value.set( parent.offset.x, parent.offset.y, parent.repeat.x, parent.repeat.y );
+
+	};
+
+	this.addParameter( 'offsetRepeat', new Vector4( 0, 0, 1, 1 ), 'offsetRepeat', getOffsetRepeat );
+
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -68,7 +79,7 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
-Object.assign( Texture.prototype, EventDispatcher.prototype, {
+Object.assign( Texture.prototype, EventDispatcher.prototype, ParameterSource.prototype, {
 
 	constructor: Texture,
 
@@ -289,6 +300,5 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 	}
 
 } );
-
 
 export { Texture };

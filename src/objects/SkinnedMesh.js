@@ -17,8 +17,9 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 	this.type = 'SkinnedMesh';
 
 	this.bindMode = "attached";
-	this.bindMatrix = new Matrix4();
-	this.bindMatrixInverse = new Matrix4();
+
+	this.addParameter( 'bindMatrix', new Matrix4() );
+	this.addParameter( 'bindMatrixInverse',  new Matrix4() );
 
 	// init bones
 

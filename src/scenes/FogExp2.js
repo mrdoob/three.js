@@ -1,4 +1,5 @@
 import { Color } from '../math/Color';
+import { ParameterSource } from '../core/ParameterSource';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -9,8 +10,8 @@ function FogExp2 ( color, density ) {
 
 	this.name = '';
 
-	this.color = new Color( color );
-	this.density = ( density !== undefined ) ? density : 0.00025;
+	this.addParameter( 'color', new Color( color ), 'fogColor' );
+	this.addParameter( 'density', ( density !== undefined ) ? density : 0.00025, 'fogDensity' );
 
 }
 
@@ -31,5 +32,7 @@ FogExp2.prototype.toJSON = function ( meta ) {
 	};
 
 };
+
+Object.assign( FogExp2.prototype, ParameterSource.prototype );
 
 export { FogExp2 };
