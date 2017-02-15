@@ -14,7 +14,7 @@ function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, 
 	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-	this.generateMipmaps  = false;
+	this.generateMipmaps = false;
 	this.flipY = false;
 	this.unpackAlignment = 1;
 
