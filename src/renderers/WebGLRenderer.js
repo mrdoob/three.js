@@ -1416,56 +1416,36 @@ function WebGLRenderer( parameters ) {
 
 				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
 
+					if ( _this.sortObjects === true ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyMatrix4( _projScreenMatrix );
+
+					}
+
+					var geometry = objects.update( object );
 					var material = object.material;
 
-					if ( material.visible === true ) {
+					if ( Array.isArray( material ) ) {
 
-						if ( _this.sortObjects === true ) {
+						var groups = geometry.groups;
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyMatrix4( _projScreenMatrix );
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-						}
+							var group = groups[ i ];
+							var groupMaterial = material[ group.materialIndex ];
 
-						var geometry = objects.update( object );
+							if ( groupMaterial && groupMaterial.visible === true ) {
 
-						if ( material.isMultiMaterial ) {
-
-							var groups = geometry.groups;
-							var materials = material.materials;
-
-							if ( groups.length > 0 ) {
-
-								// push a render item for each group of the geometry
-
-								for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-									var group = groups[ i ];
-									var groupMaterial = materials[ group.materialIndex ];
-
-									if ( groupMaterial === undefined ) {
-
-										console.warn( 'THREE.WebGLRenderer: MultiMaterial has insufficient amount of materials for geometry. %i material(s) expected but only %i provided.', groups.length, materials.length );
-
-									} else if ( groupMaterial.visible === true ) {
-
-										pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-									}
-
-								}
-
-							} else {
-
-								console.warn( 'THREE.WebGLRenderer: MultiMaterial can not be used without groups.' );
+								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
 
-						} else {
-
-							pushRenderItem( object, geometry, material, _vector3.z, null );
-
 						}
+
+					} else if ( material.visible === true ) {
+
+						pushRenderItem( object, geometry, material, _vector3.z, null );
 
 					}
 

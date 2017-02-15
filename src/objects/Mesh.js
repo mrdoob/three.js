@@ -259,8 +259,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var fvA, fvB, fvC;
-				var isFaceMaterial = ( material && material.isMultiMaterial );
-				var materials = isFaceMaterial === true ? material.materials : null;
+				var isMultiMaterial = Array.isArray( material );
 
 				var vertices = geometry.vertices;
 				var faces = geometry.faces;
@@ -272,7 +271,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					var face = faces[ f ];
-					var faceMaterial = isFaceMaterial === true ? materials[ face.materialIndex ] : material;
+					var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
 
 					if ( faceMaterial === undefined ) continue;
 
