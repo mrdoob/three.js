@@ -29,6 +29,7 @@ import { Line } from '../objects/Line';
 import { LineLoop } from '../objects/LineLoop';
 import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
+import { Bone } from '../objects/Bone';
 import { Mesh } from '../objects/Mesh';
 import { SkinnedMesh } from '../objects/SkinnedMesh';
 import { Fog } from '../scenes/Fog';
@@ -133,7 +134,9 @@ Object.assign( ObjectLoader.prototype, {
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
-		var object = this.parseObject( json.object, geometries, materials );
+		var skeletons = this.parseSkeletons( json.skeletons );
+
+		var object = this.parseObject( json.object, geometries, materials, skeletons );
 
 		if ( json.animations ) {
 
@@ -524,11 +527,27 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
+	parseSkeletons: function ( json ) {
+
+		var skeletons = {};
+
+		if ( json === undefined ) return skeletons;
+
+		for ( var i = 0; i < json.length; i ++ ) {
+
+			skeletons[ json[ i ].uuid ] = json[ i ];
+
+		}
+
+		return skeletons;
+
+	},
+
 	parseObject: function () {
 
 		var matrix = new Matrix4();
 
-		return function parseObject( data, geometries, materials ) {
+		return function parseObject( data, geometries, materials, skeletons, parent ) {
 
 			var object;
 
@@ -555,6 +574,20 @@ Object.assign( ObjectLoader.prototype, {
 				}
 
 				return materials[ name ];
+
+			}
+
+			function getSkeleton( name ) {
+
+				if ( name === undefined ) return undefined;
+
+				if ( skeletons[ name ] === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: Undefined skeleton', name );
+
+				}
+
+				return skeletons[ name ];
 
 			}
 
@@ -659,6 +692,56 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+					var skeleton = getSkeleton( data.skeleton );
+
+					var tmpBones, tmpBoneInverses;
+
+					if ( skeleton !== undefined ) {
+
+						if ( geometry.bones !== undefined ) tmpBones = geometry.bones;
+						if ( geometry.boneInverses !== undefined ) tmpBoneInverses = geometry.boneInverses;
+
+						geometry.bones = skeleton.bones;
+						geometry.boneInverses = skeleton.boneInverses;
+
+					}
+
+					var useVertexTexture = ( skeleton !== undefined ) ? skeleton.useVertexTexture : undefined;
+
+					object = new SkinnedMesh( geometry, material, useVertexTexture );
+
+					if ( skeleton !== undefined ) object.skeleton.uuid = skeleton.uuid;
+					if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
+					if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );
+					object.updateMatrixWorld( true );
+
+					if ( tmpBones !== undefined ) geometry.bones = tmpBones;
+					if ( tmpBoneInverses !== undefined ) geometry.boneInverses = tmpBoneInverses;
+
+					break;
+
+				case 'Bone':
+
+					var arg;
+
+					if ( parent instanceof SkinnedMesh ) {
+
+						arg = parent;
+
+					} else if ( parent instanceof Bone ) {
+
+						arg = parent.skin;
+
+					}
+
+					object = new Bone( arg );
+
+					break;
+
 				case 'LOD':
 
 					object = new LOD();
@@ -744,7 +827,46 @@ Object.assign( ObjectLoader.prototype, {
 
 				for ( var child in data.children ) {
 
-					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object.add( this.parseObject( data.children[ child ], geometries, materials, skeletons, object ) );
+
+				}
+
+			}
+
+			if ( data.type === 'SkinnedMesh' ) {
+
+				var skeleton = getSkeleton( data.skeleton );
+
+				if ( skeleton !== undefined && skeleton.sockets !== undefined ) {
+
+					for ( var i = 0, il = skeleton.sockets.length; i < il; i ++ ) {
+
+						var socket = skeleton.sockets[ i ];
+
+						var found = false;
+
+						for ( var j = 0, jl = object.skeleton.bones.length; j < jl; j ++ ) {
+
+							var bone = object.skeleton.bones[ j ];
+
+							if ( bone.uuid === socket.parent ) {
+
+								bone.add( this.parseObject( socket, geometries, materials, skeletons, bone ) );
+								found = true;
+
+								break;
+
+							}
+
+						}
+
+						if ( ! found ) {
+
+							console.warn( 'THREE.ObjectLoader: not found bone uuid ' + socket.parent + ' in skeleton' );
+
+						}
+
+					}
 
 				}
 

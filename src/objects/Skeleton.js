@@ -2,6 +2,7 @@ import { Matrix4 } from '../math/Matrix4';
 import { FloatType, RGBAFormat } from '../constants';
 import { DataTexture } from '../textures/DataTexture';
 import { _Math } from '../math/Math';
+import { Bone } from './Bone';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -11,6 +12,8 @@ import { _Math } from '../math/Math';
  */
 
 function Skeleton( bones, boneInverses, useVertexTexture ) {
+
+	this.uuid = _Math.generateUUID();
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
@@ -179,6 +182,78 @@ Object.assign( Skeleton.prototype, {
 	clone: function () {
 
 		return new Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = {};
+
+		var scope = this;
+
+		function getParentIndex ( bone ) {
+
+			if ( ! bone.parent instanceof Bone ) return -1;
+
+			for ( var i = 0, il = scope.bones.length; i < il; i ++ ) {
+
+				if ( scope.bones[ i ] === bone.parent ) return i;
+
+			}
+
+			return -1;
+
+		}
+
+		var bones = [];
+		var sockets = [];
+
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+
+			var bone = this.bones[ i ];
+
+			bones.push( {
+
+				name: bone.name,
+				parent: getParentIndex( bone ),
+				pos: bone.position.toArray(),
+				rotq: bone.quaternion.toArray(),
+				scl: bone.scale.toArray(),
+				uuid: bone.uuid
+
+			} );
+
+			for ( var j = 0, jl = bone.children.length; j < jl; j ++ ) {
+
+				var child = bone.children[ j ];
+
+				if ( ! ( child instanceof Bone ) /* || bone.skin !== child.skin */ ) {
+
+					var object = child.toJSON( meta ).object;
+					object.parent = bone.uuid;
+					sockets.push( object );
+
+				}
+
+			}
+
+		}
+
+		var boneInverses = [];
+
+		for ( var i = 0, il = this.boneInverses.length; i < il; i ++ ) {
+
+			boneInverses.push( this.boneInverses[ i ].toArray() );
+
+		}
+
+		data.uuid = this.uuid;
+		data.bones = bones;
+		data.boneInverses = boneInverses;
+		data.useVertexTexture = this.useVertexTexture;
+		if ( sockets.length > 0 ) data.sockets = sockets;
+
+		return data;
 
 	}
 
