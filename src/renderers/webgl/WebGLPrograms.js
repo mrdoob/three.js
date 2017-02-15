@@ -239,6 +239,16 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
+		if ( material.shaderIncludes !== undefined ){
+
+			for( var include in material.shaderIncludes ){
+
+				array.push( material.shaderIncludes[ include ] );
+
+			}
+
+		}
+
 		return array.join();
 
 	};
