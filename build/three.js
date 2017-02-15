@@ -5030,7 +5030,7 @@
 
 	var skinbase_vertex = "#ifdef USE_SKINNING\n\tmat4 boneMatX = getBoneMatrix( skinIndex.x );\n\tmat4 boneMatY = getBoneMatrix( skinIndex.y );\n\tmat4 boneMatZ = getBoneMatrix( skinIndex.z );\n\tmat4 boneMatW = getBoneMatrix( skinIndex.w );\n#endif";
 
-	var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\t#ifdef BONE_TEXTURE\n\t\tuniform sampler2D boneTexture;\n\t\tuniform int boneTextureWidth;\n\t\tuniform int boneTextureHeight;\n\t\tmat4 getBoneMatrix( const in float i ) {\n\t\t\tfloat j = i * 4.0;\n\t\t\tfloat x = mod( j, float( boneTextureWidth ) );\n\t\t\tfloat y = floor( j / float( boneTextureWidth ) );\n\t\t\tfloat dx = 1.0 / float( boneTextureWidth );\n\t\t\tfloat dy = 1.0 / float( boneTextureHeight );\n\t\t\ty = dy * ( y + 0.5 );\n\t\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\t\treturn bone;\n\t\t}\n\t#else\n\t\tuniform mat4 boneMatrices[ MAX_BONES ];\n\t\tmat4 getBoneMatrix( const in float i ) {\n\t\t\tmat4 bone = boneMatrices[ int(i) ];\n\t\t\treturn bone;\n\t\t}\n\t#endif\n#endif\n";
+	var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\t#ifdef BONE_TEXTURE\n\t\tuniform sampler2D boneTexture;\n\t\tuniform int boneTextureSize;\n\t\tmat4 getBoneMatrix( const in float i ) {\n\t\t\tfloat j = i * 4.0;\n\t\t\tfloat x = mod( j, float( boneTextureSize ) );\n\t\t\tfloat y = floor( j / float( boneTextureSize ) );\n\t\t\tfloat dx = 1.0 / float( boneTextureSize );\n\t\t\tfloat dy = 1.0 / float( boneTextureSize );\n\t\t\ty = dy * ( y + 0.5 );\n\t\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\t\treturn bone;\n\t\t}\n\t#else\n\t\tuniform mat4 boneMatrices[ MAX_BONES ];\n\t\tmat4 getBoneMatrix( const in float i ) {\n\t\t\tmat4 bone = boneMatrices[ int(i) ];\n\t\t\treturn bone;\n\t\t}\n\t#endif\n#endif\n";
 
 	var skinning_vertex = "#ifdef USE_SKINNING\n\tvec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );\n\tvec4 skinned = vec4( 0.0 );\n\tskinned += boneMatX * skinVertex * skinWeight.x;\n\tskinned += boneMatY * skinVertex * skinWeight.y;\n\tskinned += boneMatZ * skinVertex * skinWeight.z;\n\tskinned += boneMatW * skinVertex * skinWeight.w;\n\tskinned  = bindMatrixInverse * skinned;\n#endif\n";
 
@@ -5750,7 +5750,7 @@
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
 		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-		this.generateMipmaps  = false;
+		this.generateMipmaps = false;
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
@@ -16496,7 +16496,6 @@
 
 			prefixVertex = [
 
-	        
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
@@ -16511,7 +16510,6 @@
 				'#define MAX_BONES ' + parameters.maxBones,
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
-
 
 				parameters.map ? '#define USE_MAP' : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
@@ -16894,7 +16892,35 @@
 
 		function allocateBones( object ) {
 
-			if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+			var skeleton = object.skeleton;
+			var bones = skeleton.bones;
+
+			if ( capabilities.floatVertexTextures ) {
+
+				if ( skeleton.boneTexture === undefined ) {
+
+					// layout (1 matrix = 4 pixels)
+					//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+					//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+					//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+					//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+					//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+
+
+					var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
+					size = _Math.nextPowerOfTwo( Math.ceil( size ) );
+					size = Math.max( size, 4 );
+
+					var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+					boneMatrices.set( skeleton.boneMatrices ); // copy current values
+
+					var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+
+					skeleton.boneMatrices = boneMatrices;
+					skeleton.boneTexture = boneTexture;
+					skeleton.boneTextureSize = size;
+
+				}
 
 				return 1024;
 
@@ -16910,17 +16936,12 @@
 				var nVertexUniforms = capabilities.maxVertexUniforms;
 				var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
-				var maxBones = nVertexMatrices;
+				var maxBones = Math.min( nVertexMatrices, bones.length );
 
-				if ( object && object.isSkinnedMesh ) {
+				if ( maxBones < bones.length ) {
 
-					maxBones = Math.min( object.skeleton.bones.length, maxBones );
-
-					if ( maxBones < object.skeleton.bones.length ) {
-
-						console.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
-
-					}
+					console.warn( 'THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.' );
+					return 0;
 
 				}
 
@@ -16967,7 +16988,7 @@
 			// heuristics to create shader parameters according to lights in the scene
 			// (not to blow over maxLights budget)
 
-			var maxBones = allocateBones( object );
+			var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
 			var precision = renderer.getPrecision();
 
 			if ( material.precision !== null ) {
@@ -17024,9 +17045,9 @@
 				sizeAttenuation: material.sizeAttenuation,
 				logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-				skinning: ( object && object.isSkinnedMesh ),
+				skinning: ( object && object.isSkinnedMesh ) && maxBones > 0,
 				maxBones: maxBones,
-				useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+				useVertexTexture: capabilities.floatVertexTextures,
 
 				morphTargets: material.morphTargets,
 				morphNormals: material.morphNormals,
@@ -21479,11 +21500,10 @@
 
 				if ( skeleton ) {
 
-					if ( capabilities.floatVertexTextures && skeleton.useVertexTexture ) {
+					if ( capabilities.floatVertexTextures ) {
 
 						p_uniforms.set( _gl, skeleton, 'boneTexture' );
-						p_uniforms.set( _gl, skeleton, 'boneTextureWidth' );
-						p_uniforms.set( _gl, skeleton, 'boneTextureHeight' );
+						p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
 
 					} else {
 
@@ -23027,9 +23047,7 @@
 	 * @author ikerr / http://verold.com
 	 */
 
-	function Skeleton( bones, boneInverses, useVertexTexture ) {
-
-		this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
+	function Skeleton( bones, boneInverses ) {
 
 		this.identityMatrix = new Matrix4();
 
@@ -23038,34 +23056,7 @@
 		bones = bones || [];
 
 		this.bones = bones.slice( 0 );
-
-		// create a bone texture or an array of floats
-
-		if ( this.useVertexTexture ) {
-
-			// layout (1 matrix = 4 pixels)
-			//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-			//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
-			//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
-			//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
-			//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-
-
-			var size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-			size = _Math.nextPowerOfTwo( Math.ceil( size ) );
-			size = Math.max( size, 4 );
-
-			this.boneTextureWidth = size;
-			this.boneTextureHeight = size;
-
-			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
-			this.boneTexture = new DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, RGBAFormat, FloatType );
-
-		} else {
-
-			this.boneMatrices = new Float32Array( 16 * this.bones.length );
-
-		}
+		this.boneMatrices = new Float32Array( this.bones.length * 16 );
 
 		// use the supplied bone inverses or calculate the inverses
 
@@ -23170,22 +23161,27 @@
 
 			return function update() {
 
+				var bones = this.bones;
+				var boneInverses = this.boneInverses;
+				var boneMatrices = this.boneMatrices;
+				var boneTexture = this.boneTexture;
+
 				// flatten bone matrices to array
 
-				for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+				for ( var b = 0, bl = bones.length; b < bl; b ++ ) {
 
 					// compute the offset between the current and the original transform
 
-					var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
+					var matrix = bones[ b ] ? bones[ b ].matrixWorld : this.identityMatrix;
 
-					offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
-					offsetMatrix.toArray( this.boneMatrices, b * 16 );
+					offsetMatrix.multiplyMatrices( matrix, boneInverses[ b ] );
+					offsetMatrix.toArray( boneMatrices, b * 16 );
 
 				}
 
-				if ( this.useVertexTexture ) {
+				if ( boneTexture !== undefined ) {
 
-					this.boneTexture.needsUpdate = true;
+					boneTexture.needsUpdate = true;
 
 				}
 
@@ -23195,7 +23191,7 @@
 
 		clone: function () {
 
-			return new Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+			return new Skeleton( this.bones, this.boneInverses );
 
 		}
 
@@ -23229,7 +23225,7 @@
 	 * @author ikerr / http://verold.com
 	 */
 
-	function SkinnedMesh( geometry, material, useVertexTexture ) {
+	function SkinnedMesh( geometry, material ) {
 
 		Mesh.call( this, geometry, material );
 
@@ -23286,7 +23282,7 @@
 		this.normalizeSkinWeights();
 
 		this.updateMatrixWorld( true );
-		this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
+		this.bind( new Skeleton( bones ), this.matrixWorld );
 
 	}
 
@@ -23398,7 +23394,7 @@
 
 		clone: function () {
 
-			return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
+			return new this.constructor( this.geometry, this.material ).copy( this );
 
 		}
 
@@ -42034,6 +42030,21 @@
 				return this.levels;
 
 			}
+		}
+
+	} );
+
+	Object.defineProperty( Skeleton.prototype, 'useVertexTexture', {
+
+		get: function () {
+
+			console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.Skeleton: useVertexTexture has been removed.' );
+
 		}
 
 	} );
