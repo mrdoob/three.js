@@ -215,7 +215,7 @@
 				<span></span>
 			</a>
 			<div class="filterBlock" >
-				<input type="text" id="filterInput" placeholder="Type to filter" autofocus/>
+				<input type="text" id="filterInput" placeholder="Type to filter"/>
 				<a href="#" id="clearFilterButton" >x</a>
 			</div>
 			<div id="content"></div>
@@ -229,7 +229,7 @@
 				var p = window.location.search.indexOf( '?q=' );
 				if( p !== -1 ) {
 					return window.location.search.substr( 3 );
-				} 
+				}
 				return ''
 			}
 
