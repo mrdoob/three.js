@@ -66,6 +66,10 @@
 		<script>
 			var container, stats;
 			var camera, scene, renderer;
+			var meshMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
+			var INTERSECTED = {
+				material: new THREE.MeshBasicMaterial({ color: 0xffff00 }),
+			};
 			var lookAtScene = true;
 			init();
 			animate();
@@ -94,6 +98,8 @@
 				camera.position.y = 100;
 				camera.position.z = 200;
 				scene = new THREE.Scene();
+				cubes = new THREE.Group();
+				scene.add(cubes);
 
 				// Grid
 				var size = 500, step = 50;
@@ -109,14 +115,14 @@
 
 				// Cubes
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
+
 				for ( var i = 0; i < 100; i ++ ) {
-					var cube = new THREE.Mesh( geometry, material );
+					var cube = new THREE.Mesh( geometry, meshMaterial );
 					cube.scale.y = Math.floor( Math.random() * 2 + 1 );
 					cube.position.x = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
 					cube.position.y = ( cube.scale.y * 50 ) / 2;
 					cube.position.z = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
-					scene.add(cube);
+					cubes.add(cube);
 				}
 
 				// Lights
@@ -149,6 +155,11 @@
 				controls.enableZoom = true;
 				scene.add( line );
 
+				// Raycaster
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -158,13 +169,33 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 				}
 			}
-			//
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				// find intersections
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( cubes.children );
+				if ( intersects.length > 0 && INTERSECTED.object != intersects[ 0 ].object) {
+					console.log( scene );
+					if( INTERSECTED.object ){
+						INTERSECTED.object.material = meshMaterial;
+					}
+						INTERSECTED.object = intersects[ 0 ].object;
+					INTERSECTED.object.material = INTERSECTED.material;
+				}
+
+			}
+
 			function animate() {
 				requestAnimationFrame( animate );
 				stats.begin();
 				render();
 				stats.end();
 			}
+
 			function render() {
 				//var timer = Date.now() * 0.0001;
 				//camera.position.x = Math.cos( timer ) * 200;
