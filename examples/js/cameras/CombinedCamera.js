@@ -53,8 +53,8 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 	this.projectionMatrix = this.cameraP.projectionMatrix;
 
-	this.inPerspectiveMode = true;
-	this.inOrthographicMode = false;
+	this.isPerspectiveCamera = true;
+	this.isOrthographicCamera = false;
 
 };
 
@@ -89,8 +89,8 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	this.far = this.cameraO.far;
 	this.projectionMatrix = this.cameraO.projectionMatrix;
 
-	this.inPerspectiveMode = false;
-	this.inOrthographicMode = true;
+	this.isPerspectiveCamera = false;
+	this.isOrthographicCamera = true;
 
 };
 
@@ -114,8 +114,8 @@ THREE.CombinedCamera.prototype.copy = function ( source ) {
 	this.cameraO.copy( source.cameraO );
 	this.cameraP.copy( source.cameraP );
 
-	this.inOrthographicMode = source.inOrthographicMode;
-	this.inPerspectiveMode = source.inPerspectiveMode;
+	this.isOrthographicCamera = source.isOrthographicCamera;
+	this.isPerspectiveCamera = source.isPerspectiveCamera;
 
 	return this;
 
@@ -168,7 +168,7 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 	this.fov = fov;
 
-	if ( this.inPerspectiveMode ) {
+	if ( this.isPerspectiveCamera ) {
 
 		this.toPerspective();
 
@@ -184,7 +184,7 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
 
-	if ( this.inPerspectiveMode ) {
+	if ( this.isPerspectiveCamera ) {
 
 		this.toPerspective();
 
@@ -222,7 +222,7 @@ THREE.CombinedCamera.prototype.setZoom = function( zoom ) {
 
 	this.zoom = zoom;
 
-	if ( this.inPerspectiveMode ) {
+	if ( this.isPerspectiveCamera ) {
 
 		this.toPerspective();
 
