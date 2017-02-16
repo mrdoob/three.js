@@ -22,6 +22,7 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/cameras/CombinedCamera.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -104,6 +105,13 @@
 				}
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
 				var line = new THREE.LineSegments( geometry, material );
+				// Controls
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // remove when using animation loop
+				// enable animation loop when using damping or autorotation
+				//controls.enableDamping = true;
+				//controls.dampingFactor = 0.25;
+				controls.enableZoom = false;
 				scene.add( line );
 				// Cubes
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
@@ -153,10 +161,10 @@
 				stats.end();
 			}
 			function render() {
-				var timer = Date.now() * 0.0001;
-				camera.position.x = Math.cos( timer ) * 200;
-				camera.position.z = Math.sin( timer ) * 200;
-				if ( lookAtScene ) camera.lookAt( scene.position );
+				//var timer = Date.now() * 0.0001;
+				//camera.position.x = Math.cos( timer ) * 200;
+				//camera.position.z = Math.sin( timer ) * 200;
+				//if ( lookAtScene ) camera.lookAt( scene.position );
 				renderer.render( scene, camera );
 			}
 		</script>
