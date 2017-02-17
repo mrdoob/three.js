@@ -213,7 +213,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== UVMapping ) return;
+		if ( this.mapping !== UVMapping ) return uv;
 
 		uv.multiply( this.repeat );
 		uv.add( this.offset );
@@ -285,6 +285,8 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 			uv.y = 1 - uv.y;
 
 		}
+
+		return uv;
 
 	}
 
