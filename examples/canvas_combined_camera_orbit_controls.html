@@ -179,7 +179,6 @@
 				raycaster.setFromCamera( mouse, camera );
 				var intersects = raycaster.intersectObjects( cubes.children );
 				if ( intersects.length > 0 && INTERSECTED.object != intersects[ 0 ].object) {
-					console.log( scene );
 					if( INTERSECTED.object ){
 						INTERSECTED.object.material = meshMaterial;
 					}
