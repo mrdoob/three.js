@@ -95,7 +95,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/loaders/GLTF2Loader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -202,8 +202,8 @@
 					scene.add(ground);
 				}
 
-				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
-				loader = new THREE.GLTFLoader;
+				THREE.GLTF2Loader.Shaders.removeAll(); // remove all previous shaders
+				loader = new THREE.GLTF2Loader;
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -338,7 +338,7 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				if (mixer) mixer.update(clock.getDelta());
-				THREE.GLTFLoader.Shaders.update(scene, camera);
+				THREE.GLTF2Loader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
