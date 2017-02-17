@@ -26,15 +26,18 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	raycast: ( function () {
 
 		var intersectPoint = new Vector3();
-		var matrixPosition = new Vector3();
+		var worldPosition = new Vector3();
+		var worldScale = new Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
-			raycaster.ray.closestPointToPoint( matrixPosition, intersectPoint );
-			var guessSizeSq = this.scale.x * this.scale.y / 4;
+			worldPosition.setFromMatrixPosition( this.matrixWorld );
+			raycaster.ray.closestPointToPoint( worldPosition, intersectPoint );
 
-			if ( matrixPosition.distanceToSquared( intersectPoint ) > guessSizeSq ) return;
+			worldScale.setFromMatrixScale( this.matrixWorld );
+			var guessSizeSq = worldScale.x * worldScale.y / 4;
+
+			if ( worldPosition.distanceToSquared( intersectPoint ) > guessSizeSq ) return;
 
 			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
