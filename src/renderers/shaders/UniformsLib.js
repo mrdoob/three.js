@@ -140,7 +140,8 @@ var UniformsLib = {
 			shadow: {},
 			shadowBias: {},
 			shadowRadius: {},
-			shadowMapSize: {}
+			shadowMapSize: {},
+			shadowCameraFar: {},
 		} },
 
 		pointShadowMap: { value: [] },
