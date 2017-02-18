@@ -202,6 +202,21 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
 
+			if( this.combine ) data.combine = this.combine;
+			if( this.envMapIntensity ) data.envMapIntensity = this.envMapIntensity;
+			if( this.refractionRatio ) data.refractionRatio = this.refractionRatio;
+
+		}
+
+		if( this.aoMap && this.aoMap.isTexture ) {
+			
+			data.aoMap = this.aoMap.toJSON(meta).uuid;
+
+		}
+		if( this.aoMapIntensity ) {
+			
+			data.aoMapIntensity = this.aoMapIntensity;
+
 		}
 
 		if ( this.gradientMap && this.gradientMap.isTexture ) {
@@ -233,6 +248,9 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
 		data.morphTargets = this.morphTargets;
+		if(this.morphNormals) data.morphNormals = this.morphNormals;
+		
+		if(this.skinning) data.skinning = this.skinning;
 
 		// TODO: Copied from Object3D.toJSON
 

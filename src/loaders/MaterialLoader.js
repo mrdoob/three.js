@@ -73,15 +73,20 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+		
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 		if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
+
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
+		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
+		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 
 		// for PointsMaterial
 
@@ -134,7 +139,10 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
 
 		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
-
+		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
+		if ( json.combine !== undefined ) material.combine = json.combine;
+		if ( json.refractionRatio !== undefined ) material.refractionRatio = json.refractionRatio;
+		
 		if ( json.lightMap !== undefined ) material.lightMap = getTexture( json.lightMap );
 		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;
 
