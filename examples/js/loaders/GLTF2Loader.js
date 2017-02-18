@@ -3,19 +3,20 @@
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
+ * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-THREE.GLTFLoader = ( function () {
+THREE.GLTF2Loader = ( function () {
 
-	function GLTFLoader( manager ) {
+	function GLTF2Loader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	}
 
-	GLTFLoader.prototype = {
+	GLTF2Loader.prototype = {
 
-		constructor: GLTFLoader,
+		constructor: GLTF2Loader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -73,7 +74,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			console.time( 'GLTFLoader' );
+			console.time( 'GLTF2Loader' );
 
 			var parser = new GLTFParser( json, extensions, {
 
@@ -84,7 +85,7 @@ THREE.GLTFLoader = ( function () {
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
 
-				console.timeEnd( 'GLTFLoader' );
+				console.timeEnd( 'GLTF2Loader' );
 
 				var glTF = {
 					"scene": scene,
@@ -164,7 +165,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* GLTFSHADERS */
 
-	GLTFLoader.Shaders = new GLTFRegistry();
+	GLTF2Loader.Shaders = new GLTFRegistry();
 
 	/* GLTFSHADER */
 
@@ -264,19 +265,6 @@ THREE.GLTFLoader = ( function () {
 					break;
 
 			}
-
-		}
-
-	};
-
-
-	/* ANIMATION */
-
-	GLTFLoader.Animations = {
-
-		update: function () {
-
-			console.warn( 'THREE.GLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
 
 		}
 
@@ -984,7 +972,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
-				console.warn( 'THREE.GLTFLoader: ' + buffer.type + ' buffer type is not supported' );
+				console.warn( 'THREE.GLTF2Loader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
@@ -1108,7 +1096,7 @@ THREE.GLTFLoader = ( function () {
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
-								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								console.warn( 'THREE.GLTF2Loader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
 								              'internalFormat will be forced to be the same value as format.' );
 
 							}
@@ -1944,7 +1932,7 @@ THREE.GLTFLoader = ( function () {
 
 							if ( group === undefined ) {
 
-								console.warn( 'GLTFLoader: Couldn\'t find node "' + mesh + '".' );
+								console.warn( 'GLTF2Loader: Couldn\'t find node "' + mesh + '".' );
 								continue;
 
 							}
@@ -2172,11 +2160,11 @@ THREE.GLTFLoader = ( function () {
 
 				_scene.traverse( function ( child ) {
 
-					// Register raw material meshes with GLTFLoader.Shaders
+					// Register raw material meshes with GLTF2Loader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
 						var xshader = new GLTFShader( child, dependencies.nodes );
-						GLTFLoader.Shaders.add( child.uuid, xshader );
+						GLTF2Loader.Shaders.add( child.uuid, xshader );
 
 					}
 
@@ -2190,6 +2178,6 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	return GLTFLoader;
+	return GLTF2Loader;
 
 } )();

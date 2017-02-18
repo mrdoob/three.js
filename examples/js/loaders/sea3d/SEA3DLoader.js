@@ -1603,7 +1603,7 @@ THREE.SEA3D.prototype.updateTransform = function ( obj3d, sea ) {
 
 	var mtx = THREE.SEA3D.MTXBUF, vec = THREE.SEA3D.VECBUF;
 
-	if ( sea.transform ) mtx.elements.set( sea.transform );
+	if ( sea.transform ) mtx.fromArray( sea.transform );
 	else mtx.makeTranslation( sea.position.x, sea.position.y, sea.position.z );
 
 	// matrix
@@ -1993,7 +1993,6 @@ THREE.SEA3D.prototype.readMesh = function ( sea ) {
 
 				mats[ i ] = sea.material[ i ].tag;
 
-				mats[ i ].skinning = skeleton != undefined;
 				mats[ i ].morphTargets = uMorph;
 				mats[ i ].morphNormals = uMorphNormal;
 				mats[ i ].vertexColors = sea.geometry.color ? THREE.VertexColors : THREE.NoColors;
@@ -2006,7 +2005,6 @@ THREE.SEA3D.prototype.readMesh = function ( sea ) {
 
 			mat = sea.material[ 0 ].tag;
 
-			mat.skinning = skeleton != undefined;
 			mat.morphTargets = uMorph;
 			mat.morphNormals = uMorphNormal;
 			mat.vertexColors = sea.geometry.color ? THREE.VertexColors : THREE.NoColors;

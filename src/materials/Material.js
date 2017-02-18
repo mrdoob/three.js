@@ -232,7 +232,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
 		// TODO: Copied from Object3D.toJSON

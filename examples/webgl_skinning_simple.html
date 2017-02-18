@@ -63,12 +63,6 @@
 
 				loader.load( './models/skinned/simple/simple.js', function ( geometry, materials ) {
 
-					for ( var k in materials ) {
-
-						materials[k].skinning = true;
-
-					}
-
 					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MultiMaterial(materials));
 					skinnedMesh.scale.set( 1, 1, 1 );
 

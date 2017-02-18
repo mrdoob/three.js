@@ -10,7 +10,7 @@ import { Matrix4 } from '../math/Matrix4';
  * @author ikerr / http://verold.com
  */
 
-function SkinnedMesh( geometry, material, useVertexTexture ) {
+function SkinnedMesh( geometry, material ) {
 
 	Mesh.call( this, geometry, material );
 
@@ -67,7 +67,7 @@ function SkinnedMesh( geometry, material, useVertexTexture ) {
 	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
-	this.bind( new Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
+	this.bind( new Skeleton( bones ), this.matrixWorld );
 
 }
 
@@ -77,7 +77,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	isSkinnedMesh: true,
 
-	bind: function( skeleton, bindMatrix ) {
+	bind: function ( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
 
@@ -157,7 +157,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	updateMatrixWorld: function( force ) {
+	updateMatrixWorld: function () {
 
 		Mesh.prototype.updateMatrixWorld.call( this, true );
 
@@ -177,9 +177,9 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	clone: function() {
+	clone: function () {
 
-		return new this.constructor( this.geometry, this.material, this.skeleton.useVertexTexture ).copy( this );
+		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 
