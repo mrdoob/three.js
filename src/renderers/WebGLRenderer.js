@@ -1548,9 +1548,13 @@ function WebGLRenderer( parameters ) {
 
 				var shader = ShaderLib[ parameters.shaderID ];
 
+				var ph_uniforms = undefined !== material.shaderUniforms ?
+					UniformsUtils.merge([ UniformsUtils.clone( shader.uniforms ) , material.shaderUniforms ]) :
+					UniformsUtils.clone( shader.uniforms );
+
 				materialProperties.__webglShader = {
 					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
+					uniforms: ph_uniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
 				};
@@ -1883,6 +1887,13 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+			//refresh shaderUniforms
+			if ( undefined !== material.shaderUniforms ) {
+
+				refreshUniformsCustom( m_uniforms , material );
+
+			}
+
 			// refresh single material specific uniforms
 
 			if ( material.isLineBasicMaterial ) {
@@ -2062,6 +2073,14 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
+
+	}
+
+	function refreshUniformsCustom( uniforms, material ) {
+
+		for ( var uniform in material.shaderUniforms ) 
+
+			uniforms[ uniform ].value = material.shaderUniforms[ uniform ].value;
 
 	}
 

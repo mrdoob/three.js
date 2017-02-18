@@ -33,6 +33,7 @@
 		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -41,6 +42,7 @@
 			var camera, scene, renderer, clock, stats;
 			var dirLight, spotLight;
 			var sphere;
+			var gui;
 
 			init();
 			animate();
@@ -50,6 +52,10 @@
 
 				initScene();
 				initMisc();
+
+				gui = new dat.GUI();
+
+				gui.add( sphere.material.shaderUniforms.uVertexOffset , 'value' , 0 , 1 );
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -99,9 +105,8 @@
 
 				/**
 				 * create a displacement effect for material
+				 * define custom includes and custom uniforms
 				 */
-
-				 console.log( THREE );
 
 				var shaderIncludes = {
 
@@ -114,22 +119,23 @@
 
 						THREE.ShaderChunk['uv_pars_vertex'],
 
-						//a noise function
-
-						"float noise(vec3 p)",
-						"{",
-						    "p  = fract( p*0.3183099+.1 );",
-							"p *= 17.0;",
-						    "return fract( p.x*p.y*p.z*(p.x+p.y+p.z) );",
-						"}",
-
 						//some uniforms
 
 						"uniform float uGlobalTime;",
 
 						"uniform float uNoiseScale;",
 
-						"uniform float uVertexOffset;"
+						"uniform float uVertexOffset;",
+
+						//a noise function
+
+						"float noise(vec3 p)",
+						"{",
+						"	p *= uNoiseScale;",
+						"	p  = fract( p*0.3183099+.1 );",
+						"	p *= 17.0;",
+						"	return fract( p.x*p.y*p.z*(p.x+p.y+p.z) );",
+						"}",
 
 					].join("\n"),
 
@@ -144,12 +150,23 @@
 
 					begin_vertex: [
 
-						// "vec3 transformed = vec3( position ) + noise( vec3( position ) * objectNormal );"
-
 						"float offset = sin( position.z * 5. );",
-						"vec3 transformed = vec3( position ) + vec3(0.,offset,.0)*.4;"
+
+						"vec3 transformed = vec3( position ) + vec3(0.,offset,.0) * uVertexOffset;"
 
 					].join("\n")
+
+
+				};
+
+				var shaderUniforms = {
+
+					//hook the three uniforms defined in the custom chunks
+					uGlobalTime:{ value: 0 },
+
+					uNoiseScale:{ value : 1 },
+
+					uVertexOffset:{ value : 1 }
 
 				};
 
@@ -162,6 +179,7 @@
 				depthMaterialTemplate.clipping = true;
 
 				depthMaterialTemplate.shaderIncludes = shaderIncludes;
+				depthMaterialTemplate.shaderUniforms = shaderUniforms;
 
 
 				//create a distance material
@@ -176,6 +194,8 @@
 				});
 
 				distanceMaterialTemplate.shaderIncludes = shaderIncludes;
+				distanceMaterialTemplate.shaderUniforms = shaderUniforms;
+
 
 
 				var material = new THREE.MeshPhongMaterial( {
@@ -189,6 +209,7 @@
 				//modify the material
 
 				material.shaderIncludes = shaderIncludes;
+				material.shaderUniforms = shaderUniforms;
 
 				sphere = new THREE.Mesh( geometry, material );
 				sphere.position.y = 8;
@@ -268,12 +289,21 @@
 
 				renderScene();
 
-				sphere.rotation.x += 0.25 * delta;
-				sphere.rotation.y += 2 * delta;
-				sphere.rotation.z += 1 * delta;
+				sphere.rotation.x += 0.025 * delta;
+				sphere.rotation.y += 0.2 * delta;
+				sphere.rotation.z += 0.1 * delta;
 
 			}
 
 		</script>
 	</body>
 </html>
+
+
+
+
+
+
+
+
+
