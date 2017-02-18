@@ -53,9 +53,17 @@
 				initScene();
 				initMisc();
 
+				var shaderOption = { switch: true };
+
 				gui = new dat.GUI();
 
 				gui.add( sphere.material.shaderUniforms.uVertexOffset , 'value' , 0 , 1 );
+				gui.add( sphere.material.shaderUniforms.uNoiseScale , 'value' , 0 , 1 );
+				gui.add( shaderOption , 'switch' ).onChange( function(){
+
+					sphere.material.shaderUniforms.uSwitch.value = shaderOption.switch ? 1 : 0;
+
+				});
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -127,6 +135,8 @@
 
 						"uniform float uVertexOffset;",
 
+						"uniform int uSwitch;",
+
 						//a noise function
 
 						"float noise(vec3 p)",
@@ -150,9 +160,21 @@
 
 					begin_vertex: [
 
-						"float offset = sin( position.z * 5. );",
+						"float offset;",
 
-						"vec3 transformed = vec3( position ) + vec3(0.,offset,.0) * uVertexOffset;"
+						"if ( uSwitch == 0 ) {",
+						
+						"	vec2 ll = vec2( atan( position.x , position.y ) , acos( position.z / length( position ) ) );",
+						
+						"	offset = min( sin( ll.x * 16.5 * uNoiseScale ) , sin( ll.y * 16.5 * uNoiseScale ) ) * .5 + .5;",
+						
+						"}",
+
+						"else ",
+
+						"	offset = noise( position * uNoiseScale );",
+
+						"vec3 transformed = vec3( position ) + normal * offset * uVertexOffset;"
 
 					].join("\n")
 
@@ -166,7 +188,9 @@
 
 					uNoiseScale:{ value : 1 },
 
-					uVertexOffset:{ value : 1 }
+					uVertexOffset:{ value : 1 },
+
+					uSwitch:{ value : 1 }
 
 				};
 
