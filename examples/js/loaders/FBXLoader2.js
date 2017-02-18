@@ -1210,23 +1210,20 @@
 								} else {
 
 									material = new THREE.MeshBasicMaterial( { color: 0x3300ff } );
+									materials.push( material );
 
 								}
 								if ( 'color' in geometry.attributes ) {
 
-									material.vertexColors = THREE.VertexColors;
+									for ( var materialIndex = 0, numMaterials = materials.length; materialIndex < numMaterials; ++materialIndex ) {
+
+										materials[ materialIndex ].vertexColors = THREE.VertexColors;
+
+									}
 
 								}
 								if ( geometry.FBX_Deformer ) {
 
-									for ( var materialsIndex = 0, materialsLength = materials.length; materialsIndex < materialsLength; ++ materialsIndex ) {
-
-										var material = materials[ materialsIndex ];
-
-										material.skinning = true;
-
-									}
-									material.skinning = true;
 									model = new THREE.SkinnedMesh( geometry, material );
 
 								} else {

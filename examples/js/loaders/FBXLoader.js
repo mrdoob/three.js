@@ -464,20 +464,6 @@
 
 			if ( geometry.bones !== undefined && geometry.skinWeights !== undefined && geometry.skinWeights.length > 0 ) {
 
-				if ( material instanceof THREE.MultiMaterial ) {
-
-					for ( var i = 0; i < material.materials.length; ++ i ) {
-
-						material.materials[ i ].skinning = true;
-
-					}
-
-				} else {
-
-					material.skinning = true;
-
-				}
-
 				mesh = new THREE.SkinnedMesh( geometry, material );
 
 			} else {

@@ -486,8 +486,7 @@ THREE.Projector = function () {
 
 					var material = object.material;
 
-					var isFaceMaterial = material instanceof THREE.MultiMaterial;
-					var objectMaterials = isFaceMaterial === true ? object.material : null;
+					var isMultiMaterial = Array.isArray( material );
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
@@ -525,8 +524,8 @@ THREE.Projector = function () {
 
 						var face = faces[ f ];
 
-						material = isFaceMaterial === true
-							 ? objectMaterials.materials[ face.materialIndex ]
+						material = isMultiMaterial === true
+							 ? object.material[ face.materialIndex ]
 							 : object.material;
 
 						if ( material === undefined ) continue;

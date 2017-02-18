@@ -202,7 +202,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 			fragmentShader: fragmentShader,
 			side: THREE.BackSide,
 			//wireframe: true,
-			skinning: false,
 			morphTargets: false,
 			morphNormals: false,
 			fog: false
@@ -337,7 +336,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		var outlineParameters = originalMaterial.outlineParameters;
 
-		material.skinning = originalMaterial.skinning;
 		material.morphTargets = originalMaterial.morphTargets;
 		material.morphNormals = originalMaterial.morphNormals;
 		material.fog = originalMaterial.fog;
