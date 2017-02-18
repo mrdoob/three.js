@@ -54,6 +54,7 @@ function MeshBasicMaterial( parameters ) {
 	this.aoMapIntensity = 1.0;
 
 	this.specularMap = null;
+	this.specularStrength = 1;
 
 	this.alphaMap = null;
 
@@ -95,6 +96,7 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.aoMapIntensity = source.aoMapIntensity;
 
 	this.specularMap = source.specularMap;
+	this.specularStrength = source.specularStrength;
 
 	this.alphaMap = source.alphaMap;
 

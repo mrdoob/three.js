@@ -2125,12 +2125,15 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		uniforms.uSpecularStrength.value = Math.max( Math.min( material.specularStrength , 1. ) , .0 );
+
 	}
 
 	function refreshUniformsPhong( uniforms, material ) {
 
 		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+		uniforms.uSpecularStrength.value = Math.max( Math.min( material.specularStrength , 1. ) , .0 );
 
 		if ( material.emissiveMap ) {
 

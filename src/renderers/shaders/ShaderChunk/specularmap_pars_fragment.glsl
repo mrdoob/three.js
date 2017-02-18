@@ -3,3 +3,5 @@
 	uniform sampler2D specularMap;
 
 #endif
+
+uniform float uSpecularStrength;
