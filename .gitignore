@@ -6,4 +6,3 @@ node_modules
 .vscode/
 npm-debug.log
 
-build/three.js
