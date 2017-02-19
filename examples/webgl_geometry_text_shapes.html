@@ -65,12 +65,6 @@
 						side: THREE.DoubleSide
 					} );
 
-					var xMove = function( shape, shapeMid ) {
-
-						return shape.translate( shapeMid, 0, 0 );
-
-					}
-
 					var message = "   Three.js\nSimple text.";
 
 					var shapes = font.generateShapes( message, 100, 2 );
@@ -81,7 +75,7 @@
 
 					xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
 
-					xMove( geometry, xMid );
+					geometry.translate( xMid, 0, 0 );
 
 					// make shape ( N.B. edge view not visible )
 
@@ -93,6 +87,27 @@
 
 			        // make line shape ( N.B. edge view remains visible )
 
+			      		var holeShapes = [];
+
+					for ( var i = 0; i < shapes.length; i ++ ) {
+
+						var shape = shapes[ i ];
+
+						if ( shape.holes && shape.holes.length > 0 ) {
+
+							for ( var j = 0; j < shape.holes.length; j ++ ) {
+
+								var hole = shape.holes[ j ];
+								holeShapes.push( hole );
+
+							}
+
+						}
+
+					}
+
+					shapes.push.apply( shapes, holeShapes );
+
 					var lineText = new THREE.Object3D();
 
 					for ( var i = 0; i < shapes.length; i ++ ) {
@@ -101,21 +116,10 @@
 
 						var lineGeometry = shape.createPointsGeometry();
 
-						xMove( lineGeometry, xMid );
+						lineGeometry.translate( xMid, 0, 0 );
 
 						var lineMesh = new THREE.Line( lineGeometry, matDark );
 						lineText.add( lineMesh );
-
-						if ( shape.holes && shape.holes.length > 0 ) {
-
-							for ( var j = 0; j < shape.holes.length; j ++ ) {
-
-								var hole = shape.holes[ j ];
-								shapes.push( hole );
-
-							}
-
-						}
 
 					}
 
