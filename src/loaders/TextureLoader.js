@@ -23,13 +23,12 @@ Object.assign( TextureLoader.prototype, {
 		var loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
-		loader.load( url, function ( image ) {
+		var image = loader.load( url, function ( image ) {
 
 			// JPEGs can't have an alpha channel, so memory can be saved by storing them as RGB.
 			var isJPEG = url.search( /\.(jpg|jpeg)$/ ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
 
 			texture.format = isJPEG ? RGBFormat : RGBAFormat;
-			texture.image = image;
 			texture.needsUpdate = true;
 
 			if ( onLoad !== undefined ) {
@@ -40,6 +39,7 @@ Object.assign( TextureLoader.prototype, {
 
 		}, onProgress, onError );
 
+		texture.image = image;
 		return texture;
 
 	},
