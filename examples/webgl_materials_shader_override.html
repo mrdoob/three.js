@@ -108,7 +108,7 @@
 				scene.add( dirLight );
 
 				// Geometry
-				var geometry = new THREE.SphereBufferGeometry( 4, 128, 128 );
+				var geometry = new THREE.SphereBufferGeometry( 4, 200, 200 );
 
 
 				/**
@@ -166,7 +166,7 @@
 						
 						"	vec2 ll = vec2( atan( position.x , position.y ) , acos( position.z / length( position ) ) );",
 						
-						"	offset = min( sin( ll.x * 16.5 * uNoiseScale ) , sin( ll.y * 16.5 * uNoiseScale ) ) * .5 + .5;",
+						"	offset = min( sin( ll.x * 16. * uNoiseScale ) , sin( ll.y * 16. * uNoiseScale ) ) * .5 + .5;",
 						
 						"}",
 
@@ -226,7 +226,7 @@
 					color: 0xff0000,
 					shininess: 150,
 					specular: 0x222222,
-					shading: THREE.SmoothShading
+					shading: THREE.FlatShading
 				} );
 
 
