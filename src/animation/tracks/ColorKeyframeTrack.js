@@ -1,5 +1,4 @@
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
+import { KeyframeTrack } from '../KeyframeTrack';
 
 /**
  *
@@ -13,12 +12,11 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
 
 function ColorKeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+	KeyframeTrack.call( this, name, times, values, interpolation );
 
 }
 
-ColorKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+ColorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
 
 	constructor: ColorKeyframeTrack,
 

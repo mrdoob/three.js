@@ -1,7 +1,6 @@
 import { InterpolateLinear } from '../../constants';
-import { KeyframeTrackPrototype } from '../KeyframeTrackPrototype';
+import { KeyframeTrack } from '../KeyframeTrack';
 import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionLinearInterpolant';
-import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
 
 /**
  *
@@ -14,12 +13,11 @@ import { KeyframeTrackConstructor } from '../KeyframeTrackConstructor';
 
 function QuaternionKeyframeTrack( name, times, values, interpolation ) {
 
-	KeyframeTrackConstructor.call( this, name, times, values, interpolation );
+	KeyframeTrack.call( this, name, times, values, interpolation );
 
 }
 
-QuaternionKeyframeTrack.prototype =
-		Object.assign( Object.create( KeyframeTrackPrototype ), {
+QuaternionKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
 
 	constructor: QuaternionKeyframeTrack,
 
