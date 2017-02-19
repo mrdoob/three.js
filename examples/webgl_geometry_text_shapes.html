@@ -65,6 +65,12 @@
 						side: THREE.DoubleSide
 					} );
 
+					var xMove = function( shape, shapeMid ) {
+
+						return shape.translate( shapeMid, 0, 0 );
+
+					}
+
 					var message = "   Three.js\nSimple text.";
 
 					var shapes = font.generateShapes( message, 100, 2 );
@@ -125,12 +131,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			} // end init
-
-			function xMove( shape, shapeMid ) {
-
-				return shape.applyMatrix( new THREE.Matrix4().makeTranslation( shapeMid, 0, 0 ) );
-
-			}
 
 			function onWindowResize() {
 
