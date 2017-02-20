@@ -63,24 +63,26 @@ function Material() {
 
 }
 
-Material.prototype = {
+Object.defineProperty( Material.prototype, 'needsUpdate', {
 
-	constructor: Material,
-
-	isMaterial: true,
-
-	get needsUpdate() {
+	get: function () {
 
 		return this._needsUpdate;
 
 	},
 
-	set needsUpdate( value ) {
+	set: function ( value ) {
 
 		if ( value === true ) this.update();
 		this._needsUpdate = value;
 
-	},
+	}
+
+} );
+
+Object.assign( Material.prototype, EventDispatcher.prototype, {
+
+	isMaterial: true,
 
 	setValues: function ( values ) {
 
@@ -110,7 +112,7 @@ Material.prototype = {
 
 				currentValue.set( newValue );
 
-			} else if ( (currentValue && currentValue.isVector3) && (newValue && newValue.isVector3) ) {
+			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 				currentValue.copy( newValue );
 
@@ -230,7 +232,6 @@ Material.prototype = {
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
 		// TODO: Copied from Object3D.toJSON
@@ -346,8 +347,7 @@ Material.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Material.prototype, EventDispatcher.prototype );
 
 export { Material };

@@ -3,7 +3,6 @@ export { SpriteMaterial } from './SpriteMaterial.js';
 export { RawShaderMaterial } from './RawShaderMaterial.js';
 export { ShaderMaterial } from './ShaderMaterial.js';
 export { PointsMaterial } from './PointsMaterial.js';
-export { MultiMaterial } from './MultiMaterial.js';
 export { MeshPhysicalMaterial } from './MeshPhysicalMaterial.js';
 export { MeshStandardMaterial } from './MeshStandardMaterial.js';
 export { MeshPhongMaterial } from './MeshPhongMaterial.js';

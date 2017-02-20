@@ -76,9 +76,7 @@ function AnimationAction( mixer, clip, localRoot ) {
 
 }
 
-AnimationAction.prototype = {
-
-	constructor: AnimationAction,
+Object.assign( AnimationAction.prototype, {
 
 	// State & Scheduling
 
@@ -651,7 +649,7 @@ AnimationAction.prototype = {
 
 	}
 
-};
+} );
 
 
 export { AnimationAction };

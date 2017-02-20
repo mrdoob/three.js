@@ -91,25 +91,24 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-var CustomSinCurve = THREE.Curve.create(
+function CustomSinCurve( scale ){
 
-	function ( scale ) {
+	this.scale = ( scale === undefined ) ? 1 : scale;
 
-		this.scale = ( scale === undefined ) ? 1 : scale;
+}
 
-	},
+CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
+CustomSinCurve.prototype.constructor = CustomSinCurve;
 
-	function ( t ) {
+CustomSinCurve.prototype.getPoint = function ( t ) {
 
-		var tx = t * 3 - 1.5;
-		var ty = Math.sin( 2 * Math.PI * t );
-		var tz = 0;
+	var tx = t * 3 - 1.5;
+	var ty = Math.sin( 2 * Math.PI * t );
+	var tz = 0;
 
-		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 
-	}
-
-);
+};
 
 // heart shape
 
@@ -925,7 +924,8 @@ var guis = {
 			weight : "regular",
 			bevelEnabled : false,
 			bevelThickness : 1,
-			bevelSize : 0.5
+			bevelSize : 0.5,
+			bevelSegments : 3
 		};
 
 		var fonts = [
@@ -951,7 +951,8 @@ var guis = {
 					curveSegments: data.curveSegments,
 					bevelEnabled: data.bevelEnabled,
 					bevelThickness: data.bevelThickness,
-					bevelSize: data.bevelSize
+					bevelSize: data.bevelSize,
+					bevelSegments: data.bevelSegments
 				} );
 				geometry.center();
 
@@ -975,6 +976,7 @@ var guis = {
 		folder.add( data, 'bevelEnabled' ).onChange( generateGeometry );
 		folder.add( data, 'bevelThickness', 0.1, 3 ).onChange( generateGeometry );
 		folder.add( data, 'bevelSize', 0.1, 3 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 0, 8 ).step( 1 ).onChange( generateGeometry );
 
 		generateGeometry();
 

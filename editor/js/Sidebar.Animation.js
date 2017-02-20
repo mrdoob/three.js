@@ -9,16 +9,11 @@ Sidebar.Animation = function ( editor ) {
 	var options = {};
 	var possibleAnimations = {};
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/animation/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/animation/collapsed', boolean );
-
-	} );
+	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Break() );
 	container.add( new UI.Break() );
 
 	var animationsRow = new UI.Row();
@@ -31,24 +26,6 @@ Sidebar.Animation = function ( editor ) {
 	signals.objectAdded.add( function ( object ) {
 
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.SkinnedMesh ) {
-
-				var material = child.material;
-
-				if ( material instanceof THREE.MultiMaterial ) {
-
-					for ( var i = 0; i < material.materials.length; i ++ ) {
-
-						material.materials[ i ].skinning = true;
-
-					}
-
-				} else {
-
-					child.material.skinning = true;
-
-				}
 
 				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
 

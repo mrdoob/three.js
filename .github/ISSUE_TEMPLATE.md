@@ -2,11 +2,17 @@
 
 ##### Description of the problem 
 
+Describe the problem/request in detail.
+Code snippet, screenshot, and small-test help us understand.
+
+You can edit for small-test.
+http://jsfiddle.net/akmcv7Lh/ (current revision)
+http://jsfiddle.net/hw9rcLL8/ (dev)
 
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r82
+- [ ] r84
 - [ ] ...
 
 ##### Browser

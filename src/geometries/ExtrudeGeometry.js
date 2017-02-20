@@ -23,7 +23,7 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
  *  frames: <Object> // containing arrays of tangents, normals, binormals
  *
- *  uvGenerator: <Object> // object that provides UV generator functions
+ *  UVGenerator: <Object> // object that provides UV generator functions
  *
  * }
  **/

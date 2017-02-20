@@ -68,7 +68,7 @@
 
 				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var spline = new THREE.Spline( points );
+				var spline = new THREE.CatmullRomCurve3( points );
 				var geometrySpline = new THREE.Geometry();
 
 				for ( var i = 0; i < points.length * subdivisions; i ++ ) {

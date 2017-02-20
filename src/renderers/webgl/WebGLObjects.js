@@ -2,7 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BufferAttribute } from '../../core/BufferAttribute';
+import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute';
+import { arrayMax } from '../../utils';
 import { WebGLGeometries } from './WebGLGeometries';
 
 function WebGLObjects( gl, properties, info ) {
@@ -199,13 +200,11 @@ function WebGLObjects( gl, properties, info ) {
 
 		var index = geometry.index;
 		var attributes = geometry.attributes;
-		var position = attributes.position;
 
 		// console.time( 'wireframe' );
 
 		if ( index !== null ) {
 
-			var edges = {};
 			var array = index.array;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
@@ -236,8 +235,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		// console.timeEnd( 'wireframe' );
 
-		var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
-		var attribute = new BufferAttribute( new TypeArray( indices ), 1 );
+		var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 

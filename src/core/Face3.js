@@ -22,9 +22,7 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 
 }
 
-Face3.prototype = {
-
-	constructor: Face3,
+Object.assign( Face3.prototype, {
 
 	clone: function () {
 
@@ -59,7 +57,7 @@ Face3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Face3 };

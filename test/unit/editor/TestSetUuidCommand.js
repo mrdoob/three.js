@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetUuidCommand" );
+QUnit.module( "SetUuidCommand" );
 
-test( "Test SetUuidCommand (Undo and Redo)", function() {
+QUnit.test( "Test SetUuidCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 	var object = aBox( 'UUID test box' );
@@ -22,15 +22,15 @@ test( "Test SetUuidCommand (Undo and Redo)", function() {
 
 	} );
 
-	ok( object.uuid == uuids[ uuids.length - 1 ],
+	assert.ok( object.uuid == uuids[ uuids.length - 1 ],
 		"OK, UUID on actual object matches last UUID in the test data array " );
 
 	editor.undo();
-	ok( object.uuid == uuids[ uuids.length - 2 ],
+	assert.ok( object.uuid == uuids[ uuids.length - 2 ],
 		"OK, UUID on actual object matches second to the last UUID in the test data array (after undo)" );
 
 	editor.redo();
-	ok( object.uuid == uuids[ uuids.length - 1 ],
+	assert.ok( object.uuid == uuids[ uuids.length - 1 ],
 		"OK, UUID on actual object matches last UUID in the test data array again (after redo) " );
 
 

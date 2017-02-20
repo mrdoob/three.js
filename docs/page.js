@@ -43,7 +43,7 @@ var onDocumentLoad = function ( event ) {
 	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
 	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
 
-
+	
 	document.body.innerHTML = text;
 
 	// handle code snippets formatting

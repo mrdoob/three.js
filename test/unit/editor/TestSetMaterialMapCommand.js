@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "SetMaterialMapCommand" );
+QUnit.module( "SetMaterialMapCommand" );
 
-test( "Test for SetMaterialMapCommand (Undo and Redo)", function() {
+QUnit.test( "Test for SetMaterialMapCommand (Undo and Redo)", function( assert ) {
 
 	// setup
 	var editor = new Editor();
@@ -54,15 +54,15 @@ test( "Test for SetMaterialMapCommand (Undo and Redo)", function() {
 		} );
 
 
-		ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
+		assert.ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
 			"OK, " + mapName + " set correctly " );
 
 		editor.undo();
-		ok( box.material[ mapName ].image.src == images[ images.length - 2 ].image.src,
+		assert.ok( box.material[ mapName ].image.src == images[ images.length - 2 ].image.src,
 			"OK, " + mapName + " set correctly after undo " );
 
 		editor.redo();
-		ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
+		assert.ok( box.material[ mapName ].image.src == images[ images.length - 1 ].image.src,
 			"OK, " + mapName + " set correctly after redo" );
 
 	} );

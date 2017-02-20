@@ -229,7 +229,7 @@
 				var p = window.location.search.indexOf( '?q=' );
 				if( p !== -1 ) {
 					return window.location.search.substr( 3 );
-				} 
+				}
 				return ''
 			}
 
@@ -249,7 +249,6 @@
 			var MEMBER_DELIMITER = '.';
 			var nameCategoryMap = {};
 			var sections = [];
-			var selected = null;
 
 			var content = document.getElementById( 'content' );
 
@@ -339,11 +338,10 @@
 
 				var v = filterInput.value;
 				if( v !== '' ) {
-					window.history.replaceState( {} , '', '?q=' + v );
+					window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
 				} else {
-					window.history.replaceState( {} , '', window.location.pathname );
+					window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
 				}
-				if( selected ) window.location.hash = selected;
 
 				var exp = new RegExp( filterInput.value, 'gi' );
 				for( var j in nameCategoryMap ) {
@@ -400,7 +398,6 @@
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
-				selected = url;
 
 				window.location.hash = url;
 				window.document.title = title;

@@ -232,6 +232,7 @@ var files = {
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
 		"webgl_shadowmesh",
+		"webgl_simple_gi",
 		"webgl_skinning_simple",
 		"webgl_sprites",
 		"webgl_terrain_dynamic",
@@ -272,6 +273,7 @@ var files = {
 	],
 	"webvr": [
 		"webvr_cubes",
+		"webvr_daydream",
 		"webvr_panorama",
 		"webvr_rollercoaster",
 		"webvr_shadow",

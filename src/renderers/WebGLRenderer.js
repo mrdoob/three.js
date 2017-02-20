@@ -8,8 +8,8 @@ import { SpritePlugin } from './webgl/plugins/SpritePlugin';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { ShaderMaterial } from '../materials/ShaderMaterial';
 import { Mesh } from '../objects/Mesh';
-import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry';
-import { PlaneBufferGeometry } from '../geometries/PlaneBufferGeometry';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry';
+import { PlaneBufferGeometry } from '../geometries/PlaneGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
@@ -297,25 +297,8 @@ function WebGLRenderer( parameters ) {
 
 	//
 
-	var backgroundCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var backgroundCamera2 = new PerspectiveCamera();
-	var backgroundPlaneMesh = new Mesh(
-		new PlaneBufferGeometry( 2, 2 ),
-		new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-	);
-	var backgroundBoxShader = ShaderLib[ 'cube' ];
-	var backgroundBoxMesh = new Mesh(
-		new BoxBufferGeometry( 5, 5, 5 ),
-		new ShaderMaterial( {
-			uniforms: backgroundBoxShader.uniforms,
-			vertexShader: backgroundBoxShader.vertexShader,
-			fragmentShader: backgroundBoxShader.fragmentShader,
-			side: BackSide,
-			depthTest: false,
-			depthWrite: false,
-			fog: false
-		} )
-	);
+	var backgroundPlaneCamera, backgroundPlaneMesh;
+	var backgroundBoxCamera, backgroundBoxMesh;
 
 	//
 
@@ -872,6 +855,10 @@ function WebGLRenderer( parameters ) {
 
 				renderer.setMode( _gl.LINES );
 
+			} else if ( object.isLineLoop ) {
+
+				renderer.setMode( _gl.LINE_LOOP );
+
 			} else {
 
 				renderer.setMode( _gl.LINE_STRIP );
@@ -1186,25 +1173,56 @@ function WebGLRenderer( parameters ) {
 
 		if ( background && background.isCubeTexture ) {
 
-			backgroundCamera2.projectionMatrix.copy( camera.projectionMatrix );
+			if ( backgroundBoxCamera === undefined ) {
 
-			backgroundCamera2.matrixWorld.extractRotation( camera.matrixWorld );
-			backgroundCamera2.matrixWorldInverse.getInverse( backgroundCamera2.matrixWorld );
+				backgroundBoxCamera = new PerspectiveCamera();
+
+				backgroundBoxMesh = new Mesh(
+					new BoxBufferGeometry( 5, 5, 5 ),
+					new ShaderMaterial( {
+						uniforms: ShaderLib.cube.uniforms,
+						vertexShader: ShaderLib.cube.vertexShader,
+						fragmentShader: ShaderLib.cube.fragmentShader,
+						side: BackSide,
+						depthTest: false,
+						depthWrite: false,
+						fog: false
+					} )
+				);
+
+			}
+
+			backgroundBoxCamera.projectionMatrix.copy( camera.projectionMatrix );
+
+			backgroundBoxCamera.matrixWorld.extractRotation( camera.matrixWorld );
+			backgroundBoxCamera.matrixWorldInverse.getInverse( backgroundBoxCamera.matrixWorld );
+
 
 			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
-			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundCamera2.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
+			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundBoxCamera.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
 
 			objects.update( backgroundBoxMesh );
 
-			_this.renderBufferDirect( backgroundCamera2, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
+			_this.renderBufferDirect( backgroundBoxCamera, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
 
 		} else if ( background && background.isTexture ) {
+
+			if ( backgroundPlaneCamera === undefined ) {
+
+				backgroundPlaneCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+				backgroundPlaneMesh = new Mesh(
+					new PlaneBufferGeometry( 2, 2 ),
+					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
+				);
+
+			}
 
 			backgroundPlaneMesh.material.map = background;
 
 			objects.update( backgroundPlaneMesh );
 
-			_this.renderBufferDirect( backgroundCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
+			_this.renderBufferDirect( backgroundPlaneCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
 
 		}
 
@@ -1382,7 +1400,7 @@ function WebGLRenderer( parameters ) {
 				if ( _this.sortObjects === true ) {
 
 					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _projScreenMatrix );
+					_vector3.applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -1398,42 +1416,36 @@ function WebGLRenderer( parameters ) {
 
 				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
 
+					if ( _this.sortObjects === true ) {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyMatrix4( _projScreenMatrix );
+
+					}
+
+					var geometry = objects.update( object );
 					var material = object.material;
 
-					if ( material.visible === true ) {
+					if ( Array.isArray( material ) ) {
 
-						if ( _this.sortObjects === true ) {
+						var groups = geometry.groups;
 
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-						}
+							var group = groups[ i ];
+							var groupMaterial = material[ group.materialIndex ];
 
-						var geometry = objects.update( object );
+							if ( groupMaterial && groupMaterial.visible === true ) {
 
-						if ( material.isMultiMaterial ) {
-
-							var groups = geometry.groups;
-							var materials = material.materials;
-
-							for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-								var group = groups[ i ];
-								var groupMaterial = materials[ group.materialIndex ];
-
-								if ( groupMaterial.visible === true ) {
-
-									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-								}
+								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
 
-						} else {
-
-							pushRenderItem( object, geometry, material, _vector3.z, null );
-
 						}
+
+					} else if ( material.visible === true ) {
+
+						pushRenderItem( object, geometry, material, _vector3.z, null );
 
 					}
 
@@ -1705,7 +1717,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection  !== _clipping.numIntersection ) ) {
+				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
 				material.needsUpdate = true;
 
@@ -1796,7 +1808,7 @@ function WebGLRenderer( parameters ) {
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
 				material.isShaderMaterial ||
-				material.skinning ) {
+				object.isSkinnedMesh ) {
 
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -1811,7 +1823,7 @@ function WebGLRenderer( parameters ) {
 		// auto-setting of texture unit for bone texture must go before other textures
 		// not sure why, but otherwise weird things happen
 
-		if ( material.skinning ) {
+		if ( object.isSkinnedMesh ) {
 
 			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
 			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
@@ -1820,11 +1832,10 @@ function WebGLRenderer( parameters ) {
 
 			if ( skeleton ) {
 
-				if ( capabilities.floatVertexTextures && skeleton.useVertexTexture ) {
+				if ( capabilities.floatVertexTextures ) {
 
 					p_uniforms.set( _gl, skeleton, 'boneTexture' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureWidth' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureHeight' );
+					p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
 
 				} else {
 
@@ -2869,5 +2880,6 @@ function WebGLRenderer( parameters ) {
 	}
 
 }
+
 
 export { WebGLRenderer };

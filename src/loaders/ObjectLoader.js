@@ -26,6 +26,7 @@ import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
+import { LineLoop } from '../objects/LineLoop';
 import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
@@ -84,7 +85,10 @@ Object.assign( ObjectLoader.prototype, {
 
 			} catch ( error ) {
 
+				if ( onError !== undefined ) onError( error );
+
 				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+
 				return;
 
 			}
@@ -634,6 +638,10 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'SkinnedMesh':
+
+					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
+
 				case 'Mesh':
 
 					var geometry = getGeometry( data.geometry );
@@ -663,6 +671,12 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'LineLoop':
+
+					object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
 				case 'LineSegments':
 
 					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
@@ -687,10 +701,6 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Group();
 
 					break;
-
-				case 'SkinnedMesh':
-
-					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh type. Instantiates Object3D instead.' );
 
 				default:
 

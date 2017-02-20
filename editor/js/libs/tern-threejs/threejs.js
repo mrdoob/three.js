@@ -1431,15 +1431,6 @@
       },
       "!doc": "Alias for [page:EllipseCurve]"
     },
-    "ClosedSplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/ClosedSplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points that loops back onto itself",
-      "!type": "fn(points: [])"
-    },
     "CubicBezierCurve": {
       "!url": "http://threejs.org/docs/#Reference/extras/curves/CubicBezierCurve",
       "prototype": {
@@ -1527,15 +1518,6 @@
         "points": "[]"
       },
       "!doc": "Create a smooth 2d spline curve from a series of points",
-      "!type": "fn(points: [])"
-    },
-    "SplineCurve3": {
-      "!url": "http://threejs.org/docs/#Reference/extras/curves/SplineCurve3",
-      "prototype": {
-        "!proto": "THREE.Curve.prototype",
-        "points": "[]"
-      },
-      "!doc": "Create a smooth 3d spline curve from a series of points",
       "!type": "fn(points: [])"
     },
     "BoxGeometry": {
@@ -3921,16 +3903,12 @@
           "!type": "fn(x: number, y: number, z: number) -> +THREE.Matrix4",
           "!doc": "Sets this matrix as scale transform."
         },
-        "makeFrustum": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
-          "!doc": "Creates a [page:Frustum frustum] matrix."
-        },
         "makePerspective": {
-          "!type": "fn(fov: number, aspect: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, top: number, bottom: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates a perspective projection matrix."
         },
         "makeOrthographic": {
-          "!type": "fn(left: number, right: number, bottom: number, top: number, near: number, far: number) -> +THREE.Matrix4",
+          "!type": "fn(left: number, right: number, top: number, bottom: number, near: number, far: number) -> +THREE.Matrix4",
           "!doc": "Creates an orthographic projection matrix."
         },
         "clone": {
@@ -4236,34 +4214,6 @@
       },
       "!doc": "A geometric sphere defined by a center position and radius.",
       "!type": "fn(center: +THREE.Vector3, radius: number)"
-    },
-    "Spline": {
-      "!url": "http://threejs.org/docs/#Reference/math/Spline",
-      "prototype": {
-        "points": "[]",
-        "initFromArray": {
-          "!type": "fn(a: [])",
-          "!doc": "Initialises using the data in the array as a series of points. Each value in *a* must be another array with three values, where a[n] is v, the value for the *nth* point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively."
-        },
-        "getPoint": {
-          "!type": "fn(k: number) -> +THREE.Vector3",
-          "!doc": "Return the interpolated point at *k*."
-        },
-        "getControlPointsArray": {
-          "!type": "fn() -> []",
-          "!doc": "Returns an array with triplets of x, y, z coordinates that correspond to the current control points."
-        },
-        "getLength": {
-          "!type": "fn(nSubDivisions: number) -> object",
-          "!doc": "Returns an object with the two properties. The property .[page:Number total] contains\n\t\t\tthe length of the spline when using nSubDivisions. The property .[page:Array chunkLength]\n\t\t\tcontains an array with the total length from the beginning of the spline to the end of that chunk."
-        },
-        "reparametrizeByArcLength": {
-          "!type": "fn(samplingCoef: number)",
-          "!doc": "This is done by resampling the original spline, with the density of sampling controlled by *samplingCoef*. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature."
-        }
-      },
-      "!doc": "Represents a spline.",
-      "!type": "fn(points: [])"
     },
     "Triangle": {
       "!url": "http://threejs.org/docs/#Reference/math/Triangle",

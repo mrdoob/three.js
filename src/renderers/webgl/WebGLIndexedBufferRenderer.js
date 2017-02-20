@@ -27,9 +27,10 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 			size = 2;
 
 		} else {
-			
+
 			type = gl.UNSIGNED_BYTE;
 			size = 1;
+
 		}
 
 	}

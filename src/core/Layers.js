@@ -8,9 +8,7 @@ function Layers() {
 
 }
 
-Layers.prototype = {
-
-	constructor: Layers,
+Object.assign( Layers.prototype, {
 
 	set: function ( channel ) {
 
@@ -42,7 +40,7 @@ Layers.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Layers };

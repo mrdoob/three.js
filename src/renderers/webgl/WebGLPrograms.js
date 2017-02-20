@@ -2,8 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, FloatType, RGBAFormat } from '../../constants';
+import { _Math } from '../../math/Math';
+import { DataTexture } from '../../textures/DataTexture';
 import { WebGLProgram } from './WebGLProgram';
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 
 function WebGLPrograms( renderer, capabilities ) {
 
@@ -39,7 +41,35 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	function allocateBones( object ) {
 
-		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		var skeleton = object.skeleton;
+		var bones = skeleton.bones;
+
+		if ( capabilities.floatVertexTextures ) {
+
+			if ( skeleton.boneTexture === undefined ) {
+
+				// layout (1 matrix = 4 pixels)
+				//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+				//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+				//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+				//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+				//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+
+
+				var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
+				size = _Math.nextPowerOfTwo( Math.ceil( size ) );
+				size = Math.max( size, 4 );
+
+				var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+				boneMatrices.set( skeleton.boneMatrices ); // copy current values
+
+				var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+
+				skeleton.boneMatrices = boneMatrices;
+				skeleton.boneTexture = boneTexture;
+				skeleton.boneTextureSize = size;
+
+			}
 
 			return 1024;
 
@@ -55,17 +85,12 @@ function WebGLPrograms( renderer, capabilities ) {
 			var nVertexUniforms = capabilities.maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
-			var maxBones = nVertexMatrices;
+			var maxBones = Math.min( nVertexMatrices, bones.length );
 
-			if ( object !== undefined && (object && object.isSkinnedMesh) ) {
+			if ( maxBones < bones.length ) {
 
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
-
-				if ( maxBones < object.skeleton.bones.length ) {
-
-					console.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
-
-				}
+				console.warn( 'THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.' );
+				return 0;
 
 			}
 
@@ -112,7 +137,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		var maxBones = allocateBones( object );
+		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
 		var precision = renderer.getPrecision();
 
 		if ( material.precision !== null ) {
@@ -162,16 +187,16 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			fog: !! fog,
 			useFog: material.fog,
-			fogExp: (fog && fog.isFogExp2),
+			fogExp: ( fog && fog.isFogExp2 ),
 
 			flatShading: material.shading === FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: material.skinning,
+			skinning: ( object && object.isSkinnedMesh ) && maxBones > 0,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.floatVertexTextures,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,

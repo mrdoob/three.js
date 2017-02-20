@@ -286,8 +286,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return this.gain.gain.value;
 
 	},
-
-
+	
 	setVolume: function ( value ) {
 
 		this.gain.gain.value = value;

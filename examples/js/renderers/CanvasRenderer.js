@@ -854,16 +854,42 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
+		var repeatX = texture.wrapS === THREE.RepeatWrapping || texture.wrapS === THREE.MirroredRepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping || texture.wrapT === THREE.MirroredRepeatWrapping;
+
+		var mirrorX = texture.wrapS === THREE.MirroredRepeatWrapping;
+		var mirrorY = texture.wrapT === THREE.MirroredRepeatWrapping;
+
+		//
+
 		var canvas = document.createElement( 'canvas' );
-		canvas.width = image.width;
-		canvas.height = image.height;
+		canvas.width = image.width * ( mirrorX ? 2 : 1 );
+		canvas.height = image.height * ( mirrorY ? 2 : 1 );
 
 		var context = canvas.getContext( '2d' );
 		context.setTransform( 1, 0, 0, - 1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
-		var repeatX = texture.wrapS === THREE.RepeatWrapping;
-		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+		if ( mirrorX === true ) {
+
+			context.setTransform( - 1, 0, 0, - 1, image.width, image.height );
+			context.drawImage( image, - image.width, 0 );
+
+		}
+
+		if ( mirrorY === true ) {
+
+			context.setTransform( 1, 0, 0, 1, 0, 0 );
+			context.drawImage( image, 0, image.height );
+
+		}
+
+		if ( mirrorX === true && mirrorY === true ) {
+
+			context.setTransform( - 1, 0, 0, 1, image.width, 0 );
+			context.drawImage( image, - image.width, image.height );
+
+		}
 
 		var repeat = 'no-repeat';
 

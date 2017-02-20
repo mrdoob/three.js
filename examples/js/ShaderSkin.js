@@ -266,6 +266,7 @@ THREE.ShaderSkin = {
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "lights_pars" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
 
@@ -281,6 +282,7 @@ THREE.ShaderSkin = {
 				"gl_Position = projectionMatrix * mvPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+				THREE.ShaderChunk[ "fog_vertex" ],
 
 			"}"
 
@@ -569,6 +571,7 @@ THREE.ShaderSkin = {
 			"varying vec3 vViewPosition;",
 
 			THREE.ShaderChunk[ "common" ],
+			THREE.ShaderChunk[ "fog_pars_vertex" ],
 
 			"void main() {",
 
@@ -597,7 +600,10 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-			"}"
+				THREE.ShaderChunk[ "fog_vertex" ],
+
+			"}",
+
 
 		].join( "\n" ),
 

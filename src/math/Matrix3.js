@@ -9,13 +9,13 @@ import { Vector3 } from './Vector3';
 
 function Matrix3() {
 
-	this.elements = new Float32Array( [
+	this.elements = [
 
 		1, 0, 0,
 		0, 1, 0,
 		0, 0, 1
 
-	] );
+	];
 
 	if ( arguments.length > 0 ) {
 
@@ -25,9 +25,7 @@ function Matrix3() {
 
 }
 
-Matrix3.prototype = {
-
-	constructor: Matrix3,
+Object.assign( Matrix3.prototype, {
 
 	isMatrix3: true,
 
@@ -65,21 +63,16 @@ Matrix3.prototype = {
 
 	copy: function ( m ) {
 
+		var te = this.elements;
 		var me = m.elements;
 
-		this.set(
-
-			me[ 0 ], me[ 3 ], me[ 6 ],
-			me[ 1 ], me[ 4 ], me[ 7 ],
-			me[ 2 ], me[ 5 ], me[ 8 ]
-
-		);
+		for ( var i = 0; i < 9; i ++ ) te[ i ] = me[ i ];
 
 		return this;
 
 	},
 
-	setFromMatrix4: function( m ) {
+	setFromMatrix4: function ( m ) {
 
 		var me = m.elements;
 
@@ -97,11 +90,9 @@ Matrix3.prototype = {
 
 	applyToBufferAttribute: function () {
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function applyToBufferAttribute( attribute ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -181,6 +172,7 @@ Matrix3.prototype = {
 			}
 
 			return this.identity();
+
 		}
 
 		var detInv = 1 / det;
@@ -241,7 +233,7 @@ Matrix3.prototype = {
 
 		if ( offset === undefined ) offset = 0;
 
-		for( var i = 0; i < 9; i ++ ) {
+		for ( var i = 0; i < 9; i ++ ) {
 
 			this.elements[ i ] = array[ i + offset ];
 
@@ -268,13 +260,13 @@ Matrix3.prototype = {
 
 		array[ offset + 6 ] = te[ 6 ];
 		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ]  = te[ 8 ];
+		array[ offset + 8 ] = te[ 8 ];
 
 		return array;
 
 	}
 
-};
+} );
 
 
 export { Matrix3 };

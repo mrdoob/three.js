@@ -36,7 +36,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 60 );
+	var grid = new THREE.GridHelper( 60, 60 );
 	sceneHelpers.add( grid );
 
 	//
@@ -295,12 +295,12 @@ var Viewport = function ( editor ) {
 
 			case 'css/light.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
+				grid = new THREE.GridHelper( 60, 60, 0x444444, 0x888888 );
 				sceneHelpers.add( grid );
 				break;
 			case 'css/dark.css':
 				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
+				grid = new THREE.GridHelper( 60, 60, 0xbbbbbb, 0x888888 );
 				sceneHelpers.add( grid );
 				break;
 

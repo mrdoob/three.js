@@ -23,9 +23,7 @@ function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 }
 
-Frustum.prototype = {
-
-	constructor: Frustum,
+Object.assign( Frustum.prototype, {
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -178,8 +176,7 @@ Frustum.prototype = {
 		};
 
 	}(),
-
-
+	
 	containsPoint: function ( point ) {
 
 		var planes = this.planes;
@@ -198,7 +195,7 @@ Frustum.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Frustum };
