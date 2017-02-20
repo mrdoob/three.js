@@ -22827,25 +22827,28 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: ( function () {
 
-		var matrixPosition = new Vector3();
+		var intersectPoint = new Vector3();
+		var worldPosition = new Vector3();
+		var worldScale = new Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
+			worldPosition.setFromMatrixPosition( this.matrixWorld );
+			raycaster.ray.closestPointToPoint( worldPosition, intersectPoint );
 
-			var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-			var guessSizeSq = this.scale.x * this.scale.y / 4;
+			worldScale.setFromMatrixScale( this.matrixWorld );
+			var guessSizeSq = worldScale.x * worldScale.y / 4;
 
-			if ( distanceSq > guessSizeSq ) {
+			if ( worldPosition.distanceToSquared( intersectPoint ) > guessSizeSq ) return;
 
-				return;
+			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
-			}
+			if ( distance < raycaster.near || distance > raycaster.far ) return;
 
 			intersects.push( {
 
-				distance: Math.sqrt( distanceSq ),
-				point: this.position,
+				distance: distance,
+				point: intersectPoint.clone(),
 				face: null,
 				object: this
 
@@ -39165,7 +39168,7 @@ Object.assign( Clock.prototype, {
 
 	start: function () {
 
-		this.startTime = ( performance || Date ).now();
+		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
 		this.oldTime = this.startTime;
 		this.elapsedTime = 0;
@@ -39199,7 +39202,7 @@ Object.assign( Clock.prototype, {
 
 		if ( this.running ) {
 
-			var newTime = ( performance || Date ).now();
+			var newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;
