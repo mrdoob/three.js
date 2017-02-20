@@ -1632,7 +1632,7 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1682,7 +1682,7 @@ THREE.GLTF2Loader = ( function () {
 
 						var meshNode;
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
