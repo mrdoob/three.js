@@ -7,7 +7,7 @@
 var AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
-	arraySlice: function( array, from, to ) {
+	arraySlice: function ( array, from, to ) {
 
 		if ( AnimationUtils.isTypedArray( array ) ) {
 
@@ -22,10 +22,14 @@ var AnimationUtils = {
 	},
 
 	// converts an array to a specific type
-	convertArray: function( array, type, forceClone ) {
+	convertArray: function ( array, type, forceClone ) {
 
-		if ( ! array || // let 'undefined' and 'null' pass
-				! forceClone && array.constructor === type ) return array;
+		// let 'undefined' and 'null' pass
+		if ( ! array || ! forceClone && array.constructor === type ) {
+
+			return array;
+
+		}
 
 		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
 
@@ -37,15 +41,14 @@ var AnimationUtils = {
 
 	},
 
-	isTypedArray: function( object ) {
+	isTypedArray: function ( object ) {
 
-		return ArrayBuffer.isView( object ) &&
-				! ( object instanceof DataView );
+		return ArrayBuffer.isView( object ) && ! ( object instanceof DataView );
 
 	},
 
 	// returns an array by which times and values can be sorted
-	getKeyframeOrder: function( times ) {
+	getKeyframeOrder: function ( times ) {
 
 		function compareTime( i, j ) {
 
@@ -55,7 +58,11 @@ var AnimationUtils = {
 
 		var n = times.length;
 		var result = new Array( n );
-		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+		for ( var i = 0; i !== n; ++ i ) {
+
+			result[ i ] = i;
+
+		}
 
 		result.sort( compareTime );
 
@@ -64,7 +71,7 @@ var AnimationUtils = {
 	},
 
 	// uses the array previously returned by 'getKeyframeOrder' to sort data
-	sortedArray: function( values, stride, order ) {
+	sortedArray: function ( values, stride, order ) {
 
 		var nValues = values.length;
 		var result = new values.constructor( nValues );
@@ -86,7 +93,7 @@ var AnimationUtils = {
 	},
 
 	// function for parsing AOS keyframe formats
-	flattenJSON: function( jsonKeys, times, values, valuePropertyName ) {
+	flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
 
 		var i = 1, key = jsonKeys[ 0 ];
 
@@ -96,10 +103,18 @@ var AnimationUtils = {
 
 		}
 
-		if ( key === undefined ) return; // no data
+		if ( key === undefined ) {
+
+			return;
+
+		} // no data
 
 		var value = key[ valuePropertyName ];
-		if ( value === undefined ) return; // no data
+		if ( value === undefined ) {
+
+			return;
+
+		} // no data
 
 		if ( Array.isArray( value ) ) {
 
@@ -119,6 +134,7 @@ var AnimationUtils = {
 			} while ( key !== undefined );
 
 		} else if ( value.toArray !== undefined ) {
+
 			// ...assume THREE.Math-ish
 
 			do {
@@ -137,6 +153,7 @@ var AnimationUtils = {
 			} while ( key !== undefined );
 
 		} else {
+
 			// otherwise push as-is
 
 			do {
@@ -159,6 +176,5 @@ var AnimationUtils = {
 	}
 
 };
-
 
 export { AnimationUtils };

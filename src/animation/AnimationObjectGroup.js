@@ -1,5 +1,5 @@
-import { PropertyBinding } from './PropertyBinding';
 import { _Math } from '../math/Math';
+import { PropertyBinding } from './PropertyBinding';
 
 /**
  *
@@ -7,32 +7,32 @@ import { _Math } from '../math/Math';
  *
  * Usage:
  *
- * 	-	Add objects you would otherwise pass as 'root' to the
- * 		constructor or the .clipAction method of AnimationMixer.
+ *    -    Add objects you would otherwise pass as 'root' to the
+ *        constructor or the .clipAction method of AnimationMixer.
  *
- * 	-	Instead pass this object as 'root'.
+ *    -    Instead pass this object as 'root'.
  *
- * 	-	You can also add and remove objects later when the mixer
- * 		is running.
+ *    -    You can also add and remove objects later when the mixer
+ *        is running.
  *
  * Note:
  *
- *  	Objects of this class appear as one object to the mixer,
- *  	so cache control of the individual objects must be done
- *  	on the group.
+ *    Objects of this class appear as one object to the mixer,
+ *    so cache control of the individual objects must be done
+ *    on the group.
  *
  * Limitation:
  *
- * 	- 	The animated properties must be compatible among the
- * 		all objects in the group.
+ *    -    The animated properties must be compatible among the
+ *        all objects in the group.
  *
- *  -	A single property can either be controlled through a
- *  	target group or directly, but not both.
+ *  -    A single property can either be controlled through a
+ *    target group or directly, but not both.
  *
  * @author tschw
  */
 
-function AnimationObjectGroup( var_args ) {
+function AnimationObjectGroup( /*var_args*/ ) {
 
 	this.uuid = _Math.generateUUID();
 
@@ -61,11 +61,23 @@ function AnimationObjectGroup( var_args ) {
 	this.stats = {
 
 		objects: {
-			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_; }
+			get total() {
+
+				return scope._objects.length;
+
+			},
+			get inUse() {
+
+				return this.total - scope.nCachedObjects_;
+
+			}
 		},
 
-		get bindingsPerObject() { return scope._bindings.length; }
+		get bindingsPerObject() {
+
+			return scope._bindings.length;
+
+		}
 
 	};
 
@@ -75,7 +87,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	isAnimationObjectGroup: true,
 
-	add: function( var_args ) {
+	add: function ( /*var_args*/ ) {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -105,9 +117,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
 
-					bindings[ j ].push(
-							new PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] ) );
+					bindings[ j ].push( new PropertyBinding( object, paths[ j ], parsedPaths[ j ] ) );
 
 				}
 
@@ -142,8 +152,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 						// for objects that are cached, the binding may
 						// or may not exist
 
-						binding = new PropertyBinding(
-								object, paths[ j ], parsedPaths[ j ] );
+						binding = new PropertyBinding( object, paths[ j ], parsedPaths[ j ] );
 
 					}
 
@@ -154,8 +163,8 @@ Object.assign( AnimationObjectGroup.prototype, {
 			} else if ( objects[ index ] !== knownObject ) {
 
 				console.error( "Different objects with the same UUID " +
-						"detected. Clean the caches or recreate your " +
-						"infrastructure when reloading scenes..." );
+					"detected. Clean the caches or recreate your " +
+					"infrastructure when reloading scenes..." );
 
 			} // else the object is already where we want it to be
 
@@ -165,7 +174,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	},
 
-	remove: function( var_args ) {
+	remove: function ( /*var_args*/ ) {
 
 		var objects = this._objects,
 			nCachedObjects = this.nCachedObjects_,
@@ -214,7 +223,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 	},
 
 	// remove & forget
-	uncache: function( var_args ) {
+	uncache: function ( /*var_args*/ ) {
 
 		var objects = this._objects,
 			nObjects = objects.length,
@@ -308,7 +317,11 @@ Object.assign( AnimationObjectGroup.prototype, {
 			index = indicesByPath[ path ],
 			bindings = this._bindings;
 
-		if ( index !== undefined ) return bindings[ index ];
+		if ( index !== undefined ) {
+
+			return bindings[ index ];
+
+		}
 
 		var paths = this._paths,
 			parsedPaths = this._parsedPaths,
@@ -369,6 +382,5 @@ Object.assign( AnimationObjectGroup.prototype, {
 	}
 
 } );
-
 
 export { AnimationObjectGroup };

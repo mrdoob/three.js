@@ -1,9 +1,9 @@
-import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
-import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
-import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
+import { _Math } from '../math/Math';
 import { AnimationUtils } from './AnimationUtils';
 import { KeyframeTrack } from './KeyframeTrack';
-import { _Math } from '../math/Math';
+import { NumberKeyframeTrack } from './tracks/NumberKeyframeTrack';
+import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack';
+import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack';
 
 /**
  *
@@ -84,9 +84,10 @@ Object.assign( AnimationClip, {
 			var values = [];
 
 			times.push(
-					( i + numMorphTargets - 1 ) % numMorphTargets,
-					i,
-					( i + 1 ) % numMorphTargets );
+				( i + numMorphTargets - 1 ) % numMorphTargets,
+				i,
+				( i + 1 ) % numMorphTargets
+			);
 
 			values.push( 0, 1, 0 );
 
@@ -104,10 +105,11 @@ Object.assign( AnimationClip, {
 			}
 
 			tracks.push(
-					new NumberKeyframeTrack(
-						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
-						times, values
-					).scale( 1.0 / fps ) );
+				new NumberKeyframeTrack(
+					'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
+					times, values
+				).scale( 1.0 / fps )
+			);
 
 		}
 
@@ -229,7 +231,11 @@ Object.assign( AnimationClip, {
 			var animationKeys = hierarchyTracks[ h ].keys;
 
 			// skip empty tracks
-			if ( ! animationKeys || animationKeys.length === 0 ) continue;
+			if ( ! animationKeys || animationKeys.length === 0 ) {
+
+				continue;
+
+			}
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
@@ -281,17 +287,11 @@ Object.assign( AnimationClip, {
 
 				var boneName = '.bones[' + bones[ h ].name + ']';
 
-				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.position',
-						animationKeys, 'pos', tracks );
+				addNonemptyTrack( VectorKeyframeTrack, boneName + '.position', animationKeys, 'pos', tracks );
 
-				addNonemptyTrack(
-						QuaternionKeyframeTrack, boneName + '.quaternion',
-						animationKeys, 'rot', tracks );
+				addNonemptyTrack( QuaternionKeyframeTrack, boneName + '.quaternion', animationKeys, 'rot', tracks );
 
-				addNonemptyTrack(
-						VectorKeyframeTrack, boneName + '.scale',
-						animationKeys, 'scl', tracks );
+				addNonemptyTrack( VectorKeyframeTrack, boneName + '.scale', animationKeys, 'scl', tracks );
 
 			}
 
@@ -354,6 +354,5 @@ Object.assign( AnimationClip.prototype, {
 	}
 
 } );
-
 
 export { AnimationClip };
