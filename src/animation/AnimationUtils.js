@@ -13,7 +13,7 @@ var AnimationUtils = {
 
 			// in ios9 array.subarray(from, undefined) will return empty array
 			// but array.subarray(from) or array.subarray(from, len) is correct
-			return new array.constructor( array.subarray( from, to || array.length ) );
+			return new array.constructor( array.subarray( from, to === undefined ? array.length : to) );
 
 		}
 
