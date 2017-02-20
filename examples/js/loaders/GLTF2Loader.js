@@ -1063,7 +1063,7 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.textures, function ( texture ) {
 
-				if ( texture.source ) {
+				if ( texture.source !== undefined ) {
 
 					return new Promise( function ( resolve ) {
 
@@ -1103,7 +1103,7 @@ THREE.GLTF2Loader = ( function () {
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							if ( texture.sampler ) {
+							if ( texture.sampler !== undefined ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
