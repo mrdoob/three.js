@@ -57,10 +57,8 @@ function WebGLRenderer( parameters ) {
 
 	var lights = [];
 
-	var opaqueObjects = [];
-	var opaqueObjectsLastIndex = - 1;
-	var transparentObjects = [];
-	var transparentObjectsLastIndex = - 1;
+	var opaqueObjects = null;
+	var transparentObjects = null;
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -520,10 +518,8 @@ function WebGLRenderer( parameters ) {
 
 	this.dispose = function() {
 
-		transparentObjects = [];
-		transparentObjectsLastIndex = -1;
-		opaqueObjects = [];
-		opaqueObjectsLastIndex = -1;
+		opaqueObjects = null;
+		transparentObjects = null;
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
@@ -574,6 +570,16 @@ function WebGLRenderer( parameters ) {
 			programCache.releaseProgram( programInfo );
 
 		}
+
+	}
+
+	function onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', onSceneDispose );
+
+		properties.delete( scene );
 
 	}
 
@@ -1102,8 +1108,22 @@ function WebGLRenderer( parameters ) {
 
 		lights.length = 0;
 
-		opaqueObjectsLastIndex = - 1;
-		transparentObjectsLastIndex = - 1;
+		var sceneProperties = properties.get( scene );
+
+		if ( sceneProperties.opaqueRenderList === undefined ) {
+
+			sceneProperties.opaqueRenderList = [];
+			sceneProperties.transparentRenderList = [];
+
+			scene.addEventListener( 'dispose', onSceneDispose );
+
+		}
+
+		opaqueObjects = sceneProperties.opaqueRenderList;
+		transparentObjects = sceneProperties.transparentRenderList;
+
+		opaqueObjects.liveEntries = 0;
+		transparentObjects.liveEntries = 0;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -1113,8 +1133,8 @@ function WebGLRenderer( parameters ) {
 
 		projectObject( scene, camera );
 
-		opaqueObjects.length = opaqueObjectsLastIndex + 1;
-		transparentObjects.length = transparentObjectsLastIndex + 1;
+		opaqueObjects.length = opaqueObjects.liveEntries;
+		transparentObjects.length = transparentObjects.liveEntries;
 
 		if ( _this.sortObjects === true ) {
 
@@ -1273,25 +1293,23 @@ function WebGLRenderer( parameters ) {
 
 	function pushRenderItem( object, geometry, material, z, group ) {
 
-		var array, index;
+		var array;
 
 		// allocate the next position in the appropriate array
 
 		if ( material.transparent ) {
 
 			array = transparentObjects;
-			index = ++ transparentObjectsLastIndex;
 
 		} else {
 
 			array = opaqueObjects;
-			index = ++ opaqueObjectsLastIndex;
 
 		}
 
 		// recycle existing render item or grow the array
 
-		var renderItem = array[ index ];
+		var renderItem = array[ array.liveEntries ++ ];
 
 		if ( renderItem !== undefined ) {
 

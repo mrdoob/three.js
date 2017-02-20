@@ -726,6 +726,12 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		return this;
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 } );
