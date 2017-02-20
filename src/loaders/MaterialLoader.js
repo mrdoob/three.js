@@ -86,7 +86,6 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
-		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 
 		// for PointsMaterial
 
@@ -150,8 +149,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.aoMapIntensity !== undefined ) material.aoMapIntensity = json.aoMapIntensity;
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
-
-		// MultiMaterial
 
 		if ( json.materials !== undefined ) {
 

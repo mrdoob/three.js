@@ -249,11 +249,9 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		data.morphTargets = this.morphTargets;
 		if(this.morphNormals) data.morphNormals = this.morphNormals;
-		
-		if(this.skinning) data.skinning = this.skinning;
 
 		// TODO: Copied from Object3D.toJSON
-
+		// 
 		function extractFromCache( cache ) {
 
 			var values = [];
