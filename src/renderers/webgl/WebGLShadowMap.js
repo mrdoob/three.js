@@ -71,7 +71,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		var depthMaterial = depthMaterialTemplate.clone();
 		depthMaterial.morphTargets = useMorphing;
-		depthMaterial.skinning = useSkinning;
 
 		_depthMaterials[ i ] = depthMaterial;
 
@@ -83,7 +82,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 			vertexShader: distanceShader.vertexShader,
 			fragmentShader: distanceShader.fragmentShader,
 			morphTargets: useMorphing,
-			skinning: useSkinning,
 			clipping: true
 		} );
 
