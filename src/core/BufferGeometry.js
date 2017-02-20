@@ -821,8 +821,8 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 		for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
 			x = normals.getX( i );
-			y = normals.getY( i );;
-			z = normals.getZ( i );;
+			y = normals.getY( i );
+			z = normals.getZ( i );
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
