@@ -104,11 +104,11 @@
 					mesh.scale.set( s, s, s );
 					group.add( mesh );
 
-					addLineShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s );
+					addLineShape( shape, color, x, y, z, rx, ry, rz, s );
 
 				}
 
-				function addLineShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
+				function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
 
 					// lines
 
@@ -353,11 +353,11 @@
 				addShape( arcShape,         extrudeSettings, 0x804000,  150,    0, 0, 0, 0, 0, 1 );
 				addShape( splineShape,      extrudeSettings, 0x808080, - 50, -100, 0, 0, 0, 0, 1 );
 
-				addLineShape( arcShape.holes[ 0 ], extrudeSettings, 0x804000, 150, 0, 0, 0, 0, 0, 1 );
+				addLineShape( arcShape.holes[ 0 ], 0x804000, 150, 0, 0, 0, 0, 0, 1 );
 
 				for ( var i = 0; i < smileyShape.holes.length; i += 1 ) {
 
-					addLineShape( smileyShape.holes[ i ], extrudeSettings, 0xf000f0, - 200, 250, 0, 0, 0, Math.PI, 1 );
+					addLineShape( smileyShape.holes[ i ], 0xf000f0, - 200, 250, 0, 0, 0, Math.PI, 1 );
 
 				}
 
