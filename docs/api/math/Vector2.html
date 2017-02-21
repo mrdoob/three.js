@@ -54,7 +54,7 @@
 		[page:Float x] - the x value of the vector. Default is *0*.<br />
 		[page:Float y] -  the y value of the vector. Default is *0*.<br /><br />
 
-		Created a new [name].
+		Creates a new [name].
 		</div>
 
 
@@ -64,7 +64,7 @@
 		<div>
 			Used to check whether this or derived classes are Vector2s. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 		<h3>[property:Float height]</h3>
@@ -84,7 +84,7 @@
 		<div>Adds [page:Vector2 v] to this vector.</div>
 
 		<h3>[method:Vector2 addScalar]( [page:Float s] )</h3>
-		<div>Add the scalar value s to this vector's [page:.x x] and [page:.y y] values.</div>
+		<div>Adds the scalar value [page:Float s] to this vector's [page:.x x] and [page:.y y] values.</div>
 
 		<h3>[method:Vector2 addScaledVector]( [page:Vector2 v], [page:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector2 v] and [page:Float s] to this vector.</div>
@@ -131,13 +131,13 @@
 
 		<h3>[method:Vector2 clone]()</h3>
 		<div>
-		Returns a new vector2 with the same [page:.x x] and [page:.y y] values as this one.
+		Returns a new Vector2 with the same [page:.x x] and [page:.y y] values as this one.
 		</div>
 
 		<h3>[method:Vector2 copy]( [page:Vector2 v] )</h3>
 		<div>
-			Copies the values of the passed vector2's [page:.x x] and [page:.y y]
-			properties to this vector2.
+			Copies the values of the passed Vector2's [page:.x x] and [page:.y y]
+			properties to this Vector2.
 		</div>
 
 		<h3>[method:Float distanceTo]( [page:Vector2 v] )</h3>
@@ -166,7 +166,7 @@
 
 		<h3>[method:Float dot]( [page:Vector2 v] )</h3>
 		<div>
-		Calculate the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
+		Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
 	  vector and [page:Vector2 v].
 		</div>
 
@@ -179,9 +179,9 @@
 		<h3>[method:Vector2 fromArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the source array.<br />
-		[page:Integer offset] - ( optional) offset into the array. Default is 0.<br /><br />
+		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
 
-		Sets this vector's [page:.x x] value to be array[0] and [page:.y y] value to be array[1].
+		Sets this vector's [page:.x x] value to be array[ offset ] and [page:.y y] value to be array[ offset + 1 ].
 		</div>
 
 		<h3>[method:Vector2 fromBufferAttribute]( [page:BufferAttribute attribute], [page:Integer index] )</h3>
@@ -221,7 +221,7 @@
 		[page:Vector2 v] - [page:Vector2] to interpolate towards.<br />
 		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
 
-		Linearly interpolate between this vector and [page:Vector2 v], where alpha is the
+		Linearly interpolates between this vector and [page:Vector2 v], where alpha is the
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector2 v].
 		</div>
 
@@ -241,19 +241,19 @@
 
 		<h3>[method:Vector2 normalize]()</h3>
 		<div>
-		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
 		as this one, but [page:.length length] 1.
 		</div>
 
 		<h3>[method:Vector2 max]( [page:Vector2 v] )</h3>
 		<div>
-		If this vector's x or y value is less than [page:Vector2 v's] x or y value, replace
+		If this vector's x or y value is less than [page:Vector2 v]'s x or y value, replace
 		that value with the corresponding max value.
 		</div>
 
 		<h3>[method:Vector2 min]( [page:Vector2 v] )</h3>
 		<div>
-		If this vector's x or y value is greater than [page:Vector2 v's] x or y value, replace
+		If this vector's x or y value is greater than [page:Vector2 v]'s x or y value, replace
 		that value with the corresponding min value.
 		</div>
 
@@ -269,7 +269,7 @@
 			[page:Vector2 center] - the point around which to rotate.<br />
 			[page:float angle] - the angle to rotate, in radians.<br /><br />
 
-			Rotate the vector arounf [page:Vector2 center] by [page:float angle] radians.
+			Rotates the vector around [page:Vector2 center] by [page:float angle] radians.
 		</div>
 
 		<h3>[method:Vector2 round]()</h3>
@@ -294,34 +294,33 @@
 
 		<h3>[method:Vector2 setLength]( [page:Float l] )</h3>
 		<div>
-		Set this vector to the vector with the same direction as this one, but [page:.length length]
+		Sets this vector to the vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</div>
 
 		<h3>[method:Vector2 setScalar]( [page:Float scalar] )</h3>
 		<div>
-		Set the [page:.x x] and [page:.y y] values of this vector both equal to [page:Float scalar].
+		Sets the [page:.x x] and [page:.y y] values of this vector both equal to [page:Float scalar].
 		</div>
 
 		<h3>[method:Vector2 setX]( [page:Float x] )</h3>
-		<div>Replace this vector's [page:.x x] value with [page:Float x].</div>
+		<div>Replaces this vector's [page:.x x] value with [page:Float x].</div>
 
 		<h3>[method:Vector2 setY]( [page:Float y] )</h3>
-		<div>Replace this vector's [page:.y y] value with [page:Float y].</div>
+		<div>Replaces this vector's [page:.y y] value with [page:Float y].</div>
 
 		<h3>[method:Vector2 sub]( [page:Vector2 v] )</h3>
 		<div>Subtracts [page:Vector2 v] from this vector.</div>
 
 		<h3>[method:Vector2 subScalar]( [page:Float s] )</h3>
-		<div>Subtracts [page:Float s]  from this vector's [page:.x x] and [page:.y y] compnents.</div>
+		<div>Subtracts [page:Float s]  from this vector's [page:.x x] and [page:.y y] components.</div>
 
 		<h3>[method:Vector2 subVectors]( [page:Vector2 a], [page:Vector2 b] )</h3>
 		<div>Sets this vector to [page:Vector2 a] - [page:Vector2 b].</div>
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided
-		a new array will be created.<br />
+		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
 		Returns an array [x, y], or copies x and y into the provided [page:Array array].
