@@ -490,35 +490,35 @@
 	Object.defineProperties( Vector2.prototype, {
 
 		"width" : {
-			
-			get: function () { 
-				
-				return this.x; 
-			
+
+			get: function () {
+
+				return this.x;
+
 			},
-			
-			set: function ( value ) { 
-				
-				this.x = value; 
-			
+
+			set: function ( value ) {
+
+				this.x = value;
+
 			}
-			
+
 		},
 
 		"height" : {
-			
-			get: function () { 
-				
-				return this.y; 
-			
+
+			get: function () {
+
+				return this.y;
+
 			},
-			
-			set: function ( value ) { 
-				
-				this.y = value; 
-			
+
+			set: function ( value ) {
+
+				this.y = value;
+
 			}
-			
+
 		}
 
 	} );
@@ -690,17 +690,8 @@
 
 		multiplyScalar: function ( scalar ) {
 
-			if ( isFinite( scalar ) ) {
-
-				this.x *= scalar;
-				this.y *= scalar;
-
-			} else {
-
-				this.x = 0;
-				this.y = 0;
-
-			}
+			this.x *= scalar;
+			this.y *= scalar;
 
 			return this;
 
@@ -1462,21 +1453,10 @@
 
 		multiplyScalar: function ( scalar ) {
 
-			if ( isFinite( scalar ) ) {
-
-				this.x *= scalar;
-				this.y *= scalar;
-				this.z *= scalar;
-				this.w *= scalar;
-
-			} else {
-
-				this.x = 0;
-				this.y = 0;
-				this.z = 0;
-				this.w = 0;
-
-			}
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
+			this.w *= scalar;
 
 			return this;
 
@@ -2792,19 +2772,9 @@
 
 		multiplyScalar: function ( scalar ) {
 
-			if ( isFinite( scalar ) ) {
-
-				this.x *= scalar;
-				this.y *= scalar;
-				this.z *= scalar;
-
-			} else {
-
-				this.x = 0;
-				this.y = 0;
-				this.z = 0;
-
-			}
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
 
 			return this;
 
@@ -23778,6 +23748,7 @@
 
 				sphere.copy( geometry.boundingSphere );
 				sphere.applyMatrix4( matrixWorld );
+				sphere.radius += threshold;
 
 				if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
