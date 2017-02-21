@@ -1063,7 +1063,7 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.textures, function ( texture ) {
 
-				if ( texture.source ) {
+				if ( texture.source !== undefined ) {
 
 					return new Promise( function ( resolve ) {
 
@@ -1103,7 +1103,7 @@ THREE.GLTF2Loader = ( function () {
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							if ( texture.sampler ) {
+							if ( texture.sampler !== undefined ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
@@ -1632,7 +1632,7 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1682,7 +1682,7 @@ THREE.GLTF2Loader = ( function () {
 
 						var meshNode;
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1999,7 +1999,7 @@ THREE.GLTF2Loader = ( function () {
 
 								var skinEntry;
 
-								if ( node.skin ) {
+								if ( node.skin !== undefined ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
 
