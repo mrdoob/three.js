@@ -1999,7 +1999,7 @@ THREE.GLTF2Loader = ( function () {
 
 								var skinEntry;
 
-								if ( node.skin ) {
+								if ( node.skin !== undefined ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
 
