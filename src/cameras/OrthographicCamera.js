@@ -51,7 +51,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	},
 
-	setViewOffset: function( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
 
 		this.view = {
 			fullWidth: fullWidth,
@@ -66,7 +66,7 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
 		this.view = null;
 		this.updateProjectionMatrix();
@@ -115,13 +115,16 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 		data.object.near = this.near;
 		data.object.far = this.far;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) {
+
+			data.object.view = Object.assign( {}, this.view );
+
+		}
 
 		return data;
 
 	}
 
 } );
-
 
 export { OrthographicCamera };

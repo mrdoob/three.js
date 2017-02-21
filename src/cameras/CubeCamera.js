@@ -1,12 +1,15 @@
+import {
+	LinearFilter,
+	RGBFormat
+} from '../constants';
 import { Object3D } from '../core/Object3D';
-import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
-import { LinearFilter, RGBFormat } from '../constants';
-import { Vector3 } from '../math/Vector3';
 import { PerspectiveCamera } from './PerspectiveCamera';
+import { Vector3 } from '../math/Vector3';
+import { WebGLRenderTargetCube } from '../renderers/WebGLRenderTargetCube';
 
 /**
  * Camera for rendering cube maps
- *	- renders scene into axis-aligned cube
+ *    - renders scene into axis-aligned cube
  *
  * @author alteredq / http://alteredqualia.com/
  */
@@ -49,14 +52,22 @@ function CubeCamera( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
-	var options = { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+	var options = {
+		format: RGBFormat,
+		magFilter: LinearFilter,
+		minFilter: LinearFilter
+	};
 
 	this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
-		if ( this.parent === null ) this.updateMatrixWorld();
+		if ( this.parent === null ) {
+
+			this.updateMatrixWorld();
+
+		}
 
 		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.texture.generateMipmaps;
@@ -92,5 +103,5 @@ function CubeCamera( near, far, cubeResolution ) {
 CubeCamera.prototype = Object.create( Object3D.prototype );
 CubeCamera.prototype.constructor = CubeCamera;
 
-
 export { CubeCamera };
+

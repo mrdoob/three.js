@@ -1,6 +1,6 @@
+import { _Math } from '../math/Math';
 import { Camera } from './Camera';
 import { Object3D } from '../core/Object3D';
-import { _Math } from '../math/Math';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -161,7 +161,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
 		this.view = null;
 		this.updateProjectionMatrix();
@@ -191,7 +191,11 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		}
 
 		var skew = this.filmOffset;
-		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
+		if ( skew !== 0 ) {
+
+			left += near * skew / this.getFilmWidth();
+
+		}
 
 		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
 
@@ -210,7 +214,11 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 		data.object.aspect = this.aspect;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) {
+
+			data.object.view = Object.assign( {}, this.view );
+
+		}
 
 		data.object.filmGauge = this.filmGauge;
 		data.object.filmOffset = this.filmOffset;
@@ -220,6 +228,5 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	}
 
 } );
-
 
 export { PerspectiveCamera };
