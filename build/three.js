@@ -10853,17 +10853,17 @@
 
 		updateMatrixWorld: function ( force ) {
 
-			if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+			if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+			if ( this.matrixWorldNeedsUpdate || force ) {
 
-				if ( this.parent === null ) {
+				if ( this.parent ) {
 
-					this.matrixWorld.copy( this.matrix );
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 				} else {
 
-					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+					this.matrixWorld.copy( this.matrix );
 
 				}
 
