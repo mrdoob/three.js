@@ -81,7 +81,33 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		Mesh.prototype.copy.call( this, source );
 
-		this.bind( source.skeleton.clone(), this.matrixWorld );
+		var hasOwnBones = false;
+
+		source.traverse( function ( node ) {
+
+			if ( node.type === 'Bone' ) {
+
+				hasOwnBones = true;
+
+			}
+
+		} );
+
+		if ( hasOwnBones ) {
+
+			// If bones are children of the source mesh, copying the mesh should
+			// require (1) cloning these bones, and (2) constructing a new Skeleton
+			// from the resulting tree.
+			console.warn( 'SkinnedMesh: .copy() is not yet fully implemented.' );
+
+		} else {
+
+			// If bones are _not_ children of the source mesh, assume that they are
+			// part of a separate armature. The new SkinnedMesh should be bound to the
+			// same Skeleton, not a cloned copy, to match the source mesh.
+			this.bind( source.skeleton );
+
+		}
 
 		return this;
 
