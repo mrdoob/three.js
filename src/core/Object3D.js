@@ -286,7 +286,15 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			}
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
