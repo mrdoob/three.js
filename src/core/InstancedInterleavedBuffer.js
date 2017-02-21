@@ -12,20 +12,22 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 }
 
-InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
-InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
+InstancedInterleavedBuffer.prototype = Object.assign( Object.create( InterleavedBuffer.prototype ), {
 
-InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
+	constructor: InstancedInterleavedBuffer,
 
-InstancedInterleavedBuffer.prototype.copy = function ( source ) {
+	isInstancedInterleavedBuffer: true,
 
-	InterleavedBuffer.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.meshPerAttribute = source.meshPerAttribute;
+		InterleavedBuffer.prototype.copy.call( this, source );
 
-	return this;
+		this.meshPerAttribute = source.meshPerAttribute;
 
-};
+		return this;
 
+	}
+
+} );
 
 export { InstancedInterleavedBuffer };

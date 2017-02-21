@@ -259,5 +259,4 @@ Object.assign( DirectGeometry.prototype, {
 
 } );
 
-
 export { DirectGeometry };

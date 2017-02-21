@@ -42,5 +42,4 @@ Object.assign( Layers.prototype, {
 
 } );
 
-
 export { Layers };

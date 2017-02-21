@@ -8,7 +8,11 @@ Object.assign( EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
-		if ( this._listeners === undefined ) this._listeners = {};
+		if ( this._listeners === undefined ) {
+
+			this._listeners = {};
+
+		}
 
 		var listeners = this._listeners;
 
@@ -28,7 +32,11 @@ Object.assign( EventDispatcher.prototype, {
 
 	hasEventListener: function ( type, listener ) {
 
-		if ( this._listeners === undefined ) return false;
+		if ( this._listeners === undefined ) {
+
+			return false;
+
+		}
 
 		var listeners = this._listeners;
 
@@ -38,7 +46,11 @@ Object.assign( EventDispatcher.prototype, {
 
 	removeEventListener: function ( type, listener ) {
 
-		if ( this._listeners === undefined ) return;
+		if ( this._listeners === undefined ) {
+
+			return;
+
+		}
 
 		var listeners = this._listeners;
 		var listenerArray = listeners[ type ];
@@ -59,7 +71,11 @@ Object.assign( EventDispatcher.prototype, {
 
 	dispatchEvent: function ( event ) {
 
-		if ( this._listeners === undefined ) return;
+		if ( this._listeners === undefined ) {
+
+			return;
+
+		}
 
 		var listeners = this._listeners;
 		var listenerArray = listeners[ event.type ];
@@ -88,6 +104,5 @@ Object.assign( EventDispatcher.prototype, {
 	}
 
 } );
-
 
 export { EventDispatcher };

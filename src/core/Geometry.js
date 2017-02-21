@@ -1,14 +1,14 @@
+import { _Math } from '../math/Math';
+import { Box3 } from '../math/Box3';
+import { Color } from '../math/Color';
 import { EventDispatcher } from './EventDispatcher';
 import { Face3 } from './Face3';
 import { Matrix3 } from '../math/Matrix3';
-import { Sphere } from '../math/Sphere';
-import { Box3 } from '../math/Box3';
-import { Vector3 } from '../math/Vector3';
 import { Matrix4 } from '../math/Matrix4';
-import { Vector2 } from '../math/Vector2';
-import { Color } from '../math/Color';
 import { Object3D } from './Object3D';
-import { _Math } from '../math/Math';
+import { Sphere } from '../math/Sphere';
+import { Vector2 } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -20,7 +20,11 @@ import { _Math } from '../math/Math';
  */
 
 var count = 0;
-function GeometryIdCount() { return count++; }
+function GeometryIdCount() {
+
+	return count ++;
+
+}
 
 function Geometry() {
 
@@ -225,7 +229,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
 
-		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( uvs2 !== undefined ) {
+
+			this.faceVertexUvs[ 1 ] = [];
+
+		}
 
 		var tempNormals = [];
 		var tempUVs = [];
@@ -404,7 +412,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 	computeVertexNormals: function ( areaWeighted ) {
 
-		if ( areaWeighted === undefined ) areaWeighted = true;
+		if ( areaWeighted === undefined ) {
+
+			areaWeighted = true;
+
+		}
 
 		var v, vl, f, fl, face, vertices;
 
@@ -552,7 +564,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			}
 
-			if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
+			if ( ! face.__originalVertexNormals ) {
+
+				face.__originalVertexNormals = [];
+
+			}
 
 			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
 
@@ -593,7 +609,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 					faceNormal = new Vector3();
-					vertexNormals = { a: new Vector3(), b: new Vector3(), c: new Vector3() };
+					vertexNormals = {
+						a: new Vector3(),
+						b: new Vector3(),
+						c: new Vector3()
+					};
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -710,7 +730,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 			colors1 = this.colors,
 			colors2 = geometry.colors;
 
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
+		if ( materialIndexOffset === undefined ) {
+
+			materialIndexOffset = 0;
+
+		}
 
 		if ( matrix !== undefined ) {
 
@@ -726,7 +750,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix !== undefined ) vertexCopy.applyMatrix4( matrix );
+			if ( matrix !== undefined ) {
+
+				vertexCopy.applyMatrix4( matrix );
+
+			}
 
 			vertices1.push( vertexCopy );
 
@@ -862,7 +890,6 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-
 		// if faces are completely degenerate after merging vertices, we
 		// have to remove them from the geometry.
 		var faceIndicesToRemove = [];
@@ -944,20 +971,44 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		var newUvs1, newUvs2;
 
-		if ( uvs1 && uvs1.length === length ) newUvs1 = [];
-		if ( uvs2 && uvs2.length === length ) newUvs2 = [];
+		if ( uvs1 && uvs1.length === length ) {
+
+			newUvs1 = [];
+
+		}
+		if ( uvs2 && uvs2.length === length ) {
+
+			newUvs2 = [];
+
+		}
 
 		for ( var i = 0; i < length; i ++ ) {
 
 			var id = faces[ i ]._id;
 
-			if ( newUvs1 ) newUvs1.push( uvs1[ id ] );
-			if ( newUvs2 ) newUvs2.push( uvs2[ id ] );
+			if ( newUvs1 ) {
+
+				newUvs1.push( uvs1[ id ] );
+
+			}
+			if ( newUvs2 ) {
+
+				newUvs2.push( uvs2[ id ] );
+
+			}
 
 		}
 
-		if ( newUvs1 ) this.faceVertexUvs[ 0 ] = newUvs1;
-		if ( newUvs2 ) this.faceVertexUvs[ 1 ] = newUvs2;
+		if ( newUvs1 ) {
+
+			this.faceVertexUvs[ 0 ] = newUvs1;
+
+		}
+		if ( newUvs2 ) {
+
+			this.faceVertexUvs[ 1 ] = newUvs2;
+
+		}
 
 	},
 
@@ -975,7 +1026,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		data.uuid = this.uuid;
 		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		if ( this.name !== '' ) {
+
+			data.name = this.name;
+
+		}
 
 		if ( this.parameters !== undefined ) {
 
@@ -983,7 +1038,11 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined ) {
+
+					data[ key ] = parameters[ key ];
+
+				}
 
 			}
 
@@ -1146,8 +1205,16 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		data.data.vertices = vertices;
 		data.data.normals = normals;
-		if ( colors.length > 0 ) data.data.colors = colors;
-		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		if ( colors.length > 0 ) {
+
+			data.data.colors = colors;
+
+		}
+		if ( uvs.length > 0 ) {
+
+			data.data.uvs = [ uvs ];
+
+		} // temporal backward compatibility
 		data.data.faces = faces;
 
 		return data;
@@ -1426,5 +1493,7 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 } );
 
-
-export { GeometryIdCount, Geometry };
+export {
+	GeometryIdCount,
+	Geometry
+};

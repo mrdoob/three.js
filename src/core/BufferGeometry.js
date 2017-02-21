@@ -1,15 +1,20 @@
-import { Vector3 } from '../math/Vector3';
-import { Box3 } from '../math/Box3';
-import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute';
-import { Sphere } from '../math/Sphere';
-import { DirectGeometry } from './DirectGeometry';
-import { Object3D } from './Object3D';
-import { Matrix4 } from '../math/Matrix4';
-import { Matrix3 } from '../math/Matrix3';
 import { _Math } from '../math/Math';
 import { arrayMax } from '../utils';
+import { Box3 } from '../math/Box3';
+import {
+	BufferAttribute,
+	Float32BufferAttribute,
+	Uint16BufferAttribute,
+	Uint32BufferAttribute
+} from './BufferAttribute';
+import { DirectGeometry } from './DirectGeometry';
+import { EventDispatcher } from './EventDispatcher';
 import { GeometryIdCount } from './Geometry';
+import { Matrix3 } from '../math/Matrix3';
+import { Matrix4 } from '../math/Matrix4';
+import { Object3D } from './Object3D';
+import { Sphere } from '../math/Sphere';
+import { Vector3 } from '../math/Vector3';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -35,7 +40,10 @@ function BufferGeometry() {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
-	this.drawRange = { start: 0, count: Infinity };
+	this.drawRange = {
+		start: 0,
+		count: Infinity
+	};
 
 }
 
@@ -784,13 +792,21 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) {
+
+			offset = 0;
+
+		}
 
 		var attributes = this.attributes;
 
 		for ( var key in attributes ) {
 
-			if ( geometry.attributes[ key ] === undefined ) continue;
+			if ( geometry.attributes[ key ] === undefined ) {
+
+				continue;
+
+			}
 
 			var attribute1 = attributes[ key ];
 			var attributeArray1 = attribute1.array;
@@ -893,7 +909,11 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		data.uuid = this.uuid;
 		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		if ( this.name !== '' ) {
+
+			data.name = this.name;
+
+		}
 
 		if ( this.parameters !== undefined ) {
 
@@ -901,7 +921,11 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined ) {
+
+					data[ key ] = parameters[ key ];
+
+				}
 
 			}
 
@@ -1098,6 +1122,5 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 	}
 
 } );
-
 
 export { BufferGeometry };
