@@ -818,8 +818,10 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 			return;
 
 		}
-
-		mesh.matrixAutoUpdate && mesh.updateMatrix();
+		
+		if ( mesh.matrixAutoUpdate ) {
+			mesh.updateMatrix();
+		}
 
 		this.merge( mesh.geometry, mesh.matrix );
 
