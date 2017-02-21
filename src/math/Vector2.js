@@ -215,17 +215,8 @@ Object.assign( Vector2.prototype, {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-
-		}
+		this.x *= scalar;
+		this.y *= scalar;
 
 		return this;
 
