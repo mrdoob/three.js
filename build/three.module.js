@@ -2146,24 +2146,28 @@ Object.assign( Quaternion.prototype, {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( (euler && euler.isEuler) === false ) {
+		if ( ( euler && euler.isEuler ) === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 		}
 
+		var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler._x / 2 );
-		var c2 = Math.cos( euler._y / 2 );
-		var c3 = Math.cos( euler._z / 2 );
-		var s1 = Math.sin( euler._x / 2 );
-		var s2 = Math.sin( euler._y / 2 );
-		var s3 = Math.sin( euler._z / 2 );
+		var cos = Math.cos;
+		var sin = Math.sin;
 
-		var order = euler.order;
+		var c1 = cos( x / 2 );
+		var c2 = cos( y / 2 );
+		var c3 = cos( z / 2 );
+
+		var s1 = sin( x / 2 );
+		var s2 = sin( y / 2 );
+		var s3 = sin( z / 2 );
 
 		if ( order === 'XYZ' ) {
 
@@ -9351,7 +9355,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		if ( object.visible === false ) return;
 
-		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+		var visible = object.layers.test( camera.layers );
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
@@ -10286,7 +10290,7 @@ Object.assign( Euler.prototype, {
 
 function Layers() {
 
-	this.mask = 1;
+	this.mask = 1 | 0;
 
 }
 
@@ -10294,25 +10298,25 @@ Object.assign( Layers.prototype, {
 
 	set: function ( channel ) {
 
-		this.mask = 1 << channel;
+		this.mask = 1 << channel | 0;
 
 	},
 
 	enable: function ( channel ) {
 
-		this.mask |= 1 << channel;
+		this.mask |= 1 << channel | 0;
 
 	},
 
 	toggle: function ( channel ) {
 
-		this.mask ^= 1 << channel;
+		this.mask ^= 1 << channel | 0;
 
 	},
 
 	disable: function ( channel ) {
 
-		this.mask &= ~ ( 1 << channel );
+		this.mask &= ~ ( 1 << channel | 0 );
 
 	},
 
@@ -20753,7 +20757,7 @@ function WebGLRenderer( parameters ) {
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
-		projectObject( scene, camera );
+		projectObject( scene, camera, _this.sortObjects );
 
 		opaqueObjects.length = opaqueObjectsLastIndex + 1;
 		transparentObjects.length = transparentObjectsLastIndex + 1;
@@ -21013,11 +21017,11 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function projectObject( object, camera ) {
+	function projectObject( object, camera, sortObjects ) {
 
-		if ( object.visible === false ) return;
+		if ( ! object.visible ) return;
 
-		var visible = ( object.layers.mask & camera.layers.mask ) !== 0;
+		var visible = object.layers.test( camera.layers );
 
 		if ( visible ) {
 
@@ -21027,7 +21031,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isSprite ) {
 
-				if ( object.frustumCulled === false || isSpriteViewable( object ) === true ) {
+				if ( ! object.frustumCulled || isSpriteViewable( object ) ) {
 
 					sprites.push( object );
 
@@ -21039,10 +21043,9 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isImmediateRenderObject ) {
 
-				if ( _this.sortObjects === true ) {
+				if ( sortObjects ) {
 
-					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyMatrix4( _projScreenMatrix );
+					_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -21056,12 +21059,11 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( object.frustumCulled === false || isObjectViewable( object ) === true ) {
+				if ( ! object.frustumCulled || isObjectViewable( object ) ) {
 
-					if ( _this.sortObjects === true ) {
+					if ( sortObjects ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyMatrix4( _projScreenMatrix );
+						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -21077,7 +21079,7 @@ function WebGLRenderer( parameters ) {
 							var group = groups[ i ];
 							var groupMaterial = material[ group.materialIndex ];
 
-							if ( groupMaterial && groupMaterial.visible === true ) {
+							if ( groupMaterial && groupMaterial.visible ) {
 
 								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
@@ -21085,7 +21087,7 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-					} else if ( material.visible === true ) {
+					} else if ( material.visible ) {
 
 						pushRenderItem( object, geometry, material, _vector3.z, null );
 
@@ -21101,7 +21103,7 @@ function WebGLRenderer( parameters ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera );
+			projectObject( children[ i ], camera, sortObjects );
 
 		}
 
