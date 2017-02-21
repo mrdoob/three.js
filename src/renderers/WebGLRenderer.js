@@ -172,18 +172,18 @@ function WebGLRenderer( parameters ) {
 
 			hash: '',
 
-		ambient: [ 0, 0, 0 ],
-		directional: [],
-		directionalShadowMap: [],
-		directionalShadowMatrix: [],
-		spot: [],
-		spotShadowMap: [],
-		spotShadowMatrix: [],
-		rectArea: [],
-		point: [],
-		pointShadowMap: [],
-		pointShadowMatrix: [],
-		hemi: [],
+			ambient: [ 0, 0, 0 ],
+			directional: [],
+			directionalShadowMap: [],
+			directionalShadowMatrix: [],
+			spot: [],
+			spotShadowMap: [],
+			spotShadowMatrix: [],
+			rectArea: [],
+			point: [],
+			pointShadowMap: [],
+			pointShadowMatrix: [],
+			hemi: [],
 
 			shadows: []
 
@@ -518,12 +518,12 @@ function WebGLRenderer( parameters ) {
 
 	this.resetGLState = resetGLState;
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		transparentObjects = [];
-		transparentObjectsLastIndex = -1;
+		transparentObjectsLastIndex = - 1;
 		opaqueObjects = [];
-		opaqueObjectsLastIndex = -1;
+		opaqueObjectsLastIndex = - 1;
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 
@@ -578,6 +578,16 @@ function WebGLRenderer( parameters ) {
 	}
 
 	// Buffer rendering
+
+	function renderObjectImmediate( object, program, material ) {
+
+		object.render( function ( object ) {
+
+			_this.renderBufferImmediate( object, program, material );
+
+		} );
+
+	}
 
 	this.renderBufferImmediate = function ( object, program, material ) {
 
@@ -1489,7 +1499,7 @@ function WebGLRenderer( parameters ) {
 
 				_currentGeometryProgram = '';
 
-				renderObjectImmediate (object, program, material);
+				renderObjectImmediate( object, program, material );
 
 			} else {
 
@@ -1502,12 +1512,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-	}
-
-	function renderObjectImmediate(object, program, material) {
-		object.render( function ( object ) {
-			_this.renderBufferImmediate( object, program, material );
-		} );
 	}
 
 	function initMaterial( material, fog, object ) {
@@ -2312,11 +2316,11 @@ function WebGLRenderer( parameters ) {
 
 			viewMatrix = camera.matrixWorldInverse,
 
-		directionalLength = 0,
-		pointLength = 0,
-		spotLength = 0,
-		rectAreaLength = 0,
-		hemiLength = 0;
+			directionalLength = 0,
+			pointLength = 0,
+			spotLength = 0,
+			rectAreaLength = 0,
+			hemiLength = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -2521,7 +2525,7 @@ function WebGLRenderer( parameters ) {
 	this.allocTextureUnit = allocTextureUnit;
 
 	// this.setTexture2D = setTexture2D;
-	this.setTexture2D = ( function() {
+	this.setTexture2D = ( function () {
 
 		var warned = false;
 
@@ -2547,7 +2551,7 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture = ( function() {
+	this.setTexture = ( function () {
 
 		var warned = false;
 
@@ -2566,7 +2570,7 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTextureCube = ( function() {
+	this.setTextureCube = ( function () {
 
 		var warned = false;
 
@@ -2608,7 +2612,7 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.getCurrentRenderTarget = function() {
+	this.getCurrentRenderTarget = function () {
 
 		return _currentRenderTarget;
 
