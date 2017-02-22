@@ -109,7 +109,7 @@ function WebGLAttributes( gl ) {
 
 		var data = buffers[ attribute.id ];
 
-		if ( data !== undefined ) {
+		if ( data ) {
 
 			gl.deleteBuffer( data.buffer );
 

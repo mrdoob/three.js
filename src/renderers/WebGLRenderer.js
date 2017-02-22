@@ -16,9 +16,10 @@ import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { WebGLAttributes } from './webgl/WebGLAttributes';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
+import { WebGLGeometries } from './webgl/WebGLGeometries';
 import { WebGLLights } from './webgl/WebGLLights';
-import { WebGLPrograms } from './webgl/WebGLPrograms';
 import { WebGLObjects } from './webgl/WebGLObjects';
+import { WebGLPrograms } from './webgl/WebGLPrograms';
 import { WebGLTextures } from './webgl/WebGLTextures';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLState } from './webgl/WebGLState';
@@ -287,7 +288,8 @@ function WebGLRenderer( parameters ) {
 	var properties = new WebGLProperties();
 	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
 	var attributes = new WebGLAttributes( _gl );
-	var objects = new WebGLObjects( _gl, attributes, properties, this.info );
+	var geometries = new WebGLGeometries( _gl, attributes, this.info );
+	var objects = new WebGLObjects( _gl, geometries );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
 
@@ -770,7 +772,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.wireframe === true ) {
 
-			index = objects.getWireframeAttribute( geometry );
+			index = geometries.getWireframeAttribute( geometry );
 			rangeFactor = 2;
 
 		}
