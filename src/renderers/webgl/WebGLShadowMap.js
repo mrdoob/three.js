@@ -18,26 +18,26 @@ import { Frustum } from '../../math/Frustum';
 function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 	var _gl = _renderer.context,
-	_state = _renderer.state,
-	_frustum = new Frustum(),
-	_projScreenMatrix = new Matrix4(),
+		_state = _renderer.state,
+		_frustum = new Frustum(),
+		_projScreenMatrix = new Matrix4(),
 
-	_lightShadows = _lights.shadows,
+		_lightShadows = _lights.shadows,
 
-	_shadowMapSize = new Vector2(),
-	_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
+		_shadowMapSize = new Vector2(),
+		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
 
-	_lookTarget = new Vector3(),
-	_lightPositionWorld = new Vector3(),
+		_lookTarget = new Vector3(),
+		_lightPositionWorld = new Vector3(),
 
-	_MorphingFlag = 1,
+		_MorphingFlag = 1,
 
-	_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
+		_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
 
-	_depthMaterials = new Array( _NumberOfMaterialVariants ),
-	_distanceMaterials = new Array( _NumberOfMaterialVariants ),
+		_depthMaterials = new Array( _NumberOfMaterialVariants ),
+		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
 
-	_materialCache = {};
+		_materialCache = {};
 
 	var cubeDirections = [
 		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
@@ -392,7 +392,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
-			if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+			if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
 				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -408,7 +408,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 						var group = groups[ k ];
 						var groupMaterial = material[ group.materialIndex ];
 
-						if ( groupMaterial && groupMaterial.visible === true ) {
+						if ( groupMaterial && groupMaterial.visible ) {
 
 							var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
@@ -417,7 +417,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 					}
 
-				} else if ( material.visible === true ) {
+				} else if ( material.visible ) {
 
 					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
