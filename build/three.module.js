@@ -6547,7 +6547,7 @@ function LensFlarePlugin( renderer, flares ) {
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
 		state.disable( gl.CULL_FACE );
-		state.setDepthWrite( false );
+		state.buffers.depth.setMask( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
@@ -6672,7 +6672,7 @@ function LensFlarePlugin( renderer, flares ) {
 
 		state.enable( gl.CULL_FACE );
 		state.enable( gl.DEPTH_TEST );
-		state.setDepthWrite( true );
+		state.buffers.depth.setMask( true );
 
 		renderer.resetGLState();
 
@@ -6926,8 +6926,8 @@ function SpritePlugin( renderer, sprites ) {
 			gl.uniform2fv( uniforms.scale, scale );
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			state.setDepthTest( material.depthTest );
-			state.setDepthWrite( material.depthWrite );
+			state.buffers.depth.setTest( material.depthTest );
+			state.buffers.depth.setMask( material.depthWrite );
 
 			if ( material.map ) {
 
@@ -9068,9 +9068,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 		if ( _lightShadows.length === 0 ) return;
 
 		// Set GL state for depth map.
-		_state.buffers.color.setClear( 1, 1, 1, 1 );
 		_state.disable( _gl.BLEND );
-		_state.setDepthTest( true );
+		_state.buffers.color.setClear( 1, 1, 1, 1 );
+		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
 		// render depth map
@@ -18735,7 +18735,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		stencilBuffer.setClear( 0 );
 
 		enable( gl.DEPTH_TEST );
-		setDepthFunc( LessEqualDepth );
+		depthBuffer.setFunc( LessEqualDepth );
 
 		setFlipSided( false );
 		setCullFace( CullFaceBack );
@@ -18977,53 +18977,24 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	// TODO Deprecate
+	function setMaterial( material ) {
 
-	function setColorWrite( colorWrite ) {
+		material.side === DoubleSide
+			? disable( gl.CULL_FACE )
+			: enable( gl.CULL_FACE );
 
-		colorBuffer.setMask( colorWrite );
+		setFlipSided( material.side === BackSide );
 
-	}
+		material.transparent === true
+			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
+			: setBlending( NoBlending );
 
-	function setDepthTest( depthTest ) {
+		depthBuffer.setFunc( material.depthFunc );
+		depthBuffer.setTest( material.depthTest );
+		depthBuffer.setMask( material.depthWrite );
+		colorBuffer.setMask( material.colorWrite );
 
-		depthBuffer.setTest( depthTest );
-
-	}
-
-	function setDepthWrite( depthWrite ) {
-
-		depthBuffer.setMask( depthWrite );
-
-	}
-
-	function setDepthFunc( depthFunc ) {
-
-		depthBuffer.setFunc( depthFunc );
-
-	}
-
-	function setStencilTest( stencilTest ) {
-
-		stencilBuffer.setTest( stencilTest );
-
-	}
-
-	function setStencilWrite( stencilWrite ) {
-
-		stencilBuffer.setMask( stencilWrite );
-
-	}
-
-	function setStencilFunc( stencilFunc, stencilRef, stencilMask ) {
-
-		stencilBuffer.setFunc( stencilFunc, stencilRef, stencilMask );
-
-	}
-
-	function setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
-
-		stencilBuffer.setOp( stencilFail, stencilZFail, stencilZPass );
+		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
 
@@ -19286,15 +19257,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		getCompressedTextureFormats: getCompressedTextureFormats,
 
 		setBlending: setBlending,
-
-		setColorWrite: setColorWrite,
-		setDepthTest: setDepthTest,
-		setDepthWrite: setDepthWrite,
-		setDepthFunc: setDepthFunc,
-		setStencilTest: setStencilTest,
-		setStencilWrite: setStencilWrite,
-		setStencilFunc: setStencilFunc,
-		setStencilOp: setStencilOp,
+		setMaterial: setMaterial,
 
 		setFlipSided: setFlipSided,
 		setCullFace: setCullFace,
@@ -20312,7 +20275,7 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
-		setMaterial( material );
+		state.setMaterial( material );
 
 		program = setProgram( camera, fog, material, object );
 		geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
@@ -20898,9 +20861,9 @@ function WebGLRenderer( parameters ) {
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 
-		state.setDepthTest( true );
-		state.setDepthWrite( true );
-		state.setColorWrite( true );
+		state.buffers.depth.setTest( true );
+		state.buffers.depth.setMask( true );
+		state.buffers.color.setMask( true );
 
 		// _gl.finish();
 
@@ -21122,7 +21085,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isImmediateRenderObject ) {
 
-				setMaterial( material );
+				state.setMaterial( material );
 
 				var program = setProgram( camera, scene.fog, material, object );
 
@@ -21288,26 +21251,6 @@ function WebGLRenderer( parameters ) {
 				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
-
-	}
-
-	function setMaterial( material ) {
-
-		material.side === DoubleSide
-			? state.disable( _gl.CULL_FACE )
-			: state.enable( _gl.CULL_FACE );
-
-		state.setFlipSided( material.side === BackSide );
-
-		material.transparent === true
-			? state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
-			: state.setBlending( NoBlending );
-
-		state.setDepthFunc( material.depthFunc );
-		state.setDepthTest( material.depthTest );
-		state.setDepthWrite( material.depthWrite );
-		state.setColorWrite( material.colorWrite );
-		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
 
