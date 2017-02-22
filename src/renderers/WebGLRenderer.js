@@ -193,6 +193,7 @@ function WebGLRenderer( parameters ) {
 
 		_infoRender = {
 
+			frame: 0,
 			calls: 0,
 			vertices: 0,
 			faces: 0,
@@ -289,7 +290,7 @@ function WebGLRenderer( parameters ) {
 	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
 	var attributes = new WebGLAttributes( _gl );
 	var geometries = new WebGLGeometries( _gl, attributes, this.info );
-	var objects = new WebGLObjects( _gl, geometries );
+	var objects = new WebGLObjects( _gl, geometries, _infoRender );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
 
