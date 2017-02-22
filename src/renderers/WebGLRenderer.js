@@ -26,7 +26,7 @@ import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { WebGLExtensions } from './webgl/WebGLExtensions';
 import { Vector3 } from '../math/Vector3';
-import { Sphere } from '../math/Sphere';
+// import { Sphere } from '../math/Sphere';
 import { WebGLClipping } from './webgl/WebGLClipping';
 import { Frustum } from '../math/Frustum';
 import { Vector4 } from '../math/Vector4';
@@ -286,7 +286,7 @@ function WebGLRenderer( parameters ) {
 
 	var properties = new WebGLProperties();
 	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
-	var attributes = new WebGLAttributes( _gl, properties );
+	var attributes = new WebGLAttributes( _gl );
 	var objects = new WebGLObjects( _gl, attributes, properties, this.info );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
@@ -790,7 +790,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).__webglBuffer );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
 
 			}
 
@@ -939,7 +939,7 @@ function WebGLRenderer( parameters ) {
 
 					var attributeProperties = attributes.get( geometryAttribute );
 
-					var buffer = attributeProperties.__webglBuffer;
+					var buffer = attributeProperties.buffer;
 					var type = attributeProperties.type;
 					var bytesPerElement = attributeProperties.bytesPerElement;
 
@@ -1303,7 +1303,7 @@ function WebGLRenderer( parameters ) {
 
 		var renderItem = array[ index ];
 
-		if ( renderItem !== undefined ) {
+		if ( renderItem ) {
 
 			renderItem.id = object.id;
 			renderItem.object = object;
@@ -2310,7 +2310,7 @@ function WebGLRenderer( parameters ) {
 
 	function setupLights( lights, camera ) {
 
-		var l, ll, light,
+		var l, ll, light, shadow,
 			r = 0, g = 0, b = 0,
 			color,
 			intensity,
@@ -2355,15 +2355,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
 				_lights.directionalShadowMap[ directionalLength ] = shadowMap;
 				_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
-				_lights.directional[ directionalLength ++ ] = uniforms;
+				_lights.directional[ directionalLength ] = uniforms;
+
+				directionalLength ++;
 
 			} else if ( light.isSpotLight ) {
 
@@ -2388,15 +2392,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
 				_lights.spotShadowMap[ spotLength ] = shadowMap;
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
-				_lights.spot[ spotLength ++ ] = uniforms;
+				_lights.spot[ spotLength ] = uniforms;
+
+				spotLength ++;
 
 			} else if ( light.isRectAreaLight ) {
 
@@ -2428,7 +2436,9 @@ function WebGLRenderer( parameters ) {
 				// TODO (abelnation): RectAreaLight distance?
 				// uniforms.distance = distance;
 
-				_lights.rectArea[ rectAreaLength ++ ] = uniforms;
+				_lights.rectArea[ rectAreaLength ] = uniforms;
+
+				rectAreaLength ++;
 
 			} else if ( light.isPointLight ) {
 
@@ -2445,9 +2455,11 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
@@ -2464,7 +2476,9 @@ function WebGLRenderer( parameters ) {
 				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
 				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
 
-				_lights.point[ pointLength ++ ] = uniforms;
+				_lights.point[ pointLength ] = uniforms;
+
+				pointLength ++;
 
 			} else if ( light.isHemisphereLight ) {
 
@@ -2477,7 +2491,9 @@ function WebGLRenderer( parameters ) {
 				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-				_lights.hemi[ hemiLength ++ ] = uniforms;
+				_lights.hemi[ hemiLength ] = uniforms;
+
+				hemiLength ++;
 
 			}
 

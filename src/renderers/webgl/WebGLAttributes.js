@@ -2,19 +2,24 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLAttributes( gl, properties ) {
+function WebGLAttributes( gl ) {
 
-	function createBuffer( attributeProperties, data, bufferType ) {
+	var buffers = {};
 
-		attributeProperties.__webglBuffer = gl.createBuffer();
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+	function createBuffer( attribute, bufferType ) {
 
-		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+		var buffer = gl.createBuffer();
 
-		gl.bufferData( bufferType, data.array, usage );
+		gl.bindBuffer( bufferType, buffer );
+
+		var array = attribute.array;
+		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+
+		gl.bufferData( bufferType, array, usage );
+
+		attribute.onUploadCallback();
 
 		var type = gl.FLOAT;
-		var array = data.array;
 
 		if ( array instanceof Float32Array ) {
 
@@ -50,42 +55,43 @@ function WebGLAttributes( gl, properties ) {
 
 		}
 
-		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
-		attributeProperties.type = type;
-		attributeProperties.version = data.version;
-
-		data.onUploadCallback();
+		return {
+			buffer: buffer,
+			type: type,
+			bytesPerElement: array.BYTES_PER_ELEMENT,
+			version: attribute.version
+		};
 
 	}
 
-	function updateBuffer( attributeProperties, data, bufferType ) {
+	function updateBuffer( buffer, attribute, bufferType ) {
 
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+		gl.bindBuffer( bufferType, buffer );
 
-		if ( data.dynamic === false ) {
+		if ( attribute.dynamic === false ) {
 
-			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
+			gl.bufferData( bufferType, attribute.array, gl.STATIC_DRAW );
 
-		} else if ( data.updateRange.count === - 1 ) {
+		} else if ( attribute.updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
-			gl.bufferSubData( bufferType, 0, data.array );
+			gl.bufferSubData( bufferType, 0, attribute.array );
 
-		} else if ( data.updateRange.count === 0 ) {
+		} else if ( attribute.updateRange.count === 0 ) {
 
 			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
-			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+			gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
+							  attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
 
-			data.updateRange.count = 0; // reset range
+			attribute.updateRange.count = 0; // reset range
 
 		}
 
-		attributeProperties.version = data.version;
+
 
 	}
 
@@ -93,24 +99,21 @@ function WebGLAttributes( gl, properties ) {
 
 	function get( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-			return properties.get( attribute.data );
-
-		}
-
-		return properties.get( attribute );
+		return buffers[ attribute.id ];
 
 	}
 
 	function remove( attribute ) {
 
-		var attributeProperties = get( attribute );
+		var data = buffers[ attribute.id ];
 
-		if ( attributeProperties.__webglBuffer !== undefined ) {
+		if ( data !== undefined ) {
 
-			gl.deleteBuffer( attributeProperties.__webglBuffer );
-			properties.remove( attributeProperties );
+			gl.deleteBuffer( data.buffer );
+
+			delete buffers[ attribute.id ];
 
 		}
 
@@ -118,17 +121,18 @@ function WebGLAttributes( gl, properties ) {
 
 	function update( attribute, bufferType ) {
 
-		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var attributeProperties = properties.get( data );
+		var data = buffers[ attribute.id ];
 
-		if ( attributeProperties.__webglBuffer === undefined ) {
+		if ( data === undefined ) {
 
-			createBuffer( attributeProperties, data, bufferType );
+			buffers[ attribute.id ] = createBuffer( attribute, bufferType );
 
-		} else if ( attributeProperties.version !== data.version ) {
+		} else if ( data.version !== attribute.version ) {
 
-			updateBuffer( attributeProperties, data, bufferType );
+			updateBuffer( data.buffer, attribute, bufferType );
+			data.version = attribute.version;
 
 		}
 

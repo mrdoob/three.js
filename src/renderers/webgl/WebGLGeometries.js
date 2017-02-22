@@ -57,45 +57,47 @@ function WebGLGeometries( gl, attributes, properties, info ) {
 
 	}
 
-	return {
+	function get( object ) {
 
-		get: function ( object ) {
+		var geometry = object.geometry;
 
-			var geometry = object.geometry;
+		if ( geometries[ geometry.id ] !== undefined ) {
 
-			if ( geometries[ geometry.id ] !== undefined ) {
-
-				return geometries[ geometry.id ];
-
-			}
-
-			geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			var buffergeometry;
-
-			if ( geometry.isBufferGeometry ) {
-
-				buffergeometry = geometry;
-
-			} else if ( geometry.isGeometry ) {
-
-				if ( geometry._bufferGeometry === undefined ) {
-
-					geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-				}
-
-				buffergeometry = geometry._bufferGeometry;
-
-			}
-
-			geometries[ geometry.id ] = buffergeometry;
-
-			info.memory.geometries ++;
-
-			return buffergeometry;
+			return geometries[ geometry.id ];
 
 		}
+
+		geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		var buffergeometry;
+
+		if ( geometry.isBufferGeometry ) {
+
+			buffergeometry = geometry;
+
+		} else if ( geometry.isGeometry ) {
+
+			if ( geometry._bufferGeometry === undefined ) {
+
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
+
+			}
+
+			buffergeometry = geometry._bufferGeometry;
+
+		}
+
+		geometries[ geometry.id ] = buffergeometry;
+
+		info.memory.geometries ++;
+
+		return buffergeometry;
+
+	}
+
+	return {
+
+		get: get
 
 	};
 

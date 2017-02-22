@@ -71,14 +71,14 @@ function WebGLObjects( gl, attributes, properties, info ) {
 
 		var indices = [];
 
-		var index = geometry.index;
-		var attributes = geometry.attributes;
+		var geometryIndex = geometry.index;
+		var geometryAttributes = geometry.attributes;
 
 		// console.time( 'wireframe' );
 
-		if ( index !== null ) {
+		if ( geometryIndex !== null ) {
 
-			var array = index.array;
+			var array = geometryIndex.array;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
@@ -92,7 +92,7 @@ function WebGLObjects( gl, attributes, properties, info ) {
 
 		} else {
 
-			var array = attributes.position.array;
+			var array = geometryAttributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
