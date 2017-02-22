@@ -157,8 +157,6 @@ function WebGLRenderer( parameters ) {
 		_clippingEnabled = false,
 		_localClippingEnabled = false,
 
-		_sphere = new Sphere(),
-
 		// camera matrices cache
 
 		_projScreenMatrix = new Matrix4(),
@@ -1332,7 +1330,10 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	/*
 	// TODO Duplicated code (Frustum)
+
+	var _sphere = new Sphere();
 
 	function isObjectViewable( object ) {
 
@@ -1382,6 +1383,7 @@ function WebGLRenderer( parameters ) {
 		return true;
 
 	}
+	*/
 
 	function projectObject( object, camera, sortObjects ) {
 
@@ -1397,7 +1399,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || isSpriteViewable( object ) ) {
+				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
 					sprites.push( object );
 
@@ -1425,7 +1427,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( ! object.frustumCulled || isObjectViewable( object ) ) {
+				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
 					if ( sortObjects ) {
 
