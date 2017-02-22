@@ -383,7 +383,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		stencilBuffer.setClear( 0 );
 
 		enable( gl.DEPTH_TEST );
-		setDepthFunc( LessEqualDepth );
+		depthBuffer.setFunc( LessEqualDepth );
 
 		setFlipSided( false );
 		setCullFace( CullFaceBack );
@@ -637,61 +637,12 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
 			: setBlending( NoBlending );
 
-		setDepthFunc( material.depthFunc );
-		setDepthTest( material.depthTest );
-		setDepthWrite( material.depthWrite );
-		setColorWrite( material.colorWrite );
+		depthBuffer.setFunc( material.depthFunc );
+		depthBuffer.setTest( material.depthTest );
+		depthBuffer.setMask( material.depthWrite );
+		colorBuffer.setMask( material.colorWrite );
+
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
-
-	}
-
-	// TODO Deprecate
-
-	function setColorWrite( colorWrite ) {
-
-		colorBuffer.setMask( colorWrite );
-
-	}
-
-	function setDepthTest( depthTest ) {
-
-		depthBuffer.setTest( depthTest );
-
-	}
-
-	function setDepthWrite( depthWrite ) {
-
-		depthBuffer.setMask( depthWrite );
-
-	}
-
-	function setDepthFunc( depthFunc ) {
-
-		depthBuffer.setFunc( depthFunc );
-
-	}
-
-	function setStencilTest( stencilTest ) {
-
-		stencilBuffer.setTest( stencilTest );
-
-	}
-
-	function setStencilWrite( stencilWrite ) {
-
-		stencilBuffer.setMask( stencilWrite );
-
-	}
-
-	function setStencilFunc( stencilFunc, stencilRef, stencilMask ) {
-
-		stencilBuffer.setFunc( stencilFunc, stencilRef, stencilMask );
-
-	}
-
-	function setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
-
-		stencilBuffer.setOp( stencilFail, stencilZFail, stencilZPass );
 
 	}
 
@@ -955,15 +906,6 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 		setBlending: setBlending,
 		setMaterial: setMaterial,
-
-		setColorWrite: setColorWrite,
-		setDepthTest: setDepthTest,
-		setDepthWrite: setDepthWrite,
-		setDepthFunc: setDepthFunc,
-		setStencilTest: setStencilTest,
-		setStencilWrite: setStencilWrite,
-		setStencilFunc: setStencilFunc,
-		setStencilOp: setStencilOp,
 
 		setFlipSided: setFlipSided,
 		setCullFace: setCullFace,
