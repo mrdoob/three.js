@@ -4,7 +4,7 @@
 
 import { BufferGeometry } from '../../core/BufferGeometry';
 
-function WebGLGeometries( gl, properties, info ) {
+function WebGLGeometries( gl, attributes, properties, info ) {
 
 	var geometries = {};
 
@@ -15,11 +15,15 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( buffergeometry.index !== null ) {
 
-			deleteAttribute( buffergeometry.index );
+			attributes.remove( buffergeometry.index );
 
 		}
 
-		deleteAttributes( buffergeometry.attributes );
+		for ( var name in buffergeometry.attributes ) {
+
+			attributes.remove( buffergeometry.attributes[ name ] );
+
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
@@ -31,74 +35,25 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( property.wireframe ) {
 
-			deleteAttribute( property.wireframe );
+			attributes.remove( property.wireframe );
 
 		}
 
-		properties.delete( geometry );
+		properties.remove( geometry );
 
 		var bufferproperty = properties.get( buffergeometry );
 
 		if ( bufferproperty.wireframe ) {
 
-			deleteAttribute( bufferproperty.wireframe );
+			attributes.remove( bufferproperty.wireframe );
 
 		}
 
-		properties.delete( buffergeometry );
+		properties.remove( buffergeometry );
 
 		//
 
 		info.memory.geometries --;
-
-	}
-
-	function getAttributeBuffer( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			return properties.get( attribute.data ).__webglBuffer;
-
-		}
-
-		return properties.get( attribute ).__webglBuffer;
-
-	}
-
-	function deleteAttribute( attribute ) {
-
-		var buffer = getAttributeBuffer( attribute );
-
-		if ( buffer !== undefined ) {
-
-			gl.deleteBuffer( buffer );
-			removeAttributeBuffer( attribute );
-
-		}
-
-	}
-
-	function deleteAttributes( attributes ) {
-
-		for ( var name in attributes ) {
-
-			deleteAttribute( attributes[ name ] );
-
-		}
-
-	}
-
-	function removeAttributeBuffer( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			properties.delete( attribute.data );
-
-		} else {
-
-			properties.delete( attribute );
-
-		}
 
 	}
 

@@ -13,6 +13,7 @@ import { PlaneBufferGeometry } from '../geometries/PlaneGeometry';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
+import { WebGLAttributes } from './webgl/WebGLAttributes';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
 import { WebGLLights } from './webgl/WebGLLights';
@@ -220,7 +221,7 @@ function WebGLRenderer( parameters ) {
 
 	try {
 
-		var attributes = {
+		var contextAttributes = {
 			alpha: _alpha,
 			depth: _depth,
 			stencil: _stencil,
@@ -229,7 +230,7 @@ function WebGLRenderer( parameters ) {
 			preserveDrawingBuffer: _preserveDrawingBuffer
 		};
 
-		_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
 		if ( _gl === null ) {
 
@@ -284,9 +285,11 @@ function WebGLRenderer( parameters ) {
 	var capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
 	var state = new WebGLState( _gl, extensions, paramThreeToGL );
+
 	var properties = new WebGLProperties();
 	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
-	var objects = new WebGLObjects( _gl, properties, this.info );
+	var attributes = new WebGLAttributes( _gl, properties );
+	var objects = new WebGLObjects( _gl, attributes, properties, this.info );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
 
@@ -558,7 +561,7 @@ function WebGLRenderer( parameters ) {
 
 		releaseMaterialProgramReference( material );
 
-		properties.delete( material );
+		properties.remove( material );
 
 	}
 
@@ -600,15 +603,15 @@ function WebGLRenderer( parameters ) {
 		if ( object.hasUvs && ! buffers.uv ) buffers.uv = _gl.createBuffer();
 		if ( object.hasColors && ! buffers.color ) buffers.color = _gl.createBuffer();
 
-		var attributes = program.getAttributes();
+		var programAttributes = program.getAttributes();
 
 		if ( object.hasPositions ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.position );
-			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.position );
+			_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -647,9 +650,9 @@ function WebGLRenderer( parameters ) {
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.normal );
+			state.enableAttribute( programAttributes.normal );
 
-			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -658,7 +661,7 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.uv );
+			state.enableAttribute( programAttributes.uv );
 
 			_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
@@ -669,9 +672,9 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.color );
+			state.enableAttribute( programAttributes.color );
 
-			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -790,7 +793,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).__webglBuffer );
 
 			}
 
@@ -937,7 +940,7 @@ function WebGLRenderer( parameters ) {
 					var normalized = geometryAttribute.normalized;
 					var size = geometryAttribute.itemSize;
 
-					var attributeProperties = objects.getAttributeProperties( geometryAttribute );
+					var attributeProperties = attributes.get( geometryAttribute );
 
 					var buffer = attributeProperties.__webglBuffer;
 					var type = attributeProperties.type;
@@ -1579,7 +1582,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var attributes = program.getAttributes();
+		var programAttributes = program.getAttributes();
 
 		if ( material.morphTargets ) {
 
@@ -1587,7 +1590,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-				if ( attributes[ 'morphTarget' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
 
 					material.numSupportedMorphTargets ++;
 
@@ -1603,7 +1606,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-				if ( attributes[ 'morphNormal' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
 
 					material.numSupportedMorphNormals ++;
 
