@@ -202,8 +202,7 @@
 					scene.add(ground);
 				}
 
-				THREE.GLTF2Loader.Shaders.removeAll(); // remove all previous shaders
-				loader = new THREE.GLTF2Loader;
+				loader = new THREE.GLTF2Loader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -338,7 +337,6 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				if (mixer) mixer.update(clock.getDelta());
-				THREE.GLTF2Loader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
