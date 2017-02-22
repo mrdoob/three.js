@@ -16453,6 +16453,8 @@ function WebGLLights() {
 
 function WebGLObjects( gl, geometries, infoRender ) {
 
+	var updateList = {};
+
 	function update( object ) {
 
 		var frame = infoRender.frame;
@@ -16462,7 +16464,7 @@ function WebGLObjects( gl, geometries, infoRender ) {
 
 		// Update once per frame
 
-		if ( buffergeometry.__frame !== frame ) {
+		if ( updateList[ buffergeometry.id ] !== frame ) {
 
 			if ( geometry.isGeometry ) {
 
@@ -16472,7 +16474,7 @@ function WebGLObjects( gl, geometries, infoRender ) {
 
 			geometries.update( buffergeometry );
 
-			buffergeometry.__frame = frame;
+			updateList[ buffergeometry.id ] = frame;
 
 		}
 
@@ -16480,9 +16482,16 @@ function WebGLObjects( gl, geometries, infoRender ) {
 
 	}
 
+	function clear() {
+
+		updateList = {};
+
+	}
+
 	return {
 
-		update: update
+		update: update,
+		clear: clear
 
 	};
 
@@ -20154,6 +20163,7 @@ function WebGLRenderer( parameters ) {
 		setDefaultGLState();
 
 		properties.clear();
+		objects.clear();
 
 	}
 
@@ -22770,6 +22780,7 @@ function SpriteMaterial( parameters ) {
 
 SpriteMaterial.prototype = Object.create( Material.prototype );
 SpriteMaterial.prototype.constructor = SpriteMaterial;
+SpriteMaterial.prototype.isSpriteMaterial = true;
 
 SpriteMaterial.prototype.copy = function ( source ) {
 

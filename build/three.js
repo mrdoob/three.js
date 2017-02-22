@@ -16459,6 +16459,8 @@
 
 	function WebGLObjects( gl, geometries, infoRender ) {
 
+		var updateList = {};
+
 		function update( object ) {
 
 			var frame = infoRender.frame;
@@ -16468,7 +16470,7 @@
 
 			// Update once per frame
 
-			if ( buffergeometry.__frame !== frame ) {
+			if ( updateList[ buffergeometry.id ] !== frame ) {
 
 				if ( geometry.isGeometry ) {
 
@@ -16478,7 +16480,7 @@
 
 				geometries.update( buffergeometry );
 
-				buffergeometry.__frame = frame;
+				updateList[ buffergeometry.id ] = frame;
 
 			}
 
@@ -16486,9 +16488,16 @@
 
 		}
 
+		function clear() {
+
+			updateList = {};
+
+		}
+
 		return {
 
-			update: update
+			update: update,
+			clear: clear
 
 		};
 
@@ -20160,6 +20169,7 @@
 			setDefaultGLState();
 
 			properties.clear();
+			objects.clear();
 
 		}
 
@@ -22776,6 +22786,7 @@
 
 	SpriteMaterial.prototype = Object.create( Material.prototype );
 	SpriteMaterial.prototype.constructor = SpriteMaterial;
+	SpriteMaterial.prototype.isSpriteMaterial = true;
 
 	SpriteMaterial.prototype.copy = function ( source ) {
 
