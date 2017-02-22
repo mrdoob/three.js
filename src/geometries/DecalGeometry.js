@@ -43,8 +43,9 @@ function DecalGeometry( mesh, position, rotation, dimensions, check ) {
 
 	function generate() {
 
-		var i, j, faceVertices;
+		var i, j;
 		var geometry = new BufferGeometry();
+		var decalVertices = [];
 
 		var vertex = new Vector3();
 		var normal = new Vector3();
@@ -70,23 +71,15 @@ function DecalGeometry( mesh, position, rotation, dimensions, check ) {
 
 			var index = geometry.index;
 
-			for ( i = 0; i < index.count; i += 3 ) {
+			for ( i = 0; i < index.count; i ++ ) {
 
-				faceVertices = [];
+				vertex.fromBufferAttribute( positionAttribute, index[ i ] );
+				normal.fromBufferAttribute( normalAttribute, index[ i ] );
 
-				for ( j = 0; j < 3; j ++ ) {
+				vertex.applyMatrix4( mesh.matrix );
+				vertex.applyMatrix4( projectorMatrixInverse );
 
-					vertex.fromBufferAttribute( positionAttribute, index[ i + j ] );
-					normal.fromBufferAttribute( normalAttribute, index[ i + j ] );
-
-					vertex.applyMatrix4( mesh.matrix );
-					vertex.applyMatrix4( projectorMatrixInverse );
-
-					faceVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
-
-				}
-
-				processFace( faceVertices );
+				decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
 
 			}
 
@@ -94,58 +87,46 @@ function DecalGeometry( mesh, position, rotation, dimensions, check ) {
 
 			// non-indexed BufferGeometry
 
-			for ( i = 0; i < positionAttribute.count; i += 3 ) {
+			for ( i = 0; i < positionAttribute.count; i ++ ) {
 
-				faceVertices = [];
+				vertex.fromBufferAttribute( positionAttribute, i );
+				normal.fromBufferAttribute( normalAttribute, i );
 
-				for ( j = 0; j < 3; j ++ ) {
+				vertex.applyMatrix4( mesh.matrix );
+				vertex.applyMatrix4( projectorMatrixInverse );
 
-					vertex.fromBufferAttribute( positionAttribute, i + j );
-					normal.fromBufferAttribute( normalAttribute, i + j );
-
-					vertex.applyMatrix4( mesh.matrix );
-					vertex.applyMatrix4( projectorMatrixInverse );
-
-					faceVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
-
-				}
-
-				processFace( faceVertices );
+				decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
 
 			}
 
 		}
 
-	}
-
-	function processFace( faceVertices ) {
+		// check
 
 		if ( check.x ) {
 
-			faceVertices = clipFace( faceVertices, plane.set( 1, 0, 0 ) );
-			faceVertices = clipFace( faceVertices, plane.set( - 1, 0, 0 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( 1, 0, 0 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( - 1, 0, 0 ) );
 
 		}
 		if ( check.y ) {
 
-			faceVertices = clipFace( faceVertices, plane.set( 0, 1, 0 ) );
-			faceVertices = clipFace( faceVertices, plane.set( 0, - 1, 0 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( 0, 1, 0 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( 0, - 1, 0 ) );
 
 		}
 		if ( check.z ) {
 
-			faceVertices = clipFace( faceVertices, plane.set( 0, 0, 1 ) );
-			faceVertices = clipFace( faceVertices, plane.set( 0, 0, - 1 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, 1 ) );
+			decalVertices = clipGeometry( decalVertices, plane.set( 0, 0, - 1 ) );
 
 		}
 
-		if ( faceVertices.length === 0 ) return;
-
 		// generate vertices, normals and uvs
 
-		for ( var i = 0; i < faceVertices.length; i ++ ) {
+		for ( i = 0; i < decalVertices.length; i ++ ) {
 
-			var decalVertex = faceVertices[ i ];
+			var decalVertex = decalVertices[ i ];
 
 			uvs.push(
 				0.5 + ( decalVertex.position.x / dimensions.x ),
@@ -161,7 +142,7 @@ function DecalGeometry( mesh, position, rotation, dimensions, check ) {
 
 	}
 
-	function clipFace ( inVertices, plane ) {
+	function clipGeometry( inVertices, plane ) {
 
 		var outVertices = [];
 
