@@ -11609,6 +11609,8 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
+var bufferAttributeId = 0;
+
 function BufferAttribute( array, itemSize, normalized ) {
 
 	if ( Array.isArray( array ) ) {
@@ -11616,6 +11618,8 @@ function BufferAttribute( array, itemSize, normalized ) {
 		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
 	}
+
+	Object.defineProperty( this, 'id', { value: bufferAttributeId ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -15864,6 +15868,156 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
  * @author mrdoob / http://mrdoob.com/
  */
 
+function WebGLAttributes( gl ) {
+
+	var buffers = {};
+
+	function createBuffer( attribute, bufferType ) {
+
+		var buffer = gl.createBuffer();
+
+		gl.bindBuffer( bufferType, buffer );
+
+		var array = attribute.array;
+		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+
+		gl.bufferData( bufferType, array, usage );
+
+		attribute.onUploadCallback();
+
+		var type = gl.FLOAT;
+
+		if ( array instanceof Float32Array ) {
+
+			type = gl.FLOAT;
+
+		} else if ( array instanceof Float64Array ) {
+
+			console.warn( "Unsupported data buffer format: Float64Array" );
+
+		} else if ( array instanceof Uint16Array ) {
+
+			type = gl.UNSIGNED_SHORT;
+
+		} else if ( array instanceof Int16Array ) {
+
+			type = gl.SHORT;
+
+		} else if ( array instanceof Uint32Array ) {
+
+			type = gl.UNSIGNED_INT;
+
+		} else if ( array instanceof Int32Array ) {
+
+			type = gl.INT;
+
+		} else if ( array instanceof Int8Array ) {
+
+			type = gl.BYTE;
+
+		} else if ( array instanceof Uint8Array ) {
+
+			type = gl.UNSIGNED_BYTE;
+
+		}
+
+		return {
+			buffer: buffer,
+			type: type,
+			bytesPerElement: array.BYTES_PER_ELEMENT,
+			version: attribute.version
+		};
+
+	}
+
+	function updateBuffer( buffer, attribute, bufferType ) {
+
+		gl.bindBuffer( bufferType, buffer );
+
+		if ( attribute.dynamic === false ) {
+
+			gl.bufferData( bufferType, attribute.array, gl.STATIC_DRAW );
+
+		} else if ( attribute.updateRange.count === - 1 ) {
+
+			// Not using update ranges
+
+			gl.bufferSubData( bufferType, 0, attribute.array );
+
+		} else if ( attribute.updateRange.count === 0 ) {
+
+			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
+
+		} else {
+
+			gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
+							  attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+
+			attribute.updateRange.count = 0; // reset range
+
+		}
+
+
+
+	}
+
+	//
+
+	function get( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return buffers[ attribute.id ];
+
+	}
+
+	function remove( attribute ) {
+
+		var data = buffers[ attribute.id ];
+
+		if ( data !== undefined ) {
+
+			gl.deleteBuffer( data.buffer );
+
+			delete buffers[ attribute.id ];
+
+		}
+
+	}
+
+	function update( attribute, bufferType ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		var data = buffers[ attribute.id ];
+
+		if ( data === undefined ) {
+
+			buffers[ attribute.id ] = createBuffer( attribute, bufferType );
+
+		} else if ( data.version !== attribute.version ) {
+
+			updateBuffer( data.buffer, attribute, bufferType );
+			data.version = attribute.version;
+
+		}
+
+	}
+
+	return {
+
+		get: get,
+		remove: remove,
+		update: update
+
+	};
+
+}
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
@@ -17134,7 +17288,7 @@ function WebGLPrograms( renderer, capabilities ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLGeometries( gl, properties, info ) {
+function WebGLGeometries( gl, attributes, properties, info ) {
 
 	var geometries = {};
 
@@ -17145,11 +17299,15 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( buffergeometry.index !== null ) {
 
-			deleteAttribute( buffergeometry.index );
+			attributes.remove( buffergeometry.index );
 
 		}
 
-		deleteAttributes( buffergeometry.attributes );
+		for ( var name in buffergeometry.attributes ) {
+
+			attributes.remove( buffergeometry.attributes[ name ] );
+
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
@@ -17161,21 +17319,21 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( property.wireframe ) {
 
-			deleteAttribute( property.wireframe );
+			attributes.remove( property.wireframe );
 
 		}
 
-		properties.delete( geometry );
+		properties.remove( geometry );
 
 		var bufferproperty = properties.get( buffergeometry );
 
 		if ( bufferproperty.wireframe ) {
 
-			deleteAttribute( bufferproperty.wireframe );
+			attributes.remove( bufferproperty.wireframe );
 
 		}
 
-		properties.delete( buffergeometry );
+		properties.remove( buffergeometry );
 
 		//
 
@@ -17183,94 +17341,47 @@ function WebGLGeometries( gl, properties, info ) {
 
 	}
 
-	function getAttributeBuffer( attribute ) {
+	function get( object ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		var geometry = object.geometry;
 
-			return properties.get( attribute.data ).__webglBuffer;
+		if ( geometries[ geometry.id ] !== undefined ) {
 
-		}
-
-		return properties.get( attribute ).__webglBuffer;
-
-	}
-
-	function deleteAttribute( attribute ) {
-
-		var buffer = getAttributeBuffer( attribute );
-
-		if ( buffer !== undefined ) {
-
-			gl.deleteBuffer( buffer );
-			removeAttributeBuffer( attribute );
+			return geometries[ geometry.id ];
 
 		}
 
-	}
+		geometry.addEventListener( 'dispose', onGeometryDispose );
 
-	function deleteAttributes( attributes ) {
+		var buffergeometry;
 
-		for ( var name in attributes ) {
+		if ( geometry.isBufferGeometry ) {
 
-			deleteAttribute( attributes[ name ] );
+			buffergeometry = geometry;
 
-		}
+		} else if ( geometry.isGeometry ) {
 
-	}
+			if ( geometry._bufferGeometry === undefined ) {
 
-	function removeAttributeBuffer( attribute ) {
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+			}
 
-			properties.delete( attribute.data );
-
-		} else {
-
-			properties.delete( attribute );
+			buffergeometry = geometry._bufferGeometry;
 
 		}
+
+		geometries[ geometry.id ] = buffergeometry;
+
+		info.memory.geometries ++;
+
+		return buffergeometry;
 
 	}
 
 	return {
 
-		get: function ( object ) {
-
-			var geometry = object.geometry;
-
-			if ( geometries[ geometry.id ] !== undefined ) {
-
-				return geometries[ geometry.id ];
-
-			}
-
-			geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			var buffergeometry;
-
-			if ( geometry.isBufferGeometry ) {
-
-				buffergeometry = geometry;
-
-			} else if ( geometry.isGeometry ) {
-
-				if ( geometry._bufferGeometry === undefined ) {
-
-					geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-				}
-
-				buffergeometry = geometry._bufferGeometry;
-
-			}
-
-			geometries[ geometry.id ] = buffergeometry;
-
-			info.memory.geometries ++;
-
-			return buffergeometry;
-
-		}
+		get: get
 
 	};
 
@@ -17280,9 +17391,9 @@ function WebGLGeometries( gl, properties, info ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLObjects( gl, properties, info ) {
+function WebGLObjects( gl, attributes, properties, info ) {
 
-	var geometries = new WebGLGeometries( gl, properties, info );
+	var geometries = new WebGLGeometries( gl, attributes, properties, info );
 
 	//
 
@@ -17299,17 +17410,17 @@ function WebGLObjects( gl, properties, info ) {
 		}
 
 		var index = geometry.index;
-		var attributes = geometry.attributes;
+		var geometryAttributes = geometry.attributes;
 
 		if ( index !== null ) {
 
-			updateAttribute( index, gl.ELEMENT_ARRAY_BUFFER );
+			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
 
 		}
 
-		for ( var name in attributes ) {
+		for ( var name in geometryAttributes ) {
 
-			updateAttribute( attributes[ name ], gl.ARRAY_BUFFER );
+			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
 
 		}
 
@@ -17323,140 +17434,13 @@ function WebGLObjects( gl, properties, info ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				updateAttribute( array[ i ], gl.ARRAY_BUFFER );
+				attributes.update( array[ i ], gl.ARRAY_BUFFER );
 
 			}
 
 		}
 
 		return geometry;
-
-	}
-
-	function updateAttribute( attribute, bufferType ) {
-
-		var data = ( attribute.isInterleavedBufferAttribute ) ? attribute.data : attribute;
-
-		var attributeProperties = properties.get( data );
-
-		if ( attributeProperties.__webglBuffer === undefined ) {
-
-			createBuffer( attributeProperties, data, bufferType );
-
-		} else if ( attributeProperties.version !== data.version ) {
-
-			updateBuffer( attributeProperties, data, bufferType );
-
-		}
-
-	}
-
-	function createBuffer( attributeProperties, data, bufferType ) {
-
-		attributeProperties.__webglBuffer = gl.createBuffer();
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
-
-		var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
-
-		gl.bufferData( bufferType, data.array, usage );
-
-		var type = gl.FLOAT;
-		var array = data.array;
-
-		if ( array instanceof Float32Array ) {
-
-			type = gl.FLOAT;
-
-		} else if ( array instanceof Float64Array ) {
-
-			console.warn( "Unsupported data buffer format: Float64Array" );
-
-		} else if ( array instanceof Uint16Array ) {
-
-			type = gl.UNSIGNED_SHORT;
-
-		} else if ( array instanceof Int16Array ) {
-
-			type = gl.SHORT;
-
-		} else if ( array instanceof Uint32Array ) {
-
-			type = gl.UNSIGNED_INT;
-
-		} else if ( array instanceof Int32Array ) {
-
-			type = gl.INT;
-
-		} else if ( array instanceof Int8Array ) {
-
-			type = gl.BYTE;
-
-		} else if ( array instanceof Uint8Array ) {
-
-			type = gl.UNSIGNED_BYTE;
-
-		}
-
-		attributeProperties.bytesPerElement = array.BYTES_PER_ELEMENT;
-		attributeProperties.type = type;
-		attributeProperties.version = data.version;
-
-		data.onUploadCallback();
-
-	}
-
-	function updateBuffer( attributeProperties, data, bufferType ) {
-
-		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
-
-		if ( data.dynamic === false ) {
-
-			gl.bufferData( bufferType, data.array, gl.STATIC_DRAW );
-
-		} else if ( data.updateRange.count === - 1 ) {
-
-			// Not using update ranges
-
-			gl.bufferSubData( bufferType, 0, data.array );
-
-		} else if ( data.updateRange.count === 0 ) {
-
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
-
-		} else {
-
-			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
-
-			data.updateRange.count = 0; // reset range
-
-		}
-
-		attributeProperties.version = data.version;
-
-	}
-
-	function getAttributeBuffer( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			return properties.get( attribute.data ).__webglBuffer;
-
-		}
-
-		return properties.get( attribute ).__webglBuffer;
-
-	}
-
-	function getAttributeProperties( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			return properties.get( attribute.data );
-
-		}
-
-		return properties.get( attribute );
 
 	}
 
@@ -17472,14 +17456,14 @@ function WebGLObjects( gl, properties, info ) {
 
 		var indices = [];
 
-		var index = geometry.index;
-		var attributes = geometry.attributes;
+		var geometryIndex = geometry.index;
+		var geometryAttributes = geometry.attributes;
 
 		// console.time( 'wireframe' );
 
-		if ( index !== null ) {
+		if ( geometryIndex !== null ) {
 
-			var array = index.array;
+			var array = geometryIndex.array;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
@@ -17493,7 +17477,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		} else {
 
-			var array = attributes.position.array;
+			var array = geometryAttributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
@@ -17511,7 +17495,7 @@ function WebGLObjects( gl, properties, info ) {
 
 		var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
-		updateAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
+		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
 		property.wireframe = attribute;
 
@@ -17521,10 +17505,7 @@ function WebGLObjects( gl, properties, info ) {
 
 	return {
 
-		getAttributeBuffer: getAttributeBuffer,
-		getAttributeProperties: getAttributeProperties,
 		getWireframeAttribute: getWireframeAttribute,
-
 		update: update
 
 	};
@@ -17666,7 +17647,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 		}
 
 		// remove all webgl properties
-		properties.delete( texture );
+		properties.remove( texture );
 
 	}
 
@@ -17705,8 +17686,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		}
 
-		properties.delete( renderTarget.texture );
-		properties.delete( renderTarget );
+		properties.remove( renderTarget.texture );
+		properties.remove( renderTarget );
 
 	}
 
@@ -18325,36 +18306,38 @@ function WebGLProperties() {
 
 	var properties = {};
 
-	return {
+	function get( object ) {
 
-		get: function ( object ) {
+		var uuid = object.uuid;
+		var map = properties[ uuid ];
 
-			var uuid = object.uuid;
-			var map = properties[ uuid ];
+		if ( map === undefined ) {
 
-			if ( map === undefined ) {
-
-				map = {};
-				properties[ uuid ] = map;
-
-			}
-
-			return map;
-
-		},
-
-		delete: function ( object ) {
-
-			delete properties[ object.uuid ];
-
-		},
-
-		clear: function () {
-
-			properties = {};
+			map = {};
+			properties[ uuid ] = map;
 
 		}
 
+		return map;
+
+	}
+
+	function remove( object ) {
+
+		delete properties[ object.uuid ];
+
+	}
+
+	function clear() {
+
+		properties = {};
+
+	}
+
+	return {
+		get: get,
+		remove: remove,
+		clear: clear
 	};
 
 }
@@ -19658,6 +19641,7 @@ function WebGLClipping() {
 
 }
 
+// import { Sphere } from '../math/Sphere';
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author mrdoob / http://mrdoob.com/
@@ -19783,8 +19767,6 @@ function WebGLRenderer( parameters ) {
 		_clippingEnabled = false,
 		_localClippingEnabled = false,
 
-		_sphere = new Sphere(),
-
 		// camera matrices cache
 
 		_projScreenMatrix = new Matrix4(),
@@ -19847,7 +19829,7 @@ function WebGLRenderer( parameters ) {
 
 	try {
 
-		var attributes = {
+		var contextAttributes = {
 			alpha: _alpha,
 			depth: _depth,
 			stencil: _stencil,
@@ -19856,7 +19838,7 @@ function WebGLRenderer( parameters ) {
 			preserveDrawingBuffer: _preserveDrawingBuffer
 		};
 
-		_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
 		if ( _gl === null ) {
 
@@ -19911,9 +19893,11 @@ function WebGLRenderer( parameters ) {
 	var capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
 	var state = new WebGLState( _gl, extensions, paramThreeToGL );
+
 	var properties = new WebGLProperties();
 	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
-	var objects = new WebGLObjects( _gl, properties, this.info );
+	var attributes = new WebGLAttributes( _gl );
+	var objects = new WebGLObjects( _gl, attributes, properties, this.info );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
 
@@ -20185,7 +20169,7 @@ function WebGLRenderer( parameters ) {
 
 		releaseMaterialProgramReference( material );
 
-		properties.delete( material );
+		properties.remove( material );
 
 	}
 
@@ -20227,15 +20211,15 @@ function WebGLRenderer( parameters ) {
 		if ( object.hasUvs && ! buffers.uv ) buffers.uv = _gl.createBuffer();
 		if ( object.hasColors && ! buffers.color ) buffers.color = _gl.createBuffer();
 
-		var attributes = program.getAttributes();
+		var programAttributes = program.getAttributes();
 
 		if ( object.hasPositions ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.position );
-			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.position );
+			_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -20274,9 +20258,9 @@ function WebGLRenderer( parameters ) {
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.normal );
+			state.enableAttribute( programAttributes.normal );
 
-			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -20285,7 +20269,7 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.uv );
+			state.enableAttribute( programAttributes.uv );
 
 			_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
@@ -20296,9 +20280,9 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( attributes.color );
+			state.enableAttribute( programAttributes.color );
 
-			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -20310,14 +20294,16 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	var program, geometryProgram, updateBuffers;
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		setMaterial( material );
 
-		var program = setProgram( camera, fog, material, object );
+		program = setProgram( camera, fog, material, object );
+		geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
 
-		var updateBuffers = false;
-		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		updateBuffers = false;
 
 		if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -20331,6 +20317,8 @@ function WebGLRenderer( parameters ) {
 		var morphTargetInfluences = object.morphTargetInfluences;
 
 		if ( morphTargetInfluences !== undefined ) {
+
+			// TODO Remove allocations
 
 			var activeInfluences = [];
 
@@ -20378,8 +20366,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			program.getUniforms().setValue(
-				_gl, 'morphTargetInfluences', morphInfluences );
+			program.getUniforms().setValue( _gl, 'morphTargetInfluences', morphInfluences );
 
 			updateBuffers = true;
 
@@ -20398,16 +20385,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var renderer;
+		var renderer = bufferRenderer;
 
 		if ( index !== null ) {
 
 			renderer = indexedBufferRenderer;
 			renderer.setIndex( index );
-
-		} else {
-
-			renderer = bufferRenderer;
 
 		}
 
@@ -20417,7 +20400,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( index !== null ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer( index ) );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributes.get( index ).buffer );
 
 			}
 
@@ -20564,9 +20547,9 @@ function WebGLRenderer( parameters ) {
 					var normalized = geometryAttribute.normalized;
 					var size = geometryAttribute.itemSize;
 
-					var attributeProperties = objects.getAttributeProperties( geometryAttribute );
+					var attributeProperties = attributes.get( geometryAttribute );
 
-					var buffer = attributeProperties.__webglBuffer;
+					var buffer = attributeProperties.buffer;
 					var type = attributeProperties.type;
 					var bytesPerElement = attributeProperties.bytesPerElement;
 
@@ -20930,7 +20913,7 @@ function WebGLRenderer( parameters ) {
 
 		var renderItem = array[ index ];
 
-		if ( renderItem !== undefined ) {
+		if ( renderItem ) {
 
 			renderItem.id = object.id;
 			renderItem.object = object;
@@ -20957,7 +20940,10 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	/*
 	// TODO Duplicated code (Frustum)
+
+	var _sphere = new Sphere();
 
 	function isObjectViewable( object ) {
 
@@ -21007,6 +20993,7 @@ function WebGLRenderer( parameters ) {
 		return true;
 
 	}
+	*/
 
 	function projectObject( object, camera, sortObjects ) {
 
@@ -21022,7 +21009,7 @@ function WebGLRenderer( parameters ) {
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || isSpriteViewable( object ) ) {
+				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
 					sprites.push( object );
 
@@ -21050,7 +21037,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				if ( ! object.frustumCulled || isObjectViewable( object ) ) {
+				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
 					if ( sortObjects ) {
 
@@ -21206,7 +21193,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var attributes = program.getAttributes();
+		var programAttributes = program.getAttributes();
 
 		if ( material.morphTargets ) {
 
@@ -21214,7 +21201,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-				if ( attributes[ 'morphTarget' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
 
 					material.numSupportedMorphTargets ++;
 
@@ -21230,7 +21217,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-				if ( attributes[ 'morphNormal' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
 
 					material.numSupportedMorphNormals ++;
 
@@ -21920,7 +21907,8 @@ function WebGLRenderer( parameters ) {
 
 			if ( light.castShadow ) {
 
-				_lights.shadows[ lightShadowsLength ++ ] = light;
+				_lights.shadows[ lightShadowsLength ] = light;
+				lightShadowsLength ++;
 
 			}
 
@@ -21932,7 +21920,7 @@ function WebGLRenderer( parameters ) {
 
 	function setupLights( lights, camera ) {
 
-		var l, ll, light,
+		var l, ll, light, shadow,
 			r = 0, g = 0, b = 0,
 			color,
 			intensity,
@@ -21977,15 +21965,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
 				_lights.directionalShadowMap[ directionalLength ] = shadowMap;
 				_lights.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
-				_lights.directional[ directionalLength ++ ] = uniforms;
+				_lights.directional[ directionalLength ] = uniforms;
+
+				directionalLength ++;
 
 			} else if ( light.isSpotLight ) {
 
@@ -22010,15 +22002,19 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
 				_lights.spotShadowMap[ spotLength ] = shadowMap;
 				_lights.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
-				_lights.spot[ spotLength ++ ] = uniforms;
+				_lights.spot[ spotLength ] = uniforms;
+
+				spotLength ++;
 
 			} else if ( light.isRectAreaLight ) {
 
@@ -22050,7 +22046,9 @@ function WebGLRenderer( parameters ) {
 				// TODO (abelnation): RectAreaLight distance?
 				// uniforms.distance = distance;
 
-				_lights.rectArea[ rectAreaLength ++ ] = uniforms;
+				_lights.rectArea[ rectAreaLength ] = uniforms;
+
+				rectAreaLength ++;
 
 			} else if ( light.isPointLight ) {
 
@@ -22067,9 +22065,11 @@ function WebGLRenderer( parameters ) {
 
 				if ( light.castShadow ) {
 
-					uniforms.shadowBias = light.shadow.bias;
-					uniforms.shadowRadius = light.shadow.radius;
-					uniforms.shadowMapSize = light.shadow.mapSize;
+					shadow = light.shadow;
+
+					uniforms.shadowBias = shadow.bias;
+					uniforms.shadowRadius = shadow.radius;
+					uniforms.shadowMapSize = shadow.mapSize;
 
 				}
 
@@ -22086,7 +22086,9 @@ function WebGLRenderer( parameters ) {
 				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
 				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
 
-				_lights.point[ pointLength ++ ] = uniforms;
+				_lights.point[ pointLength ] = uniforms;
+
+				pointLength ++;
 
 			} else if ( light.isHemisphereLight ) {
 
@@ -22099,7 +22101,9 @@ function WebGLRenderer( parameters ) {
 				uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 				uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-				_lights.hemi[ hemiLength ++ ] = uniforms;
+				_lights.hemi[ hemiLength ] = uniforms;
+
+				hemiLength ++;
 
 			}
 
