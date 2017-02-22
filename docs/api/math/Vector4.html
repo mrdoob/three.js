@@ -22,7 +22,7 @@
 			<li>
 				A direction and length in 4D space. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
-				(straight-line distance) from (0, 0, 0, 0, 0) to (x, y, z, w) and the direction is also
+				(straight-line distance) from (0, 0, 0, 0) to (x, y, z, w) and the direction is also
 				measured from (0, 0, 0, 0) towards (x, y, z, w).
 			</li>
 			<li>
@@ -42,7 +42,7 @@ var a = new THREE.Vector4( 0, 1, 0, 0 );
 //no arguments; will be initialised to (0, 0, 0, 1)
 var b = new THREE.Vector4( );
 
-var d = a.distanceTo( b );
+var d = a.dot( b );
 		</code>
 
 
@@ -65,7 +65,7 @@ var d = a.distanceTo( b );
 		<div>
 			Used to check whether this or derived classes are Vector4s. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 		<h3>[property:Float x]</h3>
@@ -83,7 +83,7 @@ var d = a.distanceTo( b );
 		<div>Adds [page:Vector4 v] to this vector.</div>
 
 		<h3>[method:Vector4 addScalar]( [page:Float s] )</h3>
-		<div>Add the scalar value s to this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values.</div>
+		<div>Adds the scalar value s to this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values.</div>
 
 		<h3>[method:Vector4 addScaledVector]( [page:Vector4 v], [page:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector4 v] and [page:Float s] to this vector.</div>
@@ -93,7 +93,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector4 applyMatrix4]( [page:Matrix4 m] )</h3>
 		<div>
-		Multiply this vector by 4 x 4 [page:Matrix4 m].
+		Multiplies this vector by 4 x 4 [page:Matrix4 m].
 		</div>
 
 		<h3>[method:Vector4 ceil]()</h3>
@@ -138,7 +138,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Float dot]( [page:Vector4 v] )</h3>
 		<div>
-		Calculate the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
+		Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of this
 		vector and [page:Vector4 v].
 		</div>
 
@@ -151,7 +151,7 @@ var d = a.distanceTo( b );
 		<h3>[method:Vector4 fromArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
 		[page:Array array] - the source array.<br />
-		[page:Integer offset] - ( optional) offset into the array. Default is 0.<br /><br />
+		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
 
 		Sets this vector's [page:.x x] value to be array[ offset + 0 ], [page:.y y] value to be array[ offset + 1 ]
 		[page:.z z] value to be array[ offset + 2 ] and [page:.w w ] value to be array[ offset + 3 ].
@@ -196,7 +196,7 @@ var d = a.distanceTo( b );
 		[page:Vector4 v] - [page:Vector4] to interpolate towards.<br />
 		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
 
-		Linearly interpolate between this vector and [page:Vector4 v], where alpha is the
+		Linearly interpolates between this vector and [page:Vector4 v], where alpha is the
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
 		</div>
 
@@ -216,7 +216,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector4 normalize]()</h3>
 		<div>
-		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
 		as this one, but [page:.length length] 1.
 		</div>
 
@@ -250,7 +250,7 @@ var d = a.distanceTo( b );
 		<div>
 			[page:Quaterion q] - a normalized [page:Quaterion]<br /><br />
 
-			Set the [page:.x x], [page:.y y] and [page:.z z] components of this vector to the
+			Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector to the
 			quaternion's axis and [page:.w w] to the angle.
 		</div>
 
@@ -258,7 +258,7 @@ var d = a.distanceTo( b );
 		<div>
 			 [page:Matrix4 m] - a [page:Matrix4] of which the upper left 3x3 matrix is a pure rotation matrix.<br /><br />
 
-			Set the [page:.x x], [page:.y y] and [page:.z z] to the axis of rotation and [page:.w w] to the angle.
+			Sets the [page:.x x], [page:.y y] and [page:.z z] to the axis of rotation and [page:.w w] to the angle.
 		</div>
 
 		<h3>[method:null setComponent]( [page:Integer index], [page:Float value] )</h3>
@@ -275,26 +275,26 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector4 setLength]( [page:Float l] )</h3>
 		<div>
-		Set this vector to the vector with the same direction as this one, but [page:.length length]
+		Sets this vector to the vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</div>
 
 		<h3>[method:Vector4 setScalar]( [page:Float scalar] )</h3>
 		<div>
-		Set the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values of this vector both equal to [page:Float scalar].
+		Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] values of this vector both equal to [page:Float scalar].
 		</div>
 
 		<h3>[method:Vector4 setX]( [page:Float x] )</h3>
-		<div>Replace this vector's [page:.x x] value with [page:Float x].</div>
+		<div>Replaces this vector's [page:.x x] value with [page:Float x].</div>
 
 		<h3>[method:Vector4 setY]( [page:Float y] )</h3>
-		<div>Replace this vector's [page:.y y] value with [page:Float y].</div>
+		<div>Replaces this vector's [page:.y y] value with [page:Float y].</div>
 
 		<h3>[method:Vector4 setZ]( [page:Float z] )</h3>
-		<div>Replace this vector's [page:.z z] value with [page:Float z].</div>
+		<div>Replaces this vector's [page:.z z] value with [page:Float z].</div>
 
 		<h3>[method:Vector4 setW]( [page:Float w] )</h3>
-		<div>Replace this vector's [page:.w w] value with [page:Float w].</div>
+		<div>Replaces this vector's [page:.w w] value with [page:Float w].</div>
 
 		<h3>[method:Vector4 sub]( [page:Vector4 v] )</h3>
 		<div>Subtracts [page:Vector4 v] from this vector.</div>
@@ -307,8 +307,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided
-		a new array will be created.<br />
+		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
 		Returns an array [x, y, z, w], or copies x, y, z and w into the provided [page:Array array].

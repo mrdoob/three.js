@@ -279,7 +279,22 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.position.distanceToSquared( vector ) === 0 ) {
+
+				console.warn( 'THREE.Object3D.lookAt(): target vector is the same as object position.' );
+				return;
+
+			}
+
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -526,17 +541,17 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent === null ) {
+			if ( this.parent ) {
 
-				this.matrixWorld.copy( this.matrix );
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 			} else {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				this.matrixWorld.copy( this.matrix );
 
 			}
 

@@ -4,7 +4,7 @@
 
 import { BufferGeometry } from '../../core/BufferGeometry';
 
-function WebGLGeometries( gl, properties, info ) {
+function WebGLGeometries( gl, attributes, properties, info ) {
 
 	var geometries = {};
 
@@ -15,11 +15,15 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( buffergeometry.index !== null ) {
 
-			deleteAttribute( buffergeometry.index );
+			attributes.remove( buffergeometry.index );
 
 		}
 
-		deleteAttributes( buffergeometry.attributes );
+		for ( var name in buffergeometry.attributes ) {
+
+			attributes.remove( buffergeometry.attributes[ name ] );
+
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
@@ -31,21 +35,21 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( property.wireframe ) {
 
-			deleteAttribute( property.wireframe );
+			attributes.remove( property.wireframe );
 
 		}
 
-		properties.delete( geometry );
+		properties.remove( geometry );
 
 		var bufferproperty = properties.get( buffergeometry );
 
 		if ( bufferproperty.wireframe ) {
 
-			deleteAttribute( bufferproperty.wireframe );
+			attributes.remove( bufferproperty.wireframe );
 
 		}
 
-		properties.delete( buffergeometry );
+		properties.remove( buffergeometry );
 
 		//
 
@@ -53,94 +57,47 @@ function WebGLGeometries( gl, properties, info ) {
 
 	}
 
-	function getAttributeBuffer( attribute ) {
+	function get( object ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		var geometry = object.geometry;
 
-			return properties.get( attribute.data ).__webglBuffer;
+		if ( geometries[ geometry.id ] !== undefined ) {
 
-		}
-
-		return properties.get( attribute ).__webglBuffer;
-
-	}
-
-	function deleteAttribute( attribute ) {
-
-		var buffer = getAttributeBuffer( attribute );
-
-		if ( buffer !== undefined ) {
-
-			gl.deleteBuffer( buffer );
-			removeAttributeBuffer( attribute );
+			return geometries[ geometry.id ];
 
 		}
 
-	}
+		geometry.addEventListener( 'dispose', onGeometryDispose );
 
-	function deleteAttributes( attributes ) {
+		var buffergeometry;
 
-		for ( var name in attributes ) {
+		if ( geometry.isBufferGeometry ) {
 
-			deleteAttribute( attributes[ name ] );
+			buffergeometry = geometry;
 
-		}
+		} else if ( geometry.isGeometry ) {
 
-	}
+			if ( geometry._bufferGeometry === undefined ) {
 
-	function removeAttributeBuffer( attribute ) {
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+			}
 
-			properties.delete( attribute.data );
-
-		} else {
-
-			properties.delete( attribute );
+			buffergeometry = geometry._bufferGeometry;
 
 		}
+
+		geometries[ geometry.id ] = buffergeometry;
+
+		info.memory.geometries ++;
+
+		return buffergeometry;
 
 	}
 
 	return {
 
-		get: function ( object ) {
-
-			var geometry = object.geometry;
-
-			if ( geometries[ geometry.id ] !== undefined ) {
-
-				return geometries[ geometry.id ];
-
-			}
-
-			geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			var buffergeometry;
-
-			if ( geometry.isBufferGeometry ) {
-
-				buffergeometry = geometry;
-
-			} else if ( geometry.isGeometry ) {
-
-				if ( geometry._bufferGeometry === undefined ) {
-
-					geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-				}
-
-				buffergeometry = geometry._bufferGeometry;
-
-			}
-
-			geometries[ geometry.id ] = buffergeometry;
-
-			info.memory.geometries ++;
-
-			return buffergeometry;
-
-		}
+		get: get
 
 	};
 

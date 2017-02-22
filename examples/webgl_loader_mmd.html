@@ -177,7 +177,7 @@
 
 					}
 
-					phongMaterials = new THREE.MultiMaterial( array );
+					phongMaterials = array;
 
 				}
 
@@ -202,7 +202,7 @@
 					gui.add( api, 'gradient mapping' ).onChange( function () {
 
 						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
-						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material.materials );
+						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material );
 
 						if ( api[ 'gradient mapping' ] ) {
 

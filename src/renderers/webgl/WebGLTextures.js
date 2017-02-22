@@ -136,7 +136,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 		}
 
 		// remove all webgl properties
-		properties.delete( texture );
+		properties.remove( texture );
 
 	}
 
@@ -175,8 +175,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		}
 
-		properties.delete( renderTarget.texture );
-		properties.delete( renderTarget );
+		properties.remove( renderTarget.texture );
+		properties.remove( renderTarget );
 
 	}
 

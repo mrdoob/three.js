@@ -568,9 +568,9 @@ THREE.GLTF2Loader = ( function () {
 
 						value.then( function( key, value ) {
 
-							results[ idx ] = value;
+							results[ key ] = value;
 
-						}.bind( this, key ));
+						}.bind( this, idx ));
 
 					} else {
 
@@ -632,8 +632,8 @@ THREE.GLTF2Loader = ( function () {
 		if ( typeof url !== 'string' || url === '' )
 			return '';
 
-		// Absolute URL
-		if ( /^https?:\/\//i.test( url ) ) {
+		// Absolute URL http://,https://,//
+		if ( /^(https?:)?\/\//i.test( url ) ) {
 
 			return url;
 
@@ -1063,7 +1063,7 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.textures, function ( texture ) {
 
-				if ( texture.source ) {
+				if ( texture.source !== undefined ) {
 
 					return new Promise( function ( resolve ) {
 
@@ -1103,7 +1103,7 @@ THREE.GLTF2Loader = ( function () {
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							if ( texture.sampler ) {
+							if ( texture.sampler !== undefined ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
@@ -1594,7 +1594,7 @@ THREE.GLTF2Loader = ( function () {
 
 							var attributeEntry = attributes[ attributeId ];
 
-							if ( ! attributeEntry ) return;
+							if ( attributeEntry === undefined ) return;
 
 							var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
@@ -1632,7 +1632,7 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1682,7 +1682,7 @@ THREE.GLTF2Loader = ( function () {
 
 						var meshNode;
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1923,11 +1923,25 @@ THREE.GLTF2Loader = ( function () {
 
 					var node = json.nodes[ nodeId ];
 
-					if ( node.meshes !== undefined ) {
+					var meshes;
 
-						for ( var meshId in node.meshes ) {
+					if ( node.mesh !== undefined) {
 
-							var mesh = node.meshes[ meshId ];
+						meshes = [ node.mesh ];
+
+					} else if ( node.meshes !== undefined ) {
+
+						console.warn( 'GLTF2Loader: Legacy glTF file detected. Nodes may have no more than 1 mesh.' );
+
+						meshes = node.meshes;
+
+					}
+
+					if ( meshes !== undefined ) {
+
+						for ( var meshId in meshes ) {
+
+							var mesh = meshes[ meshId ];
 							var group = dependencies.meshes[ mesh ];
 
 							if ( group === undefined ) {
@@ -1985,7 +1999,7 @@ THREE.GLTF2Loader = ( function () {
 
 								var skinEntry;
 
-								if ( node.skin ) {
+								if ( node.skin !== undefined ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
 

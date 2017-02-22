@@ -580,9 +580,9 @@ THREE.GLTFLoader = ( function () {
 
 						value.then( function( key, value ) {
 
-							results[ idx ] = value;
+							results[ key ] = value;
 
-						}.bind( this, key ));
+						}.bind( this, idx ));
 
 					} else {
 
@@ -644,8 +644,8 @@ THREE.GLTFLoader = ( function () {
 		if ( typeof url !== 'string' || url === '' )
 			return '';
 
-		// Absolute URL
-		if ( /^https?:\/\//i.test( url ) ) {
+		// Absolute URL http://,https://,//
+		if ( /^(https?:)?\/\//i.test( url ) ) {
 
 			return url;
 

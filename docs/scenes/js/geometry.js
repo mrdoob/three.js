@@ -744,7 +744,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -778,7 +778,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
