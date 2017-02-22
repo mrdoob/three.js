@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending } from '../../constants';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, DoubleSide, BackSide } from '../../constants';
 import { Vector4 } from '../../math/Vector4';
 
 function WebGLState( gl, extensions, paramThreeToGL ) {
@@ -625,6 +625,26 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
+	function setMaterial( material ) {
+
+		material.side === DoubleSide
+			? disable( gl.CULL_FACE )
+			: enable( gl.CULL_FACE );
+
+		setFlipSided( material.side === BackSide );
+
+		material.transparent === true
+			? setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha )
+			: setBlending( NoBlending );
+
+		setDepthFunc( material.depthFunc );
+		setDepthTest( material.depthTest );
+		setDepthWrite( material.depthWrite );
+		setColorWrite( material.colorWrite );
+		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+
+	}
+
 	// TODO Deprecate
 
 	function setColorWrite( colorWrite ) {
@@ -934,6 +954,7 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 		getCompressedTextureFormats: getCompressedTextureFormats,
 
 		setBlending: setBlending,
+		setMaterial: setMaterial,
 
 		setColorWrite: setColorWrite,
 		setDepthTest: setDepthTest,
