@@ -99,33 +99,32 @@ THREE.RenderableSprite = function () {
 THREE.Projector = function () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
-	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
-	_face, _faceCount, _facePool = [], _facePoolLength = 0,
-	_line, _lineCount, _linePool = [], _linePoolLength = 0,
-	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
+		_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
+		_face, _faceCount, _facePool = [], _facePoolLength = 0,
+		_line, _lineCount, _linePool = [], _linePoolLength = 0,
+		_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
 
-	_renderData = { objects: [], lights: [], elements: [] },
+		_renderData = { objects: [], lights: [], elements: [] },
 
-	_vector3 = new THREE.Vector3(),
-	_vector4 = new THREE.Vector4(),
+		_vector3 = new THREE.Vector3(),
+		_vector4 = new THREE.Vector4(),
 
-	_clipBox = new THREE.Box3( new THREE.Vector3( - 1, - 1, - 1 ), new THREE.Vector3( 1, 1, 1 ) ),
-	_boundingBox = new THREE.Box3(),
-	_points3 = new Array( 3 ),
-	_points4 = new Array( 4 ),
+		_clipBox = new THREE.Box3( new THREE.Vector3( - 1, - 1, - 1 ), new THREE.Vector3( 1, 1, 1 ) ),
+		_boundingBox = new THREE.Box3(),
+		_points3 = new Array( 3 ),
 
-	_viewMatrix = new THREE.Matrix4(),
-	_viewProjectionMatrix = new THREE.Matrix4(),
+		_viewMatrix = new THREE.Matrix4(),
+		_viewProjectionMatrix = new THREE.Matrix4(),
 
-	_modelMatrix,
-	_modelViewProjectionMatrix = new THREE.Matrix4(),
+		_modelMatrix,
+		_modelViewProjectionMatrix = new THREE.Matrix4(),
 
-	_normalMatrix = new THREE.Matrix3(),
+		_normalMatrix = new THREE.Matrix3(),
 
-	_frustum = new THREE.Frustum(),
+		_frustum = new THREE.Frustum(),
 
-	_clippedVertex1PositionScreen = new THREE.Vector4(),
-	_clippedVertex2PositionScreen = new THREE.Vector4();
+		_clippedVertex1PositionScreen = new THREE.Vector4(),
+		_clippedVertex2PositionScreen = new THREE.Vector4();
 
 	//
 
@@ -143,7 +142,7 @@ THREE.Projector = function () {
 
 	};
 
-	this.pickingRay = function ( vector, camera ) {
+	this.pickingRay = function () {
 
 		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
@@ -236,22 +235,34 @@ THREE.Projector = function () {
 
 		}
 
-		function pushLine( a, b ) {
+		function pushLine( a, b, _modelViewProjectionMatrix ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
 
-			_line = getNextLineInPool();
+			// Clip
 
-			_line.id = object.id;
-			_line.v1.copy( v1 );
-			_line.v2.copy( v2 );
-			_line.z = ( v1.positionScreen.z + v2.positionScreen.z ) / 2;
-			_line.renderOrder = object.renderOrder;
+			v1.positionScreen.copy( v1.position ).applyMatrix4( _modelViewProjectionMatrix );
+			v2.positionScreen.copy( v2.position ).applyMatrix4( _modelViewProjectionMatrix );
 
-			_line.material = object.material;
+			if ( clipLine( v1.positionScreen, v2.positionScreen ) === true ) {
 
-			_renderData.elements.push( _line );
+				// Perform the perspective divide
+				v1.positionScreen.multiplyScalar( 1 / v1.positionScreen.w );
+				v2.positionScreen.multiplyScalar( 1 / v2.positionScreen.w );
+
+				_line = getNextLineInPool();
+				_line.id = object.id;
+				_line.v1.copy( v1 );
+				_line.v2.copy( v2 );
+				_line.z = Math.max( v1.positionScreen.z, v2.positionScreen.z );
+				_line.renderOrder = object.renderOrder;
+
+				_line.material = object.material;
+
+				_renderData.elements.push( _line );
+
+			}
 
 		}
 
@@ -310,7 +321,7 @@ THREE.Projector = function () {
 			pushUv: pushUv,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
-		}
+		};
 
 	};
 
@@ -609,6 +620,8 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Line ) {
 
+				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
@@ -629,7 +642,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = indices.length; i < l; i += 2 ) {
 
-								renderList.pushLine( indices[ i ], indices[ i + 1 ] );
+								renderList.pushLine( indices[ i ], indices[ i + 1 ], _modelViewProjectionMatrix );
 
 							}
 
@@ -639,7 +652,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
-								renderList.pushLine( i, i + 1 );
+								renderList.pushLine( i, i + 1, _modelViewProjectionMatrix );
 
 							}
 
@@ -648,8 +661,6 @@ THREE.Projector = function () {
 					}
 
 				} else if ( geometry instanceof THREE.Geometry ) {
-
-					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
 					var vertices = object.geometry.vertices;
 
@@ -861,10 +872,11 @@ THREE.Projector = function () {
 
 		// Calculate the boundary coordinate of each vertex for the near and far clip planes,
 		// Z = -1 and Z = +1, respectively.
-		bc1near =  s1.z + s1.w,
-		bc2near =  s2.z + s2.w,
-		bc1far =  - s1.z + s1.w,
-		bc2far =  - s2.z + s2.w;
+
+			bc1near = s1.z + s1.w,
+			bc2near = s2.z + s2.w,
+			bc1far = - s1.z + s1.w,
+			bc2far = - s2.z + s2.w;
 
 		if ( bc1near >= 0 && bc2near >= 0 && bc1far >= 0 && bc2far >= 0 ) {
 
