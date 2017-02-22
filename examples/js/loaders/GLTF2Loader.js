@@ -154,10 +154,6 @@ THREE.GLTF2Loader = ( function () {
 
 	}
 
-	/* GLTFSHADERS */
-
-	GLTF2Loader.Shaders = new GLTFRegistry();
-
 	/* GLTFSHADER */
 
 	function GLTFShader( targetNode, allNodes ) {

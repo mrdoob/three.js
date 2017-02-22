@@ -155,7 +155,15 @@ THREE.GLTFLoader = ( function () {
 
 	/* GLTFSHADERS */
 
-	GLTFLoader.Shaders = new GLTFRegistry();
+	GLTFLoader.Shaders = {
+
+		update: function () {
+
+			console.warn( 'THREE.GLTFLoader.Shaders has been deprecated, and now updates automatically.' );
+
+		}
+
+	};
 
 	/* GLTFSHADER */
 
@@ -1100,7 +1108,7 @@ THREE.GLTFLoader = ( function () {
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
 								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
-								              'internalFormat will be forced to be the same value as format.' );
+															'internalFormat will be forced to be the same value as format.' );
 
 							}
 
