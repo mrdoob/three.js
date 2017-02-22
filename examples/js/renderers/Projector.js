@@ -153,6 +153,7 @@ THREE.Projector = function () {
 	var RenderList = function () {
 
 		var normals = [];
+		var colors = [];
 		var uvs = [];
 
 		var object = null;
@@ -168,6 +169,7 @@ THREE.Projector = function () {
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
 			normals.length = 0;
+			colors.length = 0;
 			uvs.length = 0;
 
 		}
@@ -208,6 +210,12 @@ THREE.Projector = function () {
 
 		}
 
+		function pushColor( r, g, b ) {
+
+			colors.push( r, g, b );
+
+		}
+
 		function pushUv( x, y ) {
 
 			uvs.push( x, y );
@@ -235,7 +243,7 @@ THREE.Projector = function () {
 
 		}
 
-		function pushLine( a, b, _modelViewProjectionMatrix ) {
+		function pushLine( a, b ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -259,6 +267,13 @@ THREE.Projector = function () {
 				_line.renderOrder = object.renderOrder;
 
 				_line.material = object.material;
+
+				if ( object.material.vertexColors === THREE.VertexColors ) {
+
+					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
+					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
+
+				}
 
 				_renderData.elements.push( _line );
 
@@ -318,6 +333,7 @@ THREE.Projector = function () {
 			checkBackfaceCulling: checkBackfaceCulling,
 			pushVertex: pushVertex,
 			pushNormal: pushNormal,
+			pushColor: pushColor,
 			pushUv: pushUv,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
@@ -636,13 +652,25 @@ THREE.Projector = function () {
 
 						}
 
+						if ( attributes.color !== undefined ) {
+
+							var colors = attributes.color.array;
+
+							for ( var i = 0, l = colors.length; i < l; i += 3 ) {
+
+								renderList.pushColor( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] );
+
+							}
+
+						}
+
 						if ( geometry.index !== null ) {
 
 							var indices = geometry.index.array;
 
 							for ( var i = 0, l = indices.length; i < l; i += 2 ) {
 
-								renderList.pushLine( indices[ i ], indices[ i + 1 ], _modelViewProjectionMatrix );
+								renderList.pushLine( indices[ i ], indices[ i + 1 ] );
 
 							}
 
@@ -652,7 +680,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
-								renderList.pushLine( i, i + 1, _modelViewProjectionMatrix );
+								renderList.pushLine( i, i + 1 );
 
 							}
 
