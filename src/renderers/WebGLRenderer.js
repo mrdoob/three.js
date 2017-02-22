@@ -543,6 +543,7 @@ function WebGLRenderer( parameters ) {
 		setDefaultGLState();
 
 		properties.clear();
+		objects.clear();
 
 	}
 
