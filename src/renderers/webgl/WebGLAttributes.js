@@ -8,13 +8,12 @@ function WebGLAttributes( gl ) {
 
 	function createBuffer( attribute, bufferType ) {
 
-		var buffer = gl.createBuffer();
-
-		gl.bindBuffer( bufferType, buffer );
-
 		var array = attribute.array;
 		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
+		var buffer = gl.createBuffer();
+
+		gl.bindBuffer( bufferType, buffer );
 		gl.bufferData( bufferType, array, usage );
 
 		attribute.onUploadCallback();
@@ -66,32 +65,33 @@ function WebGLAttributes( gl ) {
 
 	function updateBuffer( buffer, attribute, bufferType ) {
 
+		var array = attribute.array;
+		var updateRange = attribute.updateRange;
+
 		gl.bindBuffer( bufferType, buffer );
 
 		if ( attribute.dynamic === false ) {
 
-			gl.bufferData( bufferType, attribute.array, gl.STATIC_DRAW );
+			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-		} else if ( attribute.updateRange.count === - 1 ) {
+		} else if ( updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
-			gl.bufferSubData( bufferType, 0, attribute.array );
+			gl.bufferSubData( bufferType, 0, array );
 
-		} else if ( attribute.updateRange.count === 0 ) {
+		} else if ( updateRange.count === 0 ) {
 
 			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
-			gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
-							  attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
 
-			attribute.updateRange.count = 0; // reset range
+			updateRange.count = 0; // reset range
 
 		}
-
-
 
 	}
 
@@ -129,9 +129,10 @@ function WebGLAttributes( gl ) {
 
 			buffers[ attribute.id ] = createBuffer( attribute, bufferType );
 
-		} else if ( data.version !== attribute.version ) {
+		} else if ( data.version < attribute.version ) {
 
 			updateBuffer( data.buffer, attribute, bufferType );
+
 			data.version = attribute.version;
 
 		}

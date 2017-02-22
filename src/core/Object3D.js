@@ -545,13 +545,13 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent ) {
+			if ( this.parent === null ) {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				this.matrixWorld.copy( this.matrix );
 
 			} else {
 
-				this.matrixWorld.copy( this.matrix );
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 			}
 

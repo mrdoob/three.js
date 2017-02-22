@@ -6,7 +6,7 @@ import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferA
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { arrayMax } from '../../utils';
 
-function WebGLGeometries( gl, attributes, info ) {
+function WebGLGeometries( gl, attributes, infoMemory ) {
 
 	var geometries = {};
 	var wireframeAttributes = {};
@@ -54,13 +54,12 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		//
 
-		info.memory.geometries --;
+		infoMemory.geometries --;
 
 	}
 
-	function get( object ) {
+	function get( object, geometry ) {
 
-		var geometry = object.geometry;
 		var buffergeometry = geometries[ geometry.id ];
 
 		if ( buffergeometry ) return buffergeometry;
@@ -85,9 +84,44 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		geometries[ geometry.id ] = buffergeometry;
 
-		info.memory.geometries ++;
+		infoMemory.geometries ++;
 
 		return buffergeometry;
+
+	}
+
+	function update( geometry ) {
+
+		var index = geometry.index;
+		var geometryAttributes = geometry.attributes;
+
+		if ( index !== null ) {
+
+			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+
+		}
+
+		for ( var name in geometryAttributes ) {
+
+			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
+
+		}
+
+		// morph targets
+
+		var morphAttributes = geometry.morphAttributes;
+
+		for ( var name in morphAttributes ) {
+
+			var array = morphAttributes[ name ];
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				attributes.update( array[ i ], gl.ARRAY_BUFFER );
+
+			}
+
+		}
 
 	}
 
@@ -146,46 +180,12 @@ function WebGLGeometries( gl, attributes, info ) {
 
 	}
 
-	function update( geometry ) {
-
-		var index = geometry.index;
-		var geometryAttributes = geometry.attributes;
-
-		if ( index !== null ) {
-
-			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
-
-		}
-
-		for ( var name in geometryAttributes ) {
-
-			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
-
-		}
-
-		// morph targets
-
-		var morphAttributes = geometry.morphAttributes;
-
-		for ( var name in morphAttributes ) {
-
-			var array = morphAttributes[ name ];
-
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-				attributes.update( array[ i ], gl.ARRAY_BUFFER );
-
-			}
-
-		}
-
-	}
-
 	return {
 
 		get: get,
-		getWireframeAttribute: getWireframeAttribute,
-		update: update
+		update: update,
+
+		getWireframeAttribute: getWireframeAttribute
 
 	};
 

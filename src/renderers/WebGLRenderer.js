@@ -191,6 +191,11 @@ function WebGLRenderer( parameters ) {
 
 		// info
 
+		_infoMemory = {
+			geometries: 0,
+			textures: 0
+		},
+
 		_infoRender = {
 
 			frame: 0,
@@ -204,12 +209,7 @@ function WebGLRenderer( parameters ) {
 	this.info = {
 
 		render: _infoRender,
-		memory: {
-
-			geometries: 0,
-			textures: 0
-
-		},
+		memory: _infoMemory,
 		programs: null
 
 	};
@@ -287,9 +287,9 @@ function WebGLRenderer( parameters ) {
 	var state = new WebGLState( _gl, extensions, paramThreeToGL );
 
 	var properties = new WebGLProperties();
-	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
+	var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
 	var attributes = new WebGLAttributes( _gl );
-	var geometries = new WebGLGeometries( _gl, attributes, this.info );
+	var geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
 	var objects = new WebGLObjects( _gl, geometries, _infoRender );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
@@ -1150,6 +1150,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
+		_infoRender.frame ++;
 		_infoRender.calls = 0;
 		_infoRender.vertices = 0;
 		_infoRender.faces = 0;
@@ -1416,7 +1417,8 @@ function WebGLRenderer( parameters ) {
 
 				if ( sortObjects ) {
 
-					_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+					_vector3.setFromMatrixPosition( object.matrixWorld )
+						.applyMatrix4( _projScreenMatrix );
 
 				}
 
@@ -1434,7 +1436,8 @@ function WebGLRenderer( parameters ) {
 
 					if ( sortObjects ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						_vector3.setFromMatrixPosition( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
 
 					}
 
