@@ -49,7 +49,7 @@ function DecalGeometry( mesh, position, rotation, dimensions, check ) {
 		var vertex = new Vector3();
 		var normal = new Vector3();
 
-		// handle Geometry
+		// handle different geometry types
 
 		if ( mesh.geometry.isGeometry ) {
 
