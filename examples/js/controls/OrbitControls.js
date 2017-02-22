@@ -96,6 +96,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.saveState = function () {
+
+		scope.target0.copy( scope.target );
+		scope.position0.copy( scope.object.position );
+		scope.zoom0 = scope.object.zoom;
+
+	};
+
 	this.reset = function () {
 
 		scope.target.copy( scope.target0 );
