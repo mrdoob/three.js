@@ -686,14 +686,16 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	var program, geometryProgram, updateBuffers;
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		setMaterial( material );
 
-		var program = setProgram( camera, fog, material, object );
+		program = setProgram( camera, fog, material, object );
+		geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
 
-		var updateBuffers = false;
-		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		updateBuffers = false;
 
 		if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -707,6 +709,8 @@ function WebGLRenderer( parameters ) {
 		var morphTargetInfluences = object.morphTargetInfluences;
 
 		if ( morphTargetInfluences !== undefined ) {
+
+			// TODO Remove allocations
 
 			var activeInfluences = [];
 
@@ -754,8 +758,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			program.getUniforms().setValue(
-				_gl, 'morphTargetInfluences', morphInfluences );
+			program.getUniforms().setValue( _gl, 'morphTargetInfluences', morphInfluences );
 
 			updateBuffers = true;
 
@@ -774,16 +777,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var renderer;
+		var renderer = bufferRenderer;
 
 		if ( index !== null ) {
 
 			renderer = indexedBufferRenderer;
 			renderer.setIndex( index );
-
-		} else {
-
-			renderer = bufferRenderer;
 
 		}
 
@@ -2296,7 +2295,8 @@ function WebGLRenderer( parameters ) {
 
 			if ( light.castShadow ) {
 
-				_lights.shadows[ lightShadowsLength ++ ] = light;
+				_lights.shadows[ lightShadowsLength ] = light;
+				lightShadowsLength ++;
 
 			}
 
