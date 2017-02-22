@@ -132,9 +132,9 @@ QUnit.test( "multiply/divide", function( assert ) {
 
 	b.multiplyScalar( -2 );
 	assert.ok( b.x == 2*x, "Passed!" );
-	assert.ok( b.y == 2*y, "Passed!" );	
-	assert.ok( b.z == 2*z, "Passed!" );	
-	assert.ok( b.w == 2*w, "Passed!" );	
+	assert.ok( b.y == 2*y, "Passed!" );
+	assert.ok( b.z == 2*z, "Passed!" );
+	assert.ok( b.w == 2*w, "Passed!" );
 
 	a.divideScalar( -2 );
 	assert.ok( a.x == x, "Passed!" );
@@ -202,7 +202,7 @@ QUnit.test( "length/lengthSq", function( assert ) {
 	var c = new THREE.Vector4( 0, 0, z, 0 );
 	var d = new THREE.Vector4( 0, 0, 0, w );
 	var e = new THREE.Vector4( 0, 0, 0, 0 );
-	
+
 	assert.ok( a.length() == x, "Passed!" );
 	assert.ok( a.lengthSq() == x*x, "Passed!" );
 	assert.ok( b.length() == y, "Passed!" );
@@ -224,7 +224,7 @@ QUnit.test( "normalize" , function( assert ) {
 	var b = new THREE.Vector4( 0, -y, 0, 0 );
 	var c = new THREE.Vector4( 0, 0, z, 0 );
 	var d = new THREE.Vector4( 0, 0, 0, -w );
-	
+
 	a.normalize();
 	assert.ok( a.length() == 1, "Passed!" );
 	assert.ok( a.x == 1, "Passed!" );
@@ -249,7 +249,7 @@ QUnit.test( "distanceTo/distanceToSquared", function() {
 	var c = new THREE.Vector4( 0, 0, z, 0 );
 	var d = new THREE.Vector4( 0, 0, 0, -w );
 	var e = new THREE.Vector4();
-	
+
 	ok( a.distanceTo( e ) == x, "Passed!" );
 	ok( a.distanceToSquared( e ) == x*x, "Passed!" );
 
@@ -275,7 +275,7 @@ QUnit.test( "setLength" , function( assert ) {
 	a = new THREE.Vector4( 0, 0, 0, 0 );
 	assert.ok( a.length() == 0, "Passed!" );
 	a.setLength( y );
-	assert.ok( a.length() == 0, "Passed!" );
+	assert.ok( isNaN( a.length() ), "Passed!" );
 });
 
 QUnit.test( "lerp/clone", function( assert ) {

@@ -43,6 +43,17 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 		return this;
 
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = Light.prototype.toJSON.call( this, meta );
+
+		data.object.width = this.width;
+		data.object.height = this.height;
+
+		return data;
+
 	}
 
 } );
