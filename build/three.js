@@ -10864,13 +10864,13 @@
 
 			if ( this.matrixWorldNeedsUpdate || force ) {
 
-				if ( this.parent ) {
+				if ( this.parent === null ) {
 
-					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+					this.matrixWorld.copy( this.matrix );
 
 				} else {
 
-					this.matrixWorld.copy( this.matrix );
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 				}
 
@@ -15880,13 +15880,12 @@
 
 		function createBuffer( attribute, bufferType ) {
 
-			var buffer = gl.createBuffer();
-
-			gl.bindBuffer( bufferType, buffer );
-
 			var array = attribute.array;
 			var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
+			var buffer = gl.createBuffer();
+
+			gl.bindBuffer( bufferType, buffer );
 			gl.bufferData( bufferType, array, usage );
 
 			attribute.onUploadCallback();
@@ -15938,32 +15937,33 @@
 
 		function updateBuffer( buffer, attribute, bufferType ) {
 
+			var array = attribute.array;
+			var updateRange = attribute.updateRange;
+
 			gl.bindBuffer( bufferType, buffer );
 
 			if ( attribute.dynamic === false ) {
 
-				gl.bufferData( bufferType, attribute.array, gl.STATIC_DRAW );
+				gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-			} else if ( attribute.updateRange.count === - 1 ) {
+			} else if ( updateRange.count === - 1 ) {
 
 				// Not using update ranges
 
-				gl.bufferSubData( bufferType, 0, attribute.array );
+				gl.bufferSubData( bufferType, 0, array );
 
-			} else if ( attribute.updateRange.count === 0 ) {
+			} else if ( updateRange.count === 0 ) {
 
 				console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 			} else {
 
-				gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
-								  attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
 
-				attribute.updateRange.count = 0; // reset range
+				updateRange.count = 0; // reset range
 
 			}
-
-
 
 		}
 
@@ -16001,9 +16001,10 @@
 
 				buffers[ attribute.id ] = createBuffer( attribute, bufferType );
 
-			} else if ( data.version !== attribute.version ) {
+			} else if ( data.version < attribute.version ) {
 
 				updateBuffer( data.buffer, attribute, bufferType );
+
 				data.version = attribute.version;
 
 			}
@@ -16172,7 +16173,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLGeometries( gl, attributes, info ) {
+	function WebGLGeometries( gl, attributes, infoMemory ) {
 
 		var geometries = {};
 		var wireframeAttributes = {};
@@ -16220,13 +16221,12 @@
 
 			//
 
-			info.memory.geometries --;
+			infoMemory.geometries --;
 
 		}
 
-		function get( object ) {
+		function get( object, geometry ) {
 
-			var geometry = object.geometry;
 			var buffergeometry = geometries[ geometry.id ];
 
 			if ( buffergeometry ) return buffergeometry;
@@ -16251,9 +16251,44 @@
 
 			geometries[ geometry.id ] = buffergeometry;
 
-			info.memory.geometries ++;
+			infoMemory.geometries ++;
 
 			return buffergeometry;
+
+		}
+
+		function update( geometry ) {
+
+			var index = geometry.index;
+			var geometryAttributes = geometry.attributes;
+
+			if ( index !== null ) {
+
+				attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+
+			}
+
+			for ( var name in geometryAttributes ) {
+
+				attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
+
+			}
+
+			// morph targets
+
+			var morphAttributes = geometry.morphAttributes;
+
+			for ( var name in morphAttributes ) {
+
+				var array = morphAttributes[ name ];
+
+				for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+					attributes.update( array[ i ], gl.ARRAY_BUFFER );
+
+				}
+
+			}
 
 		}
 
@@ -16312,46 +16347,12 @@
 
 		}
 
-		function update( geometry ) {
-
-			var index = geometry.index;
-			var geometryAttributes = geometry.attributes;
-
-			if ( index !== null ) {
-
-				attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
-
-			}
-
-			for ( var name in geometryAttributes ) {
-
-				attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
-
-			}
-
-			// morph targets
-
-			var morphAttributes = geometry.morphAttributes;
-
-			for ( var name in morphAttributes ) {
-
-				var array = morphAttributes[ name ];
-
-				for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-					attributes.update( array[ i ], gl.ARRAY_BUFFER );
-
-				}
-
-			}
-
-		}
-
 		return {
 
 			get: get,
-			getWireframeAttribute: getWireframeAttribute,
-			update: update
+			update: update,
+
+			getWireframeAttribute: getWireframeAttribute
 
 		};
 
@@ -16456,23 +16457,32 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLObjects( gl, geometries ) {
+	function WebGLObjects( gl, geometries, infoRender ) {
 
 		function update( object ) {
 
-			// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
+			var frame = infoRender.frame;
 
-			var geometry = geometries.get( object );
+			var geometry = object.geometry;
+			var buffergeometry = geometries.get( object, geometry );
 
-			if ( object.geometry.isGeometry ) {
+			// Update once per frame
 
-				geometry.updateFromObject( object );
+			if ( buffergeometry.__frame !== frame ) {
+
+				if ( geometry.isGeometry ) {
+
+					buffergeometry.updateFromObject( object );
+
+				}
+
+				geometries.update( buffergeometry );
+
+				buffergeometry.__frame = frame;
 
 			}
 
-			geometries.update( geometry );
-
-			return geometry;
+			return buffergeometry;
 
 		}
 
@@ -17515,9 +17525,8 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
+	function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory ) {
 
-		var _infoMemory = info.memory;
 		var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
 		//
@@ -17606,7 +17615,7 @@
 
 			deallocateTexture( texture );
 
-			_infoMemory.textures --;
+			infoMemory.textures --;
 
 
 		}
@@ -17619,7 +17628,7 @@
 
 			deallocateRenderTarget( renderTarget );
 
-			_infoMemory.textures --;
+			infoMemory.textures --;
 
 		}
 
@@ -17738,7 +17747,7 @@
 
 						textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-						_infoMemory.textures ++;
+						infoMemory.textures ++;
 
 					}
 
@@ -17909,7 +17918,7 @@
 
 				textureProperties.__webglTexture = _gl.createTexture();
 
-				_infoMemory.textures ++;
+				infoMemory.textures ++;
 
 			}
 
@@ -18210,7 +18219,7 @@
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			_infoMemory.textures ++;
+			infoMemory.textures ++;
 
 			var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );
@@ -19799,8 +19808,14 @@
 
 			// info
 
+			_infoMemory = {
+				geometries: 0,
+				textures: 0
+			},
+
 			_infoRender = {
 
+				frame: 0,
 				calls: 0,
 				vertices: 0,
 				faces: 0,
@@ -19811,12 +19826,7 @@
 		this.info = {
 
 			render: _infoRender,
-			memory: {
-
-				geometries: 0,
-				textures: 0
-
-			},
+			memory: _infoMemory,
 			programs: null
 
 		};
@@ -19894,10 +19904,10 @@
 		var state = new WebGLState( _gl, extensions, paramThreeToGL );
 
 		var properties = new WebGLProperties();
-		var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, this.info );
+		var textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, _infoMemory );
 		var attributes = new WebGLAttributes( _gl );
-		var geometries = new WebGLGeometries( _gl, attributes, this.info );
-		var objects = new WebGLObjects( _gl, geometries );
+		var geometries = new WebGLGeometries( _gl, attributes, _infoMemory );
+		var objects = new WebGLObjects( _gl, geometries, _infoRender );
 		var programCache = new WebGLPrograms( this, capabilities );
 		var lightCache = new WebGLLights();
 
@@ -20757,6 +20767,7 @@
 
 			//
 
+			_infoRender.frame ++;
 			_infoRender.calls = 0;
 			_infoRender.vertices = 0;
 			_infoRender.faces = 0;
@@ -21023,7 +21034,8 @@
 
 					if ( sortObjects ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						_vector3.setFromMatrixPosition( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -21041,7 +21053,8 @@
 
 						if ( sortObjects ) {
 
-							_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+							_vector3.setFromMatrixPosition( object.matrixWorld )
+								.applyMatrix4( _projScreenMatrix );
 
 						}
 
@@ -29980,6 +29993,64 @@
 	} );
 
 	/**
+	 * @author abelnation / http://github.com/abelnation
+	 */
+
+	function RectAreaLight ( color, intensity, width, height ) {
+
+		Light.call( this, color, intensity );
+
+		this.type = 'RectAreaLight';
+
+		this.position.set( 0, 1, 0 );
+		this.updateMatrix();
+
+		this.width = ( width !== undefined ) ? width : 10;
+		this.height = ( height !== undefined ) ? height : 10;
+
+		// TODO (abelnation): distance/decay
+
+		// TODO (abelnation): update method for RectAreaLight to update transform to lookat target
+
+		// TODO (abelnation): shadows
+		// this.shadow = new THREE.RectAreaLightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
+
+	}
+
+	// TODO (abelnation): RectAreaLight update when light shape is changed
+	RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
+
+		constructor: RectAreaLight,
+
+		isRectAreaLight: true,
+
+		copy: function ( source ) {
+
+			Light.prototype.copy.call( this, source );
+
+			this.width = source.width;
+			this.height = source.height;
+
+			// this.shadow = source.shadow.clone();
+
+			return this;
+
+		},
+
+		toJSON: function ( meta ) {
+
+			var data = Light.prototype.toJSON.call( this, meta );
+
+			data.object.width = this.width;
+			data.object.height = this.height;
+
+			return data;
+
+		}
+
+	} );
+
+	/**
 	 * @author tschw
 	 * @author Ben Houston / http://clara.io/
 	 * @author David Sarno / http://lighthaus.us/
@@ -33421,6 +33492,12 @@
 
 						break;
 
+					case 'RectAreaLight':
+
+						object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+
+						break;
+
 					case 'SpotLight':
 
 						object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
@@ -35219,53 +35296,6 @@
 				} );
 
 			}, onProgress, onError );
-
-		}
-
-	} );
-
-	/**
-	 * @author abelnation / http://github.com/abelnation
-	 */
-
-	function RectAreaLight ( color, intensity, width, height ) {
-
-		Light.call( this, color, intensity );
-
-		this.type = 'RectAreaLight';
-
-		this.position.set( 0, 1, 0 );
-		this.updateMatrix();
-
-		this.width = ( width !== undefined ) ? width : 10;
-		this.height = ( height !== undefined ) ? height : 10;
-
-		// TODO (abelnation): distance/decay
-
-		// TODO (abelnation): update method for RectAreaLight to update transform to lookat target
-
-		// TODO (abelnation): shadows
-		// this.shadow = new THREE.RectAreaLightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
-
-	}
-
-	// TODO (abelnation): RectAreaLight update when light shape is changed
-	RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
-
-		constructor: RectAreaLight,
-
-		isRectAreaLight: true,
-
-		copy: function ( source ) {
-
-			Light.prototype.copy.call( this, source );
-
-			this.width = source.width;
-			this.height = source.height;
-
-			// this.shadow = source.shadow.clone();
-
-			return this;
 
 		}
 
