@@ -136,15 +136,6 @@ THREE.GLTF2Loader = ( function () {
 
 			update: function ( scene, camera ) {
 
-				// update scene graph
-
-				scene.updateMatrixWorld();
-
-				// update camera matrices and frustum
-
-				camera.updateMatrixWorld();
-				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 				for ( var name in objects ) {
 
 					var object = objects[ name ];
@@ -2177,8 +2168,10 @@ THREE.GLTF2Loader = ( function () {
 					// Register raw material meshes with GLTF2Loader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
-						var xshader = new GLTFShader( child, dependencies.nodes );
-						GLTF2Loader.Shaders.add( child.uuid, xshader );
+						child.gltfShader = new GLTFShader( child, dependencies.nodes );
+						child.onBeforeRender = function(renderer, scene, camera){
+							this.gltfShader.update(scene, camera);
+						};
 
 					}
 

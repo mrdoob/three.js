@@ -338,7 +338,6 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				if (mixer) mixer.update(clock.getDelta());
-				THREE.GLTF2Loader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
