@@ -3200,7 +3200,7 @@
 
 		},
 
-		setFromCylindrical: function( c ) {
+		setFromCylindrical: function ( c ) {
 
 			this.x = c.radius * Math.sin( c.theta );
 			this.y = c.y;
@@ -3232,14 +3232,6 @@
 
 		setFromMatrixColumn: function ( m, index ) {
 
-			if ( typeof m === 'number' ) {
-
-				console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-				var temp = m;
-				m = index;
-				index = temp;
-
-			}
 
 			return this.fromArray( m.elements, index * 4 );
 
@@ -8991,26 +8983,26 @@
 	function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 		var _gl = _renderer.context,
-		_state = _renderer.state,
-		_frustum = new Frustum(),
-		_projScreenMatrix = new Matrix4(),
+			_state = _renderer.state,
+			_frustum = new Frustum(),
+			_projScreenMatrix = new Matrix4(),
 
-		_lightShadows = _lights.shadows,
+			_lightShadows = _lights.shadows,
 
-		_shadowMapSize = new Vector2(),
-		_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
+			_shadowMapSize = new Vector2(),
+			_maxShadowMapSize = new Vector2( capabilities.maxTextureSize, capabilities.maxTextureSize ),
 
-		_lookTarget = new Vector3(),
-		_lightPositionWorld = new Vector3(),
+			_lookTarget = new Vector3(),
+			_lightPositionWorld = new Vector3(),
 
-		_MorphingFlag = 1,
+			_MorphingFlag = 1,
 
-		_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
+			_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
 
-		_depthMaterials = new Array( _NumberOfMaterialVariants ),
-		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
+			_depthMaterials = new Array( _NumberOfMaterialVariants ),
+			_distanceMaterials = new Array( _NumberOfMaterialVariants ),
 
-		_materialCache = {};
+			_materialCache = {};
 
 		var cubeDirections = [
 			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
@@ -9365,7 +9357,7 @@
 
 			if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
-				if ( object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+				if ( object.castShadow && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
 					object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -9381,7 +9373,7 @@
 							var group = groups[ k ];
 							var groupMaterial = material[ group.materialIndex ];
 
-							if ( groupMaterial && groupMaterial.visible === true ) {
+							if ( groupMaterial && groupMaterial.visible ) {
 
 								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld );
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
@@ -9390,7 +9382,7 @@
 
 						}
 
-					} else if ( material.visible === true ) {
+					} else if ( material.visible ) {
 
 						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
 						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
@@ -10606,7 +10598,22 @@
 
 			return function lookAt( vector ) {
 
-				m1.lookAt( vector, this.position, this.up );
+				if ( this.position.distanceToSquared( vector ) === 0 ) {
+
+					console.warn( 'THREE.Object3D.lookAt(): target vector is the same as object position.' );
+					return;
+
+				}
+
+				if ( this.isCamera ) {
+
+					m1.lookAt( this.position, vector, this.up );
+
+				} else {
+
+					m1.lookAt( vector, this.position, this.up );
+
+				}
 
 				this.quaternion.setFromRotationMatrix( m1 );
 
@@ -15496,22 +15503,6 @@
 			this.getWorldQuaternion( quaternion );
 
 			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-
-		};
-
-	}();
-
-	Camera.prototype.lookAt = function () {
-
-		// This routine does not support cameras with rotated and/or translated parent(s)
-
-		var m1 = new Matrix4();
-
-		return function lookAt( vector ) {
-
-			m1.lookAt( this.position, vector, this.up );
-
-			this.quaternion.setFromRotationMatrix( m1 );
 
 		};
 
