@@ -8996,8 +8996,9 @@
 			_lightPositionWorld = new Vector3(),
 
 			_MorphingFlag = 1,
+			_SkinningFlag = 2,
 
-			_NumberOfMaterialVariants = ( _MorphingFlag ) + 1,
+			_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
 
 			_depthMaterials = new Array( _NumberOfMaterialVariants ),
 			_distanceMaterials = new Array( _NumberOfMaterialVariants ),
@@ -9031,6 +9032,7 @@
 		for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
 
 			var useMorphing = ( i & _MorphingFlag ) !== 0;
+			var useSkinning = ( i & _SkinningFlag ) !== 0;
 
 			var depthMaterial = depthMaterialTemplate.clone();
 			depthMaterial.morphTargets = useMorphing;
@@ -9270,9 +9272,12 @@
 
 				}
 
+				var useSkinning = object.isSkinnedMesh;
+
 				var variantIndex = 0;
 
 				if ( useMorphing ) variantIndex |= _MorphingFlag;
+				if ( useSkinning ) variantIndex |= _SkinningFlag;
 
 				result = materialVariants[ variantIndex ];
 
