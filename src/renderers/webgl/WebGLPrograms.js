@@ -167,7 +167,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: material.skinning,
+			skinning: material.skinning && maxBones > 0,
 			maxBones: maxBones,
 			useVertexTexture: capabilities.floatVertexTextures,
 
@@ -272,7 +272,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	};
 
-	this.releaseProgram = function( program ) {
+	this.releaseProgram = function ( program ) {
 
 		if ( -- program.usedTimes === 0 ) {
 

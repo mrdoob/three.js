@@ -690,16 +690,14 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	var program, geometryProgram, updateBuffers;
-
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
 
-		program = setProgram( camera, fog, material, object );
-		geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		var program = setProgram( camera, fog, material, object );
+		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
 
-		updateBuffers = false;
+		var updateBuffers = false;
 
 		if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -1249,19 +1247,19 @@ function WebGLRenderer( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			renderObjects( opaqueObjects, scene, camera, overrideMaterial );
-			renderObjects( transparentObjects, scene, camera, overrideMaterial );
+			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
 
 		} else {
 
 			// opaque pass (front-to-back order)
 
 			state.setBlending( NoBlending );
-			renderObjects( opaqueObjects, scene, camera );
+			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, scene, camera );
+			if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
 		}
 
