@@ -194,7 +194,7 @@ function WebGLPrograms( renderer, capabilities ) {
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: ( object && object.isSkinnedMesh ) && maxBones > 0,
+			skinning: material.skinning,
 			maxBones: maxBones,
 			useVertexTexture: capabilities.floatVertexTextures,
 
