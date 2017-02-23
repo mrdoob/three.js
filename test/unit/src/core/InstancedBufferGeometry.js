@@ -20,8 +20,8 @@ QUnit.test( "copy" , function( assert ) {
 	var instanceMock1 = {};
 	var instanceMock2 = {};
 	var indexMock = createClonableMock();
-	var defaultAttribute1 = new THREE.BufferAttribute([1]);
-	var defaultAttribute2 = new THREE.BufferAttribute([2]);
+	var defaultAttribute1 = new THREE.BufferAttribute( new Float32Array( [ 1 ] ) );
+	var defaultAttribute2 = new THREE.BufferAttribute( new Float32Array( [ 2 ] ) );
 
 	var instance = new THREE.InstancedBufferGeometry();
 
@@ -35,19 +35,18 @@ QUnit.test( "copy" , function( assert ) {
 
 	assert.ok( copiedInstance instanceof THREE.InstancedBufferGeometry, "the clone has the correct type" );
 
-	assert.ok( copiedInstance.index === indexMock, "index was copied" );
-	assert.ok( copiedInstance.index.callCount === 1, "index.clone was called once" );
+	assert.equal( copiedInstance.index, indexMock, "index was copied" );
+	assert.equal( copiedInstance.index.callCount, 1, "index.clone was called once" );
 
 	assert.ok( copiedInstance.attributes['defaultAttribute1'] instanceof THREE.BufferAttribute, "attribute was created" );
-	// the given attribute mock was passed to the array property of the created buffer attribute
-	assert.ok( copiedInstance.attributes['defaultAttribute1'].array[0] === defaultAttribute1.array, "attribute was copied" );
-	assert.ok( copiedInstance.attributes['defaultAttribute2'].array[0] === defaultAttribute2.array, "attribute was copied" );
+	assert.deepEqual( copiedInstance.attributes['defaultAttribute1'].array, defaultAttribute1.array, "attribute was copied" );
+	assert.deepEqual( copiedInstance.attributes['defaultAttribute2'].array, defaultAttribute2.array, "attribute was copied" );
 
-	assert.ok( copiedInstance.groups[0].start === 0, "group was copied" );
-	assert.ok( copiedInstance.groups[0].count === 10, "group was copied" );
-	assert.ok( copiedInstance.groups[0].instances === instanceMock1, "group was copied" );
+	assert.equal( copiedInstance.groups[0].start, 0, "group was copied" );
+	assert.equal( copiedInstance.groups[0].count, 10, "group was copied" );
+	assert.equal( copiedInstance.groups[0].materialIndex, instanceMock1, "group was copied" );
 
-	assert.ok( copiedInstance.groups[1].start === 10, "group was copied" );
-	assert.ok( copiedInstance.groups[1].count === 5, "group was copied" );
-	assert.ok( copiedInstance.groups[1].instances === instanceMock2, "group was copied" );
+	assert.equal( copiedInstance.groups[1].start, 10, "group was copied" );
+	assert.equal( copiedInstance.groups[1].count, 5, "group was copied" );
+	assert.equal( copiedInstance.groups[1].materialIndex, instanceMock2, "group was copied" );
 });

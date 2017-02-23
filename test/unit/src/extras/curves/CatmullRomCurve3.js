@@ -17,7 +17,7 @@ QUnit.test( "catmullrom check", function( assert ) {
 	var curve = new THREE.CatmullRomCurve3( positions );
 	curve.type = 'catmullrom';
 
-	var catmullPoints = [
+	var expectedPoints = [
 
 		new THREE.Vector3( - 60, - 100, 60 ),
 		new THREE.Vector3( - 60, - 51.04, 60 ),
@@ -33,11 +33,17 @@ QUnit.test( "catmullrom check", function( assert ) {
 
 	];
 
-	var getPoints = curve.getPoints( 10 );
-	var error = vectorsAreEqual( getPoints, catmullPoints );
-	assert.ok( getPoints.length == 11, 'getPoints should be equal.' );
-	var desc = error ? ' ' + error : '';
-	assert.ok( ! error, 'Lists of Vectors3 should be equal.' + desc );
+	var points = curve.getPoints( 10 );
+
+	assert.equal( points.length, expectedPoints.length, 'correct number of points.' );
+
+	points.forEach( function ( point, i ) {
+
+		assert.numEqual( point.x, expectedPoints[ i ].x, 'points[' + i + '].x' );
+		assert.numEqual( point.y, expectedPoints[ i ].y, 'points[' + i + '].y' );
+		assert.numEqual( point.z, expectedPoints[ i ].z, 'points[' + i + '].z' );
+
+	} );
 
 } );
 
@@ -47,7 +53,7 @@ QUnit.test( "chordal basic check", function( assert ) {
 
 	curve.type = 'chordal';
 
-	var chordalPoints = [
+	var expectedPoints = [
 		new THREE.Vector3( - 60, - 100, 60 ),
 		new THREE.Vector3( - 60, - 52, 60 ),
 		new THREE.Vector3( - 60, - 4, 60 ),
@@ -61,11 +67,17 @@ QUnit.test( "chordal basic check", function( assert ) {
 		new THREE.Vector3( 60.00000000000001, - 100, - 60.00000000000001 )
 	];
 
-	var getPoints = curve.getPoints( 10 );
-	var error = vectorsAreEqual( getPoints, chordalPoints );
-	assert.ok( getPoints.length == 11, 'getPoints should be equal.' );
-	var desc = error ? ' ' + error : '';
-	assert.ok( ! error, 'Lists of Vectors3 should be equal.' + desc );
+	var points = curve.getPoints( 10 );
+
+	assert.equal( points.length, expectedPoints.length, 'correct number of points.' );
+
+	points.forEach( function ( point, i ) {
+
+		assert.numEqual( point.x, expectedPoints[ i ].x, 'points[' + i + '].x' );
+		assert.numEqual( point.y, expectedPoints[ i ].y, 'points[' + i + '].y' );
+		assert.numEqual( point.z, expectedPoints[ i ].z, 'points[' + i + '].z' );
+
+	} );
 
 } );
 
@@ -74,7 +86,7 @@ QUnit.test( "centripetal basic check", function( assert ) {
 	var curve = new THREE.CatmullRomCurve3( positions );
 	curve.type = 'centripetal';
 
-	var centripetalPoints = [
+	var expectedPoints = [
 		new THREE.Vector3( - 60, - 100, 60 ),
 		new THREE.Vector3( - 60, - 51.47527724919028, 60 ),
 		new THREE.Vector3( - 60, - 3.300369665587032, 60 ),
@@ -88,11 +100,17 @@ QUnit.test( "centripetal basic check", function( assert ) {
 		new THREE.Vector3( 59.99999999999999, - 100, - 59.99999999999999 ),
 	];
 
-	var getPoints = curve.getPoints( 10 );
-	var error = vectorsAreEqual( getPoints, centripetalPoints );
-	assert.ok( getPoints.length == 11, 'getPoints should be equal.' );
-	var desc = error ? ' ' + error : '';
-	assert.ok( ! error, 'Lists of Vectors3 should be equal.' + desc );
+	var points = curve.getPoints( 10 );
+
+	assert.equal( points.length, expectedPoints.length, 'correct number of points.' );
+
+	points.forEach( function ( point, i ) {
+
+		assert.numEqual( point.x, expectedPoints[ i ].x, 'points[' + i + '].x' );
+		assert.numEqual( point.y, expectedPoints[ i ].y, 'points[' + i + '].y' );
+		assert.numEqual( point.z, expectedPoints[ i ].z, 'points[' + i + '].z' );
+
+	} );
 
 } );
 
@@ -102,7 +120,7 @@ QUnit.test( "closed catmullrom basic check", function( assert ) {
 	curve.type = 'catmullrom';
 	curve.closed = true;
 
-	var closedSplinePoints = [
+	var expectedPoints = [
 		new THREE.Vector3( - 60, - 100, 60 ),
 		new THREE.Vector3( - 67.5, - 46.25, 67.5 ),
 		new THREE.Vector3( - 60, 20, 60 ),
@@ -116,10 +134,16 @@ QUnit.test( "closed catmullrom basic check", function( assert ) {
 		new THREE.Vector3( - 60, - 100, 60 ),
 	];
 
-	var getPoints = curve.getPoints( 10 );
-	var error = vectorsAreEqual( getPoints, closedSplinePoints );
-	assert.ok( getPoints.length == 11, 'getPoints should be equal.' );
-	var desc = error ? ' ' + error : '';
-	assert.ok( ! error, 'Lists of Vectors3 should be equal.' + desc );
+	var points = curve.getPoints( 10 );
+
+	assert.equal( points.length, expectedPoints.length, 'correct number of points.' );
+
+	points.forEach( function ( point, i ) {
+
+		assert.numEqual( point.x, expectedPoints[ i ].x, 'points[' + i + '].x' );
+		assert.numEqual( point.y, expectedPoints[ i ].y, 'points[' + i + '].y' );
+		assert.numEqual( point.z, expectedPoints[ i ].z, 'points[' + i + '].z' );
+
+	} );
 
 } );

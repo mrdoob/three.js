@@ -8,7 +8,7 @@ QUnit.test( "lookAt" , function( assert ) {
 	var cam = new THREE.Camera();
 	cam.lookAt(new THREE.Vector3(0, 1, -1));
 
-	assert.ok( cam.rotation.x * (180 / Math.PI) === 45 , "x is equal" );
+	assert.numEqual( cam.rotation.x * ( 180 / Math.PI ), 45, "x is equal" );
 });
 
 QUnit.test( "clone" , function( assert ) {
