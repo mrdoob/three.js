@@ -1197,7 +1197,18 @@ THREE.ColladaLoader = function () {
 
 					applySkin( geom, skinController );
 
-					material.morphTargets = geom.morphTargets.length > 0;
+					if ( geom.morphTargets.length > 0 ) {
+
+						material.morphTargets = true;
+						material.skinning = false;
+
+					} else {
+
+						material.morphTargets = false;
+						material.skinning = true;
+
+					}
+
 
 					mesh = new THREE.SkinnedMesh( geom, material, false );
 

@@ -2023,6 +2023,7 @@ THREE.GLTFLoader = ( function () {
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
+									material.skinning = true;
 
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
