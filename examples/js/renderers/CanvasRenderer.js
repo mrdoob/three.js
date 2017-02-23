@@ -591,6 +591,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.restore();
 
+		} else if ( material.isPointsMaterial ) {
+
+			setFillStyle( material.color.getStyle() );
+
+			_context.save();
+			_context.translate( v1.x, v1.y );
+			if ( material.rotation !== 0 ) _context.rotate( material.rotation );
+			_context.scale( scaleX * material.size, - scaleY * material.size );
+			_context.fillRect( - 0.5, - 0.5, 1, 1 );
+			_context.restore();
+
 		}
 
 		/* DEBUG

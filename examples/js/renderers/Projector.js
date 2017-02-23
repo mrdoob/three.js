@@ -757,35 +757,33 @@ THREE.Projector = function () {
 
 				}
 
+			} else if ( object instanceof THREE.Points ) {
+
+				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					var vertices = object.geometry.vertices;
+
+					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
+
+						var vertex = vertices[ v ];
+
+						_vector4.set( vertex.x, vertex.y, vertex.z, 1 );
+						_vector4.applyMatrix4( _modelViewProjectionMatrix );
+
+						pushPoint( _vector4, object, camera );
+
+					}
+
+				}
+
 			} else if ( object instanceof THREE.Sprite ) {
 
 				_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
 
-				var invW = 1 / _vector4.w;
-
-				_vector4.z *= invW;
-
-				if ( _vector4.z >= - 1 && _vector4.z <= 1 ) {
-
-					_sprite = getNextSpriteInPool();
-					_sprite.id = object.id;
-					_sprite.x = _vector4.x * invW;
-					_sprite.y = _vector4.y * invW;
-					_sprite.z = _vector4.z;
-					_sprite.renderOrder = object.renderOrder;
-					_sprite.object = object;
-
-					_sprite.rotation = object.rotation;
-
-					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[ 0 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 12 ] ) );
-					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[ 5 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 13 ] ) );
-
-					_sprite.material = object.material;
-
-					_renderData.elements.push( _sprite );
-
-				}
+				pushPoint( _vector4, object, camera );
 
 			}
 
@@ -800,6 +798,35 @@ THREE.Projector = function () {
 		return _renderData;
 
 	};
+
+	function pushPoint( _vector4, object, camera ) {
+
+		var invW = 1 / _vector4.w;
+
+		_vector4.z *= invW;
+
+		if ( _vector4.z >= - 1 && _vector4.z <= 1 ) {
+
+			_sprite = getNextSpriteInPool();
+			_sprite.id = object.id;
+			_sprite.x = _vector4.x * invW;
+			_sprite.y = _vector4.y * invW;
+			_sprite.z = _vector4.z;
+			_sprite.renderOrder = object.renderOrder;
+			_sprite.object = object;
+
+			_sprite.rotation = object.rotation;
+
+			_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[ 0 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 12 ] ) );
+			_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[ 5 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 13 ] ) );
+
+			_sprite.material = object.material;
+
+			_renderData.elements.push( _sprite );
+
+		}
+
+	}
 
 	// Pools
 
