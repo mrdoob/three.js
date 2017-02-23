@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, FloatType, RGBAFormat } from '../../constants';
-import { _Math } from '../../math/Math';
-import { DataTexture } from '../../textures/DataTexture';
+import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 import { WebGLProgram } from './WebGLProgram';
 
 function WebGLPrograms( renderer, capabilities ) {
@@ -45,31 +43,6 @@ function WebGLPrograms( renderer, capabilities ) {
 		var bones = skeleton.bones;
 
 		if ( capabilities.floatVertexTextures ) {
-
-			if ( skeleton.boneTexture === undefined ) {
-
-				// layout (1 matrix = 4 pixels)
-				//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-				//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
-				//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
-				//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
-				//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-
-
-				var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-				size = _Math.nextPowerOfTwo( Math.ceil( size ) );
-				size = Math.max( size, 4 );
-
-				var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
-				boneMatrices.set( skeleton.boneMatrices ); // copy current values
-
-				var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-
-				skeleton.boneMatrices = boneMatrices;
-				skeleton.boneTexture = boneTexture;
-				skeleton.boneTextureSize = size;
-
-			}
 
 			return 1024;
 

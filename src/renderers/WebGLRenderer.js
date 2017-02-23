@@ -1,5 +1,7 @@
 import { REVISION, MaxEquation, MinEquation, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestFilter, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, FrontFaceDirectionCW, NoBlending, BackSide, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, FlatShading, LinearToneMapping } from '../constants';
+import { _Math } from '../math/Math';
 import { Matrix4 } from '../math/Matrix4';
+import { DataTexture } from '../textures/DataTexture';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
 import { UniformsUtils } from './shaders/UniformsUtils';
 import { ShaderLib } from './shaders/ShaderLib';
@@ -1827,7 +1829,34 @@ function WebGLRenderer( parameters ) {
 
 			if ( skeleton ) {
 
+				var bones = skeleton.bones;
+
 				if ( capabilities.floatVertexTextures ) {
+
+					if ( skeleton.boneTexture === undefined ) {
+
+						// layout (1 matrix = 4 pixels)
+						//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+						//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+						//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+						//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+						//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+
+
+						var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
+						size = _Math.nextPowerOfTwo( Math.ceil( size ) );
+						size = Math.max( size, 4 );
+
+						var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+						boneMatrices.set( skeleton.boneMatrices ); // copy current values
+
+						var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+
+						skeleton.boneMatrices = boneMatrices;
+						skeleton.boneTexture = boneTexture;
+						skeleton.boneTextureSize = size;
+
+					}
 
 					p_uniforms.set( _gl, skeleton, 'boneTexture' );
 					p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
