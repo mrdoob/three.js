@@ -12,6 +12,19 @@
 
 	}
 
+	if ( Number.isInteger === undefined ) {
+
+		// Missing in IE
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
+
+		Number.isInteger = function ( value ) {
+
+			return typeof value === 'number' && isFinite( value ) && Math.floor( value ) === value;
+
+		};
+
+	}
+
 	//
 
 	if ( Math.sign === undefined ) {
@@ -28,7 +41,7 @@
 
 	if ( Function.prototype.name === undefined ) {
 
-		// Missing in IE9-11.
+		// Missing in IE
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 
 		Object.defineProperty( Function.prototype, 'name', {
@@ -45,7 +58,7 @@
 
 	if ( Object.assign === undefined ) {
 
-		// Missing in IE.
+		// Missing in IE
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
 		( function () {
@@ -4195,6 +4208,30 @@
 	} );
 
 	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+
+	function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+
+		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+
+		this.image = { data: data, width: width, height: height };
+
+		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+
+	}
+
+	DataTexture.prototype = Object.create( Texture.prototype );
+	DataTexture.prototype.constructor = DataTexture;
+
+	DataTexture.prototype.isDataTexture = true;
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -5702,30 +5739,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
-
-		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
-
-		this.image = { data: data, width: width, height: height };
-
-		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-		this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
-
-		this.generateMipmaps = false;
-		this.flipY = false;
-		this.unpackAlignment = 1;
-
-	}
-
-	DataTexture.prototype = Object.create( Texture.prototype );
-	DataTexture.prototype.constructor = DataTexture;
-
-	DataTexture.prototype.isDataTexture = true;
 
 	/**
 	 * Uniforms library for shared webgl shaders
@@ -7314,6 +7327,7 @@
 			if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 			if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
+			data.skinning = this.skinning;
 			data.morphTargets = this.morphTargets;
 
 			// TODO: Copied from Object3D.toJSON
@@ -7446,6 +7460,7 @@
 	 *
 	 *  lights: <bool>,
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>,
 	 *  morphNormals: <bool>
 	 * }
@@ -7472,6 +7487,7 @@
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
+		this.skinning = false; // set to use skinning attribute streams
 		this.morphTargets = false; // set to use morph targets
 		this.morphNormals = false; // set to use morph normals
 
@@ -7528,6 +7544,8 @@
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
+		this.skinning = source.skinning;
+
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -7580,6 +7598,7 @@
 
 		this.depthPacking = BasicDepthPacking;
 
+		this.skinning = false;
 		this.morphTargets = false;
 
 		this.map = null;
@@ -7611,6 +7630,7 @@
 
 		this.depthPacking = source.depthPacking;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		this.map = source.map;
@@ -9036,6 +9056,7 @@
 
 			var depthMaterial = depthMaterialTemplate.clone();
 			depthMaterial.morphTargets = useMorphing;
+			depthMaterial.skinning = useSkinning;
 
 			_depthMaterials[ i ] = depthMaterial;
 
@@ -9047,6 +9068,7 @@
 				vertexShader: distanceShader.vertexShader,
 				fragmentShader: distanceShader.fragmentShader,
 				morphTargets: useMorphing,
+				skinning: useSkinning,
 				clipping: true
 			} );
 
@@ -9272,7 +9294,7 @@
 
 				}
 
-				var useSkinning = object.isSkinnedMesh;
+				var useSkinning = object.isSkinnedMesh && material.skinning;
 
 				var variantIndex = 0;
 
@@ -11535,6 +11557,7 @@
 	 *  wireframe: <boolean>,
 	 *  wireframeLinewidth: <float>,
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>
 	 * }
 	 */
@@ -11569,6 +11592,7 @@
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
+		this.skinning = false;
 		this.morphTargets = false;
 
 		this.lights = false;
@@ -11610,6 +11634,7 @@
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 
 		return this;
@@ -17261,31 +17286,6 @@
 
 			if ( capabilities.floatVertexTextures ) {
 
-				if ( skeleton.boneTexture === undefined ) {
-
-					// layout (1 matrix = 4 pixels)
-					//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-					//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
-					//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
-					//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
-					//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-
-
-					var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-					size = _Math.nextPowerOfTwo( Math.ceil( size ) );
-					size = Math.max( size, 4 );
-
-					var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
-					boneMatrices.set( skeleton.boneMatrices ); // copy current values
-
-					var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-
-					skeleton.boneMatrices = boneMatrices;
-					skeleton.boneTexture = boneTexture;
-					skeleton.boneTextureSize = size;
-
-				}
-
 				return 1024;
 
 			} else {
@@ -17409,7 +17409,7 @@
 				sizeAttenuation: material.sizeAttenuation,
 				logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-				skinning: ( object && object.isSkinnedMesh ) && maxBones > 0,
+				skinning: material.skinning && maxBones > 0,
 				maxBones: maxBones,
 				useVertexTexture: capabilities.floatVertexTextures,
 
@@ -17514,7 +17514,7 @@
 
 		};
 
-		this.releaseProgram = function( program ) {
+		this.releaseProgram = function ( program ) {
 
 			if ( -- program.usedTimes === 0 ) {
 
@@ -20282,16 +20282,14 @@
 
 		};
 
-		var program, geometryProgram, updateBuffers;
-
 		this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 			state.setMaterial( material );
 
-			program = setProgram( camera, fog, material, object );
-			geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+			var program = setProgram( camera, fog, material, object );
+			var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
 
-			updateBuffers = false;
+			var updateBuffers = false;
 
 			if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -20841,19 +20839,19 @@
 
 				var overrideMaterial = scene.overrideMaterial;
 
-				renderObjects( opaqueObjects, scene, camera, overrideMaterial );
-				renderObjects( transparentObjects, scene, camera, overrideMaterial );
+				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera, overrideMaterial );
+				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera, overrideMaterial );
 
 			} else {
 
 				// opaque pass (front-to-back order)
 
 				state.setBlending( NoBlending );
-				renderObjects( opaqueObjects, scene, camera );
+				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 				// transparent pass (back-to-front order)
 
-				renderObjects( transparentObjects, scene, camera );
+				if ( transparentObjects.length ) renderObjects( transparentObjects, scene, camera );
 
 			}
 
@@ -21397,7 +21395,7 @@
 					material.isMeshBasicMaterial ||
 					material.isMeshStandardMaterial ||
 					material.isShaderMaterial ||
-					object.isSkinnedMesh ) {
+					material.skinning ) {
 
 					p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
@@ -21412,7 +21410,7 @@
 			// auto-setting of texture unit for bone texture must go before other textures
 			// not sure why, but otherwise weird things happen
 
-			if ( object.isSkinnedMesh ) {
+			if ( material.skinning ) {
 
 				p_uniforms.setOptional( _gl, object, 'bindMatrix' );
 				p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
@@ -21421,7 +21419,34 @@
 
 				if ( skeleton ) {
 
+					var bones = skeleton.bones;
+
 					if ( capabilities.floatVertexTextures ) {
+
+						if ( skeleton.boneTexture === undefined ) {
+
+							// layout (1 matrix = 4 pixels)
+							//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+							//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+							//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+							//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+							//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+
+
+							var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
+							size = _Math.nextPowerOfTwo( Math.ceil( size ) );
+							size = Math.max( size, 4 );
+
+							var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+							boneMatrices.set( skeleton.boneMatrices ); // copy current values
+
+							var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
+
+							skeleton.boneMatrices = boneMatrices;
+							skeleton.boneTexture = boneTexture;
+							skeleton.boneTextureSize = size;
+
+						}
 
 						p_uniforms.set( _gl, skeleton, 'boneTexture' );
 						p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
@@ -28133,6 +28158,7 @@
 	 *  wireframe: <boolean>,
 	 *  wireframeLinewidth: <float>,
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>,
 	 *  morphNormals: <bool>
 	 * }
@@ -28188,6 +28214,7 @@
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
+		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -28248,6 +28275,7 @@
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -28344,6 +28372,7 @@
 	 *  wireframe: <boolean>,
 	 *  wireframeLinewidth: <float>,
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>,
 	 *  morphNormals: <bool>
 	 * }
@@ -28395,6 +28424,7 @@
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
+		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -28451,6 +28481,7 @@
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -28515,6 +28546,7 @@
 	 *  wireframe: <boolean>,
 	 *  wireframeLinewidth: <float>
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>,
 	 *  morphNormals: <bool>
 	 * }
@@ -28542,6 +28574,7 @@
 		this.fog = false;
 		this.lights = false;
 
+		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -28571,6 +28604,7 @@
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -28610,6 +28644,7 @@
 	 *  wireframe: <boolean>,
 	 *  wireframeLinewidth: <float>,
 	 *
+	 *  skinning: <bool>,
 	 *  morphTargets: <bool>,
 	 *  morphNormals: <bool>
 	 * }
@@ -28649,6 +28684,7 @@
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
 
+		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
 
@@ -28693,6 +28729,7 @@
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.skinning = source.skinning;
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
@@ -31829,6 +31866,7 @@
 			if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 			if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
 			if ( json.wireframeLinejoin !== undefined ) material.wireframeLinejoin = json.wireframeLinejoin;
+			if ( json.skinning !== undefined ) material.skinning = json.skinning;
 			if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
 
 			// for PointsMaterial
@@ -32359,7 +32397,7 @@
 
 	Object.assign( JSONLoader.prototype, {
 
-		load: function( url, onLoad, onProgress, onError ) {
+		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
@@ -42229,20 +42267,6 @@
 	//
 
 	Object.defineProperties( Material.prototype, {
-
-		skinning: {
-			get: function () {
-
-				console.warn( 'THREE.Material: .skinning has been removed.' );
-
-			},
-			set: function () {
-
-				console.warn( 'THREE.Material: .skinning has been removed.' );
-
-			}
-
-		},
 
 		wrapAround: {
 			get: function () {
