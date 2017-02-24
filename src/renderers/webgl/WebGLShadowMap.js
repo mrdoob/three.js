@@ -200,12 +200,6 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			if ( shadow ) {
-
-				shadow.update( light );
-
-			}
-
 			var shadowMap = shadow.map;
 			var shadowMatrix = shadow.matrix;
 
