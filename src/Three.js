@@ -50,6 +50,7 @@ export { AudioLoader } from './loaders/AudioLoader.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
+export { RectAreaLightShadow } from './lights/RectAreaLightShadow.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
