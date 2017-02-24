@@ -16042,6 +16042,184 @@ function WebGLAttributes( gl ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
+function painterSortStable( a, b ) {
+
+	if ( a.renderOrder !== b.renderOrder ) {
+
+		return a.renderOrder - b.renderOrder;
+
+	} else if ( a.program && b.program && a.program !== b.program ) {
+
+		return a.program.id - b.program.id;
+
+	} else if ( a.material.id !== b.material.id ) {
+
+		return a.material.id - b.material.id;
+
+	} else if ( a.z !== b.z ) {
+
+		return a.z - b.z;
+
+	} else {
+
+		return a.id - b.id;
+
+	}
+
+}
+
+function reversePainterSortStable( a, b ) {
+
+	if ( a.renderOrder !== b.renderOrder ) {
+
+		return a.renderOrder - b.renderOrder;
+
+	} if ( a.z !== b.z ) {
+
+		return b.z - a.z;
+
+	} else {
+
+		return a.id - b.id;
+
+	}
+
+}
+
+function WebGLRenderList() {
+
+	var opaque = [];
+	var opaqueLastIndex = - 1;
+
+	var transparent = [];
+	var transparentLastIndex = - 1;
+
+	function init() {
+
+		opaqueLastIndex = - 1;
+		transparentLastIndex = - 1;
+
+	}
+
+	function push( object, geometry, material, z, group ) {
+
+		var array, index;
+
+		// allocate the next position in the appropriate array
+
+		if ( material.transparent ) {
+
+			array = transparent;
+			index = ++ transparentLastIndex;
+
+		} else {
+
+			array = opaque;
+			index = ++ opaqueLastIndex;
+
+		}
+
+		// recycle existing render item or grow the array
+
+		var renderItem = array[ index ];
+
+		if ( renderItem ) {
+
+			renderItem.id = object.id;
+			renderItem.object = object;
+			renderItem.geometry = geometry;
+			renderItem.material = material;
+			renderItem.program = material.program;
+			renderItem.renderOrder = object.renderOrder;
+			renderItem.z = z;
+			renderItem.group = group;
+
+		} else {
+
+			renderItem = {
+				id: object.id,
+				object: object,
+				geometry: geometry,
+				material: material,
+				program: material.program,
+				renderOrder: object.renderOrder,
+				z: z,
+				group: group
+			};
+
+			// assert( index === array.length );
+			array.push( renderItem );
+
+		}
+
+	}
+
+	function finish() {
+
+		opaque.length = opaqueLastIndex + 1;
+		transparent.length = transparentLastIndex + 1;
+
+	}
+
+	function sort() {
+
+		opaque.sort( painterSortStable );
+		transparent.sort( reversePainterSortStable );
+
+	}
+
+	return {
+		opaque: opaque,
+		transparent: transparent,
+
+		init: init,
+		push: push,
+		finish: finish,
+
+		sort: sort
+	};
+
+}
+
+function WebGLRenderLists() {
+
+	var lists = {};
+
+	function get( scene, camera ) {
+
+		var hash = scene.id + ',' + camera.id;
+		var list = lists[ hash ];
+
+		if ( list === undefined ) {
+
+			console.log( 'THREE.WebGLRenderLists:', hash );
+
+			list = new WebGLRenderList();
+			lists[ hash ] = list;
+
+		}
+
+		return list;
+
+	}
+
+	function dispose() {
+
+		lists = {};
+
+	}
+
+	return {
+		get: get,
+		dispose: dispose
+	};
+
+}
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
@@ -19640,10 +19818,7 @@ function WebGLRenderer( parameters ) {
 
 	var lights = [];
 
-	var opaqueObjects = [];
-	var opaqueObjectsLastIndex = - 1;
-	var transparentObjects = [];
-	var transparentObjectsLastIndex = - 1;
+	var currentRenderList = null;
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -19874,6 +20049,7 @@ function WebGLRenderer( parameters ) {
 	var objects = new WebGLObjects( _gl, geometries, _infoRender );
 	var programCache = new WebGLPrograms( this, capabilities );
 	var lightCache = new WebGLLights();
+	var renderLists = new WebGLRenderLists();
 
 	this.info.programs = programCache.programs;
 
@@ -20105,12 +20281,9 @@ function WebGLRenderer( parameters ) {
 
 	this.dispose = function () {
 
-		transparentObjects = [];
-		transparentObjectsLastIndex = - 1;
-		opaqueObjects = [];
-		opaqueObjectsLastIndex = - 1;
-
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
+
+		renderLists.dispose();
 
 	};
 
@@ -20619,50 +20792,6 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function painterSortStable( a, b ) {
-
-		if ( a.object.renderOrder !== b.object.renderOrder ) {
-
-			return a.object.renderOrder - b.object.renderOrder;
-
-		} else if ( a.material.program && b.material.program && a.material.program !== b.material.program ) {
-
-			return a.material.program.id - b.material.program.id;
-
-		} else if ( a.material.id !== b.material.id ) {
-
-			return a.material.id - b.material.id;
-
-		} else if ( a.z !== b.z ) {
-
-			return a.z - b.z;
-
-		} else {
-
-			return a.id - b.id;
-
-		}
-
-	}
-
-	function reversePainterSortStable( a, b ) {
-
-		if ( a.object.renderOrder !== b.object.renderOrder ) {
-
-			return a.object.renderOrder - b.object.renderOrder;
-
-		} if ( a.z !== b.z ) {
-
-			return b.z - a.z;
-
-		} else {
-
-			return a.id - b.id;
-
-		}
-
-	}
-
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
@@ -20694,25 +20823,22 @@ function WebGLRenderer( parameters ) {
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		lights.length = 0;
-
-		opaqueObjectsLastIndex = - 1;
-		transparentObjectsLastIndex = - 1;
-
 		sprites.length = 0;
 		lensFlares.length = 0;
 
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
+		currentRenderList = renderLists.get( scene, camera );
+		currentRenderList.init();
+
 		projectObject( scene, camera, _this.sortObjects );
 
-		opaqueObjects.length = opaqueObjectsLastIndex + 1;
-		transparentObjects.length = transparentObjectsLastIndex + 1;
+		currentRenderList.finish();
 
 		if ( _this.sortObjects === true ) {
 
-			opaqueObjects.sort( painterSortStable );
-			transparentObjects.sort( reversePainterSortStable );
+			currentRenderList.sort();
 
 		}
 
@@ -20822,6 +20948,9 @@ function WebGLRenderer( parameters ) {
 
 		//
 
+		var opaqueObjects = currentRenderList.opaque;
+		var transparentObjects = currentRenderList.transparent;
+
 		if ( scene.overrideMaterial ) {
 
 			var overrideMaterial = scene.overrideMaterial;
@@ -20864,55 +20993,6 @@ function WebGLRenderer( parameters ) {
 		// _gl.finish();
 
 	};
-
-	function pushRenderItem( object, geometry, material, z, group ) {
-
-		var array, index;
-
-		// allocate the next position in the appropriate array
-
-		if ( material.transparent ) {
-
-			array = transparentObjects;
-			index = ++ transparentObjectsLastIndex;
-
-		} else {
-
-			array = opaqueObjects;
-			index = ++ opaqueObjectsLastIndex;
-
-		}
-
-		// recycle existing render item or grow the array
-
-		var renderItem = array[ index ];
-
-		if ( renderItem ) {
-
-			renderItem.id = object.id;
-			renderItem.object = object;
-			renderItem.geometry = geometry;
-			renderItem.material = material;
-			renderItem.z = _vector3.z;
-			renderItem.group = group;
-
-		} else {
-
-			renderItem = {
-				id: object.id,
-				object: object,
-				geometry: geometry,
-				material: material,
-				z: _vector3.z,
-				group: group
-			};
-
-			// assert( index === array.length );
-			array.push( renderItem );
-
-		}
-
-	}
 
 	/*
 	// TODO Duplicated code (Frustum)
@@ -21002,7 +21082,7 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				pushRenderItem( object, null, object.material, _vector3.z, null );
+				currentRenderList.push( object, null, object.material, _vector3.z, null );
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -21035,7 +21115,7 @@ function WebGLRenderer( parameters ) {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
 
 							}
 
@@ -21043,7 +21123,7 @@ function WebGLRenderer( parameters ) {
 
 					} else if ( material.visible ) {
 
-						pushRenderItem( object, geometry, material, _vector3.z, null );
+						currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 					}
 
