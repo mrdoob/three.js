@@ -8939,7 +8939,7 @@ Object.assign( Frustum.prototype, {
 
 			var planes = this.planes;
 
-			for ( var i = 0; i < 6 ; i ++ ) {
+			for ( var i = 0; i < 6; i ++ ) {
 
 				var plane = planes[ i ];
 
@@ -8968,7 +8968,7 @@ Object.assign( Frustum.prototype, {
 		};
 
 	}(),
-	
+
 	containsPoint: function ( point ) {
 
 		var planes = this.planes;
@@ -9278,6 +9278,12 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
 
 				}
+
+			}
+
+			if ( object.isSkinnedMesh && material.skinning === false ) {
+
+				console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
 
 			}
 
@@ -11466,10 +11472,10 @@ function Face3( a, b, c, normal, color, materialIndex ) {
 	this.b = b;
 	this.c = c;
 
-	this.normal = (normal && normal.isVector3) ? normal : new Vector3();
+	this.normal = ( normal && normal.isVector3 ) ? normal : new Vector3();
 	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
-	this.color = (color && color.isColor) ? color : new Color();
+	this.color = ( color && color.isColor ) ? color : new Color();
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
@@ -11632,8 +11638,6 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-var bufferAttributeId = 0;
-
 function BufferAttribute( array, itemSize, normalized ) {
 
 	if ( Array.isArray( array ) ) {
@@ -11641,8 +11645,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
 	}
-
-	Object.defineProperty( this, 'id', { value: bufferAttributeId ++ } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -15988,19 +15990,19 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		return buffers[ attribute.id ];
+		return buffers[ attribute.uuid ];
 
 	}
 
 	function remove( attribute ) {
 
-		var data = buffers[ attribute.id ];
+		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {
 
 			gl.deleteBuffer( data.buffer );
 
-			delete buffers[ attribute.id ];
+			delete buffers[ attribute.uuid ];
 
 		}
 
@@ -16010,11 +16012,11 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers[ attribute.id ];
+		var data = buffers[ attribute.uuid ];
 
 		if ( data === undefined ) {
 
-			buffers[ attribute.id ] = createBuffer( attribute, bufferType );
+			buffers[ attribute.uuid ] = createBuffer( attribute, bufferType );
 
 		} else if ( data.version < attribute.version ) {
 
@@ -38998,54 +39000,57 @@ function InstancedBufferGeometry() {
 
 }
 
-InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
+InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry.prototype ), {
 
-InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
+	constructor: InstancedBufferGeometry,
 
-InstancedBufferGeometry.prototype.addGroup = function ( start, count, materialIndex ) {
+	isInstancedBufferGeometry: true,
 
-	this.groups.push( {
+	addGroup: function ( start, count, materialIndex ) {
 
-		start: start,
-		count: count,
-		materialIndex: materialIndex
+		this.groups.push( {
 
-	} );
+			start: start,
+			count: count,
+			materialIndex: materialIndex
 
-};
+		} );
 
-InstancedBufferGeometry.prototype.copy = function ( source ) {
+	},
 
-	var index = source.index;
+	copy: function ( source ) {
 
-	if ( index !== null ) {
+		var index = source.index;
 
-		this.setIndex( index.clone() );
+		if ( index !== null ) {
+
+			this.setIndex( index.clone() );
+
+		}
+
+		var attributes = source.attributes;
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+			this.addAttribute( name, attribute.clone() );
+
+		}
+
+		var groups = source.groups;
+
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			this.addGroup( group.start, group.count, group.materialIndex );
+
+		}
+
+		return this;
 
 	}
 
-	var attributes = source.attributes;
-
-	for ( var name in attributes ) {
-
-		var attribute = attributes[ name ];
-		this.addAttribute( name, attribute.clone() );
-
-	}
-
-	var groups = source.groups;
-
-	for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-		var group = groups[ i ];
-		this.addGroup( group.start, group.count, group.materialIndex );
-
-	}
-
-	return this;
-
-};
+} );
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -39065,7 +39070,7 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
-	"count" : {
+	count: {
 
 		get: function () {
 
@@ -39075,7 +39080,7 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	"array" : {
+	array: {
 
 		get: function () {
 
@@ -39305,20 +39310,23 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 }
 
-InstancedInterleavedBuffer.prototype = Object.create( InterleavedBuffer.prototype );
-InstancedInterleavedBuffer.prototype.constructor = InstancedInterleavedBuffer;
+InstancedInterleavedBuffer.prototype = Object.assign( Object.create( InterleavedBuffer.prototype ), {
 
-InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
+	constructor: InstancedInterleavedBuffer,
 
-InstancedInterleavedBuffer.prototype.copy = function ( source ) {
+	isInstancedInterleavedBuffer: true,
 
-	InterleavedBuffer.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.meshPerAttribute = source.meshPerAttribute;
+		InterleavedBuffer.prototype.copy.call( this, source );
 
-	return this;
+		this.meshPerAttribute = source.meshPerAttribute;
 
-};
+		return this;
+
+	}
+
+} );
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -39332,20 +39340,23 @@ function InstancedBufferAttribute( array, itemSize, meshPerAttribute ) {
 
 }
 
-InstancedBufferAttribute.prototype = Object.create( BufferAttribute.prototype );
-InstancedBufferAttribute.prototype.constructor = InstancedBufferAttribute;
+InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
 
-InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
+	constructor: InstancedBufferAttribute,
 
-InstancedBufferAttribute.prototype.copy = function ( source ) {
+	isInstancedBufferAttribute: true,
 
-	BufferAttribute.prototype.copy.call( this, source );
+	copy: function ( source ) {
 
-	this.meshPerAttribute = source.meshPerAttribute;
+		BufferAttribute.prototype.copy.call( this, source );
 
-	return this;
+		this.meshPerAttribute = source.meshPerAttribute;
 
-};
+		return this;
+
+	}
+
+} );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -39420,12 +39431,12 @@ Object.assign( Raycaster.prototype, {
 
 	setFromCamera: function ( coords, camera ) {
 
-		if ( (camera && camera.isPerspectiveCamera) ) {
+		if ( ( camera && camera.isPerspectiveCamera ) ) {
 
 			this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
 			this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
-		} else if ( (camera && camera.isOrthographicCamera) ) {
+		} else if ( ( camera && camera.isOrthographicCamera ) ) {
 
 			this.ray.origin.set( coords.x, coords.y, ( camera.near + camera.far ) / ( camera.near - camera.far ) ).unproject( camera ); // set origin in plane of camera
 			this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
