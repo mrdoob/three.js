@@ -1584,7 +1584,7 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.meshes, function ( mesh ) {
 
-				var group = new THREE.Object3D();
+				var group = new THREE.Group();
 				if ( mesh.name !== undefined ) group.name = mesh.name;
 
 				if ( mesh.extras ) group.userData = mesh.extras;
