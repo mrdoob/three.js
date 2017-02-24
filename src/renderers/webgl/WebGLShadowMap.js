@@ -200,8 +200,7 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 			}
 
-			// TODO (abelnation / sam-g-steel): is this needed?
-			if ( shadow && shadow.isRectAreaLightShadow ) {
+			if ( shadow ) {
 
 				shadow.update( light );
 
