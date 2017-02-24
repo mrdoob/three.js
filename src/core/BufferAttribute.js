@@ -8,8 +8,6 @@ import { _Math } from '../math/Math';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var bufferAttributeId = 0;
-
 function BufferAttribute( array, itemSize, normalized ) {
 
 	if ( Array.isArray( array ) ) {
@@ -17,8 +15,6 @@ function BufferAttribute( array, itemSize, normalized ) {
 		throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
 	}
-
-	Object.defineProperty( this, 'id', { value: bufferAttributeId ++ } );
 
 	this.uuid = _Math.generateUUID();
 

@@ -101,19 +101,19 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		return buffers[ attribute.id ];
+		return buffers[ attribute.uuid ];
 
 	}
 
 	function remove( attribute ) {
 
-		var data = buffers[ attribute.id ];
+		var data = buffers[ attribute.uuid ];
 
 		if ( data ) {
 
 			gl.deleteBuffer( data.buffer );
 
-			delete buffers[ attribute.id ];
+			delete buffers[ attribute.uuid ];
 
 		}
 
@@ -123,11 +123,11 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers[ attribute.id ];
+		var data = buffers[ attribute.uuid ];
 
 		if ( data === undefined ) {
 
-			buffers[ attribute.id ] = createBuffer( attribute, bufferType );
+			buffers[ attribute.uuid ] = createBuffer( attribute, bufferType );
 
 		} else if ( data.version < attribute.version ) {
 
