@@ -4,13 +4,13 @@
 
 function painterSortStable( a, b ) {
 
-	if ( a.object.renderOrder !== b.object.renderOrder ) {
+	if ( a.renderOrder !== b.renderOrder ) {
 
-		return a.object.renderOrder - b.object.renderOrder;
+		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.material.program && b.material.program && a.material.program !== b.material.program ) {
+	} else if ( a.program && b.program && a.program !== b.program ) {
 
-		return a.material.program.id - b.material.program.id;
+		return a.program.id - b.program.id;
 
 	} else if ( a.material.id !== b.material.id ) {
 
@@ -30,9 +30,9 @@ function painterSortStable( a, b ) {
 
 function reversePainterSortStable( a, b ) {
 
-	if ( a.object.renderOrder !== b.object.renderOrder ) {
+	if ( a.renderOrder !== b.renderOrder ) {
 
-		return a.object.renderOrder - b.object.renderOrder;
+		return a.renderOrder - b.renderOrder;
 
 	} if ( a.z !== b.z ) {
 
@@ -89,6 +89,8 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
+			renderItem.program = material.program;
+			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
 
@@ -99,6 +101,8 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
+				program: material.program,
+				renderOrder: object.renderOrder,
 				z: z,
 				group: group
 			};
@@ -147,6 +151,8 @@ function WebGLRenderLists() {
 		var list = lists[ hash ];
 
 		if ( list === undefined ) {
+
+			console.log( 'THREE.WebGLRenderLists:', hash );
 
 			list = new WebGLRenderList();
 			lists[ hash ] = list;
