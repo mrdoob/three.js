@@ -672,7 +672,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			var parameters = technique.parameters:
+			var parameters = technique.parameters;
 			var extra = technique.extra;
 
 			for ( var key in parameters ) {
