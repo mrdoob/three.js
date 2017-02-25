@@ -17538,7 +17538,7 @@
 
 			}
 
-			var currentRenderTarget = renderer.getCurrentRenderTarget();
+			var currentRenderTarget = renderer.getRenderTarget();
 
 			var parameters = {
 
@@ -21160,10 +21160,10 @@
 				var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 				var group = renderItem.group;
 
+				object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-				object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 				if ( object.isImmediateRenderObject ) {
 
@@ -21182,7 +21182,6 @@
 				}
 
 				object.onAfterRender( _this, scene, camera, geometry, material, group );
-
 
 			}
 
@@ -22310,7 +22309,7 @@
 
 		}() );
 
-		this.getCurrentRenderTarget = function () {
+		this.getRenderTarget = function () {
 
 			return _currentRenderTarget;
 
@@ -42751,6 +42750,13 @@
 	//
 
 	Object.assign( WebGLRenderer.prototype, {
+
+		getCurrentRenderTarget: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
+			return this.getRenderTarget();
+
+		},
 
 		supportsFloatTextures: function () {
 
