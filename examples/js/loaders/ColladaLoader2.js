@@ -194,6 +194,8 @@ THREE.ColladaLoader.prototype = {
 
 		function getImage( id ) {
 
+			if ( !library.images[ id ] ) return;
+
 			return getBuild( library.images[ id ], buildImage );
 
 		}
@@ -349,6 +351,10 @@ THREE.ColladaLoader.prototype = {
 						data.parameters = parseEffectParameters( child );
 						break;
 
+					case 'extra':
+						data.extra = parseEffectExtra( child );
+						break;
+
 				}
 
 			}
@@ -371,6 +377,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'emission':
 					case 'diffuse':
+					case 'ambient':
 					case 'specular':
 					case 'shininess':
 					case 'transparent':
@@ -407,7 +414,7 @@ THREE.ColladaLoader.prototype = {
 						break;
 
 					case 'texture':
-						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), extra: parseEffectParameterTexture( child ) };
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), texcoord: child.getAttribute( 'texcoord' ), extra: parseEffectParameterTexture( child ) };
 						break;
 
 				}
@@ -490,12 +497,68 @@ THREE.ColladaLoader.prototype = {
 						data[ child.nodeName ] = parseInt( child.textContent );
 						break;
 
+					case 'bump':
+						data[ child.nodeName ] = parseEffectParameterTextureExtraTechniqueBump( child );
+						break;
 				}
-
 			}
 
 			return data;
 
+		}
+		function parseEffectExtra( xml ) {
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+					case 'technique':
+						data[ child.nodeName ] = parseEffectExtraTechnique( child );
+						break;
+				}
+			}
+
+			return data;
+		}
+		function parseEffectExtraTechnique( xml ) {
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+					case 'bump':
+						data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+						break;
+				}
+			}
+
+			return data;
+		}
+		function parseEffectExtraTechniqueBump( xml ) {
+			var data = {};
+
+			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				var child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+					case 'texture':
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), texcoord: child.getAttribute( 'texcoord' ), extra: parseEffectParameterTexture( child ) };
+						break;
+				}
+			}
+
+			return data;
 		}
 
 		function buildEffect( data ) {
@@ -572,7 +635,11 @@ THREE.ColladaLoader.prototype = {
 
 					var surface = effect.profile.surfaces[ sampler.source ];
 
-					var texture = new THREE.Texture( getImage( surface.init_from ) );
+					var image = getImage( surface.init_from );
+
+					if (!image) return null;
+
+					var texture = new THREE.Texture( image );
 
 					var extra = textureObject.extra;
 
@@ -605,7 +672,8 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			var parameters = technique.parameters;
+			var parameters = technique.parameters:
+			var extra = technique.extra;
 
 			for ( var key in parameters ) {
 
@@ -617,9 +685,13 @@ THREE.ColladaLoader.prototype = {
 						if ( parameter.color ) material.color.fromArray( parameter.color );
 						if ( parameter.texture ) material.map = getTexture( parameter.texture );
 						break;
+					case 'ambient':
+						//if ( parameter.color ) material.color.fromArray( parameter.color );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
+						break;
 					case 'specular':
-						if ( parameter.color && material.specular )
-							material.specular.fromArray( parameter.color );
+						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
+						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess )
@@ -640,6 +712,16 @@ THREE.ColladaLoader.prototype = {
 
 				}
 
+			}
+
+			if (extra && extra.technique) {
+				if (extra.technique.bump) {
+					var parameter = extra.technique.bump;
+					if ( parameter.texture ) {
+						material.normalMap = getTexture( parameter.texture );
+						material.normalScale = new THREE.Vector2(1,1);
+					}
+				}
 			}
 
 			return material;
@@ -1046,7 +1128,8 @@ THREE.ColladaLoader.prototype = {
 
 					case 'input':
 						var id = parseId( child.getAttribute( 'source' ) );
-						var semantic = child.getAttribute( 'semantic' );
+						var set = child.getAttribute( 'set' );
+						var semantic = child.getAttribute( 'semantic' ) + set;
 						var offset = parseInt( child.getAttribute( 'offset' ) );
 						primitive.inputs[ semantic ] = { id: id, offset: offset };
 						primitive.stride = Math.max( primitive.stride, offset + 1 );
@@ -1113,7 +1196,12 @@ THREE.ColladaLoader.prototype = {
 							break;
 
 						case 'TEXCOORD':
+						case 'TEXCOORD0':
 							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
+							break;
+
+						case 'TEXCOORD1':
+							geometry.addAttribute( 'uv2', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
 							break;
 
 					}
