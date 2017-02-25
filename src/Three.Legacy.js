@@ -1058,6 +1058,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 
 Object.assign( WebGLRenderer.prototype, {
 
+	getCurrentRenderTarget: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
+		return this.getRenderTarget();
+
+	},
+
 	supportsFloatTextures: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );

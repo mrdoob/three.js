@@ -125,7 +125,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
-		var currentRenderTarget = renderer.getCurrentRenderTarget();
+		var currentRenderTarget = renderer.getRenderTarget();
 
 		var parameters = {
 

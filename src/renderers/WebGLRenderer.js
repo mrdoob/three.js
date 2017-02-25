@@ -2549,7 +2549,7 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.getCurrentRenderTarget = function () {
+	this.getRenderTarget = function () {
 
 		return _currentRenderTarget;
 
