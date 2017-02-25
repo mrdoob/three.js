@@ -29,4 +29,17 @@ attribute vec4 aTRS0;
 attribute vec4 aTRS1;
 attribute vec4 aTRS2;
 
+mat4 getInstanceMatrix(){
+
+  return mat4(
+    
+    vec4( aTRS0.xyz , 0.),
+    vec4( aTRS1.xyz , 0.),
+    vec4( aTRS2.xyz , 0.),
+    vec4( aTRS0.w , aTRS1.w , aTRS2.w , 1.)
+
+  );
+
+}
+
 #endif
