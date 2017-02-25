@@ -82,8 +82,8 @@ function DecalGeometry( mesh, position, orientation, size ) {
 
 			for ( i = 0; i < index.count; i ++ ) {
 
-				vertex.fromBufferAttribute( positionAttribute, index[ i ] );
-				normal.fromBufferAttribute( normalAttribute, index[ i ] );
+				vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
+				normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
 
 				pushDecalVertex( decalVertices, vertex, normal );
 
