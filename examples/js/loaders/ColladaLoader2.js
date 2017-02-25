@@ -1046,8 +1046,7 @@ THREE.ColladaLoader.prototype = {
 
 					case 'input':
 						var id = parseId( child.getAttribute( 'source' ) );
-						var set = child.getAttribute( 'set' );
-						var semantic = child.getAttribute( 'semantic' ) + set;
+						var semantic = child.getAttribute( 'semantic' );
 						var offset = parseInt( child.getAttribute( 'offset' ) );
 						primitive.inputs[ semantic ] = { id: id, offset: offset };
 						primitive.stride = Math.max( primitive.stride, offset + 1 );
@@ -1114,12 +1113,7 @@ THREE.ColladaLoader.prototype = {
 							break;
 
 						case 'TEXCOORD':
-						case 'TEXCOORD0':
 							geometry.addAttribute( 'uv', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
-							break;
-
-						case 'TEXCOORD1':
-							geometry.addAttribute( 'uv2', buildGeometryAttribute( primitive, sources[ input.id ], input.offset ) );
 							break;
 
 					}
