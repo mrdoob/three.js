@@ -1399,10 +1399,10 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
+			object.onBeforeRender( _this, scene, camera, geometry, material, group );
+
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
 			if ( object.isImmediateRenderObject ) {
 
@@ -1421,7 +1421,6 @@ function WebGLRenderer( parameters ) {
 			}
 
 			object.onAfterRender( _this, scene, camera, geometry, material, group );
-
 
 		}
 
