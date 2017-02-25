@@ -68,7 +68,11 @@ Object.assign( ImageLoader.prototype, {
 
 		}, false );
 
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+		if ( url.substr( 0, 5 ) !== 'data:' ) {
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+		}
 
 		scope.manager.itemStart( url );
 

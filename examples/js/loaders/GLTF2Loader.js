@@ -3,19 +3,20 @@
  * @author mrdoob / http://mrdoob.com/
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
+ * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-THREE.GLTFLoader = ( function () {
+THREE.GLTF2Loader = ( function () {
 
-	function GLTFLoader( manager ) {
+	function GLTF2Loader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	}
 
-	GLTFLoader.prototype = {
+	GLTF2Loader.prototype = {
 
-		constructor: GLTFLoader,
+		constructor: GLTF2Loader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -73,7 +74,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			console.time( 'GLTFLoader' );
+			console.time( 'GLTF2Loader' );
 
 			var parser = new GLTFParser( json, extensions, {
 
@@ -84,7 +85,7 @@ THREE.GLTFLoader = ( function () {
 
 			parser.parse( function ( scene, scenes, cameras, animations ) {
 
-				console.timeEnd( 'GLTFLoader' );
+				console.timeEnd( 'GLTF2Loader' );
 
 				var glTF = {
 					"scene": scene,
@@ -152,18 +153,6 @@ THREE.GLTFLoader = ( function () {
 		};
 
 	}
-
-	/* GLTFSHADERS */
-
-	GLTFLoader.Shaders = {
-
-		update: function () {
-
-			console.warn( 'THREE.GLTFLoader.Shaders has been deprecated, and now updates automatically.' );
-
-		}
-
-	};
 
 	/* GLTFSHADER */
 
@@ -263,19 +252,6 @@ THREE.GLTFLoader = ( function () {
 					break;
 
 			}
-
-		}
-
-	};
-
-
-	/* ANIMATION */
-
-	GLTFLoader.Animations = {
-
-		update: function () {
-
-			console.warn( 'THREE.GLTFLoader.Animation has been deprecated. Use THREE.AnimationMixer instead.' );
 
 		}
 
@@ -983,7 +959,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
-				console.warn( 'THREE.GLTFLoader: ' + buffer.type + ' buffer type is not supported' );
+				console.warn( 'THREE.GLTF2Loader: ' + buffer.type + ' buffer type is not supported' );
 
 			}
 
@@ -1074,7 +1050,7 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.textures, function ( texture ) {
 
-				if ( texture.source ) {
+				if ( texture.source !== undefined ) {
 
 					return new Promise( function ( resolve ) {
 
@@ -1107,14 +1083,14 @@ THREE.GLTFLoader = ( function () {
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
-								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
-															'internalFormat will be forced to be the same value as format.' );
+								console.warn( 'THREE.GLTF2Loader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
+								              'internalFormat will be forced to be the same value as format.' );
 
 							}
 
 							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
 
-							if ( texture.sampler ) {
+							if ( texture.sampler !== undefined ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
@@ -1605,7 +1581,7 @@ THREE.GLTFLoader = ( function () {
 
 							var attributeEntry = attributes[ attributeId ];
 
-							if ( ! attributeEntry ) return;
+							if ( attributeEntry === undefined ) return;
 
 							var bufferAttribute = dependencies.accessors[ attributeEntry ];
 
@@ -1643,7 +1619,7 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1693,7 +1669,7 @@ THREE.GLTFLoader = ( function () {
 
 						var meshNode;
 
-						if ( primitive.indices ) {
+						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
@@ -1934,16 +1910,30 @@ THREE.GLTFLoader = ( function () {
 
 					var node = json.nodes[ nodeId ];
 
-					if ( node.meshes !== undefined ) {
+					var meshes;
 
-						for ( var meshId in node.meshes ) {
+					if ( node.mesh !== undefined) {
 
-							var mesh = node.meshes[ meshId ];
+						meshes = [ node.mesh ];
+
+					} else if ( node.meshes !== undefined ) {
+
+						console.warn( 'GLTF2Loader: Legacy glTF file detected. Nodes may have no more than 1 mesh.' );
+
+						meshes = node.meshes;
+
+					}
+
+					if ( meshes !== undefined ) {
+
+						for ( var meshId in meshes ) {
+
+							var mesh = meshes[ meshId ];
 							var group = dependencies.meshes[ mesh ];
 
 							if ( group === undefined ) {
 
-								console.warn( 'GLTFLoader: Couldn\'t find node "' + mesh + '".' );
+								console.warn( 'GLTF2Loader: Couldn\'t find node "' + mesh + '".' );
 								continue;
 
 							}
@@ -1996,7 +1986,7 @@ THREE.GLTFLoader = ( function () {
 
 								var skinEntry;
 
-								if ( node.skin ) {
+								if ( node.skin !== undefined ) {
 
 									skinEntry = dependencies.skins[ node.skin ];
 
@@ -2023,7 +2013,6 @@ THREE.GLTFLoader = ( function () {
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
-									material.skinning = true;
 
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
@@ -2172,7 +2161,7 @@ THREE.GLTFLoader = ( function () {
 
 				_scene.traverse( function ( child ) {
 
-					// Register raw material meshes with GLTFLoader.Shaders
+					// Register raw material meshes with GLTF2Loader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
 						child.gltfShader = new GLTFShader( child, dependencies.nodes );
@@ -2192,6 +2181,6 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	return GLTFLoader;
+	return GLTF2Loader;
 
 } )();

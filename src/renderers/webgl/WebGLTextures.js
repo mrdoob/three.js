@@ -5,9 +5,8 @@
 import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, info ) {
+function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory ) {
 
-	var _infoMemory = info.memory;
 	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
 
 	//
@@ -96,7 +95,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		deallocateTexture( texture );
 
-		_infoMemory.textures --;
+		infoMemory.textures --;
 
 
 	}
@@ -109,7 +108,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		deallocateRenderTarget( renderTarget );
 
-		_infoMemory.textures --;
+		infoMemory.textures --;
 
 	}
 
@@ -136,7 +135,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 		}
 
 		// remove all webgl properties
-		properties.delete( texture );
+		properties.remove( texture );
 
 	}
 
@@ -175,8 +174,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		}
 
-		properties.delete( renderTarget.texture );
-		properties.delete( renderTarget );
+		properties.remove( renderTarget.texture );
+		properties.remove( renderTarget );
 
 	}
 
@@ -228,7 +227,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 					textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-					_infoMemory.textures ++;
+					infoMemory.textures ++;
 
 				}
 
@@ -399,7 +398,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			_infoMemory.textures ++;
+			infoMemory.textures ++;
 
 		}
 
@@ -700,7 +699,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 		textureProperties.__webglTexture = _gl.createTexture();
 
-		_infoMemory.textures ++;
+		infoMemory.textures ++;
 
 		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isTargetPowerOfTwo = isPowerOfTwo( renderTarget );

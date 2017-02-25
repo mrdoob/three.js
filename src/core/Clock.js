@@ -18,7 +18,7 @@ Object.assign( Clock.prototype, {
 
 	start: function () {
 
-		this.startTime = ( performance || Date ).now();
+		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
 		this.oldTime = this.startTime;
 		this.elapsedTime = 0;
@@ -52,7 +52,7 @@ Object.assign( Clock.prototype, {
 
 		if ( this.running ) {
 
-			var newTime = ( performance || Date ).now();
+			var newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;

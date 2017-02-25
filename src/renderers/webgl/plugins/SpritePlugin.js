@@ -224,8 +224,8 @@ function SpritePlugin( renderer, sprites ) {
 			gl.uniform2fv( uniforms.scale, scale );
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			state.setDepthTest( material.depthTest );
-			state.setDepthWrite( material.depthWrite );
+			state.buffers.depth.setTest( material.depthTest );
+			state.buffers.depth.setMask( material.depthWrite );
 
 			if ( material.map ) {
 

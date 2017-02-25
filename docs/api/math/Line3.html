@@ -40,7 +40,7 @@
 		<h2>Methods</h2>
 
 		<h3>[method:Line3 applyMatrix4]( [page:Matrix4 matrix] )</h3>
-		<div>Apply a matrix transform to the line segment.</div>
+		<div>Applies a matrix transform to the line segment.</div>
 
 		<h3>[method:Vector3 at]( [page:Float t], [page:Vector3 optionalTarget] )</h3>
 		<div>
@@ -48,12 +48,12 @@
 		[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
 		otherwise a new [page:Vector3] will be created.<br /><br />
 
-		Return a vector at a certain position along the line. When [page:Float t] = 0, it returns the start vector,
+		Returns a vector at a certain position along the line. When [page:Float t] = 0, it returns the start vector,
 		and when [page:Float t] = 1 it returns the end vector.<br />
 		</div>
 
 		<h3>[method:Line3 clone]()</h3>
-		<div>Return a new [page:Line3] with the same [page:.start start] and [page:.end end] vectors as this one.</div>
+		<div>Returns a new [page:Line3] with the same [page:.start start] and [page:.end end] vectors as this one.</div>
 
 		<h3>[method:Vector3 closestPointToPoint]( [page:Vector3 point], [page:Boolean clampToLine], [page:Vector3 optionalTarget] )</h3>
 		<div>
@@ -72,7 +72,7 @@
 		[page:Boolean clampToLine] - Whether to clamp the result to the range [0, 1].<br /><br />
 
 		Returns a point parameter based on the closest point as projected on the line segement.
-		If clamp to line is true, then the returned value will be between 0 and 1.
+		If [page:Boolean clampToLine] is true, then the returned value will be between 0 and 1.
 		</div>
 
 		<h3>[method:Line3 copy]( [page:Line3 line] )</h3>
@@ -109,13 +109,13 @@
 			[page:Vector3 optionalTarget] - (optional) if specified, the result will be copied into this [page:Vector3],
 			otherwise a new [page:Vector3] will be created.<br /><br />
 
-		Return the center of the line segment.
+		Returns the center of the line segment.
 		</div>
 
 		<h3>[method:Line3 set]( [page:Vector3 start], [page:Vector3 end] )</h3>
 		<div>
 		[page:Vector3 start] - set the [page:.start start point] of the line.<br />
-		end - [page:Vector3] - set the [page:.end end point] of the line.<br /><br />
+		[page:Vector3 end] - set the [page:.end end point] of the line.<br /><br />
 
 		Sets the start and end values by copying the provided vectors.
 		</div>

@@ -23,29 +23,25 @@
 		When using custom shaders provided within a glTF file [page:THREE.GLTFLoader.Shaders] should be updated on each render loop. See [example:webgl_loader_gltf] demo source code for example usage.
 		</div>
 
-		<div>
-		This class is often used with [page:THREE.GLTFLoader.Animations THREE.GLTFLoader.Animations] to animate parsed animations. See [example:webgl_loader_gltf] demo source code for example usage.
-		</div>
-
 		<h2>Example</h2>
 
 		<code>
-		// instantiate a loader
+		// Instantiate a loader
 		var loader = new THREE.GLTFLoader();
 
-		// load a glTF resource
-		loader.load(
-			// resource URL
-			'models/gltf/duck/duck.json',
-			// Function when resource is loaded
-			function ( object ) {
-				scene.add( object.scene );
-			}
-		);
+		// Load a glTF resource
+		loader.load( 'models/gltf/duck/duck.gltf', function ( gltf ) {
+			scene.add( gltf.scene );
+
+			gltf.animations; // Array&lt;THREE.AnimationClip&gt;
+			gltf.scene;      // THREE.Scene
+			gltf.scenes;     // Array&lt;THREE.Scene&gt;
+			gltf.cameras;    // Array&lt;THREE.Camera&gt;
+		} );
 		</code>
 
 		[example:webgl_loader_gltf]
-		
+
 		<h2>Constructor</h2>
 
 		<h3>[name]( [page:LoadingManager manager] )</h3>
