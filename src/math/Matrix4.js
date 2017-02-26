@@ -326,6 +326,8 @@ Object.assign( Matrix4.prototype, {
 
 			if ( z.lengthSq() === 0 ) {
 
+				// eye and target are in the same position
+
 				z.z = 1;
 
 			}
@@ -334,6 +336,8 @@ Object.assign( Matrix4.prototype, {
 			x.crossVectors( up, z );
 
 			if ( x.lengthSq() === 0 ) {
+
+				// eye and target are in the same vertical
 
 				z.z += 0.0001;
 				x.crossVectors( up, z );
