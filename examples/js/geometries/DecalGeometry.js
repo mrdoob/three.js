@@ -5,6 +5,8 @@
  * You can use this geometry to create a decal mesh, that serves different kinds of purposes.
  * e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.
  *
+ * Constructor parameter:
+ *
  * mesh — Any mesh object
  * position — Position of the decal projector
  * orientation — Orientation of the decal projector
