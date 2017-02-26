@@ -635,6 +635,7 @@
 			var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
 
 			this.threeNode.bind( skeleton, new THREE.Matrix4() );
+			this.threeNode.material.skinning = true;
 
 		};
 
@@ -1849,7 +1850,7 @@
 
 					}
 
-
+					
 
 				}
 
@@ -1872,7 +1873,7 @@
 				} else {
 
 					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
-
+					
 				}
 
 

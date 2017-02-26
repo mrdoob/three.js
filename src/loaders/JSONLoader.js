@@ -31,7 +31,7 @@ function JSONLoader( manager ) {
 
 Object.assign( JSONLoader.prototype, {
 
-	load: function( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 

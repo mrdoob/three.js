@@ -197,24 +197,28 @@ Object.assign( Quaternion.prototype, {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( (euler && euler.isEuler) === false ) {
+		if ( ( euler && euler.isEuler ) === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 		}
 
+		var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler._x / 2 );
-		var c2 = Math.cos( euler._y / 2 );
-		var c3 = Math.cos( euler._z / 2 );
-		var s1 = Math.sin( euler._x / 2 );
-		var s2 = Math.sin( euler._y / 2 );
-		var s3 = Math.sin( euler._z / 2 );
+		var cos = Math.cos;
+		var sin = Math.sin;
 
-		var order = euler.order;
+		var c1 = cos( x / 2 );
+		var c2 = cos( y / 2 );
+		var c3 = cos( z / 2 );
+
+		var s1 = sin( x / 2 );
+		var s2 = sin( y / 2 );
+		var s3 = sin( z / 2 );
 
 		if ( order === 'XYZ' ) {
 

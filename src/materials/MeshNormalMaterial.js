@@ -21,6 +21,7 @@ import { Vector2 } from '../math/Vector2';
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  *
+ *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -48,6 +49,7 @@ function MeshNormalMaterial( parameters ) {
 	this.fog = false;
 	this.lights = false;
 
+	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -77,6 +79,7 @@ MeshNormalMaterial.prototype.copy = function ( source ) {
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 
+	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 

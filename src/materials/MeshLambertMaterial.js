@@ -34,6 +34,7 @@ import { Color } from '../math/Color';
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
+ *  skinning: <bool>,
  *  morphTargets: <bool>,
  *  morphNormals: <bool>
  * }
@@ -73,6 +74,7 @@ function MeshLambertMaterial( parameters ) {
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
+	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
 
@@ -117,6 +119,7 @@ MeshLambertMaterial.prototype.copy = function ( source ) {
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
 
+	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
 

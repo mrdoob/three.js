@@ -994,20 +994,6 @@ Object.defineProperties( Uniform.prototype, {
 
 Object.defineProperties( Material.prototype, {
 
-	skinning: {
-		get: function () {
-
-			console.warn( 'THREE.Material: .skinning has been removed.' );
-
-		},
-		set: function () {
-
-			console.warn( 'THREE.Material: .skinning has been removed.' );
-
-		}
-
-	},
-
 	wrapAround: {
 		get: function () {
 
@@ -1071,6 +1057,13 @@ Object.defineProperties( ShaderMaterial.prototype, {
 //
 
 Object.assign( WebGLRenderer.prototype, {
+
+	getCurrentRenderTarget: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
+		return this.getRenderTarget();
+
+	},
 
 	supportsFloatTextures: function () {
 

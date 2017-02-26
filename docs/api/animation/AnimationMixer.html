@@ -1,102 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <base href="../../" />
-    <script src="list.js"></script>
-    <script src="page.js"></script>
-    <link type="text/css" rel="stylesheet" href="page.css" />
-  </head>
-  <body>
-    <h1>[name]</h1>
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
 
-    <div class="desc">
-    The AnimationMixer is a player for AnimationClip objects.
-    </div>
+		<div class="desc">
+		The AnimationMixer is a player for animations on a particular object in the scene.
+		</div>
 
+		<p>
+		Each available animation sequence is stored as an [page:AnimationClip AnimationClip], and
+		playback of that clip is controlled with an [page:AnimationClip AnimationAction]. When multiple
+		objects in the scene are animated independently, one AnimationMixer may be used for each object.
+		</p>
 
-    <h2>Constructor</h2>
+		<h2>Example</h2>
 
+		<p>
+		When loading a 3D model that includes animation, many loaders also return a list of
+		[page:AnimationClip AnimationClip] instances. Each clip represents a specific animation
+		sequence, and may be played or paused individually.
+		</p>
 
-    <h3>[name]( [page:Object3D root] )</h3>
+		<code>
+		var mesh;
 
+		// Create an AnimationMixer, and get the list of AnimationClip instances
+		var mixer = new THREE.AnimationMixer( mesh );
+		var clips = mesh.animations;
 
-    <h2>Properties</h2>
+		// Update the mixer on each frame
+		function update () {
+			mixer.update( deltaSeconds );
+		}
 
+		// Play a specific animation
+		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		var action = mixer.clipAction(clip);
+		action.play();
 
-    <h3>[property:Number time]</h3>
+		// Play all animations
+		clips.forEach( function (clip) {
+			mixer.clipAction(clip).play();
+		} );
+		</code>
 
-    <h3>[property:Number timeScale]</h3>
+		<p>
+		Note that not all model formats include animation (OBJ notably does not), and that only some
+		THREE.js loaders support [page:AnimationClip AnimationClip] sequences. Several that <i>do</i>
+		support this animation type:
+		</p>
 
+		<ul>
+			<li>[page:ObjectLoader THREE.ObjectLoader]</li>
+			<li>THREE.BVHLoader</li>
+			<li>THREE.FBXLoader</li>
+			<li>THREE.FBXLoader2</li>
+			<li>[page:GLTFLoader THREE.GLTFLoader]</li>
+			<li>THREE.MMDLoader</li>
+			<li>THREE.SEA3DLoader</li>
+		</ul>
 
-    <h2>Methods</h2>
-
-
-    <h3>[method:AnimationAction clipAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
-    <div>
-    clip -- AnimationClip <br />
-    optionalRoot -- Object3D
-    </div>
-    <div>
-    Return an action for a clip, optionally using a custom root target object.
-    </div>
-
-    <h3>[method:AnimationAction existingAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
-    <div>
-    clip -- AnimationClip <br />
-    optionalRoot -- Object3D
-    </div>
-    <div>
-    Return an existing action.
-    </div>
-
-    <h3>[method:AnimationMixer stopAllAction]()</h3>
-    <div>
-    Deactivates all scheduled actions.
-    </div>
-
-    <h3>[method:AnimationMixer update]([page:Number deltaTimeMS]) </h3>
-    <div>
-    deltaTimeMS -- Time elapsed since last update in milliseconds.
-    </div>
-    <div>
-    Updates the animation with deltaTimeMS.
-    </div>
-
-    <h3>[method:Object3D getRoot]()</h3>
-    <div>
-    Return this mixer's root target object.
-    </div>
-
-    <h3>[method:null uncacheClip]([page:AnimationClip clip])</h3>
-    <div>
-    clip -- AnimationClip
-    </div>
-    <div>
-    Free all resources for a clip.
-    </div>
-
-    <h3>[method:null uncacheRoot]([page:Object3D root]) </h3>
-    <div>
-    root -- Object3D
-    </div>
-    <div>
-    Free all resources for a root target object.
-    </div>
-
-    <h3>[method:null uncacheAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
-    <div>
-    clip -- AnimationClip <br />
-    optionalRoot -- Object3D
-    </div>
-    <div>
-    Free all resources for an action.
-    </div>
+		<h2>Constructor</h2>
 
 
-    <h2>Source</h2>
+		<h3>[name]( [page:Object3D root] )</h3>
 
 
-    [link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
-  </body>
+		<h2>Properties</h2>
+
+
+		<h3>[property:Number time]</h3>
+
+		<h3>[property:Number timeScale]</h3>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>[method:AnimationAction clipAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<div>
+		clip -- AnimationClip <br />
+		optionalRoot -- Object3D
+		</div>
+		<div>
+		Return an action for a clip, optionally using a custom root target object.
+		</div>
+
+		<h3>[method:AnimationAction existingAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<div>
+		clip -- AnimationClip <br />
+		optionalRoot -- Object3D
+		</div>
+		<div>
+		Return an existing action.
+		</div>
+
+		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<div>
+		Deactivates all scheduled actions.
+		</div>
+
+		<h3>[method:AnimationMixer update]([page:Number deltaTimeMS]) </h3>
+		<div>
+		deltaTimeMS -- Time elapsed since last update in milliseconds.
+		</div>
+		<div>
+		Updates the animation with deltaTimeMS.
+		</div>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<div>
+		Return this mixer's root target object.
+		</div>
+
+		<h3>[method:null uncacheClip]([page:AnimationClip clip])</h3>
+		<div>
+		clip -- AnimationClip
+		</div>
+		<div>
+		Free all resources for a clip.
+		</div>
+
+		<h3>[method:null uncacheRoot]([page:Object3D root]) </h3>
+		<div>
+		root -- Object3D
+		</div>
+		<div>
+		Free all resources for a root target object.
+		</div>
+
+		<h3>[method:null uncacheAction]([page:AnimationClip clip], [page:Object3D optionalRoot])</h3>
+		<div>
+		clip -- AnimationClip <br />
+		optionalRoot -- Object3D
+		</div>
+		<div>
+		Free all resources for an action.
+		</div>
+
+
+		<h2>Source</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
 </html>

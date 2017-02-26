@@ -19,6 +19,8 @@
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
+		<script src="js/Mirror.js"></script>
+
 		<script>
 
 			if ( WEBVR.isAvailable() === false ) {
@@ -32,6 +34,8 @@
 			var camera, scene, renderer;
 			var effect, controls;
 
+			var mirror;
+
 			init();
 			animate();
 
@@ -39,41 +43,65 @@
 
 				scene = new THREE.Scene();
 
-				var dummy = new THREE.Camera();
-				dummy.position.set( 2, 1, 2 );
-				dummy.lookAt( scene.position );
-				scene.add( dummy );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				dummy.add( camera );
+				scene.add( camera );
 
 				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
+				mesh.position.z = - 2;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var geometry = new THREE.BoxGeometry( 3, 0.1, 3 );
+				var geometry = new THREE.BoxGeometry( 1.5, 0.1, 1.5 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.y = - 0.1;
+				mesh.position.y = - 0.2;
+				mesh.position.z = - 2;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				var light = new THREE.DirectionalLight( 0x8800ff );
-				light.position.set( - 1, 1.5, 0.5 );
+				light.position.set( - 1, 1.5, - 1.5 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
 				scene.add( light );
+				light.target.position.set( 0, 0, - 2 );
+				scene.add( light.target );
+
+				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
-				light.position.set( 1, 1.5, - 0.5 );
+				light.position.set( 1, 1.5, - 2.5 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
 				scene.add( light );
+				light.target.position.set( 0, 0, - 2 );
+				scene.add( light.target );
+
+				var helper = new THREE.CameraHelper( light.shadow.camera );
+				// scene.add( helper );
+
+				//
+
+				mirror = new THREE.Mirror( 1.4, 1.4, { textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
+				mirror.position.x = 1;
+				mirror.position.y = 0.5;
+				mirror.position.z = -3;
+				mirror.rotation.y = - Math.PI / 4;
+				scene.add( mirror );
+
+				var geometry = new THREE.BoxGeometry( 1.5, 1.5, 0.1 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 1.0, metalness: 0.0 } );
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.z = - 0.07;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mirror.add( mesh );
 
 				//
 

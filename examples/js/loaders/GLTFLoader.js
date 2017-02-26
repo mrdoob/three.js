@@ -135,15 +135,6 @@ THREE.GLTFLoader = ( function () {
 
 			update: function ( scene, camera ) {
 
-				// update scene graph
-
-				scene.updateMatrixWorld();
-
-				// update camera matrices and frustum
-
-				camera.updateMatrixWorld();
-				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 				for ( var name in objects ) {
 
 					var object = objects[ name ];
@@ -164,7 +155,15 @@ THREE.GLTFLoader = ( function () {
 
 	/* GLTFSHADERS */
 
-	GLTFLoader.Shaders = new GLTFRegistry();
+	GLTFLoader.Shaders = {
+
+		update: function () {
+
+			console.warn( 'THREE.GLTFLoader.Shaders has been deprecated, and now updates automatically.' );
+
+		}
+
+	};
 
 	/* GLTFSHADER */
 
@@ -580,9 +579,9 @@ THREE.GLTFLoader = ( function () {
 
 						value.then( function( key, value ) {
 
-							results[ idx ] = value;
+							results[ key ] = value;
 
-						}.bind( this, key ));
+						}.bind( this, idx ));
 
 					} else {
 
@@ -644,8 +643,8 @@ THREE.GLTFLoader = ( function () {
 		if ( typeof url !== 'string' || url === '' )
 			return '';
 
-		// Absolute URL
-		if ( /^https?:\/\//i.test( url ) ) {
+		// Absolute URL http://,https://,//
+		if ( /^(https?:)?\/\//i.test( url ) ) {
 
 			return url;
 
@@ -1109,7 +1108,7 @@ THREE.GLTFLoader = ( function () {
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
 								console.warn( 'THREE.GLTFLoader: Three.js doesn\'t support texture internalFormat which is different from texture format. ' +
-								              'internalFormat will be forced to be the same value as format.' );
+															'internalFormat will be forced to be the same value as format.' );
 
 							}
 
@@ -1585,7 +1584,7 @@ THREE.GLTFLoader = ( function () {
 
 			return _each( json.meshes, function ( mesh ) {
 
-				var group = new THREE.Object3D();
+				var group = new THREE.Group();
 				if ( mesh.name !== undefined ) group.name = mesh.name;
 
 				if ( mesh.extras ) group.userData = mesh.extras;
@@ -2024,6 +2023,7 @@ THREE.GLTFLoader = ( function () {
 
 									var geometry = originalGeometry;
 									var material = originalMaterial;
+									material.skinning = true;
 
 									child = new THREE.SkinnedMesh( geometry, material, false );
 									child.castShadow = true;
@@ -2175,8 +2175,10 @@ THREE.GLTFLoader = ( function () {
 					// Register raw material meshes with GLTFLoader.Shaders
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
-						var xshader = new GLTFShader( child, dependencies.nodes );
-						GLTFLoader.Shaders.add( child.uuid, xshader );
+						child.gltfShader = new GLTFShader( child, dependencies.nodes );
+						child.onBeforeRender = function(renderer, scene, camera){
+							this.gltfShader.update(scene, camera);
+						};
 
 					}
 
