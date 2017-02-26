@@ -481,6 +481,8 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	// TODO lengthSquared?
+
 	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z;

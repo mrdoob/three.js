@@ -692,7 +692,7 @@ function WebGLRenderer( parameters ) {
 		state.setMaterial( material );
 
 		var program = setProgram( camera, fog, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
 		var updateBuffers = false;
 
