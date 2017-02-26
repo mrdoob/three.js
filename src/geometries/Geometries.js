@@ -20,4 +20,3 @@ export { ConeGeometry, ConeBufferGeometry } from './ConeGeometry.js';
 export { CylinderGeometry, CylinderBufferGeometry } from './CylinderGeometry.js';
 export { CircleGeometry, CircleBufferGeometry } from './CircleGeometry.js';
 export { BoxGeometry, BoxBufferGeometry } from './BoxGeometry.js';
-export { DecalGeometry } from './DecalGeometry.js';
