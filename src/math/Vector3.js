@@ -238,7 +238,7 @@ Object.assign( Vector3.prototype, {
 
 		return function applyEuler( euler ) {
 
-			if ( (euler && euler.isEuler) === false ) {
+			if ( ( euler && euler.isEuler ) === false ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -626,7 +626,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	setFromSpherical: function( s ) {
+	setFromSpherical: function ( s ) {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
 

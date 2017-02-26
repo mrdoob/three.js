@@ -279,13 +279,6 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			if ( this.position.distanceToSquared( vector ) === 0 ) {
-
-				console.warn( 'THREE.Object3D.lookAt(): target vector is the same as object position.' );
-				return;
-
-			}
-
 			if ( this.isCamera ) {
 
 				m1.lookAt( this.position, vector, this.up );
