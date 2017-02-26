@@ -108,13 +108,12 @@ Object.assign( PropertyBinding, {
 		// be matched to parse the rest of the track name.
 		var directoryRe = /((?:[\w-]+[\/:])*)/;
 
-		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'
-		// characters, but must begin and end with a word character.
-		var nodeRe = /(\w(?:[\w-\.]*\w)?)?/;
+		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+		var nodeRe = /([\w-\.]+)?/;
 
 		// Object on target node, and accessor. May contain only word characters,
 		// and must be a member of the supportedObjectNames whitelist. Accessor may
-		// contain any non-bracket characters.
+		// contain any character except closing bracket.
 		var objectRe = /(?:\.([\w-]+)(?:\[(.+)\])?)?/;
 
 		// Property and accessor. May contain only word characters. Accessor may
@@ -144,11 +143,11 @@ Object.assign( PropertyBinding, {
 
 				var results = {
 					// directoryName: matches[ 1 ], // (tschw) currently unused
-					nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+					nodeName: matches[ 2 ],
 					objectName: matches[ 3 ],
 					objectIndex: matches[ 4 ],
-					propertyName: matches[ 5 ],
-					propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
+					propertyName: matches[ 5 ],     // required
+					propertyIndex: matches[ 6 ]
 				};
 
 				var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
@@ -159,7 +158,7 @@ Object.assign( PropertyBinding, {
 
 					if ( supportedObjectNames.indexOf( objectName ) !== -1 ) {
 
-						results.nodeName = results.nodeName.substring( 0, lastDot )
+						results.nodeName = results.nodeName.substring( 0, lastDot );
 						results.objectName = objectName;
 
 					}

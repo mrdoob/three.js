@@ -2,7 +2,7 @@
  * @author TristanVALCKE / https://github.com/TristanVALCKE
  */
 
-QUnit.module( 'BufferAttribute' );
+QUnit.module( 'PropertyBinding' );
 
 QUnit.test( 'parseTrackName' , function( assert ) {
 
