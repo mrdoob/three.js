@@ -2807,7 +2807,7 @@ Object.assign( Vector3.prototype, {
 
 		return function applyEuler( euler ) {
 
-			if ( (euler && euler.isEuler) === false ) {
+			if ( ( euler && euler.isEuler ) === false ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -3050,6 +3050,8 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	// TODO lengthSquared?
+
 	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z;
@@ -3195,7 +3197,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	setFromSpherical: function( s ) {
+	setFromSpherical: function ( s ) {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
 
@@ -3615,7 +3617,7 @@ Object.assign( Matrix4.prototype, {
 
 			var te = this.elements;
 
-			z.subVectors( eye, target ).normalize();
+			z.subVectors( eye, target );
 
 			if ( z.lengthSq() === 0 ) {
 
@@ -3623,17 +3625,25 @@ Object.assign( Matrix4.prototype, {
 
 			}
 
-			x.crossVectors( up, z ).normalize();
+			z.normalize();
+			x.crossVectors( up, z );
 
 			if ( x.lengthSq() === 0 ) {
 
-				z.z += 0.0001;
-				x.crossVectors( up, z ).normalize();
+				var t = Math.PI / 2;
+				var c = Math.cos( t ) * z.y;
+				var s = Math.sin( t ) * z.y;
+
+				te[ 0 ] = 1; te[ 4 ] =   0; te[ 8 ] =  0;
+				te[ 1 ] = 0; te[ 5 ] =   c; te[ 9 ] =  s;
+				te[ 2 ] = 0; te[ 6 ] = - s; te[ 10 ] = c;
+
+				return this;
 
 			}
 
+			x.normalize();
 			y.crossVectors( z, x );
-
 
 			te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
 			te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
@@ -10618,13 +10628,6 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			if ( this.position.distanceToSquared( vector ) === 0 ) {
-
-				console.warn( 'THREE.Object3D.lookAt(): target vector is the same as object position.' );
-				return;
-
-			}
-
 			if ( this.isCamera ) {
 
 				m1.lookAt( this.position, vector, this.up );
@@ -16270,7 +16273,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 		if ( extension === null ) {
 
-			console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+			console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 			return;
 
 		}
@@ -16284,14 +16287,12 @@ function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	return {
+	//
 
-		setMode: setMode,
-		setIndex: setIndex,
-		render: render,
-		renderInstances: renderInstances
-
-	};
+	this.setMode = setMode;
+	this.setIndex = setIndex;
+	this.render = render;
+	this.renderInstances = renderInstances;
 
 }
 
@@ -16356,11 +16357,11 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	return {
-		setMode: setMode,
-		render: render,
-		renderInstances: renderInstances
-	};
+	//
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderInstances = renderInstances;
 
 }
 
@@ -20447,7 +20448,7 @@ function WebGLRenderer( parameters ) {
 		state.setMaterial( material );
 
 		var program = setProgram( camera, fog, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
 		var updateBuffers = false;
 
@@ -23261,6 +23262,8 @@ Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 function SkinnedMesh( geometry, material ) {
 
 	Mesh.call( this, geometry, material );
+
+	if ( this.material.skinning === false ) console.warn( 'THREE.SkinnedMesh: Material must have skinning set to true.', this.material );
 
 	this.type = 'SkinnedMesh';
 
