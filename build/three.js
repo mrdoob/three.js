@@ -3627,6 +3627,8 @@
 
 				if ( z.lengthSq() === 0 ) {
 
+					// eye and target are in the same position
+
 					z.z = 1;
 
 				}
@@ -3636,15 +3638,10 @@
 
 				if ( x.lengthSq() === 0 ) {
 
-					var t = Math.PI / 2;
-					var c = Math.cos( t ) * z.y;
-					var s = Math.sin( t ) * z.y;
+					// eye and target are in the same vertical
 
-					te[ 0 ] = 1; te[ 4 ] =   0; te[ 8 ] =  0;
-					te[ 1 ] = 0; te[ 5 ] =   c; te[ 9 ] =  s;
-					te[ 2 ] = 0; te[ 6 ] = - s; te[ 10 ] = c;
-
-					return this;
+					z.z += 0.0001;
+					x.crossVectors( up, z );
 
 				}
 
