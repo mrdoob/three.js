@@ -111,9 +111,8 @@ Object.assign( PropertyBinding, {
 		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
 		var nodeRe = /([\w-\.]+)?/;
 
-		// Object on target node, and accessor. May contain only word characters,
-		// and must be a member of the supportedObjectNames whitelist. Accessor may
-		// contain any character except closing bracket.
+		// Object on target node, and accessor. Name may contain only word
+		// characters. Accessor may contain any character except closing bracket.
 		var objectRe = /(?:\.([\w-]+)(?:\[(.+)\])?)?/;
 
 		// Property and accessor. May contain only word characters. Accessor may
@@ -156,6 +155,10 @@ Object.assign( PropertyBinding, {
 
 					var objectName = results.nodeName.substring( lastDot + 1 );
 
+					// Object names must be checked against a whitelist. Otherwise, there
+					// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
+					// 'bar' could be the objectName, or part of a nodeName (which can
+					// include '.' characters).
 					if ( supportedObjectNames.indexOf( objectName ) !== -1 ) {
 
 						results.nodeName = results.nodeName.substring( 0, lastDot );
