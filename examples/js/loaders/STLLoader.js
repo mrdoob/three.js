@@ -70,55 +70,23 @@ THREE.STLLoader.prototype = {
 
 			}
 
-			// Do we see 'solid' in the first few bytes of the data?
-
 			// An ASCII STL data must begin with 'solid ' as the first six bytes.
 			// However, ASCII STLs lacking the SPACE after the 'd' are known to be
-			// plentiful.
-
-			// This check can likely be restricted to the first 6 bytes of
-			// the STL data.  It's here applied to the first 50 bytes for
-			// no particular good reason.
-
-			var fileLength = reader.byteLength;
-			if ( fileLength > 50 ) fileLength = 50;
+			// plentiful.  So, check the first 5 bytes for 'solid'.
 
 			// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
 			var solid = [ 115, 111, 108, 105, 100 ];
-        
- 			var i = 0;
- 			for ( var index = 0; index < fileLength; index ++ ) {
-				if ( reader.getUint8( index, false ) == solid[i] ) {
 
- 			 		i++;
+			for ( var i = 0; i < 5; i ++ ) {
 
- 			 		if ( i == 5 ) {
+				// If solid[ i ] does not match the i-th byte, then it is not an
+				// ASCII STL; hence, it is binary and return true.
 
- 			 			// 'solid' seen near the start of the file
- 			 			return false;
+				if ( solid[ i ] != reader.getUint8( i, false ) ) return true;
 
- 			 		}
-
-				} else {
-
- 			 		i = 0;
-
-				}
  			}
 
-			// some binary files will have different size from expected,
-			// checking characters higher than ASCII to confirm is binary
-			var fileLength = reader.byteLength;
-			for ( var index = 0; index < fileLength; index ++ ) {
-
-				if ( reader.getUint8( index, false ) > 127 ) {
-
-					return true;
-
-				}
-
-			}
-
+			// First 5 bytes read "solid"; declare it to be an ASCII STL
 			return false;
 
 		};
