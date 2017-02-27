@@ -12,6 +12,11 @@
 //    Orbit - left mouse / touch: one finger move
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finger swipe
+//
+// Use of a keyboard 
+//    Zoom - NUM_PLUS or Z / NUM_MINUS or A
+//    Pan - Arrows
+//    Orbit - Arrows or Ctrl-Arrows, if pan is disable
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -70,7 +75,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.enableKeys = true;
 
 	// The four arrow keys
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, LETTER_A: 65, LETTER_Z: 90, NUM_PLUS: 107, NUM_MINUS: 109 };
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
@@ -524,26 +529,64 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function handleKeyDown( event ) {
 
 		//console.log( 'handleKeyDown' );
+		var intKeyCode = event.keyCode;
+		var intAltKey = event.altKey;
+		var intCtrlKey = event.ctrlKey;
+
+		var angle = getAutoRotationAngle();
+		// Boost angle if Ctrl key pressed
+		if (intCtrlKey) {
+			angle = 10 * angle;
+		}
+
 
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
-				pan( 0, scope.keyPanSpeed );
+				if ( scope.enablePan === true) {
+					pan( 0, scope.keyPanSpeed );
+				} else if ( scope.autoRotate === false) {
+					rotateUp( angle );
+				}
 				scope.update();
 				break;
 
 			case scope.keys.BOTTOM:
-				pan( 0, - scope.keyPanSpeed );
+				if ( scope.enablePan === true) {
+					pan( 0, - scope.keyPanSpeed );
+				} else if ( scope.autoRotate === false ) {
+					rotateUp( - angle );
+				}
 				scope.update();
 				break;
 
 			case scope.keys.LEFT:
-				pan( scope.keyPanSpeed, 0 );
+				if ( scope.enablePan === true) {
+					pan( scope.keyPanSpeed, 0 );
+				} else if ( scope.autoRotate === false ) {
+					rotateLeft( angle );
+				}
 				scope.update();
 				break;
 
 			case scope.keys.RIGHT:
-				pan( - scope.keyPanSpeed, 0 );
+				if ( scope.enablePan === true) {
+					pan( - scope.keyPanSpeed, 0 );
+				} else if ( scope.autoRotate === false ) {
+					rotateLeft( - angle );
+				}
+				scope.update();
+				break;
+
+			case scope.keys.NUM_PLUS:
+			case scope.keys.LETTER_Z:
+				dollyOut( getZoomScale() );
+				scope.update();
+				break;
+
+			case scope.keys.NUM_MINUS:
+			case scope.keys.LETTER_A:
+				dollyIn( getZoomScale() );
 				scope.update();
 				break;
 
@@ -758,7 +801,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
+		if ( scope.enabled === false || scope.enableKeys === false ) return;
 
 		handleKeyDown( event );
 
