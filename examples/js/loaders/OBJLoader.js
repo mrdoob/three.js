@@ -308,6 +308,19 @@ THREE.OBJLoader.prototype = {
 
 			},
 
+			checkClockwise: function ( a, b, c ) {
+
+				var src = this.uvs;
+				var signedArea = 0.0;
+				// Compute the signedArea with the shoelace formula
+				signedArea += src[ a + 0 ] * src[ b + 1 ] - src[ a + 1 ] * src[ b + 0 ] ;
+				signedArea += src[ b + 0 ] * src[ c + 1 ] - src[ b + 1 ] * src[ c + 0 ] ;
+				signedArea += src[ c + 0 ] * src[ a + 1 ] - src[ c + 1 ] * src[ a + 0 ] ;
+
+				return (signedArea >= 0);
+
+			},
+
 			addUVLine: function ( a ) {
 
 				var src = this.uvs;
@@ -319,6 +332,29 @@ THREE.OBJLoader.prototype = {
 			},
 
 			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+
+				// If an UV mapping is provided, first check if it is clockwise
+				if ( ua !== undefined ) {
+
+					var uvLen = this.uvs.length;
+
+					ia = this.parseUVIndex( ua, uvLen );
+					ib = this.parseUVIndex( ub, uvLen );
+					ic = this.parseUVIndex( uc, uvLen );
+
+					if ( this.checkClockWise( ia, ib, ic ) === false ) {
+
+						console.log("Face not clockwise, invert the last two");
+						var sw = c;
+						c = b; b = sw;
+						sw = uc;
+						uc = ub; ub = sw;
+						sw = nc;
+						nc = nb; nb = sw;
+
+					}
+
+				}
 
 				var vLen = this.vertices.length;
 
