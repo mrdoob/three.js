@@ -18,7 +18,7 @@ function SpotLightHelper( light ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrix = light.matrixWorld;
+	this.matrixWorld = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	var geometry = new BufferGeometry();
