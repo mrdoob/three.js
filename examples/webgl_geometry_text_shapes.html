@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Simple text from json</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - Simple text from json fonts.
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			var camera, scene, renderer, controls;
+
+			init();
+			animate();
+
+			function init( ) {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, - 400, 600 );
+
+				controls = new THREE.OrbitControls( camera );
+				controls.target.set( 0, 0, 0 );
+
+				scene = new THREE.Scene();
+
+				var loader = new THREE.FontLoader();
+				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+					var xMid, text;
+
+					var textShape = new THREE.BufferGeometry();
+
+					var color = 0x006699;
+
+					var matDark = new THREE.LineBasicMaterial( {
+						color: color,
+						side: THREE.DoubleSide
+					} );
+
+					var matLite = new THREE.MeshBasicMaterial( {
+						color: color,
+						transparent: true,
+						opacity: 0.4,
+						side: THREE.DoubleSide
+					} );
+
+					var message = "   Three.js\nSimple text.";
+
+					var shapes = font.generateShapes( message, 100, 2 );
+
+					var geometry = new THREE.ShapeGeometry( shapes );
+
+					geometry.computeBoundingBox();
+
+					xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+
+					geometry.translate( xMid, 0, 0 );
+
+					// make shape ( N.B. edge view not visible )
+
+					textShape.fromGeometry( geometry );
+
+					text = new THREE.Mesh( textShape, matLite );
+					text.position.z = - 150;
+					scene.add( text );
+
+			        // make line shape ( N.B. edge view remains visible )
+
+			      		var holeShapes = [];
+
+					for ( var i = 0; i < shapes.length; i ++ ) {
+
+						var shape = shapes[ i ];
+
+						if ( shape.holes && shape.holes.length > 0 ) {
+
+							for ( var j = 0; j < shape.holes.length; j ++ ) {
+
+								var hole = shape.holes[ j ];
+								holeShapes.push( hole );
+
+							}
+
+						}
+
+					}
+
+					shapes.push.apply( shapes, holeShapes );
+
+					var lineText = new THREE.Object3D();
+
+					for ( var i = 0; i < shapes.length; i ++ ) {
+
+						var shape = shapes[ i ];
+
+						var lineGeometry = shape.createPointsGeometry();
+
+						lineGeometry.translate( xMid, 0, 0 );
+
+						var lineMesh = new THREE.Line( lineGeometry, matDark );
+						lineText.add( lineMesh );
+
+					}
+
+					scene.add( lineText );
+
+				} ); //end load function
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			} // end init
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -116,7 +116,7 @@
 			var clock = new THREE.Clock();
 
 			var cameraControls;
-			
+
 			var gui = new dat.GUI();
 
 			var groundMirror;
@@ -282,13 +282,6 @@
 			}
 
 			function render() {
-
-				// render (update) the mirrors
-				groundMirrorMaterial.visible = false;
-
-				groundMirror.render();
-
-				groundMirrorMaterial.visible = true;
 
 				renderer.render(scene, camera);
 

@@ -202,8 +202,7 @@
 					scene.add(ground);
 				}
 
-				THREE.GLTF2Loader.Shaders.removeAll(); // remove all previous shaders
-				loader = new THREE.GLTF2Loader;
+				loader = new THREE.GLTF2Loader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -338,7 +337,6 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				if (mixer) mixer.update(clock.getDelta());
-				THREE.GLTF2Loader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
@@ -408,6 +406,15 @@
 					addGround:true,
 					shadows:true,
 					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
+				},
+				{
+					name : "Rigged Simple",
+					url : "./models/gltf/RiggedSimple/%s/RiggedSimple.gltf",
+					cameraPos: new THREE.Vector3(0, 5, 15),
+					objectRotation: new THREE.Euler(0, 90, 0),
+					addLights:true,
+					shadows:true,
+					extensions: ["glTF"]
 				},
 				{
 					name : "Snowflake",

@@ -41,22 +41,6 @@ Camera.prototype.getWorldDirection = function () {
 
 }();
 
-Camera.prototype.lookAt = function () {
-
-	// This routine does not support cameras with rotated and/or translated parent(s)
-
-	var m1 = new Matrix4();
-
-	return function lookAt( vector ) {
-
-		m1.lookAt( this.position, vector, this.up );
-
-		this.quaternion.setFromRotationMatrix( m1 );
-
-	};
-
-}();
-
 Camera.prototype.clone = function () {
 
 	return new this.constructor().copy( this );

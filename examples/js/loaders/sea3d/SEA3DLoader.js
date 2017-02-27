@@ -1993,18 +1993,21 @@ THREE.SEA3D.prototype.readMesh = function ( sea ) {
 
 				mats[ i ] = sea.material[ i ].tag;
 
+				mats[ i ].skinning = skeleton != undefined;
 				mats[ i ].morphTargets = uMorph;
 				mats[ i ].morphNormals = uMorphNormal;
 				mats[ i ].vertexColors = sea.geometry.color ? THREE.VertexColors : THREE.NoColors;
 
 			}
 
-			mat = new THREE.MultiMaterial( mats );
+//			mat = new THREE.MultiMaterial( mats );
+			mat = mats;
 
 		} else {
 
 			mat = sea.material[ 0 ].tag;
 
+			mat.skinning = skeleton != undefined;
 			mat.morphTargets = uMorph;
 			mat.morphNormals = uMorphNormal;
 			mat.vertexColors = sea.geometry.color ? THREE.VertexColors : THREE.NoColors;

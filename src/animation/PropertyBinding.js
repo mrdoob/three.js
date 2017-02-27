@@ -102,47 +102,83 @@ Object.assign( PropertyBinding, {
 
 	},
 
-	parseTrackName: function ( trackName ) {
+	parseTrackName: function () {
 
-		// matches strings in the form of:
-		//    nodeName.property
-		//    nodeName.property[accessor]
-		//    nodeName.material.property[accessor]
-		//    uuid.property[accessor]
-		//    uuid.objectName[objectIndex].propertyName[propertyIndex]
-		//    parentName/nodeName.property
-		//    parentName/parentName/nodeName.property[index]
-		//    .bone[Armature.DEF_cog].position
-		//    scene:helium_balloon_model:helium_balloon_model.position
-		// created and tested via https://regex101.com/#javascript
+		// Parent directories, delimited by '/' or ':'. Currently unused, but must
+		// be matched to parse the rest of the track name.
+		var directoryRe = /((?:[\w-]+[\/:])*)/;
 
-		var re = /^((?:[\w-]+[\/:])*)([\w-]+)?(?:\.([\w-]+)(?:\[(.+)\])?)?\.([\w-]+)(?:\[(.+)\])?$/;
-		var matches = re.exec( trackName );
+		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+		var nodeRe = /([\w-\.]+)?/;
 
-		if ( ! matches ) {
+		// Object on target node, and accessor. Name may contain only word
+		// characters. Accessor may contain any character except closing bracket.
+		var objectRe = /(?:\.([\w-]+)(?:\[(.+)\])?)?/;
 
-			throw new Error( "cannot parse trackName at all: " + trackName );
+		// Property and accessor. May contain only word characters. Accessor may
+		// contain any non-bracket characters.
+		var propertyRe = /\.([\w-]+)(?:\[(.+)\])?/;
 
-		}
+		var trackRe = new RegExp(''
+			+ '^'
+			+ directoryRe.source
+			+ nodeRe.source
+			+ objectRe.source
+			+ propertyRe.source
+			+ '$'
+		);
 
-		var results = {
-			// directoryName: matches[ 1 ], // (tschw) currently unused
-			nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
-			objectName: matches[ 3 ],
-			objectIndex: matches[ 4 ],
-			propertyName: matches[ 5 ],
-			propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
-		};
+		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-		if ( results.propertyName === null || results.propertyName.length === 0 ) {
+		return function ( trackName ) {
 
-			throw new Error( "can not parse propertyName from trackName: " + trackName );
+				var matches = trackRe.exec( trackName );
 
-		}
+				if ( ! matches ) {
 
-		return results;
+					throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
 
-	},
+				}
+
+				var results = {
+					// directoryName: matches[ 1 ], // (tschw) currently unused
+					nodeName: matches[ 2 ],
+					objectName: matches[ 3 ],
+					objectIndex: matches[ 4 ],
+					propertyName: matches[ 5 ],     // required
+					propertyIndex: matches[ 6 ]
+				};
+
+				var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
+
+				if ( lastDot !== undefined && lastDot !== -1 ) {
+
+					var objectName = results.nodeName.substring( lastDot + 1 );
+
+					// Object names must be checked against a whitelist. Otherwise, there
+					// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
+					// 'bar' could be the objectName, or part of a nodeName (which can
+					// include '.' characters).
+					if ( supportedObjectNames.indexOf( objectName ) !== -1 ) {
+
+						results.nodeName = results.nodeName.substring( 0, lastDot );
+						results.objectName = objectName;
+
+					}
+
+				}
+
+				if ( results.propertyName === null || results.propertyName.length === 0 ) {
+
+					throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
+
+				}
+
+				return results;
+
+			};
+
+	}(),
 
 	findNode: function ( root, nodeName ) {
 

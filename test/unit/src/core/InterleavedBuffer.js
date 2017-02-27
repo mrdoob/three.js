@@ -15,11 +15,10 @@ function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
 	assert.ok( copiedInstance.dynamic === true, "dynamic was copied" );
 }
 
-QUnit.test( "length and count", function( assert ) {
+QUnit.test( "count", function( assert ) {
 	var instance = new THREE.InterleavedBuffer( new Float32Array( [1, 2, 3, 7, 8 ,9] ), 3 );
 
-	assert.ok( instance.length === 6, "length is calculated via array length" );
-	assert.ok( instance.count === 2, "count is calculated via array length / stride" );
+	assert.equal( instance.count, 2, "count is calculated via array length / stride" );
 });
 
 QUnit.test( "copy" , function( assert ) {

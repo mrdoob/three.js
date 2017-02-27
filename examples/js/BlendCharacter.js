@@ -36,6 +36,8 @@ THREE.BlendCharacter = function () {
 
 			}
 
+			scope.material.skinning = true;
+
 			scope.mixer = new THREE.AnimationMixer( scope );
 
 			// Create the animations
@@ -57,9 +59,10 @@ THREE.BlendCharacter = function () {
 		var scope = this;
 
 		var loader = new THREE.JSONLoader();
-		loader.load( url, function ( geometry, materials ) {
+		loader.load( url, function( geometry, materials ) {
 
 			var originalMaterial = materials[ 0 ];
+			originalMaterial.skinning = true;
 
 			THREE.SkinnedMesh.call( scope, geometry, originalMaterial );
 
@@ -79,7 +82,7 @@ THREE.BlendCharacter = function () {
 		} );
 
 	};
-
+	
 	this.update = function( dt ) {
 
 		this.mixer.update( dt );
@@ -176,3 +179,4 @@ THREE.BlendCharacter.prototype.getForward = function() {
 	}
 
 };
+

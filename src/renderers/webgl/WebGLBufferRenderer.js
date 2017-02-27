@@ -59,11 +59,11 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	return {
-		setMode: setMode,
-		render: render,
-		renderInstances: renderInstances
-	};
+	//
+
+	this.setMode = setMode;
+	this.render = render;
+	this.renderInstances = renderInstances;
 
 }
 

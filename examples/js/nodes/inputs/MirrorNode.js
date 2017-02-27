@@ -11,7 +11,7 @@ THREE.MirrorNode = function( renderer, camera, options ) {
 	this.coord = new THREE.OperatorNode( this.textureMatrix, this.worldPosition, THREE.OperatorNode.MUL );
 	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.renderTarget.texture, this.coord, null, true );
+	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.mirrorSampler.value, this.coord, null, true );
 
 };
 

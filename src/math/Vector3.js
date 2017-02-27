@@ -214,19 +214,9 @@ Object.assign( Vector3.prototype, {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-
-		}
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
 
 		return this;
 
@@ -248,7 +238,7 @@ Object.assign( Vector3.prototype, {
 
 		return function applyEuler( euler ) {
 
-			if ( (euler && euler.isEuler) === false ) {
+			if ( ( euler && euler.isEuler ) === false ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
@@ -491,6 +481,8 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	// TODO lengthSquared?
+
 	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z;
@@ -636,7 +628,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	setFromSpherical: function( s ) {
+	setFromSpherical: function ( s ) {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
 
@@ -648,7 +640,7 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	setFromCylindrical: function( c ) {
+	setFromCylindrical: function ( c ) {
 
 		this.x = c.radius * Math.sin( c.theta );
 		this.y = c.y;
@@ -680,14 +672,6 @@ Object.assign( Vector3.prototype, {
 
 	setFromMatrixColumn: function ( m, index ) {
 
-		if ( typeof m === 'number' ) {
-
-			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-			var temp = m;
-			m = index;
-			index = temp;
-
-		}
 
 		return this.fromArray( m.elements, index * 4 );
 

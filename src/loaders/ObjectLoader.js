@@ -38,6 +38,7 @@ import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
 import { DirectionalLight } from '../lights/DirectionalLight';
 import { AmbientLight } from '../lights/AmbientLight';
+import { RectAreaLight } from '../lights/RectAreaLight';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Scene } from '../scenes/Scene';
@@ -623,6 +624,12 @@ Object.assign( ObjectLoader.prototype, {
 				case 'PointLight':
 
 					object = new PointLight( data.color, data.intensity, data.distance, data.decay );
+
+					break;
+
+				case 'RectAreaLight':
+
+					object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
 
 					break;
 

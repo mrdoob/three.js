@@ -322,25 +322,30 @@ Object.assign( Matrix4.prototype, {
 
 			var te = this.elements;
 
-			z.subVectors( eye, target ).normalize();
+			z.subVectors( eye, target );
 
 			if ( z.lengthSq() === 0 ) {
+
+				// eye and target are in the same position
 
 				z.z = 1;
 
 			}
 
-			x.crossVectors( up, z ).normalize();
+			z.normalize();
+			x.crossVectors( up, z );
 
 			if ( x.lengthSq() === 0 ) {
 
+				// eye and target are in the same vertical
+
 				z.z += 0.0001;
-				x.crossVectors( up, z ).normalize();
+				x.crossVectors( up, z );
 
 			}
 
+			x.normalize();
 			y.crossVectors( z, x );
-
 
 			te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
 			te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
