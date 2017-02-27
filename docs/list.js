@@ -140,7 +140,6 @@ var list = {
 			[ "ConeGeometry", "api/geometries/ConeGeometry" ],
 			[ "CylinderBufferGeometry", "api/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
-			[ "DecalGeometry", "api/geometries/DecalGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
