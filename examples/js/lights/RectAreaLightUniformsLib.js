@@ -44,7 +44,16 @@
 
 	LTC_MAT_TEXTURE.needsUpdate = true;
 	LTC_MAG_TEXTURE.needsUpdate = true;
+    
+    // Add  onUpdate event
+    LTC_MAT_TEXTURE.onUpdate = function (texture) {
+        texture.needsUpdate = true;
+    };
 
+    LTC_MAG_TEXTURE.onUpdate = function (texture) {
+        texture.needsUpdate = true;
+    };
+    
 	// Add ltc tables to materials
 
 	var ltc_brdf = { ltcMat: { value: LTC_MAT_TEXTURE }, ltcMag: { value: LTC_MAT_TEXTURE } };
