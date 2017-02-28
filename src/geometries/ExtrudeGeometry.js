@@ -27,8 +27,32 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *
  * }
  **/
+ 
+ import { Geometry } from '../core/Geometry';
 
 function ExtrudeGeometry( shapes, options ) {
+
+	Geometry.call( this );
+
+	this.type = 'ExtrudeGeometry';
+
+	this.parameters = {
+		shapes: shapes,
+		options: options
+	};
+
+	this.fromBufferGeometry( new ExtrudeBufferGeometry( shapes, options ) );
+	this.mergeVertices();
+
+}
+
+
+ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
+ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+
+ 
+
+function ExtrudeBufferGeometry( shapes, options ) {
 
 	if ( typeof(shapes) === "undefined") {
 
@@ -39,7 +63,7 @@ function ExtrudeGeometry( shapes, options ) {
 
 	BufferGeometry.call(this);
 
-	this.type = 'ExtrudeGeometry';
+	this.type = 'ExtrudeBufferGeometry';
 
 	shapes = Array.isArray(shapes) ? shapes : [shapes];
 
@@ -57,10 +81,10 @@ function ExtrudeGeometry( shapes, options ) {
 
 }
 
-ExtrudeGeometry.prototype = Object.create(BufferGeometry.prototype);
-ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+ExtrudeBufferGeometry.prototype = Object.create(BufferGeometry.prototype);
+ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
-ExtrudeGeometry.prototype.getArrays = function() {
+ExtrudeBufferGeometry.prototype.getArrays = function() {
 
 	var positionAttribute = this.getAttribute("position");
 	var verticesArray = positionAttribute ? Array.prototype.slice.call(positionAttribute.array) : [];
@@ -79,7 +103,7 @@ ExtrudeGeometry.prototype.getArrays = function() {
 
 };
 
-ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
+ExtrudeBufferGeometry.prototype.addShapeList = function(shapes, options) {
 
 	var sl = shapes.length;
 	options.arrays = this.getArrays();
@@ -97,7 +121,7 @@ ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
 
 };
 
-ExtrudeGeometry.prototype.addShape = function(shape, options) {
+ExtrudeBufferGeometry.prototype.addShape = function(shape, options) {
 
 	var arrays = options.arrays ? options.arrays : this.getArrays();
 	var verticesArray = arrays.position;
@@ -792,5 +816,6 @@ ExtrudeGeometry.WorldUVGenerator = {
 
 
 export {
-	ExtrudeGeometry
+	ExtrudeGeometry,
+	ExtrudeBufferGeometry
 };
