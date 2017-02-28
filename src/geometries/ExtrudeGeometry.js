@@ -1,8 +1,6 @@
-//import { Geometry } from '../core/Geometry';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { Vector2 } from '../math/Vector2';
-import { Face3 } from '../core/Face3';
 import { Vector3 } from '../math/Vector3';
 import { ShapeUtils } from '../extras/ShapeUtils';
 
@@ -64,46 +62,18 @@ ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
 ExtrudeGeometry.prototype.getArrays = function() {
 
-	var verticesArray;
 	var positionAttribute = this.getAttribute("position");
-	if (positionAttribute) {
-		
-		verticesArray = Array.prototype.slice.call(positionAttribute.array);
-		
-	} else {
-		
-		verticesArray = [];
-		
-	}
+	var verticesArray = positionAttribute ? Array.prototype.slice.call(positionAttribute.array) : [];
 	
-	var uvArray;
 	var uvAttribute = this.getAttribute("uv");
-	if (positionAttribute) {
-		
-		uvArray = Array.prototype.slice.call(uvAttribute.array);
-		
-	} else {
-		
-		uvArray = [];
-		
-	}
+	var uvArray = uvAttribute ? Array.prototype.slice.call(uvAttribute.array) : [];
 
-	var indicesArray;
 	var IndexAttribute = this.index;
-	
-	if (IndexAttribute) {
-		
-		indicesArray = Array.prototype.slice.call(IndexAttribute.array);
-		
-	} else {
-		
-		indicesArray = [];
-		
-	}
+	var indicesArray = IndexAttribute ?  Array.prototype.slice.call(IndexAttribute.array) : [];
 
 	return {
 		position: verticesArray,
-		uv:uvArray,
+		uv: uvArray,
 		index: indicesArray
 	};
 
@@ -112,7 +82,7 @@ ExtrudeGeometry.prototype.getArrays = function() {
 ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
 
 	var sl = shapes.length;
-	options.arrays = this.getArrays()
+	options.arrays = this.getArrays();
 
 	for (var s = 0; s < sl; s++) {
 
@@ -191,8 +161,6 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
-
-	var shapesOffset = verticesArray.length / 3;
 
 	var shapePoints = shape.extractPoints(curveSegments);
 
@@ -688,6 +656,7 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 		}
 
 	}
+	
 	function v(x, y, z) {
 		
 		placeholder.push(x);
@@ -706,13 +675,9 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 		var nextIndex = verticesArray.length/3;
 		var uvs = uvgen.generateTopUV( scope, verticesArray , nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
-		uvArray.push(uvs[0].x);
-		uvArray.push(uvs[0].y);
-		uvArray.push(uvs[1].x);
-		uvArray.push(uvs[1].y);
-		uvArray.push(uvs[2].x);
-		uvArray.push(uvs[2].y);
-		//scope.faceVertexUvs[ 0 ].push( uvs );
+		addUV(uvs[0]);
+		addUV(uvs[1]);
+		addUV(uvs[2]);
 
 	}
 
@@ -726,24 +691,18 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 		addVertex(c);
 		addVertex(d);
 
-		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
-		uvArray.push(uvs[0].x);
-		uvArray.push(uvs[0].y);
-		uvArray.push(uvs[1].x);
-		uvArray.push(uvs[1].y);
-		uvArray.push(uvs[3].x);
-		uvArray.push(uvs[3].y);
+
+		var nextIndex = verticesArray.length/3;
+		var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 		
-		uvArray.push(uvs[1].x);
-		uvArray.push(uvs[1].y);
-		uvArray.push(uvs[2].x);
-		uvArray.push(uvs[2].y);
-		uvArray.push(uvs[3].x);
-		uvArray.push(uvs[3].y);
-
-		//scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
-		//scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
-
+		addUV(uvs[0]);
+		addUV(uvs[1]);
+		addUV(uvs[3]);
+		
+		addUV(uvs[1]);
+		addUV(uvs[2]);
+		addUV(uvs[3]);
+		
 	}
 	
 	function addVertex(index){
@@ -752,6 +711,14 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 		verticesArray.push(placeholder[index * 3 + 0]);
 		verticesArray.push(placeholder[index * 3 + 1]);
 		verticesArray.push(placeholder[index * 3 + 2]);
+		
+	}
+	
+	
+	function addUV(vector2){
+		
+		uvArray.push(vector2.x);
+		uvArray.push(vector2.y);
 		
 	}
 
@@ -767,7 +734,7 @@ ExtrudeGeometry.prototype.addShape = function(shape, options) {
 
 ExtrudeGeometry.WorldUVGenerator = {
 
-	generateTopUV: function(geometry, vertices , indexA, indexB, indexC) {
+	generateTopUV: function(geometry, vertices, indexA, indexB, indexC) {
 
 		var a_x = vertices[indexA * 3];
 		var a_y = vertices[indexA * 3 + 1];
@@ -786,10 +753,6 @@ ExtrudeGeometry.WorldUVGenerator = {
 
 	generateSideWallUV: function(geometry, vertices,  indexA, indexB, indexC, indexD) {
 
-
-
-		var a = vertices[indexA];
-		
 		var a_x = vertices[indexA * 3];
 		var a_y = vertices[indexA * 3 + 1];
 		var a_z = vertices[indexA * 3 + 2];
