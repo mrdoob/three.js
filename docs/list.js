@@ -14,8 +14,9 @@ var list = {
 		],
 
 		"Next Steps": [
-				[ "How to update things", "manual/introduction/How-to-update-things" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+            [ "Animation System", "manual/introduction/Animation-system" ]
 		],
 
 		"Build Tools": [
