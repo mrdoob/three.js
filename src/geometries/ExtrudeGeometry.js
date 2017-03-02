@@ -306,13 +306,13 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 				return new Vector2( v_trans_x, v_trans_y );
 
-			}			else {
+			} else {
 
 				shrink_by = Math.sqrt( v_trans_lensq / 2 );
 
 			}
 
-		}		else {
+		} else {
 
 			// handle special case of collinear edges
 
@@ -325,7 +325,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 				}
 
-			}			else {
+			} else {
 
 				if ( v_prev_x < - Number.EPSILON ) {
 
@@ -335,7 +335,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 					}
 
-				}				else {
+				} 	else {
 
 					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
 
@@ -354,7 +354,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 				v_trans_y = v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 
-			}			else {
+			} else {
 
 				// console.log("Warning: lines are a straight spike");
 				v_trans_x = v_prev_x;
@@ -460,7 +460,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 			v( vert.x, vert.y, 0 );
 
-		}		else {
+		} else {
 
 			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
@@ -490,7 +490,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 				v( vert.x, vert.y, amount / steps * s );
 
-			}			else {
+			} 	else {
 
 				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
 
@@ -541,7 +541,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 					v( vert.x, vert.y, amount + z );
 
-				}				else {
+				} 		else {
 
 					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
@@ -596,7 +596,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 			}
 
-		}		else {
+		} else {
 
 			// Bottom faces
 
@@ -797,7 +797,7 @@ ExtrudeGeometry.WorldUVGenerator = {
 				new Vector2( d_x, 1 - d_z )
 			];
 
-		}		else {
+		} else {
 
 			return [
 				new Vector2( a_y, 1 - a_z ),
