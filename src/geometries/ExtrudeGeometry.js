@@ -28,7 +28,7 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  * }
  **/
 
-function ExtrudeGeometry( shapes, options ) {
+function ExtrudeGeometry ( shapes, options ) {
 
 	if ( typeof( shapes ) === "undefined" ) {
 
@@ -57,223 +57,269 @@ function ExtrudeGeometry( shapes, options ) {
 
 }
 
-ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
-ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+Object.assign( ExtrudeGeometry, {
 
-ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+	WorldUVGenerator: {
 
-	var sl = shapes.length;
+		generateTopUV: function ( geometry, indexA, indexB, indexC ) {
 
-	for ( var s = 0; s < sl; s ++ ) {
+			var vertices = geometry.vertices;
 
-		var shape = shapes[ s ];
-		this.addShape( shape, options );
+			var a = vertices[ indexA ];
+			var b = vertices[ indexB ];
+			var c = vertices[ indexC ];
 
-	}
+			return [
+				new Vector2( a.x, a.y ),
+				new Vector2( b.x, b.y ),
+				new Vector2( c.x, c.y )
+			];
 
-};
+		},
 
-ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
+		generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
 
-	var amount = options.amount !== undefined ? options.amount : 100;
+			var vertices = geometry.vertices;
 
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
-	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
-	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+			var a = vertices[ indexA ];
+			var b = vertices[ indexB ];
+			var c = vertices[ indexC ];
+			var d = vertices[ indexD ];
 
-	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
+			if ( Math.abs( a.y - b.y ) < 0.01 ) {
 
-	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+				return [
+					new Vector2( a.x, 1 - a.z ),
+					new Vector2( b.x, 1 - b.z ),
+					new Vector2( c.x, 1 - c.z ),
+					new Vector2( d.x, 1 - d.z )
+				];
 
-	var steps = options.steps !== undefined ? options.steps : 1;
+			} else {
 
-	var extrudePath = options.extrudePath;
-	var extrudePts, extrudeByPath = false;
-
-	// Use default WorldUVGenerator if no UV generators are specified.
-	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
-
-	var splineTube, binormal, normal, position2;
-	if ( extrudePath ) {
-
-		extrudePts = extrudePath.getSpacedPoints( steps );
-
-		extrudeByPath = true;
-		bevelEnabled = false; // bevels not supported for path extrusion
-
-		// SETUP TNB variables
-
-		// TODO1 - have a .isClosed in spline?
-
-		splineTube = options.frames !== undefined ? options.frames : extrudePath.computeFrenetFrames( steps, false );
-
-		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
-
-		binormal = new Vector3();
-		normal = new Vector3();
-		position2 = new Vector3();
-
-	}
-
-	// Safeguards if bevels are not enabled
-
-	if ( ! bevelEnabled ) {
-
-		bevelSegments = 0;
-		bevelThickness = 0;
-		bevelSize = 0;
-
-	}
-
-	// Variables initialization
-
-	var ahole, h, hl; // looping of holes
-	var scope = this;
-
-	var shapesOffset = this.vertices.length;
-
-	var shapePoints = shape.extractPoints( curveSegments );
-
-	var vertices = shapePoints.shape;
-	var holes = shapePoints.holes;
-
-	var reverse = ! ShapeUtils.isClockWise( vertices );
-
-	if ( reverse ) {
-
-		vertices = vertices.reverse();
-
-		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
-
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-			ahole = holes[ h ];
-
-			if ( ShapeUtils.isClockWise( ahole ) ) {
-
-				holes[ h ] = ahole.reverse();
+				return [
+					new Vector2( a.y, 1 - a.z ),
+					new Vector2( b.y, 1 - b.z ),
+					new Vector2( c.y, 1 - c.z ),
+					new Vector2( d.y, 1 - d.z )
+				];
 
 			}
 
 		}
 
-		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
-
 	}
 
+} );
 
-	var faces = ShapeUtils.triangulateShape( vertices, holes );
+ExtrudeGeometry.prototype = Object.assign( Object.create( Geometry.prototype ), {
 
-	/* Vertices */
+	constructor: ExtrudeGeometry,
 
-	var contour = vertices; // vertices has all points but contour has only points of circumference
+	addShapeList: function ( shapes, options ) {
 
-	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		var sl = shapes.length;
 
-		ahole = holes[ h ];
+		for ( var s = 0 ; s < sl ; s++ ) {
 
-		vertices = vertices.concat( ahole );
+			var shape = shapes[ s ];
+			this.addShape( shape, options );
 
-	}
+		}
 
+	},
 
-	function scalePt2( pt, vec, size ) {
+	addShape: function ( shape, options ) {
 
-		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+		var amount = options.amount !== undefined ? options.amount : 100;
 
-		return vec.clone().multiplyScalar( size ).add( pt );
+		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
+		var bevelSize      = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
+		var bevelSegments  = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
-	}
+		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 
-	var b, bs, t, z,
-		vert, vlen = vertices.length,
-		face, flen = faces.length;
+		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
+		var steps = options.steps !== undefined ? options.steps : 1;
 
-	// Find directions for point movement
+		var extrudePath               = options.extrudePath;
+		var extrudePts, extrudeByPath = false;
 
+		// Use default WorldUVGenerator if no UV generators are specified.
+		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : ExtrudeGeometry.WorldUVGenerator;
 
-	function getBevelVec( inPt, inPrev, inNext ) {
+		var splineTube, binormal, normal, position2;
+		if ( extrudePath ) {
 
-		// computes for inPt the corresponding point inPt' on a new contour
-		//   shifted by 1 unit (length of normalized vector) to the left
-		// if we walk along contour clockwise, this new contour is outside the old one
-		//
-		// inPt' is the intersection of the two lines parallel to the two
-		//  adjacent edges of inPt at a distance of 1 unit on the left side.
+			extrudePts = extrudePath.getSpacedPoints( steps );
 
-		var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
+			extrudeByPath = true;
+			bevelEnabled  = false; // bevels not supported for path extrusion
 
-		// good reading for geometry algorithms (here: line-line intersection)
-		// http://geomalgorithms.com/a05-_intersect-1.html
+			// SETUP TNB variables
 
-		var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
-		var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
+			// TODO1 - have a .isClosed in spline?
 
-		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
+			splineTube = options.frames !== undefined ? options.frames : extrudePath.computeFrenetFrames( steps, false );
 
-		// check for collinear edges
-		var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+			// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
-		if ( Math.abs( collinear0 ) > Number.EPSILON ) {
+			binormal  = new Vector3();
+			normal    = new Vector3();
+			position2 = new Vector3();
 
-			// not collinear
+		}
 
-			// length of vectors for normalizing
+		// Safeguards if bevels are not enabled
 
-			var v_prev_len = Math.sqrt( v_prev_lensq );
-			var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
+		if ( !bevelEnabled ) {
 
-			// shift adjacent points by unit vectors to the left
+			bevelSegments  = 0;
+			bevelThickness = 0;
+			bevelSize      = 0;
 
-			var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
-			var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
+		}
 
-			var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
-			var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
+		// Variables initialization
 
-			// scaling factor for v_prev to intersection point
+		var ahole, h, hl; // looping of holes
+		var scope = this;
 
-			var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
-						( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
-					  ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+		var shapesOffset = this.vertices.length;
 
-			// vector from inPt to intersection point
+		var shapePoints = shape.extractPoints( curveSegments );
 
-			v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
-			v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
+		var vertices = shapePoints.shape;
+		var holes    = shapePoints.holes;
 
-			// Don't normalize!, otherwise sharp corners become ugly
-			//  but prevent crazy spikes
-			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
-			if ( v_trans_lensq <= 2 ) {
+		var reverse = !ShapeUtils.isClockWise( vertices );
 
-				return	new Vector2( v_trans_x, v_trans_y );
+		if ( reverse ) {
 
-			} else {
+			vertices = vertices.reverse();
 
-				shrink_by = Math.sqrt( v_trans_lensq / 2 );
+			// Maybe we should also check if holes are in the opposite direction, just to be safe ...
+
+			for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
+
+				ahole = holes[ h ];
+
+				if ( ShapeUtils.isClockWise( ahole ) ) {
+
+					holes[ h ] = ahole.reverse();
+
+				}
 
 			}
 
-		} else {
+			reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
 
-			// handle special case of collinear edges
+		}
 
-			var direction_eq = false;		// assumes: opposite
-			if ( v_prev_x > Number.EPSILON ) {
+		var faces = ShapeUtils.triangulateShape( vertices, holes );
 
-				if ( v_next_x > Number.EPSILON ) {
+		/* Vertices */
 
-					direction_eq = true;
+		var contour = vertices; // vertices has all points but contour has only points of circumference
+
+		for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
+
+			ahole = holes[ h ];
+
+			vertices = vertices.concat( ahole );
+
+		}
+
+		function scalePt2 ( pt, vec, size ) {
+
+			if ( !vec ) {
+				console.error( "THREE.ExtrudeGeometry: vec does not exist" );
+			}
+
+			return vec.clone()
+					  .multiplyScalar( size )
+					  .add( pt );
+
+		}
+
+		var b, bs, t, z,
+			vert, vlen = vertices.length,
+			face, flen = faces.length;
+
+		// Find directions for point movement
+
+		function getBevelVec ( inPt, inPrev, inNext ) {
+
+			// computes for inPt the corresponding point inPt' on a new contour
+			//   shifted by 1 unit (length of normalized vector) to the left
+			// if we walk along contour clockwise, this new contour is outside the old one
+			//
+			// inPt' is the intersection of the two lines parallel to the two
+			//  adjacent edges of inPt at a distance of 1 unit on the left side.
+
+			var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
+
+			// good reading for geometry algorithms (here: line-line intersection)
+			// http://geomalgorithms.com/a05-_intersect-1.html
+
+			var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
+			var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
+
+			var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
+
+			// check for collinear edges
+			var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+
+			if ( Math.abs( collinear0 ) > Number.EPSILON ) {
+
+				// not collinear
+
+				// length of vectors for normalizing
+
+				var v_prev_len = Math.sqrt( v_prev_lensq );
+				var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
+
+				// shift adjacent points by unit vectors to the left
+
+				var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
+				var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
+
+				var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
+				var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
+
+				// scaling factor for v_prev to intersection point
+
+				var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+					( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
+					( v_prev_x * v_next_y - v_prev_y * v_next_x );
+
+				// vector from inPt to intersection point
+
+				v_trans_x = ( ptPrevShift_x + v_prev_x * sf - inPt.x );
+				v_trans_y = ( ptPrevShift_y + v_prev_y * sf - inPt.y );
+
+				// Don't normalize!, otherwise sharp corners become ugly
+				//  but prevent crazy spikes
+				var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
+				if ( v_trans_lensq <= 2 ) {
+
+					return new Vector2( v_trans_x, v_trans_y );
+
+				} else {
+
+					shrink_by = Math.sqrt( v_trans_lensq / 2 );
 
 				}
 
 			} else {
 
-				if ( v_prev_x < - Number.EPSILON ) {
+				// handle special case of collinear edges
 
-					if ( v_next_x < - Number.EPSILON ) {
+				var direction_eq = false;		// assumes: opposite
+				if ( v_prev_x > Number.EPSILON ) {
+
+					if ( v_next_x > Number.EPSILON ) {
 
 						direction_eq = true;
 
@@ -281,166 +327,156 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				} else {
 
-					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
+					if ( v_prev_x < -Number.EPSILON ) {
 
-						direction_eq = true;
+						if ( v_next_x < -Number.EPSILON ) {
+
+							direction_eq = true;
+
+						}
+
+					} else {
+
+						if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
+
+							direction_eq = true;
+
+						}
 
 					}
 
 				}
 
+				if ( direction_eq ) {
+
+					// console.log("Warning: lines are a straight sequence");
+					v_trans_x = -v_prev_y;
+					v_trans_y = v_prev_x;
+					shrink_by = Math.sqrt( v_prev_lensq );
+
+				} else {
+
+					// console.log("Warning: lines are a straight spike");
+					v_trans_x = v_prev_x;
+					v_trans_y = v_prev_y;
+					shrink_by = Math.sqrt( v_prev_lensq / 2 );
+
+				}
+
 			}
 
-			if ( direction_eq ) {
-
-				// console.log("Warning: lines are a straight sequence");
-				v_trans_x = - v_prev_y;
-				v_trans_y =  v_prev_x;
-				shrink_by = Math.sqrt( v_prev_lensq );
-
-			} else {
-
-				// console.log("Warning: lines are a straight spike");
-				v_trans_x = v_prev_x;
-				v_trans_y = v_prev_y;
-				shrink_by = Math.sqrt( v_prev_lensq / 2 );
-
-			}
+			return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 		}
 
-		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+		var contourMovements = [];
 
-	}
+		for ( var i = 0, il = contour.length, j = il - 1, k = i + 1 ; i < il ; i++, j++, k++ ) {
 
-
-	var contourMovements = [];
-
-	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
-
-		if ( j === il ) j = 0;
-		if ( k === il ) k = 0;
-
-		//  (j)---(i)---(k)
-		// console.log('i,j,k', i, j , k)
-
-		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
-
-	}
-
-	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
-
-	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-		ahole = holes[ h ];
-
-		oneHoleMovements = [];
-
-		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
-
-			if ( j === il ) j = 0;
-			if ( k === il ) k = 0;
+			if ( j === il ) {
+				j = 0;
+			}
+			if ( k === il ) {
+				k = 0;
+			}
 
 			//  (j)---(i)---(k)
-			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+			// console.log('i,j,k', i, j , k)
+
+			contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
 		}
 
-		holesMovements.push( oneHoleMovements );
-		verticesMovements = verticesMovements.concat( oneHoleMovements );
+		var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
 
-	}
-
-
-	// Loop bevelSegments, 1 for the front, 1 for the back
-
-	for ( b = 0; b < bevelSegments; b ++ ) {
-
-		//for ( b = bevelSegments; b > 0; b -- ) {
-
-		t = b / bevelSegments;
-		z = bevelThickness * Math.cos( t * Math.PI / 2 );
-		bs = bevelSize * Math.sin( t * Math.PI / 2 );
-
-		// contract shape
-
-		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-
-			v( vert.x, vert.y,  - z );
-
-		}
-
-		// expand holes
-
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
 
 			ahole = holes[ h ];
-			oneHoleMovements = holesMovements[ h ];
 
-			for ( i = 0, il = ahole.length; i < il; i ++ ) {
+			oneHoleMovements = [];
 
-				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+			for ( i = 0, il = ahole.length, j = il - 1, k = i + 1 ; i < il ; i++, j++, k++ ) {
 
-				v( vert.x, vert.y,  - z );
+				if ( j === il ) {
+					j = 0;
+				}
+				if ( k === il ) {
+					k = 0;
+				}
+
+				//  (j)---(i)---(k)
+				oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+
+			}
+
+			holesMovements.push( oneHoleMovements );
+			verticesMovements = verticesMovements.concat( oneHoleMovements );
+
+		}
+
+		// Loop bevelSegments, 1 for the front, 1 for the back
+
+		for ( b = 0 ; b < bevelSegments ; b++ ) {
+
+			//for ( b = bevelSegments; b > 0; b -- ) {
+
+			t  = b / bevelSegments;
+			z  = bevelThickness * Math.cos( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+
+			// contract shape
+
+			for ( i = 0, il = contour.length ; i < il ; i++ ) {
+
+				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+
+				v( vert.x, vert.y, -z );
+
+			}
+
+			// expand holes
+
+			for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
+
+				ahole            = holes[ h ];
+				oneHoleMovements = holesMovements[ h ];
+
+				for ( i = 0, il = ahole.length ; i < il ; i++ ) {
+
+					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+
+					v( vert.x, vert.y, -z );
+
+				}
 
 			}
 
 		}
 
-	}
+		bs = bevelSize;
 
-	bs = bevelSize;
+		// Back facing vertices
 
-	// Back facing vertices
-
-	for ( i = 0; i < vlen; i ++ ) {
-
-		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
-
-		if ( ! extrudeByPath ) {
-
-			v( vert.x, vert.y, 0 );
-
-		} else {
-
-			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
-
-			normal.copy( splineTube.normals[ 0 ] ).multiplyScalar( vert.x );
-			binormal.copy( splineTube.binormals[ 0 ] ).multiplyScalar( vert.y );
-
-			position2.copy( extrudePts[ 0 ] ).add( normal ).add( binormal );
-
-			v( position2.x, position2.y, position2.z );
-
-		}
-
-	}
-
-	// Add stepped vertices...
-	// Including front facing vertices
-
-	var s;
-
-	for ( s = 1; s <= steps; s ++ ) {
-
-		for ( i = 0; i < vlen; i ++ ) {
+		for ( i = 0 ; i < vlen ; i++ ) {
 
 			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
-			if ( ! extrudeByPath ) {
+			if ( !extrudeByPath ) {
 
-				v( vert.x, vert.y, amount / steps * s );
+				v( vert.x, vert.y, 0 );
 
 			} else {
 
-				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+				// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
-				normal.copy( splineTube.normals[ s ] ).multiplyScalar( vert.x );
-				binormal.copy( splineTube.binormals[ s ] ).multiplyScalar( vert.y );
+				normal.copy( splineTube.normals[ 0 ] )
+					  .multiplyScalar( vert.x );
+				binormal.copy( splineTube.binormals[ 0 ] )
+						.multiplyScalar( vert.y );
 
-				position2.copy( extrudePts[ s ] ).add( normal ).add( binormal );
+				position2.copy( extrudePts[ 0 ] )
+						 .add( normal )
+						 .add( binormal );
 
 				v( position2.x, position2.y, position2.z );
 
@@ -448,45 +484,35 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-	}
+		// Add stepped vertices...
+		// Including front facing vertices
 
+		var s;
 
-	// Add bevel segments planes
+		for ( s = 1 ; s <= steps ; s++ ) {
 
-	//for ( b = 1; b <= bevelSegments; b ++ ) {
-	for ( b = bevelSegments - 1; b >= 0; b -- ) {
+			for ( i = 0 ; i < vlen ; i++ ) {
 
-		t = b / bevelSegments;
-		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
-		bs = bevelSize * Math.sin( t * Math.PI / 2 );
+				vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
-		// contract shape
+				if ( !extrudeByPath ) {
 
-		for ( i = 0, il = contour.length; i < il; i ++ ) {
-
-			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			v( vert.x, vert.y,  amount + z );
-
-		}
-
-		// expand holes
-
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-			ahole = holes[ h ];
-			oneHoleMovements = holesMovements[ h ];
-
-			for ( i = 0, il = ahole.length; i < il; i ++ ) {
-
-				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-
-				if ( ! extrudeByPath ) {
-
-					v( vert.x, vert.y,  amount + z );
+					v( vert.x, vert.y, amount / steps * s );
 
 				} else {
 
-					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
+					// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+
+					normal.copy( splineTube.normals[ s ] )
+						  .multiplyScalar( vert.x );
+					binormal.copy( splineTube.binormals[ s ] )
+							.multiplyScalar( vert.y );
+
+					position2.copy( extrudePts[ s ] )
+							 .add( normal )
+							 .add( binormal );
+
+					v( position2.x, position2.y, position2.z );
 
 				}
 
@@ -494,215 +520,210 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-	}
+		// Add bevel segments planes
 
-	/* Faces */
+		//for ( b = 1; b <= bevelSegments; b ++ ) {
+		for ( b = bevelSegments - 1 ; b >= 0 ; b-- ) {
 
-	// Top and bottom faces
+			t  = b / bevelSegments;
+			z  = bevelThickness * Math.cos( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
-	buildLidFaces();
+			// contract shape
 
-	// Sides faces
+			for ( i = 0, il = contour.length ; i < il ; i++ ) {
 
-	buildSideFaces();
-
-
-	/////  Internal functions
-
-	function buildLidFaces() {
-
-		if ( bevelEnabled ) {
-
-			var layer = 0; // steps + 1
-			var offset = vlen * layer;
-
-			// Bottom faces
-
-			for ( i = 0; i < flen; i ++ ) {
-
-				face = faces[ i ];
-				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
+				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+				v( vert.x, vert.y, amount + z );
 
 			}
 
-			layer = steps + bevelSegments * 2;
-			offset = vlen * layer;
+			// expand holes
 
-			// Top faces
+			for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
 
-			for ( i = 0; i < flen; i ++ ) {
+				ahole            = holes[ h ];
+				oneHoleMovements = holesMovements[ h ];
 
-				face = faces[ i ];
-				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
+				for ( i = 0, il = ahole.length ; i < il ; i++ ) {
 
-			}
+					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-		} else {
+					if ( !extrudeByPath ) {
 
-			// Bottom faces
+						v( vert.x, vert.y, amount + z );
 
-			for ( i = 0; i < flen; i ++ ) {
+					} else {
 
-				face = faces[ i ];
-				f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+						v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
-			}
+					}
 
-			// Top faces
-
-			for ( i = 0; i < flen; i ++ ) {
-
-				face = faces[ i ];
-				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+				}
 
 			}
 
 		}
 
-	}
+		/* Faces */
 
-	// Create faces for the z-sides of the shape
+		// Top and bottom faces
 
-	function buildSideFaces() {
+		buildLidFaces();
 
-		var layeroffset = 0;
-		sidewalls( contour, layeroffset );
-		layeroffset += contour.length;
+		// Sides faces
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		buildSideFaces();
 
-			ahole = holes[ h ];
-			sidewalls( ahole, layeroffset );
+		/////  Internal functions
 
-			//, true
-			layeroffset += ahole.length;
+		function buildLidFaces () {
 
-		}
+			if ( bevelEnabled ) {
 
-	}
+				var layer  = 0; // steps + 1
+				var offset = vlen * layer;
 
-	function sidewalls( contour, layeroffset ) {
+				// Bottom faces
 
-		var j, k;
-		i = contour.length;
+				for ( i = 0 ; i < flen ; i++ ) {
 
-		while ( -- i >= 0 ) {
+					face = faces[ i ];
+					f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
 
-			j = i;
-			k = i - 1;
-			if ( k < 0 ) k = contour.length - 1;
+				}
 
-			//console.log('b', i,j, i-1, k,vertices.length);
+				layer  = steps + bevelSegments * 2;
+				offset = vlen * layer;
 
-			var s = 0, sl = steps  + bevelSegments * 2;
+				// Top faces
 
-			for ( s = 0; s < sl; s ++ ) {
+				for ( i = 0 ; i < flen ; i++ ) {
 
-				var slen1 = vlen * s;
-				var slen2 = vlen * ( s + 1 );
+					face = faces[ i ];
+					f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
 
-				var a = layeroffset + j + slen1,
-					b = layeroffset + k + slen1,
-					c = layeroffset + k + slen2,
-					d = layeroffset + j + slen2;
+				}
 
-				f4( a, b, c, d, contour, s, sl, j, k );
+			} else {
+
+				// Bottom faces
+
+				for ( i = 0 ; i < flen ; i++ ) {
+
+					face = faces[ i ];
+					f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+
+				}
+
+				// Top faces
+
+				for ( i = 0 ; i < flen ; i++ ) {
+
+					face = faces[ i ];
+					f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+
+				}
 
 			}
 
 		}
 
-	}
+		// Create faces for the z-sides of the shape
 
+		function buildSideFaces () {
 
-	function v( x, y, z ) {
+			var layeroffset = 0;
+			sidewalls( contour, layeroffset );
+			layeroffset += contour.length;
 
-		scope.vertices.push( new Vector3( x, y, z ) );
+			for ( h = 0, hl = holes.length ; h < hl ; h++ ) {
 
-	}
+				ahole = holes[ h ];
+				sidewalls( ahole, layeroffset );
 
-	function f3( a, b, c ) {
+				//, true
+				layeroffset += ahole.length;
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
+			}
 
-		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
+		}
 
-		var uvs = uvgen.generateTopUV( scope, a, b, c );
+		function sidewalls ( contour, layeroffset ) {
 
-		scope.faceVertexUvs[ 0 ].push( uvs );
+			var j, k;
+			i = contour.length;
 
-	}
+			while ( --i >= 0 ) {
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+				j = i;
+				k = i - 1;
+				if ( k < 0 ) {
+					k = contour.length - 1;
+				}
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
-		d += shapesOffset;
+				//console.log('b', i,j, i-1, k,vertices.length);
 
-		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
-		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
+				var s = 0, sl = steps + bevelSegments * 2;
 
-		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
+				for ( s = 0 ; s < sl ; s++ ) {
 
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+					var slen1 = vlen * s;
+					var slen2 = vlen * ( s + 1 );
 
-	}
+					var a = layeroffset + j + slen1,
+						b = layeroffset + k + slen1,
+						c = layeroffset + k + slen2,
+						d = layeroffset + j + slen2;
 
-};
+					f4( a, b, c, d, contour, s, sl, j, k );
 
-ExtrudeGeometry.WorldUVGenerator = {
+				}
 
-	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
+			}
 
-		var vertices = geometry.vertices;
+		}
 
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
+		function v ( x, y, z ) {
 
-		return [
-			new Vector2( a.x, a.y ),
-			new Vector2( b.x, b.y ),
-			new Vector2( c.x, c.y )
-		];
+			scope.vertices.push( new Vector3( x, y, z ) );
 
-	},
+		}
 
-	generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
+		function f3 ( a, b, c ) {
 
-		var vertices = geometry.vertices;
+			a += shapesOffset;
+			b += shapesOffset;
+			c += shapesOffset;
 
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
-		var d = vertices[ indexD ];
+			scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
 
-		if ( Math.abs( a.y - b.y ) < 0.01 ) {
+			var uvs = uvgen.generateTopUV( scope, a, b, c );
 
-			return [
-				new Vector2( a.x, 1 - a.z ),
-				new Vector2( b.x, 1 - b.z ),
-				new Vector2( c.x, 1 - c.z ),
-				new Vector2( d.x, 1 - d.z )
-			];
+			scope.faceVertexUvs[ 0 ].push( uvs );
 
-		} else {
+		}
 
-			return [
-				new Vector2( a.y, 1 - a.z ),
-				new Vector2( b.y, 1 - b.z ),
-				new Vector2( c.y, 1 - c.z ),
-				new Vector2( d.y, 1 - d.z )
-			];
+		function f4 ( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+
+			a += shapesOffset;
+			b += shapesOffset;
+			c += shapesOffset;
+			d += shapesOffset;
+
+			scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
+			scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
+
+			var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
+
+			scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+			scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 		}
 
 	}
-};
+
+} );
 
 
 export { ExtrudeGeometry };
