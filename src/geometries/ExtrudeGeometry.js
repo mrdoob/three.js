@@ -618,7 +618,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 		
-		scope.addGroup( start, verticesArray.length/3 -start, 0);
+		scope.addGroup( start, verticesArray.length/3 -start, options.material !== undefined ? options.material : 0);
 
 	}
 
@@ -641,7 +641,11 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 		
-		scope.addGroup( start, verticesArray.length/3 -start, 1);
+		if (options.extrudeMaterial !== undefined){
+			
+			scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+			
+		}
 
 	}
 
