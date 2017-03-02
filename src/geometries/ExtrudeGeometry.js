@@ -69,7 +69,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	this.addShapeList( shapes, options );
 
-	this.computeFaceNormals();
+	this.computeVertexNormals();
 
 	// can't really use automatic vertex normals
 	// as then front and back sides get smoothed too
@@ -567,6 +567,8 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 	/////  Internal functions
 
 	function buildLidFaces() {
+		
+		var start = verticesArray.length/3;
 
 		if ( bevelEnabled ) {
 
@@ -615,6 +617,8 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 			}
 
 		}
+		
+		scope.addGroup( start, verticesArray.length/3 -start, 0);
 
 	}
 
@@ -622,6 +626,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildSideFaces() {
 
+		var start = verticesArray.length/3;
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
@@ -635,6 +640,8 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 			layeroffset += ahole.length;
 
 		}
+		
+		scope.addGroup( start, verticesArray.length/3 -start, 1);
 
 	}
 
