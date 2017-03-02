@@ -335,7 +335,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 					}
 
-				} 	else {
+				} else {
 
 					if ( Math.sign( v_prev_y ) === Math.sign( v_next_y ) ) {
 
@@ -490,7 +490,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 				v( vert.x, vert.y, amount / steps * s );
 
-			} 	else {
+			} else {
 
 				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
 
@@ -541,7 +541,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 					v( vert.x, vert.y, amount + z );
 
-				} 		else {
+				} else {
 
 					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
