@@ -16324,7 +16324,7 @@
 
 		}
 
-		function renderInstances( geometry ) {
+		function renderInstances( geometry, start, count ) {
 
 			var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -16337,8 +16337,6 @@
 
 			var position = geometry.attributes.position;
 
-			var count = 0;
-
 			if ( position.isInterleavedBufferAttribute ) {
 
 				count = position.data.count;
@@ -16347,9 +16345,7 @@
 
 			} else {
 
-				count = position.count;
-
-				extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+				extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 			}
 

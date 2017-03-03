@@ -3,6 +3,7 @@ import { _Math } from '../math/Math';
 import { Matrix4 } from '../math/Matrix4';
 import { DataTexture } from '../textures/DataTexture';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
+import { UniformsLib } from './shaders/UniformsLib';
 import { UniformsUtils } from './shaders/UniformsUtils';
 import { ShaderLib } from './shaders/ShaderLib';
 import { LensFlarePlugin } from './webgl/plugins/LensFlarePlugin';
@@ -1857,6 +1858,12 @@ function WebGLRenderer( parameters ) {
 				refreshUniformsNormal( m_uniforms, material );
 
 			}
+
+			// RectAreaLight Texture
+			// TODO (mrdoob): Find a nicer implementation
+
+			if ( m_uniforms.ltcMat !== undefined ) m_uniforms.ltcMat.value = UniformsLib.LTC_MAT_TEXTURE;
+			if ( m_uniforms.ltcMag !== undefined ) m_uniforms.ltcMag.value = UniformsLib.LTC_MAG_TEXTURE;
 
 			WebGLUniforms.upload(
 				_gl, materialProperties.uniformsList, m_uniforms, _this );
