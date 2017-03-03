@@ -102,17 +102,17 @@
 
 		<h3>[property:Material customDepthMaterial]</h3>
 		<div>
-		Custom depth material to be used by this material in depth based computation. If a material uses any custom logic to position the vertices *(animation, displacement other than the default texture based, instancing...)* the depth material should also include that logic in order to make effects like shadows and SSAO work. Defining this property allows the WebGLRenderer to use this instance of the material instead of the internal cache. Default is *undefined.
+		Custom depth material to be used by this material in depth based computation. If a material uses any custom logic to position the vertices (animation, displacement other than the default texture based, instancing...) the depth material should also include that logic in order to make effects like shadows and SSAO work. Defining this property allows the WebGLRenderer to use this instance of the material instead of the internal cache. Default is *undefined*.
 		</div>
 		
 		<h3>[property:Material customDistanceMaterial]</h3>
 		<div>
-		Same as customDepthMaterial but used for specific computation *(point lights for example)*. Default is *undefined*
+		Same as customDepthMaterial but used for specific computation (point lights for example). Default is *undefined*
 		</div>
 		
 		<h3>[property:Object defines]</h3>
 		<div>
-		Custom defines to be injected into the shader. These are defined in both vertex and fragment shaders. Example: `{ USE_CUSTOM_TRANSFORMATION: '' }`. Default is *undefined*.
+		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
 		</div>
 		
 		<h3>[property:Integer depthFunc]</h3>
