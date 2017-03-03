@@ -16,7 +16,7 @@
         
         Note: Most of AnimationAction's methods can be chained.<br /><br />
         
-        For an overview over the different elements of the three.js animation system see the
+        For an overview of the different elements of the three.js animation system see the
         "Animation System" article in the "Next Steps" section of the manual.
     </div>
     
@@ -30,8 +30,8 @@
         [page:AnimationClip clip] - the *AnimationClip* that holds the animation data for this action.<br />
         [page:Object3D localRoot] - the root object on which this action is performed.<br /><br />
         
-        Note: Instead of calling this constructor directly you can instantiate an AnimationAction with 
-        [page:AnimationMixer.clipAction].
+        Note: Instead of calling this constructor directly you should instantiate an AnimationAction with 
+        [page:AnimationMixer.clipAction] since this method provides caching for better performance.
     </div>   
     
    
@@ -40,17 +40,16 @@
         
     <h3>[property:Boolean clampWhenFinished]</h3>
     <div>
-        If *clampWhenFinished* is set to true, [page:.paused paused] will automatically be switched to 
-        true, when the last loop of the action has finished. Therefore the last frame of the animation 
-        will be hold as the final state.<br /><br />
+        If *clampWhenFinished* is set to true the animation will automatically be [page:.paused paused] 
+        on its last frame.<br /><br />
          
         If *clampWhenFinished* is set to false, [page:.enabled enabled] will automatically be switched 
-        to false, when the last loop of the action has finished, so that this action has no further 
+        to false when the last loop of the action has finished, so that this action has no further 
         impact.<br /><br />
         
         Default is false.<br /><br />
         
-        Note: *clampWhenFinished* has no impact, if the action is interrupted (it has only an effect if 
+        Note: *clampWhenFinished* has no impact if the action is interrupted (it has only an effect if 
         its last loop has really finished).
     </div>    
 
@@ -58,11 +57,11 @@
     <div>
         Setting *enabled* to *false* disables this action, so that it has no impact. Default is *true*.<br /><br />
         
-        When the action is re-enabled, the animation continues from its current point of [page:.time time] 
+        When the action is re-enabled, the animation continues from its current [page:.time time] 
         (setting *enabled* to *false* doesn't reset the action).<br /><br />
 
         Note: Setting *enabled* to *true* doesn’t automatically restart the animation. Setting *enabled* 
-        to *true* will only restart the animation immediately, if the following condition is fulfilled: 
+        to *true* will only restart the animation immediately if the following condition is fulfilled: 
         [page:.paused paused] is *false*, this action has not been deactivated in the meantime (by 
         executing a [page:.stop stop] or [page:.reset reset] command), and neither [page:.weight weight] 
         nor [page:.timeScale timeScale] is 0.
@@ -85,16 +84,6 @@
     <div>
         Setting *paused* to *true* pauses the execution of the action by setting the effective time scale
         to 0. Default is *false*.<br /><br />
-        
-        Setting *paused* to *true* doesn’t reset the action. The action can be continued from this point 
-        of time by setting *paused* to false afterwards. Unlike setting [page:.enabled enabled] to false
-        the current frame will be shown statically during pausing.<br /><br />
-
-        Note: Setting *paused* to *false* doesn’t automatically restart the animation. Setting *paused* to 
-        *false* will only restart the animation immediately, if the following condition is fulfilled:
-        [page:.enabled enabled] is *true*, this action has not been deactivated in the meantime (by executing 
-        a [page:.stop stop] or [page:.reset reset] command), and neither [page:.weight weight] nor 
-        [page:.timeScale timeScale] is 0.
     </div>    
     
     <h3>[property:Number repetitions]</h3>
@@ -230,10 +219,10 @@
 
     <h3>[method:Boolean isRunning]()</h3>
     <div>
-        Returns true, if this action is not only activated in the mixer, but really playing (as opposed 
-        to [page:.isScheduled isScheduled]).<br /><br />
+        Returns true if this action is activated in the mixer and currently playing (as opposed to 
+        [page:.isScheduled isScheduled]).<br /><br />
          
-        In addition to the activation in the mixer the following conditions must be fulfilled: 
+        In addition to being activated in the mixer the following conditions must be fulfilled: 
         [page:.paused paused] is equal to false, [page:.enabled enabled] is equal to true, 
         [page:.timeScale timeScale] is different from 0, and there is no scheduling for a delayed start 
         ([page:.startAt startAt]).
@@ -280,8 +269,8 @@
     <div>
         Sets the [page:.timeScale timeScale] and stops any scheduled warping. This method can be chained.<br /><br />
         
-        If [page:.paused paused] is false, the effective time scale (an internal property) will be set 
-        to this value, too; otherwise the effective time scale (directly affecting the animation at 
+        If [page:.paused paused] is false, the effective time scale (an internal property) will also be set 
+        to this value; otherwise the effective time scale (directly affecting the animation at 
         this moment) will be set to 0.<br /><br />
         
         Note: .*paused* will not be switched to *true* automatically, if .*timeScale* is set to 0 by 
@@ -292,9 +281,9 @@
     <div>
         Sets the [page:.weight weight] and stops any scheduled fading. This method can be chained.<br /><br />
  
-        If [page:.enabled enabled] is true, the effective weight (an internal property) will be set to 
-        this value, too; otherwise the effective weight (directly affecting the animation at this 
-        moment) will be set to 0.<br /><br />
+        If [page:.enabled enabled] is true, the effective weight (an internal property) will also be set 
+        to this value; otherwise the effective weight (directly affecting the animation at this moment) 
+        will be set to 0.<br /><br />
 
         Note: .*enabled* will not be switched to *false* automatically, if .*weight* is set to 0 by 
         this method.
@@ -320,7 +309,7 @@
     <div>
         Tells the mixer to deactivate this action. This method can be chained.<br /><br />
         
-        The action will be immediately stopped and completely resetted (calling [page:.reset reset] internally).<br /><br />
+        The action will be immediately stopped and completely [page:.reset reset].<br /><br />
         
         Note: You can stop all active actions on the same mixer in one go via 
         [page:AnimationMixer.stopAllAction mixer.stopAllAction].

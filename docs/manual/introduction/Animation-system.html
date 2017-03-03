@@ -24,9 +24,9 @@
 
         To achieve all this in one homogeneous system, the three.js animation system
         [link:https://github.com/mrdoob/three.js/issues/6881 has completely changed in 2015]
-        (be aware of outdated informations!), and it has now an architecture similar to 
-        Unity/Unreal Engine 4. Here is a short overview over its main components and how 
-        they work together:
+        (be aware of outdated information!), and it has now an architecture similar to 
+        Unity/Unreal Engine 4. This page gives a short overview of the main components of the 
+        system and how they work together.
         
     </div>
            
@@ -41,9 +41,9 @@
         properties of the loaded mesh should be an array named "animations", containing the 
         [page:AnimationClip AnimationClips] for this model (see a list of possible loaders below).<br /><br />
 
-        Each *AnimationClip* usually holds the data for a certain activity of the object. For 
-        example there can be one AnimationClip for a walkcycle, a second for a jump, a third for
-        sidestepping and so on (assumed the object is a character).
+        Each *AnimationClip* usually holds the data for a certain activity of the object. If the 
+        mesh is a character, for example, there may be one AnimationClip for a walkcycle, a second 
+        for a jump, a third for sidestepping and so on.
 
     </div>
            
@@ -60,8 +60,8 @@
         
         Assumed the model has [page:Geometry.morphTargets morph targets] (for example one morph 
         target showing a friendly face and another showing an angry face), each track holds the 
-        information, how the [page:Mesh.morphTargetInfluences influence] of a certain morph target 
-        changes during the performance of the clip.
+        information as to how the [page:Mesh.morphTargetInfluences influence] of a certain morph 
+        target changes during the performance of the clip.
 
     </div>
            
@@ -69,10 +69,10 @@
         
     <div class="desc">
         
-        The stored data form only the basis for the animations. Of course a playback software is 
-        needed, too: in three.js this is the [page:AnimationMixer]. You can imagine this not only 
-        as a player for animations, but as a simulation of a hardware like a real mixer console,
-        which can control several animations simultaneously, blending and merging them.
+        The stored data form only the basis for the animations - actual playback is controlled by 
+        the [page:AnimationMixer]. You can imagine this not only as a player for animations, but 
+        as a simulation of a hardware like a real mixer console, which can control several animations 
+        simultaneously, blending and merging them.
 
     </div>
            
@@ -84,8 +84,8 @@
         can be controlled by the [page:AnimationAction AnimationActions]. By configuring an 
         *AnimationAction* you can determine when a certain *AnimationClip* shall be played, paused 
         or stopped on one of the mixers, if and how often the clip has to be repeated, whether it 
-        shall be performed with a fade or a time scaling, and some things more (like crossfading or 
-        synchronizing).
+        shall be performed with a fade or a time scaling, and some additional things, such crossfading 
+        or synchronizing.
 
     </div>          
            
@@ -93,7 +93,7 @@
         
     <div class="desc">
               
-        If you want that a group of objects receives a shared animation state, you can use an
+        If you want a group of objects to receive a shared animation state, you can use an
         [page:AnimationObjectGroup].  
 
     </div>          
@@ -102,7 +102,7 @@
         
     <div class="desc">
 		Note that not all model formats include animation (OBJ notably does not), and that only some
-		THREE.js loaders support [page:AnimationClip AnimationClip] sequences. Several that <i>do</i>
+		three.js loaders support [page:AnimationClip AnimationClip] sequences. Several that <i>do</i>
 		support this animation type:
     </div>
 
