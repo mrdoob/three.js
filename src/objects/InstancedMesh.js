@@ -98,6 +98,13 @@ InstancedDistributedGeometry.prototype = Object.create( InstancedBufferGeometry.
 
 InstancedDistributedGeometry.constructor = InstancedDistributedGeometry;
 
+InstancedDistributedGeometry.prototype.setTransformationAtIndex = function( index , mat4 ){
+
+	_copyMat4IntoAttributes( index , mat4 , this._transformationMatrixComponents );
+
+
+};
+
 InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry , numCopies , distributeFunction ){
 
 	//a helper node used to compute positions for each instance
@@ -105,6 +112,7 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 	var normalMatrix = new Matrix3();
 	var rotationMatrix = new Matrix4();
 
+	distributeFunction = undefined !== distributeFunction ? distributeFunction : function(){}; //should just fill with identity matrices if not provided
 
 	//copy atributes from the provided geometry
 	for ( var att in regularGeometry.attributes ){								
@@ -116,38 +124,40 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 	if(regularGeometry.index!==null)
 			this.setIndex( regularGeometry.index );
 
-		var orientationMatrices = [
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
-			new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 )
-		];
+	this._transformationMatrixComponents = [
+		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
+		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
+		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 )
+	];
 
-		for ( var clone = 0 ; clone < numCopies ; clone ++ ){
+	for ( var clone = 0 ; clone < numCopies ; clone ++ ){
 
-			helperObject.matrixWorld.identity();
+		helperObject.matrixWorld.identity();
 
-			helperObject.position.set(0,0,0);
-			
-			helperObject.rotation.set(0,0,0);
-			
-			helperObject.scale.set(1,1,1);
+		helperObject.position.set(0,0,0);
+		
+		helperObject.rotation.set(0,0,0);
+		
+		helperObject.scale.set(1,1,1);
 
-			distributeFunction( helperObject , clone , numCopies );
+		distributeFunction( helperObject , clone , numCopies );
 
-			helperObject.updateMatrixWorld();
+		helperObject.updateMatrixWorld();
 
-			_copyMat4IntoAttributes( clone , helperObject.matrixWorld , orientationMatrices );
+		_copyMat4IntoAttributes( clone , helperObject.matrixWorld , this._transformationMatrixComponents );
 
-		}
+	}
 
-		for ( var i = 0 ; i < 3 ; i ++ ){
+	for ( var i = 0 ; i < 3 ; i ++ ){
 
-			this.addAttribute( 'aTRS' + i , orientationMatrices[i] );
+		this.addAttribute( 'aTRS' + i , this._transformationMatrixComponents[i] );
 
-		}
+	}
 
 }
 
+
+InstancedDistributedGeometry.prototype.getPositionAtIndex = function( index ){
 
 /**
  * copies mat4 values into an attribute buffer at an offset
@@ -167,7 +177,8 @@ function _copyMat4IntoAttributes( index , mat4 , attributeArray ){
 
 		}
 
-		row = 3 << 2;
+		// row = 3 << 2;
+		row = 12;
 
 		attributeArray[r].array[ index + 3 ] = mat4.elements[ row + r ]; //read last row as column
 
