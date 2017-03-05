@@ -88,7 +88,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		}
 
-		// now the bones are part of the scene graph and children of the skinned mesh
+		// now the bones are part of the scene graph and children of the skinned mesh.
 		// let's update the corresponding matrices
 
 		this.updateMatrixWorld( true );
@@ -193,7 +193,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		} else {
 
-			console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
+			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 		}
 
