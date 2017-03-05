@@ -183,11 +183,11 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		Mesh.prototype.updateMatrixWorld.call( this, force );
 
-		if ( this.bindMode === "attached" ) {
+		if ( this.bindMode === 'attached' ) {
 
 			this.bindMatrixInverse.getInverse( this.matrixWorld );
 
-		} else if ( this.bindMode === "detached" ) {
+		} else if ( this.bindMode === 'detached' ) {
 
 			this.bindMatrixInverse.getInverse( this.bindMatrix );
 
