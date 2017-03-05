@@ -47,12 +47,10 @@ var armSkeleton = new THREE.Skeleton( bones );
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Array bones], [page:Array boneInverses], [page:Boolean useVertexTexture]  )</h3>
+		<h3>[name]( [page:Array bones], [page:Array boneInverses] )</h3>
 		<div>
 		[page:Array bones] - The array of [page:Bone bones]. Default is an empty array.<br/>
-		[page:Array boneInverses] - (optional) An array of [page:Matrix4 Matrix4s].<br/>
-		[page:Boolean useVertexTexture] - (optional) Whether or not to use a vertex texture in the shader.
-		Default is true.<br /><br />
+		[page:Array boneInverses] - (optional) An array of [page:Matrix4 Matrix4s].<br /><br />
 
 		Creates a new [name].
 		</div>
@@ -80,26 +78,6 @@ var armSkeleton = new THREE.Skeleton( bones );
 		<h3>[property:DataTexture boneTexture]</h3>
 		<div>
 		The [page:DataTexture] holding the bone data when using a vertex texture.
-		</div>
-
-		<h3>[property:Integer boneTextureHeight]</h3>
-		<div>
-		The height of the vertex data texture.
-		</div>
-
-		<h3>[property:Integer boneTextureWidth]</h3>
-		<div>
-		The width of the vertex data texture.
-		</div>
-
-		<h3>[property:Boolean useVertexTexture]</h3>
-		<div>
-		Whether or not to use a vertex texture in the shader, set in the constructor.
-		Not all devices	support floating point pixel textures. If this option is set then
-		the bone matrices will be packed into	a texture and sent to the shader. This method
-		allows a much larger set of bones to be used. Otherwise	the vertex shader will use
-		uniforms, which do not allow for as many bones to be used. The exact numbers vary
-		between devices.
 		</div>
 
 
