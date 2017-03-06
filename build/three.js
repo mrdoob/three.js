@@ -13477,11 +13477,13 @@
 
 			}
 
-			data.vertices = vertices;
-			data.normals = normals;
-			if ( colors.length > 0 ) data.colors = colors;
-			if ( uvs.length > 0 ) data.uvs = [ uvs ]; // temporal backward compatibility
-			data.faces = faces;
+			data.data = {};
+
+			data.data.vertices = vertices;
+			data.data.normals = normals;
+			if ( colors.length > 0 ) data.data.colors = colors;
+			if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+			data.data.faces = faces;
 
 			return data;
 
@@ -32661,21 +32663,9 @@
 
 		},
 
-		parse: function ( json, texturePath ) {
+		parse: ( function () {
 
-			var geometry = new Geometry(),
-			scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
-
-			parseModel( scale );
-
-			parseSkin();
-			parseMorphing( scale );
-			parseAnimations();
-
-			geometry.computeFaceNormals();
-			geometry.computeBoundingSphere();
-
-			function parseModel( scale ) {
+			function parseModel( json, geometry ) {
 
 				function isBitSet( value, position ) {
 
@@ -32685,27 +32675,30 @@
 
 				var i, j, fi,
 
-				offset, zLength,
+					offset, zLength,
 
-			colorIndex, normalIndex, uvIndex, materialIndex,
+					colorIndex, normalIndex, uvIndex, materialIndex,
 
-				type,
-				isQuad,
-				hasMaterial,
-				hasFaceVertexUv,
-				hasFaceNormal, hasFaceVertexNormal,
-				hasFaceColor, hasFaceVertexColor,
+					type,
+					isQuad,
+					hasMaterial,
+					hasFaceVertexUv,
+					hasFaceNormal, hasFaceVertexNormal,
+					hasFaceColor, hasFaceVertexColor,
 
-			vertex, face, faceA, faceB, hex, normal,
+					vertex, face, faceA, faceB, hex, normal,
 
-				uvLayer, uv, u, v,
+					uvLayer, uv, u, v,
 
-				faces = json.faces,
-				vertices = json.vertices,
-				normals = json.normals,
-				colors = json.colors,
+					faces = json.faces,
+					vertices = json.vertices,
+					normals = json.normals,
+					colors = json.colors,
 
-				nUvLayers = 0;
+					scale = json.scale,
+
+					nUvLayers = 0;
+
 
 				if ( json.uvs !== undefined ) {
 
@@ -32747,14 +32740,13 @@
 
 					type = faces[ offset ++ ];
 
-
-					isQuad              = isBitSet( type, 0 );
-					hasMaterial         = isBitSet( type, 1 );
-					hasFaceVertexUv     = isBitSet( type, 3 );
-					hasFaceNormal       = isBitSet( type, 4 );
+					isQuad = isBitSet( type, 0 );
+					hasMaterial = isBitSet( type, 1 );
+					hasFaceVertexUv = isBitSet( type, 3 );
+					hasFaceNormal = isBitSet( type, 4 );
 					hasFaceVertexNormal = isBitSet( type, 5 );
-					hasFaceColor	     = isBitSet( type, 6 );
-					hasFaceVertexColor  = isBitSet( type, 7 );
+					hasFaceColor = isBitSet( type, 6 );
+					hasFaceVertexColor = isBitSet( type, 7 );
 
 					// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
@@ -32975,7 +32967,7 @@
 
 			}
 
-			function parseSkin() {
+			function parseSkin( json, geometry ) {
 
 				var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
 
@@ -32983,7 +32975,7 @@
 
 					for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
 
-						var x =                               json.skinWeights[ i ];
+						var x = json.skinWeights[ i ];
 						var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
 						var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
 						var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
@@ -32998,7 +32990,7 @@
 
 					for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
 
-						var a =                               json.skinIndices[ i ];
+						var a = json.skinIndices[ i ];
 						var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
 						var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
 						var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
@@ -33020,7 +33012,9 @@
 
 			}
 
-			function parseMorphing( scale ) {
+			function parseMorphing( json, geometry ) {
+
+				var scale = json.scale;
 
 				if ( json.morphTargets !== undefined ) {
 
@@ -33065,7 +33059,7 @@
 
 			}
 
-			function parseAnimations() {
+			function parseAnimations( json, geometry ) {
 
 				var outputAnimations = [];
 
@@ -33112,19 +33106,50 @@
 
 			}
 
-			if ( json.materials === undefined || json.materials.length === 0 ) {
+			return function ( json, texturePath ) {
 
-				return { geometry: geometry };
+				if ( json.data !== undefined ) {
 
-			} else {
+					// Geometry 4.0 spec
+					json = json.data;
 
-				var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+				}
 
-				return { geometry: geometry, materials: materials };
+				if ( json.scale !== undefined ) {
 
-			}
+					json.scale = 1.0 / json.scale;
 
-		}
+				} else {
+
+					json.scale = 1.0;
+
+				}
+
+				var geometry = new Geometry();
+
+				parseModel( json, geometry );
+				parseSkin( json, geometry );
+				parseMorphing( json, geometry );
+				parseAnimations( json, geometry );
+
+				geometry.computeFaceNormals();
+				geometry.computeBoundingSphere();
+
+				if ( json.materials === undefined || json.materials.length === 0 ) {
+
+					return { geometry: geometry };
+
+				} else {
+
+					var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+
+					return { geometry: geometry, materials: materials };
+
+				}
+
+			};
+
+		} )()
 
 	} );
 
