@@ -217,6 +217,7 @@ var files = {
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
 		"webgl_rtt",
+		"webgl_setglobal",
 		"webgl_sandbox",
 		"webgl_shader",
 		"webgl_shader_lava",
