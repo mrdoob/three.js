@@ -1,4 +1,4 @@
-import { ExtrudeGeometry } from './ExtrudeGeometry';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
 import { Geometry } from '../core/Geometry';
 
 /**
@@ -19,8 +19,29 @@ import { Geometry } from '../core/Geometry';
  *  bevelSize: <float> // how far from text outline is bevel
  * }
  */
+ 
 
-function TextGeometry( text, parameters ) {
+function TextGeometry(  text, parameters ) {
+
+	Geometry.call( this );
+
+	this.type = 'TextGeometry';
+
+	this.parameters = {
+		text: text,
+		parameters: parameters
+	};
+
+	this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
+	this.mergeVertices();
+
+}
+
+TextGeometry.prototype = Object.create( Geometry.prototype );
+TextGeometry.prototype.constructor = TextGeometry;
+
+
+function TextBufferGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 
@@ -45,14 +66,17 @@ function TextGeometry( text, parameters ) {
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
-	ExtrudeGeometry.call( this, shapes, parameters );
+	ExtrudeBufferGeometry.call( this, shapes, parameters );
 
 	this.type = 'TextGeometry';
 
 }
 
-TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
-TextGeometry.prototype.constructor = TextGeometry;
+TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
+TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
 
-export { TextGeometry };
+export { 
+	TextGeometry,
+	TextBufferGeometry 
+};
