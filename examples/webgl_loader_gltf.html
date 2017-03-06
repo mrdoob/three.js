@@ -228,7 +228,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
+					var object = gltf.scene;
 
 					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
 
