@@ -6,8 +6,6 @@ THREE.Mirror = function ( width, height, options ) {
 
 	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
 
-	if ( options.render === false ) this.geometry.setDrawRange( 0, 0 );
-
 	var scope = this;
 
 	scope.name = 'mirror_' + scope.id;
