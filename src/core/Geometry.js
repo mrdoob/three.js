@@ -1142,11 +1142,13 @@ Object.assign( Geometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		data.vertices = vertices;
-		data.normals = normals;
-		if ( colors.length > 0 ) data.colors = colors;
-		if ( uvs.length > 0 ) data.uvs = [ uvs ]; // temporal backward compatibility
-		data.faces = faces;
+		data.data = {};
+
+		data.data.vertices = vertices;
+		data.data.normals = normals;
+		if ( colors.length > 0 ) data.data.colors = colors;
+		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		data.data.faces = faces;
 
 		return data;
 

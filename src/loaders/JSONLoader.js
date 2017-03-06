@@ -83,6 +83,13 @@ Object.assign( JSONLoader.prototype, {
 
 	parse: function ( json, texturePath ) {
 
+		if ( json.data !== undefined ) {
+
+			// Geometry 4.0 spec
+			json = json.data;
+
+		}
+
 		var geometry = new Geometry(),
 		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
