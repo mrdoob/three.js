@@ -119,7 +119,6 @@
 
 			var gui = new dat.GUI();
 
-			var groundMirror;
 			var sphereGroup, smallSphere;
 			var groundMirrorMaterial;
 
@@ -153,7 +152,8 @@
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
 				// MIRROR planes
-				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				var groundMirror = new THREE.Mirror( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				groundMirror.geometry.setDrawRange( 0, 0 ); // avoid rendering geometry
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
