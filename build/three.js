@@ -23080,8 +23080,6 @@
 
 	function Skeleton( bones, boneInverses ) {
 
-		this.identityMatrix = new Matrix4();
-
 		// copy the bone array
 
 		bones = bones || [];
@@ -23107,7 +23105,7 @@
 
 				this.boneInverses = [];
 
-				for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+				for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 					this.boneInverses.push( new Matrix4() );
 
@@ -23125,13 +23123,13 @@
 
 			this.boneInverses = [];
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 				var inverse = new Matrix4();
 
-				if ( this.bones[ b ] ) {
+				if ( this.bones[ i ] ) {
 
-					inverse.getInverse( this.bones[ b ].matrixWorld );
+					inverse.getInverse( this.bones[ i ].matrixWorld );
 
 				}
 
@@ -23143,17 +23141,17 @@
 
 		pose: function () {
 
-			var bone;
+			var bone, i, il;
 
 			// recover the bind-time world matrices
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-				bone = this.bones[ b ];
+				bone = this.bones[ i ];
 
 				if ( bone ) {
 
-					bone.matrixWorld.getInverse( this.boneInverses[ b ] );
+					bone.matrixWorld.getInverse( this.boneInverses[ i ] );
 
 				}
 
@@ -23161,9 +23159,9 @@
 
 			// compute the local matrices, positions, rotations and scales
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-				bone = this.bones[ b ];
+				bone = this.bones[ i ];
 
 				if ( bone ) {
 
@@ -23189,6 +23187,7 @@
 		update: ( function () {
 
 			var offsetMatrix = new Matrix4();
+			var identityMatrix = new Matrix4();
 
 			return function update() {
 
@@ -23199,14 +23198,14 @@
 
 				// flatten bone matrices to array
 
-				for ( var b = 0, bl = bones.length; b < bl; b ++ ) {
+				for ( var i = 0, il = bones.length; i < il; i ++ ) {
 
 					// compute the offset between the current and the original transform
 
-					var matrix = bones[ b ] ? bones[ b ].matrixWorld : this.identityMatrix;
+					var matrix = bones[ i ] ? bones[ i ].matrixWorld : identityMatrix;
 
-					offsetMatrix.multiplyMatrices( matrix, boneInverses[ b ] );
-					offsetMatrix.toArray( boneMatrices, b * 16 );
+					offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+					offsetMatrix.toArray( boneMatrices, i * 16 );
 
 				}
 
@@ -23264,58 +23263,16 @@
 
 		this.type = 'SkinnedMesh';
 
-		this.bindMode = "attached";
+		this.bindMode = 'attached';
 		this.bindMatrix = new Matrix4();
 		this.bindMatrixInverse = new Matrix4();
 
-		// init bones
+		var bones = this.initBones();
+		var skeleton = new Skeleton( bones );
 
-		// TODO: remove bone creation as there is no reason (other than
-		// convenience) for THREE.SkinnedMesh to do this.
-
-		var bones = [];
-
-		if ( this.geometry && this.geometry.bones !== undefined ) {
-
-			var bone, gbone;
-
-			for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
-
-				gbone = this.geometry.bones[ b ];
-
-				bone = new Bone();
-				bones.push( bone );
-
-				bone.name = gbone.name;
-				bone.position.fromArray( gbone.pos );
-				bone.quaternion.fromArray( gbone.rotq );
-				if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
-
-			}
-
-			for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
-
-				gbone = this.geometry.bones[ b ];
-
-				if ( gbone.parent !== - 1 && gbone.parent !== null &&
-						bones[ gbone.parent ] !== undefined ) {
-
-					bones[ gbone.parent ].add( bones[ b ] );
-
-				} else {
-
-					this.add( bones[ b ] );
-
-				}
-
-			}
-
-		}
+		this.bind( skeleton, this.matrixWorld );
 
 		this.normalizeSkinWeights();
-
-		this.updateMatrixWorld( true );
-		this.bind( new Skeleton( bones ), this.matrixWorld );
 
 	}
 
@@ -23324,6 +23281,66 @@
 		constructor: SkinnedMesh,
 
 		isSkinnedMesh: true,
+
+		initBones: function () {
+
+			var bones = [], bone, gbone;
+			var i, il;
+
+			if ( this.geometry && this.geometry.bones !== undefined ) {
+
+				// first, create array of 'Bone' objects from geometry data
+
+				for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+					gbone = this.geometry.bones[ i ];
+
+					// create new 'Bone' object
+
+					bone = new Bone();
+					bones.push( bone );
+
+					// apply values
+
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+				}
+
+				// second, create bone hierarchy
+
+				for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+					gbone = this.geometry.bones[ i ];
+
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+						// subsequent bones in the hierarchy
+
+						bones[ gbone.parent ].add( bones[ i ] );
+
+					} else {
+
+						// topmost bone, immediate child of the skinned mesh
+
+						this.add( bones[ i ] );
+
+					}
+
+				}
+
+			}
+
+			// now the bones are part of the scene graph and children of the skinned mesh.
+			// let's update the corresponding matrices
+
+			this.updateMatrixWorld( true );
+
+			return bones;
+
+		},
 
 		bind: function ( skeleton, bindMatrix ) {
 
@@ -23352,13 +23369,15 @@
 
 		normalizeSkinWeights: function () {
 
+			var scale, i;
+
 			if ( this.geometry && this.geometry.isGeometry ) {
 
-				for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
+				for ( i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
 					var sw = this.geometry.skinWeights[ i ];
 
-					var scale = 1.0 / sw.lengthManhattan();
+					scale = 1.0 / sw.lengthManhattan();
 
 					if ( scale !== Infinity ) {
 
@@ -23378,14 +23397,14 @@
 
 				var skinWeight = this.geometry.attributes.skinWeight;
 
-				for ( var i = 0; i < skinWeight.count; i ++ ) {
+				for ( i = 0; i < skinWeight.count; i ++ ) {
 
 					vec.x = skinWeight.getX( i );
 					vec.y = skinWeight.getY( i );
 					vec.z = skinWeight.getZ( i );
 					vec.w = skinWeight.getW( i );
 
-					var scale = 1.0 / vec.lengthManhattan();
+					scale = 1.0 / vec.lengthManhattan();
 
 					if ( scale !== Infinity ) {
 
@@ -23405,21 +23424,21 @@
 
 		},
 
-		updateMatrixWorld: function () {
+		updateMatrixWorld: function ( force ) {
 
-			Mesh.prototype.updateMatrixWorld.call( this, true );
+			Mesh.prototype.updateMatrixWorld.call( this, force );
 
-			if ( this.bindMode === "attached" ) {
+			if ( this.bindMode === 'attached' ) {
 
 				this.bindMatrixInverse.getInverse( this.matrixWorld );
 
-			} else if ( this.bindMode === "detached" ) {
+			} else if ( this.bindMode === 'detached' ) {
 
 				this.bindMatrixInverse.getInverse( this.bindMatrix );
 
 			} else {
 
-				console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
+				console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 			}
 
