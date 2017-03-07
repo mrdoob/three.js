@@ -1201,7 +1201,8 @@ THREE.GLTF2Loader = ( function () {
 
 							var metallicRoughness = material.pbrMetallicRoughness;
 
-							materialParams.color = new THREE.Color();
+							materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
+							materialParams.opacity = 1.0;
 
 							if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
 
@@ -1209,11 +1210,6 @@ THREE.GLTF2Loader = ( function () {
 
 								materialParams.color.fromArray( array );
 								materialParams.opacity = array[ 3 ];
-
-							} else {
-
-								materialParams.color.setRGB( 1.0, 1.0, 1.0 );
-								materialParams.opacity = 1.0;
 
 							}
 
@@ -1265,15 +1261,11 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					materialParams.emissive = new THREE.Color();
+					materialParams.emissive = new THREE.Color( 0.0, 0.0, 0.0 );
 
 					if ( material.emissiveFactor !== undefined ) {
 
 						materialParams.emissive.fromArray( material.emissiveFactor );
-
-					} else {
-
-						materialParams.emissive.setRGB( 0.0, 0.0, 0.0 );
 
 					}
 
