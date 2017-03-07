@@ -2474,7 +2474,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			textures.setTexture2D( texture, slot );
+			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
+
+				state.activeTexture( _gl.TEXTURE0 + slot );
+				state.bindTexture( _gl.TEXTURE_2D, null );
+
+			} else {
+
+				textures.setTexture2D( texture, slot );
+
+			}
 
 		};
 
