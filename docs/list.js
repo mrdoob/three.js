@@ -14,8 +14,9 @@ var list = {
 		],
 
 		"Next Steps": [
-				[ "How to update things", "manual/introduction/How-to-update-things" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+            [ "Animation System", "manual/introduction/Animation-system" ]
 		],
 
 		"Build Tools": [
@@ -140,7 +141,6 @@ var list = {
 			[ "ConeGeometry", "api/geometries/ConeGeometry" ],
 			[ "CylinderBufferGeometry", "api/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
-			[ "DecalGeometry", "api/geometries/DecalGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],

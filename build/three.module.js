@@ -14570,7 +14570,7 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals.setXYZ(i, x * n, y * n, z * n);
+			normals.setXYZ( i, x * n, y * n, z * n );
 
 		}
 
@@ -16318,7 +16318,7 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 	}
 
-	function renderInstances( geometry ) {
+	function renderInstances( geometry, start, count ) {
 
 		var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -16331,8 +16331,6 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		var position = geometry.attributes.position;
 
-		var count = 0;
-
 		if ( position.isInterleavedBufferAttribute ) {
 
 			count = position.data.count;
@@ -16341,9 +16339,7 @@ function WebGLBufferRenderer( gl, extensions, infoRender ) {
 
 		} else {
 
-			count = position.count;
-
-			extension.drawArraysInstancedANGLE( mode, 0, count, geometry.maxInstancedCount );
+			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		}
 
@@ -23080,8 +23076,6 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 function Skeleton( bones, boneInverses ) {
 
-	this.identityMatrix = new Matrix4();
-
 	// copy the bone array
 
 	bones = bones || [];
@@ -23107,7 +23101,7 @@ function Skeleton( bones, boneInverses ) {
 
 			this.boneInverses = [];
 
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+			for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 				this.boneInverses.push( new Matrix4() );
 
@@ -23125,13 +23119,13 @@ Object.assign( Skeleton.prototype, {
 
 		this.boneInverses = [];
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
 			var inverse = new Matrix4();
 
-			if ( this.bones[ b ] ) {
+			if ( this.bones[ i ] ) {
 
-				inverse.getInverse( this.bones[ b ].matrixWorld );
+				inverse.getInverse( this.bones[ i ].matrixWorld );
 
 			}
 
@@ -23143,17 +23137,17 @@ Object.assign( Skeleton.prototype, {
 
 	pose: function () {
 
-		var bone;
+		var bone, i, il;
 
 		// recover the bind-time world matrices
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ b ];
+			bone = this.bones[ i ];
 
 			if ( bone ) {
 
-				bone.matrixWorld.getInverse( this.boneInverses[ b ] );
+				bone.matrixWorld.getInverse( this.boneInverses[ i ] );
 
 			}
 
@@ -23161,9 +23155,9 @@ Object.assign( Skeleton.prototype, {
 
 		// compute the local matrices, positions, rotations and scales
 
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ b ];
+			bone = this.bones[ i ];
 
 			if ( bone ) {
 
@@ -23189,6 +23183,7 @@ Object.assign( Skeleton.prototype, {
 	update: ( function () {
 
 		var offsetMatrix = new Matrix4();
+		var identityMatrix = new Matrix4();
 
 		return function update() {
 
@@ -23199,14 +23194,14 @@ Object.assign( Skeleton.prototype, {
 
 			// flatten bone matrices to array
 
-			for ( var b = 0, bl = bones.length; b < bl; b ++ ) {
+			for ( var i = 0, il = bones.length; i < il; i ++ ) {
 
 				// compute the offset between the current and the original transform
 
-				var matrix = bones[ b ] ? bones[ b ].matrixWorld : this.identityMatrix;
+				var matrix = bones[ i ] ? bones[ i ].matrixWorld : identityMatrix;
 
-				offsetMatrix.multiplyMatrices( matrix, boneInverses[ b ] );
-				offsetMatrix.toArray( boneMatrices, b * 16 );
+				offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+				offsetMatrix.toArray( boneMatrices, i * 16 );
 
 			}
 
@@ -23264,58 +23259,16 @@ function SkinnedMesh( geometry, material ) {
 
 	this.type = 'SkinnedMesh';
 
-	this.bindMode = "attached";
+	this.bindMode = 'attached';
 	this.bindMatrix = new Matrix4();
 	this.bindMatrixInverse = new Matrix4();
 
-	// init bones
+	var bones = this.initBones();
+	var skeleton = new Skeleton( bones );
 
-	// TODO: remove bone creation as there is no reason (other than
-	// convenience) for THREE.SkinnedMesh to do this.
-
-	var bones = [];
-
-	if ( this.geometry && this.geometry.bones !== undefined ) {
-
-		var bone, gbone;
-
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
-
-			gbone = this.geometry.bones[ b ];
-
-			bone = new Bone();
-			bones.push( bone );
-
-			bone.name = gbone.name;
-			bone.position.fromArray( gbone.pos );
-			bone.quaternion.fromArray( gbone.rotq );
-			if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
-
-		}
-
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
-
-			gbone = this.geometry.bones[ b ];
-
-			if ( gbone.parent !== - 1 && gbone.parent !== null &&
-					bones[ gbone.parent ] !== undefined ) {
-
-				bones[ gbone.parent ].add( bones[ b ] );
-
-			} else {
-
-				this.add( bones[ b ] );
-
-			}
-
-		}
-
-	}
+	this.bind( skeleton, this.matrixWorld );
 
 	this.normalizeSkinWeights();
-
-	this.updateMatrixWorld( true );
-	this.bind( new Skeleton( bones ), this.matrixWorld );
 
 }
 
@@ -23324,6 +23277,66 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	constructor: SkinnedMesh,
 
 	isSkinnedMesh: true,
+
+	initBones: function () {
+
+		var bones = [], bone, gbone;
+		var i, il;
+
+		if ( this.geometry && this.geometry.bones !== undefined ) {
+
+			// first, create array of 'Bone' objects from geometry data
+
+			for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+				gbone = this.geometry.bones[ i ];
+
+				// create new 'Bone' object
+
+				bone = new Bone();
+				bones.push( bone );
+
+				// apply values
+
+				bone.name = gbone.name;
+				bone.position.fromArray( gbone.pos );
+				bone.quaternion.fromArray( gbone.rotq );
+				if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+			}
+
+			// second, create bone hierarchy
+
+			for ( i = 0, il = this.geometry.bones.length; i < il; i ++ ) {
+
+				gbone = this.geometry.bones[ i ];
+
+				if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+					// subsequent bones in the hierarchy
+
+					bones[ gbone.parent ].add( bones[ i ] );
+
+				} else {
+
+					// topmost bone, immediate child of the skinned mesh
+
+					this.add( bones[ i ] );
+
+				}
+
+			}
+
+		}
+
+		// now the bones are part of the scene graph and children of the skinned mesh.
+		// let's update the corresponding matrices
+
+		this.updateMatrixWorld( true );
+
+		return bones;
+
+	},
 
 	bind: function ( skeleton, bindMatrix ) {
 
@@ -23352,13 +23365,15 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	normalizeSkinWeights: function () {
 
+		var scale, i;
+
 		if ( this.geometry && this.geometry.isGeometry ) {
 
-			for ( var i = 0; i < this.geometry.skinWeights.length; i ++ ) {
+			for ( i = 0; i < this.geometry.skinWeights.length; i ++ ) {
 
 				var sw = this.geometry.skinWeights[ i ];
 
-				var scale = 1.0 / sw.lengthManhattan();
+				scale = 1.0 / sw.lengthManhattan();
 
 				if ( scale !== Infinity ) {
 
@@ -23378,14 +23393,14 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			var skinWeight = this.geometry.attributes.skinWeight;
 
-			for ( var i = 0; i < skinWeight.count; i ++ ) {
+			for ( i = 0; i < skinWeight.count; i ++ ) {
 
 				vec.x = skinWeight.getX( i );
 				vec.y = skinWeight.getY( i );
 				vec.z = skinWeight.getZ( i );
 				vec.w = skinWeight.getW( i );
 
-				var scale = 1.0 / vec.lengthManhattan();
+				scale = 1.0 / vec.lengthManhattan();
 
 				if ( scale !== Infinity ) {
 
@@ -23405,21 +23420,21 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	updateMatrixWorld: function () {
+	updateMatrixWorld: function ( force ) {
 
-		Mesh.prototype.updateMatrixWorld.call( this, true );
+		Mesh.prototype.updateMatrixWorld.call( this, force );
 
-		if ( this.bindMode === "attached" ) {
+		if ( this.bindMode === 'attached' ) {
 
 			this.bindMatrixInverse.getInverse( this.matrixWorld );
 
-		} else if ( this.bindMode === "detached" ) {
+		} else if ( this.bindMode === 'detached' ) {
 
 			this.bindMatrixInverse.getInverse( this.bindMatrix );
 
 		} else {
 
-			console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
+			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 		}
 
@@ -26129,25 +26144,47 @@ var ShapeUtils = {
  *
  * }
  **/
+ 
+ function ExtrudeGeometry( shapes, options ) {
 
-function ExtrudeGeometry( shapes, options ) {
+	Geometry.call( this );
 
-	if ( typeof( shapes ) === "undefined" ) {
+	this.type = 'ExtrudeGeometry';
+
+	this.parameters = {
+		shapes: shapes,
+		options: options
+	};
+
+	this.fromBufferGeometry( new ExtrudeBufferGeometry( shapes, options ) );
+	this.mergeVertices();
+
+}
+
+
+ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
+ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+
+ 
+
+function ExtrudeBufferGeometry( shapes, options ) {
+
+	if ( typeof ( shapes ) === "undefined" ) {
 
 		shapes = [];
 		return;
 
 	}
 
-	Geometry.call( this );
+	BufferGeometry.call( this );
 
-	this.type = 'ExtrudeGeometry';
+	this.type = 'ExtrudeBufferGeometry';
 
 	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
 	this.addShapeList( shapes, options );
 
-	this.computeFaceNormals();
+	this.computeVertexNormals();
 
 	// can't really use automatic vertex normals
 	// as then front and back sides get smoothed too
@@ -26159,12 +26196,32 @@ function ExtrudeGeometry( shapes, options ) {
 
 }
 
-ExtrudeGeometry.prototype = Object.create( Geometry.prototype );
-ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
+ExtrudeBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
-ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+ExtrudeBufferGeometry.prototype.getArrays = function () {
+
+	var positionAttribute = this.getAttribute( "position" );
+	var verticesArray = positionAttribute ? Array.prototype.slice.call( positionAttribute.array ) : [];
+
+	var uvAttribute = this.getAttribute( "uv" );
+	var uvArray = uvAttribute ? Array.prototype.slice.call( uvAttribute.array ) : [];
+
+	var IndexAttribute = this.index;
+	var indicesArray = IndexAttribute ? Array.prototype.slice.call( IndexAttribute.array ) : [];
+
+	return {
+		position: verticesArray,
+		uv: uvArray,
+		index: indicesArray
+	};
+
+};
+
+ExtrudeBufferGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	var sl = shapes.length;
+	options.arrays = this.getArrays();
 
 	for ( var s = 0; s < sl; s ++ ) {
 
@@ -26173,9 +26230,21 @@ ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	}
 
+	this.setIndex( options.arrays.index );
+	this.addAttribute( 'position', new Float32BufferAttribute( options.arrays.position, 3 ) );
+	this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+
 };
 
-ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
+ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
+
+	var arrays = options.arrays ? options.arrays : this.getArrays();
+	var verticesArray = arrays.position;
+	var indicesArray = arrays.index;
+	var uvArray = arrays.uv;
+
+	var placeholder = [];
+
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -26231,8 +26300,6 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
-
-	var shapesOffset = this.vertices.length;
 
 	var shapePoints = shape.extractPoints( curveSegments );
 
@@ -26304,13 +26371,15 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		// inPt' is the intersection of the two lines parallel to the two
 		//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-		var v_trans_x, v_trans_y, shrink_by = 1;		// resulting translation vector for inPt
+		var v_trans_x, v_trans_y, shrink_by = 1; // resulting translation vector for inPt
 
 		// good reading for geometry algorithms (here: line-line intersection)
 		// http://geomalgorithms.com/a05-_intersect-1.html
 
-		var v_prev_x = inPt.x - inPrev.x, v_prev_y = inPt.y - inPrev.y;
-		var v_next_x = inNext.x - inPt.x, v_next_y = inNext.y - inPt.y;
+		var v_prev_x = inPt.x - inPrev.x,
+			v_prev_y = inPt.y - inPrev.y;
+		var v_next_x = inNext.x - inPt.x,
+			v_next_y = inNext.y - inPt.y;
 
 		var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
 
@@ -26336,9 +26405,9 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// scaling factor for v_prev to intersection point
 
-			var sf = (  ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
-						( ptNextShift_y - ptPrevShift_y ) * v_next_x    ) /
-					  ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+			var sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+					( ptNextShift_y - ptPrevShift_y ) * v_next_x ) /
+				( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
 			// vector from inPt to intersection point
 
@@ -26350,7 +26419,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
 			if ( v_trans_lensq <= 2 ) {
 
-				return	new Vector2( v_trans_x, v_trans_y );
+				return new Vector2( v_trans_x, v_trans_y );
 
 			} else {
 
@@ -26362,7 +26431,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// handle special case of collinear edges
 
-			var direction_eq = false;		// assumes: opposite
+			var direction_eq = false; // assumes: opposite
 			if ( v_prev_x > Number.EPSILON ) {
 
 				if ( v_next_x > Number.EPSILON ) {
@@ -26397,7 +26466,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				// console.log("Warning: lines are a straight sequence");
 				v_trans_x = - v_prev_y;
-				v_trans_y =  v_prev_x;
+				v_trans_y = v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 
 			} else {
@@ -26411,7 +26480,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		return	new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
+		return new Vector2( v_trans_x / shrink_by, v_trans_y / shrink_by );
 
 	}
 
@@ -26430,7 +26499,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
+	var holesMovements = [],
+		oneHoleMovements, verticesMovements = contourMovements.concat();
 
 	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
@@ -26470,7 +26540,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
-			v( vert.x, vert.y,  - z );
+			v( vert.x, vert.y, - z );
 
 		}
 
@@ -26485,7 +26555,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-				v( vert.x, vert.y,  - z );
+				v( vert.x, vert.y, - z );
 
 			}
 
@@ -26559,7 +26629,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * Math.cos ( t * Math.PI / 2 );
+		z = bevelThickness * Math.cos( t * Math.PI / 2 );
 		bs = bevelSize * Math.sin( t * Math.PI / 2 );
 
 		// contract shape
@@ -26567,7 +26637,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			v( vert.x, vert.y,  amount + z );
+			v( vert.x, vert.y, amount + z );
 
 		}
 
@@ -26584,7 +26654,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				if ( ! extrudeByPath ) {
 
-					v( vert.x, vert.y,  amount + z );
+					v( vert.x, vert.y, amount + z );
 
 				} else {
 
@@ -26612,6 +26682,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	/////  Internal functions
 
 	function buildLidFaces() {
+		
+		var start = verticesArray.length/3;
 
 		if ( bevelEnabled ) {
 
@@ -26660,6 +26732,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			}
 
 		}
+		
+		scope.addGroup( start, verticesArray.length/3 -start, options.material !== undefined ? options.material : 0);
 
 	}
 
@@ -26667,6 +26741,7 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function buildSideFaces() {
 
+		var start = verticesArray.length/3;
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
@@ -26679,6 +26754,12 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			//, true
 			layeroffset += ahole.length;
 
+		}
+		
+		if (options.extrudeMaterial !== undefined){
+			
+			scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+			
 		}
 
 	}
@@ -26696,7 +26777,8 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			var s = 0, sl = steps  + bevelSegments * 2;
+			var s = 0,
+				sl = steps + bevelSegments * 2;
 
 			for ( s = 0; s < sl; s ++ ) {
 
@@ -26716,41 +26798,76 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-
 	function v( x, y, z ) {
 
-		scope.vertices.push( new Vector3( x, y, z ) );
+		placeholder.push( x );
+		placeholder.push( y );
+		placeholder.push( z );
 
 	}
 
+
 	function f3( a, b, c ) {
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
+		addVertex( a );
+		addVertex( b );
+		addVertex( c );
 
-		scope.faces.push( new Face3( a, b, c, null, null, 0 ) );
+		var nextIndex = verticesArray.length / 3;
+		var uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
-		var uvs = uvgen.generateTopUV( scope, a, b, c );
-
-		scope.faceVertexUvs[ 0 ].push( uvs );
+		addUV( uvs[ 0 ] );
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 2 ] );
 
 	}
 
 	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
 
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
-		d += shapesOffset;
+		addVertex( a );
+		addVertex( b );
+		addVertex( d );
 
-		scope.faces.push( new Face3( a, b, d, null, null, 1 ) );
-		scope.faces.push( new Face3( b, c, d, null, null, 1 ) );
+		addVertex( b );
+		addVertex( c );
+		addVertex( d );
 
-		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
-		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+		var nextIndex = verticesArray.length / 3;
+		var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+
+		addUV( uvs[ 0 ] );
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 3 ] );
+
+		addUV( uvs[ 1 ] );
+		addUV( uvs[ 2 ] );
+		addUV( uvs[ 3 ] );
+
+	}
+
+	function addVertex( index ) {
+
+		indicesArray.push( verticesArray.length / 3 );
+		verticesArray.push( placeholder[ index * 3 + 0 ] );
+		verticesArray.push( placeholder[ index * 3 + 1 ] );
+		verticesArray.push( placeholder[ index * 3 + 2 ] );
+
+	}
+
+
+	function addUV( vector2 ) {
+
+		uvArray.push( vector2.x );
+		uvArray.push( vector2.y );
+
+	}
+
+	if ( ! options.arrays ) {
+
+		this.setIndex( indicesArray );
+		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
 
 	}
 
@@ -26758,47 +26875,54 @@ ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 ExtrudeGeometry.WorldUVGenerator = {
 
-	generateTopUV: function ( geometry, indexA, indexB, indexC ) {
+	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
 
-		var vertices = geometry.vertices;
-
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
+		var a_x = vertices[ indexA * 3 ];
+		var a_y = vertices[ indexA * 3 + 1 ];
+		var b_x = vertices[ indexB * 3 ];
+		var b_y = vertices[ indexB * 3 + 1 ];
+		var c_x = vertices[ indexC * 3 ];
+		var c_y = vertices[ indexC * 3 + 1 ];
 
 		return [
-			new Vector2( a.x, a.y ),
-			new Vector2( b.x, b.y ),
-			new Vector2( c.x, c.y )
+			new Vector2( a_x, a_y ),
+			new Vector2( b_x, b_y ),
+			new Vector2( c_x, c_y )
 		];
 
 	},
 
-	generateSideWallUV: function ( geometry, indexA, indexB, indexC, indexD ) {
+	generateSideWallUV: function ( geometry, vertices, indexA, indexB, indexC, indexD ) {
 
-		var vertices = geometry.vertices;
+		var a_x = vertices[ indexA * 3 ];
+		var a_y = vertices[ indexA * 3 + 1 ];
+		var a_z = vertices[ indexA * 3 + 2 ];
+		var b_x = vertices[ indexB * 3 ];
+		var b_y = vertices[ indexB * 3 + 1 ];
+		var b_z = vertices[ indexB * 3 + 2 ];
+		var c_x = vertices[ indexC * 3 ];
+		var c_y = vertices[ indexC * 3 + 1 ];
+		var c_z = vertices[ indexC * 3 + 2 ];
+		var d_x = vertices[ indexD * 3 ];
+		var d_y = vertices[ indexD * 3 + 1 ];
+		var d_z = vertices[ indexD * 3 + 2 ];
 
-		var a = vertices[ indexA ];
-		var b = vertices[ indexB ];
-		var c = vertices[ indexC ];
-		var d = vertices[ indexD ];
-
-		if ( Math.abs( a.y - b.y ) < 0.01 ) {
+		if ( Math.abs( a_y - b_y ) < 0.01 ) {
 
 			return [
-				new Vector2( a.x, 1 - a.z ),
-				new Vector2( b.x, 1 - b.z ),
-				new Vector2( c.x, 1 - c.z ),
-				new Vector2( d.x, 1 - d.z )
+				new Vector2( a_x, 1 - a_z ),
+				new Vector2( b_x, 1 - b_z ),
+				new Vector2( c_x, 1 - c_z ),
+				new Vector2( d_x, 1 - d_z )
 			];
 
 		} else {
 
 			return [
-				new Vector2( a.y, 1 - a.z ),
-				new Vector2( b.y, 1 - b.z ),
-				new Vector2( c.y, 1 - c.z ),
-				new Vector2( d.y, 1 - d.z )
+				new Vector2( a_y, 1 - a_z ),
+				new Vector2( b_y, 1 - b_z ),
+				new Vector2( c_y, 1 - c_z ),
+				new Vector2( d_y, 1 - d_z )
 			];
 
 		}
@@ -26824,8 +26948,29 @@ ExtrudeGeometry.WorldUVGenerator = {
  *  bevelSize: <float> // how far from text outline is bevel
  * }
  */
+ 
 
-function TextGeometry( text, parameters ) {
+function TextGeometry(  text, parameters ) {
+
+	Geometry.call( this );
+
+	this.type = 'TextGeometry';
+
+	this.parameters = {
+		text: text,
+		parameters: parameters
+	};
+
+	this.fromBufferGeometry( new TextBufferGeometry( text, parameters ) );
+	this.mergeVertices();
+
+}
+
+TextGeometry.prototype = Object.create( Geometry.prototype );
+TextGeometry.prototype.constructor = TextGeometry;
+
+
+function TextBufferGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 
@@ -26850,14 +26995,14 @@ function TextGeometry( text, parameters ) {
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 
-	ExtrudeGeometry.call( this, shapes, parameters );
+	ExtrudeBufferGeometry.call( this, shapes, parameters );
 
 	this.type = 'TextGeometry';
 
 }
 
-TextGeometry.prototype = Object.create( ExtrudeGeometry.prototype );
-TextGeometry.prototype.constructor = TextGeometry;
+TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
+TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -28078,346 +28223,6 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * @author spite / https://github.com/spite
- *
- * reference: http://blog.wolfire.com/2009/06/how-to-project-decals/
- *
- */
-
-function DecalGeometry( mesh, position, orientation, size ) {
-
-	BufferGeometry.call( this );
-
-	this.type = 'DecalGeometry';
-
-	// buffers
-
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
-
-	// helpers
-
-	var plane = new Vector3();
-
-	// this matrix represents the transformation of the decal projector
-
-	var projectorMatrix = new Matrix4();
-	projectorMatrix.makeRotationFromEuler( orientation );
-	projectorMatrix.setPosition( position );
-
-	var projectorMatrixInverse = new Matrix4().getInverse( projectorMatrix );
-
-	// generate buffers
-
-	generate();
-
-	// build geometry
-
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-	function generate() {
-
-		var i, j;
-		var geometry = new BufferGeometry();
-		var decalVertices = [];
-
-		var vertex = new Vector3();
-		var normal = new Vector3();
-
-		// handle different geometry types
-
-		if ( mesh.geometry.isGeometry ) {
-
-			geometry.fromGeometry( mesh.geometry );
-
-		} else {
-
-			geometry.copy( mesh.geometry );
-
-		}
-
-		var positionAttribute = geometry.attributes.position;
-		var normalAttribute = geometry.attributes.normal;
-
-		// first, create an array of 'DecalVertex' objects
-		// three consecutive 'DecalVertex' objects represent a single face
-		//
-		// this data structure will be later used to perform the clipping
-
-		if ( geometry.index !== null ) {
-
-			// indexed BufferGeometry
-
-			var index = geometry.index;
-
-			for ( i = 0; i < index.count; i ++ ) {
-
-				vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
-				normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
-
-				pushDecalVertex( decalVertices, vertex, normal );
-
-			}
-
-		} else {
-
-			// non-indexed BufferGeometry
-
-			for ( i = 0; i < positionAttribute.count; i ++ ) {
-
-				vertex.fromBufferAttribute( positionAttribute, i );
-				normal.fromBufferAttribute( normalAttribute, i );
-
-				pushDecalVertex( decalVertices, vertex, normal );
-
-			}
-
-		}
-
-		// second, clip the geometry so that it doesn't extend out from the projector
-
-		decalVertices = clipGeometry( decalVertices, plane.set(   1,   0,   0 ) );
-		decalVertices = clipGeometry( decalVertices, plane.set( - 1,   0,   0 ) );
-		decalVertices = clipGeometry( decalVertices, plane.set(   0,   1,   0 ) );
-		decalVertices = clipGeometry( decalVertices, plane.set(   0, - 1,   0 ) );
-		decalVertices = clipGeometry( decalVertices, plane.set(   0,   0,   1 ) );
-		decalVertices = clipGeometry( decalVertices, plane.set(   0,   0, - 1 ) );
-
-		// third, generate final vertices, normals and uvs
-
-		for ( i = 0; i < decalVertices.length; i ++ ) {
-
-			var decalVertex = decalVertices[ i ];
-
-			// create texture coordinates (we are still in projector space)
-
-			uvs.push(
-				0.5 + ( decalVertex.position.x / size.x ),
-				0.5 + ( decalVertex.position.y / size.y )
-			);
-
-			// transform the vertex back to world space
-
-			decalVertex.position.applyMatrix4( projectorMatrix );
-
-			// now create vertex and normal buffer data
-
-			vertices.push( decalVertex.position.x, decalVertex.position.y, decalVertex.position.z );
-			normals.push( decalVertex.normal.x, decalVertex.normal.y, decalVertex.normal.z );
-
-		}
-
-	}
-
-	function pushDecalVertex( decalVertices, vertex, normal ) {
-
-		// transform the vertex to world space, then to projector space
-
-		vertex.applyMatrix4( mesh.matrix );
-		vertex.applyMatrix4( projectorMatrixInverse );
-
-		decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
-
-	}
-
-	function clipGeometry( inVertices, plane ) {
-
-		var outVertices = [];
-
-		var s = 0.5 * Math.abs( size.dot( plane ) );
-
-		// a single iteration clips one face,
-		// which consists of three consecutive 'DecalVertex' objects
-
-		for ( var i = 0; i < inVertices.length; i += 3 ) {
-
-			var v1Out, v2Out, v3Out, total = 0;
-			var nV1, nV2, nV3, nV4;
-
-			var d1 = inVertices[ i + 0 ].position.dot( plane ) - s;
-			var d2 = inVertices[ i + 1 ].position.dot( plane ) - s;
-			var d3 = inVertices[ i + 2 ].position.dot( plane ) - s;
-
-			v1Out = d1 > 0;
-			v2Out = d2 > 0;
-			v3Out = d3 > 0;
-
-			// calculate, how many vertices of the face lie outside of the clipping plane
-
-			total = ( v1Out ? 1 : 0 ) + ( v2Out ? 1 : 0 ) + ( v3Out ? 1 : 0 );
-
-			switch ( total ) {
-
-				case 0: {
-
-					// the entire face lies inside of the plane, no clipping needed
-
-					outVertices.push( inVertices[ i ] );
-					outVertices.push( inVertices[ i + 1 ] );
-					outVertices.push( inVertices[ i + 2 ] );
-					break;
-
-				}
-
-				case 1: {
-
-					// one vertex lies outside of the plane, perform clipping
-
-					if ( v1Out ) {
-
-						nV1 = inVertices[ i + 1 ];
-						nV2 = inVertices[ i + 2 ];
-						nV3 = clip( inVertices[ i ], nV1, plane, s );
-						nV4 = clip( inVertices[ i ], nV2, plane, s );
-
-					}
-
-					if ( v2Out ) {
-
-						nV1 = inVertices[ i ];
-						nV2 = inVertices[ i + 2 ];
-						nV3 = clip( inVertices[ i + 1 ], nV1, plane, s );
-						nV4 = clip( inVertices[ i + 1 ], nV2, plane, s );
-
-						outVertices.push( nV3 );
-						outVertices.push( nV2.clone() );
-						outVertices.push( nV1.clone() );
-
-						outVertices.push( nV2.clone() );
-						outVertices.push( nV3.clone() );
-						outVertices.push( nV4 );
-						break;
-
-					}
-
-					if ( v3Out ) {
-
-						nV1 = inVertices[ i ];
-						nV2 = inVertices[ i + 1 ];
-						nV3 = clip( inVertices[ i + 2 ], nV1, plane, s );
-						nV4 = clip( inVertices[ i + 2 ], nV2, plane, s );
-
-					}
-
-					outVertices.push( nV1.clone() );
-					outVertices.push( nV2.clone() );
-					outVertices.push( nV3 );
-
-					outVertices.push( nV4 );
-					outVertices.push( nV3.clone() );
-					outVertices.push( nV2.clone() );
-
-					break;
-
-				}
-
-				case 2: {
-
-					// two vertices lies outside of the plane, perform clipping
-
-					if ( ! v1Out ) {
-
-						nV1 = inVertices[ i ].clone();
-						nV2 = clip( nV1, inVertices[ i + 1 ], plane, s );
-						nV3 = clip( nV1, inVertices[ i + 2 ], plane, s );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
-
-					}
-
-					if ( ! v2Out ) {
-
-						nV1 = inVertices[ i + 1 ].clone();
-						nV2 = clip( nV1, inVertices[ i + 2 ], plane, s );
-						nV3 = clip( nV1, inVertices[ i ], plane, s );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
-
-					}
-
-					if ( ! v3Out ) {
-
-						nV1 = inVertices[ i + 2 ].clone();
-						nV2 = clip( nV1, inVertices[ i ], plane, s );
-						nV3 = clip( nV1, inVertices[ i + 1 ], plane, s );
-						outVertices.push( nV1 );
-						outVertices.push( nV2 );
-						outVertices.push( nV3 );
-
-					}
-
-					break;
-
-				}
-
-				case 3: {
-
-					// the entire face lies outside of the plane, so let's discard the corresponding vertices
-
-					break;
-
-				}
-
-			}
-
-		}
-
-		return outVertices;
-
-	}
-
-	function clip( v0, v1, p, s ) {
-
-		var d0 = v0.position.dot( p ) - s;
-		var d1 = v1.position.dot( p ) - s;
-
-		var s0 = d0 / ( d0 - d1 );
-
-		var v = new DecalVertex(
-			new Vector3(
-				v0.position.x + s0 * ( v1.position.x - v0.position.x ),
-				v0.position.y + s0 * ( v1.position.y - v0.position.y ),
-				v0.position.z + s0 * ( v1.position.z - v0.position.z )
-			),
-			new Vector3(
-				v0.normal.x + s0 * ( v1.normal.x - v0.normal.x ),
-				v0.normal.y + s0 * ( v1.normal.y - v0.normal.y ),
-				v0.normal.z + s0 * ( v1.normal.z - v0.normal.z )
-			)
-		);
-
-		// need to clip more values (texture coordinates)? do it this way:
-		// intersectpoint.value = a.value + s * ( b.value - a.value );
-
-		return v;
-
-	}
-
-}
-
-DecalGeometry.prototype = Object.create( BufferGeometry.prototype );
-DecalGeometry.prototype.constructor = DecalGeometry;
-
-function DecalVertex( position, normal ) {
-
-	this.position = position;
-	this.normal = normal;
-
-}
-
-DecalVertex.prototype.clone = function() {
-
-	return new DecalVertex( this.position.clone(), this.normal.clone() );
-
-};
-
 
 
 var Geometries = Object.freeze({
@@ -28441,6 +28246,7 @@ var Geometries = Object.freeze({
 	TorusGeometry: TorusGeometry,
 	TorusBufferGeometry: TorusBufferGeometry,
 	TextGeometry: TextGeometry,
+	TextBufferGeometry: TextBufferGeometry,
 	SphereGeometry: SphereGeometry,
 	SphereBufferGeometry: SphereBufferGeometry,
 	RingGeometry: RingGeometry,
@@ -28452,6 +28258,7 @@ var Geometries = Object.freeze({
 	ShapeGeometry: ShapeGeometry,
 	ShapeBufferGeometry: ShapeBufferGeometry,
 	ExtrudeGeometry: ExtrudeGeometry,
+	ExtrudeBufferGeometry: ExtrudeBufferGeometry,
 	EdgesGeometry: EdgesGeometry,
 	ConeGeometry: ConeGeometry,
 	ConeBufferGeometry: ConeBufferGeometry,
@@ -28460,8 +28267,7 @@ var Geometries = Object.freeze({
 	CircleGeometry: CircleGeometry,
 	CircleBufferGeometry: CircleBufferGeometry,
 	BoxGeometry: BoxGeometry,
-	BoxBufferGeometry: BoxBufferGeometry,
-	DecalGeometry: DecalGeometry
+	BoxBufferGeometry: BoxBufferGeometry
 });
 
 /**
@@ -32851,21 +32657,9 @@ Object.assign( JSONLoader.prototype, {
 
 	},
 
-	parse: function ( json, texturePath ) {
+	parse: ( function () {
 
-		var geometry = new Geometry(),
-		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
-
-		parseModel( scale );
-
-		parseSkin();
-		parseMorphing( scale );
-		parseAnimations();
-
-		geometry.computeFaceNormals();
-		geometry.computeBoundingSphere();
-
-		function parseModel( scale ) {
+		function parseModel( json, geometry ) {
 
 			function isBitSet( value, position ) {
 
@@ -32875,27 +32669,30 @@ Object.assign( JSONLoader.prototype, {
 
 			var i, j, fi,
 
-			offset, zLength,
+				offset, zLength,
 
-		colorIndex, normalIndex, uvIndex, materialIndex,
+				colorIndex, normalIndex, uvIndex, materialIndex,
 
-			type,
-			isQuad,
-			hasMaterial,
-			hasFaceVertexUv,
-			hasFaceNormal, hasFaceVertexNormal,
-			hasFaceColor, hasFaceVertexColor,
+				type,
+				isQuad,
+				hasMaterial,
+				hasFaceVertexUv,
+				hasFaceNormal, hasFaceVertexNormal,
+				hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, hex, normal,
+				vertex, face, faceA, faceB, hex, normal,
 
-			uvLayer, uv, u, v,
+				uvLayer, uv, u, v,
 
-			faces = json.faces,
-			vertices = json.vertices,
-			normals = json.normals,
-			colors = json.colors,
+				faces = json.faces,
+				vertices = json.vertices,
+				normals = json.normals,
+				colors = json.colors,
 
-			nUvLayers = 0;
+				scale = json.scale,
+
+				nUvLayers = 0;
+
 
 			if ( json.uvs !== undefined ) {
 
@@ -32937,14 +32734,13 @@ Object.assign( JSONLoader.prototype, {
 
 				type = faces[ offset ++ ];
 
-
-				isQuad              = isBitSet( type, 0 );
-				hasMaterial         = isBitSet( type, 1 );
-				hasFaceVertexUv     = isBitSet( type, 3 );
-				hasFaceNormal       = isBitSet( type, 4 );
+				isQuad = isBitSet( type, 0 );
+				hasMaterial = isBitSet( type, 1 );
+				hasFaceVertexUv = isBitSet( type, 3 );
+				hasFaceNormal = isBitSet( type, 4 );
 				hasFaceVertexNormal = isBitSet( type, 5 );
-				hasFaceColor	     = isBitSet( type, 6 );
-				hasFaceVertexColor  = isBitSet( type, 7 );
+				hasFaceColor = isBitSet( type, 6 );
+				hasFaceVertexColor = isBitSet( type, 7 );
 
 				// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
@@ -33165,7 +32961,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		function parseSkin() {
+		function parseSkin( json, geometry ) {
 
 			var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
 
@@ -33173,7 +32969,7 @@ Object.assign( JSONLoader.prototype, {
 
 				for ( var i = 0, l = json.skinWeights.length; i < l; i += influencesPerVertex ) {
 
-					var x =                               json.skinWeights[ i ];
+					var x = json.skinWeights[ i ];
 					var y = ( influencesPerVertex > 1 ) ? json.skinWeights[ i + 1 ] : 0;
 					var z = ( influencesPerVertex > 2 ) ? json.skinWeights[ i + 2 ] : 0;
 					var w = ( influencesPerVertex > 3 ) ? json.skinWeights[ i + 3 ] : 0;
@@ -33188,7 +32984,7 @@ Object.assign( JSONLoader.prototype, {
 
 				for ( var i = 0, l = json.skinIndices.length; i < l; i += influencesPerVertex ) {
 
-					var a =                               json.skinIndices[ i ];
+					var a = json.skinIndices[ i ];
 					var b = ( influencesPerVertex > 1 ) ? json.skinIndices[ i + 1 ] : 0;
 					var c = ( influencesPerVertex > 2 ) ? json.skinIndices[ i + 2 ] : 0;
 					var d = ( influencesPerVertex > 3 ) ? json.skinIndices[ i + 3 ] : 0;
@@ -33210,7 +33006,9 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		function parseMorphing( scale ) {
+		function parseMorphing( json, geometry ) {
+
+			var scale = json.scale;
 
 			if ( json.morphTargets !== undefined ) {
 
@@ -33255,7 +33053,7 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		function parseAnimations() {
+		function parseAnimations( json, geometry ) {
 
 			var outputAnimations = [];
 
@@ -33302,19 +33100,50 @@ Object.assign( JSONLoader.prototype, {
 
 		}
 
-		if ( json.materials === undefined || json.materials.length === 0 ) {
+		return function ( json, texturePath ) {
 
-			return { geometry: geometry };
+			if ( json.data !== undefined ) {
 
-		} else {
+				// Geometry 4.0 spec
+				json = json.data;
 
-			var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+			}
 
-			return { geometry: geometry, materials: materials };
+			if ( json.scale !== undefined ) {
 
-		}
+				json.scale = 1.0 / json.scale;
 
-	}
+			} else {
+
+				json.scale = 1.0;
+
+			}
+
+			var geometry = new Geometry();
+
+			parseModel( json, geometry );
+			parseSkin( json, geometry );
+			parseMorphing( json, geometry );
+			parseAnimations( json, geometry );
+
+			geometry.computeFaceNormals();
+			geometry.computeBoundingSphere();
+
+			if ( json.materials === undefined || json.materials.length === 0 ) {
+
+				return { geometry: geometry };
+
+			} else {
+
+				var materials = Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
+
+				return { geometry: geometry, materials: materials };
+
+			}
+
+		};
+
+	} )()
 
 } );
 
@@ -33592,7 +33421,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
+						geometry = geometryLoader.parse( data, this.texturePath ).geometry;
 
 						break;
 
@@ -43218,4 +43047,4 @@ function CanvasRenderer() {
 
 }
 
-export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, SceneUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, DecalGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };
+export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, SceneUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };

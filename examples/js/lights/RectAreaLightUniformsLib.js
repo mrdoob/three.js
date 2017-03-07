@@ -27,6 +27,8 @@
 
 	//
 
+	var UniformsLib = THREE.UniformsLib;
+	var ShaderLib = THREE.ShaderLib;
 
 	var LTC_MAT_TEXTURE = new THREE.DataTexture(
 			new Float32Array( LTC_MAT ),
@@ -50,16 +52,22 @@
         texture.needsUpdate = true;
     };
 
+<<<<<<< HEAD
     LTC_MAG_TEXTURE.onUpdate = function (texture) {
         texture.needsUpdate = true;
     };
     
+=======
+	THREE.UniformsLib.LTC_MAT_TEXTURE = LTC_MAT_TEXTURE;
+	THREE.UniformsLib.LTC_MAG_TEXTURE = LTC_MAG_TEXTURE;
+
+>>>>>>> ad43815b46f965d6cbf90346f64a6234978c828c
 	// Add ltc tables to materials
 
-	var ltc_brdf = { ltcMat: { value: LTC_MAT_TEXTURE }, ltcMag: { value: LTC_MAT_TEXTURE } };
+	var ltc_brdf = { ltcMat: { value: null }, ltcMag: { value: null } };
 
-	Object.assign( THREE.ShaderLib.phong.uniforms, ltc_brdf );
-	Object.assign( THREE.ShaderLib.standard.uniforms, ltc_brdf );
-	Object.assign( THREE.ShaderLib.physical.uniforms, ltc_brdf );
+	Object.assign( ShaderLib.phong.uniforms, ltc_brdf );
+	Object.assign( ShaderLib.standard.uniforms, ltc_brdf );
+	Object.assign( ShaderLib.physical.uniforms, ltc_brdf );
 
 } )()

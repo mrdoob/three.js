@@ -28,16 +28,11 @@
 	 */
 	THREE.FBXLoader = function ( manager ) {
 
-		THREE.Loader.call( this );
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.fileLoader = new THREE.FileLoader( this.manager );
 		this.textureLoader = new THREE.TextureLoader( this.manager );
 
 	};
-
-	Object.assign( THREE.FBXLoader.prototype, THREE.Loader.prototype );
-
-	THREE.FBXLoader.prototype.constructor = THREE.FBXLoader;
 
 	Object.assign( THREE.FBXLoader.prototype, {
 
