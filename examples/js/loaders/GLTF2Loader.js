@@ -1190,7 +1190,97 @@ THREE.GLTF2Loader = ( function () {
 
 				} else if ( material.technique === undefined ) {
 
-					materialType = THREE.MeshPhongMaterial;
+					if ( material.pbrMetallicRoughness !== undefined )  {
+
+						// specification
+						// https://github.com/sbtron/glTF/blob/30de0b365d1566b1bbd8b9c140f9e995d3203226/specification/2.0/README.md#metallic-roughness-material
+
+						materialType = THREE.MeshStandardMaterial;
+
+						if ( material.pbrMetallicRoughness !== undefined ) {
+
+							var metallicRoughness = material.pbrMetallicRoughness;
+
+							materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
+							materialParams.opacity = 1.0;
+
+							if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+
+								var array = metallicRoughness.baseColorFactor;
+
+								materialParams.color.fromArray( array );
+								materialParams.opacity = array[ 3 ];
+
+							}
+
+							if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+								materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
+
+							}
+
+							if ( materialParams.opacity < 1.0 ||
+							     ( materialParams.map !== undefined &&
+							       ( materialParams.map.format === THREE.AlphaFormat ||
+							         materialParams.map.format === THREE.RGBAFormat ||
+							         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
+
+								materialParams.transparent = true;
+
+							}
+
+							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
+							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
+
+							if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
+
+								var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
+
+								// Note that currently metalnessMap would be entirely ignored because
+								// Three.js and glTF specification use different texture channels for metalness
+								// (Blue: Three.js, Red: glTF).
+								// But glTF specification team is discussing if they can change.
+								// Let's keep an eye on it so far.
+								//
+								// https://github.com/KhronosGroup/glTF/issues/857
+								materialParams.metalnessMap = dependencies.textures[ textureIndex ];
+								materialParams.roughnessMap = dependencies.textures[ textureIndex ];
+
+							}
+
+						}
+
+					} else {
+
+						materialType = THREE.MeshPhongMaterial;
+
+					}
+
+					if ( material.normalTexture !== undefined ) {
+
+						materialParams.normalMap = dependencies.textures[ material.normalTexture.index ];
+
+					}
+
+					if ( material.occlusionTexture !== undefined ) {
+
+						materialParams.aoMap = dependencies.textures[ material.occlusionTexture.index ];
+
+					}
+
+					if ( material.emissiveTexture !== undefined ) {
+
+						materialParams.emissiveMap = dependencies.textures[ material.emissiveTexture.index ];
+
+					}
+
+					materialParams.emissive = new THREE.Color( 0.0, 0.0, 0.0 );
+
+					if ( material.emissiveFactor !== undefined ) {
+
+						materialParams.emissive.fromArray( material.emissiveFactor );
+
+					}
 
 					Object.assign( materialValues, material.values );
 
