@@ -34,7 +34,7 @@
     "dev": "rollup -c -w",
     "lint": "eslint src",
     "test": "rollup -c test/rollup.unit.config.js -w",
-    "editor-start": "electron ./editor/main.js"
+    "editor": "electron ./editor/main.js"
   },
   "keywords": [
     "three",
