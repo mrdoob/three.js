@@ -54,9 +54,7 @@
     "qunitjs": "^2.1.1",
     "rollup": "^0.41.4",
     "rollup-watch": "^3.2.2",
-    "uglify-js": "^2.6.0"
-  },
-  "dependencies": {
+    "uglify-js": "^2.6.0",
     "electron": "^1.6.1"
   }
 }
