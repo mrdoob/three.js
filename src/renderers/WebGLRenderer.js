@@ -2528,21 +2528,30 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
-			// TODO: unify these code paths
-			if ( ( texture && texture.isCubeTexture ) ||
-				( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
 
-				// CompressedTexture can have Array in image :/
-
-				// this function alone should take care of cube textures
-				textures.setTextureCube( texture, slot );
+				state.activeTexture( _gl.TEXTURE0 + slot );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 			} else {
 
-				// assumed: texture property of THREE.WebGLRenderTargetCube
+				// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+				// TODO: unify these code paths
+				if ( ( texture && texture.isCubeTexture ) ||
+					( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
 
-				textures.setTextureCubeDynamic( texture, slot );
+					// CompressedTexture can have Array in image :/
+
+					// this function alone should take care of cube textures
+					textures.setTextureCube( texture, slot );
+
+				} else {
+
+					// assumed: texture property of THREE.WebGLRenderTargetCube
+
+					textures.setTextureCubeDynamic( texture, slot );
+
+				}
 
 			}
 
