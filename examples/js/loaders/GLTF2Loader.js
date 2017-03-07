@@ -1190,7 +1190,92 @@ THREE.GLTF2Loader = ( function () {
 
 				} else if ( material.technique === undefined ) {
 
-					materialType = THREE.MeshPhongMaterial;
+					if ( material.pbrMetallicRoughness !== undefined )  {
+
+						// specification
+						// https://github.com/sbtron/glTF/blob/30de0b365d1566b1bbd8b9c140f9e995d3203226/specification/2.0/README.md#metallic-roughness-material
+
+						materialType = THREE.MeshStandardMaterial;
+
+						if ( material.pbrMetallicRoughness !== undefined ) {
+
+							var metallicRoughness = material.pbrMetallicRoughness;
+
+							materialParams.color = new THREE.Color();
+
+							if ( Array.isArray( metallicRoughness.baseColorFactor ) ) {
+
+								var array = metallicRoughness.baseColorFactor;
+
+								materialParams.color.fromArray( array );
+								materialParams.opacity = array[ 3 ];
+
+							} else {
+
+								materialParams.color.setRGB( 1.0, 1.0, 1.0 ).getHex();
+								materialParams.opacity = 1.0;
+
+							}
+
+							if ( metallicRoughness.baseColorTexture !== undefined ) {
+
+								materialParams.map = dependencies.textures[ metallicRoughness.baseColorTexture.index ];
+
+							}
+
+							// set transparent true if map baseColorTexture is specified because
+							// A channel values of it can be less than 1.0.
+							if ( materialParams.opacity < 1.0 || materialParams.map !== undefined ) materialParams.transparent = true;
+
+							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
+							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
+
+							if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
+
+								var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
+
+								materialParams.metalnessMap = dependencies.textures[ textureIndex ];
+								materialParams.roughnessMap = dependencies.textures[ textureIndex ];
+
+							}
+
+						}
+
+					} else {
+
+						materialType = THREE.MeshPhongMaterial;
+
+					}
+
+					if ( material.normalTexture !== undefined ) {
+
+						materialParams.normalMap = dependencies.textures[ material.normalTexture.index ];
+
+					}
+
+					if ( material.occlusionTexture !== undefined ) {
+
+						materialParams.aoMap = dependencies.textures[ material.occlusionTexture.index ];
+
+					}
+
+					if ( material.emissiveTexture !== undefined ) {
+
+						materialParams.emissiveMap = dependencies.textures[ material.emissiveTexture.index ];
+
+					}
+
+					materialParams.emissive = new THREE.Color();
+
+					if ( material.emissiveFactor !== undefined ) {
+
+						materialParams.emissive.fromArray( material.emissiveFactor );
+
+					} else {
+
+						materialParams.emissive.setRGB( 0.0, 0.0, 0.0 );
+
+					}
 
 					Object.assign( materialValues, material.values );
 
