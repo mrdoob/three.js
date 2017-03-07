@@ -2489,24 +2489,15 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture = ( function () {
+	this.setTexture = function () {
 
-		var warned = false;
+		console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
 
-		return function setTexture( texture, slot ) {
+		_this.setTexture = _this.setTexture2D; // replace function after first warn
 
-			if ( ! warned ) {
+		_this.setTexture2D( texture, slot );
 
-				console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
-				warned = true;
-
-			}
-
-			textures.setTexture2D( texture, slot );
-
-		};
-
-	}() );
+	};
 
 	this.setTextureCube = ( function () {
 
