@@ -1219,9 +1219,15 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
-							// set transparent true if map baseColorTexture is specified because
-							// A channel values of it can be less than 1.0.
-							if ( materialParams.opacity < 1.0 || materialParams.map !== undefined ) materialParams.transparent = true;
+							if ( materialParams.opacity < 1.0 ||
+							     ( materialParams.map !== undefined &&
+							       ( materialParams.map.format === THREE.AlphaFormat ||
+							         materialParams.map.format === THREE.RGBAFormat ||
+							         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
+
+								materialParams.transparent = true;
+
+							}
 
 							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
 							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
