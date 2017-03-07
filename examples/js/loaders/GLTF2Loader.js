@@ -1230,6 +1230,13 @@ THREE.GLTF2Loader = ( function () {
 
 								var textureIndex = metallicRoughness.metallicRoughnessTexture.index;
 
+								// Note that currently metalnessMap would be entirely ignored because
+								// Three.js and glTF specification use different texture channels for metalness
+								// (Blue: Three.js, Red: glTF).
+								// But glTF specification team is discussing if they can change.
+								// Let's keep an eye on it so far.
+								//
+								// https://github.com/KhronosGroup/glTF/issues/857
 								materialParams.metalnessMap = dependencies.textures[ textureIndex ];
 								materialParams.roughnessMap = dependencies.textures[ textureIndex ];
 
