@@ -1212,7 +1212,7 @@ THREE.GLTF2Loader = ( function () {
 
 							} else {
 
-								materialParams.color.setRGB( 1.0, 1.0, 1.0 ).getHex();
+								materialParams.color.setRGB( 1.0, 1.0, 1.0 );
 								materialParams.opacity = 1.0;
 
 							}
