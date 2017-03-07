@@ -2488,7 +2488,7 @@ function WebGLRenderer( parameters ) {
 
 	}() );
 
-	this.setTexture = function () {
+	this.setTexture = function ( texture, slot ) {
 
 		console.warn( "THREE.WebGLRenderer: .setTexture is deprecated, use setTexture2D instead." );
 
