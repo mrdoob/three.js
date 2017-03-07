@@ -2476,8 +2476,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_2D, null );
+				textures.unsetTexture2D( slot );
 
 			} else {
 
@@ -2521,8 +2520,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( _currentRenderTarget && _currentRenderTarget.texture === texture ) {
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+				textures.unsetTextureCube( slot );
 
 			} else {
 
