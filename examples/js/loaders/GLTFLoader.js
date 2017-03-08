@@ -882,8 +882,6 @@ THREE.GLTFLoader = ( function () {
 
 		] ).then( function ( dependencies ) {
 
-			var scene = dependencies.scenes[ json.scene ];
-
 			var scenes = [];
 
 			for ( var name in dependencies.scenes ) {
@@ -891,6 +889,8 @@ THREE.GLTFLoader = ( function () {
 				scenes.push( dependencies.scenes[ name ] );
 
 			}
+
+			var scene = json.scene !== undefined ? dependencies.scenes[ json.scene ] : scenes[ 0 ];
 
 			var cameras = [];
 

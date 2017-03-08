@@ -1,10 +1,10 @@
-THREE.MirrorNode = function( renderer, camera, options ) {
+THREE.MirrorNode = function( mirror, camera, options ) {
 
 	THREE.TempNode.call( this, 'v4' );
 
-	this.mirror = renderer instanceof THREE.Mirror ? renderer : new THREE.Mirror( renderer, camera, options );
+	this.mirror = mirror;
 
-	this.textureMatrix = new THREE.Matrix4Node( this.mirror.textureMatrix );
+	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
 	this.worldPosition = new THREE.PositionNode( THREE.PositionNode.WORLD );
 
