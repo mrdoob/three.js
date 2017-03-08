@@ -34,6 +34,7 @@
 		<script src="js/utils/ShadowMapViewer.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -42,9 +43,14 @@
 			var camera, scene, renderer, clock, stats;
 			var dirLight, spotLight;
 			var torusKnot, cube;
-			var dirLightShadowMapViewer, spotLightShadowMapViewer;
-			var objectsGrid = [];
+
+			var objectWrapper;
 			var finalTriNum = 0;
+			var currentMesh;
+			var cache = {};
+			var options;
+			var trsCache;
+
 			
 			init();
 
@@ -54,8 +60,8 @@
 			function init() {
 
 				initScene();
-				initShadowMapViewers();
 				initMisc();
+				initExample();
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -77,7 +83,7 @@
 				spotLight.name = 'Spot Light';
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
-				spotLight.position.set( 10, 10, 5 );
+				spotLight.position.set( 20, 20, 15 );
 				spotLight.castShadow = true;
 				spotLight.shadow.camera.near = 8;
 				spotLight.shadow.camera.far = 30;
@@ -85,12 +91,10 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
-
 				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
-				dirLight.castShadow = true;
+				// dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
 				dirLight.shadow.camera.far = 10;
 				dirLight.shadow.camera.right = 15;
@@ -101,112 +105,6 @@
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
-				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
-
-				console.log( scene );
-
-				// Geometry
-				var geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0xff0000,
-					shininess: 150,
-					specular: 0x222222,
-					shading: THREE.SmoothShading
-				} );
-
-				var colors = [ 0xff0000 , 0x00f000 , 0x0000f0 ];
-				
-				var geometries = [new THREE.BoxBufferGeometry(1,1,1) , new THREE.SphereBufferGeometry(1,8,8) , new THREE.CylinderBufferGeometry(.3,.3,1,8)];
-					
-				var geometriesTriNum = [];
-
-				geometries.forEach( function( g ){
-
-					geometriesTriNum.push( g.index.count / 3 );
-
-				});
-
-				for( var i = -1 ; i <= 1 ; i++ )
-					for( var j = -1 ; j <= 1 ; j++ ){
-
-						var o = new THREE.Object3D();
-						
-						o.position.set( i , 0 , j );
-						
-						o.position.multiplyScalar( 10 );
-
-						o.position.y = 3;
-
-						o.scale.multiplyScalar( .8 );
-
-						scene.add(o);
-
-						objectsGrid.push( o );
-
-					}
-
-				objectsGrid.forEach( function( g , gi ){
-
-					var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ]; 
-					var rotate = Math.random() > 0.5 ? true : false;
-
-					colors.forEach( function(c , ci){
-
-						var cluster = new THREE.InstancedMesh( 
-							
-							geometry , 
-							
-							new THREE.MeshPhongMaterial( {
-								color: c,
-								shininess: 150,
-								specular: 0xffffff,
-								shading: THREE.SmoothShading
-							} ), 
-							
-							function( object , i ){
-
-								object.position.x = Math.random() * 2 - 1;
-								object.position.y = Math.random() * 2 - 1;
-								object.position.z = Math.random() * 2 - 1;
-
-								object.position.multiplyScalar( 2 );
-
-								if( rotate ){
-
-									object.rotation.x = Math.random() * 2 * Math.PI;
-									object.rotation.y = Math.random() * 2 * Math.PI;
-									object.rotation.z = Math.random() * 2 * Math.PI;
-
-								}
-
-								var scale = Math.random() + .5;
-
-								scale *=.5;
-
-								object.scale.x = scale * ( Math.random() + 0.5);
-								object.scale.y = scale * ( Math.random() + 0.5);
-								object.scale.z = scale * ( Math.random() + 0.5);
-
-							},
-
-							1000,
-
-							false
-						);
-
-						finalTriNum += geometriesTriNum[ geometries.indexOf( geometry ) ] * 1000;
-
-						cluster.castShadow = true;
-						cluster.receiveShadow = true;
-						g.add( cluster );
-
-					});
-
-				 	scene.add( g );
-
-				});
-
-				console.log( 'Total triangle num: ' + finalTriNum );
 
 				var geometry = new THREE.BoxGeometry( 10, 0.15, 10 );
 				var material = new THREE.MeshPhongMaterial( {
@@ -221,22 +119,6 @@
 				ground.castShadow = false;
 				ground.receiveShadow = true;
 				scene.add( ground );
-
-			}
-
-			function initShadowMapViewers() {
-
-				dirLightShadowMapViewer = new THREE.ShadowMapViewer( dirLight );
-				dirLightShadowMapViewer.position.x = 10;
-				dirLightShadowMapViewer.position.y = 10;
-				dirLightShadowMapViewer.size.width = 256;
-				dirLightShadowMapViewer.size.height = 256;
-				dirLightShadowMapViewer.update(); //Required when setting position or size directly
-
-				spotLightShadowMapViewer = new THREE.ShadowMapViewer( spotLight );
-				spotLightShadowMapViewer.size.set( 256, 256 );
-				spotLightShadowMapViewer.position.set( 276, 10 );
-				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
 
 			}
 
@@ -261,57 +143,275 @@
 
 			}
 
+			function getKey(){
+				
+				if( arguments.length ){
+					
+					var key = '';
+
+					for( var i = 0 ; i < arguments.length ; i ++ )
+
+						key += i < 2 ? arguments[i] : !!arguments[i];
+
+					return key;
+				} 
+
+				return options.geometry + options.instanceNumber + options.dynamic + options.uniformScale ;
+
+			}
+
+			function initExample(){
+
+				//setup
+
+				options = {
+					dynamic: false,
+					uniformScale: false,
+					material: 'phong',
+					instanceNumber: 200,
+					geometry: 'box'
+				};
+
+
+
+
+				var geometries = {
+					box: new THREE.BoxBufferGeometry(1,1,1), 
+					sphere: new THREE.SphereBufferGeometry(1,12,8), 
+					cylinder: new THREE.CylinderBufferGeometry(.3,.3,1,8)
+				};	
+
+				var instanceNumbers = [ 200 , 1000 , 5000 , 20000 , 100000 ];
+
+				var totalTriangleNumber = {};
+
+				var geometriesTriNum = {};
+
+				//different built-in materials
+
+				var materials = {
+					
+					phong: new THREE.MeshPhongMaterial( {
+						color: 0xff0000,
+						shininess: 150,
+						specular: 0x222222,
+						shading: THREE.SmoothShading
+					}),
+
+					lambert: new THREE.MeshLambertMaterial({
+						color: 0x00ff00
+
+					}),
+					
+					standard: new THREE.MeshStandardMaterial({
+						color: 0x0000ff
+					})
+				};
+
+
+				//calculate how many trinagles will be pushed
+
+				for( var g in geometries ){
+					
+					totalTriangleNumber[ g ] = [];
+
+					var n = geometriesTriNum[ g ] = geometries[ g ].index.count/3;
+
+					instanceNumbers.forEach( function( num ) { totalTriangleNumber[ g ].push( n * num ); });
+					
+				}
+				
+				//mesh wrapper
+
+				objectWrapper = new THREE.Object3D();
+				
+				objectWrapper.position.y = 3;
+
+				scene.add( objectWrapper );
+
+
+				//create mesh cache
+
+				//to avoid matrix decomposition 
+				
+				trsCache = [];
+
+				var pi2 = Math.PI * 2;
+				
+				console.log( 'Initializing object cache for 100k objects...');
+				console.time( 'Object cache initialized.');
+
+				for ( var i = 0 ; i < instanceNumbers[ 4 ] ; i ++ ){
+
+					var dummyObj = new THREE.Object3D(); //will hold position , rotation , scale 
+
+					// dummyObj.position.set( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 );
+					// dummyObj.position.multiplyScalar( 14 );
+					// dummyObj.rotation.set( Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
+					// dummyObj.scale.set( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 );
+
+					trsCache.push({
+						position: new THREE.Vector3( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 ).multiplyScalar( 14 ),
+						rotation: new THREE.Euler(  Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 ),
+						scale: new THREE.Vector3( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 )
+					});
+
+				}
+				console.timeEnd( 'Object cache initialized.');
+
+				console.log( 'Initializing instanced mesh permutations...');
+				console.time( 'Instanced mesh permutations initialized.');
+
+				instanceNumbers.forEach( function( iNum ){
+
+					for ( var g in geometries ){
+
+						for ( var uScale = 0 ; uScale < 2 ; uScale ++ ){
+
+							for ( var dynamic = 0 ; dynamic < 2 ; dynamic ++ ){
+
+								var instancedMesh = cache[ getKey( g , iNum , dynamic , uScale ) ] = new THREE.InstancedMesh(
+
+									//provide geometry
+									geometries[ g ], 		
+
+									//provide material
+									materials[ options.material ],	
+
+									//how many instances to allocate
+									iNum, 								
+									
+									//matrix initialization, if ommited will set identity matrix at each index
+									function( placementObject , i ){
+
+										//copy from outside holders
+										var source = trsCache[i];
+
+										placementObject.position.copy( source.position );
+
+										placementObject.rotation.copy( source.rotation );
+
+										if( !uScale ){
+											placementObject.scale.copy( source.scale );
+										}
+
+										//InstancedMesh will automatically extract the matrix from this object at this index
+									},
+
+ 									//is the scale known to be uniform, will do less shader work, improperly applying this will result in wrong shading 
+									!!uScale
+
+								);
+
+								instancedMesh.visible = false;
+
+								instancedMesh.castShadow = true;
+
+								instancedMesh.receiveShadow = true;
+
+								objectWrapper.add( instancedMesh );
+
+							}
+
+						}
+
+					}
+
+				});
+				console.timeEnd( 'Instanced mesh permutations initialized.');
+
+				onChangeMesh();
+
+				function onChangeMesh(){
+
+					for ( var c in cache ) cache[c].visible = false;
+					
+					cache[ getKey() ].visible = true;
+
+					console.log( 'key' , getKey() );
+					console.log( 'triangles' , totalTriangleNumber[ options.geometry ][ instanceNumbers.indexOf( parseInt(options.instanceNumber) )].toLocaleString() );
+				}
+
+				function onChangeMaterial(){
+
+					for ( var m in cache ) cache[ m ].material = materials[ options.material ];
+
+				}
+
+				var gui = new dat.GUI();
+
+				gui.add( options, 'material' , Object.keys( materials ) ).onChange( onChangeMaterial );
+
+				gui.add( options, 'instanceNumber' , instanceNumbers ).onChange( onChangeMesh );
+				
+				gui.add( options, 'geometry' , Object.keys( geometries ) ).onChange( onChangeMesh );
+
+				gui.add( options, 'dynamic' ).onChange( onChangeMesh );
+
+				gui.add( options, 'uniformScale' ).onChange( onChangeMesh );
+
+				gui.open();
+
+			}
+
+			function rotateObjects( dt ){
+
+
+				var currentMesh = cache[ getKey() ];
+
+				var _obj = new THREE.Object3D();
+
+				for ( var i = 0 ; i < currentMesh.numInstances ; i ++ ){
+
+					var o = trsCache[ i ];
+
+					//modify the cache
+					o.rotation.x += o.scale.x * dt;
+					o.rotation.y += o.scale.y * dt;
+					o.rotation.z += o.scale.z * dt;
+
+					_obj.rotation.copy( o.rotation );
+					_obj.position.copy( o.position );
+
+					if( !options.uniformScale ) _obj.scale.copy( o.scale );
+					else _obj.scale.set(1,1,1);
+
+					_obj.updateMatrixWorld();
+
+					currentMesh.geometry.setTransformationAtIndex( i , _obj.matrixWorld );
+
+				}
+
+				currentMesh.geometry.needsUpdate();
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
+
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				dirLightShadowMapViewer.updateForWindowResize();
-				spotLightShadowMapViewer.updateForWindowResize();
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				render();
+
+				var delta = clock.getDelta()*0.12;
+
+				if( options.dynamic ) rotateObjects( delta );
+
+				renderer.render( scene, camera );
 
 				stats.update();
 
 			}
 
-			function renderScene() {
-
-				renderer.render( scene, camera );
-
-			}
-
-			function renderShadowMapViewers() {
-
-				dirLightShadowMapViewer.render( renderer );
-				spotLightShadowMapViewer.render( renderer );
-
-			}
-
-			function render() {
-
-				var delta = clock.getDelta()*0.12;
-
-				renderScene();
-				renderShadowMapViewers();
-
-				objectsGrid.forEach( function(o){
-
-					o.rotation.x += 0.25 * delta;
-					o.rotation.y += 2 * delta;
-					o.rotation.z += 1 * delta;
-
-				});
-
-			}
-
 		</script>
+
 	</body>
+
 </html>

@@ -1,5 +1,5 @@
 /**
- * @pailhead www.dusanbosnjak.com
+ * @author pailhead / www.dusanbosnjak.com
  */
 
 
@@ -48,9 +48,11 @@ var
 ;
 
 
-function InstancedMesh ( geometry , material , distributeFunction , numCopies , uniformScale , disposeRegular ) {
+function InstancedMesh ( geometry , material , numInstances , distributeFunction , uniformScale , disposeRegular ) {
 
-	Mesh.call( this , new InstancedDistributedGeometry( geometry , numCopies , distributeFunction , disposeRegular ) , material.clone() );
+	Mesh.call( this , new InstancedDistributedGeometry( geometry , numInstances , distributeFunction , disposeRegular ) , material.clone() );
+
+	this.numInstances = numInstances;
 
 	//trigger this material to be instanced
 	this.material.defines = {
@@ -75,9 +77,33 @@ InstancedMesh.prototype = Object.create( Mesh.prototype );
 
 InstancedMesh.constructor = InstancedMesh;
 
+Object.defineProperty( InstancedMesh.prototype, 'material', {
+
+	set: function( m ){ 
+
+		if( m.defines ) 
+
+			m.defines.INSTANCE_TRANSFORM = '';
+
+		else 
+
+			m.defines = { INSTANCE_TRANSFORM: '' };
+
+		this._material = m;
+
+	},
+
+	get: function(){ return this._material; }
+
+});
+
+
+
 
 //helper interface to InstancedBufferGeometry, needs the method to pack TRS into 3 x v4 atts
 //could add a per instance color attribute
+
+var attributeIds = [ 'aTRS0' , 'aTRS1' , 'aTRS2' ];
 
 function InstancedDistributedGeometry (
 	regularGeometry , 							//regular buffer geometry, the geometry to be instanced
@@ -100,12 +126,39 @@ InstancedDistributedGeometry.constructor = InstancedDistributedGeometry;
 
 InstancedDistributedGeometry.prototype.setTransformationAtIndex = function( index , mat4 ){
 
-	_copyMat4IntoAttributes( index , mat4 , this._transformationMatrixComponents );
+	var attributeArray = this._transformationMatrixComponents;
+
+	index = index << 2;
+
+	for ( var r = 0 ; r < 3 ; r ++ ){
+
+		var row = r << 2;
+
+		for ( var c = 0 ; c < 3 ; c ++ ){
+			
+			attributeArray[r].array[ index + c ] = mat4.elements[ row + c ];
+
+		}
+
+		row = 12;
+
+		attributeArray[r].array[ index + 3 ] = mat4.elements[ row + r ]; //read last row as column
+
+	}
+
 
 
 };
 
-InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry , numCopies , distributeFunction ){
+InstancedDistributedGeometry.prototype.needsUpdate = function(){
+
+	this.attributes[ attributeIds[ 0 ] ].needsUpdate = true;
+	this.attributes[ attributeIds[ 1 ] ].needsUpdate = true;
+	this.attributes[ attributeIds[ 2 ] ].needsUpdate = true;
+
+}
+
+InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry , numInstances , distributeFunction ){
 
 	//a helper node used to compute positions for each instance
 	var helperObject = new Object3D(); 	
@@ -125,12 +178,12 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 			this.setIndex( regularGeometry.index );
 
 	this._transformationMatrixComponents = [
-		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
-		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 ),
-		new THREE.InstancedBufferAttribute( new Float32Array( numCopies * 4 ), 4, 1 )
+		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 ),
+		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 ),
+		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 )
 	];
 
-	for ( var clone = 0 ; clone < numCopies ; clone ++ ){
+	for ( var clone = 0 ; clone < numInstances ; clone ++ ){
 
 		helperObject.matrixWorld.identity();
 
@@ -140,51 +193,20 @@ InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry 
 		
 		helperObject.scale.set(1,1,1);
 
-		distributeFunction( helperObject , clone , numCopies );
+		distributeFunction( helperObject , clone , numInstances );
 
 		helperObject.updateMatrixWorld();
 
-		_copyMat4IntoAttributes( clone , helperObject.matrixWorld , this._transformationMatrixComponents );
+		this.setTransformationAtIndex( clone , helperObject.matrixWorld );
 
 	}
 
 	for ( var i = 0 ; i < 3 ; i ++ ){
 
-		this.addAttribute( 'aTRS' + i , this._transformationMatrixComponents[i] );
+		this.addAttribute( attributeIds[i] , this._transformationMatrixComponents[i] );
 
 	}
 
 }
-
-
-InstancedDistributedGeometry.prototype.getPositionAtIndex = function( index ){
-
-/**
- * copies mat4 values into an attribute buffer at an offset
- * packs T column into the empty row below RS
- **/
-function _copyMat4IntoAttributes( index , mat4 , attributeArray ){
-
-	index = index << 2;
-
-	for ( var r = 0 ; r < 3 ; r ++ ){
-
-		var row = r << 2;
-
-		for ( var c = 0 ; c < 3 ; c ++ ){
-			
-			attributeArray[r].array[ index + c ] = mat4.elements[ row + c ];
-
-		}
-
-		// row = 3 << 2;
-		row = 12;
-
-		attributeArray[r].array[ index + 3 ] = mat4.elements[ row + r ]; //read last row as column
-
-	}
-
-}
-
 
 export { InstancedMesh };
