@@ -97,9 +97,128 @@ Object.assign( Face.prototype, {
 
   }(),
 
-  distanceToPlane: function ( point ) {
+  distanceToPoint: function ( point ) {
 
     return this.normal.dot( point ) - this.constant;
+
+  },
+
+  // Connects two edges assuming that prev.end().point === next.start().point
+
+  connectHalfEdges: function ( prev, next ) {
+
+    var discardedFace;
+
+    if ( prev.twin.face === next.twin.face ) {
+
+      var oppositeFace = next.twin.face;
+      var twinEdge;
+
+      if ( prev === this.edge ) {
+
+        this.edge = next;
+
+      }
+
+       twinEdge = next.twin.prev.twin;
+       oppositeFace.mark = Deleted;
+       discardedFace = oppositeFace;
+
+       next.prev = prev.prev;
+       next.prev.next = next;
+
+       next.setTwin( twinEdge );
+
+       oppositeFace.compute();
+
+    } else {
+
+      prev.next = next;
+      next.prev = prev;
+
+    }
+
+    return discardedFace;
+
+  },
+
+  mergeAdjacentFaces: function( adjacentEdge, discardedFaces ) {
+
+    var twinEdge = adjacentEdge.twin;
+    var oppositeFace = twinEdge.face;
+
+    discardedFaces.push( oppositeFace );
+    oppositeFace.mark = Deleted;
+
+    // find the chain of edges whose opposite face is 'oppositeFace'
+
+    var adjacentEdgePrev = adjacentEdge.prev;
+    var adjacentEdgeNext = adjacentEdge.next;
+    var twinEdgePrev = twinEdge.prev;
+    var twinEdgeNext = twinEdge.next;
+
+    // left edge
+
+    while ( adjacentEdgePrev.twin.face === oppositeFace ) {
+
+      adjacentEdgePrev = adjacentEdgePrev.prev;
+      twinEdgeNext = twinEdgeNext.next;
+
+   }
+
+   // right edge
+
+   while ( adjacentEdgeNext.opposite.face === oppositeFace ) {
+
+     adjacentEdgeNext = adjacentEdgeNext.next;
+     twinEdgePrev = twinEdgePrev.prev;
+
+   }
+
+   // fix the face reference of all the twin edges that are not part of
+   // the edges whose opposite face is not 'face' i.e. all the edges that
+   // 'face' and 'oppositeFace' do not have in common
+
+   var edge = twinEdgeNext;
+
+   do {
+
+     edge.face = this;
+
+     edge = edge.next;
+
+   } while ( edge !== twinEdgePrev.next );
+
+   // make sure that 'face.edge' is not one of the edges to be destroyed
+   // Note: it's important for it to be a 'next' edge since 'prev' edges
+   // might be destroyed on 'connectHalfEdges'
+
+   this.edge = adjacentEdgeNext;
+
+   // connect the extremes
+   // Note: it might be possible that after connecting the edges a triangular face might be redundant
+
+   var discardedFace;
+
+   discardedFace = this.connectHalfEdges( twinEdgePrev, adjacentEdgeNext );
+
+   if ( discardedFace !== undefined ) {
+
+     discardedFaces.push( discardedFace );
+
+   }
+
+   discardedFace = this.connectHalfEdges( adjacentEdgePrev, twinEdgeNext );
+
+   if ( discardedFace !== undefined ) {
+
+     discardedFaces.push( discardedFace );
+
+   }
+   
+   this.compute();
+
+   return discardedFaces;
 
   },
 

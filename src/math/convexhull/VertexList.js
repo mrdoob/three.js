@@ -12,6 +12,18 @@ function VertexList() {
 
 Object.assign( VertexList.prototype, {
 
+  first: function () {
+
+    return this.head;
+
+  },
+
+  last: function () {
+
+    return this.tail;
+
+  },
+
 	clear: function () {
 
 		this.head = this.tail = null;

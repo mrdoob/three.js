@@ -5,6 +5,7 @@ import { Vector3 } from '../Vector3';
 import { Line3 } from '../Line3';
 import { Plane } from '../Plane';
 import { Visible, NonConvex, Deleted } from '../../constants';
+import { MergeNonConvexLargerFace, MergeNonConvex } from '../../constants';
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -137,11 +138,12 @@ Object.assign( QuickHull3.prototype, {
 
 		if ( faceVertices !== undefined ) {
 
-			// mark the vertices to be reassigned to some other face
-
-			this.unclaimed.appendChain( faceVertices );
-
 			if ( absorbingFace === undefined ) {
+
+				// mark the vertices to be reassigned to some other face
+
+				this.unclaimed.appendChain( faceVertices );
+
 
 			} else {
 
@@ -156,7 +158,7 @@ Object.assign( QuickHull3.prototype, {
 
 					var nextVertex = vertex.next;
 
-					var distance = absorbingFace.distanceToPlane( vertex.point );
+					var distance = absorbingFace.distanceToPoint( vertex.point );
 
 					// check if 'vertex' is able to see 'absorbingFace'
 
@@ -186,7 +188,7 @@ Object.assign( QuickHull3.prototype, {
 
 	resolveUnclaimedPoints: function ( newFaces ) {
 
-		var vertex = this.unclaimed.head;
+		var vertex = this.unclaimed.first();
 
 		do {
 
@@ -204,7 +206,7 @@ Object.assign( QuickHull3.prototype, {
 
 				if ( face.mark === Visible ) {
 
-					var distance = face.distanceToPlane( vertex.point );
+					var distance = face.distanceToPoint( vertex.point );
 
 					if ( distance > maxDistance ) {
 
@@ -476,7 +478,7 @@ Object.assign( QuickHull3.prototype, {
 
 					for ( j = 0; j < 4; j ++ ) {
 
-						distance = this.faces[ j ].distanceToPlane( vertex.point );
+						distance = this.faces[ j ].distanceToPoint( vertex.point );
 
 						if ( distance > maxDistance ) {
 
@@ -499,7 +501,353 @@ Object.assign( QuickHull3.prototype, {
 
 		};
 
-	}()
+	}(),
+
+	// Removes inactive faces
+
+	reindexFaceAndVertices: function () {
+
+		var activeFaces = [];
+
+		for ( var i = 0; i < this.faces.length; i ++ ) {
+
+			var face = this.faces[ i ];
+
+			if ( face.mark === Visible ) {
+
+				activeFaces.push( face );
+
+			}
+
+		}
+
+		this.faces = activeFaces;
+
+	},
+
+	// Finds the next vertex to make faces with the current hull.
+	//
+	// - let 'face' be the first face existing in the 'claimed' vertex list
+	// - if 'face' doesn't exist then return since there're no vertices left
+	// - otherwise for each 'vertex' that face sees find the one furthest away from 'face'
+
+	nextVertexToAdd: function () {
+
+		if ( this.claimed.isEmpty() === false ) {
+
+			var eyeVertex, maxDistance = 0;
+
+			var eyeFace = this.claimed.first().face;
+			var vertex = eyeFace.outside;
+
+			do {
+
+				var distance = eyeFace.distanceToPoint( vertex.point );
+
+				if ( distance > maxDistance ) {
+
+					maxDistance = distance;
+					eyeVertex = vertex;
+
+				}
+
+				vertex = vertex.next;
+
+			} while ( vertex !== null && vertex.face === eyeFace );
+
+			return eyeVertex;
+
+		}
+
+	},
+
+	// Computes a chain of half edges in ccw order called the 'horizon'.
+	// For an edge to be part of the horizon it must join a face that can see
+	// 'eyePoint' and a face that cannot see 'eyePoint'.
+	//
+	// eyePoint: The coordinates of a point
+	// crossEdge: The edge used to jump to the current 'face'
+	// face: The current face being tested
+	// horizon: The edges that form part of the horizon in ccw order
+
+	computeHorizon: function ( eyePoint, crossEdge, face, horizon ) {
+
+		// moves face's vertices to the 'unclaimed' vertex list
+
+		this.deleteFaceVertices( face );
+
+		face.mark = Deleted;
+
+		var edge;
+
+		if ( crossEdge === null ) {
+
+			edge = crossEdge = face.getEdge( 0 );
+
+		} else {
+
+			// start from the next edge since 'crossEdge' was already analyzed
+			// (actually 'crossEdge.twin' was the edge who called this method recursively)
+
+			edge = crossEdge.next;
+
+		}
+
+		do {
+
+			var twinEdge = edge.twin;
+			var oppositeFace = twinEdge.face;
+
+			if ( oppositeFace.mark === Visible ) {
+
+				if ( oppositeFace.distanceToPoint( eyePoint ) > this.tolerance ) {
+
+					// the opposite face can see the vertex, so proceed with next edge
+
+					this.computeHorizon( eyePoint, twinEdge, oppositeFace, horizon );
+
+				} else {
+
+					// the opposite face can't see the vertex, so this edge is part of the horizon
+
+					horizon.push( edge );
+
+				}
+
+				edge = edge.next;
+
+			}
+
+		} while ( edge !== crossEdge );
+
+	},
+
+	// Creates a face with the points 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in ccw order
+
+	addAdjoiningFace: function ( eyeVertex, horizonEdge ) {
+
+		// all the half edges are created in ccw order thus the face is always pointing outside the hull
+
+		var face = Face.create( eyeVertex, horizonEdge.start(), horizonEdge.end() );
+
+		this.faces.push( face );
+
+		// join face.getEdge( - 1 ) with the horizon's opposite edge face.getEdge( - 1 ) = face.getEdge( 2 )
+
+		face.getEdge( - 1 ).setTwin( horizonEdge.twin );
+
+		return face.getEdge( 0 ); // The half edge whose vertex is the eyeVertex
+
+
+	},
+
+	//  Adds horizon.length faces to the hull, each face will be 'linked' with the
+	//  horizon opposite face and the face on the left/right
+
+	addNewFaces: function ( eyeVertex, horizon ) {
+
+		this.newFaces = [];
+
+		var firstSideEdge = null;
+		var previousSideEdge = null;
+
+		for ( var i = 0; i < horizon.length; i ++ ) {
+
+			var horizonEdge = horizon[ i ];
+
+			// returns the right side edge
+
+			var sideEdge = this.addAdjoiningFace( eyeVertex, horizonEdge );
+
+			if ( firstSideEdge === null ) {
+
+				firstSideEdge = sideEdge;
+
+			} else {
+
+				// joins face.getEdge( 1 ) with previousFace.getEdge( 0 )
+
+				sideEdge.next.setTwin( previousSideEdge );
+
+			}
+
+			this.newFaces.push( sideEdge.face );
+			previousSideEdge = sideEdge;
+
+		}
+
+		firstSideEdge.next.setTwin( previousSideEdge );
+
+	},
+
+	// Computes the distance from 'edge' opposite face's centroid to 'edge.face'
+
+	oppositeFaceDistance: function ( edge ) {
+
+		// The result is:
+		//
+		// - a positive number when the centroid of the opposite face is above the face i.e. when the faces are concave
+		// - a negative number when the centroid of the opposite face is below the face i.e. when the faces are convex
+
+		return edge.face.distanceToPoint( edge.twin.face.midpoint );
+
+	},
+
+	// Merges a face with none/any/all its neighbors according to the given strategy
+
+	doAdjacentMerge: function ( face, mergeType ) {
+
+		var edge = face.edge;
+		var convex = true;
+
+		do {
+
+			var oppositeFace = edge.twin.face;
+			var merge = false;
+
+			if ( mergeType === MergeNonConvex ) {
+
+				if ( this.oppositeFaceDistance( edge ) > this.tolerance ||
+				this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
+
+					merge = true;
+
+				}
+
+			} else {
+
+				if ( face.area > oppositeFace.area ) {
+
+					if ( this.oppositeFaceDistance( edge ) > - this.tolerance ) {
+
+						merge = true;
+
+					} else if ( this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
+
+						convex = false;
+
+					}
+
+				} else {
+
+					if ( this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
+
+            merge = true;
+
+          } else if ( this.oppositeFaceDistance( edge ) > - this.tolerance ) {
+
+            convex = false;
+
+          }
+
+				}
+
+				if ( merge === true ) {
+
+					var discardedFaces = this.mergeAdjacentFaces( edge, [] );
+
+					for ( var i = 0; i < discardedFaces.length; i ++ ) {
+
+						this.deleteFaceVertices( discardedFaces[ i ], face );
+
+					}
+
+					return true;
+
+				}
+
+			}
+
+			edge = edge.next;
+
+		} while ( edge !== face.edge );
+
+		if ( convex === false ) {
+
+			face.mark = NonConvex;
+
+		}
+
+		return false;
+
+	},
+
+	addVertexToHull: function ( eyeVertex ) {
+
+		var horizon = [];
+		var i, face;
+
+		this.unclaimed.clear();
+
+		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unclaimed' vertex list
+
+		this.removeVertexFromFace( eyeVertex, eyeVertex.face );
+
+		this.computeHorizon( eyeVertex.point, null, eyeVertex.face, horizon );
+
+		this.addNewFaces( eyeVertex, horizon );
+
+		// first merge pass.
+    // Do the merge with respect to the larger face
+
+    for ( i = 0; i < this.newFaces.length; i ++ ) {
+
+      face = this.newFaces[ i ];
+
+      if ( face.mark === Visible ) {
+
+        while ( this.doAdjacentMerge( face, MergeNonConvexLargerFace ) ) {}
+
+      }
+
+    }
+
+		// second merge pass.
+    // Do the merge on non convex faces (a face is marked as non convex in the first pass)
+
+		for ( i = 0; i < this.newFaces.length; i ++ ) {
+
+      face = this.newFaces[ i ];
+
+      if ( face.mark === NonConvex ) {
+
+				face.mark = Visible;
+
+        while ( this.doAdjacentMerge( face, MergeNonConvex ) ) {}
+
+      }
+
+    }
+
+		// reassign 'unclaimed' vertices to the new faces
+
+	 this.resolveUnclaimedPoints( this.newFaces );
+
+	},
+
+	build: function () {
+
+		var iterations = 0;
+		var eyeVertex;
+
+		this.computeInitialHull();
+
+		while ( ( eyeVertex = this.nextVertexToAdd() ) !== undefined ) {
+
+			iterations ++;
+
+			console.log( 'THREE.QuickHull3: Iteration %i', iterations );
+			console.log( 'THREE.QuickHull3: Next vertex to add %i %o', eyeVertex.index, eyeVertex.point );
+
+			this.addVertexToHull( eyeVertex );
+
+		}
+
+		this.reindexFaceAndVertices();
+
+		// TODO: Clean up
+
+	}
 
 } );
 

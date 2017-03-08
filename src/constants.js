@@ -126,3 +126,5 @@ export var RGBADepthPacking = 3201;
 export var Visible = 0;
 export var NonConvex = 1;
 export var Deleted = 2;
+export var MergeNonConvexLargerFace = 0;
+export var MergeNonConvex
