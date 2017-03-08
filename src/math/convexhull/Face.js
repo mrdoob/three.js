@@ -56,14 +56,14 @@ Object.assign( Face.prototype, {
     while ( i > 0 ) {
 
       edge = edge.next;
-      i -= 1;
+      i --;
 
     }
 
     while ( i < 0 ) {
 
       edge = edge.prev;
-      i += 1;
+      i ++;
 
     }
 
@@ -83,11 +83,11 @@ Object.assign( Face.prototype, {
       var b = this.edge.end();
       var c = this.edge.next.end();
 
-      triangle.set( a, b, c );
+      triangle.set( a.point, b.point, c.point );
 
       triangle.normal( this.normal );
       triangle.midpoint( this.midpoint );
-      triangle.area( this.area );
+      this.area = triangle.area();
 
       this.constant = this.normal.dot( this.midpoint );
 
@@ -95,7 +95,7 @@ Object.assign( Face.prototype, {
 
     };
 
-  },
+  }(),
 
   distanceToPlane: function ( point ) {
 
