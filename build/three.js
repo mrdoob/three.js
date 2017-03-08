@@ -26762,11 +26762,9 @@
 
 			}
 			
-			if (options.extrudeMaterial !== undefined){
-				
-				scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
-				
-			}
+
+			scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+
 
 		}
 
