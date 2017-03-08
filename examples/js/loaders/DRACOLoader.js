@@ -63,12 +63,12 @@ THREE.DRACOLoader.prototype = {
            */
           const geometryType = wrapper.GetEncodedGeometryType(buffer);
           if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
-            fileDisplayArea.innerText = "Loaded a mesh.\n";
+            //fileDisplayArea.innerText = "Loaded a mesh.\n";
           } else if (geometryType == dracoDecoder.POINT_CLOUD) {
-            fileDisplayArea.innerText = "Loaded a point cloud.\n";
+            //fileDisplayArea.innerText = "Loaded a point cloud.\n";
           } else {
             const errorMsg = "Error: Unknown geometry type.";
-            fileDisplayArea.innerText = errorMsg;
+            //fileDisplayArea.innerText = errorMsg;
             throw new Error(errorMsg);
           }
           return scope.convertDracoGeometryTo3JS(wrapper, geometryType, buffer,
@@ -115,7 +115,7 @@ THREE.DRACOLoader.prototype = {
                                                 dracoDecoder.POSITION);
         if (posAttId == -1) {
           const errorMsg = "No position attribute found in the mesh.";
-          fileDisplayArea.innerText = errorMsg;
+          //fileDisplayArea.innerText = errorMsg;
           dracoDecoder.destroy(wrapper);
           dracoDecoder.destroy(dracoGeometry);
           throw new Error(errorMsg);
@@ -227,7 +227,7 @@ THREE.DRACOLoader.prototype = {
         dracoDecoder.destroy(wrapper);
         dracoDecoder.destroy(dracoGeometry);
 
-        fileDisplayArea.innerText += geometryInfoStr;
+        //fileDisplayArea.innerText += geometryInfoStr;
 
         // Import data to Three JS geometry.
         const geometry = new THREE.BufferGeometry();
@@ -248,9 +248,9 @@ THREE.DRACOLoader.prototype = {
           geometry.addAttribute('uv',
               new THREE.Float32BufferAttribute(geometryBuffer.uvs, 2));
         }
-        fileDisplayArea.innerText += ' decode:' + (decode_end - start_time);
-        fileDisplayArea.innerText +=
-            ' import:' + (performance.now() - decode_end);
+        //fileDisplayArea.innerText += ' decode:' + (decode_end - start_time);
+        //fileDisplayArea.innerText +=
+        //    ' import:' + (performance.now() - decode_end);
         return geometry;
     }
 };
