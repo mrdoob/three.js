@@ -14,7 +14,7 @@
             margin: 0px;
             overflow: hidden;
         }
-        
+
         #info {
             color: #fff;
             position: absolute;
@@ -38,10 +38,10 @@
 <body>
 
     <div id="canvase3d"></div>
-    <!-- 描画領域のためのdiv要素を配置 -->
-	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader test<br />
-		</div>
+
+    <div id="info">
+        <a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader test<br />
+    </div>
     <div id="dialog_tree" style="width:90%; height:90%;display:block;">
         <ul id="bonetree" class="treeview"></ul>
     </div>
@@ -50,13 +50,12 @@
     <script src="../build/three.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
 
-	<script src="js/loaders/XfileLoader.js"></script>
+    <script src="js/loaders/XfileLoader.js"></script>
 
-	<script src="js/Detector.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
+    <script src="js/Detector.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    <script src='js/libs/dat.gui.min.js'></script>
     <script>
-
         var StringBuffer = function (string) {
             this.buffer = [];
             this.append = function (string) { this.buffer.push(string); return this; };
@@ -68,6 +67,7 @@
         var container, stats, controls;
         var camera, scene, renderer;
         var clock = new THREE.Clock();
+        var gui = new dat.GUI();
         var mixers = [];
         var manager = null;
         var Texloader = null;
@@ -85,17 +85,13 @@
         var d = new Date();
         var LastDateTime = null;
 
-        init();
-
         var animates = [];
+        var actions = [];
+        init();
 
         function init() {
 
-            XfileLoader_IsUvYReverse = true;
-
             LastDateTime = Date.now();
-
-            XfileLoader_IsPosZReverse = true;
 
             container = document.createElement('canvase3d');
             document.body.appendChild(container);
@@ -126,34 +122,92 @@
             Texloader = new THREE.TextureLoader();
             var loader = new THREE.XFileLoader(manager, Texloader);
 
-            //モデルを読み込む
+            // ! If Texture was reversed Y axis, enable the following 
+            // THREE.XFileLoader.IsUvYReverse = false;
+
             // read (download) model file
             loader.load(['models/xfile/SSR06_Born2.x', true, true], function (object) {
                 for (var i = 0; i < object.FrameInfo.length; i++) {
                     Models.push(object.FrameInfo[i]);
                     scene.add(Models[i]);
 
-                    //アニメーションコントローラーをセット＆作成する
-                    // create Animation Mixer
                     if (Models[i] instanceof THREE.SkinnedMesh) {
                         skeletonHelper = new THREE.SkeletonHelper(Models[i]);
-                        scene.add( skeletonHelper );
-                        if (Models[i].geometry.animations !== undefined) {
+                        scene.add(skeletonHelper);
 
-                            Models[i].mixer = new THREE.AnimationMixer(Models[i]);
-                            animates.push(Models[i].mixer);
+                        if (object.XAnimationObj !== undefined && object.XAnimationObj.length !== 0) {
+                            Models[i].geometry.animations = [];
 
-                            var action = Models[i].mixer.clipAction(Models[i].geometry.animations);
-                            action.play();
+                            /* 
+                            *  ↓ that is BASIC animation data code.
+                            *  Usually, please use this.
+                            *  Because of the data I have, I use a different code
+                            * 
+                           for (var a = 0; a < object.XAnimationObj.length; a++) {
+                               Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(object.XAnimationObj[a], Models[i].skeleton.bones));
+                           } 
+                           Models[i].mixer = new THREE.AnimationMixer(Models[i]);
+                           animates.push(Models[i].mixer);
+
+                           var action = Models[i].mixer.clipAction(Models[i].geometry.animations[0]);
+                           action.play();
+                           */
+
+                            // ↓ that is a code for [ All animation-keyframes are connected data ]. output from 'LightWave3D' 
+                            {
+                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'stand', 10 * object.XAnimationObj[0].fps, 11 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
+                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'walk', 50 * object.XAnimationObj[0].fps, 80 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
+                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'dash', 140 * object.XAnimationObj[0].fps, 160 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
+                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'dashing', 160 * object.XAnimationObj[0].fps, 165 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
+                                Models[i].geometry.animations.push(THREE.AnimationClip.parseAnimation(splitAnimation(object.XAnimationObj[0], 'damage', 500 * object.XAnimationObj[0].fps, 530 * object.XAnimationObj[0].fps), Models[i].skeleton.bones));
+
+                                Models[i].mixer = new THREE.AnimationMixer(Models[i]);
+                                animates.push(Models[i].mixer);
+
+                                var stand = Models[i].mixer.clipAction('stand');
+                                // stand.play();
+                                stand.setLoop(THREE.LoopRepeat);
+                                actions['stand'] = stand;
+
+                                var walk = Models[i].mixer.clipAction('walk');
+                                walk.setLoop(THREE.LoopRepeat);
+                                walk.play();
+                                actions['walk'] = walk;
+
+                                var dash = Models[i].mixer.clipAction('dash');
+                                dash.setLoop(THREE.LoopOnce);
+                                //dash.play();
+                                actions['dash'] = dash;
+
+                                var dashing = Models[i].mixer.clipAction('dashing');
+                                dashing.setLoop(THREE.LoopPingPong);
+                                // dashing.play();
+                                actions['dashing'] = dashing;
+
+                                var damage = Models[i].mixer.clipAction('damage');
+                                damage.setLoop(THREE.LoopRepeat);
+                                //damage.play();
+                                actions['damage'] = damage;
+
+                                var ActionKeys = Object.keys(actions);
+                                var dmy = {};
+                                dmy.gui = "";
+                                dmy.action = "";
+                                gui.add(dmy, 'gui');
+                                gui.add(dmy, 'action', ActionKeys).onChange(function (v) {
+                                    animates[0].stopAllAction();
+                                    actions[v].play();
+                                });
+                            }
+                            ///////////
                         }
-
                     }
                 }
 
                 object = null;
             }, onProgress, onError);
 
-            // ↓アニメーションとは関係ない、three.jsお約束的コード
+
             renderer = new THREE.WebGLRenderer();
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -183,8 +237,7 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-
-        //update frame
+        //
         function animate() {
 
             requestAnimationFrame(animate);
@@ -192,22 +245,60 @@
             var dulTime = nowTime - LastDateTime;
             LastDateTime = nowTime;
 
-            if (animates != null && animates.length > 0 ) {
+            if (animates != null && animates.length > 0) {
                 for (var i = 0; i < animates.length; i++) {
                     animates[i].update(dulTime);
                 }
             }
 
-            if (Models != null && Models.length > 0)  {
+            if (Models != null && Models.length > 0) {
                 if (skeletonHelper != null) { skeletonHelper.update(); }
-            
+
             }
 
             stats.update();
             render();
         }
         function render() {
+            //renderer.setFaceCulling(THREE.CullFaceFront, THREE.FrontFaceDirectionCW);
             renderer.render(scene, camera);
+        }
+
+        /////////////////
+        /// this is not must mount codes.
+
+        // split  One and Long Animation, for time
+        function splitAnimation(_baseAnime, _name, _beginTime, _endTime) {
+            var Animation = {};
+            Animation.fps = _baseAnime.fps;
+            Animation.name = _name;
+            Animation.length = _endTime - _beginTime;
+            Animation.hierarchy = [];
+            for (var i = 0; i < _baseAnime.hierarchy.length; i++) {
+                var firstKey = -1;
+                var lastKey = -1;
+                var frame = {};
+                frame.name = _baseAnime.hierarchy[i].name;
+                frame.parent = _baseAnime.hierarchy[i].parent;
+                frame.keys = [];
+                for (var m = 1; m < _baseAnime.hierarchy[i].keys.length; m++) {
+                    if (_baseAnime.hierarchy[i].keys[m].time > _beginTime) {
+                        if (firstKey === -1) {
+                            firstKey = m - 1;
+                            frame.keys.push(_baseAnime.hierarchy[i].keys[m - 1]);
+                        }
+                        frame.keys.push(_baseAnime.hierarchy[i].keys[m]);
+                    }
+                    if (_endTime <= _baseAnime.hierarchy[i].keys[m].time || m >= _baseAnime.hierarchy[i].keys.length - 1) {
+                        break;
+                    }
+                }
+                for (var m = 0; m < frame.keys.length; m++) {
+                    frame.keys[m].time -= _beginTime;
+                }
+                Animation.hierarchy.push(frame);
+            }
+            return Animation;
         }
     </script>
 
