@@ -45,7 +45,7 @@ var onDocumentLoad = function ( event ) {
 
                     if ( page[ 1 ] === section + '/' + path ) {  
 
-                        redirectUrl = 'index.html#' 
+                        redirectUrl = '#'
                                     + mainCategory 
                                     + '/' 
                                     + subCategory.replace(/\ \/\ /g, '.').replace(/\ /g, '_') 
