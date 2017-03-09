@@ -39477,6 +39477,7 @@ Object.assign( Clock.prototype, {
 		if ( this.autoStart && ! this.running ) {
 
 			this.start();
+			return 0;
 
 		}
 
