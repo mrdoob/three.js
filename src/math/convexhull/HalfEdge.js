@@ -17,26 +17,26 @@ function HalfEdge( vertex, face ) {
 
 Object.assign( HalfEdge.prototype, {
 
-	start: function () {
+  head: function () {
 
-		return this.vertex;
+    return this.vertex;
 
-	},
+  },
 
-  end: function () {
+  tail: function () {
 
-    return this.next ? this.next.vertex : null;
+    return this.prev ? this.prev.vertex : null;
 
   },
 
   length: function () {
 
-    var start = this.end();
-    var end = this.end();
+    var head = this.head();
+    var tail = this.tail();
 
-    if ( end !== null ) {
+    if ( tail !== null ) {
 
-      return start.point.distanceTo( end.point );
+      return tail.point.distanceTo( head.point );
 
     }
 
@@ -46,12 +46,12 @@ Object.assign( HalfEdge.prototype, {
 
   lengthSquared: function () {
 
-    var start = this.end();
-    var end = this.end();
+    var head = this.head();
+    var tail = this.tail();
 
-    if ( end !== null ) {
+    if ( tail !== null ) {
 
-      return start.point.distanceToSquared( end.point );
+      return tail.point.distanceToSquared( head.point );
 
     }
 

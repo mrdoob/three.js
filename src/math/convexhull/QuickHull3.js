@@ -188,46 +188,50 @@ Object.assign( QuickHull3.prototype, {
 
 	resolveUnclaimedPoints: function ( newFaces ) {
 
-		var vertex = this.unclaimed.first();
+		if ( this.unclaimed.isEmpty() === false ) {
 
-		do {
+			var vertex = this.unclaimed.first();
 
-			// buffer 'next' reference, see .deleteFaceVertices()
+			do {
 
-			var nextVertex = vertex.next;
+				// buffer 'next' reference, see .deleteFaceVertices()
 
-			var maxDistance = this.tolerance;
+				var nextVertex = vertex.next;
 
-			var maxFace = null;
+				var maxDistance = this.tolerance;
 
-			for ( var i = 0; i < newFaces.length; i ++ ) {
+				var maxFace = null;
 
-				var face = newFaces[ i ];
+				for ( var i = 0; i < newFaces.length; i ++ ) {
 
-				if ( face.mark === Visible ) {
+					var face = newFaces[ i ];
 
-					var distance = face.distanceToPoint( vertex.point );
+					if ( face.mark === Visible ) {
 
-					if ( distance > maxDistance ) {
+						var distance = face.distanceToPoint( vertex.point );
 
-						maxDistance = distance;
-						maxFace = face;
+						if ( distance > maxDistance ) {
+
+							maxDistance = distance;
+							maxFace = face;
+
+						}
+
+						if ( maxDistance > 1000 * this.tolerance ) break; // TODO: Why this?
 
 					}
 
-					if ( maxDistance > 1000 * this.tolerance ) break; // TODO: Why this?
+				}
+
+				if ( maxFace !== null ) {
+
+					this.addVertexToFace( vertex, maxFace );
 
 				}
 
-			}
+			} while ( vertex !== null );
 
-			if ( maxFace !== null ) {
-
-				this.addVertexToFace( vertex, maxFace );
-
-			}
-
-		} while ( vertex !== null );
+		}
 
 	},
 
@@ -628,7 +632,7 @@ Object.assign( QuickHull3.prototype, {
 
 		// all the half edges are created in ccw order thus the face is always pointing outside the hull
 
-		var face = Face.create( eyeVertex, horizonEdge.start(), horizonEdge.end() );
+		var face = Face.create( eyeVertex, horizonEdge.tail(), horizonEdge.head() );
 
 		this.faces.push( face );
 

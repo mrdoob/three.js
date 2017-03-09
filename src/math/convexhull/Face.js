@@ -79,9 +79,9 @@ Object.assign( Face.prototype, {
 
       if ( triangle === undefined ) triangle = new Triangle();
 
-      var a = this.edge.start();
-      var b = this.edge.end();
-      var c = this.edge.next.end();
+      var a = this.edge.tail();
+      var b = this.edge.head();
+      var c = this.edge.next.head();
 
       triangle.set( a.point, b.point, c.point );
 
@@ -103,7 +103,7 @@ Object.assign( Face.prototype, {
 
   },
 
-  // Connects two edges assuming that prev.end().point === next.start().point
+  // Connects two edges assuming that prev.head().point === next.tail().point
 
   connectHalfEdges: function ( prev, next ) {
 
@@ -215,7 +215,7 @@ Object.assign( Face.prototype, {
      discardedFaces.push( discardedFace );
 
    }
-   
+
    this.compute();
 
    return discardedFaces;
