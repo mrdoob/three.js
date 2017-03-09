@@ -66,7 +66,7 @@ THREE.DaydreamController = function () {
 
 			// angular velocity
 
-			if ( pose.angularVelocity !== null || ! angularVelocity.equals( pose.angularVelocity ) ) {
+			if ( pose.angularVelocity !== null && ! angularVelocity.equals( pose.angularVelocity ) ) {
 
 				angularVelocity.fromArray( pose.angularVelocity );
 				scope.dispatchEvent( { type: 'angularvelocitychanged', angularVelocity: angularVelocity } );
