@@ -4,8 +4,7 @@ import { Face } from './Face';
 import { Vector3 } from '../Vector3';
 import { Line3 } from '../Line3';
 import { Plane } from '../Plane';
-import { Visible, NonConvex, Deleted } from '../../constants';
-import { MergeNonConvexLargerFace, MergeNonConvex } from '../../constants';
+import { Visible, Deleted } from '../../constants';
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
@@ -703,9 +702,9 @@ Object.assign( QuickHull3.prototype, {
 
 				}
 
-				edge = edge.next;
-
 			}
+
+			edge = edge.next;
 
 		} while ( edge !== crossEdge );
 
@@ -771,98 +770,6 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Computes the distance from 'edge' opposite face's centroid to 'edge.face'
-
-	oppositeFaceDistance: function ( edge ) {
-
-		// The result is:
-		//
-		// - a positive number when the midpoint of the opposite face is above the face i.e. when the faces are concave
-		// - a negative number when the midpoint of the opposite face is below the face i.e. when the faces are convex
-
-		return edge.face.distanceToPoint( edge.twin.face.midpoint );
-
-	},
-
-	// Merges a face with none/any/all its neighbors according to the given strategy
-
-	doAdjacentMerge: function ( face, mergeType ) {
-
-		var edge = face.edge;
-		var convex = true;
-
-		do {
-
-			var oppositeFace = edge.twin.face;
-			var merge = false;
-
-			if ( mergeType === MergeNonConvex ) {
-
-				if ( this.oppositeFaceDistance( edge ) > - this.tolerance ||
-				this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
-
-					merge = true;
-
-				}
-
-			} else {
-
-				if ( face.area > oppositeFace.area ) {
-
-					if ( this.oppositeFaceDistance( edge ) > - this.tolerance ) {
-
-						merge = true;
-
-					} else if ( this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
-
-						convex = false;
-
-					}
-
-				} else {
-
-					if ( this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
-
-            merge = true;
-
-          } else if ( this.oppositeFaceDistance( edge ) > - this.tolerance ) {
-
-            convex = false;
-
-          }
-
-				}
-
-				if ( merge === true ) {
-
-					var discardedFaces = face.mergeAdjacentFaces( edge, [] );
-
-					for ( var i = 0; i < discardedFaces.length; i ++ ) {
-
-						this.deleteFaceVertices( discardedFaces[ i ], face );
-
-					}
-
-					return true;
-
-				}
-
-			}
-
-			edge = edge.next;
-
-		} while ( edge !== face.edge );
-
-		if ( convex === false ) {
-
-			face.mark = NonConvex;
-
-		}
-
-		return false;
-
-	},
-
 	// Adds a vertex to the hull
 
 	addVertexToHull: function ( eyeVertex ) {
@@ -879,38 +786,6 @@ Object.assign( QuickHull3.prototype, {
 		this.computeHorizon( eyeVertex.point, null, eyeVertex.face, horizon );
 
 		this.addNewFaces( eyeVertex, horizon );
-
-		// first merge pass.
-    // do the merge with respect to the larger face
-
-    for ( i = 0; i < this.newFaces.length; i ++ ) {
-
-      face = this.newFaces[ i ];
-
-      if ( face.mark === Visible ) {
-
-        // while ( this.doAdjacentMerge( face, MergeNonConvexLargerFace ) ) {}
-
-      }
-
-    }
-
-		// second merge pass.
-    // do the merge on non convex faces (a face is marked as non convex in the first pass)
-
-		for ( i = 0; i < this.newFaces.length; i ++ ) {
-
-      face = this.newFaces[ i ];
-
-      if ( face.mark === NonConvex ) {
-
-				face.mark = Visible;
-
-        // while ( this.doAdjacentMerge( face, MergeNonConvex ) ) {}
-
-      }
-
-    }
 
 		// reassign 'unassigned' vertices to the new faces
 
