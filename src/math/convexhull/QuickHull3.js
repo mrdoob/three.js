@@ -28,22 +28,15 @@ function QuickHull3( points ) {
 
 	this.tolerance = - 1;
 
-	this.count = {
-		points: points.length,
-		faces: 0
-	};
-
 	this.faces = [];
 	this.newFaces = [];
-	this.discardedFaces = [];
-	this.vertexPointIndices = [];
 
-	this.claimed = new VertexList();
-	this.unclaimed = new VertexList();
+	this.assigned = new VertexList();
+	this.unassigned = new VertexList();
 
 	this.vertices = []; // vertices of the hull (internal representation of given points)
 
-	for ( var i = 0; i < this.count.points; i ++ ) {
+	for ( var i = 0, l = points.length; i < l; i ++ ) {
 
 		this.vertices.push( new Vertex( points[ i ], i ) );
 
@@ -53,17 +46,19 @@ function QuickHull3( points ) {
 
 Object.assign( QuickHull3.prototype, {
 
+	// Adds a 'vertex' to the 'assigned' list of vertices and assigns it to the given face.
+
 	addVertexToFace: function ( vertex, face ) {
 
 		vertex.face = face;
 
 		if ( face.outside === null ) {
 
-			this.claimed.append( vertex );
+			this.assigned.append( vertex );
 
 		} else {
 
-			this.claimed.insertBefore( face.outside, vertex );
+			this.assigned.insertBefore( face.outside, vertex );
 
 		}
 
@@ -73,8 +68,8 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Removes 'vertex' for the 'claimed' list of vertices.
-	// It also makes sure that the link from 'face' to the first vertex it sees in 'claimed' is linked correctly after the removal
+	// Removes 'vertex' for the 'assigned' list of vertices.
+	// It also makes sure that the link from 'face' to the first vertex it sees in 'assigned' is linked correctly after the removal
 
 	removeVertexFromFace: function ( vertex, face ) {
 
@@ -98,11 +93,11 @@ Object.assign( QuickHull3.prototype, {
 
 		}
 
-		this.claimed.remove( vertex );
+		this.assigned.remove( vertex );
 
 	},
 
-	// Removes all the visible vertices that 'face' is able to see which are stored in the 'claimed' vertext list
+	// Removes all the visible vertices that 'face' is able to see which are stored in the 'assigned' vertext list
 
 	removeAllVerticesFromFace: function ( face ) {
 
@@ -119,7 +114,7 @@ Object.assign( QuickHull3.prototype, {
 
 			}
 
-			this.claimed.removeSubList( start, end );
+			this.assigned.removeSubList( start, end );
 
 			// fix references
 
@@ -132,6 +127,12 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
+	// Removes all the visible vertices that 'face' is able to see
+
+	// If 'absorbingFace' doesn't exist then all the removed vertices will be added to the 'unassigned' vertex list.
+	// If 'absorbingFace' exists then this method will assign all the vertices of 'face' that can see 'absorbingFace',
+	// if a vertex cannot see 'absorbingFace' it's added to the 'unassigned' vertex list.
+
 	deleteFaceVertices: function ( face, absorbingFace ) {
 
 		var faceVertices = this.removeAllVerticesFromFace( face );
@@ -142,12 +143,12 @@ Object.assign( QuickHull3.prototype, {
 
 				// mark the vertices to be reassigned to some other face
 
-				this.unclaimed.appendChain( faceVertices );
+				this.unassigned.appendChain( faceVertices );
 
 
 			} else {
 
-				// if there is an absorbing face assign vertices to it
+				// if there's an absorbing face try to assign as many vertices as possible to it
 
 				var vertex = faceVertices;
 
@@ -168,7 +169,7 @@ Object.assign( QuickHull3.prototype, {
 
 					} else {
 
-						this.unclaimed.append( vertex );
+						this.unassigned.append( vertex );
 
 					}
 
@@ -184,13 +185,13 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Reassigns as many vertices as possible from the unclaimed list to the new faces
+	// Reassigns as many vertices as possible from the unassigned list to the new faces
 
-	resolveUnclaimedPoints: function ( newFaces ) {
+	resolveUnassignedPoints: function ( newFaces ) {
 
-		if ( this.unclaimed.isEmpty() === false ) {
+		if ( this.unassigned.isEmpty() === false ) {
 
-			var vertex = this.unclaimed.first();
+			var vertex = this.unassigned.first();
 
 			do {
 
@@ -217,17 +218,21 @@ Object.assign( QuickHull3.prototype, {
 
 						}
 
-						if ( maxDistance > 1000 * this.tolerance ) break; // TODO: Why this?
+						if ( maxDistance > 1000 * this.tolerance ) break;
 
 					}
 
 				}
+
+				// 'maxFace' can be null e.g. if there are identical vertices
 
 				if ( maxFace !== null ) {
 
 					this.addVertexToFace( vertex, maxFace );
 
 				}
+
+				vertex = nextVertex;
 
 			} while ( vertex !== null );
 
@@ -509,7 +514,7 @@ Object.assign( QuickHull3.prototype, {
 
 	// Removes inactive faces
 
-	reindexFaceAndVertices: function () {
+	reindexFaces: function () {
 
 		var activeFaces = [];
 
@@ -529,20 +534,22 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Finds the next vertex to make faces with the current hull.
-	//
-	// - let 'face' be the first face existing in the 'claimed' vertex list
-	// - if 'face' doesn't exist then return since there're no vertices left
-	// - otherwise for each 'vertex' that face sees find the one furthest away from 'face'
+	// Finds the next vertex to make faces with the current hull
 
 	nextVertexToAdd: function () {
 
-		if ( this.claimed.isEmpty() === false ) {
+		// if the 'assigned' list of vertices is empty, no vertices are left. return with 'undefined'
+
+		if ( this.assigned.isEmpty() === false ) {
 
 			var eyeVertex, maxDistance = 0;
 
-			var eyeFace = this.claimed.first().face;
+			// grap the first available face and start with the first visible vertex of that face
+
+			var eyeFace = this.assigned.first().face;
 			var vertex = eyeFace.outside;
+
+			// now calculate the farthest vertex that face can see
 
 			do {
 
@@ -569,14 +576,14 @@ Object.assign( QuickHull3.prototype, {
 	// For an edge to be part of the horizon it must join a face that can see
 	// 'eyePoint' and a face that cannot see 'eyePoint'.
 	//
-	// eyePoint: The coordinates of a point
-	// crossEdge: The edge used to jump to the current 'face'
-	// face: The current face being tested
-	// horizon: The edges that form part of the horizon in ccw order
+	// - eyePoint: The coordinates of a point
+	// - crossEdge: The edge used to jump to the current 'face'
+	// - face: The current face being tested
+	// - horizon: The edges that form part of the horizon in ccw order
 
 	computeHorizon: function ( eyePoint, crossEdge, face, horizon ) {
 
-		// moves face's vertices to the 'unclaimed' vertex list
+		// moves face's vertices to the 'unassigned' vertex list
 
 		this.deleteFaceVertices( face );
 
@@ -626,7 +633,7 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Creates a face with the points 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in ccw order
+	// Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in ccw order
 
 	addAdjoiningFace: function ( eyeVertex, horizonEdge ) {
 
@@ -640,12 +647,12 @@ Object.assign( QuickHull3.prototype, {
 
 		face.getEdge( - 1 ).setTwin( horizonEdge.twin );
 
-		return face.getEdge( 0 ); // The half edge whose vertex is the eyeVertex
+		return face.getEdge( 0 ); // the half edge whose vertex is the eyeVertex
 
 
 	},
 
-	//  Adds horizon.length faces to the hull, each face will be 'linked' with the
+	//  Adds 'horizon.length' faces to the hull, each face will be linked with the
 	//  horizon opposite face and the face on the left/right
 
 	addNewFaces: function ( eyeVertex, horizon ) {
@@ -679,6 +686,8 @@ Object.assign( QuickHull3.prototype, {
 			previousSideEdge = sideEdge;
 
 		}
+
+		// perform final join of new faces
 
 		firstSideEdge.next.setTwin( previousSideEdge );
 
@@ -776,14 +785,16 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
+	// Adds a vertex to the hull
+
 	addVertexToHull: function ( eyeVertex ) {
 
 		var horizon = [];
 		var i, face;
 
-		this.unclaimed.clear();
+		this.unassigned.clear();
 
-		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unclaimed' vertex list
+		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unassigned' vertex list
 
 		this.removeVertexFromFace( eyeVertex, eyeVertex.face );
 
@@ -792,7 +803,7 @@ Object.assign( QuickHull3.prototype, {
 		this.addNewFaces( eyeVertex, horizon );
 
 		// first merge pass.
-    // Do the merge with respect to the larger face
+    // do the merge with respect to the larger face
 
     for ( i = 0; i < this.newFaces.length; i ++ ) {
 
@@ -807,7 +818,7 @@ Object.assign( QuickHull3.prototype, {
     }
 
 		// second merge pass.
-    // Do the merge on non convex faces (a face is marked as non convex in the first pass)
+    // do the merge on non convex faces (a face is marked as non convex in the first pass)
 
 		for ( i = 0; i < this.newFaces.length; i ++ ) {
 
@@ -823,33 +834,37 @@ Object.assign( QuickHull3.prototype, {
 
     }
 
-		// reassign 'unclaimed' vertices to the new faces
+		// reassign 'unassigned' vertices to the new faces
 
-	 this.resolveUnclaimedPoints( this.newFaces );
+	 this.resolveUnassignedPoints( this.newFaces );
+
+	},
+
+	cleanup: function () {
+
+		this.assigned.clear();
+		this.unassigned.clear();
+		this.newFaces = [];
 
 	},
 
 	build: function () {
 
-		var iterations = 0;
-		var eyeVertex;
+		var vertex;
 
 		this.computeInitialHull();
 
-		while ( ( eyeVertex = this.nextVertexToAdd() ) !== undefined ) {
+		// add all available vertices gradually to the hull
 
-			iterations ++;
+		while ( ( vertex = this.nextVertexToAdd() ) !== undefined ) {
 
-			console.log( 'THREE.QuickHull3: Iteration %i', iterations );
-			console.log( 'THREE.QuickHull3: Next vertex to add %i %o', eyeVertex.index, eyeVertex.point );
-
-			this.addVertexToHull( eyeVertex );
+			this.addVertexToHull( vertex );
 
 		}
 
-		this.reindexFaceAndVertices();
+		this.reindexFaces();
 
-		// TODO: Clean up
+		this.cleanup();
 
 	}
 
