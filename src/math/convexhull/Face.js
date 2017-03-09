@@ -220,28 +220,7 @@ Object.assign( Face.prototype, {
 
    return discardedFaces;
 
-  },
-
-  clone: function () {
-
-    return new this.constructor().copy( this );
-
-  },
-
-	copy: function ( other ) {
-
-		this.normal.copy( other.normal );
-		this.midpoint.copy( other.midpoint );
-    this.area = other.area;
-
-    this.constant = other.constant;
-    this.outside = other.outside;
-    this.mark = other.mark;
-    this.edge = other.edge;
-
-		return this;
-
-	}
+  }
 
 } );
 

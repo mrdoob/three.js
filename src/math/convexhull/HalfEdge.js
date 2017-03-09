@@ -66,25 +66,7 @@ Object.assign( HalfEdge.prototype, {
 
     return this;
 
-  },
-
-  clone: function () {
-
-    return new this.constructor().copy( this );
-
-  },
-
-	copy: function ( other ) {
-
-		this.vertex.copy( other.vertex );
-		this.face.copy( other.face );
-		this.next.copy( other.next );
-		this.prev.copy( other.prev );
-		this.twin.copy( other.twin );
-
-		return this;
-
-	}
+  }
 
 } );
 

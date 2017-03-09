@@ -191,22 +191,7 @@ Object.assign( VertexList.prototype, {
 
     return this.head === null;
 
-  },
-
-  clone: function () {
-
-    return new this.constructor().copy( this );
-
-  },
-
-	copy: function ( other ) {
-
-    this.head.copy( other.head );
-    this.tail.copy( other.tail );
-
-		return this;
-
-	}
+  }
 
 } );
 
