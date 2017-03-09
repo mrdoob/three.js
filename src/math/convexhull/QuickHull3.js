@@ -12,19 +12,9 @@ import { MergeNonConvexLargerFace, MergeNonConvex } from '../../constants';
  *
  */
 
-function QuickHull3( points ) {
+var c = 0;
 
-	if ( Array.isArray( points ) !== true ) {
-
-		console.error( 'THREE.QuickHull3: Points parameter is not an array.' );
-
-	}
-
-	if ( points.length < 4 ) {
-
-		console.error( 'THREE.QuickHull3: The algorithm needs at least four points.' );
-
-	}
+function QuickHull3() {
 
 	this.tolerance = - 1;
 
@@ -36,15 +26,105 @@ function QuickHull3( points ) {
 
 	this.vertices = []; // vertices of the hull (internal representation of given points)
 
-	for ( var i = 0, l = points.length; i < l; i ++ ) {
-
-		this.vertices.push( new Vertex( points[ i ], i ) );
-
-	}
-
 }
 
 Object.assign( QuickHull3.prototype, {
+
+	setFromPoints: function ( points ) {
+
+		if ( Array.isArray( points ) !== true ) {
+
+			console.error( 'THREE.QuickHull3: Points parameter is not an array.' );
+
+		}
+
+		if ( points.length < 4 ) {
+
+			console.error( 'THREE.QuickHull3: The algorithm needs at least four points.' );
+
+		}
+
+		this.makeEmpty();
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			this.vertices.push( new Vertex( points[ i ] ) );
+
+		}
+
+		this.compute();
+
+		return this;
+
+	},
+
+	setFromObject: function ( object ) {
+
+		var scope = this;
+
+		this.makeEmpty();
+
+		object.updateMatrixWorld( true );
+
+		object.traverse( function ( node ) {
+
+			var i, l, point;
+
+			var geometry = node.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( geometry.isGeometry ) {
+
+					var vertices = geometry.vertices;
+
+					for ( i = 0, l = vertices.length; i < l; i ++ ) {
+
+						point = vertices[ i ].clone();
+						point.applyMatrix4( node.matrixWorld );
+
+						scope.vertices.push( new Vertex( point ) );
+
+					}
+
+				} else if ( geometry.isBufferGeometry ) {
+
+					var attribute = geometry.attributes.position;
+
+					if ( attribute !== undefined ) {
+
+						for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+							point = new Vector3();
+
+							point.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+
+							scope.vertices.push( new Vertex( point ) );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		} );
+
+		this.compute();
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.faces = [];
+		this.vertices = [];
+
+		return this;
+
+	},
 
 	// Adds a 'vertex' to the 'assigned' list of vertices and assigns it to the given face.
 
@@ -699,8 +779,8 @@ Object.assign( QuickHull3.prototype, {
 
 		// The result is:
 		//
-		// - a positive number when the centroid of the opposite face is above the face i.e. when the faces are concave
-		// - a negative number when the centroid of the opposite face is below the face i.e. when the faces are convex
+		// - a positive number when the midpoint of the opposite face is above the face i.e. when the faces are concave
+		// - a negative number when the midpoint of the opposite face is below the face i.e. when the faces are convex
 
 		return edge.face.distanceToPoint( edge.twin.face.midpoint );
 
@@ -720,7 +800,7 @@ Object.assign( QuickHull3.prototype, {
 
 			if ( mergeType === MergeNonConvex ) {
 
-				if ( this.oppositeFaceDistance( edge ) > this.tolerance ||
+				if ( this.oppositeFaceDistance( edge ) > - this.tolerance ||
 				this.oppositeFaceDistance( edge.twin ) > - this.tolerance ) {
 
 					merge = true;
@@ -757,7 +837,7 @@ Object.assign( QuickHull3.prototype, {
 
 				if ( merge === true ) {
 
-					var discardedFaces = this.mergeAdjacentFaces( edge, [] );
+					var discardedFaces = face.mergeAdjacentFaces( edge, [] );
 
 					for ( var i = 0; i < discardedFaces.length; i ++ ) {
 
@@ -811,7 +891,7 @@ Object.assign( QuickHull3.prototype, {
 
       if ( face.mark === Visible ) {
 
-        while ( this.doAdjacentMerge( face, MergeNonConvexLargerFace ) ) {}
+        // while ( this.doAdjacentMerge( face, MergeNonConvexLargerFace ) ) {}
 
       }
 
@@ -828,7 +908,7 @@ Object.assign( QuickHull3.prototype, {
 
 				face.mark = Visible;
 
-        while ( this.doAdjacentMerge( face, MergeNonConvex ) ) {}
+        // while ( this.doAdjacentMerge( face, MergeNonConvex ) ) {}
 
       }
 
@@ -848,7 +928,7 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	build: function () {
+	compute: function () {
 
 		var vertex;
 

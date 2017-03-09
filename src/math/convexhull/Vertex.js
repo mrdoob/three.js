@@ -5,10 +5,9 @@
  *
  */
 
-function Vertex( point, index ) {
+function Vertex( point ) {
 
   this.point = point;
-  this.index = index; // index in the input array of points
   this.next = null;
   this.prev = null;
   this.face = null; // the face that is able to see this point

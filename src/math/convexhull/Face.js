@@ -120,16 +120,16 @@ Object.assign( Face.prototype, {
 
       }
 
-       twinEdge = next.twin.prev.twin;
-       oppositeFace.mark = Deleted;
-       discardedFace = oppositeFace;
+      twinEdge = next.twin.prev.twin;
+      oppositeFace.mark = Deleted;
+      discardedFace = oppositeFace;
 
-       next.prev = prev.prev;
-       next.prev.next = next;
+      next.prev = prev.prev;
+      next.prev.next = next;
 
-       next.setTwin( twinEdge );
+      next.setTwin( twinEdge );
 
-       oppositeFace.compute();
+      oppositeFace.compute();
 
     } else {
 
@@ -168,7 +168,7 @@ Object.assign( Face.prototype, {
 
    // right edge
 
-   while ( adjacentEdgeNext.opposite.face === oppositeFace ) {
+   while ( adjacentEdgeNext.twin.face === oppositeFace ) {
 
      adjacentEdgeNext = adjacentEdgeNext.next;
      twinEdgePrev = twinEdgePrev.prev;
