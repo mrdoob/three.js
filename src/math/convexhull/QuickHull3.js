@@ -15,13 +15,13 @@ function QuickHull3() {
 
 	this.tolerance = - 1;
 
-	this.faces = [];
-	this.newFaces = [];
+	this.faces = []; // the generated faces of the convex hull
+	this.newFaces = []; // this array holds the faces that are generated in a single iteration
 
 	this.assigned = new VertexList();
 	this.unassigned = new VertexList();
 
-	this.vertices = []; // vertices of the hull (internal representation of given points)
+	this.vertices = []; 	// vertices of the hull (internal representation of given geometry data)
 
 }
 
@@ -57,9 +57,7 @@ Object.assign( QuickHull3.prototype, {
 
 	setFromObject: function ( object ) {
 
-		var scope = this;
-
-		this.makeEmpty();
+		var points = [];
 
 		object.updateMatrixWorld( true );
 
@@ -80,7 +78,7 @@ Object.assign( QuickHull3.prototype, {
 						point = vertices[ i ].clone();
 						point.applyMatrix4( node.matrixWorld );
 
-						scope.vertices.push( new Vertex( point ) );
+						points.push( point );
 
 					}
 
@@ -96,7 +94,7 @@ Object.assign( QuickHull3.prototype, {
 
 							point.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
-							scope.vertices.push( new Vertex( point ) );
+							points.push( point );
 
 						}
 
@@ -108,9 +106,7 @@ Object.assign( QuickHull3.prototype, {
 
 		} );
 
-		this.compute();
-
-		return this;
+		return this.setFromPoints( points );
 
 	},
 
@@ -375,7 +371,7 @@ Object.assign( QuickHull3.prototype, {
 
 		}
 
-		// use min/max vectors to compute epsilon
+		// use min/max vectors to compute an optimal epsilon
 
 		this.tolerance = 3 * Number.EPSILON * (
 			Math.max( Math.abs( min.x ), Math.abs( max.x ) ) +
@@ -387,7 +383,8 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Computes the initial tetrahedron assigning to its faces all the points that are candidates to form part of the hull
+	// Computes the initial simplex assigning to its faces all the points
+	// that are candidates to form part of the hull
 
 	computeInitialHull: function () {
 
@@ -611,7 +608,7 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Finds the next vertex to make faces with the current hull
+	// Finds the next vertex to create faces with the current hull
 
 	nextVertexToAdd: function () {
 
