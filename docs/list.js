@@ -145,6 +145,7 @@ var list = {
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
+			[ "ExtrudeBufferGeometry", "api/geometries/ExtrudeBufferGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
 			[ "LatheBufferGeometry", "api/geometries/LatheBufferGeometry" ],
