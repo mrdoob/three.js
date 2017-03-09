@@ -12,8 +12,6 @@ import { MergeNonConvexLargerFace, MergeNonConvex } from '../../constants';
  *
  */
 
-var c = 0;
-
 function QuickHull3() {
 
 	this.tolerance = - 1;

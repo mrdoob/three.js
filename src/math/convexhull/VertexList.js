@@ -78,7 +78,7 @@ Object.assign( VertexList.prototype, {
 
   },
 
-  // Appends a 'node' to the end of this doubly linked list
+  // Appends a vertex to the end of this doubly linked list
 
   append: function ( vertex ) {
 
