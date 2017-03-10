@@ -117,6 +117,7 @@ var files = {
 		"webgl_loader_utf8",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
+		"webgl_loader_x",
 		"webgl_lod",
 		"webgl_marchingcubes",
 		"webgl_materials",

@@ -44,7 +44,7 @@
     <script src='../build/three.js'></script>
     <script src='js/controls/OrbitControls.js'></script>
 
-    <script src='js/loaders/XfileLoader.js'></script>
+    <script src='js/loaders/XLoader.js'></script>
 
     <script src='js/Detector.js'></script>
     <script src='js/libs/stats.min.js'></script>
@@ -113,13 +113,16 @@
             };
 
             Texloader = new THREE.TextureLoader();
-            var loader = new THREE.XFileLoader(manager, Texloader);
+            var loader = new THREE.XLoader(manager, Texloader);
 
-            // ! If Texture was reversed Y axis, enable the following 
-            // THREE.XFileLoader.IsUvYReverse = false;
-
+            // ! If [ Texture ] was reversed Y axis, enable the following. 
+            // THREE.XLoader.IsUvYReverse = false;
+            
+		    // ! And if [ Model ] was reversed X axis, enable the following. 
+            // loader.load([' your model url ', false ], function (object) {
+            
             // read (download) model file
-            loader.load(['models/xfile/SSR06_Born2.x', true, true], function (object) {
+            loader.load(['models/xfile/SSR06_Born2.x', true], function (object) {
 
                 for (var i = 0; i < object.FrameInfo.length; i++) {
 
