@@ -122,7 +122,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 		// HACK @mrdoob
 		// Ideally we'll merge both projection matrices so we can frustum cull
 
-		scope.projectionMatrix = cameraL.projectionMatrix;
+		scope.projectionMatrix.copy( cameraL.projectionMatrix );
 
 		//
 
