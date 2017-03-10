@@ -147,7 +147,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 		} else {
 
 			cameraL.bounds.set( 0.0, 0.0, 0.5, 1.0 );
-			cameraR.bounds.set( 0.0, 0.0, 0.5, 1.0 );
+			cameraR.bounds.set( 0.5, 0.0, 0.5, 1.0 );
 
 		}
 
