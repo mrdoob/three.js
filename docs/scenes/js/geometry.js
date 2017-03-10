@@ -1300,6 +1300,74 @@ var guis = {
 
 		generateGeometry();
 
+	},
+
+	ConvexGeometry: function( mesh ) {
+
+		var data = {
+			randomPoints: 1000
+		 };
+
+		function generateGeometry() {
+
+			var vertices = [];
+
+			for ( var i = 0; i < data.randomPoints; i ++ ) {
+
+				var vertex = new THREE.Vector3();
+				vertex.x = THREE.Math.randFloat( -10, 10 );
+				vertex.y = THREE.Math.randFloat( -10, 10 );
+				vertex.z = THREE.Math.randFloat( -10, 10 );
+				vertices.push( vertex );
+
+			}
+
+			updateGroupGeometry( mesh,
+				new THREE.ConvexGeometry( vertices )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ConvexGeometry' );
+
+		folder.add( data, 'randomPoints', 4, 10000 ).step( 100 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ConvexBufferGeometry: function( mesh ) {
+
+		var data = {
+			randomPoints: 1000
+		 };
+
+		function generateGeometry() {
+
+			var vertices = [];
+
+			for ( var i = 0; i < data.randomPoints; i ++ ) {
+
+				var vertex = new THREE.Vector3();
+				vertex.x = THREE.Math.randFloat( -10, 10 );
+				vertex.y = THREE.Math.randFloat( -10, 10 );
+				vertex.z = THREE.Math.randFloat( -10, 10 );
+				vertices.push( vertex );
+
+			}
+
+			updateGroupGeometry( mesh,
+				new THREE.ConvexBufferGeometry( vertices )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ConvexBufferGeometry' );
+
+		folder.add( data, 'randomPoints', 4, 10000 ).step( 100 ).onChange( generateGeometry );
+
+		generateGeometry();
+
 	}
 
 };

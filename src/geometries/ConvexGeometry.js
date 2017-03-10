@@ -41,7 +41,7 @@ function ConvexBufferGeometry( points ) {
 
   var faces = quickHull.faces;
 
-  for ( let i = 0; i < faces.length; i ++ ) {
+  for ( var i = 0; i < faces.length; i ++ ) {
 
     var face = faces[ i ];
     var edge = face.edge;
