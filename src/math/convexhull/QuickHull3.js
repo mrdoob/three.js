@@ -16,7 +16,7 @@ function QuickHull3() {
 	this.tolerance = - 1;
 
 	this.faces = []; // the generated faces of the convex hull
-	this.newFaces = []; // this array holds the faces that are generated in a single iteration
+	this.newFaces = []; // this array holds the faces that are generated within a single iteration
 
 	this.assigned = new VertexList();
 	this.unassigned = new VertexList();

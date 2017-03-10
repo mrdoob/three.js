@@ -32,7 +32,7 @@ Object.assign( VertexList.prototype, {
 
 	},
 
-  // Inserts a vertex before a 'target' vertex
+  // Inserts a vertex before the target vertex
 
 	insertBefore: function ( target, vertex ) {
 
@@ -55,7 +55,7 @@ Object.assign( VertexList.prototype, {
 
 	},
 
-  // Inserts a vertex after a 'target' vertex
+  // Inserts a vertex after the target vertex
 
   insertAfter: function ( target, vertex ) {
 
@@ -78,7 +78,7 @@ Object.assign( VertexList.prototype, {
 
   },
 
-  // Appends a vertex to the end of this doubly linked list
+  // Appends a vertex to the end of the linked list
 
   append: function ( vertex ) {
 
@@ -131,7 +131,7 @@ Object.assign( VertexList.prototype, {
 
   },
 
-  // Deletes a vertex from this linked list
+  // Removes a vertex from the linked list
 
   remove: function ( vertex ) {
 

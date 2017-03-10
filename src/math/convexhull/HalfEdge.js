@@ -8,10 +8,10 @@
 function HalfEdge( vertex, face ) {
 
   this.vertex = vertex;
-  this.face = face;
-  this.next = null;
   this.prev = null;
+  this.next = null;
   this.twin = null;
+  this.face = face;
 
 }
 

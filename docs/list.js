@@ -282,6 +282,14 @@ var list = {
 			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
 		],
 
+		"Math / Convex Hull": [
+			[ "Face", "api/math/convexhull/Face" ],
+			[ "HalfEdge", "api/math/convexhull/HalfEdge" ],
+			[ "QuickHull3", "api/math/convexhull/QuickHull3" ],
+			[ "Vertex", "api/math/convexhull/Vertex" ],
+			[ "VertexList", "api/math/convexhull/VertexList" ]
+		],
+
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
 			[ "Group", "api/objects/Group" ],

@@ -15,7 +15,7 @@ function Face() {
   this.area = 0;
 
   this.constant = 0; // signed distance from face to the origin
-  this.outside = null; // reference to the a vertex in a vertex list this face can see
+  this.outside = null; // reference to a vertex in a vertex list this face can see
   this.mark = Visible;
   this.edge = null;
 

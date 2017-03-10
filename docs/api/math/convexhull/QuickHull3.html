@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			QuickHull3 infos
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+
+		</div>
+
+		<h2>Properties</h2>
+
+    <h3>[property:Float tolerance]</h3>
+    <div>
+      The epsilon value that is used for internal comparative operations. The calculation of this value depends on the size of the geometry. Default is -1.
+    </div>
+
+		<h3>[property:Array faces]</h3>
+		<div>
+			The generated faces of the convex hull. Default is an empty array.
+		</div>
+
+		<h3>[property:Array newFaces]</h3>
+		<div>
+			This array holds the faces that are generated within a single iteration. Default is an empty array.
+		</div>
+
+		<h3>[property:VertexList assigned]</h3>
+		<div>
+			This [page:VertexList vertex list] holds all vertices that are assigned to a face. Default is an empty vertex list.
+		</div>
+
+		<h3>[property:VertexList unassigned]</h3>
+		<div>
+			This [page:VertexList vertex list] holds all vertices that are not assigned to a face. Default is an empty vertex list.
+		</div>
+
+		<h3>[property:Array vertices]</h3>
+		<div>
+			The internal representation of the given geometry data (an array of [page:Vertex vertices]).
+		</div>
+
+    <h2>Methods</h2>
+
+    <h3>[method:QuickHull3 setFromPoints]( [page:Array points] )</h3>
+    [page:Array points] - Array of [page:Vector3 Vector3s] that the resulting convex hull will contain.<br /><br />
+
+    <div>Computes to convex hull for the given array of points.</div>
+
+    <h3>[method:QuickHull3 setFromObject]( [page:Object3D object] )</h3>
+    [page:Object3D object] - [page:Object3D] to compute the convex hull of.<br /><br />
+
+    <div>Computes the convex hull of an [page:Object3D] (including its children),
+		accounting for the world transforms of both the object and its childrens.</div>
+
+    <h3>[method:QuickHull3 makeEmpty]()</h3>
+
+    <div>Makes this convex hull empty.</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
