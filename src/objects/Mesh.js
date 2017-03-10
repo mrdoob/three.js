@@ -63,13 +63,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					
 			for ( var i = 0; i < material.length; i ++ ) {
 				
-				fn( material[i], i ); 
+				fn( material[i], i, isArray ); 
 				
 			}
 			
 		} else {
 			
-			fn( material[i], -1 ); 
+			fn( material[i], -1, isArray ); 
 			
 		}
 		
