@@ -9,6 +9,8 @@ import { Visible, Deleted } from '../../constants';
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *
+ * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
+ *
  */
 
 function QuickHull3() {
@@ -18,6 +20,16 @@ function QuickHull3() {
 	this.faces = []; // the generated faces of the convex hull
 	this.newFaces = []; // this array holds the faces that are generated within a single iteration
 
+	// the vertex lists work as follows:
+	//
+	// let 'a' and 'b' be 'Face' instances
+	// let 'v' be points wrapped as instance of 'Vertex'
+	//
+	//     [v, v, ..., v, v, v, ...]
+	//      ^             ^
+	//      |             |
+	//  a.outside     b.outside
+	//
 	this.assigned = new VertexList();
 	this.unassigned = new VertexList();
 
@@ -119,7 +131,7 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Adds a 'vertex' to the 'assigned' list of vertices and assigns it to the given face.
+	// Adds a vertex to the 'assigned' list of vertices and assigns it to the given face
 
 	addVertexToFace: function ( vertex, face ) {
 
@@ -141,8 +153,7 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Removes 'vertex' for the 'assigned' list of vertices.
-	// It also makes sure that the link from 'face' to the first vertex it sees in 'assigned' is linked correctly after the removal
+	// Removes a vertex from the 'assigned' list of vertices and from the given face
 
 	removeVertexFromFace: function ( vertex, face ) {
 
@@ -168,9 +179,11 @@ Object.assign( QuickHull3.prototype, {
 
 		this.assigned.remove( vertex );
 
+		return this;
+
 	},
 
-	// Removes all the visible vertices that 'face' is able to see which are stored in the 'assigned' vertext list
+	// Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertext list
 
 	removeAllVerticesFromFace: function ( face ) {
 
@@ -201,10 +214,6 @@ Object.assign( QuickHull3.prototype, {
 	},
 
 	// Removes all the visible vertices that 'face' is able to see
-
-	// If 'absorbingFace' doesn't exist then all the removed vertices will be added to the 'unassigned' vertex list.
-	// If 'absorbingFace' exists then this method will assign all the vertices of 'face' that can see 'absorbingFace',
-	// if a vertex cannot see 'absorbingFace' it's added to the 'unassigned' vertex list.
 
 	deleteFaceVertices: function ( face, absorbingFace ) {
 
@@ -255,6 +264,8 @@ Object.assign( QuickHull3.prototype, {
 			}
 
 		}
+
+		return this;
 
 	},
 
@@ -311,9 +322,11 @@ Object.assign( QuickHull3.prototype, {
 
 		}
 
+		return this;
+
 	},
 
-	// Computes the extremes of a tetrahedron which will be the initial hull
+	// Computes the extremes of a simplex which will be the initial hull
 
 	computeExtremes: function () {
 
@@ -582,6 +595,8 @@ Object.assign( QuickHull3.prototype, {
 
 			}
 
+			return this;
+
 		};
 
 	}(),
@@ -605,6 +620,8 @@ Object.assign( QuickHull3.prototype, {
 		}
 
 		this.faces = activeFaces;
+
+		return this;
 
 	},
 
@@ -646,14 +663,9 @@ Object.assign( QuickHull3.prototype, {
 
 	},
 
-	// Computes a chain of half edges in ccw order called the 'horizon'.
+	// Computes a chain of half edges in CCW order called the 'horizon'.
 	// For an edge to be part of the horizon it must join a face that can see
 	// 'eyePoint' and a face that cannot see 'eyePoint'.
-	//
-	// - eyePoint: The coordinates of a point
-	// - crossEdge: The edge used to jump to the current 'face'
-	// - face: The current face being tested
-	// - horizon: The edges that form part of the horizon in ccw order
 
 	computeHorizon: function ( eyePoint, crossEdge, face, horizon ) {
 
@@ -705,9 +717,11 @@ Object.assign( QuickHull3.prototype, {
 
 		} while ( edge !== crossEdge );
 
+		return this;
+
 	},
 
-	// Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in ccw order
+	// Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in CCW order
 
 	addAdjoiningFace: function ( eyeVertex, horizonEdge ) {
 
@@ -765,6 +779,8 @@ Object.assign( QuickHull3.prototype, {
 
 		firstSideEdge.next.setTwin( previousSideEdge );
 
+		return this;
+
 	},
 
 	// Adds a vertex to the hull
@@ -788,6 +804,8 @@ Object.assign( QuickHull3.prototype, {
 
 	 this.resolveUnassignedPoints( this.newFaces );
 
+	 return this;
+
 	},
 
 	cleanup: function () {
@@ -795,6 +813,8 @@ Object.assign( QuickHull3.prototype, {
 		this.assigned.clear();
 		this.unassigned.clear();
 		this.newFaces = [];
+
+		return this;
 
 	},
 
@@ -815,6 +835,8 @@ Object.assign( QuickHull3.prototype, {
 		this.reindexFaces();
 
 		this.cleanup();
+
+		return this;
 
 	}
 
