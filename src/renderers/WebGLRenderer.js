@@ -1037,7 +1037,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 	
-	this.compileMaterials = function(scene, camera){
+	this.compile = function(scene, camera){
 
 		lights = [];
 		
