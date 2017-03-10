@@ -640,6 +640,13 @@ THREE.GLTF2Loader = ( function () {
 
 		}
 
+		// Blob URL
+		if ( /^blob:.*$/i.test( url ) ) {
+
+			return url;
+
+		}
+
 		// Relative URL
 		return ( path || '' ) + url;
 
@@ -1070,8 +1077,9 @@ THREE.GLTF2Loader = ( function () {
 						if ( source.bufferView !== undefined ) {
 
 							var bufferView = dependencies.bufferViews[ source.bufferView ];
-							var stringData = convertUint8ArrayToString( new Uint8Array( bufferView ) );
-							sourceUri = 'data:' + source.mimeType + ';base64,' + btoa( stringData );
+							var blob = new Blob( [ bufferView ], { type: source.mimeType } );
+							var urlCreator = window.URL || window.webkitURL;
+							sourceUri = urlCreator.createObjectURL( blob );
 
 						}
 
