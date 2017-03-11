@@ -59,13 +59,17 @@ THREE.CSS3DRenderer = function () {
 
 	// IE10 and 11 does not support 'preserve-3d'.
 	// Thus, z-order in 3D will not work.
-	// Should we calc z-order and set "CSS z-index" manually?
+	// We have to calc z-order and set "CSS z-index" manually for IE.
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.MozTransformStyle = 'preserve-3d';
 	cameraElement.style.oTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
 
 	domElement.appendChild( cameraElement );
+
+	// Should we replace to feature detection?
+	// https://github.com/Modernizr/Modernizr/issues/762
+	var isIE = !!document.documentMode;
 
 	this.setClearColor = function () {};
 
@@ -150,6 +154,30 @@ THREE.CSS3DRenderer = function () {
 
 	};
 
+	var getDistanceToSquared = function () {
+
+		var a = new THREE.Vector3();
+		var b = new THREE.Vector3();
+
+		return function ( object1, object2 ) {
+
+			a.set(
+				object1.matrixWorld.elements[ 12 ],
+				object1.matrixWorld.elements[ 13 ],
+				object1.matrixWorld.elements[ 14 ]
+			);
+			b.set(
+				object2.matrixWorld.elements[ 12 ],
+				object2.matrixWorld.elements[ 13 ],
+				object2.matrixWorld.elements[ 14 ]
+			);
+
+			return a.distanceToSquared( b );
+
+		}
+
+	}();
+
 	var renderObject = function ( object, camera, parentTransfrom ) {
 
 		var style;
@@ -179,16 +207,17 @@ THREE.CSS3DRenderer = function () {
 			}
 
 			var element = object.element;
-			var cachedStyle = cache.objects[ object.id ];
+			var cachedStyle = cache.objects[ object.id ] && cache.objects[ object.id ].style;
 
 			if ( cachedStyle === undefined || cachedStyle !== style ) {
 			       
 				element.style.WebkitTransform = 'translate3d(-50%,-50%,0) ' + style;
-				element.style.MozTransform =  'translate3d(-50%,-50%,0) ' + style;
-				element.style.oTransform =  'translate3d(-50%,-50%,0) ' + style;
-				element.style.transform =  'translate3d(-50%,-50%,0) ' + style;
+				element.style.MozTransform = 'translate3d(-50%,-50%,0) ' + style;
+				element.style.oTransform = 'translate3d(-50%,-50%,0) ' + style;
+				element.style.transform = 'translate3d(-50%,-50%,0) ' + style;
 
-				cache.objects[ object.id ] =  'translate3d(-50%,-50%,0) ' + style;
+				cache.objects[ object.id ] = { style: 'translate3d(-50%,-50%,0) ' + style };
+				if ( isIE ) cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
 
 			}
 
@@ -210,16 +239,39 @@ THREE.CSS3DRenderer = function () {
 
 	};
 
+	this.zOrder = function ( scene ) {
+
+		var order = Object.keys( cache.objects ).sort( function ( a, b ) {
+
+			return cache.objects[ a ].distanceToCameraSquared - cache.objects[ b ].distanceToCameraSquared;
+
+		} );
+		var zMax = order.length;
+
+		scene.traverse( function ( object ) {
+
+			var index = order.indexOf( object.id + '' );
+
+			if ( index !== -1 ) {
+
+				object.element.style.zIndex = zMax - index;
+
+			}
+
+		} );
+
+	}
+
 	this.render = function ( scene, camera ) {
 
 		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.getEffectiveFOV() * 0.5 ) ) * _height;
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + "px";
-			domElement.style.MozPerspective = fov + "px";
-			domElement.style.oPerspective = fov + "px";
-			domElement.style.perspective = fov + "px";
+			domElement.style.WebkitPerspective = fov + 'px';
+			domElement.style.MozPerspective = fov + 'px';
+			domElement.style.oPerspective = fov + 'px';
+			domElement.style.perspective = fov + 'px';
 
 			cache.camera.fov = fov;
 
@@ -231,10 +283,12 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var style = "translate3d(" + _widthHalf + "px," + _heightHalf + "px, " + fov  + "px) " + 
+		var style = 'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, ' + fov  + 'px) ' + 
 		            getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		renderObject( scene, camera, style );
+
+		if ( isIE ) this.zOrder( scene );
 
 	};
 
