@@ -55,7 +55,7 @@ THREE.GLTF2Loader = ( function () {
 
 			var magic = convertUint8ArrayToString( new Uint8Array( data, 0, 4 ) );
 
-			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
+			if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
 				extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( data );
 				content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
@@ -320,63 +320,70 @@ THREE.GLTF2Loader = ( function () {
 	/* BINARY EXTENSION */
 
 	var BINARY_EXTENSION_BUFFER_NAME = 'binary_glTF';
-
-	var BINARY_EXTENSION_HEADER_DEFAULTS = { magic: 'glTF', version: 1, contentFormat: 0 };
-
-	var BINARY_EXTENSION_HEADER_LENGTH = 20;
+	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
+	var BINARY_EXTENSION_HEADER_LENGTH = 12;
+	var BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
 
 	function GLTFBinaryExtension( data ) {
 
 		this.name = EXTENSIONS.KHR_BINARY_GLTF;
+		this.content = null;
+		this.body = null;
 
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
-		var header = {
+		this.header = {
 			magic: convertUint8ArrayToString( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
-			length: headerView.getUint32( 8, true ),
-			contentLength: headerView.getUint32( 12, true ),
-			contentFormat: headerView.getUint32( 16, true )
+			length: headerView.getUint32( 8, true )
 		};
 
-		for ( var key in BINARY_EXTENSION_HEADER_DEFAULTS ) {
+		if ( this.header.magic !== BINARY_EXTENSION_HEADER_MAGIC ) {
 
-			var value = BINARY_EXTENSION_HEADER_DEFAULTS[ key ];
+			throw new Error( 'GLTF2Loader: Unsupported glTF-Binary header.' );
 
-			if ( header[ key ] !== value ) {
+		} else if ( this.header.version < 2.0 ) {
 
-				throw new Error( 'Unsupported glTF-Binary header: Expected "%s" to be "%s".', key, value );
-
-			}
+			throw new Error( 'GLTF2Loader: Legacy binary file detected. Use GLTFLoader instead.' );
 
 		}
 
-		var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH, header.contentLength );
+		var chunkView = new DataView( data, BINARY_EXTENSION_HEADER_LENGTH );
+		var chunkIndex = 0;
 
-		this.header = header;
-		this.content = convertUint8ArrayToString( contentArray );
-		this.body = data.slice( BINARY_EXTENSION_HEADER_LENGTH + header.contentLength, header.length );
+		while ( chunkIndex < chunkView.byteLength ) {
+
+			var chunkLength = chunkView.getUint32( chunkIndex, true );
+			chunkIndex += 4;
+
+			var chunkType = chunkView.getUint32( chunkIndex, true );
+			chunkIndex += 4;
+
+			if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON ) {
+
+				var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength );
+				this.content = convertUint8ArrayToString( contentArray );
+
+			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
+
+				var byteOffset = BINARY_EXTENSION_HEADER_LENGTH + chunkIndex;
+				this.body = data.slice( byteOffset, byteOffset + chunkLength );
+
+			}
+
+			// Clients must ignore chunks with unknown types.
+
+			chunkIndex += chunkLength;
+
+		}
+
+		if ( this.content === null ) {
+
+			throw new Error( 'GLTF2Loader: JSON content not found.' );
+
+		}
 
 	}
-
-	GLTFBinaryExtension.prototype.loadShader = function ( shader, bufferViews ) {
-
-		var bufferView = bufferViews[ shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].bufferView ];
-		var array = new Uint8Array( bufferView );
-
-		return convertUint8ArrayToString( array );
-
-	};
-
-	GLTFBinaryExtension.prototype.loadTextureSourceUri = function ( source, bufferViews ) {
-
-		var metadata = source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ];
-		var bufferView = bufferViews[ metadata.bufferView ];
-		var stringData = convertUint8ArrayToString( new Uint8Array( bufferView ) );
-
-		return 'data:' + metadata.mimeType + ';base64,' + btoa( stringData );
-
-	};
 
 	/*********************************/
 	/********** INTERNALS ************/
@@ -628,6 +635,13 @@ THREE.GLTF2Loader = ( function () {
 
 		// Data URI
 		if ( /^data:.*,.*$/i.test( url ) ) {
+
+			return url;
+
+		}
+
+		// Blob URL
+		if ( /^blob:.*$/i.test( url ) ) {
 
 			return url;
 
@@ -894,7 +908,6 @@ THREE.GLTF2Loader = ( function () {
 	GLTFParser.prototype.loadShaders = function () {
 
 		var json = this.json;
-		var extensions = this.extensions;
 		var options = this.options;
 
 		return this._withDependencies( [
@@ -905,9 +918,11 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.shaders, function ( shader ) {
 
-				if ( shader.extensions && shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
+				if ( shader.bufferView !== undefined ) {
 
-					return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadShader( shader, dependencies.bufferViews );
+					var bufferView = dependencies.bufferViews[ shader.bufferView ];
+					var array = new Uint8Array( bufferView );
+					return convertUint8ArrayToString( array );
 
 				}
 
@@ -937,13 +952,14 @@ THREE.GLTF2Loader = ( function () {
 
 		return _each( json.buffers, function ( buffer, name ) {
 
-			if ( name === BINARY_EXTENSION_BUFFER_NAME ) {
-
-				return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].body;
-
-			}
-
 			if ( buffer.type === 'arraybuffer' || buffer.type === undefined ) {
+
+				// If present, GLB container is required to be the first buffer.
+				if ( buffer.uri === undefined && name === 0 ) {
+
+					return extensions[ EXTENSIONS.KHR_BINARY_GLTF ].body;
+
+				}
 
 				return new Promise( function ( resolve ) {
 
@@ -1011,11 +1027,13 @@ THREE.GLTF2Loader = ( function () {
 				var elementBytes = TypedArray.BYTES_PER_ELEMENT;
 				var itemBytes = elementBytes * itemSize;
 
+				var array;
+
 				// The buffer is not interleaved if the stride is the item size in bytes.
 				if ( accessor.byteStride && accessor.byteStride !== itemBytes ) {
 
 					// Use the full buffer if it's interleaved.
-					var array = new TypedArray( arraybuffer );
+					array = new TypedArray( arraybuffer );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					var ib = new THREE.InterleavedBuffer( array, accessor.byteStride / elementBytes );
@@ -1039,7 +1057,6 @@ THREE.GLTF2Loader = ( function () {
 	GLTFParser.prototype.loadTextures = function () {
 
 		var json = this.json;
-		var extensions = this.extensions;
 		var options = this.options;
 
 		return this._withDependencies( [
@@ -1057,9 +1074,14 @@ THREE.GLTF2Loader = ( function () {
 						var source = json.images[ texture.source ];
 						var sourceUri = source.uri;
 
-						if ( source.extensions && source.extensions[ EXTENSIONS.KHR_BINARY_GLTF ] ) {
+						var urlCreator;
 
-							sourceUri = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].loadTextureSourceUri( source, dependencies.bufferViews );
+						if ( source.bufferView !== undefined ) {
+
+							var bufferView = dependencies.bufferViews[ source.bufferView ];
+							var blob = new Blob( [ bufferView ], { type: source.mimeType } );
+							urlCreator = window.URL || window.webkitURL;
+							sourceUri = urlCreator.createObjectURL( blob );
 
 						}
 
@@ -1074,6 +1096,12 @@ THREE.GLTF2Loader = ( function () {
 						textureLoader.setCrossOrigin( options.crossOrigin );
 
 						textureLoader.load( resolveURL( sourceUri, options.path ), function ( _texture ) {
+
+							if ( urlCreator !== undefined ) {
+
+								urlCreator.revokeObjectURL( sourceUri );
+
+							}
 
 							_texture.flipY = false;
 
