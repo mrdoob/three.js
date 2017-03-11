@@ -1699,7 +1699,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || camera !== _currentCamera ) {
 
-			p_uniforms.set( _gl, camera, 'projectionMatrix' );
+			p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 			if ( capabilities.logarithmicDepthBuffer ) {
 
@@ -1752,8 +1752,8 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
-			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
+			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
+			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 		}
 
@@ -1799,8 +1799,8 @@ function WebGLRenderer( parameters ) {
 
 					}
 
-					p_uniforms.set( _gl, skeleton, 'boneTexture' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
+					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture );
+					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
 				} else {
 
@@ -1913,8 +1913,8 @@ function WebGLRenderer( parameters ) {
 
 		// common matrices
 
-		p_uniforms.set( _gl, object, 'modelViewMatrix' );
-		p_uniforms.set( _gl, object, 'normalMatrix' );
+		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
+		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;
