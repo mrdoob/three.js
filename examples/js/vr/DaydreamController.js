@@ -25,7 +25,7 @@ THREE.DaydreamController = function () {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad !== null && ( gamepad.id === 'Daydream Controller' ) ) {
+			if ( gamepad && ( gamepad.id === 'Daydream Controller' ) ) {
 
 				return gamepad;
 
@@ -66,7 +66,7 @@ THREE.DaydreamController = function () {
 
 			// angular velocity
 
-			if ( pose.angularVelocity !== null || ! angularVelocity.equals( pose.angularVelocity ) ) {
+			if ( pose.angularVelocity !== null && ! angularVelocity.equals( pose.angularVelocity ) ) {
 
 				angularVelocity.fromArray( pose.angularVelocity );
 				scope.dispatchEvent( { type: 'angularvelocitychanged', angularVelocity: angularVelocity } );

@@ -37,7 +37,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	if ( navigator.getVRDisplays ) {
 
-		navigator.getVRDisplays().then( gotVRDisplays ).catch ( function () {
+		navigator.getVRDisplays().then( gotVRDisplays ).catch( function () {
 
 			console.warn( 'THREE.VRControls: Unable to get VR Displays' );
 
