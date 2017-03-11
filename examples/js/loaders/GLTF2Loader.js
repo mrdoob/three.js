@@ -1074,11 +1074,13 @@ THREE.GLTF2Loader = ( function () {
 						var source = json.images[ texture.source ];
 						var sourceUri = source.uri;
 
+						var urlCreator;
+
 						if ( source.bufferView !== undefined ) {
 
 							var bufferView = dependencies.bufferViews[ source.bufferView ];
 							var blob = new Blob( [ bufferView ], { type: source.mimeType } );
-							var urlCreator = window.URL || window.webkitURL;
+							urlCreator = window.URL || window.webkitURL;
 							sourceUri = urlCreator.createObjectURL( blob );
 
 						}
@@ -1094,6 +1096,12 @@ THREE.GLTF2Loader = ( function () {
 						textureLoader.setCrossOrigin( options.crossOrigin );
 
 						textureLoader.load( resolveURL( sourceUri, options.path ), function ( _texture ) {
+
+							if ( urlCreator !== undefined ) {
+
+								urlCreator.revokeObjectURL( sourceUri );
+
+							}
 
 							_texture.flipY = false;
 
