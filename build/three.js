@@ -7161,26 +7161,9 @@
 
 		this.visible = true;
 
-		this._needsUpdate = true;
+		this.needsUpdate = true;
 
 	}
-
-	Object.defineProperty( Material.prototype, 'needsUpdate', {
-
-		get: function () {
-
-			return this._needsUpdate;
-
-		},
-
-		set: function ( value ) {
-
-			if ( value === true ) this.update();
-			this._needsUpdate = value;
-
-		}
-
-	} );
 
 	Object.assign( Material.prototype, EventDispatcher.prototype, {
 
@@ -7435,12 +7418,6 @@
 			this.clippingPlanes = dstPlanes;
 
 			return this;
-
-		},
-
-		update: function () {
-
-			this.dispatchEvent( { type: 'update' } );
 
 		},
 
