@@ -10,98 +10,98 @@ import { Visible, Deleted } from '../../constants';
 
 function Face() {
 
-  this.normal = new Vector3();
-  this.midpoint = new Vector3();
-  this.area = 0;
+	this.normal = new Vector3();
+	this.midpoint = new Vector3();
+	this.area = 0;
 
-  this.constant = 0; // signed distance from face to the origin
-  this.outside = null; // reference to a vertex in a vertex list this face can see
-  this.mark = Visible;
-  this.edge = null;
+	this.constant = 0; // signed distance from face to the origin
+	this.outside = null; // reference to a vertex in a vertex list this face can see
+	this.mark = Visible;
+	this.edge = null;
 
 }
 
 Object.assign( Face, {
 
-  create: function( a, b, c ) {
+	create: function( a, b, c ) {
 
-    var face = new Face();
+		var face = new Face();
 
-    var e0 = new HalfEdge( a, face );
-    var e1 = new HalfEdge( b, face );
-    var e2 = new HalfEdge( c, face );
+		var e0 = new HalfEdge( a, face );
+		var e1 = new HalfEdge( b, face );
+		var e2 = new HalfEdge( c, face );
 
-    // join edges
+		// join edges
 
-    e0.next = e2.prev = e1;
-    e1.next = e0.prev = e2;
-    e2.next = e1.prev = e0;
+		e0.next = e2.prev = e1;
+		e1.next = e0.prev = e2;
+		e2.next = e1.prev = e0;
 
-    // main half edge reference
+		// main half edge reference
 
-    face.edge = e0;
+		face.edge = e0;
 
-    return face.compute();
+		return face.compute();
 
-  }
+	}
 
 } );
 
 Object.assign( Face.prototype, {
 
-  getEdge: function ( i ) {
+	getEdge: function ( i ) {
 
-    var edge = this.edge;
+		var edge = this.edge;
 
-    while ( i > 0 ) {
+		while ( i > 0 ) {
 
-      edge = edge.next;
-      i --;
+			edge = edge.next;
+			i --;
 
-    }
+		}
 
-    while ( i < 0 ) {
+		while ( i < 0 ) {
 
-      edge = edge.prev;
-      i ++;
+			edge = edge.prev;
+			i ++;
 
-    }
+		}
 
-    return edge;
+		return edge;
 
-  },
+	},
 
-  compute: function () {
+	compute: function () {
 
-    var triangle;
+		var triangle;
 
-    return function compute () {
+		return function compute () {
 
-      if ( triangle === undefined ) triangle = new Triangle();
+			if ( triangle === undefined ) triangle = new Triangle();
 
-      var a = this.edge.tail();
-      var b = this.edge.head();
-      var c = this.edge.next.head();
+			var a = this.edge.tail();
+			var b = this.edge.head();
+			var c = this.edge.next.head();
 
-      triangle.set( a.point, b.point, c.point );
+			triangle.set( a.point, b.point, c.point );
 
-      triangle.normal( this.normal );
-      triangle.midpoint( this.midpoint );
-      this.area = triangle.area();
+			triangle.normal( this.normal );
+			triangle.midpoint( this.midpoint );
+			this.area = triangle.area();
 
-      this.constant = this.normal.dot( this.midpoint );
+			this.constant = this.normal.dot( this.midpoint );
 
-      return this;
+			return this;
 
-    };
+		};
 
-  }(),
+	}(),
 
-  distanceToPoint: function ( point ) {
+	distanceToPoint: function ( point ) {
 
-    return this.normal.dot( point ) - this.constant;
+		return this.normal.dot( point ) - this.constant;
 
-  }
+	}
 
 } );
 

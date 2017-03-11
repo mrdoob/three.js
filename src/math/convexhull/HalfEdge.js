@@ -7,66 +7,66 @@
 
 function HalfEdge( vertex, face ) {
 
-  this.vertex = vertex;
-  this.prev = null;
-  this.next = null;
-  this.twin = null;
-  this.face = face;
+	this.vertex = vertex;
+	this.prev = null;
+	this.next = null;
+	this.twin = null;
+	this.face = face;
 
 }
 
 Object.assign( HalfEdge.prototype, {
 
-  head: function () {
+	head: function () {
 
-    return this.vertex;
+		return this.vertex;
 
-  },
+	},
 
-  tail: function () {
+	tail: function () {
 
-    return this.prev ? this.prev.vertex : null;
+		return this.prev ? this.prev.vertex : null;
 
-  },
+	},
 
-  length: function () {
+	length: function () {
 
-    var head = this.head();
-    var tail = this.tail();
+		var head = this.head();
+		var tail = this.tail();
 
-    if ( tail !== null ) {
+		if ( tail !== null ) {
 
-      return tail.point.distanceTo( head.point );
+			return tail.point.distanceTo( head.point );
 
-    }
+		}
 
-    return - 1;
+		return - 1;
 
-  },
+	},
 
-  lengthSquared: function () {
+	lengthSquared: function () {
 
-    var head = this.head();
-    var tail = this.tail();
+		var head = this.head();
+		var tail = this.tail();
 
-    if ( tail !== null ) {
+		if ( tail !== null ) {
 
-      return tail.point.distanceToSquared( head.point );
+			return tail.point.distanceToSquared( head.point );
 
-    }
+		}
 
-    return - 1;
+		return - 1;
 
-  },
+	},
 
-  setTwin: function ( edge ) {
+	setTwin: function ( edge ) {
 
-    this.twin = edge;
-    edge.twin = this;
+		this.twin = edge;
+		edge.twin = this;
 
-    return this;
+		return this;
 
-  }
+	}
 
 } );
 

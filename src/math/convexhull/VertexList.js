@@ -5,193 +5,193 @@
 
 function VertexList() {
 
-  this.head = null;
-  this.tail = null;
+	this.head = null;
+	this.tail = null;
 
 }
 
 Object.assign( VertexList.prototype, {
 
-  first: function () {
+	first: function () {
 
-    return this.head;
+		return this.head;
 
-  },
+	},
 
-  last: function () {
+	last: function () {
 
-    return this.tail;
+		return this.tail;
 
-  },
+	},
 
 	clear: function () {
 
 		this.head = this.tail = null;
 
-    return this;
+		return this;
 
 	},
 
-  // Inserts a vertex before the target vertex
+	// Inserts a vertex before the target vertex
 
 	insertBefore: function ( target, vertex ) {
 
 		vertex.prev = target.prev;
-    vertex.next = target;
+		vertex.next = target;
 
-    if ( vertex.prev === null ) {
+		if ( vertex.prev === null ) {
 
-      this.head = vertex;
+			this.head = vertex;
 
-    } else {
+		} else {
 
-      vertex.prev.next = vertex;
+			vertex.prev.next = vertex;
 
-    }
+		}
 
-    target.prev = vertex;
+		target.prev = vertex;
 
-    return this;
+		return this;
 
 	},
 
-  // Inserts a vertex after the target vertex
+	// Inserts a vertex after the target vertex
 
-  insertAfter: function ( target, vertex ) {
+	insertAfter: function ( target, vertex ) {
 
-    vertex.prev = target;
-    vertex.next = target.next;
+		vertex.prev = target;
+		vertex.next = target.next;
 
-    if ( vertex.next === null ) {
+		if ( vertex.next === null ) {
 
-      this.tail = vertex;
+			this.tail = vertex;
 
-    } else {
+		} else {
 
-      vertex.next.prev = vertex;
+			vertex.next.prev = vertex;
 
-    }
+		}
 
-    target.next = vertex;
+		target.next = vertex;
 
-    return this;
+		return this;
 
-  },
+	},
 
-  // Appends a vertex to the end of the linked list
+	// Appends a vertex to the end of the linked list
 
-  append: function ( vertex ) {
+	append: function ( vertex ) {
 
-    if ( this.head === null ) {
+		if ( this.head === null ) {
 
-      this.head = vertex;
+			this.head = vertex;
 
-    } else {
+		} else {
 
-      this.tail.next = vertex;
+			this.tail.next = vertex;
 
-    }
+		}
 
-    vertex.prev = this.tail;
-    vertex.next = null; // the tail has no subsequent vertex
+		vertex.prev = this.tail;
+		vertex.next = null; // the tail has no subsequent vertex
 
-    this.tail = vertex;
+		this.tail = vertex;
 
-    return this;
+		return this;
 
-  },
+	},
 
-  // Appends a chain of vertices where 'vertex' is the head.
+	// Appends a chain of vertices where 'vertex' is the head.
 
-  appendChain: function ( vertex ) {
+	appendChain: function ( vertex ) {
 
-    if ( this.head === null ) {
+		if ( this.head === null ) {
 
-      this.head = vertex;
+			this.head = vertex;
 
-    } else {
+		} else {
 
-      this.tail.next = vertex;
+			this.tail.next = vertex;
 
-    }
+		}
 
-    vertex.prev = this.tail;
+		vertex.prev = this.tail;
 
-    // ensure that the 'tail' reference points to the last vertex of the chain
+		// ensure that the 'tail' reference points to the last vertex of the chain
 
-    while ( vertex.next !== null ) {
+		while ( vertex.next !== null ) {
 
-      vertex = vertex.next;
+			vertex = vertex.next;
 
-    }
+		}
 
-    this.tail = vertex;
+		this.tail = vertex;
 
-    return this;
+		return this;
 
-  },
+	},
 
-  // Removes a vertex from the linked list
+	// Removes a vertex from the linked list
 
-  remove: function ( vertex ) {
+	remove: function ( vertex ) {
 
-    if ( vertex.prev === null ) {
+		if ( vertex.prev === null ) {
 
-      this.head = vertex.next;
+			this.head = vertex.next;
 
-    } else {
+		} else {
 
-      vertex.prev.next = vertex.next;
+			vertex.prev.next = vertex.next;
 
-    }
+		}
 
-    if ( vertex.next === null ) {
+		if ( vertex.next === null ) {
 
-      this.tail = vertex.prev;
+			this.tail = vertex.prev;
 
-    } else {
+		} else {
 
-      vertex.next.prev = vertex.prev;
+			vertex.next.prev = vertex.prev;
 
-    }
+		}
 
-    return this;
+		return this;
 
-  },
+	},
 
-  // Removes a list of vertices whose 'head' is 'a' and whose 'tail' is b
+	// Removes a list of vertices whose 'head' is 'a' and whose 'tail' is b
 
-  removeSubList: function ( a, b ) {
+	removeSubList: function ( a, b ) {
 
-    if ( a.prev === null ) {
+		if ( a.prev === null ) {
 
-      this.head = b.next;
+			this.head = b.next;
 
-    } else {
+		} else {
 
-      a.prev.next = b.next;
+			a.prev.next = b.next;
 
-    }
+		}
 
-    if ( b.next === null ) {
+		if ( b.next === null ) {
 
-      this.tail = a.prev;
+			this.tail = a.prev;
 
-    } else {
+		} else {
 
-      b.next.prev = a.prev;
+			b.next.prev = a.prev;
 
-    }
+		}
 
-    return this;
+		return this;
 
-  },
+	},
 
-  isEmpty: function() {
+	isEmpty: function() {
 
-    return this.head === null;
+		return this.head === null;
 
-  }
+	}
 
 } );
 
