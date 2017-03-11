@@ -557,7 +557,7 @@ Object.assign( QuickHull3.prototype, {
 
 			for ( i = 0; i < 4; i ++ ) {
 
-      	this.faces.push( faces[ i ] );
+				this.faces.push( faces[ i ] );
 
 			}
 
@@ -802,9 +802,9 @@ Object.assign( QuickHull3.prototype, {
 
 		// reassign 'unassigned' vertices to the new faces
 
-	 this.resolveUnassignedPoints( this.newFaces );
+		this.resolveUnassignedPoints( this.newFaces );
 
-	 return this;
+		return	this;
 
 	},
 
