@@ -82,7 +82,6 @@ THREE.CSS3DRenderer = function () {
 
 		_width = width;
 		_height = height;
-
 		_widthHalf = _width / 2;
 		_heightHalf = _height / 2;
 
@@ -203,14 +202,19 @@ THREE.CSS3DRenderer = function () {
 			var cachedStyle = cache.objects[ object.id ] && cache.objects[ object.id ].style;
 
 			if ( cachedStyle === undefined || cachedStyle !== style ) {
-			       
+
 				element.style.WebkitTransform = style;
 				element.style.MozTransform = style;
 				element.style.oTransform = style;
 				element.style.transform = style;
 
 				cache.objects[ object.id ] = { style: style };
-				if ( isIE ) cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
+
+				if ( isIE ) {
+
+					cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
+
+				}
 
 			}
 
@@ -270,7 +274,11 @@ THREE.CSS3DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null ) {
+
+			camera.updateMatrixWorld();
+
+		}
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -280,7 +288,11 @@ THREE.CSS3DRenderer = function () {
 
 		renderObject( scene, camera, style );
 
-		if ( isIE ) this.zOrder( scene );
+		if ( isIE ) {
+
+			this.zOrder( scene );
+
+		}
 
 	};
 
