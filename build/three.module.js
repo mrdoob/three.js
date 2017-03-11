@@ -15508,43 +15508,46 @@ function Camera() {
 
 }
 
-Camera.prototype = Object.create( Object3D.prototype );
-Camera.prototype.constructor = Camera;
+Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Camera.prototype.isCamera = true;
+	constructor: Camera,
 
-Camera.prototype.getWorldDirection = function () {
+	isCamera: true,
 
-	var quaternion = new Quaternion();
+	copy: function ( source ) {
 
-	return function getWorldDirection( optionalTarget ) {
+		Object3D.prototype.copy.call( this, source );
 
-		var result = optionalTarget || new Vector3();
+		this.matrixWorldInverse.copy( source.matrixWorldInverse );
+		this.projectionMatrix.copy( source.projectionMatrix );
 
-		this.getWorldQuaternion( quaternion );
+		return this;
 
-		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+	},
 
-	};
+	getWorldDirection: function () {
 
-}();
+		var quaternion = new Quaternion();
 
-Camera.prototype.clone = function () {
+		return function getWorldDirection( optionalTarget ) {
 
-	return new this.constructor().copy( this );
+			var result = optionalTarget || new Vector3();
 
-};
+			this.getWorldQuaternion( quaternion );
 
-Camera.prototype.copy = function ( source ) {
+			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-	Object3D.prototype.copy.call( this, source );
+		};
 
-	this.matrixWorldInverse.copy( source.matrixWorldInverse );
-	this.projectionMatrix.copy( source.projectionMatrix );
+	}(),
 
-	return this;
+	clone: function () {
 
-};
+		return new this.constructor().copy( this );
+
+	}
+
+} );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -15705,7 +15708,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
 		this.view = null;
 		this.updateProjectionMatrix();
@@ -20809,6 +20812,8 @@ function WebGLRenderer( parameters ) {
 
 		// update camera matrices and frustum
 
+		camera.onBeforeRender( _this );
+
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
@@ -20957,6 +20962,7 @@ function WebGLRenderer( parameters ) {
 			// opaque pass (front-to-back order)
 
 			state.setBlending( NoBlending );
+
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
@@ -20983,6 +20989,14 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setTest( true );
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
+
+		if ( camera.isArrayCamera && camera.enabled ) {
+
+			_this.setScissorTest( false );
+
+		}
+
+		camera.onAfterRender( _this );
 
 		// _gl.finish();
 
@@ -21150,26 +21164,57 @@ function WebGLRenderer( parameters ) {
 
 			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+			if ( camera.isArrayCamera && camera.enabled ) {
 
-			if ( object.isImmediateRenderObject ) {
+				var cameras = camera.cameras;
 
-				state.setMaterial( material );
+				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-				var program = setProgram( camera, scene.fog, material, object );
+					var camera2 = cameras[ j ];
+					var bounds = camera2.bounds;
+					_this.setViewport(
+						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					);
+					_this.setScissor(
+						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					);
+					_this.setScissorTest( true );
+					renderObject( object, scene, camera2, geometry, material, group );
 
-				_currentGeometryProgram = '';
-
-				renderObjectImmediate( object, program, material );
+				}
 
 			} else {
 
-				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+				renderObject( object, scene, camera, geometry, material, group );
 
 			}
 
 			object.onAfterRender( _this, scene, camera, geometry, material, group );
+
+		}
+
+	}
+
+	function renderObject( object, scene, camera, geometry, material, group ) {
+
+		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		if ( object.isImmediateRenderObject ) {
+
+			state.setMaterial( material );
+
+			var program = setProgram( camera, scene.fog, material, object );
+
+			_currentGeometryProgram = '';
+
+			renderObjectImmediate( object, program, material );
+
+		} else {
+
+			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 		}
 
@@ -23254,8 +23299,6 @@ Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
 function SkinnedMesh( geometry, material ) {
 
 	Mesh.call( this, geometry, material );
-
-	if ( this.material.skinning === false ) console.warn( 'THREE.SkinnedMesh: Material must have skinning set to true.', this.material );
 
 	this.type = 'SkinnedMesh';
 
@@ -26756,11 +26799,9 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 		
-		if (options.extrudeMaterial !== undefined){
-			
-			scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
-			
-		}
+
+		scope.addGroup( start, verticesArray.length/3 -start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1);
+
 
 	}
 
@@ -35715,6 +35756,27 @@ CubeCamera.prototype.constructor = CubeCamera;
  * @author mrdoob / http://mrdoob.com/
  */
 
+function ArrayCamera( array ) {
+
+	PerspectiveCamera.call( this );
+
+	this.enabled = false;
+	this.cameras = array || [];
+
+}
+
+ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototype ), {
+
+	constructor: ArrayCamera,
+
+	isArrayCamera: true
+
+} );
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 function AudioListener() {
 
 	Object3D.call( this );
@@ -39479,6 +39541,7 @@ Object.assign( Clock.prototype, {
 		if ( this.autoStart && ! this.running ) {
 
 			this.start();
+			return 0;
 
 		}
 
@@ -43047,4 +43110,4 @@ function CanvasRenderer() {
 
 }
 
-export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, SceneUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };
+export { WebGLRenderTargetCube, WebGLRenderTarget, WebGLRenderer, ShaderLib, UniformsLib, UniformsUtils, ShaderChunk, FogExp2, Fog, Scene, LensFlare, Sprite, LOD, SkinnedMesh, Skeleton, Bone, Mesh, LineSegments, LineLoop, Line, Points, Group, VideoTexture, DataTexture, CompressedTexture, CubeTexture, CanvasTexture, DepthTexture, Texture, CompressedTextureLoader, DataTextureLoader, CubeTextureLoader, TextureLoader, ObjectLoader, MaterialLoader, BufferGeometryLoader, DefaultLoadingManager, LoadingManager, JSONLoader, ImageLoader, FontLoader, FileLoader, Loader, Cache, AudioLoader, SpotLightShadow, SpotLight, PointLight, RectAreaLight, HemisphereLight, DirectionalLightShadow, DirectionalLight, AmbientLight, LightShadow, Light, StereoCamera, PerspectiveCamera, OrthographicCamera, CubeCamera, ArrayCamera, Camera, AudioListener, PositionalAudio, AudioContext, AudioAnalyser, Audio, VectorKeyframeTrack, StringKeyframeTrack, QuaternionKeyframeTrack, NumberKeyframeTrack, ColorKeyframeTrack, BooleanKeyframeTrack, PropertyMixer, PropertyBinding, KeyframeTrack, AnimationUtils, AnimationObjectGroup, AnimationMixer, AnimationClip, Uniform, InstancedBufferGeometry, BufferGeometry, GeometryIdCount, Geometry, InterleavedBufferAttribute, InstancedInterleavedBuffer, InterleavedBuffer, InstancedBufferAttribute, Face3, Object3D, Raycaster, Layers, EventDispatcher, Clock, QuaternionLinearInterpolant, LinearInterpolant, DiscreteInterpolant, CubicInterpolant, Interpolant, Triangle, _Math as Math, Spherical, Cylindrical, Plane, Frustum, Sphere, Ray, Matrix4, Matrix3, Box3, Box2, Line3, Euler, Vector4, Vector3, Vector2, Quaternion, Color, MorphBlendMesh, ImmediateRenderObject, VertexNormalsHelper, SpotLightHelper, SkeletonHelper, PointLightHelper, RectAreaLightHelper, HemisphereLightHelper, GridHelper, PolarGridHelper, FaceNormalsHelper, DirectionalLightHelper, CameraHelper, BoxHelper, ArrowHelper, AxisHelper, CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, LineCurve3, ArcCurve, EllipseCurve, SplineCurve, CubicBezierCurve, QuadraticBezierCurve, LineCurve, Shape, Path, ShapePath, Font, CurvePath, Curve, ShapeUtils, SceneUtils, WireframeGeometry, ParametricGeometry, ParametricBufferGeometry, TetrahedronGeometry, TetrahedronBufferGeometry, OctahedronGeometry, OctahedronBufferGeometry, IcosahedronGeometry, IcosahedronBufferGeometry, DodecahedronGeometry, DodecahedronBufferGeometry, PolyhedronGeometry, PolyhedronBufferGeometry, TubeGeometry, TubeBufferGeometry, TorusKnotGeometry, TorusKnotBufferGeometry, TorusGeometry, TorusBufferGeometry, TextGeometry, TextBufferGeometry, SphereGeometry, SphereBufferGeometry, RingGeometry, RingBufferGeometry, PlaneGeometry, PlaneBufferGeometry, LatheGeometry, LatheBufferGeometry, ShapeGeometry, ShapeBufferGeometry, ExtrudeGeometry, ExtrudeBufferGeometry, EdgesGeometry, ConeGeometry, ConeBufferGeometry, CylinderGeometry, CylinderBufferGeometry, CircleGeometry, CircleBufferGeometry, BoxGeometry, BoxBufferGeometry, ShadowMaterial, SpriteMaterial, RawShaderMaterial, ShaderMaterial, PointsMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshPhongMaterial, MeshToonMaterial, MeshNormalMaterial, MeshLambertMaterial, MeshDepthMaterial, MeshBasicMaterial, LineDashedMaterial, LineBasicMaterial, Material, Float64BufferAttribute, Float32BufferAttribute, Uint32BufferAttribute, Int32BufferAttribute, Uint16BufferAttribute, Int16BufferAttribute, Uint8ClampedBufferAttribute, Uint8BufferAttribute, Int8BufferAttribute, BufferAttribute, REVISION, MOUSE, CullFaceNone, CullFaceBack, CullFaceFront, CullFaceFrontBack, FrontFaceDirectionCW, FrontFaceDirectionCCW, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, FrontSide, BackSide, DoubleSide, FlatShading, SmoothShading, NoColors, FaceColors, VertexColors, NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth, MultiplyOperation, MixOperation, AddOperation, NoToneMapping, LinearToneMapping, ReinhardToneMapping, Uncharted2ToneMapping, CineonToneMapping, UVMapping, CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, SphericalReflectionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, NearestMipMapNearestFilter, NearestMipMapLinearFilter, LinearFilter, LinearMipMapNearestFilter, LinearMipMapLinearFilter, UnsignedByteType, ByteType, ShortType, UnsignedShortType, IntType, UnsignedIntType, FloatType, HalfFloatType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedInt248Type, AlphaFormat, RGBFormat, RGBAFormat, LuminanceFormat, LuminanceAlphaFormat, RGBEFormat, DepthFormat, DepthStencilFormat, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, LoopOnce, LoopRepeat, LoopPingPong, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, ZeroCurvatureEnding, ZeroSlopeEnding, WrapAroundEnding, TrianglesDrawMode, TriangleStripDrawMode, TriangleFanDrawMode, LinearEncoding, sRGBEncoding, GammaEncoding, RGBEEncoding, LogLuvEncoding, RGBM7Encoding, RGBM16Encoding, RGBDEncoding, BasicDepthPacking, RGBADepthPacking, BoxGeometry as CubeGeometry, Face4, LineStrip, LinePieces, MeshFaceMaterial, MultiMaterial, PointCloud, Particle, ParticleSystem, PointCloudMaterial, ParticleBasicMaterial, ParticleSystemMaterial, Vertex, DynamicBufferAttribute, Int8Attribute, Uint8Attribute, Uint8ClampedAttribute, Int16Attribute, Uint16Attribute, Int32Attribute, Uint32Attribute, Float32Attribute, Float64Attribute, ClosedSplineCurve3, SplineCurve3, Spline, BoundingBoxHelper, EdgesHelper, WireframeHelper, XHRLoader, BinaryTextureLoader, GeometryUtils, ImageUtils, Projector, CanvasRenderer };

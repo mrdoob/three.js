@@ -25,7 +25,7 @@ THREE.DaydreamController = function () {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad !== null && ( gamepad.id === 'Daydream Controller' ) ) {
+			if ( gamepad && ( gamepad.id === 'Daydream Controller' ) ) {
 
 				return gamepad;
 

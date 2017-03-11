@@ -147,6 +147,7 @@ var list = {
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
+			[ "ExtrudeBufferGeometry", "api/geometries/ExtrudeBufferGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
 			[ "LatheBufferGeometry", "api/geometries/LatheBufferGeometry" ],
@@ -349,7 +350,7 @@ var list = {
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
-			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "GLTF2Loader", "examples/loaders/GLTF2Loader" ],
 			[ "MTLLoader", "examples/loaders/MTLLoader" ],
 			[ "OBJLoader", "examples/loaders/OBJLoader" ],
 			[ "PCDLoader", "examples/loaders/PCDLoader" ],

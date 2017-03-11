@@ -61,6 +61,7 @@ export { StereoCamera } from './cameras/StereoCamera.js';
 export { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 export { OrthographicCamera } from './cameras/OrthographicCamera.js';
 export { CubeCamera } from './cameras/CubeCamera.js';
+export { ArrayCamera } from './cameras/ArrayCamera.js';
 export { Camera } from './cameras/Camera.js';
 export { AudioListener } from './audio/AudioListener.js';
 export { PositionalAudio } from './audio/PositionalAudio.js';
