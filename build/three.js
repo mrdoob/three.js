@@ -23306,8 +23306,6 @@
 
 		Mesh.call( this, geometry, material );
 
-		if ( this.material.skinning === false ) console.warn( 'THREE.SkinnedMesh: Material must have skinning set to true.', this.material );
-
 		this.type = 'SkinnedMesh';
 
 		this.bindMode = 'attached';
