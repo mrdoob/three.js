@@ -64,6 +64,7 @@
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
@@ -113,7 +114,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -142,6 +142,12 @@
 				var gamepadHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
 				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
 				gamepad.add( gamepadHelper );
+
+				renderer.domElement.addEventListener( 'click', function ( event ) {
+
+					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
+
+				} );
 
 				//
 
@@ -205,8 +211,6 @@
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
-
-					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
 
 					cube.position.add( cube.userData.velocity );
 
