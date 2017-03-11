@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF 1.0</title>
+		<title>three.js webgl - glTF 2.0</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -63,10 +63,9 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> 1.0 loader
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> 2.0 loader
 		<br>
-		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> - COLLADA duck by Sony -
-		Cesium models by <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		BoomBox by <a href="https://www.microsoft.com/" target="_blank">Microsoft</a>
 		</div>
 	<div id="container"></div>
 	<div id="controls">
@@ -95,7 +94,7 @@
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/loaders/GLTF2Loader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -202,7 +201,7 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.GLTFLoader();
+				loader = new THREE.GLTF2Loader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -370,71 +369,10 @@
 
 			var sceneList = [
 				{
-					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
-					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
-					objectPosition: new THREE.Vector3(2, 1, 0),
-					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
-					animationTime: 3,
+					name : "BoomBox (PBR)", url : "./models/gltf/BoomBox/%s/BoomBox.gltf",
+					cameraPos: new THREE.Vector3(2, 1, 3),
+					objectRotation: new THREE.Euler(0, Math.PI, 0),
 					addLights:true,
-					shadows:true,
-					addGround:true,
-					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
-				},
-				{
-					name : "Duck", url : "./models/gltf/duck/%s/duck.gltf",
-					cameraPos: new THREE.Vector3(0, 3, 5),
-					addLights:true,
-					addGround:true,
-					shadows:true,
-					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
-				},
-				{
-					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/Cesium_Man.gltf",
-					 cameraPos: new THREE.Vector3(0, 3, 10),
-					 objectRotation: new THREE.Euler(0, 0, 0),
-					 addLights:true,
-					 addGround:true,
-					 shadows:true,
-					 extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
-				},
-				{
-					name : "Cesium Milk Truck",
-					url : "./models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf",
-					cameraPos: new THREE.Vector3(0, 3, 10),
-					addLights:true,
-					addGround:true,
-					shadows:true,
-					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
-				},
-				{
-					name : "Rigged Simple",
-					url : "./models/gltf/RiggedSimple/%s/RiggedSimple.gltf",
-					cameraPos: new THREE.Vector3(0, 5, 15),
-					objectRotation: new THREE.Euler(0, 90, 0),
-					addLights:true,
-					shadows:true,
-					extensions: ["glTF"]
-				},
-				{
-					name : "Snowflake",
-					url : "./models/gltf/snowflake/snowFlake.gltf",
-					objectScale: new THREE.Vector3(4, 4, 1),
-					cameraPos: new THREE.Vector3(0, 100, 5000),
-					objectPosition: new THREE.Vector3(0, 0, 0),
-					addLights:false,
-					addGround:false,
-					shadows:false,
-					extensions: ["glTF"]
-				},
-				{
-					name : "Snowflakes",
-					url : "./models/gltf/snowflakes/snowFlakes.gltf",
-					cameraPos: new THREE.Vector3(0, 100, 5000),
-					objectPosition: new THREE.Vector3(-1200, -1200, 0),
-					addLights:false,
-					addGround:false,
-					shadows:false,
 					extensions: ["glTF"]
 				}
 			];

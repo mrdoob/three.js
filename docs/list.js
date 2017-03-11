@@ -340,7 +340,7 @@ var list = {
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
-			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "GLTF2Loader", "examples/loaders/GLTF2Loader" ],
 			[ "MTLLoader", "examples/loaders/MTLLoader" ],
 			[ "OBJLoader", "examples/loaders/OBJLoader" ],
 			[ "PCDLoader", "examples/loaders/PCDLoader" ],
