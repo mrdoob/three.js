@@ -1,6 +1,7 @@
 import { Vector4 } from '../../math/Vector4';
 import { Color } from '../../math/Color';
 import { Vector2 } from '../../math/Vector2';
+import { DataTexture } from '../../textures/DataTexture';
 
 /**
  * Uniforms library for shared webgl shaders
@@ -80,6 +81,12 @@ var UniformsLib = {
 
 	},
 
+	gradientmap: {
+
+		gradientMap: { value: null }
+
+	},
+
 	fog: {
 
 		fogDensity: { value: 0.00025 },
@@ -143,6 +150,14 @@ var UniformsLib = {
 			direction: {},
 			skyColor: {},
 			groundColor: {}
+		} },
+
+		// TODO (abelnation): RectAreaLight BRDF data needs to be moved from example to main src
+		rectAreaLights: { value: [], properties: {
+			color: {},
+			position: {},
+			width: {},
+			height: {}
 		} }
 
 	},
@@ -159,6 +174,5 @@ var UniformsLib = {
 	}
 
 };
-
 
 export { UniformsLib };

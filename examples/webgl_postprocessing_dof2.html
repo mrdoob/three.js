@@ -300,7 +300,7 @@ Use WEBGL Depth buffer support?
 					postprocessing.enabled = effectController.enabled;
 					postprocessing.bokeh_uniforms[ 'znear' ].value = camera.near;
 					postprocessing.bokeh_uniforms[ 'zfar' ].value = camera.far;
-					camera.setLens(effectController.focalLength);
+					camera.setFocalLength(effectController.focalLength);
 
 				};
 

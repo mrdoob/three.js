@@ -265,19 +265,19 @@ var RollerCoasterLiftersGeometry = function ( curve, size ) {
 			var point1 = shape[ j ];
 			var point2 = shape[ ( j + 1 ) % jl ];
 
-			vector1.copy( point1 )
+			vector1.copy( point1 );
 			vector1.applyQuaternion( quaternion );
 			vector1.add( fromPoint );
 
-			vector2.copy( point2 )
+			vector2.copy( point2 );
 			vector2.applyQuaternion( quaternion );
 			vector2.add( fromPoint );
 
-			vector3.copy( point2 )
+			vector3.copy( point2 );
 			vector3.applyQuaternion( quaternion );
 			vector3.add( toPoint );
 
-			vector4.copy( point1 )
+			vector4.copy( point1 );
 			vector4.applyQuaternion( quaternion );
 			vector4.add( toPoint );
 

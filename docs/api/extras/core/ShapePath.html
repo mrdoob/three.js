@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:CurvePath] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+		This is class is used to convert a series of shapes to an array of [page:Path]s, for example an SVG shape to a
+		path (see the example below). It is used internally by [page:Font] to convert a font in JSON format to a
+		series of paths.
+		</div>
+
+		<h2>Example</h2>
+
+		[example:webgl_geometry_extrude_shapes2 geometry / extrude / shapes2]
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name](  )</h3>
+		<div>
+		Creates a new ShapePath. Unlike a [page:Path], no points are passed in as the ShapePath is designed to
+		be generated after creation.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:array subPaths]</h3>
+		<div>
+		Array of [page:Path]s.
+		</div>
+
+		<h3>[property:array currentPath]</h3>
+		<div>
+		The current [page:Path] that is being generated.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null moveTo]( [page:Float x], [page:Float y] )</h3>
+		<div>
+		Starts a new [page:Path] and calls [page:Path.moveTo]( x, y ) on that [page:Path].
+		Also points [page:ShapePath.currentPath currentPath] to that [page:Path].
+		</div>
+
+		<h3>[method:null lineTo]( [page:Float x], [page:Float y] )</h3>
+		<div>This creates a line from the [page:ShapePath.currentPath currentPath]'s
+			offset to X and Y and updates the offset to X and Y.</div>
+
+		<h3>[method:null quadraticCurveTo]( [page:Float cpX], [page:Float cpY], [page:Float x], [page:Float y] )</h3>
+		<div>This creates a quadratic curve from the [page:ShapePath.currentPath currentPath]'s
+			offset to x and y with cpX and cpY as control point and updates the [page:ShapePath.currentPath currentPath]'s
+			offset to x and y.</div>
+
+		<h3>[method:null bezierCurveTo]( [page:Float cp1X], [page:Float cp1Y], [page:Float cp2X], [page:Float cp2Y], [page:Float x], [page:Float y] )</h3>
+		<div>This creates a bezier curve from the [page:ShapePath.currentPath currentPath]'s
+			 offset to x and y with cp1X, cp1Y and cp1X, cp1Y as control points and updates the
+			 [page:ShapePath.currentPath currentPath]'s offset to x and y.</div>
+
+		<h3>[method:null splineThru] ( [page:Array points] ) </h3>
+		<div>points - An array of [page:Vector2]s</div>
+		<div>Connects a new [page:SplineCurve] onto the [page:ShapePath.currentPath currentPath].</div>
+
+
+		<h3>[method:Array toShapes]( [page:Boolean isCCW], [page:Boolean noHoles] )</h3>
+		<div>
+		isCCW -- Changes how solids and holes are generated<br/>
+		noHoles -- Whether or not to generate holes
+		</div>
+		<div>
+		Converts the [page:ShapePath.subPaths subPaths] array into an array of Shapes. By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If isCCW is set to true,
+		then those are flipped. If the paramater noHoles is set to true then all paths are set as solid shapes and isCCW is ignored.
+		<br/>
+
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/extras/core/Path.js src/extras/core/Path.js]
+	</body>
+</html>

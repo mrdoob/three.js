@@ -14,28 +14,28 @@ KeyframeTrackPrototype = {
 
 	DefaultInterpolation: InterpolateLinear,
 
-	InterpolantFactoryMethodDiscrete: function( result ) {
+	InterpolantFactoryMethodDiscrete: function ( result ) {
 
 		return new DiscreteInterpolant(
 				this.times, this.values, this.getValueSize(), result );
 
 	},
 
-	InterpolantFactoryMethodLinear: function( result ) {
+	InterpolantFactoryMethodLinear: function ( result ) {
 
 		return new LinearInterpolant(
 				this.times, this.values, this.getValueSize(), result );
 
 	},
 
-	InterpolantFactoryMethodSmooth: function( result ) {
+	InterpolantFactoryMethodSmooth: function ( result ) {
 
 		return new CubicInterpolant(
 				this.times, this.values, this.getValueSize(), result );
 
 	},
 
-	setInterpolation: function( interpolation ) {
+	setInterpolation: function ( interpolation ) {
 
 		var factoryMethod;
 
@@ -90,7 +90,7 @@ KeyframeTrackPrototype = {
 
 	},
 
-	getInterpolation: function() {
+	getInterpolation: function () {
 
 		switch ( this.createInterpolant ) {
 
@@ -110,20 +110,20 @@ KeyframeTrackPrototype = {
 
 	},
 
-	getValueSize: function() {
+	getValueSize: function () {
 
 		return this.values.length / this.times.length;
 
 	},
 
 	// move all keyframes either forwards or backwards in time
-	shift: function( timeOffset ) {
+	shift: function ( timeOffset ) {
 
-		if( timeOffset !== 0.0 ) {
+		if ( timeOffset !== 0.0 ) {
 
 			var times = this.times;
 
-			for( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] += timeOffset;
 
@@ -136,13 +136,13 @@ KeyframeTrackPrototype = {
 	},
 
 	// scale all keyframe times by a factor (useful for frame <-> seconds conversions)
-	scale: function( timeScale ) {
+	scale: function ( timeScale ) {
 
-		if( timeScale !== 1.0 ) {
+		if ( timeScale !== 1.0 ) {
 
 			var times = this.times;
 
-			for( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( var i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
 
@@ -156,7 +156,7 @@ KeyframeTrackPrototype = {
 
 	// removes keyframes before and after animation without changing any values within the range [startTime, endTime].
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
-	trim: function( startTime, endTime ) {
+	trim: function ( startTime, endTime ) {
 
 		var times = this.times,
 			nKeys = times.length,
@@ -164,14 +164,14 @@ KeyframeTrackPrototype = {
 			to = nKeys - 1;
 
 		while ( from !== nKeys && times[ from ] < startTime ) ++ from;
-		while ( to !== -1 && times[ to ] > endTime ) -- to;
+		while ( to !== - 1 && times[ to ] > endTime ) -- to;
 
 		++ to; // inclusive -> exclusive bound
 
-		if( from !== 0 || to !== nKeys ) {
+		if ( from !== 0 || to !== nKeys ) {
 
 			// empty tracks are forbidden, so keep at least one keyframe
-			if ( from >= to ) to = Math.max( to , 1 ), from = to - 1;
+			if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
 
 			var stride = this.getValueSize();
 			this.times = AnimationUtils.arraySlice( times, from, to );
@@ -185,7 +185,7 @@ KeyframeTrackPrototype = {
 	},
 
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
-	validate: function() {
+	validate: function () {
 
 		var valid = true;
 
@@ -202,7 +202,7 @@ KeyframeTrackPrototype = {
 
 			nKeys = times.length;
 
-		if( nKeys === 0 ) {
+		if ( nKeys === 0 ) {
 
 			console.error( "track is empty", this );
 			valid = false;
@@ -211,7 +211,7 @@ KeyframeTrackPrototype = {
 
 		var prevTime = null;
 
-		for( var i = 0; i !== nKeys; i ++ ) {
+		for ( var i = 0; i !== nKeys; i ++ ) {
 
 			var currTime = times[ i ];
 
@@ -223,7 +223,7 @@ KeyframeTrackPrototype = {
 
 			}
 
-			if( prevTime !== null && prevTime > currTime ) {
+			if ( prevTime !== null && prevTime > currTime ) {
 
 				console.error( "out of order keys", this, i, currTime, prevTime );
 				valid = false;
@@ -263,15 +263,18 @@ KeyframeTrackPrototype = {
 
 	// removes equivalent sequential keys as common in morph target sequences
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
-	optimize: function() {
+	optimize: function () {
 
 		var times = this.times,
 			values = this.values,
 			stride = this.getValueSize(),
 
-			writeIndex = 1;
+			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
 
-		for( var i = 1, n = times.length - 1; i <= n; ++ i ) {
+			writeIndex = 1,
+			lastIndex = times.length - 1;
+
+		for ( var i = 1; i < lastIndex; ++ i ) {
 
 			var keep = false;
 
@@ -282,24 +285,29 @@ KeyframeTrackPrototype = {
 
 			if ( time !== timeNext && ( i !== 1 || time !== time[ 0 ] ) ) {
 
-				// remove unnecessary keyframes same as their neighbors
-				var offset = i * stride,
-					offsetP = offset - stride,
-					offsetN = offset + stride;
+				if ( ! smoothInterpolation ) {
 
-				for ( var j = 0; j !== stride; ++ j ) {
+					// remove unnecessary keyframes same as their neighbors
 
-					var value = values[ offset + j ];
+					var offset = i * stride,
+						offsetP = offset - stride,
+						offsetN = offset + stride;
 
-					if ( value !== values[ offsetP + j ] ||
-							value !== values[ offsetN + j ] ) {
+					for ( var j = 0; j !== stride; ++ j ) {
 
-						keep = true;
-						break;
+						var value = values[ offset + j ];
+
+						if ( value !== values[ offsetP + j ] ||
+								value !== values[ offsetN + j ] ) {
+
+							keep = true;
+							break;
+
+						}
 
 					}
 
-				}
+				} else keep = true;
 
 			}
 
@@ -314,18 +322,29 @@ KeyframeTrackPrototype = {
 					var readOffset = i * stride,
 						writeOffset = writeIndex * stride;
 
-					for ( var j = 0; j !== stride; ++ j ) {
+					for ( var j = 0; j !== stride; ++ j )
 
 						values[ writeOffset + j ] = values[ readOffset + j ];
-
-					}
-
 
 				}
 
 				++ writeIndex;
 
 			}
+
+		}
+
+		// flush last keyframe (compaction looks ahead)
+
+		if ( lastIndex > 0 ) {
+
+			times[ writeIndex ] = times[ lastIndex ];
+
+			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j )
+
+				values[ writeOffset + j ] = values[ readOffset + j ];
+
+			++ writeIndex;
 
 		}
 
@@ -340,6 +359,6 @@ KeyframeTrackPrototype = {
 
 	}
 
-}
+};
 
 export { KeyframeTrackPrototype };

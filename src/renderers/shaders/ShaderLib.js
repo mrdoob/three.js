@@ -15,11 +15,10 @@ var ShaderLib = {
 	basic: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.aomap,
+			UniformsLib.lightmap,
 			UniformsLib.fog
-
 		] ),
 
 		vertexShader: ShaderChunk.meshbasic_vert,
@@ -30,18 +29,15 @@ var ShaderLib = {
 	lambert: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-
 			{
-				emissive : { value: new Color( 0x000000 ) }
+				emissive: { value: new Color( 0x000000 ) }
 			}
-
 		] ),
 
 		vertexShader: ShaderChunk.meshlambert_vert,
@@ -52,7 +48,6 @@ var ShaderLib = {
 	phong: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -60,15 +55,14 @@ var ShaderLib = {
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
+			UniformsLib.gradientmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-
 			{
-				emissive : { value: new Color( 0x000000 ) },
-				specular : { value: new Color( 0x111111 ) },
+				emissive: { value: new Color( 0x000000 ) },
+				specular: { value: new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
-
 		] ),
 
 		vertexShader: ShaderChunk.meshphong_vert,
@@ -79,7 +73,6 @@ var ShaderLib = {
 	standard: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -91,14 +84,12 @@ var ShaderLib = {
 			UniformsLib.metalnessmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-
 			{
-				emissive : { value: new Color( 0x000000 ) },
+				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
 				metalness: { value: 0 },
-				envMapIntensity : { value: 1 }, // temporary
+				envMapIntensity: { value: 1 } // temporary
 			}
-
 		] ),
 
 		vertexShader: ShaderChunk.meshphysical_vert,
@@ -109,10 +100,8 @@ var ShaderLib = {
 	points: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.points,
 			UniformsLib.fog
-
 		] ),
 
 		vertexShader: ShaderChunk.points_vert,
@@ -123,16 +112,13 @@ var ShaderLib = {
 	dashed: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.fog,
-
 			{
-				scale    : { value: 1 },
-				dashSize : { value: 1 },
+				scale: { value: 1 },
+				dashSize: { value: 1 },
 				totalSize: { value: 2 }
 			}
-
 		] ),
 
 		vertexShader: ShaderChunk.linedashed_vert,
@@ -143,10 +129,8 @@ var ShaderLib = {
 	depth: {
 
 		uniforms: UniformsUtils.merge( [
-
 			UniformsLib.common,
 			UniformsLib.displacementmap
-
 		] ),
 
 		vertexShader: ShaderChunk.depth_vert,
@@ -156,11 +140,15 @@ var ShaderLib = {
 
 	normal: {
 
-		uniforms: {
-
-			opacity : { value: 1.0 }
-
-		},
+		uniforms: UniformsUtils.merge( [
+			UniformsLib.common,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			{
+				opacity: { value: 1.0 }
+			}
+		] ),
 
 		vertexShader: ShaderChunk.normal_vert,
 		fragmentShader: ShaderChunk.normal_frag
@@ -203,9 +191,7 @@ var ShaderLib = {
 	distanceRGBA: {
 
 		uniforms: {
-
 			lightPos: { value: new Vector3() }
-
 		},
 
 		vertexShader: ShaderChunk.distanceRGBA_vert,
@@ -218,14 +204,11 @@ var ShaderLib = {
 ShaderLib.physical = {
 
 	uniforms: UniformsUtils.merge( [
-
 		ShaderLib.standard.uniforms,
-
 		{
 			clearCoat: { value: 0 },
 			clearCoatRoughness: { value: 0 }
 		}
-
 	] ),
 
 	vertexShader: ShaderChunk.meshphysical_vert,

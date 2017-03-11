@@ -1,9 +1,6 @@
 import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
 
-/**************************************************************
- *	Ellipse curve
- **************************************************************/
 
 function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation ) {
 
@@ -27,7 +24,7 @@ EllipseCurve.prototype.constructor = EllipseCurve;
 
 EllipseCurve.prototype.isEllipseCurve = true;
 
-EllipseCurve.prototype.getPoint = function( t ) {
+EllipseCurve.prototype.getPoint = function ( t ) {
 
 	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;

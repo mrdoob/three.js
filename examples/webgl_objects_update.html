@@ -47,22 +47,22 @@
 
 				//
 
-				var object = createObject( createMultiMaterial(), 1 );
+				var object = createObject( createMaterials(), 1 );
 				object.position.set( -100, 100, 0 );
 				scene.add( object );
 				objectNewGeometry = object;
 
-				object = createObject( createMultiMaterial(), 1 );
+				object = createObject( createMaterials(), 1 );
 				object.position.set( 100, 100, 0 );
 				scene.add( object );
 				objectToggleAddRemove = object;
 
-				object = createObject( createMultiMaterial(), 4 );
+				object = createObject( createMaterials(), 4 );
 				object.position.set( -100, -100, 0 );
 				scene.add( object );
 				objectRandomizeFaces = object;
 
-				object = createObject( createMultiMaterial(), 4 );
+				object = createObject( createMaterials(), 4 );
 				object.position.set( 100, -100, 0 );
 				scene.add( object );
 				objectRandomizeMaterialIndices = object;
@@ -99,7 +99,7 @@
 
 			}
 
-			function createMultiMaterial(){
+			function createMaterials(){
 				var materials = [
 					new THREE.MeshBasicMaterial( { color: 0xff0000 } ),
 					new THREE.MeshBasicMaterial( { color: 0xffff00 } ),
@@ -109,7 +109,7 @@
 					new THREE.MeshBasicMaterial( { color: 0xff00ff } )
 				];
 
-				return new THREE.MultiMaterial( materials );
+				return materials;
 			}
 
 			function onWindowResize() {

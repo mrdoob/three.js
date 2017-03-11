@@ -14,7 +14,7 @@
 
 
 		<h2>Constructor</h2>
-		
+
 
 		<h3>[name]( [page:Integer hex], [page:Float near], [page:Float far] )</h3>
 		<div>The hex parameter is passed to the [page:Color] constructor to set the color property.  Hex can be a hexadecimal integer or a CSS-style string.</div>
@@ -22,7 +22,7 @@
 		<h2>Properties</h2>
 
 		<h3>[property:String name]</h3>
-		<div>Default is the empty string.</div>
+		<div>Optional name of the object (doesn't need to be unique). Default is an empty string.</div>
 
 		<h3>[property:Color color]</h3>
 		<div>Fog color.  Example: If set to black, far away objects will be rendered black.</div>
@@ -30,15 +30,18 @@
 		<h3>[property:Float near]</h3>
 		<div>The minimum distance to start applying fog. Objects that are less than 'near' units from the active camera won't be affected by fog.</div>
 		<div>Default is 1.</div>
-		
+
 		<h3>[property:Float far]</h3>
 		<div>The maximum distance at which fog stops being calculated and applied. Objects that are more than 'far' units away from the active camera won't be affected by fog.</div>
 		<div>Default is 1000.</div>
-		
+
 		<h2>Methods</h2>
 
 		<h3>[method:Fog clone]()</h3>
-		<div>Returns a copy of this.</div>
+		<div>Returns a new fog instance with the same parameters as this one.</div>
+
+		<h3>[method:Fog toJSON]()</h3>
+		<div>Return fog data in JSON format.</div>
 
 		<h2>Source</h2>
 

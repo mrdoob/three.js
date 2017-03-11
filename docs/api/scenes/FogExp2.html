@@ -22,7 +22,7 @@
 		<h2>Properties</h2>
 
 		<h3>[property:String name]</h3>
-		<div>Default is the empty string.</div>
+		<div>Optional name of the object (doesn't need to be unique). Default is an empty string.</div>
 
 		<h3>[property:Color color]</h3>
 		<div>Fog color. Example: If set to black, far away objects will be rendered black.</div>
@@ -32,10 +32,12 @@
 		<div>Default is 0.00025.</div>
 
 		<h2>Methods</h2>
-		
-		<h3>[method:FogExp2 clone]()</h3>
-		<div>Returns a copy of this.</div>
 
+		<h3>[method:FogExp2 clone]()</h3>
+		<div>Returns a new FogExp2 instance with the same parameters as this one.</div>
+
+		<h3>[method:FogExp2 toJSON]()</h3>
+		<div>Return FogExp2 data in JSON format.</div>
 
 		<h2>Source</h2>
 

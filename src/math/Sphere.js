@@ -13,9 +13,7 @@ function Sphere( center, radius ) {
 
 }
 
-Sphere.prototype = {
-
-	constructor: Sphere,
+Object.assign( Sphere.prototype, {
 
 	set: function ( center, radius ) {
 
@@ -40,7 +38,7 @@ Sphere.prototype = {
 
 			} else {
 
-				box.setFromPoints( points ).center( center );
+				box.setFromPoints( points ).getCenter( center );
 
 			}
 
@@ -174,7 +172,7 @@ Sphere.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Sphere };

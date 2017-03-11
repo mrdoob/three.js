@@ -8,8 +8,8 @@ THREE.UCSCharacter = function() {
 
 	this.root = new THREE.Object3D();
 
-	this.numSkins;
-	this.numMorphs;
+	this.numSkins = undefined;
+	this.numMorphs = undefined;
 
 	this.skins = [];
 	this.materials = [];
@@ -44,7 +44,7 @@ THREE.UCSCharacter = function() {
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
 
-			mesh = new THREE.SkinnedMesh( geometry, new THREE.MultiMaterial() );
+			mesh = new THREE.SkinnedMesh( geometry, [] );
 			mesh.name = config.character;
 			scope.root.add( mesh );
 

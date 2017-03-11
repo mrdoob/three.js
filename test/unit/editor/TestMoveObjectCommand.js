@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "MoveObjectCommand" );
+QUnit.module( "MoveObjectCommand" );
 
-test( "Test MoveObjectCommand (Undo and Redo)", function() {
+QUnit.test( "Test MoveObjectCommand (Undo and Redo)", function( assert ) {
 
 	var editor = new Editor();
 
@@ -19,24 +19,24 @@ test( "Test MoveObjectCommand (Undo and Redo)", function() {
 	editor.execute( new AddObjectCommand( lukeSkywalker ) );
 
 
-	ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is 'Scene' " );
-	ok( lukeSkywalker.parent.name   == "Scene", "OK, Luke's parent is 'Scene' " );
+	assert.ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is 'Scene' " );
+	assert.ok( lukeSkywalker.parent.name   == "Scene", "OK, Luke's parent is 'Scene' " );
 
 	// Tell Luke, Anakin is his father
 	editor.execute( new MoveObjectCommand( lukeSkywalker, anakinSkywalker ) );
 
-	ok( true === true, "(Luke has been told who his father is)" );
-	ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
-	ok( lukeSkywalker.parent.name   == anakinsName, "OK, Luke's parent is '" + anakinsName + "' " );
+	assert.ok( true === true, "(Luke has been told who his father is)" );
+	assert.ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
+	assert.ok( lukeSkywalker.parent.name   == anakinsName, "OK, Luke's parent is '" + anakinsName + "' " );
 
 	editor.undo();
-	ok( true === true, "(Statement undone)" );
-	ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
-	ok( lukeSkywalker.parent.name   == "Scene", "OK, Luke's parent is 'Scene' again " );
+	assert.ok( true === true, "(Statement undone)" );
+	assert.ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
+	assert.ok( lukeSkywalker.parent.name   == "Scene", "OK, Luke's parent is 'Scene' again " );
 
 	editor.redo();
-	ok( true === true, "(Statement redone)" );
-	ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
-	ok( lukeSkywalker.parent.name   == anakinsName, "OK, Luke's parent is '" + anakinsName + "' again " );
+	assert.ok( true === true, "(Statement redone)" );
+	assert.ok( anakinSkywalker.parent.name == "Scene", "OK, Anakin's parent is still 'Scene' " );
+	assert.ok( lukeSkywalker.parent.name   == anakinsName, "OK, Luke's parent is '" + anakinsName + "' again " );
 
 } );

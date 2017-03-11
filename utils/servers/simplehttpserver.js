@@ -95,7 +95,7 @@ http.createServer(handleRequest).listen(port);
 
 require('dns').lookup(require('os').hostname(), function (err, addr, fam) {
  	console.log('Running at http://' + addr  + ((port === 80) ? '' : ':') + port + '/');
-})
+});
 
 console.log('Three.js server has started...');
 console.log('Base directory at ' + currentDir);

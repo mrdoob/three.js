@@ -20,9 +20,7 @@ function Spherical( radius, phi, theta ) {
 
 }
 
-Spherical.prototype = {
-
-	constructor: Spherical,
+Object.assign( Spherical.prototype, {
 
 	set: function ( radius, phi, theta ) {
 
@@ -42,9 +40,9 @@ Spherical.prototype = {
 
 	copy: function ( other ) {
 
-		this.radius.copy( other.radius );
-		this.phi.copy( other.phi );
-		this.theta.copy( other.theta );
+		this.radius = other.radius;
+		this.phi = other.phi;
+		this.theta = other.theta;
 
 		return this;
 
@@ -78,9 +76,9 @@ Spherical.prototype = {
 
 		return this;
 
-	},
+	}
 
-};
+} );
 
 
 export { Spherical };

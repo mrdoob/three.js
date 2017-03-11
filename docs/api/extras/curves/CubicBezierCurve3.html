@@ -13,7 +13,9 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-			Create a smooth 3d <a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">cubic bezier curve</a>.
+			Create a smooth 3d
+			<a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">cubic bezier curve</a>,
+			defined by a start point, endpoint and two control points.
 		</div>
 
 		<h2>Example</h2>
@@ -31,7 +33,7 @@ geometry.vertices = curve.getPoints( 50 );
 
 var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final Object3d to add to the scene
+// Create the final object to add to the scene
 var curveObject = new THREE.Line( geometry, material );
 
 </code>
@@ -41,26 +43,31 @@ var curveObject = new THREE.Line( geometry, material );
 
 		<h3>[name]( [page:Vector3 v0], [page:Vector3 v1], [page:Vector3 v2], [page:Vector3 v3] )</h3>
 		<div>
-			[page:Vector3 v0] – The starting point<br/>
-			[page:Vector3 v1] – The first control point<br/>
-			[page:Vector3 v2] – The second control point<br/>
-			[page:Vector3 v3] – The ending point<br/>
+			[page:Vector3 v0] – The starting point.<br/>
+			[page:Vector3 v1] – The first control point.<br/>
+			[page:Vector3 v2] – The second control point.<br/>
+			[page:Vector3 v3] – The ending point.
 		</div>
 
 		<h2>Properties</h2>
+		<div>See the base [page:Curve] class for common properties.</div>
 
-		<h3>[property:Vector3 v0]</h3>
+		<h3>[property:Vector2 v0]</h3>
+		<div>The starting point.</div>
 
-		<h3>[property:Vector3 v1]</h3>
+		<h3>[property:Vector2 v1]</h3>
+		<div>The first control point.</div>
 
-		<h3>[property:Vector3 v2]</h3>
+		<h3>[property:Vector2 v2]</h3>
+		<div>The second control point.</div>
 
-		<h3>[property:Vector3 v3]</h3>
+		<h3>[property:Vector2 v3]</h3>
+		<div>The ending point.</div>
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:Curve] class for common Methods.</div>
 
-		<h3>See [page:Curve] for inherited methods</h3>
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

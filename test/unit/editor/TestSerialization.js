@@ -3,9 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-module( "Serialization" );
+QUnit.module( "Serialization" );
 
-test( "Test Serialization", function( assert ) {
+QUnit.test( "Test Serialization", function( assert ) {
 
 	// setup
 	var editor = new Editor();
@@ -321,7 +321,7 @@ test( "Test Serialization", function( assert ) {
 
 			var history2 = JSON.stringify( editor.history.toJSON() );
 
-			ok( history == history2, "OK, forward serializing was successful for " + name );
+			assert.ok( history == history2, "OK, forward serializing was successful for " + name );
 
 			editor.clear();
 
@@ -346,7 +346,7 @@ test( "Test Serialization", function( assert ) {
 
 			var history2 = JSON.stringify( editor.history.toJSON() );
 
-			ok( history == history2, "OK, backward serializing was successful for " + name );
+			assert.ok( history == history2, "OK, backward serializing was successful for " + name );
 
 			editor.clear();
 

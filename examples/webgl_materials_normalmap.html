@@ -67,24 +67,23 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var statsEnabled = true;
 
 			var container, stats, loader;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
-			var mesh1;
+			var mesh;
 
 			var directionalLight, pointLight, ambientLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
+
+			var targetX = 0;
+			var targetY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -146,12 +145,9 @@
 
 				//
 
-				if ( statsEnabled ) {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
-
-				}
 
 				// COMPOSER
 
@@ -165,22 +161,21 @@
 
 				var canvas = renderer.context.canvas;
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / canvas.width, 1 / canvas.height );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.4;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				effectFXAA.renderToScreen = true;
+				effectColor.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
-
+				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
-				composer.addPass( effectFXAA );
 
 				// EVENTS
 
@@ -191,12 +186,12 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh1 = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 
-				mesh1.position.y = - 50;
-				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
+				mesh.position.y = - 50;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
-				scene.add( mesh1 );
+				scene.add( mesh );
 
 			}
 
@@ -207,12 +202,11 @@
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				composer.reset();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
@@ -220,8 +214,8 @@
 
 			function onDocumentMouseMove(event) {
 
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
 
 			}
 
@@ -232,22 +226,23 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
+
+				stats.update();
 
 			}
 
 			function render() {
 
-				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
 
-				if( mesh1 ) {
+				if ( mesh ) {
 
-					mesh1.rotation.y = ry;
-					mesh1.rotation.x = rx;
+					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
+					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
 
 				}
 
-				//renderer.render( scene, camera );
 				composer.render();
 
 			}

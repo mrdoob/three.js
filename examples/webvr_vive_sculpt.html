@@ -21,17 +21,17 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
-		<script src="js/ViveController.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/ViveController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/MarchingCubes.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -72,7 +72,11 @@
 				scene.add( camera );
 
 				var geometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x444444, roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x444444,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
 				var table = new THREE.Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
@@ -81,13 +85,17 @@
 				scene.add( table );
 
 				var geometry = new THREE.PlaneGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x222222, roughness: 1.0, metalness: 0.0 } );
+				var material = new THREE.MeshStandardMaterial( {
+					color: 0x222222,
+					roughness: 1.0,
+					metalness: 0.0
+				} );
 				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 10, 40, 0x111111, 0x111111 ) );
+				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
@@ -110,7 +118,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.width = ( window.innerWidth * 2 ) + 'px';
 				renderer.sortObjects = false;
 				renderer.shadowMap.enabled = true;
 				renderer.gammaInput = true;
@@ -239,22 +246,24 @@
 
 			function handleController( controller, id ) {
 
-				var gamepad = controller.getGamepad();
+				controller.update();
+
 				var pivot = controller.getObjectByName( 'pivot' );
 
-				if ( gamepad && pivot ) {
+				if ( pivot ) {
 
 					var matrix = pivot.matrixWorld;
+
 					points[ id ].position.setFromMatrixPosition( matrix );
 					transformPoint( points[ id ].position );
 
-					if ( gamepad.buttons[ 0 ].pressed ) {
+					if ( controller.getButtonState( 'thumbpad' ) ) {
 
 						blob.material.color.setHex( Math.random() * 0xffffff );
 
 					}
 
-					if ( gamepad.buttons[ 1 ].pressed ) {
+					if ( controller.getButtonState( 'trigger' ) ) {
 
 						var strength = points[ id ].strength / 2;
 
@@ -266,7 +275,7 @@
 
 					}
 
-					if ( gamepad.buttons[ 2 ].pressed && id === 0 ) {
+					if ( id === 0 && controller.getButtonState( 'grips' ) ) {
 
 						if ( points.length > 2 ) {
 
@@ -288,7 +297,7 @@
 
 					}
 
-					if ( gamepad.buttons[ 2 ].pressed && id === 1 ) {
+					if ( id === 1 && controller.getButtonState( 'grips' ) ) {
 
 						points[ id ].strength = ( Math.sin( performance.now() / 1000 ) + 1.5 ) / 20.0;
 

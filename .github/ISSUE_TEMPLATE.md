@@ -1,12 +1,18 @@
+(*** This section is for bug reports and feature requests only. This is NOT a help site. Do not ask help questions here. If you need help, please use stackoverflow. ***)
+
 ##### Description of the problem 
 
-(This is NOT a help site. Please read the guidelines above before posting.)
+Describe the problem/request in detail.
+Code snippet, screenshot, and small-test help us understand.
 
+You can edit for small-test.
+http://jsfiddle.net/akmcv7Lh/ (current revision)
+http://jsfiddle.net/hw9rcLL8/ (dev)
 
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r80
+- [ ] r84
 - [ ] ...
 
 ##### Browser

@@ -41,6 +41,7 @@ NUMERIC = {
     'SphericalReflectionMapping': 305,
 
     'RepeatWrapping': 1000,
+    'repeat': 1000,
     'ClampToEdgeWrapping': 1001,
     'MirroredRepeatWrapping': 1002,
 
@@ -159,12 +160,12 @@ EXPORT_OPTIONS = {
     EMBED_TEXTURES: False,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
-    ENABLE_PRECISION: True,
+    ENABLE_PRECISION: False,
     PRECISION: DEFAULT_PRECISION,
     CUSTOM_PROPERTIES: False,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
-    GEOMETRY_TYPE: GEOMETRY,
+    GEOMETRY_TYPE: BUFFER_GEOMETRY,
     INFLUENCES_PER_VERTEX: 2,
     INDENT: True
 }
@@ -204,7 +205,10 @@ AMBIENT_LIGHT = 'AmbientLight'
 DIRECTIONAL_LIGHT = 'DirectionalLight'
 POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
+# TODO (abelnation): confirm this is correct area light string for exporter
+RECT_AREA_LIGHT = 'RectAreaLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
+# TODO: RectAreaLight support
 MESH = 'Mesh'
 EMPTY = 'Empty'
 SPRITE = 'Sprite'
@@ -254,9 +258,9 @@ URL = 'url'
 WRAP = 'wrap'
 REPEAT = 'repeat'
 WRAPPING = type('Wrapping', (), {
-    'REPEAT': 'RepeatWrapping',
-    'CLAMP': 'ClampToEdgeWrapping',
-    'MIRROR': 'MirroredRepeatWrapping'
+    'REPEAT': 'repeat',
+    'CLAMP': 'clamp',
+    'MIRROR': 'mirror'
 })
 ANISOTROPY = 'anisotropy'
 MAG_FILTER = 'magFilter'

@@ -12,9 +12,7 @@ function Line3( start, end ) {
 
 }
 
-Line3.prototype = {
-
-	constructor: Line3,
+Object.assign( Line3.prototype, {
 
 	set: function ( start, end ) {
 
@@ -40,7 +38,7 @@ Line3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
 		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
@@ -126,7 +124,7 @@ Line3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Line3 };

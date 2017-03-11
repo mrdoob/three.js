@@ -15,17 +15,21 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	this.fov = fov;
 
+	this.far = far;
+	this.near = near;
+
 	this.left = - width / 2;
 	this.right = width / 2;
 	this.top = height / 2;
 	this.bottom = - height / 2;
 
+	this.aspect =  width / height;
+	this.zoom = 1;
+	this.view = null;
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
 	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width / height, near, far );
-
-	this.zoom = 1;
 
 	this.toPerspective();
 
@@ -41,7 +45,9 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 	this.near = this.cameraP.near;
 	this.far = this.cameraP.far;
 
+	this.cameraP.aspect = this.aspect;
 	this.cameraP.fov =  this.fov / this.zoom ;
+	this.cameraP.view = this.view;
 
 	this.cameraP.updateProjectionMatrix();
 
@@ -75,16 +81,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	this.cameraO.right = halfWidth;
 	this.cameraO.top = halfHeight;
 	this.cameraO.bottom = - halfHeight;
-
-	// this.cameraO.left = -farHalfWidth;
-	// this.cameraO.right = farHalfWidth;
-	// this.cameraO.top = farHalfHeight;
-	// this.cameraO.bottom = -farHalfHeight;
-
-	// this.cameraO.left = this.left / this.zoom;
-	// this.cameraO.right = this.right / this.zoom;
-	// this.cameraO.top = this.top / this.zoom;
-	// this.cameraO.bottom = this.bottom / this.zoom;
+	this.cameraO.view = this.view;
 
 	this.cameraO.updateProjectionMatrix();
 
@@ -97,6 +94,64 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 };
 
+THREE.CombinedCamera.prototype.copy = function ( source ) {
+
+	THREE.Camera.prototype.copy.call( this, source );
+
+	this.fov = source.fov;
+	this.far = source.far;
+	this.near = source.near;
+
+	this.left = source.left;
+	this.right = source.right;
+	this.top = source.top;
+	this.bottom = source.bottom;
+
+	this.zoom = source.zoom;
+	this.view = source.view === null ? null : Object.assign( {}, source.view );
+	this.aspect = source.aspect;
+
+	this.cameraO.copy( source.cameraO );
+	this.cameraP.copy( source.cameraP );
+
+	this.inOrthographicMode = source.inOrthographicMode;
+	this.inPerspectiveMode = source.inPerspectiveMode;
+
+	return this;
+
+};
+
+THREE.CombinedCamera.prototype.setViewOffset = function( fullWidth, fullHeight, x, y, width, height ) {
+
+	this.view = {
+		fullWidth: fullWidth,
+		fullHeight: fullHeight,
+		offsetX: x,
+		offsetY: y,
+		width: width,
+		height: height
+	};
+
+	if ( this.inPerspectiveMode ) {
+
+		this.aspect = fullWidth / fullHeight;
+
+		this.toPerspective();
+
+	} else {
+
+		this.toOrthographic();
+
+	}
+
+};
+
+THREE.CombinedCamera.prototype.clearViewOffset = function() {
+
+	this.view = null;
+	this.updateProjectionMatrix();
+
+};
 
 THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 

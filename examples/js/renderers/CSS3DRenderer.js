@@ -10,7 +10,7 @@ THREE.CSS3DObject = function ( element ) {
 	this.element = element;
 	this.element.style.position = 'absolute';
 
-	this.addEventListener( 'removed', function ( event ) {
+	this.addEventListener( 'removed', function () {
 
 		if ( this.element.parentNode !== null ) {
 
@@ -41,7 +41,6 @@ THREE.CSS3DRenderer = function () {
 	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
-	var _widthHalf, _heightHalf;
 
 	var matrix = new THREE.Matrix4();
 
@@ -62,6 +61,10 @@ THREE.CSS3DRenderer = function () {
 
 	var cameraElement = document.createElement( 'div' );
 
+	cameraElement.style.position = 'absolute';
+	cameraElement.style.left = '50%';
+	cameraElement.style.top = '50%';
+
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.MozTransformStyle = 'preserve-3d';
 	cameraElement.style.oTransformStyle = 'preserve-3d';
@@ -71,7 +74,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.setClearColor = function () {};
 
-	this.getSize = function() {
+	this.getSize = function () {
 
 		return {
 			width: _width,
@@ -85,24 +88,18 @@ THREE.CSS3DRenderer = function () {
 		_width = width;
 		_height = height;
 
-		_widthHalf = _width / 2;
-		_heightHalf = _height / 2;
-
 		domElement.style.width = width + 'px';
 		domElement.style.height = height + 'px';
 
-		cameraElement.style.width = width + 'px';
-		cameraElement.style.height = height + 'px';
-
 	};
 
-	var epsilon = function ( value ) {
+	function epsilon( value ) {
 
 		return Math.abs( value ) < Number.EPSILON ? 0 : value;
 
-	};
+	}
 
-	var getCameraCSSMatrix = function ( matrix ) {
+	function getCameraCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 
@@ -125,9 +122,9 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-	};
+	}
 
-	var getObjectCSSMatrix = function ( matrix ) {
+	function getObjectCSSMatrix( matrix ) {
 
 		var elements = matrix.elements;
 
@@ -150,9 +147,9 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-	};
+	}
 
-	var renderObject = function ( object, camera ) {
+	function renderObject( object, camera ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
 
@@ -208,7 +205,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-	};
+	}
 
 	this.render = function ( scene, camera ) {
 
@@ -231,8 +228,7 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +
-			" translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
+		var style = 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		if ( cache.camera.style !== style ) {
 

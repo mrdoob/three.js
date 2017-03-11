@@ -1,17 +1,17 @@
-THREE.MirrorNode = function( renderer, camera, options ) {
+THREE.MirrorNode = function( mirror, camera, options ) {
 
 	THREE.TempNode.call( this, 'v4' );
 
-	this.mirror = renderer instanceof THREE.Mirror ? renderer : new THREE.Mirror( renderer, camera, options );
+	this.mirror = mirror;
 
-	this.textureMatrix = new THREE.Matrix4Node( this.mirror.textureMatrix );
+	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
 	this.worldPosition = new THREE.PositionNode( THREE.PositionNode.WORLD );
 
 	this.coord = new THREE.OperatorNode( this.textureMatrix, this.worldPosition, THREE.OperatorNode.MUL );
 	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.renderTarget.texture, this.coord, null, true );
+	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.mirrorSampler.value, this.coord, null, true );
 
 };
 
@@ -27,12 +27,15 @@ THREE.MirrorNode.prototype.generate = function( builder, output ) {
 		this.coordResult.a = this.offset;
 		this.texture.coord = this.offset ? this.coordResult : this.coord;
 
-		var coord = this.texture.build( builder, this.type );
+		if ( output === 'sampler2D' ) {
 
-		return builder.format( coord, this.type, output );
+			return this.texture.build( builder, output );
 
-	}
-	else {
+		}
+
+		return builder.format( this.texture.build( builder, this.type ), this.type, output );
+
+	} else {
 
 		console.warn( "THREE.MirrorNode is not compatible with " + builder.shader + " shader." );
 

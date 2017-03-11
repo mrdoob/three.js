@@ -1,5 +1,9 @@
 {
+	"metadata": {
+		"type": "App"
+	},
 	"project": {
+		"shadows": true,
 		"vr": false
 	},
 	"camera": {

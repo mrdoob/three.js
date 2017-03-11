@@ -226,7 +226,7 @@
 			for ( var i = 0; i < length; i ++ ) {
 
 				vector.fromArray( positions, i * 3 );
-				vector.applyProjection( matrix );
+				vector.applyMatrix4( matrix );
 
 				sortArray.push( [ vector.z, i ] );
 
