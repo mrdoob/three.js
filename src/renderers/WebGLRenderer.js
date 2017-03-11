@@ -1209,8 +1209,6 @@ function WebGLRenderer( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			state.setBlending( NoBlending );
-
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
