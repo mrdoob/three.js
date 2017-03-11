@@ -528,16 +528,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
 
-	function onMaterialUpdate ( event ) {
-
-		var material = event.target;
-
-		material.removeEventListener( 'update', onMaterialUpdate );
-
-		delete shaders[ material.id ];
-
-	}
-
 	function getMaterialShader( material ) {
 
 		var id = material.id;
@@ -545,9 +535,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		if ( shader && material.map && !textures[ material.map.id ] ) delete shaders[ id ];
 
-		if ( shaders[ id ] === undefined ) {
-
-			material.addEventListener( 'update', onMaterialUpdate );
+		if ( shaders[ id ] === undefined || material.needsUpdate === true ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
