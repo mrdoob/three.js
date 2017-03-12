@@ -18,15 +18,15 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Vertex vertex], [page:Face face] )</h3>
-		[page:Vertex vertex] - [page:Vertex] A reference to its destination vertex.<br /><br />
+		<h3>[name]( [page:VertexNode vertex], [page:Face face] )</h3>
+		[page:VertexNode vertex] - [page:VertexNode] A reference to its destination vertex.<br /><br />
 		[page:Face face] - [page:Face] A reference to its face.<br />
 
 		</div>
 
 		<h2>Properties</h2>
 
-		<h3>[property:Vertex vertex]</h3>
+		<h3>[property:VertexNode vertex]</h3>
 		<div>
 			Reference to the destination vertex. The origin vertex can be obtained by querying the destination of its twin, or of the previous half-edge. Default is undefined.
 		</div>
@@ -53,10 +53,10 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Vertex head]()</h3>
+		<h3>[method:VertexNode head]()</h3>
 		<div>Returns the destintation vertex.</div>
 
-		<h3>[method:Vertex tail]()</h3>
+		<h3>[method:VertexNode tail]()</h3>
 		<div>Returns the origin vertex.</div>
 
 		<h3>[method:Float length]()</h3>

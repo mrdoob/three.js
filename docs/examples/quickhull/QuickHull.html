@@ -51,44 +51,44 @@
 
 		<h3>[property:Array vertices]</h3>
 		<div>
-			The internal representation of the given geometry data (an array of [page:Vertex vertices]).
+			The internal representation of the given geometry data (an array of [page:VertexNode vertices]).
 		</div>
 
 		<h2>Methods</h2>
 
-		<h3>[method:QuickHull3 setFromPoints]( [page:Array points] )</h3>
+		<h3>[method:QuickHull setFromPoints]( [page:Array points] )</h3>
 		[page:Array points] - Array of [page:Vector3 Vector3s] that the resulting convex hull will contain.<br /><br />
 
 		<div>Computes to convex hull for the given array of points.</div>
 
-		<h3>[method:QuickHull3 setFromObject]( [page:Object3D object] )</h3>
+		<h3>[method:QuickHull setFromObject]( [page:Object3D object] )</h3>
 		[page:Object3D object] - [page:Object3D] to compute the convex hull of.<br /><br />
 
 		<div>Computes the convex hull of an [page:Object3D] (including its children),
 		accounting for the world transforms of both the object and its childrens.</div>
 
-		<h3>[method:QuickHull3 makeEmpty]()</h3>
+		<h3>[method:QuickHull makeEmpty]()</h3>
 
 		<div>Makes this convex hull empty.</div>
 
-		<h3>[method:QuickHull3 addVertexToFace]( [page:Vertex vertex], [page:Face face]	)</h3>
-		[page:Vertex vertex] - The vetex to add.<br /><br />
+		<h3>[method:QuickHull addVertexToFace]( [page:VertexNode vertex], [page:Face face]	)</h3>
+		[page:VertexNodeNode vertex] - The vetex to add.<br /><br />
 		[page:Face face] - The target face.<br /><br />
 
 		<div>Adds a vertex to the 'assigned' list of vertices and assigns it to the given face.</div>
 
-		<h3>[method:QuickHull3 removeVertexFromFace]( [page:Vertex vertex], [page:Face face]	)</h3>
-		[page:Vertex vertex] - The vetex to remove.<br /><br />
+		<h3>[method:QuickHull removeVertexFromFace]( [page:VertexNode vertex], [page:Face face]	)</h3>
+		[page:VertexNode vertex] - The vetex to remove.<br /><br />
 		[page:Face face] - The target face.<br /><br />
 
 		<div>Removes a vertex from the 'assigned' list of vertices and from the given face. It also makes sure that the link from 'face' to the first vertex it sees in 'assigned' is linked correctly after the removal.</div>
 
-		<h3>[method:Vertex removeAllVerticesFromFace]( [page:Face face]	)</h3>
+		<h3>[method:VertexNode removeAllVerticesFromFace]( [page:Face face]	)</h3>
 		[page:Face face] - The given face.<br /><br />
 
 		<div>Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertext list.</div>
 
-		<h3>[method:QuickHull3 deleteFaceVertices]( [page:Face face], [page:Face absorbingFace]	)</h3>
+		<h3>[method:QuickHull deleteFaceVertices]( [page:Face face], [page:Face absorbingFace]	)</h3>
 		[page:Face face] - The given face.<br /><br />
 		[page:Face absorbingFace] - An optional face that tries to absorb the vertices of the first face.<br /><br />
 
@@ -100,7 +100,7 @@
 			</ul>
 		</div>
 
-		<h3>[method:QuickHull3 resolveUnassignedPoints]( [page:Array newFaces]	)</h3>
+		<h3>[method:QuickHull resolveUnassignedPoints]( [page:Array newFaces]	)</h3>
 		[page:Face newFaces] - An array of new faces.<br /><br />
 
 		<div>Reassigns as many vertices as possible from the unassigned list to the new faces.</div>
@@ -109,15 +109,15 @@
 
 		<div>Computes the extremes values (min/max vectors) which will be used to compute the inital hull.</div>
 
-		<h3>[method:QuickHull3 computeInitialHull]()</h3>
+		<h3>[method:QuickHull computeInitialHull]()</h3>
 
 		<div>Computes the initial simplex assigning to its faces all the points that are candidates to form part of the hull.</div>
 
-		<h3>[method:QuickHull3 reindexFaces]()</h3>
+		<h3>[method:QuickHull reindexFaces]()</h3>
 
 		<div>Removes inactive (e.g. deleted) faces from the internal face list.</div>
 
-		<h3>[method:Vertex nextVertexToAdd]()</h3>
+		<h3>[method:VertexNode nextVertexToAdd]()</h3>
 
 		<div>Finds the next vertex to create faces with the current hull.
 			<ul>
@@ -127,7 +127,7 @@
 			</ul>
 		</div>
 
-		<h3>[method:QuickHull3 computeHorizon]( [page:Vector3 eyePoint], [page:HalfEdge crossEdge], [page:Face face], [page:Array horizon]	)</h3>
+		<h3>[method:QuickHull computeHorizon]( [page:Vector3 eyePoint], [page:HalfEdge crossEdge], [page:Face face], [page:Array horizon]	)</h3>
 		[page:Vector3 eyePoint] - The 3D-coordinates of a point.<br /><br />
 		[page:HalfEdge crossEdge] - The edge used to jump to the current face.<br /><br />
 		[page:Face face] - The current face being tested.<br /><br />
@@ -135,21 +135,21 @@
 
 		<div>Computes a chain of half edges in CCW order called the 'horizon'. For an edge to be part of the horizon it must join a face that can see 'eyePoint' and a face that cannot see 'eyePoint'.</div>
 
-		<h3>[method:HalfEdge addAdjoiningFace]( [page:Vertex eyeVertex], [page:HalfEdge horizonEdge] )</h3>
-		[page:Vertex eyeVertex] - The vertex that is added to the hull.<br /><br />
+		<h3>[method:HalfEdge addAdjoiningFace]( [page:VertexNode eyeVertex], [page:HalfEdge horizonEdge] )</h3>
+		[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br /><br />
 		[page:HalfEdge horizonEdge] - A single edge of the horizon.<br /><br />
 
 		<div>Creates a face with the vertices 'eyeVertex.point', 'horizonEdge.tail' and 'horizonEdge.head' in CCW order.
 			All the half edges are created in CCW order thus the face is always pointing outside the hull</div>
 
-		<h3>[method:QuickHull3 addNewFaces]( [page:Vertex eyeVertex], [page:HalfEdge horizonEdge] )</h3>
-		[page:Vertex eyeVertex] - The vertex that is added to the hull.<br /><br />
+		<h3>[method:QuickHull addNewFaces]( [page:VertexNode eyeVertex], [page:HalfEdge horizonEdge] )</h3>
+		[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br /><br />
 		[page:HalfEdge horizon] - An array of half-edges that form the horizon.<br /><br />
 
 		<div>Adds 'horizon.length' faces to the hull, each face will be linked with the horizon opposite face and the face on the left/right.</div>
 
-		<h3>[method:QuickHull3 addVertexToHull]( [page:Vertex eyeVertex] )</h3>
-		[page:Vertex eyeVertex] - The vertex that is added to the hull.<br /><br />
+		<h3>[method:QuickHull addVertexToHull]( [page:VertexNode eyeVertex] )</h3>
+		[page:VertexNode eyeVertex] - The vertex that is added to the hull.<br /><br />
 
 		<div>Adds a vertex to the hull with the following algorithm
 			<ul>
@@ -160,11 +160,11 @@
 			</ul>
 		</div>
 
-		<h3>[method:QuickHull3 cleanup]()</h3>
+		<h3>[method:QuickHull cleanup]()</h3>
 
 		<div>Cleans up internal properties after computing the convex hull.</div>
 
-		<h3>[method:QuickHull3 compute]()</h3>
+		<h3>[method:QuickHull compute]()</h3>
 
 		<div>Starts the execution of the quick hull algorithm.</div>
 
