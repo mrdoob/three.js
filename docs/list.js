@@ -139,8 +139,6 @@ var list = {
 			[ "CircleGeometry", "api/geometries/CircleGeometry" ],
 			[ "ConeBufferGeometry", "api/geometries/ConeBufferGeometry" ],
 			[ "ConeGeometry", "api/geometries/ConeGeometry" ],
-			[ "ConvexBufferGeometry", "api/geometries/ConvexBufferGeometry" ],
-			[ "ConvexGeometry", "api/geometries/ConvexGeometry" ],
 			[ "CylinderBufferGeometry", "api/geometries/CylinderBufferGeometry" ],
 			[ "CylinderGeometry", "api/geometries/CylinderGeometry" ],
 			[ "DodecahedronBufferGeometry", "api/geometries/DodecahedronBufferGeometry" ],
@@ -285,14 +283,6 @@ var list = {
 			[ "QuaternionLinearInterpolant", "api/math/interpolants/QuaternionLinearInterpolant" ]
 		],
 
-		"Math / Convex Hull": [
-			[ "Face", "api/math/convexhull/Face" ],
-			[ "HalfEdge", "api/math/convexhull/HalfEdge" ],
-			[ "QuickHull3", "api/math/convexhull/QuickHull3" ],
-			[ "Vertex", "api/math/convexhull/Vertex" ],
-			[ "VertexList", "api/math/convexhull/VertexList" ]
-		],
-
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
 			[ "Group", "api/objects/Group" ],
@@ -347,6 +337,11 @@ var list = {
 			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
+		"Geometries": [
+			[ "ConvexBufferGeometry", "examples/geometries/ConvexBufferGeometry" ],
+			[ "ConvexGeometry", "examples/geometries/ConvexGeometry" ]
+		],
+
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
@@ -363,6 +358,14 @@ var list = {
 			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "examples/Lut" ],
 			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
+		],
+
+		"QuickHull": [
+			[ "Face", "examples/quickhull/Face" ],
+			[ "HalfEdge", "examples/quickhull/HalfEdge" ],
+			[ "QuickHull", "examples/quickhull/QuickHull" ],
+			[ "VertexNode", "examples/quickhull/VertexNode" ],
+			[ "VertexList", "examples/quickhull/VertexList" ]
 		],
 
 		"Renderers": [
