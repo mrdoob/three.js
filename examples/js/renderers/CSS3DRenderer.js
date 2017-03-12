@@ -153,16 +153,13 @@ THREE.CSS3DRenderer = function () {
 
 		return function ( object1, object2 ) {
 
-			a.set(
-				object1.matrixWorld.elements[ 12 ],
-				object1.matrixWorld.elements[ 13 ],
-				object1.matrixWorld.elements[ 14 ]
-			);
-			b.set(
-				object2.matrixWorld.elements[ 12 ],
-				object2.matrixWorld.elements[ 13 ],
-				object2.matrixWorld.elements[ 14 ]
-			);
+			a.x = object1.matrixWorld.elements[ 12 ];
+			a.y = object1.matrixWorld.elements[ 13 ];
+			a.z = object1.matrixWorld.elements[ 14 ];
+
+			b.x = object2.matrixWorld.elements[ 12 ];
+			b.y = object2.matrixWorld.elements[ 13 ];
+			b.z = object2.matrixWorld.elements[ 14 ];
 
 			return a.distanceToSquared( b );
 
