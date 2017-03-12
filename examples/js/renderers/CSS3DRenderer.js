@@ -144,7 +144,7 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-	};
+	}
 
 	var getDistanceToSquared = function () {
 
@@ -229,9 +229,9 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-	};
+	}
 
-	this.zOrder = function ( scene ) {
+	function zOrder ( scene ) {
 
 		var order = Object.keys( cache.objects ).sort( function ( a, b ) {
 
@@ -280,14 +280,14 @@ THREE.CSS3DRenderer = function () {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var style = 'translate3d(-50%,-50%,0) ' +
-					'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, ' + fov  + 'px) ' +
+		            'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, ' + fov  + 'px) ' +
 		            getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		renderObject( scene, camera, style );
 
 		if ( isIE ) {
 
-			this.zOrder( scene );
+			zOrder( scene );
 
 		}
 
