@@ -100,7 +100,6 @@ export { QuaternionLinearInterpolant } from './math/interpolants/QuaternionLinea
 export { LinearInterpolant } from './math/interpolants/LinearInterpolant.js';
 export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js';
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
-export { QuickHull3 } from './math/convexhull/QuickHull3.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
 export { _Math as Math } from './math/Math.js';
