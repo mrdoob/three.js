@@ -14,9 +14,6 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 	}
 
-	var eyeTranslationL = new THREE.Vector3();
-	var eyeTranslationR = new THREE.Vector3();
-
 	var cameraL = new THREE.PerspectiveCamera();
 	cameraL.bounds = new THREE.Vector4( 0.0, 0.0, 0.5, 1.0 );
 	cameraL.layers.enable( 1 );
@@ -93,28 +90,8 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 		//
 
-		var eyeParamsL = display.getEyeParameters( 'left' );
-		var eyeParamsR = display.getEyeParameters( 'right' );
-
-		eyeTranslationL.fromArray( eyeParamsL.offset );
-		eyeTranslationR.fromArray( eyeParamsR.offset );
-
-		cameraL.position.copy( scope.position );
-		cameraL.quaternion.copy( scope.quaternion );
-		cameraL.scale.copy( scope.scale );
-
-		cameraR.position.copy( scope.position );
-		cameraR.quaternion.copy( scope.quaternion );
-		cameraR.scale.copy( scope.scale );
-
-		cameraL.translateOnAxis( eyeTranslationL, cameraL.scale.x );
-		cameraR.translateOnAxis( eyeTranslationR, cameraR.scale.x );
-
-		cameraL.updateMatrixWorld();
-		cameraL.matrixWorldInverse.getInverse( cameraL.matrixWorld );
-
-		cameraR.updateMatrixWorld();
-		cameraR.matrixWorldInverse.getInverse( cameraR.matrixWorld );
+		cameraL.matrixWorldInverse.elements = frameData.leftViewMatrix;
+		cameraR.matrixWorldInverse.elements = frameData.rightViewMatrix;
 
 		cameraL.projectionMatrix.elements = frameData.leftProjectionMatrix;
 		cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
@@ -122,7 +99,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 		// HACK @mrdoob
 		// Ideally we'll merge both projection matrices so we can frustum cull
 
-		scope.projectionMatrix.copy( cameraL.projectionMatrix );
+		scope.projectionMatrix.elements = cameraL.projectionMatrix.elements;
 
 		//
 
