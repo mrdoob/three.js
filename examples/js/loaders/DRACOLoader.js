@@ -18,6 +18,7 @@ THREE.DRACOLoader = function(manager) {
     this.manager = (manager !== undefined) ? manager :
         THREE.DefaultLoadingManager;
     this.materials = null;
+    this.verbosity = 0;
 };
 
 
@@ -37,6 +38,10 @@ THREE.DRACOLoader.prototype = {
 
     setPath: function(value) {
         this.path = value;
+    },
+
+    setVerbosity: function(level) {
+        this.verbosity = level;
     },
 
     decodeDracoFile: ( function() {
@@ -63,12 +68,16 @@ THREE.DRACOLoader.prototype = {
            */
           const geometryType = wrapper.GetEncodedGeometryType(buffer);
           if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
-            //fileDisplayArea.innerText = "Loaded a mesh.\n";
+            if (this.verbosity > 0) {
+              console.log('Loaded a mesh.');
+            }
           } else if (geometryType == dracoDecoder.POINT_CLOUD) {
-            //fileDisplayArea.innerText = "Loaded a point cloud.\n";
+            if (this.verbosity > 0) {
+              console.log('Loaded a point cloud.');
+            }
           } else {
-            const errorMsg = "Error: Unknown geometry type.";
-            //fileDisplayArea.innerText = errorMsg;
+            const errorMsg = 'THREE.DRACOLoader: Unknown geometry type.'
+            console.error(errorMsg);
             throw new Error(errorMsg);
           }
           return scope.convertDracoGeometryTo3JS(wrapper, geometryType, buffer,
@@ -96,8 +105,9 @@ THREE.DRACOLoader.prototype = {
         let geometryInfoStr;
         if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
           numFaces = dracoGeometry.num_faces();
-          geometryInfoStr += "Number of faces loaded: " + numFaces.toString()
-              + ".\n";
+          if (this.verbosity > 0) {
+            console.log('Number of faces loaded: ' + numFaces.toString());
+          }
         } else {
           numFaces = 0;
         }
@@ -105,17 +115,18 @@ THREE.DRACOLoader.prototype = {
         numVertexCoordinates = numPoints * 3;
         numTextureCoordinates = numPoints * 2;
         numAttributes = dracoGeometry.num_attributes();
-        geometryInfoStr = "Number of points loaded: " + numPoints.toString()
-            + ".\n";
-        geometryInfoStr += "Number of attributes loaded: " +
-            numAttributes.toString() + ".\n";
+        if (this.verbosity > 0) {
+          console.log('Number of points loaded: ' + numPoints.toString());
+          console.log('Number of attributes loaded: ' +
+              numAttributes.toString());
+        }
 
         // Get position attribute. Must exists.
         const posAttId = wrapper.GetAttributeId(dracoGeometry,
                                                 dracoDecoder.POSITION);
         if (posAttId == -1) {
-          const errorMsg = "No position attribute found in the mesh.";
-          //fileDisplayArea.innerText = errorMsg;
+          const errorMsg = 'THREE.DRACOLoader: No position attribute found.';
+          console.error(errorMsg);
           dracoDecoder.destroy(wrapper);
           dracoDecoder.destroy(dracoGeometry);
           throw new Error(errorMsg);
@@ -129,7 +140,9 @@ THREE.DRACOLoader.prototype = {
                                                   dracoDecoder.COLOR);
         let colAttributeData;
         if (colorAttId != -1) {
-          geometryInfoStr += "\nLoaded color attribute.\n";
+          if (this.verbosity > 0) {
+            console.log('Loaded color attribute.');
+          }
           const colAttribute = wrapper.GetAttribute(dracoGeometry, colorAttId);
           colAttributeData = new dracoDecoder.DracoFloat32Array();
           wrapper.GetAttributeFloatForAllPoints(dracoGeometry, colAttribute,
@@ -141,7 +154,9 @@ THREE.DRACOLoader.prototype = {
             wrapper.GetAttributeId(dracoGeometry, dracoDecoder.NORMAL);
         let norAttributeData;
         if (normalAttId != -1) {
-          geometryInfoStr += "\nLoaded normal attribute.\n";
+          if (this.verbosity > 0) {
+            console.log('Loaded normal attribute.');
+          }
           const norAttribute = wrapper.GetAttribute(dracoGeometry, normalAttId);
           norAttributeData = new dracoDecoder.DracoFloat32Array();
           wrapper.GetAttributeFloatForAllPoints(dracoGeometry, norAttribute,
@@ -153,7 +168,9 @@ THREE.DRACOLoader.prototype = {
             wrapper.GetAttributeId(dracoGeometry, dracoDecoder.TEX_COORD);
         let textCoordAttributeData;
         if (texCoordAttId != -1) {
-          geometryInfoStr += "\nLoaded texture coordinate attribute.\n";
+          if (this.verbosity > 0) {
+            console.log('Loaded texture coordinate attribute.');
+          }
           const texCoordAttribute = wrapper.GetAttribute(dracoGeometry,
                                                          texCoordAttId);
           textCoordAttributeData = new dracoDecoder.DracoFloat32Array();
@@ -180,8 +197,10 @@ THREE.DRACOLoader.prototype = {
             // ThreeJS vertex colors need to be normalized to properly display
             if (colorAttId != -1) {
               geometryBuffer.colors[i] = colAttributeData.GetValue(i) / 255;
-              geometryBuffer.colors[i + 1] = colAttributeData.GetValue(i + 1) / 255;
-              geometryBuffer.colors[i + 2] = colAttributeData.GetValue(i + 2) / 255;
+              geometryBuffer.colors[i + 1] =
+                  colAttributeData.GetValue(i + 1) / 255;
+              geometryBuffer.colors[i + 2] =
+                  colAttributeData.GetValue(i + 2) / 255;
             } else {
               // Default is white. This is faster than TypedArray.fill().
               geometryBuffer.colors[i] = 1.0;
@@ -227,8 +246,6 @@ THREE.DRACOLoader.prototype = {
         dracoDecoder.destroy(wrapper);
         dracoDecoder.destroy(dracoGeometry);
 
-        //fileDisplayArea.innerText += geometryInfoStr;
-
         // Import data to Three JS geometry.
         const geometry = new THREE.BufferGeometry();
         if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
@@ -248,9 +265,13 @@ THREE.DRACOLoader.prototype = {
           geometry.addAttribute('uv',
               new THREE.Float32BufferAttribute(geometryBuffer.uvs, 2));
         }
-        //fileDisplayArea.innerText += ' decode:' + (decode_end - start_time);
-        //fileDisplayArea.innerText +=
-        //    ' import:' + (performance.now() - decode_end);
+        this.decode_time = decode_end - start_time;
+        this.import_time = performance.now() - decode_end;
+
+        if (this.verbosity > 0) {
+          console.log('Decode time: ' + this.decode_time);
+          console.log('Import time: ' + this.import_time);
+        }
         return geometry;
     }
 };
