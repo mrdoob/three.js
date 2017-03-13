@@ -1330,7 +1330,7 @@ var guis = {
 
 		}
 
-		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
+		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );

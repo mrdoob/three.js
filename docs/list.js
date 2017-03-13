@@ -337,6 +337,11 @@ var list = {
 			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
+		"Geometries": [
+			[ "ConvexBufferGeometry", "examples/geometries/ConvexBufferGeometry" ],
+			[ "ConvexGeometry", "examples/geometries/ConvexGeometry" ]
+		],
+
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
@@ -353,6 +358,14 @@ var list = {
 			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "examples/Lut" ],
 			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
+		],
+
+		"QuickHull": [
+			[ "Face", "examples/quickhull/Face" ],
+			[ "HalfEdge", "examples/quickhull/HalfEdge" ],
+			[ "QuickHull", "examples/quickhull/QuickHull" ],
+			[ "VertexNode", "examples/quickhull/VertexNode" ],
+			[ "VertexList", "examples/quickhull/VertexList" ]
 		],
 
 		"Renderers": [
