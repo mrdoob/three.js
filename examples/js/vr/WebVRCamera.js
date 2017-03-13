@@ -108,7 +108,7 @@ THREE.WebVRCamera = function ( display, renderer ) {
 		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
 		// HACK @mrdoob
-		// Ideally we'll merge both projection matrices so we can frustum cull
+		// https://github.com/w3c/webvr/issues/203
 
 		scope.projectionMatrix.copy( cameraL.projectionMatrix );
 
