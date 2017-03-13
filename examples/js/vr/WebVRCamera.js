@@ -22,6 +22,8 @@ THREE.WebVRCamera = function ( display, renderer ) {
 	cameraR.bounds = new THREE.Vector4( 0.5, 0.0, 0.5, 1.0 );
 	cameraR.layers.enable( 2 );
 
+	var matrixWorldInverse = new THREE.Matrix4();
+
 	//
 
 	var currentSize, currentPixelRatio;
@@ -90,16 +92,25 @@ THREE.WebVRCamera = function ( display, renderer ) {
 
 		//
 
-		cameraL.matrixWorldInverse.elements = frameData.leftViewMatrix;
-		cameraR.matrixWorldInverse.elements = frameData.rightViewMatrix;
+		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
+		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
 
-		cameraL.projectionMatrix.elements = frameData.leftProjectionMatrix;
-		cameraR.projectionMatrix.elements = frameData.rightProjectionMatrix;
+		if ( scope.parent !== null ) {
+
+			matrixWorldInverse.getInverse( scope.parent.matrixWorld );
+
+			cameraL.matrixWorldInverse.multiply( matrixWorldInverse );
+			cameraR.matrixWorldInverse.multiply( matrixWorldInverse );
+
+		}
+
+		cameraL.projectionMatrix.fromArray( frameData.leftProjectionMatrix );
+		cameraR.projectionMatrix.fromArray( frameData.rightProjectionMatrix );
 
 		// HACK @mrdoob
 		// Ideally we'll merge both projection matrices so we can frustum cull
 
-		scope.projectionMatrix.elements = cameraL.projectionMatrix.elements;
+		scope.projectionMatrix.copy( cameraL.projectionMatrix );
 
 		//
 
