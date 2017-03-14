@@ -19,7 +19,7 @@
 		<h3>[name]([page:Object3d root], [page:String name])</h3>
 		<div>
 		root -- The mesh to animate. <br />
-		name -- The name of the animation
+		name -- The name of the animation.
 		</div>
 		<div>
 		Creates an animation for root. The animation data is gathered from AnimationHandler based on its name.
@@ -34,7 +34,7 @@
 
 		<h3>[property:Object data]</h3>
 		<div>
-		The data containing the animation
+		The data containing the animation.
 		</div>
 
 		<h3>[property:Array hierarchy]</h3>
@@ -86,7 +86,7 @@
 
 		<h3>[method:Boolean update]([page:Number deltaTimeMS])</h3>
 		<div>
-		deltaTimeMS -- The time of the between the previous frame and this frame in miliseconds.
+		deltaTimeMS -- The time elapsed between the previous frame and this frame in milliseconds.
 		</div>
 		<div>
 		Updates the animation in time. This shouldn't be called by user code. The animationHandler calls this method.
@@ -94,8 +94,8 @@
 
 		<h3>[method:array interpolateCatmullRom]([page:Array points], [page:Number scale])</h3>
 		<div>
-		points -- The 4 control point to calculate CatMullRom <br />
-		scale -- The scale between the previous key and the nex key
+		points -- The 4 control point to calculate CatMullRom. <br />
+		scale -- The scale between the previous key and the next key.
 		</div>
 		<div>
 		Interpolates the point based on the key. Is used in update.
@@ -104,7 +104,7 @@
 		<h3>[method:Object getNextKeyWith]([page:String type], [page:Object h], [page:Number key])</h3>
 		<div>
 		type -- The animationtype for the key. Can be "pos", "rot" and "scl".<br />
-		h -- The object of the hierarchy that catins the key <br />
+		h -- The object of the hierarchy that contains the key. <br />
 		key -- The index of the next possible key.
 		</div>
 		<div>
