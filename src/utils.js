@@ -1,14 +1,18 @@
-// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
-
 function arrayMin( array ) {
 
-	var length = array.length, min = Infinity;
+	if ( array.length === 0 ) {
 
-	while ( length -- ) {
+		return Infinity;
 
-		if ( array[ length ] < min ) {
+	}
 
-			min = array[ length ];
+	var min = array[ 0 ];
+
+	for ( var i = 1; i < array.length; ++ i ) {
+
+		if ( array[ i ] < min ) {
+
+			min = array[ i ];
 
 		}
 
@@ -20,13 +24,19 @@ function arrayMin( array ) {
 
 function arrayMax( array ) {
 
-	var length = array.length, max = - Infinity;
+	if ( array.length === 0 ) {
 
-	while ( length -- ) {
+		return - Infinity;
 
-		if ( array[ length ] > max ) {
+	}
 
-			max = array[ length ];
+	var max = array[ 0 ];
+
+	for ( var i = 1; i < array.length; ++ i ) {
+
+		if ( array[ i ] > max ) {
+
+			max = array[ i ];
 
 		}
 
