@@ -1,4 +1,5 @@
 function arrayMin( array ) {
+
 	if ( array.length === 0 ) {
 
 		return Infinity;
@@ -22,6 +23,7 @@ function arrayMin( array ) {
 }
 
 function arrayMax( array ) {
+
 	if ( array.length === 0 ) {
 
 		return - Infinity;
