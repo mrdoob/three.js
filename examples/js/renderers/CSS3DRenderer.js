@@ -66,7 +66,7 @@ THREE.CSS3DRenderer = function () {
 	domElement.appendChild( cameraElement );
 
 	// Should we replace to feature detection?
-	// https://github.com/Modernizr/Modernizr/issues/762
+	// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/transformstylepreserve3d.js
 	var isIE = !!document.documentMode;
 
 	this.setClearColor = function () {};
@@ -262,10 +262,10 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + "px";
-			domElement.style.MozPerspective = fov + "px";
-			domElement.style.oPerspective = fov + "px";
-			domElement.style.perspective = fov + "px";
+			domElement.style.WebkitPerspective = fov + 'px';
+			domElement.style.MozPerspective = fov + 'px';
+			domElement.style.oPerspective = fov + 'px';
+			domElement.style.perspective = fov + 'px';
 
 			cache.camera.fov = fov;
 
@@ -278,8 +278,8 @@ THREE.CSS3DRenderer = function () {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var style = 'translate3d(-50%,-50%,0) ' +
-		            'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, ' + fov  + 'px) ' +
-		            getCameraCSSMatrix( camera.matrixWorldInverse );
+			'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,' + fov  + 'px) ' +
+			getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		renderObject( scene, camera, style );
 
