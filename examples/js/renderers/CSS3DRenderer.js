@@ -95,7 +95,7 @@ THREE.CSS3DRenderer = function () {
 
 	function epsilon( value ) {
 
-		return Math.abs( value ) < Number.EPSILON ? 0 : value;
+		return Math.abs( value ) < 1e-10 ? 0 : value;
 
 	}
 
