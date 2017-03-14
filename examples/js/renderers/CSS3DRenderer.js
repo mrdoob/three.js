@@ -96,7 +96,7 @@ THREE.CSS3DRenderer = function () {
 
 	function epsilon( value ) {
 
-		return Math.abs( value ) <  1e-10 ? 0 : value;
+		return Math.abs( value ) < 1e-10 ? 0 : value;
 
 	}
 
@@ -171,20 +171,20 @@ THREE.CSS3DRenderer = function () {
 				matrix.elements[ 15 ] = 1;
 
 				style = ! isFlatTransform ?
-					'translate3d(-50%,-50%,0)' +
+					'translate(-50%,-50%)' +
 					getObjectCSSMatrix( matrix ) :
-					'translate3d(-50%,-50%,0)' +
-					'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,0)' +
+					'translate(-50%,-50%)' +
+					'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
 					cameraCSSMatrix +
 					getObjectCSSMatrix( matrix );
 
 			} else {
 
 				style = ! isFlatTransform ?
-					'translate3d(-50%,-50%,0)' +
+					'translate(-50%,-50%)' +
 					getObjectCSSMatrix( object.matrixWorld ) :
-					'translate3d(-50%,-50%,0)' +
-					'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,0)' +
+					'translate(-50%,-50%)' +
+					'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
 					cameraCSSMatrix +
 					getObjectCSSMatrix( object.matrixWorld );
 
@@ -292,11 +292,11 @@ THREE.CSS3DRenderer = function () {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var cameraCSSMatrix =
-			'translateZ(' + fov + 'px) ' +
+			'translateZ(' + fov + 'px)' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		var style = cameraCSSMatrix +
-			'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, 0)';
+			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
 		if ( cache.camera.style !== style ) {
 
