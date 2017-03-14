@@ -298,7 +298,7 @@ THREE.CSS3DRenderer = function () {
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
-		if ( cache.camera.style !== style ) {
+		if ( !isFlatTransform && cache.camera.style !== style ) {
 
 			cameraElement.style.WebkitTransform = style;
 			cameraElement.style.MozTransform = style;
