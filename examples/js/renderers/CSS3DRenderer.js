@@ -59,7 +59,6 @@ THREE.CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.MozTransformStyle = 'preserve-3d';
-	cameraElement.style.oTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
 
 	domElement.appendChild( cameraElement );
@@ -197,7 +196,6 @@ THREE.CSS3DRenderer = function () {
 
 				element.style.WebkitTransform = style;
 				element.style.MozTransform = style;
-				element.style.oTransform = style;
 				element.style.transform = style;
 
 				cache.objects[ object.id ] = { style: style };
@@ -278,7 +276,6 @@ THREE.CSS3DRenderer = function () {
 
 			domElement.style.WebkitPerspective = fov + 'px';
 			domElement.style.MozPerspective = fov + 'px';
-			domElement.style.oPerspective = fov + 'px';
 			domElement.style.perspective = fov + 'px';
 
 			cache.camera.fov = fov;
@@ -298,11 +295,10 @@ THREE.CSS3DRenderer = function () {
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
-		if ( !isFlatTransform && cache.camera.style !== style ) {
+		if ( ! isFlatTransform && cache.camera.style !== style ) {
 
 			cameraElement.style.WebkitTransform = style;
 			cameraElement.style.MozTransform = style;
-			cameraElement.style.oTransform = style;
 			cameraElement.style.transform = style;
 
 			cache.camera.style = style;
