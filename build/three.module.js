@@ -6168,7 +6168,8 @@ Object.assign( Box2.prototype, {
 
 	intersectsBox: function ( box ) {
 
-		// using 6 splitting planes to rule out intersections.
+		// using 4 splitting planes to rule out intersections
+
 		return box.max.x < this.min.x || box.min.x > this.max.x ||
 			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
@@ -12180,17 +12181,21 @@ Object.assign( DirectGeometry.prototype, {
 
 } );
 
-// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
-
 function arrayMax( array ) {
 
-	var length = array.length, max = - Infinity;
+	if ( array.length === 0 ) {
 
-	while ( length -- ) {
+		return - Infinity;
 
-		if ( array[ length ] > max ) {
+	}
 
-			max = array[ length ];
+	var max = array[ 0 ];
+
+	for ( var i = 1; i < array.length; ++ i ) {
+
+		if ( array[ i ] > max ) {
+
+			max = array[ i ];
 
 		}
 
