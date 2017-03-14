@@ -52,16 +52,18 @@ THREE.CSS3DRenderer = function () {
 
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
-
-	// IE10 and 11 does not support 'preserve-3d'.
-	// Thus, z-order in 3D will not work.
-	// We have to calc z-order manually and set "CSS z-index" for IE.
-	domElement.style.WebkitTransformStyle = 'preserve-3d';
-	domElement.style.MozTransformStyle = 'preserve-3d';
-	domElement.style.oTransformStyle = 'preserve-3d';
-	domElement.style.transformStyle = 'preserve-3d';
+	domElement.style.position = 'relative';
 
 	this.domElement = domElement;
+
+	var cameraElement = document.createElement( 'div' );
+
+	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
+	cameraElement.style.MozTransformStyle = 'preserve-3d';
+	cameraElement.style.oTransformStyle = 'preserve-3d';
+	cameraElement.style.transformStyle = 'preserve-3d';
+
+	domElement.appendChild( cameraElement );
 
 	// Should we replace to feature detection?
 	// https://github.com/Modernizr/Modernizr/issues/762
@@ -92,7 +94,7 @@ THREE.CSS3DRenderer = function () {
 
 	function epsilon( value ) {
 
-		return Math.abs( value ) < Number.EPSILON ? 0 : value;
+		return Math.abs( value ) < 1e-10 ? 0 : value;
 
 	}
 
@@ -146,28 +148,7 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	var getDistanceToSquared = function () {
-
-		var a = new THREE.Vector3();
-		var b = new THREE.Vector3();
-
-		return function ( object1, object2 ) {
-
-			a.x = object1.matrixWorld.elements[ 12 ];
-			a.y = object1.matrixWorld.elements[ 13 ];
-			a.z = object1.matrixWorld.elements[ 14 ];
-
-			b.x = object2.matrixWorld.elements[ 12 ];
-			b.y = object2.matrixWorld.elements[ 13 ];
-			b.z = object2.matrixWorld.elements[ 14 ];
-
-			return a.distanceToSquared( b );
-
-		}
-
-	}();
-
-	function renderObject( object, camera, cameraTransfrom ) {
+	function renderObject( object, camera, cameraTransform ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
 
@@ -187,11 +168,11 @@ THREE.CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = cameraTransfrom + getObjectCSSMatrix( matrix );
+				style = cameraTransform + getObjectCSSMatrix( matrix );
 
 			} else {
 
-				style = cameraTransfrom + getObjectCSSMatrix( object.matrixWorld );
+				style = cameraTransform + getObjectCSSMatrix( object.matrixWorld );
 
 			}
 
@@ -215,9 +196,9 @@ THREE.CSS3DRenderer = function () {
 
 			}
 
-			if ( element.parentNode !== domElement ) {
+			if ( element.parentNode !== cameraElement ) {
 
-				domElement.appendChild( element );
+				cameraElement.appendChild( element );
 
 			}
 
@@ -225,11 +206,32 @@ THREE.CSS3DRenderer = function () {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraTransfrom );
+			renderObject( object.children[ i ], camera, cameraTransform );
 
 		}
 
 	}
+
+	var getDistanceToSquared = function () {
+
+		var a = new THREE.Vector3();
+		var b = new THREE.Vector3();
+
+		return function ( object1, object2 ) {
+
+			a.x = object1.matrixWorld.elements[ 12 ];
+			a.y = object1.matrixWorld.elements[ 13 ];
+			a.z = object1.matrixWorld.elements[ 14 ];
+
+			b.x = object2.matrixWorld.elements[ 12 ];
+			b.y = object2.matrixWorld.elements[ 13 ];
+			b.z = object2.matrixWorld.elements[ 14 ];
+
+			return a.distanceToSquared( b );
+
+		}
+
+	}();
 
 	function zOrder ( scene ) {
 
@@ -260,10 +262,10 @@ THREE.CSS3DRenderer = function () {
 
 		if ( cache.camera.fov !== fov ) {
 
-			domElement.style.WebkitPerspective = fov + 'px';
-			domElement.style.MozPerspective = fov + 'px';
-			domElement.style.oPerspective = fov + 'px';
-			domElement.style.perspective = fov + 'px';
+			domElement.style.WebkitPerspective = fov + "px";
+			domElement.style.MozPerspective = fov + "px";
+			domElement.style.oPerspective = fov + "px";
+			domElement.style.perspective = fov + "px";
 
 			cache.camera.fov = fov;
 
@@ -271,11 +273,7 @@ THREE.CSS3DRenderer = function () {
 
 		scene.updateMatrixWorld();
 
-		if ( camera.parent === null ) {
-
-			camera.updateMatrixWorld();
-
-		}
+		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -287,6 +285,10 @@ THREE.CSS3DRenderer = function () {
 
 		if ( isIE ) {
 
+			// IE10 and 11 does not support 'preserve-3d'.
+			// Thus, z-order in 3D will not work.
+			// We have to calc z-order manually and set "CSS z-index" for IE.
+			// FYI: z-index can't handle object intersection
 			zOrder( scene );
 
 		}
