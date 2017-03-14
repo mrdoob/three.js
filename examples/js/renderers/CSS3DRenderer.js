@@ -52,7 +52,6 @@ THREE.CSS3DRenderer = function () {
 
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
-	domElement.style.position = 'relative';
 
 	this.domElement = domElement;
 
@@ -67,7 +66,7 @@ THREE.CSS3DRenderer = function () {
 
 	// Should we replace to feature detection?
 	// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/transformstylepreserve3d.js
-	var isIE = !!document.documentMode;
+	var isFlatTransform = !! document.documentMode;
 
 	this.setClearColor = function () {};
 
@@ -90,11 +89,14 @@ THREE.CSS3DRenderer = function () {
 		domElement.style.width = width + 'px';
 		domElement.style.height = height + 'px';
 
+		cameraElement.style.width = width + 'px';
+		cameraElement.style.height = height + 'px';
+
 	};
 
 	function epsilon( value ) {
 
-		return Math.abs( value ) < 1e-10 ? 0 : value;
+		return Math.abs( value ) <  1e-10 ? 0 : value;
 
 	}
 
@@ -148,7 +150,7 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	function renderObject( object, camera, cameraTransform ) {
+	function renderObject( object, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
 
@@ -168,11 +170,23 @@ THREE.CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = cameraTransform + getObjectCSSMatrix( matrix );
+				style = ! isFlatTransform ?
+					'translate3d(-50%,-50%,0)' +
+					getObjectCSSMatrix( matrix ) :
+					'translate3d(-50%,-50%,0)' +
+					'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,0)' +
+					cameraCSSMatrix +
+					getObjectCSSMatrix( matrix );
 
 			} else {
 
-				style = cameraTransform + getObjectCSSMatrix( object.matrixWorld );
+				style = ! isFlatTransform ?
+					'translate3d(-50%,-50%,0)' +
+					getObjectCSSMatrix( object.matrixWorld ) :
+					'translate3d(-50%,-50%,0)' +
+					'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,0)' +
+					cameraCSSMatrix +
+					getObjectCSSMatrix( object.matrixWorld );
 
 			}
 
@@ -188,7 +202,7 @@ THREE.CSS3DRenderer = function () {
 
 				cache.objects[ object.id ] = { style: style };
 
-				if ( isIE ) {
+				if ( isFlatTransform ) {
 
 					cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
 
@@ -206,7 +220,7 @@ THREE.CSS3DRenderer = function () {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraTransform );
+			renderObject( object.children[ i ], camera, cameraCSSMatrix );
 
 		}
 
@@ -229,11 +243,11 @@ THREE.CSS3DRenderer = function () {
 
 			return a.distanceToSquared( b );
 
-		}
+		};
 
 	}();
 
-	function zOrder ( scene ) {
+	function zOrder( scene ) {
 
 		var order = Object.keys( cache.objects ).sort( function ( a, b ) {
 
@@ -246,7 +260,7 @@ THREE.CSS3DRenderer = function () {
 
 			var index = order.indexOf( object.id + '' );
 
-			if ( index !== -1 ) {
+			if ( index !== - 1 ) {
 
 				object.element.style.zIndex = zMax - index;
 
@@ -277,13 +291,27 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var style = 'translate3d(-50%,-50%,0) ' +
-			'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px,' + fov  + 'px) ' +
+		var cameraCSSMatrix =
+			'translateZ(' + fov + 'px) ' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );
 
-		renderObject( scene, camera, style );
+		var style = cameraCSSMatrix +
+			'translate3d(' + _widthHalf + 'px,' + _heightHalf + 'px, 0)';
 
-		if ( isIE ) {
+		if ( cache.camera.style !== style ) {
+
+			cameraElement.style.WebkitTransform = style;
+			cameraElement.style.MozTransform = style;
+			cameraElement.style.oTransform = style;
+			cameraElement.style.transform = style;
+
+			cache.camera.style = style;
+
+		}
+
+		renderObject( scene, camera, cameraCSSMatrix );
+
+		if ( isFlatTransform ) {
 
 			// IE10 and 11 does not support 'preserve-3d'.
 			// Thus, z-order in 3D will not work.
