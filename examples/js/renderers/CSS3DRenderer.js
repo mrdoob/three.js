@@ -65,6 +65,7 @@ THREE.CSS3DRenderer = function () {
 
 	// Should we replace to feature detection?
 	// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/transformstylepreserve3d.js
+	// So far, we use `document.documentMode` to detect IE
 	var isFlatTransform = !! document.documentMode;
 
 	this.setClearColor = function () {};
@@ -124,11 +125,10 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	function getObjectCSSMatrix( matrix ) {
+	function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
 
 		var elements = matrix.elements;
-
-		return 'matrix3d(' +
+		var matrix3d = 'matrix3d(' +
 			epsilon( elements[ 0 ] ) + ',' +
 			epsilon( elements[ 1 ] ) + ',' +
 			epsilon( elements[ 2 ] ) + ',' +
@@ -146,6 +146,17 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 14 ] ) + ',' +
 			epsilon( elements[ 15 ] ) +
 		')';
+
+		if ( ! isFlatTransform ) {
+
+			return 'translate(-50%,-50%)' + matrix3d;
+
+		}
+
+		return 'translate(-50%,-50%)' +
+			cameraCSSMatrix +
+			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
+			matrix3d;
 
 	}
 
@@ -169,23 +180,11 @@ THREE.CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = ! isFlatTransform ?
-					'translate(-50%,-50%)' +
-					getObjectCSSMatrix( matrix ) :
-					'translate(-50%,-50%)' +
-					'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
-					cameraCSSMatrix +
-					getObjectCSSMatrix( matrix );
+				style = getObjectCSSMatrix( matrix, cameraCSSMatrix );
 
 			} else {
 
-				style = ! isFlatTransform ?
-					'translate(-50%,-50%)' +
-					getObjectCSSMatrix( object.matrixWorld ) :
-					'translate(-50%,-50%)' +
-					'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
-					cameraCSSMatrix +
-					getObjectCSSMatrix( object.matrixWorld );
+				style = getObjectCSSMatrix( object.matrixWorld, cameraCSSMatrix );
 
 			}
 
@@ -288,8 +287,7 @@ THREE.CSS3DRenderer = function () {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var cameraCSSMatrix =
-			'translateZ(' + fov + 'px)' +
+		var cameraCSSMatrix = 'translateZ(' + fov + 'px)' +
 			getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		var style = cameraCSSMatrix +
@@ -311,7 +309,7 @@ THREE.CSS3DRenderer = function () {
 
 			// IE10 and 11 does not support 'preserve-3d'.
 			// Thus, z-order in 3D will not work.
-			// We have to calc z-order manually and set "CSS z-index" for IE.
+			// We have to calc z-order manually and set CSS z-index for IE.
 			// FYI: z-index can't handle object intersection
 			zOrder( scene );
 
