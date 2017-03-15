@@ -78,7 +78,7 @@
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
 				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An instance of THREE.TubeGeometry.FrenetFrames containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 
@@ -88,8 +88,8 @@
 		</div>
 
 		<div>
-			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face 
-			and its extruded sides, you can use an instance of THREE.MultiMaterial. The first material will be 
+			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face
+			and its extruded sides, you can use an array of materials. The first material will be
 			applied to the face; the second material will be applied to the sides.
 		</div>
 
@@ -112,7 +112,7 @@
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
 				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An instance of THREE.TubeGeometry.FrenetFrames containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>
@@ -131,7 +131,7 @@
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
 				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
-				<li>frames — An instance of THREE.TubeGeometry.FrenetFrames containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 		</div>
