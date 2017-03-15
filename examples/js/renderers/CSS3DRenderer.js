@@ -154,8 +154,8 @@ THREE.CSS3DRenderer = function () {
 		}
 
 		return 'translate(-50%,-50%)' +
-			cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
+			cameraCSSMatrix +
 			matrix3d;
 
 	}
