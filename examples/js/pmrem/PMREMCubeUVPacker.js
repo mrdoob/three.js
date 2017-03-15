@@ -28,10 +28,10 @@ THREE.PMREMCubeUVPacker = function( cubeTextureLods, numLods ) {
 		type: sourceTexture.type,
 		generateMipmaps: sourceTexture.generateMipmaps,
 		anisotropy: sourceTexture.anisotropy,
-		encoding: sourceTexture.encoding
+		encoding: ( sourceTexture.encoding === THREE.RGBEEncoding ) ? THREE.RGBM16Encoding : sourceTexture.encoding
 	};
 
-	if( sourceTexture.encoding === THREE.RGBM16Encoding ) {
+	if( params.encoding === THREE.RGBM16Encoding ) {
 		params.magFilter = THREE.LinearFilter;
 		params.minFilter = THREE.LinearFilter;
 	}
