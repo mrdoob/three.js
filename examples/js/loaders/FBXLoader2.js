@@ -2954,7 +2954,7 @@
 
 					}
 
-					for ( var frame = 0; frame < stack.frames; frame ++ ) {
+					for ( var frame = 0; frame <= stack.frames; frame ++ ) {
 
 						for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
 
