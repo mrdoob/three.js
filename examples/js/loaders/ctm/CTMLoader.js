@@ -133,7 +133,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 					};
 
-					worker.postMessage( { "data": binaryData, "offsets": offsets } );
+					worker.postMessage( { "data": binaryData, "offsets": offsets }, [binaryData.buffer] );
 
 				} else {
 
