@@ -966,8 +966,7 @@
 				path = path.substr( path.lastIndexOf( "/" ) + 1 );
 
 			}
-
-			return THREE.ImageUtils.loadTexture( baseURL + path );
+			return ( new TextureLoader() ).load( baseURL + path );
 
 		};
 
