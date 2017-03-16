@@ -1,0 +1,78 @@
+{
+  "accessors": [],
+  "asset": {
+    "generator": "Hand-crafted, artisanal glTF",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "uri": "DracoBunny.bin",
+      "byteLength": 86176,
+      "type": "arraybuffer",
+      "name": "Buffer",
+      "extensions": {}
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 86176,
+      "name": "DracoBunnyBuffer"
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_draco_mesh_compression"
+  ],
+  "images": [],
+  "materials": [],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "mode": 4,
+          "extensions" : {
+            "KHR_draco_mesh_compression" : {
+              "bufferView" : 0,
+              "indexCount" : 1000,
+              "vertexCount" : 500,
+              "attributes" : [
+                {
+                  "semantic" : "POSITION",
+                  "componentType" : 5126,
+                  "type" : "VEC3"
+                }
+              ],
+              "version" : "0.9.1"
+            }
+          }
+        }
+      ],
+      "name": "DracoBunnyMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "children": [],
+      "mesh": 0,
+      "name": "DracoBunny"
+    }
+  ],
+  "programs": [],
+  "samplers": [],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ],
+      "name": "default scene"
+    }
+  ],
+  "shaders": [],
+  "techniques": [],
+  "textures": []
+}
