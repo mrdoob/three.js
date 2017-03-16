@@ -63,7 +63,7 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	var isIE = /Trident/i.test( navigator.userAgent )
+	var isIE = /Trident/i.test( navigator.userAgent );
 
 	this.setClearColor = function () {};
 
@@ -227,13 +227,8 @@ THREE.CSS3DRenderer = function () {
 
 		return function ( object1, object2 ) {
 
-			a.x = object1.matrixWorld.elements[ 12 ];
-			a.y = object1.matrixWorld.elements[ 13 ];
-			a.z = object1.matrixWorld.elements[ 14 ];
-
-			b.x = object2.matrixWorld.elements[ 12 ];
-			b.y = object2.matrixWorld.elements[ 13 ];
-			b.z = object2.matrixWorld.elements[ 14 ];
+			a.setFromMatrixPosition( object1.matrixWorld );
+			b.setFromMatrixPosition( object2.matrixWorld );
 
 			return a.distanceToSquared( b );
 
