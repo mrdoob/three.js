@@ -3131,19 +3131,19 @@
 		 * Position of the vertex.
 		 * @type {THREE.Vector3}
 		 */
-		this.position = new THREE.Vector3( );
+		this.position = new THREE.Vector3();
 
 		/**
 		 * Normal of the vertex
 		 * @type {THREE.Vector3}
 		 */
-		this.normal = new THREE.Vector3( );
+		this.normal = new THREE.Vector3();
 
 		/**
 		 * UV coordinates of the vertex.
 		 * @type {THREE.Vector2}
 		 */
-		this.uv = new THREE.Vector2( );
+		this.uv = new THREE.Vector2();
 
 		/**
 		 * Color of the vertex
