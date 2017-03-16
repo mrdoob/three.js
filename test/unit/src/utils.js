@@ -9,7 +9,7 @@ QUnit.test( 'arrayMax' , function( assert ) {
 	assert.equal( THREE.arrayMax( [] ), - Infinity );
 	assert.equal( THREE.arrayMax( [ 5 ] ), 5 );
 	assert.equal( THREE.arrayMax( [ 1, 5, 10 ] ), 10 );
-	assert.equal( THREE.arrayMax( [ 5, 1, 10 ] ), 10 );
+	assert.equal( THREE.arrayMax( [ 1, 10, 5 ] ), 10 );
 	assert.equal( THREE.arrayMax( [ 10, 5, 1 ] ), 10 );
 
 });
