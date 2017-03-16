@@ -48,3 +48,8 @@ THREE.MAXConverter(source) {
 		return mesh;
 	}
 }
+
+/// USAGE:
+// var model = new THREE.MaxConverter('objects/obj.3ds');
+// Immediatly ready for scene addition using:
+// scene.add(model);
