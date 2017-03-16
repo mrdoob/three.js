@@ -98,6 +98,8 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/GLTF2Loader.js"></script>
+		<script src="js/loaders/draco/draco_decoder.js"></script>
+		<script src="js/loaders/draco/DRACOLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -414,6 +416,13 @@
 			}
 
 			var sceneList = [
+				{
+					name : "DracoBunny", url : "./models/gltf/DracoBunny/DracoBunny.gltf",
+					cameraPos: new THREE.Vector3(2, 1, 3),
+					objectRotation: new THREE.Euler(0, Math.PI, 0),
+					addLights:true,
+					extensions: ["glTF"]
+				},
 				{
 					name : 'BoomBox (PBR)', url : './models/gltf/BoomBox/%s/BoomBox.gltf',
 					cameraPos: new THREE.Vector3(0.02, 0.01, 0.03),
