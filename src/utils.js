@@ -4,13 +4,9 @@ function arrayMin( array ) {
 
 	var min = array[ 0 ];
 
-	for ( var i = 1, length = array.length; i < length; ++ i ) {
+	for ( var i = 1, l = array.length; i < l; ++ i ) {
 
-		if ( array[ i ] < min ) {
-
-			min = array[ i ];
-
-		}
+		if ( array[ i ] < min ) min = array[ i ];
 
 	}
 
@@ -24,13 +20,9 @@ function arrayMax( array ) {
 
 	var max = array[ 0 ];
 
-	for ( var i = 1, length = array.length; i < length; ++ i ) {
+	for ( var i = 1, l = array.length; i < l; ++ i ) {
 
-		if ( array[ i ] > max ) {
-
-			max = array[ i ];
-
-		}
+		if ( array[ i ] > max ) max = array[ i ];
 
 	}
 
