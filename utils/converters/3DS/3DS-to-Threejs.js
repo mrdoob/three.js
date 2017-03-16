@@ -1,7 +1,3 @@
-<!-- NOTE: BROWSERFS will be installed at some point. I need to reverify real quick! -->
-
-<script type="text/javascript" src="browserfs.min.js"></script>
-<script type="text/javascript">
   // Installs globals onto window:
   // * Buffer
   // * require (monkey-patches if already defined)
@@ -13,9 +9,7 @@
   var lsfs = new BrowserFS.FileSystem.LocalStorage();
   // Initialize it as the root file system.
   BrowserFS.initialize(lsfs);
-</script>
 
-<script>
 /*
  * @author TheCodeCrafter / Converting the original FS to a file saving mechanism
  * @author chrispalazzolo / Creating the original Node.js converter
@@ -25,8 +19,13 @@
 /*
 ##### Class to parse a .3ds file into a js object.
 */
+
 var binary3DSParser = function(file, options){
-	this.fs = 
+	this.fs = function() {
+		this.stats = function() {
+			
+		}
+	}
 
 	this.err = false;
 	this.errMsg = '';
@@ -2705,5 +2704,3 @@ exports.parse = parse;
 exports.parseToJson = parseToJson;
 exports.help = help;
 exports.print = print;
-
-</script>
