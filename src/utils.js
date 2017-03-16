@@ -1,14 +1,10 @@
 function arrayMin( array ) {
 
-	if ( array.length === 0 ) {
-
-		return Infinity;
-
-	}
+	if ( array.length === 0 ) return Infinity;
 
 	var min = array[ 0 ];
 
-	for ( var i = 1; i < array.length; ++ i ) {
+	for ( var i = 1, length = array.length; i < length; ++ i ) {
 
 		if ( array[ i ] < min ) {
 
@@ -24,15 +20,11 @@ function arrayMin( array ) {
 
 function arrayMax( array ) {
 
-	if ( array.length === 0 ) {
-
-		return - Infinity;
-
-	}
+	if ( array.length === 0 ) return - Infinity;
 
 	var max = array[ 0 ];
 
-	for ( var i = 1; i < array.length; ++ i ) {
+	for ( var i = 1, length = array.length; i < length; ++ i ) {
 
 		if ( array[ i ] > max ) {
 
