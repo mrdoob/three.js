@@ -63,10 +63,7 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	// Should we replace to feature detection?
-	// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/css/transformstylepreserve3d.js
-	// So far, we use `document.documentMode` to detect IE
-	var isFlatTransform = !! document.documentMode;
+	var isIE = /Trident/i.test( navigator.userAgent )
 
 	this.setClearColor = function () {};
 
@@ -147,16 +144,16 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 15 ] ) +
 		')';
 
-		if ( ! isFlatTransform ) {
+		if ( isIE ) {
 
-			return 'translate(-50%,-50%)' + matrix3d;
+			return 'translate(-50%,-50%)' +
+				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
+				cameraCSSMatrix +
+				matrix3d;
 
 		}
 
-		return 'translate(-50%,-50%)' +
-			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
-			cameraCSSMatrix +
-			matrix3d;
+		return 'translate(-50%,-50%)' + matrix3d;
 
 	}
 
@@ -199,7 +196,7 @@ THREE.CSS3DRenderer = function () {
 
 				cache.objects[ object.id ] = { style: style };
 
-				if ( isFlatTransform ) {
+				if ( isIE ) {
 
 					cache.objects[ object.id ].distanceToCameraSquared = getDistanceToSquared( camera, object );
 
@@ -293,7 +290,7 @@ THREE.CSS3DRenderer = function () {
 		var style = cameraCSSMatrix +
 			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
-		if ( ! isFlatTransform && cache.camera.style !== style ) {
+		if ( cache.camera.style !== style && ! isIE ) {
 
 			cameraElement.style.WebkitTransform = style;
 			cameraElement.style.MozTransform = style;
@@ -305,7 +302,7 @@ THREE.CSS3DRenderer = function () {
 
 		renderObject( scene, camera, cameraCSSMatrix );
 
-		if ( isFlatTransform ) {
+		if ( isIE ) {
 
 			// IE10 and 11 does not support 'preserve-3d'.
 			// Thus, z-order in 3D will not work.
