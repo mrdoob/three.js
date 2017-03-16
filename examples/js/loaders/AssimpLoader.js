@@ -966,7 +966,8 @@
 				path = path.substr( path.lastIndexOf( "/" ) + 1 );
 
 			}
-			return ( new TextureLoader() ).load( baseURL + path );
+
+			return new THREE.TextureLoader().load( baseURL + path );
 
 		};
 
@@ -1849,7 +1850,7 @@
 
 					}
 
-					
+
 
 				}
 
@@ -1872,7 +1873,7 @@
 				} else {
 
 					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
-					
+
 				}
 
 
