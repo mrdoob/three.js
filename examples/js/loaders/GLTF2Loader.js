@@ -1830,6 +1830,15 @@ THREE.GLTF2Loader = ( function () {
 
 			return _each( json.accessors, function ( accessor ) {
 
+				if ( accessor.bufferView === undefined ) {
+
+					// Ignore accessors without a bufferView, which may be used to declare
+					// runtime information about attributes coming from another source
+					// (e.g. Draco compression extension).
+					return accessor;
+
+				}
+
 				var arraybuffer = dependencies.bufferViews[ accessor.bufferView ];
 				var itemSize = WEBGL_TYPE_SIZES[ accessor.type ];
 				var TypedArray = WEBGL_COMPONENT_TYPES[ accessor.componentType ];
