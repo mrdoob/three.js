@@ -26,7 +26,7 @@ THREE.BlendCharacter = function () {
 
 			} );
 
-			THREE.SkinnedMesh.call( scope, scope.skinnedMesh.geometry, scope.skinnedMesh.material );
+			THREE.SkinnedMesh.call( scope, scope.skinnedMesh.geometry, scope.skinnedMesh.materials );
 
 			// If we didn't successfully find the mesh, bail out
 			if ( scope.skinnedMesh == undefined ) {
@@ -36,7 +36,7 @@ THREE.BlendCharacter = function () {
 
 			}
 
-			scope.material.skinning = true;
+			scope.materials[0].skinning = true;
 
 			scope.mixer = new THREE.AnimationMixer( scope );
 

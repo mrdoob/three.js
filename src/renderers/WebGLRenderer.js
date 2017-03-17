@@ -1358,16 +1358,16 @@ function WebGLRenderer( parameters ) {
 					}
 
 					var geometry = objects.update( object );
-					var material = object.material;
+					var materials = object.materials;
 
-					if ( Array.isArray( material ) ) {
+					if ( materials.length > 1 ) {
 
 						var groups = geometry.groups;
 
 						for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 							var group = groups[ i ];
-							var groupMaterial = material[ group.materialIndex ];
+							var groupMaterial = materials[ group.materialIndex ];
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
@@ -1377,9 +1377,9 @@ function WebGLRenderer( parameters ) {
 
 						}
 
-					} else if ( material.visible ) {
+					} else if ( materials[0].visible ) {
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null );
+						currentRenderList.push( object, geometry, materials[0], _vector3.z, null );
 
 					}
 

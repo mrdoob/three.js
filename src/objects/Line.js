@@ -25,7 +25,19 @@ function Line( geometry, material, mode ) {
 	this.type = 'Line';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
+	if (Array.isArray(material)){
+		
+		this.materials = material;
+		
+	} else if ( material !== undefined ) {
+		
+		this.materials = [ material ];
+		
+	} else {
+		
+		this.materials = [ new LineBasicMaterial( { color: Math.random() * 0xffffff } ) ];
+		
+	}
 
 }
 
@@ -191,6 +203,41 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	}
 
 } );
+
+
+Object.defineProperty(Line.prototype,"material", {
+
+	get: function(){
+		
+		console.log("Deprecated material");
+		if ( this.materials ) {
+			
+			return this.materials[0];
+			
+		} else {
+			
+			return undefined;
+			
+		}
+		
+	},
+	
+	set: function( value ){
+		
+		console.log("Deprecated material");
+		if (Array.isArray(value)){
+			
+			this.materials = value;
+			
+		} else {
+			
+			this.materials = [ value ];
+			
+		} 
+		
+	}
+	
+});
 
 
 export { Line };
