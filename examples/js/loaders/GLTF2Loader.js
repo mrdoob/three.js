@@ -2143,8 +2143,6 @@ THREE.GLTF2Loader = ( function () {
 
 					var geometry;
 
-					var meshNode;
-
 					if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
 						geometry = extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ].decodePrimitive( primitive, dependencies );
