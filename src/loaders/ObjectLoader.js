@@ -122,8 +122,14 @@ Object.assign( ObjectLoader.prototype, {
 	},
 
 	parse: function ( json, onLoad ) {
+		
+		var fonts = this.parseFonts( json.fonts );
 
-		var geometries = this.parseGeometries( json.geometries );
+		var geometries = this.parseGeometries( json.geometries, fonts, function () {
+			
+			if ( onLoad !== undefined ) onLoad( object );			
+			
+		} );
 
 		var images = this.parseImages( json.images, function () {
 
@@ -151,8 +157,37 @@ Object.assign( ObjectLoader.prototype, {
 		return object;
 
 	},
+	
+	parseFonts: function ( json ) {
+		
+		var fonts = {};
+		
+		if ( json !== undefined ) {
+			
+			var fontLoader = new FontLoader();
+			
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+				
+				var font;
+				var data = json[ i ];
+				
+				//
+				
+				font.uuid = data.uuid;
+				
+				if ( data.name !== undefined ) font.name = data.name;
 
-	parseGeometries: function ( json ) {
+				fonts[ data.uuid ] = font;
+				
+			}
+			
+		}
+		
+		return fonts;
+		
+	},
+
+	parseGeometries: function ( json, fonts ) {
 
 		var geometries = {};
 
