@@ -35,6 +35,9 @@ import { Color } from '../math/Color';
  *
  *  skinning: <bool>,
  *  morphTargets: <bool>
+ *
+ *  meshLine: <bool>
+ *  meshLineWidth: <float>
  * }
  */
 

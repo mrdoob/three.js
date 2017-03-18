@@ -32,22 +32,39 @@ MeshLine.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	prepare: function ( srcGeometry ) {
 
 		var geometry;
+		var i, l;
 
 		// convert geometry if necessary
 
 		if ( srcGeometry.isGeometry === true ) {
 
 			geometry = new BufferGeometry();
-			var position = [];
+			var vertices = [];
+			var colors = [];
 
-			for ( var i = 0, l = srcGeometry.vertices.length; i < l; i ++ ) {
+			for ( i = 0, l = srcGeometry.vertices.length; i < l; i ++ ) {
 
 				var vertex = srcGeometry.vertices[ i ];
-				position.push( vertex.x, vertex.y, vertex.z );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+			for ( i = 0, l = srcGeometry.colors.length; i < l; i ++ ) {
+
+				var color = srcGeometry.colors[ i ];
+				colors.push( color.r, color.g, color.b );
+
+			}
+
+			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+			// optional
+
+			if ( colors.length > 0 ) {
+
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+			}
 
 		} else if ( srcGeometry.isBufferGeometry === true ) {
 
@@ -68,6 +85,7 @@ MeshLine.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		var indices = [];
 		var vertices = [];
 		var uvs = [];
+		var colors = [];
 
 		var side = [];
 		var width = [];
@@ -78,6 +96,7 @@ MeshLine.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		// generate vertices, uvs, side and width attributes
 
 		var position = geometry.attributes.position;
+		var color = geometry.attributes.color;
 
 		for ( i = 0, l = position.count; i < l; i ++ ) {
 
@@ -113,6 +132,19 @@ MeshLine.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			width.push( w );
 			width.push( w );
+
+			// colors (optional)
+
+			if ( color !== undefined ) {
+
+				var r = color.getX( i );
+				var g = color.getY( i );
+				var b = color.getZ( i );
+
+				colors.push( r, g, b );
+				colors.push( r, g, b );
+
+			}
 
 		}
 
@@ -201,6 +233,12 @@ MeshLine.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		this.geometry.addAttribute( 'width', new Float32BufferAttribute( width, 1 ) );
 		this.geometry.addAttribute( 'prev', new Float32BufferAttribute( prev, 3 ) );
 		this.geometry.addAttribute( 'next', new Float32BufferAttribute( next, 3 ) );
+
+		if ( colors.length > 0 ) {
+
+			this.geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+		}
 
 	}
 
