@@ -2,9 +2,9 @@ import { AnimationUtils } from './AnimationUtils';
 
 function KeyframeTrackConstructor( name, times, values, interpolation ) {
 
-	if( name === undefined ) throw new Error( "track name is undefined" );
+	if ( name === undefined ) throw new Error( "track name is undefined" );
 
-	if( times === undefined || times.length === 0 ) {
+	if ( times === undefined || times.length === 0 ) {
 
 		throw new Error( "no keyframes in track named " + name );
 

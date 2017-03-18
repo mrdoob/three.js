@@ -52,7 +52,7 @@
 
 			var camera, cameraTarget, scene, renderer;
 
-			var group, textMesh1, textMesh2, textGeo, material;
+			var group, textMesh1, textMesh2, textGeo, materials;
 
 			var firstLetter = true;
 
@@ -181,10 +181,10 @@
 
 				}
 
-				material = new THREE.MultiMaterial( [
+				materials = [
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
-				] );
+				];
 
 				group = new THREE.Group();
 				group.position.y = 100;
@@ -363,7 +363,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextGeometry( text, {
+				textGeo = new THREE.TextBufferGeometry( text, {
 
 					font: font,
 
@@ -427,7 +427,7 @@
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textMesh1 = new THREE.Mesh( textGeo, material );
+				textMesh1 = new THREE.Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -440,7 +440,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, material );
+					textMesh2 = new THREE.Mesh( textGeo, materials );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;

@@ -101,9 +101,7 @@ function Object3D() {
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object3D.prototype = {
-
-	constructor: Object3D,
+Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	isObject3D: true,
 
@@ -281,7 +279,15 @@ Object3D.prototype = {
 
 		return function lookAt( vector ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -528,9 +534,9 @@ Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
 			if ( this.parent === null ) {
 
@@ -730,8 +736,7 @@ Object3D.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Object3D.prototype, EventDispatcher.prototype );
 
 export { Object3D };

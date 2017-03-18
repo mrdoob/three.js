@@ -967,7 +967,7 @@
 
 			}
 
-			return THREE.ImageUtils.loadTexture( baseURL + path );
+			return new THREE.TextureLoader().load( baseURL + path );
 
 		};
 
@@ -1850,7 +1850,7 @@
 
 					}
 
-					
+
 
 				}
 
@@ -1873,7 +1873,7 @@
 				} else {
 
 					throw ( new Error( "Sorry, can't currently triangulate polys. Use the triangulate preprocessor in Assimp." ))
-					
+
 				}
 
 

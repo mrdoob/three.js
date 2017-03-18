@@ -14,8 +14,9 @@ var list = {
 		],
 
 		"Next Steps": [
-				[ "How to update things", "manual/introduction/How-to-update-things" ],
-			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+			[ "How to update things", "manual/introduction/How-to-update-things" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ],
+            [ "Animation System", "manual/introduction/Animation-system" ]
 		],
 
 		"Build Tools": [
@@ -126,23 +127,6 @@ var list = {
 			[ "SplineCurve", "api/extras/curves/SplineCurve" ]
 		],
 
-		"Extras / Helpers": [
-			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
-			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
-			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
-			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
-			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
-			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
-			[ "GridHelper", "api/extras/helpers/GridHelper" ],
-			[ "PolarGridHelper", "api/extras/helpers/PolarGridHelper"],
-			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
-			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
-			[ "RectAreaLightHelper", "api/extras/helpers/RectAreaLightHelper" ],
-			[ "SkeletonHelper", "api/extras/helpers/SkeletonHelper" ],
-			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
-			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ]
-		],
-
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
@@ -161,6 +145,7 @@ var list = {
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
+			[ "ExtrudeBufferGeometry", "api/geometries/ExtrudeBufferGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
 			[ "LatheBufferGeometry", "api/geometries/LatheBufferGeometry" ],
@@ -189,6 +174,23 @@ var list = {
 			[ "TubeGeometry", "api/geometries/TubeGeometry" ],
 			[ "TubeBufferGeometry", "api/geometries/TubeBufferGeometry" ],
 			[ "WireframeGeometry", "api/geometries/WireframeGeometry" ]
+		],
+
+		"Helpers": [
+			[ "ArrowHelper", "api/helpers/ArrowHelper" ],
+			[ "AxisHelper", "api/helpers/AxisHelper" ],
+			[ "BoxHelper", "api/helpers/BoxHelper" ],
+			[ "CameraHelper", "api/helpers/CameraHelper" ],
+			[ "DirectionalLightHelper", "api/helpers/DirectionalLightHelper" ],
+			[ "FaceNormalsHelper", "api/helpers/FaceNormalsHelper" ],
+			[ "GridHelper", "api/helpers/GridHelper" ],
+			[ "PolarGridHelper", "api/helpers/PolarGridHelper" ],
+			[ "HemisphereLightHelper", "api/helpers/HemisphereLightHelper" ],
+			[ "PointLightHelper", "api/helpers/PointLightHelper" ],
+			[ "RectAreaLightHelper", "api/helpers/RectAreaLightHelper" ],
+			[ "SkeletonHelper", "api/helpers/SkeletonHelper" ],
+			[ "SpotLightHelper", "api/helpers/SpotLightHelper" ],
+			[ "VertexNormalsHelper", "api/helpers/VertexNormalsHelper" ]
 		],
 
 		"Lights": [
@@ -243,7 +245,6 @@ var list = {
 			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "MeshToonMaterial", "api/materials/MeshToonMaterial" ],
-			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
@@ -286,6 +287,7 @@ var list = {
 			[ "Group", "api/objects/Group" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
+			[ "LineLoop", "api/objects/LineLoop" ],
 			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
@@ -334,10 +336,15 @@ var list = {
 			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
+		"Geometries": [
+			[ "ConvexBufferGeometry", "examples/geometries/ConvexBufferGeometry" ],
+			[ "ConvexGeometry", "examples/geometries/ConvexGeometry" ]
+		],
+
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
-			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "GLTF2Loader", "examples/loaders/GLTF2Loader" ],
 			[ "MTLLoader", "examples/loaders/MTLLoader" ],
 			[ "OBJLoader", "examples/loaders/OBJLoader" ],
 			[ "PCDLoader", "examples/loaders/PCDLoader" ],
@@ -350,6 +357,14 @@ var list = {
 			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "examples/Lut" ],
 			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
+		],
+
+		"QuickHull": [
+			[ "Face", "examples/quickhull/Face" ],
+			[ "HalfEdge", "examples/quickhull/HalfEdge" ],
+			[ "QuickHull", "examples/quickhull/QuickHull" ],
+			[ "VertexNode", "examples/quickhull/VertexNode" ],
+			[ "VertexList", "examples/quickhull/VertexList" ]
 		],
 
 		"Renderers": [

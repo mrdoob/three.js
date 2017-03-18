@@ -15,9 +15,7 @@ function Vector4( x, y, z, w ) {
 
 }
 
-Vector4.prototype = {
-
-	constructor: Vector4,
+Object.assign( Vector4.prototype, {
 
 	isVector4: true,
 
@@ -215,21 +213,10 @@ Vector4.prototype = {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-			this.w *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.w = 0;
-
-		}
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
+		this.w *= scalar;
 
 		return this;
 
@@ -450,16 +437,10 @@ Vector4.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector4();
+		var max = new Vector4();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new Vector4();
-				max = new Vector4();
-
-			}
 
 			min.set( minVal, minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal, maxVal );
@@ -628,7 +609,7 @@ Vector4.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Vector4 };

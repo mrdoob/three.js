@@ -26,6 +26,7 @@ import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
+import { LineLoop } from '../objects/LineLoop';
 import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
@@ -37,6 +38,7 @@ import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
 import { DirectionalLight } from '../lights/DirectionalLight';
 import { AmbientLight } from '../lights/AmbientLight';
+import { RectAreaLight } from '../lights/RectAreaLight';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Scene } from '../scenes/Scene';
@@ -324,7 +326,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
+						geometry = geometryLoader.parse( data, this.texturePath ).geometry;
 
 						break;
 
@@ -625,6 +627,12 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'RectAreaLight':
+
+					object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+
+					break;
+
 				case 'SpotLight':
 
 					object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
@@ -636,6 +644,10 @@ Object.assign( ObjectLoader.prototype, {
 					object = new HemisphereLight( data.color, data.groundColor, data.intensity );
 
 					break;
+
+				case 'SkinnedMesh':
+
+					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
 
 				case 'Mesh':
 
@@ -666,6 +678,12 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'LineLoop':
+
+					object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
+
+					break;
+
 				case 'LineSegments':
 
 					object = new LineSegments( getGeometry( data.geometry ), getMaterial( data.material ) );
@@ -690,10 +708,6 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Group();
 
 					break;
-
-				case 'SkinnedMesh':
-
-					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh type. Instantiates Object3D instead.' );
 
 				default:
 

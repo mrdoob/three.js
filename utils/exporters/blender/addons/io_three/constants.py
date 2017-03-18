@@ -41,6 +41,7 @@ NUMERIC = {
     'SphericalReflectionMapping': 305,
 
     'RepeatWrapping': 1000,
+    'repeat': 1000,
     'ClampToEdgeWrapping': 1001,
     'MirroredRepeatWrapping': 1002,
 

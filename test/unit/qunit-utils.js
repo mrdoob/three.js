@@ -60,10 +60,10 @@ function checkGeometryClone( geom ) {
 	var excludedProperties = [ 'parameters', 'widthSegments', 'heightSegments', 'depthSegments' ];
 
 	var differingProp = getDifferingProp( geom, copy, excludedProperties );
-	ok( differingProp === undefined, 'properties are equal' );
+	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
 	differingProp = getDifferingProp( copy, geom, excludedProperties );
-	ok( differingProp === undefined, 'properties are equal' );
+	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
 	checkGeometryJsonRoundtrip( copy );
@@ -151,10 +151,10 @@ function checkGeometryJsonReading( json, geom ) {
 	var excludedProperties = [ 'bones' ];
 
 	var differingProp = getDifferingProp( output[ geom.uuid ], geom, excludedProperties );
-	ok( differingProp === undefined, 'properties are equal' );
+	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 
 	differingProp = getDifferingProp( geom, output[ geom.uuid ], excludedProperties );
-	ok( differingProp === undefined, 'properties are equal' );
+	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
 }
 
 // Verify geom -> json -> geom

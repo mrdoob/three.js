@@ -16,7 +16,9 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
 	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetX.texture.name = "BloomPass.x";
 	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetY.texture.name = "BloomPass.y";
 
 	// copy material
 

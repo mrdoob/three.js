@@ -5,7 +5,6 @@
 import { Color } from '../../math/Color';
 import { Vector3 } from '../../math/Vector3';
 import { Vector2 } from '../../math/Vector2';
-import { Matrix4 } from '../../math/Matrix4';
 
 function WebGLLights() {
 

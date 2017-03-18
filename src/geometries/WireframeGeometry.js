@@ -86,7 +86,7 @@ function WireframeGeometry( geometry ) {
 
 			if ( groups.length === 0 ) {
 
-				geometry.addGroup( 0, indices.count );
+				groups = [ { start: 0, count: indices.count, materialIndex: 0 } ];
 
 			}
 

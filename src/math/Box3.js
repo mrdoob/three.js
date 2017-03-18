@@ -13,9 +13,7 @@ function Box3( min, max ) {
 
 }
 
-Box3.prototype = {
-
-	constructor: Box3,
+Object.assign( Box3.prototype, {
 
 	isBox3: true,
 
@@ -310,11 +308,9 @@ Box3.prototype = {
 
 	intersectsSphere: ( function () {
 
-		var closestPoint;
+		var closestPoint = new Vector3();
 
 		return function intersectsSphere( sphere ) {
-
-			if ( closestPoint === undefined ) closestPoint = new Vector3();
 
 			// Find the point on the AABB closest to the sphere center.
 			this.clampPoint( sphere.center, closestPoint );
@@ -483,7 +479,7 @@ Box3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Box3 };

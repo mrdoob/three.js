@@ -2,8 +2,8 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { WebGLProgram } from './WebGLProgram';
 import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
+import { WebGLProgram } from './WebGLProgram';
 
 function WebGLPrograms( renderer, capabilities ) {
 
@@ -39,7 +39,10 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	function allocateBones( object ) {
 
-		if ( capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		var skeleton = object.skeleton;
+		var bones = skeleton.bones;
+
+		if ( capabilities.floatVertexTextures ) {
 
 			return 1024;
 
@@ -55,17 +58,12 @@ function WebGLPrograms( renderer, capabilities ) {
 			var nVertexUniforms = capabilities.maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
-			var maxBones = nVertexMatrices;
+			var maxBones = Math.min( nVertexMatrices, bones.length );
 
-			if ( object !== undefined && (object && object.isSkinnedMesh) ) {
+			if ( maxBones < bones.length ) {
 
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
-
-				if ( maxBones < object.skeleton.bones.length ) {
-
-					console.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
-
-				}
+				console.warn( 'THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.' );
+				return 0;
 
 			}
 
@@ -112,7 +110,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		var maxBones = allocateBones( object );
+		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
 		var precision = renderer.getPrecision();
 
 		if ( material.precision !== null ) {
@@ -127,7 +125,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
-		var currentRenderTarget = renderer.getCurrentRenderTarget();
+		var currentRenderTarget = renderer.getRenderTarget();
 
 		var parameters = {
 
@@ -162,16 +160,16 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			fog: !! fog,
 			useFog: material.fog,
-			fogExp: (fog && fog.isFogExp2),
+			fogExp: ( fog && fog.isFogExp2 ),
 
 			flatShading: material.shading === FlatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
 
-			skinning: material.skinning,
+			skinning: material.skinning && maxBones > 0,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: capabilities.floatVertexTextures,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -274,7 +272,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	};
 
-	this.releaseProgram = function( program ) {
+	this.releaseProgram = function ( program ) {
 
 		if ( -- program.usedTimes === 0 ) {
 

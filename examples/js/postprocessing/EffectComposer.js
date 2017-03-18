@@ -16,11 +16,12 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 		};
 		var size = renderer.getSize();
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
-
+		renderTarget.texture.name = "EffectComposer.rt1";
 	}
 
 	this.renderTarget1 = renderTarget;
 	this.renderTarget2 = renderTarget.clone();
+	this.renderTarget2.texture.name = "EffectComposer.rt2";
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;

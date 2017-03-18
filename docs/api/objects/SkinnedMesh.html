@@ -66,12 +66,11 @@
 		</code>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture] )</h3>
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 		<div>
     [page:Geometry geometry] - an instance of [page:Geometry] or [page:BufferGeometry] (recommended).
 		[page:Geometry.skinIndices skinIndices] and [page:Geometry.skinWeights skinWeights] should be set to true on the geometry.<br />
-    [page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial] .<br />
-		[page:boolean useVertexTexture] - (optional) defines whether a vertex texture can be used. Default is true.
+    [page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
 		</div>
 
 
@@ -153,7 +152,10 @@
 		Updates the [page:Matrix4 MatrixWorld].
 		</div>
 
-
+		<h3>[method:null initBones]()</h3>
+		<div>
+		Creates an array of hierarchical [page:Bone bones] objects from the internal geometry.
+		</div>
 
 		<h2>Source</h2>
 

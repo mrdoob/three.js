@@ -4,7 +4,7 @@
 
 function EventDispatcher() {}
 
-EventDispatcher.prototype = {
+Object.assign( EventDispatcher.prototype, {
 
 	addEventListener: function ( type, listener ) {
 
@@ -87,7 +87,7 @@ EventDispatcher.prototype = {
 
 	}
 
-};
+} );
 
 
 export { EventDispatcher };

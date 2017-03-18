@@ -65,7 +65,7 @@ var d = a.distanceTo( b );
 		<div>
 			Used to check whether this or derived classes are Vector3s. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 		<h3>[property:Float x]</h3>
@@ -81,7 +81,7 @@ var d = a.distanceTo( b );
 		<div>Adds [page:Vector3 v] to this vector.</div>
 
 		<h3>[method:Vector3 addScalar]( [page:Float s] )</h3>
-		<div>Add the scalar value s to this vector's [page:.x x], [page:.y y] and [page:.z z] values.</div>
+		<div>Adds the scalar value s to this vector's [page:.x x], [page:.y y] and [page:.z z] values.</div>
 
 		<h3>[method:Vector3 addScaledVector]( [page:Vector3 v], [page:Float s] )</h3>
 		<div>Adds the multiple of [page:Vector3 v] and [page:Float s] to this vector.</div>
@@ -104,7 +104,7 @@ var d = a.distanceTo( b );
 		</div>
 
 		<h3>[method:Vector3 applyMatrix3]( [page:Matrix3 m] )</h3>
-		<div>Multiply this vector by [page:Matrix3 m]</div>
+		<div>Multiplies this vector by [page:Matrix3 m]</div>
 
 		<h3>[method:Vector3 applyMatrix4]( [page:Matrix4 m] )</h3>
 		<div>
@@ -284,13 +284,13 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Vector3 max]( [page:Vector3 v] )</h3>
 		<div>
-		If this vector's x, y or z value is less than [page:Vector3 v's] x, y or z value, replace
+		If this vector's x, y or z value is less than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding max value.
 		</div>
 
 		<h3>[method:Vector3 min]( [page:Vector3 v] )</h3>
 		<div>
-		If this vector's x, y or z value is greater than [page:Vector3 v's] x, y or z value, replace
+		If this vector's x, y or z value is greater than [page:Vector3 v]'s x, y or z value, replace
 		that value with the corresponding min value.
 		</div>
 

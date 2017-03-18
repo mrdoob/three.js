@@ -44,7 +44,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
@@ -59,17 +58,21 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Texture.prototype = {
+Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
+Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	constructor: Texture,
 
 	isTexture: true,
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-
-	},
 
 	clone: function () {
 
@@ -78,6 +81,8 @@ Texture.prototype = {
 	},
 
 	copy: function ( source ) {
+
+		this.name = source.name;
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );
@@ -283,8 +288,7 @@ Texture.prototype = {
 
 	}
 
-};
+} );
 
-Object.assign( Texture.prototype, EventDispatcher.prototype );
 
 export { Texture };

@@ -108,8 +108,6 @@
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 
-					var faceMaterial = new THREE.MultiMaterial( materials );
-
 					for ( var i = 0; i < 729; i ++ ) {
 
 						// random placement in a grid
@@ -121,7 +119,7 @@
 
 						if ( Math.abs( x ) < 2 && Math.abs( z ) < 2 ) continue;
 
-						mesh = new THREE.Mesh( geometry, faceMaterial );
+						mesh = new THREE.Mesh( geometry, materials );
 
 						var s = THREE.Math.randFloat( 0.00075, 0.001 );
 						mesh.scale.set( s, s, s );

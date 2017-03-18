@@ -19,9 +19,7 @@ function Vector3( x, y, z ) {
 
 }
 
-Vector3.prototype = {
-
-	constructor: Vector3,
+Object.assign( Vector3.prototype, {
 
 	isVector3: true,
 
@@ -216,19 +214,9 @@ Vector3.prototype = {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-
-		}
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
 
 		return this;
 
@@ -246,17 +234,15 @@ Vector3.prototype = {
 
 	applyEuler: function () {
 
-		var quaternion;
+		var quaternion = new Quaternion();
 
 		return function applyEuler( euler ) {
 
-			if ( (euler && euler.isEuler) === false ) {
+			if ( ( euler && euler.isEuler ) === false ) {
 
 				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 			}
-
-			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
@@ -266,11 +252,9 @@ Vector3.prototype = {
 
 	applyAxisAngle: function () {
 
-		var quaternion;
+		var quaternion = new Quaternion();
 
 		return function applyAxisAngle( axis, angle ) {
-
-			if ( quaternion === undefined ) quaternion = new Quaternion();
 
 			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -329,11 +313,9 @@ Vector3.prototype = {
 
 	project: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function project( camera ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 			return this.applyMatrix4( matrix );
@@ -344,11 +326,9 @@ Vector3.prototype = {
 
 	unproject: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function unproject( camera ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 			return this.applyMatrix4( matrix );
@@ -423,16 +403,10 @@ Vector3.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector3();
+		var max = new Vector3();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new Vector3();
-				max = new Vector3();
-
-			}
 
 			min.set( minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal );
@@ -506,6 +480,8 @@ Vector3.prototype = {
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 
 	},
+
+	// TODO lengthSquared?
 
 	lengthSq: function () {
 
@@ -595,11 +571,9 @@ Vector3.prototype = {
 
 	projectOnPlane: function () {
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function projectOnPlane( planeNormal ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			v1.copy( this ).projectOnVector( planeNormal );
 
@@ -614,11 +588,9 @@ Vector3.prototype = {
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1;
+		var v1 = new Vector3();
 
 		return function reflect( normal ) {
-
-			if ( v1 === undefined ) v1 = new Vector3();
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
@@ -656,7 +628,7 @@ Vector3.prototype = {
 
 	},
 
-	setFromSpherical: function( s ) {
+	setFromSpherical: function ( s ) {
 
 		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
 
@@ -668,7 +640,7 @@ Vector3.prototype = {
 
 	},
 
-	setFromCylindrical: function( c ) {
+	setFromCylindrical: function ( c ) {
 
 		this.x = c.radius * Math.sin( c.theta );
 		this.y = c.y;
@@ -700,14 +672,6 @@ Vector3.prototype = {
 
 	setFromMatrixColumn: function ( m, index ) {
 
-		if ( typeof m === 'number' ) {
-
-			console.warn( 'THREE.Vector3: setFromMatrixColumn now expects ( matrix, index ).' );
-			var temp = m;
-			m = index;
-			index = temp;
-
-		}
 
 		return this.fromArray( m.elements, index * 4 );
 
@@ -760,7 +724,7 @@ Vector3.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Vector3 };

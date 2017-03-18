@@ -37,6 +37,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/Mirror.js"></script>
+		<script src="js/MirrorRTT.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<!-- NodeLibrary -->
@@ -116,10 +117,9 @@
 			var clock = new THREE.Clock();
 
 			var cameraControls;
-			
+
 			var gui = new dat.GUI();
 
-			var groundMirror;
 			var sphereGroup, smallSphere;
 			var groundMirrorMaterial;
 
@@ -153,7 +153,7 @@
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
 				// MIRROR planes
-				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				var groundMirror = new THREE.MirrorRTT( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
 				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 				var maskFlip = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
@@ -282,13 +282,6 @@
 			}
 
 			function render() {
-
-				// render (update) the mirrors
-				groundMirrorMaterial.visible = false;
-
-				groundMirror.render();
-
-				groundMirrorMaterial.visible = true;
 
 				renderer.render(scene, camera);
 
