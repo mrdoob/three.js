@@ -176,6 +176,9 @@ function WebGLPrograms( renderer, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
+			meshLine: material.meshLine,
+			meshLineWidth: material.meshLineWidth,
+
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,

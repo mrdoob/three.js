@@ -71,6 +71,9 @@ function MeshBasicMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 
+	this.meshLine = false;
+	this.meshLineWidth = 1;
+
 	this.lights = false;
 
 	this.setValues( parameters );
@@ -112,6 +115,9 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
+
+	this.meshLine = source.meshLine;
+	this.meshLineWidth = source.meshLineWidth;
 
 	return this;
 

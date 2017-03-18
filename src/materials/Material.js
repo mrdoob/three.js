@@ -218,6 +218,9 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.meshLine = this.meshLine;
+		data.meshLineWidth = this.meshLineWidth;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache( cache ) {

@@ -1935,6 +1935,14 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.meshLine ) {
+
+			uniforms.lineWidth.value = material.meshLineWidth;
+			uniforms.resolution.value.x = _width;
+			uniforms.resolution.value.y = _height;
+
+		}
+
 		uniforms.map.value = material.map;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
