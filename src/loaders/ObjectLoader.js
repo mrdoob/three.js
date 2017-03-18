@@ -50,6 +50,7 @@ import { MaterialLoader } from './MaterialLoader';
 import { BufferGeometryLoader } from './BufferGeometryLoader';
 import { JSONLoader } from './JSONLoader';
 import { FileLoader } from './FileLoader';
+import { FontLoader } from './FontLoader';
 import * as Geometries from '../geometries/Geometries';
 
 /**
@@ -173,7 +174,7 @@ Object.assign( ObjectLoader.prototype, {
 				var font;
 				var data = json[ i ];
 				
-				font = fontLoader.parse( data );
+				font = fontLoader.parse( data.glyphs ); //TODO, extend to file resource someFont.json
 				
 				font.uuid = data.uuid;
 				
@@ -318,6 +319,8 @@ Object.assign( ObjectLoader.prototype, {
 						
 					case 'TextGeometry':
 					case 'TextBufferGeometry':
+					
+						data.parameters.font = fonts[ data.parameters.glyphs ];
 					
 						geometry = new Geometries[ data.type ](
 							data.text,
