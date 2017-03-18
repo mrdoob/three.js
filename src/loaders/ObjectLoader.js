@@ -159,7 +159,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 	
-	parseFonts: function ( json ) {
+	parseFonts: function ( json, onLoad ) {
 		
 		var fonts = {};
 		
