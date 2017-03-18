@@ -5,7 +5,7 @@
 
 	vec2 convertToNDC( vec4 clipCoords, float aspect ) {
 
-		// the prespective divide does the acutal conversion
+		// the prespective divide does the actual conversion
 
 		vec2 ndcCoords = clipCoords.xy / clipCoords.w;
 
