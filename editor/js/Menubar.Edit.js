@@ -104,7 +104,7 @@ Menubar.Edit = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Delete' );
+	option.setTextContent( 'Delete (Del)' );
 	option.onClick( function () {
 
 		var object = editor.selected;

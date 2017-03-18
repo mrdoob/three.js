@@ -4,7 +4,7 @@
 
 THREE.ColorsNode = function( index ) {
 
-	THREE.TempNode.call( this, 'v4', { share: false } );
+	THREE.TempNode.call( this, 'v4', { shared: false } );
 
 	this.index = index || 0;
 
@@ -21,7 +21,7 @@ THREE.ColorsNode.prototype.generate = function( builder, output ) {
 	var material = builder.material;
 	var result;
 
-	material.requestAttrib.color[ this.index ] = true;
+	material.requestAttribs.color[ this.index ] = true;
 
 	if ( builder.isShader( 'vertex' ) ) result = THREE.ColorsNode.vertexDict[ this.index ];
 	else result = THREE.ColorsNode.fragmentDict[ this.index ];

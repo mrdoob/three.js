@@ -10,46 +10,14 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading a [page:BufferGeometry].</div>
-
-
-		<h2>Constructor</h2>
-
-		<h3>[name]( [page:LoadingManager manager] )</h3>
-		<div>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		<div class="desc">
+			A loader for loading a [page:BufferGeometry].
+			This uses the [page:FileLoader] internally for loading files.
 		</div>
-		<div>
-		Creates a new [name].
-		</div>
-
-
-		<h2>Properties</h2>
-
-
-		<h2>Methods</h2>
-
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
-		<div>
-		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:BufferGeometry].<br />
-		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — Will be called when load errors.<br />
-		</div>
-		<div>
-		Begin loading from url and call onLoad with the parsed response content.
-		</div>
-
-		<h3>[method:BufferGeometry parse]( [page:Object json] )</h3>
-		<div>
-		[page:Object json] — The <em>JSON</em> structure to parse.
-		</div>
-		<div>
-		Parse a <em>JSON</em> structure and return a [page:BufferGeometry].
-		</div>
-
 
 		<h2>Example</h2>
+
+		[example:webgl_geometry_colors_lookuptable WebGL / geometry / colors / lookuptable]
 
 		<code>
 		// instantiate a loader
@@ -75,6 +43,44 @@
 			}
 		);
 		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<div>
+			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — the path or URL to the file. This can also be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].d<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:BufferGeometry].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:BufferGeometry parse]( [page:Object json] )</h3>
+		<div>
+		[page:Object json] — The <em>JSON</em> structure to parse.<br /><br />
+		Parse a <em>JSON</em> structure and return a [page:BufferGeometry].
+		</div>
 
 		<h2>Source</h2>
 

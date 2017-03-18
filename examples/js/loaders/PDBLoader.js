@@ -1,5 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 THREE.PDBLoader = function ( manager ) {
@@ -16,7 +17,7 @@ THREE.PDBLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
 			var json = scope.parsePDB( text );
@@ -56,7 +57,7 @@ THREE.PDBLoader.prototype = {
 
 				var h = hash( satom, eatom );
 
-				if ( bhash[ h ] == undefined ) {
+				if ( bhash[ h ] === undefined ) {
 
 					bonds.push( [ satom - 1, eatom - 1, 1 ] );
 					bhash[ h ] = bonds.length - 1;
@@ -88,7 +89,7 @@ THREE.PDBLoader.prototype = {
 
 		var x, y, z, e;
 
-		for ( var i = 0, il = lines.length; i < il; ++ i ) {
+		for ( var i = 0, l = lines.length; i < l; ++ i ) {
 
 			if ( lines[ i ].substr( 0, 4 ) == "ATOM" || lines[ i ].substr( 0, 6 ) == "HETATM" ) {
 
@@ -98,10 +99,10 @@ THREE.PDBLoader.prototype = {
 
 				e = trim( lines[ i ].substr( 76, 2 ) ).toLowerCase();
 
-				if ( e == "" ) e = trim( lines[ i ].substr( 12, 2 ) ).toLowerCase();
+				if ( e === "" ) e = trim( lines[ i ].substr( 12, 2 ) ).toLowerCase();
 				atoms.push( [ x, y, z, CPK[ e ], capitalize( e ) ] );
 
-				if ( histogram[ e ] == undefined ) histogram[ e ] = 1;
+				if ( histogram[ e ] === undefined ) histogram[ e ] = 1;
 				else histogram[ e ] += 1;
 
 			} else if ( lines[ i ].substr( 0, 6 ) == "CONECT" ) {
@@ -123,16 +124,21 @@ THREE.PDBLoader.prototype = {
 
 	createModel: function ( json, callback ) {
 
-		var scope = this,
-		geometryAtoms = new THREE.Geometry(),
-		geometryBonds = new THREE.Geometry();
+		var geometryAtoms = new THREE.BufferGeometry();
+		var geometryBonds = new THREE.BufferGeometry();
+
+		var i, l;
+
+		var verticesAtoms = [];
+		var colors = [];
+		var verticesBonds = [];
 
 		geometryAtoms.elements = [];
 
 		var atoms = json.atoms;
 		var bonds = json.bonds;
 
-		for ( var i = 0; i < atoms.length; i ++ ) {
+		for ( i = 0, l = atoms.length; i < l; i ++ ) {
 
 			var atom = atoms[ i ];
 
@@ -140,40 +146,42 @@ THREE.PDBLoader.prototype = {
 			var y = atom[ 1 ];
 			var z = atom[ 2 ];
 
-			var position = new THREE.Vector3( x, y, z );
-			geometryAtoms.vertices.push( position );
+			verticesAtoms.push( x, y, z );
 
 			var r = atom[ 3 ][ 0 ] / 255;
 			var g = atom[ 3 ][ 1 ] / 255;
 			var b = atom[ 3 ][ 2 ] / 255;
 
-			var color = new THREE.Color();
-			color.setRGB( r, g, b );
-
-			geometryAtoms.colors.push( color );
+			colors.push( r, g, b );
 
 			geometryAtoms.elements.push( atom[ 4 ] );
 
 		}
 
-		for ( var i = 0; i < bonds.length; i ++ ) {
+		for ( i = 0, l = bonds.length; i < l; i ++ ) {
 
 			var bond = bonds[ i ];
 
 			var start = bond[ 0 ];
 			var end = bond[ 1 ];
 
-			var vertex1 = geometryAtoms.vertices[ start ];
-			var vertex2 = geometryAtoms.vertices[ end ];
+			verticesBonds.push( verticesAtoms[ ( start * 3 ) + 0 ] );
+			verticesBonds.push( verticesAtoms[ ( start * 3 ) + 1 ] );
+			verticesBonds.push( verticesAtoms[ ( start * 3 ) + 2 ] );
 
-			geometryBonds.vertices.push( vertex1.clone() );
-			geometryBonds.vertices.push( vertex2.clone() );
+			verticesBonds.push( verticesAtoms[ ( end * 3 ) + 0 ] );
+			verticesBonds.push( verticesAtoms[ ( end * 3 ) + 1 ] );
+			verticesBonds.push( verticesAtoms[ ( end * 3 ) + 2 ] );
 
 		}
+
+		geometryAtoms.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
+		geometryAtoms.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+		geometryBonds.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
 
 		callback( geometryAtoms, geometryBonds, json );
 
 	}
 
 };
-

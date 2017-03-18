@@ -92,7 +92,7 @@ test( "getBoundingBox", function() {
 
 	ok( a.getBoundingBox().equals( new THREE.Box3( zero3, two3 ) ), "Passed!" );
 
-	a.set( zero3, 0 )
+	a.set( zero3, 0 );
 	ok( a.getBoundingBox().equals( new THREE.Box3( zero3, zero3 ) ), "Passed!" );
 });
 

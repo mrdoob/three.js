@@ -16,7 +16,7 @@
 	<body>
 
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
@@ -42,7 +42,7 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -118,9 +118,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );

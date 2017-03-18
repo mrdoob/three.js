@@ -1,13 +1,7 @@
----UPDATED 2/21/2007
-Scaled down the duck to a more reasonable size, removed physics scene, removed extra "dummy" transforms and pivot points, added camera and light.
----
-
-This model is a typical bathtub rubber duck.  It uses a single texture.
-
-One version uses a polylist the other is triangles only.
-
-The model has been stripped of all <extra> tags and should be COLLADA 1.4.1 compliant.
-
-For additional information post messages on www.collada.org or mail collada@collada.org
-
-These models are Copyright 2006 Sony Computer Entertainment Inc. and are distributed under the terms of the SCEA Shared Source License, available at http://research.scea.com/scea_shared_source_license.html
+Copyright 2006 Sony Computer Entertainment Inc.
+
+Licensed under the SCEA Shared Source License, Version 1.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
+
+http://research.scea.com/scea_shared_source_license.html
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.

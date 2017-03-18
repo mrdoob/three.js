@@ -66,15 +66,6 @@
 					"visible"  : true
 				},
 
-				"sphere_cube" : {
-					"geometry" : "sphere_uvs",
-					"material" : "phong_compressed_cube",
-					"position" : [ -30, -2, -15 ],
-					"rotation" : [ 0, 0, 0 ],
-					"scale"	   : [ 1.5, 1.5, 1.5 ],
-					"visible"  : true
-				},
-
 				"icosahedron" : {
 					"geometry" : "icosahedron",
 					"material" : "faceted_white",
@@ -174,15 +165,6 @@
 					"position" : [ -45, -10, 0 ],
 					"rotation" : [ 0, 0.5, 0 ],
 					"scale"	   : [ 55, 55, 55 ],
-					"visible"  : true
-				},
-
-				"ninja" : {
-					"geometry" : "NinjaLo",
-					"material" : "phong_normal",
-					"position" : [ 75, 10, -30 ],
-					"rotation" : [ 0, -0.5, 0 ],
-					"scale"	   : [ 1.25, 1.25, 1.25 ],
 					"visible"  : true
 				},
 
@@ -452,11 +434,6 @@
 			"url" : "obj/walt/WaltHead_bin.js"
 		},
 
-		"NinjaLo": {
-			"type": "binary",
-			"url" : "obj/ninja/NinjaLo_bin.js"
-		},
-
 		"veyron": {
 			"type": "binary",
 			"url" : "obj/veyron/VeyronNoUv_bin.js"
@@ -589,11 +566,6 @@
 			"parameters": { "color": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
 		},
 
-		"phong_normal": {
-			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ] }
-		},
-
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true }
@@ -602,11 +574,6 @@
 		"phong_skin": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
-		},
-
-		"phong_compressed_cube": {
-			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16777215, "envMap": "cube_compressed", "bumpMap": "texture_bump_repeat_2", "bumpScale": -0.1 }
 		},
 
 		"lambert_green": {
@@ -696,7 +663,7 @@
 
 		"multi_2": {
 			"type": "MultiMaterial",
-			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
+			"parameters": { "materials": [ "basic_refraction", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
 		},
 
 		"multi_veyron": {
@@ -731,17 +698,6 @@
 			"mapping": "CubeRefractionMapping"
 		},
 
-		"cube_compressed": {
-			"url": [
-				"textures/cube/Escher/dds/px.dds",
-				 "textures/cube/Escher/dds/nx.dds",
-				 "textures/cube/Escher/dds/py.dds",
-				 "textures/cube/Escher/dds/ny.dds",
-				 "textures/cube/Escher/dds/pz.dds",
-				 "textures/cube/Escher/dds/nz.dds"
-			]
-		},
-
 		"texture_bg": {
 			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
 			"anisotropy": 4
@@ -771,21 +727,6 @@
 		"texture_bump_repeat_2": {
 			"url": "textures/water.jpg",
 			"repeat" : [ 4, 2 ],
-			"anisotropy": 4
-		},
-
-		"texture_normal": {
-			"url": "textures/normal/ninja/normal.jpg",
-			"anisotropy": 4
-		},
-
-		"texture_ao": {
-			"url": "textures/normal/ninja/ao.jpg",
-			"anisotropy": 4
-		},
-
-		"texture_displacement": {
-			"url": "textures/normal/ninja/displacement.jpg",
 			"anisotropy": 4
 		},
 

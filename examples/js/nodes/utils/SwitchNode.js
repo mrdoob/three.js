@@ -16,7 +16,7 @@ THREE.SwitchNode.prototype.constructor = THREE.SwitchNode;
 
 THREE.SwitchNode.prototype.getType = function( builder ) {
 
-	return builder.getFormatByLength( this.components.length );
+	return builder.getFormatFromLength( this.components.length );
 
 };
 

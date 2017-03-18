@@ -19,11 +19,13 @@ THREE.TempNode.prototype.constructor = THREE.TempNode;
 
 THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
+	output = output || this.getType( builder );
+
 	var material = builder.material;
 
-	if ( this.isShared() ) {
+	if ( this.isShared( builder, output ) ) {
 
-		var isUnique = this.isUnique();
+		var isUnique = this.isUnique( builder, output );
 
 		if ( isUnique && this.constructor.uuid === undefined ) {
 
@@ -35,23 +37,31 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 		var data = material.getDataNode( uuid );
 
-		if ( builder.isShader( 'verify' ) ) {
+		if ( builder.parsing ) {
 
 			if ( data.deps || 0 > 0 ) {
 
-				this.verifyDepsNode( builder, data, output );
-				return '';
+				this.appendDepsNode( builder, data, output );
+
+				return this.generate( builder, type, uuid );
 
 			}
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
-		}
-		else if ( data.deps == 1 ) {
+		} else if ( isUnique ) {
+
+			data.name = data.name || THREE.GLNode.prototype.build.call( this, builder, output, uuid );
+
+			return data.name;
+
+		} else if ( ! builder.optimize || data.deps == 1 ) {
 
 			return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 		}
+
+		uuid = this.getUuid( false );
 
 		var name = this.getTemp( builder, uuid );
 		var type = data.output || this.getType( builder );
@@ -60,8 +70,7 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 
 			return builder.format( name, type, output );
 
-		}
-		else {
+		} else {
 
 			name = THREE.TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
 
@@ -75,29 +84,30 @@ THREE.TempNode.prototype.build = function( builder, output, uuid, ns ) {
 		}
 
 	}
-	else {
 
-		return builder.format( this.generate( builder, this.getType( builder ), uuid ), this.getType( builder ), output );
-
-	}
+	return THREE.GLNode.prototype.build.call( this, builder, output, uuid );
 
 };
 
-THREE.TempNode.prototype.isShared = function() {
+THREE.TempNode.prototype.isShared = function( builder, output ) {
 
-	return this.shared;
+	return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
 
 };
 
-THREE.TempNode.prototype.isUnique = function() {
+THREE.TempNode.prototype.isUnique = function( builder, output ) {
 
 	return this.unique;
 
 };
 
-THREE.TempNode.prototype.getUuid = function() {
+THREE.TempNode.prototype.getUuid = function( unique ) {
 
-	return this.constructor.uuid || this.uuid;
+	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
+
+	if ( typeof this.scope == "string" ) uuid = this.scope + '-' + uuid;
+
+	return uuid;
 
 };
 
@@ -114,7 +124,7 @@ THREE.TempNode.prototype.getTemp = function( builder, uuid ) {
 
 THREE.TempNode.prototype.generate = function( builder, output, uuid, type, ns ) {
 
-	if ( ! this.isShared() ) console.error( "THREE.TempNode is not shared!" );
+	if ( ! this.isShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
 
 	uuid = uuid || this.uuid;
 

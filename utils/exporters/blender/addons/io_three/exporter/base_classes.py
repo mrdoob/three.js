@@ -90,7 +90,7 @@ class BaseNode(BaseClass):
             self[constants.UUID] = utilities.id()
         else:
             self[constants.NAME] = node
-            self[constants.UUID] = utilities.id_from_name(node)
+            self[constants.UUID] = utilities.id()
 
         if isinstance(parent, BaseScene):
             scene = parent

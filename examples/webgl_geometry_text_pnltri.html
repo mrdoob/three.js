@@ -37,7 +37,7 @@
 		</div>
 
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/utils/GeometryUtils.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -47,10 +47,26 @@
 		<!-- replace built-in triangulation with PnlTri.js -->
 		<script src="js/libs/pnltri.min.js"></script>
 		<script>
-			THREE.Shape.Utils.triangulateShape = ( function () {
+			THREE.ShapeUtils.triangulateShape = ( function () {
 				var pnlTriangulator = new PNLTRI.Triangulator();
+				function removeDupEndPts(points) {
+
+					var l = points.length;
+
+					if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+
+						points.pop();
+
+					}
+
+				}
+
 				return function triangulateShape( contour, holes ) {
 					// console.log("new Triangulation: PnlTri.js " + PNLTRI.REVISION );
+
+					removeDupEndPts( contour );
+					holes.forEach( removeDupEndPts );
+
 					return pnlTriangulator.triangulate_polygon( [ contour ].concat(holes) );
 				};
 			} )();
@@ -226,9 +242,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				//container.appendChild( stats.dom );
 
 				// EVENTS
 
@@ -367,7 +381,7 @@
 			function loadFont() {
 
 				var loader = new THREE.FontLoader();
-				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.js', function ( response ) {
+				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
 
 					font = response;
 

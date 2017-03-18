@@ -42,7 +42,7 @@
 			STL loader test by <a href="https://github.com/aleeper">aleeper</a>. PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/STLLoader.js"></script>
 
@@ -180,16 +180,14 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				container.appendChild( renderer.domElement );
 
 				// stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -204,21 +202,20 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				// directionalLight.shadowCameraVisible = true;
 
 				var d = 1;
-				directionalLight.shadowCameraLeft = -d;
-				directionalLight.shadowCameraRight = d;
-				directionalLight.shadowCameraTop = d;
-				directionalLight.shadowCameraBottom = -d;
+				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.right = d;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
 
-				directionalLight.shadowCameraNear = 1;
-				directionalLight.shadowCameraFar = 4;
+				directionalLight.shadow.camera.near = 1;
+				directionalLight.shadow.camera.far = 4;
 
-				directionalLight.shadowMapWidth = 1024;
-				directionalLight.shadowMapHeight = 1024;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadowBias = -0.005;
+				directionalLight.shadow.bias = -0.005;
 
 			}
 

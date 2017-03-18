@@ -1,27 +1,30 @@
+import { Color } from '../math/Color';
+import { Vector3 } from '../math/Vector3';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
+function Face3( a, b, c, normal, color, materialIndex ) {
 
 	this.a = a;
 	this.b = b;
 	this.c = c;
 
-	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
+	this.normal = (normal && normal.isVector3) ? normal : new Vector3();
 	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
-	this.color = color instanceof THREE.Color ? color : new THREE.Color();
+	this.color = (color && color.isColor) ? color : new Color();
 	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-};
+}
 
-THREE.Face3.prototype = {
+Face3.prototype = {
 
-	constructor: THREE.Face3,
+	constructor: Face3,
 
 	clone: function () {
 
@@ -57,3 +60,6 @@ THREE.Face3.prototype = {
 	}
 
 };
+
+
+export { Face3 };

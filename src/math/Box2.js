@@ -1,17 +1,19 @@
+import { Vector2 } from './Vector2';
+
 /**
  * @author bhouston / http://clara.io
  */
 
-THREE.Box2 = function ( min, max ) {
+function Box2( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector2( + Infinity, + Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
+	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
+	this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
 
-};
+}
 
-THREE.Box2.prototype = {
+Box2.prototype = {
 
-	constructor: THREE.Box2,
+	constructor: Box2,
 
 	set: function ( min, max ) {
 
@@ -38,9 +40,9 @@ THREE.Box2.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 			this.min.copy( center ).sub( halfSize );
@@ -84,17 +86,17 @@ THREE.Box2.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
-		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new Vector2();
+		return this.isEmpty() ? result.set( 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function ( optionalTarget ) {
+	getSize: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
-		return result.subVectors( this.max, this.min );
+		var result = optionalTarget || new Vector2();
+		return this.isEmpty() ? result.set( 0, 0 ) : result.subVectors( this.max, this.min );
 
 	},
 
@@ -127,27 +129,15 @@ THREE.Box2.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ) {
-
-			return false;
-
-		}
-
-		return true;
+		return point.x < this.min.x || point.x > this.max.x ||
+			point.y < this.min.y || point.y > this.max.y ? false : true;
 
 	},
 
 	containsBox: function ( box ) {
 
-		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-		     ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
-
-			return true;
-
-		}
-
-		return false;
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y;
 
 	},
 
@@ -156,7 +146,7 @@ THREE.Box2.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 
 		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -168,30 +158,23 @@ THREE.Box2.prototype = {
 	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-
-		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ) {
-
-			return false;
-
-		}
-
-		return true;
+		return box.max.x < this.min.x || box.min.x > this.max.x ||
+			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
 	},
 
 	clampPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector2();
+		var result = optionalTarget || new Vector2();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
 	distanceToPoint: function () {
 
-		var v1 = new THREE.Vector2();
+		var v1 = new Vector2();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -234,3 +217,6 @@ THREE.Box2.prototype = {
 	}
 
 };
+
+
+export { Box2 };

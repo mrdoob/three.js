@@ -21,7 +21,7 @@ THREE.ConvexGeometry = function( vertices ) {
 
 	THREE.Geometry.call( this );
 
-	var faces = [ [ 0, 1, 2 ], [ 0, 2, 1 ] ]; 
+	var faces = [ [ 0, 1, 2 ], [ 0, 2, 1 ] ];
 
 	for ( var i = 3; i < vertices.length; i ++ ) {
 
@@ -93,7 +93,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		// construct the new faces formed by the edges of the hole and the vertex
 		for ( var h = 0; h < hole.length; h ++ ) {
 
-			faces.push( [ 
+			faces.push( [
 				hole[ h ][ 0 ],
 				hole[ h ][ 1 ],
 				vertexId
@@ -117,7 +117,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		// distance from face to origin
 		var dist = n.dot( va );
 
-		return n.dot( vertex ) >= dist; 
+		return n.dot( vertex ) >= dist;
 
 	}
 
@@ -146,7 +146,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	 */
 	function equalEdge( ea, eb ) {
 
-		return ea[ 0 ] === eb[ 1 ] && ea[ 1 ] === eb[ 0 ]; 
+		return ea[ 0 ] === eb[ 1 ] && ea[ 1 ] === eb[ 0 ];
 
 	}
 
@@ -156,17 +156,6 @@ THREE.ConvexGeometry = function( vertices ) {
 	function randomOffset() {
 
 		return ( Math.random() - 0.5 ) * 2 * 1e-6;
-
-	}
-
-
-	/**
-	 * XXX: Not sure if this is the correct approach. Need someone to review.
-	 */
-	function vertexUv( vertex ) {
-
-		var mag = vertex.length();
-		return new THREE.Vector2( vertex.x / mag, vertex.y / mag );
 
 	}
 
@@ -196,7 +185,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	// Convert faces into instances of THREE.Face3
 	for ( var i = 0; i < faces.length; i ++ ) {
 
-		this.faces.push( new THREE.Face3( 
+		this.faces.push( new THREE.Face3(
 				faces[ i ][ 0 ],
 				faces[ i ][ 1 ],
 				faces[ i ][ 2 ]
@@ -204,23 +193,22 @@ THREE.ConvexGeometry = function( vertices ) {
 
 	}
 
-	// Compute UVs
+	this.computeFaceNormals();
+
+	// Compute flat vertex normals
 	for ( var i = 0; i < this.faces.length; i ++ ) {
 
 		var face = this.faces[ i ];
+		var normal = face.normal;
 
-		this.faceVertexUvs[ 0 ].push( [
-			vertexUv( this.vertices[ face.a ] ),
-			vertexUv( this.vertices[ face.b ] ),
-			vertexUv( this.vertices[ face.c ] )
-		] );
+		face.vertexNormals[ 0 ] = normal.clone();
+		face.vertexNormals[ 1 ] = normal.clone();
+		face.vertexNormals[ 2 ] = normal.clone();
 
 	}
-
-	this.computeFaceNormals();
-	this.computeVertexNormals();
 
 };
 
 THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
+

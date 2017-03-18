@@ -1,18 +1,40 @@
+import {
+	NoBlending,
+	NormalBlending,
+	AdditiveBlending,
+	SubtractiveBlending,
+	MultiplyBlending,
+	CustomBlending,
+
+	FaceColors,
+	VertexColors,
+
+	DoubleSide,
+	BackSide,
+
+	MirroredRepeatWrapping,
+	RepeatWrapping
+} from '../constants';
+import { _Math } from '../math/Math';
+import { MaterialLoader } from './MaterialLoader';
+import { TextureLoader } from './TextureLoader';
+import { Color } from '../math/Color';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Loader = function () {
+function Loader() {
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
-};
+}
 
-THREE.Loader.prototype = {
+Loader.prototype = {
 
-	constructor: THREE.Loader,
+	constructor: Loader,
 
 	crossOrigin: undefined,
 
@@ -44,13 +66,22 @@ THREE.Loader.prototype = {
 
 	createMaterial: ( function () {
 
+		var BlendingMode = {
+			NoBlending: NoBlending,
+			NormalBlending: NormalBlending,
+			AdditiveBlending: AdditiveBlending,
+			SubtractiveBlending: SubtractiveBlending,
+			MultiplyBlending: MultiplyBlending,
+			CustomBlending: CustomBlending
+		};
+
 		var color, textureLoader, materialLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial( m, texturePath, crossOrigin ) {
 
-			if ( color === undefined ) color = new THREE.Color();
-			if ( textureLoader === undefined ) textureLoader = new THREE.TextureLoader();
-			if ( materialLoader === undefined ) materialLoader = new THREE.MaterialLoader();
+			if ( color === undefined ) color = new Color();
+			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
+			if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
 
 			// convert from old material format
 
@@ -59,7 +90,7 @@ THREE.Loader.prototype = {
 			function loadTexture( path, repeat, offset, wrap, anisotropy ) {
 
 				var fullPath = texturePath + path;
-				var loader = THREE.Loader.Handlers.get( fullPath );
+				var loader = Loader.Handlers.get( fullPath );
 
 				var texture;
 
@@ -78,8 +109,8 @@ THREE.Loader.prototype = {
 
 					texture.repeat.fromArray( repeat );
 
-					if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
-					if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
+					if ( repeat[ 0 ] !== 1 ) texture.wrapS = RepeatWrapping;
+					if ( repeat[ 1 ] !== 1 ) texture.wrapT = RepeatWrapping;
 
 				}
 
@@ -91,11 +122,11 @@ THREE.Loader.prototype = {
 
 				if ( wrap !== undefined ) {
 
-					if ( wrap[ 0 ] === 'repeat' ) texture.wrapS = THREE.RepeatWrapping;
-					if ( wrap[ 0 ] === 'mirror' ) texture.wrapS = THREE.MirroredRepeatWrapping;
+					if ( wrap[ 0 ] === 'repeat' ) texture.wrapS = RepeatWrapping;
+					if ( wrap[ 0 ] === 'mirror' ) texture.wrapS = MirroredRepeatWrapping;
 
-					if ( wrap[ 1 ] === 'repeat' ) texture.wrapT = THREE.RepeatWrapping;
-					if ( wrap[ 1 ] === 'mirror' ) texture.wrapT = THREE.MirroredRepeatWrapping;
+					if ( wrap[ 1 ] === 'repeat' ) texture.wrapT = RepeatWrapping;
+					if ( wrap[ 1 ] === 'mirror' ) texture.wrapT = MirroredRepeatWrapping;
 
 				}
 
@@ -105,7 +136,7 @@ THREE.Loader.prototype = {
 
 				}
 
-				var uuid = THREE.Math.generateUUID();
+				var uuid = _Math.generateUUID();
 
 				textures[ uuid ] = texture;
 
@@ -116,7 +147,7 @@ THREE.Loader.prototype = {
 			//
 
 			var json = {
-				uuid: THREE.Math.generateUUID(),
+				uuid: _Math.generateUUID(),
 				type: 'MeshLambertMaterial'
 			};
 
@@ -125,6 +156,7 @@ THREE.Loader.prototype = {
 				var value = m[ name ];
 
 				switch ( name ) {
+
 					case 'DbgColor':
 					case 'DbgIndex':
 					case 'opticalDensity':
@@ -134,7 +166,7 @@ THREE.Loader.prototype = {
 						json.name = value;
 						break;
 					case 'blending':
-						json.blending = THREE[ value ];
+						json.blending = BlendingMode[ value ];
 						break;
 					case 'colorAmbient':
 					case 'mapAmbient':
@@ -155,6 +187,7 @@ THREE.Loader.prototype = {
 					case 'shading':
 						if ( value.toLowerCase() === 'basic' ) json.type = 'MeshBasicMaterial';
 						if ( value.toLowerCase() === 'phong' ) json.type = 'MeshPhongMaterial';
+						if ( value.toLowerCase() === 'standard' ) json.type = 'MeshStandardMaterial';
 						break;
 					case 'mapDiffuse':
 						json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
@@ -163,6 +196,14 @@ THREE.Loader.prototype = {
 					case 'mapDiffuseOffset':
 					case 'mapDiffuseWrap':
 					case 'mapDiffuseAnisotropy':
+						break;
+					case 'mapEmissive':
+						json.emissiveMap = loadTexture( value, m.mapEmissiveRepeat, m.mapEmissiveOffset, m.mapEmissiveWrap, m.mapEmissiveAnisotropy );
+						break;
+					case 'mapEmissiveRepeat':
+					case 'mapEmissiveOffset':
+					case 'mapEmissiveWrap':
+					case 'mapEmissiveAnisotropy':
 						break;
 					case 'mapLight':
 						json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
@@ -210,6 +251,22 @@ THREE.Loader.prototype = {
 					case 'mapSpecularWrap':
 					case 'mapSpecularAnisotropy':
 						break;
+					case 'mapMetalness':
+						json.metalnessMap = loadTexture( value, m.mapMetalnessRepeat, m.mapMetalnessOffset, m.mapMetalnessWrap, m.mapMetalnessAnisotropy );
+						break;
+					case 'mapMetalnessRepeat':
+					case 'mapMetalnessOffset':
+					case 'mapMetalnessWrap':
+					case 'mapMetalnessAnisotropy':
+						break;
+					case 'mapRoughness':
+						json.roughnessMap = loadTexture( value, m.mapRoughnessRepeat, m.mapRoughnessOffset, m.mapRoughnessWrap, m.mapRoughnessAnisotropy );
+						break;
+					case 'mapRoughnessRepeat':
+					case 'mapRoughnessOffset':
+					case 'mapRoughnessWrap':
+					case 'mapRoughnessAnisotropy':
+						break;
 					case 'mapAlpha':
 						json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
 						break;
@@ -219,10 +276,10 @@ THREE.Loader.prototype = {
 					case 'mapAlphaAnisotropy':
 						break;
 					case 'flipSided':
-						json.side = THREE.BackSide;
+						json.side = BackSide;
 						break;
 					case 'doubleSided':
-						json.side = THREE.DoubleSide;
+						json.side = DoubleSide;
 						break;
 					case 'transparency':
 						console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
@@ -239,12 +296,13 @@ THREE.Loader.prototype = {
 						json[ name ] = value;
 						break;
 					case 'vertexColors':
-						if ( value === true ) json.vertexColors = THREE.VertexColors;
-						if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
+						if ( value === true ) json.vertexColors = VertexColors;
+						if ( value === 'face' ) json.vertexColors = FaceColors;
 						break;
 					default:
 						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 						break;
+
 				}
 
 			}
@@ -264,7 +322,7 @@ THREE.Loader.prototype = {
 
 };
 
-THREE.Loader.Handlers = {
+Loader.Handlers = {
 
 	handlers: [],
 
@@ -281,7 +339,7 @@ THREE.Loader.Handlers = {
 		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
 
 			var regex = handlers[ i ];
-			var loader  = handlers[ i + 1 ];
+			var loader = handlers[ i + 1 ];
 
 			if ( regex.test( file ) ) {
 
@@ -296,3 +354,6 @@ THREE.Loader.Handlers = {
 	}
 
 };
+
+
+export { Loader };

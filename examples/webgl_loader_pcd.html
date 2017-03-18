@@ -41,12 +41,12 @@
 			<a href="http://threejs.org" target="_blank">three.js</a>
 			<a href="http://pointclouds.org/documentation/tutorials/pcd_file_format.php#pcd-file-format" target="_blank">PCD File format</a>
 			<div>PCD loader test by <a href="http://filipecaixeta.com.br" target="_blank">Filipe Caixeta</a></div>
-			<div>+/-: Increase/Decrease point size</a></div>
-			<div>c: Toggle color</a></div>
+			<div>+/-: Increase/Decrease point size</div>
+			<div>c: Toggle color</div>
 		</div>
 
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/PCDLoader.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/Detector.js"></script>
@@ -111,9 +111,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

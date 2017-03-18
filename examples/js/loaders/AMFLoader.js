@@ -33,7 +33,7 @@ THREE.AMFLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( text ) {
 
@@ -424,22 +424,21 @@ THREE.AMFLoader.prototype = {
 
 		for ( var id in amfObjects ) {
 
-			var meshes = amfObjects[ id ].meshes;
+			var part = amfObjects[ id ];
+			var meshes = part.meshes;
 			var newObject = new THREE.Group();
+			newObject.name = part.name || '';
 
 			for ( var i = 0; i < meshes.length; i ++ ) {
 
 				var objDefaultMaterial = defaultMaterial;
 				var mesh = meshes[ i ];
-				var meshVertices = Float32Array.from( mesh.vertices );
-				var vertices = new THREE.BufferAttribute( Float32Array.from( meshVertices ), 3 );
-				var meshNormals = null;
+				var vertices = new THREE.BufferAttribute( new Float32Array( mesh.vertices ), 3 );
 				var normals = null;
 
 				if ( mesh.normals.length ) {
 
-					meshNormals = Float32Array.from( mesh.normals );
-					normals = new THREE.BufferAttribute( Float32Array.from( meshNormals ), 3 );
+					normals = new THREE.BufferAttribute( new Float32Array( mesh.normals ), 3 );
 
 				}
 
@@ -465,7 +464,7 @@ THREE.AMFLoader.prototype = {
 
 					var volume = volumes[ j ];
 					var newGeometry = new THREE.BufferGeometry();
-					var indexes = Uint32Array.from( volume.triangles );
+					var indexes = new  Uint32Array( volume.triangles );
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( new THREE.BufferAttribute( indexes, 1 ) );

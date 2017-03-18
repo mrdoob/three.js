@@ -37,7 +37,7 @@
 			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -94,7 +94,7 @@
 					middleGrey: 0.04,
 					maxLuminance: 16,
 
-					adaptionRate: 2.0,
+					adaptionRate: 2.0
 				};
 
 				container = document.createElement( 'div' );
@@ -138,13 +138,12 @@
 					uniforms: THREE.UniformsUtils.merge( [
 
 						THREE.UniformsLib[ "common" ],
-						THREE.UniformsLib[ "ambient" ],
-						THREE.UniformsLib[ "lights" ],
+						THREE.UniformsLib[ "lights" ]
+
 					] ),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
 						"varying vec3 vNormal;",
-						THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 						"void main() {",
 							THREE.ShaderChunk[ "beginnormal_vertex" ],
 							THREE.ShaderChunk[ "defaultnormal_vertex" ],
@@ -161,7 +160,6 @@
 
 						THREE.ShaderChunk[ "common" ],
 						THREE.ShaderChunk[ "bsdfs" ],
-						THREE.ShaderChunk[ "ambient_pars" ],
 						THREE.ShaderChunk[ "lights_pars" ],
 						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 
@@ -192,7 +190,7 @@
 
 						"}"
 
-					].join("\n"),
+					].join("\n")
 				};
 
 				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -285,7 +283,7 @@
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -296,11 +294,11 @@
 
 				currentLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						map: { type: 't', value: null }
+						map: { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
-					depthTest: false,
+					depthTest: false
 					// color: 0xffffff
 					// blending: THREE.NoBlending
 				} );
@@ -352,8 +350,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
@@ -361,7 +357,7 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
 
-				if ( extensions.get('OES_texture_half_float_linear') ) {
+				if ( renderer.extensions.get('OES_texture_half_float_linear') ) {
 					parameters.type = THREE.FloatType;
 				}
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );

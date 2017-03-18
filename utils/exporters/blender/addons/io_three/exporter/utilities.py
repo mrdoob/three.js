@@ -46,16 +46,6 @@ def id():
     return str(uuid.uuid4()).upper()
 
 
-def id_from_name(name):
-    """Generate a UUID using a name as the namespace
-
-    :type name: str
-    :rtype: str
-
-    """
-    return str(uuid.uuid3(uuid.NAMESPACE_DNS, name)).upper()
-
-
 def rgb2int(rgb):
     """Convert a given rgb value to an integer
 

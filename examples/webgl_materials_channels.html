@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - channels</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
+			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank">AMD GPU MeshMapper</a>
+
+			<div id="vt">displacement mapping requires vertex textures</div>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var stats;
+
+			var camera, scene, renderer, controls;
+
+			var params = {
+				material: 'normal',
+				camera: 'perspective',
+				side: 'double'
+			};
+
+			var cameraOrtho, cameraPerspective;
+			var controlsOrtho, controlsPerspective;
+
+			var mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
+
+			var pointLight, ambientLight;
+
+			var height = 500; // of camera frustum
+
+			var SCALE = 2.436143; // from original model
+			var BIAS = - 0.428408; // from original model
+
+			init();
+			animate();
+			initGui();
+
+			// Init gui
+			function initGui() {
+
+				var gui = new dat.GUI();
+				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
+				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
+			}
+
+			function init() {
+
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				scene = new THREE.Scene();
+
+				var aspect = window.innerWidth / window.innerHeight;
+				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
+				cameraPerspective.position.z = 1500;
+				scene.add( cameraPerspective );
+
+				cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1000, 2500 );
+				cameraOrtho.position.z = 1500;
+				scene.add( cameraOrtho );
+
+				camera = cameraPerspective;
+
+				controlsPerspective = new THREE.OrbitControls( cameraPerspective, renderer.domElement );
+				controlsPerspective.minDistance = 1000;
+				controlsPerspective.maxDistance = 2500;
+				controlsPerspective.enablePan = false;
+				controlsPerspective.enableDamping = true;
+
+				controlsOrtho = new THREE.OrbitControls( cameraOrtho, renderer.domElement );
+				controlsOrtho.minZoom = 0.5;
+				controlsOrtho.maxZoom = 2;
+				controlsOrtho.enablePan = false;
+				controlsOrtho.enableDamping = true;
+
+				// lights
+
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
+				scene.add( ambientLight );
+
+				var pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight.position.z = 2500;
+				scene.add( pointLight );
+
+				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				camera.add( pointLight2 );
+
+				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				pointLight3.position.x = - 1000;
+				pointLight3.position.z = 1000;
+				scene.add( pointLight3 );
+
+				// textures
+
+				var textureLoader = new THREE.TextureLoader();
+				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
+				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
+				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+
+				// material
+
+				materialStandard = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+
+					metalness: 0.5,
+					roughness: 0.6,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					aoMap: aoMap,
+
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+
+					//shading: THREE.FlatShading,
+
+					side: THREE.DoubleSide
+				} );
+
+				materialDepthBasic = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.BasicDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
+				} );
+
+				materialDepthRGBA = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.RGBADepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
+				} );
+
+				materialNormal = new THREE.MeshNormalMaterial( {
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+
+					//shading: THREE.FlatShading,
+
+					side: THREE.DoubleSide
+				} );
+
+				//
+
+				var loader = new THREE.OBJLoader();
+				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
+
+					geometry = group.children[ 0 ].geometry;
+					geometry.attributes.uv2 = geometry.attributes.uv;
+					geometry.center();
+
+					mesh = new THREE.Mesh( geometry, materialNormal );
+					mesh.scale.multiplyScalar( 25 );
+					scene.add( mesh );
+
+				} );
+
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				var aspect = window.innerWidth / window.innerHeight;
+
+				camera.aspect = aspect;
+
+				camera.left = - height * aspect;
+				camera.right = height * aspect;
+				camera.top = height;
+				camera.bottom = - height;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controlsOrtho.update();
+				controlsPerspective.update();
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				if ( mesh ) {
+
+					var material = mesh.material;
+
+					switch ( params.material ) {
+
+						case 'standard': material = materialStandard; break;
+						case 'depthBasic': material = materialDepthBasic; break;
+						case 'depthRGBA': material = materialDepthRGBA; break;
+						case 'normal': material = materialNormal; break;
+
+					}
+
+					if ( params.side !== material.side ) {
+
+						switch ( params.side ) {
+
+							case 'front': material.side = THREE.FrontSide; break;
+							case 'back': material.side = THREE.BackSide; break;
+							case 'double': material.side = THREE.DoubleSide; break;
+
+						}
+
+						material.needsUpdate = true;
+
+					}
+
+					mesh.material = material;
+
+				}
+
+				switch ( params.camera ) {
+
+					case 'perspective': camera = cameraPerspective; break;
+					case 'ortho': camera = cameraOrtho; break;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

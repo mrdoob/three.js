@@ -21,7 +21,7 @@ THREE.VelocityNode = function( target, params ) {
 THREE.VelocityNode.prototype = Object.create( THREE.Vector3Node.prototype );
 THREE.VelocityNode.prototype.constructor = THREE.VelocityNode;
 
-THREE.VelocityNode.prototype.updateAnimation = function( delta ) {
+THREE.VelocityNode.prototype.updateFrame = function( delta ) {
 
 	this.velocity.subVectors( this.target.position, this.position );
 	this.position.copy( this.target.position );

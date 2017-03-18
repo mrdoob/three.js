@@ -11,7 +11,9 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		This class makes raycasting easier. Raycasting is used for picking and more.
+		This class is designed to assist with [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
+		Raycasting is used for mouse picking (working out what objects in the 3d space the mouse is over) amongst
+		other things.
 		</div>
 
 		<h2>Example</h2>
@@ -25,14 +27,14 @@
 			// (-1 to +1) for both components
 
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;		
-		
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 		}
 
 		function render() {
 
-			// update the picking ray with the camera and mouse position	
-			raycaster.setFromCamera( mouse, camera );	
+			// update the picking ray with the camera and mouse position
+			raycaster.setFromCamera( mouse, camera );
 
 			// calculate objects intersecting the picking ray
 			var intersects = raycaster.intersectObjects( scene.children );
@@ -40,9 +42,9 @@
 			for ( var i = 0; i < intersects.length; i++ ) {
 
 				intersects[ i ].object.material.color.set( 0xff0000 );
-			
+
 			}
-			
+
 			renderer.render( scene, camera );
 
 		}
@@ -52,14 +54,17 @@
 		window.requestAnimationFrame(render);
 
 		</code>
-		<div>Examples: [example:webgl_interactive_cubes Raycasting to a Mesh], 
-			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera], 
-			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry], 
-			[example:webgl_interactive_lines Raycasting to a Line], 
-			[example:webgl_interactive_raycasting_points Raycasting to Points], 
-			[example:webgl_geometry_terrain_raycast Terrain raycasting], 
-			[example:webgl_octree_raycasting Raycasting using an octree],
-			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]</div>
+		<div>
+			Examples: [example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_interactive_lines Raycasting to a Line]<br />
+			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
+			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
+			[example:webgl_octree_raycasting Raycasting using an octree]<br />
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
+			[example:webgl_raycast_texture Raycast to a Texture]
+		</div>
 
 
 		<div>
@@ -82,27 +87,42 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:Ray ray]</h3>
+		<h3>[property:float far]</h3>
 		<div>
-		The Ray used for the raycasting.
+		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
+		This value shouldn't be negative and should be larger than the near property.
+		</div>
+
+		<h3>[property:float linePrecision]</h3>
+		<div>
+		The precision factor of the raycaster when intersecting [page:Line] objects.
 		</div>
 
 		<h3>[property:float near]</h3>
 		<div>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be smaller than the far property. 
+		This value shouldn't be negative and should be smaller than the far property.
 		</div>
 
-		<h3>[property:float far]</h3>
+		<h3>[property:Object params]</h3>
 		<div>
-		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be larger than the near property. 
+		An object with the following properties:
+
+			<code>
+{
+	Mesh: {},
+	Line: {},
+	LOD: {},
+	Points: { threshold: 1 },
+	Sprite: {}
+}
+			</code>
+
 		</div>
 
-		<h3>.[page:float linePrecision]</h3>
-		<div>
-		The precision factor of the raycaster when intersecting [page:Line] objects. 
-		</div>
+		<h3>[property:Ray ray]</h3>
+		<div>The [Page:Ray] used for the raycasting.</div>
+
 
 		<h2>Methods</h2>
 
@@ -129,7 +149,7 @@
 		<div>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
+		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.
 		</p>
 		</div>
 		<div>
@@ -143,23 +163,24 @@
         [page:Face3 face] – intersected face<br />
         [page:Integer faceIndex] – index of the intersected face<br />
         [page:Array indices] – indices of vertices comprising the intersected face<br />
-        [page:Object3D object] – the intersected object
+        [page:Object3D object] – the intersected object<br />
+        [page:Vector2 uv] - U,V coordinates at point of intersection
     	</p>
         <p>
-        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
+        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*.
         </p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
 		<p>
-		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.  
+		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.
 		</p>
 		</div>
 
 		<h3>[method:Array intersectObjects]( [page:Array objects], [page:Boolean recursive] )</h3>
 		<div>
 		[page:Array objects] — The objects to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
+		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.
 		</div>
 		<div>
 		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].

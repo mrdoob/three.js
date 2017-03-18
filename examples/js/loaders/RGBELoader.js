@@ -11,8 +11,8 @@ THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
 
 };
 
-// extend THREE.BinaryTextureLoader
-THREE.RGBELoader.prototype = Object.create( THREE.BinaryTextureLoader.prototype );
+// extend THREE.DataTextureLoader
+THREE.RGBELoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 THREE.RGBELoader.prototype._parser = function( buffer ) {
@@ -112,16 +112,16 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 					programtype: 'RGBE',              /* listed at beginning of file to identify it
 													* after "#?".  defaults to "RGBE" */
-														
+
 					format: '',                       /* RGBE format, default 32-bit_rle_rgbe */
 
 					gamma: 1.0,                       /* image has already been gamma corrected with
 													* given gamma.  defaults to 1.0 (no correction) */
-														
+
 					exposure: 1.0,                    /* a value of 1.0 in an image corresponds to
 													* <exposure> watts/steradian/m^2.
 													* defaults to 1.0 */
-														
+
 					width: 0, height: 0               /* image dimensions, width/height */
 
 				}

@@ -38,6 +38,5 @@ THREE.ExplodeModifier.prototype.modify = function ( geometry ) {
 	}
 
 	geometry.vertices = vertices;
-	delete geometry.__tmpVertices;
 
 };

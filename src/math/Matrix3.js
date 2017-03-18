@@ -1,10 +1,13 @@
+import { Vector3 } from './Vector3';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
+ * @author tschw
  */
 
-THREE.Matrix3 = function () {
+function Matrix3() {
 
 	this.elements = new Float32Array( [
 
@@ -20,19 +23,21 @@ THREE.Matrix3 = function () {
 
 	}
 
-};
+}
 
-THREE.Matrix3.prototype = {
+Matrix3.prototype = {
 
-	constructor: THREE.Matrix3,
+	constructor: Matrix3,
+
+	isMatrix3: true,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		var te = this.elements;
 
-		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
-		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
-		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
+		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
+		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
+		te[ 6 ] = n13; te[ 7 ] = n23; te[ 8 ] = n33;
 
 		return this;
 
@@ -74,53 +79,43 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	applyToVector3Array: function () {
+	setFromMatrix4: function( m ) {
+
+		var me = m.elements;
+
+		this.set(
+
+			me[ 0 ], me[ 4 ], me[  8 ],
+			me[ 1 ], me[ 5 ], me[  9 ],
+			me[ 2 ], me[ 6 ], me[ 10 ]
+
+		);
+
+		return this;
+
+	},
+
+	applyToBufferAttribute: function () {
 
 		var v1;
 
-		return function ( array, offset, length ) {
+		return function applyToBufferAttribute( attribute ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = array.length;
+			if ( v1 === undefined ) v1 = new Vector3();
 
-			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				v1.fromArray( array, j );
-				v1.applyMatrix3( this );
-				v1.toArray( array, j );
-
-			}
-
-			return array;
-
-		};
-
-	}(),
-
-	applyToBuffer: function () {
-
-		var v1;
-
-		return function applyToBuffer( buffer, offset, length ) {
-
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
-			if ( offset === undefined ) offset = 0;
-			if ( length === undefined ) length = buffer.length / buffer.itemSize;
-
-			for ( var i = 0, j = offset; i < length; i ++, j ++ ) {
-
-				v1.x = buffer.getX( j );
-				v1.y = buffer.getY( j );
-				v1.z = buffer.getZ( j );
+				v1.x = attribute.getX( i );
+				v1.y = attribute.getY( i );
+				v1.z = attribute.getZ( i );
 
 				v1.applyMatrix3( this );
 
-				buffer.setXYZ( v1.x, v1.y, v1.z );
+				attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
 			}
 
-			return buffer;
+			return attribute;
 
 		};
 
@@ -152,31 +147,30 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		// input: THREE.Matrix4
-		// ( based on http://code.google.com/p/webgl-mjs/ )
+		if ( matrix && matrix.isMatrix4 ) {
 
-		var me = matrix.elements;
-		var te = this.elements;
+			console.error( "THREE.Matrix3.getInverse no longer takes a Matrix4 argument." );
 
-		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
-		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
-		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
-		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
-		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
-		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
-		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
-		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
-		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
+		}
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
+		var me = matrix.elements,
+			te = this.elements,
 
-		// no inverse
+			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
+			n12 = me[ 3 ], n22 = me[ 4 ], n32 = me[ 5 ],
+			n13 = me[ 6 ], n23 = me[ 7 ], n33 = me[ 8 ],
+
+			t11 = n33 * n22 - n32 * n23,
+			t12 = n32 * n13 - n33 * n12,
+			t13 = n23 * n12 - n22 * n13,
+
+			det = n11 * t11 + n21 * t12 + n31 * t13;
 
 		if ( det === 0 ) {
 
 			var msg = "THREE.Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if ( throwOnDegenerate || false ) {
+			if ( throwOnDegenerate === true ) {
 
 				throw new Error( msg );
 
@@ -186,13 +180,22 @@ THREE.Matrix3.prototype = {
 
 			}
 
-			this.identity();
-
-			return this;
-
+			return this.identity();
 		}
 
-		this.multiplyScalar( 1.0 / det );
+		var detInv = 1 / det;
+
+		te[ 0 ] = t11 * detInv;
+		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
+		te[ 2 ] = ( n32 * n21 - n31 * n22 ) * detInv;
+
+		te[ 3 ] = t12 * detInv;
+		te[ 4 ] = ( n33 * n11 - n31 * n13 ) * detInv;
+		te[ 5 ] = ( n31 * n12 - n32 * n11 ) * detInv;
+
+		te[ 6 ] = t13 * detInv;
+		te[ 7 ] = ( n21 * n13 - n23 * n11 ) * detInv;
+		te[ 8 ] = ( n22 * n11 - n21 * n12 ) * detInv;
 
 		return this;
 
@@ -210,33 +213,9 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	flattenToArrayOffset: function ( array, offset ) {
+	getNormalMatrix: function ( matrix4 ) {
 
-		var te = this.elements;
-
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
-
-		array[ offset + 3 ] = te[ 3 ];
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ]  = te[ 8 ];
-
-		return array;
-
-	},
-
-	getNormalMatrix: function ( m ) {
-
-		// input: THREE.Matrix4
-
-		this.getInverse( m ).transpose();
-
-		return this;
+		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
 	},
 
@@ -258,24 +237,44 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.elements.set( array );
+		if ( offset === undefined ) offset = 0;
+
+		for( var i = 0; i < 9; i ++ ) {
+
+			this.elements[ i ] = array[ i + offset ];
+
+		}
 
 		return this;
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
+
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
 		var te = this.elements;
 
-		return [
-			te[ 0 ], te[ 1 ], te[ 2 ],
-			te[ 3 ], te[ 4 ], te[ 5 ],
-			te[ 6 ], te[ 7 ], te[ 8 ]
-		];
+		array[ offset ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+
+		array[ offset + 3 ] = te[ 3 ];
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
+		array[ offset + 8 ]  = te[ 8 ];
+
+		return array;
 
 	}
 
 };
+
+
+export { Matrix3 };

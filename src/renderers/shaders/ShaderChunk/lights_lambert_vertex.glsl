@@ -24,7 +24,7 @@ vec3 directLightColor_Diffuse;
 
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
-		directLight = getPointDirectLight( pointLights[ i ], geometry );
+		getPointDirectLightIrradiance( pointLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;
@@ -45,7 +45,7 @@ vec3 directLightColor_Diffuse;
 
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
-		directLight = getSpotDirectLight( spotLights[ i ], geometry );
+		getSpotDirectLightIrradiance( spotLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;
@@ -61,11 +61,23 @@ vec3 directLightColor_Diffuse;
 
 #endif
 
+/*
+#if NUM_RECT_AREA_LIGHTS > 0
+
+	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
+
+		// TODO (abelnation): implement
+
+	}
+
+#endif
+*/
+
 #if NUM_DIR_LIGHTS > 0
 
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
-		directLight = getDirectionalDirectLight( directionalLights[ i ], geometry );
+		getDirectionalDirectLightIrradiance( directionalLights[ i ], geometry, directLight );
 
 		dotNL = dot( geometry.normal, directLight.direction );
 		directLightColor_Diffuse = PI * directLight.color;

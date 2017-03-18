@@ -37,7 +37,7 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> webgl - collada - skinning
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/loaders/collada/Animation.js"></script>
 		<script src="js/loaders/collada/AnimationHandler.js"></script>
 		<script src="js/loaders/collada/KeyFrameAnimation.js"></script>
@@ -77,9 +77,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 				
 
 				var loader = new THREE.ColladaLoader();

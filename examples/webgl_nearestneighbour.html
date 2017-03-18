@@ -30,7 +30,7 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - typed arrays - nearest neighbour for 500,000 sprites</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/TypedArrayUtils.js"></script>
 		<script src="js/controls/FirstPersonControls.js"></script>
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -127,8 +127,8 @@
 
 				pointShaderMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
-						tex1: { type: "t", value: imagePreviewTexture },
-						zoom: { type: 'f', value: 9.0 },
+						tex1: { value: imagePreviewTexture },
+						zoom: { value: 9.0 }
 					},
 					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

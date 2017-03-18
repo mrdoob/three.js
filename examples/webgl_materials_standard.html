@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - pyhsical</title>
+		<title>three.js webgl - materials - standard</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,11 +34,6 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -47,10 +42,15 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based material - <a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -64,7 +64,6 @@
 			var container, stats, loader;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
 
 			var controls;
 
@@ -87,52 +86,39 @@
 
 				controls = new THREE.TrackballControls( camera );
 
-				scene = new THREE.Scene();
+				//
 
-				sceneCube = new THREE.Scene();
-				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				sceneCube.add( cameraCube );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x202020 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/pisa/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
+
+				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
-				// scene.add( new THREE.AmbientLight( 0xffffff ) );
-
-				//
-
-				var loader = new THREE.CubeTextureLoader();
-				loader.setPath( 'textures/cube/pisa/' );
-				var textureCube = loader.load( [
-					"px.png", "nx.png",
-					"py.png", "ny.png",
-					"pz.png", "nz.png"
-				] );
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
 
 				//
 
 				var path = 'models/obj/cerberus/';
 
 				var loader = new THREE.OBJLoader();
+				var material = new THREE.MeshStandardMaterial();
 				loader.load( path + 'Cerberus.obj', function ( group ) {
 
 					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
-					var material = new THREE.MeshStandardMaterial();
 
 					var loader = new THREE.TextureLoader();
 
@@ -143,7 +129,6 @@
 					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
 					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
 					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
-					material.envMap = textureCube;
 
 					material.map.wrapS = THREE.RepeatWrapping;
 					material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -166,24 +151,36 @@
 
 				} );
 
-				//
+				var genCubeUrls = function( prefix, postfix ) {
+					return [
+						prefix + 'px' + postfix, prefix + 'nx' + postfix,
+						prefix + 'py' + postfix, prefix + 'ny' + postfix,
+						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+					];
+				};
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x202020 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
+				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
-				renderer.autoClear = false;
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					material.envMap = hdrCubeRenderTarget.texture;
+					material.needsUpdate = true;
+
+				} );
 
 				//
 
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 
@@ -213,9 +210,6 @@
 
 				controls.update();
 
-				cameraCube.quaternion.copy( camera.quaternion );
-
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();

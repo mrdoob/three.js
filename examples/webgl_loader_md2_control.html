@@ -26,11 +26,6 @@
 			}
 
 			a { color: skyblue; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -41,7 +36,7 @@
 			use arrows to control characters, mouse for camera
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/OrbitControls.js"></script>
 
@@ -105,14 +100,17 @@
 				light.position.set( 200, 450, 500 );
 
 				light.castShadow = true;
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 512;
-				light.shadowCameraNear = 100;
-				light.shadowCameraFar = 1200;
-				light.shadowCameraTop = 350;
-				light.shadowCameraBottom = -350;
-				light.shadowCameraRight = 1000;
-				light.shadowCameraLeft = -1000;
+
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 512;
+
+				light.shadow.camera.near = 100;
+				light.shadow.camera.far = 1200;
+
+				light.shadow.camera.left = -1000;
+				light.shadow.camera.right = 1000;
+				light.shadow.camera.top = 350;
+				light.shadow.camera.bottom = -350;
 
 				scene.add( light );
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
@@ -153,7 +151,7 @@
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 

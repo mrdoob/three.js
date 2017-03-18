@@ -237,10 +237,19 @@
 			</div>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
 
 		<script src="files.js"></script>
+
 		<script>
+
+		function extractQuery() {
+			var p = window.location.search.indexOf( '?q=' );
+			if( p !== -1 ) {
+				return window.location.search.substr( 3 );
+			}
+			return ''
+		}
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
@@ -255,16 +264,13 @@
 			event.preventDefault();
 		} );
 
-		// iOS8 workaround
+		// iOS iframe auto-resize workaround
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			viewer.addEventListener( 'load', function ( event ) {
-
-				viewer.contentWindow.innerWidth -= 10;
-				viewer.contentWindow.innerHeight -= 2;
-
-			} );
+			viewer.style.width = getComputedStyle( viewer ).width;
+			viewer.style.height = getComputedStyle( viewer ).height;
+			viewer.setAttribute( 'scrolling', 'no' );
 
 		}
 
@@ -276,10 +282,7 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
-			var array = location.href.split( '/' );
-			array.pop();
-
-			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+			window.open( 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';
@@ -306,15 +309,13 @@
 					var link = document.createElement( 'a' );
 					link.className = 'link';
 					link.textContent = name;
-					link.href = "#" + file;
+					link.href = file + '.html';
+					link.setAttribute( 'target', 'viewer' );
 					link.addEventListener( 'click', function ( event ) {
 
 						if ( event.button === 0 ) {
 
-							event.preventDefault();
-
-							panel.classList.toggle( 'collapsed' );
-							load( file );
+							selectFile( file );
 
 						}
 
@@ -329,25 +330,32 @@
 
 		}
 
-		var load = function ( file ) {
+		function loadFile( file ) {
 
-			if ( selected !== null ) links[ selected ].className = 'link';
+			selectFile( file );
+			viewer.src = file + '.html';
 
-			links[ file ].className = 'link selected';
+		}
+
+		function selectFile( file ) {
+
+			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
+
+			links[ file ].classList.add( 'selected' );
 
 			window.location.hash = file;
-			viewer.src = file + '.html';
 			viewer.focus();
 
 			button.style.display = '';
+			panel.classList.toggle( 'collapsed' );
 
 			selected = file;
 
-		};
+		}
 
 		if ( window.location.hash !== '' ) {
 
-			load( window.location.hash.substring( 1 ) );
+			loadFile( window.location.hash.substring( 1 ) );
 
 		}
 
@@ -369,7 +377,15 @@
 
 		function updateFilter() {
 
-			var exp = new RegExp( filterInput.value, 'gi' );
+			var v = filterInput.value;
+			if( v !== '' ) {
+				window.history.replaceState( {} , '', '?q=' + v );
+			} else {
+				window.history.replaceState( {} , '', window.location.pathname );
+			}
+			if( selected ) window.location.hash = selected;
+
+			var exp = new RegExp( v, 'gi' );
 
 			for ( var key in files ) {
 
@@ -456,6 +472,9 @@
 			}
 
 		}
+
+		filterInput.value = extractQuery();
+		updateFilter( )
 
 		</script>
 

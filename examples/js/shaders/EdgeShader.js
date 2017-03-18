@@ -11,8 +11,8 @@ THREE.EdgeShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null },
-		"aspect":    { type: "v2", value: new THREE.Vector2( 512, 512 ) },
+		"tDiffuse": { value: null },
+		"aspect":    { value: new THREE.Vector2( 512, 512 ) }
 	},
 
 	vertexShader: [
@@ -87,7 +87,7 @@ THREE.EdgeShader = {
 			"float S = (cnv[4] + cnv[5]) + (cnv[6] + cnv[7]) + (cnv[8] + M);",
 
 			"gl_FragColor = vec4(vec3(sqrt(M/S)), 1.0);",
-		"}",
+		"}"
 
 	].join( "\n" )
 };

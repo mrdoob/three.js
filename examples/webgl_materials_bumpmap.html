@@ -34,11 +34,6 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-
-			#stats { position: absolute; top:0; left: 0 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -48,7 +43,7 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -101,17 +96,16 @@
 				scene.add( spotLight );
 
 				spotLight.castShadow = true;
-				// spotLight.shadowCameraVisible = true;
 
-				spotLight.shadowMapWidth = 2048;
-				spotLight.shadowMapHeight = 2048;
+				spotLight.shadow.mapSize.width = 2048;
+				spotLight.shadow.mapSize.height = 2048;
 
-				spotLight.shadowCameraNear = 200;
-				spotLight.shadowCameraFar = 1500;
+				spotLight.shadow.camera.near = 200;
+				spotLight.shadow.camera.far = 1500;
 
-				spotLight.shadowCameraFov = 40;
+				spotLight.shadow.camera.fov = 40;
 
-				spotLight.shadowBias = -0.005;
+				spotLight.shadow.bias = -0.005;
 
 				//
 
@@ -141,7 +135,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				//
 
@@ -153,7 +147,7 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					container.appendChild( stats.domElement );
+					container.appendChild( stats.dom );
 
 				}
 

@@ -11,17 +11,17 @@ THREE.ShaderLib[ 'water' ] = {
 
 	uniforms: THREE.UniformsUtils.merge( [
 		THREE.UniformsLib[ "fog" ], {
-			"normalSampler":    { type: "t", value: null },
-			"mirrorSampler":    { type: "t", value: null },
-			"alpha":            { type: "f", value: 1.0 },
-			"time":             { type: "f", value: 0.0 },
-			"distortionScale":  { type: "f", value: 20.0 },
-			"noiseScale":       { type: "f", value: 1.0 },
-			"textureMatrix" :   { type: "m4", value: new THREE.Matrix4() },
-			"sunColor":         { type: "c", value: new THREE.Color( 0x7F7F7F ) },
-			"sunDirection":     { type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-			"eye":              { type: "v3", value: new THREE.Vector3() },
-			"waterColor":       { type: "c", value: new THREE.Color( 0x555555 ) }
+			"normalSampler":    { value: null },
+			"mirrorSampler":    { value: null },
+			"alpha":            { value: 1.0 },
+			"time":             { value: 0.0 },
+			"distortionScale":  { value: 20.0 },
+			"noiseScale":       { value: 1.0 },
+			"textureMatrix" :   { value: new THREE.Matrix4() },
+			"sunColor":         { value: new THREE.Color( 0x7F7F7F ) },
+			"sunDirection":     { value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+			"eye":              { value: new THREE.Vector3() },
+			"waterColor":       { value: new THREE.Color( 0x555555 ) }
 		}
 	] ),
 
@@ -32,12 +32,17 @@ THREE.ShaderLib[ 'water' ] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 
+		THREE.ShaderChunk[ "fog_pars_vertex"],
+
 		'void main()',
 		'{',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+		THREE.ShaderChunk[ "fog_vertex"],
+
 		'}'
 	].join( '\n' ),
 
@@ -150,9 +155,11 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	this.clipPlane = new THREE.Vector4();
 
-	if ( camera instanceof THREE.PerspectiveCamera )
+	if ( camera instanceof THREE.PerspectiveCamera ) {
+
 		this.camera = camera;
-	else {
+
+	} else {
 
 		this.camera = new THREE.PerspectiveCamera();
 		console.log( this.name + ': camera is not a Perspective Camera!' );
@@ -163,8 +170,8 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	this.mirrorCamera = this.camera.clone();
 
-	this.texture = new THREE.WebGLRenderTarget( width, height );
-	this.tempTexture = new THREE.WebGLRenderTarget( width, height );
+	this.renderTarget = new THREE.WebGLRenderTarget( width, height );
+	this.renderTarget2 = new THREE.WebGLRenderTarget( width, height );
 
 	var mirrorShader = THREE.ShaderLib[ "water" ];
 	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
@@ -178,7 +185,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 		fog: this.fog
 	} );
 
-	this.material.uniforms.mirrorSampler.value = this.texture;
+	this.material.uniforms.mirrorSampler.value = this.renderTarget.texture;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 	this.material.uniforms.alpha.value = this.alpha;
 	this.material.uniforms.time.value = this.time;
@@ -192,10 +199,10 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) ) {
 
-		this.texture.generateMipmaps = false;
-		this.texture.minFilter = THREE.LinearFilter;
-		this.tempTexture.generateMipmaps = false;
-		this.tempTexture.minFilter = THREE.LinearFilter;
+		this.renderTarget.texture.generateMipmaps = false;
+		this.renderTarget.texture.minFilter = THREE.LinearFilter;
+		this.renderTarget2.texture.generateMipmaps = false;
+		this.renderTarget2.texture.minFilter = THREE.LinearFilter;
 
 	}
 

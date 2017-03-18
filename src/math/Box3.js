@@ -1,18 +1,23 @@
+import { Vector3 } from './Vector3';
+import { Sphere } from './Sphere';
+
 /**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Box3 = function ( min, max ) {
+function Box3( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector3( + Infinity, + Infinity, + Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
+	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
+	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
-};
+}
 
-THREE.Box3.prototype = {
+Box3.prototype = {
 
-	constructor: THREE.Box3,
+	constructor: Box3,
+
+	isBox3: true,
 
 	set: function ( min, max ) {
 
@@ -25,8 +30,6 @@ THREE.Box3.prototype = {
 
 	setFromArray: function ( array ) {
 
-		this.makeEmpty();
-
 		var minX = + Infinity;
 		var minY = + Infinity;
 		var minZ = + Infinity;
@@ -35,7 +38,7 @@ THREE.Box3.prototype = {
 		var maxY = - Infinity;
 		var maxZ = - Infinity;
 
-		for ( var i = 0, il = array.length; i < il; i += 3 ) {
+		for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
 			var x = array[ i ];
 			var y = array[ i + 1 ];
@@ -53,6 +56,41 @@ THREE.Box3.prototype = {
 
 		this.min.set( minX, minY, minZ );
 		this.max.set( maxX, maxY, maxZ );
+
+		return this;
+
+	},
+
+	setFromBufferAttribute: function ( attribute ) {
+
+		var minX = + Infinity;
+		var minY = + Infinity;
+		var minZ = + Infinity;
+
+		var maxX = - Infinity;
+		var maxY = - Infinity;
+		var maxZ = - Infinity;
+
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+
+			var x = attribute.getX( i );
+			var y = attribute.getY( i );
+			var z = attribute.getZ( i );
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
+
+		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
+
+		return this;
 
 	},
 
@@ -72,9 +110,9 @@ THREE.Box3.prototype = {
 
 	setFromCenterAndSize: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
-		return function ( center, size ) {
+		return function setFromCenterAndSize( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
@@ -87,48 +125,13 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	setFromObject: function () {
+	setFromObject: function ( object ) {
 
-		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
+		this.makeEmpty();
 
-		var box;
+		return this.expandByObject( object );
 
-		return function ( object ) {
-
-			if ( box === undefined ) box = new THREE.Box3();
-
-			var scope = this;
-
-			this.makeEmpty();
-
-			object.updateMatrixWorld( true );
-
-			object.traverse( function ( node ) {
-
-				var geometry = node.geometry;
-
-				if ( geometry !== undefined ) {
-
-					if ( geometry.boundingBox === null ) {
-
-						geometry.computeBoundingBox();
-
-					}
-
-					box.copy( geometry.boundingBox );
-					box.applyMatrix4( node.matrixWorld );
-					scope.union( box );
-
-				}
-
-			} );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 
@@ -162,17 +165,17 @@ THREE.Box3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
-		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new Vector3();
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function ( optionalTarget ) {
+	getSize: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
-		return result.subVectors( this.max, this.min );
+		var result = optionalTarget || new Vector3();
+		return this.isEmpty() ? result.set( 0, 0, 0 ) : result.subVectors( this.max, this.min );
 
 	},
 
@@ -203,31 +206,81 @@ THREE.Box3.prototype = {
 
 	},
 
+	expandByObject: function () {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and children's, world transforms
+
+		var v1 = new Vector3();
+
+		return function expandByObject( object ) {
+
+			var scope = this;
+
+			object.updateMatrixWorld( true );
+
+			object.traverse( function ( node ) {
+
+				var i, l;
+
+				var geometry = node.geometry;
+
+				if ( geometry !== undefined ) {
+
+					if ( geometry.isGeometry ) {
+
+						var vertices = geometry.vertices;
+
+						for ( i = 0, l = vertices.length; i < l; i ++ ) {
+
+							v1.copy( vertices[ i ] );
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry.isBufferGeometry ) {
+
+						var attribute = geometry.attributes.position;
+
+						if ( attribute !== undefined ) {
+
+							for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+
+								scope.expandByPoint( v1 );
+
+							}
+
+						}
+
+					}
+
+				}
+
+			} );
+
+			return this;
+
+		};
+
+	}(),
+
 	containsPoint: function ( point ) {
 
-		if ( point.x < this.min.x || point.x > this.max.x ||
-				 point.y < this.min.y || point.y > this.max.y ||
-				 point.z < this.min.z || point.z > this.max.z ) {
-
-			return false;
-
-		}
-
-		return true;
+		return point.x < this.min.x || point.x > this.max.x ||
+			point.y < this.min.y || point.y > this.max.y ||
+			point.z < this.min.z || point.z > this.max.z ? false : true;
 
 	},
 
 	containsBox: function ( box ) {
 
-		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
-
-			return true;
-
-		}
-
-		return false;
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y &&
+			this.min.z <= box.min.z && box.max.z <= this.max.z;
 
 	},
 
@@ -236,7 +289,7 @@ THREE.Box3.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -249,16 +302,9 @@ THREE.Box3.prototype = {
 	intersectsBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-
-		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-				 box.max.y < this.min.y || box.min.y > this.max.y ||
-				 box.max.z < this.min.z || box.min.z > this.max.z ) {
-
-			return false;
-
-		}
-
-		return true;
+		return box.max.x < this.min.x || box.min.x > this.max.x ||
+			box.max.y < this.min.y || box.min.y > this.max.y ||
+			box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
 
 	},
 
@@ -268,7 +314,7 @@ THREE.Box3.prototype = {
 
 		return function intersectsSphere( sphere ) {
 
-			if ( closestPoint === undefined ) closestPoint = new THREE.Vector3();
+			if ( closestPoint === undefined ) closestPoint = new Vector3();
 
 			// Find the point on the AABB closest to the sphere center.
 			this.clampPoint( sphere.center, closestPoint );
@@ -329,16 +375,16 @@ THREE.Box3.prototype = {
 
 	clampPoint: function ( point, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
 	distanceToPoint: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
-		return function ( point ) {
+		return function distanceToPoint( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
@@ -349,14 +395,15 @@ THREE.Box3.prototype = {
 
 	getBoundingSphere: function () {
 
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
-		return function ( optionalTarget ) {
+		return function getBoundingSphere( optionalTarget ) {
 
-			var result = optionalTarget || new THREE.Sphere();
+			var result = optionalTarget || new Sphere();
 
-			result.center = this.center();
-			result.radius = this.size( v1 ).length() * 0.5;
+			this.getCenter( result.center );
+
+			result.radius = this.getSize( v1 ).length() * 0.5;
 
 			return result;
 
@@ -368,6 +415,9 @@ THREE.Box3.prototype = {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
+
+		// ensure that if there is no overlap, the result is fully empty, not slightly empty with non-inf/+inf values that will cause subsequence intersects to erroneously return valid values.
+		if( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 
@@ -385,17 +435,20 @@ THREE.Box3.prototype = {
 	applyMatrix4: function () {
 
 		var points = [
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3(),
-			new THREE.Vector3()
+			new Vector3(),
+			new Vector3(),
+			new Vector3(),
+			new Vector3(),
+			new Vector3(),
+			new Vector3(),
+			new Vector3(),
+			new Vector3()
 		];
 
-		return function ( matrix ) {
+		return function applyMatrix4( matrix ) {
+
+			// transform of empty box is an empty box.
+			if( this.isEmpty() ) return this;
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
@@ -407,7 +460,6 @@ THREE.Box3.prototype = {
 			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
 			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );	// 111
 
-			this.makeEmpty();
 			this.setFromPoints( points );
 
 			return this;
@@ -432,3 +484,6 @@ THREE.Box3.prototype = {
 	}
 
 };
+
+
+export { Box3 };

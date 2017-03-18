@@ -3,37 +3,35 @@
  * @thanks bhouston / https://clara.io/
  */
 
-THREE.FunctionNode = function( src, includes, extensions ) {
+THREE.FunctionNode = function( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions ) {
 
-	THREE.GLNode.call( this );
+	src = src || '';
 
-	this.parse( src || '', includes, extensions );
+	this.isMethod = typeof includesOrType !== "string";
+	this.useKeywords = true;
+
+	THREE.TempNode.call( this, this.isMethod ? null : includesOrType );
+
+	if ( this.isMethod ) this.eval( src, includesOrType, extensionsOrIncludes, keywordsOrExtensions );
+	else this.eval( src, extensionsOrIncludes, keywordsOrExtensions );
 
 };
 
-THREE.FunctionNode.prototype = Object.create( THREE.GLNode.prototype );
+THREE.FunctionNode.rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\((.*?)\)/i;
+THREE.FunctionNode.rProperties = /[a-z_0-9]+/ig;
+
+THREE.FunctionNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.FunctionNode.prototype.constructor = THREE.FunctionNode;
 
-THREE.FunctionNode.prototype.parseReference = function( name ) {
+THREE.FunctionNode.prototype.isShared = function( builder, output ) {
 
-	switch ( name ) {
-		case 'uv': return new THREE.UVNode().name;
-		case 'uv2': return new THREE.UVNode( 1 ).name;
-		case 'position': return new THREE.PositionNode().name;
-		case 'worldPosition': return new THREE.PositionNode( THREE.PositionNode.WORLD ).name;
-		case 'normal': return new THREE.NormalNode().name;
-		case 'normalPosition': return new THREE.NormalNode( THREE.NormalNode.WORLD ).name;
-		case 'viewPosition': return new THREE.PositionNode( THREE.NormalNode.VIEW ).name;
-		case 'viewNormal': return new THREE.NormalNode( THREE.NormalNode.VIEW ).name;
-	}
-
-	return name;
+	return ! this.isMethod;
 
 };
 
-THREE.FunctionNode.prototype.getTypeNode = function( builder, type ) {
+THREE.FunctionNode.prototype.getType = function( builder ) {
 
-	return builder.getType( type ) || type;
+	return builder.getTypeByFormat( this.type );
 
 };
 
@@ -50,13 +48,7 @@ THREE.FunctionNode.prototype.getInputByName = function( name ) {
 
 };
 
-THREE.FunctionNode.prototype.getType = function( builder ) {
-
-	return this.getTypeNode( builder, this.type );
-
-};
-
-THREE.FunctionNode.prototype.getInclude = function( name ) {
+THREE.FunctionNode.prototype.getIncludeByName = function( name ) {
 
 	var i = this.includes.length;
 
@@ -67,93 +59,145 @@ THREE.FunctionNode.prototype.getInclude = function( name ) {
 
 	}
 
-	return undefined;
+};
+
+THREE.FunctionNode.prototype.generate = function( builder, output ) {
+
+	var match, offset = 0, src = this.value;
+
+	for ( var i = 0; i < this.includes.length; i ++ ) {
+
+		builder.include( this.includes[ i ], this );
+
+	}
+
+	for ( var ext in this.extensions ) {
+
+		builder.material.extensions[ ext ] = true;
+
+	}
+
+	while ( match = THREE.FunctionNode.rProperties.exec( this.value ) ) {
+
+		var prop = match[ 0 ], isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true;
+		var reference = prop;
+
+		if ( this.keywords[ prop ] || ( this.useKeywords && isGlobal && THREE.NodeLib.containsKeyword( prop ) ) ) {
+
+			var node = this.keywords[ prop ];
+
+			if ( ! node ) {
+
+				var keyword = THREE.NodeLib.getKeywordData( prop );
+
+				if ( keyword.cache ) node = builder.keywords[ prop ];
+
+				node = node || THREE.NodeLib.getKeyword( prop, builder );
+
+				if ( keyword.cache ) builder.keywords[ prop ] = node;
+
+			}
+
+			reference = node.build( builder );
+
+		}
+
+		if ( prop != reference ) {
+
+			src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
+
+			offset += reference.length - prop.length;
+
+		}
+
+		if ( this.getIncludeByName( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
+
+			builder.include( THREE.NodeLib.get( reference ) );
+
+		}
+
+	}
+
+	if ( output === 'source' ) {
+
+		return src;
+
+	} else if ( this.isMethod ) {
+
+		builder.include( this, false, src );
+
+		return this.name;
+
+	} else {
+
+		return builder.format( "(" + src + ")", this.getType( builder ), output );
+
+	}
 
 };
 
-THREE.FunctionNode.prototype.parse = function( src, includes, extensions ) {
+THREE.FunctionNode.prototype.eval = function( src, includes, extensions, keywords ) {
 
-	var rDeclaration = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\((.*?)\)/i;
-	var rProperties = /[a-z_0-9]+/ig;
+	src = ( src || '' ).trim();
 
 	this.includes = includes || [];
 	this.extensions = extensions || {};
+	this.keywords = keywords || {};
 
-	var match = src.match( rDeclaration );
+	if ( this.isMethod ) {
 
-	this.inputs = [];
+		var match = src.match( THREE.FunctionNode.rDeclaration );
 
-	if ( match && match.length == 4 ) {
+		this.inputs = [];
 
-		this.type = match[ 1 ];
-		this.name = match[ 2 ];
+		if ( match && match.length == 4 ) {
 
-		var inputs = match[ 3 ].match( rProperties );
+			this.type = match[ 1 ];
+			this.name = match[ 2 ];
 
-		if ( inputs ) {
+			var inputs = match[ 3 ].match( THREE.FunctionNode.rProperties );
 
-			var i = 0;
+			if ( inputs ) {
 
-			while ( i < inputs.length ) {
+				var i = 0;
 
-				var qualifier = inputs[ i ++ ];
-				var type, name;
+				while ( i < inputs.length ) {
 
-				if ( qualifier == 'in' || qualifier == 'out' || qualifier == 'inout' ) {
+					var qualifier = inputs[ i ++ ];
+					var type, name;
 
-					type = inputs[ i ++ ];
+					if ( qualifier == 'in' || qualifier == 'out' || qualifier == 'inout' ) {
+
+						type = inputs[ i ++ ];
+
+					} else {
+
+						type = qualifier;
+						qualifier = '';
+
+					}
+
+					name = inputs[ i ++ ];
+
+					this.inputs.push( {
+						name : name,
+						type : type,
+						qualifier : qualifier
+					} );
 
 				}
-				else {
-
-					type = qualifier;
-					qualifier = '';
-
-				}
-
-				name = inputs[ i ++ ];
-
-				this.inputs.push( {
-					name : name,
-					type : type,
-					qualifier : qualifier
-				} );
 
 			}
+
+		} else {
+
+			this.type = '';
+			this.name = '';
 
 		}
 
-		var match, offset = 0;
-
-		while ( match = rProperties.exec( src ) ) {
-
-			var prop = match[ 0 ];
-			var reference = this.parseReference( prop );
-
-			if ( prop != reference ) {
-
-				src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
-
-				offset += reference.length - prop.length;
-
-			}
-
-			if ( this.getInclude( reference ) === undefined && THREE.NodeLib.contains( reference ) ) {
-
-				this.includes.push( THREE.NodeLib.get( reference ) );
-
-			}
-
-		}
-
-		this.src = src;
-
 	}
-	else {
 
-		this.type = '';
-		this.name = '';
-
-	}
+	this.value = src;
 
 };

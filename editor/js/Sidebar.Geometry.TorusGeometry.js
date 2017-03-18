@@ -8,7 +8,8 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
@@ -65,7 +66,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.TorusGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),
@@ -77,4 +78,6 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.TorusBufferGeometry = Sidebar.Geometry.TorusGeometry;

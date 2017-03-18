@@ -8,7 +8,8 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radius
 
@@ -30,16 +31,6 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	container.add( tubeRow );
 
-	// radialSegments
-
-	var radialSegmentsRow = new UI.Row();
-	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
-
-	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
-	radialSegmentsRow.add( radialSegments );
-
-	container.add( radialSegmentsRow );
-
 	// tubularSegments
 
 	var tubularSegmentsRow = new UI.Row();
@@ -49,6 +40,16 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
+
+	// radialSegments
+
+	var radialSegmentsRow = new UI.Row();
+	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+
+	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
+	radialSegmentsRow.add( radialSegments );
+
+	container.add( radialSegmentsRow );
 
 	// p
 
@@ -70,33 +71,24 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	container.add( qRow );
 
-	// heightScale
-
-	var heightScaleRow = new UI.Row();
-	var heightScale = new UI.Number( parameters.heightScale ).onChange( update );
-
-	pRow.add( new UI.Text( 'Height scale' ).setWidth( '90px' ) );
-	pRow.add( heightScale );
-
-	container.add( heightScaleRow );
-
 
 	//
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.TorusKnotGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
-			radialSegments.getValue(),
 			tubularSegments.getValue(),
+			radialSegments.getValue(),
 			p.getValue(),
-			q.getValue(),
-			heightScale.getValue()
+			q.getValue()
 		) ) );
 
 	}
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.TorusKnotBufferGeometry = Sidebar.Geometry.TorusKnotGeometry;

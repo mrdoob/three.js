@@ -11,6 +11,7 @@ body {
 	font-family: 'inconsolata';
 	font-size: 15px;
 	line-height: 18px;
+	tab-size: 4;
 	overflow: auto;
 }
 

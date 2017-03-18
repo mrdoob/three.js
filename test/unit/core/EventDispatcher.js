@@ -4,18 +4,6 @@
 
 module( "EventDispatcher" );
 
-test( "apply", function() {
-	var innocentObject = {};
-	var eventDispatcher = new THREE.EventDispatcher();
-
-	eventDispatcher.apply( innocentObject );
-
-	ok( innocentObject.addEventListener !== undefined &&
-			innocentObject.hasEventListener !== undefined &&
-		innocentObject.removeEventListener !== undefined &&
-		innocentObject.dispatchEvent !== undefined, "events where added to object" );
-});
-
 test( "addEventListener", function() {
 	var eventDispatcher = new THREE.EventDispatcher();
 

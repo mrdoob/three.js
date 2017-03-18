@@ -1,3 +1,5 @@
+import { Vector3 } from './Vector3';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -5,18 +7,18 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Quaternion = function ( x, y, z, w ) {
+function Quaternion( x, y, z, w ) {
 
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
 	this._w = ( w !== undefined ) ? w : 1;
 
-};
+}
 
-THREE.Quaternion.prototype = {
+Quaternion.prototype = {
 
-	constructor: THREE.Quaternion,
+	constructor: Quaternion,
 
 	get x () {
 
@@ -104,9 +106,9 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( euler instanceof THREE.Euler === false ) {
+		if ( (euler && euler.isEuler) === false ) {
 
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 		}
 
@@ -261,9 +263,9 @@ THREE.Quaternion.prototype = {
 
 		var EPS = 0.000001;
 
-		return function ( vFrom, vTo ) {
+		return function setFromUnitVectors( vFrom, vTo ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new Vector3();
 
 			r = vFrom.dot( vTo ) + 1;
 
@@ -292,9 +294,7 @@ THREE.Quaternion.prototype = {
 			this._z = v1.z;
 			this._w = r;
 
-			this.normalize();
-
-			return this;
+			return this.normalize();
 
 		};
 
@@ -302,9 +302,7 @@ THREE.Quaternion.prototype = {
 
 	inverse: function () {
 
-		this.conjugate().normalize();
-
-		return this;
+		return this.conjugate().normalize();
 
 	},
 
@@ -376,6 +374,12 @@ THREE.Quaternion.prototype = {
 		}
 
 		return this.multiplyQuaternions( this, q );
+
+	},
+
+	premultiply: function ( q ) {
+
+		return this.multiplyQuaternions( q, this );
 
 	},
 
@@ -509,7 +513,7 @@ THREE.Quaternion.prototype = {
 
 };
 
-Object.assign( THREE.Quaternion, {
+Object.assign( Quaternion, {
 
 	slerp: function( qa, qb, qm, t ) {
 
@@ -581,3 +585,6 @@ Object.assign( THREE.Quaternion, {
 	}
 
 } );
+
+
+export { Quaternion };
