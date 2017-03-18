@@ -162,16 +162,18 @@ Object.assign( ObjectLoader.prototype, {
 		
 		var fonts = {};
 		
-		if ( json !== undefined ) {
+		if ( json !== undefined && json.length > 0 ) {
 			
-			var fontLoader = new FontLoader();
+			var manager = new LoadingManager( onLoad );
+			
+			var fontLoader = new FontLoader( manager );
 			
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 				
 				var font;
 				var data = json[ i ];
 				
-				//
+				font = fontLoader.parse( data );
 				
 				font.uuid = data.uuid;
 				
@@ -312,6 +314,16 @@ Object.assign( ObjectLoader.prototype, {
 							data.thetaLength
 						);
 
+						break;
+						
+					case 'TextGeometry':
+					case 'TextBufferGeometry':
+					
+						geometry = new Geometries[ data.type ](
+							data.text,
+							data.parameters
+						);
+					
 						break;
 
 					case 'TorusGeometry':
