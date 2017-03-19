@@ -266,7 +266,26 @@ Object.assign( Matrix3.prototype, {
 
 		return array;
 
-	}
+	},
+    
+    log: function ( decimals ) {
+            
+        Matrix4.prototype.log.call( this, decimals );
+
+    },
+
+    _consoleOutput: function ( color1, color2, format ) {
+
+        for ( var i = 0; i < 3; i ++ ) {    
+
+            console.log( '%c'    + format ( 0 + i ) + 
+                         '%c %c' + format ( 3 + i ) + 
+                         '%c %c' + format ( 6 + i ),
+                         color1, color2, color1, color2, color1 );
+
+        }                
+
+    }
 
 } );
 
