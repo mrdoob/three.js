@@ -25,7 +25,6 @@
 			a {
 				color: #fff;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -33,11 +32,8 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - geometry - meshlines</div>
 
-
 		<script src="../build/three.js"></script>
-
 		<script src="js/geometries/hilbert3D.js"></script>
-
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -82,17 +78,17 @@
 				var colors = [];
 
 				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
-				var divisions = points.length * 6;
 
 				var spline = new THREE.CatmullRomCurve3( points );
+				var divisions = points.length * 6;
+				var color = new THREE.Color();
 
 				for ( var i = 0, l = divisions; i < l; i ++ ) {
 
-					var point = spline.getPoint( i / l );
+					var point = spline.getPoint( i / l ); // sample points along the spline
 					point.multiplyScalar( 0.5 );
 					vertices.push( point.x, point.y, point.z )
 
-					var color = new THREE.Color( 0xffffff );
 					color.setHSL( i / l, 1.0, 0.5 );
 					colors.push( color.r, color.g, color.b );
 
@@ -107,18 +103,14 @@
 				material2 = new THREE.MeshBasicMaterial( { meshLineWidth: 5, meshLine: true, vertexColors: THREE.VertexColors } );
 				material3 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLineWidth: 10, meshLine: true } );
 
-				// this meshline has an animated width
+				// mesh lines
 
 				var meshLine = new THREE.MeshLine( geometry, material1 );
 				meshLine.position.set( - 200, 0, 0 );
 				scene.add( meshLine );
 
-				// this meshline uses vertex colors
-
-			 	meshLine = new THREE.MeshLine( geometry, material2 );
+				meshLine = new THREE.MeshLine( geometry, material2 );
 				scene.add( meshLine );
-
-				// this meshline has a variable width defined by a custom function
 
 				meshLine = new THREE.MeshLine( geometry, material3, widthCallback );
 				meshLine.position.set( 200, 0, 0 );
@@ -142,8 +134,8 @@
 
 			function onWindowResize() {
 
-				var windowHalfX = window.innerWidth / 2;
-				var windowHalfY = window.innerHeight / 2;
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -158,6 +150,7 @@
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -168,7 +161,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -179,11 +174,10 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
 
 			}
-
-			//
 
 			function animate() {
 
@@ -215,7 +209,7 @@
 
 				// animate line width
 
-				material1.meshLineWidth = 10 * ( 1 + 0.75 * Math.sin( 5 * time ) );
+				material1.meshLineWidth = 10 * ( 1 + 0.5 * Math.sin( 5 * time ) );
 
 				renderer.render( scene, camera );
 
