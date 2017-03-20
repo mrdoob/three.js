@@ -124,7 +124,11 @@ Object.assign( ObjectLoader.prototype, {
 
 	parse: function ( json, onLoad ) {
 		
-		var fonts = this.parseFonts( json.fonts );
+        var fonts = this.parseFonts( json.fonts, function () {
+
+            if ( onLoad !== undefined ) onLoad( object );
+
+        } );
 
 		var geometries = this.parseGeometries( json.geometries, fonts, function () {
 			
@@ -160,27 +164,43 @@ Object.assign( ObjectLoader.prototype, {
 	},
 	
 	parseFonts: function ( json, onLoad ) {
-		
-		var fonts = {};
-		
+
+        var scope = this;
+        var fonts = {};
+
+        function loadFont(url) {
+
+            scope.manager.itemStart(url);
+
+            return loader.load(url, function ( response ) {
+
+                scope.manager.itemEnd(url);
+
+                //setFont(response);
+
+            });
+
+        }
+
 		if ( json !== undefined && json.length > 0 ) {
 			
 			var manager = new LoadingManager( onLoad );
 			
-			var fontLoader = new FontLoader( manager );
+            var loader = new FontLoader( manager );
 			
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 				
-				var font;
-				var data = json[ i ];
-				
-				font = fontLoader.parse( data.glyphs ); //TODO, extend to file resource someFont.json
-				
-				font.uuid = data.uuid;
-				
-				if ( data.name !== undefined ) font.name = data.name;
+				var font = json[ i ];
 
-				fonts[ data.uuid ] = font;
+                if ( font.glyphs.hasOwnProperty( 'glyphs' ) ) {
+
+                    fonts[ font.uuid ] = loader.parse( font.glyphs );
+
+                } else {
+
+                    fonts[font.uuid] = loader.load(font.glyphs);
+
+                }
 				
 			}
 			
