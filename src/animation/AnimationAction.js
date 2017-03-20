@@ -328,6 +328,8 @@ Object.assign( AnimationAction.prototype, {
 
 	_update: function( time, deltaTime, timeDirection, accuIndex ) {
 
+		// called by the mixer
+
 		if ( ! this.enabled ) {
 
 			// call ._updateWeight() to update ._effectiveWeight
@@ -336,8 +338,6 @@ Object.assign( AnimationAction.prototype, {
 			return;
 
 		}
-
-		// called by the mixer
 
 		var startTime = this._startTime;
 
