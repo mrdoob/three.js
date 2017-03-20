@@ -34,6 +34,12 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Line,
 
 	isLine: true,
+	
+	isMultiMaterial: function() {
+		
+		return Array.isArray( this.material );
+		
+	},
 
 	raycast: ( function () {
 

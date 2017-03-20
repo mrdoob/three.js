@@ -22,6 +22,12 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Sprite,
 
 	isSprite: true,
+	
+	isMultiMaterial: function() {
+		
+		return Array.isArray( this.material );
+		
+	},
 
 	raycast: ( function () {
 
