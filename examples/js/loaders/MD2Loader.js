@@ -218,8 +218,8 @@ THREE.MD2Loader.prototype = {
 				for ( var j = 0; j < 16; j ++ ) {
 
 					var character = data.getUint8( offset + j, true );
-					if( character === 0 ) break;
-					
+					if ( character === 0 ) break;
+
 					string[ j ] = character;
 
 				}
@@ -298,13 +298,13 @@ THREE.MD2Loader.prototype = {
 
 			}
 
-			geometry.animations = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 )
+			geometry.animations = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( geometry.morphTargets, 10 );
 
 			console.timeEnd( 'MD2Loader' );
 
 			return geometry;
 
-		}
+		};
 
 	} )()
 

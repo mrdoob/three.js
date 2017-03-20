@@ -495,7 +495,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var scope = this;
 	var geometry = new THREE.BufferGeometry();
-	var material = new THREE.MultiMaterial();
+	var materials = [];
 	var helper = new THREE.MMDLoader.DataCreationHelper();
 
 	var buffer = {};
@@ -947,12 +947,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				t.wrapS = THREE.RepeatWrapping;
 				t.wrapT = THREE.RepeatWrapping;
 
-				if ( params.sphericalReflectionMapping === true ) {
-
-					t.mapping = THREE.SphericalReflectionMapping;
-
-				}
-
 				for ( var i = 0; i < texture.readyCallbacks.length; i++ ) {
 
 					texture.readyCallbacks[ i ]( texture );
@@ -962,6 +956,12 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
+
+			if ( params.sphericalReflectionMapping === true ) {
+
+				texture.mapping = THREE.SphericalReflectionMapping;
+
+			}
 
 			texture.readyCallbacks = [];
 
@@ -1258,13 +1258,6 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 				m.envMap = getTexture( p.envMap, textures );
 				m.combine = p.envMapType;
 
-				// TODO: WebGLRenderer should automatically update?
-				m.envMap.readyCallbacks.push( function ( t ) {
-
-					m.needsUpdate = true;
-
-				} );
-
 			}
 
 			m.opacity = p.opacity;
@@ -1337,7 +1330,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 			}
 
-			material.materials.push( m );
+			materials.push( m );
 
 		}
 
@@ -1361,7 +1354,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 					}
 
-					var m = material.materials[ e.index ];
+					var m = materials[ e.index ];
 
 					if ( m.opacity !== e.diffuse[ 3 ] ) {
 
@@ -1484,7 +1477,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 
 	var initGeometry = function () {
 
-		geometry.setIndex( new ( buffer.indices.length > 65535 ? THREE.Uint32BufferAttribute : THREE.Uint16BufferAttribute )( buffer.indices, 1 ) );
+		geometry.setIndex( buffer.indices );
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
 		geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
 		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
@@ -1506,7 +1499,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 	initPhysics();
 	initGeometry();
 
-	var mesh = new THREE.SkinnedMesh( geometry, material );
+	var mesh = new THREE.SkinnedMesh( geometry, materials );
 
 	// console.log( mesh ); // for console debug
 
@@ -2000,7 +1993,7 @@ THREE.MMDAudioManager = function ( audio, listener, p ) {
 	this.currentTime = 0.0;
 	this.delayTime = params.delayTime !== undefined ? params.delayTime : 0.0;
 
-	this.audioDuration = this.audio.source.buffer.duration;
+	this.audioDuration = this.audio.buffer.duration;
 	this.duration = this.audioDuration + this.delayTime;
 
 };
@@ -2215,7 +2208,7 @@ THREE.MMDHelper.prototype = {
 
 		var physics = new THREE.MMDPhysics( mesh, params );
 
-		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== false ) {
+		if ( mesh.mixer !== null && mesh.mixer !== undefined && params.preventAnimationWarmup !== true ) {
 
 			this.animateOneMesh( 0, mesh );
 			physics.reset();
@@ -2557,7 +2550,7 @@ THREE.MMDHelper.prototype = {
 
 		}
 
-		if ( physics !== null && this.doPhysics && ! this.sharedPhysics) {
+		if ( physics !== null && this.doPhysics && ! this.sharedPhysics ) {
 
 			physics.update( delta );
 

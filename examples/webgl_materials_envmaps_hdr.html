@@ -39,8 +39,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -65,7 +63,8 @@
 				roughness: 1.0,
 				bumpScale: 0.3,
 				background: false,
-				exposure: 1.0
+				exposure: 1.0,
+				side: 'front'
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -93,8 +92,8 @@
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					bumpScale: - 0.05,
-					color: 0xffffff,
-					metalness: 1.0,
+					color: 0xff4444,
+					metalness: 0.5,
 					roughness: 1.0,
 					shading: THREE.SmoothShading
 				} );
@@ -129,6 +128,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 2 );
+					standardMaterial.map = map;
 					standardMaterial.roughnessMap = map;
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
@@ -221,6 +221,7 @@
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', - 1, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 				gui.open();
 
 			}
@@ -277,6 +278,23 @@
 
 					}
 
+
+					var side = standardMaterial.side;
+
+					switch ( params.side ) {
+
+						case 'front': side = THREE.FrontSide; break;
+						case 'back': side = THREE.BackSide; break;
+						case 'double': side = THREE.DoubleSide; break;
+	
+					}
+
+					if( standardMaterial.side !== side ) {
+						
+						standardMaterial.side = side;
+						standardMaterial.needsUpdate = true;
+
+					}
 				}
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );

@@ -11,7 +11,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 
 	var shader = THREE.FilmShader;
 
-	this.uniforms = Object.assign( {}, shader.uniforms );
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -30,6 +30,7 @@ THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, 
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

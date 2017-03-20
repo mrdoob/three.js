@@ -79,6 +79,7 @@
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2(0xaabbbb, 0.0001);
 
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
 				camera.position.set( 2000, 750, 2000 );
@@ -108,7 +109,8 @@
 					sunDirection: light.position.clone().normalize(),
 					sunColor: 0xffffff,
 					waterColor: 0x001e0f,
-					distortionScale: 50.0
+					distortionScale: 50.0,
+					fog: scene.fog != undefined
 				} );
 
 

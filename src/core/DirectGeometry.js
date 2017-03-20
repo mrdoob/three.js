@@ -41,7 +41,7 @@ Object.assign( DirectGeometry.prototype, {
 
 		var group;
 		var groups = [];
-		var materialIndex;
+		var materialIndex = undefined;
 
 		var faces = geometry.faces;
 

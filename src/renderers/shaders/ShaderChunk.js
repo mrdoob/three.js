@@ -28,6 +28,8 @@ import envmap_fragment from './ShaderChunk/envmap_fragment.glsl';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl';
 import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl';
+import fog_vertex from './ShaderChunk/fog_vertex.glsl';
+import fog_pars_vertex from './ShaderChunk/fog_pars_vertex.glsl';
 import fog_fragment from './ShaderChunk/fog_fragment.glsl';
 import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl';
 import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl';
@@ -99,8 +101,6 @@ import meshphong_frag from './ShaderLib/meshphong_frag.glsl';
 import meshphong_vert from './ShaderLib/meshphong_vert.glsl';
 import meshphysical_frag from './ShaderLib/meshphysical_frag.glsl';
 import meshphysical_vert from './ShaderLib/meshphysical_vert.glsl';
-import meshtoon_frag from './ShaderLib/meshtoon_frag.glsl';
-import meshtoon_vert from './ShaderLib/meshtoon_vert.glsl';
 import normal_frag from './ShaderLib/normal_frag.glsl';
 import normal_vert from './ShaderLib/normal_vert.glsl';
 import points_frag from './ShaderLib/points_frag.glsl';
@@ -139,6 +139,8 @@ export var ShaderChunk = {
 	envmap_pars_fragment: envmap_pars_fragment,
 	envmap_pars_vertex: envmap_pars_vertex,
 	envmap_vertex: envmap_vertex,
+	fog_vertex: fog_vertex,
+	fog_pars_vertex: fog_pars_vertex,
 	fog_fragment: fog_fragment,
 	fog_pars_fragment: fog_pars_fragment,
 	gradientmap_pars_fragment: gradientmap_pars_fragment,
@@ -210,8 +212,6 @@ export var ShaderChunk = {
 	meshphong_vert: meshphong_vert,
 	meshphysical_frag: meshphysical_frag,
 	meshphysical_vert: meshphysical_vert,
-	meshtoon_frag: meshtoon_frag,
-	meshtoon_vert: meshtoon_vert,
 	normal_frag: normal_frag,
 	normal_vert: normal_vert,
 	points_frag: points_frag,

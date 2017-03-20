@@ -22,26 +22,26 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 }
 
 #if NUM_RECT_AREA_LIGHTS > 0
-    void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
+	void RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-        vec3 matDiffColor = material.diffuseColor;
-        vec3 matSpecColor = material.specularColor;
-        vec3 lightColor   = rectAreaLight.color;
-        float roughness = material.specularRoughness;
+		vec3 matDiffColor = material.diffuseColor;
+		vec3 matSpecColor = material.specularColor;
+		vec3 lightColor   = rectAreaLight.color;
+		float roughness = material.specularRoughness;
 
-        vec3 spec = Rect_Area_Light_Specular_Reflectance(
-                geometry,
-                rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight,
-                roughness,
-                ltcMat, ltcMag );
-        vec3 diff = Rect_Area_Light_Diffuse_Reflectance(
-                geometry,
-                rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
+		vec3 spec = Rect_Area_Light_Specular_Reflectance(
+				geometry,
+				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight,
+				roughness,
+				ltcMat, ltcMag );
+		vec3 diff = Rect_Area_Light_Diffuse_Reflectance(
+				geometry,
+				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
 
-        reflectedLight.directSpecular += lightColor * matSpecColor * spec;
-        reflectedLight.directDiffuse  += lightColor * matDiffColor * diff;
+		reflectedLight.directSpecular += lightColor * matSpecColor * spec;
+		reflectedLight.directDiffuse  += lightColor * matDiffColor * diff;
 
-    }
+	}
 #endif
 
 void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Creates extruded BufferGeometry from a path shape.</div>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+
+		<code>
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		var extrudeSettings = {
+			steps: 2,
+			amount: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Array shapes], [page:Object options])</h3>
+		<div>
+		shapes — Shape or an array of shapes. <br />
+		options — Object that can contain the following parameters.
+
+			<ul>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>UVGenerator —  Object. object that provides UV generator functions</li>
+			</ul>
+
+		</div>
+		<div>
+			This object extrudes a 2D shape to a 3D geometry.
+		</div>
+
+		<div>
+			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face
+			and its extruded sides, you can use an array of materials. The first material will be
+			applied to the face; the second material will be applied to the sides.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null addShapeList]([page:Array shapes], [page:Object options])</h3>
+		<div>
+			shapes — An Array of shapes to add. <br />
+			options — Object that can contain the following parameters.
+			<ul>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>UVGenerator —  Object. object that provides UV generator functions</li>
+			</ul>
+		</div>
+		<div>Adds the shapes to the list to extrude.</div>
+
+		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
+		<div>
+			shape — A shape to add. <br />
+			options — Object that can contain the following parameters.
+			<ul>
+				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
+				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
+				<li>amount — int. Depth to extrude the shape. Default is 100.</li>
+				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
+				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
+				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
+				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded (creates Frames if frames aren't defined).</li>
+				<li>frames — An object containing arrays of tangents, normals, binormals for each step along the extrudePath. </li>
+				<li>UVGenerator —  Object. object that provides UV generator functions</li>
+			</ul>
+		</div>
+		<div>Add the shape to the list to extrude.</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

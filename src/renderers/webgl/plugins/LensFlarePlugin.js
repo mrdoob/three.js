@@ -228,7 +228,7 @@ function LensFlarePlugin( renderer, flares ) {
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
 		state.disable( gl.CULL_FACE );
-		state.setDepthWrite( false );
+		state.buffers.depth.setMask( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
@@ -242,7 +242,7 @@ function LensFlarePlugin( renderer, flares ) {
 			tempPosition.set( flare.matrixWorld.elements[ 12 ], flare.matrixWorld.elements[ 13 ], flare.matrixWorld.elements[ 14 ] );
 
 			tempPosition.applyMatrix4( camera.matrixWorldInverse );
-			tempPosition.applyProjection( camera.projectionMatrix );
+			tempPosition.applyMatrix4( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
@@ -353,7 +353,7 @@ function LensFlarePlugin( renderer, flares ) {
 
 		state.enable( gl.CULL_FACE );
 		state.enable( gl.DEPTH_TEST );
-		state.setDepthWrite( true );
+		state.buffers.depth.setMask( true );
 
 		renderer.resetGLState();
 

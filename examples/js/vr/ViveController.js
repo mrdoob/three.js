@@ -27,7 +27,7 @@ THREE.ViveController = function ( id ) {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && gamepad.id === 'OpenVR Gamepad' ) {
+			if ( gamepad && ( gamepad.id === 'OpenVR Gamepad' || gamepad.id === 'Oculus Touch (Left)' || gamepad.id === 'Oculus Touch (Right)' ) ) {
 
 				if ( j === id ) return gamepad;
 

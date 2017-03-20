@@ -24,7 +24,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
 	this.materialCopy = new THREE.ShaderMaterial( {
 
@@ -41,7 +41,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: Object.assign( {}, THREE.LuminosityShader.uniforms ),
+		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending
@@ -97,7 +97,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {
 
-		uniforms: Object.assign( {}, this.adaptLuminanceShader.uniforms ),
+		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
 		defines: this.adaptLuminanceShader.defines,
@@ -109,7 +109,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: Object.assign( {}, THREE.ToneMapShader.uniforms ),
+		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
 		vertexShader: THREE.ToneMapShader.vertexShader,
 		fragmentShader: THREE.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending
@@ -119,6 +119,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
@@ -190,14 +191,17 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
 		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.luminanceRT.texture.name = "AdaptiveToneMappingPass.l";
 		this.luminanceRT.texture.generateMipmaps = false;
 
 		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT.texture.name = "AdaptiveToneMappingPass.pl";
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
 
 		if ( this.adaptive ) {
 

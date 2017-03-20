@@ -2,11 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
+import { arrayMax } from '../../utils';
 
-function WebGLGeometries( gl, properties, info ) {
+function WebGLGeometries( gl, attributes, infoMemory ) {
 
 	var geometries = {};
+	var wireframeAttributes = {};
 
 	function onGeometryDispose( event ) {
 
@@ -15,132 +18,174 @@ function WebGLGeometries( gl, properties, info ) {
 
 		if ( buffergeometry.index !== null ) {
 
-			deleteAttribute( buffergeometry.index );
+			attributes.remove( buffergeometry.index );
 
 		}
 
-		deleteAttributes( buffergeometry.attributes );
+		for ( var name in buffergeometry.attributes ) {
+
+			attributes.remove( buffergeometry.attributes[ name ] );
+
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];
 
-		// TODO
+		// TODO Remove duplicate code
 
-		var property = properties.get( geometry );
+		var attribute = wireframeAttributes[ geometry.id ];
 
-		if ( property.wireframe ) {
+		if ( attribute ) {
 
-			deleteAttribute( property.wireframe );
-
-		}
-
-		properties.delete( geometry );
-
-		var bufferproperty = properties.get( buffergeometry );
-
-		if ( bufferproperty.wireframe ) {
-
-			deleteAttribute( bufferproperty.wireframe );
+			attributes.remove( attribute );
+			delete wireframeAttributes[ geometry.id ];
 
 		}
 
-		properties.delete( buffergeometry );
+		attribute = wireframeAttributes[ buffergeometry.id ];
+
+		if ( attribute ) {
+
+			attributes.remove( attribute );
+			delete wireframeAttributes[ buffergeometry.id ];
+
+		}
 
 		//
 
-		info.memory.geometries --;
+		infoMemory.geometries --;
 
 	}
 
-	function getAttributeBuffer( attribute ) {
+	function get( object, geometry ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		var buffergeometry = geometries[ geometry.id ];
 
-			return properties.get( attribute.data ).__webglBuffer;
+		if ( buffergeometry ) return buffergeometry;
+
+		geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		if ( geometry.isBufferGeometry ) {
+
+			buffergeometry = geometry;
+
+		} else if ( geometry.isGeometry ) {
+
+			if ( geometry._bufferGeometry === undefined ) {
+
+				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
+
+			}
+
+			buffergeometry = geometry._bufferGeometry;
 
 		}
 
-		return properties.get( attribute ).__webglBuffer;
+		geometries[ geometry.id ] = buffergeometry;
+
+		infoMemory.geometries ++;
+
+		return buffergeometry;
 
 	}
 
-	function deleteAttribute( attribute ) {
+	function update( geometry ) {
 
-		var buffer = getAttributeBuffer( attribute );
+		var index = geometry.index;
+		var geometryAttributes = geometry.attributes;
 
-		if ( buffer !== undefined ) {
+		if ( index !== null ) {
 
-			gl.deleteBuffer( buffer );
-			removeAttributeBuffer( attribute );
+			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
+
+		}
+
+		for ( var name in geometryAttributes ) {
+
+			attributes.update( geometryAttributes[ name ], gl.ARRAY_BUFFER );
+
+		}
+
+		// morph targets
+
+		var morphAttributes = geometry.morphAttributes;
+
+		for ( var name in morphAttributes ) {
+
+			var array = morphAttributes[ name ];
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				attributes.update( array[ i ], gl.ARRAY_BUFFER );
+
+			}
 
 		}
 
 	}
 
-	function deleteAttributes( attributes ) {
+	function getWireframeAttribute( geometry ) {
 
-		for ( var name in attributes ) {
+		var attribute = wireframeAttributes[ geometry.id ];
 
-			deleteAttribute( attributes[ name ] );
+		if ( attribute ) return attribute;
 
-		}
+		var indices = [];
 
-	}
+		var geometryIndex = geometry.index;
+		var geometryAttributes = geometry.attributes;
 
-	function removeAttributeBuffer( attribute ) {
+		// console.time( 'wireframe' );
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		if ( geometryIndex !== null ) {
 
-			properties.delete( attribute.data );
+			var array = geometryIndex.array;
+
+			for ( var i = 0, l = array.length; i < l; i += 3 ) {
+
+				var a = array[ i + 0 ];
+				var b = array[ i + 1 ];
+				var c = array[ i + 2 ];
+
+				indices.push( a, b, b, c, c, a );
+
+			}
 
 		} else {
 
-			properties.delete( attribute );
+			var array = geometryAttributes.position.array;
+
+			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+
+				var a = i + 0;
+				var b = i + 1;
+				var c = i + 2;
+
+				indices.push( a, b, b, c, c, a );
+
+			}
 
 		}
+
+		// console.timeEnd( 'wireframe' );
+
+		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+
+		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
+
+		wireframeAttributes[ geometry.id ] = attribute;
+
+		return attribute;
 
 	}
 
 	return {
 
-		get: function ( object ) {
+		get: get,
+		update: update,
 
-			var geometry = object.geometry;
-
-			if ( geometries[ geometry.id ] !== undefined ) {
-
-				return geometries[ geometry.id ];
-
-			}
-
-			geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			var buffergeometry;
-
-			if ( geometry.isBufferGeometry ) {
-
-				buffergeometry = geometry;
-
-			} else if ( geometry.isGeometry ) {
-
-				if ( geometry._bufferGeometry === undefined ) {
-
-					geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-				}
-
-				buffergeometry = geometry._bufferGeometry;
-
-			}
-
-			geometries[ geometry.id ] = buffergeometry;
-
-			info.memory.geometries ++;
-
-			return buffergeometry;
-
-		}
+		getWireframeAttribute: getWireframeAttribute
 
 	};
 

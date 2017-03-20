@@ -1,4 +1,20 @@
-import { FaceColors, VertexColors, DoubleSide, BackSide, MirroredRepeatWrapping, RepeatWrapping, BlendingMode } from '../constants';
+import {
+	NoBlending,
+	NormalBlending,
+	AdditiveBlending,
+	SubtractiveBlending,
+	MultiplyBlending,
+	CustomBlending,
+
+	FaceColors,
+	VertexColors,
+
+	DoubleSide,
+	BackSide,
+
+	MirroredRepeatWrapping,
+	RepeatWrapping
+} from '../constants';
 import { _Math } from '../math/Math';
 import { MaterialLoader } from './MaterialLoader';
 import { TextureLoader } from './TextureLoader';
@@ -16,9 +32,40 @@ function Loader() {
 
 }
 
-Loader.prototype = {
+Loader.Handlers = {
 
-	constructor: Loader,
+	handlers: [],
+
+	add: function ( regex, loader ) {
+
+		this.handlers.push( regex, loader );
+
+	},
+
+	get: function ( file ) {
+
+		var handlers = this.handlers;
+
+		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			var regex = handlers[ i ];
+			var loader = handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+};
+
+Object.assign( Loader.prototype, {
 
 	crossOrigin: undefined,
 
@@ -50,13 +97,20 @@ Loader.prototype = {
 
 	createMaterial: ( function () {
 
-		var color, textureLoader, materialLoader;
+		var BlendingMode = {
+			NoBlending: NoBlending,
+			NormalBlending: NormalBlending,
+			AdditiveBlending: AdditiveBlending,
+			SubtractiveBlending: SubtractiveBlending,
+			MultiplyBlending: MultiplyBlending,
+			CustomBlending: CustomBlending
+		};
+
+		var color = new Color();
+		var textureLoader = new TextureLoader();
+		var materialLoader = new MaterialLoader();
 
 		return function createMaterial( m, texturePath, crossOrigin ) {
-
-			if ( color === undefined ) color = new Color();
-			if ( textureLoader === undefined ) textureLoader = new TextureLoader();
-			if ( materialLoader === undefined ) materialLoader = new MaterialLoader();
 
 			// convert from old material format
 
@@ -131,6 +185,7 @@ Loader.prototype = {
 				var value = m[ name ];
 
 				switch ( name ) {
+
 					case 'DbgColor':
 					case 'DbgIndex':
 					case 'opticalDensity':
@@ -276,6 +331,7 @@ Loader.prototype = {
 					default:
 						console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
 						break;
+
 				}
 
 			}
@@ -293,40 +349,7 @@ Loader.prototype = {
 
 	} )()
 
-};
-
-Loader.Handlers = {
-
-	handlers: [],
-
-	add: function ( regex, loader ) {
-
-		this.handlers.push( regex, loader );
-
-	},
-
-	get: function ( file ) {
-
-		var handlers = this.handlers;
-
-		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
-
-			var regex = handlers[ i ];
-			var loader  = handlers[ i + 1 ];
-
-			if ( regex.test( file ) ) {
-
-				return loader;
-
-			}
-
-		}
-
-		return null;
-
-	}
-
-};
+} );
 
 
 export { Loader };

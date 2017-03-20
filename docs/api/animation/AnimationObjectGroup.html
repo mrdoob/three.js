@@ -10,24 +10,28 @@
   <body>
     <h1>[name]</h1>
 
-    <div class="desc">A group of objects that receives a shared animation state.</div>
+    <div class="desc">A group of objects that receives a shared animation state.<br /><br />
+        		
+        For an overview of the different elements of the three.js animation system see the
+        "Animation System" article in the "Next Steps" section of the manual.
+    </div>
 
     <h2>Usage:</h2>
 
-    <div>
-      Add objects you would otherwise pass as 'root' to the	constructor or the [page:AnimationMixer.clipAction clipAction]
-      method of [page:AnimationMixer AnimationMixer] and instead pass this object as 'root'.<br /><br />
+    <div class="desc">
+        Add objects you would otherwise pass as 'root' to the	constructor or the [page:AnimationMixer.clipAction clipAction]
+        method of [page:AnimationMixer AnimationMixer] and instead pass this object as 'root'.<br /><br />
 
-      Note that objects of this class appear as one object to the mixer,
-      so cache control of the individual objects must be done	on the group.
+        Note that objects of this class appear as one object to the mixer,
+        so cache control of the individual objects must be done	on the group.
     </div>
 
 
-   <h2>Limitations</h2>
-   <div>
-    The animated properties must be compatible among all objects in the group.<br /><br />
+    <h2>Limitations</h2>
+    <div class="desc">
+        The animated properties must be compatible among all objects in the group.<br /><br />
 
-    A single property can either be controlled through a target group or directly, but not both.
+        A single property can either be controlled through a target group or directly, but not both.
     </div>
 
 
@@ -35,16 +39,23 @@
 
 
     <h3>[name]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
+      [page:object obj] - an abitrary number of meshes that share the same animation state.<br />
 
-
+   
     <h2>Properties</h2>
+    
 
     <h3>[property:object stats]</h3>
     <div>
-
+        An object that contains some informations of this *AnimationObjectGroup* (total number, number 
+        in use, number of bindings per object)
+    </div>    
+    
+    <h3>[property:String uuid]</h3>
+    <div>
+        The [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this 
+        *AnimationObjectGroup*. It gets automatically assigned and shouldn't be edited.
     </div>
-
-    <h3>[property:Number timeScale]</h3>
 
 
     <h2>Methods</h2>
@@ -52,17 +63,17 @@
 
     <h3>[method:null add]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
     <div>
-
+        Adds an arbitrary number of objects to this *AnimationObjectGroup*.
     </div>
 
     <h3>[method:null remove]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
     <div>
-
+        Removes an arbitrary number of objects from this *AnimationObjectGroup*.
     </div>
 
     <h3>[method:null uncache]( [page:object obj1], [page:object obj2], [page:object obj3], ... )</h3>
     <div>
-
+        Deallocates all memory resources for the passed objects of this *AnimationObjectGroup*.
     </div>
 
 

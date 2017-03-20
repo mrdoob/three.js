@@ -62,7 +62,7 @@ function AnimationObjectGroup( var_args ) {
 
 		objects: {
 			get total() { return scope._objects.length; },
-			get inUse() { return this.total - scope.nCachedObjects_;  }
+			get inUse() { return this.total - scope.nCachedObjects_; }
 		},
 
 		get bindingsPerObject() { return scope._bindings.length; }
@@ -71,9 +71,7 @@ function AnimationObjectGroup( var_args ) {
 
 }
 
-AnimationObjectGroup.prototype = {
-
-	constructor: AnimationObjectGroup,
+Object.assign( AnimationObjectGroup.prototype, {
 
 	isAnimationObjectGroup: true,
 
@@ -92,7 +90,8 @@ AnimationObjectGroup.prototype = {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
-				index = indicesByUUID[ uuid ];
+				index = indicesByUUID[ uuid ],
+				knownObject = undefined;
 
 			if ( index === undefined ) {
 
@@ -114,7 +113,7 @@ AnimationObjectGroup.prototype = {
 
 			} else if ( index < nCachedObjects ) {
 
-				var knownObject = objects[ index ];
+				knownObject = objects[ index ];
 
 				// move existing object to the ACTIVE region
 
@@ -152,7 +151,7 @@ AnimationObjectGroup.prototype = {
 
 				}
 
-			} else if ( objects[ index ] !== knownObject) {
+			} else if ( objects[ index ] !== knownObject ) {
 
 				console.error( "Different objects with the same UUID " +
 						"detected. Clean the caches or recreate your " +
@@ -300,7 +299,8 @@ AnimationObjectGroup.prototype = {
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_: function( path, parsedPath ) {
+	subscribe_: function ( path, parsedPath ) {
+
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
 
@@ -325,13 +325,10 @@ AnimationObjectGroup.prototype = {
 		parsedPaths.push( parsedPath );
 		bindings.push( bindingsForPath );
 
-		for ( var i = nCachedObjects,
-				n = objects.length; i !== n; ++ i ) {
+		for ( var i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
 
 			var object = objects[ i ];
-
-			bindingsForPath[ i ] =
-					new PropertyBinding( object, path, parsedPath );
+			bindingsForPath[ i ] = new PropertyBinding( object, path, parsedPath );
 
 		}
 
@@ -339,7 +336,8 @@ AnimationObjectGroup.prototype = {
 
 	},
 
-	unsubscribe_: function( path ) {
+	unsubscribe_: function ( path ) {
+
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
 
@@ -370,8 +368,7 @@ AnimationObjectGroup.prototype = {
 
 	}
 
-};
-
+} );
 
 
 export { AnimationObjectGroup };

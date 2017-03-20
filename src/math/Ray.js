@@ -11,9 +11,7 @@ function Ray( origin, direction ) {
 
 }
 
-Ray.prototype = {
-
-	constructor: Ray,
+Object.assign( Ray.prototype, {
 
 	set: function ( origin, direction ) {
 
@@ -325,8 +323,6 @@ Ray.prototype = {
 
 	},
 
-
-
 	intersectsPlane: function ( plane ) {
 
 		// check if the ray lies on the plane first
@@ -534,7 +530,7 @@ Ray.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Ray };

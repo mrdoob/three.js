@@ -25,8 +25,10 @@ THREE.BokehPass = function ( scene, camera, params ) {
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat
 	} );
+	this.renderTargetColor.texture.name = "BokehPass.color";
 
 	this.renderTargetDepth = this.renderTargetColor.clone();
+	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material
 
@@ -41,7 +43,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	}
 
 	var bokehShader = THREE.BokehShader;
-	var bokehUniforms = Object.assign( {}, bokehShader.uniforms );
+	var bokehUniforms = THREE.UniformsUtils.clone( bokehShader.uniforms );
 
 	bokehUniforms[ "tDepth" ].value = this.renderTargetDepth.texture;
 
@@ -63,6 +65,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.scene2  = new THREE.Scene();
 
 	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad2.frustumCulled = false; // Avoid getting clipped
 	this.scene2.add( this.quad2 );
 
 };

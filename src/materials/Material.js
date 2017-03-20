@@ -59,28 +59,13 @@ function Material() {
 
 	this.visible = true;
 
-	this._needsUpdate = true;
+	this.needsUpdate = true;
 
 }
 
-Material.prototype = {
-
-	constructor: Material,
+Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 	isMaterial: true,
-
-	get needsUpdate() {
-
-		return this._needsUpdate;
-
-	},
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.update();
-		this._needsUpdate = value;
-
-	},
 
 	setValues: function ( values ) {
 
@@ -110,7 +95,7 @@ Material.prototype = {
 
 				currentValue.set( newValue );
 
-			} else if ( (currentValue && currentValue.isVector3) && (newValue && newValue.isVector3) ) {
+			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
 
 				currentValue.copy( newValue );
 
@@ -334,20 +319,13 @@ Material.prototype = {
 
 	},
 
-	update: function () {
-
-		this.dispatchEvent( { type: 'update' } );
-
-	},
-
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-};
+} );
 
-Object.assign( Material.prototype, EventDispatcher.prototype );
 
 export { Material };

@@ -43,11 +43,13 @@ float getShadowMask() {
 
 	#endif
 
+	/*
 	#if NUM_RECT_AREA_LIGHTS > 0
 
-	// TODO (abelnation): update shadow for Area light
+		// TODO (abelnation): update shadow for Area light
 
 	#endif
+	*/
 
 	#endif
 

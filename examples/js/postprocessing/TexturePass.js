@@ -14,7 +14,7 @@ THREE.TexturePass = function ( map, opacity ) {
 	this.map = map;
 	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
 
-	this.uniforms = Object.assign( {}, shader.uniforms );
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
 
@@ -32,6 +32,7 @@ THREE.TexturePass = function ( map, opacity ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
@@ -47,8 +48,8 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		this.quad.material = this.material;
 
-		this.uniforms[ "opacity" ] = new THREE.Uniform( this.opacity );
-		this.uniforms[ "tDiffuse" ] = new THREE.Uniform( this.map );
+		this.uniforms[ "opacity" ].value = this.opacity;
+		this.uniforms[ "tDiffuse" ].value = this.map;
 		this.material.transparent = ( this.opacity < 1.0 );
 
 		renderer.render( this.scene, this.camera, this.renderToScreen ? null : readBuffer, this.clear );

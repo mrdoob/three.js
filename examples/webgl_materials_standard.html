@@ -48,8 +48,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
+
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
@@ -127,8 +126,8 @@
 					material.metalness = 1;
 
 					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
-					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
+					// roughness is in G channel, metalness is in B channel 
+					material.metalnessMap = material.roughnessMap = loader.load( path + 'Cerberus_RM.jpg' );
 					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
 
 					material.map.wrapS = THREE.RepeatWrapping;

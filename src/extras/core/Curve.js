@@ -27,7 +27,7 @@ import { Matrix4 } from '../../math/Matrix4';
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
  * THREE.CubicBezierCurve3
- * THREE.SplineCurve3
+ * THREE.CatmullRomCurve3
  *
  * A series of curves can be represented as a THREE.CurvePath
  *
@@ -39,14 +39,12 @@ import { Matrix4 } from '../../math/Matrix4';
 
 function Curve() {}
 
-Curve.prototype = {
-
-	constructor: Curve,
+Object.assign( Curve.prototype, {
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function ( t ) {
+	getPoint: function () {
 
 		console.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
 		return null;
@@ -67,7 +65,7 @@ Curve.prototype = {
 
 	getPoints: function ( divisions ) {
 
-		if ( ! divisions ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -85,7 +83,7 @@ Curve.prototype = {
 
 	getSpacedPoints: function ( divisions ) {
 
-		if ( ! divisions ) divisions = 5;
+		if ( divisions === undefined ) divisions = 5;
 
 		var points = [];
 
@@ -112,7 +110,7 @@ Curve.prototype = {
 
 	getLengths: function ( divisions ) {
 
-		if ( ! divisions ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
+		if ( divisions === undefined ) divisions = ( this.__arcLengthDivisions ) ? ( this.__arcLengthDivisions ) : 200;
 
 		if ( this.cacheArcLengths
 			&& ( this.cacheArcLengths.length === divisions + 1 )
@@ -133,7 +131,7 @@ Curve.prototype = {
 
 		for ( p = 1; p <= divisions; p ++ ) {
 
-			current = this.getPoint ( p / divisions );
+			current = this.getPoint( p / divisions );
 			sum += current.distanceTo( last );
 			cache.push( sum );
 			last = current;
@@ -146,7 +144,7 @@ Curve.prototype = {
 
 	},
 
-	updateArcLengths: function() {
+	updateArcLengths: function () {
 
 		this.needsUpdate = true;
 		this.getLengths();
@@ -239,7 +237,7 @@ Curve.prototype = {
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function( t ) {
+	getTangent: function ( t ) {
 
 		var delta = 0.0001;
 		var t1 = t - delta;
@@ -382,25 +380,7 @@ Curve.prototype = {
 
 	}
 
-};
-
-// TODO: Transformation for Curves?
-
-/**************************************************************
- *	3D Curves
- **************************************************************/
-
-// A Factory method for creating new curve subclasses
-
-Curve.create = function ( constructor, getPointFunc ) {
-
-	constructor.prototype = Object.create( Curve.prototype );
-	constructor.prototype.constructor = constructor;
-	constructor.prototype.getPoint = getPointFunc;
-
-	return constructor;
-
-};
+} );
 
 
 export { Curve };

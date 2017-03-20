@@ -17,7 +17,7 @@ function AnimationClip( name, duration, tracks ) {
 
 	this.name = name;
 	this.tracks = tracks;
-	this.duration = ( duration !== undefined ) ? duration : -1;
+	this.duration = ( duration !== undefined ) ? duration : - 1;
 
 	this.uuid = _Math.generateUUID();
 
@@ -32,59 +32,9 @@ function AnimationClip( name, duration, tracks ) {
 
 }
 
-AnimationClip.prototype = {
-
-	constructor: AnimationClip,
-
-	resetDuration: function() {
-
-		var tracks = this.tracks,
-			duration = 0;
-
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
-
-			var track = this.tracks[ i ];
-
-			duration = Math.max(
-					duration, track.times[ track.times.length - 1 ] );
-
-		}
-
-		this.duration = duration;
-
-	},
-
-	trim: function() {
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			this.tracks[ i ].trim( 0, this.duration );
-
-		}
-
-		return this;
-
-	},
-
-	optimize: function() {
-
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
-
-			this.tracks[ i ].optimize();
-
-		}
-
-		return this;
-
-	}
-
-};
-
-// Static methods:
-
 Object.assign( AnimationClip, {
 
-	parse: function( json ) {
+	parse: function ( json ) {
 
 		var tracks = [],
 			jsonTracks = json.tracks,
@@ -100,8 +50,7 @@ Object.assign( AnimationClip, {
 
 	},
 
-
-	toJSON: function( clip ) {
+	toJSON: function ( clip ) {
 
 		var tracks = [],
 			clipTracks = clip.tracks;
@@ -124,8 +73,7 @@ Object.assign( AnimationClip, {
 
 	},
 
-
-	CreateFromMorphTargetSequence: function( name, morphTargetSequence, fps, noLoop ) {
+	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
 
 		var numMorphTargets = morphTargetSequence.length;
 		var tracks = [];
@@ -160,13 +108,14 @@ Object.assign( AnimationClip, {
 						'.morphTargetInfluences[' + morphTargetSequence[ i ].name + ']',
 						times, values
 					).scale( 1.0 / fps ) );
+
 		}
 
-		return new AnimationClip( name, -1, tracks );
+		return new AnimationClip( name, - 1, tracks );
 
 	},
 
-	findByName: function( objectOrClipArray, name ) {
+	findByName: function ( objectOrClipArray, name ) {
 
 		var clipArray = objectOrClipArray;
 
@@ -184,13 +133,14 @@ Object.assign( AnimationClip, {
 				return clipArray[ i ];
 
 			}
+
 		}
 
 		return null;
 
 	},
 
-	CreateClipsFromMorphTargetSequences: function( morphTargets, fps, noLoop ) {
+	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
 
 		var animationToMorphTargets = {};
 
@@ -235,7 +185,7 @@ Object.assign( AnimationClip, {
 	},
 
 	// parse the animation.hierarchy format
-	parseAnimation: function( animation, bones ) {
+	parseAnimation: function ( animation, bones ) {
 
 		if ( ! animation ) {
 
@@ -244,8 +194,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var addNonemptyTrack = function(
-				trackType, trackName, animationKeys, propertyName, destTracks ) {
+		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
 			if ( animationKeys.length !== 0 ) {
@@ -253,8 +202,7 @@ Object.assign( AnimationClip, {
 				var times = [];
 				var values = [];
 
-				AnimationUtils.flattenJSON(
-						animationKeys, times, values, propertyName );
+				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
 				// empty keys are filtered out, so check again
 				if ( times.length !== 0 ) {
@@ -271,7 +219,7 @@ Object.assign( AnimationClip, {
 
 		var clipName = animation.name || 'default';
 		// automatic length determination in AnimationClip.
-		var duration = animation.length || -1;
+		var duration = animation.length || - 1;
 		var fps = animation.fps || 30;
 
 		var hierarchyTracks = animation.hierarchy || [];
@@ -285,17 +233,19 @@ Object.assign( AnimationClip, {
 
 			// process morph targets in a way exactly compatible
 			// with AnimationHandler.init( animation )
-			if ( animationKeys[0].morphTargets ) {
+			if ( animationKeys[ 0 ].morphTargets ) {
 
 				// figure out all morph targets used in this track
 				var morphTargetNames = {};
+
 				for ( var k = 0; k < animationKeys.length; k ++ ) {
 
-					if ( animationKeys[k].morphTargets ) {
+					if ( animationKeys[ k ].morphTargets ) {
 
-						for ( var m = 0; m < animationKeys[k].morphTargets.length; m ++ ) {
+						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
-							morphTargetNames[ animationKeys[k].morphTargets[m] ] = -1;
+							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
+
 						}
 
 					}
@@ -310,24 +260,23 @@ Object.assign( AnimationClip, {
 					var times = [];
 					var values = [];
 
-					for ( var m = 0;
-							m !== animationKeys[k].morphTargets.length; ++ m ) {
+					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
 
-						var animationKey = animationKeys[k];
+						var animationKey = animationKeys[ k ];
 
 						times.push( animationKey.time );
 						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
 
 					}
 
-					tracks.push( new NumberKeyframeTrack(
-							'.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
+					tracks.push( new NumberKeyframeTrack( '.morphTargetInfluence[' + morphTargetName + ']', times, values ) );
 
 				}
 
 				duration = morphTargetNames.length * ( fps || 1.0 );
 
 			} else {
+
 				// ...assume skeletal animation
 
 				var boneName = '.bones[' + bones[ h ].name + ']';
@@ -357,6 +306,50 @@ Object.assign( AnimationClip, {
 		var clip = new AnimationClip( clipName, duration, tracks );
 
 		return clip;
+
+	}
+
+} );
+
+Object.assign( AnimationClip.prototype, {
+
+	resetDuration: function () {
+
+		var tracks = this.tracks, duration = 0;
+
+		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+
+			var track = this.tracks[ i ];
+
+			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
+
+		}
+
+		this.duration = duration;
+
+	},
+
+	trim: function () {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].trim( 0, this.duration );
+
+		}
+
+		return this;
+
+	},
+
+	optimize: function () {
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			this.tracks[ i ].optimize();
+
+		}
+
+		return this;
 
 	}
 

@@ -1,6 +1,7 @@
 import { ShaderMaterial } from './ShaderMaterial';
 import { ShaderChunk } from '../renderers/shaders/ShaderChunk';
 import { UniformsLib } from '../renderers/shaders/UniformsLib';
+import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -9,12 +10,12 @@ import { UniformsLib } from '../renderers/shaders/UniformsLib';
 function ShadowMaterial() {
 
 	ShaderMaterial.call( this, {
-		uniforms: Object.assign( {},
+		uniforms: UniformsUtils.merge( [
 			UniformsLib.lights,
 			{
 				opacity: { value: 1.0 }
 			}
-		),
+		] ),
 		vertexShader: ShaderChunk[ 'shadow_vert' ],
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );

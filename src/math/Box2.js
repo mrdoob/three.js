@@ -11,9 +11,7 @@ function Box2( min, max ) {
 
 }
 
-Box2.prototype = {
-
-	constructor: Box2,
+Object.assign( Box2.prototype, {
 
 	set: function ( min, max ) {
 
@@ -129,27 +127,15 @@ Box2.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( point.x < this.min.x || point.x > this.max.x ||
-		     point.y < this.min.y || point.y > this.max.y ) {
-
-			return false;
-
-		}
-
-		return true;
+		return point.x < this.min.x || point.x > this.max.x ||
+			point.y < this.min.y || point.y > this.max.y ? false : true;
 
 	},
 
 	containsBox: function ( box ) {
 
-		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-		     ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
-
-			return true;
-
-		}
-
-		return false;
+		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
+			this.min.y <= box.min.y && box.max.y <= this.max.y;
 
 	},
 
@@ -169,16 +155,10 @@ Box2.prototype = {
 
 	intersectsBox: function ( box ) {
 
-		// using 6 splitting planes to rule out intersections.
+		// using 4 splitting planes to rule out intersections
 
-		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-		     box.max.y < this.min.y || box.min.y > this.max.y ) {
-
-			return false;
-
-		}
-
-		return true;
+		return box.max.x < this.min.x || box.min.x > this.max.x ||
+			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
 	},
 
@@ -235,7 +215,7 @@ Box2.prototype = {
 
 	}
 
-};
+} );
 
 
 export { Box2 };

@@ -15,9 +15,7 @@ function Vector4( x, y, z, w ) {
 
 }
 
-Vector4.prototype = {
-
-	constructor: Vector4,
+Object.assign( Vector4.prototype, {
 
 	isVector4: true,
 
@@ -86,7 +84,7 @@ Vector4.prototype = {
 			default: throw new Error( 'index is out of range: ' + index );
 
 		}
-		
+
 		return this;
 
 	},
@@ -215,21 +213,10 @@ Vector4.prototype = {
 
 	multiplyScalar: function ( scalar ) {
 
-		if ( isFinite( scalar ) ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-			this.w *= scalar;
-
-		} else {
-
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.w = 0;
-
-		}
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
+		this.w *= scalar;
 
 		return this;
 
@@ -450,16 +437,10 @@ Vector4.prototype = {
 
 	clampScalar: function () {
 
-		var min, max;
+		var min = new Vector4();
+		var max = new Vector4();
 
 		return function clampScalar( minVal, maxVal ) {
-
-			if ( min === undefined ) {
-
-				min = new Vector4();
-				max = new Vector4();
-
-			}
 
 			min.set( minVal, minVal, minVal, minVal );
 			max.set( maxVal, maxVal, maxVal, maxVal );
@@ -611,22 +592,24 @@ Vector4.prototype = {
 
 	},
 
-	fromAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute: function ( attribute, index, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset !== undefined ) {
 
-		index = index * attribute.itemSize + offset;
+			console.warn( 'THREE.Vector4: offset has been removed from .fromBufferAttribute().' );
 
-		this.x = attribute.array[ index ];
-		this.y = attribute.array[ index + 1 ];
-		this.z = attribute.array[ index + 2 ];
-		this.w = attribute.array[ index + 3 ];
+		}
+
+		this.x = attribute.getX( index );
+		this.y = attribute.getY( index );
+		this.z = attribute.getZ( index );
+		this.w = attribute.getW( index );
 
 		return this;
 
 	}
 
-};
+} );
 
 
 export { Vector4 };

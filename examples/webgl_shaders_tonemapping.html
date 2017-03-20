@@ -135,12 +135,12 @@
 					// blending: THREE.AdditiveBlending,
 					transparent: true,
 					lights: true,
-					uniforms: Object.assign( {},
+					uniforms: THREE.UniformsUtils.merge( [
 
 						THREE.UniformsLib[ "common" ],
 						THREE.UniformsLib[ "lights" ]
 
-					),
+					] ),
 					vertexShader: [
 						"varying vec3 vViewPosition;",
 						"varying vec3 vNormal;",

@@ -93,8 +93,8 @@ function Object3D() {
 
 	this.userData = {};
 
-	this.onBeforeRender = function(){};
-	this.onAfterRender = function(){};
+	this.onBeforeRender = function () {};
+	this.onAfterRender = function () {};
 
 }
 
@@ -279,7 +279,15 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		return function lookAt( vector ) {
 
-			m1.lookAt( vector, this.position, this.up );
+			if ( this.isCamera ) {
+
+				m1.lookAt( this.position, vector, this.up );
+
+			} else {
+
+				m1.lookAt( vector, this.position, this.up );
+
+			}
 
 			this.quaternion.setFromRotationMatrix( m1 );
 
@@ -308,7 +316,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( (object && object.isObject3D) ) {
+		if ( ( object && object.isObject3D ) ) {
 
 			if ( object.parent !== null ) {
 
@@ -526,9 +534,9 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 	updateMatrixWorld: function ( force ) {
 
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
 			if ( this.parent === null ) {
 
@@ -702,6 +710,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
+		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
 
 		this.castShadow = source.castShadow;
@@ -728,5 +737,6 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 	}
 
 } );
+
 
 export { Object3D };

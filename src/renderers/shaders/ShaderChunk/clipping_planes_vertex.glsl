@@ -1,4 +1,4 @@
-#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG ) && ! defined( TOON )
+#if NUM_CLIPPING_PLANES > 0 && ! defined( PHYSICAL ) && ! defined( PHONG )
 	vViewPosition = - mvPosition.xyz;
 #endif
 

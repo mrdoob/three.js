@@ -25,13 +25,13 @@ Sidebar.Material = function ( editor ) {
 
 	} ) );
 
-	managerRow.add( new UI.Button( 'Copy' ).onClick( function () {
+	managerRow.add( new UI.Button( 'Copy' ).setMarginLeft( '4px' ).onClick( function () {
 
 		copiedMaterial = currentObject.material;
 
 	} ) );
 
-	managerRow.add( new UI.Button( 'Paste' ).onClick( function () {
+	managerRow.add( new UI.Button( 'Paste' ).setMarginLeft( '4px' ).onClick( function () {
 
 		if ( copiedMaterial === undefined ) return;
 
@@ -71,8 +71,8 @@ Sidebar.Material = function ( editor ) {
 	// uuid
 
 	var materialUUIDRow = new UI.Row();
-	var materialUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
-	var materialUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var materialUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var materialUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
 
 		materialUUID.setValue( THREE.Math.generateUUID() );
 		update();

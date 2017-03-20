@@ -1,9 +1,10 @@
-import { FileLoader } from './FileLoader';
-import { DefaultLoadingManager } from './LoadingManager';
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
+
 
 function ImageLoader( manager ) {
 
@@ -15,48 +16,67 @@ Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( url === undefined ) url = '';
+
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
+		var cached = Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			scope.manager.itemStart( url );
+
+			setTimeout( function () {
+
+				if ( onLoad ) onLoad( cached );
+
+				scope.manager.itemEnd( url );
+
+			}, 0 );
+
+			return cached;
+
+		}
+
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-		image.onload = function () {
 
-			image.onload = null;
+		image.addEventListener( 'load', function () {
 
-			URL.revokeObjectURL( image.src );
+			Cache.add( url, this );
 
-			if ( onLoad ) onLoad( image );
+			if ( onLoad ) onLoad( this );
 
 			scope.manager.itemEnd( url );
 
-		};
-		image.onerror = onError;
+		}, false );
 
-		if ( url.indexOf( 'data:' ) === 0 ) {
+		/*
+		image.addEventListener( 'progress', function ( event ) {
 
-			image.src = url;
+			if ( onProgress ) onProgress( event );
 
-		} else if ( this.crossOrigin !== undefined ) {
+		}, false );
+		*/
 
-			// crossOrigin doesn't work with URL.createObjectURL()?
+		image.addEventListener( 'error', function ( event ) {
 
-			image.crossOrigin = this.crossOrigin;
-			image.src = url;
+			if ( onError ) onError( event );
 
-		} else {
+			scope.manager.itemError( url );
 
-			var loader = new FileLoader();
-			loader.setPath( this.path );
-			loader.setResponseType( 'blob' );
-			loader.setWithCredentials( this.withCredentials );
-			loader.load( url, function ( blob ) {
+		}, false );
 
-				image.src = URL.createObjectURL( blob );
+		if ( url.substr( 0, 5 ) !== 'data:' ) {
 
-			}, onProgress, onError );
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
 		}
 
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 
@@ -65,13 +85,6 @@ Object.assign( ImageLoader.prototype, {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
 		return this;
 
 	},

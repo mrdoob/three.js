@@ -1,4 +1,24 @@
-import { TextureMapping, TextureWrapping, TextureFilter } from '../constants';
+import {
+	UVMapping,
+	CubeReflectionMapping,
+	CubeRefractionMapping,
+	EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping,
+	SphericalReflectionMapping,
+	CubeUVReflectionMapping,
+	CubeUVRefractionMapping,
+
+	RepeatWrapping,
+	ClampToEdgeWrapping,
+	MirroredRepeatWrapping,
+
+	NearestFilter,
+	NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter,
+	LinearFilter,
+	LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter
+} from '../constants';
 import { Color } from '../math/Color';
 import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../core/Object3D';
@@ -6,6 +26,7 @@ import { Group } from '../objects/Group';
 import { Sprite } from '../objects/Sprite';
 import { Points } from '../objects/Points';
 import { Line } from '../objects/Line';
+import { LineLoop } from '../objects/LineLoop';
 import { LineSegments } from '../objects/LineSegments';
 import { LOD } from '../objects/LOD';
 import { Mesh } from '../objects/Mesh';
@@ -17,6 +38,7 @@ import { SpotLight } from '../lights/SpotLight';
 import { PointLight } from '../lights/PointLight';
 import { DirectionalLight } from '../lights/DirectionalLight';
 import { AmbientLight } from '../lights/AmbientLight';
+import { RectAreaLight } from '../lights/RectAreaLight';
 import { OrthographicCamera } from '../cameras/OrthographicCamera';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Scene } from '../scenes/Scene';
@@ -64,7 +86,10 @@ Object.assign( ObjectLoader.prototype, {
 
 			} catch ( error ) {
 
+				if ( onError !== undefined ) onError( error );
+
 				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+
 				return;
 
 			}
@@ -301,7 +326,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
+						geometry = geometryLoader.parse( data, this.texturePath ).geometry;
 
 						break;
 
@@ -409,6 +434,32 @@ Object.assign( ObjectLoader.prototype, {
 	},
 
 	parseTextures: function ( json, images ) {
+
+		var TextureMapping = {
+			UVMapping: UVMapping,
+			CubeReflectionMapping: CubeReflectionMapping,
+			CubeRefractionMapping: CubeRefractionMapping,
+			EquirectangularReflectionMapping: EquirectangularReflectionMapping,
+			EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+			SphericalReflectionMapping: SphericalReflectionMapping,
+			CubeUVReflectionMapping: CubeUVReflectionMapping,
+			CubeUVRefractionMapping: CubeUVRefractionMapping
+		};
+
+		var TextureWrapping = {
+			RepeatWrapping: RepeatWrapping,
+			ClampToEdgeWrapping: ClampToEdgeWrapping,
+			MirroredRepeatWrapping: MirroredRepeatWrapping
+		};
+
+		var TextureFilter = {
+			NearestFilter: NearestFilter,
+			NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+			NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+			LinearFilter: LinearFilter,
+			LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+			LinearMipMapLinearFilter: LinearMipMapLinearFilter
+		};
 
 		function parseConstant( value, type ) {
 
@@ -576,6 +627,12 @@ Object.assign( ObjectLoader.prototype, {
 
 					break;
 
+				case 'RectAreaLight':
+
+					object = new RectAreaLight( data.color, data.intensity, data.width, data.height );
+
+					break;
+
 				case 'SpotLight':
 
 					object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
@@ -587,6 +644,10 @@ Object.assign( ObjectLoader.prototype, {
 					object = new HemisphereLight( data.color, data.groundColor, data.intensity );
 
 					break;
+
+				case 'SkinnedMesh':
+
+					console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
 
 				case 'Mesh':
 
@@ -614,6 +675,12 @@ Object.assign( ObjectLoader.prototype, {
 				case 'Line':
 
 					object = new Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
+
+					break;
+
+				case 'LineLoop':
+
+					object = new LineLoop( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 

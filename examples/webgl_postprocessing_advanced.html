@@ -188,8 +188,8 @@
 
 				var effectColorify1 = new THREE.ShaderPass( THREE.ColorifyShader );
 				var effectColorify2 = new THREE.ShaderPass( THREE.ColorifyShader );
-				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
-				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
+				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
+				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
 
 				var clearMask = new THREE.ClearMaskPass();
 				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );

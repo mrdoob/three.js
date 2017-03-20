@@ -1,0 +1,588 @@
+{
+    "accessors": {
+        "IBM_Armature_Cylinder-skin": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2,
+            "type": "MAT4"
+        },
+        "accessor_16": {
+            "bufferView": "bufferView_44",
+            "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 564,
+            "type": "SCALAR"
+        },
+        "accessor_18": {
+            "bufferView": "bufferView_45",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 96,
+            "max": [
+                1,
+                1,
+                4.57508
+            ],
+            "min": [
+                -1,
+                -1,
+                -4.57508
+            ],
+            "type": "VEC3"
+        },
+        "accessor_20": {
+            "bufferView": "bufferView_45",
+            "byteOffset": 1152,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 96,
+            "max": [
+                0.998198,
+                0.998198,
+                0.688838
+            ],
+            "min": [
+                -0.998198,
+                -0.998198,
+                -0.644473
+            ],
+            "type": "VEC3"
+        },
+        "accessor_37": {
+            "bufferView": "bufferView_45",
+            "byteOffset": 3840,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 96,
+            "max": [
+                1,
+                0.261398,
+                0,
+                0
+            ],
+            "min": [
+                0.738602,
+                0,
+                0,
+                0
+            ],
+            "type": "VEC4"
+        },
+        "accessor_40": {
+            "bufferView": "bufferView_45",
+            "byteOffset": 2304,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 96,
+            "max": [
+                1,
+                1,
+                0,
+                0
+            ],
+            "min": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "type": "VEC4"
+        },
+        "animAccessor_0": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 128,
+            "componentType": 5126,
+            "count": 3,
+            "type": "SCALAR"
+        },
+        "animAccessor_1": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 140,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC3"
+        },
+        "animAccessor_2": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 176,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC3"
+        },
+        "animAccessor_3": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 212,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC4"
+        },
+        "animAccessor_4": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 260,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC3"
+        },
+        "animAccessor_5": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 296,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC3"
+        },
+        "animAccessor_6": {
+            "bufferView": "bufferView_43",
+            "byteOffset": 332,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC4"
+        }
+    },
+    "animations": {
+        "animation_0": {
+            "channels": [
+                {
+                    "sampler": "animation_0_scale_sampler",
+                    "target": {
+                        "id": "Bone",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_0_translation_sampler",
+                    "target": {
+                        "id": "Bone",
+                        "path": "translation"
+                    }
+                },
+                {
+                    "sampler": "animation_0_rotation_sampler",
+                    "target": {
+                        "id": "Bone",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_3",
+                "scale": "animAccessor_1",
+                "translation": "animAccessor_2"
+            },
+            "samplers": {
+                "animation_0_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_0_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_0_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_1": {
+            "channels": [
+                {
+                    "sampler": "animation_1_scale_sampler",
+                    "target": {
+                        "id": "Bone_001",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_1_translation_sampler",
+                    "target": {
+                        "id": "Bone_001",
+                        "path": "translation"
+                    }
+                },
+                {
+                    "sampler": "animation_1_rotation_sampler",
+                    "target": {
+                        "id": "Bone_001",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_6",
+                "scale": "animAccessor_4",
+                "translation": "animAccessor_5"
+            },
+            "samplers": {
+                "animation_1_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_1_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_1_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        }
+    },
+    "asset": {
+        "generator": "collada2gltf@027f74366341d569dea42e9a68b7104cc3892054",
+        "premultipliedAlpha": true,
+        "profile": {
+            "api": "WebGL",
+            "version": "1.0.2"
+        },
+        "version": "1.0"
+    },
+    "bufferViews": {
+        "bufferView_43": {
+            "buffer": "RiggedSimple",
+            "byteLength": 380,
+            "byteOffset": 0
+        },
+        "bufferView_44": {
+            "buffer": "RiggedSimple",
+            "byteLength": 1128,
+            "byteOffset": 380,
+            "target": 34963
+        },
+        "bufferView_45": {
+            "buffer": "RiggedSimple",
+            "byteLength": 5376,
+            "byteOffset": 1508,
+            "target": 34962
+        }
+    },
+    "buffers": {
+        "RiggedSimple": {
+            "byteLength": 6884,
+            "type": "arraybuffer",
+            "uri": "RiggedSimple.bin"
+        }
+    },
+    "materials": {
+        "Material_001-effect": {
+            "name": "Material_001",
+            "technique": "technique0",
+            "values": {
+                "ambient": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "diffuse": [
+                    0.279635,
+                    0.64,
+                    0.210944,
+                    1
+                ],
+                "emission": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "shininess": 50,
+                "specular": [
+                    0.5,
+                    0.5,
+                    0.5,
+                    1
+                ]
+            }
+        }
+    },
+    "meshes": {
+        "Cylinder-mesh": {
+            "name": "Cylinder",
+            "primitives": [
+                {
+                    "attributes": {
+                        "JOINT": "accessor_40",
+                        "NORMAL": "accessor_20",
+                        "POSITION": "accessor_18",
+                        "WEIGHT": "accessor_37"
+                    },
+                    "indices": "accessor_16",
+                    "material": "Material_001-effect",
+                    "mode": 4
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "Armature": {
+            "children": [
+                "Bone"
+            ],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "name": "Armature"
+        },
+        "Bone": {
+            "children": [
+                "Bone_001"
+            ],
+            "jointName": "Bone",
+            "name": "Bone",
+            "rotation": [
+                0.70474,
+                0,
+                0,
+                0.709465
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                -3.15606e-007,
+                -4.18033
+            ]
+        },
+        "Bone_001": {
+            "children": [],
+            "jointName": "Bone_001",
+            "name": "Bone.001",
+            "rotation": [
+                0.00205211,
+                9.94789e-008,
+                0.000291371,
+                0.999998
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                4.18717,
+                0
+            ]
+        },
+        "Cylinder": {
+            "children": [],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "meshes": [
+                "Cylinder-mesh"
+            ],
+            "name": "Cylinder",
+            "skeletons": [
+                "Bone"
+            ],
+            "skin": "Armature_Cylinder-skin"
+        },
+        "node_4": {
+            "children": [
+                "Armature",
+                "Cylinder"
+            ],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "name": "Y_UP_Transform"
+        }
+    },
+    "programs": {
+        "program_0": {
+            "attributes": [
+                "a_joint",
+                "a_normal",
+                "a_position",
+                "a_weight"
+            ],
+            "fragmentShader": "RiggedSimple0FS",
+            "vertexShader": "RiggedSimple0VS"
+        }
+    },
+    "scene": "defaultScene",
+    "scenes": {
+        "defaultScene": {
+            "nodes": [
+                "node_4"
+            ]
+        }
+    },
+    "shaders": {
+        "RiggedSimple0FS": {
+            "type": 35632,
+            "uri": "RiggedSimple0FS.glsl"
+        },
+        "RiggedSimple0VS": {
+            "type": 35633,
+            "uri": "RiggedSimple0VS.glsl"
+        }
+    },
+    "skins": {
+        "Armature_Cylinder-skin": {
+            "bindShapeMatrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "inverseBindMatrices": "IBM_Armature_Cylinder-skin",
+            "jointNames": [
+                "Bone",
+                "Bone_001"
+            ],
+            "name": "Armature"
+        }
+    },
+    "techniques": {
+        "technique0": {
+            "attributes": {
+                "a_joint": "joint",
+                "a_normal": "normal",
+                "a_position": "position",
+                "a_weight": "weight"
+            },
+            "parameters": {
+                "ambient": {
+                    "type": 35666
+                },
+                "diffuse": {
+                    "type": 35666
+                },
+                "emission": {
+                    "type": 35666
+                },
+                "joint": {
+                    "semantic": "JOINT",
+                    "type": 35666
+                },
+                "jointMat": {
+                    "count": 2,
+                    "semantic": "JOINTMATRIX",
+                    "type": 35676
+                },
+                "modelViewMatrix": {
+                    "semantic": "MODELVIEW",
+                    "type": 35676
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": 35665
+                },
+                "normalMatrix": {
+                    "semantic": "MODELVIEWINVERSETRANSPOSE",
+                    "type": 35675
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": 35665
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": 35676
+                },
+                "shininess": {
+                    "type": 5126
+                },
+                "specular": {
+                    "type": 35666
+                },
+                "weight": {
+                    "semantic": "WEIGHT",
+                    "type": 35666
+                }
+            },
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929,
+                    2884
+                ]
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_jointMat": "jointMat",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_shininess": "shininess",
+                "u_specular": "specular"
+            }
+        }
+    }
+}

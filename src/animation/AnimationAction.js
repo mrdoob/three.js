@@ -74,11 +74,9 @@ function AnimationAction( mixer, clip, localRoot ) {
 	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
 	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
 
-};
+}
 
-AnimationAction.prototype = {
-
-	constructor: AnimationAction,
+Object.assign( AnimationAction.prototype, {
 
 	// State & Scheduling
 
@@ -273,7 +271,7 @@ AnimationAction.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._timeScaleInterpolant = interpolant;
 
 		}
@@ -473,7 +471,7 @@ AnimationAction.prototype = {
 			if ( loopCount === -1 ) {
 				// just started
 
-				this.loopCount = 0;
+				this._loopCount = 0;
 				this._setEndings( true, true, false );
 
 			}
@@ -636,7 +634,7 @@ AnimationAction.prototype = {
 
 		if ( interpolant === null ) {
 
-			interpolant = mixer._lendControlInterpolant(),
+			interpolant = mixer._lendControlInterpolant();
 			this._weightInterpolant = interpolant;
 
 		}
@@ -651,7 +649,7 @@ AnimationAction.prototype = {
 
 	}
 
-};
+} );
 
 
 export { AnimationAction };

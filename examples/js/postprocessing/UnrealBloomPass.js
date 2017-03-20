@@ -22,18 +22,21 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	var resy = Math.round(this.resolution.y/2);
 
 	this.renderTargetBright = new THREE.WebGLRenderTarget( resx, resy, pars );
+	this.renderTargetBright.texture.name = "UnrealBloomPass.bright";
 	this.renderTargetBright.texture.generateMipmaps = false;
 
 	for( var i=0; i<this.nMips; i++) {
 
 		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
 
+		renderTarget.texture.name = "UnrealBloomPass.h" + i;
 		renderTarget.texture.generateMipmaps = false;
 
 		this.renderTargetsHorizontal.push(renderTarget);
 
 		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
 
+		renderTarget.texture.name = "UnrealBloomPass.v" + i;
 		renderTarget.texture.generateMipmaps = false;
 
 		this.renderTargetsVertical.push(renderTarget);
@@ -49,7 +52,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 		console.error( "THREE.UnrealBloomPass relies on THREE.LuminosityHighPassShader" );
 
 	var highPassShader = THREE.LuminosityHighPassShader;
-	this.highPassUniforms = Object.assign( {}, highPassShader.uniforms );
+	this.highPassUniforms = THREE.UniformsUtils.clone( highPassShader.uniforms );
 
 	this.highPassUniforms[ "luminosityThreshold" ].value = threshold;
 	this.highPassUniforms[ "smoothWidth" ].value = 0.01;
@@ -101,7 +104,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	var copyShader = THREE.CopyShader;
 
-	this.copyUniforms = Object.assign( {}, copyShader.uniforms );
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 	this.copyUniforms[ "opacity" ].value = 1.0;
 
 	this.materialCopy = new THREE.ShaderMaterial( {
@@ -124,6 +127,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };

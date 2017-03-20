@@ -304,7 +304,7 @@
 
 				};
 
-				uniformsNormal = Object.assign( {}, normalShader.uniforms );
+				uniformsNormal = THREE.UniformsUtils.clone( normalShader.uniforms );
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
@@ -335,7 +335,7 @@
 
 				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-				uniformsTerrain = Object.assign( {}, terrainShader.uniforms );
+				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
 				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
 				uniformsTerrain[ 'uNormalScale' ].value = 3.5;

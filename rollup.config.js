@@ -1,20 +1,26 @@
-function glsl () {
+function glsl() {
+
 	return {
-		transform ( code, id ) {
-			if ( !/\.glsl$/.test( id ) ) return;
+
+		transform( code, id ) {
+
+			if ( /\.glsl$/.test( id ) === false ) return;
 
 			var transformedCode = 'export default ' + JSON.stringify(
 				code
-					.replace( /[ \t]*\/\/.*\n/g, '' )
-					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' )
-					.replace( /\n{2,}/g, '\n' )
+					.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
+					.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
+					.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
 			) + ';';
 			return {
 				code: transformedCode,
 				map: { mappings: '' }
-			}
+			};
+
 		}
+
 	};
+
 }
 
 export default {
@@ -23,6 +29,7 @@ export default {
 	plugins: [
 		glsl()
 	],
+	// sourceMap: true,
 	targets: [
 		{
 			format: 'umd',
@@ -31,7 +38,7 @@ export default {
 		},
 		{
 			format: 'es',
-			dest: 'build/three.modules.js'
+			dest: 'build/three.module.js'
 		}
 	]
 };

@@ -99,6 +99,7 @@ THREE.CCDIKSolver.prototype = {
 		var effectorVec = new THREE.Vector3();
 		var linkPos = new THREE.Vector3();
 		var invLinkQ = new THREE.Quaternion();
+		var linkScale = new THREE.Vector3();
 		var axis = new THREE.Vector3();
 
 		var bones = this.mesh.skeleton.bones;
@@ -142,8 +143,8 @@ THREE.CCDIKSolver.prototype = {
 
 					// don't use getWorldPosition/Quaternion() here for the performance
 					// because they call updateMatrixWorld( true ) inside.
-					linkPos.setFromMatrixPosition( link.matrixWorld );
-					invLinkQ.setFromRotationMatrix( link.matrixWorld ).inverse();
+					link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
+					invLinkQ.inverse();
 					effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 					// work in link world

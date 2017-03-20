@@ -718,16 +718,24 @@
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
+			var vertex = new THREE.Vector3();
 			var matrix = new THREE.Matrix4();
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
-
+				var offset = i * posLen;
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
-				vertices.set( pos.array, i * posLen );
-				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
+				vertices.set( pos.array, offset );
+
+				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
+
+					vertex.fromArray( vertices.array, l );
+					vertex.applyMatrix4( matrix );
+					vertex.toArray( vertices.array, l );
+
+				}
 
 			}
 			mgeo.addAttribute( 'position', vertices );

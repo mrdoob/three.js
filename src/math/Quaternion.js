@@ -16,61 +16,151 @@ function Quaternion( x, y, z, w ) {
 
 }
 
-Quaternion.prototype = {
+Object.assign( Quaternion, {
 
-	constructor: Quaternion,
+	slerp: function ( qa, qb, qm, t ) {
 
-	get x () {
-
-		return this._x;
+		return qm.copy( qa ).slerp( qb, t );
 
 	},
 
-	set x ( value ) {
+	slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
-		this._x = value;
-		this.onChangeCallback();
+		// fuzz-free, array-based Quaternion SLERP operation
+
+		var x0 = src0[ srcOffset0 + 0 ],
+			y0 = src0[ srcOffset0 + 1 ],
+			z0 = src0[ srcOffset0 + 2 ],
+			w0 = src0[ srcOffset0 + 3 ],
+
+			x1 = src1[ srcOffset1 + 0 ],
+			y1 = src1[ srcOffset1 + 1 ],
+			z1 = src1[ srcOffset1 + 2 ],
+			w1 = src1[ srcOffset1 + 3 ];
+
+		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
+
+			var s = 1 - t,
+
+				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
+
+				dir = ( cos >= 0 ? 1 : - 1 ),
+				sqrSin = 1 - cos * cos;
+
+			// Skip the Slerp for tiny steps to avoid numeric problems:
+			if ( sqrSin > Number.EPSILON ) {
+
+				var sin = Math.sqrt( sqrSin ),
+					len = Math.atan2( sin, cos * dir );
+
+				s = Math.sin( s * len ) / sin;
+				t = Math.sin( t * len ) / sin;
+
+			}
+
+			var tDir = t * dir;
+
+			x0 = x0 * s + x1 * tDir;
+			y0 = y0 * s + y1 * tDir;
+			z0 = z0 * s + z1 * tDir;
+			w0 = w0 * s + w1 * tDir;
+
+			// Normalize in case we just did a lerp:
+			if ( s === 1 - t ) {
+
+				var f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
+
+				x0 *= f;
+				y0 *= f;
+				z0 *= f;
+				w0 *= f;
+
+			}
+
+		}
+
+		dst[ dstOffset ] = x0;
+		dst[ dstOffset + 1 ] = y0;
+		dst[ dstOffset + 2 ] = z0;
+		dst[ dstOffset + 3 ] = w0;
+
+	}
+
+} );
+
+Object.defineProperties( Quaternion.prototype, {
+
+	x: {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this.onChangeCallback();
+
+		}
 
 	},
 
-	get y () {
+	y: {
 
-		return this._y;
+		get: function () {
 
-	},
+			return this._y;
 
-	set y ( value ) {
+		},
 
-		this._y = value;
-		this.onChangeCallback();
+		set: function ( value ) {
 
-	},
+			this._y = value;
+			this.onChangeCallback();
 
-	get z () {
-
-		return this._z;
+		}
 
 	},
 
-	set z ( value ) {
+	z: {
 
-		this._z = value;
-		this.onChangeCallback();
+		get: function () {
 
-	},
+			return this._z;
 
-	get w () {
+		},
 
-		return this._w;
+		set: function ( value ) {
 
-	},
+			this._z = value;
+			this.onChangeCallback();
 
-	set w ( value ) {
-
-		this._w = value;
-		this.onChangeCallback();
+		}
 
 	},
+
+	w: {
+
+		get: function () {
+
+			return this._w;
+
+		},
+
+		set: function ( value ) {
+
+			this._w = value;
+			this.onChangeCallback();
+
+		}
+
+	}
+
+} );
+
+Object.assign( Quaternion.prototype, {
 
 	set: function ( x, y, z, w ) {
 
@@ -106,24 +196,28 @@ Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( (euler && euler.isEuler) === false ) {
+		if ( ( euler && euler.isEuler ) === false ) {
 
 			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
 		}
 
+		var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler._x / 2 );
-		var c2 = Math.cos( euler._y / 2 );
-		var c3 = Math.cos( euler._z / 2 );
-		var s1 = Math.sin( euler._x / 2 );
-		var s2 = Math.sin( euler._y / 2 );
-		var s3 = Math.sin( euler._z / 2 );
+		var cos = Math.cos;
+		var sin = Math.sin;
 
-		var order = euler.order;
+		var c1 = cos( x / 2 );
+		var c2 = cos( y / 2 );
+		var c3 = cos( z / 2 );
+
+		var s1 = sin( x / 2 );
+		var s2 = sin( y / 2 );
+		var s3 = sin( z / 2 );
 
 		if ( order === 'XYZ' ) {
 
@@ -259,7 +353,8 @@ Quaternion.prototype = {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1, r;
+		var v1 = new Vector3();
+		var r;
 
 		var EPS = 0.000001;
 
@@ -453,7 +548,7 @@ Quaternion.prototype = {
 
 		var halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+			ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 		this._w = ( w * ratioA + this._w * ratioB );
 		this._x = ( x * ratioA + this._x * ratioB );
@@ -510,79 +605,6 @@ Quaternion.prototype = {
 	},
 
 	onChangeCallback: function () {}
-
-};
-
-Object.assign( Quaternion, {
-
-	slerp: function( qa, qb, qm, t ) {
-
-		return qm.copy( qa ).slerp( qb, t );
-
-	},
-
-	slerpFlat: function(
-			dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
-
-		// fuzz-free, array-based Quaternion SLERP operation
-
-		var x0 = src0[ srcOffset0 + 0 ],
-			y0 = src0[ srcOffset0 + 1 ],
-			z0 = src0[ srcOffset0 + 2 ],
-			w0 = src0[ srcOffset0 + 3 ],
-
-			x1 = src1[ srcOffset1 + 0 ],
-			y1 = src1[ srcOffset1 + 1 ],
-			z1 = src1[ srcOffset1 + 2 ],
-			w1 = src1[ srcOffset1 + 3 ];
-
-		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
-
-			var s = 1 - t,
-
-				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-
-				dir = ( cos >= 0 ? 1 : - 1 ),
-				sqrSin = 1 - cos * cos;
-
-			// Skip the Slerp for tiny steps to avoid numeric problems:
-			if ( sqrSin > Number.EPSILON ) {
-
-				var sin = Math.sqrt( sqrSin ),
-					len = Math.atan2( sin, cos * dir );
-
-				s = Math.sin( s * len ) / sin;
-				t = Math.sin( t * len ) / sin;
-
-			}
-
-			var tDir = t * dir;
-
-			x0 = x0 * s + x1 * tDir;
-			y0 = y0 * s + y1 * tDir;
-			z0 = z0 * s + z1 * tDir;
-			w0 = w0 * s + w1 * tDir;
-
-			// Normalize in case we just did a lerp:
-			if ( s === 1 - t ) {
-
-				var f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
-
-				x0 *= f;
-				y0 *= f;
-				z0 *= f;
-				w0 *= f;
-
-			}
-
-		}
-
-		dst[ dstOffset ] = x0;
-		dst[ dstOffset + 1 ] = y0;
-		dst[ dstOffset + 2 ] = z0;
-		dst[ dstOffset + 3 ] = w0;
-
-	}
 
 } );
 

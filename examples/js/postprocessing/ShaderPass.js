@@ -16,7 +16,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 	} else if ( shader ) {
 
-		this.uniforms = Object.assign( {}, shader.uniforms );
+		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 		this.material = new THREE.ShaderMaterial( {
 
@@ -33,6 +33,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 	this.scene = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
@@ -45,7 +46,7 @@ THREE.ShaderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ] = new THREE.Uniform( readBuffer.texture );
+			this.uniforms[ this.textureID ].value = readBuffer.texture;
 
 		}
 

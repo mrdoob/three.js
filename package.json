@@ -1,21 +1,22 @@
 {
   "name": "three",
-  "version": "0.82.1",
+  "version": "0.84.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
-  "jsnext:main": "build/three.modules.js",
+  "jsnext:main": "build/three.module.js",
+  "module": "build/three.module.js",
   "files": [
     "package.json",
+    "bower.json",
     "LICENSE",
     "README.md",
     "build/three.js",
     "build/three.min.js",
-    "build/three.modules.js",
+    "build/three.module.js",
     "src",
     "examples/js",
-    "examples/fonts",
-    "bower.json"
+    "examples/fonts"
   ],
   "directories": {
     "doc": "docs",
@@ -27,11 +28,13 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "build-test": "rollup -c test/rollup.unit.config.js",
     "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
     "build-closure": "rollup -c && java -jar utils/build/compiler/closure-compiler-v20160713.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "dev": "rollup -c -w",
+    "dev": "rollup -c -w -m inline",
     "lint": "eslint src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "rollup -c test/rollup.unit.config.js -w",
+    "editor": "electron ./editor/main.js"
   },
   "keywords": [
     "three",
@@ -48,8 +51,10 @@
   "devDependencies": {
     "eslint": "^3.10.1",
     "eslint-config-mdcs": "^4.2.2",
-    "rollup": "^0.36.3",
-    "rollup-watch": "^2.5.0",
-    "uglify-js": "^2.6.0"
+    "qunitjs": "^2.1.1",
+    "rollup": "^0.41.4",
+    "rollup-watch": "^3.2.2",
+    "uglify-js": "^2.6.0",
+    "electron": "^1.6.1"
   }
 }

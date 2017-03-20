@@ -178,7 +178,7 @@ class Geometry(base_classes.BaseNode):
 
     def write(self, filepath=None):
         """Write the geometry definitions to disk. Uses the
-        desitnation path of the scene.
+        destination path of the scene.
 
         :param filepath: optional output file path
                         (Default value = None)
@@ -234,13 +234,18 @@ class Geometry(base_classes.BaseNode):
         logger.debug("Geometry()._component_data()")
 
         if self[constants.TYPE] != constants.GEOMETRY.title():
-            return self[constants.ATTRIBUTES]
+            data = {}
+            index = self.get(constants.INDEX)
+            if index is not None:
+                data[constants.INDEX] = index
+            data[constants.ATTRIBUTES] = self.get(constants.ATTRIBUTES)
+            return {constants.DATA: data}
 
         components = [constants.VERTICES, constants.FACES,
                       constants.UVS, constants.COLORS,
                       constants.NORMALS, constants.BONES,
                       constants.SKIN_WEIGHTS,
-                      constants.SKIN_INDICES, constants.NAME,
+                      constants.SKIN_INDICES,
                       constants.INFLUENCES_PER_VERTEX,
                       constants.INDEX]
 
@@ -281,18 +286,13 @@ class Geometry(base_classes.BaseNode):
         :rtype: dict
 
         """
-        data = self._component_data()
-
-        if self[constants.TYPE] != constants.GEOMETRY.title():
-            data = {
-                constants.DATA: {constants.ATTRIBUTES: data}
+        data = {
+            constants.METADATA: {
+                constants.TYPE: self[constants.TYPE]
             }
-
-        data[constants.METADATA] = {
-            constants.TYPE: self[constants.TYPE]
         }
-
         data[constants.METADATA].update(self.metadata)
+        data.update(self._component_data())
 
         draw_calls = self.get(constants.DRAW_CALLS)
         if draw_calls is not None:
@@ -347,31 +347,18 @@ class Geometry(base_classes.BaseNode):
 
         """
         data = {
+            constants.NAME: self[constants.NAME],
             constants.UUID: self[constants.UUID],
             constants.TYPE: self[constants.TYPE]
         }
 
-        component_data = self._component_data()
         if self[constants.TYPE] == constants.GEOMETRY.title():
-            data[constants.DATA] = component_data
-            data[constants.DATA].update({
-                constants.METADATA: self.metadata
-            })
+            data[constants.DATA] = self._component_data()
         else:
-            geometry_data = data
-            if self.options.get(constants.EMBED_GEOMETRY, True):
-                data[constants.DATA] = geometry_data = {}
-
-            geometry_data[constants.ATTRIBUTES] = component_data
-            index = self.get(constants.INDEX)
-            if index is not None:
-                geometry_data[constants.INDEX] = index
+            data.update(self._component_data())
             draw_calls = self.get(constants.DRAW_CALLS)
             if draw_calls is not None:
                 geometry_data[constants.DRAW_CALLS] = draw_calls
-
-            data[constants.METADATA] = self.metadata
-            data[constants.NAME] = self[constants.NAME]
 
         return data
 
@@ -386,13 +373,13 @@ class Geometry(base_classes.BaseNode):
         option_index_type = self.options.get(constants.INDEX_TYPE)
 
         pos_tuple = (constants.POSITION, options_vertices,
-                     api.mesh.buffer_position, 3)
+                     lambda m: api.mesh.buffer_position(m, self.options), 3)
         uvs_tuple = (constants.UV, option_uvs,
                      api.mesh.buffer_uv, 2)
         uvs2_tuple = (constants.UV2, option_uvs,
                      lambda m: api.mesh.buffer_uv(m, layer=1), 2)
         normals_tuple = (constants.NORMAL, option_normals,
-                         api.mesh.buffer_normal, 3)
+                         lambda m: api.mesh.buffer_normal(m, self.options), 3)
         dispatch = (pos_tuple, uvs_tuple, uvs2_tuple, normals_tuple)
 
         for key, option, func, size in dispatch:
@@ -513,11 +500,11 @@ class Geometry(base_classes.BaseNode):
         """Parse the geometry to Three.Geometry specs"""
         if self.options.get(constants.VERTICES):
             logger.info("Parsing %s", constants.VERTICES)
-            self[constants.VERTICES] = api.mesh.vertices(self.node) or []
+            self[constants.VERTICES] = api.mesh.vertices(self.node, self.options) or []
 
         if self.options.get(constants.NORMALS):
             logger.info("Parsing %s", constants.NORMALS)
-            self[constants.NORMALS] = api.mesh.normals(self.node) or []
+            self[constants.NORMALS] = api.mesh.normals(self.node, self.options) or []
 
         if self.options.get(constants.COLORS):
             logger.info("Parsing %s", constants.COLORS)

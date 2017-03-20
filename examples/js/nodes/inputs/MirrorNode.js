@@ -1,17 +1,17 @@
-THREE.MirrorNode = function( renderer, camera, options ) {
+THREE.MirrorNode = function( mirror, camera, options ) {
 
 	THREE.TempNode.call( this, 'v4' );
 
-	this.mirror = renderer instanceof THREE.Mirror ? renderer : new THREE.Mirror( renderer, camera, options );
+	this.mirror = mirror;
 
-	this.textureMatrix = new THREE.Matrix4Node( this.mirror.textureMatrix );
+	this.textureMatrix = new THREE.Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
 	this.worldPosition = new THREE.PositionNode( THREE.PositionNode.WORLD );
 
 	this.coord = new THREE.OperatorNode( this.textureMatrix, this.worldPosition, THREE.OperatorNode.MUL );
 	this.coordResult = new THREE.OperatorNode( null, this.coord, THREE.OperatorNode.ADD );
 
-	this.texture = new THREE.TextureNode( this.mirror.renderTarget.texture, this.coord, null, true );
+	this.texture = new THREE.TextureNode( this.mirror.material.uniforms.mirrorSampler.value, this.coord, null, true );
 
 };
 
