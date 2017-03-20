@@ -38,6 +38,7 @@ import { Color } from '../math/Color';
  *
  *  meshLine: <bool>
  *  meshLineWidth: <float>
+ *  meshLineSizeAttenuation: <float>
  * }
  */
 
@@ -76,6 +77,7 @@ function MeshBasicMaterial( parameters ) {
 
 	this.meshLine = false;
 	this.meshLineWidth = 1;
+	this.meshLineSizeAttenuation= false;
 
 	this.lights = false;
 
@@ -121,6 +123,7 @@ MeshBasicMaterial.prototype.copy = function ( source ) {
 
 	this.meshLine = source.meshLine;
 	this.meshLineWidth = source.meshLineWidth;
+	this.meshLineSizeAttenuation = source.meshLineSizeAttenuation;
 
 	return this;
 

@@ -30,7 +30,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - geometry - meshlines</div>
+		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - meshlines</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/geometries/hilbert3D.js"></script>
@@ -99,9 +99,9 @@
 
 				// materials
 
-				material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLineWidth: 10, meshLine: true } );
-				material2 = new THREE.MeshBasicMaterial( { meshLineWidth: 5, meshLine: true, vertexColors: THREE.VertexColors } );
-				material3 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLineWidth: 10, meshLine: true } );
+				material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10 } );
+				material2 = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, meshLine: true, meshLineWidth: 5 } );
+				material3 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10 } );
 
 				// mesh lines
 

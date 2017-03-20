@@ -16,7 +16,7 @@ function MeshLine( geometry, material, widthCallback ) {
 
 	this.type = 'MeshLine';
 	this.widthCallback = widthCallback || undefined;
-	this.frustumCulled = false; // culling not possible, geometry is mainly generated in the vertex shader
+	this.frustumCulled = false; // frustum culling not possible, geometry is partly generated in the vertex shader
 
 	var srcGeometry = this.prepare( geometry );
 	this.generate( srcGeometry );

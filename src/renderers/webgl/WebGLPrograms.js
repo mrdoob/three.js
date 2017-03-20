@@ -178,6 +178,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 			meshLine: material.meshLine,
 			meshLineWidth: material.meshLineWidth,
+			meshLineSizeAttenuation: material.meshLineSizeAttenuation,
 
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,

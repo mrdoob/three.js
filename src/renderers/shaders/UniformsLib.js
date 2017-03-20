@@ -176,6 +176,7 @@ var UniformsLib = {
 	meshLine: {
 
 		lineWidth: { value: 1 },
+		sizeAttenuation: { value: 0 },
 		resolution: { value: new Vector2( 1, 1 ) }
 
 	}

@@ -1,7 +1,8 @@
 #ifdef USE_MESHLINE
 
-	uniform vec2 resolution;
 	uniform float lineWidth;
+	uniform float sizeAttenuation;
+	uniform vec2 resolution;
 
 	vec2 convertToNDC( vec4 clipCoords, float aspect ) {
 

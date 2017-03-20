@@ -220,6 +220,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		data.meshLine = this.meshLine;
 		data.meshLineWidth = this.meshLineWidth;
+		data.meshLineSizeAttenuation = this.meshLineSizeAttenuation;
 
 		// TODO: Copied from Object3D.toJSON
 
