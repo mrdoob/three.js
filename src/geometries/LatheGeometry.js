@@ -139,6 +139,10 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
+	// add a group to the geometry. this will ensure multi material support
+
+	this.addGroup( 0, indices.length );
+
 	// generate normals
 
 	this.computeVertexNormals();

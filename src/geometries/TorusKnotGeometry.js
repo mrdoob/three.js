@@ -171,6 +171,10 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
+	// add a group to the geometry. this will ensure multi material support
+
+	this.addGroup( 0, indices.length );
+
 	// this function calculates the current position on the torus curve
 
 	function calculatePositionOnCurve( u, p, q, radius, position ) {
