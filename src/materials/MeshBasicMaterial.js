@@ -34,11 +34,11 @@ import { Color } from '../math/Color';
  *  wireframeLinewidth: <float>,
  *
  *  skinning: <bool>,
- *  morphTargets: <bool>
+ *  morphTargets: <bool>,
  *
- *  meshLine: <bool>
- *  meshLineWidth: <float>
- *  meshLineSizeAttenuation: <float>
+ *  meshLine: <bool>,
+ *  meshLineWidth: <float>,
+ *  meshLineSizeAttenuation: <bool>
  * }
  */
 
