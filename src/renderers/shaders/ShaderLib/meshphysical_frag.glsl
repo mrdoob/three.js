@@ -13,7 +13,7 @@ uniform vec3 emissive;
 
 uniform float opacity;
 
-#ifndef STANDARD_COMMON
+#ifndef STANDARD
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
 #endif
