@@ -151,7 +151,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			object.animations = this.parseAnimations( json.animations );
 
-		}
+        }
 
 		if ( json.images === undefined || json.images.length === 0 ) {
 
@@ -168,20 +168,6 @@ Object.assign( ObjectLoader.prototype, {
         var scope = this;
         var fonts = {};
 
-        function loadFont(url) {
-
-            scope.manager.itemStart(url);
-
-            return loader.load(url, function ( response ) {
-
-                scope.manager.itemEnd(url);
-
-                //setFont(response);
-
-            });
-
-        }
-
 		if ( json !== undefined && json.length > 0 ) {
 			
 			var manager = new LoadingManager( onLoad );
@@ -192,20 +178,16 @@ Object.assign( ObjectLoader.prototype, {
 				
 				var font = json[ i ];
 
-                if ( font.glyphs.hasOwnProperty( 'glyphs' ) ) {
+                if ( font.glyphs.hasOwnProperty( 'glyphs' )) {
 
                     fonts[ font.uuid ] = loader.parse( font.glyphs );
-
-                } else {
-
-                    fonts[font.uuid] = loader.load(font.glyphs);
 
                 }
 				
 			}
 			
 		}
-		
+
 		return fonts;
 		
 	},
