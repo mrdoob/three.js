@@ -2,8 +2,15 @@
 
 uniform vec3 diffuse;
 uniform vec3 emissive;
-uniform float roughness;
-uniform float metalness;
+
+#ifdef STANDARD_SG
+	uniform float glossiness;
+	uniform vec3 specular2;
+#else
+	uniform float roughness;
+	uniform float metalness;
+#endif
+
 uniform float opacity;
 
 #ifndef STANDARD
@@ -38,8 +45,15 @@ varying vec3 vViewPosition;
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
-#include <roughnessmap_pars_fragment>
-#include <metalnessmap_pars_fragment>
+
+#ifdef STANDARD_SG
+	#include <glossinessmap_pars_fragment>
+	#include <specular2map_pars_fragment>
+#else
+	#include <roughnessmap_pars_fragment>
+	#include <metalnessmap_pars_fragment>
+#endif
+
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
@@ -57,8 +71,15 @@ void main() {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
-	#include <roughnessmap_fragment>
-	#include <metalnessmap_fragment>
+
+	#ifdef STANDARD_SG
+		#include <glossinessmap_fragment>
+		#include <specular2map_fragment>
+	#else
+		#include <roughnessmap_fragment>
+		#include <metalnessmap_fragment>
+	#endif
+
 	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>

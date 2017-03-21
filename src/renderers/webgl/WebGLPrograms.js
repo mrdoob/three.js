@@ -17,6 +17,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		MeshPhongMaterial: 'phong',
 		MeshToonMaterial: 'phong',
 		MeshStandardMaterial: 'physical',
+		MeshStandardMaterialSG: 'physical',
 		MeshPhysicalMaterial: 'physical',
 		LineBasicMaterial: 'basic',
 		LineDashedMaterial: 'dashed',
@@ -26,7 +27,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "gradientMap",
+		"roughnessMap", "metalnessMap", "gradientMap", "glossinessMap", "specular2Map",
 		"alphaMap", "combine", "vertexColors", "fog", "useFog", "fogExp",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
@@ -149,6 +150,8 @@ function WebGLPrograms( renderer, capabilities ) {
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
 			metalnessMap: !! material.metalnessMap,
+			glossinessMap: !! material.glossinessMap,
+			specular2Map: !! material.specular2Map,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 

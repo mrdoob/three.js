@@ -87,6 +87,18 @@ var UniformsLib = {
 
 	},
 
+	glossinessmap: {
+
+		glossinessMap: { value: null }
+
+	},
+
+	specular2map: {
+
+		specular2Map: { value: null }
+
+	},
+
 	fog: {
 
 		fogDensity: { value: 0.00025 },
