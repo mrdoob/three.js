@@ -2202,7 +2202,7 @@ function WebGLRenderer( parameters ) {
 	function refreshUniformsStandardSG( uniforms, material ) {
 
 		uniforms.glossiness.value = material.roughness;
-		uniforms.specular2.value.copy( material.specular2 );
+		uniforms.specular.value.copy( material.specular );
 
 		if ( material.glossinessMap ) {
 
@@ -2210,9 +2210,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.specular2Map ) {
+		if ( material.specularMap ) {
 
-			uniforms.specular2Map.value = material.specular2Map;
+			uniforms.specularMap.value = material.specularMap;
 
 		}
 

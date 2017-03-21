@@ -93,12 +93,6 @@ var UniformsLib = {
 
 	},
 
-	specular2map: {
-
-		specular2Map: { value: null }
-
-	},
-
 	fog: {
 
 		fogDensity: { value: 0.00025 },
