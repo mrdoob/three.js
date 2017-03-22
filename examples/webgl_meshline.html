@@ -33,6 +33,7 @@
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - meshlines</div>
 
 		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/geometries/hilbert3D.js"></script>
 		<script src="js/Detector.js"></script>
 
@@ -40,12 +41,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var camera, scene, renderer;
+			var camera, scene, renderer, controls;
 			var material1, material2, material3;
 
 			init();
@@ -118,11 +114,11 @@
 
 				// event listener
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				// controls
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			}
 
@@ -134,48 +130,10 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			//
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length > 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -188,28 +146,11 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
 				var time = Date.now() * 0.0005;
-
-				for ( var i = 0; i < scene.children.length; i ++ ) {
-
-					var object = scene.children[ i ];
-
-					if ( object instanceof THREE.Line ) {
-
-						object.rotation.y = time * ( i % 2 ? 1 : -1 );
-
-					}
-
-				}
 
 				// animate line width
 
-				material1.meshLineWidth = 10 * ( 1 + 0.5 * Math.sin( 5 * time ) );
+				material2.meshLineWidth = 10 * ( 1 + 0.5 * Math.sin( 5 * time ) );
 
 				renderer.render( scene, camera );
 
