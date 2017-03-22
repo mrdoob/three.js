@@ -122,7 +122,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-	parse: function ( json, onLoad ) {
+    parse: function ( json, onLoad ) {
 
         var fonts = this.parseFonts( json.fonts, function () {
 
@@ -130,7 +130,7 @@ Object.assign( ObjectLoader.prototype, {
 
         } );
 
-		var geometries = this.parseGeometries( json.geometries, fonts, function () {
+        var geometries = this.parseGeometries( json.geometries, fonts, function () {
 
             if ( onLoad !== undefined ) onLoad( object );
 
@@ -168,7 +168,7 @@ Object.assign( ObjectLoader.prototype, {
         var scope = this;
         var fonts = {};
 
-		if ( json !== undefined && json.length > 0 ) {
+        if ( json !== undefined && json.length > 0 ) {
 
             var manager = new LoadingManager( onLoad );
 
@@ -188,7 +188,7 @@ Object.assign( ObjectLoader.prototype, {
 
         }
 
-		return fonts;
+        return fonts;
 
     },
 
@@ -320,14 +320,14 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
                     case 'TextGeometry':
-					case 'TextBufferGeometry':
+                    case 'TextBufferGeometry':
 
                         data.parameters.font = fonts[data.parameters.glyphs];
 
                         geometry = new Geometries[data.type](
-							data.text,
-							data.parameters
-						);
+                            data.text,
+                            data.parameters
+                        );
 
                         break;
 
