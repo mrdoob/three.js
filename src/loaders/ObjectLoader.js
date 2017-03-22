@@ -122,7 +122,7 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-    parse: function ( json, onLoad ) {
+    	parse: function ( json, onLoad ) {
 
 		var fonts = this.parseFonts( json.fonts, function () {
 
@@ -163,34 +163,34 @@ Object.assign( ObjectLoader.prototype, {
 
 	},
 
-    parseFonts: function ( json, onLoad ) {
+    	parseFonts: function ( json, onLoad ) {
 
-        var scope = this;
-        var fonts = {};
+        	var scope = this;
+        	var fonts = {};
 
-        if ( json !== undefined && json.length > 0 ) {
+        	if ( json !== undefined && json.length > 0 ) {
 
-            var manager = new LoadingManager( onLoad );
+            		var manager = new LoadingManager( onLoad );
 
-            var loader = new FontLoader( manager );
+            		var loader = new FontLoader( manager );
 
-            for ( var i = 0, l = json.length; i < l; i++ ) {
+            		for ( var i = 0, l = json.length; i < l; i++ ) {
 
-                var font = json[i];
+                		var font = json[i];
 
-                if ( font.glyphs.hasOwnProperty( 'glyphs' )) {
+                		if ( font.glyphs.hasOwnProperty( 'glyphs' )) {
 
-                    fonts[ font.uuid ] = loader.parse( font.glyphs );
+                    		fonts[ font.uuid ] = loader.parse( font.glyphs );
 
-                }
+                		}
 
-            }
+            		}
 
-        }
+        	}
 
-        return fonts;
+        	return fonts;
 
-    },
+    	},
 
 	parseGeometries: function ( json, fonts ) {
 
