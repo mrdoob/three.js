@@ -1,4 +1,11 @@
-THREE.WebGLClipping = function() {
+/**
+ * @author tschw
+ */
+
+import { Matrix3 } from '../../math/Matrix3';
+import { Plane } from '../../math/Plane';
+
+function WebGLClipping() {
 
 	var scope = this,
 
@@ -7,13 +14,14 @@ THREE.WebGLClipping = function() {
 		localClippingEnabled = false,
 		renderingShadows = false,
 
-		plane = new THREE.Plane(),
-		viewNormalMatrix = new THREE.Matrix3(),
+		plane = new Plane(),
+		viewNormalMatrix = new Matrix3(),
 
 		uniform = { value: null, needsUpdate: false };
 
 	this.uniform = uniform;
 	this.numPlanes = 0;
+	this.numIntersection = 0;
 
 	this.init = function( planes, enableLocalClipping, camera ) {
 
@@ -48,7 +56,7 @@ THREE.WebGLClipping = function() {
 
 	};
 
-	this.setState = function( planes, clipShadows, camera, cache, fromCache ) {
+	this.setState = function( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
 
 		if ( ! localClippingEnabled ||
 				planes === null || planes.length === 0 ||
@@ -83,6 +91,7 @@ THREE.WebGLClipping = function() {
 			}
 
 			cache.clippingState = dstArray;
+			this.numIntersection = clipIntersection ? this.numPlanes : 0;
 			this.numPlanes += nGlobal;
 
 		}
@@ -100,6 +109,7 @@ THREE.WebGLClipping = function() {
 		}
 
 		scope.numPlanes = numGlobalPlanes;
+		scope.numIntersection = 0;
 
 	}
 
@@ -144,9 +154,12 @@ THREE.WebGLClipping = function() {
 		}
 
 		scope.numPlanes = nPlanes;
+		
 		return dstArray;
 
 	}
 
-};
+}
 
+
+export { WebGLClipping };

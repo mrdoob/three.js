@@ -1,3 +1,7 @@
+import { Material } from './Material';
+import { MultiplyOperation } from '../constants';
+import { Color } from '../math/Color';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -36,13 +40,13 @@
  * }
  */
 
-THREE.MeshLambertMaterial = function ( parameters ) {
+function MeshLambertMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.type = 'MeshLambertMaterial';
 
-	this.color = new THREE.Color( 0xffffff ); // diffuse
+	this.color = new Color( 0xffffff ); // diffuse
 
 	this.map = null;
 
@@ -52,7 +56,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
-	this.emissive = new THREE.Color( 0x000000 );
+	this.emissive = new Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
@@ -61,7 +65,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
+	this.combine = MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
 
@@ -76,14 +80,16 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
+MeshLambertMaterial.prototype = Object.create( Material.prototype );
+MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
 
-THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
+MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
-	THREE.Material.prototype.copy.call( this, source );
+MeshLambertMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 
@@ -120,3 +126,6 @@ THREE.MeshLambertMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { MeshLambertMaterial };

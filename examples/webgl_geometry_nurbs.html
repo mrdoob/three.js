@@ -159,7 +159,7 @@
 					return nurbsSurface.getPoint(u, v);
 				};
 
-				var geometry = new THREE.ParametricGeometry( getSurfacePoint, 20, 20 );
+				var geometry = new THREE.ParametricBufferGeometry( getSurfacePoint, 20, 20 );
 				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 				var object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 100, 0 );

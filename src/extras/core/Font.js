@@ -3,13 +3,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Font = function ( data ) {
+import { QuadraticBezier, CubicBezier } from './Interpolations';
+import { ShapePath } from './ShapePath';
+
+
+function Font( data ) {
 
 	this.data = data;
 
-};
+}
 
-Object.assign( THREE.Font.prototype, {
+Object.assign( Font.prototype, {
+
+	isFont: true,
 
 	generateShapes: function ( text, size, divisions ) {
 
@@ -17,16 +23,28 @@ Object.assign( THREE.Font.prototype, {
 
 			var chars = String( text ).split( '' );
 			var scale = size / data.resolution;
-			var offset = 0;
+			var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+
+			var offsetX = 0, offsetY = 0;
 
 			var paths = [];
 
 			for ( var i = 0; i < chars.length; i ++ ) {
 
-				var ret = createPath( chars[ i ], scale, offset );
-				offset += ret.offset;
+				var char = chars[ i ];
 
-				paths.push( ret.path );
+				if ( char === '\n' ) {
+
+					offsetX = 0;
+					offsetY -= line_height;
+
+				} else {
+
+					var ret = createPath( char, scale, offsetX, offsetY );
+					offsetX += ret.offsetX;
+					paths.push( ret.path );
+
+				}
 
 			}
 
@@ -34,15 +52,15 @@ Object.assign( THREE.Font.prototype, {
 
 		}
 
-		function createPath( c, scale, offset ) {
+		function createPath( c, scale, offsetX, offsetY ) {
 
 			var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
 
 			if ( ! glyph ) return;
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 
-			var pts = [], b2 = THREE.ShapeUtils.b2, b3 = THREE.ShapeUtils.b3;
+			var pts = [];
 			var x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2, laste;
 
 			if ( glyph.o ) {
@@ -57,8 +75,8 @@ Object.assign( THREE.Font.prototype, {
 
 						case 'm': // moveTo
 
-							x = outline[ i ++ ] * scale + offset;
-							y = outline[ i ++ ] * scale;
+							x = outline[ i ++ ] * scale + offsetX;
+							y = outline[ i ++ ] * scale + offsetY;
 
 							path.moveTo( x, y );
 
@@ -66,8 +84,8 @@ Object.assign( THREE.Font.prototype, {
 
 						case 'l': // lineTo
 
-							x = outline[ i ++ ] * scale + offset;
-							y = outline[ i ++ ] * scale;
+							x = outline[ i ++ ] * scale + offsetX;
+							y = outline[ i ++ ] * scale + offsetY;
 
 							path.lineTo( x, y );
 
@@ -75,10 +93,10 @@ Object.assign( THREE.Font.prototype, {
 
 						case 'q': // quadraticCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offset;
-							cpy  = outline[ i ++ ] * scale;
-							cpx1 = outline[ i ++ ] * scale + offset;
-							cpy1 = outline[ i ++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offsetX;
+							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx1 = outline[ i ++ ] * scale + offsetX;
+							cpy1 = outline[ i ++ ] * scale + offsetY;
 
 							path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
@@ -92,8 +110,8 @@ Object.assign( THREE.Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b2( t, cpx0, cpx1, cpx );
-									b2( t, cpy0, cpy1, cpy );
+									QuadraticBezier( t, cpx0, cpx1, cpx );
+									QuadraticBezier( t, cpy0, cpy1, cpy );
 
 								}
 
@@ -103,12 +121,12 @@ Object.assign( THREE.Font.prototype, {
 
 						case 'b': // bezierCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offset;
-							cpy  = outline[ i ++ ] * scale;
-							cpx1 = outline[ i ++ ] * scale + offset;
-							cpy1 = outline[ i ++ ] * scale;
-							cpx2 = outline[ i ++ ] * scale + offset;
-							cpy2 = outline[ i ++ ] * scale;
+							cpx  = outline[ i ++ ] * scale + offsetX;
+							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx1 = outline[ i ++ ] * scale + offsetX;
+							cpy1 = outline[ i ++ ] * scale + offsetY;
+							cpx2 = outline[ i ++ ] * scale + offsetX;
+							cpy2 = outline[ i ++ ] * scale + offsetY;
 
 							path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
@@ -122,8 +140,8 @@ Object.assign( THREE.Font.prototype, {
 								for ( var i2 = 1; i2 <= divisions; i2 ++ ) {
 
 									var t = i2 / divisions;
-									b3( t, cpx0, cpx1, cpx2, cpx );
-									b3( t, cpy0, cpy1, cpy2, cpy );
+									CubicBezier( t, cpx0, cpx1, cpx2, cpx );
+									CubicBezier( t, cpy0, cpy1, cpy2, cpy );
 
 								}
 
@@ -137,7 +155,7 @@ Object.assign( THREE.Font.prototype, {
 
 			}
 
-			return { offset: glyph.ha * scale, path: path };
+			return { offsetX: glyph.ha * scale, path: path };
 
 		}
 
@@ -162,3 +180,6 @@ Object.assign( THREE.Font.prototype, {
 	}
 
 } );
+
+
+export { Font };

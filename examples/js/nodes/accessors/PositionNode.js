@@ -50,7 +50,7 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 
 		case THREE.PositionNode.LOCAL:
 
-			material.requestAttrib.position = true;
+			material.requestAttribs.position = true;
 
 			if ( builder.isShader( 'vertex' ) ) result = 'transformed';
 			else result = 'vPosition';
@@ -59,7 +59,7 @@ THREE.PositionNode.prototype.generate = function( builder, output ) {
 
 		case THREE.PositionNode.WORLD:
 
-			material.requestAttrib.worldPosition = true;
+			material.requestAttribs.worldPosition = true;
 
 			if ( builder.isShader( 'vertex' ) ) result = 'vWPosition';
 			else result = 'vWPosition';

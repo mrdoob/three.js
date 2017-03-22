@@ -94,7 +94,7 @@
 					middleGrey: 0.04,
 					maxLuminance: 16,
 
-					adaptionRate: 2.0,
+					adaptionRate: 2.0
 				};
 
 				container = document.createElement( 'div' );
@@ -190,7 +190,7 @@
 
 						"}"
 
-					].join("\n"),
+					].join("\n")
 				};
 
 				var earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -298,7 +298,7 @@
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
-					depthTest: false,
+					depthTest: false
 					// color: 0xffffff
 					// blending: THREE.NoBlending
 				} );
@@ -350,8 +350,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
@@ -359,7 +357,7 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
 
-				if ( extensions.get('OES_texture_half_float_linear') ) {
+				if ( renderer.extensions.get('OES_texture_half_float_linear') ) {
 					parameters.type = THREE.FloatType;
 				}
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );

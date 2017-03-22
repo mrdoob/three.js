@@ -60,6 +60,7 @@
 		var dispatcher;
 		var broadphase;
 		var solver;
+		var softBodySolver;
 		var physicsWorld;
 		var rigidBodies = [];
 		var margin = 0.05;
@@ -281,7 +282,7 @@
 			var sbConfig = ropeSoftBody.get_m_cfg();
 			sbConfig.set_viterations( 10 );
 			sbConfig.set_piterations( 10 );
-			ropeSoftBody.setTotalMass( ropeMass, false )
+			ropeSoftBody.setTotalMass( ropeMass, false );
 			Ammo.castObject( ropeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin * 3 );
 			physicsWorld.addSoftBody( ropeSoftBody, 1, -1 );
 			rope.userData.physicsBody = ropeSoftBody;

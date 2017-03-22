@@ -10,7 +10,12 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A render target is a buffer where the video card draws pixels for a scene that is being rendered in the background. It is used in different effects. </div>
+		<div class="desc">
+			A [link:https://msdn.microsoft.com/en-us/library/bb976073.aspx render target] is a buffer
+			where the video card draws pixels for a scene that	is being rendered in the background.
+			It is used in different effects, such as applying postprocessing to a rendered image
+			before displaying it on the screen.
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -19,27 +24,26 @@
 		<h3>[name]([page:Number width], [page:Number height], [page:Object options])</h3>
 
 		<div>
-		width -- The width of the renderTarget. <br />
-		height -- The height of the renderTarget.
-		</div>
+		[page:Float width] - The width of the renderTarget. <br />
+		[page:Float height] - The height of the renderTarget.<br />
+		options - (optional0 object that holds texture parameters for an auto-generated target
+		texture and depthBuffer/stencilBuffer booleans.
 
-		<div>options is an optional object that holds texture parameters for an auto-generated target texture and depthBuffer/stencilBuffer booleans. For an explanation of the texture parameters see [page:Texture Texture].</div>
+		For an explanation of the texture parameters see [page:Texture Texture]. The following are
+		valid options:<br /><br />
 
-		<div>
-		wrapS — [page:Number] default is *THREE.ClampToEdgeWrapping*. <br />
-		wrapT — [page:Number] default is *THREE.ClampToEdgeWrapping*. <br />
-		magFilter — [page:Number], default is *THREE.LinearFilter*. <br />
-		minFilter — [page:Number], default is *THREE.LinearFilter*. <br />
-		format — [page:Number], default is *THREE.RGBAFormat*. <br />
-		type — [page:Number], default is *THREE.UnsignedByteType*. <br />
-		anisotropy — [page:Number], default is *1*. <br />
-		encoding — [page:Number], default is *THREE.LinearEncoding*. <br />
-		depthBuffer — [page:Boolean], default is *true*. Set this to false if you don't need it. <br />
-		stencilBuffer — [page:Boolean], default is *true*. Set this to false if you don't need it.
-		</div>
+		[page:Constant wrapS] - default is [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant wrapT] - default is [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant magFilter] - default is [page:Textures .LinearFilter]. <br />
+		[page:Constant minFilter] - default is [page:Textures LinearFilter]. <br />
+		[page:Constant format] - default is [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - default is [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - default is *1*. See [page:Texture.anistropy]<br />
+		[page:Constant encoding] - default is [page:Textures LinearEncoding]. <br />
+		[page:Boolean depthBuffer] - default is *true*. Set this to false if you don't need it. <br />
+		[page:Boolean stencilBuffer] - default is *true*. Set this to false if you don't need it.<br /><br />
 
-		<div>
-		Creates a new render target with a certain width and height.
+		Creates a new [name]]
 		</div>
 
 		<h2>Properties</h2>
@@ -58,7 +62,7 @@
 		<div>
 		The height of the render target.
 		</div>
-		
+
 		<h3>[property:Vector4 scissor]</h3>
 		<div>
 		A rectangular area inside the render target's viewport. Fragments that are outside the area will be discarded.
@@ -116,10 +120,10 @@
 		<div>
 		Dispatches a dispose event.
 		</div>
-		
-		
-		
-		
+
+
+
+
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 

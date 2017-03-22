@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - simple global illumination</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+
+			a {
+				color: #0078ff;
+			}
+
+			#info {
+				position: absolute;
+				top: 5px;
+				width: 100%;
+				color:#fff;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+			// HACK:
+
+			THREE.Mesh.prototype.clone = function () {
+
+				var newMaterial = ( this.material.isMaterial ) ? this.material.clone() : this.material.slice();
+
+				return new this.constructor( this.geometry.clone(), newMaterial ).copy( this );
+
+			};
+
+			//
+
+			var SimpleGI = function ( renderer, scene ) {
+
+				var SIZE = 32, SIZE2 = SIZE * SIZE;
+
+				var camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
+
+				scene.updateMatrixWorld( true );
+
+				var clone = scene.clone();
+				clone.autoUpdate = false;
+
+				var rt = new THREE.WebGLRenderTarget( SIZE, SIZE, {
+					wrapS: THREE.ClampToEdgeWrapping,
+					wrapT: THREE.ClampToEdgeWrapping,
+					stencilBuffer: false,
+					depthBuffer: true
+				} );
+
+				var normalMatrix = new THREE.Matrix3();
+
+				var position = new THREE.Vector3();
+				var normal = new THREE.Vector3();
+
+				var bounces = 0;
+				var currentVertex = 0;
+
+				var color = new Float32Array( 3 );
+				var buffer = new Uint8Array( SIZE2 * 4 );
+
+				function compute() {
+
+					if ( bounces === 3 ) return;
+
+					var object = scene.children[ 0 ];
+					var geometry = object.geometry;
+
+					var attributes = geometry.attributes;
+					var positions = attributes.position.array;
+					var normals = attributes.normal.array;
+
+					if ( attributes.color === undefined ) {
+
+						var colors = new Float32Array( positions.length );
+						geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
+
+					}
+
+					var colors = attributes.color.array;
+
+					var startVertex = currentVertex;
+					var totalVertex = positions.length / 3;
+
+					for ( var i = 0; i < 32; i ++ ) {
+
+						if ( currentVertex >= totalVertex ) break;
+
+						position.fromArray( positions, currentVertex * 3 );
+						position.applyMatrix4( object.matrixWorld );
+
+						normal.fromArray( normals, currentVertex * 3 );
+						normal.applyMatrix3( normalMatrix.getNormalMatrix( object.matrixWorld ) ).normalize();
+
+						camera.position.copy( position );
+						camera.lookAt( position.add( normal ) );
+
+						renderer.render( clone, camera, rt );
+
+						renderer.readRenderTargetPixels( rt, 0, 0, SIZE, SIZE, buffer );
+
+						color[ 0 ] = 0;
+						color[ 1 ] = 0;
+						color[ 2 ] = 0;
+
+						for ( var k = 0, kl = buffer.length; k < kl; k += 4 ) {
+
+							color[ 0 ] += buffer[ k + 0 ];
+							color[ 1 ] += buffer[ k + 1 ];
+							color[ 2 ] += buffer[ k + 2 ];
+
+						}
+
+						colors[ currentVertex * 3 + 0 ] = color[ 0 ] / ( SIZE2 * 255 );
+						colors[ currentVertex * 3 + 1 ] = color[ 1 ] / ( SIZE2 * 255 );
+						colors[ currentVertex * 3 + 2 ] = color[ 2 ] / ( SIZE2 * 255 );
+
+						currentVertex ++;
+
+					}
+
+					attributes.color.updateRange.offset = startVertex * 3;
+					attributes.color.updateRange.count = ( currentVertex - startVertex ) * 3;
+					attributes.color.needsUpdate = true;
+
+					if ( currentVertex >= totalVertex ) {
+
+						clone = scene.clone();
+						clone.autoUpdate = false;
+
+						bounces ++
+						currentVertex = 0;
+
+					}
+
+					requestAnimationFrame( compute );
+
+				}
+
+				requestAnimationFrame( compute );
+
+			}
+
+			//
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+
+				// sphere
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
+				// var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 10, 10, 10 )
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors });
+
+				var mesh = new THREE.Mesh( geometry, material );
+				// mesh.position.y = 1;
+				scene.add( mesh );
+
+				/*
+				var geometry = new THREE.SphereBufferGeometry( 0.5, 16, 8 );
+
+				for ( var i = 0; i < 10; i ++ ) {
+
+					var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } );
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = Math.random() * 3 - 1.5;
+					mesh.position.y = Math.random() * 3 - 1.5;
+					mesh.position.z = Math.random() * 3 - 1.5;
+					mesh.updateMatrix();
+					scene.add( mesh );
+
+				}
+				*/
+
+				// room
+
+				var materials = [];
+
+				for ( var i = 0; i < 8; i ++ ) {
+
+					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.BackSide } ) );
+
+				}
+
+				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+
+				var mesh = new THREE.Mesh( geometry, materials );
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				new SimpleGI( renderer, scene );
+
+				controls = new THREE.OrbitControls( camera );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

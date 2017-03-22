@@ -1,10 +1,12 @@
+import { _Math } from '../math/Math';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset, normalized ) {
+function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
@@ -12,31 +14,35 @@ THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offse
 
 	this.normalized = normalized === true;
 
-};
+}
 
+Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
-THREE.InterleavedBufferAttribute.prototype = {
+	count: {
 
-	constructor: THREE.InterleavedBufferAttribute,
+		get: function () {
 
-	get length() {
+			return this.data.count;
 
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-		return this.array.length;
-
-	},
-
-	get count() {
-
-		return this.data.count;
+		}
 
 	},
 
-	get array() {
+	array: {
 
-		return this.data.array;
+		get: function () {
 
-	},
+			return this.data.array;
+
+		}
+
+	}
+
+} );
+
+Object.assign( InterleavedBufferAttribute.prototype, {
+
+	isInterleavedBufferAttribute: true,
 
 	setX: function ( index, x ) {
 
@@ -130,4 +136,7 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	}
 
-};
+} );
+
+
+export { InterleavedBufferAttribute };

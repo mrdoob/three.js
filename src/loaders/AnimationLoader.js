@@ -1,20 +1,24 @@
+import { AnimationClip } from '../animation/AnimationClip';
+import { FileLoader } from './FileLoader';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author bhouston / http://clara.io/
  */
 
-THREE.AnimationLoader = function ( manager ) {
+function AnimationLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-Object.assign( THREE.AnimationLoader.prototype, {
+Object.assign( AnimationLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -29,7 +33,7 @@ Object.assign( THREE.AnimationLoader.prototype, {
 
 		for ( var i = 0; i < json.length; i ++ ) {
 
-			var clip = THREE.AnimationClip.parse( json[ i ] );
+			var clip = AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 
@@ -40,3 +44,6 @@ Object.assign( THREE.AnimationLoader.prototype, {
 	}
 
 } );
+
+
+export { AnimationLoader };

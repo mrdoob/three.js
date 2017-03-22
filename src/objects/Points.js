@@ -1,27 +1,37 @@
+import { Sphere } from '../math/Sphere';
+import { Ray } from '../math/Ray';
+import { Matrix4 } from '../math/Matrix4';
+import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3';
+import { PointsMaterial } from '../materials/PointsMaterial';
+import { BufferGeometry } from '../core/BufferGeometry';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Points = function ( geometry, material ) {
+function Points( geometry, material ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Points';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.BufferGeometry();
-	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
+	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
 
-};
+}
 
-THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.Points,
+	constructor: Points,
+
+	isPoints: true,
 
 	raycast: ( function () {
 
-		var inverseMatrix = new THREE.Matrix4();
-		var ray = new THREE.Ray();
-		var sphere = new THREE.Sphere();
+		var inverseMatrix = new Matrix4();
+		var ray = new Ray();
+		var sphere = new Sphere();
 
 		return function raycast( raycaster, intersects ) {
 
@@ -36,6 +46,7 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
+			sphere.radius += threshold;
 
 			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
 
@@ -46,7 +57,7 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 
 			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localThresholdSq = localThreshold * localThreshold;
-			var position = new THREE.Vector3();
+			var position = new Vector3();
 
 			function testPoint( point, index ) {
 
@@ -76,7 +87,7 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 
 			}
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			if ( geometry.isBufferGeometry ) {
 
 				var index = geometry.index;
 				var attributes = geometry.attributes;
@@ -131,3 +142,6 @@ THREE.Points.prototype = Object.assign( Object.create( THREE.Object3D.prototype 
 	}
 
 } );
+
+
+export { Points };

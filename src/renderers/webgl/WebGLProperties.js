@@ -1,12 +1,12 @@
 /**
-* @author fordacious / fordacious.github.io
-*/
+ * @author fordacious / fordacious.github.io
+ */
 
-THREE.WebGLProperties = function () {
+function WebGLProperties() {
 
 	var properties = {};
 
-	this.get = function ( object ) {
+	function get( object ) {
 
 		var uuid = object.uuid;
 		var map = properties[ uuid ];
@@ -20,18 +20,27 @@ THREE.WebGLProperties = function () {
 
 		return map;
 
-	};
+	}
 
-	this.delete = function ( object ) {
+	function remove( object ) {
 
 		delete properties[ object.uuid ];
 
-	};
+	}
 
-	this.clear = function () {
+	function clear() {
 
 		properties = {};
 
+	}
+
+	return {
+		get: get,
+		remove: remove,
+		clear: clear
 	};
 
-};
+}
+
+
+export { WebGLProperties };

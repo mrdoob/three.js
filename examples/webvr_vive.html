@@ -21,22 +21,24 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
-		<script src="js/ViveController.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/ViveController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
 			}
 
 			//
+
+			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, renderer;
@@ -226,6 +228,11 @@
 
 			function render() {
 
+				var delta = clock.getDelta() * 60;
+
+				controller1.update();
+				controller2.update();
+
 				controls.update();
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
@@ -257,7 +264,7 @@
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += 0.01 * delta;
 
 				}
 

@@ -54,15 +54,20 @@
 
 			var cameraControls;
 
-			var verticalMirror, groundMirror;
 			var sphereGroup, smallSphere;
 
+			init();
+			animate();
+
 			function init() {
+
+				var container = document.getElementById( 'container' );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
+				container.appendChild( renderer.domElement );
 
 				// scene
 				scene = new THREE.Scene();
@@ -77,30 +82,21 @@
 				cameraControls.minDistance = 10;
 				cameraControls.update();
 
-				var container = document.getElementById( 'container' );
-				container.appendChild( renderer.domElement );
-
-			}
-
-			function fillScene() {
+				//
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
 				// MIRROR planes
-				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
 
-				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
-				mirrorMesh.add( groundMirror );
-				mirrorMesh.rotateX( - Math.PI / 2 );
-				scene.add( mirrorMesh );
+				var groundMirror = new THREE.Mirror( 100, 100, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
+				groundMirror.rotateX( - Math.PI / 2 );
+				scene.add( groundMirror );
 
-				verticalMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
+				var verticalMirror = new THREE.Mirror( 60, 60, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
+				verticalMirror.position.y = 35;
+				verticalMirror.position.z = -45;
+				scene.add( verticalMirror );
 
-				var verticalMirrorMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 60, 60 ), verticalMirror.material );
-				verticalMirrorMesh.add( verticalMirror );
-				verticalMirrorMesh.position.y = 35;
-				verticalMirrorMesh.position.z = -45;
-				scene.add( verticalMirrorMesh );
 
 				sphereGroup = new THREE.Object3D();
 				scene.add( sphereGroup );
@@ -173,19 +169,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
-				// render (update) the mirrors
-				groundMirror.renderWithMirror( verticalMirror );
-				verticalMirror.renderWithMirror( groundMirror );
-
-				renderer.render(scene, camera);
-
-			}
-
-			function update() {
-
-				requestAnimationFrame( update );
+				requestAnimationFrame( animate );
 
 				var timer = Date.now() * 0.01;
 
@@ -201,12 +187,9 @@
 
 				cameraControls.update();
 
-				render();
-			}
+				renderer.render(scene, camera);
 
-			init();
-			fillScene();
-			update();
+			}
 
 		</script>
 	</body>

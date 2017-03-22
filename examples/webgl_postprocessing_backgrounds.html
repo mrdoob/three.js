@@ -30,7 +30,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank">Ben Houston</a>
+		</div>
 
 		<div id="container"></div>
 
@@ -69,12 +70,12 @@
 				cubeTexturePass: true,
 				cubeTexturePassOpacity: 1.0,
 
-				renderPass: true,
+				renderPass: true
 
 				//autoRotate: true,
 
 				//camera: 'perspective'
-		
+
 			};
 
 			init();
@@ -89,21 +90,21 @@
 				gui = new dat.GUI();
 
 				gui.add( params, "clearPass" );
-				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );		
-				gui.add( params, "clearAlpha", 0, 1 );		
+				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
+				gui.add( params, "clearAlpha", 0, 1 );
 
 				gui.add( params, "texturePass" );
-				gui.add( params, "texturePassOpacity", 0, 1 );		
+				gui.add( params, "texturePassOpacity", 0, 1 );
 
 				gui.add( params, "cubeTexturePass" );
-				gui.add( params, "cubeTexturePassOpacity", 0, 1 );		
-	
+				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
+
 				gui.add( params, "renderPass" );
-			
+
 				//gui.add( params, "autoRotate" );
 
 				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
-			
+
 				gui.open();
 
 			}
@@ -127,7 +128,7 @@
 
 				//
 
-				cameraP = new THREE.PerspectiveCamera( 65, aspect, 3, 10 );
+				cameraP = new THREE.PerspectiveCamera( 65, aspect, 1, 10 );
 				cameraP.position.z = 7;
 
 			//	cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
@@ -190,14 +191,14 @@
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
 					texturePass.map = map;
 				});
 
 				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
-				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 					cubeTexturePassP.envMap = ldrCubeMap;
 					console.log( "loaded envmap");
@@ -206,11 +207,11 @@
 				renderPass = new THREE.RenderPass( scene, cameraP );
 				renderPass.clear = false;
 				composer.addPass( renderPass );
-		
+
 				copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
-		
+
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
@@ -250,7 +251,7 @@
 				stats.begin();
 
 				cameraP.updateMatrixWorld( true );
-			
+
 				var newColor = clearPass.clearColor;
 				switch( params.clearColor ) {
 					case 'blue': newColor = 0x0000ff; break;
@@ -259,7 +260,7 @@
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
 				}
-	
+
 				clearPass.enabled = params.clearPass;
 				clearPass.clearColor = newColor;
 				clearPass.clearAlpha = params.clearAlpha;
@@ -279,6 +280,5 @@
 			}
 
 		</script>
-		<div>
 	</body>
 </html>

@@ -1,102 +1,108 @@
+import { Vector3 } from './Vector3';
+import { Line3 } from './Line3';
+import { Plane } from './Plane';
+
 /**
  * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Triangle = function ( a, b, c ) {
+function Triangle( a, b, c ) {
 
-	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
-	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
-	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
+	this.a = ( a !== undefined ) ? a : new Vector3();
+	this.b = ( b !== undefined ) ? b : new Vector3();
+	this.c = ( c !== undefined ) ? c : new Vector3();
 
-};
+}
 
-THREE.Triangle.normal = function () {
+Object.assign( Triangle, {
 
-	var v0 = new THREE.Vector3();
+	normal: function () {
 
-	return function normal( a, b, c, optionalTarget ) {
+		var v0 = new Vector3();
 
-		var result = optionalTarget || new THREE.Vector3();
+		return function normal( a, b, c, optionalTarget ) {
 
-		result.subVectors( c, b );
-		v0.subVectors( a, b );
-		result.cross( v0 );
+			var result = optionalTarget || new Vector3();
 
-		var resultLengthSq = result.lengthSq();
-		if ( resultLengthSq > 0 ) {
+			result.subVectors( c, b );
+			v0.subVectors( a, b );
+			result.cross( v0 );
 
-			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+			var resultLengthSq = result.lengthSq();
+			if ( resultLengthSq > 0 ) {
 
-		}
+				return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
-		return result.set( 0, 0, 0 );
+			}
 
-	};
+			return result.set( 0, 0, 0 );
 
-}();
+		};
 
-// static/instance method to calculate barycentric coordinates
-// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-THREE.Triangle.barycoordFromPoint = function () {
+	}(),
 
-	var v0 = new THREE.Vector3();
-	var v1 = new THREE.Vector3();
-	var v2 = new THREE.Vector3();
+	// static/instance method to calculate barycentric coordinates
+	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
+	barycoordFromPoint: function () {
 
-	return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
+		var v0 = new Vector3();
+		var v1 = new Vector3();
+		var v2 = new Vector3();
 
-		v0.subVectors( c, a );
-		v1.subVectors( b, a );
-		v2.subVectors( point, a );
+		return function barycoordFromPoint( point, a, b, c, optionalTarget ) {
 
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
+			v0.subVectors( c, a );
+			v1.subVectors( b, a );
+			v2.subVectors( point, a );
 
-		var denom = ( dot00 * dot11 - dot01 * dot01 );
+			var dot00 = v0.dot( v0 );
+			var dot01 = v0.dot( v1 );
+			var dot02 = v0.dot( v2 );
+			var dot11 = v1.dot( v1 );
+			var dot12 = v1.dot( v2 );
 
-		var result = optionalTarget || new THREE.Vector3();
+			var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-		// collinear or singular triangle
-		if ( denom === 0 ) {
+			var result = optionalTarget || new Vector3();
 
-			// arbitrary location outside of triangle?
-			// not sure if this is the best idea, maybe should be returning undefined
-			return result.set( - 2, - 1, - 1 );
+			// collinear or singular triangle
+			if ( denom === 0 ) {
 
-		}
+				// arbitrary location outside of triangle?
+				// not sure if this is the best idea, maybe should be returning undefined
+				return result.set( - 2, - 1, - 1 );
 
-		var invDenom = 1 / denom;
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+			}
 
-		// barycentric coordinates must always sum to 1
-		return result.set( 1 - u - v, v, u );
+			var invDenom = 1 / denom;
+			var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+			var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-	};
+			// barycentric coordinates must always sum to 1
+			return result.set( 1 - u - v, v, u );
 
-}();
+		};
 
-THREE.Triangle.containsPoint = function () {
+	}(),
 
-	var v1 = new THREE.Vector3();
+	containsPoint: function () {
 
-	return function containsPoint( point, a, b, c ) {
+		var v1 = new Vector3();
 
-		var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, v1 );
+		return function containsPoint( point, a, b, c ) {
 
-		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+			var result = Triangle.barycoordFromPoint( point, a, b, c, v1 );
 
-	};
+			return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
 
-}();
+		};
 
-THREE.Triangle.prototype = {
+	}()
 
-	constructor: THREE.Triangle,
+} );
+
+Object.assign( Triangle.prototype, {
 
 	set: function ( a, b, c ) {
 
@@ -136,8 +142,8 @@ THREE.Triangle.prototype = {
 
 	area: function () {
 
-		var v0 = new THREE.Vector3();
-		var v1 = new THREE.Vector3();
+		var v0 = new Vector3();
+		var v1 = new Vector3();
 
 		return function area() {
 
@@ -152,20 +158,20 @@ THREE.Triangle.prototype = {
 
 	midpoint: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 
 	normal: function ( optionalTarget ) {
 
-		return THREE.Triangle.normal( this.a, this.b, this.c, optionalTarget );
+		return Triangle.normal( this.a, this.b, this.c, optionalTarget );
 
 	},
 
 	plane: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Plane();
+		var result = optionalTarget || new Plane();
 
 		return result.setFromCoplanarPoints( this.a, this.b, this.c );
 
@@ -173,32 +179,26 @@ THREE.Triangle.prototype = {
 
 	barycoordFromPoint: function ( point, optionalTarget ) {
 
-		return THREE.Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+		return Triangle.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
 
 	},
 
 	containsPoint: function ( point ) {
 
-		return THREE.Triangle.containsPoint( point, this.a, this.b, this.c );
+		return Triangle.containsPoint( point, this.a, this.b, this.c );
 
 	},
 
 	closestPointToPoint: function () {
 
-		var plane, edgeList, projectedPoint, closestPoint;
+		var plane = new Plane();
+		var edgeList = [ new Line3(), new Line3(), new Line3() ];
+		var projectedPoint = new Vector3();
+		var closestPoint = new Vector3();
 
 		return function closestPointToPoint( point, optionalTarget ) {
 
-			if ( plane === undefined ) {
-
-				plane = new THREE.Plane();
-				edgeList = [ new THREE.Line3(), new THREE.Line3(), new THREE.Line3() ];
-				projectedPoint = new THREE.Vector3();
-				closestPoint = new THREE.Vector3();
-
-			}
-
-			var result = optionalTarget || new THREE.Vector3();
+			var result = optionalTarget || new Vector3();
 			var minDistance = Infinity;
 
 			// project the point onto the plane of the triangle
@@ -252,4 +252,7 @@ THREE.Triangle.prototype = {
 
 	}
 
-};
+} );
+
+
+export { Triangle };

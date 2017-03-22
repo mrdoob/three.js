@@ -2,18 +2,22 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PositionalAudio = function ( listener ) {
+import { Vector3 } from '../math/Vector3';
+import { Audio } from './Audio';
+import { Object3D } from '../core/Object3D';
 
-	THREE.Audio.call( this, listener );
+function PositionalAudio( listener ) {
+
+	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
 
-};
+}
 
-THREE.PositionalAudio.prototype = Object.assign( Object.create( THREE.Audio.prototype ), {
+PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
-	constructor: THREE.PositionalAudio,
+	constructor: PositionalAudio,
 
 	getOutput: function () {
 
@@ -71,11 +75,11 @@ THREE.PositionalAudio.prototype = Object.assign( Object.create( THREE.Audio.prot
 
 	updateMatrixWorld: ( function () {
 
-		var position = new THREE.Vector3();
+		var position = new Vector3();
 
 		return function updateMatrixWorld( force ) {
 
-			THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+			Object3D.prototype.updateMatrixWorld.call( this, force );
 
 			position.setFromMatrixPosition( this.matrixWorld );
 
@@ -87,3 +91,5 @@ THREE.PositionalAudio.prototype = Object.assign( Object.create( THREE.Audio.prot
 
 
 } );
+
+export { PositionalAudio };

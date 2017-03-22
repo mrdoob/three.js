@@ -5,7 +5,10 @@
 The [Closure Compiler](https://developers.google.com/closure/compiler/) is a tool for making JavaScript download and run faster. It is a true compiler for JavaScript. Instead of compiling from a source language to machine code, it compiles from JavaScript to better JavaScript. It parses your JavaScript, analyzes it, removes dead code and rewrites and minimizes what's left. It also checks syntax, variable references, and types, and warns about common JavaScript pitfalls.
 
 ## Getting Started
- * [Download the latest version](http://dl.google.com/closure-compiler/compiler-latest.zip)
+ * [Download the latest version](http://dl.google.com/closure-compiler/compiler-latest.zip) ([Release details here](https://github.com/google/closure-compiler/wiki/Releases))
+ * [Download a specific version](https://github.com/google/closure-compiler/wiki/Binary-Downloads). Also available via:
+   - [Maven](https://github.com/google/closure-compiler/wiki/Maven)
+   - [NPM](https://www.npmjs.com/package/google-closure-compiler)
  * See the [Google Developers Site](https://developers.google.com/closure/compiler/docs/gettingstarted_app) for documentation including instructions for running the compiler from the command line.
 
 ## Options for Getting Help
@@ -17,29 +20,41 @@ The [Closure Compiler](https://developers.google.com/closure/compiler/) is a too
 
 Note: The Closure Compiler requires [Java 7 or higher](http://www.java.com/).
 
-### Using [Ant](http://ant.apache.org/)
+### Using [Maven](http://maven.apache.org/)
 
-1. Download the [Ant build tool](http://ant.apache.org/bindownload.cgi).
+1. Download [Maven](http://maven.apache.org/download.cgi).
 
-2. At the root of the source tree, there is an Ant file named ```build.xml```.
-   To use it, navigate to the same directory and type the command
+2. Add sonatype snapshots repository to `~/.m2/settings.xml`:
+   ```
+   <profile>
+     <id>allow-snapshots</id>
+        <activation><activeByDefault>true</activeByDefault></activation>
+     <repositories>
+       <repository>
+         <id>snapshots-repo</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         <releases><enabled>false</enabled></releases>
+         <snapshots><enabled>true</enabled></snapshots>
+       </repository>
+     </repositories>
+   </profile>
+   ```
 
-    ```
-    ant jar
-    ```
+3. Run `mvn -DskipTests` (omit the `-DskipTests` if you want to run all the
+unit tests too).
 
-    This will produce a jar file called ```build/compiler.jar```.
+    This will produce a jar file called `target/closure-compiler-1.0-SNAPSHOT.jar`.
 
 ### Using [Eclipse](http://www.eclipse.org/)
 
 1. Download and open the [Eclipse IDE](http://www.eclipse.org/).
-2. Navigate to ```File > New > Project ...``` and create a Java Project. Give
+2. Navigate to `File > New > Project ...` and create a Java Project. Give
    the project a name.
-3. Select ```Create project from existing source``` and choose the root of the
+3. Select `Create project from existing source` and choose the root of the
    checked-out source tree as the existing directory.
-3. Navigate to the ```build.xml``` file. You will see all the build rules in
-   the Outline pane. Run the ```jar``` rule to build the compiler in
-   ```build/compiler.jar```.
+3. Navigate to the `build.xml` file. You will see all the build rules in
+   the Outline pane. Run the `jar` rule to build the compiler in
+   `build/compiler.jar`.
 
 ## Running
 
@@ -88,7 +103,7 @@ You can also use minimatch-style globs.
 # Recursively include all js files in subdirs
 java -jar compiler.jar --js_output_file=out.js 'src/**.js'
 
-# Recursively include all js files in subdirs, exclusing test files.
+# Recursively include all js files in subdirs, excluding test files.
 # Use single-quotes, so that bash doesn't try to expand the '!'
 java -jar compiler.jar --js_output_file=out.js 'src/**.js' '!**_test.js'
 ```
@@ -115,10 +130,21 @@ will re-order the inputs automatically.
 1. Consult the [FAQ](https://github.com/google/closure-compiler/wiki/FAQ) to make sure that the behaviour you would like isn't specifically excluded (such as string inlining).
 2. Make sure someone hasn't requested the same thing. See the list of [known issues](https://github.com/google/closure-compiler/issues).
 3. Read up on [what type of feature requests are accepted](https://github.com/google/closure-compiler/wiki/FAQ#how-do-i-submit-a-feature-request-for-a-new-type-of-optimization).
-4. Submit your reqest as an issue.
+4. Submit your request as an issue.
 
 ### Submitting patches
-1. All contributors must sign a contributor license agreement. See the [CONTRIBUTORS](https://raw.githubusercontent.com/google/closure-compiler/master/CONTRIBUTORS) file for details.
+1. All contributors must sign a contributor license agreement (CLA).
+   A CLA basically says that you own the rights to any code you contribute,
+   and that you give us permission to use that code in Closure Compiler.
+   You maintain the copyright on that code.
+   If you own all the rights to your code, you can fill out an
+   [individual CLA](http://code.google.com/legal/individual-cla-v1.0.html).
+   If your employer has any rights to your code, then they also need to fill out
+   a [corporate CLA](http://code.google.com/legal/corporate-cla-v1.0.html).
+   If you don't know if your employer has any rights to your code, you should
+   ask before signing anything.
+   By default, anyone with an @google.com email address already has a CLA
+   signed for them.
 2. To make sure your changes are of the type that will be accepted, ask about your patch on the [Closure Compiler Discuss Group](https://groups.google.com/forum/#!forum/closure-compiler-discuss)
 3. Fork the repository.
 4. Make your changes.
@@ -226,12 +252,12 @@ options/arguments in your CUI application.</td>
 
   <tr>
     <td>URL</td>
-    <td>http://code.google.com/p/guava-libraries/</td>
+    <td>https://github.com/google/guava</td>
   </tr>
 
   <tr>
     <td>Version</td>
-    <td>18.0</td>
+    <td>20.0</td>
   </tr>
 
   <tr>
@@ -328,7 +354,7 @@ options/arguments in your CUI application.</td>
 
   <tr>
     <td>URL</td>
-    <td>http://code.google.com/p/protobuf/</td>
+    <td>https://github.com/google/protobuf</td>
   </tr>
 
   <tr>
@@ -345,6 +371,40 @@ options/arguments in your CUI application.</td>
     <td>Description</td>
     <td>Supporting libraries for protocol buffers,
 an encoding of structured data.</td>
+  </tr>
+
+  <tr>
+    <td>Local Modifications</td>
+    <td>None</td>
+  </tr>
+</table>
+
+### Truth
+
+<table>
+  <tr>
+    <td>Code Path</td>
+    <td><code>lib/truth.jar</code></td>
+  </tr>
+
+  <tr>
+    <td>URL</td>
+    <td>https://github.com/google/truth</td>
+  </tr>
+
+  <tr>
+    <td>Version</td>
+    <td>0.24</td>
+  </tr>
+
+  <tr>
+    <td>License</td>
+    <td>Apache License 2.0</td>
+  </tr>
+
+  <tr>
+    <td>Description</td>
+    <td>Assertion/Proposition framework for Java unit tests</td>
   </tr>
 
   <tr>
@@ -390,103 +450,32 @@ without make's wrinkles and with the full portability of pure java code.</td>
   </tr>
 </table>
 
-### JSON
+### GSON
 
 <table>
   <tr>
     <td>Code Path</td>
-    <td><code>lib/json.jar</code></td>
+    <td><code>lib/gson.jar</code></td>
   </tr>
 
   <tr>
     <td>URL</td>
-    <td>http://json.org/java/index.html</td>
+    <td>https://github.com/google/gson</td>
   </tr>
 
   <tr>
     <td>Version</td>
-    <td>JSON version 20090211</td>
+    <td>2.2.4</td>
   </tr>
 
   <tr>
     <td>License</td>
-    <td>MIT license</td>
+    <td>Apache license 2.0</td>
   </tr>
 
   <tr>
     <td>Description</td>
-    <td>JSON is a set of java files for use in transmitting data in JSON format.</td>
-  </tr>
-
-  <tr>
-    <td>Local Modifications</td>
-    <td>None</td>
-  </tr>
-</table>
-
-### Mockito
-
-<table>
-  <tr>
-    <td>Code Path</td>
-    <td><code>lib/mockito-core.jar</code></td>
-  </tr>
-
-  <tr>
-    <td>URL</td>
-    <td>https://code.google.com/p/mockito</td>
-  </tr>
-
-  <tr>
-    <td>Version</td>
-    <td>1.9.5</td>
-  </tr>
-
-  <tr>
-    <td>License</td>
-    <td>MIT license</td>
-  </tr>
-
-  <tr>
-    <td>Description</td>
-    <td>Mockito is an open source testing framework for Java. The framework allows the
-creation of Test Double objects (called "Mock Objects") in automated unit tests
-for the purpose of Test-driven Development (TDD) or Behavior Driven Development
-(BDD).</td>
-  </tr>
-
-  <tr>
-    <td>Local Modifications</td>
-    <td>None</td>
-  </tr>
-</table>
-
-### Objenesis
-
-<table>
-  <tr>
-    <td>Code Path</td>
-    <td><code>lib/objenesis.jar</code></td>
-  </tr>
-
-  <tr>
-    <td>URL</td>
-    <td>http://objenesis.org</td>
-  </tr>
-
-  <tr>
-    <td>Version</td>
-    <td>1.2</td>
-  </tr>
-
-  <tr>
-    <td>License</td>
-    <td>Apache 2.0 license</td>
-  </tr>
-
-  <tr>
-    <td>Description</td>
-    <td>Depended by lib/mockito-core.jar, not used directly.</td>
+    <td>A Java library to convert JSON to Java objects and vice-versa</td>
   </tr>
 
   <tr>

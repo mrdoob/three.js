@@ -1,3 +1,6 @@
+import { Material } from './Material';
+import { Color } from '../math/Color';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -11,13 +14,13 @@
  * }
  */
 
-THREE.SpriteMaterial = function ( parameters ) {
+function SpriteMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.type = 'SpriteMaterial';
 
-	this.color = new THREE.Color( 0xffffff );
+	this.color = new Color( 0xffffff );
 	this.map = null;
 
 	this.rotation = 0;
@@ -27,14 +30,15 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
+SpriteMaterial.prototype = Object.create( Material.prototype );
+SpriteMaterial.prototype.constructor = SpriteMaterial;
+SpriteMaterial.prototype.isSpriteMaterial = true;
 
-THREE.SpriteMaterial.prototype.copy = function ( source ) {
+SpriteMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype.copy.call( this, source );
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 	this.map = source.map;
@@ -44,3 +48,6 @@ THREE.SpriteMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { SpriteMaterial };

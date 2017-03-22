@@ -1,3 +1,7 @@
+import { Material } from './Material';
+import { Vector2 } from '../math/Vector2';
+import { Color } from '../math/Color';
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
@@ -49,15 +53,15 @@
  * }
  */
 
-THREE.MeshStandardMaterial = function ( parameters ) {
+function MeshStandardMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.defines = { 'STANDARD': '' };
 
 	this.type = 'MeshStandardMaterial';
 
-	this.color = new THREE.Color( 0xffffff ); // diffuse
+	this.color = new Color( 0xffffff ); // diffuse
 	this.roughness = 0.5;
 	this.metalness = 0.5;
 
@@ -69,7 +73,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
 
-	this.emissive = new THREE.Color( 0x000000 );
+	this.emissive = new Color( 0x000000 );
 	this.emissiveIntensity = 1.0;
 	this.emissiveMap = null;
 
@@ -77,7 +81,7 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 	this.bumpScale = 1;
 
 	this.normalMap = null;
-	this.normalScale = new THREE.Vector2( 1, 1 );
+	this.normalScale = new Vector2( 1, 1 );
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
@@ -105,14 +109,16 @@ THREE.MeshStandardMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshStandardMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshStandardMaterial.prototype.constructor = THREE.MeshStandardMaterial;
+MeshStandardMaterial.prototype = Object.create( Material.prototype );
+MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
 
-THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
+MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
-	THREE.Material.prototype.copy.call( this, source );
+MeshStandardMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
 
 	this.defines = { 'STANDARD': '' };
 
@@ -165,3 +171,6 @@ THREE.MeshStandardMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { MeshStandardMaterial };

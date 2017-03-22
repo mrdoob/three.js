@@ -249,7 +249,6 @@
 					renderer.setScissor( left, bottom, width, height );
 
 					renderer.render( scene, scene.userData.camera );
-					scene.userData.controls.update();
 
 					for ( var i = 0 ; i < scene.children[0].geometry.vertices.length ; i++ ) {
 
@@ -426,15 +425,9 @@
 					sin(<i>k</i><i>r</i>&thinsp;&plusmn;&thinsp;&omega;<i>t</i>)
 				</span>
 				<span class="math-denom">
-					<span class="math-sqrt">&radic;</span><span class="math-sqrt-stem"><i>r</i>
+					<span class="math-sqrt">&radic;</span><span class="math-sqrt-stem"><i>r</i></span>
 				</span>
 			</span>
-
-		</div>
-
-		<div class="math">
-
-</span>
 
 		</div>
 
@@ -461,7 +454,7 @@
 
 				}
 
-			}
+			};
 
 			parent.lattice = true;
 
@@ -492,7 +485,7 @@
 
 				}
 
-			}
+			};
 
 			parent.lattice = false;
 
@@ -598,7 +591,7 @@
 
 				}
 
-			}
+			};
 
 			parent.lattice = true;
 
@@ -629,7 +622,7 @@
 					return new THREE.Vector3( 3 * Math.cos( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.sin( phi ) * Math.sin( theta ) * Math.sin( r - t ) / r , 3 * Math.cos( theta ) * Math.sin( r - t ) / r );
 
 				}
-			}
+			};
 
 			parent.lattice = false;
 

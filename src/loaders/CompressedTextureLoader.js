@@ -1,19 +1,24 @@
+import { LinearFilter } from '../constants';
+import { FileLoader } from './FileLoader';
+import { CompressedTexture } from '../textures/CompressedTexture';
+import { DefaultLoadingManager } from './LoadingManager';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
-THREE.CompressedTextureLoader = function ( manager ) {
+function CompressedTextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	// override in sub classes
 	this._parser = null;
 
-};
+}
 
-Object.assign( THREE.CompressedTextureLoader.prototype, {
+Object.assign( CompressedTextureLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -21,10 +26,10 @@ Object.assign( THREE.CompressedTextureLoader.prototype, {
 
 		var images = [];
 
-		var texture = new THREE.CompressedTexture();
+		var texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new THREE.XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -46,7 +51,7 @@ Object.assign( THREE.CompressedTextureLoader.prototype, {
 				if ( loaded === 6 ) {
 
 					if ( texDatas.mipmapCount === 1 )
-						texture.minFilter = THREE.LinearFilter;
+						texture.minFilter = LinearFilter;
 
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
@@ -106,7 +111,7 @@ Object.assign( THREE.CompressedTextureLoader.prototype, {
 
 				if ( texDatas.mipmapCount === 1 ) {
 
-					texture.minFilter = THREE.LinearFilter;
+					texture.minFilter = LinearFilter;
 
 				}
 
@@ -131,3 +136,6 @@ Object.assign( THREE.CompressedTextureLoader.prototype, {
 	}
 
 } );
+
+
+export { CompressedTextureLoader };

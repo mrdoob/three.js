@@ -1,6 +1,6 @@
 #if defined( USE_ENVMAP ) || defined( PHYSICAL )
 	uniform float reflectivity;
-	uniform float envMapIntenstiy;
+	uniform float envMapIntensity;
 #endif
 
 #ifdef USE_ENVMAP

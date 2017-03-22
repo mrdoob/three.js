@@ -296,6 +296,7 @@
 				// sphere
 
 				var vector = new THREE.Vector3();
+				var spherical = new THREE.Spherical();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
@@ -304,9 +305,9 @@
 
 					var object = new THREE.Object3D();
 
-					object.position.x = 800 * Math.cos( theta ) * Math.sin( phi );
-					object.position.y = 800 * Math.sin( theta ) * Math.sin( phi );
-					object.position.z = 800 * Math.cos( phi );
+					spherical.set( 800, phi, theta );
+
+					object.position.setFromSpherical( spherical );
 
 					vector.copy( object.position ).multiplyScalar( 2 );
 
@@ -319,16 +320,18 @@
 				// helix
 
 				var vector = new THREE.Vector3();
+				var cylindrical = new THREE.Cylindrical();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-					var phi = i * 0.175 + Math.PI;
+					var theta = i * 0.175 + Math.PI;
+					var y = - ( i * 8 ) + 450;
 
 					var object = new THREE.Object3D();
 
-					object.position.x = 900 * Math.sin( phi );
-					object.position.y = - ( i * 8 ) + 450;
-					object.position.z = 900 * Math.cos( phi );
+					cylindrical.set( 900, theta, y );
+
+					object.position.setFromCylindrical( cylindrical );
 
 					vector.x = object.position.x * 2;
 					vector.y = object.position.y;

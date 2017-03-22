@@ -1,11 +1,15 @@
+import { Light } from './Light';
+import { PerspectiveCamera } from '../cameras/PerspectiveCamera';
+import { LightShadow } from './LightShadow';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 
-THREE.PointLight = function ( color, intensity, distance, decay ) {
+function PointLight( color, intensity, distance, decay ) {
 
-	THREE.Light.call( this, color, intensity );
+	Light.call( this, color, intensity );
 
 	this.type = 'PointLight';
 
@@ -26,17 +30,19 @@ THREE.PointLight = function ( color, intensity, distance, decay ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-	this.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 90, 1, 0.5, 500 ) );
+	this.shadow = new LightShadow( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-};
+}
 
-THREE.PointLight.prototype = Object.assign( Object.create( THREE.Light.prototype ), {
+PointLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	constructor: THREE.PointLight,
+	constructor: PointLight,
+
+	isPointLight: true,
 
 	copy: function ( source ) {
 
-		THREE.Light.prototype.copy.call( this, source );
+		Light.prototype.copy.call( this, source );
 
 		this.distance = source.distance;
 		this.decay = source.decay;
@@ -48,3 +54,6 @@ THREE.PointLight.prototype = Object.assign( Object.create( THREE.Light.prototype
 	}
 
 } );
+
+
+export { PointLight };

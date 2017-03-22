@@ -2,47 +2,81 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+import { Cache } from './Cache';
+import { DefaultLoadingManager } from './LoadingManager';
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-};
+function ImageLoader( manager ) {
 
-Object.assign( THREE.ImageLoader.prototype, {
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+
+}
+
+Object.assign( ImageLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( url === undefined ) url = '';
+
+		if ( this.path !== undefined ) url = this.path + url;
+
 		var scope = this;
 
+		var cached = Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			scope.manager.itemStart( url );
+
+			setTimeout( function () {
+
+				if ( onLoad ) onLoad( cached );
+
+				scope.manager.itemEnd( url );
+
+			}, 0 );
+
+			return cached;
+
+		}
+
 		var image = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'img' );
-		image.onload = function () {
 
-			URL.revokeObjectURL( image.src );
+		image.addEventListener( 'load', function () {
 
-			if ( onLoad ) onLoad( image );
+			Cache.add( url, this );
+
+			if ( onLoad ) onLoad( this );
 
 			scope.manager.itemEnd( url );
 
-		};
+		}, false );
 
-		if ( url.indexOf( 'data:' ) === 0 ) {
+		/*
+		image.addEventListener( 'progress', function ( event ) {
 
-			image.src = url;
+			if ( onProgress ) onProgress( event );
 
-		} else {
+		}, false );
+		*/
 
-			var loader = new THREE.XHRLoader();
-			loader.setPath( this.path );
-			loader.setResponseType( 'blob' );
-			loader.load( url, function ( blob ) {
+		image.addEventListener( 'error', function ( event ) {
 
-				image.src = URL.createObjectURL( blob );
+			if ( onError ) onError( event );
 
-			}, onProgress, onError );
+			scope.manager.itemError( url );
+
+		}, false );
+
+		if ( url.substr( 0, 5 ) !== 'data:' ) {
+
+			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
 		}
 
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 
@@ -63,3 +97,6 @@ Object.assign( THREE.ImageLoader.prototype, {
 	}
 
 } );
+
+
+export { ImageLoader };

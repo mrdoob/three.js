@@ -1,11 +1,14 @@
+import { Camera } from './Camera';
+import { Object3D } from '../core/Object3D';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author arose / http://github.com/arose
  */
 
-THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
+function OrthographicCamera( left, right, top, bottom, near, far ) {
 
-	THREE.Camera.call( this );
+	Camera.call( this );
 
 	this.type = 'OrthographicCamera';
 
@@ -22,15 +25,17 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 	this.updateProjectionMatrix();
 
-};
+}
 
-THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.prototype ), {
+OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
 
-	constructor: THREE.OrthographicCamera,
+	constructor: OrthographicCamera,
+
+	isOrthographicCamera: true,
 
 	copy: function ( source ) {
 
-		THREE.Camera.prototype.copy.call( this, source );
+		Camera.prototype.copy.call( this, source );
 
 		this.left = source.left;
 		this.right = source.right;
@@ -100,7 +105,7 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 
 	toJSON: function ( meta ) {
 
-		var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.zoom = this.zoom;
 		data.object.left = this.left;
@@ -117,3 +122,6 @@ THREE.OrthographicCamera.prototype = Object.assign( Object.create( THREE.Camera.
 	}
 
 } );
+
+
+export { OrthographicCamera };

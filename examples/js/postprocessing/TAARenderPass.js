@@ -14,32 +14,33 @@
 
 THREE.TAARenderPass = function ( scene, camera, params ) {
 
-	if ( THREE.ManualMSAARenderPass === undefined ) {
+	if ( THREE.SSAARenderPass === undefined ) {
 
-		console.error( "THREE.TAARenderPass relies on THREE.ManualMSAARenderPass" );
+		console.error( "THREE.TAARenderPass relies on THREE.SSAARenderPass" );
 
 	}
-	THREE.ManualMSAARenderPass.call( this, scene, camera, params );
+
+	THREE.SSAARenderPass.call( this, scene, camera, params );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;
 
 };
 
-THREE.TAARenderPass.JitterVectors = THREE.ManualMSAARenderPass.JitterVectors;
+THREE.TAARenderPass.JitterVectors = THREE.SSAARenderPass.JitterVectors;
 
-THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARenderPass.prototype ), {
+THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPass.prototype ), {
 
 	constructor: THREE.TAARenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		if( ! this.accumulate ) {
+		if ( ! this.accumulate ) {
 
-				THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
+			THREE.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta );
 
-				this.accumulateIndex = -1;
-				return;
+			this.accumulateIndex = - 1;
+			return;
 
 		}
 
@@ -48,20 +49,22 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARe
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.sampleRenderTarget.texture.name = "TAARenderPass.sample";
 
 		}
 
 		if ( ! this.holdRenderTarget ) {
 
 			this.holdRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.holdRenderTarget.texture.name = "TAARenderPass.hold";
 
 		}
 
-		if( this.accumulate && this.accumulateIndex === -1 ) {
+		if ( this.accumulate && this.accumulateIndex === - 1 ) {
 
-				THREE.ManualMSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
+			THREE.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, delta );
 
-				this.accumulateIndex = 0;
+			this.accumulateIndex = 0;
 
 		}
 
@@ -70,7 +73,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARe
 
 		var sampleWeight = 1.0 / ( jitterOffsets.length );
 
-		if( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
+		if ( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
 			this.copyUniforms[ "tDiffuse" ].value = writeBuffer.texture;
@@ -80,18 +83,23 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARe
 			for ( var i = 0; i < numSamplesPerFrame; i ++ ) {
 
 				var j = this.accumulateIndex;
-				var jitterOffset = jitterOffsets[j];
+				var jitterOffset = jitterOffsets[ j ];
+
 				if ( this.camera.setViewOffset ) {
+
 					this.camera.setViewOffset( readBuffer.width, readBuffer.height,
 						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 						readBuffer.width, readBuffer.height );
+
 				}
 
 				renderer.render( this.scene, this.camera, writeBuffer, true );
 				renderer.render( this.scene2, this.camera2, this.sampleRenderTarget, ( this.accumulateIndex === 0 ) );
 
 				this.accumulateIndex ++;
-				if( this.accumulateIndex >= jitterOffsets.length ) break;
+
+				if ( this.accumulateIndex >= jitterOffsets.length ) break;
+
 			}
 
 			if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
@@ -100,19 +108,24 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.ManualMSAARe
 
 		var accumulationWeight = this.accumulateIndex * sampleWeight;
 
-		if( accumulationWeight > 0 ) {
+		if ( accumulationWeight > 0 ) {
+
 			this.copyUniforms[ "opacity" ].value = 1.0;
 			this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, true );
+
 		}
-		if( accumulationWeight < 1.0 ) {
+
+		if ( accumulationWeight < 1.0 ) {
+
 			this.copyUniforms[ "opacity" ].value = 1.0 - accumulationWeight;
 			this.copyUniforms[ "tDiffuse" ].value = this.holdRenderTarget.texture;
 			renderer.render( this.scene2, this.camera2, writeBuffer, ( accumulationWeight === 0 ) );
+
 		}
 
 		renderer.autoClear = autoClear;
 
 	}
 
-});
+} );

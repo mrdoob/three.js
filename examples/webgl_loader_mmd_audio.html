@@ -18,7 +18,6 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
@@ -28,20 +27,22 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank">MMD Assets license</a><br />
 		Copyright
 		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
-		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a><br />
-		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank">Audio Data</a>
-		<a href="http://www.deviantart.com/art/MMD-Rainbow-Stage-212433590" target="_blank">Stage Data</a><br />
+		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank">Dance Data</a>
+		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank">Audio Data</a><br />
 		<a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank">Original Camera Data(I've customized this)</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/libs/charsetencoder.min.js"></script>
+		<script src="js/libs/mmdparser.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
+
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
 
@@ -52,7 +53,7 @@
 
 			var container, stats;
 
-			var mesh, camera, scene, renderer;
+			var mesh, camera, scene, renderer, effect;
 			var helper;
 
 			var ready = false;
@@ -78,6 +79,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
@@ -87,11 +90,13 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
 
 				// model
 
@@ -106,16 +111,14 @@
 				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmd/wavefile_v2.vmd' ];
-				var cameraFiles = [ 'models/mmd/vmd/wavefile_camera.vmd' ];
-				var stageFile = 'models/mmd/stage/stage.pmd';
-				var audioFile = 'models/mmd/audio/wavefile_short.mp3';
+				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				var cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
+				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDHelper();
 
 				var loader = new THREE.MMDLoader();
-				loader.setDefaultTexturePath( './models/mmd/default/' );
 
 				loader.load( modelFile, vmdFiles, function ( object ) {
 
@@ -123,18 +126,7 @@
 
 					helper.add( mesh );
 					helper.setAnimation( mesh );
-
-					/*
-					 * Note: You must set Physics
-					 *       before you add mesh to scene or any other 3D object.
-					 * Note: Physics calculation is pretty heavy.
-					 *       It may not be acceptable for most mobile devices yet.
-			 		 */
-					if ( ! isMobileDevice() ) {
-
-						helper.setPhysics( mesh );
-
-					}
+					helper.setPhysics( mesh );
 
 					loader.loadVmds( cameraFiles, function ( vmd ) {
 
@@ -143,28 +135,23 @@
 						loader.pourVmdIntoCamera( camera, vmd );
 						helper.setCameraAnimation( camera );
 
-						loader.loadModel( stageFile, function ( stage ) {
+						loader.loadAudio( audioFile, function ( audio, listener ) {
 
-							loader.loadAudio( audioFile, function ( audio, listener ) {
+							listener.position.z = 1;
 
-								listener.position.z = 1;
+							helper.setAudio( audio, listener, audioParams );
 
-								helper.setAudio( audio, listener, audioParams );
+							/*
+							 * Note: call this method after you set all animations
+							 *       including camera and audio.
+							 */
+							helper.unifyAnimationDuration();
 
-								/*
-								 * Note: call this method after you set all animations
-								 *       including camera and audio.
-								 */
-								helper.unifyAnimationDuration();
+							scene.add( audio );
+							scene.add( listener );
+							scene.add( mesh );
 
-								scene.add( audio );
-								scene.add( listener );
-								scene.add( stage );
-								scene.add( mesh );
-
-								ready = true;
-
-							}, onProgress, onError );
+							ready = true;
 
 						}, onProgress, onError );
 
@@ -188,7 +175,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -212,43 +199,11 @@
 
 				if ( ready ) {
 
-					var delta = clock.getDelta();
-					helper.animate( delta );
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.clear();
-					renderer.render( scene, camera );
+					helper.animate( clock.getDelta() );
 
 				}
 
-			}
-
-			// easy mobile device detection
-			function isMobileDevice () {
-
-				if ( navigator === undefined || navigator.userAgent === undefined ) {
-
-					return true;
-
-				}
-
-				var s = navigator.userAgent;
-
-				if (    s.match( /iPhone/i )
-//				     || s.match( /iPad/i )
-				     || s.match( /iPod/i )
-				     || s.match( /webOS/i )
-				     || s.match( /BlackBerry/i )
-				     || ( s.match( /Windows/i ) && s.match( /Phone/i ) )
-				     || ( s.match( /Android/i ) && s.match( /Mobile/i ) ) ) {
-
-					return true;
-
-				}
-
-				return false;
+				effect.render( scene, camera );
 
 			}
 

@@ -165,12 +165,12 @@
 					bevelEnabled	: true,
 					bevelThickness  : 2,
 					bevelSize       : 4,
-					bevelSegments   : 1,
+					bevelSegments   : 1
 				};
 
 				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+				var mesh = new THREE.Mesh( geometry, materials );
 
 				mesh.position.set( 50, 100, 50 );
 
