@@ -123,7 +123,7 @@ Object.assign( ObjectLoader.prototype, {
 	},
 
 	parse: function ( json, onLoad ) {
-		
+
         var fonts = this.parseFonts( json.fonts, function () {
 
             if ( onLoad !== undefined ) onLoad( object );
@@ -131,10 +131,10 @@ Object.assign( ObjectLoader.prototype, {
         } );
 
 		var geometries = this.parseGeometries( json.geometries, fonts, function () {
-			
-			if ( onLoad !== undefined ) onLoad( object );			
-			
-		} );
+
+            if ( onLoad !== undefined ) onLoad( object );
+
+        });
 
 		var images = this.parseImages( json.images, function () {
 
@@ -162,35 +162,35 @@ Object.assign( ObjectLoader.prototype, {
 		return object;
 
 	},
-	
-	parseFonts: function ( json, onLoad ) {
+
+    parseFonts: function ( json, onLoad ) {
 
         var scope = this;
         var fonts = {};
 
 		if ( json !== undefined && json.length > 0 ) {
-			
-			var manager = new LoadingManager( onLoad );
-			
+
+            var manager = new LoadingManager( onLoad );
+
             var loader = new FontLoader( manager );
-			
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
-				
-				var font = json[ i ];
+
+            for ( var i = 0, l = json.length; i < l; i++ ) {
+
+                var font = json[i];
 
                 if ( font.glyphs.hasOwnProperty( 'glyphs' )) {
 
                     fonts[ font.uuid ] = loader.parse( font.glyphs );
 
                 }
-				
-			}
-			
-		}
+
+            }
+
+        }
 
 		return fonts;
-		
-	},
+
+    },
 
 	parseGeometries: function ( json, fonts ) {
 
@@ -318,18 +318,18 @@ Object.assign( ObjectLoader.prototype, {
 						);
 
 						break;
-						
-					case 'TextGeometry':
+
+                    case 'TextGeometry':
 					case 'TextBufferGeometry':
-					
-						data.parameters.font = fonts[ data.parameters.glyphs ];
-					
-						geometry = new Geometries[ data.type ](
+
+                        data.parameters.font = fonts[data.parameters.glyphs];
+
+                        geometry = new Geometries[data.type](
 							data.text,
 							data.parameters
 						);
-					
-						break;
+
+                        break;
 
 					case 'TorusGeometry':
 					case 'TorusBufferGeometry':
