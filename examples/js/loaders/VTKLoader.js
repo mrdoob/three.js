@@ -532,8 +532,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		function Float32Concat(first, second)
-		{
+		function Float32Concat(first, second) {
 		    var firstLength = first.length,
 		        result = new Float32Array(firstLength + second.length);
 
@@ -543,8 +542,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		    return result;
 		}
 
-		function Int32Concat(first, second)
-		{
+		function Int32Concat(first, second) {
 		    var firstLength = first.length,
 		        result = new Int32Array(firstLength + second.length);
 
