@@ -124,17 +124,17 @@ Object.assign( ObjectLoader.prototype, {
 
     parse: function ( json, onLoad ) {
 
-        var fonts = this.parseFonts( json.fonts, function () {
+		var fonts = this.parseFonts( json.fonts, function () {
 
-            if ( onLoad !== undefined ) onLoad( object );
+			if ( onLoad !== undefined ) onLoad( object );
 
-        } );
+		} );
 
-        var geometries = this.parseGeometries( json.geometries, fonts, function () {
+		var geometries = this.parseGeometries( json.geometries, fonts, function () {
 
-            if ( onLoad !== undefined ) onLoad( object );
+			if ( onLoad !== undefined ) onLoad( object );
 
-        });
+		});
 
 		var images = this.parseImages( json.images, function () {
 
@@ -151,7 +151,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			object.animations = this.parseAnimations( json.animations );
 
-        }
+		}
 
 		if ( json.images === undefined || json.images.length === 0 ) {
 
@@ -319,17 +319,19 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
-                    case 'TextGeometry':
-                    case 'TextBufferGeometry':
+					case 'TextGeometry':
+					case 'TextBufferGeometry':
 
-                        data.parameters.font = fonts[data.parameters.glyphs];
+						data.parameters.font = fonts[data.parameters.glyphs];
 
-                        geometry = new Geometries[data.type](
-                            data.text,
-                            data.parameters
-                        );
+						geometry = new Geometries[data.type](
 
-                        break;
+							data.text,
+							data.parameters
+
+						);
+
+						break;
 
 					case 'TorusGeometry':
 					case 'TorusBufferGeometry':
