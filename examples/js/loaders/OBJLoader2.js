@@ -6,7 +6,7 @@
 'use strict';
 
 if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
-THREE.OBJLoader2.version = '1.0.6';
+THREE.OBJLoader2.version = '1.1.0';
 
 /**
  * Use this class to load OBJ data from files or to parse OBJ data from arraybuffer or text
@@ -965,7 +965,7 @@ THREE.OBJLoader2 = (function () {
 			}
 			if ( ! normalBA ) bufferGeometry.computeVertexNormals();
 
-			if ( createMultiMaterial ) material = new THREE.MultiMaterial( materials );
+			if ( createMultiMaterial ) material = materials;
 			var mesh = new THREE.Mesh( bufferGeometry, material );
 			this.sceneGraphBaseNode.add( mesh );
 

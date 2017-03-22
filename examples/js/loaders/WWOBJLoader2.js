@@ -6,7 +6,7 @@
 'use strict';
 
 if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
-THREE.OBJLoader2.version = '1.0.6';
+THREE.OBJLoader2.version = '1.1.0';
 
 /**
  * OBJ data will be loaded by dynamically created web worker.
@@ -416,10 +416,9 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					if ( createMultiMaterial ) multiMaterials.push( material );
 
 				}
-
 				if ( createMultiMaterial ) {
 
-					material = new THREE.MultiMaterial( multiMaterials );
+					material = multiMaterials;
 					var materialGroups = payload.materialGroups;
 					var materialGroup;
 					for ( var key in materialGroups ) {
