@@ -95,7 +95,7 @@
 
 				// materials
 
-				material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10 } );
+				material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10, meshLineSizeAttenuation: true } );
 				material2 = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, meshLine: true, meshLineWidth: 5 } );
 				material3 = new THREE.MeshBasicMaterial( { color: 0xffffff, meshLine: true, meshLineWidth: 10 } );
 
@@ -150,7 +150,7 @@
 
 				// animate line width
 
-				material2.meshLineWidth = 10 * ( 1 + 0.5 * Math.sin( 5 * time ) );
+				material2.meshLineWidth = 100 * ( 1 + 0.5 * Math.sin( 5 * time ) );
 
 				renderer.render( scene, camera );
 
