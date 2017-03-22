@@ -516,7 +516,7 @@
 
 			}
 
-			function attachButtonMaterials( materials, faceMaterial, material_indices, car ) {
+			function attachButtonMaterials( materials, faceMaterials, material_indices, car ) {
 
 				for( var i = 0; i < materials.length; i ++ ) {
 
@@ -525,7 +525,7 @@
 
 						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							faceMaterial.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
+							faceMaterials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -539,7 +539,7 @@
 
 				geometry.sortFacesByMaterialIndex();
 
-				var m = new THREE.MultiMaterial(),
+				var m = [],
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,
 					materials = CARS[ car ].materials,
@@ -548,7 +548,7 @@
 
 				for ( var i in CARS[ car ].mmap ) {
 
-					m.materials[ i ] = CARS[ car ].mmap[ i ];
+					m[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 

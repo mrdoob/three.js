@@ -510,14 +510,6 @@ WebGLUniforms.prototype.setValue = function ( gl, name, value ) {
 
 };
 
-WebGLUniforms.prototype.set = function ( gl, object, name ) {
-
-	var u = this.map[ name ];
-
-	if ( u !== undefined ) u.setValue( gl, object[ name ], this.renderer );
-
-};
-
 WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
 
 	var v = object[ name ];

@@ -692,7 +692,7 @@ function WebGLRenderer( parameters ) {
 		state.setMaterial( material );
 
 		var program = setProgram( camera, fog, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
 
 		var updateBuffers = false;
 
@@ -900,13 +900,9 @@ function WebGLRenderer( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
-		var extension;
-
 		if ( geometry && geometry.isInstancedBufferGeometry ) {
 
-			extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-			if ( extension === null ) {
+			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 				return;
@@ -952,7 +948,7 @@ function WebGLRenderer( parameters ) {
 
 						if ( data && data.isInstancedInterleavedBuffer ) {
 
-							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
+							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -973,7 +969,7 @@ function WebGLRenderer( parameters ) {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
+							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -1059,6 +1055,8 @@ function WebGLRenderer( parameters ) {
 		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
+
+		camera.onBeforeRender( _this );
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
@@ -1207,7 +1205,6 @@ function WebGLRenderer( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			state.setBlending( NoBlending );
 			if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 			// transparent pass (back-to-front order)
@@ -1234,6 +1231,14 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setTest( true );
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
+
+		if ( camera.isArrayCamera && camera.enabled ) {
+
+			_this.setScissorTest( false );
+
+		}
+
+		camera.onAfterRender( _this );
 
 		// _gl.finish();
 
@@ -1401,26 +1406,57 @@ function WebGLRenderer( parameters ) {
 
 			object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+			if ( camera.isArrayCamera && camera.enabled ) {
 
-			if ( object.isImmediateRenderObject ) {
+				var cameras = camera.cameras;
 
-				state.setMaterial( material );
+				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-				var program = setProgram( camera, scene.fog, material, object );
+					var camera2 = cameras[ j ];
+					var bounds = camera2.bounds;
+					_this.setViewport(
+						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					);
+					_this.setScissor(
+						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					);
+					_this.setScissorTest( true );
+					renderObject( object, scene, camera2, geometry, material, group );
 
-				_currentGeometryProgram = '';
-
-				renderObjectImmediate( object, program, material );
+				}
 
 			} else {
 
-				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+				renderObject( object, scene, camera, geometry, material, group );
 
 			}
 
 			object.onAfterRender( _this, scene, camera, geometry, material, group );
+
+		}
+
+	}
+
+	function renderObject( object, scene, camera, geometry, material, group ) {
+
+		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		if ( object.isImmediateRenderObject ) {
+
+			state.setMaterial( material );
+
+			var program = setProgram( camera, scene.fog, material, object );
+
+			_currentGeometryProgram = '';
+
+			renderObjectImmediate( object, program, material );
+
+		} else {
+
+			_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 		}
 
@@ -1659,7 +1695,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || camera !== _currentCamera ) {
 
-			p_uniforms.set( _gl, camera, 'projectionMatrix' );
+			p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 			if ( capabilities.logarithmicDepthBuffer ) {
 
@@ -1712,8 +1748,8 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			p_uniforms.set( _gl, _this, 'toneMappingExposure' );
-			p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
+			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
+			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 		}
 
@@ -1759,8 +1795,8 @@ function WebGLRenderer( parameters ) {
 
 					}
 
-					p_uniforms.set( _gl, skeleton, 'boneTexture' );
-					p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
+					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture );
+					p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
 				} else {
 
@@ -1873,8 +1909,8 @@ function WebGLRenderer( parameters ) {
 
 		// common matrices
 
-		p_uniforms.set( _gl, object, 'modelViewMatrix' );
-		p_uniforms.set( _gl, object, 'normalMatrix' );
+		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
+		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;

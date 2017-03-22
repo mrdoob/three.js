@@ -3,6 +3,7 @@
 import '../src/polyfills.js';
 export * from '../src/constants.js';
 export * from '../src/Three.Legacy.js';
+export * from '../src/utils.js';
 
 //src/animation
 export { AnimationAction } from '../src/animation/AnimationAction.js';

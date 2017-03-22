@@ -74,7 +74,7 @@
 
 			}
 
-			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MultiMaterial( materials ) );
+			var skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), materials );
 			skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) );
 			scene.add( skyBox );
 

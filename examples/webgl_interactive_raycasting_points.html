@@ -187,13 +187,9 @@
 						var y = ( Math.cos( u * Math.PI * 8 ) + Math.sin( v * Math.PI * 8) ) / 20;
 						var z = v - 0.5;
 						var v = new THREE.Vector3( x,y,z );
+						geometry.vertices.push( v );
 
 						var intensity = ( y + 0.1 ) * 7;
-						colors[ 3 * k ] = color.r * intensity;
-						colors[ 3 * k + 1 ] = color.g * intensity;
-						colors[ 3 * k + 2 ] = color.b * intensity;
-
-						geometry.vertices.push( v );
 						colors[ k ] = ( color.clone().multiplyScalar( intensity ) );
 
 						k++;
