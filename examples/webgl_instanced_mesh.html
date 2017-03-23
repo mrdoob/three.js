@@ -250,9 +250,12 @@
 					// dummyObj.rotation.set( Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
 					// dummyObj.scale.set( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 );
 
+					let rot = new THREE.Euler(  Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 );
+					let quat = new THREE.Quaternion().setFromEuler( rot );
 					trsCache.push({
 						position: new THREE.Vector3( Math.random() * 2 - 1 , 0 , Math.random() * 2 - 1 ).multiplyScalar( 14 ),
-						rotation: new THREE.Euler(  Math.random() * pi2 , Math.random() * pi2 , Math.random() * pi2 ),
+						rotation: rot,
+						quaternion: quat,
 						scale: new THREE.Vector3( Math.random() + .5 , Math.random() + .5 , Math.random() + .5 )
 					});
 
@@ -282,26 +285,38 @@
 									iNum, 								
 									
 									//matrix initialization, if ommited will set identity matrix at each index
-									function( placementObject , i ){
+									// function( placementObject , i ){
 
-										//copy from outside holders
-										var source = trsCache[i];
+									// 	//copy from outside holders
+									// 	var source = trsCache[i];
 
-										placementObject.position.copy( source.position );
+									// 	placementObject.position.copy( source.position );
 
-										placementObject.rotation.copy( source.rotation );
+									// 	placementObject.rotation.copy( source.rotation );
 
-										if( !uScale ){
-											placementObject.scale.copy( source.scale );
-										}
+									// 	if( !uScale ){
+									// 		placementObject.scale.copy( source.scale );
+									// 	}
 
-										//InstancedMesh will automatically extract the matrix from this object at this index
-									},
+									// 	//InstancedMesh will automatically extract the matrix from this object at this index
+									// },
 
  									//is the scale known to be uniform, will do less shader work, improperly applying this will result in wrong shading 
 									!!uScale
 
 								);
+
+								var ss = new THREE.Vector3(1,1,1);
+
+								for ( var i = 0 ; i < iNum ; i++ ){
+
+									instancedMesh.geometry.setPositionAt( 	i , trsCache[ i ].position );
+									instancedMesh.geometry.setQuaternionAt( i , trsCache[ i ].quaternion );
+									// instancedMesh.geometry.setQuaternionAt( i , new THREE.Quaternion() );
+									// instancedMesh.geometry.setScaleAt( 		i , new THREE.Vector3(1,1,1) );
+									instancedMesh.geometry.setScaleAt( 		i , uScale ? ss : trsCache[ i ].scale );
+
+								}
 
 								instancedMesh.visible = false;
 
@@ -370,19 +385,23 @@
 					o.rotation.y += o.scale.y * dt;
 					o.rotation.z += o.scale.z * dt;
 
-					_obj.rotation.copy( o.rotation );
-					_obj.position.copy( o.position );
+					// _obj.rotation.copy( o.rotation );
+					// _obj.position.copy( o.position );
 
 					if( !options.uniformScale ) _obj.scale.copy( o.scale );
+					
 					else _obj.scale.set(1,1,1);
 
-					_obj.updateMatrixWorld();
 
-					currentMesh.geometry.setTransformationAtIndex( i , _obj.matrixWorld );
+					// _obj.updateMatrixWorld();
 
+					// currentMesh.geometry.setTransformationAtIndex( i , _obj.matrixWorld );
+
+					currentMesh.geometry.setQuaternionAt( i , o.quaternion.setFromEuler( o.rotation ) );
 				}
 
-				currentMesh.geometry.needsUpdate();
+				currentMesh.geometry.attributes.instanceQuaternion.needsUpdate = true;
+				// currentMesh.geometry.needsUpdate();
 
 			}
 

@@ -7,7 +7,9 @@
 
 
 //for now the most convenient place to attach vert transformation logic in global scope
-#ifdef INSTANCE_TRANSFORM
+// #ifdef INSTANCE_TRANSFORM
+#if defined ( INSTANCE_TRANSFORM )
+
 
 mat3 inverse(mat3 m) {
   float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
@@ -25,21 +27,119 @@ mat3 inverse(mat3 m) {
               b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;
 }
 
-attribute vec4 aTRS0;
-attribute vec4 aTRS1;
-attribute vec4 aTRS2;
+// attribute vec4 aTRS0;
+// attribute vec4 aTRS1;
+// attribute vec4 aTRS2;
 
-mat4 getInstanceMatrix(){
+  //for static? 
+// #ifndef STATIC_INSTANCE
 
-  return mat4(
-    
-    vec4( aTRS0.xyz , 0.),
-    vec4( aTRS1.xyz , 0.),
-    vec4( aTRS2.xyz , 0.),
-    vec4( aTRS0.w , aTRS1.w , aTRS2.w , 1.)
 
-  );
+//   mat4 getInstanceMatrix(){
 
-}
+//     return mat4(
+      
+//       vec4( aTRS0.xyz , 0.),
+//       vec4( aTRS1.xyz , 0.),
+//       vec4( aTRS2.xyz , 0.),
+//       vec4( aTRS0.w , aTRS1.w , aTRS2.w , 1.)
+
+//     );
+
+//   }
+
+// #else
+  
+  //for dynamic, avoid computing the matrices on the cpu
+  attribute vec3 instancePosition;
+  attribute vec4 instanceQuaternion;
+  attribute vec3 instanceScale;
+
+  // vec3 applyTRS( vec3 position, vec3 translation, vec4 rotation, vec3 scale ) {
+
+  //   position *= scale;
+  //   position += 2.0 * cross( rotation.xyz, cross( rotation.xyz, position ) + rotation.w * position );
+  //   position += translation;
+
+  //   return position;
+
+  // }
+
+  mat4 getInstanceMatrix(){
+
+
+    //precompute some stuff
+    vec4 q = vec4(
+      instanceQuaternion.x,
+      instanceQuaternion.y,
+      instanceQuaternion.z,
+      instanceQuaternion.w
+    );
+
+    //do one instruction?
+    vec4 q2 = q * q;
+
+    vec3 s = instanceScale;
+
+    //halve the number of mult?
+    float qxy = q.x * q.y;
+    float qxz = q.x * q.z;
+    float qxw = q.x * q.w;
+    float qyw = q.y * q.w;
+    float qyz = q.y * q.z;
+    float qzw = q.z * q.w;
+
+
+
+    // return mat4(
+
+    //     1.0 - 2.0 * ( q2.y - q2.z ) * s.x ,   2.0 * ( q.x * q.y + q.z * q.w )   ,   2.0 * ( q.x * q.z - q.y * q.w )   , 0.0 ,
+        
+    //     2.0 * ( q.x * q.y - q.z * q.w )   ,   1.0 - 2.0 * ( q2.x - q2.z ) * s.y ,   2.0 * ( q.y * q.z + q.x * q.w )   , 0.0 ,
+        
+    //     2.0 * ( q.x * q.z + q.y * q.w )   ,   2.0 * ( q.y * q.z - q.x * q.w )   ,   1.0 - 2.0 * ( q2.x - q2.y ) * s.z , 0.0 ,
+
+    //     instancePosition.x                ,   instancePosition.y                ,   instancePosition.z                , 1.0 
+
+    // )
+
+    // return mat4(
+
+    //     (1.0 - 2.0 * ( q2.y + q2.z )) * s.x ,   2.0 * ( qxy + qzw ) * s.y           ,   2.0 * ( qxz - qyw ) * s.z           , 0.0 ,
+        
+    //     2.0 * ( qxy - qzw ) * s.x           ,   (1.0 - 2.0 * ( q2.x + q2.z )) * s.y ,   2.0 * ( qyz + qxw ) * s.z           , 0.0 ,
+        
+    //     2.0 * ( qxz + qyw ) * s.x           ,   2.0 * ( qyz - qxw ) * s.y           ,   (1.0 - 2.0 * ( q2.x + q2.y )) * s.z , 0.0 ,
+
+    //     instancePosition.x                  ,   instancePosition.y                  ,   instancePosition.z                  , 1.0 
+
+    // );
+
+    return mat4(
+
+        (1.0 - 2.0 * ( q2.y + q2.z )) * s.x ,   2.0 * ( qxy - qzw ) * s.x           ,   2.0 * ( qxz + qyw ) * s.x           , 0.0 ,
+        
+        2.0 * ( qxy + qzw ) * s.y           ,   (1.0 - 2.0 * ( q2.x + q2.z )) * s.y ,   2.0 * ( qyz - qxw ) * s.y           , 0.0 ,
+        
+        2.0 * ( qxz - qyw ) * s.z           ,   2.0 * ( qyz + qxw ) * s.z           ,   (1.0 - 2.0 * ( q2.x + q2.y )) * s.z , 0.0 ,
+
+        instancePosition.x                  ,   instancePosition.y                  ,   instancePosition.z                  , 1.0 
+
+    );
+
+    // return mat4(
+
+    //   (1.0 - 2.0 * ( q2.y - q2.z )) * s.x , 2.0 * ( qxy - qzw ) * s.x           , 2.0 * ( qxz + qyw ) * s.x           , 0. ,
+    //   2.0 * ( qxy + qzw ) * s.y           , (1.0 - 2.0 * ( q2.x - q2.z )) * s.y , 2.0 * ( qyz - qxw ) * s.y           , 0. ,
+    //   2.0 * ( qxz - qyw ) * s.z           , 2.0 * ( qyz + qxw ) * s.z           , (1.0 - 2.0 * ( q2.x - q2.y )) * s.z , 0. ,
+    //   instancePosition.x                  ,   instancePosition.y                 ,   instancePosition.z               , 1.0 
+
+    // );
+
+  }
+
+// #endif
+
+
 
 #endif
