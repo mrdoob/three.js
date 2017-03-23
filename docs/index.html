@@ -350,7 +350,10 @@
 						nameCategoryMap[ j ].element.parentElement.classList.remove( 'filtered' );
 						var str = nameCategoryMap[ j ].name;
 						for( var i = 0; i < res.length; i++ ) {
-							str = str.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+							var resI = res[ i ];
+							if ( resI !== '' ) {
+							    str = str.replace( resI, '<b>' + resI + '</b>' );
+							}
 						}
 						nameCategoryMap[ j ].element.innerHTML = str;
 					} else {
