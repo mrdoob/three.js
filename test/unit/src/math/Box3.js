@@ -300,6 +300,52 @@ QUnit.test( "applyMatrix4" , function( assert ) {
 	assert.ok( compareBox( d.clone().applyMatrix4( m ), d.clone().translate( t1 ) ), "Passed!" );
 });
 
+QUnit.test( "getCorners", function( assert ) {
+	var a = new THREE.Box3( zero3.clone(), one3.clone() );
+
+	var b = a.getCorners();
+
+	assert.ok( b[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	assert.ok( b[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	assert.ok( b[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	assert.ok( b[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
+	assert.ok( b[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( b[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
+	assert.ok( b[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	assert.ok( b[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+
+	var c = [
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone(),
+		zero3.clone()
+	];
+
+	var d = a.getCorners(c);
+
+	assert.ok( d[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	assert.ok( d[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	assert.ok( d[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	assert.ok( d[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
+	assert.ok( d[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( d[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
+	assert.ok( d[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	assert.ok( d[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+
+	assert.ok( d[0] === c[0], "Passed!" );
+	assert.ok( d[1] === c[1], "Passed!" );
+	assert.ok( d[2] === c[2], "Passed!" );
+	assert.ok( d[3] === c[3], "Passed!" );
+	assert.ok( d[4] === c[4], "Passed!" );
+	assert.ok( d[5] === c[5], "Passed!" );
+	assert.ok( d[6] === c[6], "Passed!" );
+	assert.ok( d[7] === c[7], "Passed!" );
+});
+
 QUnit.test( "translate" , function( assert ) {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 	var b = new THREE.Box3( zero3.clone(), one3.clone() );
