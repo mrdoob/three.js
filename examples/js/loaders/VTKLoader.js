@@ -919,8 +919,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						while ( dataArrayIndex < numberOfDataArrays ) {
 
 							// Parse the DataArray
-							if ( ('#text' in arr[ dataArrayIndex ]) && (arr[ dataArrayIndex ][ '#text' ].length > 0) )
-							{
+							if ( ('#text' in arr[ dataArrayIndex ]) && (arr[ dataArrayIndex ][ '#text' ].length > 0) ) {
 								arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
 							}
 								dataArrayIndex ++;
