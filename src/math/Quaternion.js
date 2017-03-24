@@ -18,14 +18,13 @@ function Quaternion( x, y, z, w ) {
 
 Object.assign( Quaternion, {
 
-	slerp: function( qa, qb, qm, t ) {
+	slerp: function ( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
 
 	},
 
-	slerpFlat: function(
-			dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+	slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
 
@@ -91,7 +90,7 @@ Object.assign( Quaternion, {
 
 Object.defineProperties( Quaternion.prototype, {
 
-	"x" : {
+	x: {
 
 		get: function () {
 
@@ -108,7 +107,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"y" : {
+	y: {
 
 		get: function () {
 
@@ -125,7 +124,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"z" : {
+	z: {
 
 		get: function () {
 
@@ -142,7 +141,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	},
 
-	"w" : {
+	w: {
 
 		get: function () {
 
@@ -159,7 +158,7 @@ Object.defineProperties( Quaternion.prototype, {
 
 	}
 
-});
+} );
 
 Object.assign( Quaternion.prototype, {
 

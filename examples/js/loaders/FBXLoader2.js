@@ -106,6 +106,18 @@
 
 			}
 
+			function findIndex( array, func ) {
+
+				for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+					if ( func( array[ i ] ) ) return i;
+
+				}
+
+				return -1;
+
+			}
+
 			var FBXTree = new TextParser().parse( FBXText );
 
 			var connections = parseConnections( FBXTree );
@@ -627,7 +639,8 @@
 
 									deformer.array.forEach( function ( subDeformer, subDeformerIndex ) {
 
-										var index = subDeformer.indices.findIndex( function ( indx ) {
+
+										var index = findIndex( subDeformer.indices, function ( indx ) {
 
 											return indx === vertexIndex;
 
@@ -1145,7 +1158,7 @@
 							if ( deformer.map.has( conns.parents[ i ].ID ) ) {
 
 								model = new THREE.Bone();
-								var index = deformer.array.findIndex( function ( subDeformer ) {
+								var index = findIndex( deformer.array, function ( subDeformer ) {
 
 									return subDeformer.FBX_ID === conns.parents[ i ].ID;
 
@@ -1308,7 +1321,7 @@
 					var conns = connections.get( model.FBX_ID );
 					for ( var parentIndex = 0; parentIndex < conns.parents.length; parentIndex ++ ) {
 
-						var pIndex = modelArray.findIndex( function ( mod ) {
+						var pIndex = findIndex( modelArray, function ( mod ) {
 
 							return mod.FBX_ID === conns.parents[ parentIndex ].ID;
 
@@ -2485,7 +2498,7 @@
 
 					for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
 
-						var boneID = sceneGraph.skeleton.bones.findIndex( function ( bone ) {
+						var boneID = findIndex( sceneGraph.skeleton.bones, function ( bone ) {
 
 							return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
 
@@ -2945,7 +2958,7 @@
 						var bone = bones[ bonesIndex ];
 
 						var name = bone.name.replace( /.*:/, '' );
-						var parentIndex = bones.findIndex( function ( parentBone ) {
+						var parentIndex = findIndex( bones, function ( parentBone ) {
 
 							return bone.parent === parentBone;
 
@@ -2954,7 +2967,7 @@
 
 					}
 
-					for ( var frame = 0; frame < stack.frames; frame ++ ) {
+					for ( var frame = 0; frame <= stack.frames; frame ++ ) {
 
 						for ( var bonesIndex = 0, bonesLength = bones.length; bonesIndex < bonesLength; ++ bonesIndex ) {
 
@@ -3118,19 +3131,19 @@
 		 * Position of the vertex.
 		 * @type {THREE.Vector3}
 		 */
-		this.position = new THREE.Vector3( );
+		this.position = new THREE.Vector3();
 
 		/**
 		 * Normal of the vertex
 		 * @type {THREE.Vector3}
 		 */
-		this.normal = new THREE.Vector3( );
+		this.normal = new THREE.Vector3();
 
 		/**
 		 * UV coordinates of the vertex.
 		 * @type {THREE.Vector2}
 		 */
-		this.uv = new THREE.Vector2( );
+		this.uv = new THREE.Vector2();
 
 		/**
 		 * Color of the vertex

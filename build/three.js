@@ -1986,14 +1986,13 @@
 
 	Object.assign( Quaternion, {
 
-		slerp: function( qa, qb, qm, t ) {
+		slerp: function ( qa, qb, qm, t ) {
 
 			return qm.copy( qa ).slerp( qb, t );
 
 		},
 
-		slerpFlat: function(
-				dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+		slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 			// fuzz-free, array-based Quaternion SLERP operation
 
@@ -2059,7 +2058,7 @@
 
 	Object.defineProperties( Quaternion.prototype, {
 
-		"x" : {
+		x: {
 
 			get: function () {
 
@@ -2076,7 +2075,7 @@
 
 		},
 
-		"y" : {
+		y: {
 
 			get: function () {
 
@@ -2093,7 +2092,7 @@
 
 		},
 
-		"z" : {
+		z: {
 
 			get: function () {
 
@@ -2110,7 +2109,7 @@
 
 		},
 
-		"w" : {
+		w: {
 
 			get: function () {
 
@@ -2127,7 +2126,7 @@
 
 		}
 
-	});
+	} );
 
 	Object.assign( Quaternion.prototype, {
 
@@ -3376,7 +3375,10 @@
 			var te = this.elements;
 			var me = m.elements;
 
-			for ( var i = 0; i < 16; i ++ ) te[ i ] = me[ i ];
+			te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ]; te[ 3 ] = me[ 3 ];
+			te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ]; te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ];
+			te[ 8 ] = me[ 8 ]; te[ 9 ] = me[ 9 ]; te[ 10 ] = me[ 10 ]; te[ 11 ] = me[ 11 ];
+			te[ 12 ] = me[ 12 ]; te[ 13 ] = me[ 13 ]; te[ 14 ] = me[ 14 ]; te[ 15 ] = me[ 15 ];
 
 			return this;
 
@@ -3580,7 +3582,7 @@
 
 			var te = this.elements;
 
-			var x = q.x, y = q.y, z = q.z, w = q.w;
+			var x = q._x, y = q._y, z = q._z, w = q._w;
 			var x2 = x + x, y2 = y + y, z2 = z + z;
 			var xx = x * x2, xy = x * y2, xz = x * z2;
 			var yy = y * y2, yz = y * z2, zz = z * z2;
@@ -4065,18 +4067,14 @@
 
 				// if determine is negative, we need to invert one scale
 				var det = this.determinant();
-				if ( det < 0 ) {
-
-					sx = - sx;
-
-				}
+				if ( det < 0 ) sx = - sx;
 
 				position.x = te[ 12 ];
 				position.y = te[ 13 ];
 				position.z = te[ 14 ];
 
 				// scale the rotation part
-				for ( var i = 0; i < 16; i ++ ) matrix.elements[ i ] = this.elements[ i ]; // at this point matrix is incomplete so we can't use .copy()
+				matrix.copy( this );
 
 				var invSX = 1 / sx;
 				var invSY = 1 / sy;
@@ -4171,7 +4169,7 @@
 
 			if ( offset === undefined ) offset = 0;
 
-			for( var i = 0; i < 16; i ++ ) {
+			for ( var i = 0; i < 16; i ++ ) {
 
 				this.elements[ i ] = array[ i + offset ];
 
@@ -4198,8 +4196,8 @@
 			array[ offset + 6 ] = te[ 6 ];
 			array[ offset + 7 ] = te[ 7 ];
 
-			array[ offset + 8 ]  = te[ 8 ];
-			array[ offset + 9 ]  = te[ 9 ];
+			array[ offset + 8 ] = te[ 8 ];
+			array[ offset + 9 ] = te[ 9 ];
 			array[ offset + 10 ] = te[ 10 ];
 			array[ offset + 11 ] = te[ 11 ];
 
@@ -4780,14 +4778,6 @@
 		var u = this.map[ name ];
 
 		if ( u !== undefined ) u.setValue( gl, value, this.renderer );
-
-	};
-
-	WebGLUniforms.prototype.set = function ( gl, object, name ) {
-
-		var u = this.map[ name ];
-
-		if ( u !== undefined ) u.setValue( gl, object[ name ], this.renderer );
 
 	};
 
@@ -6286,7 +6276,8 @@
 
 		intersectsBox: function ( box ) {
 
-			// using 6 splitting planes to rule out intersections.
+			// using 4 splitting planes to rule out intersections
+
 			return box.max.x < this.min.x || box.min.x > this.max.x ||
 				box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
 
@@ -7161,26 +7152,9 @@
 
 		this.visible = true;
 
-		this._needsUpdate = true;
+		this.needsUpdate = true;
 
 	}
-
-	Object.defineProperty( Material.prototype, 'needsUpdate', {
-
-		get: function () {
-
-			return this._needsUpdate;
-
-		},
-
-		set: function ( value ) {
-
-			if ( value === true ) this.update();
-			this._needsUpdate = value;
-
-		}
-
-	} );
 
 	Object.assign( Material.prototype, EventDispatcher.prototype, {
 
@@ -7435,12 +7409,6 @@
 			this.clippingPlanes = dstPlanes;
 
 			return this;
-
-		},
-
-		update: function () {
-
-			this.dispatchEvent( { type: 'update' } );
 
 		},
 
@@ -8374,7 +8342,9 @@
 			var te = this.elements;
 			var me = m.elements;
 
-			for ( var i = 0; i < 9; i ++ ) te[ i ] = me[ i ];
+			te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
+			te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
+			te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ]; te[ 8 ] = me[ 8 ];
 
 			return this;
 
@@ -9991,7 +9961,7 @@
 
 	Object.defineProperties( Euler.prototype, {
 
-		"x" : {
+		x: {
 
 			get: function () {
 
@@ -10008,7 +9978,7 @@
 
 		},
 
-		"y" : {
+		y: {
 
 			get: function () {
 
@@ -10025,7 +9995,7 @@
 
 		},
 
-		"z" : {
+		z: {
 
 			get: function () {
 
@@ -10042,7 +10012,7 @@
 
 		},
 
-		"order" : {
+		order: {
 
 			get: function () {
 
@@ -10059,7 +10029,7 @@
 
 		}
 
-	});
+	} );
 
 	Object.assign( Euler.prototype, {
 
@@ -12325,19 +12295,15 @@
 
 	} );
 
-	// http://stackoverflow.com/questions/1669190/javascript-min-max-array-values/13440842#13440842
-
 	function arrayMax( array ) {
 
-		var length = array.length, max = - Infinity;
+		if ( array.length === 0 ) return - Infinity;
 
-		while ( length -- ) {
+		var max = array[ 0 ];
 
-			if ( array[ length ] > max ) {
+		for ( var i = 1, l = array.length; i < l; ++ i ) {
 
-				max = array[ length ];
-
-			}
+			if ( array[ i ] > max ) max = array[ i ];
 
 		}
 
@@ -15514,43 +15480,46 @@
 
 	}
 
-	Camera.prototype = Object.create( Object3D.prototype );
-	Camera.prototype.constructor = Camera;
+	Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	Camera.prototype.isCamera = true;
+		constructor: Camera,
 
-	Camera.prototype.getWorldDirection = function () {
+		isCamera: true,
 
-		var quaternion = new Quaternion();
+		copy: function ( source ) {
 
-		return function getWorldDirection( optionalTarget ) {
+			Object3D.prototype.copy.call( this, source );
 
-			var result = optionalTarget || new Vector3();
+			this.matrixWorldInverse.copy( source.matrixWorldInverse );
+			this.projectionMatrix.copy( source.projectionMatrix );
 
-			this.getWorldQuaternion( quaternion );
+			return this;
 
-			return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+		},
 
-		};
+		getWorldDirection: function () {
 
-	}();
+			var quaternion = new Quaternion();
 
-	Camera.prototype.clone = function () {
+			return function getWorldDirection( optionalTarget ) {
 
-		return new this.constructor().copy( this );
+				var result = optionalTarget || new Vector3();
 
-	};
+				this.getWorldQuaternion( quaternion );
 
-	Camera.prototype.copy = function ( source ) {
+				return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-		Object3D.prototype.copy.call( this, source );
+			};
 
-		this.matrixWorldInverse.copy( source.matrixWorldInverse );
-		this.projectionMatrix.copy( source.projectionMatrix );
+		}(),
 
-		return this;
+		clone: function () {
 
-	};
+			return new this.constructor().copy( this );
+
+		}
+
+	} );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -15711,7 +15680,7 @@
 
 		},
 
-		clearViewOffset: function() {
+		clearViewOffset: function () {
 
 			this.view = null;
 			this.updateProjectionMatrix();
@@ -18954,7 +18923,7 @@
 
 		}
 
-		function enableAttributeAndDivisor( attribute, meshPerAttribute, extension ) {
+		function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
 
 			newAttributes[ attribute ] = 1;
 
@@ -18966,6 +18935,8 @@
 			}
 
 			if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
 				extension.vertexAttribDivisorANGLE( attribute, meshPerAttribute );
 				attributeDivisors[ attribute ] = meshPerAttribute;
@@ -20655,13 +20626,9 @@
 
 		function setupVertexAttributes( material, program, geometry, startIndex ) {
 
-			var extension;
-
 			if ( geometry && geometry.isInstancedBufferGeometry ) {
 
-				extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-				if ( extension === null ) {
+				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 					console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 					return;
@@ -20707,7 +20674,7 @@
 
 							if ( data && data.isInstancedInterleavedBuffer ) {
 
-								state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
+								state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
 								if ( geometry.maxInstancedCount === undefined ) {
 
@@ -20728,7 +20695,7 @@
 
 							if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-								state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
+								state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
 								if ( geometry.maxInstancedCount === undefined ) {
 
@@ -20814,6 +20781,8 @@
 			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 			// update camera matrices and frustum
+
+			camera.onBeforeRender( _this );
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
@@ -20962,7 +20931,6 @@
 
 				// opaque pass (front-to-back order)
 
-				state.setBlending( NoBlending );
 				if ( opaqueObjects.length ) renderObjects( opaqueObjects, scene, camera );
 
 				// transparent pass (back-to-front order)
@@ -20989,6 +20957,14 @@
 			state.buffers.depth.setTest( true );
 			state.buffers.depth.setMask( true );
 			state.buffers.color.setMask( true );
+
+			if ( camera.isArrayCamera && camera.enabled ) {
+
+				_this.setScissorTest( false );
+
+			}
+
+			camera.onAfterRender( _this );
 
 			// _gl.finish();
 
@@ -21156,26 +21132,57 @@
 
 				object.onBeforeRender( _this, scene, camera, geometry, material, group );
 
-				object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-				object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+				if ( camera.isArrayCamera && camera.enabled ) {
 
-				if ( object.isImmediateRenderObject ) {
+					var cameras = camera.cameras;
 
-					state.setMaterial( material );
+					for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-					var program = setProgram( camera, scene.fog, material, object );
+						var camera2 = cameras[ j ];
+						var bounds = camera2.bounds;
+						_this.setViewport(
+							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+						);
+						_this.setScissor(
+							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+						);
+						_this.setScissorTest( true );
+						renderObject( object, scene, camera2, geometry, material, group );
 
-					_currentGeometryProgram = '';
-
-					renderObjectImmediate( object, program, material );
+					}
 
 				} else {
 
-					_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
+					renderObject( object, scene, camera, geometry, material, group );
 
 				}
 
 				object.onAfterRender( _this, scene, camera, geometry, material, group );
+
+			}
+
+		}
+
+		function renderObject( object, scene, camera, geometry, material, group ) {
+
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+			if ( object.isImmediateRenderObject ) {
+
+				state.setMaterial( material );
+
+				var program = setProgram( camera, scene.fog, material, object );
+
+				_currentGeometryProgram = '';
+
+				renderObjectImmediate( object, program, material );
+
+			} else {
+
+				_this.renderBufferDirect( camera, scene.fog, geometry, material, object, group );
 
 			}
 
@@ -21414,7 +21421,7 @@
 
 			if ( refreshProgram || camera !== _currentCamera ) {
 
-				p_uniforms.set( _gl, camera, 'projectionMatrix' );
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				if ( capabilities.logarithmicDepthBuffer ) {
 
@@ -21467,8 +21474,8 @@
 
 				}
 
-				p_uniforms.set( _gl, _this, 'toneMappingExposure' );
-				p_uniforms.set( _gl, _this, 'toneMappingWhitePoint' );
+				p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
+				p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
 			}
 
@@ -21514,8 +21521,8 @@
 
 						}
 
-						p_uniforms.set( _gl, skeleton, 'boneTexture' );
-						p_uniforms.set( _gl, skeleton, 'boneTextureSize' );
+						p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture );
+						p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
 					} else {
 
@@ -21628,8 +21635,8 @@
 
 			// common matrices
 
-			p_uniforms.set( _gl, object, 'modelViewMatrix' );
-			p_uniforms.set( _gl, object, 'normalMatrix' );
+			p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
+			p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 			p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 			return program;
@@ -23260,8 +23267,6 @@
 	function SkinnedMesh( geometry, material ) {
 
 		Mesh.call( this, geometry, material );
-
-		if ( this.material.skinning === false ) console.warn( 'THREE.SkinnedMesh: Material must have skinning set to true.', this.material );
 
 		this.type = 'SkinnedMesh';
 
@@ -35719,6 +35724,27 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	function ArrayCamera( array ) {
+
+		PerspectiveCamera.call( this );
+
+		this.enabled = false;
+		this.cameras = array || [];
+
+	}
+
+	ArrayCamera.prototype = Object.assign( Object.create( PerspectiveCamera.prototype ), {
+
+		constructor: ArrayCamera,
+
+		isArrayCamera: true
+
+	} );
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
 	function AudioListener() {
 
 		Object3D.call( this );
@@ -39483,6 +39509,7 @@
 			if ( this.autoStart && ! this.running ) {
 
 				this.start();
+				return 0;
 
 			}
 
@@ -43110,6 +43137,7 @@
 	exports.PerspectiveCamera = PerspectiveCamera;
 	exports.OrthographicCamera = OrthographicCamera;
 	exports.CubeCamera = CubeCamera;
+	exports.ArrayCamera = ArrayCamera;
 	exports.Camera = Camera;
 	exports.AudioListener = AudioListener;
 	exports.PositionalAudio = PositionalAudio;

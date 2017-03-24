@@ -18,6 +18,24 @@ var WEBVR = {
 
 	},
 
+	getVRDisplay: function ( onDisplay ) {
+
+		if ( 'getVRDisplays' in navigator ) {
+
+			navigator.getVRDisplays()
+				.then( function ( displays ) {
+
+					onDisplay( displays[ 0 ] );
+
+				} )
+				.catch( function () {
+					// no displays
+				} );
+
+		}
+
+	},
+
 	getMessage: function () {
 
 		var message;
@@ -65,7 +83,16 @@ var WEBVR = {
 
 	},
 
-	getButton: function ( effect ) {
+	getButton: function ( display, canvas ) {
+
+		/*
+		if ( display instanceof VRDisplay === false ) {
+
+			console.error( 'WebVR.getButton() now expects a VRDisplay.' );
+			return;
+
+		}
+		*/
 
 		var button = document.createElement( 'button' );
 		button.style.position = 'absolute';
@@ -85,13 +112,13 @@ var WEBVR = {
 		button.textContent = 'ENTER VR';
 		button.onclick = function () {
 
-			effect.isPresenting ? effect.exitPresent() : effect.requestPresent();
+			display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
 
 		};
 
 		window.addEventListener( 'vrdisplaypresentchange', function () {
 
-			button.textContent = effect.isPresenting ? 'EXIT VR' : 'ENTER VR';
+			button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
 
 		}, false );
 

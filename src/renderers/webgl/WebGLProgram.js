@@ -152,7 +152,7 @@ function replaceLightNums( string, parameters ) {
 
 function parseIncludes( string ) {
 
-	var pattern = /#include +<([\w\d.]+)>/g;
+	var pattern = /^\s*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 

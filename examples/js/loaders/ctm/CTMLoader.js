@@ -19,7 +19,7 @@ THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 
 // Load multiple CTM parts defined in JSON
 
-THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
+THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 	parameters = parameters || {};
 
@@ -29,7 +29,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 	var basePath = parameters.basePath ? parameters.basePath : this.extractUrlBase( url );
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState === 4 ) {
 
@@ -65,7 +65,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 				// load joined CTM file
 
 				var partUrl = basePath + jsonObject.data;
-				var parametersPart = { useWorker: parameters.useWorker, worker:parameters.worker, offsets: jsonObject.offsets };
+				var parametersPart = { useWorker: parameters.useWorker, worker: parameters.worker, offsets: jsonObject.offsets };
 				scope.load( partUrl, callbackFinal, parametersPart );
 
 			}
@@ -85,7 +85,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 //		- url (required)
 //		- callback (required)
 
-THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
+THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 
 	parameters = parameters || {};
 
@@ -98,21 +98,21 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 	var length = 0;
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState === 4 ) {
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var binaryData = new Uint8Array(xhr.response);
+				var binaryData = new Uint8Array( xhr.response );
 
 				var s = Date.now();
 
 				if ( parameters.useWorker ) {
 
-					var worker = parameters.worker || new Worker( "js/loaders/ctm/CTMWorker.js" );
+					var worker = parameters.worker || new Worker( 'js/loaders/ctm/CTMWorker.js' );
 
-					worker.onmessage = function( event ) {
+					worker.onmessage = function ( event ) {
 
 						var files = event.data;
 
@@ -126,14 +126,14 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							console.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
+							console.log( "model load time [worker]: " + ( e - e1 ) + " ms, total: " + ( e - s ) );
 
 						}
 
 
 					};
 
-					worker.postMessage( { "data": binaryData, "offsets": offsets } );
+					worker.postMessage( { "data": binaryData, "offsets": offsets }, [ binaryData.buffer ] );
 
 				} else {
 
@@ -197,9 +197,9 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		this.materials = [];
 
-		var indices = file.body.indices,
-		positions = file.body.vertices,
-		normals = file.body.normals;
+		var indices = file.body.indices;
+		var positions = file.body.vertices;
+		var normals = file.body.normals;
 
 		var uvs, colors;
 
@@ -249,7 +249,9 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 	// compute vertex normals if not present in the CTM model
 	if ( geometry.attributes.normal === undefined ) {
+
 		geometry.computeVertexNormals();
+
 	}
 
 	callback( geometry );

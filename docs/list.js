@@ -145,6 +145,7 @@ var list = {
 			[ "DodecahedronGeometry", "api/geometries/DodecahedronGeometry" ],
 			[ "EdgesGeometry", "api/geometries/EdgesGeometry" ],
 			[ "ExtrudeGeometry", "api/geometries/ExtrudeGeometry" ],
+			[ "ExtrudeBufferGeometry", "api/geometries/ExtrudeBufferGeometry" ],
 			[ "IcosahedronBufferGeometry", "api/geometries/IcosahedronBufferGeometry" ],
 			[ "IcosahedronGeometry", "api/geometries/IcosahedronGeometry" ],
 			[ "LatheBufferGeometry", "api/geometries/LatheBufferGeometry" ],
@@ -244,7 +245,6 @@ var list = {
 			[ "MeshPhysicalMaterial", "api/materials/MeshPhysicalMaterial" ],
 			[ "MeshStandardMaterial", "api/materials/MeshStandardMaterial" ],
 			[ "MeshToonMaterial", "api/materials/MeshToonMaterial" ],
-			[ "MultiMaterial", "api/materials/MultiMaterial" ],
 			[ "PointsMaterial", "api/materials/PointsMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
@@ -336,10 +336,15 @@ var list = {
 			[ "KeyFrameAnimation", "examples/collada/KeyFrameAnimation" ]
 		],
 
+		"Geometries": [
+			[ "ConvexBufferGeometry", "examples/geometries/ConvexBufferGeometry" ],
+			[ "ConvexGeometry", "examples/geometries/ConvexGeometry" ]
+		],
+
 		"Loaders": [
 			[ "BabylonLoader", "examples/loaders/BabylonLoader" ],
 			[ "ColladaLoader", "examples/loaders/ColladaLoader" ],
-			[ "GLTFLoader", "examples/loaders/GLTFLoader" ],
+			[ "GLTF2Loader", "examples/loaders/GLTF2Loader" ],
 			[ "MTLLoader", "examples/loaders/MTLLoader" ],
 			[ "OBJLoader", "examples/loaders/OBJLoader" ],
 			[ "PCDLoader", "examples/loaders/PCDLoader" ],
@@ -352,6 +357,14 @@ var list = {
 			[ "CombinedCamera", "examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "examples/Lut" ],
 			[ "SpriteCanvasMaterial", "examples/SpriteCanvasMaterial" ]
+		],
+
+		"QuickHull": [
+			[ "Face", "examples/quickhull/Face" ],
+			[ "HalfEdge", "examples/quickhull/HalfEdge" ],
+			[ "QuickHull", "examples/quickhull/QuickHull" ],
+			[ "VertexNode", "examples/quickhull/VertexNode" ],
+			[ "VertexList", "examples/quickhull/VertexList" ]
 		],
 
 		"Renderers": [
