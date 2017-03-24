@@ -1232,12 +1232,6 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setMask( true );
 		state.buffers.color.setMask( true );
 
-		if ( camera.isArrayCamera && camera.enabled ) {
-
-			_this.setScissorTest( false );
-
-		}
-
 		camera.onAfterRender( _this );
 
 		// _gl.finish();
@@ -1414,15 +1408,19 @@ function WebGLRenderer( parameters ) {
 
 					var camera2 = cameras[ j ];
 					var bounds = camera2.bounds;
-					_this.setViewport(
-						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					state.viewport(
+						_currentViewport.set(
+							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+						)
 					);
-					_this.setScissor(
-						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
-						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+					state.scissor(
+						_currentScissor.set(
+							bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
+							bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
+						)
 					);
-					_this.setScissorTest( true );
+					state.setScissorTest( true );
 					renderObject( object, scene, camera2, geometry, material, group );
 
 				}
