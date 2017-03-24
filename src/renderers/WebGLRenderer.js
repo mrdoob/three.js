@@ -373,7 +373,7 @@ function WebGLRenderer( parameters ) {
 
 	this.forceContextLoss = function () {
 
-		if (extensions.get( 'WEBGL_lose_context' )) {
+		if ( extensions.get( 'WEBGL_lose_context' ) ) {
 
 			extensions.get( 'WEBGL_lose_context' ).loseContext();
 
