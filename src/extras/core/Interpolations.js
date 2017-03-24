@@ -78,4 +78,8 @@ function CubicBezier( t, p0, p1, p2, p3 ) {
 
 }
 
-export { CatmullRom, QuadraticBezier, CubicBezier };
+export {
+	CatmullRom,
+	QuadraticBezier,
+	CubicBezier
+};

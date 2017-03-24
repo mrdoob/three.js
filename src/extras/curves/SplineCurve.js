@@ -1,7 +1,6 @@
-import { Curve } from '../core/Curve';
 import { CatmullRom } from '../core/Interpolations';
+import { Curve } from '../core/Curve';
 import { Vector2 } from '../../math/Vector2';
-
 
 function SplineCurve( points /* array of Vector2 */ ) {
 
@@ -9,29 +8,32 @@ function SplineCurve( points /* array of Vector2 */ ) {
 
 }
 
-SplineCurve.prototype = Object.create( Curve.prototype );
-SplineCurve.prototype.constructor = SplineCurve;
+SplineCurve.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-SplineCurve.prototype.isSplineCurve = true;
+	constructor: SplineCurve,
 
-SplineCurve.prototype.getPoint = function ( t ) {
+	isSplineCurve: true,
 
-	var points = this.points;
-	var point = ( points.length - 1 ) * t;
+	getPoint: function ( t ) {
 
-	var intPoint = Math.floor( point );
-	var weight = point - intPoint;
+		var points = this.points;
+		var point = ( points.length - 1 ) * t;
 
-	var point0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
-	var point1 = points[ intPoint ];
-	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+		var intPoint = Math.floor( point );
+		var weight = point - intPoint;
 
-	return new Vector2(
-		CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
-		CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
-	);
+		var point0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
+		var point1 = points[ intPoint ];
+		var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
+		var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
-};
+		return new Vector2(
+			CatmullRom( weight, point0.x, point1.x, point2.x, point3.x ),
+			CatmullRom( weight, point0.y, point1.y, point2.y, point3.y )
+		);
+
+	}
+
+} );
 
 export { SplineCurve };

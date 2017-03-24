@@ -3,9 +3,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { QuadraticBezier, CubicBezier } from './Interpolations';
+import {
+	QuadraticBezier,
+	CubicBezier
+} from './Interpolations';
 import { ShapePath } from './ShapePath';
-
 
 function Font( data ) {
 
@@ -56,7 +58,11 @@ Object.assign( Font.prototype, {
 
 			var glyph = data.glyphs[ c ] || data.glyphs[ '?' ];
 
-			if ( ! glyph ) return;
+			if ( ! glyph ) {
+
+				return;
+
+			}
 
 			var path = new ShapePath();
 
@@ -93,8 +99,8 @@ Object.assign( Font.prototype, {
 
 						case 'q': // quadraticCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 
@@ -121,8 +127,8 @@ Object.assign( Font.prototype, {
 
 						case 'b': // bezierCurveTo
 
-							cpx  = outline[ i ++ ] * scale + offsetX;
-							cpy  = outline[ i ++ ] * scale + offsetY;
+							cpx = outline[ i ++ ] * scale + offsetX;
+							cpy = outline[ i ++ ] * scale + offsetY;
 							cpx1 = outline[ i ++ ] * scale + offsetX;
 							cpy1 = outline[ i ++ ] * scale + offsetY;
 							cpx2 = outline[ i ++ ] * scale + offsetX;
@@ -155,14 +161,25 @@ Object.assign( Font.prototype, {
 
 			}
 
-			return { offsetX: glyph.ha * scale, path: path };
+			return {
+				offsetX: glyph.ha * scale,
+				path: path
+			};
 
 		}
 
 		//
 
-		if ( size === undefined ) size = 100;
-		if ( divisions === undefined ) divisions = 4;
+		if ( size === undefined ) {
+
+			size = 100;
+
+		}
+		if ( divisions === undefined ) {
+
+			divisions = 4;
+
+		}
 
 		var data = this.data;
 
@@ -180,6 +197,5 @@ Object.assign( Font.prototype, {
 	}
 
 } );
-
 
 export { Font };
