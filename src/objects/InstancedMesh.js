@@ -46,23 +46,19 @@ var
 	})
 ;
 
+function InstancedMesh ( bufferGeometry , material , numInstances , uniformScale ) {
 
-// function InstancedMesh ( geometry , material , numInstances , distributeFunction , uniformScale , disposeRegular ) {
-function InstancedMesh ( geometry , material , numInstances , uniformScale ) {
+	Mesh.call( this , (new InstancedBufferGeometry()).copy( bufferGeometry ) );
 
-	Mesh.call( this , new InstancedDistributedGeometry( geometry , numInstances ) , material.clone() );
 
 	this.numInstances = numInstances;
 
-	//trigger this material to be instanced
-	this.material.defines = {
+	this._setAttributes();
 
-		INSTANCE_TRANSFORM: ''
-
-	};
+	//use the setter to decorate this material
+	this.material = material.clone();
  	
- 	if( undefined !== uniformScale && uniformScale )
-		this.material.defines.INSTANCE_UNIFORM = true;
+ 	this._uniformScale = !!uniformScale;
 
 	this.frustumCulled = false; //you can uncheck this if you generate your own bounding info
 
@@ -77,172 +73,135 @@ InstancedMesh.prototype = Object.create( Mesh.prototype );
 
 InstancedMesh.constructor = InstancedMesh;
 
-Object.defineProperty( InstancedMesh.prototype, 'material', {
+// Object.defineProperty( InstancedMesh.prototype, 'material', {
+Object.defineProperties( InstancedMesh.prototype , {
 
-	set: function( m ){ 
+	'material': {
 
-		if( m.defines ) 
+		set: function( m ){ 
 
-			m.defines.INSTANCE_TRANSFORM = '';
+			if ( m.defines ) {
+			
+				m.defines.INSTANCE_TRANSFORM = '';
+				
+				if( this._uniformScale) m.defines.INSTANCE_UNIFORM = '';
 
-		else 
+			}
 
-			m.defines = { INSTANCE_TRANSFORM: '' };
+			else{ 
+			
+				m.defines = { INSTANCE_TRANSFORM: '' };
 
-		this._material = m;
+				if ( this._uniformScale ) m.defines.INSTANCE_UNIFORM = '';
+			
+			}
+
+			this._material = m;
+
+		},
+
+		get: function(){ return this._material; }
 
 	},
 
-	get: function(){ return this._material; }
+	'numInstances': {
+
+		set: function( v ){ 
+
+			this._numInstances = v;
+
+			//reset buffers
+
+			this._setAttributes();
+
+		},
+
+		get: function(){ return this._numInstances; }
+
+	},
+
+	'geometry':{
+
+		set: function( g ){ 
+
+			//if its not already instanced attach buffers
+			if ( !!g.attributes.instancePosition ) {
+
+				this._geometry = new InstancedBufferGeometry();
+
+				this._setAttributes();
+
+			} 
+
+			else 
+
+				this._geometry = g;
+
+		},
+
+		get: function(){ return this._geometry; }
+
+	}
 
 });
 
+InstancedMesh.prototype.setPositionAt = function( index , position ){
 
+	this.geometry.attributes.instancePosition.setXYZ( index , position.x , position.y , position.z );
 
+};
 
-//helper interface to InstancedBufferGeometry, needs the method to pack TRS into 3 x v4 atts
-//could add a per instance color attribute
+InstancedMesh.prototype.setQuaternionAt = function ( index , quat ) {
 
-// var attributeIds = [ 'aTRS0' , 'aTRS1' , 'aTRS2' ];
-var attributeIds = [ 
-	'instancePosition' , 
-	'instanceQuaternion' , 
-	'instanceScale' 
-];
+	this.geometry.attributes.instanceQuaternion.setXYZW( index , quat.x , quat.y , quat.z , quat.w );
 
-function InstancedDistributedGeometry (
-	regularGeometry , 							//regular buffer geometry, the geometry to be instanced
-	numCopies , 								//maximum number of copies to be generated
-	distributeFunction,					 		//distribution function
-	disposeRegular								//destroy the geometry that was converted to this
-) {
+};
 
-	InstancedBufferGeometry.call( this );
+InstancedMesh.prototype.setScaleAt = function ( index , scale ) {
 
-	// this.fromGeometry( regularGeometry , numCopies , distributeFunction );
-	this.fromGeometry( regularGeometry , numCopies );
+	this.geometry.attributes.instanceScale.setXYZ( index , scale.x , scale.y , scale.z );
 
-	// if( disposeRegular ) regularGeometry.dispose();
+};
+
+InstancedMesh.prototype.needsUpdate = function( attribute ){
+
+	switch ( attribute ){
+
+		case 'position' :
+
+			this.geometry.attributes.instancePosition.needsUpdate = 	true;
+
+			break;
+
+		case 'quaternion' :
+
+			this.geometry.attributes.instanceQuaternion.needsUpdate = 	true;
+
+			break;
+
+		case 'scale' :
+
+			this.geometry.attributes.instanceScale.needsUpdate = 		true;
+
+			break;
+
+		default:
+
+			this.geometry.attributes.instancePosition.needsUpdate = 	true;
+			this.geometry.attributes.instanceQuaternion.needsUpdate = 	true;
+			this.geometry.attributes.instanceScale.needsUpdate = 		true;
+
+			break;
+
+	}
 
 }
 
-InstancedDistributedGeometry.prototype = Object.create( InstancedBufferGeometry.prototype );
+InstancedMesh.prototype._setAttributes = function(){
 
-InstancedDistributedGeometry.constructor = InstancedDistributedGeometry;
-
-// InstancedDistributedGeometry.prototype.setMatrixAtIndex = function( index , mat4 ){
-
-// 	var attributeArray = this._transformationMatrixComponents;
-
-// 	index = index << 2;
-
-// 	for ( var r = 0 ; r < 3 ; r ++ ){
-
-// 		var row = r << 2;
-
-// 		for ( var c = 0 ; c < 3 ; c ++ ){
-			
-// 			attributeArray[r].array[ index + c ] = mat4.elements[ row + c ];
-
-// 		}
-
-// 		row = 12;
-
-// 		attributeArray[r].array[ index + 3 ] = mat4.elements[ row + r ]; //read last row as column
-
-// 	}
-
-// };
-
-
-InstancedDistributedGeometry.prototype.setPositionAt = function( index , position ){
-
-	this.attributes.instancePosition.setXYZ( index , position.x , position.y , position.z );
-
-};
-
-InstancedDistributedGeometry.prototype.setQuaternionAt = function ( index , quat ) {
-
-	this.attributes.instanceQuaternion.setXYZW( index , quat.x , quat.y , quat.z , quat.w );
-
-};
-
-InstancedDistributedGeometry.prototype.setScaleAt = function ( index , scale ) {
-
-	this.attributes.instanceScale.setXYZ( index , scale.x , scale.y , scale.z );
-
-};
-
-
-
-
-// InstancedDistributedGeometry.prototype.needsUpdate = function(){
-
-// 	this.attributes[ attributeIds[ 0 ] ].needsUpdate = true;
-// 	this.attributes[ attributeIds[ 1 ] ].needsUpdate = true;
-// 	this.attributes[ attributeIds[ 2 ] ].needsUpdate = true;
-
-// };
-
-// InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry , numInstances , distributeFunction ){
-InstancedDistributedGeometry.prototype.fromGeometry = function( regularGeometry , numInstances , distributeFunction ){
-
-	//a helper node used to compute positions for each instance
-	// var helperObject = new Object3D(); 	
-	// var normalMatrix = new Matrix3();
-	// var rotationMatrix = new Matrix4();
-
-	// distributeFunction = undefined !== distributeFunction ? distributeFunction : function(){}; //should just fill with identity matrices if not provided
-
-	//copy atributes from the provided geometry
-	for ( var att in regularGeometry.attributes ){	
-
-		if(regularGeometry.attributes.hasOwnProperty( att ) ){
-
-			this.addAttribute( att , regularGeometry.attributes[att] );	
-
-		}
-
-	}
-
-	if(regularGeometry.index!==null)
-			this.setIndex( regularGeometry.index );
-
-	// this._transformationMatrixComponents = [
-	// 	new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 ),
-	// 	new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 ),
-	// 	new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 )
-	// ];
-
-	this._transformationMatrixComponents = [
-		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 3 ), 3, 1 ),
-		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 4 ), 4, 1 ),
-		new THREE.InstancedBufferAttribute( new Float32Array( numInstances * 3 ), 3, 1 )
-	];
-
-	// for ( var clone = 0 ; clone < numInstances ; clone ++ ){
-
-	// 	helperObject.matrixWorld.identity();
-
-	// 	helperObject.position.set(0,0,0);
-		
-	// 	helperObject.rotation.set(0,0,0);
-		
-	// 	helperObject.scale.set(1,1,1);
-
-	// 	distributeFunction( helperObject , clone , numInstances );
-
-	// 	helperObject.updateMatrixWorld();
-
-	// 	this.setTransformationAtIndex( clone , helperObject.matrixWorld );
-
-	// }
-
-	for ( var i = 0 ; i < 3 ; i ++ ){
-
-		this.addAttribute( attributeIds[i] , this._transformationMatrixComponents[i] );
-
-	}
+	this.geometry.addAttribute( 'instancePosition' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) ); 
+	this.geometry.addAttribute( 'instanceQuaternion' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
+	this.geometry.addAttribute( 'instanceScale' , 		new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
 
 };
 
