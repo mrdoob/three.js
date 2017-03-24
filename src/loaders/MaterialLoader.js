@@ -21,9 +21,10 @@ Object.assign( MaterialLoader.prototype, {
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
-		loader.load( url, function ( text ) {
+		loader.setResponseType( 'json' );
+		loader.load( url, function ( json ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			onLoad( scope.parse( json ) );
 
 		}, onProgress, onError );
 
