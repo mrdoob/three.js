@@ -36,6 +36,7 @@ ParametricGeometry.prototype.constructor = ParametricGeometry;
 
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
 
 function ParametricBufferGeometry( func, slices, stacks ) {
 
@@ -53,11 +54,15 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	var indices = [];
 	var vertices = [];
+	var normals = [];
 	var uvs = [];
+
+	var EPS = 0.00001;
+	var pu = new Vector3(), pv = new Vector3(), normal = new Vector3();
 
 	var i, j;
 
-	// generate vertices and uvs
+	// generate vertices, normals and uvs
 
 	var sliceCount = slices + 1;
 
@@ -71,6 +76,16 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			var p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
+
+			// approximate tangent plane vectors via central difference
+
+			pu.subVectors( func( u + EPS, v ), func( u - EPS, v ) );
+			pv.subVectors( func( u, v + EPS ), func( u, v - EPS ) );
+
+			// cross product of tangent plane vectors returns surface normal
+
+			normal.crossVectors( pu, pv );
+			normals.push( normal.x, normal.y, normal.z );
 
 			uvs.push( u, v );
 
@@ -102,11 +117,10 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	this.setIndex( indices );
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
-	// generate normals
-
-	this.computeVertexNormals();
+	this.normalizeNormals();
 
 }
 
