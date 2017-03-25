@@ -19,6 +19,7 @@ function PlaneGeometry( width, height, widthSegments, heightSegments ) {
 	};
 
 	this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+	this.mergeVertices();
 
 }
 

@@ -21,6 +21,7 @@ function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
 	};
 
 	this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
+	this.mergeVertices();
 
 }
 
