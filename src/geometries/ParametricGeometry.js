@@ -77,12 +77,29 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 			var p = func( u, v );
 			vertices.push( p.x, p.y, p.z );
 
-			// approximate tangent plane vectors via central difference
+			// approximate tangent vectors via finite differences
 
-			pu.subVectors( func( u + EPS, v ), func( u - EPS, v ) );
-			pv.subVectors( func( u, v + EPS ), func( u, v - EPS ) );
+			if ( u - EPS >= 0 ) {
 
-			// cross product of tangent plane vectors returns surface normal
+				pu.subVectors( p, func( u - EPS, v ) );
+
+			} else {
+
+				pu.subVectors( func( u + EPS, v ), p );
+
+			}
+
+			if ( v - EPS >= 0 ) {
+
+				pv.subVectors( p, func( u, v - EPS ) );
+
+			} else {
+
+				pv.subVectors( func( u, v + EPS ), p );
+
+			}
+
+			// cross product of tangent vectors returns surface normal
 
 			normal.crossVectors( pu, pv ).normalize();
 			normals.push( normal.x, normal.y, normal.z );
@@ -119,6 +136,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
 }
 
 ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
