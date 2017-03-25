@@ -84,7 +84,7 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 			// cross product of tangent plane vectors returns surface normal
 
-			normal.crossVectors( pu, pv );
+			normal.crossVectors( pu, pv ).normalize();
 			normals.push( normal.x, normal.y, normal.z );
 
 			uvs.push( u, v );
@@ -119,9 +119,6 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-	this.normalizeNormals();
-
 }
 
 ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
