@@ -556,9 +556,9 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 			console.time( 'buildWebWorkerCode' );
 			var wwDef = (function () {
 
-				function OBJLoader() {
-					this.meshCreator = new MeshCreator();
-					this.parser = new Parser( this.meshCreator );
+				function WWOBJLoader() {
+					this.wwMeshCreator = new WWMeshCreator();
+					this.parser = new Parser( this.wwMeshCreator );
 					this.validated = false;
 					this.cmdState = 'created';
 
@@ -571,9 +571,9 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				 * @param parserDebug
 				 * @param meshCreatorDebug
 				 */
-				OBJLoader.prototype._setDebug = function ( parserDebug, meshCreatorDebug ) {
-					this.parser._setDebug( parserDebug );
-					this.meshCreator._setDebug( meshCreatorDebug );
+				WWOBJLoader.prototype.setDebug = function ( parserDebug, meshCreatorDebug ) {
+					this.parser.setDebug( parserDebug );
+					this.wwMeshCreator.setDebug( meshCreatorDebug );
 				};
 
 				/**
@@ -581,11 +581,11 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				 *
 				 * @param arrayBuffer
 				 */
-				OBJLoader.prototype.parse = function ( arrayBuffer ) {
+				WWOBJLoader.prototype.parse = function ( arrayBuffer ) {
 					console.log( 'Parsing arrayBuffer...' );
 					console.time( 'parseArrayBuffer' );
 
-					this._validate();
+					this.validate();
 					this.parser.parseArrayBuffer( arrayBuffer );
 					var objGroup = this._finalize();
 
@@ -594,33 +594,33 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					return objGroup;
 				};
 
-				OBJLoader.prototype._validate = function () {
+				WWOBJLoader.prototype.validate = function () {
 					if ( this.validated ) return;
 
-					this.parser._validate();
-					this.meshCreator._validate();
+					this.parser.validate();
+					this.wwMeshCreator.validate();
 
 					this.validated = true;
 				};
 
-				OBJLoader.prototype._finalize = function () {
-					console.log( 'Global output object count: ' + this.meshCreator.globalObjectCount );
-					this.parser._finalize();
-					this.meshCreator._finalize();
+				WWOBJLoader.prototype._finalize = function () {
+					console.log( 'Global output object count: ' + this.wwMeshCreator.globalObjectCount );
+					this.parser.finalize();
+					this.wwMeshCreator.finalize();
 					this.validated = false;
 				};
 
-				OBJLoader.prototype.init = function ( payload ) {
+				WWOBJLoader.prototype.init = function ( payload ) {
 					this.cmdState = 'init';
-					this._setDebug( payload.debug, payload.debug );
+					this.setDebug( payload.debug, payload.debug );
 				};
 
-				OBJLoader.prototype.setMaterials = function ( payload ) {
+				WWOBJLoader.prototype.setMaterials = function ( payload ) {
 					this.cmdState = 'setMaterials';
-					this.meshCreator._setMaterials( payload.materialNames );
+					this.wwMeshCreator.setMaterials( payload.materialNames );
 				};
 
-				OBJLoader.prototype.run = function ( payload ) {
+				WWOBJLoader.prototype.run = function ( payload ) {
 					this.cmdState = 'run';
 
 					this.parse( payload.objAsArrayBuffer );
@@ -633,35 +633,35 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					} );
 				};
 
-				return OBJLoader;
+				return WWOBJLoader;
 			})();
 
 			var wwMeshCreatorDef = (function () {
 
-				function MeshCreator() {
+				function WWMeshCreator() {
 					this.materials = null;
 					this.debug = false;
 					this.globalObjectCount = 1;
 					this.validated = false;
 				}
 
-				MeshCreator.prototype._setMaterials = function ( materials ) {
+				WWMeshCreator.prototype.setMaterials = function ( materials ) {
 					this.materials = ( materials == null ) ? ( this.materials == null ? { materials: [] } : this.materials ) : materials;
 				};
 
-				MeshCreator.prototype._setDebug = function ( debug ) {
+				WWMeshCreator.prototype.setDebug = function ( debug ) {
 					this.debug = ( debug == null ) ? this.debug : debug;
 				};
 
-				MeshCreator.prototype._validate = function () {
+				WWMeshCreator.prototype.validate = function () {
 					if ( this.validated ) return;
 
-					this._setMaterials( null );
-					this._setDebug( null );
+					this.setMaterials( null );
+					this.setDebug( null );
 					this.globalObjectCount = 1;
 				};
 
-				MeshCreator.prototype._finalize = function () {
+				WWMeshCreator.prototype.finalize = function () {
 					this.materials = null;
 					this.validated = false;
 				};
@@ -676,7 +676,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				 * @param absoluteNormalCount
 				 * @param absoluteUvCount
 				 */
-				MeshCreator.prototype._buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount, absoluteNormalCount, absoluteUvCount ) {
+				WWMeshCreator.prototype.buildMesh = function ( rawObjectDescriptions, inputObjectCount, absoluteVertexCount, absoluteNormalCount, absoluteUvCount ) {
 					if ( this.debug ) console.log( 'OBJLoader.buildMesh:\nInput object no.: ' + inputObjectCount );
 
 					var vertexFa = new Float32Array( absoluteVertexCount );
@@ -774,34 +774,34 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					this.globalObjectCount++;
 				};
 
-				return MeshCreator;
+				return WWMeshCreator;
 			})();
 
-			var wwLoaderRunnerDef = (function () {
+			var wwObjLoaderRunnerDef = (function () {
 
-				function OBJLoaderRunner() {
+				function WWOBJLoaderRunner() {
 					self.addEventListener( 'message', this.runner, false );
 				}
 
-				OBJLoaderRunner.prototype.runner = function ( event ) {
+				WWOBJLoaderRunner.prototype.runner = function ( event ) {
 					var payload = event.data;
 
-					console.log( 'Command state before: ' + OBJLoaderRef.cmdState );
+					console.log( 'Command state before: ' + WWOBJLoaderRef.cmdState );
 
 					switch ( payload.cmd ) {
 						case 'init':
 
-							OBJLoaderRef.init( payload );
+							WWOBJLoaderRef.init( payload );
 							break;
 
 						case 'setMaterials':
 
-							OBJLoaderRef.setMaterials( payload );
+							WWOBJLoaderRef.setMaterials( payload );
 							break;
 
 						case 'run':
 
-							OBJLoaderRef.run( payload );
+							WWOBJLoaderRef.run( payload );
 							break;
 
 						default:
@@ -811,10 +811,10 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 					}
 
-					console.log( 'Command state after: ' + OBJLoaderRef.cmdState );
+					console.log( 'Command state after: ' + WWOBJLoaderRef.cmdState );
 				};
 
-				return OBJLoaderRunner;
+				return WWOBJLoaderRunner;
 			})();
 
 			var buildObject = function ( fullName, object ) {
@@ -882,11 +882,11 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 			this.workerCode += objLoaderHelper._buildWebWorkerCode( buildObject, buildSingelton );
 
 			// web worker construction
-			this.workerCode += buildSingelton( 'OBJLoader', 'OBJLoader', wwDef );
-			this.workerCode += buildSingelton( 'MeshCreator', 'MeshCreator', wwMeshCreatorDef );
-			this.workerCode += 'OBJLoaderRef = new OBJLoader();\n\n';
-			this.workerCode += buildSingelton( 'OBJLoaderRunner', 'OBJLoaderRunner', wwLoaderRunnerDef );
-			this.workerCode += 'new OBJLoaderRunner();\n\n';
+			this.workerCode += buildSingelton( 'WWOBJLoader', 'WWOBJLoader', wwDef );
+			this.workerCode += buildSingelton( 'WWMeshCreator', 'WWMeshCreator', wwMeshCreatorDef );
+			this.workerCode += 'WWOBJLoaderRef = new WWOBJLoader();\n\n';
+			this.workerCode += buildSingelton( 'WWOBJLoaderRunner', 'WWOBJLoaderRunner', wwObjLoaderRunnerDef );
+			this.workerCode += 'new WWOBJLoaderRunner();\n\n';
 
 			console.timeEnd( 'buildWebWorkerCode' );
 		}
