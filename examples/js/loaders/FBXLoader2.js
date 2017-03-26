@@ -1065,7 +1065,7 @@
 
 		for ( var i = 0; i < pointsValues.length; i += 4 ) {
 
-			controlPoints.push( new THREE.Vector4().fromArray( pointsValues ) );
+			controlPoints.push( new THREE.Vector4().fromArray( pointsValues, i ) );
 
 		}
 
