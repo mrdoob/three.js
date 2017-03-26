@@ -633,6 +633,7 @@
 
 						var currentWeight = weight;
 						var currentIndex = weightIndices[ weightIndex ];
+
 						Weight.forEach( function ( comparedWeight, comparedWeightIndex, comparedWeightArray ) {
 
 							if ( currentWeight > comparedWeight ) {
@@ -738,15 +739,19 @@
 		}
 
 		// Convert the material indices of each vertex into rendering groups on the geometry.
-		var prevMaterialIndex = bufferInfo.materialIndexBuffer[ 0 ];
+
+		var materialIndexBuffer = bufferInfo.materialIndexBuffer;
+		var prevMaterialIndex = materialIndexBuffer[ 0 ];
 		var startIndex = 0;
-		for ( var materialBufferIndex = 0; materialBufferIndex < bufferInfo.materialIndexBuffer.length; ++ materialBufferIndex ) {
 
-			if ( bufferInfo.materialIndexBuffer[ materialBufferIndex ] !== prevMaterialIndex ) {
+		for ( var i = 0; i < materialIndexBuffer.length; ++ i ) {
 
-				geo.addGroup( startIndex, materialBufferIndex - startIndex, prevMaterialIndex );
-				startIndex = materialBufferIndex;
-				prevMaterialIndex = bufferInfo.materialIndexBuffer[ materialBufferIndex ];
+			if ( materialIndexBuffer[ i ] !== prevMaterialIndex ) {
+
+				geo.addGroup( startIndex, i - startIndex, prevMaterialIndex );
+
+				prevMaterialIndex = materialIndexBuffer[ i ];
+				startIndex = i;
 
 			}
 
@@ -2518,11 +2523,7 @@
 				version: null,
 				id: animationCurve.id,
 				internalID: animationCurve.id,
-				times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( function ( time ) {
-
-					return ConvertFBXTimeToSeconds( time );
-
-				} ),
+				times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
 				values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
 
 				attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
@@ -3038,7 +3039,7 @@
 
 	}
 
-
+	var AXES = [ 'x', 'y', 'z' ];
 
 	function hasCurve( animationNode, attribute ) {
 
@@ -3049,13 +3050,14 @@
 		}
 
 		var attributeNode = animationNode[ attribute ];
+
 		if ( ! attributeNode ) {
 
 			return false;
 
 		}
 
-		return [ 'x', 'y', 'z' ].every( function ( key ) {
+		return AXES.every( function ( key ) {
 
 			return attributeNode.curves[ key ] !== null;
 
@@ -3065,17 +3067,17 @@
 
 	function hasKeyOnFrame( attributeNode, frame ) {
 
-		return [ 'x', 'y', 'z' ].every( function ( key ) {
+		return AXES.every( function ( key ) {
 
 			return isKeyExistOnFrame( attributeNode.curves[ key ], frame );
 
-			function isKeyExistOnFrame( curve, frame ) {
-
-				return curve.values[ frame ] !== undefined;
-
-			}
-
 		} );
+
+	}
+
+	function isKeyExistOnFrame( curve, frame ) {
+
+		return curve.values[ frame ] !== undefined;
 
 	}
 
@@ -3672,8 +3674,7 @@
 
 				case "ColorRGB":
 				case "Vector3D":
-					var tmp = innerPropValue.split( ',' );
-					innerPropValue = new THREE.Vector3( tmp[ 0 ], tmp[ 1 ], tmp[ 2 ] );
+					innerPropValue = new THREE.Vector3().fromArray( innerPropValue.split( ',' ).map( parseFloatMap ) );
 					break;
 
 			}
@@ -3907,7 +3908,7 @@
 	 * @param {number} time - FBX tick timestamp to convert.
 	 * @returns {number} - FBX tick in real world time.
 	 */
-	function ConvertFBXTimeToSeconds( time ) {
+	function convertFBXTimeToSeconds( time ) {
 
 		// Constant is FBX ticks per second.
 		return time / 46186158000;
@@ -3923,17 +3924,11 @@
 	 */
 	function parseFloatArray( string ) {
 
-		var array = string.split( ',' );
-
-		for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-			array[ i ] = parseFloat( array[ i ] );
-
-		}
-
-		return array;
+		return string.split( ',' ).map( parseFloatMap );
 
 	}
+
+	function parseFloatMap( string ) { return parseFloat( string ); }
 
 	/**
 	 * Parses comma separated list of int numbers and returns them in an array.
@@ -3944,17 +3939,11 @@
 	 */
 	function parseIntArray( string ) {
 
-		var array = string.split( ',' );
-
-		for ( var i = 0, l = array.length; i < l; i ++ ) {
-
-			array[ i ] = parseInt( array[ i ] );
-
-		}
-
-		return array;
+		return string.split( ',' ).map( parseIntMap );
 
 	}
+
+	function parseIntMap( string ) { return parseInt( string ); }
 
 	/**
 	 * Parses Vector3 property from FBXTree.  Property is given as .value.x, .value.y, etc.
