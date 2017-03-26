@@ -1063,7 +1063,7 @@
 		var controlPoints = [];
 		var pointsValues = parseFloatArray( geometryNode.subNodes.Points.properties.a );
 
-		for ( var i = 0; i < pointsValues.length; i += 4 ) {
+		for ( var i = 0, l = pointsValues.length; i < l; i += 4 ) {
 
 			controlPoints.push( new THREE.Vector4().fromArray( pointsValues, i ) );
 
@@ -1091,17 +1091,16 @@
 		var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
 		var vertices = curve.getPoints( controlPoints.length * 7 );
 
-		var vertexBuffer = [];
+		var positions = new Float32Array( vertices.length * 3 );
 
-		for ( var verticesIndex = 0, verticesLength = vertices.length; verticesIndex < verticesLength; ++ verticesIndex ) {
+		for ( var i = 0, l = vertices.length; i < l; ++ i ) {
 
-			var position = vertices[ verticesIndex ];
-			position.toArray( vertexBuffer, vertexBuffer.length );
+			vertices[ i ].toArray( positions, i * 3 );
 
 		}
 
 		var geometry = new THREE.BufferGeometry();
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertexBuffer ), 3 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 		return geometry;
 
