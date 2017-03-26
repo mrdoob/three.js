@@ -91,7 +91,9 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-function CustomSinCurve( scale ){
+function CustomSinCurve( scale ) {
+
+	THREE.Curve.call( this );
 
 	this.scale = ( scale === undefined ) ? 1 : scale;
 
