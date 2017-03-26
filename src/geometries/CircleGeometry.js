@@ -18,6 +18,7 @@ function CircleGeometry( radius, segments, thetaStart, thetaLength ) {
 	};
 
 	this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 }
 

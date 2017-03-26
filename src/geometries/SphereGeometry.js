@@ -21,6 +21,7 @@ function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLen
 	};
 
 	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+	this.mergeVertices();
 
 }
 
