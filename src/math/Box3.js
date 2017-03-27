@@ -1,5 +1,6 @@
 import { Vector3 } from './Vector3';
 import { Sphere } from './Sphere';
+import { Matrix4 } from './Matrix4';
 
 /**
  * @author bhouston / http://clara.io
@@ -123,11 +124,11 @@ Object.assign( Box3.prototype, {
 
 	}(),
 
-	setFromObject: function (object, reference, excludeInvisibleObjects, excludeInvisibleMaterials) {
+	setFromObject: function (object, reference, excludeInvisibleObjects) {
 		
 		this.makeEmpty();
 
-		return this.expandByObject( object, reference, excludeInvisibleObjects, excludeInvisibleMaterials );
+		return this.expandByObject( object, reference, excludeInvisibleObjects );
 		
 	},
 
@@ -212,45 +213,31 @@ Object.assign( Box3.prototype, {
 		// The two last parameters specify what to do with invisible
 		// parts of the object.
 		
-		var v1 = new THREE.Vector3();
+		var v1 = new Vector3();
 
-		return function expandByObject( object, reference, excludeInvisibleObjects, excludeInvisibleMaterials ) {
+		return function expandByObject( object, reference, excludeInvisibleObjects ) {
 
 			excludeInvisibleObjects = excludeInvisibleObjects || false;
-			excludeInvisibleMaterials = excludeInvisibleMaterials || false;
 			
 			var m;
-			if (reference !== undefined) {
-				m = new THREE.Matrix4();
+			if ( reference !== undefined ) {
+				
+				m = new Matrix4();
 				m.getInverse(reference.matrixWorld);
+
 			}
+			
 			var scope = this;
 
 			object.updateMatrixWorld( true );
 
-			let trav;
-			if (excludeInvisibleObjects) {
-				trav = function(f) {
-					object.traverseVisible(f);					
-				};
-			} else {
-				trav = function(f) {
-					object.traverse(f);					
-				};
-			}
-			
-			trav( function ( node ) {
+			object["traverse"+(excludeInvisibleObjects ? "Visible" : "")]( function ( node ) {
 
 				var i, l;
 
 				var geometry = node.geometry;
 
-				if ( geometry !== undefined 
-					&& (!excludeInvisibleMaterials 
-						|| (excludeInvisibleMaterials
-							//no material is treated as invisible material. OK?
-							&& node.material !== undefined
-							&& node.material.visible==true))) {
+				if ( geometry !== undefined ) {
 					
 					if ( geometry.isGeometry ) {
 
@@ -260,8 +247,10 @@ Object.assign( Box3.prototype, {
 
 							v1.copy( vertices[ i ] );
 							v1.applyMatrix4( node.matrixWorld );
-							if (m !== undefined) {
+							if ( m !== undefined ) {
+								
 								v1.applyMatrix4( m );
+								
 							}
 							scope.expandByPoint( v1 );
 
@@ -276,8 +265,10 @@ Object.assign( Box3.prototype, {
 							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
 								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-								if (m !== undefined) {
+								if ( m !== undefined ) {
+									
 									v1.applyMatrix4( m );
+									
 								}
 								scope.expandByPoint( v1 );
 
