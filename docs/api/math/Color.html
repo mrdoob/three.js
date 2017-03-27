@@ -44,9 +44,9 @@ var color = new THREE.Color( 1, 0, 0 );
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Multi r], [page:Float g], [page:Float b] )</h3>
+		<h3>[name]( [page:Color_Hex_or_String r], [page:Float g], [page:Float b] )</h3>
 		<div>
-		[page:Multi r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color.
+		[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color.
 		If they are not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended), a CSS-style string, or another Color instance.<br />
 		[page:Float g] - (optional) If it is defined, the green component of the color.<br />
 		[page:Float b] - (optional) If it is defined, the blue component of the color.<br /><br />
@@ -54,8 +54,8 @@ var color = new THREE.Color( 1, 0, 0 );
 		Note that standard method of specifying color in three.js is with a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet], and that method is used
 		throughout the rest of the documentation.<br /><br />
 
-		When all arguments are defined then [page:Multi r] is the red component, [page:Float g] is the green component and [page:Float b] is the blue component of the color.<br />
-		When only [page:Multi r] is defined:<br />
+		When all arguments are defined then [page:Color_Hex_or_String r] is the red component, [page:Float g] is the green component and [page:Float b] is the blue component of the color.<br />
+		When only [page:Color_Hex_or_String r] is defined:<br />
 		<ul>
 			<li>It can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] representing the color (recommended).</li>
 			<li>It can be an another Color instance.</li>
@@ -202,11 +202,11 @@ var color = new THREE.Color( 1, 0, 0 );
 			[page:Float h], [page:Float s], and [page:Float l], and then converts the color back to RGB.
 		</div>
 
-		<h3>[method:Color set]( [page:Multi value] ) </h3>
+		<h3>[method:Color set]( [page:Color_Hex_or_String value] ) </h3>
 		<div>
-		[page:Multi value] - Value to set this color to.<br /><br />
+		[page:Color_Hex_or_String value] - Value to set this color to.<br /><br />
 
-		See the Constructor above for full details of what [page:Multi value] can be.
+		See the Constructor above for full details of what [page:Color_Hex_or_String value] can be.
 		Delegates to [page:.copy], [page:.setStyle], or [page:.setHex] depending on input type.
 		</div>
 
