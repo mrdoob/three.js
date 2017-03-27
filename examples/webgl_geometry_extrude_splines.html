@@ -95,7 +95,7 @@
 			SampleClosedSpline: sampleClosedSpline
 		};
 
-		var parent, tube, tubeMesh;
+		var parent, tubeGeometry, group;
 
 		var params = {
 			spline: 'GrannyKnot',
@@ -108,42 +108,45 @@
 			cameraHelper: false,
 		};
 
+		var material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
+
+		var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
+
 		function addTube() {
 
-			if ( tubeMesh !== undefined ) parent.remove( tubeMesh );
+			if ( group !== undefined ) {
+
+				parent.remove( group );
+
+				group.children[ 0 ].geometry.dispose();
+				group.children[ 1 ].geometry.dispose();
+
+			}
 
 			extrudePath = splines[ params.spline ];
 
-			tube = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
+			tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
-			addGeometry( tube, 0xff00ff );
+			addGeometry( tubeGeometry );
+
 			setScale();
 
 		}
 
 		function setScale() {
 
-			tubeMesh.scale.set( params.scale, params.scale, params.scale );
+			group.scale.set( params.scale, params.scale, params.scale );
 
 		}
 
 
-		function addGeometry( geometry, color ) {
+		function addGeometry( geometry ) {
 
 			// 3D shape
 
-			tubeMesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [
-				new THREE.MeshLambertMaterial( {
-					color: color
-				} ),
-				new THREE.MeshBasicMaterial( {
-					color: 0x000000,
-					opacity: 0.3,
-					wireframe: true,
-					transparent: true
-			} ) ] );
+			group = THREE.SceneUtils.createMultiMaterialObject( geometry, [ material, wireframeMaterial ] );
 
-			parent.add( tubeMesh );
+			parent.add( group );
 
 		}
 
@@ -266,20 +269,20 @@
 			var looptime = 20 * 1000;
 			var t = ( time % looptime ) / looptime;
 
-			var pos = tube.parameters.path.getPointAt( t );
+			var pos = tubeGeometry.parameters.path.getPointAt( t );
 			pos.multiplyScalar( params.scale );
 
 			// interpolation
 
-			var segments = tube.tangents.length;
+			var segments = tubeGeometry.tangents.length;
 			var pickt = t * segments;
 			var pick = Math.floor( pickt );
 			var pickNext = ( pick + 1 ) % segments;
 
-			binormal.subVectors( tube.binormals[ pickNext ], tube.binormals[ pick ] );
-			binormal.multiplyScalar( pickt - pick ).add( tube.binormals[ pick ] );
+			binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
+			binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
-			var dir = tube.parameters.path.getTangentAt( t );
+			var dir = tubeGeometry.parameters.path.getTangentAt( t );
 			var offset = 15;
 
 			normal.copy( binormal ).cross( dir );
@@ -293,7 +296,7 @@
 
 			// using arclength for stablization in look ahead
 
-			var lookAt = tube.parameters.path.getPointAt( ( t + 30 / tube.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+			var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
 
 			// camera orientation 2 - up orientation via normal
 
