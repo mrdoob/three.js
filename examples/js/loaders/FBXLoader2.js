@@ -1467,7 +1467,6 @@
 		var rawCurves = FBXTree.Objects.subNodes.AnimationCurve;
 		var rawLayers = FBXTree.Objects.subNodes.AnimationLayer;
 		var rawStacks = FBXTree.Objects.subNodes.AnimationStack;
-		var rawModels = FBXTree.Objects.subNodes.Model;
 
 		/**
 		 * @type {{
@@ -2136,6 +2135,7 @@
 			 */
 			var layer = [];
 			var children = connections.get( parseInt( nodeID ) ).children;
+
 			for ( var childIndex = 0; childIndex < children.length; childIndex ++ ) {
 
 				// Skip lockInfluenceWeights
@@ -2167,8 +2167,8 @@
 
 			var layers = [];
 			var children = connections.get( parseInt( nodeID ) ).children;
-			var maxTimeStamp = 0;
-			var minTimeStamp = Number.MAX_VALUE;
+			var timestamps = { max: 0, min: Number.MAX_VALUE };
+
 			for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
 
 				var currentLayer = returnObject.layers[ children[ childIndex ].ID ];
@@ -2183,214 +2183,7 @@
 
 						if ( layer ) {
 
-							getCurveNodeMaxMinTimeStamps( layer );
-
-						}
-
-						/**
-						 * Sets the maxTimeStamp and minTimeStamp variables if it has timeStamps that are either larger or smaller
-						 * than the max or min respectively.
-						 * @param {{
-									T: {
-											id: number,
-											attr: string,
-											internalID: number,
-											attrX: boolean,
-											attrY: boolean,
-											attrZ: boolean,
-											containerBoneID: number,
-											containerID: number,
-											curves: {
-													x: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													y: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													z: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-											},
-									},
-									R: {
-											id: number,
-											attr: string,
-											internalID: number,
-											attrX: boolean,
-											attrY: boolean,
-											attrZ: boolean,
-											containerBoneID: number,
-											containerID: number,
-											curves: {
-													x: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													y: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													z: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-											},
-									},
-									S: {
-											id: number,
-											attr: string,
-											internalID: number,
-											attrX: boolean,
-											attrY: boolean,
-											attrZ: boolean,
-											containerBoneID: number,
-											containerID: number,
-											curves: {
-													x: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													y: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-													z: {
-															version: any,
-															id: number,
-															internalID: number,
-															times: number[],
-															values: number[],
-															attrFlag: number[],
-															attrData: number[],
-													},
-											},
-									},
-							}} layer
-						 */
-						function getCurveNodeMaxMinTimeStamps( layer ) {
-
-							/**
-							 * Sets the maxTimeStamp and minTimeStamp if one of the curve's time stamps
-							 * exceeds the maximum or minimum.
-							 * @param {{
-										x: {
-												version: any,
-												id: number,
-												internalID: number,
-												times: number[],
-												values: number[],
-												attrFlag: number[],
-												attrData: number[],
-										},
-										y: {
-												version: any,
-												id: number,
-												internalID: number,
-												times: number[],
-												values: number[],
-												attrFlag: number[],
-												attrData: number[],
-										},
-										z: {
-												version: any,
-												id: number,
-												internalID: number,
-												times: number[],
-												values: number[],
-												attrFlag: number[],
-												attrData: number[],
-										}
-								}} curve
-							 */
-							function getCurveMaxMinTimeStamp( curve ) {
-
-								/**
-								 * Sets the maxTimeStamp and minTimeStamp if one of its timestamps exceeds the maximum or minimum.
-								 * @param {{times: number[]}} axis
-								 */
-								function getCurveAxisMaxMinTimeStamps( axis ) {
-
-									maxTimeStamp = axis.times[ axis.times.length - 1 ] > maxTimeStamp ? axis.times[ axis.times.length - 1 ] : maxTimeStamp;
-									minTimeStamp = axis.times[ 0 ] < minTimeStamp ? axis.times[ 0 ] : minTimeStamp;
-
-								}
-
-								if ( curve.x ) {
-
-									getCurveAxisMaxMinTimeStamps( curve.x );
-
-								}
-								if ( curve.y ) {
-
-									getCurveAxisMaxMinTimeStamps( curve.y );
-
-								}
-								if ( curve.z ) {
-
-									getCurveAxisMaxMinTimeStamps( curve.z );
-
-								}
-
-							}
-
-							if ( layer.R ) {
-
-								getCurveMaxMinTimeStamp( layer.R.curves );
-
-							}
-							if ( layer.S ) {
-
-								getCurveMaxMinTimeStamp( layer.S.curves );
-
-							}
-							if ( layer.T ) {
-
-								getCurveMaxMinTimeStamp( layer.T.curves );
-
-							}
+							getCurveNodeMaxMinTimeStamps( layer, timestamps );
 
 						}
 
@@ -2401,13 +2194,13 @@
 			}
 
 			// Do we have an animation clip with actual length?
-			if ( maxTimeStamp > minTimeStamp ) {
+			if ( timestamps.max > timestamps.min ) {
 
 				returnObject.stacks[ nodeID ] = {
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
-					length: maxTimeStamp - minTimeStamp,
-					frames: ( maxTimeStamp - minTimeStamp ) * 30
+					length: timestamps.max - timestamps.min,
+					frames: ( timestamps.max - timestamps.min ) * 30
 				};
 
 			}
@@ -2416,142 +2209,351 @@
 
 		return returnObject;
 
-		/**
-		 * @param {Object} FBXTree
-		 * @param {{id: number, attrName: string, properties: Object<string, any>}} animationCurveNode
-		 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
-		 * @param {{skeleton: {bones: {FBX_ID: number}[]}}} sceneGraph
-		 */
-		function parseAnimationNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
+	}
 
-			var returnObject = {
-				/**
-				 * @type {number}
-				 */
-				id: animationCurveNode.id,
+	/**
+	 * @param {Object} FBXTree
+	 * @param {{id: number, attrName: string, properties: Object<string, any>}} animationCurveNode
+	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
+	 * @param {{skeleton: {bones: {FBX_ID: number}[]}}} sceneGraph
+	 */
+	function parseAnimationNode( FBXTree, animationCurveNode, connections, sceneGraph ) {
 
-				/**
-				 * @type {string}
-				 */
-				attr: animationCurveNode.attrName,
+		var rawModels = FBXTree.Objects.subNodes.Model;
 
-				/**
-				 * @type {number}
-				 */
-				internalID: animationCurveNode.id,
+		var returnObject = {
+			/**
+			 * @type {number}
+			 */
+			id: animationCurveNode.id,
 
-				/**
-				 * @type {boolean}
-				 */
-				attrX: false,
+			/**
+			 * @type {string}
+			 */
+			attr: animationCurveNode.attrName,
 
-				/**
-				 * @type {boolean}
-				 */
-				attrY: false,
+			/**
+			 * @type {number}
+			 */
+			internalID: animationCurveNode.id,
 
-				/**
-				 * @type {boolean}
-				 */
-				attrZ: false,
+			/**
+			 * @type {boolean}
+			 */
+			attrX: false,
 
-				/**
-				 * @type {number}
-				 */
-				containerBoneID: - 1,
+			/**
+			 * @type {boolean}
+			 */
+			attrY: false,
 
-				/**
-				 * @type {number}
-				 */
-				containerID: - 1,
+			/**
+			 * @type {boolean}
+			 */
+			attrZ: false,
 
-				curves: {
-					x: null,
-					y: null,
-					z: null
+			/**
+			 * @type {number}
+			 */
+			containerBoneID: - 1,
+
+			/**
+			 * @type {number}
+			 */
+			containerID: - 1,
+
+			curves: {
+				x: null,
+				y: null,
+				z: null
+			},
+
+			/**
+			 * @type {number[]}
+			 */
+			preRotations: null
+		};
+
+		if ( returnObject.attr.match( /S|R|T/ ) ) {
+
+			for ( var attributeKey in animationCurveNode.properties ) {
+
+				if ( attributeKey.match( /X/ ) ) {
+
+					returnObject.attrX = true;
+
+				}
+				if ( attributeKey.match( /Y/ ) ) {
+
+					returnObject.attrY = true;
+
+				}
+				if ( attributeKey.match( /Z/ ) ) {
+
+					returnObject.attrZ = true;
+
+				}
+
+			}
+
+		} else {
+
+			return null;
+
+		}
+
+		var conns = connections.get( returnObject.id );
+		var containerIndices = conns.parents;
+
+		for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
+
+			var boneID = findIndex( sceneGraph.skeleton.bones, function ( bone ) {
+
+				return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
+
+			} );
+			if ( boneID > - 1 ) {
+
+				returnObject.containerBoneID = boneID;
+				returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
+				var model = rawModels[ returnObject.containerID.toString() ];
+				if ( 'PreRotation' in model.properties ) {
+
+					returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
+
+				}
+				break;
+
+			}
+
+		}
+
+		return returnObject;
+
+	}
+
+	/**
+	 * @param {{id: number, subNodes: {KeyTime: {properties: {a: string}}, KeyValueFloat: {properties: {a: string}}, KeyAttrFlags: {properties: {a: string}}, KeyAttrDataFloat: {properties: {a: string}}}}} animationCurve
+	 */
+	function parseAnimationCurve( animationCurve ) {
+
+		return {
+			version: null,
+			id: animationCurve.id,
+			internalID: animationCurve.id,
+			times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
+			values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+
+			attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
+			attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
+		};
+
+	}
+
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp variables if it has timeStamps that are either larger or smaller
+	 * than the max or min respectively.
+	 * @param {{
+				T: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
 				},
+				R: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
+				},
+				S: {
+						id: number,
+						attr: string,
+						internalID: number,
+						attrX: boolean,
+						attrY: boolean,
+						attrZ: boolean,
+						containerBoneID: number,
+						containerID: number,
+						curves: {
+								x: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								y: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+								z: {
+										version: any,
+										id: number,
+										internalID: number,
+										times: number[],
+										values: number[],
+										attrFlag: number[],
+										attrData: number[],
+								},
+						},
+				},
+		}} layer
+	 */
+	function getCurveNodeMaxMinTimeStamps( layer, timestamps ) {
 
-				/**
-				 * @type {number[]}
-				 */
-				preRotations: null
-			};
+		if ( layer.R ) {
 
-			if ( returnObject.attr.match( /S|R|T/ ) ) {
+			getCurveMaxMinTimeStamp( layer.R.curves, timestamps );
 
-				for ( var attributeKey in animationCurveNode.properties ) {
+		}
+		if ( layer.S ) {
 
-					if ( attributeKey.match( /X/ ) ) {
+			getCurveMaxMinTimeStamp( layer.S.curves, timestamps );
 
-						returnObject.attrX = true;
+		}
+		if ( layer.T ) {
 
-					}
-					if ( attributeKey.match( /Y/ ) ) {
-
-						returnObject.attrY = true;
-
-					}
-					if ( attributeKey.match( /Z/ ) ) {
-
-						returnObject.attrZ = true;
-
-					}
-
-				}
-
-			} else {
-
-				return null;
-
-			}
-
-			var conns = connections.get( returnObject.id );
-			var containerIndices = conns.parents;
-
-			for ( var containerIndicesIndex = containerIndices.length - 1; containerIndicesIndex >= 0; -- containerIndicesIndex ) {
-
-				var boneID = findIndex( sceneGraph.skeleton.bones, function ( bone ) {
-
-					return bone.FBX_ID === containerIndices[ containerIndicesIndex ].ID;
-
-				} );
-				if ( boneID > - 1 ) {
-
-					returnObject.containerBoneID = boneID;
-					returnObject.containerID = containerIndices[ containerIndicesIndex ].ID;
-					var model = rawModels[ returnObject.containerID.toString() ];
-					if ( 'PreRotation' in model.properties ) {
-
-						returnObject.preRotations = parseVector3( model.properties.PreRotation ).multiplyScalar( Math.PI / 180 );
-
-					}
-					break;
-
-				}
-
-			}
-
-			return returnObject;
+			getCurveMaxMinTimeStamp( layer.T.curves, timestamps );
 
 		}
 
-		/**
-		 * @param {{id: number, subNodes: {KeyTime: {properties: {a: string}}, KeyValueFloat: {properties: {a: string}}, KeyAttrFlags: {properties: {a: string}}, KeyAttrDataFloat: {properties: {a: string}}}}} animationCurve
-		 */
-		function parseAnimationCurve( animationCurve ) {
+	}
 
-			return {
-				version: null,
-				id: animationCurve.id,
-				internalID: animationCurve.id,
-				times: parseFloatArray( animationCurve.subNodes.KeyTime.properties.a ).map( convertFBXTimeToSeconds ),
-				values: parseFloatArray( animationCurve.subNodes.KeyValueFloat.properties.a ),
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp if one of the curve's time stamps
+	 * exceeds the maximum or minimum.
+	 * @param {{
+				x: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				},
+				y: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				},
+				z: {
+						version: any,
+						id: number,
+						internalID: number,
+						times: number[],
+						values: number[],
+						attrFlag: number[],
+						attrData: number[],
+				}
+		}} curve
+	 */
+	function getCurveMaxMinTimeStamp( curve, timestamps ) {
 
-				attrFlag: parseIntArray( animationCurve.subNodes.KeyAttrFlags.properties.a ),
-				attrData: parseFloatArray( animationCurve.subNodes.KeyAttrDataFloat.properties.a )
-			};
+		if ( curve.x ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.x, timestamps );
 
 		}
+		if ( curve.y ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.y, timestamps );
+
+		}
+		if ( curve.z ) {
+
+			getCurveAxisMaxMinTimeStamps( curve.z, timestamps );
+
+		}
+
+	}
+
+	/**
+	 * Sets the maxTimeStamp and minTimeStamp if one of its timestamps exceeds the maximum or minimum.
+	 * @param {{times: number[]}} axis
+	 */
+	function getCurveAxisMaxMinTimeStamps( axis, timestamps ) {
+
+		timestamps.max = axis.times[ axis.times.length - 1 ] > timestamps.max ? axis.times[ axis.times.length - 1 ] : timestamps.max;
+		timestamps.min = axis.times[ 0 ] < timestamps.min ? axis.times[ 0 ] : timestamps.min;
 
 	}
 
