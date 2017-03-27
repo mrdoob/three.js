@@ -29,21 +29,22 @@
 					[page:Object3D.matrix]: This stores the local transform of the object.
 				</li>
 				<li>
-					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the objects transformation relative to its parent.
+					[page:Object3D.matrixWorld]: The global or world transform of the object. This is the object's transformation relative to its parent.
 					If the object has no parent, then this is identical to the local transform.
 				</li>
 				<li>
-					[page:Object3D.modelViewMatrix]:
+					[page:Object3D.modelViewMatrix]: This represents the object's transformation relative to the camera's coordinate system.
+					An object's modelViewMatrix is the object's matrixWorld pre-multiplied by the camera's matrixWorldInverse.
 				</li>
 			</ul>
 
-			[page:Camera Cameras] have two additional matrix4s:
+			[page:Camera Cameras] have two additional Matrix4s:
 			<ul>
 				<li>
-					[page:Object3D.matrixWorldInverse]: The inverse of the [page:Object3D.matrixWorld] described above.
+					[page:Camera.matrixWorldInverse]: The view matrix - the inverse of the Camera's [page:Object3D.matrixWorld matrixWorld].
 				</li>
 				<li>
-					[page:Object3D.projectionMatrix]:
+					[page:Camera.projectionMatrix]: Represents the information how to project the scene to clip space.
 				</li>
 			</ul>
 		</div>
