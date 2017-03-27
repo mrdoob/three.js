@@ -522,11 +522,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 		gl.bindAttribLocation( program, 0, material.index0AttributeName );
 
-	} else if ( parameters.morphTargets === true ) {
-
-		// programs with morphTargets displace position out of attribute 0
-		gl.bindAttribLocation( program, 0, 'position' );
-
 	}
 
 	gl.linkProgram( program );
