@@ -110,9 +110,9 @@
 			var connections = parseConnections( FBXTree );
 			var textures = parseTextures( FBXTree, new THREE.TextureLoader( this.manager ).setPath( resourceDirectory ) );
 			var materials = parseMaterials( FBXTree, textures, connections );
-			var deformerMap = parseDeformers( FBXTree, connections );
-			var geometryMap = parseGeometries( FBXTree, connections, deformerMap );
-			var sceneGraph = parseScene( FBXTree, connections, deformerMap, geometryMap, materials );
+			var deformers = parseDeformers( FBXTree, connections );
+			var geometryMap = parseGeometries( FBXTree, connections, deformers );
+			var sceneGraph = parseScene( FBXTree, connections, deformers, geometryMap, materials );
 
 			return sceneGraph;
 
@@ -392,20 +392,23 @@
 	 */
 	function parseDeformers( FBXTree, connections ) {
 
-		var skeletonMap = new Map();
+		var deformers = {};
 
 		if ( 'Deformer' in FBXTree.Objects.subNodes ) {
 
 			var DeformerNodes = FBXTree.Objects.subNodes.Deformer;
+
 			for ( var nodeID in DeformerNodes ) {
 
 				var deformerNode = DeformerNodes[ nodeID ];
+
 				if ( deformerNode.attrType === 'Skin' ) {
 
 					var conns = connections.get( parseInt( nodeID ) );
 					var skeleton = parseSkeleton( conns, DeformerNodes );
 					skeleton.FBX_ID = parseInt( nodeID );
-					skeletonMap.set( parseInt( nodeID ), skeleton );
+
+					deformers[ parseInt( nodeID ) ] = skeleton;
 
 				}
 
@@ -413,7 +416,7 @@
 
 		}
 
-		return skeletonMap;
+		return deformers;
 
 	}
 
@@ -425,35 +428,38 @@
 	 */
 	function parseSkeleton( connections, DeformerNodes ) {
 
-		var subDeformers = new Map();
-		var subDeformerArray = [];
-		for ( var childrenIndex = 0, childrenLength = connections.children.length; childrenIndex < childrenLength; ++ childrenIndex ) {
+		var subDeformers = {};
+		var children = connections.children;
 
-			var child = connections.children[ childrenIndex ];
+		for ( var i = 0, l = children.length; i < l; ++ i ) {
+
+			var child = children[ i ];
 
 			var subDeformerNode = DeformerNodes[ child.ID ];
+
 			var subDeformer = {
 				FBX_ID: child.ID,
+				index: i,
 				indices: [],
 				weights: [],
 				transform: parseMatrixArray( subDeformerNode.subNodes.Transform.properties.a ),
 				transformLink: parseMatrixArray( subDeformerNode.subNodes.TransformLink.properties.a ),
 				linkMode: subDeformerNode.properties.Mode
 			};
+
 			if ( 'Indexes' in subDeformerNode.subNodes ) {
 
 				subDeformer.indices = parseIntArray( subDeformerNode.subNodes.Indexes.properties.a );
 				subDeformer.weights = parseFloatArray( subDeformerNode.subNodes.Weights.properties.a );
 
 			}
-			subDeformers.set( child.ID, subDeformer );
-			subDeformerArray.push( subDeformer );
+
+			subDeformers[ child.ID ] = subDeformer;
 
 		}
 
 		return {
 			map: subDeformers,
-			array: subDeformerArray,
 			bones: []
 		};
 
@@ -463,20 +469,21 @@
 	 * Generates Buffer geometries from geometry information in FBXTree, and generates map of THREE.BufferGeometries
 	 * @param {{Objects: {subNodes: {Geometry: Object.<number, FBXGeometryNode}}}} FBXTree
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
-	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformerMap
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformers
 	 * @returns {Map<number, THREE.BufferGeometry>}
 	 */
-	function parseGeometries( FBXTree, connections, deformerMap ) {
+	function parseGeometries( FBXTree, connections, deformers ) {
 
 		var geometryMap = new Map();
 
 		if ( 'Geometry' in FBXTree.Objects.subNodes ) {
 
 			var geometryNodes = FBXTree.Objects.subNodes.Geometry;
+
 			for ( var nodeID in geometryNodes ) {
 
 				var relationships = connections.get( parseInt( nodeID ) );
-				var geo = parseGeometry( geometryNodes[ nodeID ], relationships, deformerMap );
+				var geo = parseGeometry( geometryNodes[ nodeID ], relationships, deformers );
 				geometryMap.set( parseInt( nodeID ), geo );
 
 			}
@@ -491,19 +498,19 @@
 	 * Generates BufferGeometry from FBXGeometryNode.
 	 * @param {FBXGeometryNode} geometryNode
 	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
-	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformers
 	 * @returns {THREE.BufferGeometry}
 	 */
-	function parseGeometry( geometryNode, relationships, deformerMap ) {
+	function parseGeometry( geometryNode, relationships, deformers ) {
 
 		switch ( geometryNode.attrType ) {
 
 			case 'Mesh':
-				return parseMeshGeometry( geometryNode, relationships, deformerMap );
+				return parseMeshGeometry( geometryNode, relationships, deformers );
 				break;
 
 			case 'NurbsCurve':
-				return parseNurbsGeometry( geometryNode, relationships, deformerMap );
+				return parseNurbsGeometry( geometryNode );
 				break;
 
 		}
@@ -514,21 +521,15 @@
 	 * Specialty function for parsing Mesh based Geometry Nodes.
 	 * @param {FBXGeometryNode} geometryNode
 	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships - Object representing relationships between specific geometry node and other nodes.
-	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformerMap - Map object of deformers and subDeformers by ID.
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[]}>} deformers - Map object of deformers and subDeformers by ID.
 	 * @returns {THREE.BufferGeometry}
 	 */
-	function parseMeshGeometry( geometryNode, relationships, deformerMap ) {
+	function parseMeshGeometry( geometryNode, relationships, deformers ) {
 
-		var FBX_ID = geometryNode.id;
-		var name = geometryNode.attrName;
 		for ( var i = 0; i < relationships.children.length; ++ i ) {
 
-			if ( deformerMap.has( relationships.children[ i ].ID ) ) {
-
-				var deformer = deformerMap.get( relationships.children[ i ].ID );
-				break;
-
-			}
+			var deformer = deformers[ relationships.children[ i ].ID ];
+			if ( deformer !== undefined ) break;
 
 		}
 
@@ -598,11 +599,11 @@
 
 			if ( deformer ) {
 
-				var array = deformer.array;
+				var subDeformers = deformer.map;
 
-				for ( var i = 0; i < array.length; i ++ ) {
+				for ( var key in subDeformers ) {
 
-					var subDeformer = array[ i ];
+					var subDeformer = subDeformers[ key ];
 					var indices = subDeformer.indices;
 
 					for ( var j = 0; j < indices.length; j ++ ) {
@@ -612,7 +613,7 @@
 						if ( index === vertexIndex ) {
 
 							weights.push( subDeformer.weights[ j ] );
-							weightIndices.push( i );
+							weightIndices.push( subDeformer.index );
 
 							break;
 
@@ -1044,7 +1045,7 @@
 	 * @param {{parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}} relationships
 	 * @returns {THREE.BufferGeometry}
 	 */
-	function parseNurbsGeometry( geometryNode, relationships ) {
+	function parseNurbsGeometry( geometryNode ) {
 
 		if ( THREE.NURBSCurve === undefined ) {
 
@@ -1115,12 +1116,12 @@
 	 * Finally generates Scene graph and Scene graph Objects.
 	 * @param {{Objects: {subNodes: {Model: Object.<number, FBXModelNode>}}}} FBXTree
 	 * @param {Map<number, {parents: {ID: number, relationship: string}[], children: {ID: number, relationship: string}[]}>} connections
-	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformerMap
+	 * @param {Map<number, {map: Map<number, {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}>, array: {FBX_ID: number, indices: number[], weights: number[], transform: number[], transformLink: number[], linkMode: string}[], skeleton: THREE.Skeleton|null}>} deformers
 	 * @param {Map<number, THREE.BufferGeometry>} geometryMap
 	 * @param {Map<number, THREE.Material>} materialMap
 	 * @returns {THREE.Group}
 	 */
-	function parseScene( FBXTree, connections, deformerMap, geometryMap, materialMap ) {
+	function parseScene( FBXTree, connections, deformers, geometryMap, materialMap ) {
 
 		var sceneGraph = new THREE.Group();
 
@@ -1142,25 +1143,37 @@
 			var node = ModelNode[ nodeID ];
 			var conns = connections.get( id );
 			var model = null;
+
 			for ( var i = 0; i < conns.parents.length; ++ i ) {
 
-				deformerMap.forEach( function ( deformer ) {
+				for ( var FBX_ID in deformers ) {
 
-					if ( deformer.map.has( conns.parents[ i ].ID ) ) {
+					var deformer = deformers[ FBX_ID ];
+					var subDeformers = deformer.map;
+
+					if ( subDeformers[ conns.parents[ i ].ID ] !== undefined ) {
 
 						model = new THREE.Bone();
-						var index = findIndex( deformer.array, function ( subDeformer ) {
 
-							return subDeformer.FBX_ID === conns.parents[ i ].ID;
+						for ( var key in subDeformers ) {
 
-						} );
-						deformer.bones[ index ] = model;
+							var subDeformer = subDeformers[ key ];
+
+							if ( subDeformer.FBX_ID === conns.parents[ i ].ID ) {
+
+								deformer.bones[ subDeformer.index ] = model;
+								break;
+
+							}
+
+						}
 
 					}
 
-				} );
+				}
 
 			}
+
 			if ( ! model ) {
 
 				switch ( node.attrType ) {
@@ -1366,12 +1379,15 @@
 
 		}
 
-		deformerMap.forEach( function ( deformer, FBX_ID ) {
+		for ( var FBX_ID in deformers ) {
 
-			for ( var deformerArrayIndex = 0, deformerArrayLength = deformer.array.length; deformerArrayIndex < deformerArrayLength; ++ deformerArrayIndex ) {
+			var deformer = deformers[ FBX_ID ];
+			var subDeformers = deformer.map;
 
-				//var subDeformer = deformer.array[ deformerArrayIndex ];
-				var subDeformerIndex = deformerArrayIndex;
+			for ( var key in subDeformers ) {
+
+				var subDeformer = subDeformers[ key ];
+				var subDeformerIndex = subDeformer.index;
 
 				/**
 				 * @type {THREE.Bone}
@@ -1389,7 +1405,7 @@
 
 			// Now that skeleton is in bind pose, bind to model.
 			deformer.skeleton = new THREE.Skeleton( deformer.bones );
-			var conns = connections.get( FBX_ID );
+			var conns = connections.get( parseInt( FBX_ID ) );
 			for ( var parentsIndex = 0, parentsLength = conns.parents.length; parentsIndex < parentsLength; ++ parentsIndex ) {
 
 				var parent = conns.parents[ parentsIndex ];
@@ -1415,7 +1431,7 @@
 
 			}
 
-		} );
+		}
 
 		//Skeleton is now bound, return objects to starting
 		//world positions.
