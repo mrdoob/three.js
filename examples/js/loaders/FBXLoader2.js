@@ -408,7 +408,7 @@
 					var skeleton = parseSkeleton( conns, DeformerNodes );
 					skeleton.FBX_ID = parseInt( nodeID );
 
-					deformers[ parseInt( nodeID ) ] = skeleton;
+					deformers[ nodeID ] = skeleton;
 
 				}
 
@@ -1405,15 +1405,19 @@
 
 			// Now that skeleton is in bind pose, bind to model.
 			deformer.skeleton = new THREE.Skeleton( deformer.bones );
-			var conns = connections.get( parseInt( FBX_ID ) );
-			for ( var parentsIndex = 0, parentsLength = conns.parents.length; parentsIndex < parentsLength; ++ parentsIndex ) {
 
-				var parent = conns.parents[ parentsIndex ];
+			var conns = connections.get( deformer.FBX_ID );
+			var parents = conns.parents;
+
+			for ( var parentsIndex = 0, parentsLength = parents.length; parentsIndex < parentsLength; ++ parentsIndex ) {
+
+				var parent = parents[ parentsIndex ];
 
 				if ( geometryMap.has( parent.ID ) ) {
 
 					var geoID = parent.ID;
 					var geoConns = connections.get( geoID );
+
 					for ( var i = 0; i < geoConns.parents.length; ++ i ) {
 
 						if ( modelMap.has( geoConns.parents[ i ].ID ) ) {
@@ -1835,8 +1839,8 @@
 		 */
 		var returnObject = {
 			curves: new Map(),
-			layers: new Map(),
-			stacks: new Map(),
+			layers: {},
+			stacks: {},
 			length: 0,
 			fps: 30,
 			frames: 0
@@ -2155,7 +2159,7 @@
 
 			}
 
-			returnObject.layers.set( parseInt( nodeID ), layer );
+			returnObject.layers[ nodeID ] = layer;
 
 		}
 
@@ -2167,9 +2171,10 @@
 			var minTimeStamp = Number.MAX_VALUE;
 			for ( var childIndex = 0; childIndex < children.length; ++ childIndex ) {
 
-				if ( returnObject.layers.has( children[ childIndex ].ID ) ) {
+				var currentLayer = returnObject.layers[ children[ childIndex ].ID ];
 
-					var currentLayer = returnObject.layers.get( children[ childIndex ].ID );
+				if ( currentLayer !== undefined ) {
+
 					layers.push( currentLayer );
 
 					for ( var currentLayerIndex = 0, currentLayerLength = currentLayer.length; currentLayerIndex < currentLayerLength; ++ currentLayerIndex ) {
@@ -2398,12 +2403,12 @@
 			// Do we have an animation clip with actual length?
 			if ( maxTimeStamp > minTimeStamp ) {
 
-				returnObject.stacks.set( parseInt( nodeID ), {
+				returnObject.stacks[ nodeID ] = {
 					name: rawStacks[ nodeID ].attrName,
 					layers: layers,
 					length: maxTimeStamp - minTimeStamp,
 					frames: ( maxTimeStamp - minTimeStamp ) * 30
-				} );
+				};
 
 			}
 
@@ -2928,7 +2933,11 @@
 
 		}
 
-		animations.stacks.forEach( function ( stack ) {
+		var stacks = animations.stacks;
+
+		for ( var key in stacks ) {
+
+			var stack = stacks[ key ];
 
 			/**
 			 * @type {{
@@ -2997,7 +3006,7 @@
 
 			group.animations.push( THREE.AnimationClip.parseAnimation( animationData, bones ) );
 
-		} );
+		}
 
 	}
 
