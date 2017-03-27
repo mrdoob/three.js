@@ -37,7 +37,6 @@ TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
 
 function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
 
@@ -74,7 +73,6 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	var vertex = new Vector3();
 	var normal = new Vector3();
-	var uv = new Vector2();
 
 	var P1 = new Vector3();
 	var P2 = new Vector3();

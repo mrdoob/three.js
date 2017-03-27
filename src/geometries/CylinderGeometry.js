@@ -78,7 +78,6 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 	// helper variables
 
 	var index = 0;
-	var indexOffset = 0;
 	var indexArray = [];
 	var halfHeight = height / 2;
 	var groupStart = 0;
