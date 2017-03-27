@@ -180,7 +180,11 @@ THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segments
 	this.p = p || 2;
 	this.q = q || 3;
 
-	function TorusKnotCurve() {}
+	function TorusKnotCurve() {
+
+		THREE.Curve.call( this );
+
+	}
 
 	TorusKnotCurve.prototype = Object.create( THREE.Curve.prototype );
 	TorusKnotCurve.prototype.constructor = TorusKnotCurve;
