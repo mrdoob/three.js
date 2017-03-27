@@ -714,29 +714,29 @@
 
 		var geo = new THREE.BufferGeometry();
 		geo.name = geometryNode.name;
-		geo.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( bufferInfo.vertexBuffer ), 3 ) );
+		geo.addAttribute( 'position', new THREE.Float32BufferAttribute( bufferInfo.vertexBuffer, 3 ) );
 
 		if ( bufferInfo.normalBuffer.length > 0 ) {
 
-			geo.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( bufferInfo.normalBuffer ), 3 ) );
+			geo.addAttribute( 'normal', new THREE.Float32BufferAttribute( bufferInfo.normalBuffer, 3 ) );
 
 		}
 		if ( bufferInfo.uvBuffer.length > 0 ) {
 
-			geo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( bufferInfo.uvBuffer ), 2 ) );
+			geo.addAttribute( 'uv', new THREE.Float32BufferAttribute( bufferInfo.uvBuffer, 2 ) );
 
 		}
 		if ( subNodes.LayerElementColor ) {
 
-			geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorBuffer ), 3 ) );
+			geo.addAttribute( 'color', new THREE.Float32BufferAttribute( bufferInfo.colorBuffer, 3 ) );
 
 		}
 
 		if ( deformer ) {
 
-			geo.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( bufferInfo.skinIndexBuffer ), 4 ) );
+			geo.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( bufferInfo.skinIndexBuffer, 4 ) );
 
-			geo.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( bufferInfo.skinWeightBuffer ), 4 ) );
+			geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( bufferInfo.skinWeightBuffer, 4 ) );
 
 			geo.FBX_Deformer = deformer;
 
@@ -1302,7 +1302,7 @@
 
 			if ( 'PreRotation' in node.properties ) {
 
-				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( Math.PI / 180 ), 'ZYX' );
+				var preRotations = new THREE.Euler().setFromVector3( parseVector3( node.properties.PreRotation ).multiplyScalar( DEG2RAD ), 'ZYX' );
 				preRotations = new THREE.Quaternion().setFromEuler( preRotations );
 				var currentRotation = new THREE.Quaternion().setFromEuler( model.rotation );
 				preRotations.multiply( currentRotation );
