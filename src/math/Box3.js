@@ -123,12 +123,12 @@ Object.assign( Box3.prototype, {
 
 	}(),
 
-	setFromObject: function ( object ) {
-
+	setFromObject: function (object, reference, excludeInvisibleObjects, excludeInvisibleMaterials) {
+		
 		this.makeEmpty();
 
-		return this.expandByObject( object );
-
+		return this.expandByObject( object, reference, excludeInvisibleObjects, excludeInvisibleMaterials );
+		
 	},
 
 	clone: function () {
@@ -205,26 +205,53 @@ Object.assign( Box3.prototype, {
 	},
 
 	expandByObject: function () {
+		// Computes the bounding box of an object (including its children) 
+		// in the given reference object's coordinate system, 
+		// or world coordinates if no reference is specified,
+		// accounting for both the object's, and children's, transforms
+		// The two last parameters specify what to do with invisible
+		// parts of the object.
+		
+		var v1 = new THREE.Vector3();
 
-		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
+		return function expandByObject( object, reference, excludeInvisibleObjects, excludeInvisibleMaterials ) {
 
-		var v1 = new Vector3();
-
-		return function expandByObject( object ) {
-
+			excludeInvisibleObjects = excludeInvisibleObjects || false;
+			excludeInvisibleMaterials = excludeInvisibleMaterials || false;
+			
+			var m;
+			if (reference !== undefined) {
+				m = new THREE.Matrix4();
+				m.getInverse(reference.matrixWorld);
+			}
 			var scope = this;
 
 			object.updateMatrixWorld( true );
 
-			object.traverse( function ( node ) {
+			let trav;
+			if (excludeInvisibleObjects) {
+				trav = function(f) {
+					object.traverseVisible(f);					
+				};
+			} else {
+				trav = function(f) {
+					object.traverse(f);					
+				};
+			}
+			
+			trav( function ( node ) {
 
 				var i, l;
 
 				var geometry = node.geometry;
 
-				if ( geometry !== undefined ) {
-
+				if ( geometry !== undefined 
+					&& (!excludeInvisibleMaterials 
+						|| (excludeInvisibleMaterials
+							//no material is treated as invisible material. OK?
+							&& node.material !== undefined
+							&& node.material.visible==true))) {
+					
 					if ( geometry.isGeometry ) {
 
 						var vertices = geometry.vertices;
@@ -233,7 +260,9 @@ Object.assign( Box3.prototype, {
 
 							v1.copy( vertices[ i ] );
 							v1.applyMatrix4( node.matrixWorld );
-
+							if (m !== undefined) {
+								v1.applyMatrix4( m );
+							}
 							scope.expandByPoint( v1 );
 
 						}
@@ -247,7 +276,9 @@ Object.assign( Box3.prototype, {
 							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
 								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
+								if (m !== undefined) {
+									v1.applyMatrix4( m );
+								}
 								scope.expandByPoint( v1 );
 
 							}
