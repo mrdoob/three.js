@@ -206,12 +206,12 @@ Object.assign( Box3.prototype, {
 	},
 
 	expandByObject: function () {
+		
 		// Computes the bounding box of an object (including its children) 
 		// in the given reference object's coordinate system, 
 		// or world coordinates if no reference is specified,
-		// accounting for both the object's, and children's, transforms
-		// The two last parameters specify what to do with invisible
-		// parts of the object.
+		// accounting for both the object's, and children's, transforms.
+		// excludeInvisibleObjects specifies whether to use traverseVisible instead of traverse.
 		
 		var v1 = new Vector3();
 
