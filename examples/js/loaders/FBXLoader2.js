@@ -2985,6 +2985,9 @@
 
 	}
 
+	var euler = new THREE.Euler();
+	var quaternion = new THREE.Quaternion();
+
 	/**
 	 * @param {THREE.Bone} bone
 	 */
@@ -2997,11 +3000,7 @@
 			scl: bone.scale.toArray()
 		};
 
-		if ( animationNode === undefined ) {
-
-			return key;
-
-		}
+		if ( animationNode === undefined ) return key;
 
 		try {
 
@@ -3016,8 +3015,9 @@
 				var rotationX = animationNode.R.curves.x.values[ frame ];
 				var rotationY = animationNode.R.curves.y.values[ frame ];
 				var rotationZ = animationNode.R.curves.z.values[ frame ];
-				var euler = new THREE.Euler( rotationX, rotationY, rotationZ, 'ZYX' );
-				key.rot = new THREE.Quaternion().setFromEuler( euler ).toArray();
+
+				quaternion.setFromEuler( euler.set( rotationX, rotationY, rotationZ, 'ZYX' ) );
+				key.rot = quaternion.toArray();
 
 			}
 
