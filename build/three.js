@@ -15363,6 +15363,7 @@
 		};
 
 		this.fromBufferGeometry( new PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
+		this.mergeVertices();
 
 	}
 
@@ -20099,7 +20100,8 @@
 
 		this.forceContextLoss = function () {
 
-			extensions.get( 'WEBGL_lose_context' ).loseContext();
+			var extension = extensions.get( 'WEBGL_lose_context' );
+			if ( extension ) extension.loseContext();
 
 		};
 
@@ -24274,11 +24276,15 @@
 
 		var indices = [];
 		var vertices = [];
+		var normals = [];
 		var uvs = [];
+
+		var EPS = 0.00001;
+		var pu = new Vector3(), pv = new Vector3(), normal = new Vector3();
 
 		var i, j;
 
-		// generate vertices and uvs
+		// generate vertices, normals and uvs
 
 		var sliceCount = slices + 1;
 
@@ -24292,6 +24298,33 @@
 
 				var p = func( u, v );
 				vertices.push( p.x, p.y, p.z );
+
+				// approximate tangent vectors via finite differences
+
+				if ( u - EPS >= 0 ) {
+
+					pu.subVectors( p, func( u - EPS, v ) );
+
+				} else {
+
+					pu.subVectors( func( u + EPS, v ), p );
+
+				}
+
+				if ( v - EPS >= 0 ) {
+
+					pv.subVectors( p, func( u, v - EPS ) );
+
+				} else {
+
+					pv.subVectors( func( u, v + EPS ), p );
+
+				}
+
+				// cross product of tangent vectors returns surface normal
+
+				normal.crossVectors( pu, pv ).normalize();
+				normals.push( normal.x, normal.y, normal.z );
 
 				uvs.push( u, v );
 
@@ -24323,11 +24356,8 @@
 
 		this.setIndex( indices );
 		this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-		// generate normals
-
-		this.computeVertexNormals();
 
 	}
 
@@ -25182,7 +25212,6 @@
 
 		var vertex = new Vector3();
 		var normal = new Vector3();
-		var uv = new Vector2();
 
 		var P1 = new Vector3();
 		var P2 = new Vector3();
@@ -25320,6 +25349,7 @@
 		};
 
 		this.fromBufferGeometry( new TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc ) );
+		this.mergeVertices();
 
 	}
 
@@ -27028,6 +27058,7 @@
 		};
 
 		this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
+		this.mergeVertices();
 
 	}
 
@@ -27170,6 +27201,7 @@
 		};
 
 		this.fromBufferGeometry( new RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) );
+		this.mergeVertices();
 
 	}
 
@@ -27823,7 +27855,6 @@
 		// helper variables
 
 		var index = 0;
-		var indexOffset = 0;
 		var indexArray = [];
 		var halfHeight = height / 2;
 		var groupStart = 0;
@@ -28126,6 +28157,7 @@
 		};
 
 		this.fromBufferGeometry( new CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) );
+		this.mergeVertices();
 
 	}
 
