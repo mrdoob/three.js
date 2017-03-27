@@ -545,32 +545,34 @@
 
 		var geometry = new Geometry();
 
+		var subNodes = geometryNode.subNodes;
+
 		// First, each index is going to be its own vertex.
 
-		var vertexBuffer = parseFloatArray( geometryNode.subNodes.Vertices.properties.a );
-		var indexBuffer = parseIntArray( geometryNode.subNodes.PolygonVertexIndex.properties.a );
+		var vertexBuffer = parseFloatArray( subNodes.Vertices.properties.a );
+		var indexBuffer = parseIntArray( subNodes.PolygonVertexIndex.properties.a );
 
-		if ( 'LayerElementNormal' in geometryNode.subNodes ) {
+		if ( subNodes.LayerElementNormal ) {
 
-			var normalInfo = getNormals( geometryNode );
-
-		}
-
-		if ( 'LayerElementUV' in geometryNode.subNodes ) {
-
-			var uvInfo = getUVs( geometryNode );
+			var normalInfo = getNormals( subNodes.LayerElementNormal[ 0 ] );
 
 		}
 
-		if ( 'LayerElementColor' in geometryNode.subNodes ) {
+		if ( subNodes.LayerElementUV ) {
 
-			var colorInfo = getColors( geometryNode );
+			var uvInfo = getUVs( subNodes.LayerElementUV[ 0 ] );
 
 		}
 
-		if ( 'LayerElementMaterial' in geometryNode.subNodes ) {
+		if ( subNodes.LayerElementColor ) {
 
-			var materialInfo = getMaterials( geometryNode );
+			var colorInfo = getColors( subNodes.LayerElementColor[ 0 ] );
+
+		}
+
+		if ( subNodes.LayerElementMaterial ) {
+
+			var materialInfo = getMaterials( subNodes.LayerElementMaterial[ 0 ] );
 
 		}
 
@@ -698,6 +700,7 @@
 				geometry.faces.push( face );
 				faceVertexBuffer = [];
 				polygonIndex ++;
+
 				endOfFace = false;
 
 			}
@@ -723,7 +726,7 @@
 			geo.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( bufferInfo.uvBuffer ), 2 ) );
 
 		}
-		if ( 'LayerElementColor' in geometryNode.subNodes ) {
+		if ( subNodes.LayerElementColor ) {
 
 			geo.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( bufferInfo.colorBuffer ), 3 ) );
 
@@ -767,9 +770,7 @@
 	 * @param {FBXGeometryNode} geometryNode
 	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 	 */
-	function getNormals( geometryNode ) {
-
-		var NormalNode = geometryNode.subNodes.LayerElementNormal[ 0 ];
+	function getNormals( NormalNode ) {
 
 		var mappingType = NormalNode.properties.MappingInformationType;
 		var referenceType = NormalNode.properties.ReferenceInformationType;
@@ -804,9 +805,7 @@
 	 * @param {FBXGeometryNode} geometryNode
 	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 	 */
-	function getUVs( geometryNode ) {
-
-		var UVNode = geometryNode.subNodes.LayerElementUV[ 0 ];
+	function getUVs( UVNode ) {
 
 		var mappingType = UVNode.properties.MappingInformationType;
 		var referenceType = UVNode.properties.ReferenceInformationType;
@@ -833,9 +832,7 @@
 	 * @param {FBXGeometryNode} geometryNode
 	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 	 */
-	function getColors( geometryNode ) {
-
-		var ColorNode = geometryNode.subNodes.LayerElementColor[ 0 ];
+	function getColors( ColorNode ) {
 
 		var mappingType = ColorNode.properties.MappingInformationType;
 		var referenceType = ColorNode.properties.ReferenceInformationType;
@@ -862,11 +859,11 @@
 	 * @param {FBXGeometryNode}
 	 * @returns {{dataSize: number, buffer: number[], indices: number[], mappingType: string, referenceType: string}}
 	 */
-	function getMaterials( geometryNode ) {
+	function getMaterials( MaterialNode ) {
 
-		var MaterialNode = geometryNode.subNodes.LayerElementMaterial[ 0 ];
 		var mappingType = MaterialNode.properties.MappingInformationType;
 		var referenceType = MaterialNode.properties.ReferenceInformationType;
+
 		if ( mappingType === 'NoMappingInformation' ) {
 
 			return {
@@ -878,12 +875,14 @@
 			};
 
 		}
+
 		var materialIndexBuffer = parseIntArray( MaterialNode.subNodes.Materials.properties.a );
 
 		// Since materials are stored as indices, there's a bit of a mismatch between FBX and what
 		// we expect.  So we create an intermediate buffer that points to the index in the buffer,
 		// for conforming with the other functions we've written for other data.
 		var materialIndices = [];
+
 		for ( var materialIndexBufferIndex = 0, materialIndexBufferLength = materialIndexBuffer.length; materialIndexBufferIndex < materialIndexBufferLength; ++ materialIndexBufferIndex ) {
 
 			materialIndices.push( materialIndexBufferIndex );
@@ -1150,23 +1149,12 @@
 
 					var deformer = deformers[ FBX_ID ];
 					var subDeformers = deformer.map;
+					var subDeformer = subDeformers[ conns.parents[ i ].ID ];
 
-					if ( subDeformers[ conns.parents[ i ].ID ] !== undefined ) {
+					if ( subDeformer ) {
 
 						model = new THREE.Bone();
-
-						for ( var key in subDeformers ) {
-
-							var subDeformer = subDeformers[ key ];
-
-							if ( subDeformer.FBX_ID === conns.parents[ i ].ID ) {
-
-								deformer.bones[ subDeformer.index ] = model;
-								break;
-
-							}
-
-						}
+						deformer.bones[ subDeformer.index ] = model;
 
 					}
 
@@ -3701,7 +3689,7 @@
 
 				case "ColorRGB":
 				case "Vector3D":
-					innerPropValue = new THREE.Vector3().fromArray( innerPropValue.split( ',' ).map( parseFloatMap ) );
+					innerPropValue = new THREE.Vector3().fromArray( parseFloatArray( innerPropValue ) );
 					break;
 
 			}
@@ -3951,11 +3939,17 @@
 	 */
 	function parseFloatArray( string ) {
 
-		return string.split( ',' ).map( parseFloatMap );
+		var array = string.split( ',' );
+
+		for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+			array[ i ] = parseFloat( array[ i ] );
+
+		}
+
+		return array;
 
 	}
-
-	function parseFloatMap( string ) { return parseFloat( string ); }
 
 	/**
 	 * Parses comma separated list of int numbers and returns them in an array.
@@ -3966,11 +3960,17 @@
 	 */
 	function parseIntArray( string ) {
 
-		return string.split( ',' ).map( parseIntMap );
+		var array = string.split( ',' );
+
+		for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+			array[ i ] = parseInt( array[ i ] );
+
+		}
+
+		return array;
 
 	}
-
-	function parseIntMap( string ) { return parseInt( string ); }
 
 	/**
 	 * Parses Vector3 property from FBXTree.  Property is given as .value.x, .value.y, etc.
@@ -3990,7 +3990,7 @@
 	 */
 	function parseColor( property ) {
 
-		return new THREE.Color().fromArray( parseVector3( property ).toArray() );
+		return new THREE.Color( parseFloat( property.value.x ), parseFloat( property.value.y ), parseFloat( property.value.z ) );
 
 	}
 
@@ -4007,9 +4007,11 @@
 	 */
 	function degreeToRadian( value ) {
 
-		return value * Math.PI / 180;
+		return value * DEG2RAD;
 
 	}
+
+	var DEG2RAD = Math.PI / 180;
 
 	//
 
