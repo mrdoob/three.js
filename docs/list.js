@@ -1,5 +1,7 @@
 var list = {
+
     "Manual": {
+
         "Getting Started": {
             "Creating a scene": "manual/introduction/Creating-a-scene",
             "Detecting WebGL and browser compatibility": "manual/introduction/Detecting-WebGL-and-browser-compatibility",
@@ -11,16 +13,21 @@ var list = {
             "FAQ": "manual/introduction/FAQ",
             "Useful links": "manual/introduction/Useful-links"
         },
+
         "Next Steps": {
             "How to update things": "manual/introduction/How-to-update-things",
             "Matrix transformations": "manual/introduction/Matrix-transformations",
             "Animation System": "manual/introduction/Animation-system"
         },
+
         "Build Tools": {
             "Testing with NPM": "manual/buildTools/Testing-with-NPM"
         }
+
     },
+
     "Reference": {
+
         "Animation": {
             "AnimationAction": "api/animation/AnimationAction",
             "AnimationClip": "api/animation/AnimationClip",
@@ -31,6 +38,7 @@ var list = {
             "PropertyBinding": "api/animation/PropertyBinding",
             "PropertyMixer": "api/animation/PropertyMixer"
         },
+
         "Animation / Tracks": {
             "BooleanKeyframeTrack": "api/animation/tracks/BooleanKeyframeTrack",
             "ColorKeyframeTrack": "api/animation/tracks/ColorKeyframeTrack",
@@ -39,6 +47,7 @@ var list = {
             "StringKeyframeTrack": "api/animation/tracks/StringKeyframeTrack",
             "VectorKeyframeTrack": "api/animation/tracks/VectorKeyframeTrack"
         },
+
         "Audio": {
             "Audio": "api/audio/Audio",
             "AudioAnalyser": "api/audio/AudioAnalyser",
@@ -46,6 +55,7 @@ var list = {
             "AudioListener": "api/audio/AudioListener",
             "PositionalAudio": "api/audio/PositionalAudio"
         },
+
         "Cameras": {
             "Camera": "api/cameras/Camera",
             "CubeCamera": "api/cameras/CubeCamera",
@@ -53,6 +63,7 @@ var list = {
             "PerspectiveCamera": "api/cameras/PerspectiveCamera",
             "StereoCamera": "api/cameras/StereoCamera"
         },
+
         "Constants": {
             "Animation": "api/constants/Animation",
             "Core": "api/constants/Core",
@@ -62,6 +73,7 @@ var list = {
             "Renderer": "api/constants/Renderer",
             "Textures": "api/constants/Textures"
         },
+
         "Core": {
             "BufferAttribute": "api/core/BufferAttribute",
             "BufferGeometry": "api/core/BufferGeometry",
@@ -80,17 +92,21 @@ var list = {
             "Raycaster": "api/core/Raycaster",
             "Uniform": "api/core/Uniform"
         },
+
         "Core / BufferAttributes": {
             "BufferAttribute Types": "api/core/bufferAttributeTypes/BufferAttributeTypes"
         },
+
         "Deprecated": {
             "DeprecatedList": "api/deprecated/DeprecatedList"
         },
+
         "Extras": {
             "CurveUtils": "api/extras/CurveUtils",
             "SceneUtils": "api/extras/SceneUtils",
             "ShapeUtils": "api/extras/ShapeUtils"
         },
+
         "Extras / Core": {
             "Curve": "api/extras/core/Curve",
             "CurvePath": "api/extras/core/CurvePath",
@@ -99,6 +115,7 @@ var list = {
             "Shape": "api/extras/core/Shape",
             "ShapePath": "api/extras/core/ShapePath"
         },
+
         "Extras / Curves": {
             "ArcCurve": "api/extras/curves/ArcCurve",
             "CatmullRomCurve3": "api/extras/curves/CatmullRomCurve3",
@@ -111,10 +128,12 @@ var list = {
             "QuadraticBezierCurve3": "api/extras/curves/QuadraticBezierCurve3",
             "SplineCurve": "api/extras/curves/SplineCurve"
         },
+
         "Extras / Objects": {
             "ImmediateRenderObject": "api/extras/objects/ImmediateRenderObject",
             "MorphBlendMesh": "api/extras/objects/MorphBlendMesh"
         },
+
         "Geometries": {
             "BoxBufferGeometry": "api/geometries/BoxBufferGeometry",
             "BoxGeometry": "api/geometries/BoxGeometry",
@@ -158,6 +177,7 @@ var list = {
             "TubeBufferGeometry": "api/geometries/TubeBufferGeometry",
             "WireframeGeometry": "api/geometries/WireframeGeometry"
         },
+
         "Helpers": {
             "ArrowHelper": "api/helpers/ArrowHelper",
             "AxisHelper": "api/helpers/AxisHelper",
@@ -174,6 +194,7 @@ var list = {
             "SpotLightHelper": "api/helpers/SpotLightHelper",
             "VertexNormalsHelper": "api/helpers/VertexNormalsHelper"
         },
+
         "Lights": {
             "AmbientLight": "api/lights/AmbientLight",
             "DirectionalLight": "api/lights/DirectionalLight",
@@ -183,12 +204,14 @@ var list = {
             "RectAreaLight": "api/lights/RectAreaLight",
             "SpotLight": "api/lights/SpotLight"
         },
+
         "Lights / Shadows": {
             "DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
             "LightShadow": "api/lights/shadows/LightShadow",
             "RectAreaLightShadow": "api/lights/shadows/RectAreaLightShadow",
             "SpotLightShadow": "api/lights/shadows/SpotLightShadow"
         },
+
         "Loaders": {
             "AnimationLoader": "api/loaders/AnimationLoader",
             "AudioLoader": "api/loaders/AudioLoader",
@@ -206,10 +229,12 @@ var list = {
             "ObjectLoader": "api/loaders/ObjectLoader",
             "TextureLoader": "api/loaders/TextureLoader"
         },
+
         "Loaders / Managers": {
             "DefaultLoadingManager": "api/loaders/managers/DefaultLoadingManager",
             "LoadingManager": "api/loaders/managers/LoadingManager"
         },
+
         "Materials": {
             "LineBasicMaterial": "api/materials/LineBasicMaterial",
             "LineDashedMaterial": "api/materials/LineDashedMaterial",
@@ -228,6 +253,7 @@ var list = {
             "ShadowMaterial": "api/materials/ShadowMaterial",
             "SpriteMaterial": "api/materials/SpriteMaterial"
         },
+
         "Math": {
             "Box2": "api/math/Box2",
             "Box3": "api/math/Box3",
@@ -250,12 +276,14 @@ var list = {
             "Vector3": "api/math/Vector3",
             "Vector4": "api/math/Vector4"
         },
+
         "Math / Interpolants": {
             "CubicInterpolant": "api/math/interpolants/CubicInterpolant",
             "DiscreteInterpolant": "api/math/interpolants/DiscreteInterpolant",
             "LinearInterpolant": "api/math/interpolants/LinearInterpolant",
             "QuaternionLinearInterpolant": "api/math/interpolants/QuaternionLinearInterpolant"
         },
+
         "Objects": {
             "Bone": "api/objects/Bone",
             "Group": "api/objects/Group",
@@ -270,22 +298,26 @@ var list = {
             "SkinnedMesh": "api/objects/SkinnedMesh",
             "Sprite": "api/objects/Sprite"
         },
+
         "Renderers": {
             "WebGLRenderer": "api/renderers/WebGLRenderer",
             "WebGLRenderTarget": "api/renderers/WebGLRenderTarget",
             "WebGLRenderTargetCube": "api/renderers/WebGLRenderTargetCube"
         },
+
         "Renderers / Shaders": {
             "ShaderChunk": "api/renderers/shaders/ShaderChunk",
             "ShaderLib": "api/renderers/shaders/ShaderLib",
             "UniformsLib": "api/renderers/shaders/UniformsLib",
             "UniformsUtils": "api/renderers/shaders/UniformsUtils"
         },
+
         "Scenes": {
             "Fog": "api/scenes/Fog",
             "FogExp2": "api/scenes/FogExp2",
             "Scene": "api/scenes/Scene"
         },
+
         "Textures": {
             "CanvasTexture": "api/textures/CanvasTexture",
             "CompressedTexture": "api/textures/CompressedTexture",
@@ -295,17 +327,22 @@ var list = {
             "Texture": "api/textures/Texture",
             "VideoTexture": "api/textures/VideoTexture"
         }
+
     },
+
     "Examples": {
+
         "Collada Animation": {
             "ColladaAnimation": "examples/collada/Animation",
             "AnimationHandler": "examples/collada/AnimationHandler",
             "KeyFrameAnimation": "examples/collada/KeyFrameAnimation"
         },
+
         "Geometries": {
             "ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
             "ConvexGeometry": "examples/geometries/ConvexGeometry"
         },
+
         "Loaders": {
             "BabylonLoader": "examples/loaders/BabylonLoader",
             "ColladaLoader": "examples/loaders/ColladaLoader",
@@ -317,11 +354,13 @@ var list = {
             "SVGLoader": "examples/loaders/SVGLoader",
             "TGALoader": "examples/loaders/TGALoader"
         },
+
         "Plugins": {
             "CombinedCamera": "examples/cameras/CombinedCamera",
             "LookupTable": "examples/Lut",
             "SpriteCanvasMaterial": "examples/SpriteCanvasMaterial"
         },
+
         "QuickHull": {
             "Face": "examples/quickhull/Face",
             "HalfEdge": "examples/quickhull/HalfEdge",
@@ -329,22 +368,30 @@ var list = {
             "VertexNode": "examples/quickhull/VertexNode",
             "VertexList": "examples/quickhull/VertexList"
         },
+
         "Renderers": {
             "CanvasRenderer": "examples/renderers/CanvasRenderer"
         }
+
     },
+
     "Developer Reference": {
+
         "Polyfills": {
             "Polyfills": "api/Polyfills"
         },
+
         "WebGLRenderer": {
             "WebGLProgram": "api/renderers/webgl/WebGLProgram",
             "WebGLShader": "api/renderers/webgl/WebGLShader",
             "WebGLState": "api/renderers/webgl/WebGLState"
         },
+
         "WebGLRenderer / Plugins": {
             "LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
             "SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
         }
+
     }
+
 }
