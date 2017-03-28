@@ -306,13 +306,13 @@ QUnit.test( "getCorners", function( assert ) {
 	var b = a.getCorners();
 
 	assert.ok( b[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
-	assert.ok( b[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
-	assert.ok( b[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
-	assert.ok( b[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
-	assert.ok( b[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( b[1].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( b[2].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	assert.ok( b[3].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	assert.ok( b[4].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
 	assert.ok( b[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
-	assert.ok( b[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
-	assert.ok( b[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	assert.ok( b[6].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	assert.ok( b[7].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
 
 	var c = [
 		zero3.clone(),
@@ -328,13 +328,13 @@ QUnit.test( "getCorners", function( assert ) {
 	var d = a.getCorners(c);
 
 	assert.ok( d[0].equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
-	assert.ok( d[1].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
-	assert.ok( d[2].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
-	assert.ok( d[3].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
-	assert.ok( d[4].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( d[1].equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	assert.ok( d[2].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+	assert.ok( d[3].equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	assert.ok( d[4].equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
 	assert.ok( d[5].equals( new THREE.Vector3( 1, 0, 1 ) ), "Passed!" );
-	assert.ok( d[6].equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
-	assert.ok( d[7].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	assert.ok( d[6].equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	assert.ok( d[7].equals( new THREE.Vector3( 0, 1, 1 ) ), "Passed!" );
 
 	assert.ok( d[0] === c[0], "Passed!" );
 	assert.ok( d[1] === c[1], "Passed!" );
