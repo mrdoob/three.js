@@ -3403,11 +3403,11 @@
 				if ( match ) {
 
 					var nodeName = match[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, "" );
-					var nodeAttrs = match[ 2 ].split( ',' ).map( function ( element ) {
+					var nodeAttrs = match[ 2 ].split( ',' );
 
-						return element.trim().replace( /^"/, '' ).replace( /"$/, '' );
-
-					} );
+					for ( var i = 0, l = nodeAttrs.length; i < l; i ++ ) {
+						nodeAttrs[ i ] = nodeAttrs[ i ].trim().replace( /^"/, '' ).replace( /"$/, '' );
+					}
 
 					this.parseNodeBegin( l, nodeName, nodeAttrs || null );
 					continue;
@@ -3658,11 +3658,11 @@
 			// P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
 			// into array like below
 			// ["Lcl Scaling", "Lcl Scaling", "", "A", "1,1,1" ]
-			var props = propValue.split( '",' ).map( function ( element ) {
+			var props = propValue.split( '",' );
 
-				return element.trim().replace( /^\"/, '' ).replace( /\s/, '_' );
-
-			} );
+			for ( var i = 0, l = props.length; i < l; i ++ ) {
+				props[ i ] = props[ i ].trim().replace( /^\"/, '' ).replace( /\s/, '_' );
+			}
 
 			var innerPropName = props[ 0 ];
 			var innerPropType1 = props[ 1 ];
@@ -3689,7 +3689,7 @@
 
 				case "ColorRGB":
 				case "Vector3D":
-					innerPropValue = new THREE.Vector3().fromArray( parseFloatArray( innerPropValue ) );
+					innerPropValue = parseFloatArray( innerPropValue );
 					break;
 
 			}
@@ -3979,7 +3979,7 @@
 	 */
 	function parseVector3( property ) {
 
-		return new THREE.Vector3( parseFloat( property.value.x ), parseFloat( property.value.y ), parseFloat( property.value.z ) );
+		return new THREE.Vector3().fromArray( property.value );
 
 	}
 
@@ -3990,7 +3990,7 @@
 	 */
 	function parseColor( property ) {
 
-		return new THREE.Color( parseFloat( property.value.x ), parseFloat( property.value.y ), parseFloat( property.value.z ) );
+		return new THREE.Color().fromArray( property.value );
 
 	}
 
