@@ -7,7 +7,9 @@
 
 THREE.ParametricGeometries = {
 
-	klein: function ( v, u ) {
+	klein: function ( v, u, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		u *= Math.PI;
 		v *= 2 * Math.PI;
@@ -28,25 +30,29 @@ THREE.ParametricGeometries = {
 
 		y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
 
-		return new THREE.Vector3( x, y, z );
+		return result.set( x, y, z );
 
 	},
 
 	plane: function ( width, height ) {
 
-		return function( u, v ) {
+		return function( u, v, optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Vector3();
 
 			var x = u * width;
 			var y = 0;
 			var z = v * height;
 
-			return new THREE.Vector3( x, y, z );
+			return result.set( x, y, z );
 
 		};
 
 	},
 
-	mobius: function( u, t ) {
+	mobius: function( u, t, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		// flat mobius strip
 		// http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
@@ -56,28 +62,36 @@ THREE.ParametricGeometries = {
 		var x, y, z;
 
 		var a = 2;
+
 		x = Math.cos( v ) * ( a + u * Math.cos( v / 2 ) );
 		y = Math.sin( v ) * ( a + u * Math.cos( v / 2 ) );
 		z = u * Math.sin( v / 2 );
-		return new THREE.Vector3( x, y, z );
+
+		return result.set( x, y, z );
 
 	},
 
-	mobius3d: function( u, t ) {
+	mobius3d: function( u, t, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		// volumetric mobius strip
+
 		u *= Math.PI;
 		t *= 2 * Math.PI;
 
 		u = u * 2;
 		var phi = u / 2;
 		var major = 2.25, a = 0.125, b = 0.65;
+
 		var x, y, z;
+
 		x = a * Math.cos( t ) * Math.cos( phi ) - b * Math.sin( t ) * Math.sin( phi );
 		z = a * Math.cos( t ) * Math.sin( phi ) + b * Math.sin( t ) * Math.cos( phi );
 		y = ( major + x ) * Math.sin( u );
 		x = ( major + x ) * Math.cos( u );
-		return new THREE.Vector3( x, y, z );
+
+		return result.set( x, y, z );
 
 	}
 
@@ -123,7 +137,9 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 
 
 
-	var ParametricTube = function( u, v ) {
+	var ParametricTube = function( u, v, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		v *= 2 * Math.PI;
 
@@ -152,7 +168,7 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 		pos2.y += cx * normal.y + cy * binormal.y;
 		pos2.z += cx * normal.z + cy * binormal.z;
 
-		return pos2.clone();
+		return result.copy( pos2 );
 
 	};
 
@@ -222,7 +238,9 @@ THREE.ParametricGeometries.TorusKnotGeometry.prototype.constructor = THREE.Param
   *********************************************/
 THREE.ParametricGeometries.SphereGeometry = function( size, u, v ) {
 
-	function sphere( u, v ) {
+	function sphere( u, v, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		u *= Math.PI;
 		v *= 2 * Math.PI;
@@ -231,8 +249,7 @@ THREE.ParametricGeometries.SphereGeometry = function( size, u, v ) {
 		var y = size * Math.sin( u ) * Math.sin( v );
 		var z = size * Math.cos( u );
 
-
-		return new THREE.Vector3( x, y, z );
+		return result.set( x, y, z );
 
 	}
 
@@ -252,13 +269,15 @@ THREE.ParametricGeometries.SphereGeometry.prototype.constructor = THREE.Parametr
 
 THREE.ParametricGeometries.PlaneGeometry = function( width, depth, segmentsWidth, segmentsDepth ) {
 
-	function plane( u, v ) {
+	function plane( u, v, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
 
 		var x = u * width;
 		var y = 0;
 		var z = v * depth;
 
-		return new THREE.Vector3( x, y, z );
+		return result.set( x, y, z );
 
 	}
 
