@@ -122,7 +122,7 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 
 		x, y, z, tx, ty, tz, u, v,
 
-		cx, cy, pos, pos2 = new THREE.Vector3(),
+		cx, cy, pos,
 		i, j, ip, jp, a, b, c, d, uva, uvb, uvc, uvd;
 
 	var frames = path.computeFrenetFrames( segments, closed ),
@@ -163,12 +163,11 @@ THREE.ParametricGeometries.TubeGeometry = function( path, segments, radius, segm
 		cx = - scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 		cy = scope.radius * Math.sin( v );
 
-		pos2.copy( pos );
-		pos2.x += cx * normal.x + cy * binormal.x;
-		pos2.y += cx * normal.y + cy * binormal.y;
-		pos2.z += cx * normal.z + cy * binormal.z;
+		pos.x += cx * normal.x + cy * binormal.x;
+		pos.y += cx * normal.y + cy * binormal.y;
+		pos.z += cx * normal.z + cy * binormal.z;
 
-		return result.copy( pos2 );
+		return result.copy( pos );
 
 	};
 
