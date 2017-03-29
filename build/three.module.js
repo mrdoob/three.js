@@ -21025,7 +21025,32 @@ function WebGLRenderer( parameters ) {
 
 		if ( ! object.visible ) return;
 
-		var visible = object.layers.test( camera.layers );
+		var visible;
+
+		if ( camera.isArrayCamera ) { 
+
+			visible = true;
+
+			var i = 0;
+
+			var cameras = camera.cameras;
+
+			while(i < cameras.length){
+
+				projectObject(object, cameras[i], sortObjects);
+
+				i++;
+			}
+
+			return;
+
+		}
+
+		else{
+
+			visible = object.layers.test( camera.layers );
+
+		}
 
 		if ( visible ) {
 
