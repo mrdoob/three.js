@@ -1308,15 +1308,13 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.isArrayCamera ) { 
 
-			visible = true;
-
 			var i = 0
 
 			var cameras = camera.cameras;
 
-			while(i < cameras.length){
+			while(i < cameras.length) {
 
-				projectObject(object, cameras[i], sortObjects)
+				projectObject(object, cameras[i], sortObjects);
 
 				i++
 			}
@@ -1325,7 +1323,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		else{
+		else {
 
 			visible = object.layers.test( camera.layers );
 
