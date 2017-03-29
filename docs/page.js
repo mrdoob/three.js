@@ -1,18 +1,25 @@
 if ( !window.frameElement ) {
 
-// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
-// redirect to the index page (using the current URL without extension as the new fragment).
-// If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
+    // If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
+    // redirect to the index page (using the current URL without extension as the new fragment).
+    // If this URL itself has a fragment, append it with a dot (since '#' in an URL fragment is not allowed).
 
-    var hash = window.location.hash.substr( 1 );
+    var href = window.location.href;
+    var splitIndex = href.lastIndexOf( '/docs/' ) + 6;
+    var docsBaseURL = href.substr( 0, splitIndex );
 
-    if (hash !== '') {
+    var hash = window.location.hash;
 
-        hash = '.' + hash;
+    if ( hash !== '' ) {
+
+        href = href.replace( hash, '' );
+        hash = hash.replace( '#', '.' );
 
     }
 
-    window.location.replace( window.location.origin + '/docs/#' + window.location.pathname.slice(6, -5) + hash );
+    var pathSnippet = href.slice( splitIndex, -5 );
+
+    window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
 }
 
