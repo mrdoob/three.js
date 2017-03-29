@@ -1163,8 +1163,15 @@ THREE.GLTF2Loader = ( function () {
 
 	GLTFDracoMeshCompressionExtension.prototype.decodePrimitive = function ( primitive, dependencies ) {
 
-		var bufferViewID = primitive.extensions[ this.name ].bufferView;
-		var bufferView = dependencies.bufferViews[ bufferViewID ];
+		var extension = primitive.extensions[ this.name ];
+
+		if ( !this.dracoLoader.isVersionSupported( extension.version ) ) {
+
+			throw new Error( 'GLTF2Loader: Incompatible Draco asset version: ' + extension.version + '.' );
+
+		}
+
+		var bufferView = dependencies.bufferViews[ extension.bufferView ];
 		return this.dracoLoader.decodeDracoFile( bufferView );
 
 	};
