@@ -52,7 +52,7 @@ function Material() {
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
 
-	this.removeBanding = false;
+	this.dithering = false;
 
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;

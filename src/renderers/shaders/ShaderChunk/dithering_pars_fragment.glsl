@@ -1,5 +1,5 @@
 // based on https://www.shadertoy.com/view/MslGR8
-vec3 removeBanding( vec3 color ) {
+vec3 dithering( vec3 color ) {
 	//Calculate grid position
 	float grid_position = fract( dot( gl_FragCoord.xy - vec2( 0.5, 0.5 ) , vec2( 1.0 / 16.0, 10.0 / 36.0 ) + 0.25 ) );
 
