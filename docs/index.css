@@ -50,16 +50,9 @@ h3 {
     margin-left: 20px;
 }
 
-a, li span {
-    color: #2194CE;
-}
-
 a {
+    color: #2194CE;
     text-decoration: none;
-}
-
-li span {
-    cursor: pointer;
 }
 
 #panel {

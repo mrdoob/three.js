@@ -125,7 +125,11 @@
                         var pageURL = pages[ pageName ];
 
                         var listElement = createAndAppendDOMElement( { type: 'li', parent: categoryContent } );
-                        var linkElement = createAndAppendDOMElement( { type: 'span', parent: listElement, content: pageName } );
+                        var linkElement = createAndAppendDOMElement( { type: 'a', parent: listElement, content: pageName } );
+
+                        // The href attribute is only used for the option to create a new tab by right click
+
+                        linkElement.setAttribute( 'href', '#' + pageURL );
 
                         addClickHandlers( linkElement, pageURL );
 
