@@ -220,6 +220,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		data.skinning = this.skinning;
 		data.morphTargets = this.morphTargets;
 
+		data.dithering = this.dithering;
+
 		// TODO: Copied from Object3D.toJSON
 
 		function extractFromCache( cache ) {
@@ -291,6 +293,8 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		this.polygonOffset = source.polygonOffset;
 		this.polygonOffsetFactor = source.polygonOffsetFactor;
 		this.polygonOffsetUnits = source.polygonOffsetUnits;
+
+		this.dithering = source.dithering;
 
 		this.alphaTest = source.alphaTest;
 
