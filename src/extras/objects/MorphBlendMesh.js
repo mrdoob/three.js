@@ -29,10 +29,11 @@ function MorphBlendMesh( geometry, material ) {
 
 }
 
-MorphBlendMesh.prototype = Object.create( Mesh.prototype );
-MorphBlendMesh.prototype.constructor = MorphBlendMesh;
+MorphBlendMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
-MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
+	constructor: MorphBlendMesh,
+
+	createAnimation: function ( name, start, end, fps ) {
 
 	var animation = {
 
@@ -61,9 +62,9 @@ MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
 	this.animationsMap[ name ] = animation;
 	this.animationsList.push( animation );
 
-};
+},
 
-MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
+	autoCreateAnimations: function ( fps ) {
 
 	var pattern = /([a-z]+)_?(\d+)/i;
 
@@ -102,9 +103,9 @@ MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
 	this.firstAnimation = firstAnimation;
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationDirectionForward = function ( name ) {
+	setAnimationDirectionForward: function ( name ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -115,9 +116,9 @@ MorphBlendMesh.prototype.setAnimationDirectionForward = function ( name ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationDirectionBackward = function ( name ) {
+	setAnimationDirectionBackward: function ( name ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -128,9 +129,9 @@ MorphBlendMesh.prototype.setAnimationDirectionBackward = function ( name ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationFPS = function ( name, fps ) {
+	setAnimationFPS: function ( name, fps ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -141,9 +142,9 @@ MorphBlendMesh.prototype.setAnimationFPS = function ( name, fps ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationDuration = function ( name, duration ) {
+	setAnimationDuration: function ( name, duration ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -154,9 +155,9 @@ MorphBlendMesh.prototype.setAnimationDuration = function ( name, duration ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationWeight = function ( name, weight ) {
+	setAnimationWeight: function ( name, weight ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -166,9 +167,9 @@ MorphBlendMesh.prototype.setAnimationWeight = function ( name, weight ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.setAnimationTime = function ( name, time ) {
+	setAnimationTime: function ( name, time ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -178,9 +179,9 @@ MorphBlendMesh.prototype.setAnimationTime = function ( name, time ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.getAnimationTime = function ( name ) {
+	getAnimationTime: function ( name ) {
 
 	var time = 0;
 
@@ -194,9 +195,9 @@ MorphBlendMesh.prototype.getAnimationTime = function ( name ) {
 
 	return time;
 
-};
+},
 
-MorphBlendMesh.prototype.getAnimationDuration = function ( name ) {
+	getAnimationDuration: function ( name ) {
 
 	var duration = - 1;
 
@@ -210,9 +211,9 @@ MorphBlendMesh.prototype.getAnimationDuration = function ( name ) {
 
 	return duration;
 
-};
+},
 
-MorphBlendMesh.prototype.playAnimation = function ( name ) {
+	playAnimation: function ( name ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -227,9 +228,9 @@ MorphBlendMesh.prototype.playAnimation = function ( name ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.stopAnimation = function ( name ) {
+	stopAnimation: function ( name ) {
 
 	var animation = this.animationsMap[ name ];
 
@@ -239,9 +240,9 @@ MorphBlendMesh.prototype.stopAnimation = function ( name ) {
 
 	}
 
-};
+},
 
-MorphBlendMesh.prototype.update = function ( delta ) {
+	update: function ( delta ) {
 
 	for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
 
@@ -315,7 +316,9 @@ MorphBlendMesh.prototype.update = function ( delta ) {
 
 	}
 
-};
+},
+
+} );
 
 
 export { MorphBlendMesh };

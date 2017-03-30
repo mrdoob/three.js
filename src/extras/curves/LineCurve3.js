@@ -11,26 +11,29 @@ function LineCurve3( v1, v2 ) {
 
 }
 
-LineCurve3.prototype = Object.create( Curve.prototype );
-LineCurve3.prototype.constructor = LineCurve3;
+LineCurve3.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-LineCurve3.prototype.getPoint = function ( t ) {
+	constructor: LineCurve3,
 
-	if ( t === 1 ) {
+	getPoint: function ( t ) {
 
-		return this.v2.clone();
+		if ( t === 1 ) {
+
+			return this.v2.clone();
+
+		}
+
+		var vector = new Vector3();
+
+		vector.subVectors( this.v2, this.v1 ); // diff
+		vector.multiplyScalar( t );
+		vector.add( this.v1 );
+
+		return vector;
 
 	}
 
-	var vector = new Vector3();
-
-	vector.subVectors( this.v2, this.v1 ); // diff
-	vector.multiplyScalar( t );
-	vector.add( this.v1 );
-
-	return vector;
-
-};
+} );
 
 
 export { LineCurve3 };

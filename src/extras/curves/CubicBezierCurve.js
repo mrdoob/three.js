@@ -14,19 +14,22 @@ function CubicBezierCurve( v0, v1, v2, v3 ) {
 
 }
 
-CubicBezierCurve.prototype = Object.create( Curve.prototype );
-CubicBezierCurve.prototype.constructor = CubicBezierCurve;
+CubicBezierCurve.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-CubicBezierCurve.prototype.getPoint = function ( t ) {
+	constructor: CubicBezierCurve,
 
-	var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
+	getPoint: function ( t ) {
 
-	return new Vector2(
-		CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
-		CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
-	);
+		var v0 = this.v0, v1 = this.v1, v2 = this.v2, v3 = this.v3;
 
-};
+		return new Vector2(
+			CubicBezier( t, v0.x, v1.x, v2.x, v3.x ),
+			CubicBezier( t, v0.y, v1.y, v2.y, v3.y )
+		);
+
+	}
+
+} );
 
 
 export { CubicBezierCurve };

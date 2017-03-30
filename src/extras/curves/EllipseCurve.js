@@ -21,12 +21,13 @@ function EllipseCurve( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockw
 
 }
 
-EllipseCurve.prototype = Object.create( Curve.prototype );
-EllipseCurve.prototype.constructor = EllipseCurve;
+EllipseCurve.prototype = Object.assign( Object.create( Curve.prototype ), {
 
-EllipseCurve.prototype.isEllipseCurve = true;
+	constructor: EllipseCurve,
 
-EllipseCurve.prototype.getPoint = function ( t ) {
+	isEllipseCurve: true,
+
+	getPoint: function ( t ) {
 
 	var twoPi = Math.PI * 2;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
@@ -84,7 +85,9 @@ EllipseCurve.prototype.getPoint = function ( t ) {
 
 	return new Vector2( x, y );
 
-};
+}
+
+} );
 
 
 export { EllipseCurve };
