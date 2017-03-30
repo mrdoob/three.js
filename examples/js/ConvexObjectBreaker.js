@@ -468,17 +468,18 @@ THREE.ConvexObjectBreaker.transformTiedVectorInverse = function( v, m ) {
 
 THREE.ConvexObjectBreaker.transformPlaneToLocalSpace = function() {
 
-	var v1 = new THREE.Vector3();
-	var m1 = new THREE.Matrix3();
+	var vector;
 
-	return function transformPlaneToLocalSpace( plane, m, resultPlane ) {
+	return function transformPlaneToLocalSpace( plane, matrix, resultPlane ) {
 
+		if (vector === undefined) vector = new THREE.Vector3();
+		
 		resultPlane.normal.copy( plane.normal );
 		resultPlane.constant = plane.constant;
 
-		var referencePoint = THREE.ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( v1 ), m );
+		var referencePoint = THREE.ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( vector ), matrix );
 
-		THREE.ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
+		THREE.ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, matrix );
 
 		// recalculate constant (like in setFromNormalAndCoplanarPoint)
 		resultPlane.constant = - referencePoint.dot( resultPlane.normal );

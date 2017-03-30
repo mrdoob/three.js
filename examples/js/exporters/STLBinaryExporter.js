@@ -12,11 +12,17 @@ THREE.STLBinaryExporter.prototype = {
 
 	parse: ( function () {
 
-		var vector = new THREE.Vector3();
-		var normalMatrixWorld = new THREE.Matrix3();
+		var vector, normalMatrixWorld;
 
 		return function parse( scene ) {
 
+			if (vector === undefined) {
+
+				vector = new THREE.Vector3();
+				normalMatrixWorld = new THREE.Matrix3();
+
+			}
+			
 			// We collect objects first, as we may need to convert from BufferGeometry to Geometry
 			var objects = [];
 			var triangles = 0;

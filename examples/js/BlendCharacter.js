@@ -163,9 +163,11 @@ THREE.BlendCharacter.prototype.constructor = THREE.BlendCharacter;
 
 THREE.BlendCharacter.prototype.getForward = function() {
 
-	var forward = new THREE.Vector3();
+	var forward;
 
 	return function() {
+		
+		if (forward === undefined) forward = new THREE.Vector3();
 
 		// pull the character's forward basis vector out of the matrix
 		forward.set(

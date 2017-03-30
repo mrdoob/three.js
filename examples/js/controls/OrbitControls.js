@@ -122,17 +122,25 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// this method is exposed, but perhaps it would be better if we can make it private...
 	this.update = function () {
 
-		var offset = new THREE.Vector3();
-
-		// so camera.up is the orbit axis
-		var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
-
-		var lastPosition = new THREE.Vector3();
-		var lastQuaternion = new THREE.Quaternion();
+		var offset;
+		var quat, quatInverse;
+		var lastPosition, lastQuaternion;
 
 		return function update() {
 
+			if (offset === undefined) {
+
+				offset = new THREE.Vector3();
+
+				// so camera.up is the orbit axis
+				quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+				quatInverse = quat.clone().inverse();
+
+				lastPosition = new THREE.Vector3();
+				lastQuaternion = new THREE.Quaternion();
+
+			}
+			
 			var position = scope.object.position;
 
 			offset.copy( position ).sub( scope.target );
@@ -297,14 +305,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var panLeft = function () {
 
-		var v = new THREE.Vector3();
+		var vector;
 
 		return function panLeft( distance, objectMatrix ) {
 
-			v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
-			v.multiplyScalar( - distance );
+			if (vector === undefined) vector = new THREE.Vector3();
 
-			panOffset.add( v );
+			vector.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
+			vector.multiplyScalar( - distance );
+
+			panOffset.add( vector );
 
 		};
 
@@ -312,14 +322,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var panUp = function () {
 
-		var v = new THREE.Vector3();
+		var vector;
 
 		return function panUp( distance, objectMatrix ) {
 
-			v.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
-			v.multiplyScalar( distance );
+			if (vector === undefined) vector = new THREE.Vector3();
 
-			panOffset.add( v );
+			vector.setFromMatrixColumn( objectMatrix, 1 ); // get Y column of objectMatrix
+			vector.multiplyScalar( distance );
+
+			panOffset.add( vector );
 
 		};
 
@@ -328,9 +340,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// deltaX and deltaY are in pixels; right and down are positive
 	var pan = function () {
 
-		var offset = new THREE.Vector3();
+		var offset;
 
 		return function pan( deltaX, deltaY ) {
+
+			if (offset === undefined) offset = new THREE.Vector3();
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 

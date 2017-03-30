@@ -11,11 +11,17 @@ THREE.STLExporter.prototype = {
 
 	parse: ( function () {
 
-		var vector = new THREE.Vector3();
-		var normalMatrixWorld = new THREE.Matrix3();
+		var vector, normalMatrixWorld;
 
 		return function parse( scene ) {
 
+			if (vector === undefined) {
+
+				vector = new THREE.Vector3();
+				normalMatrixWorld = new THREE.Matrix3();
+
+			}
+			
 			var output = '';
 
 			output += 'solid exported\n';

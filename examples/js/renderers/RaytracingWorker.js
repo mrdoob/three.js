@@ -122,33 +122,49 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 	var spawnRay = ( function () {
 
-		var diffuseColor = new THREE.Color();
-		var specularColor = new THREE.Color();
-		var lightColor = new THREE.Color();
-		var schlick = new THREE.Color();
+		var diffuseColor, specularColor, lightColor, schlick;
 
-		var lightContribution = new THREE.Color();
+		var lightContribution;
 
-		var eyeVector = new THREE.Vector3();
-		var lightVector = new THREE.Vector3();
-		var normalVector = new THREE.Vector3();
-		var halfVector = new THREE.Vector3();
+		var eyeVector, lightVector, normalVector, halfVector;
 
-		var localPoint = new THREE.Vector3();
-		var reflectionVector = new THREE.Vector3();
+		var localPoint, reflectionVector;
 
-		var tmpVec = new THREE.Vector3();
+		var tmpVec;
 
-		var tmpColor = [];
-
-		for ( var i = 0; i < maxRecursionDepth; i ++ ) {
-
-			tmpColor[ i ] = new THREE.Color();
-
-		}
+		var tmpColor;
 
 		return function spawnRay( rayOrigin, rayDirection, outputColor, recursionDepth ) {
 
+			if (diffuseColor === undefined) {
+
+				diffuseColor = new THREE.Color();
+				specularColor = new THREE.Color();
+				lightColor = new THREE.Color();
+				schlick = new THREE.Color();
+
+				lightContribution = new THREE.Color();
+
+				eyeVector = new THREE.Vector3();
+				lightVector = new THREE.Vector3();
+				normalVector = new THREE.Vector3();
+				halfVector = new THREE.Vector3();
+
+				localPoint = new THREE.Vector3();
+				reflectionVector = new THREE.Vector3();
+
+				tmpVec = new THREE.Vector3();
+
+				tmpColor = [];
+
+				for ( i = 0; i < maxRecursionDepth; i ++ ) {
+
+					tmpColor[ i ] = new THREE.Color();
+
+				}
+
+			}
+			
 			var ray = raycaster.ray;
 
 			ray.origin = rayOrigin;
@@ -395,12 +411,18 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 	var computePixelNormal = ( function () {
 
-		var tmpVec1 = new THREE.Vector3();
-		var tmpVec2 = new THREE.Vector3();
-		var tmpVec3 = new THREE.Vector3();
+		var tmpVec1, tmpVec2, tmpVec3;
 
 		return function computePixelNormal( outputVector, point, shading, face, vertices ) {
 
+			if (tmpVec1 === undefined) {
+
+				tmpVec1 = new THREE.Vector3();
+				tmpVec2 = new THREE.Vector3();
+				tmpVec3 = new THREE.Vector3();
+
+			}
+			
 			var faceNormal = face.normal;
 			var vertexNormals = face.vertexNormals;
 
@@ -455,9 +477,11 @@ THREE.RaytracingRendererWorker = function ( parameters ) {
 
 		var data = new Uint8ClampedArray( blockSize * blockSize * 4 );
 
-		var pixelColor = new THREE.Color();
+		var pixelColor;
 
 		return function renderBlock( blockX, blockY ) {
+
+			if (pixelColor === undefined) pixelColor = new THREE.Color();
 
 			var index = 0;
 

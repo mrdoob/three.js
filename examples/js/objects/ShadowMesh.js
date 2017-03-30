@@ -29,11 +29,13 @@ THREE.ShadowMesh.prototype.constructor = THREE.ShadowMesh;
 
 THREE.ShadowMesh.prototype.update = function () {
 
-	var shadowMatrix = new THREE.Matrix4();
+	var shadowMatrix;
 
 	return function ( plane, lightPosition4D ) {
 
 		// based on https://www.opengl.org/archives/resources/features/StencilTalk/tsld021.htm
+
+		if (shadowMatrix === undefined) shadowMatrix = new THREE.Matrix4();
 
 		var dot = plane.normal.x * lightPosition4D.x +
 			  plane.normal.y * lightPosition4D.y +

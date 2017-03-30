@@ -2432,9 +2432,11 @@ THREE.ColladaLoader = function () {
 
 	Transform.prototype.apply = function () {
 
-		var m1 = new THREE.Matrix4();
+		var m1;
 
 		return function ( matrix ) {
+
+			if (m1 === undefined) m1 = new THREE.Matrix4();
 
 			switch ( this.type ) {
 

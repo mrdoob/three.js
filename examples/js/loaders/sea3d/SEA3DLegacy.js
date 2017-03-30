@@ -153,9 +153,11 @@ THREE.SEA3D.prototype.flipIndexes = function ( v ) {
 
 THREE.SEA3D.prototype.flipBoneMatrix = function () {
 
-	var zero = new THREE.Vector3();
+	var zero;
 
 	return function ( mtx ) {
+
+		if (zero === undefined) zero = new THREE.Vector3();
 
 		var pos = THREE.SEA3D.VECBUF.setFromMatrixPosition( mtx );
 		pos.z = - pos.z;
@@ -172,19 +174,25 @@ THREE.SEA3D.prototype.flipBoneMatrix = function () {
 
 THREE.SEA3D.prototype.flipScaleMatrix = function () {
 
-	var pos = new THREE.Vector3();
-	var qua = new THREE.Quaternion();
-	var slc = new THREE.Vector3();
+	var position, quaternion, scale;
 
 	return function ( local, rotate, parent, parentRotate ) {
 
+		if (position === undefined) {
+
+			position = new THREE.Vector3();
+			quaternion = new THREE.Quaternion();
+			scale = new THREE.Vector3();
+
+		}
+		
 		if ( parent ) local.multiplyMatrices( parent, local );
 
-		local.decompose( pos, qua, slc );
+		local.decompose( position, quaternion, scale );
 
-		slc.z = - slc.z;
+		scale.z = - scale.z;
 
-		local.compose( pos, qua, slc );
+		local.compose( position, quaternion, scale );
 
 		if ( rotate ) {
 
@@ -214,19 +222,29 @@ THREE.SEA3D.prototype.flipScaleMatrix = function () {
 
 THREE.SEA3D.prototype.flipDefaultAnimation = function () {
 
-	var buf1 = new THREE.Matrix4();
-	var buf2 = new THREE.Matrix4();
+	var buf1, buf2;
 
-	var pos = new THREE.Vector3();
-	var qua = new THREE.Quaternion();
-	var slc = new THREE.Vector3();
+	var pos, qua, slc;
 
-	var to_pos = new THREE.Vector3();
-	var to_qua = new THREE.Quaternion();
-	var to_slc = new THREE.Vector3();
+	var to_pos, to_qua, to_slc;
 
 	return function ( animation, obj3d, relative ) {
 
+		if (buf1 === undefined) {
+
+			buf1 = new THREE.Matrix4();
+			buf2 = new THREE.Matrix4();
+
+			pos = new THREE.Vector3();
+			qua = new THREE.Quaternion();
+			slc = new THREE.Vector3();
+
+			to_pos = new THREE.Vector3();
+			to_qua = new THREE.Quaternion();
+			to_slc = new THREE.Vector3();
+
+		}
+		
 		if ( animation.isFliped ) return;
 
 		var dataList = animation.dataList,
@@ -439,10 +457,16 @@ THREE.SEA3D.prototype.getAnimationType = function ( req ) {
 
 THREE.SEA3D.prototype.updateTransform = function () {
 
-	var buf1 = new THREE.Matrix4();
-	var identity = new THREE.Matrix4();
+	var buf1, identity;
 
 	return function ( obj3d, sea ) {
+
+		if (buf1 === undefined) {
+
+			buf1 = new THREE.Matrix4();
+			identity = new THREE.Matrix4();
+
+		}
 
 		if ( this.isLegacy( sea ) ) {
 
@@ -477,14 +501,22 @@ THREE.SEA3D.prototype.updateTransform = function () {
 
 THREE.SEA3D.prototype.readSkeleton = function () {
 
-	var mtx_tmp_inv = new THREE.Matrix4(),
-		mtx_local = new THREE.Matrix4(),
-		mtx_parent = new THREE.Matrix4(),
-		pos = new THREE.Vector3(),
-		qua = new THREE.Quaternion();
+	var mtx_tmp_inv, mtx_local, mtx_parent;
+	var pos, qua;
 
 	return function ( sea ) {
 
+		if (mtx_tmp_inv === undefined) {
+
+			mtx_tmp_inv = new THREE.Matrix4();
+			mtx_local = new THREE.Matrix4();
+			mtx_parent = new THREE.Matrix4();
+			
+			pos = new THREE.Vector3();
+			qua = new THREE.Quaternion();
+
+		}
+		
 		var bones = [],
 			isLegacy = sea.sea3d.config.legacy;
 
@@ -545,13 +577,19 @@ THREE.SEA3D.prototype.readSkeleton = function () {
 
 THREE.SEA3D.prototype.readSkeletonAnimationLegacy = function () {
 
-	var mtx_tmp_inv = new THREE.Matrix4(),
-		mtx_local = new THREE.Matrix4(),
-		mtx_global = new THREE.Matrix4(),
-		mtx_parent = new THREE.Matrix4();
+	var mtx_tmp_inv, mtx_local, mtx_global, mtx_parent;
 
 	return function ( sea, skl ) {
+		
+		if (mtx_tmp_inv === undefined) {
 
+			mtx_tmp_inv = new THREE.Matrix4();
+			mtx_local = new THREE.Matrix4();
+			mtx_global = new THREE.Matrix4();
+			mtx_parent = new THREE.Matrix4();
+
+		}
+		
 		if ( sea.tag ) return sea.tag;
 
 		var animations = [],
