@@ -284,7 +284,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 				mouseChange.y *= scale_y;
 
 				pan.copy( _eye ).cross( _this.object.up ).setLength( mouseChange.x );
-				pan.add( objectUp.copy( _this.object.up ).setLength( mouseChange.y ) );
+				pan.add( objectUp.copy( _eye ).cross( _this.object.up ).cross( _eye ).setLength( mouseChange.y ) );
+
 
 				_this.object.position.add( pan );
 				_this.target.add( pan );
