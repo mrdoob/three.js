@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>three.js / documentation</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="index.css">
-</head>
-<body>
+	<head>
+		<meta charset="utf-8">
+		<title>three.js / documentation</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="index.css">
+	</head>
+	<body>
 
-    <div id="panel" class="collapsed">
+		<div id="panel" class="collapsed">
 
-        <h1><a href="http://threejs.org">three.js</a> / docs</h1>
+			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
 
-        <a id="expandButton" href="#">
-            <span></span>
-            <span></span>
-            <span></span>
-        </a>
+			<a id="expandButton" href="#">
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
 
-        <div class="filterBlock" >
-            <input type="text" id="filterInput" placeholder="Type to filter">
-            <a href="#" id="clearFilterButton">x</a>
-        </div>
+			<div class="filterBlock" >
+				<input type="text" id="filterInput" placeholder="Type to filter">
+				<a href="#" id="clearFilterButton">x</a>
+			</div>
 
-    </div>
+		</div>
 
-    <iframe></iframe>
+		<iframe></iframe>
 
-    <script src="list.js"></script>
+		<script src="list.js"></script>
 
-    <script>
+		<script>
 
-        var panel = document.getElementById( 'panel' );
-        var clearFilterButton = document.getElementById( 'clearFilterButton' );
-        var expandButton = document.getElementById( 'expandButton' );
-        var filterInput = document.getElementById( 'filterInput' );
-        var iframe = document.querySelector( 'iframe' );
+			var panel = document.getElementById( 'panel' );
+			var clearFilterButton = document.getElementById( 'clearFilterButton' );
+			var expandButton = document.getElementById( 'expandButton' );
+			var filterInput = document.getElementById( 'filterInput' );
+			var iframe = document.querySelector( 'iframe' );
 
-        var pageProperties = {};
-        var titles = {};
-        var categoryElements = [];
+			var pageProperties = {};
+			var titles = {};
+			var categoryElements = [];
 
 
 // ----------------------------------------------------------------------------
@@ -47,46 +47,46 @@
 // ----------------------------------------------------------------------------
 
 
-        // Functionality for hamburger button (on small devices)
+			// Functionality for hamburger button (on small devices)
 
-        expandButton.onclick = function ( event ) {
+			expandButton.onclick = function ( event ) {
 
-            event.preventDefault();
-            panel.classList.toggle( 'collapsed' );
+				event.preventDefault();
+				panel.classList.toggle( 'collapsed' );
 
-        };
-
-
-        // Functionality for search/filter input field
-
-        filterInput.oninput = function ( event ) {
-
-            updateFilter();
-
-        };
+			};
 
 
-        // Functionality for filter clear button
+			// Functionality for search/filter input field
 
-        clearFilterButton.onclick = function ( event ) {
+			filterInput.oninput = function ( event ) {
 
-            event.preventDefault();
+				updateFilter();
 
-            filterInput.value = '';
-            updateFilter();
-
-        };
+			};
 
 
-        // Activate content and title change on browser navigation
+			// Functionality for filter clear button
 
-        window.onpopstate = createNewIframe;
+			clearFilterButton.onclick = function ( event ) {
+
+				event.preventDefault();
+
+				filterInput.value = '';
+				updateFilter();
+
+			};
 
 
-        // Create the navigation panel and configure the iframe
+			// Activate content and title change on browser navigation
 
-        createNavigation();
-        createNewIframe();
+			window.onpopstate = createNewIframe;
+
+
+			// Create the navigation panel and configure the iframe
+
+			createNavigation();
+			createNewIframe();
 
 
 // ----------------------------------------------------------------------------
@@ -94,106 +94,106 @@
 // ----------------------------------------------------------------------------
 
 
-        function createNavigation () {
+			function createNavigation () {
 
-            // Create the navigation panel using data from list.js
+				// Create the navigation panel using data from list.js
 
-            var navigation = createAndAppendDOMElement( { type: 'div', parent: panel } );
+				var navigation = createAndAppendDOMElement( { type: 'div', parent: panel } );
 
-            for ( var section in list ) {
+				for ( var section in list ) {
 
-                // Create sections
+					// Create sections
 
-                var categories = list[ section ];
+					var categories = list[ section ];
 
-                var sectionHead = createAndAppendDOMElement( { type: 'h2', parent: navigation, content: section } )
+					var sectionHead = createAndAppendDOMElement( { type: 'h2', parent: navigation, content: section } )
 
-                for ( var category in categories ) {
+					for ( var category in categories ) {
 
-                    // Create categories
+						// Create categories
 
-                    var pages = categories[ category ];
+						var pages = categories[ category ];
 
-                    var categoryContainer = createAndAppendDOMElement( { type: 'div', parent: navigation } );
-                    var categoryHead = createAndAppendDOMElement( { type: 'h3', parent: categoryContainer, content: category } );
-                    var categoryContent = createAndAppendDOMElement( { type: 'ul', parent: categoryContainer } );
+						var categoryContainer = createAndAppendDOMElement( { type: 'div', parent: navigation } );
+						var categoryHead = createAndAppendDOMElement( { type: 'h3', parent: categoryContainer, content: category } );
+						var categoryContent = createAndAppendDOMElement( { type: 'ul', parent: categoryContainer } );
 
-                    for ( var pageName in pages ) {
+						for ( var pageName in pages ) {
 
-                        // Create page links
+							// Create page links
 
-                        var pageURL = pages[ pageName ];
+							var pageURL = pages[ pageName ];
 
-                        var listElement = createAndAppendDOMElement( { type: 'li', parent: categoryContent } );
-                        var linkElement = createAndAppendDOMElement( { type: 'a', parent: listElement, content: pageName } );
+							var listElement = createAndAppendDOMElement( { type: 'li', parent: categoryContent } );
+							var linkElement = createAndAppendDOMElement( { type: 'a', parent: listElement, content: pageName } );
 
-                        // The href attribute is only used for the option to create a new tab by right click
+							// The href attribute is only used for the option to create a new tab by right click
 
-                        linkElement.setAttribute( 'href', '#' + pageURL );
+							linkElement.setAttribute( 'href', '#' + pageURL );
 
-                        addClickHandlers( linkElement, pageURL );
+							addClickHandlers( linkElement, pageURL );
 
-                        // Gather the main properties for the current subpage
+							// Gather the main properties for the current subpage
 
-                        pageProperties[ pageName ] = {
-                            section: section,
-                            category: category,
-                            pageURL: pageURL,
-                            linkElement: linkElement
-                        };
+							pageProperties[ pageName ] = {
+								section: section,
+								category: category,
+								pageURL: pageURL,
+								linkElement: linkElement
+							};
 
-                    // Gather the document titles (used for easy access on browser navigation)
+						// Gather the document titles (used for easy access on browser navigation)
 
-                    titles[ pageURL ] = pageName;
+						titles[ pageURL ] = pageName;
 
-                    }
+						}
 
-                    // Gather the category elements for easy access on filtering
+						// Gather the category elements for easy access on filtering
 
-                    categoryElements.push( categoryContent );
+						categoryElements.push( categoryContent );
 
-                }
+					}
 
-            }
+				}
 
-        };
-
-
-        function createAndAppendDOMElement( properties ) {
-
-            // Helper function for creating and appending new DOM elements
-
-            var newElement = document.createElement( properties.type );
-
-            properties.parent.appendChild( newElement );
-
-            if ( properties.content ) {
-
-                newElement.textContent = properties.content;
-
-            }
-
-            return newElement;
-
-        }
+			};
 
 
-        function addClickHandlers ( linkElement, pageURL ) {
+			function createAndAppendDOMElement( properties ) {
 
-            // Helper function for adding ClickHandlers to the page links
+				// Helper function for creating and appending new DOM elements
 
-            linkElement.onclick = function ( event ) {
+				var newElement = document.createElement( properties.type );
 
-                event.preventDefault();
+				properties.parent.appendChild( newElement );
 
-                window.location.hash = pageURL;
-                createNewIframe();
+				if ( properties.content ) {
 
-                panel.classList.add( 'collapsed' );
+					newElement.textContent = properties.content;
 
-            };
+				}
 
-        };
+				return newElement;
+
+			}
+
+
+			function addClickHandlers ( linkElement, pageURL ) {
+
+				// Helper function for adding ClickHandlers to the page links
+
+				linkElement.onclick = function ( event ) {
+
+					event.preventDefault();
+
+					window.location.hash = pageURL;
+					createNewIframe();
+
+					panel.classList.add( 'collapsed' );
+
+				};
+
+			};
 
 
 // ----------------------------------------------------------------------------
@@ -201,36 +201,36 @@
 // ----------------------------------------------------------------------------
 
 
-//        (uncomment the following lines and the first line in updateFilter(), if you want query strings):
+//			(uncomment the following lines and the first line in updateFilter(), if you want query strings):
 
-//        filterInput.value = extractFromQueryString();
-//        updateFilter();
+//			filterInput.value = extractFromQueryString();
+//			updateFilter();
 //
 //
-//        function extractFromQueryString() {
+//			function extractFromQueryString() {
 //
-//            var queryString = window.location.search;
+//				var queryString = window.location.search;
 //
-//            if ( queryString.indexOf( '?q=' ) === -1 ) return '';
+//				if ( queryString.indexOf( '?q=' ) === -1 ) return '';
 //
-//            return queryString.substr( 3 );
+//				return queryString.substr( 3 );
 //
-//        }
+//			}
 //
-//        function updateQueryString() {
+//			function updateQueryString() {
 //
-//            var searchString = filterInput.value;
-//            var query = '';
+//				var searchString = filterInput.value;
+//				var query = '';
 //
-//            if (searchString !== '') {
+//				if (searchString !== '') {
 //
-//                query = '?q=' + searchString;
+//					query = '?q=' + searchString;
 //
-//            }
+//				}
 //
-//            window.history.replaceState( {} , '', window.location.pathname + query + window.location.hash ); 
+//				window.history.replaceState( {} , '', window.location.pathname + query + window.location.hash ); 
 //
-//        }
+//			}
 
 
 // ----------------------------------------------------------------------------
@@ -238,91 +238,91 @@
 // ----------------------------------------------------------------------------
 
 
-        function updateFilter() {
+			function updateFilter() {
 
-//            (uncomment the following line and the "Query strings" section, if you want query strings):
-//            updateQueryString();
+//			(uncomment the following line and the "Query strings" section, if you want query strings):
+//			updateQueryString();
 
-            var regExp = new RegExp( filterInput.value, 'gi' );
+				var regExp = new RegExp( filterInput.value, 'gi' );
 
-            for ( var pageName in pageProperties ) {
- 
-                var linkElement = pageProperties[ pageName ].linkElement;
-                var categoryClassList = linkElement.parentElement.classList;
-                var filterResults = pageName.match( regExp );
+				for ( var pageName in pageProperties ) {
 
-                if ( filterResults && filterResults.length > 0 ) {
+					var linkElement = pageProperties[ pageName ].linkElement;
+					var categoryClassList = linkElement.parentElement.classList;
+					var filterResults = pageName.match( regExp );
 
-                    // Accentuate matching characters
+					if ( filterResults && filterResults.length > 0 ) {
 
-                    for ( var i = 0; i < filterResults.length; i++ ) {
+						// Accentuate matching characters
 
-                        var result = filterResults[ i ];
+						for ( var i = 0; i < filterResults.length; i++ ) {
 
-                        if ( result !== '' ) {
-                            pageName = pageName.replace( result, '<b>' + result + '</b>' );
-                        }
+							var result = filterResults[ i ];
 
-                    }
+							if ( result !== '' ) {
+								pageName = pageName.replace( result, '<b>' + result + '</b>' );
+							}
 
-                    categoryClassList.remove( 'hidden' );
-                    linkElement.innerHTML = pageName;
+						}
 
-                } else {
+						categoryClassList.remove( 'hidden' );
+						linkElement.innerHTML = pageName;
 
-                    // Hide all non-matching page names
+					} else {
 
-                    categoryClassList.add( 'hidden' );
+						// Hide all non-matching page names
 
-                }
+						categoryClassList.add( 'hidden' );
 
-            }
+					}
 
-            displayFilteredPanel();
+				}
 
-        }
+				displayFilteredPanel();
+
+			}
 
 
-        function displayFilteredPanel() {
+			function displayFilteredPanel() {
 
-            // Show/hide categories depending on their content
-            // First check if at least one page in this category is not hidden
+				// Show/hide categories depending on their content
+				// First check if at least one page in this category is not hidden
 
-            categoryElements.forEach( function ( category ) {
+				categoryElements.forEach( function ( category ) {
 
-                var pages = category.children;
-                var pagesLength = pages.length;
-                var sectionClassList = category.parentElement.classList;
+					var pages = category.children;
+					var pagesLength = pages.length;
+					var sectionClassList = category.parentElement.classList;
 
-                var hideCategory = true;
+					var hideCategory = true;
 
-                for ( var i = 0; i < pagesLength; i ++ ) {
+					for ( var i = 0; i < pagesLength; i ++ ) {
 
-                    var pageClassList = pages[ i ].classList;
+						var pageClassList = pages[ i ].classList;
 
-                    if ( ! pageClassList.contains( 'hidden' ) ) {
+						if ( ! pageClassList.contains( 'hidden' ) ) {
 
-                        hideCategory = false;
+							hideCategory = false;
 
-                    }
+						}
 
-                }
+					}
 
-                // If and only if all page names are hidden, hide the whole category
+					// If and only if all page names are hidden, hide the whole category
 
-                if ( hideCategory ) {
+					if ( hideCategory ) {
 
-                    sectionClassList.add( 'hidden' );
+						sectionClassList.add( 'hidden' );
 
-                } else {
+					} else {
 
-                    sectionClassList.remove( 'hidden' );
+						sectionClassList.remove( 'hidden' );
 
-                }
+					}
 
-            } );
+				} );
 
-        }
+			}
 
 
 // ----------------------------------------------------------------------------
@@ -330,92 +330,92 @@
 // ----------------------------------------------------------------------------
 
 
-        function setUrlFragment( pageName ) {
+			function setUrlFragment( pageName ) {
 
-            // Handle navigation from the subpages (iframes):
-            // First separate the memeber (if existing) from the page name,
-            // then identify the subpage's URL and set it as URL fragment (re-adding the member)
+				// Handle navigation from the subpages (iframes):
+				// First separate the memeber (if existing) from the page name,
+				// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
-            var splitPageName = decomposePageName( pageName, '.', '.' );
+				var splitPageName = decomposePageName( pageName, '.', '.' );
 
-            var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
 
-            if ( currentProperties ) {
+				if ( currentProperties ) {
 
-                window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+					window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
 
-                createNewIframe();
+					createNewIframe();
 
-            }
+				}
 
-        }
-
-
-        function createNewIframe() {
-
-            // Change the content displayed in the iframe
-            // First separate the member part of the fragment (if existing)
-
-            var hash = window.location.hash.substring( 1 );
-            var splitHash = decomposePageName( hash, '.', '#' );
-
-            // Creating a new Iframe instead of assigning a new src is
-            // a cross-browser solution to allow normal browser navigation;
-            // - only assigning a new src would result in two history states each time.
-
-            // Note: iframe.contentWindow.location.replace(hash) should work, too,
-            // but it doesn't work in Edge with links from the subpages!
-
-            var oldIframe;
-            var subtitle;
-
-            oldIframe = iframe;
-            iframe = oldIframe.cloneNode();
-
-            if(hash) {
-
-                iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-                subtitle = ' - ' + titles[ splitHash[ 0 ] ] + splitHash[ 1 ];
-
-            } else {
-
-                iframe.src = '';
-                subtitle = '';
-
-            }
-
-            document.body.replaceChild( iframe, oldIframe );
-            document.title = 'three.js docs' + subtitle;
-
-        }
+			}
 
 
-        function decomposePageName ( pageName, oldDelimiter, newDelimiter ) {
+			function createNewIframe() {
 
-            // Helper function for separating the member (if existing) from the pageName
-            // For example: 'Geometry.morphTarget' can be converted to 
-            // ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
-            // Note: According RFC 3986 no '#' allowed inside of an URL fragment!
+				// Change the content displayed in the iframe
+				// First separate the member part of the fragment (if existing)
 
-            var parts = [];
+				var hash = window.location.hash.substring( 1 );
+				var splitHash = decomposePageName( hash, '.', '#' );
 
-            var dotIndex = pageName.indexOf( oldDelimiter );
+				// Creating a new Iframe instead of assigning a new src is
+				// a cross-browser solution to allow normal browser navigation;
+				// - only assigning a new src would result in two history states each time.
 
-            if ( dotIndex !== -1 ) {
+				// Note: iframe.contentWindow.location.replace(hash) should work, too,
+				// but it doesn't work in Edge with links from the subpages!
 
-                parts = pageName.split( oldDelimiter );
-                parts[ 1 ] = newDelimiter + parts[ 1 ];
+				var oldIframe;
+				var subtitle;
 
-            } else {
+				oldIframe = iframe;
+				iframe = oldIframe.cloneNode();
 
-                parts[ 0 ] = pageName;
-                parts[ 1 ] = '';
+				if(hash) {
 
-            }
+					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+					subtitle = ' - ' + titles[ splitHash[ 0 ] ] + splitHash[ 1 ];
 
-            return parts;
+				} else {
 
-        }
+					iframe.src = '';
+					subtitle = '';
+
+				}
+
+				document.body.replaceChild( iframe, oldIframe );
+				document.title = 'three.js docs' + subtitle;
+
+			}
+
+
+			function decomposePageName ( pageName, oldDelimiter, newDelimiter ) {
+
+				// Helper function for separating the member (if existing) from the pageName
+				// For example: 'Geometry.morphTarget' can be converted to 
+				// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
+				// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
+
+				var parts = [];
+
+				var dotIndex = pageName.indexOf( oldDelimiter );
+
+				if ( dotIndex !== -1 ) {
+
+					parts = pageName.split( oldDelimiter );
+					parts[ 1 ] = newDelimiter + parts[ 1 ];
+
+				} else {
+
+					parts[ 0 ] = pageName;
+					parts[ 1 ] = '';
+
+				}
+
+				return parts;
+
+			}
 
 
 // ----------------------------------------------------------------------------
@@ -423,20 +423,20 @@
 // ----------------------------------------------------------------------------
 
 
-        console.log( [
-            '    __     __',
-            ' __/ __\\  / __\\__   ____   _____   _____',
-            '/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
-            '\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
-            '/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
-            '\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
-            '                                         / __/  /  \\__  \\',
-            '                                         \\/____/\\/_____/'
-        ].join( '\n' ) );
+			console.log([
+				'    __     __',
+				' __/ __\\  / __\\__   ____   _____   _____',
+				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+				'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+				'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+				'                                         / __/  /  \\__  \\',
+				'                                         \\/____/\\/_____/'
+			].join('\n'));
 
 
-    </script>
+		</script>
 
 
-</body>
+	</body>
 </html>

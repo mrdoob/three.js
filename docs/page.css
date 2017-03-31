@@ -17,8 +17,8 @@ body {
 
 a {
 	color: #1184CE;
-    cursor: pointer;
-    text-decoration: underline;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 h1 {
@@ -107,8 +107,8 @@ strong {
 }
 
 #button:hover {
-    cursor: pointer;
-    opacity: 1;
+	cursor: pointer;
+	opacity: 1;
 }
 
 a.permalink {
