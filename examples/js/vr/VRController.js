@@ -283,35 +283,10 @@ THREE.VRController.prototype.update = function(){
 THREE.VRController.verbosity = 0//0.5
 
 
-//  This is what makes everything so convenient. We keep track of found 
-//  controllers right here. And by adding this one update function into your
-//  animation loop we automagically update all the controller positions, 
-//  orientations, and button states. 
+//  We need to keep a record of found controllers
+//  and have some connection / disconnection handlers.
 
 THREE.VRController.controllers = {}
-THREE.VRController.hasGamepadEvents = 'ongamepadconnected' in window
-THREE.VRController.scanGamepads = function(){
-
-	var 
-	gamepads = navigator.getGamepads(),
-	gamepad,
-	i
-
-	for( i = 0; i < gamepads.length; i ++ ){
-
-		gamepad = gamepads[ i ]
-		if( gamepad !== null && this.controllers[ gamepad.index ] === undefined ){
-
-			THREE.VRController.onGamepadConnect( gamepad )
-		}
-	}
-}
-
-
-//  These event listeners track gamepads connecting and disconnecting,
-//  create controller instances, and add them to our controllers array
-//  so that THREE.VRController.update can update them all in one go.
-
 THREE.VRController.onGamepadConnect = function( gamepad ){
 
 
@@ -344,14 +319,9 @@ THREE.VRController.onGamepadConnect = function( gamepad ){
 	//  if we don’t already have a reference to it?!
 
 	if( scope.verbosity >= 0.5 ) console.log( 'vr controller connected', controller )
+	controller.visible = true
 	window.dispatchEvent( new CustomEvent( 'vr controller connected', { detail: controller }))
 }
-window.addEventListener( 'gamepadconnected', function( event ){
-
-	THREE.VRController.onGamepadConnect( event.gamepad )
-})
-
-
 THREE.VRController.onGamepadDisconnect = function( gamepad ){
 
 
@@ -366,24 +336,51 @@ THREE.VRController.onGamepadDisconnect = function( gamepad ){
 	//  and also delete from our controllers object. Goodbye!
 
 	if( scope.verbosity >= 0.5 ) console.log( 'vr controller disconnected', controller )
+	controller.visible = false
 	controller.dispatchEvent({ type: 'disconnected', controller: controller })
 	delete controller
 }
-window.addEventListener( 'gamepaddisconnected', function( event ){
-	
-	THREE.VRController.onGamepadDisconnect( event.gamepad )
-})
 
+
+//  This is what makes everything so convenient. We keep track of found 
+//  controllers right here. And by adding this one update function into your
+//  animation loop we automagically update all the controller positions, 
+//  orientations, and button states. 
 
 THREE.VRController.update = function(){
 
-	var scope = this
+	var 
+	gamepads = navigator.getGamepads(),
+	gamepad, i
 
-	if( this.hasGamepadEvents === false ) THREE.VRController.scanGamepads()
-	Object.keys( this.controllers ).forEach( function( controllerKey ){
 
-		scope.controllers[ controllerKey ].update()
-	})
+	//  Yes, we need to scan the gamepads Array with each update loop
+	//  because it is the *safest* way to detect new gamepads / lost gamepads
+	//  and we avoid Doob’s proposed problem of a user accidentally including 
+	//  VRControllers.js multiple times if we were using the 'ongamepadconnected' 
+	//  and 'ongamepaddisconnected' events firing multiple times. 
+	//  Also... those events are not widely supported yet anyhow.
+
+	for( i = 0; i < gamepads.length; i ++ ){
+
+		gamepad = gamepads[ i ]
+		if( gamepad !== null ){
+
+			if( this.controllers[ i ] === undefined ) THREE.VRController.onGamepadConnect( gamepad )
+			this.controllers[ i ].update()
+		}
+
+
+		//  Note: If you power down a gamepad after startup the gamepad will NOT
+		//  be null and gamepad.connected will still equal true so this will not fire!! 
+		//  Instead you’d need to check for gamepad.pose.position === null and
+		//  gamepad.pose.orientation === null yourself.
+
+		else if( gamepad === null && this.controllers[ i ] !== undefined ){
+
+			THREE.VRController.onGamepadDisconnect( gamepad )
+		}
+	}
 }
 
 
