@@ -587,7 +587,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 			};
 
 			output.metadata = {
-				version: 4.4,
+				version: 4.5,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -611,7 +611,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		//
 
-		function serialise( library, element ) {
+		function serialize( library, element ) {
 
 			if ( library[ element.uuid ] === undefined ) {
 
@@ -625,7 +625,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 		if ( this.geometry !== undefined ) {
 
-			object.geometry = serialise( meta.geometries, this.geometry );
+			object.geometry = serialize( meta.geometries, this.geometry );
 
 		}
 
@@ -637,7 +637,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 				for ( var i = 0, l = this.material.length; i < l; i ++ ) {
 
-					uuids.push( serialise( meta.materials, this.material[ i ] ) );
+					uuids.push( serialize( meta.materials, this.material[ i ] ) );
 
 				}
 
@@ -645,7 +645,7 @@ Object.assign( Object3D.prototype, EventDispatcher.prototype, {
 
 			} else {
 
-				object.material = serialise( meta.materials, this.material );
+				object.material = serialize( meta.materials, this.material );
 
 			}
 
