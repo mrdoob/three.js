@@ -11002,27 +11002,43 @@
 
 			//
 
-			if ( this.geometry !== undefined ) {
+			function serialise( library, element ) {
 
-				if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+				if ( library[ element.uuid ] === undefined ) {
 
-					meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+					library[ element.uuid ] = element.toJSON( meta );
 
 				}
 
-				object.geometry = this.geometry.uuid;
+				return element.uuid;
+
+			}
+
+			if ( this.geometry !== undefined ) {
+
+				object.geometry = serialise( meta.geometries, this.geometry );
 
 			}
 
 			if ( this.material !== undefined ) {
 
-				if ( meta.materials[ this.material.uuid ] === undefined ) {
+				if ( Array.isArray( this.material ) ) {
 
-					meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+					var uuids = [];
+
+					for ( var i = 0, l = this.material.length; i < l; i ++ ) {
+
+						uuids.push( serialise( meta.materials, this.material[ i ] ) );
+
+					}
+
+					object.material = uuids;
+
+				} else {
+
+					object.material = serialise( meta.materials, this.material );
 
 				}
-
-				object.material = this.material.uuid;
 
 			}
 
@@ -33761,6 +33777,28 @@
 				function getMaterial( name ) {
 
 					if ( name === undefined ) return undefined;
+
+					if ( Array.isArray( name ) ) {
+
+						var array = [];
+
+						for ( var i = 0, l = name.length; i < l; i ++ ) {
+
+							var uuid = name[ i ];
+
+							if ( materials[ uuid ] === undefined ) {
+
+								console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
+
+							}
+
+							array.push( materials[ uuid ] );
+
+						}
+
+						return array;
+
+					}
 
 					if ( materials[ name ] === undefined ) {
 
