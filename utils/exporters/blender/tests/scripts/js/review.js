@@ -147,13 +147,14 @@ function loadGeometry( data, url ) {
 
     } else {
 
-        mesh = new THREE.Mesh( data.geometry, material );
-
         if ( data.geometry.morphTargets.length > 0 ) {
 
             console.log( 'loading morph targets' );
             data.materials[ 0 ].morphTargets = true;
-            animation = new THREE.MorphAnimation( mesh );
+            mesh = new THREE.MorphAnimMesh( data.geometry, material );
+
+            mixer = mesh.mixer;
+            animation = mixer.clipAction( mesh.geometry.animations[ 0 ] );
             hasMorph = true;
 
         }
