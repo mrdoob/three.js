@@ -226,11 +226,15 @@
 		<script>
 
 			function extractQuery() {
+
 				var p = window.location.search.indexOf( '?q=' );
-				if( p !== -1 ) {
+				if ( p !== -1 ) {
+
 					return window.location.search.substr( 3 );
+
 				}
-				return ''
+				return '';
+
 			}
 
 			var panel = document.getElementById( 'panel' );
@@ -238,8 +242,10 @@
 
 			var expandButton = document.getElementById( 'expandButton' );
 			expandButton.addEventListener( 'click', function ( event ) {
+
 				panel.classList.toggle( 'collapsed' );
 				event.preventDefault();
+
 			} );
 
 			var filterInput = document.getElementById( 'filterInput' );
@@ -278,20 +284,26 @@
 						var li = document.createElement( 'li' );
 						var a = document.createElement( 'a' );
 						a.setAttribute( 'href', '#' );
-						( function( s, c, p ) {
-							a.addEventListener( 'click', function( e ) {
+
+						( function ( s, c, p ) {
+
+							a.addEventListener( 'click', function ( e ) {
+
 								goTo( s, c, p );
 								e.preventDefault();
-							} )
+
+							} );
+
 						} )( section, category, page[ 0 ] );
+
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
 						ul.appendChild( li );
 
-						nameCategoryMap[page[0]] = {
+						nameCategoryMap[ page[ 0 ] ] = {
 							section: section,
 							category: category,
-							name: page[0],
+							name: page[ 0 ],
 							element: a
 						};
 
@@ -302,110 +314,152 @@
 
 				}
 
-
 			}
 
 			panel.appendChild( content );
 
 			function layoutList() {
 
-				sections.forEach( function( el ) {
+				sections.forEach( function ( el ) {
+
 					var collapsed = true;
-					Array.prototype.slice.apply( el.children ).forEach( function( item ) {
-						if( !item.classList.contains( 'filtered' ) ) {
+					Array.prototype.slice.apply( el.children ).forEach( function ( item ) {
+
+						if ( !item.classList.contains( 'filtered' ) ) {
+
 							collapsed = false;
+
 						}
+
 					} );
-					if( collapsed ) {
+					if ( collapsed ) {
+
 						el.parentElement.classList.add( 'filtered' );
+
 					} else {
+
 						el.parentElement.classList.remove( 'filtered' );
+
 					}
+
 				} );
+
 			}
 
-			filterInput.addEventListener( 'input', function( e ) {
+			filterInput.addEventListener( 'input', function ( e ) {
+
 				updateFilter();
+
 			} );
 
-			clearFilterButton.addEventListener( 'click', function( e ) {
+			clearFilterButton.addEventListener( 'click', function ( e ) {
+
 				filterInput.value = '';
 				updateFilter();
 				e.preventDefault();
+
 			} );
 
 			function updateFilter() {
 
 				var v = filterInput.value;
-				if( v !== '' ) {
-					window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
+				if ( v !== '' ) {
+
+					window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
 				} else {
-					window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
+
+					window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
 				}
 
 				var exp = new RegExp( filterInput.value, 'gi' );
-				for( var j in nameCategoryMap ) {
+
+				for ( var j in nameCategoryMap ) {
+
 					var res = nameCategoryMap[ j ].name.match( exp );
-					if( res && res.length > 0 ) {
+					if ( res && res.length > 0 ) {
+
 						nameCategoryMap[ j ].element.parentElement.classList.remove( 'filtered' );
 						var str = nameCategoryMap[ j ].name;
-						for( var i = 0; i < res.length; i++ ) {
+						for ( var i = 0; i < res.length; i++ ) {
+
 							var resI = res[ i ];
 							if ( resI !== '' ) {
-							    str = str.replace( resI, '<b>' + resI + '</b>' );
+
+								str = str.replace( resI, '<b>' + resI + '</b>' );
+
 							}
+
 						}
+
 						nameCategoryMap[ j ].element.innerHTML = str;
+
 					} else {
+
 						nameCategoryMap[ j ].element.parentElement.classList.add( 'filtered' );
 						nameCategoryMap[ j ].element.textContent = nameCategoryMap[ j ].name;
+
 					}
+
 				}
+
 				layoutList();
 
 			}
 
 			function encodeUrl( path ) {
 
-				return path.replace(/\ \/\ /g, '.').replace(/\ /g, '_');
+				return path.replace( /\ \/\ /g, '.' ).replace( /\ /g, '_' );
 
 			}
 
 			function decodeUrl( path ) {
 
-				return path.replace(/_/g, ' ').replace(/\./g, ' / ');
+				return path.replace( /_/g, ' ' ).replace( /\./g, ' / ' );
 
 			}
 
 			// Page loading
 
 			function goTo( section, category, name, member ) {
+
 				var parts, location;
 
 				// Fully resolve links that only provide a name
-				if(arguments.length == 1) {
+				if ( arguments.length == 1 ) {
 
 					// Resolve links of the form 'Class.member'
-					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
-						parts = section.split(MEMBER_DELIMITER);
-						section = parts[0];
-						member = parts[1];
+					if ( section.indexOf( MEMBER_DELIMITER ) !== -1 ) {
+
+						parts = section.split( MEMBER_DELIMITER );
+						section = parts[ 0 ];
+						member = parts[ 1 ];
+
 					}
 
-					location = nameCategoryMap[section];
-					if (!location) return;
+					location = nameCategoryMap[ section ];
+					if ( !location ) {
+
+						return;
+
+					}
 					section = location.section;
 					category = location.category;
 					name = location.name;
+
 				}
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
-				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
+				var url = encodeUrl( section ) +
+					DELIMITER + encodeUrl( category ) +
+					DELIMITER + encodeUrl( name ) +
+					( !!member ? MEMBER_DELIMITER + encodeUrl( member ) : '' );
 
 				window.location.hash = url;
 				window.document.title = title;
 
-				viewer.src = pages[ section ][ category ][ name ] + '.html' + (!!member ? '#'+member : '');
+				viewer.src = pages[ section ][ category ][ name ] + '.html' + ( !!member ? '#' + member : '' );
 
 				panel.classList.add( 'collapsed' );
 
@@ -413,9 +467,13 @@
 
 			function goToHash() {
 
-				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
-				var member = hash[2].split(MEMBER_DELIMITER);
-				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
+				var hash = window.location.hash.substring( 1 ).split( DELIMITER );
+				var member = hash[ 2 ].split( MEMBER_DELIMITER );
+				goTo( decodeUrl( hash[ 0 ] ),
+					decodeUrl( hash[ 1 ] ),
+					decodeUrl( member[ 0 ] ),
+					decodeUrl( member.length > 1 ? member[ 1 ] : '' )
+				);
 
 			}
 
@@ -423,7 +481,7 @@
 
 			if ( window.location.hash.length > 0 ) goToHash();
 
-			console.log([
+			console.log( [
 				'    __     __',
 				' __/ __\\  / __\\__   ____   _____   _____',
 				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
@@ -432,10 +490,10 @@
 				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
 				'                                         / __/  /  \\__  \\',
 				'                                         \\/____/\\/_____/'
-			].join('\n'));
+			].join( '\n' ) );
 
 			filterInput.value = extractQuery();
-			updateFilter( )
+			updateFilter();
 
 		</script>
 		<script src="../build/three.min.js"></script> <!-- console sandbox -->
