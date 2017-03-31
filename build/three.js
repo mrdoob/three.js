@@ -1114,7 +1114,7 @@
 
 			var output = {
 				metadata: {
-					version: 4.4,
+					version: 4.5,
 					type: 'Texture',
 					generator: 'Texture.toJSON'
 				},
@@ -7230,7 +7230,7 @@
 
 			var data = {
 				metadata: {
-					version: 4.4,
+					version: 4.5,
 					type: 'Material',
 					generator: 'Material.toJSON'
 				}
@@ -10978,7 +10978,7 @@
 				};
 
 				output.metadata = {
-					version: 4.4,
+					version: 4.5,
 					type: 'Object',
 					generator: 'Object3D.toJSON'
 				};
@@ -11002,7 +11002,7 @@
 
 			//
 
-			function serialise( library, element ) {
+			function serialize( library, element ) {
 
 				if ( library[ element.uuid ] === undefined ) {
 
@@ -11016,7 +11016,7 @@
 
 			if ( this.geometry !== undefined ) {
 
-				object.geometry = serialise( meta.geometries, this.geometry );
+				object.geometry = serialize( meta.geometries, this.geometry );
 
 			}
 
@@ -11028,7 +11028,7 @@
 
 					for ( var i = 0, l = this.material.length; i < l; i ++ ) {
 
-						uuids.push( serialise( meta.materials, this.material[ i ] ) );
+						uuids.push( serialize( meta.materials, this.material[ i ] ) );
 
 					}
 
@@ -11036,7 +11036,7 @@
 
 				} else {
 
-					object.material = serialise( meta.materials, this.material );
+					object.material = serialize( meta.materials, this.material );
 
 				}
 
@@ -13351,7 +13351,7 @@
 
 			var data = {
 				metadata: {
-					version: 4.4,
+					version: 4.5,
 					type: 'Geometry',
 					generator: 'Geometry.toJSON'
 				}
@@ -14682,7 +14682,7 @@
 
 			var data = {
 				metadata: {
-					version: 4.4,
+					version: 4.5,
 					type: 'BufferGeometry',
 					generator: 'BufferGeometry.toJSON'
 				}
