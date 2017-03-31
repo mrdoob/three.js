@@ -131,7 +131,7 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		var data = {
 			metadata: {
-				version: 4.4,
+				version: 4.5,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
