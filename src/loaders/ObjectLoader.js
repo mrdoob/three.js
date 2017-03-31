@@ -549,6 +549,28 @@ Object.assign( ObjectLoader.prototype, {
 
 				if ( name === undefined ) return undefined;
 
+				if ( Array.isArray( name ) ) {
+
+					var array = [];
+
+					for ( var i = 0, l = name.length; i < l; i ++ ) {
+
+						var uuid = name[ i ];
+
+						if ( materials[ uuid ] === undefined ) {
+
+							console.warn( 'THREE.ObjectLoader: Undefined material', uuid );
+
+						}
+
+						array.push( materials[ uuid ] );
+
+					}
+
+					return array;
+
+				}
+
 				if ( materials[ name ] === undefined ) {
 
 					console.warn( 'THREE.ObjectLoader: Undefined material', name );
