@@ -1,10 +1,3 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector2 } from '../math/Vector2';
-import { Vector3 } from '../math/Vector3';
-import { ShapeUtils } from '../extras/ShapeUtils';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -27,7 +20,14 @@ import { ShapeUtils } from '../extras/ShapeUtils';
  *  UVGenerator: <Object> // object that provides UV generator functions
  *
  * }
- **/
+ */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector2 } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
+import { ShapeUtils } from '../extras/ShapeUtils';
 
 // ExtrudeGeometry
 

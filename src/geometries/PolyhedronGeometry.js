@@ -1,15 +1,15 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-
 /**
  * @author clockworkgeek / https://github.com/clockworkgeek
  * @author timothypratley / https://github.com/timothypratley
  * @author WestLangley / http://github.com/WestLangley
  * @author Mugen87 / https://github.com/Mugen87
-*/
+ */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+import { Vector2 } from '../math/Vector2';
 
 // PolyhedronGeometry
 

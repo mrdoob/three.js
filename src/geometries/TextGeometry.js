@@ -1,6 +1,3 @@
-import { Geometry } from '../core/Geometry';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
-
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author alteredq / http://alteredqualia.com/
@@ -19,6 +16,9 @@ import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
  *  bevelSize: <float> // how far from text outline is bevel
  * }
  */
+
+import { Geometry } from '../core/Geometry';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
 
 // TextGeometry
 

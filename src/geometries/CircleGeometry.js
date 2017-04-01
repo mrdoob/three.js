@@ -1,14 +1,14 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-import { Vector2 } from '../math/Vector2';
-
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  * @author Mugen87 / https://github.com/Mugen87
  * @author hughes
  */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
+import { Vector2 } from '../math/Vector2';
 
 // CircleGeometry
 

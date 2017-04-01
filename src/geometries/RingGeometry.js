@@ -1,13 +1,13 @@
+/**
+ * @author Kaleb Murphy
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
 import { Geometry } from '../core/Geometry';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
-
-/**
- * @author Kaleb Murphy
- * @author Mugen87 / https://github.com/Mugen87
- */
 
 // RingGeometry
 

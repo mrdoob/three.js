@@ -1,10 +1,10 @@
-import { Geometry } from '../core/Geometry';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
-
 /**
  * @author timothypratley / https://github.com/timothypratley
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+import { Geometry } from '../core/Geometry';
+import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
 
 // OctahedronGeometry
 

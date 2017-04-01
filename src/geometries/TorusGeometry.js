@@ -1,8 +1,3 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-
 /**
  * @author oosmoxiecode
  * @author mrdoob / http://mrdoob.com/
@@ -10,6 +5,11 @@ import { Vector3 } from '../math/Vector3';
  *
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
 
 // TorusGeometry
 

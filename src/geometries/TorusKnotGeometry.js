@@ -1,14 +1,14 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-
 /**
  * @author oosmoxiecode
  * @author Mugen87 / https://github.com/Mugen87
  *
  * based on http://www.blackpawn.com/texts/pqtorus/
  */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
 
 // TorusKnotGeometry
 

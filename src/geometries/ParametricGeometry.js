@@ -1,8 +1,3 @@
-import { Geometry } from '../core/Geometry';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { Vector3 } from '../math/Vector3';
-
 /**
  * @author zz85 / https://github.com/zz85
  * @author Mugen87 / https://github.com/Mugen87
@@ -10,6 +5,11 @@ import { Vector3 } from '../math/Vector3';
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
+
+import { Geometry } from '../core/Geometry';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { Float32BufferAttribute } from '../core/BufferAttribute';
+import { Vector3 } from '../math/Vector3';
 
 // ParametricGeometry
 
