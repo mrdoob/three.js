@@ -30,40 +30,37 @@ attribute vec4 instanceQuaternion;
 attribute vec3 instanceScale;
 
 mat4 getInstanceMatrix(){
-
-  //precompute some stuff
-  vec4 q = vec4(
-    instanceQuaternion.x,
-    instanceQuaternion.y,
-    instanceQuaternion.z,
-    instanceQuaternion.w
-  );
-
-  //do one instruction?
-  vec4 q2 = q * q;
-
+  vec4 q = instanceQuaternion;
   vec3 s = instanceScale;
+  vec3 v = instancePosition;
 
-  //halve the number of mult?
-  float qxy = q.x * q.y;
-  float qxz = q.x * q.z;
-  float qxw = q.x * q.w;
-  float qyw = q.y * q.w;
-  float qyz = q.y * q.z;
-  float qzw = q.z * q.w;
+  float x2 = q.x + q.x;
+  float y2 = q.y + q.y;
+  float z2 = q.z + q.z;
+
+  float xx = q.x * x2;
+  float xy = q.x * y2;
+  float xz = q.x * z2;
+
+  float yy = q.y * y2;
+  float yz = q.y * z2;
+  float zz = q.z * z2;
+
+  float wx = q.w * x2;
+  float wy = q.w * y2;
+  float wz = q.w * z2;
 
   return mat4(
 
-      (1.0 - 2.0 * ( q2.y + q2.z )) * s.x ,   2.0 * ( qxy - qzw ) * s.x           ,   2.0 * ( qxz + qyw ) * s.x           , 0.0 ,
-      
-      2.0 * ( qxy + qzw ) * s.y           ,   (1.0 - 2.0 * ( q2.x + q2.z )) * s.y ,   2.0 * ( qyz - qxw ) * s.y           , 0.0 ,
-      
-      2.0 * ( qxz - qyw ) * s.z           ,   2.0 * ( qyz + qxw ) * s.z           ,   (1.0 - 2.0 * ( q2.x + q2.y )) * s.z , 0.0 ,
+      (1.0 - (yy + zz)) * s.x  ,   (xy + wz)  * s.x         ,   (xz - wy)  * s.x          , 0.0 ,
 
-      instancePosition.x                  ,   instancePosition.y                  ,   instancePosition.z                  , 1.0 
+      (xy - wz)  * s.y         ,   (1.0 - (xx + zz)) * s.y  ,  (yz + wx) * s.y            , 0.0 ,
+
+      (xz + wy) * s.z          ,   (yz - wx) * s.z          ,   (1.0 - (xx + yy)) * s.z   , 0.0 ,
+
+      v.x                      ,   v.y                      ,   v.z                       , 1.0
 
   );
-
 }
 
 
