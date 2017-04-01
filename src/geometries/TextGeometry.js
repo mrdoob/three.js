@@ -1,5 +1,5 @@
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
 import { Geometry } from '../core/Geometry';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -19,7 +19,8 @@ import { Geometry } from '../core/Geometry';
  *  bevelSize: <float> // how far from text outline is bevel
  * }
  */
- 
+
+// TextGeometry
 
 function TextGeometry(  text, parameters ) {
 
@@ -40,6 +41,7 @@ function TextGeometry(  text, parameters ) {
 TextGeometry.prototype = Object.create( Geometry.prototype );
 TextGeometry.prototype.constructor = TextGeometry;
 
+// TextBufferGeometry
 
 function TextBufferGeometry( text, parameters ) {
 
@@ -68,7 +70,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	ExtrudeBufferGeometry.call( this, shapes, parameters );
 
-	this.type = 'TextGeometry';
+	this.type = 'TextBufferGeometry';
 
 }
 
@@ -76,7 +78,4 @@ TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
 TextBufferGeometry.prototype.constructor = TextBufferGeometry;
 
 
-export { 
-	TextGeometry,
-	TextBufferGeometry 
-};
+export { TextGeometry, TextBufferGeometry };
