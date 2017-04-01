@@ -4,13 +4,14 @@
  * @author zz85 / https://github.com/zz85
  * @author miningold / https://github.com/miningold
  * @author jonobr1 / https://github.com/jonobr1
+ * @author NiklasKnaack / https://github.com/NiklasKnaack
  *
  * Creates a tube which extrudes along a 3d spline.
  */
 
 import { Geometry } from '../core/Geometry';
 
-function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, taper ) {
+function TubeGeometry( path, tubularSegments, radiusStart, radiusEnd, radialSegments, closed, taper ) {
 
 	Geometry.call( this );
 
@@ -19,14 +20,15 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 	this.parameters = {
 		path: path,
 		tubularSegments: tubularSegments,
-		radius: radius,
+		radiusStart: radiusStart,
+		radiusEnd: radiusEnd,
 		radialSegments: radialSegments,
 		closed: closed
 	};
 
 	if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
 
-	var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+	var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radiusStart, radiusEnd, radialSegments, closed );
 
 	// expose internals
 
@@ -46,6 +48,7 @@ TubeGeometry.prototype.constructor = TubeGeometry;
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
+ * @author NiklasKnaack / https://github.com/NiklasKnaack
  */
 
 import { Float32BufferAttribute } from '../core/BufferAttribute';
@@ -53,7 +56,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
 
-function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed ) {
+function TubeBufferGeometry( path, tubularSegments, radiusStart, radiusEnd, radialSegments, closed ) {
 
 	BufferGeometry.call( this );
 
@@ -62,13 +65,15 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	this.parameters = {
 		path: path,
 		tubularSegments: tubularSegments,
-		radius: radius,
+		radiusStart: radiusStart,
+		radiusEnd: radiusEnd,
 		radialSegments: radialSegments,
 		closed: closed
 	};
 
 	tubularSegments = tubularSegments || 64;
-	radius = radius || 1;
+	radiusStart = radiusStart || 1;
+	radiusEnd = radiusEnd || 1;
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
 
@@ -81,6 +86,9 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	this.binormals = frames.binormals;
 
 	// helper variables
+	
+	var radiusMin = Math.min( radiusStart, radiusEnd );
+	var radiusDiff = Math.abs( radiusStart - radiusEnd );
 
 	var vertex = new Vector3();
 	var normal = new Vector3();
@@ -135,6 +143,22 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	}
 
 	function generateSegment( i ) {
+		
+		// calc radius
+
+		var radius;
+
+		if ( radiusStart === radiusEnd ) {
+
+			radius = radiusStart;
+
+		} else {
+
+			radius = ( tubularSegments - i ) * radiusDiff / tubularSegments + radiusMin; 
+
+		}
+
+		var radius = radiusDiff ? ( tubularSegments - i ) * radiusDiff / tubularSegments + radiusMin : radiusStart;
 
 		// we use getPointAt to sample evenly distributed points from the given path
 
@@ -190,6 +214,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 				indices.push( a, b, d );
 				indices.push( b, c, d );
+				
 
 			}
 
