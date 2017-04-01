@@ -86,7 +86,13 @@
 		<div>Optional name of the object (doesn't need to be unique). Default is an empty string.</div>
 
 		<h3>[property:Matrix3 normalMatrix]</h3>
-		<div>This is passed to the shader and used to calculate lighting for the object.</div>
+		<div>
+		This is passed to the shader and used to calculate lighting for the object. It is the transpose of the inverse of the upper left 3x3 sub-matrix of this object's modelViewMatrix.<br /><br />
+
+		The reason for this special matrix is that simply using the modelViewMatrix could result in a non-unit length of normals (on scaling) or in a non-perpendicular direction (on non-uniform scaling).<br /><br />
+
+		On the other hand the translation part of the modelViewMatrix is not relevant for the calculation of normals. Thus a Matrix3 is sufficient.
+		</div>
 
 		<h3>[property:function onAfterRender]</h3>
 		<div>
