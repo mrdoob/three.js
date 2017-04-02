@@ -46,10 +46,11 @@ var
 	})
 ;
 
-function InstancedMesh ( bufferGeometry , material , numInstances , uniformScale ) {
+function InstancedMesh ( bufferGeometry , material , numInstances , dynamic , uniformScale ) {
 
 	Mesh.call( this , (new InstancedBufferGeometry()).copy( bufferGeometry ) );
 
+	this._dynamic = !!dynamic;
 
 	this.numInstances = numInstances;
 
@@ -203,6 +204,10 @@ InstancedMesh.prototype._setAttributes = function(){
 	this.geometry.addAttribute( 'instanceQuaternion' , 	new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 4 ) , 4 , 1 ) );
 	this.geometry.addAttribute( 'instanceScale' , 		new THREE.InstancedBufferAttribute( new Float32Array( this.numInstances * 3 ) , 3 , 1 ) );
 
+	this.geometry.attributes.instancePosition.dynamic = this._dynamic;
+	this.geometry.attributes.instanceQuaternion.dynamic = this._dynamic;
+	this.geometry.attributes.instanceScale.dynamic = this._dynamic;
+	
 };
 
 export { InstancedMesh };
