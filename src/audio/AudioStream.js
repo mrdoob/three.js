@@ -4,7 +4,7 @@
 
 function AudioStream( path, listener ) {
 
-	this.audioElement = new Audio( path );
+	this.audioElement = new Audio( path ); // HTML5 Audio
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
