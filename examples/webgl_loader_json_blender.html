@@ -33,7 +33,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> -
+			<a href="https://threejs.org" target="_blank">three.js</a> -
 			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
 		</div>
 
@@ -46,9 +46,8 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container, stats, clock, mixer;
 			var camera, scene, renderer, objects;
-			var clock, mixer;
 
 			init();
 			animate();
