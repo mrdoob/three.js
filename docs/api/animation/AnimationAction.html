@@ -219,13 +219,15 @@
 
 		<h3>[method:Boolean isRunning]()</h3>
 		<div>
-			Returns true if this action is activated in the mixer and currently playing (as opposed to
-			[page:.isScheduled isScheduled]).<br /><br />
+			Returns true if the action’s [page:.time time] is currently running.<br /><br />
 
-			In addition to being activated in the mixer the following conditions must be fulfilled:
+			In addition to being activated in the mixer (see [page:.isScheduled isScheduled]) the following conditions must be fulfilled:
 			[page:.paused paused] is equal to false, [page:.enabled enabled] is equal to true,
 			[page:.timeScale timeScale] is different from 0, and there is no scheduling for a delayed start
-			([page:.startAt startAt]).
+			([page:.startAt startAt]).<br /><br />
+
+			Note: *isRunning* being true doesn’t necessarily mean that the animation can actually be seen.
+			This is only the case, if [page:.weight weight] is additionally set to a non-zero value.
 		</div>
 
 		<h3>[method:Boolean isScheduled]()</h3>
