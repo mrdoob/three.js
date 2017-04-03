@@ -45,7 +45,7 @@
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
-			uniform sampler2D tDiffuse;
+			uniform sampler2D tAudioData;
 			uniform vec2 resolution;
 
 			void main()	{
@@ -53,16 +53,17 @@
 				vec2 uv = gl_FragCoord.xy / resolution.xy;
 
 				vec3 backgroundColor = vec3( 0.0 );
-				vec3 finalColor = vec3( 1.0, 0.0, 0.0 );
+				vec3 color = vec3( 1.0, 0.0, 0.0 );
 
-				float f = texture2D( tDiffuse, vec2( uv.x, 0 ) ).r; // sample data texture, only the red channel is relevant
-				float i = step( uv.y, f ); // this will be used to draw the bars
+				float f = texture2D( tAudioData, vec2( uv.x, 0 ) ).r; // sample data texture, only the red channel is relevant
+				float i = step( uv.y, f );
 
-				gl_FragColor = vec4( mix( backgroundColor, finalColor, i ), 1.0 );
+				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
 
 			}
 
 		</script>
+
 	</head>
 <body>
 
@@ -125,7 +126,7 @@
 		var size = fftSize / 2;
 
 		uniforms = {
-			tDiffuse: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) },
+			tAudioData: { value: new THREE.DataTexture( new Uint8Array( size * 3 ), size, 1, THREE.RGBFormat ) },
 			resolution: { value: new THREE.Vector2( renderer.domElement.width, renderer.domElement.height ) }
 		};
 
@@ -179,11 +180,11 @@
 
 		for ( var i = 0, l = data.length; i < l; i ++ ) {
 
-			uniforms.tDiffuse.value.image.data[ i * 3 ] = data[ i ];
+			uniforms.tAudioData.value.image.data[ i * 3 ] = data[ i ];
 
 		}
 
-		uniforms.tDiffuse.value.needsUpdate = true;
+		uniforms.tAudioData.value.needsUpdate = true;
 
 		renderer.render( scene, camera );
 
