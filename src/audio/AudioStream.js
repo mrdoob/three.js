@@ -68,6 +68,20 @@ Object.assign( AudioStream.prototype, {
 
 	},
 
+	getLoop: function () {
+
+		return this.audioElement.loop;
+
+	},
+
+	setLoop: function ( value ) {
+
+		this.audioElement.loop = value;
+
+		return this;
+
+	},
+
 	connect: function () {
 
 		this.source.connect( this.getOutput() );
