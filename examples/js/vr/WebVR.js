@@ -80,7 +80,7 @@ var WEBVR = {
 
 	getButton: function ( display, canvas ) {
 
-		if ( display instanceof VRDisplay === false ) {
+		if ( 'VREffect' in THREE && display instanceof THREE.VREffect ) {
 
 			console.error( 'WebVR.getButton() now expects a VRDisplay.' );
 			return document.createElement( 'button' );
