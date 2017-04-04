@@ -907,13 +907,14 @@ THREE.ColladaLoader = function () {
 						var transforms = jointData.transforms;
 
 						var matrix = new THREE.Matrix4();
+						var m1 = new THREE.Matrix4();
 
 						for (i = 0; i < transforms.length; i ++ ) {
 
 							var transform = transforms[ i ];
 
 							// kinda ghetto joint detection
-							var m1 = new THREE.Matrix4();
+
 							if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
 
 								// apply actual joint value here
@@ -937,7 +938,6 @@ THREE.ColladaLoader = function () {
 								}
 
 							} else {
-
 
 								switch ( transform.type ) {
 
@@ -988,7 +988,9 @@ THREE.ColladaLoader = function () {
 
 						threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
 						threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
-						jointMap[jointIndex].position=value;
+
+						jointMap[ jointIndex ].position = value;
+
 					}
 
 				} else {
