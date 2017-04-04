@@ -913,6 +913,7 @@ THREE.ColladaLoader = function () {
 							var transform = transforms[ i ];
 
 							// kinda ghetto joint detection
+							var m1 = new THREE.Matrix4();
 							if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
 
 								// apply actual joint value here
@@ -937,7 +938,6 @@ THREE.ColladaLoader = function () {
 
 							} else {
 
-								var m1 = new THREE.Matrix4();
 
 								switch ( transform.type ) {
 
@@ -988,6 +988,7 @@ THREE.ColladaLoader = function () {
 
 						threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
 						threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
+						jointMap[jointIndex].position=value;
 					}
 
 				} else {
