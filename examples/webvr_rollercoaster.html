@@ -105,9 +105,9 @@
 
 						t *= Math.PI;
 
-						var x = Math.sin(t * 4) * Math.cos(t * 6) * 1000;
-						var y = Math.cos(t * 8) * 80 + Math.cos(t * 20 * Math.sin(t)) * 40 + 200;
-						var z = Math.sin(t * 5) * Math.sin(t * 3) * 1000;
+						var x = Math.sin( t * 4 ) * Math.cos( t * 6) * 1000;
+						var y = Math.cos( t * 8 ) * 80 + Math.cos( t * 15 * Math.sin( t ) ) * 40 + 130;
+						var z = Math.sin( t * 5 ) * Math.sin( t * 3 ) * 1000;
 
 						return vector.set( x, y, z );
 
@@ -204,13 +204,13 @@
 			var velocity = 0;
 			var progress = 0;
 
-			var clock = new THREE.Clock();
+			var prevTime = performance.now();
 
 			function animate( time ) {
 
 				effect.requestAnimationFrame( animate );
 
-				var delta = clock.getDelta() * 60;
+				var delta = ( time - prevTime ) / 15;
 
 				for ( var i = 0; i < funfairs.length; i ++ ) {
 
@@ -230,16 +230,18 @@
 
 				tangent.copy( curve.getTangentAt( progress ) );
 
-				velocity -= tangent.y * 0.0000015 * delta;
+				velocity -= tangent.y * 0.000001 * delta;
 				velocity = Math.max( velocity, 0.00004 );
 
-				train.lookAt( lookAt.copy( position ).sub( tangent ) );
+				train.lookAt( lookAt.copy( position ).add( tangent ) );
 
 				//
 
 				controls.update();
 
 				effect.render( scene, camera );
+
+				prevTime = time;
 
 			}
 
