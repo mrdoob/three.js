@@ -123,7 +123,7 @@
 
 				WEBVR.getVRDisplay( function ( display ) {
 
-					if ( display !== unfedined ) {
+					if ( display !== undefined ) {
 
 						vrdisplay = display;
 						camera = new THREE.WebVRCamera( display, renderer );
