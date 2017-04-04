@@ -2,17 +2,12 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function AudioStream( path, listener ) {
+function AudioStream( listener ) {
 
-	this.audioElement = new Audio( path ); // HTML5 Audio
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
 	this.gain.connect( listener.getInput() );
-
-	this.source = listener.context.createMediaElementSource( this.audioElement );
-
-	this.connect();
 
 }
 
@@ -21,6 +16,15 @@ Object.assign( AudioStream.prototype, {
 	getOutput: function () {
 
 		return this.gain;
+
+	},
+
+	setAudioElement: function ( audioElement ) {
+
+		this.audioElement = audioElement;
+		this.source = this.context.createMediaElementSource( audioElement );
+
+		return this.connect();
 
 	},
 

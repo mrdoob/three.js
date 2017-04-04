@@ -112,10 +112,11 @@
 
 		// audio stream and analyzer
 
-		var audioStream = new THREE.AudioStream( 'sounds/358232_j_s_song.mp3', listener );
-		audioStream.setLoop( true );
+		var audioStream = new THREE.AudioStream( listener );
 		analyser = new THREE.AudioAnalyser( audioStream, fftSize );
 
+		audioStream.setAudioElement( new Audio( 'sounds/358232_j_s_song.mp3' ) );
+		audioStream.setLoop( true );
 		audioStream.play();
 
 		// geometry

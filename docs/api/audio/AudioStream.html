@@ -24,7 +24,8 @@
 		camera.add( listener );
 
 		// create an audio stream
-		var audioStream = new THREE.AudioStream( 'myaudio.mp3', listener );
+		var audioStream = new THREE.AudioStream( listener );
+		audioStream.setAudioElement( new Audio( 'myaudio.mp3' ) );
 		audioStream.play();
 
 		</code>
@@ -33,9 +34,8 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:String path], [page:AudioListener listener] )</h3>
+		<h3>[name]( [page:AudioListener listener] )</h3>
 		<div>
-		path — (required) [page:String path] to the audio file.</br>
 		listener — (required) [page:AudioListener AudioListener] instance.
 		</div>
 
@@ -64,12 +64,17 @@
 		Returns the [page:.gain gainNode].
 		</div>
 
-		<h3>[method:null play]()</h3>
+		<h3>[method:AudioStream setAudioElement]( audioElement )</h3>
+		<div>
+		Sets the [link:https://developer.mozilla.org/de/docs/Web/API/HTMLAudioElement HTMLAudioElement].
+		</div>
+
+		<h3>[method:AudioStream play]()</h3>
 		<div>
 		Starts playback.
 		</div>
 
-		<h3>[method:null pause]()</h3>
+		<h3>[method:AudioStream pause]()</h3>
 		<div>
 		Pauses playback.
 		</div>
@@ -79,7 +84,7 @@
 		Returns the current time of the audio.
 		</div>
 
-		<h3>[method:Number setCurrentTime]( value )</h3>
+		<h3>[method:AudioStream setCurrentTime]( value )</h3>
 		<div>
 		Sets the current time of the audio.
 		</div>
@@ -89,7 +94,7 @@
 		Returns the current volume.
 		</div>
 
-		<h3>[method:Number setVolume]( value )</h3>
+		<h3>[method:AudioStream setVolume]( value )</h3>
 		<div>
 		Sets the current volume.
 		</div>
@@ -99,17 +104,17 @@
 		Returns the loop property of the [page:.audioElement].
 		</div>
 
-		<h3>[method:Number setLoop]( value )</h3>
+		<h3>[method:AudioStream setLoop]( value )</h3>
 		<div>
 		Sets the loop property of the [page:.audioElement]. If set to true, the audio will start over again, every time it is finished.
 		</div>
 
-		<h3>[method:null connect]()</h3>
+		<h3>[method:AudioStream connect]()</h3>
 		<div>
 		Connects to the output node.
 		</div>
 
-		<h3>[method:null disconnect]()</h3>
+		<h3>[method:AudioStream disconnect]()</h3>
 		<div>
 		Disconnects from the output node.
 		</div>
