@@ -1,46 +1,78 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author vladgaidukov / vlad@meliar.ru
  */
 
 var Cache = {
 
-	enabled: false,
+    enabled: false,
 
-	files: {},
+    objects: {},
 
-	add: function ( key, file ) {
+    addObject: function ( key, obj ) {
+        
+        if ( this.enabled === false ) return;
 
-		if ( this.enabled === false ) return;
+        this.objects[ key ] = {
+            loaded: false,
+            object: obj,
+            callbacks: []
+        };
 
-		// console.log( 'THREE.Cache', 'Adding key:', key );
+    },
 
-		this.files[ key ] = file;
+    addCallback: function ( key, callback ) {
+        
+        if ( this.enabled === false ) return;
 
-	},
+        this.objects[ key ].callbacks.push( callback );
 
-	get: function ( key ) {
+    },
 
-		if ( this.enabled === false ) return;
+    isCached: function ( key ) {
 
-		// console.log( 'THREE.Cache', 'Checking key:', key );
+        if ( this.objects [ key ] ) return true;
 
-		return this.files[ key ];
+        return false;
 
-	},
+    },
 
-	remove: function ( key ) {
+    getObject: function ( key ) {
+        
+        if ( this.enabled === false ) return;
 
-		delete this.files[ key ];
+        return this.objects[ key ];
 
-	},
+    },
 
-	clear: function () {
+    loaded: function ( key, obj ) {
 
-		this.files = {};
+        if ( !this.objects[ key ] ) return;
 
-	}
+        this.objects[ key ].object = obj;
+        this.objects[ key ].loaded = true;
 
+    },
+
+    isLoaded: function ( key ) {
+
+        if ( !this.objects[ key ] ) return false;
+
+        return this.objects[ key ].loaded;
+
+    },
+
+    remove: function ( key ) {
+
+        delete this.objects[ key ];
+
+    },
+
+    clear: function () {
+
+        this.objects = {};
+
+    }
 };
-
 
 export { Cache };

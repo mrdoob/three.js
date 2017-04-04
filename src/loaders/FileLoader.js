@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author vladgaidukov / vlad@meliar.ru
  */
 
 import { Cache } from './Cache';
@@ -21,19 +22,25 @@ Object.assign( FileLoader.prototype, {
 
 		var scope = this;
 
-		var cached = Cache.get( url );
-
-		if ( cached !== undefined ) {
+		if ( Cache.isLoaded( url ) ) {
+                    
+			var cached = Cache.getObject( url ).object;
 
 			scope.manager.itemStart( url );
 
-			setTimeout( function () {
+			if ( onLoad ) {
+                            
+				setTimeout ( function () {
 
-				if ( onLoad ) onLoad( cached );
+					onLoad( cached );
+					scope.manager.itemEnd( url );
+
+				}, 0);
+			} else {
 
 				scope.manager.itemEnd( url );
 
-			}, 0 );
+			}
 
 			return cached;
 
@@ -129,72 +136,105 @@ Object.assign( FileLoader.prototype, {
 
 			var request = new XMLHttpRequest();
 			request.open( 'GET', url, true );
+            
+                        if ( Cache.isCached( url ) ) {
 
-			request.addEventListener( 'load', function ( event ) {
+                            Cache.addCallback( url, onLoad );
 
-				var response = event.target.response;
+                        } else {
 
-				Cache.add( url, response );
+                            Cache.addObject( url );
+                            
+                            Cache.addCallback( url, onLoad );
 
-				if ( this.status === 200 ) {
+                            request.addEventListener( 'load', function ( event ) {
 
-					if ( onLoad ) onLoad( response );
+                                var response = event.target.response;
 
-					scope.manager.itemEnd( url );
+                                if ( this.status === 200 ) {
 
-				} else if ( this.status === 0 ) {
+                                    if ( Cache.enabled ) {
+                                    
+                                        Cache.loaded ( url, response );
+                                        var cached = Cache.getObject ( url );
 
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
+                                        for ( var i = 0; i < cached.callbacks.length; i ++ ) {
 
-					console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+                                            if ( cached.callbacks[ i ] ) {
 
-					if ( onLoad ) onLoad( response );
+                                                cached.callbacks[ i ]( response );
 
-					scope.manager.itemEnd( url );
+                                            }
 
-				} else {
+                                            scope.manager.itemEnd( url );
 
-					if ( onError ) onError( event );
+                                        }
+                                    } else {
+                                        
+                                        if ( onLoad ) onLoad( response );
+                                        
+                                        scope.manager.itemEnd( url );
+                                        
+                                    }
 
-					scope.manager.itemError( url );
+                                } else if ( this.status === 0 ) {
 
-				}
+                                    // Some browsers return HTTP Status 0 when using non-http protocol
+                                    // e.g. 'file://' or 'data://'. Handle as success.
 
-			}, false );
+                                    console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-			if ( onProgress !== undefined ) {
+                                    if ( onLoad ) onLoad( response );
 
-				request.addEventListener( 'progress', function ( event ) {
+                                    scope.manager.itemEnd( url );
 
-					onProgress( event );
+                                } else {
 
-				}, false );
+                                    Cache.remove ( url );
 
-			}
+                                    if ( onError ) onError( event );
 
-			request.addEventListener( 'error', function ( event ) {
+                                    scope.manager.itemError( url );
 
-				if ( onError ) onError( event );
+                                }
 
-				scope.manager.itemError( url );
+                            }, false );
 
-			}, false );
+                            if ( onProgress !== undefined ) {
 
-			if ( this.responseType !== undefined ) request.responseType = this.responseType;
-			if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+                                request.addEventListener( 'progress', function ( event ) {
 
-			if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
+                                    onProgress( event );
 
-			for ( var header in this.requestHeader ) {
+
+                                }, false );
+
+                            }
+
+                            request.addEventListener( 'error', function ( event ) {
+
+                                if ( onError ) onError( event );
+
+                                scope.manager.itemError( url );
+
+                            }, false );
+
+                            if ( this.responseType !== undefined ) request.responseType = this.responseType;
+                            if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
+
+                            if ( request.overrideMimeType ) request.overrideMimeType( this.mimeType !== undefined ? this.mimeType : 'text/plain' );
+
+                            for ( var header in this.requestHeader ) {
 
 				request.setRequestHeader( header, this.requestHeader[ header ] );
 
-			}
+                            }
 
-			request.send( null );
+                            request.send( null );
+                            
+                        }
 
-		}
+                }
 
 		scope.manager.itemStart( url );
 
