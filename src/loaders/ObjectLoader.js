@@ -405,6 +405,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			}, undefined, function () {
 
+				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
 
 			} );

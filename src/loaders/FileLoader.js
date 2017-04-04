@@ -119,6 +119,7 @@ Object.assign( FileLoader.prototype, {
 
 					if ( onError ) onError( error );
 
+					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}, 0 );
@@ -157,6 +158,7 @@ Object.assign( FileLoader.prototype, {
 
 					if ( onError ) onError( event );
 
+					scope.manager.itemEnd( url );
 					scope.manager.itemError( url );
 
 				}
@@ -177,6 +179,7 @@ Object.assign( FileLoader.prototype, {
 
 				if ( onError ) onError( event );
 
+				scope.manager.itemEnd( url );
 				scope.manager.itemError( url );
 
 			}, false );
