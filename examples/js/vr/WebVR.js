@@ -89,7 +89,6 @@ var WEBVR = {
 		button.style.position = 'absolute';
 		button.style.left = 'calc(50% - 50px)';
 		button.style.bottom = '20px';
-		button.style.width = '100px';
 		button.style.border = '0';
 		button.style.padding = '8px';
 		button.style.cursor = 'pointer';
