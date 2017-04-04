@@ -117,7 +117,6 @@ var files = {
 		"webgl_loader_sea3d_physics",
 		"webgl_loader_sea3d_skinning",
 		"webgl_loader_sea3d_sound",
-		"webgl_loader_scene",
 		"webgl_loader_stl",
 		"webgl_loader_utf8",
 		"webgl_loader_vrml",
