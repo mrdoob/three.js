@@ -83,16 +83,7 @@ var WEBVR = {
 
 	},
 
-	getButton: function ( display, canvas ) {
-
-		/*
-		if ( display instanceof VRDisplay === false ) {
-
-			console.error( 'WebVR.getButton() now expects a VRDisplay.' );
-			return;
-
-		}
-		*/
+	getButton: function ( effect, canvas ) {
 
 		var button = document.createElement( 'button' );
 		button.style.position = 'absolute';
@@ -110,24 +101,24 @@ var WEBVR = {
 		button.style.textAlign = 'center';
 		button.style.zIndex = '999';
 
-		if ( display ) {
+		if ( effect.getVRDisplay() ) {
 
 			button.textContent = 'ENTER VR';
 			button.onclick = function () {
 
-				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
+				effect.isPresenting ? effect.exitPresent() : effect.requestPresent( [ { source: canvas } ] );
 
 			};
 
 			window.addEventListener( 'vrdisplaypresentchange', function () {
 
-				button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+				button.textContent = effect.isPresenting ? 'EXIT VR' : 'ENTER VR';
 
 			}, false );
 
 		} else {
 
-			button.textContent = 'NO VR DISPLAY';			
+			button.textContent = 'NO VR DISPLAY';
 
 		}
 
