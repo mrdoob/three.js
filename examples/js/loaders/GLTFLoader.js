@@ -1625,6 +1625,10 @@ THREE.GLTFLoader = ( function () {
 									geometry.addAttribute( 'uv', bufferAttribute );
 									break;
 
+								case 'TEXCOORD_1':
+									geometry.addAttribute( 'uv2', bufferAttribute );
+									break;
+
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
