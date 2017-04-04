@@ -109,18 +109,27 @@ var WEBVR = {
 		button.style.fontStyle = 'normal';
 		button.style.textAlign = 'center';
 		button.style.zIndex = '999';
-		button.textContent = 'ENTER VR';
-		button.onclick = function () {
 
-			display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
+		if ( display ) {
 
-		};
+			button.textContent = 'ENTER VR';
+			button.onclick = function () {
 
-		window.addEventListener( 'vrdisplaypresentchange', function () {
+				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
 
-			button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+			};
 
-		}, false );
+			window.addEventListener( 'vrdisplaypresentchange', function () {
+
+				button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+
+			}, false );
+
+		} else {
+
+			button.textContent = 'NO VR DISPLAY';			
+
+		}
 
 		return button;
 
