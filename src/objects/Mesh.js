@@ -24,7 +24,19 @@ function Mesh( geometry, material ) {
 	this.type = 'Mesh';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+	if (Array.isArray(material)){
+		
+		this.materials = material;
+		
+	} else if ( material !== undefined ) {
+		
+		this.materials = [ material ];
+		
+	} else {
+		
+		this.materials = [ new MeshBasicMaterial( { color: Math.random() * 0xffffff } ) ];
+		
+	}
 
 	this.drawMode = TrianglesDrawMode;
 
@@ -114,15 +126,15 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		function checkIntersection( object, raycaster, ray, pA, pB, pC, point ) {
 
 			var intersect;
-			var material = object.material;
+			var materials = object.materials;
 
-			if ( material.side === BackSide ) {
+			if ( materials[0].side === BackSide ) {
 
 				intersect = ray.intersectTriangle( pC, pB, pA, true, point );
 
 			} else {
 
-				intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+				intersect = ray.intersectTriangle( pA, pB, pC, materials[0].side !== DoubleSide, point );
 
 			}
 
@@ -175,10 +187,10 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return function raycast( raycaster, intersects ) {
 
 			var geometry = this.geometry;
-			var material = this.material;
+			var materials = this.materials;
 			var matrixWorld = this.matrixWorld;
 
-			if ( material === undefined ) return;
+			if ( materials === undefined ) return;
 
 			// Checking boundingSphere distance to ray
 
@@ -259,7 +271,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			} else if ( geometry.isGeometry ) {
 
 				var fvA, fvB, fvC;
-				var isMultiMaterial = Array.isArray( material );
+				var isMultiMaterial = materials.legnth > 1;
 
 				var vertices = geometry.vertices;
 				var faces = geometry.faces;
@@ -271,7 +283,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					var face = faces[ f ];
-					var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
+					var faceMaterial = isMultiMaterial ? materials[ face.materialIndex ] : materials[0];
 
 					if ( faceMaterial === undefined ) continue;
 
@@ -343,11 +355,45 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	clone: function () {
 
-		return new this.constructor( this.geometry, this.material ).copy( this );
+		return new this.constructor( this.geometry, this.materials ).copy( this );
 
 	}
 
 } );
+
+Object.defineProperty(Mesh.prototype,"material", {
+
+	get: function(){
+		
+		console.log("Deprecated material");
+		if ( this.materials ) {
+			
+			return this.materials[0];
+			
+		} else {
+			
+			return undefined;
+			
+		}
+		
+	},
+	
+	set: function( value ){
+		
+		console.log("Deprecated material");
+		if (Array.isArray(value)){
+			
+			this.materials = value;
+			
+		} else {
+			
+			this.materials = [ value ];
+			
+		} 
+		
+	}
+	
+});
 
 
 export { Mesh };

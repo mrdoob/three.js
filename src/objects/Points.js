@@ -17,7 +17,19 @@ function Points( geometry, material ) {
 	this.type = 'Points';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
+	if (Array.isArray(material)){
+		
+		this.materials = material;
+		
+	} else if ( material !== undefined ) {
+		
+		this.materials = [ material ];
+		
+	} else {
+		
+		this.materials = [ new PointsMaterial( { color: Math.random() * 0xffffff } ) ];
+		
+	}
 
 }
 
@@ -143,5 +155,40 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 } );
 
+
+
+Object.defineProperty(Points.prototype,"material", {
+
+	get: function(){
+		
+		console.log("Deprecated material");
+		if ( this.materials ) {
+			
+			return this.materials[0];
+			
+		} else {
+			
+			return undefined;
+			
+		}
+		
+	},
+	
+	set: function( value ){
+		
+		console.log("Deprecated material");
+		if (Array.isArray(value)){
+			
+			this.materials = value;
+			
+		} else {
+			
+			this.materials = [ value ];
+			
+		} 
+		
+	}
+	
+});
 
 export { Points };

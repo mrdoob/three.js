@@ -403,16 +403,16 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 				var geometry = _objects.update( object );
-				var material = object.material;
+				var materials = object.materials;
 
-				if ( Array.isArray( material ) ) {
+				if ( materials.length > 1) {
 
 					var groups = geometry.groups;
 
 					for ( var k = 0, kl = groups.length; k < kl; k ++ ) {
 
 						var group = groups[ k ];
-						var groupMaterial = material[ group.materialIndex ];
+						var groupMaterial = materials[ group.materialIndex ];
 
 						if ( groupMaterial && groupMaterial.visible ) {
 
@@ -423,9 +423,9 @@ function WebGLShadowMap( _renderer, _lights, _objects, capabilities ) {
 
 					}
 
-				} else if ( material.visible ) {
+				} else if ( materials[0].visible ) {
 
-					var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld );
+					var depthMaterial = getDepthMaterial( object, materials[0], isPointLight, _lightPositionWorld );
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}
