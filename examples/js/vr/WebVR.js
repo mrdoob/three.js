@@ -100,7 +100,7 @@ var WEBVR = {
 		button.style.textAlign = 'center';
 		button.style.zIndex = '999';
 
-		if ( effect.getVRDisplay() ) {
+		if ( this.isAvailable() ) {
 
 			button.textContent = 'ENTER VR';
 			button.onclick = function () {
