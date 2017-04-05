@@ -282,7 +282,7 @@ var files = {
 		"webvr_daydream",
 		"webvr_panorama",
 		"webvr_rollercoaster",
-		"webvr_shadow",
+		"webvr_sandbox",
 		"webvr_video",
 		"webvr_vive",
 		"webvr_vive_dragging",
