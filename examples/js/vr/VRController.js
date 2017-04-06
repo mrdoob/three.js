@@ -53,11 +53,11 @@ THREE.VRController = function( gamepad ){
 	primaryButtonName,
 	axes     = [ 0, 0 ],
 	buttons  = [],
-	hand     = ''
+	hand     = '';
 
 
-	THREE.Object3D.call( this )
-	this.matrixAutoUpdate = false
+	THREE.Object3D.call( this );
+	this.matrixAutoUpdate = false;
 
 
 	//  These are special properties you ought to overwrite on the instance
@@ -65,7 +65,7 @@ THREE.VRController = function( gamepad ){
 	//    controller.standingMatrix = controls.getStandingMatrix()
 	//    controller.head = camera//  Only really needed if controller is 3DOF.
 
-	this.standingMatrix = new THREE.Matrix4()
+	this.standingMatrix = new THREE.Matrix4();
 	this.head = {
 
 		position:   new THREE.Vector3(),
@@ -76,7 +76,7 @@ THREE.VRController = function( gamepad ){
 	//  Do we recognize this type of controller based on its gamepad.id string?
 	//  If not we’ll still roll with it, just the buttons won’t be mapped.
 
-	supported = THREE.VRController.supported[ gamepad.id ]
+	supported = THREE.VRController.supported[ gamepad.id ];
 	if( supported !== undefined ){
 
 		style = supported.style
@@ -92,10 +92,10 @@ THREE.VRController = function( gamepad ){
 	//  We’ll also add style and DOF here but not onto the actual gamepad
 	//  object because that’s the browser’s territory.
 
-	this.gamepad      = gamepad
-	this.gamepadStyle = style
-	this.gamepadDOF   = null//  Have to wait until gamepad.pose is defined to handle this. 
-	this.name         = gamepad.id
+	this.gamepad      = gamepad;
+	this.gamepadStyle = style;
+	this.gamepadDOF   = null;//  Have to wait until gamepad.pose is defined to handle this. 
+	this.name         = gamepad.id;
 
 
 	//  Setup axes and button states so we can watch for change events.
@@ -117,15 +117,15 @@ THREE.VRController = function( gamepad ){
 		var
 		verbosity  = THREE.VRController.verbosity,
 		controller = this,
-		prefix = '> #'+ controller.gamepad.index +' '+ controller.gamepad.id +' ('+ controller.gamepad.hand +') '
+		prefix = '> #'+ controller.gamepad.index +' '+ controller.gamepad.id +' ('+ controller.gamepad.hand +') ';
 		
 		
 		//  Did the handedness change?
 		
 		if( hand !== controller.gamepad.hand ){
 			
-			hand = controller.gamepad.hand
-			controller.dispatchEvent({ type: 'hand changed', hand: hand })
+			hand = controller.gamepad.hand;
+			controller.dispatchEvent({ type: 'hand changed', hand: hand });
 		}
 
 
@@ -133,10 +133,10 @@ THREE.VRController = function( gamepad ){
 
 		if( axes[ 0 ] !== gamepad.axes[ 0 ] || axes[ 1 ] !== gamepad.axes[ 1 ]){
 
-			axes[ 0 ] = gamepad.axes[ 0 ]
-			axes[ 1 ] = gamepad.axes[ 1 ]
-			if( verbosity >= 0.5 ) console.log( prefix +'axes changed', axes )
-			controller.dispatchEvent({ type: 'axes changed', axes: axes })
+			axes[ 0 ] = gamepad.axes[ 0 ];
+			axes[ 1 ] = gamepad.axes[ 1 ];
+			if( verbosity >= 0.5 ) console.log( prefix +'axes changed', axes );
+			controller.dispatchEvent({ type: 'axes changed', axes: axes });
 		}
 
 
@@ -147,30 +147,30 @@ THREE.VRController = function( gamepad ){
 			var
 			prefixFull = prefix + button.name +' ',
 			isPrimary  = button.name === primaryButtonName ? ' isPrimary!' : '',
-			suffix
+			suffix;
 
 			if( button.value !== gamepad.buttons[ i ].value ){
 
-				button.value = gamepad.buttons[ i ].value
-				if( verbosity >= 0.5 ) console.log( prefixFull +'value changed'+ isPrimary, button.value )
-				controller.dispatchEvent({ type: button.name  +' value changed', value: button.value })
-				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary value changed', value: button.value })
+				button.value = gamepad.buttons[ i ].value;
+				if( verbosity >= 0.5 ) console.log( prefixFull +'value changed'+ isPrimary, button.value );
+				controller.dispatchEvent({ type: button.name  +' value changed', value: button.value });
+				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary value changed', value: button.value });
 			}
 			if( button.isTouched !== gamepad.buttons[ i ].touched ){
 
-				button.isTouched = gamepad.buttons[ i ].touched
-				suffix = ' ' + ( button.isTouched ? 'began' : 'ended' )
-				if( verbosity >= 0.5 ) console.log( prefixFull +'touch'+ suffix + isPrimary )
-				controller.dispatchEvent({ type: button.name  +' touch'+ suffix })
-				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary touch'+ suffix })
+				button.isTouched = gamepad.buttons[ i ].touched;
+				suffix = ' ' + ( button.isTouched ? 'began' : 'ended' );
+				if( verbosity >= 0.5 ) console.log( prefixFull +'touch'+ suffix + isPrimary );
+				controller.dispatchEvent({ type: button.name  +' touch'+ suffix });
+				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary touch'+ suffix });
 			}
 			if( button.isPressed !== gamepad.buttons[ i ].pressed ){
 
-				button.isPressed = gamepad.buttons[ i ].pressed
-				suffix = ' ' + ( button.isPressed ? 'began' : 'ended' )
-				if( verbosity >= 0.5 ) console.log( prefixFull +'press'+ suffix + isPrimary )
-				controller.dispatchEvent({ type: button.name  +' press'+ suffix })
-				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary press'+ suffix })
+				button.isPressed = gamepad.buttons[ i ].pressed;
+				suffix = ' ' + ( button.isPressed ? 'began' : 'ended' );
+				if( verbosity >= 0.5 ) console.log( prefixFull +'press'+ suffix + isPrimary );
+				controller.dispatchEvent({ type: button.name  +' press'+ suffix });
+				if( isPrimary !== '' ) controller.dispatchEvent({ type: 'primary press'+ suffix });
 			}
 		})
 	}
@@ -178,12 +178,12 @@ THREE.VRController = function( gamepad ){
 
 		return buttons.find( function( button ){
 
-			return button.name === buttonName
+			return button.name === buttonName;
 		})
 	}
 }
-THREE.VRController.prototype = Object.create( THREE.Object3D.prototype )
-THREE.VRController.prototype.constructor = THREE.VRController
+THREE.VRController.prototype = Object.create( THREE.Object3D.prototype );
+THREE.VRController.prototype.constructor = THREE.VRController;
 
 
 
@@ -195,26 +195,26 @@ THREE.VRController.prototype.update = function(){
 
 	var
 	gamepad = this.gamepad,
-	pose = gamepad.pose
+	pose = gamepad.pose;
 
 
 	//  Once connected a gamepad will have a not-undefined pose
 	//  but that pose will be null until a user action ocurrs.
 	//  If it’s all null then no point in going any futher here. 
 
-	if( pose === null || ( pose.orientation === null && pose.position === null )) return
+	if( pose === null || ( pose.orientation === null && pose.position === null )) return;
 
 
 	//  If we’ve gotten to here then gamepad.pose has a definition
 	//  so now we can set a convenience variable to know if we are 3DOF or 6DOF.
 
-	this.gamepadDOF = ( +gamepad.pose.hasOrientation + +gamepad.pose.hasPosition ) * 3
+	this.gamepadDOF = ( +gamepad.pose.hasOrientation + +gamepad.pose.hasPosition ) * 3;
 
 
 	//  ORIENTATION. Do we have data for this?
 	//  If so let’s use it. If not ... no fallback plan.
 
-	if( pose.orientation !== null ) this.quaternion.fromArray( pose.orientation )
+	if( pose.orientation !== null ) this.quaternion.fromArray( pose.orientation );
 	
 
 	//  POSITION -- EXISTS!
@@ -222,8 +222,8 @@ THREE.VRController.prototype.update = function(){
 
 	if( pose.position !== null ){
 
-		this.position.fromArray( pose.position )
-		this.matrix.compose( this.position, this.quaternion, this.scale )
+		this.position.fromArray( pose.position );
+		this.matrix.compose( this.position, this.quaternion, this.scale );
 	}
 
 
@@ -237,35 +237,35 @@ THREE.VRController.prototype.update = function(){
 		//  If this is our first go-round with a 3DOF this then we’ll need to
 		//  create the arm model.
 
-		if( this.armModel === undefined ) this.armModel = new OrientationArmModel()
+		if( this.armModel === undefined ) this.armModel = new OrientationArmModel();
 
 
 		//  Now and forever after we can just update this arm model
 		//  with the head (camera) position and orientation
 		//  and use its output to predict where the this is.
 
-		this.armModel.setHeadPosition( this.head.position )
-		this.armModel.setHeadOrientation( this.head.quaternion )
-		this.armModel.setControllerOrientation(( new THREE.Quaternion() ).fromArray( pose.orientation ))
-		this.armModel.update()
+		this.armModel.setHeadPosition( this.head.position );
+		this.armModel.setHeadOrientation( this.head.quaternion );
+		this.armModel.setControllerOrientation(( new THREE.Quaternion() ).fromArray( pose.orientation ));
+		this.armModel.update();
 		this.matrix.compose( 
 
 			this.armModel.getPose().position, 
 			this.armModel.getPose().orientation, 
 			this.scale
-		)
+		);
 	}
 
 
 	//  Ok, we know where the this ought to be so let’s set that.
 	
-	this.matrix.multiplyMatrices( this.standingMatrix, this.matrix )
-	this.matrixWorldNeedsUpdate = true
+	this.matrix.multiplyMatrices( this.standingMatrix, this.matrix );
+	this.matrixWorldNeedsUpdate = true;
 
 
 	//  BUTTON EVENTS.
 
-	this.listenForButtonEvents()
+	this.listenForButtonEvents();
 }
 
 
@@ -280,13 +280,13 @@ THREE.VRController.prototype.update = function(){
 
 //  This makes inspecting through the console a little bit saner.
 
-THREE.VRController.verbosity = 0//0.5
+THREE.VRController.verbosity = 0;//0.5
 
 
 //  We need to keep a record of found controllers
 //  and have some connection / disconnection handlers.
 
-THREE.VRController.controllers = {}
+THREE.VRController.controllers = {};
 THREE.VRController.onGamepadConnect = function( gamepad ){
 
 
@@ -296,20 +296,20 @@ THREE.VRController.onGamepadConnect = function( gamepad ){
 	
 	var
 	scope = THREE.VRController,
-	controller = new scope( gamepad )
+	controller = new scope( gamepad );
 
 
 	//  We also need to store this reference somewhere so that we have a list
 	//  controllers that we know need updating, and by using the gamepad.index
 	//  as the key we also know which gamepads have already been found.
 
-	scope.controllers[ gamepad.index ] = controller
+	scope.controllers[ gamepad.index ] = controller;
 
 
 	//  Let’s give the controller a little rumble; some haptic feedback to 
 	//  let the user know it’s connected and happy.
 
-	if( controller.gamepad.hapticActuators ) controller.gamepad.hapticActuators[ 0 ].pulse( 0.1, 300 )
+	if( controller.gamepad.hapticActuators ) controller.gamepad.hapticActuators[ 0 ].pulse( 0.1, 300 );
 
 
 	//  Now we’ll broadcast a global connection event.
@@ -318,9 +318,9 @@ THREE.VRController.onGamepadConnect = function( gamepad ){
 	//  How would we listen for events on the controller instance
 	//  if we don’t already have a reference to it?!
 
-	if( scope.verbosity >= 0.5 ) console.log( 'vr controller connected', controller )
-	controller.visible = true
-	window.dispatchEvent( new CustomEvent( 'vr controller connected', { detail: controller }))
+	if( scope.verbosity >= 0.5 ) console.log( 'vr controller connected', controller );
+	controller.visible = true;
+	window.dispatchEvent( new CustomEvent( 'vr controller connected', { detail: controller }));
 }
 THREE.VRController.onGamepadDisconnect = function( gamepad ){
 
@@ -329,16 +329,16 @@ THREE.VRController.onGamepadDisconnect = function( gamepad ){
 
 	var 
 	scope = THREE.VRController,
-	controller = scope.controllers[ gamepad.index ]
+	controller = scope.controllers[ gamepad.index ];
 
 
 	//  Now we can broadcast the disconnection event on the controller itself
 	//  and also delete from our controllers object. Goodbye!
 
-	if( scope.verbosity >= 0.5 ) console.log( 'vr controller disconnected', controller )
-	controller.visible = false
-	controller.dispatchEvent({ type: 'disconnected', controller: controller })
-	delete controller
+	if( scope.verbosity >= 0.5 ) console.log( 'vr controller disconnected', controller );
+	controller.visible = false;
+	controller.dispatchEvent({ type: 'disconnected', controller: controller });
+	delete controller;
 }
 
 
@@ -351,7 +351,7 @@ THREE.VRController.update = function(){
 
 	var 
 	gamepads = navigator.getGamepads(),
-	gamepad, i
+	gamepad, i;
 
 
 	//  Yes, we need to scan the gamepads Array with each update loop
@@ -363,11 +363,11 @@ THREE.VRController.update = function(){
 
 	for( i = 0; i < gamepads.length; i ++ ){
 
-		gamepad = gamepads[ i ]
+		gamepad = gamepads[ i ];
 		if( gamepad !== null ){
 
-			if( this.controllers[ i ] === undefined ) THREE.VRController.onGamepadConnect( gamepad )
-			this.controllers[ i ].update()
+			if( this.controllers[ i ] === undefined ) THREE.VRController.onGamepadConnect( gamepad );
+			this.controllers[ i ].update();
 		}
 
 
@@ -378,7 +378,7 @@ THREE.VRController.update = function(){
 
 		else if( gamepad === null && this.controllers[ i ] !== undefined ){
 
-			THREE.VRController.onGamepadDisconnect( gamepad )
+			THREE.VRController.onGamepadDisconnect( gamepad );
 		}
 	}
 }
@@ -529,40 +529,40 @@ THREE.VRController.supported = {
 
 function OrientationArmModel(){
 
-	this.isLeftHanded = false
+	this.isLeftHanded = false;
 
 
 	//  Current and previous controller orientations.
 
-	this.controllerQ     = new THREE.Quaternion()
-	this.lastControllerQ = new THREE.Quaternion()
+	this.controllerQ     = new THREE.Quaternion();
+	this.lastControllerQ = new THREE.Quaternion();
 
 
 	//  Current and previous head orientations.
 	
-	this.headQ = new THREE.Quaternion()
+	this.headQ = new THREE.Quaternion();
 
 
 	//  Current head position.
 	
-	this.headPos = new THREE.Vector3()
+	this.headPos = new THREE.Vector3();
 
 
 	//  Positions of other joints (mostly for debugging).
 	
-	this.elbowPos = new THREE.Vector3()
-	this.wristPos = new THREE.Vector3()
+	this.elbowPos = new THREE.Vector3();
+	this.wristPos = new THREE.Vector3();
 
 
 	//  Current and previous times the model was updated.
 
-	this.time     = null
-	this.lastTime = null
+	this.time     = null;
+	this.lastTime = null;
 
 
 	//  Root rotation.
 	
-	this.rootQ = new THREE.Quaternion()
+	this.rootQ = new THREE.Quaternion();
 
 
 	//  Current pose that this arm model calculates.
@@ -586,7 +586,7 @@ Object.assign( OrientationArmModel, {
 	ELBOW_BEND_RATIO        : 0.4,//  40% elbow, 60% wrist.
 	EXTENSION_RATIO_WEIGHT  : 0.4,
 	MIN_ANGULAR_SPEED       : 0.61//  35˚ per second, converted to radians.
-})
+});
 
 
 //  SETTERS.
@@ -594,20 +594,20 @@ Object.assign( OrientationArmModel, {
 
 OrientationArmModel.prototype.setControllerOrientation = function( quaternion ){
 		
-	this.lastControllerQ.copy( this.controllerQ )
-	this.controllerQ.copy( quaternion )
+	this.lastControllerQ.copy( this.controllerQ );
+	this.controllerQ.copy( quaternion );
 }
 OrientationArmModel.prototype.setHeadOrientation = function( quaternion ){
 	
-	this.headQ.copy( quaternion )
+	this.headQ.copy( quaternion );
 }
 OrientationArmModel.prototype.setHeadPosition = function( position ){
 	
-	this.headPos.copy( position )
+	this.headPos.copy( position );
 }
 OrientationArmModel.prototype.setLeftHanded = function( isLeftHanded ){//  TODO(smus): Implement me!
 	
-	this.isLeftHanded = isLeftHanded
+	this.isLeftHanded = isLeftHanded;
 }
 
 
@@ -616,7 +616,7 @@ OrientationArmModel.prototype.setLeftHanded = function( isLeftHanded ){//  TODO(
  */
 OrientationArmModel.prototype.update = function(){
 		
-	this.time = performance.now()
+	this.time = performance.now();
 
 
 	//  If the controller’s angular velocity is above a certain amount,
@@ -627,13 +627,13 @@ OrientationArmModel.prototype.update = function(){
 	headYawQ = this.getHeadYawOrientation_(),
 	timeDelta = (this.time - this.lastTime) / 1000,
 	angleDelta = this.quatAngle_( this.lastControllerQ, this.controllerQ ),
-	controllerAngularSpeed = angleDelta / timeDelta
+	controllerAngularSpeed = angleDelta / timeDelta;
 
 	if( controllerAngularSpeed > OrientationArmModel.MIN_ANGULAR_SPEED ){
 	
-		this.rootQ.slerp( headYawQ, angleDelta / 10 )// Attenuate the Root rotation slightly.
-	} 
-	else this.rootQ.copy( headYawQ )
+		this.rootQ.slerp( headYawQ, angleDelta / 10 );// Attenuate the Root rotation slightly.
+	}
+	else this.rootQ.copy( headYawQ );
 
 
 	// We want to move the elbow up and to the center as the user points the
@@ -699,10 +699,10 @@ OrientationArmModel.prototype.update = function(){
 	
 	//  Set the resulting pose orientation and position.
 	
-	this.pose.orientation.copy( orientation )
-	this.pose.position.copy( position )
+	this.pose.orientation.copy( orientation );
+	this.pose.position.copy( position );
 
-	this.lastTime = this.time
+	this.lastTime = this.time;
 }
 
 
@@ -713,7 +713,7 @@ OrientationArmModel.prototype.update = function(){
 
 OrientationArmModel.prototype.getPose = function(){
 	
-	return this.pose
+	return this.pose;
 }
 
 
@@ -721,30 +721,30 @@ OrientationArmModel.prototype.getPose = function(){
 
 OrientationArmModel.prototype.getForearmLength = function(){
 	
-	return OrientationArmModel.ELBOW_WRIST_OFFSET.length()
+	return OrientationArmModel.ELBOW_WRIST_OFFSET.length();
 }
 OrientationArmModel.prototype.getElbowPosition = function(){
 
-	var out = this.elbowPos.clone()
+	var out = this.elbowPos.clone();
 
-	return out.applyQuaternion( this.rootQ )
+	return out.applyQuaternion( this.rootQ );
 }
 OrientationArmModel.prototype.getWristPosition = function(){
 	
-	var out = this.wristPos.clone()
+	var out = this.wristPos.clone();
 
-	return out.applyQuaternion( this.rootQ )
+	return out.applyQuaternion( this.rootQ );
 }
 OrientationArmModel.prototype.getHeadYawOrientation_ = function(){
 	
 	var 
 	headEuler = new THREE.Euler().setFromQuaternion( this.headQ, 'YXZ' ),
-	destinationQ
+	destinationQ;
 
-	headEuler.x  = 0
-	headEuler.z  = 0
-	destinationQ = new THREE.Quaternion().setFromEuler( headEuler )
-	return destinationQ
+	headEuler.x  = 0;
+	headEuler.z  = 0;
+	destinationQ = new THREE.Quaternion().setFromEuler( headEuler );
+	return destinationQ;
 }
 
 
@@ -752,17 +752,17 @@ OrientationArmModel.prototype.getHeadYawOrientation_ = function(){
 
 OrientationArmModel.prototype.clamp_ = function( value, min, max ){
 		
-	return Math.min( Math.max( value, min ), max )
+	return Math.min( Math.max( value, min ), max );
 }
 OrientationArmModel.prototype.quatAngle_ = function( q1, q2 ){ 
 		
 	var 
 	vec1 = new THREE.Vector3( 0, 0, -1 ),
-	vec2 = new THREE.Vector3( 0, 0, -1 )
+	vec2 = new THREE.Vector3( 0, 0, -1 );
 
-	vec1.applyQuaternion( q1 )
-	vec2.applyQuaternion( q2 )
-	return vec1.angleTo( vec2 )
+	vec1.applyQuaternion( q1 );
+	vec2.applyQuaternion( q2 );
+	return vec1.angleTo( vec2 );
 }
 
 
