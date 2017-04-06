@@ -379,7 +379,7 @@ var Viewport = function ( editor ) {
 		selectionBox.visible = false;
 		transformControls.detach();
 
-		if ( object !== null && object !== scene ) {
+		if ( object !== null && object !== scene && object !== camera ) {
 
 			box.setFromObject( object );
 
