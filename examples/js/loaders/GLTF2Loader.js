@@ -735,6 +735,11 @@ THREE.GLTF2Loader = ( function () {
 					shaderText = shaderText.replace( regEx, 'uv' );
 					break;
 
+				case 'TEXCOORD_1':
+
+					shaderText = shaderText.replace( regEx, 'uv2' );
+					break;
+
 				case 'COLOR_0':
 				case 'COLOR0':
 				case 'COLOR':
