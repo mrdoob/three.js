@@ -82,16 +82,12 @@ var ShaderLib = {
 			UniformsLib.displacementmap,
 			UniformsLib.roughnessmap,
 			UniformsLib.metalnessmap,
-			UniformsLib.glossinessmap,
-			UniformsLib.specular2map,
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
 				metalness: { value: 0.5 },
-				glossiness: { value: 0.5 },
-				specular2: { value: new Color( 0x000000 ) },
 				envMapIntensity: { value: 1 } // temporary
 			}
 		] ),

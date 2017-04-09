@@ -338,8 +338,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
-			parameters.glossinessMap ? '#define USE_GLOSSINESSMAP' : '',
-			parameters.specular2Map ? '#define USE_SPECULAR2MAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
@@ -447,8 +445,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
-			parameters.glossinessMap ? '#define USE_GLOSSINESSMAP' : '',
-			parameters.specular2Map ? '#define USE_SPECULAR2MAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 

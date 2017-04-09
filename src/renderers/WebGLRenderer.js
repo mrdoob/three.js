@@ -623,7 +623,6 @@ function WebGLRenderer( parameters ) {
 
 			if ( ! material.isMeshPhongMaterial &&
 				! material.isMeshStandardMaterial &&
-				! material.isMeshStandardMaterialSG &&
 				! material.isMeshNormalMaterial &&
 				material.shading === FlatShading ) {
 
@@ -1724,7 +1723,6 @@ function WebGLRenderer( parameters ) {
 			if ( material.isShaderMaterial ||
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
-				material.isMeshStandardMaterialSG ||
 				material.envMap ) {
 
 				var uCamPos = p_uniforms.map.cameraPosition;
@@ -1742,7 +1740,6 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
-				material.isMeshStandardMaterialSG ||
 				material.isShaderMaterial ||
 				material.skinning ) {
 
@@ -1839,7 +1836,6 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial ||
-				material.isMeshStandardMaterialSG ||
 				material.isMeshNormalMaterial ||
 				material.isMeshDepthMaterial ) {
 
@@ -1881,10 +1877,6 @@ function WebGLRenderer( parameters ) {
 			} else if ( material.isMeshStandardMaterial ) {
 
 				refreshUniformsStandard( m_uniforms, material );
-
-			} else if ( material.isMeshStandardMaterialSG ) {
-
-				refreshUniformsStandardSG( m_uniforms, material );
 
 			} else if ( material.isMeshDepthMaterial ) {
 
@@ -2142,7 +2134,22 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function refreshUniformsStandardCommon( uniforms, material ) {
+	function refreshUniformsStandard( uniforms, material ) {
+
+		uniforms.roughness.value = material.roughness;
+		uniforms.metalness.value = material.metalness;
+
+		if ( material.roughnessMap ) {
+
+			uniforms.roughnessMap.value = material.roughnessMap;
+
+		}
+
+		if ( material.metalnessMap ) {
+
+			uniforms.metalnessMap.value = material.metalnessMap;
+
+		}
 
 		if ( material.emissiveMap ) {
 
@@ -2178,48 +2185,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.envMapIntensity.value = material.envMapIntensity;
 
 		}
-
-	}
-
-	function refreshUniformsStandard( uniforms, material ) {
-
-		uniforms.roughness.value = material.roughness;
-		uniforms.metalness.value = material.metalness;
-
-		if ( material.roughnessMap ) {
-
-			uniforms.roughnessMap.value = material.roughnessMap;
-
-		}
-
-		if ( material.metalnessMap ) {
-
-			uniforms.metalnessMap.value = material.metalnessMap;
-
-		}
-
-		refreshUniformsStandardCommon( uniforms, material );
-
-	}
-
-	function refreshUniformsStandardSG( uniforms, material ) {
-
-		uniforms.glossiness.value = material.roughness;
-		uniforms.specular2.value.copy( material.specular2 );
-
-		if ( material.glossinessMap ) {
-
-			uniforms.glossinessMap.value = material.glossinessMap;
-
-		}
-
-		if ( material.specular2Map ) {
-
-			uniforms.specular2Map.value = material.specular2Map;
-
-		}
-
-		refreshUniformsStandardCommon( uniforms, material );
 
 	}
 
