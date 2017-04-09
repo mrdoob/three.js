@@ -153,7 +153,9 @@ function loadGeometry( data, url ) {
 
             console.log( 'loading morph targets' );
             data.materials[ 0 ].morphTargets = true;
-            animation = new THREE.MorphAnimation( mesh );
+
+            mixer = new THREE.AnimationMixer( mesh );
+            animation = mixer.clipAction( mesh.geometry.animations[ 0 ] );
             hasMorph = true;
 
         }

@@ -49,6 +49,11 @@ THREE.OBJExporter.prototype = {
 				// name of the mesh object
 				output += 'o ' + mesh.name + '\n';
 
+				// name of the mesh material
+				if ( mesh.material && mesh.material.name ) {
+					output += 'usemtl ' + mesh.material.name + '\n';
+				}
+
 				// vertices
 
 				if( vertices !== undefined ) {

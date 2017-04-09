@@ -100,6 +100,39 @@ QUnit.test( "identity" , function( assert ) {
 	assert.ok( matrixEquals3( a, b ), "Passed!" );
 });
 
+QUnit.test( "multiplyMatrices" , function ( assert ) {
+	// Reference:
+	//
+	// #!/usr/bin/env python
+	// from __future__ import print_function
+	// import numpy as np
+	// print(
+	//     np.dot(
+	//         np.reshape([2, 3, 5, 7, 11, 13, 17, 19, 23], (3, 3)),
+	//         np.reshape([29, 31, 37, 41, 43, 47, 53, 59, 61], (3, 3))
+	//     )
+	// )
+	//
+	// [[ 446  486  520]
+	//  [1343 1457 1569]
+	//  [2491 2701 2925]]
+	var lhs = new THREE.Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
+	var rhs = new THREE.Matrix3().set( 29, 31, 37, 41, 43, 47, 53, 59, 61 );
+	var ans = new THREE.Matrix3();
+
+	ans.multiplyMatrices(lhs, rhs);
+
+	assert.ok( ans.elements[0] == 446 );
+	assert.ok( ans.elements[1] == 1343 );
+	assert.ok( ans.elements[2] == 2491 );
+	assert.ok( ans.elements[3] == 486 );
+	assert.ok( ans.elements[4] == 1457 );
+	assert.ok( ans.elements[5] == 2701 );
+	assert.ok( ans.elements[6] == 520 );
+	assert.ok( ans.elements[7] == 1569 );
+	assert.ok( ans.elements[8] == 2925 );
+});
+
 QUnit.test( "multiplyScalar" , function( assert ) {
 	var b = new THREE.Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 	assert.ok( b.elements[0] == 0 );

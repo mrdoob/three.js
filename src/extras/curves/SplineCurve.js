@@ -5,6 +5,8 @@ import { Vector2 } from '../../math/Vector2';
 
 function SplineCurve( points /* array of Vector2 */ ) {
 
+	Curve.call( this );
+
 	this.points = ( points === undefined ) ? [] : points;
 
 }

@@ -123,9 +123,12 @@
 
 				WEBVR.getVRDisplay( function ( display ) {
 
-					vrdisplay = display;
+					if ( display !== undefined ) {
 
-					camera = new THREE.WebVRCamera( display, renderer );
+						vrdisplay = display;
+						camera = new THREE.WebVRCamera( display, renderer );
+
+					}
 
 					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 

@@ -85,6 +85,8 @@ var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
 function CatmullRomCurve3( p /* array of Vector3 */ ) {
 
+	Curve.call( this );
+
 	this.points = p || [];
 	this.closed = false;
 

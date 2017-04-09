@@ -373,7 +373,8 @@ function WebGLRenderer( parameters ) {
 
 	this.forceContextLoss = function () {
 
-		extensions.get( 'WEBGL_lose_context' ).loseContext();
+		var extension = extensions.get( 'WEBGL_lose_context' );
+		if ( extension ) extension.loseContext();
 
 	};
 
@@ -1303,27 +1304,42 @@ function WebGLRenderer( parameters ) {
 
 		if ( ! object.visible ) return;
 
-		var visible = object.layers.test( camera.layers );
+		if ( object.isLight ) {
 
-		if ( visible ) {
+			lights.push( object );
 
-			if ( object.isLight ) {
+		} else if ( object.isSprite ) {
 
-				lights.push( object );
+			if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-			} else if ( object.isSprite ) {
+				sprites.push( object );
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+			}
 
-					sprites.push( object );
+		} else if ( object.isLensFlare ) {
 
-				}
+			lensFlares.push( object );
 
-			} else if ( object.isLensFlare ) {
+		} else if ( object.isImmediateRenderObject ) {
 
-				lensFlares.push( object );
+			if ( sortObjects ) {
 
-			} else if ( object.isImmediateRenderObject ) {
+				_vector3.setFromMatrixPosition( object.matrixWorld )
+					.applyMatrix4( _projScreenMatrix );
+
+			}
+
+			currentRenderList.push( object, null, object.material, _vector3.z, null );
+
+		} else if ( object.isMesh || object.isLine || object.isPoints ) {
+
+			if ( object.isSkinnedMesh ) {
+
+				object.skeleton.update();
+
+			}
+
+			if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
 				if ( sortObjects ) {
 
@@ -1332,50 +1348,29 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				currentRenderList.push( object, null, object.material, _vector3.z, null );
+				var geometry = objects.update( object );
+				var material = object.material;
 
-			} else if ( object.isMesh || object.isLine || object.isPoints ) {
+				if ( Array.isArray( material ) ) {
 
-				if ( object.isSkinnedMesh ) {
+					var groups = geometry.groups;
 
-					object.skeleton.update();
+					for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-				}
+						var group = groups[ i ];
+						var groupMaterial = material[ group.materialIndex ];
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+						if ( groupMaterial && groupMaterial.visible ) {
 
-					if ( sortObjects ) {
-
-						_vector3.setFromMatrixPosition( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
-
-					}
-
-					var geometry = objects.update( object );
-					var material = object.material;
-
-					if ( Array.isArray( material ) ) {
-
-						var groups = geometry.groups;
-
-						for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-							var group = groups[ i ];
-							var groupMaterial = material[ group.materialIndex ];
-
-							if ( groupMaterial && groupMaterial.visible ) {
-
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
-
-							}
+							currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
 
 						}
 
-					} else if ( material.visible ) {
-
-						currentRenderList.push( object, geometry, material, _vector3.z, null );
-
 					}
+
+				} else if ( material.visible ) {
+
+					currentRenderList.push( object, geometry, material, _vector3.z, null );
 
 				}
 
@@ -1414,6 +1409,7 @@ function WebGLRenderer( parameters ) {
 
 					var camera2 = cameras[ j ];
 					var bounds = camera2.bounds;
+
 					_this.setViewport(
 						bounds.x * _width * _pixelRatio, bounds.y * _height * _pixelRatio,
 						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
@@ -1423,6 +1419,7 @@ function WebGLRenderer( parameters ) {
 						bounds.z * _width * _pixelRatio, bounds.w * _height * _pixelRatio
 					);
 					_this.setScissorTest( true );
+
 					renderObject( object, scene, camera2, geometry, material, group );
 
 				}
@@ -1440,6 +1437,8 @@ function WebGLRenderer( parameters ) {
 	}
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
+
+		if ( object.layers.test( camera.layers ) === false ) return;
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
