@@ -1223,50 +1223,7 @@ THREE.GLTF2Loader = ( function () {
 
 				} else if ( material.technique === undefined ) {
 
-					if ( material.extensions && material.extensions.KHR_materials_pbrSpecularGlossiness ) {
-
-						// specification
-						// https://github.com/sbtron/glTF/tree/KHRpbrSpecGloss/extensions/Khronos/KHR_materials_pbrSpecularGlossiness
-
-						var pbrSpecularGlossiness = material.extensions.KHR_materials_pbrSpecularGlossiness;
-
-						materialType = THREE.MeshStandardMaterialSG;
-
-						materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
-						materialParams.opacity = 1.0;
-
-						if ( Array.isArray( pbrSpecularGlossiness.diffuseFactor ) ) {
-
-							var array = pbrSpecularGlossiness.diffuseFactor;
-
-							materialParams.color.fromArray( array );
-							materialParams.opacity = array[ 3 ];
-
-						}
-
-						if ( pbrSpecularGlossiness.diffuseTexture !== undefined ) {
-
-							materialParams.map = dependencies.textures[ pbrSpecularGlossiness.diffuseTexture.index ];
-
-						}
-
-						materialParams.glossiness = pbrSpecularGlossiness.glossinessFactor !== undefined ? pbrSpecularGlossiness.glossinessFactor : 1.0;
-						materialParams.specular2 = new THREE.Color( 1.0, 1.0, 1.0 );
-
-						if ( Array.isArray( pbrSpecularGlossiness.specularFactor ) ) {
-
-							materialParams.specular2.fromArray( pbrSpecularGlossiness.specularFactor );
-
-						}
-
-						if ( pbrSpecularGlossiness.specularGlossinessTexture !== undefined ) {
-
-							materialParams.glossinessMap = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
-							materialParams.specular2Map = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
-
-						}
-
-					} else if ( material.pbrMetallicRoughness !== undefined )  {
+					if ( material.pbrMetallicRoughness !== undefined )  {
 
 						// specification
 						// https://github.com/sbtron/glTF/blob/30de0b365d1566b1bbd8b9c140f9e995d3203226/specification/2.0/README.md#metallic-roughness-material
@@ -1295,6 +1252,16 @@ THREE.GLTF2Loader = ( function () {
 
 							}
 
+							if ( materialParams.opacity < 1.0 ||
+							     ( materialParams.map !== undefined &&
+							       ( materialParams.map.format === THREE.AlphaFormat ||
+							         materialParams.map.format === THREE.RGBAFormat ||
+							         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
+
+								materialParams.transparent = true;
+
+							}
+
 							materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0;
 							materialParams.roughness = metallicRoughness.roughnessFactor !== undefined ? metallicRoughness.roughnessFactor : 1.0;
 
@@ -1319,16 +1286,6 @@ THREE.GLTF2Loader = ( function () {
 					} else {
 
 						materialType = THREE.MeshPhongMaterial;
-
-					}
-
-					if ( materialParams.opacity < 1.0 ||
-					     ( materialParams.map !== undefined &&
-					       ( materialParams.map.format === THREE.AlphaFormat ||
-					         materialParams.map.format === THREE.RGBAFormat ||
-					         materialParams.map.format === THREE.LuminanceAlphaFormat ) ) ) {
-
-						materialParams.transparent = true;
 
 					}
 
