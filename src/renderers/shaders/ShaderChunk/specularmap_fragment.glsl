@@ -1,25 +1,12 @@
-#ifdef STANDARD_SG
-	vec3 specularFactor = specular;
+float specularStrength;
 
-	#ifdef USE_SPECULARMAP
+#ifdef USE_SPECULARMAP
 
-		vec4 texelSpecular = texture2D( specularMap, vUv );
+	vec4 texelSpecular = texture2D( specularMap, vUv );
+	specularStrength = texelSpecular.r;
 
-		// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture
-		specularFactor *= texelSpecular.rgb;
-
-	#endif
 #else
-	float specularStrength;
 
-	#ifdef USE_SPECULARMAP
+	specularStrength = 1.0;
 
-		vec4 texelSpecular = texture2D( specularMap, vUv );
-		specularStrength = texelSpecular.r;
-
-	#else
-
-		specularStrength = 1.0;
-
-	#endif
 #endif

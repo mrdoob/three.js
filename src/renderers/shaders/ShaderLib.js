@@ -83,6 +83,7 @@ var ShaderLib = {
 			UniformsLib.roughnessmap,
 			UniformsLib.metalnessmap,
 			UniformsLib.glossinessmap,
+			UniformsLib.specular2map,
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
@@ -90,7 +91,7 @@ var ShaderLib = {
 				roughness: { value: 0.5 },
 				metalness: { value: 0.5 },
 				glossiness: { value: 0.5 },
-				specular: { value: new Color( 0x111111 ) },
+				specular2: { value: new Color( 0x000000 ) },
 				envMapIntensity: { value: 1 } // temporary
 			}
 		] ),

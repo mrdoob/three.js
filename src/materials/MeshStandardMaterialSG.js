@@ -7,11 +7,11 @@ import { Color } from '../math/Color';
  *
  * parameters = {
  *  glossiness: <float>,
- *  specular: <hex>,
+ *  specular2: <hex>,
  *
  *  glossinessMap: new THREE.Texture( <Image> ),
  *
- *  specularMap: new THREE.Texture( <Image> ),
+ *  specular2Map: new THREE.Texture( <Image> ),
  * }
  */
 
@@ -24,11 +24,11 @@ function MeshStandardMaterialSG( parameters ) {
 	this.type = 'MeshStandardMaterialSG';
 
 	this.glossiness = 0.5;
-	this.specular = new Color( 0x111111 );
+	this.specular2 = new Color ( 0x000000 );
 
 	this.glossinessMap = null;
 
-	this.specularMap = null;
+	this.specular2Map = null;
 
 	this.setValues( parameters );
 
@@ -46,11 +46,11 @@ MeshStandardMaterialSG.prototype.copy = function ( source ) {
 	this.defines[ 'STANDARD_SG' ] = '';
 
 	this.glossiness = source.glossiness;
-	this.specular.copy( source.specular );
+	this.speculars.copy( source.specular2 );
 
 	this.glossinessMap = source.glossinessMap;
 
-	this.specularMap = source.specularMap;
+	this.specular2Map = source.specular2Map;
 
 	return this;
 

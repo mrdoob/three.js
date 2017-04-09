@@ -5,7 +5,7 @@ uniform vec3 emissive;
 
 #ifdef STANDARD_SG
 	uniform float glossiness;
-	uniform vec3 specular;
+	uniform vec3 specular2;
 #else
 	uniform float roughness;
 	uniform float metalness;
@@ -48,7 +48,7 @@ varying vec3 vViewPosition;
 
 #ifdef STANDARD_SG
 	#include <glossinessmap_pars_fragment>
-	#include <specularmap_pars_fragment>
+	#include <specular2map_pars_fragment>
 #else
 	#include <roughnessmap_pars_fragment>
 	#include <metalnessmap_pars_fragment>
@@ -70,10 +70,11 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <specularmap_fragment>
 
 	#ifdef STANDARD_SG
 		#include <glossinessmap_fragment>
-		#include <specularmap_fragment>
+		#include <specular2map_fragment>
 	#else
 		#include <roughnessmap_fragment>
 		#include <metalnessmap_fragment>
