@@ -4,7 +4,7 @@ struct PhysicalMaterial {
 	float	specularRoughness;
 	vec3	specularColor;
 
-	#ifndef STANDARD_COMMON
+	#ifndef STANDARD
 		float clearCoat;
 		float clearCoatRoughness;
 	#endif
@@ -56,7 +56,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	#ifndef STANDARD_COMMON
+	#ifndef STANDARD
 		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
 	#else
 		float clearCoatDHR = 0.0;
@@ -65,7 +65,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 	reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );
 	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
-	#ifndef STANDARD_COMMON
+	#ifndef STANDARD
 
 		reflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_Specular_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
@@ -81,7 +81,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	#ifndef STANDARD_COMMON
+	#ifndef STANDARD
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 		float dotNL = dotNV;
 		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
@@ -91,7 +91,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 clearCo
 
 	reflectedLight.indirectSpecular += ( 1.0 - clearCoatDHR ) * radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
 
-	#ifndef STANDARD_COMMON
+	#ifndef STANDARD
 
 		reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
