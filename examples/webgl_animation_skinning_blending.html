@@ -175,10 +175,10 @@
 					'pause/continue':        pauseContinue,
 					'make single step':      toSingleStepMode,
 					'modify step size':      0.05,
-					'from walk to idle':     function() { prepareCrossFade( walkAction, idleAction, runAction, 1.0 ) },
-					'from idle to walk':     function() { prepareCrossFade( idleAction, walkAction, runAction, 0.5 ) },
-					'from walk to run':      function() { prepareCrossFade( walkAction, runAction, idleAction, 2.5 ) },
-					'from run to walk':      function() { prepareCrossFade( runAction, walkAction, idleAction, 5.0 ) },
+					'from walk to idle':     function () { prepareCrossFade( walkAction, idleAction, runAction, 1.0 ) },
+					'from idle to walk':     function () { prepareCrossFade( idleAction, walkAction, runAction, 0.5 ) },
+					'from walk to run':      function () { prepareCrossFade( walkAction, runAction, idleAction, 2.5 ) },
+					'from run to walk':      function () { prepareCrossFade( runAction, walkAction, idleAction, 5.0 ) },
 					'use default duration':  true,
 					'set custom duration':   3.5,
 					'modify idle weight':    0.0,
@@ -200,9 +200,9 @@
 				folder4.add( settings, 'from run to walk' );
 				folder4.add( settings, 'use default duration' );
 				folder4.add( settings, 'set custom duration', 0, 10, 0.01 );
-				folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function(weight) { setWeight( idleAction, weight ) } );
-				folder5.add( settings, 'modify walk weight', 0.0, 1.0, 0.01 ).listen().onChange( function(weight) { setWeight( walkAction, weight ) } );
-				folder5.add( settings, 'modify run weight', 0.0, 1.0, 0.01 ).listen().onChange( function(weight) { setWeight( runAction, weight ) } );
+				folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( idleAction, weight ) } );
+				folder5.add( settings, 'modify walk weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( walkAction, weight ) } );
+				folder5.add( settings, 'modify run weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( runAction, weight ) } );
 				folder6.add( settings, 'modify time scale', 0.0, 1.5, 0.01 ).onChange( modifyTimeScale );
 
 				folder1.open();
