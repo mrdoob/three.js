@@ -1,7 +1,7 @@
 PhysicalMaterial material;
 
 #ifdef STANDARD_SG
-	material.diffuseColor = diffuseColor.rgb;
+	material.diffuseColor = diffuseColor.rgb * ( 1.0 - max( max( specular2Factor.r, specular2Factor.g ), specular2Factor.b ) );
 	material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.04, 1.0 );
 	material.specularColor = specular2Factor.rgb;
 #else
