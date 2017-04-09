@@ -1251,18 +1251,18 @@ THREE.GLTF2Loader = ( function () {
 						}
 
 						materialParams.glossiness = pbrSpecularGlossiness.glossinessFactor !== undefined ? pbrSpecularGlossiness.glossinessFactor : 1.0;
-						materialParams.specular = new THREE.Color( 1.0, 1.0, 1.0 );
+						materialParams.specular2 = new THREE.Color( 1.0, 1.0, 1.0 );
 
 						if ( Array.isArray( pbrSpecularGlossiness.specularFactor ) ) {
 
-							materialParams.specular.fromArray( pbrSpecularGlossiness.specularFactor );
+							materialParams.specular2.fromArray( pbrSpecularGlossiness.specularFactor );
 
 						}
 
 						if ( pbrSpecularGlossiness.specularGlossinessTexture !== undefined ) {
 
 							materialParams.glossinessMap = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
-							materialParams.specularMap = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
+							materialParams.specular2Map = dependencies.textures[ pbrSpecularGlossiness.specularGlossinessTexture.index ];
 
 						}
 
