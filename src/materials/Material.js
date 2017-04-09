@@ -147,7 +147,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
-		if ( this.glossiness !== undefined ) data.glossiness = this.glossiness;
 
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
@@ -179,7 +178,6 @@ Object.assign( Material.prototype, EventDispatcher.prototype, {
 		}
 		if ( this.roughnessMap && this.roughnessMap.isTexture ) data.roughnessMap = this.roughnessMap.toJSON( meta ).uuid;
 		if ( this.metalnessMap && this.metalnessMap.isTexture ) data.metalnessMap = this.metalnessMap.toJSON( meta ).uuid;
-		if ( this.glossinessMap && this.glossinessMap.isTexture ) data.glossinessMap = this.glossinessMap.toJSON( meta ).uuid;
 
 		if ( this.emissiveMap && this.emissiveMap.isTexture ) data.emissiveMap = this.emissiveMap.toJSON( meta ).uuid;
 		if ( this.specularMap && this.specularMap.isTexture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;

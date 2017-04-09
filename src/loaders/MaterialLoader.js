@@ -59,7 +59,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.roughness !== undefined ) material.roughness = json.roughness;
 		if ( json.metalness !== undefined ) material.metalness = json.metalness;
-		if ( json.glossiness !== undefined ) material.glossiness = json.glossiness;
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
@@ -128,7 +127,6 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.roughnessMap !== undefined ) material.roughnessMap = getTexture( json.roughnessMap );
 		if ( json.metalnessMap !== undefined ) material.metalnessMap = getTexture( json.metalnessMap );
-		if ( json.glossinessMap !== undefined ) material.glossinessMap = getTexture( json.glossinessMap );
 
 		if ( json.emissiveMap !== undefined ) material.emissiveMap = getTexture( json.emissiveMap );
 		if ( json.emissiveIntensity !== undefined ) material.emissiveIntensity = json.emissiveIntensity;

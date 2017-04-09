@@ -296,14 +296,6 @@ Object.assign( Loader.prototype, {
 					case 'mapRoughnessWrap':
 					case 'mapRoughnessAnisotropy':
 						break;
-					case 'mapGlossinessRepeat':
-					case 'mapGlossinessOffset':
-					case 'mapGlossinessWrap':
-					case 'mapGlossinessAnisotropy':
-						break;
-					case 'mapGlossiness':
-						json.glossinessMap = loadTexture( value, m.mapGlossinessRepeat, m.mapGlossinessOffset, m.mapGlossinessWrap, m.mapGlossinessAnisotropy );
-						break;
 					case 'mapAlpha':
 						json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
 						break;
