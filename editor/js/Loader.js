@@ -155,6 +155,26 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'glb':
+			case 'gltf':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new THREE.GLTFLoader();
+					loader.parse( contents, function ( result ) {
+
+						result.scene.name = filename;
+						editor.execute( new AddObjectCommand( result.scene ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'js':
 			case 'json':
 
@@ -302,7 +322,7 @@ var Loader = function ( editor ) {
 					editor.execute( new AddObjectCommand( mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 

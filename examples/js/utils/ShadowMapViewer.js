@@ -39,7 +39,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		x: 10,
 		y: 10,
 		width: 256,
-		height: 256,
+		height: 256
 	};
 
 	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
@@ -150,7 +150,7 @@ THREE.ShadowMapViewer = function ( light ) {
 			//always end up with the scene's first added shadow casting light's shadowMap
 			//in the shader
 			//See: https://github.com/mrdoob/three.js/issues/5932
-			uniforms.tDiffuse.value = light.shadow.map;
+			uniforms.tDiffuse.value = light.shadow.map.texture;
 
 			userAutoClearSetting = renderer.autoClear;
 			renderer.autoClear = false; // To allow render overlay

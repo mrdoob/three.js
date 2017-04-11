@@ -16,41 +16,41 @@
 		A bone which is part of a [page:Skeleton]. The skeleton in turn is used by the [page:SkinnedMesh].
 		Bones are almost identical to a blank [page:Object3D].
 		</div>
-		
+
 		<h3>Example</h3>
-		
+
 		<code>
 		var root = new THREE.Bone();
 		var child = new THREE.Bone();
-		
+
 		root.add( child );
 		child.position.y = 5;
 		</code>
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([page:SkinnedMesh skin])</h3>
+		<h3>[name]( )</h3>
 		<div>
-		skin — (optional) The [page:SkinnedMesh] to which the bone belongs.
+		Creates a new [name].
 		</div>
 
 		<h2>Properties</h2>
+		<div>See the base [page:Object3D] class for common properties.</div>
 
-		<h3>[property:SkinnedMesh skin]</h3>
+		<h3>[property:Boolean isBone]</h3>
 		<div>
-		An optional reference to the [page:SkinnedMesh].
+			Used to check whether this or derived classes are bones. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
 		</div>
+
+
+		<h3>[property:String type]</h3>
+		<div>Set to 'Bone', this can be used to find all Bones in a scene.</div>
+
 
 		<h2>Methods</h2>
-
-		<h3>[method:Object3D clone]([page:Object3D object])</h3>
-		<div>
-		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned Bone Object.
-		</div>
-		<div>
-		Clone a Bone Object.
-		</div>
+		<div>See the base [page:Object3D] class for common methods.</div>
 
 		<h2>Source</h2>
 

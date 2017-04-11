@@ -74,10 +74,6 @@
 				camera.position.z = 3;
 				camera.focalLength = 3;
 
-				scene = new THREE.Scene();
-
-				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
-
 				var path = "textures/cube/pisa/";
 				var format = '.png';
 				var urls = [
@@ -87,6 +83,11 @@
 				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
+
+				scene = new THREE.Scene();
+				scene.background = textureCube;
+
+				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -104,23 +105,6 @@
 					spheres.push( mesh );
 
 				}
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				scene.add( mesh );
 
 				//
 
@@ -142,8 +126,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

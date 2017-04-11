@@ -17,6 +17,7 @@
 
 		<script src="../build/three.js"></script>
 
+		<script src="js/controls/DragControls.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -25,12 +26,7 @@
 
 			var container, stats;
 			var camera, controls, scene, renderer;
-			var objects = [], plane;
-
-			var raycaster = new THREE.Raycaster();
-			var mouse = new THREE.Vector2(),
-			offset = new THREE.Vector3(),
-			INTERSECTED, SELECTED;
+			var objects = [];
 
 			init();
 			animate();
@@ -95,12 +91,6 @@
 
 				}
 
-				plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000, 8, 8 ),
-					new THREE.MeshBasicMaterial( { visible: false } )
-				);
-				scene.add( plane );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -112,6 +102,10 @@
 
 				container.appendChild( renderer.domElement );
 
+				var dragControls = new THREE.DragControls( objects, camera, renderer.domElement );
+				dragControls.addEventListener( 'dragstart', function ( event ) { controls.enabled = false; } );
+				dragControls.addEventListener( 'dragend', function ( event ) { controls.enabled = true; } );
+
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
@@ -122,10 +116,6 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 				//
 
@@ -139,107 +129,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-				//
-
-				raycaster.setFromCamera( mouse, camera );
-
-				if ( SELECTED ) {
-
-					var intersects = raycaster.intersectObject( plane );
-
-					if ( intersects.length > 0 ) {
-
-						SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-
-					}
-
-					return;
-
-				}
-
-				var intersects = raycaster.intersectObjects( objects );
-
-				if ( intersects.length > 0 ) {
-
-					if ( INTERSECTED != intersects[ 0 ].object ) {
-
-						if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-
-						plane.position.copy( INTERSECTED.position );
-						plane.lookAt( camera.position );
-
-					}
-
-					container.style.cursor = 'pointer';
-
-				} else {
-
-					if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-
-					INTERSECTED = null;
-
-					container.style.cursor = 'auto';
-
-				}
-
-			}
-
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
-
-				raycaster.setFromCamera( mouse, camera );
-
-				var intersects = raycaster.intersectObjects( objects );
-
-				if ( intersects.length > 0 ) {
-
-					controls.enabled = false;
-
-					SELECTED = intersects[ 0 ].object;
-
-					var intersects = raycaster.intersectObject( plane );
-
-					if ( intersects.length > 0 ) {
-
-						offset.copy( intersects[ 0 ].point ).sub( plane.position );
-
-					}
-
-					container.style.cursor = 'move';
-
-				}
-
-			}
-
-			function onDocumentMouseUp( event ) {
-
-				event.preventDefault();
-
-				controls.enabled = true;
-
-				if ( INTERSECTED ) {
-
-					plane.position.copy( INTERSECTED.position );
-
-					SELECTED = null;
-
-				}
-
-				container.style.cursor = 'auto';
 
 			}
 

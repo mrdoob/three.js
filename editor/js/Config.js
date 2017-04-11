@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function () {
-
-	var name = 'threejs-editor';
+var Config = function ( name ) {
 
 	var storage = {
 		'autosave': true,
@@ -12,14 +10,12 @@ var Config = function () {
 
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
+		'project/renderer/gammaInput': false,
+		'project/renderer/gammaOutput': false,
 		'project/renderer/shadows': true,
-		'project/editable': false,
 		'project/vr': false,
 
-		'settings/history': false,
-
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/script/collapsed': true
+		'settings/history': false
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {

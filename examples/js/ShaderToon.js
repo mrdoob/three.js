@@ -16,12 +16,12 @@ THREE.ShaderToon = {
 
 		uniforms: {
 
-			"uDirLightPos":	{ type: "v3", value: new THREE.Vector3() },
-			"uDirLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"uDirLightPos": { value: new THREE.Vector3() },
+			"uDirLightColor": { value: new THREE.Color( 0xeeeeee ) },
 
-			"uAmbientLightColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uAmbientLightColor": { value: new THREE.Color( 0x050505 ) },
 
-			"uBaseColor":  { type: "c", value: new THREE.Color( 0xffffff ) }
+			"uBaseColor": { value: new THREE.Color( 0xffffff ) }
 
 		},
 
@@ -92,16 +92,16 @@ THREE.ShaderToon = {
 
 		uniforms: {
 
-			"uDirLightPos":	{ type: "v3", value: new THREE.Vector3() },
-			"uDirLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"uDirLightPos": { value: new THREE.Vector3() },
+			"uDirLightColor": { value: new THREE.Color( 0xeeeeee ) },
 
-			"uAmbientLightColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uAmbientLightColor": { value: new THREE.Color( 0x050505 ) },
 
-			"uBaseColor":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"uLineColor1": { type: "c", value: new THREE.Color( 0x808080 ) },
-			"uLineColor2": { type: "c", value: new THREE.Color( 0x000000 ) },
-			"uLineColor3": { type: "c", value: new THREE.Color( 0x000000 ) },
-			"uLineColor4": { type: "c", value: new THREE.Color( 0x000000 ) }
+			"uBaseColor": { value: new THREE.Color( 0xeeeeee ) },
+			"uLineColor1": { value: new THREE.Color( 0x808080 ) },
+			"uLineColor2": { value: new THREE.Color( 0x000000 ) },
+			"uLineColor3": { value: new THREE.Color( 0x000000 ) },
+			"uLineColor4": { value: new THREE.Color( 0x000000 ) }
 
 		},
 
@@ -162,16 +162,16 @@ THREE.ShaderToon = {
 
 		uniforms: {
 
-			"uDirLightPos":	{ type: "v3", value: new THREE.Vector3() },
-			"uDirLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"uDirLightPos":	{ value: new THREE.Vector3() },
+			"uDirLightColor": { value: new THREE.Color( 0xeeeeee ) },
 
-			"uAmbientLightColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uAmbientLightColor": { value: new THREE.Color( 0x050505 ) },
 
-			"uBaseColor":  { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uLineColor1": { type: "c", value: new THREE.Color( 0x000000 ) },
-			"uLineColor2": { type: "c", value: new THREE.Color( 0x000000 ) },
-			"uLineColor3": { type: "c", value: new THREE.Color( 0x000000 ) },
-			"uLineColor4": { type: "c", value: new THREE.Color( 0x000000 ) }
+			"uBaseColor":  { value: new THREE.Color( 0xffffff ) },
+			"uLineColor1": { value: new THREE.Color( 0x000000 ) },
+			"uLineColor2": { value: new THREE.Color( 0x000000 ) },
+			"uLineColor3": { value: new THREE.Color( 0x000000 ) },
+			"uLineColor4": { value: new THREE.Color( 0x000000 ) }
 
 		},
 
@@ -257,13 +257,13 @@ THREE.ShaderToon = {
 
 		uniforms: {
 
-			"uDirLightPos":	{ type: "v3", value: new THREE.Vector3() },
-			"uDirLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"uDirLightPos":	{ value: new THREE.Vector3() },
+			"uDirLightColor": { value: new THREE.Color( 0xeeeeee ) },
 
-			"uAmbientLightColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uAmbientLightColor": { value: new THREE.Color( 0x050505 ) },
 
-			"uBaseColor":  { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uLineColor1": { type: "c", value: new THREE.Color( 0x000000 ) }
+			"uBaseColor":  { value: new THREE.Color( 0xffffff ) },
+			"uLineColor1": { value: new THREE.Color( 0x000000 ) }
 
 		},
 

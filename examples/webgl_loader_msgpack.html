@@ -56,7 +56,11 @@ https://github.com/creationix/msgpack-js-browser
 
 			function render() {
 
-				renderer.render( scene, camera );
+				if ( scene !== undefined ) {
+
+					renderer.render( scene, camera );
+
+				}
 
 			}
 
@@ -82,7 +86,7 @@ https://github.com/creationix/msgpack-js-browser
 			function setupScene( result ) {
 
 				scene = result;
-				scene.add( new THREE.GridHelper( 10, 2.5 ) );
+				scene.add( new THREE.GridHelper( 20, 8 ) );
 
 				threePointLight();
 
@@ -92,7 +96,7 @@ https://github.com/creationix/msgpack-js-browser
 
 			function loadMSGPack() {
 
-				var loader = new THREE.XHRLoader();
+				var loader = new THREE.FileLoader();
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( 'scenes/robo_pigeon.pack', function ( data ) {
 
@@ -118,9 +122,6 @@ https://github.com/creationix/msgpack-js-browser
 
 			function init() {
 
-				scene = new THREE.Scene();
-
-				scene.add( new THREE.GridHelper( 10, 2.5 ) );
 				container = document.getElementById( 'viewport' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );

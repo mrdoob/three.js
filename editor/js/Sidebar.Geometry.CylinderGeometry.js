@@ -8,7 +8,8 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// radiusTop
 
@@ -74,7 +75,7 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.CylinderGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
@@ -87,4 +88,6 @@ Sidebar.Geometry.CylinderGeometry = function ( editor, object ) {
 
 	return container;
 
-}
+};
+
+Sidebar.Geometry.CylinderBufferGeometry = Sidebar.Geometry.CylinderGeometry;

@@ -16,7 +16,6 @@
 				background-color: #fff;
 				margin: 0px;
 				overflow: hidden;
-				text
 			}
 
 			#info {
@@ -49,7 +48,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-
 
 		<script>
 
@@ -84,7 +82,7 @@
 
 				var effectController  = {
 					turbidity: 10,
-					reileigh: 2,
+					rayleigh: 2,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.8,
 					luminance: 1,
@@ -99,7 +97,7 @@
 
 					var uniforms = sky.uniforms;
 					uniforms.turbidity.value = effectController.turbidity;
-					uniforms.reileigh.value = effectController.reileigh;
+					uniforms.rayleigh.value = effectController.rayleigh;
 					uniforms.luminance.value = effectController.luminance;
 					uniforms.mieCoefficient.value = effectController.mieCoefficient;
 					uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
@@ -122,7 +120,7 @@
 				var gui = new dat.GUI();
 
 				gui.add( effectController, "turbidity", 1.0, 20.0, 0.1 ).onChange( guiChanged );
-				gui.add( effectController, "reileigh", 0.0, 4, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "luminance", 0.0, 2 ).onChange( guiChanged );
@@ -143,9 +141,7 @@
 
 				scene = new THREE.Scene();
 
-				var helper = new THREE.GridHelper( 5000, 5000 );
-				helper.color1.setHex( 0xffffff );
-				helper.color2.setHex( 0xffffff );
+				var helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
 				scene.add( helper );
 
 				renderer = new THREE.WebGLRenderer();

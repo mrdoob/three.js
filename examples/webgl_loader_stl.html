@@ -180,7 +180,7 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				container.appendChild( renderer.domElement );
 

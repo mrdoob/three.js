@@ -31,9 +31,9 @@
 	this.geometrySize = optionalParameter( options.GEOMETRY_SIZE, 2000 );
 	this.resolution = optionalParameter( options.RESOLUTION, 64 );
 	this.floatSize = optionalParameter( options.SIZE_OF_FLOAT, 4 );
-	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 ),
-	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 ),
-	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 ),
+	this.windX = optionalParameter( options.INITIAL_WIND[ 0 ], 10.0 );
+	this.windY = optionalParameter( options.INITIAL_WIND[ 1 ], 10.0 );
+	this.size = optionalParameter( options.INITIAL_SIZE, 250.0 );
 	this.choppiness = optionalParameter( options.INITIAL_CHOPPINESS, 1.5 );
 
 	//
@@ -97,9 +97,9 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: "#define HORIZONTAL \n" + oceanHorizontalShader.fragmentShader
 	} );
-	this.materialOceanHorizontal.uniforms.u_transformSize = { type: "f", value: this.resolution };
-	this.materialOceanHorizontal.uniforms.u_subtransformSize = { type: "f", value: null };
-	this.materialOceanHorizontal.uniforms.u_input = { type: "t", value: null };
+	this.materialOceanHorizontal.uniforms.u_transformSize = { value: this.resolution };
+	this.materialOceanHorizontal.uniforms.u_subtransformSize = { value: null };
+	this.materialOceanHorizontal.uniforms.u_input = { value: null };
 	this.materialOceanHorizontal.depthTest = false;
 
 	// 2 - Vertical wave vertices used for FFT
@@ -110,9 +110,9 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: oceanVerticalShader.fragmentShader
 	} );
-	this.materialOceanVertical.uniforms.u_transformSize = { type: "f", value: this.resolution };
-	this.materialOceanVertical.uniforms.u_subtransformSize = { type: "f", value: null };
-	this.materialOceanVertical.uniforms.u_input = { type: "t", value: null };
+	this.materialOceanVertical.uniforms.u_transformSize = { value: this.resolution };
+	this.materialOceanVertical.uniforms.u_subtransformSize = { value: null };
+	this.materialOceanVertical.uniforms.u_input = { value: null };
 	this.materialOceanVertical.depthTest = false;
 
 	// 3 - Initial spectrum used to generate height map
@@ -123,8 +123,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: initialSpectrumShader.fragmentShader
 	} );
-	this.materialInitialSpectrum.uniforms.u_wind = { type: "v2", value: new THREE.Vector2() };
-	this.materialInitialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialInitialSpectrum.uniforms.u_wind = { value: new THREE.Vector2() };
+	this.materialInitialSpectrum.uniforms.u_resolution = { value: this.resolution };
 	this.materialInitialSpectrum.depthTest = false;
 
 	// 4 - Phases used to animate heightmap
@@ -135,7 +135,7 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: phaseShader.fragmentShader
 	} );
-	this.materialPhase.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialPhase.uniforms.u_resolution = { value: this.resolution };
 	this.materialPhase.depthTest = false;
 
 	// 5 - Shader used to update spectrum
@@ -146,8 +146,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: spectrumShader.fragmentShader
 	} );
-	this.materialSpectrum.uniforms.u_initialSpectrum = { type: "t", value: null };
-	this.materialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialSpectrum.uniforms.u_initialSpectrum = { value: null };
+	this.materialSpectrum.uniforms.u_resolution = { value: this.resolution };
 	this.materialSpectrum.depthTest = false;
 
 	// 6 - Shader used to update spectrum normals
@@ -158,8 +158,8 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader: normalShader.fragmentShader
 	} );
-	this.materialNormal.uniforms.u_displacementMap = { type: "t", value: null };
-	this.materialNormal.uniforms.u_resolution = { type: "f", value: this.resolution };
+	this.materialNormal.uniforms.u_displacementMap = { value: null };
+	this.materialNormal.uniforms.u_resolution = { value: this.resolution };
 	this.materialNormal.depthTest = false;
 
 	// 7 - Shader used to update normals
@@ -171,13 +171,13 @@
 		fragmentShader: oceanShader.fragmentShader
 	} );
 	// this.materialOcean.wireframe = true;
-	this.materialOcean.uniforms.u_geometrySize = { type: "f", value: this.resolution };
-	this.materialOcean.uniforms.u_displacementMap = { type: "t", value: this.displacementMapFramebuffer };
-	this.materialOcean.uniforms.u_normalMap = { type: "t", value: this.normalMapFramebuffer };
-	this.materialOcean.uniforms.u_oceanColor = { type: "v3", value: this.oceanColor };
-	this.materialOcean.uniforms.u_skyColor = { type: "v3", value: this.skyColor };
-	this.materialOcean.uniforms.u_sunDirection = { type: "v3", value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
-	this.materialOcean.uniforms.u_exposure = { type: "f", value: this.exposure };
+	this.materialOcean.uniforms.u_geometrySize = { value: this.resolution };
+	this.materialOcean.uniforms.u_displacementMap = { value: this.displacementMapFramebuffer.texture };
+	this.materialOcean.uniforms.u_normalMap = { value: this.normalMapFramebuffer.texture };
+	this.materialOcean.uniforms.u_oceanColor = { value: this.oceanColor };
+	this.materialOcean.uniforms.u_skyColor = { value: this.skyColor };
+	this.materialOcean.uniforms.u_sunDirection = { value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
+	this.materialOcean.uniforms.u_exposure = { value: this.exposure };
 
 	// Disable blending to prevent default premultiplied alpha values
 	this.materialOceanHorizontal.blending = 0;
@@ -271,7 +271,7 @@ THREE.Ocean.prototype.renderWavePhase = function () {
 
 	}else {
 
-		this.materialPhase.uniforms.u_phases.value = this.pingPhase ? this.pingPhaseFramebuffer  : this.pongPhaseFramebuffer;
+		this.materialPhase.uniforms.u_phases.value = this.pingPhase ? this.pingPhaseFramebuffer.texture : this.pongPhaseFramebuffer.texture;
 
 	}
 	this.materialPhase.uniforms.u_deltaTime.value = this.deltaTime;
@@ -284,10 +284,10 @@ THREE.Ocean.prototype.renderWavePhase = function () {
 THREE.Ocean.prototype.renderSpectrum = function () {
 
 	this.scene.overrideMaterial = this.materialSpectrum;
-	this.materialSpectrum.uniforms.u_initialSpectrum.value = this.initialSpectrumFramebuffer;
-	this.materialSpectrum.uniforms.u_phases.value = this.pingPhase ? this.pingPhaseFramebuffer : this.pongPhaseFramebuffer;
-	this.materialSpectrum.uniforms.u_choppiness.value = this.choppiness ;
-	this.materialSpectrum.uniforms.u_size.value = this.size ;
+	this.materialSpectrum.uniforms.u_initialSpectrum.value = this.initialSpectrumFramebuffer.texture;
+	this.materialSpectrum.uniforms.u_phases.value = this.pingPhase ? this.pingPhaseFramebuffer.texture : this.pongPhaseFramebuffer.texture;
+	this.materialSpectrum.uniforms.u_choppiness.value = this.choppiness;
+	this.materialSpectrum.uniforms.u_size.value = this.size;
 	this.renderer.render( this.scene, this.oceanCamera, this.spectrumFramebuffer );
 
 };
@@ -303,19 +303,19 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 
 		if ( i === 0 ) {
 
-			this.materialOceanHorizontal.uniforms.u_input.value = this.spectrumFramebuffer;
+			this.materialOceanHorizontal.uniforms.u_input.value = this.spectrumFramebuffer.texture;
 			this.materialOceanHorizontal.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.pingTransformFramebuffer );
 
 		} else if ( i % 2 === 1 ) {
 
-			this.materialOceanHorizontal.uniforms.u_input.value = this.pingTransformFramebuffer;
+			this.materialOceanHorizontal.uniforms.u_input.value = this.pingTransformFramebuffer.texture;
 			this.materialOceanHorizontal.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.pongTransformFramebuffer );
 
 		} else {
 
-			this.materialOceanHorizontal.uniforms.u_input.value = this.pongTransformFramebuffer;
+			this.materialOceanHorizontal.uniforms.u_input.value = this.pongTransformFramebuffer.texture;
 			this.materialOceanHorizontal.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.pingTransformFramebuffer );
 
@@ -327,19 +327,19 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 
 		if ( i === iterations * 2 - 1 ) {
 
-			this.materialOceanVertical.uniforms.u_input.value = ( iterations % 2 === 0 ) ? this.pingTransformFramebuffer : this.pongTransformFramebuffer;
+			this.materialOceanVertical.uniforms.u_input.value = ( iterations % 2 === 0 ) ? this.pingTransformFramebuffer.texture : this.pongTransformFramebuffer.texture;
 			this.materialOceanVertical.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.displacementMapFramebuffer );
 
 		} else if ( i % 2 === 1 ) {
 
-			this.materialOceanVertical.uniforms.u_input.value = this.pingTransformFramebuffer;
+			this.materialOceanVertical.uniforms.u_input.value = this.pingTransformFramebuffer.texture;
 			this.materialOceanVertical.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.pongTransformFramebuffer );
 
 		} else {
 
-			this.materialOceanVertical.uniforms.u_input.value = this.pongTransformFramebuffer;
+			this.materialOceanVertical.uniforms.u_input.value = this.pongTransformFramebuffer.texture;
 			this.materialOceanVertical.uniforms.u_subtransformSize.value = Math.pow( 2, ( i % ( iterations ) ) + 1 );
 			this.renderer.render( this.scene, this.oceanCamera, this.pingTransformFramebuffer );
 
@@ -353,7 +353,7 @@ THREE.Ocean.prototype.renderNormalMap = function () {
 
 	this.scene.overrideMaterial = this.materialNormal;
 	if ( this.changed ) this.materialNormal.uniforms.u_size.value = this.size;
-	this.materialNormal.uniforms.u_displacementMap.value = this.displacementMapFramebuffer;
+	this.materialNormal.uniforms.u_displacementMap.value = this.displacementMapFramebuffer.texture;
 	this.renderer.render( this.scene, this.oceanCamera, this.normalMapFramebuffer, true );
 
 };

@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">This displays a cylinder helper object for a [page:SpotLight] </div>
+		<div class="desc">This displays a cone shaped helper object for a [page:SpotLight].</div>
 
 		<h2>Example</h2>
 		<iframe src='../examples/webgl_lights_spotlight.html'></iframe>
@@ -36,27 +36,37 @@
 
 
 		<h3>[name]([page:SpotLight light])</h3>
-		<div>
-		light -- The [page:SpotLight] to display
-		</div>
+		<div>light -- The [page:SpotLight] to be visualized.</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Object3D] class for common properties.</div>
+
+		<h3>[property:LineSegments cone]</h3>
+		<div>[page:LineSegments] used to visualize the light.</div>
 
 
 		<h3>[property:SpotLight light]</h3>
+		<div>Reference to the [page:SpotLight] being visualized.</div>
+
+		<h3>[property:object matrix]</h3>
+		<div>Reference to the spotLight's [page:Object3D.matrixWorld matrixWorld].</div>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
 		<div>
-		The [page:SpotLight]
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			spotLight's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
 
 		<h2>Methods</h2>
-
+		<div>See the base [page:Object3D] class for common methods.</div>
 
 		<h3>[method:null update]()</h3>
-		<div>
-		Updates the light helper.
-		</div>
+		<div>Disposes of the light helper.</div>
+
+		<h3>[method:null update]()</h3>
+		<div>Updates the light helper.</div>
 
 		<h2>Source</h2>
 

@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Line] &rarr;
+		[page:LineSegments] &rarr;
 
 		<h1>[name]</h1>
 
@@ -18,20 +18,31 @@
 
 		<h2>Example</h2>
 
-                <code>var axisHelper = new THREE.AxisHelper( 5 );
-		scene.add( axisHelper );
-                </code>
+		<div>[example:webgl_geometries WebGL / geometries]</div>
+		<div>[example:webgl_geometries2 WebGL / geometries2]</div>
+		<div>[example:webgl_geometry_convex WebGL / geometry / convex]</div>
+		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor]</div>
+
+
+
+		<code>
+var axisHelper = new THREE.AxisHelper( 5 );
+scene.add( axisHelper );
+    </code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Number size])</h3>
+		<h3>[name]( [page:Number size] )</h3>
 		<div>
-		size -- Define the size of the line representing the axes.
+		[page:Number size] -- (optional )size of the lines representing the axes. Default is *1*.
 		</div>
-		<div>
-		Creates an axisHelper with lines of length size.
-		</div>
+
+		<h2>Properties</h2>
+		<div>See the base [page:LineSegments] class for common properties.</div>
+
+		<h2>Methods</h2>
+		<div>See the base [page:LineSegments] class for common methods.</div>
 
 		<h2>Source</h2>
 

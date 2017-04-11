@@ -1,20 +1,29 @@
+import { Texture } from './Texture';
+import { NearestFilter } from '../constants';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
-	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
 	this.image = { data: data, width: width, height: height };
 
-	this.magFilter = magFilter !== undefined ? magFilter : THREE.NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : THREE.NearestFilter;
+	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
 
-	this.flipY = false;
 	this.generateMipmaps  = false;
+	this.flipY = false;
+	this.unpackAlignment = 1;
 
-};
+}
 
-THREE.DataTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.DataTexture.prototype.constructor = THREE.DataTexture;
+DataTexture.prototype = Object.create( Texture.prototype );
+DataTexture.prototype.constructor = DataTexture;
+
+DataTexture.prototype.isDataTexture = true;
+
+
+export { DataTexture };

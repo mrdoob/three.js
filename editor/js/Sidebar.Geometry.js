@@ -12,6 +12,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	// Actions
 
+	/*
 	var objectActions = new UI.Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
@@ -79,7 +80,8 @@ Sidebar.Geometry = function ( editor ) {
 		this.setValue( 'Actions' );
 
 	} );
-	// container.addStatic( objectActions );
+	container.addStatic( objectActions );
+	*/
 
 	// type
 
@@ -94,8 +96,8 @@ Sidebar.Geometry = function ( editor ) {
 	// uuid
 
 	var geometryUUIDRow = new UI.Row();
-	var geometryUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var geometryUUID = new UI.Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var geometryUUIDRenew = new UI.Button( 'New' ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
 

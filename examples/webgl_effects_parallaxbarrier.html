@@ -163,7 +163,12 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Bridge2/')
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+
 				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -181,23 +186,6 @@
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );
 				pointLight.position.set( 2000, 1200, 10000 );
 				scene.add( pointLight );
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				scene.add( mesh );
 
 				//
 
@@ -220,15 +208,6 @@
 				}
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
-
-				var r = "textures/cube/Bridge2/";
-				var urls = [
-					r + "posx.jpg", r + "negx.jpg",
-					r + "posy.jpg", r + "negy.jpg",
-					r + "posz.jpg", r + "negz.jpg"
-				];
-
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				// common materials
 
@@ -334,7 +313,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 
@@ -375,7 +354,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 
@@ -435,7 +414,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 

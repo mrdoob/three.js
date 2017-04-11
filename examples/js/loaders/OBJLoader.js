@@ -43,7 +43,7 @@ THREE.OBJLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
@@ -89,21 +89,142 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
+
+				if ( this.object && typeof this.object._finalize === 'function' ) {
+
+					this.object._finalize( true );
+
+				}
+
 				this.object = {
 					name : name || '',
+					fromDeclaration : ( fromDeclaration !== false ),
+
 					geometry : {
 						vertices : [],
 						normals  : [],
 						uvs      : []
 					},
-					material : {
-						name   : '',
-						smooth : true
+					materials : [],
+					smooth : true,
+
+					startMaterial : function( name, libraries ) {
+
+						var previous = this._finalize( false );
+
+						// New usemtl declaration overwrites an inherited material, except if faces were declared
+						// after the material, then it must be preserved for proper MultiMaterial continuation.
+						if ( previous && ( previous.inherited || previous.groupCount <= 0 ) ) {
+
+							this.materials.splice( previous.index, 1 );
+
+						}
+
+						var material = {
+							index      : this.materials.length,
+							name       : name || '',
+							mtllib     : ( Array.isArray( libraries ) && libraries.length > 0 ? libraries[ libraries.length - 1 ] : '' ),
+							smooth     : ( previous !== undefined ? previous.smooth : this.smooth ),
+							groupStart : ( previous !== undefined ? previous.groupEnd : 0 ),
+							groupEnd   : -1,
+							groupCount : -1,
+							inherited  : false,
+
+							clone : function( index ) {
+								var cloned = {
+									index      : ( typeof index === 'number' ? index : this.index ),
+									name       : this.name,
+									mtllib     : this.mtllib,
+									smooth     : this.smooth,
+									groupStart : 0,
+									groupEnd   : -1,
+									groupCount : -1,
+									inherited  : false
+								};
+								cloned.clone = this.clone.bind(cloned);
+								return cloned;
+							}
+						};
+
+						this.materials.push( material );
+
+						return material;
+
 					},
-					fromDeclaration : ( fromDeclaration !== false )
+
+					currentMaterial : function() {
+
+						if ( this.materials.length > 0 ) {
+							return this.materials[ this.materials.length - 1 ];
+						}
+
+						return undefined;
+
+					},
+
+					_finalize : function( end ) {
+
+						var lastMultiMaterial = this.currentMaterial();
+						if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
+
+							lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
+							lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
+							lastMultiMaterial.inherited = false;
+
+						}
+
+						// Ignore objects tail materials if no face declarations followed them before a new o/g started.
+						if ( end && this.materials.length > 1 ) {
+
+							for ( var mi = this.materials.length - 1; mi >= 0; mi-- ) {
+								if ( this.materials[mi].groupCount <= 0 ) {
+									this.materials.splice( mi, 1 );
+								}
+							}
+
+						}
+
+						// Guarantee at least one empty material, this makes the creation later more straight forward.
+						if ( end && this.materials.length === 0 ) {
+
+							this.materials.push({
+								name   : '',
+								smooth : this.smooth
+							});
+
+						}
+
+						return lastMultiMaterial;
+
+					}
 				};
 
+				// Inherit previous objects material.
+				// Spec tells us that a declared material must be set to all objects until a new material is declared.
+				// If a usemtl declaration is encountered while this new object is being parsed, it will
+				// overwrite the inherited material. Exception being that there was already face declarations
+				// to the inherited material, then it will be preserved for proper MultiMaterial continuation.
+
+				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function" ) {
+
+					var declared = previousMaterial.clone( 0 );
+					declared.inherited = true;
+					this.object.materials.push( declared );
+
+				}
+
 				this.objects.push( this.object );
+
+			},
+
+			finalize : function() {
+
+				if ( this.object && typeof this.object._finalize === 'function' ) {
+
+					this.object._finalize( true );
+
+				}
 
 			},
 
@@ -306,7 +427,14 @@ THREE.OBJLoader.prototype = {
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
 			// This is faster than String.split with regex that splits on both
-			text = text.replace( '\r\n', '\n' );
+			text = text.replace( /\r\n/g, '\n' );
+
+		}
+
+		if ( text.indexOf( '\\\n' ) !== - 1) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\n/g, '' );
 
 		}
 
@@ -457,14 +585,17 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[ 0 ].substr( 1 ).trim();
+				// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
+				// var name = result[ 0 ].substr( 1 ).trim();
+				var name = ( " " + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
+
 				state.startObject( name );
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {
 
 				// material
 
-				state.object.material.name = line.substring( 7 ).trim();
+				state.object.startMaterial( line.substring( 7 ).trim(), state.materialLibraries );
 
 			} else if ( this.regexp.material_library_pattern.test( line ) ) {
 
@@ -476,8 +607,22 @@ THREE.OBJLoader.prototype = {
 
 				// smooth shading
 
+				// @todo Handle files that have varying smooth values for a set of faces inside one geometry,
+				// but does not define a usemtl for each face set.
+				// This should be detected and a dummy material created (later MultiMaterial and geometry groups).
+				// This requires some care to not create extra material on each smooth value for "normal" obj files.
+				// where explicit usemtl defines geometry groups.
+				// Example asset: examples/models/obj/cerberus/Cerberus.obj
+
 				var value = result[ 1 ].trim().toLowerCase();
-				state.object.material.smooth = ( value === '1' || value === 'on' );
+				state.object.smooth = ( value === '1' || value === 'on' );
+
+				var material = state.object.currentMaterial();
+				if ( material ) {
+
+					material.smooth = state.object.smooth;
+
+				}
 
 			} else {
 
@@ -490,6 +635,8 @@ THREE.OBJLoader.prototype = {
 
 		}
 
+		state.finalize();
+
 		var container = new THREE.Group();
 		container.materialLibraries = [].concat( state.materialLibraries );
 
@@ -497,6 +644,7 @@ THREE.OBJLoader.prototype = {
 
 			var object = state.objects[ i ];
 			var geometry = object.geometry;
+			var materials = object.materials;
 			var isLine = ( geometry.type === 'Line' );
 
 			// Skip o/g line declarations that did not follow with any faces
@@ -522,33 +670,64 @@ THREE.OBJLoader.prototype = {
 
 			}
 
-			var material;
+			// Create materials
 
-			if ( this.materials !== null ) {
+			var createdMaterials = [];
 
-				material = this.materials.create( object.material.name );
+			for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
 
-				// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
-				if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
+				var sourceMaterial = materials[mi];
+				var material = undefined;
 
-					var materialLine = new THREE.LineBasicMaterial();
-					materialLine.copy( material );
-					material = materialLine;
+				if ( this.materials !== null ) {
+
+					material = this.materials.create( sourceMaterial.name );
+
+					// mtl etc. loaders probably can't create line materials correctly, copy properties to a line material.
+					if ( isLine && material && ! ( material instanceof THREE.LineBasicMaterial ) ) {
+
+						var materialLine = new THREE.LineBasicMaterial();
+						materialLine.copy( material );
+						material = materialLine;
+
+					}
 
 				}
 
+				if ( ! material ) {
+
+					material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
+					material.name = sourceMaterial.name;
+
+				}
+
+				material.shading = sourceMaterial.smooth ? THREE.SmoothShading : THREE.FlatShading;
+
+				createdMaterials.push(material);
+
 			}
 
-			if ( ! material ) {
+			// Create mesh
 
-				material = ( ! isLine ? new THREE.MeshPhongMaterial() : new THREE.LineBasicMaterial() );
-				material.name = object.material.name;
+			var mesh;
 
+			if ( createdMaterials.length > 1 ) {
+
+				for ( var mi = 0, miLen = materials.length; mi < miLen ; mi++ ) {
+
+					var sourceMaterial = materials[mi];
+					buffergeometry.addGroup( sourceMaterial.groupStart, sourceMaterial.groupCount, mi );
+
+				}
+
+				var multiMaterial = new THREE.MultiMaterial( createdMaterials );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, multiMaterial ) : new THREE.LineSegments( buffergeometry, multiMaterial ) );
+
+			} else {
+
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] ) );
 			}
 
-			material.shading = object.material.smooth ? THREE.SmoothShading : THREE.FlatShading;
-
-			var mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, material ) : new THREE.Line( buffergeometry, material ) );
 			mesh.name = object.name;
 
 			container.add( mesh );

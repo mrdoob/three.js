@@ -1,8 +1,8 @@
 /**
-* @author mrdoob / http://mrdoob.com/
-*/
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
+function WebGLIndexedBufferRenderer( gl, extensions, infoRender ) {
 
 	var mode;
 
@@ -18,13 +18,18 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
-			type = _gl.UNSIGNED_INT;
+			type = gl.UNSIGNED_INT;
 			size = 4;
+
+		} else if ( index.array instanceof Uint16Array ) {
+
+			type = gl.UNSIGNED_SHORT;
+			size = 2;
 
 		} else {
 
-			type = _gl.UNSIGNED_SHORT;
-			size = 2;
+			type = gl.UNSIGNED_BYTE;
+			size = 1;
 
 		}
 
@@ -32,11 +37,12 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 	function render( start, count ) {
 
-		_gl.drawElements( mode, count, type, start * size );
+		gl.drawElements( mode, count, type, start * size );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += count / 3;
 
 	}
 
@@ -53,14 +59,23 @@ THREE.WebGLIndexedBufferRenderer = function ( _gl, extensions, _infoRender ) {
 
 		extension.drawElementsInstancedANGLE( mode, count, type, start * size, geometry.maxInstancedCount );
 
-		_infoRender.calls ++;
-		_infoRender.vertices += count * geometry.maxInstancedCount;
-		if ( mode === _gl.TRIANGLES ) _infoRender.faces += geometry.maxInstancedCount * count / 3;
+		infoRender.calls ++;
+		infoRender.vertices += count * geometry.maxInstancedCount;
+
+		if ( mode === gl.TRIANGLES ) infoRender.faces += geometry.maxInstancedCount * count / 3;
+
 	}
 
-	this.setMode = setMode;
-	this.setIndex = setIndex;
-	this.render = render;
-	this.renderInstances = renderInstances;
+	return {
 
-};
+		setMode: setMode,
+		setIndex: setIndex,
+		render: render,
+		renderInstances: renderInstances
+
+	};
+
+}
+
+
+export { WebGLIndexedBufferRenderer };

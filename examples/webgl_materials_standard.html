@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - pyhsical</title>
+		<title>three.js webgl - materials - standard</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -48,8 +48,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/RGBELoader.js"></script>
 		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
+
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
@@ -65,7 +64,6 @@
 			var container, stats, loader;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
 
 			var controls;
 
@@ -96,49 +94,21 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.autoClear = false;
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/pisa/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
 
 				scene = new THREE.Scene();
-
-				sceneCube = new THREE.Scene();
-				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				sceneCube.add( cameraCube );
+				scene.background = textureCube;
 
 				// LIGHTS
 
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
-				// scene.add( new THREE.AmbientLight( 0xffffff ) );
-
-				//
-
-				var loader = new THREE.CubeTextureLoader();
-				loader.setPath( 'textures/cube/pisa/' );
-				var textureCube = loader.load( [
-					"px.png", "nx.png",
-					"py.png", "ny.png",
-					"pz.png", "nz.png"
-				] );
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var materialBG = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), materialBG );
-				sceneCube.add( mesh );
 
 				//
 
@@ -189,7 +159,7 @@
 					];
 				};
 
-				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
+				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
@@ -200,8 +170,9 @@
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					material.envMap = hdrCubeRenderTarget;
+					material.envMap = hdrCubeRenderTarget.texture;
 					material.needsUpdate = true;
+
 				} );
 
 				//
@@ -239,9 +210,6 @@
 
 				controls.update();
 
-				cameraCube.quaternion.copy( camera.quaternion );
-
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();

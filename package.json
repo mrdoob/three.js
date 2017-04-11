@@ -1,20 +1,37 @@
 {
-  "name": "three.js",
-  "version": "0.76.0",
+  "name": "three",
+  "version": "0.84.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "repository": "mrdoob/three.js",
+  "jsnext:main": "build/three.module.js",
+  "module": "build/three.module.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "build/three.js",
+    "build/three.min.js",
+    "build/three.module.js",
+    "src",
+    "examples/js",
+    "examples/fonts"
+  ],
   "directories": {
     "doc": "docs",
     "example": "examples",
     "test": "test"
   },
-  "scripts": {
-    "build": "cd ./utils/build && node build.js --include common --include extras",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "eslintConfig": {
+    "extends": "mdcs"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
+  "scripts": {
+    "build": "rollup -c",
+    "build-uglify": "rollup -c && uglifyjs build/three.js -cm --preamble \"// threejs.org/license\" > build/three.min.js",
+    "build-closure": "rollup -c && java -jar utils/build/compiler/closure-compiler-v20160713.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "dev": "rollup -c -w",
+    "lint": "eslint src",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "three",
@@ -29,8 +46,10 @@
   },
   "homepage": "http://threejs.org/",
   "devDependencies": {
-    "argparse": "^1.0.3",
-    "jscs": "^1.13.1",
+    "eslint": "^3.10.1",
+    "eslint-config-mdcs": "^4.2.2",
+    "rollup": "^0.36.3",
+    "rollup-watch": "^2.5.0",
     "uglify-js": "^2.6.0"
   }
 }

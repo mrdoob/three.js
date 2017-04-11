@@ -75,18 +75,15 @@
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
 				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var path = "textures/cube/skybox/";
-				var format = '.jpg';
-				var urls = [
-					path + 'px' + format, path + 'nx' + format,
-					path + 'py' + format, path + 'ny' + format,
-					path + 'pz' + format, path + 'nz' + format
-				];
-
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
@@ -103,23 +100,6 @@
 					spheres.push( mesh );
 
 				}
-
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100000, 100000, 100000 ), material );
-				scene.add( mesh );
 
 				//
 
@@ -138,8 +118,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

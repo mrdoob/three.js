@@ -8,48 +8,19 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Loader] &rarr;
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading objects in JSON format.</div>
-
-
-		<h2>Constructor</h2>
-
-		<h3>[name]()</h3>
-		<div>
-		Creates a new [name].
+		<div class="desc">
+			A loader for loading objects in JSON format.
+			This uses the [page:FileLoader] internally for loading files.
 		</div>
-
-
-		<h2>Properties</h2>
-
-		<h3>[property:boolean withCredentials]</h3>
-		<div>
-		If true, the ajax request will use cookies.
-		</div>
-
-
-		<h2>Methods</h2>
-
-		<h3>[method:null load]( [page:String url], [page:Function callback], [page:String texturePath] )</h3>
-		<div>
-		[page:String url] — required<br />
-		[page:Function callback] — required. Will be called when load completes. The arguments will be the loaded [page:Object3D] and the loaded [page:Array materials].<br />
-		[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file.
-		</div>
-
-		<h3>[method:Object3D parse]( [page:Object json], [page:String texturePath] )</h3>
-		<div>
-		[page:String json] — JSON object to parse.<br />
-		[page:String texturePath] — Base path for textures.
-		</div>
-		<div>
-		Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials].
-		</div>
-
 
 		<h2>Example</h2>
+
+		<div>
+		[example:webgl_loader_json_blender WebGL / loader / json / blender]<br />
+		[example:webgl_loader_json_objconverter WebGL / loader / json / objconverter]
+		</div>
 
 		<code>
 		// instantiate a loader
@@ -68,8 +39,56 @@
 		);
 		</code>
 
-		[example:webgl_loader_json_blender]
+		<h2>Constructor</h2>
 
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<div>
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+		</div>
+
+		<h3>[property:String withCredentials]</h3>
+		<div>
+			Whether the XMLHttpRequest uses credentials.
+			Default is *false*.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — the path or URL to the file. This can also be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI]..<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and pass the <em>JSON</em> to onLoad.
+		</div>
+
+		<h3>[method:null setTexturePath]( [page:String texturePath] )</h3>
+		<div>
+			Set the base path or URL from which to load files. This can be useful if
+			you are loading many files from the same directory.
+		</div>
+
+		<h3>[method:Object3D parse]( [page:Object json], [page:String texturePath] )</h3>
+		<div>
+		[page:String json] — JSON object to parse.<br />
+		[page:String texturePath] — Base path for textures.<br /><br />
+
+		Parse a <em>JSON</em> structure and return an [page:object] containing the parsed [page:Geometry geometry] and [page:Array materials].
+		</div>
 
 		<h2>Source</h2>
 

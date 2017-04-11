@@ -11,8 +11,20 @@ THREE.CameraNode = function( scope, camera ) {
 
 };
 
+THREE.CameraNode.fDepthColor = new THREE.FunctionNode( [
+"float depthColor( float mNear, float mFar ) {",
+"	#ifdef USE_LOGDEPTHBUF_EXT",
+"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+"	#else",
+"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+"	#endif",
+"	return 1.0 - smoothstep( mNear, mFar, depth );",
+"}"
+].join( "\n" ) );
+
 THREE.CameraNode.POSITION = 'position';
 THREE.CameraNode.DEPTH = 'depth';
+THREE.CameraNode.TO_VERTEX = 'toVertex';
 
 THREE.CameraNode.prototype = Object.create( THREE.TempNode.prototype );
 THREE.CameraNode.prototype.constructor = THREE.CameraNode;
@@ -67,6 +79,7 @@ THREE.CameraNode.prototype.isUnique = function( builder ) {
 
 	switch ( this.scope ) {
 		case THREE.CameraNode.DEPTH:
+		case THREE.CameraNode.TO_VERTEX:
 			return true;
 	}
 
@@ -100,9 +113,17 @@ THREE.CameraNode.prototype.generate = function( builder, output ) {
 
 		case THREE.CameraNode.DEPTH:
 
-			builder.include( 'depthcolor' );
+			var func = THREE.CameraNode.fDepthColor;
 
-			result = 'depthcolor(' + this.near.build( builder, 'fv1' ) + ',' + this.far.build( builder, 'fv1' ) + ')';
+			builder.include( func );
+
+			result = func.name + '(' + this.near.build( builder, 'fv1' ) + ',' + this.far.build( builder, 'fv1' ) + ')';
+
+			break;
+
+		case THREE.CameraNode.TO_VERTEX:
+
+			result = 'normalize( ' + new THREE.PositionNode( THREE.PositionNode.WORLD ).build( builder, 'v3' ) + ' - cameraPosition )';
 
 			break;
 
@@ -112,7 +133,7 @@ THREE.CameraNode.prototype.generate = function( builder, output ) {
 
 };
 
-THREE.CameraNode.prototype.updateAnimation = function( delta ) {
+THREE.CameraNode.prototype.updateFrame = function( delta ) {
 
 	switch ( this.scope ) {
 

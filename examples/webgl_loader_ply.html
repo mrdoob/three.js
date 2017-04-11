@@ -68,7 +68,7 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+				cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
@@ -92,14 +92,34 @@
 				var loader = new THREE.PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
-					geometry.computeFaceNormals();
+					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff } );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
 					var mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.y = - 0.25;
+					mesh.position.y = - 0.2;
+					mesh.position.z =   0.3;
 					mesh.rotation.x = - Math.PI / 2;
 					mesh.scale.multiplyScalar( 0.001 );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
+
+				loader.load( './models/ply/binary/Lucy100k.ply', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, shading: THREE.FlatShading } );
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = - 0.2;
+					mesh.position.y = - 0.02;
+					mesh.position.z = - 0.2;
+					mesh.scale.multiplyScalar( 0.0006 );
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
@@ -126,7 +146,7 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -187,8 +207,8 @@
 
 				var timer = Date.now() * 0.0005;
 
-				camera.position.x = Math.sin( timer ) * 3;
-				camera.position.z = Math.cos( timer ) * 3;
+				camera.position.x = Math.sin( timer ) * 2.5;
+				camera.position.z = Math.cos( timer ) * 2.5;
 
 				camera.lookAt( cameraTarget );
 

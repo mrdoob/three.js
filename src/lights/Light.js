@@ -1,49 +1,62 @@
+import { Object3D } from '../core/Object3D';
+import { Color } from '../math/Color';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Light = function ( color, intensity ) {
+function Light( color, intensity ) {
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'Light';
 
-	this.color = new THREE.Color( color );
+	this.color = new Color( color );
 	this.intensity = intensity !== undefined ? intensity : 1;
 
 	this.receiveShadow = undefined;
 
-};
+}
 
-THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Light.prototype.constructor = THREE.Light;
+Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-THREE.Light.prototype.copy = function ( source ) {
+	constructor: Light,
 
-	THREE.Object3D.prototype.copy.call( this, source );
+	isLight: true,
 
-	this.color.copy( source.color );
-	this.intensity = source.intensity;
+	copy: function ( source ) {
 
-	return this;
+		Object3D.prototype.copy.call( this, source );
 
-};
+		this.color.copy( source.color );
+		this.intensity = source.intensity;
 
-THREE.Light.prototype.toJSON = function ( meta ) {
+		return this;
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	},
 
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
+	toJSON: function ( meta ) {
 
-	if ( this.groundColor !== undefined ) data.object.groundColor = this.groundColor.getHex();
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
-	if ( this.distance !== undefined ) data.object.distance = this.distance;
-	if ( this.angle !== undefined ) data.object.angle = this.angle;
-	if ( this.decay !== undefined ) data.object.decay = this.decay;
-	if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
+		data.object.color = this.color.getHex();
+		data.object.intensity = this.intensity;
 
-	return data;
+		if ( this.groundColor !== undefined ) data.object.groundColor = this.groundColor.getHex();
 
-};
+		if ( this.distance !== undefined ) data.object.distance = this.distance;
+		if ( this.angle !== undefined ) data.object.angle = this.angle;
+		if ( this.decay !== undefined ) data.object.decay = this.decay;
+		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
+
+		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
+
+		return data;
+
+	}
+
+} );
+
+
+export { Light };

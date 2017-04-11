@@ -116,7 +116,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -215,131 +215,6 @@ UI.Panel = function () {
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
 UI.Panel.prototype.constructor = UI.Panel;
-
-
-// Collapsible Panel
-
-UI.CollapsiblePanel = function () {
-
-	UI.Panel.call( this );
-
-	this.setClass( 'Panel Collapsible' );
-
-	var scope = this;
-
-	this.static = new UI.Panel();
-	this.static.setClass( 'Static' );
-	this.static.onClick( function () {
-
-		scope.toggle();
-
-	} );
-	this.dom.appendChild( this.static.dom );
-
-	this.contents = new UI.Panel();
-	this.contents.setClass( 'Content' );
-	this.dom.appendChild( this.contents.dom );
-
-	var button = new UI.Panel();
-	button.setClass( 'Button' );
-	this.static.add( button );
-
-	this.isCollapsed = false;
-
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
-UI.CollapsiblePanel.prototype.constructor = UI.CollapsiblePanel;
-
-UI.CollapsiblePanel.prototype.addStatic = function () {
-
-	this.static.add.apply( this.static, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.removeStatic = function () {
-
-	this.static.remove.apply( this.static, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.clearStatic = function () {
-
-	this.static.clear();
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.add = function () {
-
-	this.contents.add.apply( this.contents, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.remove = function () {
-
-	this.contents.remove.apply( this.contents, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.clear = function () {
-
-	this.contents.clear();
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.toggle = function() {
-
-	this.setCollapsed( ! this.isCollapsed );
-
-};
-
-UI.CollapsiblePanel.prototype.collapse = function() {
-
-	this.setCollapsed( true );
-
-};
-
-UI.CollapsiblePanel.prototype.expand = function() {
-
-	this.setCollapsed( false );
-
-};
-
-UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
-
-	if ( boolean ) {
-
-		this.dom.classList.add( 'collapsed' );
-
-	} else {
-
-		this.dom.classList.remove( 'collapsed' );
-
-	}
-
-	this.isCollapsed = boolean;
-
-	if ( this.onCollapsedChangeCallback !== undefined ) {
-
-		this.onCollapsedChangeCallback( boolean );
-
-	}
-
-};
-
-UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
-
-	this.onCollapsedChangeCallback = callback;
-
-};
 
 // Text
 
@@ -684,6 +559,7 @@ UI.Number = function ( number ) {
 
 	this.precision = 2;
 	this.step = 1;
+	this.unit = '';
 
 	this.dom = dom;
 
@@ -751,19 +627,7 @@ UI.Number = function ( number ) {
 
 	function onChange( event ) {
 
-		var value = 0;
-
-		try {
-
-			value = eval( dom.value );
-
-		} catch ( error ) {
-
-			console.error( error.message );
-
-		}
-
-		scope.setValue( value );
+		scope.setValue( dom.value );
 
 	}
 
@@ -813,7 +677,25 @@ UI.Number.prototype.setValue = function ( value ) {
 		this.value = value;
 		this.dom.value = value.toFixed( this.precision );
 
+		if ( this.unit !== '' ) this.dom.value += ' ' + this.unit;
+
 	}
+
+	return this;
+
+};
+
+UI.Number.prototype.setPrecision = function ( precision ) {
+
+	this.precision = precision;
+
+	return this;
+
+};
+
+UI.Number.prototype.setStep = function ( step ) {
+
+	this.step = step;
 
 	return this;
 
@@ -828,14 +710,13 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 };
 
-UI.Number.prototype.setPrecision = function ( precision ) {
+UI.Number.prototype.setUnit = function ( unit ) {
 
-	this.precision = precision;
+	this.unit = unit;
 
 	return this;
 
 };
-
 
 // Integer
 
@@ -928,19 +809,7 @@ UI.Integer = function ( number ) {
 
 	function onChange( event ) {
 
-		var value = 0;
-
-		try {
-
-			value = eval( dom.value );
-
-		} catch ( error ) {
-
-			console.error( error.message );
-
-		}
-
-		scope.setValue( value );
+		scope.setValue( dom.value );
 
 	}
 
@@ -982,10 +851,20 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
-		this.value = value | 0;
-		this.dom.value = value | 0;
+		value = parseInt( value );
+
+		this.value = value;
+		this.dom.value = value;
 
 	}
+
+	return this;
+
+};
+
+UI.Number.prototype.setStep = function ( step ) {
+
+	this.step = step;
 
 	return this;
 
@@ -1044,8 +923,6 @@ UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
 UI.Button = function ( value ) {
 
 	UI.Element.call( this );
-
-	var scope = this;
 
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';

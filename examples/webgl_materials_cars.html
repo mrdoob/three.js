@@ -140,7 +140,6 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
 
 			var m, mi;
 
@@ -164,12 +163,15 @@
 				// CAMERAS
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				// SCENE
 
+				var textureCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Bridge2/')
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -188,31 +190,12 @@
 				pointLight.position.set( 2000, 1200, 10000 );
 				scene.add( pointLight );
 
-				// Skybox
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
-
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
-				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -224,16 +207,6 @@
 				}
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				var r = "textures/cube/Bridge2/";
-				var urls = [
-					r + "posx.jpg", r + "negx.jpg",
-					r + "posy.jpg", r + "negy.jpg",
-					r + "posz.jpg", r + "negz.jpg"
-				];
-
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
 
 				// common materials
 
@@ -339,7 +312,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 
@@ -380,7 +353,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 
@@ -440,7 +413,7 @@
 						[ "Bronze", 	mlib[ "Bronze" ] ],
 						[ "Chrome", 	mlib[ "Chrome" ] ]
 
-					],
+					]
 
 				};
 
@@ -478,9 +451,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = window.innerWidth / window.innerHeight;
-				cameraCube.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -626,9 +596,7 @@
 				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
-				cameraCube.rotation.copy( camera.rotation );
 
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();

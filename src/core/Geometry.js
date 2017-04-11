@@ -1,3 +1,15 @@
+import { EventDispatcher } from './EventDispatcher';
+import { Face3 } from './Face3';
+import { Matrix3 } from '../math/Matrix3';
+import { Sphere } from '../math/Sphere';
+import { Box3 } from '../math/Box3';
+import { Vector3 } from '../math/Vector3';
+import { Matrix4 } from '../math/Matrix4';
+import { Vector2 } from '../math/Vector2';
+import { Color } from '../math/Color';
+import { Object3D } from './Object3D';
+import { _Math } from '../math/Math';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
@@ -7,11 +19,14 @@
  * @author bhouston / http://clara.io
  */
 
-THREE.Geometry = function () {
+var count = 0;
+function GeometryIdCount() { return count++; }
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+function Geometry() {
 
-	this.uuid = THREE.Math.generateUUID();
+	Object.defineProperty( this, 'id', { value: GeometryIdCount() } );
+
+	this.uuid = _Math.generateUUID();
 
 	this.name = '';
 	this.type = 'Geometry';
@@ -19,7 +34,7 @@ THREE.Geometry = function () {
 	this.vertices = [];
 	this.colors = [];
 	this.faces = [];
-	this.faceVertexUvs = [ [] ];
+	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
 	this.morphNormals = [];
@@ -34,23 +49,25 @@ THREE.Geometry = function () {
 
 	// update flags
 
-	this.verticesNeedUpdate = false;
 	this.elementsNeedUpdate = false;
+	this.verticesNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 	this.groupsNeedUpdate = false;
 
-};
+}
 
-THREE.Geometry.prototype = {
+Geometry.prototype = {
 
-	constructor: THREE.Geometry,
+	constructor: Geometry,
+
+	isGeometry: true,
 
 	applyMatrix: function ( matrix ) {
 
-		var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -99,7 +116,7 @@ THREE.Geometry.prototype = {
 
 		return function rotateX( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationX( angle );
 
@@ -119,7 +136,7 @@ THREE.Geometry.prototype = {
 
 		return function rotateY( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationY( angle );
 
@@ -139,7 +156,7 @@ THREE.Geometry.prototype = {
 
 		return function rotateZ( angle ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeRotationZ( angle );
 
@@ -159,7 +176,7 @@ THREE.Geometry.prototype = {
 
 		return function translate( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeTranslation( x, y, z );
 
@@ -179,7 +196,7 @@ THREE.Geometry.prototype = {
 
 		return function scale( x, y, z ) {
 
-			if ( m1 === undefined ) m1 = new THREE.Matrix4();
+			if ( m1 === undefined ) m1 = new Matrix4();
 
 			m1.makeScale( x, y, z );
 
@@ -197,7 +214,7 @@ THREE.Geometry.prototype = {
 
 		return function lookAt( vector ) {
 
-			if ( obj === undefined ) obj = new THREE.Object3D();
+			if ( obj === undefined ) obj = new Object3D();
 
 			obj.lookAt( vector );
 
@@ -230,29 +247,29 @@ THREE.Geometry.prototype = {
 
 		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
-			scope.vertices.push( new THREE.Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
+			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
 
 			if ( normals !== undefined ) {
 
-				tempNormals.push( new THREE.Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
+				tempNormals.push( new Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
 
 			}
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new THREE.Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
+				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
 
 			}
 
 			if ( uvs !== undefined ) {
 
-				tempUVs.push( new THREE.Vector2( uvs[ j ], uvs[ j + 1 ] ) );
+				tempUVs.push( new Vector2( uvs[ j ], uvs[ j + 1 ] ) );
 
 			}
 
 			if ( uvs2 !== undefined ) {
 
-				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
 
 			}
 
@@ -263,7 +280,7 @@ THREE.Geometry.prototype = {
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
+			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
 			scope.faces.push( face );
 
@@ -296,7 +313,7 @@ THREE.Geometry.prototype = {
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex  );
+						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
 
 					}
 
@@ -344,7 +361,7 @@ THREE.Geometry.prototype = {
 
 		this.computeBoundingBox();
 
-		var offset = this.boundingBox.center().negate();
+		var offset = this.boundingBox.getCenter().negate();
 
 		this.translate( offset.x, offset.y, offset.z );
 
@@ -361,7 +378,7 @@ THREE.Geometry.prototype = {
 
 		var s = radius === 0 ? 1 : 1.0 / radius;
 
-		var matrix = new THREE.Matrix4();
+		var matrix = new Matrix4();
 		matrix.set(
 			s, 0, 0, - s * center.x,
 			0, s, 0, - s * center.y,
@@ -377,7 +394,7 @@ THREE.Geometry.prototype = {
 
 	computeFaceNormals: function () {
 
-		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+		var cb = new Vector3(), ab = new Vector3();
 
 		for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -409,7 +426,7 @@ THREE.Geometry.prototype = {
 
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			vertices[ v ] = new THREE.Vector3();
+			vertices[ v ] = new Vector3();
 
 		}
 
@@ -419,7 +436,7 @@ THREE.Geometry.prototype = {
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
 			var vA, vB, vC;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+			var cb = new Vector3(), ab = new Vector3();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -440,6 +457,8 @@ THREE.Geometry.prototype = {
 			}
 
 		} else {
+
+			this.computeFaceNormals();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -476,6 +495,42 @@ THREE.Geometry.prototype = {
 				vertexNormals[ 0 ] = vertices[ face.a ].clone();
 				vertexNormals[ 1 ] = vertices[ face.b ].clone();
 				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
+
+		}
+
+		if ( this.faces.length > 0 ) {
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeFlatVertexNormals: function () {
+
+		var f, fl, face;
+
+		this.computeFaceNormals();
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( face.normal );
+				vertexNormals[ 1 ].copy( face.normal );
+				vertexNormals[ 2 ].copy( face.normal );
+
+			} else {
+
+				vertexNormals[ 0 ] = face.normal.clone();
+				vertexNormals[ 1 ] = face.normal.clone();
+				vertexNormals[ 2 ] = face.normal.clone();
 
 			}
 
@@ -531,7 +586,7 @@ THREE.Geometry.prototype = {
 
 		// use temp geometry to compute face and vertex normals for each morph
 
-		var tmpGeo = new THREE.Geometry();
+		var tmpGeo = new Geometry();
 		tmpGeo.faces = this.faces;
 
 		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
@@ -551,8 +606,8 @@ THREE.Geometry.prototype = {
 
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-					faceNormal = new THREE.Vector3();
-					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+					faceNormal = new Vector3();
+					vertexNormals = { a: new Vector3(), b: new Vector3(), c: new Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -606,12 +661,6 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeTangents: function () {
-
-		console.warn( 'THREE.Geometry: .computeTangents() has been removed.' );
-
-	},
-
 	computeLineDistances: function () {
 
 		var d = 0;
@@ -635,7 +684,7 @@ THREE.Geometry.prototype = {
 
 		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new THREE.Box3();
+			this.boundingBox = new Box3();
 
 		}
 
@@ -647,7 +696,7 @@ THREE.Geometry.prototype = {
 
 		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new THREE.Sphere();
+			this.boundingSphere = new Sphere();
 
 		}
 
@@ -657,7 +706,7 @@ THREE.Geometry.prototype = {
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
-		if ( geometry instanceof THREE.Geometry === false ) {
+		if ( ( geometry && geometry.isGeometry ) === false ) {
 
 			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
@@ -671,13 +720,15 @@ THREE.Geometry.prototype = {
 		faces1 = this.faces,
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry.faceVertexUvs[ 0 ];
+		uvs2 = geometry.faceVertexUvs[ 0 ],
+		colors1 = this.colors,
+		colors2 = geometry.colors;
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
-			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+			normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
 		}
 
@@ -695,6 +746,14 @@ THREE.Geometry.prototype = {
 
 		}
 
+		// colors
+
+		for ( var i = 0, il = colors2.length; i < il; i ++ ) {
+
+			colors1.push( colors2[ i ].clone() );
+
+		}
+
 		// faces
 
 		for ( i = 0, il = faces2.length; i < il; i ++ ) {
@@ -703,7 +762,7 @@ THREE.Geometry.prototype = {
 			faceVertexNormals = face.vertexNormals,
 			faceVertexColors = face.vertexColors;
 
-			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+			faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix !== undefined ) {
@@ -767,7 +826,7 @@ THREE.Geometry.prototype = {
 
 	mergeMesh: function ( mesh ) {
 
-		if ( mesh instanceof THREE.Mesh === false ) {
+		if ( ( mesh && mesh.isMesh ) === false ) {
 
 			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
@@ -832,15 +891,12 @@ THREE.Geometry.prototype = {
 
 			indices = [ face.a, face.b, face.c ];
 
-			var dupIndex = - 1;
-
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
 
 				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
-					dupIndex = n;
 					faceIndicesToRemove.push( i );
 					break;
 
@@ -1138,33 +1194,65 @@ THREE.Geometry.prototype = {
 		return new this.constructor().copy( this );
 		*/
 
-		return new THREE.Geometry().copy( this );
+		return new Geometry().copy( this );
 
 	},
 
 	copy: function ( source ) {
 
+		var i, il, j, jl, k, kl;
+
+		// reset
+
 		this.vertices = [];
+		this.colors = [];
 		this.faces = [];
-		this.faceVertexUvs = [ [] ];
+		this.faceVertexUvs = [[]];
+		this.morphTargets = [];
+		this.morphNormals = [];
+		this.skinWeights = [];
+		this.skinIndices = [];
+		this.lineDistances = [];
+		this.boundingBox = null;
+		this.boundingSphere = null;
+
+		// name
+
+		this.name = source.name;
+
+		// vertices
 
 		var vertices = source.vertices;
 
-		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
 			this.vertices.push( vertices[ i ].clone() );
 
 		}
 
+		// colors
+
+		var colors = source.colors;
+
+		for ( i = 0, il = colors.length; i < il; i ++ ) {
+
+			this.colors.push( colors[ i ].clone() );
+
+		}
+
+		// faces
+
 		var faces = source.faces;
 
-		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+		for ( i = 0, il = faces.length; i < il; i ++ ) {
 
 			this.faces.push( faces[ i ].clone() );
 
 		}
 
-		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
+		// face vertex uvs
+
+		for ( i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
 
 			var faceVertexUvs = source.faceVertexUvs[ i ];
 
@@ -1174,11 +1262,11 @@ THREE.Geometry.prototype = {
 
 			}
 
-			for ( var j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
+			for ( j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
 
 				var uvs = faceVertexUvs[ j ], uvsCopy = [];
 
-				for ( var k = 0, kl = uvs.length; k < kl; k ++ ) {
+				for ( k = 0, kl = uvs.length; k < kl; k ++ ) {
 
 					var uv = uvs[ k ];
 
@@ -1192,6 +1280,154 @@ THREE.Geometry.prototype = {
 
 		}
 
+		// morph targets
+
+		var morphTargets = source.morphTargets;
+
+		for ( i = 0, il = morphTargets.length; i < il; i ++ ) {
+
+			var morphTarget = {};
+			morphTarget.name = morphTargets[ i ].name;
+
+			// vertices
+
+			if ( morphTargets[ i ].vertices !== undefined ) {
+
+				morphTarget.vertices = [];
+
+				for ( j = 0, jl = morphTargets[ i ].vertices.length; j < jl; j ++ ) {
+
+					morphTarget.vertices.push( morphTargets[ i ].vertices[ j ].clone() );
+
+				}
+
+			}
+
+			// normals
+
+			if ( morphTargets[ i ].normals !== undefined ) {
+
+				morphTarget.normals = [];
+
+				for ( j = 0, jl = morphTargets[ i ].normals.length; j < jl; j ++ ) {
+
+					morphTarget.normals.push( morphTargets[ i ].normals[ j ].clone() );
+
+				}
+
+			}
+
+			this.morphTargets.push( morphTarget );
+
+		}
+
+		// morph normals
+
+		var morphNormals = source.morphNormals;
+
+		for ( i = 0, il = morphNormals.length; i < il; i ++ ) {
+
+			var morphNormal = {};
+
+			// vertex normals
+
+			if ( morphNormals[ i ].vertexNormals !== undefined ) {
+
+				morphNormal.vertexNormals = [];
+
+				for ( j = 0, jl = morphNormals[ i ].vertexNormals.length; j < jl; j ++ ) {
+
+					var srcVertexNormal = morphNormals[ i ].vertexNormals[ j ];
+					var destVertexNormal = {};
+
+					destVertexNormal.a = srcVertexNormal.a.clone();
+					destVertexNormal.b = srcVertexNormal.b.clone();
+					destVertexNormal.c = srcVertexNormal.c.clone();
+
+					morphNormal.vertexNormals.push( destVertexNormal );
+
+				}
+
+			}
+
+			// face normals
+
+			if ( morphNormals[ i ].faceNormals !== undefined ) {
+
+				morphNormal.faceNormals = [];
+
+				for ( j = 0, jl = morphNormals[ i ].faceNormals.length; j < jl; j ++ ) {
+
+					morphNormal.faceNormals.push( morphNormals[ i ].faceNormals[ j ].clone() );
+
+				}
+
+			}
+
+			this.morphNormals.push( morphNormal );
+
+		}
+
+		// skin weights
+
+		var skinWeights = source.skinWeights;
+
+		for ( i = 0, il = skinWeights.length; i < il; i ++ ) {
+
+			this.skinWeights.push( skinWeights[ i ].clone() );
+
+		}
+
+		// skin indices
+
+		var skinIndices = source.skinIndices;
+
+		for ( i = 0, il = skinIndices.length; i < il; i ++ ) {
+
+			this.skinIndices.push( skinIndices[ i ].clone() );
+
+		}
+
+		// line distances
+
+		var lineDistances = source.lineDistances;
+
+		for ( i = 0, il = lineDistances.length; i < il; i ++ ) {
+
+			this.lineDistances.push( lineDistances[ i ] );
+
+		}
+
+		// bounding box
+
+		var boundingBox = source.boundingBox;
+
+		if ( boundingBox !== null ) {
+
+			this.boundingBox = boundingBox.clone();
+
+		}
+
+		// bounding sphere
+
+		var boundingSphere = source.boundingSphere;
+
+		if ( boundingSphere !== null ) {
+
+			this.boundingSphere = boundingSphere.clone();
+
+		}
+
+		// update flags
+
+		this.elementsNeedUpdate = source.elementsNeedUpdate;
+		this.verticesNeedUpdate = source.verticesNeedUpdate;
+		this.uvsNeedUpdate = source.uvsNeedUpdate;
+		this.normalsNeedUpdate = source.normalsNeedUpdate;
+		this.colorsNeedUpdate = source.colorsNeedUpdate;
+		this.lineDistancesNeedUpdate = source.lineDistancesNeedUpdate;
+		this.groupsNeedUpdate = source.groupsNeedUpdate;
+
 		return this;
 
 	},
@@ -1204,6 +1440,6 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
+Object.assign( Geometry.prototype, EventDispatcher.prototype );
 
-THREE.GeometryIdCount = 0;
+export { GeometryIdCount, Geometry };

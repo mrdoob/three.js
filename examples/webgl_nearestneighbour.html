@@ -127,8 +127,8 @@
 
 				pointShaderMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
-						tex1: { type: "t", value: imagePreviewTexture },
-						zoom: { type: 'f', value: 9.0 },
+						tex1: { value: imagePreviewTexture },
+						zoom: { value: 9.0 }
 					},
 					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

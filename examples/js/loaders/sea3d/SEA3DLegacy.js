@@ -9,19 +9,23 @@
 //	Header
 //
 
-THREE.SEA3D.prototype._onHead = THREE.SEA3D.prototype.onHead;
-THREE.SEA3D.prototype._updateTransform = THREE.SEA3D.prototype.updateTransform;
-THREE.SEA3D.prototype._readVertexAnimation = THREE.SEA3D.prototype.readVertexAnimation;
-THREE.SEA3D.prototype._readGeometryBuffer = THREE.SEA3D.prototype.readGeometryBuffer;
-THREE.SEA3D.prototype._readLine = THREE.SEA3D.prototype.readLine;
-THREE.SEA3D.prototype._getSkeletonAnimation = THREE.SEA3D.prototype.getSkeletonAnimation;
-THREE.SEA3D.prototype._applyDefaultAnimation = THREE.SEA3D.prototype.applyDefaultAnimation;
+Object.assign( THREE.SEA3D.prototype, {
+
+	_onHead: THREE.SEA3D.prototype.onHead,
+	_updateTransform: THREE.SEA3D.prototype.updateTransform,
+	_readVertexAnimation: THREE.SEA3D.prototype.readVertexAnimation,
+	_readGeometryBuffer: THREE.SEA3D.prototype.readGeometryBuffer,
+	_readLine: THREE.SEA3D.prototype.readLine,
+	_getAnimationType: THREE.SEA3D.prototype.getAnimationType,
+	_readAnimation: THREE.SEA3D.prototype.readAnimation
+
+} );
 
 //
 //	Utils
 //
 
-THREE.SEA3D.prototype.isLegacy = function( sea ) {
+THREE.SEA3D.prototype.isLegacy = function ( sea ) {
 
 	var sea3d = sea.sea3d;
 
@@ -37,11 +41,11 @@ THREE.SEA3D.prototype.isLegacy = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.flipZVec3 = function( v ) {
+THREE.SEA3D.prototype.flipVec3 = function ( v ) {
 
 	if ( ! v ) return;
 
-	var i = 2; // z
+	var i = 2;
 
 	while ( i < v.length ) {
 
@@ -55,7 +59,7 @@ THREE.SEA3D.prototype.flipZVec3 = function( v ) {
 
 };
 
-THREE.SEA3D.prototype.expandJoints = function( sea ) {
+THREE.SEA3D.prototype.expandJoints = function ( sea ) {
 
 	var numJoints = sea.numVertex * 4;
 
@@ -92,7 +96,7 @@ THREE.SEA3D.prototype.expandJoints = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.compressJoints = function( sea ) {
+THREE.SEA3D.prototype.compressJoints = function ( sea ) {
 
 	var numJoints = sea.numVertex * 4;
 
@@ -129,7 +133,7 @@ THREE.SEA3D.prototype.compressJoints = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.flipZIndex = function( v ) {
+THREE.SEA3D.prototype.flipIndexes = function ( v ) {
 
 	var i = 1; // y >-< z
 
@@ -147,21 +151,17 @@ THREE.SEA3D.prototype.flipZIndex = function( v ) {
 
 };
 
-THREE.SEA3D.prototype.flipMatrixBone = function( mtx ) {
+THREE.SEA3D.prototype.flipBoneMatrix = function () {
 
 	var zero = new THREE.Vector3();
-	var buf1 = new THREE.Matrix4();
 
-	return function( mtx ) {
+	return function ( mtx ) {
 
-		buf1.copy( mtx );
+		var pos = THREE.SEA3D.VECBUF.setFromMatrixPosition( mtx );
+		pos.z = - pos.z;
 
 		mtx.setPosition( zero );
 		mtx.multiplyMatrices( THREE.SEA3D.MTXBUF.makeRotationZ( THREE.Math.degToRad( 180 ) ), mtx );
-		mtx.makeRotationFromQuaternion( THREE.SEA3D.QUABUF.setFromRotationMatrix( mtx ) );
-
-		var pos = THREE.SEA3D.VECBUF.setFromMatrixPosition( buf1 );
-		pos.z = - pos.z;
 		mtx.setPosition( pos );
 
 		return mtx;
@@ -170,13 +170,13 @@ THREE.SEA3D.prototype.flipMatrixBone = function( mtx ) {
 
 }();
 
-THREE.SEA3D.prototype.flipMatrixScale = function( local, global, parent, parentGlobal ) {
+THREE.SEA3D.prototype.flipScaleMatrix = function () {
 
 	var pos = new THREE.Vector3();
 	var qua = new THREE.Quaternion();
 	var slc = new THREE.Vector3();
 
-	return function( local, global, parent, parentGlobal ) {
+	return function ( local, rotate, parent, parentRotate ) {
 
 		if ( parent ) local.multiplyMatrices( parent, local );
 
@@ -184,20 +184,19 @@ THREE.SEA3D.prototype.flipMatrixScale = function( local, global, parent, parentG
 
 		slc.z = - slc.z;
 
-		if ( global ) {
+		local.compose( pos, qua, slc );
 
-			slc.y = - slc.y;
-			slc.x = - slc.x;
+		if ( rotate ) {
+
+			local.multiplyMatrices( local, THREE.SEA3D.MTXBUF.makeRotationZ( THREE.Math.degToRad( 180 ) ) );
 
 		}
-
-		local.compose( pos, qua, slc );
 
 		if ( parent ) {
 
 			parent = parent.clone();
 
-			this.flipMatrixScale( parent, parentGlobal );
+			this.flipScaleMatrix( parent, parentRotate );
 
 			local.multiplyMatrices( parent.getInverse( parent ), local );
 
@@ -213,7 +212,7 @@ THREE.SEA3D.prototype.flipMatrixScale = function( local, global, parent, parentG
 //	Legacy
 //
 
-THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
+THREE.SEA3D.prototype.flipDefaultAnimation = function () {
 
 	var buf1 = new THREE.Matrix4();
 	var buf2 = new THREE.Matrix4();
@@ -226,35 +225,34 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 	var to_qua = new THREE.Quaternion();
 	var to_slc = new THREE.Vector3();
 
-	return function( obj3d ) {
+	return function ( animation, obj3d, relative ) {
 
-		var anmSet = obj3d.animation.animationSet;
-		var relative = obj3d.animation.relative;
-		var anms = anmSet.animations;
+		if ( animation.isFliped ) return;
 
-		if ( anmSet.flip && ! anms.length )
-			return;
-
-		var dataList = anms[ 0 ].dataList,
+		var dataList = animation.dataList,
 			t_anm = [];
 
 		for ( var i = 0; i < dataList.length; i ++ ) {
 
-			var data = dataList[ i ];
-			var raw = dataList[ i ].data;
-			var kind = data.kind;
-			var numFrames = raw.length / data.blockLength;
+			var data = dataList[ i ],
+				raw = data.data,
+				kind = data.kind,
+				numFrames = raw.length / data.blockSize;
 
 			switch ( kind ) {
+
 				case SEA3D.Animation.POSITION:
 				case SEA3D.Animation.ROTATION:
 				case SEA3D.Animation.SCALE:
+
 					t_anm.push( {
-						kind : kind,
-						numFrames : numFrames,
-						raw : raw
+						kind: kind,
+						numFrames: numFrames,
+						raw: raw
 					} );
+
 					break;
+
 			}
 
 		}
@@ -264,21 +262,20 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 			var numFrames = t_anm[ 0 ].numFrames,
 				parent = undefined;
 
-			if ( obj3d.animation.relative ) {
+			if ( relative ) {
 
 				buf1.identity();
-				parent = this.flipMatrixScale( buf2.copy( obj3d.matrixWorld ) );
+				parent = this.flipScaleMatrix( buf2.copy( obj3d.matrixWorld ) );
 
-			}
-			else {
+			} else {
 
 				if ( obj3d.parent ) {
 
-					parent = this.flipMatrixScale( buf2.copy( obj3d.parent.matrixWorld ) );
+					parent = this.flipScaleMatrix( buf2.copy( obj3d.parent.matrixWorld ) );
 
 				}
 
-				this.flipMatrixScale( buf1.copy( obj3d.matrix ), false, parent );
+				this.flipScaleMatrix( buf1.copy( obj3d.matrix ), false, parent );
 
 			}
 
@@ -292,6 +289,7 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 						kind = t_anm[ t ].kind;
 
 					switch ( kind ) {
+
 						case SEA3D.Animation.POSITION:
 
 							c = f * 3;
@@ -335,7 +333,7 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 
 				buf1.compose( pos, qua, slc );
 
-				this.flipMatrixScale( buf1, false, buf2 );
+				this.flipScaleMatrix( buf1, false, buf2 );
 
 				buf1.decompose( to_pos, to_qua, to_slc );
 
@@ -345,6 +343,7 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 						kind = t_anm[ t ].kind;
 
 					switch ( kind ) {
+
 						case SEA3D.Animation.POSITION:
 
 							c = f * 3;
@@ -375,6 +374,7 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 							raw[ c + 2 ] = to_slc.z;
 
 							break;
+
 					}
 
 				}
@@ -383,38 +383,73 @@ THREE.SEA3D.prototype.updateAnimationSet = function( obj3d ) {
 
 		}
 
-		anmSet.flip = true;
+		animation.isFliped = true;
 
 	};
 
 }();
 
+THREE.SEA3D.prototype.readAnimation = function ( sea ) {
 
-THREE.SEA3D.prototype.applyDefaultAnimation = function( sea, animatorClass ) {
+	if ( ! this.isLegacy( sea ) ) {
 
-	this._applyDefaultAnimation( sea, animatorClass );
-
-	if ( this.isLegacy( sea ) && sea.tag.animation ) {
-
-		this.updateAnimationSet( sea.tag );
+		this._readAnimation( sea );
 
 	}
 
 };
 
-THREE.SEA3D.prototype.updateTransform = function( obj3d, sea ) {
+THREE.SEA3D.prototype.getAnimationType = function ( req ) {
+
+	var sea = req.sea;
+
+	if ( this.isLegacy( sea ) ) {
+
+		switch ( sea.type ) {
+
+			case SEA3D.SkeletonAnimation.prototype.type:
+
+				this.readSkeletonAnimationLegacy( sea, req.skeleton );
+
+				return sea.tag;
+
+				break;
+
+			case SEA3D.Animation.prototype.type:
+
+				if ( req.scope instanceof THREE.Object3D ) {
+
+					this.flipDefaultAnimation( sea, req.scope, req.relative );
+
+				}
+
+				this._readAnimation( sea );
+
+				return sea.tag;
+
+				break;
+
+		}
+
+	}
+
+	return this._getAnimationType( req );
+
+};
+
+THREE.SEA3D.prototype.updateTransform = function () {
 
 	var buf1 = new THREE.Matrix4();
 	var identity = new THREE.Matrix4();
 
-	return function( obj3d, sea ) {
+	return function ( obj3d, sea ) {
 
 		if ( this.isLegacy( sea ) ) {
 
 			if ( sea.transform ) buf1.elements.set( sea.transform );
 			else buf1.makeTranslation( sea.position.x, sea.position.y, sea.position.z );
 
-			this.flipMatrixScale(
+			this.flipScaleMatrix(
 				buf1, false,
 				obj3d.parent ? obj3d.parent.matrixWorld : identity,
 				obj3d.parent instanceof THREE.Bone
@@ -430,8 +465,7 @@ THREE.SEA3D.prototype.updateTransform = function( obj3d, sea ) {
 
 			obj3d.updateMatrixWorld();
 
-		}
-		else {
+		} else {
 
 			this._updateTransform( obj3d, sea );
 
@@ -441,7 +475,7 @@ THREE.SEA3D.prototype.updateTransform = function( obj3d, sea ) {
 
 }();
 
-THREE.SEA3D.prototype.readSkeleton = function( sea ) {
+THREE.SEA3D.prototype.readSkeleton = function () {
 
 	var mtx_tmp_inv = new THREE.Matrix4(),
 		mtx_local = new THREE.Matrix4(),
@@ -449,14 +483,14 @@ THREE.SEA3D.prototype.readSkeleton = function( sea ) {
 		pos = new THREE.Vector3(),
 		qua = new THREE.Quaternion();
 
-	return function( sea ) {
+	return function ( sea ) {
 
 		var bones = [],
 			isLegacy = sea.sea3d.config.legacy;
 
 		for ( var i = 0; i < sea.joint.length; i ++ ) {
 
-			var bone = sea.joint[ i ]
+			var bone = sea.joint[ i ];
 
 			// get world inverse matrix
 
@@ -468,7 +502,7 @@ THREE.SEA3D.prototype.readSkeleton = function( sea ) {
 
 			// convert to three.js order
 
-			if ( isLegacy ) this.flipMatrixBone( mtx_local );
+			if ( isLegacy ) this.flipBoneMatrix( mtx_local );
 
 			if ( bone.parentIndex > - 1 ) {
 
@@ -479,7 +513,7 @@ THREE.SEA3D.prototype.readSkeleton = function( sea ) {
 
 				// convert parent to three.js order
 
-				if ( isLegacy ) this.flipMatrixBone( mtx_parent );
+				if ( isLegacy ) this.flipBoneMatrix( mtx_parent );
 
 				// to local
 
@@ -509,26 +543,19 @@ THREE.SEA3D.prototype.readSkeleton = function( sea ) {
 
 }();
 
-THREE.SEA3D.prototype.getSkeletonAnimation = function( sea, skl ) {
-
-	if ( this.isLegacy( sea ) ) return this.getSkeletonAnimationLegacy( sea, skl );
-	else return this._getSkeletonAnimation( sea, skl );
-
-};
-
-THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
+THREE.SEA3D.prototype.readSkeletonAnimationLegacy = function () {
 
 	var mtx_tmp_inv = new THREE.Matrix4(),
 		mtx_local = new THREE.Matrix4(),
 		mtx_global = new THREE.Matrix4(),
 		mtx_parent = new THREE.Matrix4();
 
-	return function( sea, skl ) {
+	return function ( sea, skl ) {
 
 		if ( sea.tag ) return sea.tag;
 
 		var animations = [],
-			delta = sea.frameRate / 1000,
+			delta = ( 1000 / sea.frameRate ) / 1000,
 			scale = [ 1, 1, 1 ];
 
 		for ( var i = 0; i < sea.sequence.length; i ++ ) {
@@ -537,14 +564,13 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 			var start = seq.start;
 			var end = start + seq.count;
-			var ns = sea.name + "/" + seq.name;
 
 			var animation = {
-				name: ns,
+				name: seq.name,
 				repeat: seq.repeat,
 				fps: sea.frameRate,
 				JIT: 0,
-				length: delta * ( seq.count - 1 ),
+				length: delta * seq.count,
 				hierarchy: []
 			};
 
@@ -577,11 +603,11 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 						// convert to three.js matrix
 
-						this.flipMatrixBone( mtx_global );
+						this.flipBoneMatrix( mtx_global );
 
 						// flip parent inverse
 
-						this.flipMatrixBone( mtx_parent );
+						this.flipBoneMatrix( mtx_parent );
 
 						// to local
 
@@ -589,10 +615,9 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 						mtx_local.multiplyMatrices( mtx_parent, mtx_global );
 
-					}
-					else {
+					} else {
 
-						this.flipMatrixBone( mtx_local );
+						this.flipBoneMatrix( mtx_local );
 
 					}
 
@@ -614,17 +639,18 @@ THREE.SEA3D.prototype.getSkeletonAnimationLegacy = function( sea, skl ) {
 
 			}
 
-			animations.push( animation );
+			animations.push( THREE.SEA3D.AnimationClip.fromClip( THREE.AnimationClip.parseAnimation( animation, skl.tag ), seq.repeat ) );
 
 		}
 
-		return sea.tag = animations;
+		this.domain.clips = this.clips = this.clips || [];
+		this.clips.push( this.objects[ sea.name + '.anm' ] = sea.tag = animations );
 
 	};
 
 }();
 
-THREE.SEA3D.prototype.readVertexAnimation = function( sea ) {
+THREE.SEA3D.prototype.readVertexAnimation = function ( sea ) {
 
 	if ( this.isLegacy( sea ) ) {
 
@@ -632,8 +658,8 @@ THREE.SEA3D.prototype.readVertexAnimation = function( sea ) {
 
 			var frame = sea.frame[ i ];
 
-			this.flipZVec3( frame.vertex );
-			this.flipZVec3( frame.normal );
+			this.flipVec3( frame.vertex );
+			this.flipVec3( frame.normal );
 
 		}
 
@@ -643,14 +669,14 @@ THREE.SEA3D.prototype.readVertexAnimation = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
+THREE.SEA3D.prototype.readGeometryBuffer = function ( sea ) {
 
 	if ( this.isLegacy( sea ) ) {
 
-		this.flipZVec3( sea.vertex );
-		this.flipZVec3( sea.normal );
+		this.flipVec3( sea.vertex, true );
+		this.flipVec3( sea.normal, true );
 
-		this.flipZIndex( sea.indexes );
+		this.flipIndexes( sea.indexes );
 
 		if ( sea.jointPerVertex > 4 ) this.compressJoints( sea );
 		else if ( sea.jointPerVertex < 4 ) this.expandJoints( sea );
@@ -661,11 +687,11 @@ THREE.SEA3D.prototype.readGeometryBuffer = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.readLines = function( sea ) {
+THREE.SEA3D.prototype.readLines = function ( sea ) {
 
 	if ( this.isLegacy( sea ) ) {
 
-		this.flipZVec3( sea.vertex );
+		this.flipVec3( sea.vertex );
 
 	}
 
@@ -673,13 +699,17 @@ THREE.SEA3D.prototype.readLines = function( sea ) {
 
 };
 
-THREE.SEA3D.prototype.onHead = function( args ) {
+THREE.SEA3D.prototype.onHead = function ( args ) {
 
-	// TODO: Ignore sign
+	if ( args.sign != "S3D" && args.sign != "TJS" ) {
+
+		throw new Error( "Sign '" + args.sign + "' unknown." );
+
+	}
 
 };
 
-THREE.SEA3D.EXTENSIONS.push( function() {
+THREE.SEA3D.EXTENSIONS_LOADER.push( { setTypeRead: function () {
 
 	// CONFIG
 
@@ -687,4 +717,4 @@ THREE.SEA3D.EXTENSIONS.push( function() {
 
 	this.file.typeRead[ SEA3D.Skeleton.prototype.type ] = this.readSkeleton;
 
-} );
+} } );

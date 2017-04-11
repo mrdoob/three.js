@@ -269,7 +269,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		window.removeEventListener( 'keydown', _onKeyDown, false );
 		window.removeEventListener( 'keyup', _onKeyUp, false );
 
-	}
+	};
 
 	var _onMouseMove = bind( this, this.onMouseMove );
 	var _onMouseDown = bind( this, this.onMouseDown );

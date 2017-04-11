@@ -9,15 +9,13 @@ THREE.VTKLoader = function( manager ) {
 
 };
 
-THREE.VTKLoader.prototype = {
-
-	constructor: THREE.VTKLoader,
+Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( text ) {
 
@@ -1108,6 +1106,4 @@ THREE.VTKLoader.prototype = {
 
 	}
 
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.VTKLoader.prototype );
+} );

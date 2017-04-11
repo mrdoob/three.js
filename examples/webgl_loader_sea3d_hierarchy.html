@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d</title>
+		<title>three.js webgl - sea3d / hierarchy</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -28,7 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Studio</a>. Asset by <a href="http://vhalldez.cgsociety.org/" style="color:#FFFFFF" target="_blank">Valdez Araujo</a>
+			<br/>
+			<br/>High geometry compression with <a href="https://github.com/amd/rest3d/tree/master/server/o3dgc" style="color:#FFFFFF" target="_blank">Open3DGC</a> and LZMA<br>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -43,13 +45,12 @@
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
 
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-
+		
+		<script src="js/libs/o3dgc.js"></script>
+		<script src="js/loaders/sea3d/o3dgc/SEA3DGC.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -57,6 +58,8 @@
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
 
 			var container, stats;
 
@@ -81,13 +84,13 @@
 
 			loader.onComplete = function( e ) {
 
-				// reset global time
-				SEA3D.AnimationHandler.setTime( 0 );
-
 				// play all animations
+
 				for(var i = 0; i < loader.meshes.length; i++) {
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.play("root");
+
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.play( "root" );
+
 				}
 
 				// Get the first camera from SEA3D Studio
@@ -103,6 +106,7 @@
 
 			};
 
+			// Open3DGC - Export by SEA3D Studio
 			loader.load( './models/sea3d/robot.tjs.sea' );
 
 			//
@@ -120,6 +124,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x333333, 1 );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -130,7 +136,6 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
@@ -144,8 +149,9 @@
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
-				composer.addPass( copyPass );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
+				composer.addPass( copyPass );
 
 				// events
 

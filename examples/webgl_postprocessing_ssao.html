@@ -185,7 +185,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
 				ssaoPass.renderToScreen = true;
 				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
-				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
+				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget.texture;
 				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
 				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;

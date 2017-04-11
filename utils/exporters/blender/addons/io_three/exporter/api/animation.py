@@ -1,5 +1,6 @@
 """
 Module for handling the parsing of skeletal animation data.
+updated on 2/07/2016: bones scaling support (@uthor verteAzur verteAzur@multivers3d.fr)
 """
 
 import math
@@ -91,18 +92,22 @@ def _parse_rest_action(action, armature, options):
                                      action, rotation_matrix)
             rot = _normalize_quaternion(rot)
 
+            sca, schange = _scale(bone, computed_frame,
+                                     action, armature.matrix_world)
+
             pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y
             rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w
+            sca_x, sca_y, sca_z = sca.x, sca.z, sca.y
 
             if frame == start_frame:
 
                 time = (frame * frame_step - start_frame) / fps
-                # @TODO: missing scale values
+                
                 keyframe = {
                     constants.TIME: time,
                     constants.POS: [pos_x, pos_y, pos_z],
                     constants.ROT: [rot_x, rot_y, rot_z, rot_w],
-                    constants.SCL: [1, 1, 1]
+                    constants.SCL: [sca_x, sca_y, sca_z]
                 }
                 keys.append(keyframe)
 
@@ -116,14 +121,14 @@ def _parse_rest_action(action, armature, options):
                     constants.TIME: time,
                     constants.POS: [pos_x, pos_y, pos_z],
                     constants.ROT: [rot_x, rot_y, rot_z, rot_w],
-                    constants.SCL: [1, 1, 1]
+                    constants.SCL: [sca_x, sca_y, sca_z]
                 }
                 keys.append(keyframe)
 
             # MIDDLE-FRAME: needs only one of the attributes,
             # can be an empty frame (optional frame)
 
-            elif pchange is True or rchange is True:
+            elif pchange is True or rchange is True or schange is True:
 
                 time = (frame * frame_step - start_frame) / fps
 
@@ -131,7 +136,8 @@ def _parse_rest_action(action, armature, options):
                     keyframe = {
                         constants.TIME: time,
                         constants.POS: [pos_x, pos_y, pos_z],
-                        constants.ROT: [rot_x, rot_y, rot_z, rot_w]
+                        constants.ROT: [rot_x, rot_y, rot_z, rot_w],
+                        constants.SCL: [sca_x, sca_y, sca_z]
                     }
                 elif pchange is True:
                     keyframe = {
@@ -142,6 +148,11 @@ def _parse_rest_action(action, armature, options):
                     keyframe = {
                         constants.TIME: time,
                         constants.ROT: [rot_x, rot_y, rot_z, rot_w]
+                    }
+                elif schange is True:
+                    keyframe = {
+                        constants.TIME: time,
+                        constants.SCL: [sca_x, sca_y, sca_z]
                     }
 
                 keys.append(keyframe)
@@ -495,6 +506,60 @@ def _rotation(bone, frame, action, armature_matrix):
 
     return rotation, change
 
+def _scale(bone, frame, action, armature_matrix):
+    """
+
+    :param bone:
+    :param frame:
+    :param action:
+    :param armature_matrix:
+
+    """
+    scale = mathutils.Vector((0.0, 0.0, 0.0))
+
+    change = False
+
+    ngroups = len(action.groups)
+
+    # animation grouped by bones
+	
+    if ngroups > 0:
+
+        index = -1
+
+        for i in range(ngroups):
+            if action.groups[i].name == bone.name:
+		
+                print(action.groups[i].name)
+
+                index = i
+
+        if index > -1:
+            for channel in action.groups[index].channels:
+ 
+                if "scale" in channel.data_path:
+                    has_changed = _handle_scale_channel(
+                        channel, frame, scale)
+                    change = change or has_changed
+                    
+    # animation in raw fcurves
+
+    else:
+
+        bone_label = '"%s"' % bone.name
+	
+        for channel in action.fcurves:
+            data_path = channel.data_path
+            if bone_label in data_path and "scale" in data_path:
+                has_changed = _handle_scale_channel(
+                    channel, frame, scale)
+                change = change or has_changed
+    	
+   
+    #scale.xyz = armature_matrix * scale.xyz
+
+    return scale, change
+
 
 def _handle_rotation_channel(channel, frame, rotation):
     """
@@ -556,6 +621,34 @@ def _handle_position_channel(channel, frame, position):
 
         if channel.array_index == 2:
             position.z = value
+
+    return change
+
+def _handle_scale_channel(channel, frame, scale):
+    """
+
+    :param channel:
+    :param frame:
+    :param position:
+
+    """
+    change = False
+
+    if channel.array_index in [0, 1, 2]:
+        for keyframe in channel.keyframe_points:
+            if keyframe.co[0] == frame:
+                change = True
+       
+        value = channel.evaluate(frame)
+      
+        if channel.array_index == 0:
+            scale.x = value
+
+        if channel.array_index == 1:
+            scale.y = value
+
+        if channel.array_index == 2:
+            scale.z = value
 
     return change
 

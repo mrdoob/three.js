@@ -15,14 +15,14 @@ THREE.SSAOShader = {
 
 	uniforms: {
 
-		"tDiffuse":     { type: "t", value: null },
-		"tDepth":       { type: "t", value: null },
-		"size":         { type: "v2", value: new THREE.Vector2( 512, 512 ) },
-		"cameraNear":   { type: "f", value: 1 },
-		"cameraFar":    { type: "f", value: 100 },
-		"onlyAO":       { type: "i", value: 0 },
-		"aoClamp":      { type: "f", value: 0.5 },
-		"lumInfluence": { type: "f", value: 0.5 }
+		"tDiffuse":     { value: null },
+		"tDepth":       { value: null },
+		"size":         { value: new THREE.Vector2( 512, 512 ) },
+		"cameraNear":   { value: 1 },
+		"cameraFar":    { value: 100 },
+		"onlyAO":       { value: 0 },
+		"aoClamp":      { value: 0.5 },
+		"lumInfluence": { value: 0.5 }
 
 	},
 
@@ -44,6 +44,9 @@ THREE.SSAOShader = {
 
 		"uniform float cameraNear;",
 		"uniform float cameraFar;",
+		"#ifdef USE_LOGDEPTHBUF",
+			"uniform float logDepthBufFC;",
+		"#endif",
 
 		"uniform bool onlyAO;",      // use only ambient occlusion pass?
 
@@ -109,8 +112,19 @@ THREE.SSAOShader = {
 			"float cameraFarMinusNear = cameraFar - cameraNear;",
 			"float cameraCoef = 2.0 * cameraNear;",
 
-			// "return ( 2.0 * cameraNear ) / ( cameraFar + cameraNear - unpackDepth( texture2D( tDepth, coord ) ) * ( cameraFar - cameraNear ) );",
-			"return cameraCoef / ( cameraFarPlusNear - unpackRGBAToDepth( texture2D( tDepth, coord ) ) * cameraFarMinusNear );",
+			"#ifdef USE_LOGDEPTHBUF",
+
+				"float logz = unpackRGBAToDepth( texture2D( tDepth, coord ) );",
+				"float w = pow(2.0, (logz / logDepthBufFC)) - 1.0;",
+				"float z = (logz / w) + 1.0;",
+
+			"#else",
+
+				"float z = unpackRGBAToDepth( texture2D( tDepth, coord ) );",
+
+			"#endif",
+
+			"return cameraCoef / ( cameraFarPlusNear - z * cameraFarMinusNear );",
 
 
 		"}",

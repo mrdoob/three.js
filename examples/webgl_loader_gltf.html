@@ -31,106 +31,71 @@
 			}
 
 			#controls {
-				position:absolute;
-				width:250px;
-				bottom:0%;
-				right:0%;
-				height:132px;
-				background-color:White;
-				opacity:.9;
-				font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+				position: absolute;
+				width: 200px;
+				bottom: 0px;
+				left: 0px;
+				padding: 10px;
+				background-color: White;
+				font: 13px "Lucida Grande", Lucida, Verdana, sans-serif;
 			}
 
-			#status {
-				position:absolute;
-				width:25%;
-				left:2%;
-				top:95%;
-				height:5%;
-				opacity:.9;
-				font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
+			#controls > div {
+				margin-bottom: 8px;
 			}
 
-			.control {
-				position:absolute;
-				margin-left:12px;
-				width:100%;
-				font-weight:bold;
+			#controls hr {
+				border: 0px;
+				height: 1px;
+				margin-bottom: 10px;
+				background-color: #bbb;
 			}
 
-			.controlValue {
-				position:absolute;
-				left:36%;
-				top:0%;
+			#info a, .button {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
 			}
-
-			#scenes_control {
-				position:absolute;
-				top:8px;
-			}
-
-			#cameras_control {
-				position:absolute;
-				top:40px;
-			}
-
-			#animations_control {
-				position:absolute;
-				top:72px;
-			}
-
-			#materials_extension_control {
-				position:absolute;
-				top:104px;
-			}
-
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader -
-		<br></br>
-		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
-		COLLADA duck by Sony - other models courtesy <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader
+		<br>
+		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> - COLLADA duck by Sony -
+		Cesium models by <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
 		</div>
-	<div id="container">
-	</div>
-	<div id="status">
-	</div>
+	<div id="container"></div>
 	<div id="controls">
-		<div class="control" id="scenes_control">
-		Model
-		<select class="controlValue" id="scenes_list" size="1" onchange="selectScene();" ondblclick="selectScene();">
-		</select>
+		<div id="status">Loading...</div>
+		<hr />
+		<div>
+			Model
+			<select id="scenes_list" size="1" onchange="selectScene();" ondblclick="selectScene();"></select>
 		</div>
-
-		<div class="control" id="cameras_control">
-		Camera
-		<select class="controlValue" id="cameras_list" size="1" onchange="selectCamera();" ondblclick="selectCamera();">
-		</select>
+		<div>
+			Camera
+			<select id="cameras_list" size="1" onchange="selectCamera();" ondblclick="selectCamera();"></select>
 		</div>
-		<div class="control" id="animations_control">
-		Animations
-		<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
+		<div>
+			Animations
+			<input type="checkbox" checked onclick="toggleAnimations();">Play</input>
 		</div>
-		<div class="control" id="materials_extension_control">
-			Shaders
-			<div class="controlValue">
-			<input type="checkbox" id="materials_extension_checkbox" checked onclick="toggleMaterialsExtension();">Use built-in</input>
-			</div>
+		<div>
+			Extension
+			<select id="extensions_list" onchange="selectExtension();">
+				<option value="glTF">None</option>
+				<option value="glTF-MaterialsCommon">Built-in shaders</option>
+				<option value="glTF-Binary">Binary</option>
+			</select>
 		</div>
-
 	</div>
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/gltf/glTF-parser.js"></script>
-		<script src="js/loaders/gltf/glTFLoader.js"></script>
-		<script src="js/loaders/gltf/glTFLoaderUtils.js"></script>
-		<script src="js/loaders/gltf/glTFAnimation.js"></script>
-		<script src="js/loaders/gltf/glTFShaders.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script>
 			var orbitControls = null;
@@ -141,6 +106,8 @@
 			var cameraNames = [];
 			var defaultCamera = null;
 			var gltf = null;
+			var mixer = null;
+			var clock = new THREE.Clock();
 
 			function onload() {
 
@@ -216,7 +183,7 @@
 				if (sceneInfo.addGround) {
 					var groundMaterial = new THREE.MeshPhongMaterial({
 							color: 0xFFFFFF,
-							shading: THREE.SmoothShading,
+							shading: THREE.SmoothShading
 						});
 					ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(512, 512), groundMaterial);
 
@@ -235,29 +202,36 @@
 					scene.add(ground);
 				}
 
-				loader = new THREE.glTFLoader;
-				var loadStartTime = Date.now();
-				var status = document.getElementById("status");
-				status.innerHTML = "Loading...";
+				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
+				loader = new THREE.GLTFLoader;
+
+				for (var i = 0; i < extensionSelect.children.length; i++) {
+					var child = extensionSelect.children[i];
+					child.disabled = sceneInfo.extensions.indexOf(child.value) === -1;
+					if (child.disabled && child.selected) {
+						extensionSelect.value = extension = 'glTF';
+					}
+				}
+
 				var url = sceneInfo.url;
 				var r = eval("/" + '\%s' + "/g");
-				var dir = useMaterialsExtension ? 'glTF-MaterialsCommon' :  'glTF';
-				url = url.replace(r, dir);
+				url = url.replace(r, extension);
 
-				var loadStartTime = Date.now();
+				if (extension === 'glTF-Binary') {
+					url = url.replace('.gltf', '.glb');
+				}
+
+				var loadStartTime = performance.now();
 				var status = document.getElementById("status");
 				status.innerHTML = "Loading...";
+
 				loader.load( url, function(data) {
 
 					gltf = data;
 
-					var object = gltf.scene;
+					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
 
-					var loadEndTime = Date.now();
-
-					var loadTime = (loadEndTime - loadStartTime) / 1000;
-
-					status.innerHTML = "Load time: " + loadTime.toFixed(2) + " seconds.";
+					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
 
 					if (sceneInfo.cameraPos)
 						defaultCamera.position.copy(sceneInfo.cameraPos);
@@ -315,18 +289,25 @@
 
 					}
 
-					if (gltf.animations && gltf.animations.length) {
+					var animations = gltf.animations;
 
-						var i, len = gltf.animations.length;
-						for (i = 0; i < len; i++) {
-							var animation = gltf.animations[i];
-							animation.loop = true;
+					if ( animations && animations.length ) {
+
+						mixer = new THREE.AnimationMixer( object );
+
+						for ( var i = 0; i < animations.length; i ++ ) {
+
+							var animation = animations[ i ];
+
 							// There's .3333 seconds junk at the tail of the Monster animation that
 							// keeps it from looping cleanly. Clip it at 3 seconds
-							if (sceneInfo.animationTime)
+							if ( sceneInfo.animationTime )
 								animation.duration = sceneInfo.animationTime;
-							animation.play();
+
+							mixer.clipAction( animation ).play();
+
 						}
+
 					}
 
 					scene.add( object );
@@ -356,8 +337,8 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-				THREE.glTFAnimator.update();
-				THREE.glTFShaders.update(scene, camera);
+				if (mixer) mixer.update(clock.getDelta());
+				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
@@ -393,20 +374,22 @@
 				{
 					name : "Monster", url : "./models/gltf/monster/%s/monster.gltf",
 					cameraPos: new THREE.Vector3(30, 10, 70),
-					objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-					objectPosition: new THREE.Vector3(2, 6, 0),
+					objectScale: new THREE.Vector3(0.4, 0.4, 0.4),
+					objectPosition: new THREE.Vector3(2, 1, 0),
 					objectRotation: new THREE.Euler(0, - 3 * Math.PI / 4, 0),
 					animationTime: 3,
 					addLights:true,
 					shadows:true,
-					addGround:true
+					addGround:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Duck", url : "./models/gltf/duck/%s/duck.gltf",
 					cameraPos: new THREE.Vector3(0, 3, 5),
 					addLights:true,
 					addGround:true,
-					shadows:true
+					shadows:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Cesium Man", url : "./models/gltf/CesiumMan/%s/Cesium_Man.gltf",
@@ -414,7 +397,8 @@
 					 objectRotation: new THREE.Euler(0, 0, 0),
 					 addLights:true,
 					 addGround:true,
-					 shadows:true
+					 shadows:true,
+					 extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
 				{
 					name : "Cesium Milk Truck",
@@ -422,9 +406,30 @@
 					cameraPos: new THREE.Vector3(0, 3, 10),
 					addLights:true,
 					addGround:true,
-					shadows:true
+					shadows:true,
+					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
 				},
-
+				{
+					name : "Snowflake",
+					url : "./models/gltf/snowflake/snowFlake.gltf",
+					objectScale: new THREE.Vector3(4, 4, 1),
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(0, 0, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false,
+					extensions: ["glTF"]
+				},
+				{
+					name : "Snowflakes",
+					url : "./models/gltf/snowflakes/snowFlakes.gltf",
+					cameraPos: new THREE.Vector3(0, 100, 5000),
+					objectPosition: new THREE.Vector3(-1200, -1200, 0),
+					addLights:false,
+					addGround:false,
+					shadows:false,
+					extensions: ["glTF"]
+				}
 			];
 
 			function buildSceneList() {
@@ -521,26 +526,26 @@
 
 				for (i = 0; i < len; i++) {
 
-					var animation = gltf.animations[i];
+					var clip = gltf.animations[i];
+					var action = mixer.existingAction( clip );
 
-					if (animation.running) {
-						animation.stop();
+					if (action.isRunning()) {
+						action.stop();
 					} else {
-						animation.play();
+						action.play();
 					}
 
 				}
 
 			}
 
-			var useextmaterials = document.getElementById("materials_extension_checkbox");
-			var useMaterialsExtension = useextmaterials.hasAttribute("checked");
-			function toggleMaterialsExtension()
+			var extensionSelect = document.getElementById("extensions_list");
+			var extension = extensionSelect.value;
+			function selectExtension()
 			{
-				useMaterialsExtension = !useMaterialsExtension;
+				extension = extensionSelect.value;
 				selectScene();
 			}
-
 
 			function cleanup() {
 
@@ -553,17 +558,10 @@
 				cameraNames = [];
 				defaultCamera = null;
 
-				if (!loader || !gltf.animations)
+				if (!loader || !mixer)
 					return;
 
-				var i, len = gltf.animations.length;
-
-				for (i = 0; i < len; i++) {
-					var animation = gltf.animations[i];
-					if (animation.running) {
-						animation.stop();
-					}
-				}
+				mixer.stopAllAction();
 
 			}
 

@@ -45,10 +45,15 @@
 
 				scene.add( new THREE.PointLightHelper( light, 5 ) );
 
-				var helper = new THREE.GridHelper( 200, 10 );
-				helper.setColors( 0x0000ff, 0x808080 );
-				helper.position.y = - 150;
-				scene.add( helper );
+				var gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
+				gridHelper.position.y = - 150;
+				gridHelper.position.x = - 150;
+				scene.add( gridHelper );
+
+				var polarGridHelper = new THREE.PolarGridHelper( 200, 16, 8, 64, 0x0000ff, 0x808080 );
+				polarGridHelper.position.y = - 150;
+				polarGridHelper.position.x = 200;
+				scene.add( polarGridHelper );
 
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {

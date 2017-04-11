@@ -67,7 +67,7 @@
       float readDepth (sampler2D depthSampler, vec2 coord) {
         float fragCoordZ = texture2D(depthSampler, coord).x;
         float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
-        return viewZToOrthoDepth( viewZ, cameraNear, cameraFar );
+        return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
       }
 
       void main() {
@@ -177,10 +177,10 @@
           vertexShader: document.querySelector('#post-vert').textContent.trim(),
           fragmentShader: document.querySelector('#post-frag').textContent.trim(),
           uniforms: {
-            cameraNear: { type: 'f', value: camera.near },
-            cameraFar: { type: 'f', value: camera.far },
-            tDiffuse: { type: 't', value: target },
-            tDepth: { type: 't', value: target.depthTexture }
+            cameraNear: { value: camera.near },
+            cameraFar:  { value: camera.far },
+            tDiffuse:   { value: target.texture },
+            tDepth:     { value: target.depthTexture }
           }
         });
         var postPlane = new THREE.PlaneGeometry(2, 2);
@@ -196,7 +196,7 @@
 
         // Setup some geometries
         var geometry = new THREE.TorusKnotGeometry(1, 0.3, 128, 64);
-        var material = new THREE.MeshBasicMaterial({ color: 'blue' })
+        var material = new THREE.MeshBasicMaterial({ color: 'blue' });
 
         var count = 50;
         var scale = 5;

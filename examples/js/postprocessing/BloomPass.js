@@ -69,13 +69,12 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
 
-THREE.BloomPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.BloomPass.prototype = {
+THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.BloomPass,
 
@@ -87,7 +86,7 @@ THREE.BloomPass.prototype = {
 
 		this.quad.material = this.materialConvolution;
 
-		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
+		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
 		renderer.render( this.scene, this.camera, this.renderTargetX, true );
@@ -95,7 +94,7 @@ THREE.BloomPass.prototype = {
 
 		// Render quad with blured scene into texture (convolution pass 2)
 
-		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
+		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX.texture;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
 
 		renderer.render( this.scene, this.camera, this.renderTargetY, true );
@@ -104,7 +103,7 @@ THREE.BloomPass.prototype = {
 
 		this.quad.material = this.materialCopy;
 
-		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
+		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY.texture;
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
@@ -112,7 +111,7 @@ THREE.BloomPass.prototype = {
 
 	}
 
-};
+} );
 
 THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );

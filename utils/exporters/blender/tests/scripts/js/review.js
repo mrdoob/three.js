@@ -1,4 +1,4 @@
-var scene, renderer, camera, container, animation;
+var scene, renderer, camera, container, animation ,mixer;
 var hasMorph = false;
 var prevTime = Date.now();
 var clock = new THREE.Clock();
@@ -22,10 +22,10 @@ function animate() {
 
     requestAnimationFrame( animate );
 
-    if ( animation !== null ) {
+    if ( mixer !== null ) {
 
         var delta = clock.getDelta();
-        THREE.AnimationHandler.update( delta );
+        mixer.update(delta);
 
     }
 
@@ -47,7 +47,7 @@ function onWindowResize() {
 function setupScene( result, data ) {
 
     scene = new THREE.Scene();
-    scene.add( new THREE.GridHelper( 10, 2.5 ) );
+    scene.add( new THREE.GridHelper( 10, 8 ) );
 
 }
 
@@ -77,12 +77,13 @@ function loadObject( data ) {
 
     var hasLights = false;
 
+    // TODO: RectAreaLight support
     var lights = ['AmbientLight', 'DirectionalLight',
-        'PointLight', 'SpotLight', 'HemisphereLight']
+        'PointLight', 'SpotLight', 'RectAreaLight', 'HemisphereLight'];
 
     var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 
-    for ( i = 0; i < scene.children.length; i ++ ) {
+    for ( var i = 0; i < scene.children.length; i ++ ) {
 
         var lightIndex = lights.indexOf( scene.children[ i ].type );
 
@@ -141,8 +142,8 @@ function loadGeometry( data, url ) {
         data.materials[ 0 ].skinning = true;
         mesh = new THREE.SkinnedMesh( data.geometry, material, false );
 
-        var name = data.geometry.animations[0].name;
-        animation = new THREE.Animation( mesh, data.geometry.animations[0] );
+        mixer = new THREE.AnimationMixer( mesh );
+        animation =  mixer.clipAction( mesh.geometry.animations[ 0 ] );
 
     } else {
 

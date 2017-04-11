@@ -1,3 +1,10 @@
+import { AnimationAction } from './AnimationAction';
+import { EventDispatcher } from '../core/EventDispatcher';
+import { LinearInterpolant } from '../math/interpolants/LinearInterpolant';
+import { PropertyBinding } from './PropertyBinding';
+import { PropertyMixer } from './PropertyMixer';
+import { AnimationClip } from './AnimationClip';
+
 /**
  *
  * Player for AnimationClips.
@@ -8,7 +15,7 @@
  * @author tschw
  */
 
-THREE.AnimationMixer = function( root ) {
+function AnimationMixer( root ) {
 
 	this._root = root;
 	this._initMemoryManager();
@@ -18,24 +25,27 @@ THREE.AnimationMixer = function( root ) {
 
 	this.timeScale = 1.0;
 
-};
+}
 
-THREE.AnimationMixer.prototype = {
+AnimationMixer.prototype = {
 
-	constructor: THREE.AnimationMixer,
+	constructor: AnimationMixer,
 
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function( clip, optionalRoot ) {
+	clipAction: function ( clip, optionalRoot ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			clipObject = ( clip !== clipName ) ? clip : null,
 
-			actionsForClip = this._actionsByClip[ clipName ],
-			prototypeAction;
+			clipObject = typeof clip === 'string' ?
+					AnimationClip.findByName( root, clip ) : clip,
+
+			clipUuid = clipObject !== null ? clipObject.uuid : clip,
+
+			actionsForClip = this._actionsByClip[ clipUuid ],
+			prototypeAction = null;
 
 		if ( actionsForClip !== undefined ) {
 
@@ -53,14 +63,8 @@ THREE.AnimationMixer.prototype = {
 			prototypeAction = actionsForClip.knownActions[ 0 ];
 
 			// also, take the clip from the prototype action
-			clipObject = prototypeAction._clip;
-
-			if ( clip !== clipName && clip !== clipObject ) {
-
-				throw new Error(
-						"Different clips with the same name detected!" );
-
-			}
+			if ( clipObject === null )
+				clipObject = prototypeAction._clip;
 
 		}
 
@@ -68,25 +72,29 @@ THREE.AnimationMixer.prototype = {
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new THREE.
-				AnimationMixer._Action( this, clipObject, optionalRoot );
+		var newAction = new AnimationAction( this, clipObject, optionalRoot );
 
 		this._bindAction( newAction, prototypeAction );
 
 		// and make the action known to the memory manager
-		this._addInactiveAction( newAction, clipName, rootUuid );
+		this._addInactiveAction( newAction, clipUuid, rootUuid );
 
 		return newAction;
 
 	},
 
 	// get an existing action
-	existingAction: function( clip, optionalRoot ) {
+	existingAction: function ( clip, optionalRoot ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
-			clipName = ( typeof clip === 'string' ) ? clip : clip.name,
-			actionsForClip = this._actionsByClip[ clipName ];
+
+			clipObject = typeof clip === 'string' ?
+					AnimationClip.findByName( root, clip ) : clip,
+
+			clipUuid = clipObject ? clipObject.uuid : clip,
+
+			actionsForClip = this._actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -99,7 +107,7 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	// deactivates all previously scheduled actions
-	stopAllAction: function() {
+	stopAllAction: function () {
 
 		var actions = this._actions,
 			nActions = this._nActiveActions,
@@ -126,7 +134,7 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	// advance the time and update apply the animation
-	update: function( deltaTime ) {
+	update: function ( deltaTime ) {
 
 		deltaTime *= this.timeScale;
 
@@ -168,19 +176,19 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	// return this mixer's root target object
-	getRoot: function() {
+	getRoot: function () {
 
 		return this._root;
 
 	},
 
 	// free all resources specific to a particular clip
-	uncacheClip: function( clip ) {
+	uncacheClip: function ( clip ) {
 
 		var actions = this._actions,
-			clipName = clip.name,
+			clipUuid = clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip !== undefined ) {
 
@@ -210,21 +218,21 @@ THREE.AnimationMixer.prototype = {
 
 			}
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
 	},
 
 	// free all resources specific to a particular root target object
-	uncacheRoot: function( root ) {
+	uncacheRoot: function ( root ) {
 
 		var rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
 
-		for ( var clipName in actionsByClip ) {
+		for ( var clipUuid in actionsByClip ) {
 
-			var actionByRoot = actionsByClip[ clipName ].actionByRoot,
+			var actionByRoot = actionsByClip[ clipUuid ].actionByRoot,
 				action = actionByRoot[ rootUuid ];
 
 			if ( action !== undefined ) {
@@ -254,7 +262,7 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	// remove a targeted clip from the cache
-	uncacheAction: function( clip, optionalRoot ) {
+	uncacheAction: function ( clip, optionalRoot ) {
 
 		var action = this.existingAction( clip, optionalRoot );
 
@@ -269,673 +277,11 @@ THREE.AnimationMixer.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.AnimationMixer.prototype );
-
-THREE.AnimationMixer._Action =
-		function( mixer, clip, localRoot ) {
-
-	this._mixer = mixer;
-	this._clip = clip;
-	this._localRoot = localRoot || null;
-
-	var tracks = clip.tracks,
-		nTracks = tracks.length,
-		interpolants = new Array( nTracks );
-
-	var interpolantSettings = {
-			endingStart: 	THREE.ZeroCurvatureEnding,
-			endingEnd:		THREE.ZeroCurvatureEnding
-	};
-
-	for ( var i = 0; i !== nTracks; ++ i ) {
-
-		var interpolant = tracks[ i ].createInterpolant( null );
-		interpolants[ i ] = interpolant;
-		interpolant.settings = interpolantSettings
-
-	}
-
-	this._interpolantSettings = interpolantSettings;
-
-	this._interpolants = interpolants;	// bound by the mixer
-
-	// inside: PropertyMixer (managed by the mixer)
-	this._propertyBindings = new Array( nTracks );
-
-	this._cacheIndex = null;			// for the memory manager
-	this._byClipCacheIndex = null;		// for the memory manager
-
-	this._timeScaleInterpolant = null;
-	this._weightInterpolant = null;
-
-	this.loop = THREE.LoopRepeat;
-	this._loopCount = -1;
-
-	// global mixer time when the action is to be started
-	// it's set back to 'null' upon start of the action
-	this._startTime = null;
-
-	// scaled local time of the action
-	// gets clamped or wrapped to 0..clip.duration according to loop
-	this.time = 0;
-
-	this.timeScale = 1;
-	this._effectiveTimeScale = 1;
-
-	this.weight = 1;
-	this._effectiveWeight = 1;
-
-	this.repetitions = Infinity; 		// no. of repetitions when looping
-
-	this.paused = false;				// false -> zero effective time scale
-	this.enabled = true;				// true -> zero effective weight
-
-	this.clampWhenFinished 	= false;	// keep feeding the last frame?
-
-	this.zeroSlopeAtStart 	= true;		// for smooth interpolation w/o separate
-	this.zeroSlopeAtEnd		= true;		// clips for start, loop and end
-
-};
-
-THREE.AnimationMixer._Action.prototype = {
-
-	constructor: THREE.AnimationMixer._Action,
-
-	// State & Scheduling
-
-	play: function() {
-
-		this._mixer._activateAction( this );
-
-		return this;
-
-	},
-
-	stop: function() {
-
-		this._mixer._deactivateAction( this );
-
-		return this.reset();
-
-	},
-
-	reset: function() {
-
-		this.paused = false;
-		this.enabled = true;
-
-		this.time = 0;			// restart clip
-		this._loopCount = -1;	// forget previous loops
-		this._startTime = null;	// forget scheduling
-
-		return this.stopFading().stopWarping();
-
-	},
-
-	isRunning: function() {
-
-		var start = this._startTime;
-
-		return this.enabled && ! this.paused && this.timeScale !== 0 &&
-				this._startTime === null && this._mixer._isActiveAction( this )
-
-	},
-
-	// return true when play has been called
-	isScheduled: function() {
-
-		return this._mixer._isActiveAction( this );
-
-	},
-
-	startAt: function( time ) {
-
-		this._startTime = time;
-
-		return this;
-
-	},
-
-	setLoop: function( mode, repetitions ) {
-
-		this.loop = mode;
-		this.repetitions = repetitions;
-
-		return this;
-
-	},
-
-	// Weight
-
-	// set the weight stopping any scheduled fading
-	// although .enabled = false yields an effective weight of zero, this
-	// method does *not* change .enabled, because it would be confusing
-	setEffectiveWeight: function( weight ) {
-
-		this.weight = weight;
-
-		// note: same logic as when updated at runtime
-		this._effectiveWeight = this.enabled ? weight : 0;
-
-		return this.stopFading();
-
-	},
-
-	// return the weight considering fading and .enabled
-	getEffectiveWeight: function() {
-
-		return this._effectiveWeight;
-
-	},
-
-	fadeIn: function( duration ) {
-
-		return this._scheduleFading( duration, 0, 1 );
-
-	},
-
-	fadeOut: function( duration ) {
-
-		return this._scheduleFading( duration, 1, 0 );
-
-	},
-
-	crossFadeFrom: function( fadeOutAction, duration, warp ) {
-
-		var mixer = this._mixer;
-
-		fadeOutAction.fadeOut( duration );
-		this.fadeIn( duration );
-
-		if( warp ) {
-
-			var fadeInDuration = this._clip.duration,
-				fadeOutDuration = fadeOutAction._clip.duration,
-
-				startEndRatio = fadeOutDuration / fadeInDuration,
-				endStartRatio = fadeInDuration / fadeOutDuration;
-
-			fadeOutAction.warp( 1.0, startEndRatio, duration );
-			this.warp( endStartRatio, 1.0, duration );
-
-		}
-
-		return this;
-
-	},
-
-	crossFadeTo: function( fadeInAction, duration, warp ) {
-
-		return fadeInAction.crossFadeFrom( this, duration, warp );
-
-	},
-
-	stopFading: function() {
-
-		var weightInterpolant = this._weightInterpolant;
-
-		if ( weightInterpolant !== null ) {
-
-			this._weightInterpolant = null;
-			this._mixer._takeBackControlInterpolant( weightInterpolant );
-
-		}
-
-		return this;
-
-	},
-
-	// Time Scale Control
-
-	// set the weight stopping any scheduled warping
-	// although .paused = true yields an effective time scale of zero, this
-	// method does *not* change .paused, because it would be confusing
-	setEffectiveTimeScale: function( timeScale ) {
-
-		this.timeScale = timeScale;
-		this._effectiveTimeScale = this.paused ? 0 :timeScale;
-
-		return this.stopWarping();
-
-	},
-
-	// return the time scale considering warping and .paused
-	getEffectiveTimeScale: function() {
-
-		return this._effectiveTimeScale;
-
-	},
-
-	setDuration: function( duration ) {
-
-		this.timeScale = this._clip.duration / duration;
-
-		return this.stopWarping();
-
-	},
-
-	syncWith: function( action ) {
-
-		this.time = action.time;
-		this.timeScale = action.timeScale;
-
-		return this.stopWarping();
-
-	},
-
-	halt: function( duration ) {
-
-		return this.warp( this._currentTimeScale, 0, duration );
-
-	},
-
-	warp: function( startTimeScale, endTimeScale, duration ) {
-
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._timeScaleInterpolant,
-
-			timeScale = this.timeScale;
-
-		if ( interpolant === null ) {
-
-			interpolant = mixer._lendControlInterpolant(),
-			this._timeScaleInterpolant = interpolant;
-
-		}
-
-		var times = interpolant.parameterPositions,
-			values = interpolant.sampleValues;
-
-		times[ 0 ] = now;
-		times[ 1 ] = now + duration;
-
-		values[ 0 ] = startTimeScale / timeScale;
-		values[ 1 ] = endTimeScale / timeScale;
-
-		return this;
-
-	},
-
-	stopWarping: function() {
-
-		var timeScaleInterpolant = this._timeScaleInterpolant;
-
-		if ( timeScaleInterpolant !== null ) {
-
-			this._timeScaleInterpolant = null;
-			this._mixer._takeBackControlInterpolant( timeScaleInterpolant );
-
-		}
-
-		return this;
-
-	},
-
-	// Object Accessors
-
-	getMixer: function() {
-
-		return this._mixer;
-
-	},
-
-	getClip: function() {
-
-		return this._clip;
-
-	},
-
-	getRoot: function() {
-
-		return this._localRoot || this._mixer._root;
-
-	},
-
-	// Interna
-
-	_update: function( time, deltaTime, timeDirection, accuIndex ) {
-		// called by the mixer
-
-		var startTime = this._startTime;
-
-		if ( startTime !== null ) {
-
-			// check for scheduled start of action
-
-			var timeRunning = ( time - startTime ) * timeDirection;
-			if ( timeRunning < 0 || timeDirection === 0 ) {
-
-				return; // yet to come / don't decide when delta = 0
-
-			}
-
-			// start
-
-			this._startTime = null; // unschedule
-			deltaTime = timeDirection * timeRunning;
-
-		}
-
-		// apply time scale and advance time
-
-		deltaTime *= this._updateTimeScale( time );
-		var clipTime = this._updateTime( deltaTime );
-
-		// note: _updateTime may disable the action resulting in
-		// an effective weight of 0
-
-		var weight = this._updateWeight( time );
-
-		if ( weight > 0 ) {
-
-			var interpolants = this._interpolants;
-			var propertyMixers = this._propertyBindings;
-
-			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
-
-				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight );
-
-			}
-
-		}
-
-	},
-
-	_updateWeight: function( time ) {
-
-		var weight = 0;
-
-		if ( this.enabled ) {
-
-			weight = this.weight;
-			var interpolant = this._weightInterpolant;
-
-			if ( interpolant !== null ) {
-
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
-
-				weight *= interpolantValue;
-
-				if ( time > interpolant.parameterPositions[ 1 ] ) {
-
-					this.stopFading();
-
-					if ( interpolantValue === 0 ) {
-
-						// faded out, disable
-						this.enabled = false;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		this._effectiveWeight = weight;
-		return weight;
-
-	},
-
-	_updateTimeScale: function( time ) {
-
-		var timeScale = 0;
-
-		if ( ! this.paused ) {
-
-			timeScale = this.timeScale;
-
-			var interpolant = this._timeScaleInterpolant;
-
-			if ( interpolant !== null ) {
-
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
-
-				timeScale *= interpolantValue;
-
-				if ( time > interpolant.parameterPositions[ 1 ] ) {
-
-					this.stopWarping();
-
-					if ( timeScale === 0 ) {
-
-						// motion has halted, pause
-						this.pause = true;
-
-					} else {
-
-						// warp done - apply final time scale
-						this.timeScale = timeScale;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		this._effectiveTimeScale = timeScale;
-		return timeScale;
-
-	},
-
-	_updateTime: function( deltaTime ) {
-
-		var time = this.time + deltaTime;
-
-		if ( deltaTime === 0 ) return time;
-
-		var duration = this._clip.duration,
-
-			loop = this.loop,
-			loopCount = this._loopCount,
-
-			pingPong = false;
-
-		switch ( loop ) {
-
-			case THREE.LoopOnce:
-
-				if ( loopCount === -1 ) {
-
-					// just started
-
-					this.loopCount = 0;
-					this._setEndings( true, true, false );
-
-				}
-
-				if ( time >= duration ) {
-
-					time = duration;
-
-				} else if ( time < 0 ) {
-
-					time = 0;
-
-				} else break;
-
-				// reached the end
-
-				if ( this.clampWhenFinished ) this.pause = true;
-				else this.enabled = false;
-
-				this._mixer.dispatchEvent( {
-					type: 'finished', action: this,
-					direction: deltaTime < 0 ? -1 : 1
-				} );
-
-				break;
-
-			case THREE.LoopPingPong:
-
-				pingPong = true;
-
-			case THREE.LoopRepeat:
-
-				if ( loopCount === -1 ) {
-
-					// just started
-
-					if ( deltaTime > 0 ) {
-
-						loopCount = 0;
-
-						this._setEndings(
-								true, this.repetitions === 0, pingPong );
-
-					} else {
-
-						// when looping in reverse direction, the initial
-						// transition through zero counts as a repetition,
-						// so leave loopCount at -1
-
-						this._setEndings(
-								this.repetitions === 0, true, pingPong );
-
-					}
-
-				}
-
-				if ( time >= duration || time < 0 ) {
-
-					// wrap around
-
-					var loopDelta = Math.floor( time / duration ); // signed
-					time -= duration * loopDelta;
-
-					loopCount += Math.abs( loopDelta );
-
-					var pending = this.repetitions - loopCount;
-
-					if ( pending < 0 ) {
-
-						// stop (switch state, clamp time, fire event)
-
-						if ( this.clampWhenFinished ) this.paused = true;
-						else this.enabled = false;
-
-						time = deltaTime > 0 ? duration : 0;
-
-						this._mixer.dispatchEvent( {
-							type: 'finished', action: this,
-							direction: deltaTime > 0 ? 1 : -1
-						} );
-
-						break;
-
-					} else if ( pending === 0 ) {
-
-						// transition to last round
-
-						var atStart = deltaTime < 0;
-						this._setEndings( atStart, ! atStart, pingPong );
-
-					} else {
-
-						this._setEndings( false, false, pingPong );
-
-					}
-
-					this._loopCount = loopCount;
-
-					this._mixer.dispatchEvent( {
-						type: 'loop', action: this, loopDelta: loopDelta
-					} );
-
-				}
-
-				if ( loop === THREE.LoopPingPong && ( loopCount & 1 ) === 1 ) {
-
-					// invert time for the "pong round"
-
-					this.time = time;
-
-					return duration - time;
-
-				}
-
-				break;
-
-		}
-
-		this.time = time;
-
-		return time;
-
-	},
-
-	_setEndings: function( atStart, atEnd, pingPong ) {
-
-		var settings = this._interpolantSettings;
-
-		if ( pingPong ) {
-
-			settings.endingStart 	= THREE.ZeroSlopeEnding;
-			settings.endingEnd		= THREE.ZeroSlopeEnding;
-
-		} else {
-
-			// assuming for LoopOnce atStart == atEnd == true
-
-			if ( atStart ) {
-
-				settings.endingStart = this.zeroSlopeAtStart ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
-
-			} else {
-
-				settings.endingStart = THREE.WrapAroundEnding;
-
-			}
-
-			if ( atEnd ) {
-
-				settings.endingEnd = this.zeroSlopeAtEnd ?
-						THREE.ZeroSlopeEnding : THREE.ZeroCurvatureEnding;
-
-			} else {
-
-				settings.endingEnd 	 = THREE.WrapAroundEnding;
-
-			}
-
-		}
-
-	},
-
-	_scheduleFading: function( duration, weightNow, weightThen ) {
-
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._weightInterpolant;
-
-		if ( interpolant === null ) {
-
-			interpolant = mixer._lendControlInterpolant(),
-			this._weightInterpolant = interpolant;
-
-		}
-
-		var times = interpolant.parameterPositions,
-			values = interpolant.sampleValues;
-
-		times[ 0 ] = now; 				values[ 0 ] = weightNow;
-		times[ 1 ] = now + duration;	values[ 1 ] = weightThen;
-
-		return this;
-
-	}
-
-};
-
 // Implementation details:
 
-Object.assign( THREE.AnimationMixer.prototype, {
+Object.assign( AnimationMixer.prototype, {
 
-	_bindAction: function( action, prototypeAction ) {
+	_bindAction: function ( action, prototypeAction ) {
 
 		var root = action._localRoot || this._root,
 			tracks = action._clip.tracks,
@@ -985,8 +331,8 @@ Object.assign( THREE.AnimationMixer.prototype, {
 				var path = prototypeAction && prototypeAction.
 						_propertyBindings[ i ].binding.parsedPath;
 
-				binding = new THREE.PropertyMixer(
-						THREE.PropertyBinding.create( root, trackName, path ),
+				binding = new PropertyMixer(
+						PropertyBinding.create( root, trackName, path ),
 						track.ValueTypeName, track.getValueSize() );
 
 				++ binding.referenceCount;
@@ -1002,7 +348,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_activateAction: function( action ) {
+	_activateAction: function ( action ) {
 
 		if ( ! this._isActiveAction( action ) ) {
 
@@ -1012,13 +358,13 @@ Object.assign( THREE.AnimationMixer.prototype, {
 				// appears to be still using it -> rebind
 
 				var rootUuid = ( action._localRoot || this._root ).uuid,
-					clipName = action._clip.name,
-					actionsForClip = this._actionsByClip[ clipName ];
+					clipUuid = action._clip.uuid,
+					actionsForClip = this._actionsByClip[ clipUuid ];
 
 				this._bindAction( action,
 						actionsForClip && actionsForClip.knownActions[ 0 ] );
 
-				this._addInactiveAction( action, clipName, rootUuid );
+				this._addInactiveAction( action, clipUuid, rootUuid );
 
 			}
 
@@ -1044,7 +390,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_deactivateAction: function( action ) {
+	_deactivateAction: function ( action ) {
 
 		if ( this._isActiveAction( action ) ) {
 
@@ -1072,7 +418,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	// Memory manager
 
-	_initMemoryManager: function() {
+	_initMemoryManager: function () {
 
 		this._actions = []; // 'nActiveActions' followed by inactive ones
 		this._nActiveActions = 0;
@@ -1080,8 +426,8 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< _Action >	- used as prototypes
-		// 		actionByRoot: _Action			- lookup
+		// 		knownActions: Array< AnimationAction >	- used as prototypes
+		// 		actionByRoot: AnimationAction			- lookup
 		// }
 
 
@@ -1115,20 +461,20 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	// Memory management for _Action objects
+	// Memory management for AnimationAction objects
 
-	_isActiveAction: function( action ) {
+	_isActiveAction: function ( action ) {
 
 		var index = action._cacheIndex;
 		return index !== null && index < this._nActiveActions;
 
 	},
 
-	_addInactiveAction: function( action, clipName, rootUuid ) {
+	_addInactiveAction: function ( action, clipUuid, rootUuid ) {
 
 		var actions = this._actions,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ];
+			actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip === undefined ) {
 
@@ -1141,7 +487,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 			action._byClipCacheIndex = 0;
 
-			actionsByClip[ clipName ] = actionsForClip;
+			actionsByClip[ clipUuid ] = actionsForClip;
 
 		} else {
 
@@ -1159,7 +505,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveAction: function( action ) {
+	_removeInactiveAction: function ( action ) {
 
 		var actions = this._actions,
 			lastInactiveAction = actions[ actions.length - 1 ],
@@ -1172,9 +518,9 @@ Object.assign( THREE.AnimationMixer.prototype, {
 		action._cacheIndex = null;
 
 
-		var clipName = action._clip.name,
+		var clipUuid = action._clip.uuid,
 			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipName ],
+			actionsForClip = actionsByClip[ clipUuid ],
 			knownActionsForClip = actionsForClip.knownActions,
 
 			lastKnownAction =
@@ -1196,7 +542,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		if ( knownActionsForClip.length === 0 ) {
 
-			delete actionsByClip[ clipName ];
+			delete actionsByClip[ clipUuid ];
 
 		}
 
@@ -1204,7 +550,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveBindingsForAction: function( action ) {
+	_removeInactiveBindingsForAction: function ( action ) {
 
 		var bindings = action._propertyBindings;
 		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
@@ -1221,7 +567,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_lendAction: function( action ) {
+	_lendAction: function ( action ) {
 
 		// [ active actions |  inactive actions  ]
 		// [  active actions >| inactive actions ]
@@ -1244,7 +590,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackAction: function( action ) {
+	_takeBackAction: function ( action ) {
 
 		// [  active actions  | inactive actions ]
 		// [ active actions |< inactive actions  ]
@@ -1269,7 +615,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	// Memory management for PropertyMixer objects
 
-	_addInactiveBinding: function( binding, rootUuid, trackName ) {
+	_addInactiveBinding: function ( binding, rootUuid, trackName ) {
 
 		var bindingsByRoot = this._bindingsByRootAndName,
 			bindingByName = bindingsByRoot[ rootUuid ],
@@ -1290,7 +636,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_removeInactiveBinding: function( binding ) {
+	_removeInactiveBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			propBinding = binding.binding,
@@ -1318,7 +664,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_lendBinding: function( binding ) {
+	_lendBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
@@ -1335,7 +681,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackBinding: function( binding ) {
+	_takeBackBinding: function ( binding ) {
 
 		var bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
@@ -1355,7 +701,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	// Memory management of Interpolants for weight and time scale
 
-	_lendControlInterpolant: function() {
+	_lendControlInterpolant: function () {
 
 		var interpolants = this._controlInterpolants,
 			lastActiveIndex = this._nActiveControlInterpolants ++,
@@ -1363,7 +709,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 		if ( interpolant === undefined ) {
 
-			interpolant = new THREE.LinearInterpolant(
+			interpolant = new LinearInterpolant(
 					new Float32Array( 2 ), new Float32Array( 2 ),
 						1, this._controlInterpolantsResultBuffer );
 
@@ -1376,7 +722,7 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 	},
 
-	_takeBackControlInterpolant: function( interpolant ) {
+	_takeBackControlInterpolant: function ( interpolant ) {
 
 		var interpolants = this._controlInterpolants,
 			prevIndex = interpolant.__cacheIndex,
@@ -1397,3 +743,6 @@ Object.assign( THREE.AnimationMixer.prototype, {
 
 } );
 
+Object.assign( AnimationMixer.prototype, EventDispatcher.prototype );
+
+export { AnimationMixer };

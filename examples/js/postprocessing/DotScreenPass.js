@@ -29,19 +29,18 @@ THREE.DotScreenPass = function ( center, angle, scale ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
 
-THREE.DotScreenPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.DotScreenPass.prototype = {
+THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.DotScreenPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
 		this.quad.material = this.material;
@@ -58,4 +57,4 @@ THREE.DotScreenPass.prototype = {
 
 	}
 
-};
+} );

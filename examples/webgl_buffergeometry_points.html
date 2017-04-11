@@ -45,7 +45,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var points;
 
 			init();
 			animate();
@@ -110,8 +110,8 @@
 
 				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
 
-				particleSystem = new THREE.Points( geometry, material );
-				scene.add( particleSystem );
+				points = new THREE.Points( geometry, material );
+				scene.add( points );
 
 				//
 
@@ -157,8 +157,8 @@
 
 				var time = Date.now() * 0.001;
 
-				particleSystem.rotation.x = time * 0.25;
-				particleSystem.rotation.y = time * 0.5;
+				points.rotation.x = time * 0.25;
+				points.rotation.y = time * 0.5;
 
 				renderer.render( scene, camera );
 

@@ -1,3 +1,7 @@
+import { Material } from './Material';
+import { MultiplyOperation } from '../constants';
+import { Color } from '../math/Color';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -6,6 +10,9 @@
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
+ *
+ *  lightMap: new THREE.Texture( <Image> ),
+ *  lightMapIntensity: <float>
  *
  *  aoMap: new THREE.Texture( <Image> ),
  *  aoMapIntensity: <float>
@@ -20,31 +27,29 @@
  *  refractionRatio: <float>,
  *
  *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
- *
  *  skinning: <bool>,
- *  morphTargets: <bool>,
- *
- *  fog: <bool>
+ *  morphTargets: <bool>
  * }
  */
 
-THREE.MeshBasicMaterial = function ( parameters ) {
+function MeshBasicMaterial( parameters ) {
 
-	THREE.Material.call( this );
+	Material.call( this );
 
 	this.type = 'MeshBasicMaterial';
 
-	this.color = new THREE.Color( 0xffffff ); // emissive
+	this.color = new Color( 0xffffff ); // emissive
 
 	this.map = null;
+
+	this.lightMap = null;
+	this.lightMapIntensity = 1.0;
 
 	this.aoMap = null;
 	this.aoMapIntensity = 1.0;
@@ -54,39 +59,39 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.alphaMap = null;
 
 	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
+	this.combine = MultiplyOperation;
 	this.reflectivity = 1;
 	this.refractionRatio = 0.98;
-
-	this.fog = true;
-
-	this.shading = THREE.SmoothShading;
-	this.blending = THREE.NormalBlending;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 	this.wireframeLinecap = 'round';
 	this.wireframeLinejoin = 'round';
 
-	this.vertexColors = THREE.NoColors;
-
 	this.skinning = false;
 	this.morphTargets = false;
 
+	this.lights = false;
+
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
-THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
+MeshBasicMaterial.prototype = Object.create( Material.prototype );
+MeshBasicMaterial.prototype.constructor = MeshBasicMaterial;
 
-THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
+MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
-	THREE.Material.prototype.copy.call( this, source );
+MeshBasicMaterial.prototype.copy = function ( source ) {
+
+	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 
 	this.map = source.map;
+
+	this.lightMap = source.lightMap;
+	this.lightMapIntensity = source.lightMapIntensity;
 
 	this.aoMap = source.aoMap;
 	this.aoMapIntensity = source.aoMapIntensity;
@@ -100,16 +105,10 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 	this.reflectivity = source.reflectivity;
 	this.refractionRatio = source.refractionRatio;
 
-	this.fog = source.fog;
-
-	this.shading = source.shading;
-
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 	this.wireframeLinecap = source.wireframeLinecap;
 	this.wireframeLinejoin = source.wireframeLinejoin;
-
-	this.vertexColors = source.vertexColors;
 
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
@@ -117,3 +116,6 @@ THREE.MeshBasicMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
+
+export { MeshBasicMaterial };

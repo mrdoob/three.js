@@ -110,8 +110,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-				document.addEventListener( 'MozMousePixelScroll', onDocumentMouseWheel, false );
+				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 				//
 
@@ -161,25 +160,7 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				// WebKit
-
-				if ( event.wheelDeltaY ) {
-
-					distance -= event.wheelDeltaY * 0.05;
-
-				// Opera / Explorer 9
-
-				} else if ( event.wheelDelta ) {
-
-					distance -= event.wheelDelta * 0.05;
-
-				// Firefox
-
-				} else if ( event.detail ) {
-
-					distance += event.detail * 1.0;
-
-				}
+				distance += event.deltaY * 0.05;
 
 			}
 

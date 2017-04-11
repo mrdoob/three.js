@@ -217,7 +217,7 @@ class Scene(base_classes.BaseScene):
             scene_name = constants.SCENE
         self[constants.OBJECT] = object_.Object(None, parent=self)
         self[constants.OBJECT][constants.TYPE] = constants.SCENE.title()
-        self[constants.UUID] = utilities.id_from_name(scene_name)
+        self[constants.UUID] = utilities.id()
 
         objects = []
         if self.options.get(constants.HIERARCHY, False):

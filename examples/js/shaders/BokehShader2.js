@@ -14,37 +14,37 @@ THREE.BokehShader = {
 
 	uniforms: {
 
-		"textureWidth":  { type: "f", value: 1.0 },
-		"textureHeight":  { type: "f", value: 1.0 },
+		"textureWidth":  { value: 1.0 },
+		"textureHeight":  { value: 1.0 },
 
-		"focalDepth":   { type: "f", value: 1.0 },
-		"focalLength":   { type: "f", value: 24.0 },
-		"fstop": { type: "f", value: 0.9 },
+		"focalDepth":   { value: 1.0 },
+		"focalLength":   { value: 24.0 },
+		"fstop": { value: 0.9 },
 
-		"tColor":   { type: "t", value: null },
-		"tDepth":   { type: "t", value: null },
+		"tColor":   { value: null },
+		"tDepth":   { value: null },
 
-		"maxblur":  { type: "f", value: 1.0 },
+		"maxblur":  { value: 1.0 },
 
-		"showFocus":   { type: "i", value: 0 },
-		"manualdof":   { type: "i", value: 0 },
-		"vignetting":   { type: "i", value: 0 },
-		"depthblur":   { type: "i", value: 0 },
+		"showFocus":   { value: 0 },
+		"manualdof":   { value: 0 },
+		"vignetting":   { value: 0 },
+		"depthblur":   { value: 0 },
 
-		"threshold":  { type: "f", value: 0.5 },
-		"gain":  { type: "f", value: 2.0 },
-		"bias":  { type: "f", value: 0.5 },
-		"fringe":  { type: "f", value: 0.7 },
+		"threshold":  { value: 0.5 },
+		"gain":  { value: 2.0 },
+		"bias":  { value: 0.5 },
+		"fringe":  { value: 0.7 },
 
-		"znear":  { type: "f", value: 0.1 },
-		"zfar":  { type: "f", value: 100 },
+		"znear":  { value: 0.1 },
+		"zfar":  { value: 100 },
 
-		"noise":  { type: "i", value: 1 },
-		"dithering":  { type: "f", value: 0.0001 },
-		"pentagon": { type: "i", value: 0 },
+		"noise":  { value: 1 },
+		"dithering":  { value: 0.0001 },
+		"pentagon": { value: 0 },
 
-		"shaderFocus":  { type: "i", value: 1 },
-		"focusCoords":  { type: "v2", value: new THREE.Vector2() },
+		"shaderFocus":  { value: 1 },
+		"focusCoords":  { value: new THREE.Vector2() }
 
 
 	},

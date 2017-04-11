@@ -151,21 +151,23 @@
 			attribute vec3 pickingColor;
 		#else
 			attribute vec3 color;
+			varying vec3 vPosition;
 		#endif
 
 		varying vec3 vColor;
-		varying vec3 vPosition;
 
 		void main()	{
+
+			vec3 positionEye = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
 
 			#ifdef PICKING
 				vColor = pickingColor;
 			#else
 				vColor = color;
+				vPosition = positionEye;
 			#endif
-			vPosition = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
 
-			gl_Position = projectionMatrix * vec4( vPosition, 1.0 );
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
 
 		}
 
@@ -179,7 +181,10 @@
 		precision highp float;
 
 		varying vec3 vColor;
-		varying vec3 vPosition;
+
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
 
 		void main()	{
 
@@ -187,9 +192,9 @@
 				gl_FragColor = vec4( vColor, 1.0 );
 			#else
 				vec3 fdx = dFdx( vPosition );
-	            vec3 fdy = dFdy( vPosition );
-	            vec3 normal = normalize( cross( fdx, fdy ) );
-	            float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
 
 				gl_FragColor = vec4( diffuse * vColor, 1.0 );
 			#endif
@@ -207,19 +212,19 @@
 		uniform mat4 projectionMatrix;
 
 		attribute vec3 position;
-		// attribute mat4 matrix;
 		attribute vec3 mcol0;
 		attribute vec3 mcol1;
 		attribute vec3 mcol2;
 		attribute vec3 mcol3;
+
 		#ifdef PICKING
 			attribute vec3 pickingColor;
 		#else
 			attribute vec3 color;
+			varying vec3 vPosition;
 		#endif
 
 		varying vec3 vColor;
-		varying vec3 vPosition;
 
 		void main()	{
 
@@ -230,14 +235,16 @@
 				vec4( mcol3, 1 )
 			);
 
+			vec3 positionEye = ( modelViewMatrix * matrix * vec4( position, 1.0 ) ).xyz;
+
 			#ifdef PICKING
 				vColor = pickingColor;
 			#else
 				vColor = color;
+				vPosition = positionEye;
 			#endif
-			vPosition = ( modelViewMatrix * matrix * vec4( position, 1.0 ) ).xyz;
 
-			gl_Position = projectionMatrix * vec4( vPosition, 1.0 );
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
 
 		}
 
@@ -251,7 +258,10 @@
 		precision highp float;
 
 		varying vec3 vColor;
-		varying vec3 vPosition;
+
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
 
 		void main()	{
 
@@ -259,9 +269,9 @@
 				gl_FragColor = vec4( vColor, 1.0 );
 			#else
 				vec3 fdx = dFdx( vPosition );
-	            vec3 fdy = dFdy( vPosition );
-	            vec3 normal = normalize( cross( fdx, fdy ) );
-	            float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
 
 				gl_FragColor = vec4( diffuse * vColor, 1.0 );
 			#endif
@@ -280,13 +290,19 @@
 
 		attribute vec3 position;
 
-		varying vec3 vPosition;
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
 
 		void main()	{
 
-			vPosition = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
+			vec3 positionEye = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
 
-			gl_Position = projectionMatrix * vec4( vPosition, 1.0 );
+			#ifndef PICKING
+				vPosition = positionEye;
+			#endif
+
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
 
 		}
 
@@ -303,9 +319,8 @@
 			uniform vec3 pickingColor;
 		#else
 			uniform vec3 color;
+			varying vec3 vPosition;
 		#endif
-
-		varying vec3 vPosition;
 
 		void main()	{
 
@@ -313,9 +328,9 @@
 				gl_FragColor = vec4( pickingColor, 1.0 );
 			#else
 				vec3 fdx = dFdx( vPosition );
-	            vec3 fdy = dFdy( vPosition );
-	            vec3 normal = normalize( cross( fdx, fdy ) );
-	            float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
 
 				gl_FragColor = vec4( diffuse * color, 1.0 );
 			#endif
@@ -486,13 +501,9 @@
 			loader.load( 'obj/Suzanne.js', function ( geo ) {
 
 				geo.computeBoundingBox();
-				geometrySize = geo.boundingBox.size();
+				geometrySize = geo.boundingBox.getSize();
 				geometryList.push( geo );
 
-				console.log( "method:", method );
-				console.log( "instanceCount:", instanceCount );
-
-				console.time( "init mesh" );
 				var start = window.performance.now();
 
 				switch ( method ){
@@ -517,14 +528,7 @@
 
 				render();
 
-				console.timeEnd( "init mesh", method );
 				var end = window.performance.now();
-
-				console.log( "material count:", materialList.length );
-				console.log( "geometry count:", geometryList.length );
-				console.log( "object count:", objectCount );
-				console.log( renderer.info.memory )
-				console.log( renderer.info.render )
 
 				document.getElementById( 'materialCount' ).innerText = materialList.length;
 				document.getElementById( 'objectCount' ).innerText = objectCount;
@@ -547,8 +551,7 @@
 				fragmentShader: frag,
 				uniforms: {
 					color: {
-						type: "c",
-						value: new THREE.Color(),
+						value: new THREE.Color()
 					}
 				}
 			} );
@@ -558,8 +561,7 @@
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
 					pickingColor: {
-						type: "c",
-						value: new THREE.Color(),
+						value: new THREE.Color()
 					}
 				}
 			} );
@@ -604,7 +606,7 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
-			function updateColor( object, camera ) {
+			function updateColor( object, material, camera ) {
 
 				this.value.setHex( object.userData.color );
 
@@ -693,13 +695,13 @@
 
 			var material = new THREE.RawShaderMaterial( {
 				vertexShader: vert,
-				fragmentShader: frag,
+				fragmentShader: frag
 			} );
 			materialList.push( material );
 
 			var pickingMaterial = new THREE.RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
-				fragmentShader: "#define PICKING\n" + frag,
+				fragmentShader: "#define PICKING\n" + frag
 			} );
 			materialList.push( pickingMaterial );
 
@@ -716,16 +718,24 @@
 			var vertices = new THREE.BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
+			var vertex = new THREE.Vector3();
 			var matrix = new THREE.Matrix4();
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
-
+				var offset = i * posLen;
 				randomizeMatrix( matrix );
 				var object = new THREE.Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
-				vertices.set( pos.array, i * posLen );
-				matrix.applyToVector3Array( vertices.array, i * posLen, posLen )
+				vertices.set( pos.array, offset );
+
+				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
+
+					vertex.fromArray( vertices.array, l );
+					vertex.applyMatrix4( matrix );
+					vertex.toArray( vertices.array, l );
+
+				}
 
 			}
 			mgeo.addAttribute( 'position', vertices );
@@ -792,7 +802,7 @@
 
 			var pickingMaterial = new THREE.RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
-				fragmentShader: "#define PICKING\n" + frag,
+				fragmentShader: "#define PICKING\n" + frag
 			} );
 			materialList.push( pickingMaterial );
 
@@ -973,6 +983,7 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			pickingRenderTarget.setSize( window.innerWidth, window.innerHeight );
 
 		}
 

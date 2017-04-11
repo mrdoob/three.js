@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webvr - cubes</title>
+		<title>three.js webvr - htc vive</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -21,15 +21,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/ViveController.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -37,14 +38,14 @@
 
 			//
 
+			var clock = new THREE.Clock();
+
 			var container;
-			var camera, scene, raycaster, renderer;
+			var camera, scene, renderer;
 			var effect, controls;
+			var controller1, controller2;
 
 			var room;
-
-			var INTERSECTED;
-			var crosshair;
 
 			init();
 			animate();
@@ -59,7 +60,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - htc vive';
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
@@ -67,25 +68,14 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
 
-				crosshair = new THREE.Mesh(
-					new THREE.RingGeometry( 0.02, 0.04, 32 ),
-					new THREE.MeshBasicMaterial( {
-						color: 0xffffff,
-						opacity: 0.5,
-						transparent: true
-					} )
-				);
-				crosshair.position.z = - 2;
-				camera.add( crosshair );
-
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				room.position.y = 3;
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -120,21 +110,22 @@
 
 				var material = new THREE.MeshStandardMaterial();
 
-				var path = 'models/obj/cerberus/';
 				var loader = new THREE.OBJLoader();
-				loader.load( path + 'Cerberus.obj', function ( group ) {
+				loader.setPath( 'models/obj/cerberus/' );
+				loader.load( 'Cerberus.obj', function ( group ) {
 
 					// var material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/cerberus/' );
 
 					material.roughness = 1;
 					material.metalness = 1;
 
-					material.map = loader.load( path + 'Cerberus_A.jpg' );
-					material.roughnessMap = loader.load( path + 'Cerberus_R.jpg' );
-					material.metalnessMap = loader.load( path + 'Cerberus_M.jpg' );
-					material.normalMap = loader.load( path + 'Cerberus_N.jpg' );
+					material.map = loader.load( 'Cerberus_A.jpg' );
+					material.roughnessMap = loader.load( 'Cerberus_R.jpg' );
+					material.metalnessMap = loader.load( 'Cerberus_M.jpg' );
+					material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
 					material.map.wrapS = THREE.RepeatWrapping;
 					material.roughnessMap.wrapS = THREE.RepeatWrapping;
@@ -165,11 +156,10 @@
 					"pz.png", "nz.png"
 				] );
 
-
-				raycaster = new THREE.Raycaster();
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
+				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -177,6 +167,32 @@
 
 				controls = new THREE.VRControls( camera );
 				controls.standing = true;
+
+				// controllers
+
+				controller1 = new THREE.ViveController( 0 );
+				controller1.standingMatrix = controls.getStandingMatrix();
+				scene.add( controller1 );
+
+				controller2 = new THREE.ViveController( 1 );
+				controller2.standingMatrix = controls.getStandingMatrix();
+				scene.add( controller2 );
+
+				var loader = new THREE.OBJLoader();
+				loader.setPath( 'models/obj/vive-controller/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+
+					var loader = new THREE.TextureLoader();
+					loader.setPath( 'models/obj/vive-controller/' );
+
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+
+					controller1.add( object.clone() );
+					controller2.add( object.clone() );
+
+				} );
 
 				effect = new THREE.VREffect( renderer );
 
@@ -205,41 +221,19 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}
 
 			function render() {
 
-				// find intersections
+				var delta = clock.getDelta() * 60;
 
-				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
-
-				var intersects = raycaster.intersectObjects( room.children );
-
-				if ( intersects.length > 0 ) {
-
-					if ( INTERSECTED != intersects[ 0 ].object ) {
-
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-					}
-
-				} else {
-
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-					INTERSECTED = null;
-
-				}
+				controller1.update();
+				controller2.update();
 
 				controls.update();
-
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
@@ -270,7 +264,7 @@
 
 					}
 
-					cube.rotation.x += 0.01;
+					cube.rotation.x += 0.01 * delta;
 
 				}
 

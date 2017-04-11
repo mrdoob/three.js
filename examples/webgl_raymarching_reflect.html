@@ -266,7 +266,7 @@
 
 				},
 				freeCamera: false,
-				resolution: '512',
+				resolution: '512'
 			};
 
 			init();
@@ -282,9 +282,9 @@
 				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						resolution: { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
-						cameraPos: { type: 'v3', value: camera.getWorldPosition() },
-						cameraDir: { type: 'v3', value: camera.getWorldDirection() },
+						resolution: { value: new THREE.Vector2( 512, 512 ) },
+						cameraPos:  { value: camera.getWorldPosition() },
+						cameraDir:  { value: camera.getWorldDirection() }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent

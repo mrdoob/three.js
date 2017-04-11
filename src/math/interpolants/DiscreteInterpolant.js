@@ -1,3 +1,5 @@
+import { Interpolant } from '../Interpolant';
+
 /**
  *
  * Interpolant that evaluates to the sample value at the position preceeding
@@ -6,18 +8,18 @@
  * @author tschw
  */
 
-THREE.DiscreteInterpolant = function(
+function DiscreteInterpolant(
 		parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	THREE.Interpolant.call(
+	Interpolant.call(
 			this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
-};
+}
 
-THREE.DiscreteInterpolant.prototype =
-		Object.assign( Object.create( THREE.Interpolant.prototype ), {
+DiscreteInterpolant.prototype =
+		Object.assign( Object.create( Interpolant.prototype ), {
 
-	constructor: THREE.DiscreteInterpolant,
+	constructor: DiscreteInterpolant,
 
 	interpolate_: function( i1, t0, t, t1 ) {
 
@@ -26,3 +28,6 @@ THREE.DiscreteInterpolant.prototype =
 	}
 
 } );
+
+
+export { DiscreteInterpolant };

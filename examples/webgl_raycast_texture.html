@@ -103,7 +103,7 @@
 
 				this._draw();
 
-			}
+			};
 
 
 			CanvasTexture.prototype = {
@@ -146,7 +146,7 @@
 
 					if ( ! this._context2D ) return;
 
-					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height )
+					this._context2D.clearRect( 0, 0, this._canvas.width, this._canvas.height );
 
 					// Background.
 					this._context2D.drawImage( this._background, 0, 0 );
@@ -290,7 +290,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			};
+			}
 
 			function onMouseMove( evt ) {
 
@@ -309,7 +309,7 @@
 
 				}
 
-			};
+			}
 
 			var getMousePosition = function ( dom, x, y ) {
 
@@ -333,45 +333,45 @@
 				requestAnimationFrame( render );
 				renderer.render( scene, camera );
 
-			};
+			}
 
 			function setwrapS( that ) {
 
 				circleTexture.wrapS = THREE[ that.value ];
 				circleTexture.needsUpdate = true;
 
-			};
+			}
 
 			function setwrapT( that ) {
 
 				circleTexture.wrapT = THREE[ that.value ];
 				circleTexture.needsUpdate = true;
 
-			};
+			}
 
 			function setOffsetU( that ) {
 
 				circleTexture.offset.x = parseFloat( that.value );
 
-			};
+			}
 
 			function setOffsetV( that ) {
 
 				circleTexture.offset.y = parseFloat( that.value );
 
-			};
+			}
 
 			function setRepeatU( that ) {
 
 				circleTexture.repeat.x = parseFloat( that.value );
 
-			};
+			}
 
 			function setRepeatV( that ) {
 
 				circleTexture.repeat.y = parseFloat( that.value );
 
-			};
+			}
 
 		</script>
 	</body>

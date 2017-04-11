@@ -15,12 +15,13 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
@@ -46,7 +47,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				dummy.add( camera );
 
-				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );;
+				var geometry = new THREE.TorusKnotGeometry( 0.4, 0.15, 150, 20 );
 				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
@@ -111,7 +112,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}

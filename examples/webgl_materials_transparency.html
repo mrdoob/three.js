@@ -31,22 +31,21 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
-		<script src="../src/loaders/BinaryTextureLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="../examples/js/Detector.js"></script>
-		<script src="../examples/js/libs/stats.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../examples/js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="../examples/js/postprocessing/EffectComposer.js"></script>
-		<script src="../examples/js/postprocessing/RenderPass.js"></script>
-		<script src="../examples/js/postprocessing/MaskPass.js"></script>
-		<script src="../examples/js/postprocessing/ShaderPass.js"></script>
-		<script src="../examples/js/shaders/CopyShader.js"></script>
-		<script src="../examples/js/shaders/FXAAShader.js"></script>
-		<script src="../examples/js/postprocessing/BloomPass.js"></script>
-		<script src="../examples/js/shaders/ConvolutionShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script>
 
@@ -75,13 +74,11 @@
 				var geometry = new THREE.SphereGeometry( 18, 30, 30 );
 
 				var material1 = new THREE.MeshStandardMaterial( {
-					roughness: params.roughness,
 					opacity: params.opacity,
 					transparent: true
 				} );
 
 				var material2 = new THREE.MeshStandardMaterial( {
-					roughness: params.roughness,
 					opacity: params.opacity,
 					premultipliedAlpha: true,
 					transparent: true

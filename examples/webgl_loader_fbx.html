@@ -34,7 +34,9 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/curves/NURBSCurve.js"></script>
+		<script src="js/curves/NURBSUtils.js"></script>
+		<script src="js/loaders/FBXLoader2.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -44,7 +46,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, controls;
-			var camera, scene, renderer;
+			var camera, scene, renderer, light;
 
 			var clock = new THREE.Clock();
 
@@ -62,8 +64,7 @@
 				scene = new THREE.Scene();
 
 				// grid
-				var gridHelper = new THREE.GridHelper( 14, 1 );
-				gridHelper.setColors( 0x303030, 0x303030 );
+				var gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
 				gridHelper.position.set( 0, - 0.04, 0 );
 				scene.add( gridHelper );
 
@@ -96,32 +97,20 @@
 				var loader = new THREE.FBXLoader( manager );
 				loader.load( 'models/fbx/xsi_man_skinning.fbx', function( object ) {
 
-					object.traverse( function( child ) {
+					object.mixer = new THREE.AnimationMixer( object );
+					mixers.push( object.mixer );
 
-						if ( child instanceof THREE.Mesh ) {
-
-							// pass
-
-						}
-
-						if ( child instanceof THREE.SkinnedMesh ) {
-
-							if ( child.geometry.animations !== undefined || child.geometry.morphAnimations !== undefined ) {
-
-								child.mixer = new THREE.AnimationMixer( child );
-								mixers.push( child.mixer );
-
-								var action = child.mixer.clipAction( child.geometry.animations[ 0 ] );
-								action.play();
-
-							}
-
-						}
-
-					} );
+					var action = object.mixer.clipAction( object.animations[ 0 ] );
+					action.play();
 
 					scene.add( object );
 
+
+				}, onProgress, onError );
+
+				loader.load( 'models/fbx/nurbs.fbx', function( object ) {
+
+					scene.add( object );
 
 				}, onProgress, onError );
 
@@ -138,6 +127,14 @@
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
+
+				light = new THREE.DirectionalLight(0xffffff, 1.0);
+				light.position.set(0, 1, 0);
+				scene.add(light);
 
 				animate();
 

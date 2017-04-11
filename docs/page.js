@@ -2,19 +2,25 @@ var onDocumentLoad = function ( event ) {
 
 	var path;
 	var pathname = window.location.pathname;
-	var section = /\/(manual|api)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
+	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
 	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
-	if ( section == 'manual' ) {
+	switch ( section ) {
 
-		name = name.replace( /\-/g, ' ' );
+		case 'api':
+			path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			break;
 
-		path = pathname.replace( /\ /g, '-' );
-		path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+		case 'examples':
+			path = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			break;
 
-	} else {
+		case 'manual':
+			name = name.replace( /\-/g, ' ' );
 
-		path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			path = pathname.replace( /\ /g, '-' );
+			path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			break;
 
 	}
 
@@ -37,7 +43,7 @@ var onDocumentLoad = function ( event ) {
 	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
 	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, "<a href=\"../examples/#$1\"  target=\"_blank\">$2</a>" ); // [example:name title]
 
-
+	
 	document.body.innerHTML = text;
 
 	// handle code snippets formatting
@@ -98,7 +104,7 @@ var onDocumentLoad = function ( event ) {
 
 		prettyPrint();
 
-	}
+	};
 
 	document.head.appendChild( prettify );
 

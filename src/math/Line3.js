@@ -1,17 +1,20 @@
+import { Vector3 } from './Vector3';
+import { _Math } from './Math';
+
 /**
  * @author bhouston / http://clara.io
  */
 
-THREE.Line3 = function ( start, end ) {
+function Line3( start, end ) {
 
-	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
-	this.end = ( end !== undefined ) ? end : new THREE.Vector3();
+	this.start = ( start !== undefined ) ? start : new Vector3();
+	this.end = ( end !== undefined ) ? end : new Vector3();
 
-};
+}
 
-THREE.Line3.prototype = {
+Line3.prototype = {
 
-	constructor: THREE.Line3,
+	constructor: Line3,
 
 	set: function ( start, end ) {
 
@@ -37,16 +40,16 @@ THREE.Line3.prototype = {
 
 	},
 
-	center: function ( optionalTarget ) {
+	getCenter: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
 
 	},
 
 	delta: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 		return result.subVectors( this.end, this.start );
 
 	},
@@ -65,7 +68,7 @@ THREE.Line3.prototype = {
 
 	at: function ( t, optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return this.delta( result ).multiplyScalar( t ).add( this.start );
 
@@ -73,10 +76,10 @@ THREE.Line3.prototype = {
 
 	closestPointToPointParameter: function () {
 
-		var startP = new THREE.Vector3();
-		var startEnd = new THREE.Vector3();
+		var startP = new Vector3();
+		var startEnd = new Vector3();
 
-		return function ( point, clampToLine ) {
+		return function closestPointToPointParameter( point, clampToLine ) {
 
 			startP.subVectors( point, this.start );
 			startEnd.subVectors( this.end, this.start );
@@ -88,7 +91,7 @@ THREE.Line3.prototype = {
 
 			if ( clampToLine ) {
 
-				t = THREE.Math.clamp( t, 0, 1 );
+				t = _Math.clamp( t, 0, 1 );
 
 			}
 
@@ -102,7 +105,7 @@ THREE.Line3.prototype = {
 
 		var t = this.closestPointToPointParameter( point, clampToLine );
 
-		var result = optionalTarget || new THREE.Vector3();
+		var result = optionalTarget || new Vector3();
 
 		return this.delta( result ).multiplyScalar( t ).add( this.start );
 
@@ -124,3 +127,6 @@ THREE.Line3.prototype = {
 	}
 
 };
+
+
+export { Line3 };

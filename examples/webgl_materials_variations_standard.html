@@ -40,11 +40,11 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, objects = [];
+			var camera, scene, renderer, controls;
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/gentilis_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -59,7 +59,15 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
+				//
+
+				var reflectionCube = new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/SwedishRoyalCastle/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+				reflectionCube.format = THREE.RGBFormat;
+
 				scene = new THREE.Scene();
+				scene.background = reflectionCube;
 
 				// Materials
 
@@ -72,17 +80,6 @@
 
 				var materials = [];
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
-
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -90,29 +87,25 @@
 
 				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
-				var localReflectionCube;
+				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-				for( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
+					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-					var roughness = 1.0 - alpha;
-
-					if( alphaIndex % 2 === 0 ) {
-						localReflectionCube = null;
-					}
-					else {
-						localReflectionCube = reflectionCube;
-					}
-
-					for( var beta = 0; beta <= 1.0; beta += stepSize ) {
-
-						var metalness = beta;
-
-						for( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color( gamma, 0, 0 ).multiplyScalar( 1 - 0.08 );
+							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 );
 
-							var material = new THREE.MeshStandardMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: diffuseColor, metalness: metalness, roughness: roughness, shading: THREE.SmoothShading, envMap: localReflectionCube } )
+							var material = new THREE.MeshStandardMaterial( {
+								map: imgTexture,
+								bumpMap: imgTexture,
+								bumpScale: bumpScale,
+								color: diffuseColor,
+								metalness: beta,
+								roughness: 1.0 - alpha,
+								shading: THREE.SmoothShading,
+								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
+							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -120,14 +113,16 @@
 							mesh.position.y = beta * 400 - 200;
 							mesh.position.z = gamma * 400 - 200;
 
-							objects.push( mesh );
-
 							scene.add( mesh );
+
 						}
+
 					}
+
 				}
 
 				function addLabel( name, location ) {
+
 					var textGeo = new THREE.TextGeometry( name, {
 
 						font: font,
@@ -142,6 +137,7 @@
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
+
 				}
 
 				addLabel( "+roughness", new THREE.Vector3( -350, 0, 0 ) );
@@ -170,11 +166,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x0a0a0a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = true;
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
@@ -221,14 +214,6 @@
 				//camera.position.z = Math.sin( timer ) * 800;
 
 				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-
-					object.rotation.y += 0.005;
-
-				}
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

@@ -28,7 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a>
+			<br/>
+			<br/><div id="description">Flag is Vertex Animation / Teapot is Morpher</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -43,9 +45,6 @@
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
 
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -56,6 +55,8 @@
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
 
 			var container, stats;
 
@@ -90,6 +91,7 @@
 				controls = new THREE.OrbitControls( camera );
 
 				// get mesh
+
 				teapot = loader.getMesh("Teapot01");
 
 				// events
@@ -145,10 +147,6 @@
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
 
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
-
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -186,6 +184,9 @@
 				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 

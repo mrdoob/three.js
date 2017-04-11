@@ -156,9 +156,7 @@
 
 				// ground
 
-				var helper = new THREE.GridHelper( 500, 10 );
-				helper.color1.setHex( 0x444444 );
-				helper.color2.setHex( 0x444444 );
+				var helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
 				helper.position.y = 0.1;
 				scene.add( helper );
 
@@ -173,7 +171,7 @@
 				var GeneratorControls = function() {
 					   this.frequency = oscillator.frequency.value;
 					   this.wavetype = oscillator.type;
-				}
+				};
       			var gui = new dat.GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
@@ -253,9 +251,9 @@
 
 				controls.update( delta );
 
-				material_sphere1.emissive.b = analyser1.getData()[ 8 ] / 256;
-				material_sphere2.emissive.b = analyser2.getData()[ 8 ] / 256;
-				material_sphere3.emissive.b = analyser3.getData()[ 8 ] / 256;
+				material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
+				material_sphere2.emissive.b = analyser2.getAverageFrequency() / 256;
+				material_sphere3.emissive.b = analyser3.getAverageFrequency() / 256;
 
 				renderer.render( scene, camera );
 

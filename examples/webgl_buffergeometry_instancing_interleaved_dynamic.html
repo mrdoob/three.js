@@ -153,7 +153,7 @@
 			1, -1, 1, 0, 1, 0, 0, 0,
 			-1, -1, 1, 0, 0, 0, 0, 0,
 			1, -1, -1, 0, 1, 1, 0, 0,
-			-1, -1, -1, 0, 0, 1, 0, 0,
+			-1, -1, -1, 0, 0, 1, 0, 0
 		] ), 8 );
 
 		// Use vertexBuffer, starting at offset 0, 3 items in position attribute
@@ -217,7 +217,7 @@
 		var material = new THREE.RawShaderMaterial( {
 
 			uniforms: {
-				map: { type: "t", value: texture }
+				map: { value: texture }
 			},
 			vertexShader: document.getElementById( 'vertexShader' ).textContent,
 			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,

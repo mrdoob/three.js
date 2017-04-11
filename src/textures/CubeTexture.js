@@ -1,22 +1,27 @@
+import { Texture } from './Texture';
+import { CubeReflectionMapping } from '../constants';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 	images = images !== undefined ? images : [];
-	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
+	mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
 
-	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+	Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
 	this.flipY = false;
 
-};
+}
 
-THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
-THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
+CubeTexture.prototype = Object.create( Texture.prototype );
+CubeTexture.prototype.constructor = CubeTexture;
 
-Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
+CubeTexture.prototype.isCubeTexture = true;
+
+Object.defineProperty( CubeTexture.prototype, 'images', {
 
 	get: function () {
 
@@ -31,3 +36,6 @@ Object.defineProperty( THREE.CubeTexture.prototype, 'images', {
 	}
 
 } );
+
+
+export { CubeTexture };

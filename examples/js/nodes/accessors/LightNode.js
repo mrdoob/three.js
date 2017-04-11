@@ -17,10 +17,9 @@ THREE.LightNode.prototype.generate = function( builder, output ) {
 
 		return builder.format( 'reflectedLight.directDiffuse', this.getType( builder ), output )
 
-	}
-	else {
+	} else {
 
-		console.warn( "THREE.LightNode is compatible only in \"light\" channel." );
+		console.warn( "THREE.LightNode is only compatible in \"light\" channel." );
 
 		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 

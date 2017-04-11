@@ -47,8 +47,6 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -110,20 +108,6 @@
 				scene.fog = new THREE.Fog( 0xffffff, 1, 5000 );
 				scene.fog.color.setHSL( 0.6, 0, 1 );
 
-				/*
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.15;
-				*/
-
 				// LIGHTS
 
 				hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
@@ -142,19 +126,18 @@
 
 				dirLight.castShadow = true;
 
-				dirLight.shadowMapWidth = 2048;
-				dirLight.shadowMapHeight = 2048;
+				dirLight.shadow.mapSize.width = 2048;
+				dirLight.shadow.mapSize.height = 2048;
 
 				var d = 50;
 
-				dirLight.shadowCameraLeft = -d;
-				dirLight.shadowCameraRight = d;
-				dirLight.shadowCameraTop = d;
-				dirLight.shadowCameraBottom = -d;
+				dirLight.shadow.camera.left = -d;
+				dirLight.shadow.camera.right = d;
+				dirLight.shadow.camera.top = d;
+				dirLight.shadow.camera.bottom = -d;
 
-				dirLight.shadowCameraFar = 3500;
-				dirLight.shadowBias = -0.0001;
-				//dirLight.shadowCameraVisible = true;
+				dirLight.shadow.camera.far = 3500;
+				dirLight.shadow.bias = -0.0001;
 
 				// GROUND
 
@@ -174,10 +157,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: 	 { type: "c", value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset:		 { type: "f", value: 33 },
-					exponent:	 { type: "f", value: 0.6 }
+					topColor:    { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset:      { value: 33 },
+					exponent:    { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( hemiLight.color );
 
@@ -193,7 +176,7 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "models/animated/flamingo.js", function( geometry ) {
+				loader.load( 'models/animated/flamingo.js', function( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var mesh = new THREE.Mesh( geometry, material );
@@ -226,7 +209,7 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 
 				// STATS
 
@@ -281,8 +264,6 @@
 			function render() {
 
 				var delta = clock.getDelta();
-
-				//controls.update();
 
 				for ( var i = 0; i < mixers.length; i ++ ) {
 

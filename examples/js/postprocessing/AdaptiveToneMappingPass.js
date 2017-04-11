@@ -44,18 +44,18 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
-		blending: THREE.NoBlending,
+		blending: THREE.NoBlending
 	} );
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 ),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
 		},
 		uniforms: {
-			"lastLum": { type: "t", value: null },
-			"currentLum": { type: "t", value: null },
-			"delta": { type: 'f', value: 0.016 },
-			"tau": { type: 'f', value: 1.0 }
+			"lastLum": { value: null },
+			"currentLum": { value: null },
+			"delta": { value: 0.016 },
+			"tau": { value: 1.0 }
 		},
 		vertexShader: [
 			"varying vec2 vUv;",
@@ -91,7 +91,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
 				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
-			"}",
+			"}"
 		].join( '\n' )
 	};
 
@@ -119,13 +119,12 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
 
-THREE.AdaptiveToneMappingPass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.AdaptiveToneMappingPass.prototype = {
+THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.AdaptiveToneMappingPass,
 
@@ -146,26 +145,26 @@ THREE.AdaptiveToneMappingPass.prototype = {
 
 			//Render the luminance of the current scene into a render target with mipmapping enabled
 			this.quad.material = this.materialLuminance;
-			this.materialLuminance.uniforms.tDiffuse.value = readBuffer;
+			this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
 			renderer.render( this.scene, this.camera, this.currentLuminanceRT );
 
 			//Use the new luminance values, the previous luminance and the frame delta to
 			//adapt the luminance over time.
 			this.quad.material = this.materialAdaptiveLum;
 			this.materialAdaptiveLum.uniforms.delta.value = delta;
-			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT;
-			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT;
+			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
+			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
 			renderer.render( this.scene, this.camera, this.luminanceRT );
 
 			//Copy the new adapted luminance value so that it can be used by the next frame.
 			this.quad.material = this.materialCopy;
-			this.copyUniforms.tDiffuse.value = this.luminanceRT;
+			this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
 
 		}
 
 		this.quad.material = this.materialToneMap;
-		this.materialToneMap.uniforms.tDiffuse.value = readBuffer;
+		this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 
 	},
@@ -204,7 +203,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		if ( this.adaptive ) {
 
 			this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ] = "";
-			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
+			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
 		//Put something in the adaptive luminance texture so that the scene can render initially
@@ -224,13 +223,13 @@ THREE.AdaptiveToneMappingPass.prototype = {
 
 			this.adaptive = true;
 			this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ] = "";
-			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
+			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		} else {
 
 			this.adaptive = false;
 			delete this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ];
-			this.materialToneMap.uniforms.luminanceMap.value = undefined;
+			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}
 		this.materialToneMap.needsUpdate = true;
@@ -317,4 +316,4 @@ THREE.AdaptiveToneMappingPass.prototype = {
 
 	}
 
-};
+} );

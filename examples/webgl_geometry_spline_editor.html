@@ -16,10 +16,10 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+
+		<script src="js/controls/DragControls.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
-		<script src="js/controls/DragControls.js"></script>
-		<script src="js/materials/ShadowMaterial.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -35,7 +35,7 @@
 				}
 				return str;
 
-			}
+			};
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -89,7 +89,7 @@
 				plane.receiveShadow = true;
 				scene.add( plane );
 
-				var helper = new THREE.GridHelper( 1000, 100 );
+				var helper = new THREE.GridHelper( 2000, 100 );
 				helper.position.y = - 199;
 				helper.material.opacity = 0.25;
 				helper.material.transparent = true;
@@ -166,20 +166,20 @@
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( camera, splineHelperObjects, renderer.domElement ); //
+				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
+				dragcontrols.enabled = false;
+				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 
-				dragcontrols.on( 'hoveron', function( e ) {
+					transformControl.attach( event.object );
+					cancelHideTransorm();
 
-					transformControl.attach( e.object );
-					cancelHideTransorm(); // *
+				} );
 
-				} )
+				dragcontrols.addEventListener( 'hoveroff', function ( event ) {
 
-				dragcontrols.on( 'hoveroff', function( e ) {
+					delayHideTransform();
 
-					if ( e ) delayHideTransform();
-
-				} )
+				} );
 
 
 				controls.addEventListener( 'start', function() {
@@ -305,7 +305,7 @@
 				} else {
 
 					object.position.x = Math.random() * 1000 - 500;
-					object.position.y = Math.random() * 600
+					object.position.y = Math.random() * 600;
 					object.position.z = Math.random() * 800 - 400;
 
 				}

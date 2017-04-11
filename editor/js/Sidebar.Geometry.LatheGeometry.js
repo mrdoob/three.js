@@ -8,7 +8,8 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	var container = new UI.Row();
 
-	var parameters = object.geometry.parameters;
+	var geometry = object.geometry;
+	var parameters = geometry.parameters;
 
 	// segments
 
@@ -133,17 +134,17 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 		}
 
-		var geometry = new THREE.LatheGeometry(
+		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
 			points,
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
 			phiLength.getValue() / 180 * Math.PI
-		);
-
-		editor.execute( new SetGeometryCommand( object, geometry ) );
+		) ) );
 
 	}
 
 	return container;
 
 };
+
+Sidebar.Geometry.LatheBufferGeometry = Sidebar.Geometry.LatheGeometry;

@@ -184,7 +184,7 @@
 
 				// SHADOW
 
-				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.renderReverseSided = false;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -199,37 +199,37 @@
 
 				// MATERIALS
 
-				var cubeTarget = cubeCamera.renderTarget;
+				var cubeTexture = cubeCamera.renderTarget.texture;
 
 				mlib = {
 
 					body: [],
 
-					"Chrome": new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget  } ),
+					"Chrome": new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTexture  } ),
 
-					"Dark chrome": new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTarget } ),
+					"Dark chrome": new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTexture } ),
 
 					"Black rough": new THREE.MeshLambertMaterial( { color: 0x050505, } ),
 
-					"Dark glass": new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
+					"Dark glass": new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTexture, opacity: 0.5, transparent: true } ),
 					"Orange glass": new THREE.MeshLambertMaterial( { color: 0xffbb00, opacity: 0.5, transparent: true } ),
 					"Red glass": new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ),
 
-					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
-					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
+					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTexture, combine: THREE.MultiplyOperation } ),
+					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTexture, combine: THREE.MultiplyOperation } )
 
 				};
 
-				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
 
-				mlib.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular: 0xffaaaa, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular: 0xffaaaa, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTexture, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTexture, combine: THREE.MultiplyOperation } ) ] );
 
 				// FLARES
 				var textureLoader = new THREE.TextureLoader();
@@ -319,11 +319,11 @@
 
 					var params  = {
 
-						"a" : { map: flareA, useScreenCoordinates: false, color: 0xffffff, blending: THREE.AdditiveBlending },
-						"b" : { map: flareB, useScreenCoordinates: false, color: 0xffffff, blending: THREE.AdditiveBlending },
+						"a" : { map: flareA, color: 0xffffff, blending: THREE.AdditiveBlending },
+						"b" : { map: flareB, color: 0xffffff, blending: THREE.AdditiveBlending },
 
-						"ar" : { map: flareA, useScreenCoordinates: false, color: 0xff0000, blending: THREE.AdditiveBlending },
-						"br" : { map: flareB, useScreenCoordinates: false, color: 0xff0000, blending: THREE.AdditiveBlending }
+						"ar" : { map: flareA, color: 0xff0000, blending: THREE.AdditiveBlending },
+						"br" : { map: flareB, color: 0xff0000, blending: THREE.AdditiveBlending }
 
 					};
 
@@ -440,7 +440,7 @@
 
 				// motion blur
 
-				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget;
+				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget.texture;
 				effectBlend.uniforms[ 'mixRatio' ].value = 0.65;
 
 				var renderModel = new THREE.RenderPass( scene, camera );
@@ -671,7 +671,7 @@
 
 				var shadowPlane = new THREE.PlaneBufferGeometry( shadowWidth, shadowHeight );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
-					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture,
+					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture.texture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
 				} );
 

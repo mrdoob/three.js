@@ -49,7 +49,7 @@
 
 		<script src="js/Detector.js"></script>
 
-		<video id="video" autoplay loop style="display:none">
+		<video id="video" autoplay loop webkit-playsinline style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
@@ -132,7 +132,7 @@
 					oy = j;
 
 					geometry = new THREE.BoxGeometry( xsize, ysize, xsize );
-					
+
 					change_uvs( geometry, ux, uy, ox, oy );
 
 					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );

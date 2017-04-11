@@ -133,9 +133,9 @@
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { type: "t", value: texture },
-						exposure:  { type: "f", value: 0.125 },
-						brightMax: { type: "f", value: 0.5 }
+						tDiffuse:  { value: texture },
+						exposure:  { value: 0.125 },
+						brightMax: { value: 0.5 }
 						},
 					vertexShader: getText( 'vs-hdr' ),
 					fragmentShader: getText( 'fs-hdr' )

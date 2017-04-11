@@ -96,7 +96,7 @@
 			}
 
 			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 				init( font );
 				animate();
@@ -125,9 +125,9 @@
 					wireframe: true
 				} );
 
-				textShapes = font.generateShapes( theText, 180, 2 );
+				var textShapes = font.generateShapes( theText, 180, 2 );
 
-				text3d = new THREE.ShapeGeometry( textShapes );
+				var text3d = new THREE.ShapeGeometry( textShapes );
 
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
@@ -138,9 +138,9 @@
 
 				//
 
-				vA = new THREE.Vector2();
-				vB = new THREE.Vector2();
-				vDot = new THREE.Vector2();
+				var vA = new THREE.Vector2();
+				var vB = new THREE.Vector2();
+				var vDot = new THREE.Vector2();
 
 				function processShape(path, reverse) {
 
@@ -196,16 +196,21 @@
 					};
 				}
 
+				var pts, pts2;
 				var subshape;
+				var convexhullShape;
+				var solidShape;
 				var convexhullShapeGroup = [];
 				var solidShapeGroup = [];
 
 				var beziers = [], invert = [];
+				var process;
+				var hole;
 
 				for (var s=0;s<textShapes.length;s++) {
 
 					subshape = textShapes[s];
-					var process = processShape(subshape.curves);
+					process = processShape(subshape.curves);
 
 					pts = process.pts;
 					pts2 = process.pts2;
@@ -236,7 +241,7 @@
 
 				} // end of subshape
 
-				bezierGeometry = new THREE.Geometry();
+				var bezierGeometry = new THREE.Geometry();
 
 				for (var i=0;i<beziers.length;i++) {
 					p = beziers[i];
@@ -256,7 +261,7 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text1 = new THREE.Mesh( text3d, textMaterial );
+				var text1 = new THREE.Mesh( text3d, textMaterial );
 
 				text1.position.x = centerOffset + 150;
 
@@ -266,7 +271,7 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
+				var text2 = new THREE.Mesh( text3d, new THREE.MeshBasicMaterial( { color: new THREE.Color(1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
 				text2.position.x = centerOffset + 150;
 				group.add( text2 );
 
@@ -276,13 +281,13 @@
 				bezierGeometry.computeVertexNormals();
 
 				bezierGeometry = new THREE.BufferGeometry().fromGeometry( bezierGeometry );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32Attribute( invert, 1 ) );
+				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				//
 
-				newMaterial = new THREE.ShaderMaterial({
+				var newMaterial = new THREE.ShaderMaterial({
 					uniforms: {
-						color: { type: 'c', value: new THREE.Color(0.45 * 0xffffff) }
+						color: { value: new THREE.Color(0.45 * 0xffffff) }
 					},
 					vertexShader: document.getElementById( 'vs' ).textContent,
 					fragmentShader: document.getElementById( 'fs' ).textContent,

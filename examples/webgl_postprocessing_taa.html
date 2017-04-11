@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing manual msaa</title>
+		<title>three.js webgl - postprocessing manual taa and ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -15,6 +15,8 @@
 				text-align:center;
 				overflow: hidden;
 			}
+
+			a { color: #88f; }
 
 			#info {
 				color: #fff;
@@ -31,7 +33,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - Temporal Anti-Aliasing (TAA) pass by <a href="https://clara.io" target="_blank">Ben Houston</a><br/><br/>
 			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples<br/>
 			across frames to create a high quality anti-aliased result.<br/><br/>
-			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect MSAA levels have one the resulting render quality.
+			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect SSAA levels have one the resulting render quality.
 		</div>
 
 		<div id="container"></div>
@@ -41,10 +43,9 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/CompositeShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ManualMSAARenderPass.js"></script>
+		<script src="js/postprocessing/SSAARenderPass.js"></script>
 		<script src="js/postprocessing/TAARenderPass.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -145,6 +146,7 @@
 				composer = new THREE.EffectComposer( renderer );
 
 				taaRenderPass = new THREE.TAARenderPass( scene, camera );
+				taaRenderPass.unbiased = false;
 				composer.addPass( taaRenderPass );
 
 				renderPass = new THREE.RenderPass( scene, camera );
@@ -173,7 +175,6 @@
 				var newWidth  = Math.floor( width / pixelRatio ) || 1;
 				var newHeight = Math.floor( height / pixelRatio ) || 1;
 				composer.setSize( newWidth, newHeight );
-				taaRenderPass.setSize( newWidth, newHeight );
 
 			}
 
@@ -207,6 +208,5 @@
 			}
 
 		</script>
-		<div>
 	</body>
 </html>

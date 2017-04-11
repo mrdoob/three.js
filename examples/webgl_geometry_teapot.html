@@ -54,7 +54,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, sceneCube, renderer;
+			var camera, scene, renderer;
 			var cameraControls;
 			var effectController;
 			var teapotSize = 400;
@@ -70,7 +70,7 @@
 			var shading;
 			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
 
-			var teapot;
+			var teapot, textureCube;
 
 			// allocate these just once
 			var diffuseColor = new THREE.Color();
@@ -127,7 +127,7 @@
 					path + "pz.jpg", path + "nz.jpg"
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				// MATERIALS
 				var materialColor = new THREE.Color();
@@ -144,26 +144,6 @@
 				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 
 				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
-
-				// SKYBOX
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var skyboxMaterial = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} );
-
-				skybox = new THREE.Mesh( new THREE.BoxGeometry( 5000, 5000, 5000 ), skyboxMaterial );
-
-				// skybox scene - keep camera centered here
-				sceneCube = new THREE.Scene();
-				sceneCube.add( skybox );
 
 				// scene itself
 				scene = new THREE.Scene();
@@ -339,20 +319,13 @@
 				light.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
 
 				// skybox is rendered separately, so that it is always behind the teapot.
-				if ( shading === "reflective" )
-				{
+				if ( shading === "reflective" ) {
 
-					// clear to skybox
-					renderer.autoClear = false;
-					skybox.position.copy( camera.position );
-					renderer.render( sceneCube, camera );
+					scene.background = textureCube;
 
-				}
-				else
-				{
+				} else {
 
-					// clear to regular background color
-					renderer.autoClear = true;
+					scene.background = null;
 
 				}
 

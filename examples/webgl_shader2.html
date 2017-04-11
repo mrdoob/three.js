@@ -192,14 +192,14 @@
 				var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					time: { type: "f", value: 1.0 },
-					resolution: { type: "v2", value: new THREE.Vector2() }
+					time:       { value: 1.0 },
+					resolution: { value: new THREE.Vector2() }
 				};
 
 				uniforms2 = {
-					time: { type: "f", value: 1.0 },
-					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: new THREE.TextureLoader().load( "textures/disturb.jpg" ) }
+					time:       { value: 1.0 },
+					resolution: { value: new THREE.Vector2() },
+					texture:    { value: new THREE.TextureLoader().load( "textures/disturb.jpg" ) }
 				};
 
 				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;

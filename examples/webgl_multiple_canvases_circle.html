@@ -306,7 +306,6 @@
 					container.appendChild( renderer.domElement );
 
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-					document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 
 				}
 
@@ -314,37 +313,6 @@
 
 					mouseX = ( event.clientX - windowHalfX );
 					mouseY = ( event.clientY - windowHalfY );
-
-				}
-
-				function onDocumentMouseWheel ( event ) {
-
-					var delta = 0;
-
-					if ( event.wheelDelta ) {
-
-						delta = event.wheelDelta / 120;
-						if ( window.opera ) delta = -delta;
-
-					} else if ( event.detail ) {
-
-						delta = -event.detail / 3;
-
-					}
-
-					if ( delta ) {
-
-						if ( delta < 0 ) {
-
-							cameraZ -= 200;
-
-						} else {
-
-							cameraZ += 200;
-
-						}
-
-					}
 
 				}
 

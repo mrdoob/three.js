@@ -134,10 +134,11 @@
 				],
 
 				Indices = [
-					0, 1, 2,	0, 2, 3,	0, 3, 1,	1, 3, 2 ],
+					0, 1, 2,	0, 2, 3,	0, 3, 1,	1, 3, 2
+				],
 
 				Planes = planesFromMesh( Vertices, Indices ),
-				PlaneMatrices = Planes.map( planeToMatrix );
+				PlaneMatrices = Planes.map( planeToMatrix ),
 
 				GlobalClippingPlanes = cylindricalPlanes( 5, 3.5 ),
 
@@ -267,6 +268,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.renderSingleSided = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize, false );

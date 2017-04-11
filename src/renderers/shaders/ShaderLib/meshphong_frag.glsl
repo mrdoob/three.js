@@ -17,6 +17,7 @@ uniform float opacity;
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
 #include <envmap_pars_fragment>
+#include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars>
@@ -42,6 +43,7 @@ void main() {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
+	#include <normal_flip>
 	#include <normal_fragment>
 	#include <emissivemap_fragment>
 

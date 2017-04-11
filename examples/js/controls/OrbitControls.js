@@ -11,7 +11,7 @@
 //
 //    Orbit - left mouse / touch: one finger move
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
-//    Pan - right mouse, or arrow keys / touch: three finter swipe
+//    Pan - right mouse, or arrow keys / touch: three finger swipe
 
 THREE.OrbitControls = function ( object, domElement ) {
 
@@ -86,13 +86,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.getPolarAngle = function () {
 
-		return phi;
+		return spherical.phi;
 
 	};
 
 	this.getAzimuthalAngle = function () {
 
-		return theta;
+		return spherical.theta;
 
 	};
 
@@ -112,7 +112,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	};
 
 	// this method is exposed, but perhaps it would be better if we can make it private...
-	this.update = function() {
+	this.update = function () {
 
 		var offset = new THREE.Vector3();
 
@@ -123,7 +123,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
-		return function () {
+		return function update() {
 
 			var position = scope.object.position;
 
@@ -208,12 +208,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
 		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
-		scope.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-		scope.domElement.removeEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+		scope.domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
 		scope.domElement.removeEventListener( 'touchstart', onTouchStart, false );
 		scope.domElement.removeEventListener( 'touchend', onTouchEnd, false );
@@ -221,7 +220,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
-		document.removeEventListener( 'mouseout', onMouseUp, false );
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
@@ -239,7 +237,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
 
-	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+	var STATE = { NONE: - 1, ROTATE: 0, DOLLY: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_DOLLY: 4, TOUCH_PAN: 5 };
 
 	var state = STATE.NONE;
 
@@ -289,7 +287,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	var panLeft = function() {
+	var panLeft = function () {
 
 		var v = new THREE.Vector3();
 
@@ -304,7 +302,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	var panUp = function() {
+	var panUp = function () {
 
 		var v = new THREE.Vector3();
 
@@ -320,11 +318,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}();
 
 	// deltaX and deltaY are in pixels; right and down are positive
-	var pan = function() {
+	var pan = function () {
 
 		var offset = new THREE.Vector3();
 
-		return function( deltaX, deltaY ) {
+		return function pan( deltaX, deltaY ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -493,35 +491,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseUp( event ) {
 
-		//console.log( 'handleMouseUp' );
+		// console.log( 'handleMouseUp' );
 
 	}
 
 	function handleMouseWheel( event ) {
 
-		//console.log( 'handleMouseWheel' );
+		// console.log( 'handleMouseWheel' );
 
-		var delta = 0;
-
-		if ( event.wheelDelta !== undefined ) {
-
-			// WebKit / Opera / Explorer 9
-
-			delta = event.wheelDelta;
-
-		} else if ( event.detail !== undefined ) {
-
-			// Firefox
-
-			delta = - event.detail;
-
-		}
-
-		if ( delta > 0 ) {
+		if ( event.deltaY < 0 ) {
 
 			dollyOut( getZoomScale() );
 
-		} else if ( delta < 0 ) {
+		} else if ( event.deltaY > 0 ) {
 
 			dollyIn( getZoomScale() );
 
@@ -702,7 +684,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			document.addEventListener( 'mousemove', onMouseMove, false );
 			document.addEventListener( 'mouseup', onMouseUp, false );
-			document.addEventListener( 'mouseout', onMouseUp, false );
 
 			scope.dispatchEvent( startEvent );
 
@@ -746,7 +727,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
-		document.removeEventListener( 'mouseout', onMouseUp, false );
 
 		scope.dispatchEvent( endEvent );
 
@@ -893,8 +873,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
 	scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	scope.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	scope.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
+	scope.domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
@@ -998,37 +977,37 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 
 	},
 
-	staticMoving : {
+	staticMoving: {
 
 		get: function () {
 
 			console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
-			return ! this.constraint.enableDamping;
+			return ! this.enableDamping;
 
 		},
 
 		set: function ( value ) {
 
 			console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
-			this.constraint.enableDamping = ! value;
+			this.enableDamping = ! value;
 
 		}
 
 	},
 
-	dynamicDampingFactor : {
+	dynamicDampingFactor: {
 
 		get: function () {
 
 			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			return this.constraint.dampingFactor;
+			return this.dampingFactor;
 
 		},
 
 		set: function ( value ) {
 
 			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			this.constraint.dampingFactor = value;
+			this.dampingFactor = value;
 
 		}
 

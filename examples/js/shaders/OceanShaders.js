@@ -23,9 +23,6 @@
 
 
 THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
-	varying: {
-		"vUV": { type: "v2" }
-	},
 	vertexShader: [
 		'varying vec2 vUV;',
 
@@ -37,12 +34,9 @@ THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
 };
 THREE.ShaderLib[ 'ocean_subtransform' ] = {
 	uniforms: {
-		"u_input": { type: "t", value: null },
-		"u_transformSize": { type: "f", value: 512.0 },
-		"u_subtransformSize": { type: "f", value: 250.0 }
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_input": { value: null },
+		"u_transformSize": { value: 512.0 },
+		"u_subtransformSize": { value: 250.0 }
 	},
 	fragmentShader: [
 		//GPU FFT using a Stockham formulation
@@ -90,9 +84,9 @@ THREE.ShaderLib[ 'ocean_subtransform' ] = {
 };
 THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
-		"u_wind": { type: "v2", value: new THREE.Vector2( 10.0, 10.0 ) },
-		"u_resolution": { type: "f", value: 512.0 },
-		"u_size": { type: "f", value: 250.0 },
+		"u_wind": { value: new THREE.Vector2( 10.0, 10.0 ) },
+		"u_resolution": { value: 512.0 },
+		"u_size": { value: 250.0 }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -166,13 +160,10 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 };
 THREE.ShaderLib[ 'ocean_phase' ] = {
 	uniforms: {
-		"u_phases": { type: "t", value: null },
-		"u_deltaTime": { type: "f", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_phases": { value: null },
+		"u_deltaTime": { value: null },
+		"u_resolution": { value: null },
+		"u_size": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -209,14 +200,11 @@ THREE.ShaderLib[ 'ocean_phase' ] = {
 };
 THREE.ShaderLib[ 'ocean_spectrum' ] = {
 	uniforms: {
-		"u_size": { type: "f", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_choppiness": { type: "f", value: null },
-		"u_phases": { type: "t", value: null },
-		"u_initialSpectrum": { type: "t", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_size": { value: null },
+		"u_resolution": { value: null },
+		"u_choppiness": { value: null },
+		"u_phases": { value: null },
+		"u_initialSpectrum": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -276,12 +264,9 @@ THREE.ShaderLib[ 'ocean_spectrum' ] = {
 };
 THREE.ShaderLib[ 'ocean_normals' ] = {
 	uniforms: {
-		"u_displacementMap": { type: "t", value: null },
-		"u_resolution": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-	},
-	varying: {
-		"vUV": { type: "v2" }
+		"u_displacementMap": { value: null },
+		"u_resolution": { value: null },
+		"u_size": { value: null }
 	},
 	fragmentShader: [
 		'precision highp float;',
@@ -313,21 +298,17 @@ THREE.ShaderLib[ 'ocean_normals' ] = {
 };
 THREE.ShaderLib[ 'ocean_main' ] = {
 	uniforms: {
-		"u_displacementMap": { type: "t", value: null },
-		"u_normalMap": { type: "t", value: null },
-		"u_geometrySize": { type: "f", value: null },
-		"u_size": { type: "f", value: null },
-		"u_projectionMatrix": { type: "m4", value: null },
-		"u_viewMatrix": { type: "m4", value: null },
-		"u_cameraPosition": { type: "v3", value: null },
-		"u_skyColor": { type: "v3", value: null },
-		"u_oceanColor": { type: "v3", value: null },
-		"u_sunDirection": { type: "v3", value: null },
-		"u_exposure": { type: "f", value: null },
-	},
-	varying: {
-		"vPos": { type: "v3" },
-		"vUV": { type: "v2" }
+		"u_displacementMap": { value: null },
+		"u_normalMap": { value: null },
+		"u_geometrySize": { value: null },
+		"u_size": { value: null },
+		"u_projectionMatrix": { value: null },
+		"u_viewMatrix": { value: null },
+		"u_cameraPosition": { value: null },
+		"u_skyColor": { value: null },
+		"u_oceanColor": { value: null },
+		"u_sunDirection": { value: null },
+		"u_exposure": { value: null }
 	},
 	vertexShader: [
 		'precision highp float;',

@@ -39,7 +39,6 @@ THREE.BlendCharacter = function () {
 			scope.material.skinning = true;
 
 			scope.mixer = new THREE.AnimationMixer( scope );
-			scope.mixer = scope.mixer;
 
 			// Create the animations
 			for ( var i = 0; i < scope.geometry.animations.length; ++ i ) {
@@ -55,6 +54,35 @@ THREE.BlendCharacter = function () {
 
 	};
 
+	this.loadJSON = function ( url, onLoad ) {
+
+		var scope = this;
+
+		var loader = new THREE.JSONLoader();
+		loader.load( url, function( geometry, materials ) {
+
+			var originalMaterial = materials[ 0 ];
+			originalMaterial.skinning = true;
+
+			THREE.SkinnedMesh.call( scope, geometry, originalMaterial );
+
+			var mixer = new THREE.AnimationMixer( scope );
+			scope.mixer = mixer;
+
+			// Create the animations
+			for ( var i = 0; i < geometry.animations.length; ++ i ) {
+
+				mixer.clipAction( geometry.animations[ i ] );
+
+			}
+
+			// Loading is complete, fire the callback
+			if ( onLoad !== undefined ) onLoad();
+
+		} );
+
+	};
+	
 	this.update = function( dt ) {
 
 		this.mixer.update( dt );
@@ -100,7 +128,7 @@ THREE.BlendCharacter = function () {
 
 		return this.mixer.clipAction( animName ).getEffectiveWeight();
 
-	}
+	};
 
 	this.pauseAll = function() {
 
@@ -125,7 +153,7 @@ THREE.BlendCharacter = function () {
 
 		this.visible = boolean;
 
-	}
+	};
 
 };
 

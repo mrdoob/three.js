@@ -1,3 +1,6 @@
+import { PropertyBinding } from './PropertyBinding';
+import { _Math } from '../math/Math';
+
 /**
  *
  * A group of objects that receives a shared animation state.
@@ -29,9 +32,9 @@
  * @author tschw
  */
 
-THREE.AnimationObjectGroup = function( var_args ) {
+function AnimationObjectGroup( var_args ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = _Math.generateUUID();
 
 	// cached objects followed by the active ones
 	this._objects = Array.prototype.slice.call( arguments );
@@ -66,11 +69,13 @@ THREE.AnimationObjectGroup = function( var_args ) {
 
 	};
 
-};
+}
 
-THREE.AnimationObjectGroup.prototype = {
+AnimationObjectGroup.prototype = {
 
-	constructor: THREE.AnimationObjectGroup,
+	constructor: AnimationObjectGroup,
+
+	isAnimationObjectGroup: true,
 
 	add: function( var_args ) {
 
@@ -87,7 +92,8 @@ THREE.AnimationObjectGroup.prototype = {
 
 			var object = arguments[ i ],
 				uuid = object.uuid,
-				index = indicesByUUID[ uuid ];
+				index = indicesByUUID[ uuid ],
+				knownObject = undefined;
 
 			if ( index === undefined ) {
 
@@ -102,14 +108,14 @@ THREE.AnimationObjectGroup.prototype = {
 				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
 
 					bindings[ j ].push(
-							new THREE.PropertyBinding(
+							new PropertyBinding(
 								object, paths[ j ], parsedPaths[ j ] ) );
 
 				}
 
 			} else if ( index < nCachedObjects ) {
 
-				var knownObject = objects[ index ];
+				knownObject = objects[ index ];
 
 				// move existing object to the ACTIVE region
 
@@ -138,7 +144,7 @@ THREE.AnimationObjectGroup.prototype = {
 						// for objects that are cached, the binding may
 						// or may not exist
 
-						binding = new THREE.PropertyBinding(
+						binding = new PropertyBinding(
 								object, paths[ j ], parsedPaths[ j ] );
 
 					}
@@ -164,7 +170,6 @@ THREE.AnimationObjectGroup.prototype = {
 	remove: function( var_args ) {
 
 		var objects = this._objects,
-			nObjects = objects.length,
 			nCachedObjects = this.nCachedObjects_,
 			indicesByUUID = this._indicesByUUID,
 			bindings = this._bindings,
@@ -327,7 +332,7 @@ THREE.AnimationObjectGroup.prototype = {
 			var object = objects[ i ];
 
 			bindingsForPath[ i ] =
-					new THREE.PropertyBinding( object, path, parsedPath );
+					new PropertyBinding( object, path, parsedPath );
 
 		}
 
@@ -368,3 +373,6 @@ THREE.AnimationObjectGroup.prototype = {
 
 };
 
+
+
+export { AnimationObjectGroup };

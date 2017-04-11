@@ -8,22 +8,22 @@
  * @author tschw
  */
 
-THREE.PropertyBinding = function ( rootNode, path, parsedPath ) {
+function PropertyBinding( rootNode, path, parsedPath ) {
 
 	this.path = path;
 	this.parsedPath = parsedPath ||
-			THREE.PropertyBinding.parseTrackName( path );
+			PropertyBinding.parseTrackName( path );
 
-	this.node = THREE.PropertyBinding.findNode(
+	this.node = PropertyBinding.findNode(
 			rootNode, this.parsedPath.nodeName ) || rootNode;
 
 	this.rootNode = rootNode;
 
-};
+}
 
-THREE.PropertyBinding.prototype = {
+PropertyBinding.prototype = {
 
-	constructor: THREE.PropertyBinding,
+	constructor: PropertyBinding,
 
 	getValue: function getValue_unbound( targetArray, offset ) {
 
@@ -57,7 +57,7 @@ THREE.PropertyBinding.prototype = {
 
 		if ( ! targetObject ) {
 
-			targetObject = THREE.PropertyBinding.findNode(
+			targetObject = PropertyBinding.findNode(
 					this.rootNode, parsedPath.nodeName ) || this.rootNode;
 
 			this.node = targetObject;
@@ -76,7 +76,7 @@ THREE.PropertyBinding.prototype = {
 
 		}
 
-		if( objectName ) {
+		if ( objectName ) {
 
 			var objectIndex = parsedPath.objectIndex;
 
@@ -85,14 +85,14 @@ THREE.PropertyBinding.prototype = {
 
 				case 'materials':
 
-					if( ! targetObject.material ) {
+					if ( ! targetObject.material ) {
 
 						console.error( '  can not bind to material as node does not have a material', this );
 						return;
 
 					}
 
-					if( ! targetObject.material.materials ) {
+					if ( ! targetObject.material.materials ) {
 
 						console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
 						return;
@@ -105,7 +105,7 @@ THREE.PropertyBinding.prototype = {
 
 				case 'bones':
 
-					if( ! targetObject.skeleton ) {
+					if ( ! targetObject.skeleton ) {
 
 						console.error( '  can not bind to bones as node does not have a skeleton', this );
 						return;
@@ -120,7 +120,7 @@ THREE.PropertyBinding.prototype = {
 					// support resolving morphTarget names into indices.
 					for ( var i = 0; i < targetObject.length; i ++ ) {
 
-						if ( targetObject[i].name === objectIndex ) {
+						if ( targetObject[ i ].name === objectIndex ) {
 
 							objectIndex = i;
 							break;
@@ -147,7 +147,7 @@ THREE.PropertyBinding.prototype = {
 
 			if ( objectIndex !== undefined ) {
 
-				if( targetObject[ objectIndex ] === undefined ) {
+				if ( targetObject[ objectIndex ] === undefined ) {
 
 					console.error( "  trying to bind to objectIndex of objectName, but is undefined:", this, targetObject );
 					return;
@@ -163,7 +163,7 @@ THREE.PropertyBinding.prototype = {
 		// resolve property
 		var nodeProperty = targetObject[ propertyName ];
 
-		if ( ! nodeProperty ) {
+		if ( nodeProperty === undefined ) {
 
 			var nodeName = parsedPath.nodeName;
 
@@ -214,7 +214,7 @@ THREE.PropertyBinding.prototype = {
 
 				for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
 
-					if ( targetObject.geometry.morphTargets[i].name === propertyIndex ) {
+					if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
 
 						propertyIndex = i;
 						break;
@@ -268,15 +268,15 @@ THREE.PropertyBinding.prototype = {
 
 };
 
-Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
+Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 	// these are used to "bind" a nonexistent property
 	_getValue_unavailable: function() {},
 	_setValue_unavailable: function() {},
 
 	// initial state of these methods that calls 'bind'
-	_getValue_unbound: THREE.PropertyBinding.prototype.getValue,
-	_setValue_unbound: THREE.PropertyBinding.prototype.setValue,
+	_getValue_unbound: PropertyBinding.prototype.getValue,
+	_setValue_unbound: PropertyBinding.prototype.setValue,
 
 	BindingType: {
 		Direct: 0,
@@ -448,20 +448,20 @@ Object.assign( THREE.PropertyBinding.prototype, { // prototype, continued
 
 } );
 
-THREE.PropertyBinding.Composite =
+PropertyBinding.Composite =
 		function( targetGroup, path, optionalParsedPath ) {
 
 	var parsedPath = optionalParsedPath ||
-			THREE.PropertyBinding.parseTrackName( path );
+			PropertyBinding.parseTrackName( path );
 
 	this._targetGroup = targetGroup;
 	this._bindings = targetGroup.subscribe_( path, parsedPath );
 
 };
 
-THREE.PropertyBinding.Composite.prototype = {
+PropertyBinding.Composite.prototype = {
 
-	constructor: THREE.PropertyBinding.Composite,
+	constructor: PropertyBinding.Composite,
 
 	getValue: function( array, offset ) {
 
@@ -516,21 +516,21 @@ THREE.PropertyBinding.Composite.prototype = {
 
 };
 
-THREE.PropertyBinding.create = function( root, path, parsedPath ) {
+PropertyBinding.create = function( root, path, parsedPath ) {
 
-	if ( ! ( root instanceof THREE.AnimationObjectGroup ) ) {
+	if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
-		return new THREE.PropertyBinding( root, path, parsedPath );
+		return new PropertyBinding( root, path, parsedPath );
 
 	} else {
 
-		return new THREE.PropertyBinding.Composite( root, path, parsedPath );
+		return new PropertyBinding.Composite( root, path, parsedPath );
 
 	}
 
 };
 
-THREE.PropertyBinding.parseTrackName = function( trackName ) {
+PropertyBinding.parseTrackName = function( trackName ) {
 
 	// matches strings in the form of:
 	//    nodeName.property
@@ -540,55 +540,56 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//    uuid.objectName[objectIndex].propertyName[propertyIndex]
 	//    parentName/nodeName.property
 	//    parentName/parentName/nodeName.property[index]
-	//	  .bone[Armature.DEF_cog].position
+	//    .bone[Armature.DEF_cog].position
+	//    scene:helium_balloon_model:helium_balloon_model.position
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-\d]+)?(\.([\w]+)(\[([\w\d\[\]\_.:\- ]+)\])?)?(\.([\w.]+)(\[([\w\d\[\]\_. ]+)\])?)$/;
-	var matches = re.exec(trackName);
+	var re = /^((?:[\w-]+[\/:])*)([\w-]+)?(?:\.([\w-]+)(?:\[(.+)\])?)?\.([\w-]+)(?:\[(.+)\])?$/;
+	var matches = re.exec( trackName );
 
-	if( ! matches ) {
+	if ( ! matches ) {
+
 		throw new Error( "cannot parse trackName at all: " + trackName );
+
 	}
 
-    if (matches.index === re.lastIndex) {
-        re.lastIndex++;
-    }
-
 	var results = {
-		// directoryName: matches[1], // (tschw) currently unused
-		nodeName: matches[3], 	// allowed to be null, specified root node.
-		objectName: matches[5],
-		objectIndex: matches[7],
-		propertyName: matches[9],
-		propertyIndex: matches[11]	// allowed to be null, specifies that the whole property is set.
+		// directoryName: matches[ 1 ], // (tschw) currently unused
+		nodeName: matches[ 2 ], 	// allowed to be null, specified root node.
+		objectName: matches[ 3 ],
+		objectIndex: matches[ 4 ],
+		propertyName: matches[ 5 ],
+		propertyIndex: matches[ 6 ]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	if( results.propertyName === null || results.propertyName.length === 0 ) {
+	if ( results.propertyName === null || results.propertyName.length === 0 ) {
+
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
+
 	}
 
 	return results;
 
 };
 
-THREE.PropertyBinding.findNode = function( root, nodeName ) {
+PropertyBinding.findNode = function( root, nodeName ) {
 
-	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
+	if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
 		return root;
 
 	}
 
 	// search into skeleton bones.
-	if( root.skeleton ) {
+	if ( root.skeleton ) {
 
 		var searchSkeleton = function( skeleton ) {
 
 			for( var i = 0; i < skeleton.bones.length; i ++ ) {
 
-				var bone = skeleton.bones[i];
+				var bone = skeleton.bones[ i ];
 
-				if( bone.name === nodeName ) {
+				if ( bone.name === nodeName ) {
 
 					return bone;
 
@@ -601,7 +602,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		var bone = searchSkeleton( root.skeleton );
 
-		if( bone ) {
+		if ( bone ) {
 
 			return bone;
 
@@ -609,15 +610,15 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 	}
 
 	// search into node subtree.
-	if( root.children ) {
+	if ( root.children ) {
 
 		var searchNodeSubtree = function( children ) {
 
 			for( var i = 0; i < children.length; i ++ ) {
 
-				var childNode = children[i];
+				var childNode = children[ i ];
 
-				if( childNode.name === nodeName || childNode.uuid === nodeName ) {
+				if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
 
 					return childNode;
 
@@ -625,7 +626,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 				var result = searchNodeSubtree( childNode.children );
 
-				if( result ) return result;
+				if ( result ) return result;
 
 			}
 
@@ -635,7 +636,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		var subTreeNode = searchNodeSubtree( root.children );
 
-		if( subTreeNode ) {
+		if ( subTreeNode ) {
 
 			return subTreeNode;
 
@@ -645,4 +646,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	return null;
 
-}
+};
+
+
+export { PropertyBinding };

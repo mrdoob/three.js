@@ -1,26 +1,34 @@
-/**************************************************************
- *	Line3D
- **************************************************************/
+import { Vector3 } from '../../math/Vector3';
+import { Curve } from '../core/Curve';
 
-THREE.LineCurve3 = THREE.Curve.create(
 
-	function ( v1, v2 ) {
+function LineCurve3( v1, v2 ) {
 
-		this.v1 = v1;
-		this.v2 = v2;
+	this.v1 = v1;
+	this.v2 = v2;
 
-	},
+}
 
-	function ( t ) {
+LineCurve3.prototype = Object.create( Curve.prototype );
+LineCurve3.prototype.constructor = LineCurve3;
 
-		var vector = new THREE.Vector3();
+LineCurve3.prototype.getPoint = function ( t ) {
 
-		vector.subVectors( this.v2, this.v1 ); // diff
-		vector.multiplyScalar( t );
-		vector.add( this.v1 );
+	if ( t === 1 ) {
 
-		return vector;
+		return this.v2.clone();
 
 	}
 
-);
+	var vector = new Vector3();
+
+	vector.subVectors( this.v2, this.v1 ); // diff
+	vector.multiplyScalar( t );
+	vector.add( this.v1 );
+
+	return vector;
+
+};
+
+
+export { LineCurve3 };

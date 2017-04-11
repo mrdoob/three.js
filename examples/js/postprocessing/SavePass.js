@@ -38,13 +38,12 @@ THREE.SavePass = function ( renderTarget ) {
 	this.scene  = new THREE.Scene();
 
 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
 	this.scene.add( this.quad );
 
 };
 
-THREE.SavePass.prototype = Object.create( THREE.Pass.prototype );
-
-THREE.SavePass.prototype = {
+THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.SavePass,
 
@@ -52,7 +51,7 @@ THREE.SavePass.prototype = {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].value = readBuffer;
+			this.uniforms[ this.textureID ].value = readBuffer.texture;
 
 		}
 
@@ -62,4 +61,4 @@ THREE.SavePass.prototype = {
 
 	}
 
-};
+} );

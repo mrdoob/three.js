@@ -1,71 +1,65 @@
+import { Vector3 } from '../math/Vector3';
+import { Object3D } from '../core/Object3D';
+import { SpriteMaterial } from '../materials/SpriteMaterial';
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = ( function () {
+function Sprite( material ) {
 
-	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
-	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
-	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
+	Object3D.call( this );
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.type = 'Sprite';
 
-	return function Sprite( material ) {
+	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
-		THREE.Object3D.call( this );
+}
 
-		this.type = 'Sprite';
+Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-		this.geometry = geometry;
-		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+	constructor: Sprite,
 
-	};
+	isSprite: true,
 
-} )();
+	raycast: ( function () {
 
-THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
-THREE.Sprite.prototype.constructor = THREE.Sprite;
+		var matrixPosition = new Vector3();
 
-THREE.Sprite.prototype.raycast = ( function () {
+		return function raycast( raycaster, intersects ) {
 
-	var matrixPosition = new THREE.Vector3();
+			matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
-	return function raycast( raycaster, intersects ) {
+			var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
+			var guessSizeSq = this.scale.x * this.scale.y / 4;
 
-		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+			if ( distanceSq > guessSizeSq ) {
 
-		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-		var guessSizeSq = this.scale.x * this.scale.y / 4;
+				return;
 
-		if ( distanceSq > guessSizeSq ) {
+			}
 
-			return;
+			intersects.push( {
 
-		}
+				distance: Math.sqrt( distanceSq ),
+				point: this.position,
+				face: null,
+				object: this
 
-		intersects.push( {
+			} );
 
-			distance: Math.sqrt( distanceSq ),
-			point: this.position,
-			face: null,
-			object: this
+		};
 
-		} );
+	}() ),
 
-	};
+	clone: function () {
 
-}() );
+		return new this.constructor( this.material ).copy( this );
 
-THREE.Sprite.prototype.clone = function () {
+	}
 
-	return new this.constructor( this.material ).copy( this );
+} );
 
-};
 
-// Backwards compatibility
-
-THREE.Particle = THREE.Sprite;
+export { Sprite };

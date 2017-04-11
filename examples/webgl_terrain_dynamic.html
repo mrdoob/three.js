@@ -214,7 +214,7 @@
 			var camera, scene;
 			var cameraOrtho, sceneRenderTarget;
 
-			var uniformsNoise, uniformsNormal,
+			var uniformsNoise, uniformsNormal, uniformsTerrain,
 				heightMap, normalMap,
 				quadTarget;
 
@@ -298,9 +298,9 @@
 
 				uniformsNoise = {
 
-					time:   { type: "f", value: 1.0 },
-					scale:  { type: "v2", value: new THREE.Vector2( 1.5, 1.5 ) },
-					offset: { type: "v2", value: new THREE.Vector2( 0, 0 ) }
+					time:   { value: 1.0 },
+					scale:  { value: new THREE.Vector2( 1.5, 1.5 ) },
+					offset: { value: new THREE.Vector2( 0, 0 ) }
 
 				};
 
@@ -308,7 +308,7 @@
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.value = heightMap;
+				uniformsNormal.heightMap.value = heightMap.texture;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
@@ -337,14 +337,14 @@
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsTerrain[ 'tNormal' ].value = normalMap;
+				uniformsTerrain[ 'tNormal' ].value = normalMap.texture;
 				uniformsTerrain[ 'uNormalScale' ].value = 3.5;
 
-				uniformsTerrain[ 'tDisplacement' ].value = heightMap;
+				uniformsTerrain[ 'tDisplacement' ].value = heightMap.texture;
 
 				uniformsTerrain[ 'tDiffuse1' ].value = diffuseTexture1;
 				uniformsTerrain[ 'tDiffuse2' ].value = diffuseTexture2;
-				uniformsTerrain[ 'tSpecular' ].value = specularMap;
+				uniformsTerrain[ 'tSpecular' ].value = specularMap.texture;
 				uniformsTerrain[ 'tDetail' ].value = detailTexture;
 
 				uniformsTerrain[ 'enableDiffuse1' ].value = true;

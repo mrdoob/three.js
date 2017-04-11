@@ -133,7 +133,7 @@
 				container = document.getElementById( 'container' );
 
 				var loader = new THREE.FontLoader();
-				loader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
+				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var scene = initScene( font );
 
@@ -150,12 +150,11 @@
 
 				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
 				border = document.getElementById( 'renderer_border' );
-				border.addEventListener("mousedown", onBorderMouseDown);
+				border.addEventListener( 'mousedown', onBorderMouseDown );
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousewheel', onMouseWheel, false );
-				window.addEventListener( 'MozMousePixelScroll', onMouseWheel, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'wheel', onMouseWheel, false );
 
 			}
 
@@ -181,6 +180,8 @@
 
 				var scene = new THREE.Scene();
 
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
 				var light = new THREE.DirectionalLight(0xffffff, 1);
 				light.position.set(100,100,100);
 				scene.add(light);
@@ -194,9 +195,6 @@
 				};
 
 				var meshes = [];
-				var coloroffset = 0;
-				var colorskip = ['black', 'antiquewhite', 'bisque', 'beige', 'blanchedalmond', 'darkblue', 'darkcyan'];
-				var colorkeys = Object.keys( THREE.ColorKeywords );
 
 				var geometry = new THREE.SphereBufferGeometry(0.5, 24, 12);
 
@@ -207,7 +205,7 @@
 					var labelgeo = new THREE.TextGeometry( labeldata[i].label, {
 						font: font,
 						size: labeldata[i].size,
-						height: labeldata[i].size / 2,
+						height: labeldata[i].size / 2
 					} );
 
 					labelgeo.computeBoundingSphere();
@@ -215,11 +213,7 @@
 					// center text
 					labelgeo.translate( - labelgeo.boundingSphere.radius, 0, 0 );
 
-					// Pick a color at "random".  Exclude black, because it looks bad.
-					while ( colorskip.indexOf( colorkeys[ i + coloroffset ] ) != -1 ) {
-						coloroffset++;
-					}
-					materialargs.color = THREE.ColorKeywords[ colorkeys[ i + coloroffset ] ];
+					materialargs.color = new THREE.Color().setHSL( Math.random(), 0.5, 0.5 );
 
 					var material = new THREE.MeshPhongMaterial( materialargs );
 
@@ -340,7 +334,7 @@
 				mouse[1] = ev.clientY / window.innerHeight;
 			}
 			function onMouseWheel(ev) {
-				var amount = -ev.wheelDeltaY || ev.detail;
+				var amount = ev.deltaY;
 				if ( amount === 0 ) return;
 				var dir = amount / Math.abs(amount);
 				zoomspeed = dir/10;

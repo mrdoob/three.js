@@ -91,6 +91,7 @@ Use WEBGL Depth buffer support?
 				camera.position.z = 450;
 
 				scene = new THREE.Scene();
+				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -101,9 +102,6 @@ Use WEBGL Depth buffer support?
 				material_depth = new THREE.MeshDepthMaterial();
 
 				//
-
-				object = new THREE.Object3D();
-				scene.add( object );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -129,7 +127,7 @@ Use WEBGL Depth buffer support?
 				} );
 
 				mesh = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), material );
-				scene.add( mesh );
+				camera.add( mesh );
 
 
 				// Focusing Floor
@@ -201,7 +199,7 @@ Use WEBGL Depth buffer support?
 						mesh.rotation.x = Math.PI / 2;
 						mesh.rotation.z = -i / monkeys * Math.PI * 2;
 
-						object.add( mesh );
+						scene.add( mesh );
 
 					}
 
@@ -222,14 +220,11 @@ Use WEBGL Depth buffer support?
 
 					var mesh = new THREE.Mesh( geometry, ballmaterial );
 
-					mesh.position.set(
-						(Math.random() - 0.5) * 200,
-						Math.random() * 50,
-						(Math.random() - 0.5)  * 200
-					);
-
-					mesh.scale.multiplyScalar(10);
-					object.add( mesh );
+					mesh.position.x = ( Math.random() - 0.5 ) * 200;
+					mesh.position.y = Math.random() * 50;
+					mesh.position.z = ( Math.random() - 0.5 )  * 200;
+					mesh.scale.multiplyScalar( 10 );
+					scene.add( mesh );
 
 				}
 
@@ -305,7 +300,7 @@ Use WEBGL Depth buffer support?
 					postprocessing.enabled = effectController.enabled;
 					postprocessing.bokeh_uniforms[ 'znear' ].value = camera.near;
 					postprocessing.bokeh_uniforms[ 'zfar' ].value = camera.far;
-					camera.setLens(effectController.focalLength);
+					camera.setFocalLength(effectController.focalLength);
 
 				};
 
@@ -409,8 +404,8 @@ Use WEBGL Depth buffer support?
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor;
-				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth;
+				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor.texture;
+				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth.texture;
 
 				postprocessing.bokeh_uniforms[ "textureWidth" ].value = window.innerWidth;
 

@@ -28,8 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
-			<div id="description">Click to play</div>
+			<a href="http://threejs.org" target="_blank">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank">SEA3D Exporter</a>
+			<br/>
+			<br/><div id="description">Click to play</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -44,9 +45,6 @@
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
 		<script src="js/shaders/VignetteShader.js"></script>
 
-		<script src="js/MorphAnimMesh.js"></script>
-		<script src="js/loaders/collada/Animation.js"></script>
-
 		<script src="js/loaders/sea3d/SEA3D.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
@@ -57,6 +55,8 @@
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
 
 			var container, stats;
 
@@ -90,9 +90,6 @@
 
 				controls = new THREE.OrbitControls( camera );
 
-				// reset global animation time
-				SEA3D.AnimationHandler.setTime( 0 );
-
 				// events
 
 				window.addEventListener('click', onMouseClick, false);
@@ -107,35 +104,38 @@
 			//	Animation Functions
 			//
 
-			function playAll(name, crossfade, offset) {
-
-				// reset global time
-				SEA3D.AnimationHandler.setTime( 0 );
+			function playAll(id, crossfade, offset) {
 
 				// play all animations
+
 				for(var i = 0; i < loader.meshes.length; i++) {
-					if (loader.meshes[i].animation)
-						loader.meshes[i].animation.play(name, crossfade, offset);
+
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.play(id, crossfade, offset);
+
 				}
 
 			}
 
 			function setTimeScale( timeScale ) {
 
-				// set in all active animations
-				for(var i in SEA3D.AnimationHandler.animations) {
-					SEA3D.AnimationHandler.animations[i].timeScale = timeScale;
+				for(var i = 0; i < loader.meshes.length; i++) {
+
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.setTimeScale( timeScale );
+
 				}
 
 			}
 
 			function stopAll() {
 
-				// reset global time
-				SEA3D.AnimationHandler.setTime( 0 );
+				for(var i = 0; i < loader.meshes.length; i++) {
 
-				// stop all active animations
-				SEA3D.AnimationHandler.stop();
+					if (loader.meshes[i].animator)
+						loader.meshes[i].animator.stop();
+
+				}
 
 			}
 
@@ -181,10 +181,6 @@
 
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
-
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
 
 				// events
 
@@ -246,18 +242,15 @@
 
 						var fracture99 = loader.getMesh("Object099");
 
-						//fracture99.animation.time = 0;
-						//fracture99.animation.timeScale = 1;
-						//fracture99.animation.playing
-						//fracture99.animation.states ...
-						//fracture99.animation.currentState ...
+						//fracture99.animator.setTimeScale( 1 );
+						//fracture99.animator.playing
+						//fracture99.animator.currentAnimation
+						//fracture99.animator.previousAnimation
 
-						//fracture99.animation.node ...
-						//fracture99.animation.node.duration
-
-						fracture99.animation.play("crash#2", .5, 0);
-						//fracture99.animation.pause();
-						//fracture99.animation.stop();
+						fracture99.animator.play("crash#2", .5, 0);
+						//fracture99.animator.stop();
+						//fracture99.animator.pause();
+						//fracture99.animator.resume();
 
 						description("crash#2 in single object - crossfade 0.5 seconds");
 

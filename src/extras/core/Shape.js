@@ -1,3 +1,6 @@
+import { PathPrototype } from './PathPrototype';
+import { Path } from './Path';
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Defines a 2d shape plane using paths.
@@ -9,65 +12,52 @@
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-THREE.Shape = function () {
+function Shape() {
 
-	THREE.Path.apply( this, arguments );
+	Path.apply( this, arguments );
 
 	this.holes = [];
 
-};
+}
 
-THREE.Shape.prototype = Object.create( THREE.Path.prototype );
-THREE.Shape.prototype.constructor = THREE.Shape;
+Shape.prototype = Object.assign( Object.create( PathPrototype ), {
 
-// Convenience method to return ExtrudeGeometry
+	constructor: Shape,
 
-THREE.Shape.prototype.extrude = function ( options ) {
+	getPointsHoles: function ( divisions ) {
 
-	return new THREE.ExtrudeGeometry( this, options );
+		var holesPts = [];
 
-};
+		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
 
-// Convenience method to return ShapeGeometry
+			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
-THREE.Shape.prototype.makeGeometry = function ( options ) {
+		}
 
-	return new THREE.ShapeGeometry( this, options );
+		return holesPts;
 
-};
+	},
 
-// Get points of holes
+	// Get points of shape and holes (keypoints based on segments parameter)
 
-THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
+	extractAllPoints: function ( divisions ) {
 
-	var holesPts = [];
+		return {
 
-	for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+			shape: this.getPoints( divisions ),
+			holes: this.getPointsHoles( divisions )
 
-		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+		};
+
+	},
+
+	extractPoints: function ( divisions ) {
+
+		return this.extractAllPoints( divisions );
 
 	}
 
-	return holesPts;
-
-};
+} );
 
 
-// Get points of shape and holes (keypoints based on segments parameter)
-
-THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getPoints( divisions ),
-		holes: this.getPointsHoles( divisions )
-
-	};
-
-};
-
-THREE.Shape.prototype.extractPoints = function ( divisions ) {
-
-	return this.extractAllPoints( divisions );
-
-};
+export { Shape };

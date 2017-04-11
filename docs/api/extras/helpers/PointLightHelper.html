@@ -12,12 +12,18 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">This displays a helper object for a [page:PointLight] </div>
+		<div class="desc">
+			This displays a helper object consisting of a spherical [page:Mesh] for visualizing
+			 a [page:PointLight].
+		 </div>
 
 
 		<h2>Example</h2>
 
-		<code>var pointLight = new THREE.PointLight( 0xff0000, 1, 100 );
+		[example:webgl_helpers WebGL /  helpers]
+
+		<code>
+		var pointLight = new THREE.PointLight( 0xff0000, 1, 100 );
 		pointLight.position.set( 10, 10, 10 );
 		scene.add( pointLight );
 
@@ -25,32 +31,44 @@
 		var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
 		scene.add( pointLightHelper );
 		</code>
-		[example:webgl_helpers Example using various helpers]
+
+
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:PointLight light], [page:Float sphereSize])</h3>
+		<h3>[name]( [page:PointLight light], [page:Float sphereSize] )</h3>
 		<div>
-		light -- The [page:PointLight] to display. <br />
-		sphereSize -- The size of the sphere helper
+		[page:PointLight light] -- The light to be visualized. <br />
+		 [page:Float sphereSize] -- (optional) The size of the sphere helper. Default is *1*.
 		</div>
 
 
 		<h2>Properties</h2>
+		<div>See the base [page:Mesh] class for common properties.</div>
 
 		<h3>[property:PointLight light]</h3>
+		<div>The [page:PointLight] that is being visualized.</div>
+
+		<h3>[property:object matrix]</h3>
+		<div>Reference to the pointLight's [page:Object3D.matrixWorld matrixWorld].</div>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
 		<div>
-		The [page:PointLight] that is being represented.
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			pointLight's [page:Object3D.matrixWorld matrixWorld].
 		</div>
 
 
 		<h2>Methods</h2>
+		<div>See the base [page:Mesh] class for common methods.</div>
+
+		<h3>[method:null dispose]()</h3>
+		<div>Dispose of the pointLightHelper.</div>
+
 
 		<h3>[method:null update]()</h3>
-		<div>
-		Updates the light helper.
-		</div>
+		<div>Updates the helper to match the position of the [page:.light].</div>
 
 		<h2>Source</h2>
 

@@ -39,8 +39,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/Half.js"></script>
-		<script src="js/Encodings.js"></script>
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -66,6 +64,7 @@
 				bumpScale: 0.3,
 				background: false,
 				exposure: 1.0,
+				side: 'front'
 			};
 			var camera, scene, renderer, controls, objects = [];
 			var hdrCubeMap;
@@ -93,13 +92,13 @@
 				standardMaterial = new THREE.MeshStandardMaterial( {
 					map: null,
 					bumpScale: - 0.05,
-					color: 0xffffff,
-					metalness: 1.0,
+					color: 0xff4444,
+					metalness: 0.5,
 					roughness: 1.0,
 					shading: THREE.SmoothShading
 				} );
 
-				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );;
+				var geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
 				torusMesh1.position.x = 0.0;
 				torusMesh1.castShadow = true;
@@ -129,6 +128,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 2 );
+					standardMaterial.map = map;
 					standardMaterial.roughnessMap = map;
 					standardMaterial.bumpMap = map;
 					standardMaterial.needsUpdate = true;
@@ -152,6 +152,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
@@ -166,6 +167,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 
@@ -181,6 +183,7 @@
 					pmremCubeUVPacker.update( renderer );
 
 					rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
 				} );
 
 				// Lights
@@ -190,7 +193,7 @@
 				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8
+				spotLight.penumbra = 0.8;
 				spotLight.castShadow = true;
 				scene.add( spotLight );
 
@@ -218,6 +221,7 @@
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'bumpScale', - 1, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 				gui.open();
 
 			}
@@ -252,19 +256,44 @@
 
 					standardMaterial.roughness = params.roughness;
 					standardMaterial.bumpScale = - 0.05 * params.bumpScale;
+
 					var newEnvMap = standardMaterial.envMap;
+
 					switch( params.envMap ) {
+
 						case 'None': newEnvMap = null; break;
-						case 'LDR': newEnvMap = ldrCubeRenderTarget; break;
-						case 'HDR': newEnvMap = hdrCubeRenderTarget; break;
-						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget; break;
+						case 'LDR': newEnvMap = ldrCubeRenderTarget ? ldrCubeRenderTarget.texture : null; break;
+						case 'HDR': newEnvMap = hdrCubeRenderTarget ? hdrCubeRenderTarget.texture : null; break;
+						case 'RGBM16': newEnvMap = rgbmCubeRenderTarget ? rgbmCubeRenderTarget.texture : null; break;
+
 					}
+
 					if( newEnvMap !== standardMaterial.envMap ) {
+
 						standardMaterial.envMap = newEnvMap;
 						standardMaterial.needsUpdate = true;
 						floorMaterial.emissive = new THREE.Color( 1, 1, 1 );
 						floorMaterial.emissiveMap = newEnvMap;
 						floorMaterial.needsUpdate = true;
+
+					}
+
+
+					var side = standardMaterial.side;
+
+					switch ( params.side ) {
+
+						case 'front': side = THREE.FrontSide; break;
+						case 'back': side = THREE.BackSide; break;
+						case 'double': side = THREE.DoubleSide; break;
+	
+					}
+
+					if( standardMaterial.side !== side ) {
+						
+						standardMaterial.side = side;
+						standardMaterial.needsUpdate = true;
+
 					}
 				}
 

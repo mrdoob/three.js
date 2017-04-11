@@ -188,8 +188,8 @@
 
 				var effectColorify1 = new THREE.ShaderPass( THREE.ColorifyShader );
 				var effectColorify2 = new THREE.ShaderPass( THREE.ColorifyShader );
-				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
-				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
+				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
+				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
 
 				var clearMask = new THREE.ClearMaskPass();
 				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
@@ -234,7 +234,7 @@
 
 				//
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
 
 				//
 
@@ -287,7 +287,7 @@
 
 				//onWindowResize();
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -317,7 +317,7 @@
 				composer3.setSize( halfWidth, halfHeight );
 				composer4.setSize( halfWidth, halfHeight );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
+				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );

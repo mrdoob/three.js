@@ -1,3 +1,5 @@
+import { MeshStandardMaterial } from './MeshStandardMaterial';
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
@@ -6,9 +8,9 @@
  * }
  */
 
-THREE.MeshPhysicalMaterial = function ( parameters ) {
+function MeshPhysicalMaterial( parameters ) {
 
-	THREE.MeshStandardMaterial.call( this );
+	MeshStandardMaterial.call( this );
 
 	this.defines = { 'PHYSICAL': '' };
 
@@ -16,21 +18,32 @@ THREE.MeshPhysicalMaterial = function ( parameters ) {
 
 	this.reflectivity = 0.5; // maps to F0 = 0.04
 
+	this.clearCoat = 0.0;
+	this.clearCoatRoughness = 0.0;
+
 	this.setValues( parameters );
 
-};
+}
 
-THREE.MeshPhysicalMaterial.prototype = Object.create( THREE.MeshStandardMaterial.prototype );
-THREE.MeshPhysicalMaterial.prototype.constructor = THREE.MeshPhysicalMaterial;
+MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
+MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
 
-THREE.MeshPhysicalMaterial.prototype.copy = function ( source ) {
+MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
-	THREE.MeshStandardMaterial.prototype.copy.call( this, source );
+MeshPhysicalMaterial.prototype.copy = function ( source ) {
+
+	MeshStandardMaterial.prototype.copy.call( this, source );
 
 	this.defines = { 'PHYSICAL': '' };
 
 	this.reflectivity = source.reflectivity;
 
+	this.clearCoat = source.clearCoat;
+	this.clearCoatRoughness = source.clearCoatRoughness;
+
 	return this;
 
 };
+
+
+export { MeshPhysicalMaterial };

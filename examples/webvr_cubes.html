@@ -21,19 +21,21 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/WebVR.js"></script>
-		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script>
 
-			if ( WEBVR.isLatestAvailable() === false ) {
+			if ( WEBVR.isAvailable() === false ) {
 
 				document.body.appendChild( WEBVR.getMessage() );
 
 			}
 
 			//
+
+			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, raycaster, renderer;
@@ -78,12 +80,12 @@
 				camera.add( crosshair );
 
 				room = new THREE.Mesh(
-					new THREE.BoxGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0x202020, wireframe: true } )
+					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x404020, 0x202040, 0.5 ) );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -119,7 +121,7 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0x101010 );
+				renderer.setClearColor( 0x505050 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -128,7 +130,16 @@
 				controls = new THREE.VRControls( camera );
 				effect = new THREE.VREffect( renderer );
 
-				if ( WEBVR.isAvailable() === true ) {
+				if ( navigator.getVRDisplays ) {
+
+					navigator.getVRDisplays()
+						.then( function ( displays ) {
+							effect.setVRDisplay( displays[ 0 ] );
+							controls.setVRDisplay( displays[ 0 ] );
+						} )
+						.catch( function () {
+							// no displays
+						} );
 
 					document.body.appendChild( WEBVR.getButton( effect ) );
 
@@ -170,12 +181,14 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
+				effect.requestAnimationFrame( animate );
 				render();
 
 			}
 
 			function render() {
+
+				var delta = clock.getDelta() * 60;
 
 				if ( isMouseDown === true ) {
 
@@ -184,9 +197,9 @@
 
 					cube.position.set( 0, 0, - 0.75 );
 					cube.position.applyQuaternion( camera.quaternion );
-					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
 					cube.userData.velocity.applyQuaternion( camera.quaternion );
 					room.add( cube );
 
@@ -224,7 +237,7 @@
 
 					var cube = room.children[ i ];
 
-					cube.userData.velocity.multiplyScalar( 0.999 );
+					cube.userData.velocity.multiplyScalar( 1 - ( 0.001 * delta ) );
 
 					cube.position.add( cube.userData.velocity );
 
@@ -249,9 +262,9 @@
 
 					}
 
-					cube.rotation.x += cube.userData.velocity.x * 2;
-					cube.rotation.y += cube.userData.velocity.y * 2;
-					cube.rotation.z += cube.userData.velocity.z * 2;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 

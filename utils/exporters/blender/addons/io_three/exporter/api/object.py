@@ -9,6 +9,7 @@ from .constants import (
     EMPTY,
     ARMATURE,
     LAMP,
+    AREA,
     SPOT,
     SUN,
     POINT,
@@ -20,6 +21,7 @@ from .constants import (
     NO_SHADOW,
     ZYX
 )
+# TODO: RectAreaLight support
 
 
 # Blender doesn't seem to have a good way to link a mesh back to the
@@ -250,7 +252,7 @@ def custom_properties(obj):
     # Grab any properties except those marked private (by underscore
     # prefix) or those with types that would be rejected by the JSON
     # serializer object model.
-    return {kvp[0]: kvp[1] for kvp in obj.data.items() if kvp[0][:1] != '_' and isinstance(kvp[1], constants.VALID_DATA_TYPES)}
+    return {K: obj[K] for K in obj.keys() if K[:1] != '_' and isinstance(obj[K], constants.VALID_DATA_TYPES)}  # 'Empty' Blender objects do not use obj.data.items() for custom properties, using obj.keys()
 
 @_object
 def mesh(obj, options):
@@ -306,11 +308,13 @@ def node_type(obj):
     elif obj.type == EMPTY:
         return constants.OBJECT.title()
 
+    # TODO: RectAreaLight support
     dispatch = {
         LAMP: {
             POINT: constants.POINT_LIGHT,
             SUN: constants.DIRECTIONAL_LIGHT,
             SPOT: constants.SPOT_LIGHT,
+            AREA: constants.RECT_AREA_LIGHT,
             HEMI: constants.HEMISPHERE_LIGHT
         },
         CAMERA: {
@@ -378,7 +382,7 @@ def matrix(obj, options):
         parent_inverted = obj.parent.matrix_world.inverted(mathutils.Matrix())
         return parent_inverted * obj.matrix_world
     else:
-        return obj.matrix_world
+        return AXIS_CONVERSION * obj.matrix_world
 
 
 @_object

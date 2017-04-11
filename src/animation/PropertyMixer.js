@@ -1,3 +1,5 @@
+import { Quaternion } from '../math/Quaternion';
+
 /**
  *
  * Buffered scene graph property that allows weighted accumulation.
@@ -8,7 +10,7 @@
  * @author tschw
  */
 
-THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
+function PropertyMixer( binding, typeName, valueSize ) {
 
 	this.binding = binding;
 	this.valueSize = valueSize;
@@ -18,14 +20,18 @@ THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 
 	switch ( typeName ) {
 
-		case 'quaternion':			mixFunction = this._slerp;		break;
+		case 'quaternion':
+			mixFunction = this._slerp;
+			break;
 
 		case 'string':
 		case 'bool':
+			bufferType = Array;
+			mixFunction = this._select;
+			break;
 
-			bufferType = Array,		mixFunction = this._select;		break;
-
-		default:					mixFunction = this._lerp;
+		default:
+			mixFunction = this._lerp;
 
 	}
 
@@ -48,11 +54,11 @@ THREE.PropertyMixer = function ( binding, typeName, valueSize ) {
 	this.useCount = 0;
 	this.referenceCount = 0;
 
-};
+}
 
-THREE.PropertyMixer.prototype = {
+PropertyMixer.prototype = {
 
-	constructor: THREE.PropertyMixer,
+	constructor: PropertyMixer,
 
 	// accumulate data in the 'incoming' region into 'accu<i>'
 	accumulate: function( accuIndex, weight ) {
@@ -181,7 +187,7 @@ THREE.PropertyMixer.prototype = {
 
 	_slerp: function( buffer, dstOffset, srcOffset, t, stride ) {
 
-		THREE.Quaternion.slerpFlat( buffer, dstOffset,
+		Quaternion.slerpFlat( buffer, dstOffset,
 				buffer, dstOffset, buffer, srcOffset, t );
 
 	},
@@ -201,3 +207,6 @@ THREE.PropertyMixer.prototype = {
 	}
 
 };
+
+
+export { PropertyMixer };

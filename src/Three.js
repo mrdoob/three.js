@@ -1,337 +1,156 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var THREE = { REVISION: '76' };
-
-//
-
-if ( typeof define === 'function' && define.amd ) {
-
-	define( 'three', THREE );
-
-} else if ( 'undefined' !== typeof exports && 'undefined' !== typeof module ) {
-
-	module.exports = THREE;
-
-}
-
-//
-
-if ( Number.EPSILON === undefined ) {
-
-	Number.EPSILON = Math.pow( 2, - 52 );
-
-}
-
-//
-
-if ( Math.sign === undefined ) {
-
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
-
-	Math.sign = function ( x ) {
-
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : + x;
-
-	};
-
-}
-
-if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
-
-	// Missing in IE9-11.
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
-
-	Object.defineProperty( Function.prototype, 'name', {
-
-		get: function () {
-
-			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
-
-		}
-
-	} );
-
-}
-
-if ( Object.assign === undefined ) {
-
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-
-	Object.defineProperty( Object, 'assign', {
-
-		writable: true,
-		configurable: true,
-
-		value: function ( target ) {
-
-			'use strict';
-
-			if ( target === undefined || target === null ) {
-
-				throw new TypeError( "Cannot convert first argument to object" );
-
-			}
-
-			var to = Object( target );
-
-			for ( var i = 1, n = arguments.length; i !== n; ++ i ) {
-
-				var nextSource = arguments[ i ];
-
-				if ( nextSource === undefined || nextSource === null ) continue;
-
-				nextSource = Object( nextSource );
-
-				var keysArray = Object.keys( nextSource );
-
-				for ( var nextIndex = 0, len = keysArray.length; nextIndex !== len; ++ nextIndex ) {
-
-					var nextKey = keysArray[ nextIndex ];
-					var desc = Object.getOwnPropertyDescriptor( nextSource, nextKey );
-
-					if ( desc !== undefined && desc.enumerable ) {
-
-						to[ nextKey ] = nextSource[ nextKey ];
-
-					}
-
-				}
-
-			}
-
-			return to;
-
-		}
-
-	} );
-
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
-
-// GL STATE CONSTANTS
-
-THREE.CullFaceNone = 0;
-THREE.CullFaceBack = 1;
-THREE.CullFaceFront = 2;
-THREE.CullFaceFrontBack = 3;
-
-THREE.FrontFaceDirectionCW = 0;
-THREE.FrontFaceDirectionCCW = 1;
-
-// SHADOWING TYPES
-
-THREE.BasicShadowMap = 0;
-THREE.PCFShadowMap = 1;
-THREE.PCFSoftShadowMap = 2;
-
-// MATERIAL CONSTANTS
-
-// side
-
-THREE.FrontSide = 0;
-THREE.BackSide = 1;
-THREE.DoubleSide = 2;
-
-// shading
-
-THREE.FlatShading = 1;
-THREE.SmoothShading = 2;
-
-// colors
-
-THREE.NoColors = 0;
-THREE.FaceColors = 1;
-THREE.VertexColors = 2;
-
-// blending modes
-
-THREE.NoBlending = 0;
-THREE.NormalBlending = 1;
-THREE.AdditiveBlending = 2;
-THREE.SubtractiveBlending = 3;
-THREE.MultiplyBlending = 4;
-THREE.CustomBlending = 5;
-
-// custom blending equations
-// (numbers start from 100 not to clash with other
-// mappings to OpenGL constants defined in Texture.js)
-
-THREE.AddEquation = 100;
-THREE.SubtractEquation = 101;
-THREE.ReverseSubtractEquation = 102;
-THREE.MinEquation = 103;
-THREE.MaxEquation = 104;
-
-// custom blending destination factors
-
-THREE.ZeroFactor = 200;
-THREE.OneFactor = 201;
-THREE.SrcColorFactor = 202;
-THREE.OneMinusSrcColorFactor = 203;
-THREE.SrcAlphaFactor = 204;
-THREE.OneMinusSrcAlphaFactor = 205;
-THREE.DstAlphaFactor = 206;
-THREE.OneMinusDstAlphaFactor = 207;
-
-// custom blending source factors
-
-//THREE.ZeroFactor = 200;
-//THREE.OneFactor = 201;
-//THREE.SrcAlphaFactor = 204;
-//THREE.OneMinusSrcAlphaFactor = 205;
-//THREE.DstAlphaFactor = 206;
-//THREE.OneMinusDstAlphaFactor = 207;
-THREE.DstColorFactor = 208;
-THREE.OneMinusDstColorFactor = 209;
-THREE.SrcAlphaSaturateFactor = 210;
-
-// depth modes
-
-THREE.NeverDepth = 0;
-THREE.AlwaysDepth = 1;
-THREE.LessDepth = 2;
-THREE.LessEqualDepth = 3;
-THREE.EqualDepth = 4;
-THREE.GreaterEqualDepth = 5;
-THREE.GreaterDepth = 6;
-THREE.NotEqualDepth = 7;
-
-
-// TEXTURE CONSTANTS
-
-THREE.MultiplyOperation = 0;
-THREE.MixOperation = 1;
-THREE.AddOperation = 2;
-
-// Tone Mapping modes
-
-THREE.NoToneMapping = 0; // do not do any tone mapping, not even exposure (required for special purpose passes.)
-THREE.LinearToneMapping = 1; // only apply exposure.
-THREE.ReinhardToneMapping = 2;
-THREE.Uncharted2ToneMapping = 3; // John Hable
-THREE.CineonToneMapping = 4;  // optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
-
-// Mapping modes
-
-THREE.UVMapping = 300;
-
-THREE.CubeReflectionMapping = 301;
-THREE.CubeRefractionMapping = 302;
-
-THREE.EquirectangularReflectionMapping = 303;
-THREE.EquirectangularRefractionMapping = 304;
-
-THREE.SphericalReflectionMapping = 305;
-THREE.CubeUVReflectionMapping = 306;
-THREE.CubeUVRefractionMapping = 307;
-
-// Wrapping modes
-
-THREE.RepeatWrapping = 1000;
-THREE.ClampToEdgeWrapping = 1001;
-THREE.MirroredRepeatWrapping = 1002;
-
-// Filters
-
-THREE.NearestFilter = 1003;
-THREE.NearestMipMapNearestFilter = 1004;
-THREE.NearestMipMapLinearFilter = 1005;
-THREE.LinearFilter = 1006;
-THREE.LinearMipMapNearestFilter = 1007;
-THREE.LinearMipMapLinearFilter = 1008;
-
-// Data types
-
-THREE.UnsignedByteType = 1009;
-THREE.ByteType = 1010;
-THREE.ShortType = 1011;
-THREE.UnsignedShortType = 1012;
-THREE.IntType = 1013;
-THREE.UnsignedIntType = 1014;
-THREE.FloatType = 1015;
-THREE.HalfFloatType = 1025;
-
-// Pixel types
-
-//THREE.UnsignedByteType = 1009;
-THREE.UnsignedShort4444Type = 1016;
-THREE.UnsignedShort5551Type = 1017;
-THREE.UnsignedShort565Type = 1018;
-
-// Pixel formats
-
-THREE.AlphaFormat = 1019;
-THREE.RGBFormat = 1020;
-THREE.RGBAFormat = 1021;
-THREE.LuminanceFormat = 1022;
-THREE.LuminanceAlphaFormat = 1023;
-// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
-THREE.RGBEFormat = THREE.RGBAFormat; //1024;
-THREE.DepthFormat = 1026;
-
-// DDS / ST3C Compressed texture formats
-
-THREE.RGB_S3TC_DXT1_Format = 2001;
-THREE.RGBA_S3TC_DXT1_Format = 2002;
-THREE.RGBA_S3TC_DXT3_Format = 2003;
-THREE.RGBA_S3TC_DXT5_Format = 2004;
-
-
-// PVRTC compressed texture formats
-
-THREE.RGB_PVRTC_4BPPV1_Format = 2100;
-THREE.RGB_PVRTC_2BPPV1_Format = 2101;
-THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
-THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-
-// ETC compressed texture formats
-
-THREE.RGB_ETC1_Format = 2151;
-
-// Loop styles for AnimationAction
-
-THREE.LoopOnce = 2200;
-THREE.LoopRepeat = 2201;
-THREE.LoopPingPong = 2202;
-
-// Interpolation
-
-THREE.InterpolateDiscrete = 2300;
-THREE.InterpolateLinear = 2301;
-THREE.InterpolateSmooth = 2302;
-
-// Interpolant ending modes
-
-THREE.ZeroCurvatureEnding = 2400;
-THREE.ZeroSlopeEnding = 2401;
-THREE.WrapAroundEnding = 2402;
-
-// Triangle Draw modes
-
-THREE.TrianglesDrawMode = 0;
-THREE.TriangleStripDrawMode = 1;
-THREE.TriangleFanDrawMode = 2;
-
-// Texture Encodings
-
-THREE.LinearEncoding = 3000; // No encoding at all.
-THREE.sRGBEncoding = 3001;
-THREE.GammaEncoding = 3007; // uses GAMMA_FACTOR, for backwards compatibility with WebGLRenderer.gammaInput/gammaOutput
-
-// The following Texture Encodings are for RGB-only (no alpha) HDR light emission sources.
-// These encodings should not specified as output encodings except in rare situations.
-THREE.RGBEEncoding = 3002; // AKA Radiance.
-THREE.LogLuvEncoding = 3003;
-THREE.RGBM7Encoding = 3004;
-THREE.RGBM16Encoding = 3005;
-THREE.RGBDEncoding = 3006; // MaxRange is 256.
-
-// Depth packing strategies
-
-THREE.BasicDepthPacking = 3200;  // for writing to float textures for high precision or for visualizing results in RGB buffers
-THREE.RGBADepthPacking = 3201; // for packing into RGBA buffers.
+import './polyfills.js';
+
+export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
+export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
+export { WebGLRenderer } from './renderers/WebGLRenderer.js';
+// export { WebGL2Renderer } from './renderers/WebGL2Renderer.js';
+export { ShaderLib } from './renderers/shaders/ShaderLib.js';
+export { UniformsLib } from './renderers/shaders/UniformsLib.js';
+export { UniformsUtils } from './renderers/shaders/UniformsUtils.js';
+export { ShaderChunk } from './renderers/shaders/ShaderChunk.js';
+export { FogExp2 } from './scenes/FogExp2.js';
+export { Fog } from './scenes/Fog.js';
+export { Scene } from './scenes/Scene.js';
+export { LensFlare } from './objects/LensFlare.js';
+export { Sprite } from './objects/Sprite.js';
+export { LOD } from './objects/LOD.js';
+export { SkinnedMesh } from './objects/SkinnedMesh.js';
+export { Skeleton } from './objects/Skeleton.js';
+export { Bone } from './objects/Bone.js';
+export { Mesh } from './objects/Mesh.js';
+export { LineSegments } from './objects/LineSegments.js';
+export { Line } from './objects/Line.js';
+export { Points } from './objects/Points.js';
+export { Group } from './objects/Group.js';
+export { VideoTexture } from './textures/VideoTexture.js';
+export { DataTexture } from './textures/DataTexture.js';
+export { CompressedTexture } from './textures/CompressedTexture.js';
+export { CubeTexture } from './textures/CubeTexture.js';
+export { CanvasTexture } from './textures/CanvasTexture.js';
+export { DepthTexture } from './textures/DepthTexture.js';
+export { Texture } from './textures/Texture.js';
+export * from './geometries/Geometries.js';
+export * from './materials/Materials.js';
+export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
+export { DataTextureLoader } from './loaders/DataTextureLoader.js';
+export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
+export { TextureLoader } from './loaders/TextureLoader.js';
+export { ObjectLoader } from './loaders/ObjectLoader.js';
+export { MaterialLoader } from './loaders/MaterialLoader.js';
+export { BufferGeometryLoader } from './loaders/BufferGeometryLoader.js';
+export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.js';
+export { JSONLoader } from './loaders/JSONLoader.js';
+export { ImageLoader } from './loaders/ImageLoader.js';
+export { FontLoader } from './loaders/FontLoader.js';
+export { FileLoader } from './loaders/FileLoader.js';
+export { Loader } from './loaders/Loader.js';
+export { Cache } from './loaders/Cache.js';
+export { AudioLoader } from './loaders/AudioLoader.js';
+export { SpotLightShadow } from './lights/SpotLightShadow.js';
+export { SpotLight } from './lights/SpotLight.js';
+export { PointLight } from './lights/PointLight.js';
+export { RectAreaLight } from './lights/RectAreaLight.js';
+export { HemisphereLight } from './lights/HemisphereLight.js';
+export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
+export { DirectionalLight } from './lights/DirectionalLight.js';
+export { AmbientLight } from './lights/AmbientLight.js';
+export { LightShadow } from './lights/LightShadow.js';
+export { Light } from './lights/Light.js';
+export { StereoCamera } from './cameras/StereoCamera.js';
+export { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
+export { OrthographicCamera } from './cameras/OrthographicCamera.js';
+export { CubeCamera } from './cameras/CubeCamera.js';
+export { Camera } from './cameras/Camera.js';
+export { AudioListener } from './audio/AudioListener.js';
+export { PositionalAudio } from './audio/PositionalAudio.js';
+export { AudioContext } from './audio/AudioContext.js';
+export { AudioAnalyser } from './audio/AudioAnalyser.js';
+export { Audio } from './audio/Audio.js';
+export { VectorKeyframeTrack } from './animation/tracks/VectorKeyframeTrack.js';
+export { StringKeyframeTrack } from './animation/tracks/StringKeyframeTrack.js';
+export { QuaternionKeyframeTrack } from './animation/tracks/QuaternionKeyframeTrack.js';
+export { NumberKeyframeTrack } from './animation/tracks/NumberKeyframeTrack.js';
+export { ColorKeyframeTrack } from './animation/tracks/ColorKeyframeTrack.js';
+export { BooleanKeyframeTrack } from './animation/tracks/BooleanKeyframeTrack.js';
+export { PropertyMixer } from './animation/PropertyMixer.js';
+export { PropertyBinding } from './animation/PropertyBinding.js';
+export { KeyframeTrack } from './animation/KeyframeTrack.js';
+export { AnimationUtils } from './animation/AnimationUtils.js';
+export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
+export { AnimationMixer } from './animation/AnimationMixer.js';
+export { AnimationClip } from './animation/AnimationClip.js';
+export { Uniform } from './core/Uniform.js';
+export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
+export { BufferGeometry } from './core/BufferGeometry.js';
+export { GeometryIdCount, Geometry } from './core/Geometry.js';
+export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
+export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
+export { InterleavedBuffer } from './core/InterleavedBuffer.js';
+export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
+export * from './core/BufferAttribute.js';
+export { Face3 } from './core/Face3.js';
+export { Object3D } from './core/Object3D.js';
+export { Raycaster } from './core/Raycaster.js';
+export { Layers } from './core/Layers.js';
+export { EventDispatcher } from './core/EventDispatcher.js';
+export { Clock } from './core/Clock.js';
+export { QuaternionLinearInterpolant } from './math/interpolants/QuaternionLinearInterpolant.js';
+export { LinearInterpolant } from './math/interpolants/LinearInterpolant.js';
+export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js';
+export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
+export { Interpolant } from './math/Interpolant.js';
+export { Triangle } from './math/Triangle.js';
+export { _Math as Math } from './math/Math.js';
+export { Spherical } from './math/Spherical.js';
+export { Cylindrical } from './math/Cylindrical.js';
+export { Plane } from './math/Plane.js';
+export { Frustum } from './math/Frustum.js';
+export { Sphere } from './math/Sphere.js';
+export { Ray } from './math/Ray.js';
+export { Matrix4 } from './math/Matrix4.js';
+export { Matrix3 } from './math/Matrix3.js';
+export { Box3 } from './math/Box3.js';
+export { Box2 } from './math/Box2.js';
+export { Line3 } from './math/Line3.js';
+export { Euler } from './math/Euler.js';
+export { Vector4 } from './math/Vector4.js';
+export { Vector3 } from './math/Vector3.js';
+export { Vector2 } from './math/Vector2.js';
+export { Quaternion } from './math/Quaternion.js';
+export { Color } from './math/Color.js';
+export { MorphBlendMesh } from './extras/objects/MorphBlendMesh.js';
+export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
+export { VertexNormalsHelper } from './helpers/VertexNormalsHelper.js';
+export { SpotLightHelper } from './helpers/SpotLightHelper.js';
+export { SkeletonHelper } from './helpers/SkeletonHelper.js';
+export { PointLightHelper } from './helpers/PointLightHelper.js';
+export { RectAreaLightHelper } from './helpers/RectAreaLightHelper.js';
+export { HemisphereLightHelper } from './helpers/HemisphereLightHelper.js';
+export { GridHelper } from './helpers/GridHelper.js';
+export { PolarGridHelper } from './helpers/PolarGridHelper.js';
+export { FaceNormalsHelper } from './helpers/FaceNormalsHelper.js';
+export { DirectionalLightHelper } from './helpers/DirectionalLightHelper.js';
+export { CameraHelper } from './helpers/CameraHelper.js';
+export { BoxHelper } from './helpers/BoxHelper.js';
+export { ArrowHelper } from './helpers/ArrowHelper.js';
+export { AxisHelper } from './helpers/AxisHelper.js';
+export { CatmullRomCurve3 } from './extras/curves/CatmullRomCurve3.js';
+export { CubicBezierCurve3 } from './extras/curves/CubicBezierCurve3.js';
+export { QuadraticBezierCurve3 } from './extras/curves/QuadraticBezierCurve3.js';
+export { LineCurve3 } from './extras/curves/LineCurve3.js';
+export { ArcCurve } from './extras/curves/ArcCurve.js';
+export { EllipseCurve } from './extras/curves/EllipseCurve.js';
+export { SplineCurve } from './extras/curves/SplineCurve.js';
+export { CubicBezierCurve } from './extras/curves/CubicBezierCurve.js';
+export { QuadraticBezierCurve } from './extras/curves/QuadraticBezierCurve.js';
+export { LineCurve } from './extras/curves/LineCurve.js';
+export { Shape } from './extras/core/Shape.js';
+export { Path } from './extras/core/Path.js';
+export { ShapePath } from './extras/core/ShapePath.js';
+export { Font } from './extras/core/Font.js';
+export { CurvePath } from './extras/core/CurvePath.js';
+export { Curve } from './extras/core/Curve.js';
+export { ShapeUtils } from './extras/ShapeUtils.js';
+export { SceneUtils } from './extras/SceneUtils.js';
+export * from './constants.js';
+export * from './Three.Legacy.js';
