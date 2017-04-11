@@ -24,6 +24,9 @@ function ShadowMaterial( parameters ) {
 		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 	} );
 
+	this.lights = true;
+	this.transparent = true;
+
 	Object.defineProperties( this, {
 		opacity: {
 			enumerable: true,
@@ -37,9 +40,6 @@ function ShadowMaterial( parameters ) {
 	} );
 
 	this.setValues( parameters );
-
-	this.lights = true;
-	this.transparent = true;
 
 }
 
