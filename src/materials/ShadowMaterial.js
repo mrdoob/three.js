@@ -5,9 +5,13 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ *
+ * parameters = {
+ *  opacity: <float>
+ * }
  */
 
-function ShadowMaterial() {
+function ShadowMaterial( parameters ) {
 
 	ShaderMaterial.call( this, {
 		uniforms: UniformsUtils.merge( [
@@ -34,6 +38,8 @@ function ShadowMaterial() {
 			}
 		}
 	} );
+
+	this.setValues( parameters );
 
 }
 
