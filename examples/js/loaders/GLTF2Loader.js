@@ -718,12 +718,12 @@ THREE.GLTF2Loader = ( function () {
 
 			switch ( semantic ) {
 
-				case "POSITION":
+				case 'POSITION':
 
 					shaderText = shaderText.replace( regEx, 'position' );
 					break;
 
-				case "NORMAL":
+				case 'NORMAL':
 
 					shaderText = shaderText.replace( regEx, 'normal' );
 					break;
@@ -747,12 +747,14 @@ THREE.GLTF2Loader = ( function () {
 					shaderText = shaderText.replace( regEx, 'color' );
 					break;
 
-				case "WEIGHT":
+				case 'WEIGHTS_0':
+				case 'WEIGHT': // WEIGHT semantic deprecated.
 
 					shaderText = shaderText.replace( regEx, 'skinWeight' );
 					break;
 
-				case "JOINT":
+				case 'JOINTS_0':
+				case 'JOINT': // JOINT semantic deprecated.
 
 					shaderText = shaderText.replace( regEx, 'skinIndex' );
 					break;
@@ -1711,34 +1713,43 @@ THREE.GLTF2Loader = ( function () {
 							switch ( attributeId ) {
 
 								case 'POSITION':
+
 									geometry.addAttribute( 'position', bufferAttribute );
 									break;
 
 								case 'NORMAL':
+
 									geometry.addAttribute( 'normal', bufferAttribute );
 									break;
 
 								case 'TEXCOORD_0':
 								case 'TEXCOORD0':
 								case 'TEXCOORD':
+
 									geometry.addAttribute( 'uv', bufferAttribute );
 									break;
 
 								case 'TEXCOORD_1':
+
 									geometry.addAttribute( 'uv2', bufferAttribute );
 									break;
 
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
+
 									geometry.addAttribute( 'color', bufferAttribute );
 									break;
 
-								case 'WEIGHT':
+								case 'WEIGHTS_0':
+								case 'WEIGHT': // WEIGHT semantic deprecated.
+
 									geometry.addAttribute( 'skinWeight', bufferAttribute );
 									break;
 
-								case 'JOINT':
+								case 'JOINTS_0':
+								case 'JOINT': // JOINT semantic deprecated.
+
 									geometry.addAttribute( 'skinIndex', bufferAttribute );
 									break;
 
