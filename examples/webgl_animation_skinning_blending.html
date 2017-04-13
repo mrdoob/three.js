@@ -19,14 +19,21 @@
 				top: 0px; width: 100%;
 				padding: 5px;
 			}
-			.ac {
+			a {
+				color: #bbb;
+			}
+			.ac {  /* prevent dat-gui from being selected */
 				-webkit-user-select: none;
 				-moz-user-select: none;
 				-ms-user-select: none;
 				user-select: none;
 			}
-			a {
-				color: #bbb;
+			.no-pointer-events {
+				pointer-events: none;
+			}
+			.control-disabled {
+				color: #888;
+				text-decoration: line-through;
 			}
 		</style>
 	</head>
@@ -35,7 +42,8 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Skeletal Animation Blending
 			(model from <a href="http://realitymeltdown.com" target="_blank">realitymeltdown.com</a>)
-			<br><br>- camera orbit/zoom/pan with left/middle/right mouse button -
+			<br><br>camera orbit/zoom/pan with left/middle/right mouse button
+			<br>Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -54,7 +62,10 @@
 			var scene, renderer, camera, controls, stats;
 			var mesh, skeleton, mixer;
 
+			var crossFadeControls = [];
+
 			var idleAction, walkAction, runAction;
+			var idleWeight, walkWeight, runWeight;
 			var actions;
 			var settings;
 
@@ -175,10 +186,10 @@
 					'pause/continue':        pauseContinue,
 					'make single step':      toSingleStepMode,
 					'modify step size':      0.05,
-					'from walk to idle':     function () { prepareCrossFade( walkAction, idleAction, runAction, 1.0 ) },
-					'from idle to walk':     function () { prepareCrossFade( idleAction, walkAction, runAction, 0.5 ) },
-					'from walk to run':      function () { prepareCrossFade( walkAction, runAction, idleAction, 2.5 ) },
-					'from run to walk':      function () { prepareCrossFade( runAction, walkAction, idleAction, 5.0 ) },
+					'from walk to idle':     function () { prepareCrossFade( walkAction, idleAction, 1.0 ) },
+					'from idle to walk':     function () { prepareCrossFade( idleAction, walkAction, 0.5 ) },
+					'from walk to run':      function () { prepareCrossFade( walkAction, runAction, 2.5 ) },
+					'from run to walk':      function () { prepareCrossFade( runAction, walkAction, 5.0 ) },
 					'use default duration':  true,
 					'set custom duration':   3.5,
 					'modify idle weight':    0.0,
@@ -194,10 +205,10 @@
 				folder3.add( settings, 'pause/continue' );
 				folder3.add( settings, 'make single step' );
 				folder3.add( settings, 'modify step size', 0.01, 0.1, 0.001 );
-				folder4.add( settings, 'from walk to idle' );
-				folder4.add( settings, 'from idle to walk' );
-				folder4.add( settings, 'from walk to run' );
-				folder4.add( settings, 'from run to walk' );
+				crossFadeControls.push( folder4.add( settings, 'from walk to idle' ) );
+				crossFadeControls.push( folder4.add( settings, 'from idle to walk' ) );
+				crossFadeControls.push( folder4.add( settings, 'from walk to run' ) );
+				crossFadeControls.push( folder4.add( settings, 'from run to walk' ) );
 				folder4.add( settings, 'use default duration' );
 				folder4.add( settings, 'set custom duration', 0, 10, 0.01 );
 				folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) { setWeight( idleAction, weight ) } );
@@ -211,6 +222,27 @@
 				folder4.open();
 				folder5.open();
 				folder6.open();
+
+				crossFadeControls.forEach( function ( control ) {
+
+					control.classList1 = control.domElement.parentElement.parentElement.classList;
+					control.classList2 = control.domElement.previousElementSibling.classList;
+
+					control.setDisabled = function () {
+
+						control.classList1.add( 'no-pointer-events' );
+						control.classList2.add( 'control-disabled' );
+
+					};
+
+					control.setEnabled = function () {
+
+						control.classList1.remove( 'no-pointer-events' );
+						control.classList2.remove( 'control-disabled' );
+
+					};
+
+				} );
 
 			}
 
@@ -318,63 +350,29 @@
 			}
 
 
-			function prepareCrossFade( startAction, endAction, otherAction, defaultDuration ) {
+			function prepareCrossFade( startAction, endAction, defaultDuration ) {
 
-				var duration;
+				// Switch default / custom crossfade duration (according to the user's choice)
 
-				// If the current weight values don't allow the choosen crossfade type,
-				// display a message only, and modify the blend weights accordingly; else go on
+				var duration = setCrossFadeDuration( defaultDuration );
 
-				if ( startAction.getEffectiveWeight() !== 1 ||
-					 endAction.getEffectiveWeight()   !== 0 ||
-					 otherAction.getEffectiveWeight() !== 0 ) {
+				// Make sure that we don't go on in singleStepMode, and that all actions are unpaused
 
-					displayMessage();
-					prepareWeightsForCrossfade( startAction, endAction, otherAction );
+				singleStepMode = false;
+				unPauseAllActions();
+
+				// If the current action is 'idle' (duration 4 sec), execute the crossfade immediately;
+				// else wait until the current action has finished its current loop
+
+				if ( startAction === idleAction ) {
+
+					executeCrossFade( startAction, endAction, duration );
 
 				} else {
 
-					// Switch default / custom crossfade duration (according to the user's choice)
-
-					var duration = setCrossFadeDuration( defaultDuration );
-
-					// Make sure that we don't go on in singleStepMode, and that all actions are unpaused
-
-					singleStepMode = false;
-					unPauseAllActions();
-
-					// If the current action is 'idle' (duration 4 sec), execute the crossfade immediately;
-					// else wait until the current action has finished its current loop
-
-					if ( startAction === idleAction ) {
-
-						executeCrossFade( startAction, endAction, duration );
-
-					} else {
-
-						synchronizeCrossFade( startAction, endAction, duration );
-
-					}
+					synchronizeCrossFade( startAction, endAction, duration );
 
 				}
-
-			}
-
-
-			function displayMessage() {
-
-				alert( 'Crossfading is not useful if its start animation isn\'t already running before (or if it is not the only one at this moment).\n\n' +
-					   'Thus the initial blend weights are now modified according to your crossfade choice.\n\n' +
-					   'That being done you can try the same crossfade again by clicking its button!\n\n' );
-
-			}
-
-
-			function prepareWeightsForCrossfade( startAction, endAction, otherAction ) {
-
-				setWeight( startAction, 1 );
-				setWeight( endAction,   0 );
-				setWeight( otherAction, 0 );
 
 			}
 
@@ -442,6 +440,49 @@
 			}
 
 
+			// Called by the render loop
+
+			function updateWeightSliders() {
+
+				settings[ 'modify idle weight' ] = idleWeight;
+				settings[ 'modify walk weight' ] = walkWeight;
+				settings[ 'modify run weight' ] = runWeight;
+
+			}
+
+
+			// Called by the render loop
+
+			function updateCrossFadeControls() {
+
+				crossFadeControls.forEach( function ( control ) {
+
+					control.setDisabled();
+
+				} );
+
+				if ( idleWeight === 1 && walkWeight === 0 && runWeight === 0 ) {
+
+					crossFadeControls[ 1 ].setEnabled();
+
+				}
+
+				if ( idleWeight === 0 && walkWeight === 1 && runWeight === 0 ) {
+
+					crossFadeControls[ 0 ].setEnabled();
+					crossFadeControls[ 2 ].setEnabled();
+
+				}
+
+				if ( idleWeight === 0 && walkWeight === 0 && runWeight === 1 ) {
+
+					crossFadeControls[ 3 ].setEnabled();
+
+				}
+
+			}
+
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -458,11 +499,17 @@
 
 				requestAnimationFrame( animate );
 
+				idleWeight = idleAction.getEffectiveWeight();
+				walkWeight = walkAction.getEffectiveWeight();
+				runWeight = runAction.getEffectiveWeight();
+
 				// Update the panel values if weights are modified from "outside" (by crossfadings)
 
-				settings[ 'modify idle weight' ] = idleAction.getEffectiveWeight();
-				settings[ 'modify walk weight' ] = walkAction.getEffectiveWeight();
-				settings[ 'modify run weight' ] = runAction.getEffectiveWeight();
+				updateWeightSliders();
+
+				// Enable/disable crossfade controls according to current weight values
+
+				updateCrossFadeControls();
 
 				// Get the time elapsed since the last frame, used for mixer update (if not in single step mode)
 
