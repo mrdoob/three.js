@@ -38,6 +38,7 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 				geometry,
 				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
 
+		// division by 2 * PI is inside the above calls. This is essential as Eq (11) is having this normalization.
 		reflectedLight.directSpecular += lightColor * matSpecColor * spec;
 		reflectedLight.directDiffuse  += lightColor * matDiffColor * diff;
 

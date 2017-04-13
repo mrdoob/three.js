@@ -355,6 +355,86 @@ vec3 integrateLtcBrdfOverRect( const in GeometricContext geometry, const in mat3
 
 	vec3 Lo_i = vec3( sum, sum, sum );
 
+	return Lo_i/(2.0 * PI);
+
+}
+
+/* From http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
+Basically its an approximation for the form factor of a clipped rectangle.
+*/
+
+float ClippedSphereFormFactor( const in vec3 f ) {
+	float l = length(f);
+	return max((l*l + f.z)/(l+1.0), 0.0);
+}
+
+/* From http://advances.realtimerendering.com/s2016/s2016_ltc_rnd.pdf
+ Normalization by 2*PI is incorporated in this function itself.
+ This Normalization can be seen in Eq 11 of
+ https://drive.google.com/file/d/0BzvWIdpUpRx_d09ndGVjNVJzZjA/view
+ theta/sin(theta)	is approximated by rational polynomial
+ */
+
+vec3 EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {
+
+	float x = dot(v1, v2);
+
+	float y = abs(x);
+	float a = 0.86267 + (0.49788 + 0.01436*y)*y;
+	float b = 3.45068 + (4.18814 + y)*y;
+	float v = a/b;
+
+	float theta_sintheta = (x > 0.0) ? v : 0.5*inversesqrt(1.0 - x*x) - v;
+
+	return cross(v1, v2)*theta_sintheta;
+}
+
+vec3 integrateLtcBrdfOverRectOptimized( const in GeometricContext geometry, const in mat3 brdfMat, const in vec3 rectPoints[4] ) {
+
+	vec3 N = geometry.normal;
+	vec3 V = geometry.viewDir;
+	vec3 P = geometry.position;
+
+	// construct orthonormal basis around N
+	vec3 T1, T2;
+	T1 = normalize(V - N * dot( V, N ));
+	// TODO (abelnation): I had to negate this cross product to get proper light.  Curious why sample code worked without negation
+	T2 = - cross( N, T1 );
+
+	// rotate area light in (T1, T2, N) basis
+	mat3 brdfWrtSurface = brdfMat * transpose( mat3( T1, T2, N ) );
+
+	// transformed rect relative to surface point
+	vec3 clippedRect[4];
+	clippedRect[0] = brdfWrtSurface * ( rectPoints[0] - P );
+	clippedRect[1] = brdfWrtSurface * ( rectPoints[1] - P );
+	clippedRect[2] = brdfWrtSurface * ( rectPoints[2] - P );
+	clippedRect[3] = brdfWrtSurface * ( rectPoints[3] - P );
+
+	// Find light normal
+	vec3 v1 = clippedRect[1] - clippedRect[0];
+	vec3 v2 = clippedRect[3] - clippedRect[0];
+	vec3 lightNormal = cross(v1, v2);
+
+	bool bSameSide = dot(lightNormal, clippedRect[0]) > 0.0;
+	if( !bSameSide )
+		return vec3(0.0);
+
+	// project clipped rect onto sphere
+	clippedRect[0] = normalize( clippedRect[0] );
+	clippedRect[1] = normalize( clippedRect[1] );
+	clippedRect[2] = normalize( clippedRect[2] );
+	clippedRect[3] = normalize( clippedRect[3] );
+
+	// Accumulate vector form factor
+	vec3 edgeVectorFormFactor = vec3(0.0);
+	edgeVectorFormFactor += EdgeVectorFormFactor( clippedRect[0], clippedRect[1] );
+	edgeVectorFormFactor += EdgeVectorFormFactor( clippedRect[1], clippedRect[2] );
+	edgeVectorFormFactor += EdgeVectorFormFactor( clippedRect[2], clippedRect[3] );
+	edgeVectorFormFactor += EdgeVectorFormFactor( clippedRect[3], clippedRect[0] );
+
+	vec3 Lo_i = vec3( ClippedSphereFormFactor( edgeVectorFormFactor ) );
+
 	return Lo_i;
 
 }
@@ -384,7 +464,7 @@ vec3 Rect_Area_Light_Specular_Reflectance(
 		vec3( t.w,   0, t.x )
 	);
 
-	vec3 specularReflectance = integrateLtcBrdfOverRect( geometry, brdfLtcApproxMat, rectPoints );
+	vec3 specularReflectance = integrateLtcBrdfOverRectOptimized( geometry, brdfLtcApproxMat, rectPoints );
 	specularReflectance *= brdfLtcScalar;
 
 	return specularReflectance;
@@ -399,7 +479,7 @@ vec3 Rect_Area_Light_Diffuse_Reflectance(
 	initRectPoints( lightPos, lightHalfWidth, lightHalfHeight, rectPoints );
 
 	mat3 diffuseBrdfMat = mat3(1);
-	vec3 diffuseReflectance = integrateLtcBrdfOverRect( geometry, diffuseBrdfMat, rectPoints );
+	vec3 diffuseReflectance = integrateLtcBrdfOverRectOptimized( geometry, diffuseBrdfMat, rectPoints );
 
 	return diffuseReflectance;
 
