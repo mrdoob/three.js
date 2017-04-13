@@ -1809,7 +1809,7 @@ THREE.GLTF2Loader = ( function () {
 
 					} else {
 
-						console.warn( "Only triangular and line primitives are supported" );
+						throw new Error( "Only triangular and line primitives are supported" );
 
 					}
 
