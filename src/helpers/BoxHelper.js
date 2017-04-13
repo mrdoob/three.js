@@ -45,8 +45,6 @@ BoxHelper.prototype.update = ( function () {
 
 		}
 
-		this.object.updateMatrixWorld( true );
-
 		box.setFromObject( this.object );
 
 		if ( box.isEmpty() ) return;
