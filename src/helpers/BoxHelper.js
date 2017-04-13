@@ -84,8 +84,6 @@ BoxHelper.prototype.update = ( function () {
 
 		this.geometry.computeBoundingSphere();
 
-		return this;
-
 	};
 
 } )();
