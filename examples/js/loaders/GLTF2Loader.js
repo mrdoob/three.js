@@ -1696,11 +1696,13 @@ THREE.GLTF2Loader = ( function () {
 
 					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
+					var geometry;
+
 					var meshNode;
 
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1750,12 +1752,6 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						if ( geometry.attributes.color !== undefined ) {
-
-							material.vertexColors = THREE.VertexColors;
-
-						}
-
 						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
@@ -1767,7 +1763,7 @@ THREE.GLTF2Loader = ( function () {
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1810,6 +1806,13 @@ THREE.GLTF2Loader = ( function () {
 					} else {
 
 						throw new Error( "Only triangular and line primitives are supported" );
+
+					}
+
+					if ( geometry.attributes.color !== undefined ) {
+
+						material.vertexColors = THREE.VertexColors;
+						material.needsUpdate = true;
 
 					}
 
