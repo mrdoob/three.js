@@ -1750,6 +1750,12 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
+						if ( geometry.attributes.color !== undefined ) {
+
+							material.vertexColors = THREE.VertexColors;
+
+						}
+
 						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
