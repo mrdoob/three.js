@@ -6,9 +6,12 @@ import { BufferGeometry } from '../core/BufferGeometry';
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / http://github.com/Mugen87
  */
 
 function BoxHelper( object, color ) {
+
+	this.object = object;
 
 	if ( color === undefined ) color = 0xffff00;
 
@@ -21,11 +24,9 @@ function BoxHelper( object, color ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
 
-	if ( object !== undefined ) {
+	this.matrixAutoUpdate = false;
 
-		this.update( object );
-
-	}
+	this.update();
 
 }
 
@@ -38,15 +39,15 @@ BoxHelper.prototype.update = ( function () {
 
 	return function update( object ) {
 
-		if ( object && object.isBox3 ) {
+		if ( object !== undefined ) {
 
-			box.copy( object );
-
-		} else {
-
-			box.setFromObject( object );
+			console.warn( 'THREE.BoxHelper: .update() has no longer arguments.' );
 
 		}
+
+		this.object.updateMatrixWorld( true );
+
+		box.setFromObject( this.object );
 
 		if ( box.isEmpty() ) return;
 
@@ -83,7 +84,7 @@ BoxHelper.prototype.update = ( function () {
 
 		position.needsUpdate = true;
 
-		this.geometry.computeBoundingSphere();
+		return this;
 
 	};
 
