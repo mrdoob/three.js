@@ -1696,9 +1696,15 @@ THREE.GLTF2Loader = ( function () {
 
 					var primitive = primitives[ name ];
 
+					var material = primitive.material !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
+
+					var geometry;
+
+					var meshNode;
+
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1763,19 +1769,12 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						var material = dependencies.materials !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
-
-						var meshNode = new THREE.Mesh( geometry, material );
+						meshNode = new THREE.Mesh( geometry, material );
 						meshNode.castShadow = true;
-						meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-						if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-						group.add( meshNode );
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-						var geometry = new THREE.BufferGeometry();
+						geometry = new THREE.BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1803,10 +1802,6 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						var material = dependencies.materials[ primitive.material ];
-
-						var meshNode;
-
 						if ( primitive.indices !== undefined ) {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
@@ -1819,17 +1814,24 @@ THREE.GLTF2Loader = ( function () {
 
 						}
 
-						meshNode.name = ( name === "0" ? group.name : group.name + name );
-
-						if ( primitive.extras ) meshNode.userData = primitive.extras;
-
-						group.add( meshNode );
-
 					} else {
 
-						console.warn( "Only triangular and line primitives are supported" );
+						throw new Error( "Only triangular and line primitives are supported" );
 
 					}
+
+					if ( geometry.attributes.color !== undefined ) {
+
+						material.vertexColors = THREE.VertexColors;
+						material.needsUpdate = true;
+
+					}
+
+					meshNode.name = ( name === "0" ? group.name : group.name + name );
+
+					if ( primitive.extras ) meshNode.userData = primitive.extras;
+
+					group.add( meshNode );
 
 				}
 
