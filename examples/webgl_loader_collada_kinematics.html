@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - collada</title>
+		<title>three.js webgl - collada - kinematics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background:#777;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
 			}
 
 			#info {
-				color: #fff;
 				position: absolute;
-				top: 10px;
+				top: 0px;
 				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
 			}
 
-			a { color: skyblue }
+			a {
+				color: #ffffff;
+			}
 		</style>
 	</head>
 	<body>
@@ -93,23 +96,8 @@
 
 				// Grid
 
-				var size = 14, step = 1;
-
-				var geometry = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
-
-				}
-
-				var line = new THREE.LineSegments( geometry, material );
-				scene.add( line );
+				var grid = new THREE.GridHelper( 20, 20 );
+				scene.add( grid );
 
 				// Add the COLLADA
 
