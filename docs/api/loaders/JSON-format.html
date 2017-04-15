@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+
+		<style>
+			.headline {
+				cursor:pointer;
+			}
+			.detailsSection {
+				display: none;
+			}
+			#structure {
+				width: 50em;
+				background: #f9f9f9;
+				padding: 20px;
+				padding-bottom: 40px;
+			}
+			.expandButton,
+			.collapseButton {
+				float: right;
+				margin-left: 20px;
+				padding: 2px 5px;
+				background: grey;
+				color: white;
+				cursor: pointer;"
+			}
+		</style>
+
+		<script>
+
+			document.addEventListener( 'DOMContentLoaded', function( ) {
+
+				var headlines = document.querySelectorAll('.headline');
+				var detailsSections = document.querySelectorAll('.detailsSection');
+				var triangles = document.querySelectorAll('.triangle');
+				var expandButtons = document.querySelectorAll('.expandButton');
+				var collapseButtons = document.querySelectorAll('.collapseButton');
+
+				for (var i = 0; i < collapseButtons.length; i++) {
+
+					collapseButtons[i].onclick = function() {
+						for (var j = 0; j < detailsSections.length; j++) {
+
+							triangles[j].innerHTML = '&#9658;';
+							detailsSections[j].style.display = 'none';
+
+						}
+
+					};
+
+				};
+
+				for (var i = 0; i < expandButtons.length; i++) {
+
+					expandButtons[i].onclick = function() {
+
+						for (var j = 0; j < detailsSections.length; j++) {
+
+							triangles[j].innerHTML = '&#9660;';
+							detailsSections[j].style.display = 'block';
+
+						}
+
+					};
+
+				};
+
+				for (var i = 0; i < headlines.length; i++) {
+
+					headlines[i].onclick = function (event) {
+
+						var header = event.target;
+						var triangle = header.firstElementChild;
+						var detailsSection = header.nextElementSibling;
+
+						if (detailsSection.style.display === 'block') {
+
+							triangle.innerHTML = '&#9658;'
+							detailsSection.style.display = 'none';
+
+						} else {
+
+							triangle.innerHTML = '&#9660;'
+							detailsSection.style.display = 'block';
+
+						}
+
+					};
+
+				};
+
+			});
+
+		</script>
+
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Beschreibung<br /><br />
+		</div>
+
+
+<div id="structure">
+
+	<span class="collapseButton">collapse all</span>
+	<span class="expandButton">expand all</span>
+
+<pre>
+{
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> metadata: {
+</pre>
+<pre class="detailsSection">
+		type
+</pre>
+<pre>
+	},
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> object: {
+</pre>
+<pre class="detailsSection">
+		children: [
+			{
+				uuid,
+				type,
+				geometry <i>(uuid)</i>,
+				material <i>(uuid)</i>,
+				....,
+				children: [
+					{
+						uuid,
+						type,
+						geometry <i>(uuid)</i>,
+						material <i>(uuid)</i>,
+						....
+						children: [
+							{
+							...
+							}
+						]
+					}
+				]
+			}
+		],
+		uuid,
+		type,
+		geometry <i>(uuid)</i>,
+		material <i>(uuid)</i>,
+		matrix,
+		position,
+		rotation,
+		quaternion,
+		scale,
+		visible,
+		castShadow,
+		receiveShadow,
+		userData,
+		background,
+		fog: {
+			type,
+			color,
+			near,
+			far,
+			density
+		},
+		fov,
+		aspect,
+		near,
+		far,
+		focus,
+		zoom,
+		filmGauge,
+		filmOffset,
+		view,
+		left,
+		right,
+		top,
+		bottom,
+		color,
+		intensity,
+		distance,
+		decay,
+		width,
+		height,
+		angle,
+		penumbra,
+		groundColor,
+		shadow: {
+			bias,
+			radius,
+			mapSize,
+			camera
+		},
+		mode
+		levels
+</pre>
+<pre>
+	},
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> geometries: [
+</pre>
+<pre class="detailsSection">
+		{
+			uuid,
+			type,
+			data: {
+				name,
+				index: {
+					type,
+					array
+				},
+				attributes: {
+					...: {
+						type,
+						array,
+						itemSize,
+						normalized
+					},
+					...
+				},
+				groups: [
+					{
+						start,
+						count,
+						materialIndex
+					},
+					...
+				],
+				boundingSphere: {
+					center,
+					radius
+				},
+				metadata: {
+					type
+				}
+				materials: [
+					{
+						DbgName,
+						blending,
+						colorDiffuse,
+						colorSpecular,
+						colorEmissive,
+						specularCoef,
+						shading,
+						flipSided,
+						doubleSided,
+						transparency,
+						depthTest,
+						depthWrite,
+						colorWrite,
+						opacity,
+						reflectivity,
+						transparent,
+						visible,
+						wireframe,
+						vertexColors,
+						mapDiffuse, (path)
+						mapDiffuseRepeat,
+						mapDiffuseOffset,
+						mapDiffuseWrap,
+						mapDiffuseAnisotropy,
+						mapEmissive, (path)
+						mapEmissiveRepeat,
+						mapEmissiveOffset,
+						mapEmissiveWrap,
+						mapEmissiveAnisotropy,
+						mapLight, (path)
+						mapLightRepeat,
+						mapLightOffset,
+						mapLightWrap,
+						mapLightAnisotropy,
+						mapAO, (path)
+						mapAORepeat,
+						mapAOOffset,
+						mapAOWrap,
+						mapAOAnisotropy,
+						mapBump, (path)
+						mapBumpScale,
+						mapBumpRepeat,
+						mapBumpOffset,
+						mapBumpWrap,
+						mapBumpAnisotropy,
+						mapNormal, (path)
+						mapNormalFactor,
+						mapNormalRepeat,
+						mapNormalOffset,
+						mapNormalWrap,
+						mapNormalAnisotropy,
+						mapSpecular, (path)
+						mapSpecularRepeat,
+						mapSpecularOffset,
+						mapSpecularWrap,
+						mapSpecularAnisotropy,
+						mapMetalness, (path)
+						mapMetalnessRepeat,
+						mapMetalnessOffset,
+						mapMetalnessWrap,
+						mapMetalnessAnisotropy,
+						mapRoughness, (path)
+						mapRoughnessRepeat,
+						mapRoughnessOffset,
+						mapRoughnessWrap,
+						mapRoughnessAnisotropy,
+						mapAlpha, (path)
+						mapAlphaRepeat,
+						mapAlphaOffset,
+						mapAlphaWrap,
+						mapAlphaAnisotropy
+					},
+					...
+				],
+				scale,
+				vertices,
+				colors,
+				uvs: [
+					[...],
+				...
+				],
+				normals,
+				faces,
+				skinWeights,
+				skinIndices,
+				influencesPerVertex,
+				bones: [
+					{
+						name,
+						parent,
+						pos,
+						scl,
+						rotq,
+					},
+					...
+				],
+				animation: {
+					name,
+					length,
+					fps,
+					hierarchy: {
+						parent,
+						keys: {
+							time,
+							pos,
+							scl,
+							rot
+						},
+					},
+				},
+				animations: [
+					{
+						name,
+						length,
+						fps,
+						hierarchy: {
+							parent,
+							keys: {
+								time,
+								pos,
+								scl,
+								rot
+							},
+						},
+					},
+					...
+				],
+				morphTargets: [
+					{
+						name,
+						vertices
+					},
+					...
+				],
+			},
+			width,
+			height,
+			widthSegments,
+			heightSegments,
+			depth,
+			depthSegments,
+			radius,
+			segments,
+			thetaStart,
+			thetaLength,
+			radiusTop,
+			radiusBottom,
+			radialSegments,
+			openEnded,
+			phiStart,
+			phiLength,
+			detail,
+			innerRadius,
+			outerRadius,
+			phiSegments,
+			tube,
+			tubularSegments,
+			p,
+			q,
+			points
+		},
+		...,
+</pre>
+<pre>
+	],
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> materials: [
+</pre>
+<pre class="detailsSection">
+		{
+			type,
+			uuid,
+			name,
+			color,
+			roughness,
+			metalness,
+			emissive,
+			specular,
+			shininess,
+			clearCoat,
+			clearCoatRoughness,
+			uniforms,
+			vertexShader,
+			fragmentShader,
+			vertexColors,
+			fog,
+			shading,
+			blending,
+			side,
+			opacity,
+			transparent,
+			alphaTest,
+			depthTest,
+			depthWrite,
+			colorWrite,
+			wireframe,
+			wireframeLinewidth,
+			wireframeLinecap,
+			wireframeLinejoin,
+			skinning,
+			morphTargets,
+			size,
+			sizeAttenuation,
+			map <i>(uuid)</i>,
+			alphaMap <i>(uuid)</i>,
+			bumpMap <i>(uuid)</i>,
+			bumpScale,
+			normalMap <i>(uuid)</i>,
+			normalScale,
+			displacementMap <i>(uuid)</i>,
+			displacementScale,
+			displacementBias,
+			roughnessMap <i>(uuid)</i>,
+			metalnessMap <i>(uuid)</i>,
+			emissiveMap <i>(uuid)</i>,
+			emissiveIntensity,
+			specularMap <i>(uuid)</i>,
+			envMap <i>(uuid)</i>,
+			reflectivity,
+			lightMap <i>(uuid)</i>,
+			lightMapIntensity,
+			aoMap <i>(uuid)</i>,
+			aoMapIntensity,
+			gradientMap <i>(uuid)</i>,
+			materials
+		},
+		...,
+</pre>
+<pre>
+	],
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> textures: [
+</pre>
+<pre class="detailsSection">
+		{
+			uuid,
+			image <i>(uuid)</i>,
+			name,
+			repeat,
+			offset,
+			wrap,
+			anisotropy,
+			mapping,
+			minFilter,
+			magFilter,
+			flipY
+		},
+		...,
+</pre>
+<pre>
+	],
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> images: [
+</pre>
+<pre class="detailsSection">
+		{
+			uuid,
+			name,
+			url
+		},
+		...,
+</pre>
+<pre>
+	],
+</pre>
+<pre class="headline">
+	<span class="triangle">&#9658;</span> animations: [
+</pre>
+<pre class="detailsSection">
+		{
+			name,
+			tracks,
+			fps
+		},
+		...,
+</pre>
+<pre>
+	]
+
+}
+</pre>
+
+	<span class="collapseButton">collapse all</span>
+	<span class="expandButton">expand all</span>
+
+</div>
+
+
+
+
+
+
+
+	</body>
+</html>
