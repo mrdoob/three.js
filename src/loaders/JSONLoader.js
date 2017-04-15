@@ -50,7 +50,7 @@ Object.assign( JSONLoader.prototype, {
 
 				if ( type !== undefined ) {
 
-					if ( type.toLowerCase() !== 'geometry' ) {
+					if ( type.toLowerCase() === 'object' || type.toLowerCase() === 'scene' ) {
 
 						console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
 						return;
