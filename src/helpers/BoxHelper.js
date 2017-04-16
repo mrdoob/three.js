@@ -97,6 +97,8 @@ BoxHelper.prototype.setFromObject = function ( object ) {
 	this.object = object;
 	this.update();
 
+	return this;
+
 };
 
 
