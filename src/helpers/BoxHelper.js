@@ -45,7 +45,11 @@ BoxHelper.prototype.update = ( function () {
 
 		}
 
-		box.setFromObject( this.object );
+		if ( this.object !== undefined ) {
+
+			box.setFromObject( this.object );
+
+		}
 
 		if ( box.isEmpty() ) return;
 
@@ -87,6 +91,13 @@ BoxHelper.prototype.update = ( function () {
 	};
 
 } )();
+
+BoxHelper.prototype.setFromObject = function ( object ) {
+
+	this.object = object;
+	this.update();
+
+};
 
 
 export { BoxHelper };
