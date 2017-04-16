@@ -69,14 +69,14 @@ var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-drawCount = 2; // draw the first 2 points, only
+var drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
 var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
 
 // line
-line = new THREE.Line( geometry,  material );
+var line = new THREE.Line( geometry,  material );
 scene.add( line );
 				</code>
 			 	<p>
@@ -85,7 +85,8 @@ scene.add( line );
 				<code>
 var positions = line.geometry.attributes.position.array;
 
-var x = y = z = index = 0;
+var x, y, z, index;
+x = y = z = index = 0;
 
 for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
