@@ -245,11 +245,3 @@ select {
 	.Outliner .option.active {
 		background-color: rgba(21,60,94,1);
 	}
-
-.Panel.Collapsible.collapsed .Static .Button {
-	border-left-color: #444;
-}
-
-.Panel.Collapsible:not(.collapsed) .Static .Button {
-	border-top-color: #444;
-}
