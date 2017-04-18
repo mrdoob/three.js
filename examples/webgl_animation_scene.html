@@ -100,7 +100,7 @@
 				// Ground plane and fog: examples for applying additional children and new property values to the loaded scene
 
 				var geometry = new THREE.PlaneBufferGeometry( 20000, 20000 );
-				var material = new THREE.MeshStandardMaterial( { roughness: 1 } );
+				var material = new THREE.MeshPhongMaterial( { shininess: 0.1 } );
 				var ground = new THREE.Mesh( geometry, material );
 
 				ground.position.set( 0, - 250, 0 );
