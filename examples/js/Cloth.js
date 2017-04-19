@@ -90,6 +90,7 @@ Particle.prototype.integrate = function( timesq ) {
 	newPos.multiplyScalar( DRAG ).add( this.position );
 	newPos.add( this.a.multiplyScalar( timesq ) );
 
+	this.tmp = this.previous;
 	this.previous = this.position;
 	this.position = newPos;
 
