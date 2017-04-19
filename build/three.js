@@ -9166,6 +9166,10 @@
 				}
 
 				var shadowCamera = shadow.camera;
+				var shadowMatrix = shadow.matrix;
+
+				_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+				shadowCamera.position.copy( _lightPositionWorld );
 
 				_shadowMapSize.copy( shadow.mapSize );
 				_shadowMapSize.min( _maxShadowMapSize );
@@ -9207,10 +9211,33 @@
 					_shadowMapSize.x *= 4.0;
 					_shadowMapSize.y *= 2.0;
 
+
+					// for point lights we set the shadow matrix to be a translation-only matrix
+					// equal to inverse of the light's position
+
+					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
 				} else {
 
 					faceCount = 1;
 					isPointLight = false;
+
+					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+					shadowCamera.lookAt( _lookTarget );
+					shadowCamera.updateMatrixWorld();
+					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+					// compute shadow matrix
+
+					shadowMatrix.set(
+						0.5, 0.0, 0.0, 0.5,
+						0.0, 0.5, 0.0, 0.5,
+						0.0, 0.0, 0.5, 0.5,
+						0.0, 0.0, 0.0, 1.0
+					);
+
+					shadowMatrix.multiply( shadowCamera.projectionMatrix );
+					shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
 
 				}
 
@@ -9232,10 +9259,6 @@
 				}
 
 				var shadowMap = shadow.map;
-				var shadowMatrix = shadow.matrix;
-
-				_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-				shadowCamera.position.copy( _lightPositionWorld );
 
 				_renderer.setRenderTarget( shadowMap );
 				_renderer.clear();
@@ -9251,31 +9274,13 @@
 						_lookTarget.add( cubeDirections[ face ] );
 						shadowCamera.up.copy( cubeUps[ face ] );
 						shadowCamera.lookAt( _lookTarget );
+						shadowCamera.updateMatrixWorld();
+						shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 						var vpDimensions = cube2DViewPorts[ face ];
 						_state.viewport( vpDimensions );
 
-					} else {
-
-						_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-						shadowCamera.lookAt( _lookTarget );
-
 					}
-
-					shadowCamera.updateMatrixWorld();
-					shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
-
-					// compute shadow matrix
-
-					shadowMatrix.set(
-						0.5, 0.0, 0.0, 0.5,
-						0.0, 0.5, 0.0, 0.5,
-						0.0, 0.0, 0.5, 0.5,
-						0.0, 0.0, 0.0, 1.0
-					);
-
-					shadowMatrix.multiply( shadowCamera.projectionMatrix );
-					shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
 
 					// update camera matrices and frustum
 
@@ -21129,42 +21134,27 @@
 
 			if ( ! object.visible ) return;
 
-			if ( object.isLight ) {
+			var visible = object.layers.test( camera.layers );
 
-				lights.push( object );
+			if ( visible ) {
 
-			} else if ( object.isSprite ) {
+				if ( object.isLight ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+					lights.push( object );
 
-					sprites.push( object );
+				} else if ( object.isSprite ) {
 
-				}
+					if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-			} else if ( object.isLensFlare ) {
+						sprites.push( object );
 
-				lensFlares.push( object );
+					}
 
-			} else if ( object.isImmediateRenderObject ) {
+				} else if ( object.isLensFlare ) {
 
-				if ( sortObjects ) {
+					lensFlares.push( object );
 
-					_vector3.setFromMatrixPosition( object.matrixWorld )
-						.applyMatrix4( _projScreenMatrix );
-
-				}
-
-				currentRenderList.push( object, null, object.material, _vector3.z, null );
-
-			} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				if ( object.isSkinnedMesh ) {
-
-					object.skeleton.update();
-
-				}
-
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				} else if ( object.isImmediateRenderObject ) {
 
 					if ( sortObjects ) {
 
@@ -21173,29 +21163,50 @@
 
 					}
 
-					var geometry = objects.update( object );
-					var material = object.material;
+					currentRenderList.push( object, null, object.material, _vector3.z, null );
 
-					if ( Array.isArray( material ) ) {
+				} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-						var groups = geometry.groups;
+					if ( object.isSkinnedMesh ) {
 
-						for ( var i = 0, l = groups.length; i < l; i ++ ) {
+						object.skeleton.update();
 
-							var group = groups[ i ];
-							var groupMaterial = material[ group.materialIndex ];
+					}
 
-							if ( groupMaterial && groupMaterial.visible ) {
+					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+						if ( sortObjects ) {
 
-							}
+							_vector3.setFromMatrixPosition( object.matrixWorld )
+								.applyMatrix4( _projScreenMatrix );
 
 						}
 
-					} else if ( material.visible ) {
+						var geometry = objects.update( object );
+						var material = object.material;
 
-						currentRenderList.push( object, geometry, material, _vector3.z, null );
+						if ( Array.isArray( material ) ) {
+
+							var groups = geometry.groups;
+
+							for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+								var group = groups[ i ];
+								var groupMaterial = material[ group.materialIndex ];
+
+								if ( groupMaterial && groupMaterial.visible ) {
+
+									currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+
+								}
+
+							}
+
+						} else if ( material.visible ) {
+
+							currentRenderList.push( object, geometry, material, _vector3.z, null );
+
+						}
 
 					}
 
@@ -21262,8 +21273,6 @@
 		}
 
 		function renderObject( object, scene, camera, geometry, material, group ) {
-
-			if ( object.layers.test( camera.layers ) === false ) return;
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -22241,18 +22250,7 @@
 					}
 
 					_lights.pointShadowMap[ pointLength ] = shadowMap;
-
-					if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
-
-						_lights.pointShadowMatrix[ pointLength ] = new Matrix4();
-
-					}
-
-					// for point lights we set the shadow matrix to be a translation-only matrix
-					// equal to inverse of the light's position
-					_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-					_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
-
+					_lights.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 					_lights.point[ pointLength ] = uniforms;
 
 					pointLength ++;
