@@ -174,6 +174,17 @@ THREE.VRController = function( gamepad ){
 			}
 		})
 	}
+	this.getButton = function( buttonNameOrIndex ){
+		
+		if( typeof buttonNameOrIndex === 'number' ) return buttons[ buttonNameOrIndex ]
+		else if( typeof buttonNameOrIndex === 'string' ){
+
+			return buttons.find( function( button ){
+			
+				return button.name === buttonNameOrIndex
+			})
+		}
+	}
 	this.getButtonState = function( buttonName ){
 
 		return buttons.find( function( button ){
