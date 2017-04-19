@@ -60,7 +60,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.update( object );
+			selectionBox.setFromObject( object );
 
 			if ( editor.helpers[ object.id ] !== undefined ) {
 
@@ -385,7 +385,7 @@ var Viewport = function ( editor ) {
 
 			if ( box.isEmpty() === false ) {
 
-				selectionBox.update( box );
+				selectionBox.setFromObject( object );
 				selectionBox.visible = true;
 
 			}
@@ -408,7 +408,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.update( object );
+			selectionBox.setFromObject( object );
 
 		}
 
@@ -430,7 +430,7 @@ var Viewport = function ( editor ) {
 
 		if ( editor.selected === object ) {
 
-			selectionBox.update( object );
+			selectionBox.setFromObject( object );
 			transformControls.update();
 
 		}
