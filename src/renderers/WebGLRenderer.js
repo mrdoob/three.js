@@ -2416,18 +2416,7 @@ function WebGLRenderer( parameters ) {
 				}
 
 				_lights.pointShadowMap[ pointLength ] = shadowMap;
-
-				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
-
-					_lights.pointShadowMatrix[ pointLength ] = new Matrix4();
-
-				}
-
-				// for point lights we set the shadow matrix to be a translation-only matrix
-				// equal to inverse of the light's position
-				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
-
+				_lights.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 				_lights.point[ pointLength ] = uniforms;
 
 				pointLength ++;
