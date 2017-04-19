@@ -39,6 +39,7 @@
 	<script src="../build/three.js"></script>
 	<script src="./js/controls/TrackballControls.js"></script>
 	<script src="./js/libs/dat.gui.min.js"></script>
+	<script src="./js/libs/stats.min.js"></script>
 	<script src="./js/GPUParticleSystem.js"></script>
 
 	<script>
@@ -109,6 +110,11 @@
 
 			//
 
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			//
+
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -166,6 +172,7 @@
 			particleSystem.update( tick );
 
 			render();
+			stats.update();
 
 		}
 
