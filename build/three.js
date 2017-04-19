@@ -41305,9 +41305,12 @@
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
+	 * @author Mugen87 / http://github.com/Mugen87
 	 */
 
 	function BoxHelper( object, color ) {
+
+		this.object = object;
 
 		if ( color === undefined ) color = 0xffff00;
 
@@ -41320,11 +41323,9 @@
 
 		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
 
-		if ( object !== undefined ) {
+		this.matrixAutoUpdate = false;
 
-			this.update( object );
-
-		}
+		this.update();
 
 	}
 
@@ -41337,13 +41338,15 @@
 
 		return function update( object ) {
 
-			if ( object && object.isBox3 ) {
+			if ( object !== undefined ) {
 
-				box.copy( object );
+				console.warn( 'THREE.BoxHelper: .update() has no longer arguments.' );
 
-			} else {
+			}
 
-				box.setFromObject( object );
+			if ( this.object !== undefined ) {
+
+				box.setFromObject( this.object );
 
 			}
 
@@ -41387,6 +41390,15 @@
 		};
 
 	} )();
+
+	BoxHelper.prototype.setFromObject = function ( object ) {
+
+		this.object = object;
+		this.update();
+
+		return this;
+
+	};
 
 	/**
 	 * @author WestLangley / http://github.com/WestLangley
