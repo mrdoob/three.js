@@ -6,18 +6,18 @@
 'use strict';
 
 if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
-THREE.OBJLoader2.version = '1.1.0';
+THREE.OBJLoader2.version = '1.2.1';
 
 /**
  * Use this class to load OBJ data from files or to parse OBJ data from arraybuffer or text
  * @class
  *
- * @param {THREE.DefaultLoadingManager} [manager] Extension of {@link THREE.DefaultLoadingManager}
+ * @param {THREE.DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link THREE.DefaultLoadingManager}
  */
 THREE.OBJLoader2 = (function () {
 
 	function OBJLoader2( manager ) {
-		this.manager = ( manager == null ) ? THREE.DefaultLoadingManager : manager;
+		this.manager = ! Boolean( manager ) ? THREE.DefaultLoadingManager : manager;
 
 		this.path = '';
 		this.fileLoader = new THREE.FileLoader( this.manager );
@@ -29,17 +29,17 @@ THREE.OBJLoader2 = (function () {
 	}
 
 	/**
-	 * Base path to use
+	 * Base path to use.
 	 * @memberOf THREE.OBJLoader2
 	 *
 	 * @param {string} path The basepath
 	 */
 	OBJLoader2.prototype.setPath = function ( path ) {
-		this.path = ( path == null ) ? this.path : path;
+		this.path = Boolean( path ) ? path : this.path;
 	};
 
 	/**
-	 * Set the node where the loaded objects will be attached
+	 * Set the node where the loaded objects will be attached.
 	 * @memberOf THREE.OBJLoader2
 	 *
 	 * @param {THREE.Object3D} sceneGraphBaseNode Scenegraph object where meshes will be attached
@@ -49,21 +49,21 @@ THREE.OBJLoader2 = (function () {
 	};
 
 	/**
-	 * Set materials loaded by MTLLoader
+	 * Set materials loaded by MTLLoader or any other supplier of an Array of {@link THREE.Material}.
 	 * @memberOf THREE.OBJLoader2
 	 *
-	 * @param {THREE.MTLLoader.MaterialCreator.materials[]} materials {@link THREE.MTLLoader.MaterialCreator.materials}
+	 * @param {THREE.Material[]} materials  Array of {@link THREE.Material} from MTLLoader
 	 */
 	OBJLoader2.prototype.setMaterials = function ( materials ) {
 		this.meshCreator.setMaterials( materials );
 	};
 
 	/**
-	 * Allows to set debug mode for the parser and the meshCreator
+	 * Allows to set debug mode for the parser and the meshCreator.
 	 * @memberOf THREE.OBJLoader2
 	 *
-	 * @param {boolean} parserDebug {@link Parser} will produce debug output
-	 * @param {boolean} meshCreatorDebug {@link THREE.OBJLoader2.MeshCreator} will produce debug output
+	 * @param {boolean} parserDebug Internal Parser will produce debug output
+	 * @param {boolean} meshCreatorDebug Internal MeshCreator will produce debug output
 	 */
 	OBJLoader2.prototype.setDebug = function ( parserDebug, meshCreatorDebug ) {
 		this.parser.setDebug( parserDebug );
@@ -76,20 +76,20 @@ THREE.OBJLoader2 = (function () {
 	 *
 	 * @param {string} url URL of the file to load
 	 * @param {callback} onLoad Called after loading was successfully completed
-	 * @param {callback} onProgress Called to report progress of loading
+	 * @param {callback} onProgress Called to report progress of loading. The argument will be the XmlHttpRequest instance, that contain {integer total} and {integer loaded} bytes.
 	 * @param {callback} onError Called after an error occurred during loading
 	 * @param {boolean} [useArrayBuffer=true] Set this to false to force string based parsing
 	 */
 	OBJLoader2.prototype.load = function ( url, onLoad, onProgress, onError, useArrayBuffer ) {
 		this._validate();
 		this.fileLoader.setPath( this.path );
-		this.fileLoader.setResponseType( ( useArrayBuffer || useArrayBuffer == null ) ? 'arraybuffer' : 'text' );
+		this.fileLoader.setResponseType( ( useArrayBuffer || useArrayBuffer === null || useArrayBuffer === undefined ) ? 'arraybuffer' : 'text' );
 
 		var scope = this;
 		scope.fileLoader.load( url, function ( content ) {
 
 			// only use parseText if useArrayBuffer is explicitly set to false
-			onLoad( ( useArrayBuffer || useArrayBuffer == null ) ? scope.parse( content ) : scope.parseText( content ) );
+			onLoad( ( useArrayBuffer || useArrayBuffer === null || useArrayBuffer === undefined ) ? scope.parse( content ) : scope.parseText( content ) );
 
 		}, onProgress, onError );
 	};
@@ -147,8 +147,7 @@ THREE.OBJLoader2 = (function () {
 	OBJLoader2.prototype._validate = function () {
 		if ( this.validated ) return;
 
-		this.fileLoader = ( this.fileLoader == null ) ? new THREE.FileLoader( this.manager ) : this.fileLoader;
-		this.setPath();
+		this.fileLoader = Boolean( this.fileLoader ) ? this.fileLoader : new THREE.FileLoader( this.manager );
 		this.parser.validate();
 		this.meshCreator.validate();
 
@@ -221,7 +220,7 @@ THREE.OBJLoader2 = (function () {
 		}
 
 		Parser.prototype.setDebug = function ( debug ) {
-			this.debug = ( debug == null ) ? this.debug : debug;
+			this.debug = Boolean( debug ) ? debug : this.debug;
 		};
 
 		Parser.prototype.validate = function () {
@@ -487,9 +486,9 @@ THREE.OBJLoader2 = (function () {
 			this.uvs = [];
 
 			// faces are stored according combined index of group, material and smoothingGroup (0 or not)
-			this.mtllibName = ( mtllibName != null ) ? mtllibName : 'none';
-			this.objectName = ( objectName != null ) ? objectName : 'none';
-			this.groupName = ( groupName != null ) ? groupName : 'none';
+			this.mtllibName = Boolean( mtllibName ) ? mtllibName : 'none';
+			this.objectName = Boolean( objectName ) ? objectName : 'none';
+			this.groupName = Boolean( groupName ) ? groupName : 'none';
 			this.activeMtlName = 'none';
 			this.activeSmoothingGroup = 1;
 
@@ -563,7 +562,7 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.pushUsemtl = function ( mtlName ) {
-			if ( this.activeMtlName === mtlName || mtlName == null ) return;
+			if ( this.activeMtlName === mtlName || mtlName === null || mtlName === undefined ) return;
 			this.activeMtlName = mtlName;
 			this.mtlCount++;
 
@@ -581,16 +580,11 @@ THREE.OBJLoader2 = (function () {
 
 		RawObject.prototype.verifyIndex = function () {
 			var index = this.buildIndex( this.activeMtlName, ( this.activeSmoothingGroup === 0 ) ? 0 : 1 );
-			if ( this.rawObjectDescriptions[ index ] == null ) {
+			this.rawObjectDescriptionInUse = this.rawObjectDescriptions[ index ];
+			if ( ! Boolean( this.rawObjectDescriptionInUse ) ) {
 
-				this.rawObjectDescriptionInUse = this.rawObjectDescriptions[ index ] =
-					new RawObjectDescription(
-						this.objectName, this.groupName, this.activeMtlName, this.activeSmoothingGroup
-					);
-
-			} else {
-
-				this.rawObjectDescriptionInUse = this.rawObjectDescriptions[ index ];
+				this.rawObjectDescriptionInUse = new RawObjectDescription( this.objectName, this.groupName, this.activeMtlName, this.activeSmoothingGroup );
+				this.rawObjectDescriptions[ index ] = this.rawObjectDescriptionInUse;
 
 			}
 		};
@@ -815,15 +809,15 @@ THREE.OBJLoader2 = (function () {
 		}
 
 		MeshCreator.prototype.setSceneGraphBaseNode = function ( sceneGraphBaseNode ) {
-			this.sceneGraphBaseNode = ( sceneGraphBaseNode == null ) ? ( this.sceneGraphBaseNode == null ? new THREE.Group() : this.sceneGraphBaseNode ) : sceneGraphBaseNode;
+			this.sceneGraphBaseNode = Boolean( sceneGraphBaseNode ) ? sceneGraphBaseNode : ( Boolean( this.sceneGraphBaseNode ) ? this.sceneGraphBaseNode : new THREE.Group() );
 		};
 
 		MeshCreator.prototype.setMaterials = function ( materials ) {
-			this.materials = ( materials == null ) ? ( this.materials == null ? { materials: [] } : this.materials ) : materials;
+			this.materials = Boolean( materials ) ? materials : ( Boolean( this.materials ) ? this.materials : { materials: [] } );
 		};
 
 		MeshCreator.prototype.setDebug = function ( debug ) {
-			this.debug = ( debug == null ) ? this.debug : debug;
+			this.debug = Boolean( debug ) ? debug : this.debug;
 		};
 
 		MeshCreator.prototype.validate = function () {

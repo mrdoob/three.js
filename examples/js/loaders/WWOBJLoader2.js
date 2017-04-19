@@ -6,7 +6,7 @@
 'use strict';
 
 if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
-THREE.OBJLoader2.version = '1.1.0';
+THREE.OBJLoader2.version = '1.2.1';
 
 /**
  * OBJ data will be loaded by dynamically created web worker.
@@ -39,17 +39,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		this.running = false;
 		this.requestTerminate = false;
 
-		this.callbacks = {
-			progress: null,
-			completedLoading: null,
-			errorWhileLoading: null,
-			materialsLoaded: null,
-			meshLoaded: null,
-			director: {
-				completedLoading: null,
-				errorWhileLoading: null
-			}
-		};
+		this.clearAllCallbacks();
 
 		this.manager = THREE.DefaultLoadingManager;
 		this.fileLoader = new THREE.FileLoader( this.manager );
@@ -70,10 +60,10 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 	};
 
 	/**
-	 * Set enable or disable debug logging
+	 * Enable or disable debug logging.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
-	 * @param {boolean} enabled
+	 * @param {boolean} enabled True or false
 	 */
 	WWOBJLoader2.prototype.setDebug = function ( enabled ) {
 		this.debug = enabled;
@@ -90,68 +80,83 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 	};
 
 	/**
-	 * Register callback function that is invoked by internal function "_announceProgress" to print feedback
+	 * Register callback function that is invoked by internal function "_announceProgress" to print feedback.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
 	 * @param {callback} callbackProgress Callback function for described functionality
 	 */
 	WWOBJLoader2.prototype.registerCallbackProgress = function ( callbackProgress ) {
-		if ( callbackProgress != null ) this.callbacks.progress = callbackProgress;
+		if ( Boolean( callbackProgress ) ) this.callbacks.progress.push( callbackProgress );
 	};
 
 	/**
-	 * Register callback function that is called once loading of the complete model is completed
+	 * Register callback function that is called once loading of the complete model is completed.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
 	 * @param {callback} callbackCompletedLoading Callback function for described functionality
 	 */
 	WWOBJLoader2.prototype.registerCallbackCompletedLoading = function ( callbackCompletedLoading ) {
-		if ( callbackCompletedLoading != null ) this.callbacks.completedLoading = callbackCompletedLoading;
+		if ( Boolean( callbackCompletedLoading ) ) this.callbacks.completedLoading.push( callbackCompletedLoading );
 	};
 
 	/**
-	 * Register callback function that is called once materials have been loaded. It allows to alter and return materials
+	 * Register callback function that is called once materials have been loaded. It allows to alter and return materials.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
 	 * @param {callback} callbackMaterialsLoaded Callback function for described functionality
 	 */
 	WWOBJLoader2.prototype.registerCallbackMaterialsLoaded = function ( callbackMaterialsLoaded ) {
-		if ( callbackMaterialsLoaded != null ) this.callbacks.materialsLoaded = callbackMaterialsLoaded;
+		if ( Boolean( callbackMaterialsLoaded ) ) this.callbacks.materialsLoaded.push( callbackMaterialsLoaded );
 	};
 
 	/**
-	 * Register callback function that is called every time a mesh was loaded
+	 * Register callback function that is called every time a mesh was loaded.
+	 * Use {@link THREE.OBJLoader2.WWOBJLoader2.LoadedMeshUserOverride} for alteration instructions (geometry, material or disregard mesh).
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
 	 * @param {callback} callbackMeshLoaded Callback function for described functionality
 	 */
 	WWOBJLoader2.prototype.registerCallbackMeshLoaded = function ( callbackMeshLoaded ) {
-		if ( callbackMeshLoaded != null ) this.callbacks.meshLoaded = callbackMeshLoaded;
+		if ( Boolean( callbackMeshLoaded ) ) this.callbacks.meshLoaded.push( callbackMeshLoaded );
 	};
 
 	/**
-	 * Report if an error prevented loading
+	 * Register callback function that is called to report an error that prevented loading.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
 	 * @param {callback} callbackErrorWhileLoading Callback function for described functionality
 	 */
 	WWOBJLoader2.prototype.registerCallbackErrorWhileLoading = function ( callbackErrorWhileLoading ) {
-		if ( callbackErrorWhileLoading != null ) this.callbacks.errorWhileLoading = callbackErrorWhileLoading;
+		if ( Boolean( callbackErrorWhileLoading ) ) this.callbacks.errorWhileLoading.push( callbackErrorWhileLoading );
 	};
 
 	/**
-	 * Call requestTerminate to terminate the web worker and free local resource after execution
+	 * Clears all registered callbacks.
+	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
+	 */
+	WWOBJLoader2.prototype.clearAllCallbacks = function () {
+		this.callbacks = {
+			progress: [],
+			completedLoading: [],
+			errorWhileLoading: [],
+			materialsLoaded: [],
+			meshLoaded: []
+		};
+	};
+
+	/**
+	 * Call requestTerminate to terminate the web worker and free local resource after execution.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2
 	 *
-	 * @param {boolean} requestTerminate
+	 * @param {boolean} requestTerminate True or false
 	 */
 	WWOBJLoader2.prototype.setRequestTerminate = function ( requestTerminate ) {
-		this.requestTerminate = ( requestTerminate != null && requestTerminate ) ? true : false;
+		this.requestTerminate = Boolean( requestTerminate );
 	};
 
 	WWOBJLoader2.prototype._validate = function () {
 		if ( this.validated ) return;
-		if ( this.worker == null ) {
+		if ( ! Boolean( this.worker ) ) {
 
 			this._buildWebWorkerCode();
 			var blob = new Blob( [ this.workerCode ], { type: 'text/plain' } );
@@ -173,9 +178,9 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		this.running = true;
 		this.requestTerminate = false;
 
-		this.fileLoader = ( this.fileLoader == null ) ? new THREE.FileLoader( this.manager ) : this.fileLoader;
-		this.mtlLoader = ( this.mtlLoader == null ) ?  new THREE.MTLLoader() : this.mtlLoader;
-		if ( this.crossOrigin != null ) this.mtlLoader.setCrossOrigin( this.crossOrigin );
+		this.fileLoader = Boolean( this.fileLoader ) ? this.fileLoader : new THREE.FileLoader( this.manager );
+		this.mtlLoader = Boolean( this.mtlLoader ) ? this.mtlLoader : new THREE.MTLLoader();
+		if ( Boolean( this.crossOrigin ) ) this.mtlLoader.setCrossOrigin( this.crossOrigin );
 
 		this.dataAvailable = false;
 		this.fileObj = null;
@@ -253,7 +258,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		var processLoadedMaterials = function ( materialCreator ) {
 			var materialCreatorMaterials = [];
 			var materialNames = [];
-			if ( materialCreator != null ) {
+			if ( Boolean( materialCreator ) ) {
 
 				materialCreator.preload();
 				materialCreatorMaterials = materialCreator.materials;
@@ -274,13 +279,15 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				materialNames: materialNames
 			} );
 
-			if ( scope.callbacks.materialsLoaded != null ) {
+			var materialsFromCallback;
+			var callbackMaterialsLoaded;
+			for ( var index in scope.callbacks.materialsLoaded ) {
 
-				var materialsCallback = scope.callbacks.materialsLoaded( scope.materials );
-				if ( materialsCallback != null ) scope.materials = materialsCallback;
+				callbackMaterialsLoaded = scope.callbacks.materialsLoaded[ index ];
+				materialsFromCallback = callbackMaterialsLoaded( scope.materials );
+				if ( Boolean( materialsFromCallback ) ) scope.materials = materialsFromCallback;
 
 			}
-
 			if ( scope.dataAvailable && scope.objAsArrayBuffer ) {
 
 				scope.worker.postMessage({
@@ -337,17 +344,24 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		this.mtlLoader.setPath( this.pathTexture );
 		if ( this.dataAvailable ) {
 
-			processLoadedMaterials( ( this.mtlAsString != null ) ? this.mtlLoader.parse( this.mtlAsString ) : null );
+			processLoadedMaterials( Boolean( this.mtlAsString ) ? this.mtlLoader.parse( this.mtlAsString ) : null );
 
 		} else {
 
-			if ( this.fileMtl == null ) {
+			if ( Boolean( this.fileMtl ) ) {
 
-				processLoadedMaterials();
+				var onError = function ( event ) {
+					output = 'Error occurred while downloading "' + scope.fileMtl + '"';
+					console.error( output + ': ' + event );
+					scope._announceProgress( output );
+					scope._finalize( 'error' );
+				};
+
+				this.mtlLoader.load( this.fileMtl, processLoadedMaterials, undefined, onError );
 
 			} else {
 
-				this.mtlLoader.load( this.fileMtl, processLoadedMaterials );
+				processLoadedMaterials();
 
 			}
 
@@ -360,9 +374,10 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		switch ( payload.cmd ) {
 			case 'objData':
 
-				this.counter ++;
-				var bufferGeometry = new THREE.BufferGeometry();
+				this.counter++;
+				var meshName = payload.meshName;
 
+				var bufferGeometry = new THREE.BufferGeometry();
 				bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( payload.vertices ), 3 ) );
 				if ( payload.normals !== null ) {
 
@@ -386,7 +401,8 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				var createMultiMaterial = payload.multiMaterial;
 				var multiMaterials = [];
 
-				for ( var key in materialDescriptions ) {
+				var key;
+				for ( key in materialDescriptions ) {
 
 					materialDescription = materialDescriptions[ key ];
 					material = this.materials[ materialDescription.name ];
@@ -421,7 +437,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					material = multiMaterials;
 					var materialGroups = payload.materialGroups;
 					var materialGroup;
-					for ( var key in materialGroups ) {
+					for ( key in materialGroups ) {
 
 						materialGroup = materialGroups[ key ];
 						bufferGeometry.addGroup( materialGroup.start, materialGroup.count, materialGroup.index );
@@ -429,41 +445,68 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					}
 
 				}
-				if ( this.callbacks.meshLoaded !== null ) {
 
-					var materialOverride = this.callbacks.meshLoaded( payload.meshName, material );
-					if ( materialOverride != null ) material = materialOverride;
+				var callbackMeshLoaded;
+				var callbackMeshLoadedResult;
+				var disregardMesh = false;
+				for ( var index in this.callbacks.meshLoaded ) {
+
+					callbackMeshLoaded = this.callbacks.meshLoaded[ index ];
+					callbackMeshLoadedResult = callbackMeshLoaded( meshName, bufferGeometry, material );
+
+					if ( Boolean( callbackMeshLoadedResult ) ) {
+
+						if ( callbackMeshLoadedResult.disregardMesh ) {
+
+							// if one callback disregards the mesh, then processing stops
+							disregardMesh = true;
+							break;
+
+						}
+						if ( callbackMeshLoadedResult.replaceBufferGeometry ) bufferGeometry = callbackMeshLoadedResult.bufferGeometry;
+						if ( callbackMeshLoadedResult.replaceMaterial ) material = callbackMeshLoadedResult.material;
+
+					}
 
 				}
-				var mesh = new THREE.Mesh( bufferGeometry, material );
-				mesh.name = payload.meshName;
-				if ( this.streamMeshes ) {
 
-					this.sceneGraphBaseNode.add( mesh );
+				if ( !disregardMesh ) {
+
+					var mesh = new THREE.Mesh( bufferGeometry, material );
+					mesh.name = meshName;
+
+					if ( this.streamMeshes ) {
+
+						this.sceneGraphBaseNode.add( mesh );
+
+					} else {
+
+						this.meshStore.push( mesh );
+
+					}
+					this._announceProgress( 'Adding mesh (' + this.counter + '):', meshName );
 
 				} else {
 
-					this.meshStore.push( mesh );
+					this._announceProgress( 'Removing mesh:', meshName );
 
 				}
-				var output = '(' + this.counter + '): ' + payload.meshName;
-				this._announceProgress( 'Adding mesh', output );
 				break;
 
 			case 'complete':
 
 				if ( ! this.streamMeshes ) {
 
-					for ( var key in this.meshStore ) {
+					for ( var meshStoreKey in this.meshStore ) {
 
-						this.sceneGraphBaseNode.add( this.meshStore[ key ] );
+						if ( this.meshStore.hasOwnProperty( meshStoreKey ) ) this.sceneGraphBaseNode.add( this.meshStore[ meshStoreKey ] );
 
 					}
 
 				}
 
 				console.timeEnd( 'WWOBJLoader2' );
-				if ( payload.msg != null ) {
+				if ( Boolean( payload.msg ) ) {
 
 					this._announceProgress( payload.msg );
 
@@ -488,7 +531,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 	};
 
 	WWOBJLoader2.prototype._terminate = function () {
-		if ( this.worker != null ) {
+		if ( Boolean( this.worker ) ) {
 
 			if ( this.running ) throw 'Unable to gracefully terminate worker as it is currently running!';
 
@@ -504,15 +547,26 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 
 	WWOBJLoader2.prototype._finalize = function ( reason, requestTerminate ) {
 		this.running = false;
+		var index;
+		var callback;
+
 		if ( reason === 'complete' ) {
 
-			if ( this.callbacks.completedLoading != null ) this.callbacks.completedLoading( this.modelName, this.instanceNo, this.requestTerminate );
-			if ( this.callbacks.director.completedLoading != null ) this.callbacks.director.completedLoading( this.modelName, this.instanceNo, this.requestTerminate );
+			for ( index in this.callbacks.completedLoading ) {
+
+				callback = this.callbacks.completedLoading[ index ];
+				callback( this.modelName, this.instanceNo, this.requestTerminate );
+
+			}
 
 		} else if ( reason === 'error' ) {
 
-			if ( this.callbacks.errorWhileLoading != null ) this.callbacks.errorWhileLoading( this.modelName, this.instanceNo, this.requestTerminate );
-			if ( this.callbacks.director.errorWhileLoading != null ) this.callbacks.director.errorWhileLoading( this.modelName, this.instanceNo, this.requestTerminate );
+			for ( index in this.callbacks.errorWhileLoading ) {
+
+				callback = this.callbacks.errorWhileLoading[ index ];
+				callback( this.modelName, this.instanceNo, this.requestTerminate );
+
+			}
 
 		}
 		this.validated = false;
@@ -525,32 +579,23 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 	};
 
 	WWOBJLoader2.prototype._announceProgress = function ( baseText, text ) {
-		var output = "";
-		if ( baseText !== null && baseText !== undefined ) {
+		var output = ( Boolean( baseText ) ) ? baseText: "";
+		output = ( Boolean( text ) ) ? output + " " + text : output;
 
-			output = baseText;
+		var callbackProgress;
+		for ( var index in this.callbacks.progress ) {
 
-		}
-		if ( text !== null && text !== undefined ) {
-
-			output = output + " " + text;
-
-		}
-		if ( this.callbacks.progress !== null ) {
-
-			this.callbacks.progress( output );
+			callbackProgress = this.callbacks.progress[ index ];
+			callbackProgress( output );
 
 		}
-		if ( this.debug ) {
 
-			console.log( output );
-
-		}
+		if ( this.debug ) console.log( output );
 	};
 
 	WWOBJLoader2.prototype._buildWebWorkerCode = function ( existingWorkerCode ) {
-		if ( existingWorkerCode != null ) this.workerCode = existingWorkerCode;
-		if ( this.workerCode == null ) {
+		if ( Boolean( existingWorkerCode ) ) this.workerCode = existingWorkerCode;
+		if ( ! Boolean( this.workerCode ) ) {
 
 			console.time( 'buildWebWorkerCode' );
 			var wwDef = (function () {
@@ -645,11 +690,11 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 				}
 
 				WWMeshCreator.prototype.setMaterials = function ( materials ) {
-					this.materials = ( materials == null ) ? ( this.materials == null ? { materials: [] } : this.materials ) : materials;
+					this.materials = Boolean( materials ) ? materials : ( Boolean( this.materials ) ? this.materials : { materials: [] } );
 				};
 
 				WWMeshCreator.prototype.setDebug = function ( debug ) {
-					this.debug = ( debug == null ) ? this.debug : debug;
+					this.debug = Boolean( debug ) ? debug : this.debug;
 				};
 
 				WWMeshCreator.prototype.validate = function () {
@@ -700,6 +745,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 					var uvOffset = 0;
 
 					for ( var oodIndex in rawObjectDescriptions ) {
+						if ( ! rawObjectDescriptions.hasOwnProperty( oodIndex ) ) continue;
 						rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
 						materialDescription = { name: rawObjectDescription.materialName, flat: false, default: false };
@@ -898,69 +944,228 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 })();
 
 /**
- * Instruction to configure {@link THREE.OBJLoader2.WWOBJLoader2}.prepareRun to load OBJ from given ArrayBuffer and MTL from given String
+ * Instruction to configure {@link THREE.OBJLoader2.WWOBJLoader2}.prepareRun to load OBJ from given ArrayBuffer and MTL from given String.
  *
  * @param {string} modelName Overall name of the model
  * @param {Uint8Array} objAsArrayBuffer OBJ file content as ArrayBuffer
  * @param {string} pathTexture Path to texture files
  * @param {string} mtlAsString MTL file content as string
- * @param {THREE.Object3D} sceneGraphBaseNode {@link THREE.Object3D} where meshes will be attached
- * @param {boolean} streamMeshes=true Singles meshes are directly integrated into scene when loaded or later
- * @param {boolean} [requestTerminate=false] Request termination of web worker and free local resources after execution
  *
  * @returns {{modelName: string, dataAvailable: boolean, objAsArrayBuffer: null, pathTexture: null, mtlAsString: null, sceneGraphBaseNode: null, streamMeshes: boolean, requestTerminate: boolean}}
  * @constructor
  */
-THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer = function ( modelName, objAsArrayBuffer, pathTexture, mtlAsString, sceneGraphBaseNode, streamMeshes, requestTerminate ) {
+THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer = function ( modelName, objAsArrayBuffer, pathTexture, mtlAsString ) {
+	return {
 
-	var data = {
-		modelName: ( modelName == null ) ? 'none' : modelName,
+		/**
+		 * {@link THREE.Object3D} where meshes will be attached.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer
+		 *
+		 * @param {THREE.Object3D} sceneGraphBaseNode Scene graph object
+		 */
+		setSceneGraphBaseNode: function ( sceneGraphBaseNode ) {
+			this.sceneGraphBaseNode = Boolean( sceneGraphBaseNode ) ? sceneGraphBaseNode : null;
+		},
+
+		/**
+		 * Singles meshes are directly integrated into scene when loaded or later.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer
+		 *
+		 * @param {boolean} streamMeshes=true Default is true
+		 */
+		setStreamMeshes: function ( streamMeshes ) {
+			this.streamMeshes = ( streamMeshes === null || streamMeshes === undefined ) ? true : streamMeshes;
+		},
+
+		/**
+		 * Request termination of web worker and free local resources after execution.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer
+		 *
+		 * @param {boolean} requestTerminate=false Default is false
+		 */
+		setRequestTerminate: function ( requestTerminate ) {
+			this.requestTerminate = Boolean( requestTerminate );
+		},
+
+		/**
+		 * Returns all callbacks as {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks}
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer
+		 *
+		 * @returns {THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks}
+		 */
+		getCallbacks: function () {
+			return this.callbacks;
+		},
+		modelName: Boolean( modelName ) ? modelName : 'none',
 		dataAvailable: true,
-		objAsArrayBuffer: ( objAsArrayBuffer == null ) ? null : objAsArrayBuffer,
-		pathTexture: ( pathTexture == null ) ? null : pathTexture,
-		mtlAsString: ( mtlAsString == null ) ? null : mtlAsString,
-		sceneGraphBaseNode: ( sceneGraphBaseNode == null ) ? null : sceneGraphBaseNode,
-		streamMeshes: ( streamMeshes == null ) ? true : streamMeshes,
-		requestTerminate: ( requestTerminate == null ) ? false : requestTerminate
+		objAsArrayBuffer: Boolean( objAsArrayBuffer ) ? objAsArrayBuffer : null,
+		pathTexture: Boolean( pathTexture ) ? pathTexture : null,
+		mtlAsString: Boolean( mtlAsString ) ? mtlAsString : null,
+		sceneGraphBaseNode: null,
+		streamMeshes: true,
+		requestTerminate: false,
+		callbacks: new THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks()
 	};
-
-	return data;
 };
 
 /**
- * Instruction to configure {@link THREE.OBJLoader2.WWOBJLoader2}.prepareRun to load OBJ and MTL from files
+ * Instruction to configure {@link THREE.OBJLoader2.WWOBJLoader2}.prepareRun to load OBJ and MTL from files.
  *
  * @param {string} modelName Overall name of the model
  * @param {string} pathObj Path to OBJ file
  * @param {string} fileObj OBJ file name
  * @param {string} pathTexture Path to texture files
  * @param {string} fileMtl MTL file name
- * @param {THREE.Object3D} sceneGraphBaseNode {@link THREE.Object3D} where meshes will be attached
- * @param {boolean} streamMeshes=true Singles meshes are directly integrated into scene when loaded or later
- * @param {boolean} [requestTerminate=false] Request termination of web worker and free local resources after execution
  *
  * @returns {{modelName: string, dataAvailable: boolean, pathObj: null, fileObj: null, pathTexture: null, fileMtl: null, sceneGraphBaseNode: null, streamMeshes: boolean,  requestTerminate: boolean}}
  * @constructor
  */
-THREE.OBJLoader2.WWOBJLoader2.PrepDataFile = function ( modelName, pathObj, fileObj, pathTexture, fileMtl, sceneGraphBaseNode, streamMeshes, requestTerminate ) {
+THREE.OBJLoader2.WWOBJLoader2.PrepDataFile = function ( modelName, pathObj, fileObj, pathTexture, fileMtl ) {
+	return {
 
-	var data = {
-		modelName: ( modelName == null ) ? 'none' : modelName,
+		/**
+		 * {@link THREE.Object3D} where meshes will be attached.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataFile
+		 *
+		 * @param {THREE.Object3D} sceneGraphBaseNode Scene graph object
+		 */
+		setSceneGraphBaseNode: function ( sceneGraphBaseNode ) {
+			this.sceneGraphBaseNode = Boolean( sceneGraphBaseNode ) ? sceneGraphBaseNode : null;
+		},
+
+		/**
+		 * Singles meshes are directly integrated into scene when loaded or later.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataFile
+		 *
+		 * @param {boolean} streamMeshes=true Default is true
+		 */
+		setStreamMeshes: function ( streamMeshes ) {
+			this.streamMeshes = ( streamMeshes === null || streamMeshes === undefined ) ? true : streamMeshes;
+		},
+
+		/**
+		 * Request termination of web worker and free local resources after execution.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataFile
+		 *
+		 * @param {boolean} requestTerminate=false Default is false
+		 */
+		setRequestTerminate: function ( requestTerminate ) {
+			this.requestTerminate = Boolean( requestTerminate );
+		},
+
+		/**
+		 * Returns all callbacks as {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks}
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataFile
+		 *
+		 * @returns {THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks}
+		 */
+		getCallbacks: function () {
+			return this.callbacks;
+		},
+		modelName: Boolean( modelName ) ? modelName : 'none',
 		dataAvailable: false,
-		pathObj: ( pathObj == null ) ? null : pathObj,
-		fileObj: ( fileObj == null ) ? null : fileObj,
-		pathTexture: ( pathTexture == null ) ? null : pathTexture,
-		fileMtl: ( fileMtl == null ) ? null : fileMtl,
-		sceneGraphBaseNode: ( sceneGraphBaseNode == null ) ? null : sceneGraphBaseNode,
-		streamMeshes: ( streamMeshes == null ) ? true : streamMeshes,
-		requestTerminate: ( requestTerminate == null ) ? false : requestTerminate
+		pathObj: Boolean( pathObj ) ? pathObj : null,
+		fileObj: Boolean( fileObj ) ? fileObj : null,
+		pathTexture: Boolean( pathTexture ) ? pathTexture : null,
+		fileMtl: Boolean( fileMtl ) ? fileMtl : null,
+		sceneGraphBaseNode: null,
+		streamMeshes: true,
+		requestTerminate: false,
+		callbacks: new THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks()
 	};
-
-	return data;
 };
+
+/**
+ * Callbacks utilized by functions working with {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer} or {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataFile}
+ *
+ * @returns {{registerCallbackProgress: THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks.registerCallbackProgress, registerCallbackCompletedLoading: THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks.registerCallbackCompletedLoading, registerCallbackMaterialsLoaded: THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks.registerCallbackMaterialsLoaded, registerCallbackMeshLoaded: THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks.registerCallbackMeshLoaded, registerCallbackErrorWhileLoading: THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks.registerCallbackErrorWhileLoading, progress: null, completedLoading: null, errorWhileLoading: null, materialsLoaded: null, meshLoaded: null}}
+ * @constructor
+ */
+THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks = function () {
+	return {
+		/**
+		 * Register callback function that is invoked by internal function "_announceProgress" to print feedback.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks
+		 *
+		 * @param {callback} callbackProgress Callback function for described functionality
+		 */
+		registerCallbackProgress: function ( callbackProgress ) {
+			if ( Boolean( callbackProgress ) ) this.progress = callbackProgress;
+		},
+
+		/**
+		 * Register callback function that is called once loading of the complete model is completed.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks
+		 *
+		 * @param {callback} callbackCompletedLoading Callback function for described functionality
+		 */
+		registerCallbackCompletedLoading: function ( callbackCompletedLoading ) {
+			if ( Boolean( callbackCompletedLoading ) ) this.completedLoading = callbackCompletedLoading;
+		},
+
+		/**
+		 * Register callback function that is called once materials have been loaded. It allows to alter and return materials.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks
+		 *
+		 * @param {callback} callbackMaterialsLoaded Callback function for described functionality
+		 */
+		registerCallbackMaterialsLoaded: function ( callbackMaterialsLoaded ) {
+			if ( Boolean( callbackMaterialsLoaded ) ) this.materialsLoaded = callbackMaterialsLoaded;
+		},
+
+		/**
+		 * Register callback function that is called every time a mesh was loaded.
+		 * Use {@link THREE.OBJLoader2.WWOBJLoader2.LoadedMeshUserOverride} for alteration instructions (geometry, material or disregard mesh).
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks
+		 *
+		 * @param {callback} callbackMeshLoaded Callback function for described functionality
+		 */
+		registerCallbackMeshLoaded: function ( callbackMeshLoaded ) {
+			if ( Boolean( callbackMeshLoaded ) ) this.meshLoaded = callbackMeshLoaded;
+		},
+
+		/**
+		 * Report if an error prevented loading.
+		 * @memberOf THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks
+		 *
+		 * @param {callback} callbackErrorWhileLoading Callback function for described functionality
+		 */
+		registerCallbackErrorWhileLoading: function ( callbackErrorWhileLoading ) {
+			if ( Boolean( callbackErrorWhileLoading ) ) this.errorWhileLoading = callbackErrorWhileLoading;
+		},
+
+		progress: null,
+		completedLoading: null,
+		errorWhileLoading: null,
+		materialsLoaded: null,
+		meshLoaded: null
+	};
+};
+
+
+/**
+ * Object to return by {@link THREE.OBJLoader2.WWOBJLoader2}.callbacks.meshLoaded. Used to adjust bufferGeometry or material or prevent complete loading of mesh
+ *
+ * @param {boolean} disregardMesh=false Tell WWOBJLoader2 to completely disregard this mesh
+ * @param {THREE.BufferGeometry} bufferGeometry The {@link THREE.BufferGeometry} to be used
+ * @param {THREE.Material} material The {@link THREE.Material} to be used
+ *
+ * @returns {{ disregardMesh: boolean, replaceBufferGeometry: boolean, bufferGeometry: THREE.BufferGeometry, replaceMaterial: boolean, material: THREE.Material}}
+ * @constructor
+ */
+THREE.OBJLoader2.WWOBJLoader2.LoadedMeshUserOverride = function ( disregardMesh, bufferGeometry, material ) {
+	return {
+		disregardMesh: Boolean( disregardMesh ),
+		replaceBufferGeometry: Boolean( bufferGeometry ),
+		bufferGeometry: Boolean( bufferGeometry ) ? bufferGeometry : null,
+		replaceMaterial: Boolean( material ),
+		material: Boolean( material ) ? material : null
+	};
+};
+
 /**
  * Orchestrate loading of multiple OBJ files/data from an instruction queue with a configurable amount of workers (1-16).
- * Use:
+ * Workflow:
  *   prepareWorkers
  *   enqueueForRun
  *   processQueue
@@ -980,7 +1185,7 @@ THREE.OBJLoader2.WWOBJLoader2Director = (function () {
 
 		this.workerDescription = {
 			prototypeDef: THREE.OBJLoader2.WWOBJLoader2.prototype,
-			callbacks: {},
+			globalCallbacks: {},
 			webWorkers: [],
 			codeBuffer: null
 		};
@@ -1022,22 +1227,12 @@ THREE.OBJLoader2.WWOBJLoader2Director = (function () {
 	 * Create or destroy workers according limits. Set the name and register callbacks for dynamically created web workers.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2Director
 	 *
-	 * @param {callback[]} callbacks Register callbacks for all web workers:
-	 * 		{ progress: null, completedLoading: null, errorWhileLoading: null, materialsLoaded: null, meshLoaded: null }
+	 * @param {THREE.OBJLoader2.WWOBJLoader2.PrepDataCallbacks} globalCallbacks  Register global callbacks used by all web workers
 	 * @param {number} maxQueueSize Set the maximum size of the instruction queue (1-1024)
 	 * @param {number} maxWebWorkers Set the maximum amount of workers (1-16)
 	 */
-	WWOBJLoader2Director.prototype.prepareWorkers = function ( callbacks, maxQueueSize, maxWebWorkers ) {
-		if ( callbacks != null ) {
-
-			for ( var key in callbacks ) {
-
-				if ( callbacks.hasOwnProperty( key ) ) this.workerDescription.callbacks[ key ] = callbacks[ key ];
-
-			}
-
-		}
-
+	WWOBJLoader2Director.prototype.prepareWorkers = function ( globalCallbacks, maxQueueSize, maxWebWorkers ) {
+		if ( Boolean( globalCallbacks ) ) this.workerDescription.globalCallbacks = globalCallbacks;
 		this.maxQueueSize = Math.min( maxQueueSize, MAX_QUEUE_SIZE );
 		this.maxWebWorkers = Math.min( maxWebWorkers, MAX_WEB_WORKER );
 		this.objectsCompleted = 0;
@@ -1068,10 +1263,10 @@ THREE.OBJLoader2.WWOBJLoader2Director = (function () {
 	};
 
 	/**
-	 * Store run instructions in internal instructionQueue
+	 * Store run instructions in internal instructionQueue.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2Director
 	 *
-	 * @param {Object} params Either {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer} or {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataFile}
+	 * @param {Object} runParams Either {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataArrayBuffer} or {@link THREE.OBJLoader2.WWOBJLoader2.PrepDataFile}
 	 */
 	WWOBJLoader2Director.prototype.enqueueForRun = function ( runParams ) {
 		if ( this.instructionQueue.length < this.maxQueueSize ) {
@@ -1080,76 +1275,99 @@ THREE.OBJLoader2.WWOBJLoader2Director = (function () {
 	};
 
 	/**
-	 * Process the instructionQueue until it is depleted
+	 * Process the instructionQueue until it is depleted.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2Director
 	 */
 	WWOBJLoader2Director.prototype.processQueue = function () {
 		if ( this.instructionQueue.length === 0 ) return;
 
-		var webWorker;
-		var runParams;
 		var length = Math.min( this.maxWebWorkers, this.instructionQueue.length );
 		for ( var i = 0; i < length; i++ ) {
 
-			webWorker = this.workerDescription.webWorkers[ i ];
-			runParams = this.instructionQueue[ 0 ];
-			webWorker.prepareRun( runParams );
-			webWorker.run();
+			this._kickWebWorkerRun( this.workerDescription.webWorkers[ i ], this.instructionQueue[ 0 ] );
 			this.instructionQueue.shift();
 
 		}
 	};
 
-	WWOBJLoader2Director.prototype._buildWebWorker = function () {
-		var webWorker = Object.create( this.workerDescription.prototypeDef );
-		webWorker._init();
-		if ( this.crossOrigin != null )	webWorker.setCrossOrigin( this.crossOrigin );
+	WWOBJLoader2Director.prototype._kickWebWorkerRun = function( worker, runParams ) {
+		worker.clearAllCallbacks();
+		var key;
+		var globalCallbacks = this.workerDescription.globalCallbacks;
+		var workerCallbacks = worker.callbacks;
+		var selectedGlobalCallback;
+		for ( key in globalCallbacks ) {
 
-		// Ensure code string is built once and then it is just passed on to every new instance
-		if ( this.workerDescription.codeBuffer == null ) {
+			if ( workerCallbacks.hasOwnProperty( key ) && globalCallbacks.hasOwnProperty( key ) ) {
 
-			this.workerDescription.codeBuffer = webWorker._buildWebWorkerCode();
-
-		} else {
-
-			webWorker._buildWebWorkerCode( this.workerDescription.codeBuffer );
-
-		}
-		for ( var key in this.workerDescription.callbacks ) {
-
-			if ( webWorker.callbacks.hasOwnProperty( key ) && this.workerDescription.callbacks.hasOwnProperty( key ) ) {
-
-				webWorker.callbacks[ key ] = this.workerDescription.callbacks[ key ];
+				selectedGlobalCallback = globalCallbacks[ key ];
+				if ( Boolean( selectedGlobalCallback ) ) workerCallbacks[ key ].push( selectedGlobalCallback );
 
 			}
 
 		}
+		// register per object callbacks
+		var runCallbacks = runParams.callbacks;
+		if ( Boolean( runCallbacks ) ) {
+
+			for ( key in runCallbacks ) {
+
+				if ( workerCallbacks.hasOwnProperty( key ) && runCallbacks.hasOwnProperty( key ) && Boolean( runCallbacks[ key ] ) ) {
+
+					workerCallbacks[ key ].push( runCallbacks[ key ] );
+
+				}
+
+			}
+
+		}
+
 		var scope = this;
-		var managerCompletedLoading = function ( modelName, instanceNo, requestTerminate ) {
+		var directorCompletedLoading = function ( modelName, instanceNo, requestTerminate ) {
 			scope.objectsCompleted++;
 			if ( ! requestTerminate ) {
 
-				var rekick = scope.workerDescription.webWorkers[ instanceNo ];
+				var worker = scope.workerDescription.webWorkers[ instanceNo ];
 				var runParams = scope.instructionQueue[ 0 ];
-				if ( runParams != null ) {
+				if ( Boolean( runParams ) ) {
 
-					rekick.prepareRun( runParams );
-					rekick.run();
+					console.log( '\nAssigning next item from queue to worker (queue length: ' + scope.instructionQueue.length + ')\n\n' );
+					scope._kickWebWorkerRun( worker, runParams );
 					scope.instructionQueue.shift();
 
 				}
 
 			}
 		};
+		worker.registerCallbackCompletedLoading( directorCompletedLoading );
 
-		webWorker.callbacks.director[ 'completedLoading' ] = managerCompletedLoading;
+		worker.prepareRun( runParams );
+		worker.run();
+	};
+
+	WWOBJLoader2Director.prototype._buildWebWorker = function () {
+		var webWorker = Object.create( this.workerDescription.prototypeDef );
+		webWorker._init();
+		if ( Boolean( this.crossOrigin ) ) webWorker.setCrossOrigin( this.crossOrigin );
+
+		// Ensure code string is built once and then it is just passed on to every new instance
+		if ( Boolean( this.workerDescription.codeBuffer ) ) {
+
+			webWorker._buildWebWorkerCode( this.workerDescription.codeBuffer );
+
+		} else {
+
+			this.workerDescription.codeBuffer = webWorker._buildWebWorkerCode();
+
+		}
+
 		webWorker.instanceNo = this.workerDescription.webWorkers.length;
 		this.workerDescription.webWorkers.push( webWorker );
 		return webWorker;
 	};
 
 	/**
-	 * Terminate all workers
+	 * Terminate all workers.
 	 * @memberOf THREE.OBJLoader2.WWOBJLoader2Director
 	 */
 	WWOBJLoader2Director.prototype.deregister = function () {
@@ -1160,7 +1378,7 @@ THREE.OBJLoader2.WWOBJLoader2Director = (function () {
 			webWorker.setRequestTerminate( true );
 
 		}
-		this.workerDescription.callbacks = {};
+		this.workerDescription.globalCallbacks = {};
 		this.workerDescription.webWorkers = [];
 		this.workerDescription.codeBuffer = null;
 	};

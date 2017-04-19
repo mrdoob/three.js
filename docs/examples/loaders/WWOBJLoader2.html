@@ -16,6 +16,8 @@
 		<h2>Sub-Classes</h2>
 		[page:WWOBJLoader2.PrepDataArrayBuffer]<br>
 		[page:WWOBJLoader2.PrepDataFile]<br>
+		[page:WWOBJLoader2.PrepDataCallbacks]<br>
+		[page:WWOBJLoader2.LoadedMeshUserOverride]<br>
 		[page:WWOBJLoader2.WWOBJLoader2Director]
 
 		<h2>Example</h2>
@@ -131,7 +133,7 @@
 			[page:Function callbackMeshLoaded] — 	Callback function for described functionality
 		</div>
 		<div>
-			Register callback function that is called every time a mesh was loaded. Return altered [page:Material] or null from callback.
+			Register callback function that is called every time a mesh was loaded. Use [page:WWOBJLoader2.LoadedMeshUserOverride] for alteration instructions (geometry, material or disregard mesh).
 		</div>
 
 		<h3>[method:null registerCallbackErrorWhileLoading]( [page:Function callbackErrorWhileLoading] )</h3>
@@ -140,6 +142,12 @@
 		</div>
 		<div>
 			Register callback function that is called to report an error that prevented loading.
+		</div>
+
+
+		<h3>[method:null clearAllCallbacks]()</h3>
+		<div>
+			Clears all registered callbacks.
 		</div>
 
 
@@ -154,12 +162,43 @@
 			[page:Uint8Array objAsArrayBuffer] — OBJ file content as ArrayBuffer<br>
 			[page:String pathTexture] — Path to texture files<br>
 			[page:String mtlAsString] — MTL file content as string
-			[page:Object3D sceneGraphBaseNode] [page:Object3D] where meshes will be attached
-			[page:Boolean streamMeshes] Singles meshes are directly integrated into scene when loaded or later
-			[page:Boolean requestTerminate] Request termination of web worker and free local resources after execution
 		</div>
 		<div>
 			Instruction to configure [page:WWOBJLoader2.prepareRun] to load OBJ from given ArrayBuffer and MTL from given String.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:PrepDataCallbacks getCallbacks]()</h3>
+		<div>
+			Returns all callbacks as [page:WWOBJLoader2.PrepDataCallbacks].
+		</div>
+
+
+		<h3>[method:null setRequestTerminate]( [page:Boolean requestTerminate] )</h3>
+		<div>
+			[page:Boolean requestTerminate] — Default is false
+		</div>
+		<div>
+			Request termination of web worker and free local resources after execution.
+		</div>
+
+
+		<h3>[method:null setSceneGraphBaseNode]( [page:THREE.Object3D sceneGraphBaseNode] )</h3>
+		<div>
+			[page:Object3D sceneGraphBaseNode] — Scene graph object
+		</div>
+		<div>
+			[page:Object3D] where meshes will be attached.
+		</div>
+
+
+		<h3>[method:null setStreamMeshes]( [page:Boolean streamMeshes] )</h3>
+		<div>
+			[page:Boolean streamMeshes] — Default is true
+		</div>
+		<div>
+			Singles meshes are directly integrated into scene when loaded or later.
 		</div>
 		<br>
 		<br>
@@ -175,12 +214,116 @@
 			[page:String fileObj] — OBJ file name<br>
 			[page:String pathTexture] — Path to texture files<br>
 			[page:String fileMtl] — MTL file name
-			[page:Object3D sceneGraphBaseNode] [page:Object3D] where meshes will be attached
-			[page:Boolean streamMeshes] Singles meshes are directly integrated into scene when loaded or later
-			[page:Boolean requestTerminate] Request termination of web worker and free local resources after execution
 		</div>
 		<div>
 			Instruction to configure [page:WWOBJLoader2.prepareRun] to load OBJ and MTL from files.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:PrepDataCallbacks getCallbacks]()</h3>
+		<div>
+			Returns all callbacks as [page:WWOBJLoader2.PrepDataCallbacks].
+		</div>
+
+
+		<h3>[method:null setRequestTerminate]( [page:Boolean requestTerminate] )</h3>
+		<div>
+			[page:Boolean requestTerminate] — Default is false
+		</div>
+		<div>
+			Request termination of web worker and free local resources after execution.
+		</div>
+
+
+		<h3>[method:null setSceneGraphBaseNode]( [page:THREE.Object3D sceneGraphBaseNode] )</h3>
+		<div>
+			[page:Object3D sceneGraphBaseNode] — Scene graph object
+		</div>
+		<div>
+			[page:Object3D] where meshes will be attached.
+		</div>
+
+
+		<h3>[method:null setStreamMeshes]( [page:Boolean streamMeshes] )</h3>
+		<div>
+			[page:Boolean streamMeshes] — Default is true
+		</div>
+		<div>
+			Singles meshes are directly integrated into scene when loaded or later.
+		</div>
+		<br>
+		<br>
+
+
+		<a name="PrepDataCallbacks"></a><h1>PrepDataCallbacks</h1>
+		<h2>Constructor</h2>
+
+		<h3>PrepDataCallbacks()</h3>
+		<div>
+			Callbacks utilized by functions working with [page:WWOBJLoader2.PrepDataArrayBuffer] or [page:WWOBJLoader2.PrepDataFile].
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null registerCallbackCompletedLoading]( [page:Function callbackCompletedLoading] )</h3>
+		<div>
+			[page:Function callbackCompletedLoading] — Callback function for described functionality
+		</div>
+		<div>
+			Register callback function that is called once loading of the complete model is completed.
+		</div>
+
+
+		<h3>[method:null registerCallbackProgress]( [page:Function callbackProgress] )</h3>
+		<div>
+			[page:Function callbackProgress] — Callback function for described functionality
+		</div>
+		<div>
+			Register callback function that is invoked by internal function "_announceProgress" to print feedback.
+		</div>
+
+
+		<h3>[method:null registerCallbackErrorWhileLoading]( [page:Function callbackErrorWhileLoading] )</h3>
+		<div>
+			[page:Function callbackErrorWhileLoading] — Callback function for described functionality
+		</div>
+		<div>
+			Report if an error prevented loading.
+		</div>
+
+
+		<h3>[method:null registerCallbackMaterialsLoaded]( [page:Function callbackMaterialsLoaded] )</h3>
+		<div>
+			[page:Function callbackMaterialsLoaded] — Callback function for described functionality
+		</div>
+		<div>
+			Register callback function that is called once materials have been loaded. It allows to alter and return materials.
+		</div>
+
+
+		<h3>[method:null registerCallbackMeshLoaded]( [page:Function callbackMeshLoaded] )</h3>
+		<div>
+			[page:Function callbackMeshLoaded] — Callback function for described functionality
+		</div>
+		<div>
+			Register callback function that is called every time a mesh was loaded. Use [page:WWOBJLoader2.LoadedMeshUserOverride] for alteration instructions (geometry, material or disregard mesh).
+		</div>
+		<br>
+		<br>
+
+
+		<a name="LoadedMeshUserOverride"></a><h1>LoadedMeshUserOverride</h1>
+		<h2>Constructor</h2>
+
+		<h3>LoadedMeshUserOverride( [page:Boolean disregardMesh], [page:THREE.BufferGeometry bufferGeometry], [page:THREE.Material material] )</h3>
+		<div>
+			[page:Boolean disregardMesh] — Tell [page:WWOBJLoader2] to completely disregard this mesh<br>
+			[page:BufferGeometry bufferGeometry] — The [page:BufferGeometry] to be used<br>
+			[page:Material material] — The [page:Material] to be used
+		</div>
+		<div>
+			Object to return by THREE.OBJLoader2.WWOBJLoader2.callbacks.meshLoaded. Used to adjust bufferGeometry or material or prevent complete loading of mesh.
 		</div>
 		<br>
 		<br>
@@ -199,9 +342,9 @@
 				deregister
 		</div>
 
-		<h3>[method:null prepareWorkers]( Array of [page:Function callbacks], [page:Number maxQueueSize], [page:Number maxWebWorkers] )</h3>
+		<h3>[method:null prepareWorkers]( [page:WWOBJLoader2.PrepDataCallbacks globalCallbacks], [page:Number maxQueueSize], [page:Number maxWebWorkers] )</h3>
 		<div>
-			Array of [page:Function callbacks] — Register callbacks for all web workers: progress, completedLoading, errorWhileLoading, materialsLoaded, meshLoaded<br>
+			[page:WWOBJLoader2.PrepDataCallbacks globalCallbacks] — Register global callbacks used by all web workers<br>
 			[page:Number maxQueueSize] — Set the maximum size of the instruction queue (1-1024)<br>
 			[page:Number maxWebWorkers] — Set the maximum amount of workers (1-16)
 		</div>
