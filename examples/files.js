@@ -254,6 +254,7 @@ var files = {
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawcalls",
 		"webgl_buffergeometry_instancing",
+		"webgl_buffergeometry_instancing2",
 		"webgl_buffergeometry_instancing_billboards",
 		"webgl_buffergeometry_instancing_dynamic",
 		"webgl_buffergeometry_instancing_interleaved_dynamic",
