@@ -213,7 +213,7 @@ Object.assign( Box3.prototype, {
 			
 			if (ref !== undefined) {
 				
-				trans = new THREE.Matrix4().getInverse(ref.matrixWorld);
+				trans = new Matrix4().getInverse(ref.matrixWorld);
 				
 			}
 			
@@ -226,8 +226,8 @@ Object.assign( Box3.prototype, {
 		// accounting for both the object's, and children's, transforms.
 		// excludeInvisibleObjects specifies whether to use traverseVisible instead of traverse.
 		
-		var v1 = new THREE.Vector3();
-		var m1 = new THREE.Matrix4();
+		var v1 = new Vector3();
+		var m1 = new Matrix4();
 
 		return function expandByObject( object, trans, excludeInvisibleObjects ) {
 			
