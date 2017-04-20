@@ -205,35 +205,49 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	expandByObject: function () {
+	expandByObject: function (object, ref, excludeInvisibleObjects) {
+		// Computes the bounding box of an object (including its children) in the given reference object's coordinate system, or world coordinates if no reference is specified,
+		// accounting for both the object's, and children's, transforms.
+		// excludeInvisibleObjects specifies whether to use traverseVisible instead of traverse.
+			var trans;
+			
+			if (ref !== undefined) {
+				
+				trans = new THREE.Matrix4().getInverse(ref.matrixWorld);
+				
+			}
+			
+			this.expandByTransformedObject(object, trans, excludeInvisibleObjects);
+	},
+	expandByTransformedObject: function () {
 		
-		// Computes the bounding box of an object (including its children) 
-		// in the given reference object's coordinate system, 
-		// or world coordinates if no reference is specified,
+		// Computes the bounding box of an object (including its children)in the coordinate system given by trans,
+		// or world coordinates if no trans is specified,
 		// accounting for both the object's, and children's, transforms.
 		// excludeInvisibleObjects specifies whether to use traverseVisible instead of traverse.
 		
-		var v1 = new Vector3();
+		var v1 = new THREE.Vector3();
+		var m1 = new THREE.Matrix4();
 
-		return function expandByObject( object, reference, excludeInvisibleObjects ) {
-
-			excludeInvisibleObjects = excludeInvisibleObjects || false;
-			
-			var m;
-			if ( reference !== undefined ) {
-				
-				m = new Matrix4();
-				m.getInverse(reference.matrixWorld);
-
-			}
+		return function expandByObject( object, trans, excludeInvisibleObjects ) {
 			
 			var scope = this;
 
 			object.updateMatrixWorld( true );
-
+			
 			object["traverse"+(excludeInvisibleObjects ? "Visible" : "")]( function ( node ) {
 
 				var i, l;
+				
+				if (trans !== undefined) {
+
+					m1.multiplyMatrices(trans, node.matrixWorld);
+
+				} else {
+
+					m1.copy(node.matrixWorld);
+
+				}
 
 				var geometry = node.geometry;
 
@@ -246,12 +260,7 @@ Object.assign( Box3.prototype, {
 						for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
 							v1.copy( vertices[ i ] );
-							v1.applyMatrix4( node.matrixWorld );
-							if ( m !== undefined ) {
-								
-								v1.applyMatrix4( m );
-								
-							}
+							v1.applyMatrix4( m1 );
 							scope.expandByPoint( v1 );
 
 						}
@@ -264,14 +273,9 @@ Object.assign( Box3.prototype, {
 
 							for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-								v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-								if ( m !== undefined ) {
-									
-									v1.applyMatrix4( m );
-									
-								}
+								v1.fromBufferAttribute( attribute, i ).applyMatrix4( m1 );
 								scope.expandByPoint( v1 );
-
+								
 							}
 
 						}
