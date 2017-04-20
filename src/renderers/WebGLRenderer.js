@@ -688,6 +688,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	function absNumericalSort( a, b ) {
+
+		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+
+	}
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -1026,52 +1032,45 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	// Sorting
+	// Compile
 
-	function absNumericalSort( a, b ) {
-
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
-
-	}
-	
-	this.compile = function(scene, camera){
+	this.compile = function ( scene, camera ) {
 
 		lights = [];
-		
-		scene.traverse(function( object ) {
-			
-			if ( object.isLight ) {
-				
-				lights.push(object);
-				
-			}
-			
-		});
-		
-		setupLights(lights,camera);
 
-		scene.traverse(function( object ) {
-			
-			
-			if (object.material) {
-				
-				if ( Array.isArray( object.material ) ) {
-					
-					for ( var i = 0; i < object.material.length; i ++ ) {
-						
-						initMaterial(object.material[i], scene.fog, object); 
-						
-					}
-					
-				} else {
-					
-					initMaterial(object.material, scene.fog, object); 
-					
-				}
-				
+		scene.traverse( function ( object ) {
+
+			if ( object.isLight ) {
+
+				lights.push( object );
+
 			}
-			
-		});
+
+		} );
+
+		setupLights( lights, camera );
+
+		scene.traverse( function ( object ) {
+
+			if ( object.material ) {
+
+				if ( Array.isArray( object.material ) ) {
+
+					for ( var i = 0; i < object.material.length; i ++ ) {
+
+						initMaterial( object.material[ i ], scene.fog, object );
+
+					}
+
+				} else {
+
+					initMaterial( object.material, scene.fog, object );
+
+				}
+
+			}
+
+		} );
 
 	};
 

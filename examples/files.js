@@ -131,6 +131,7 @@ var files = {
 		"webgl_materials_bumpmap_skin",
 		"webgl_materials_cars",
 		"webgl_materials_channels",
+		"webgl_materials_compile",
 		"webgl_materials_cubemap",
 		"webgl_materials_cubemap_balls_reflection",
 		"webgl_materials_cubemap_balls_refraction",
