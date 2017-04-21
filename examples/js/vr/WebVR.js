@@ -18,6 +18,19 @@ var WEBVR = {
 
 	},
 
+	getVRDisplay: function ( onDisplay ) {
+
+		if ( 'getVRDisplays' in navigator ) {
+
+			navigator.getVRDisplays()
+				.then( function ( displays ) {
+					onDisplay( displays[ 0 ] );
+				} );
+
+		}
+
+	},
+
 	getMessage: function () {
 
 		var message;
@@ -65,7 +78,14 @@ var WEBVR = {
 
 	},
 
-	getButton: function ( effect ) {
+	getButton: function ( display, canvas ) {
+
+		if ( 'VREffect' in THREE && display instanceof THREE.VREffect ) {
+
+			console.error( 'WebVR.getButton() now expects a VRDisplay.' );
+			return document.createElement( 'button' );
+
+		}
 
 		var button = document.createElement( 'button' );
 		button.style.position = 'absolute';
@@ -82,18 +102,27 @@ var WEBVR = {
 		button.style.fontStyle = 'normal';
 		button.style.textAlign = 'center';
 		button.style.zIndex = '999';
-		button.textContent = 'ENTER VR';
-		button.onclick = function() {
 
-			effect.isPresenting ? effect.exitPresent() : effect.requestPresent();
+		if ( display ) {
 
-		};
+			button.textContent = 'ENTER VR';
+			button.onclick = function () {
 
-		window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
+				display.isPresenting ? display.exitPresent() : display.requestPresent( [ { source: canvas } ] );
 
-			button.textContent = effect.isPresenting ? 'EXIT VR' : 'ENTER VR';
+			};
 
-		}, false );
+			window.addEventListener( 'vrdisplaypresentchange', function () {
+
+				button.textContent = display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+
+			}, false );
+
+		} else {
+
+			button.textContent = 'NO VR DISPLAY';
+
+		}
 
 		return button;
 

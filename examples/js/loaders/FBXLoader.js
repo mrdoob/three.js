@@ -10,7 +10,7 @@
  *  - normal / uv
  *  - material (Multi-Material too)
  *  - textures (Must be in same directory)
- *  - nurbs
+ *  - nurbs (Open, Closed and Periodic forms)
  *
  *  No Support
  *  - morph
@@ -20,16 +20,11 @@
 
 	THREE.FBXLoader = function ( manager ) {
 
-		THREE.Loader.call( this );
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.textureLoader = null;
 		this.textureBasePath = null;
 
 	};
-
-	THREE.FBXLoader.prototype = Object.create( THREE.Loader.prototype );
-
-	THREE.FBXLoader.prototype.constructor = THREE.FBXLoader;
 
 	Object.assign( THREE.FBXLoader.prototype, {
 
@@ -377,6 +372,7 @@
 
 			}
 
+			var degree = order - 1;
 			var knots = this.parseFloatList( nurbsInfo.subNodes.KnotVector.properties.a );
 
 			var controlPoints = [];
@@ -389,17 +385,30 @@
 
 			}
 
+			var startKnot, endKnot;
+
 			if ( nurbsInfo.properties.Form == "Closed" ) {
 
 				controlPoints.push( controlPoints[ 0 ] );
 
+			} else if ( nurbsInfo.properties.Form === 'Periodic' ) {
+
+				startKnot = degree;
+				endKnot = knots.length - 1 - startKnot;
+
+				for ( var i = 0; i < degree; ++ i ) {
+
+					controlPoints.push( controlPoints[ i ] );
+
+				}
+
 			}
 
-			var curve = new THREE.NURBSCurve( order - 1, knots, controlPoints );
+			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
 
 			// Pre-generate a geometry
 			var geometry = new THREE.Geometry();
-			geometry.vertices = curve.getPoints( controlPoints.length * 1.5 );
+			geometry.vertices = curve.getPoints( controlPoints.length * 7 );
 
 			var mesh = new THREE.Line( geometry );
 			// Store the THREE.NURBSCurve class so the user can recreate a new geometry with a different number of points

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF</title>
+		<title>three.js webgl - glTF 1.0</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -63,7 +63,7 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> -
-		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> loader
+		<a href="https://github.com/KhronosGroup/glTF" target="_blank">glTF</a> 1.0 loader
 		<br>
 		monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> - COLLADA duck by Sony -
 		Cesium models by <a href="http://cesiumjs.org/" target="_blank">Cesium</a>
@@ -202,8 +202,7 @@
 					scene.add(ground);
 				}
 
-				THREE.GLTFLoader.Shaders.removeAll(); // remove all previous shaders
-				loader = new THREE.GLTFLoader;
+				loader = new THREE.GLTFLoader();
 
 				for (var i = 0; i < extensionSelect.children.length; i++) {
 					var child = extensionSelect.children[i];
@@ -229,7 +228,7 @@
 
 					gltf = data;
 
-					var object = gltf.scene !== undefined ? gltf.scene : gltf.scenes[ 0 ];
+					var object = gltf.scene;
 
 					status.innerHTML = "Load time: " + ( performance.now() - loadStartTime ).toFixed( 2 ) + " ms.";
 
@@ -338,7 +337,6 @@
 			function animate() {
 				requestAnimationFrame( animate );
 				if (mixer) mixer.update(clock.getDelta());
-				THREE.GLTFLoader.Shaders.update(scene, camera);
 				if (cameraIndex == 0)
 					orbitControls.update();
 				render();
@@ -408,6 +406,15 @@
 					addGround:true,
 					shadows:true,
 					extensions: ["glTF", "glTF-MaterialsCommon", "glTF-Binary"]
+				},
+				{
+					name : "Rigged Simple",
+					url : "./models/gltf/RiggedSimple/%s/RiggedSimple.gltf",
+					cameraPos: new THREE.Vector3(0, 5, 15),
+					objectRotation: new THREE.Euler(0, 90, 0),
+					addLights:true,
+					shadows:true,
+					extensions: ["glTF"]
 				},
 				{
 					name : "Snowflake",

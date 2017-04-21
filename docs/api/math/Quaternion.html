@@ -89,7 +89,7 @@
 
 		<h3>[method:Float dot]( [page:Quaternion v] )</h3>
 		<div>
-			Calculate the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of
+			Calculates the [link:https://en.wikipedia.org/wiki/Dot_product dot product] of
 			quaternions [page:Quaternion v] and this one.
 		</div>
 
@@ -137,11 +137,11 @@
 		</div>
 
 		<h3>[method:Quaternion onChange]( [page:Function onChangeCallback] )</h3>
-		<div>Set the [page:.onChangeCallback onChangeCallback]() method.</div>
+		<div>Sets the [page:.onChangeCallback onChangeCallback]() method.</div>
 
 		<h3>[method:Quaternion onChangeCallback]( )</h3>
 		<div>
-			This function is called whenever and of the following occur:
+			This function is called whenever any of the following occurs:
 			<ul>
 				<li>
 					The [page:.x x], [page:.y y], [page:.z z] or
@@ -188,7 +188,7 @@
 		<div>
 		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
-		*Axis* is asumed to be normalized, *angle* is in radians.
+		*Axis* is assumed to be normalized, *angle* is in radians.
 		</div>
 
 		<h3>[method:Quaternion setFromEuler]( [page:Euler euler] )</h3>
@@ -210,8 +210,8 @@
 
 		<h3>[method:Array toArray]( [page:Array array], [page:Integer offset] )</h3>
 		<div>
-		[page:Array array] - An optional array to store the quaternion. If not specified a new array will be created.<br/>
-		[page:Integer offset] - optional) if specified, the result will be copied
+		[page:Array array] - An optional array to store the quaternion. If not specified, a new array will be created.<br/>
+		[page:Integer offset] - (optional) if specified, the result will be copied
 		into this [page:Array].<br /><br />
 
 		Returns the numerical elements of this quaternion in an array of format [x, y, z, w].

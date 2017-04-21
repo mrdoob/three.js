@@ -11,9 +11,22 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
 		</style>
 	</head>
 	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - geometry - catmull spline editor</div>
 
 		<script src="../build/three.js"></script>
 
@@ -22,6 +35,7 @@
 		<script src="js/controls/TransformControls.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
@@ -39,8 +53,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var splineHelperObjects = [],
-				splineOutline;
+			var splineHelperObjects = [], splineOutline;
 			var splinePointsLength = 4;
 			var positions = [];
 			var options;
@@ -50,8 +63,16 @@
 			var ARC_SEGMENTS = 200;
 			var splineMesh;
 
-			var splines = {
+			var splines = {};
 
+			var params = {
+				uniform: true,
+				tension: 0.5,
+				centripetal: true,
+				chordal: true,
+				addPoint: addPoint,
+				removePoint: removePoint,
+				exportSpline: exportSpline
 			};
 
 			init();
@@ -59,11 +80,11 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
+
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
+				camera.position.set( 0, 250, 1000 );
 				scene.add( camera );
 
 				scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
@@ -77,12 +98,9 @@
 				scene.add( light );
 				spotlight = light;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
-
 				var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new THREE.ShadowMaterial();
-				planeMaterial.opacity = 0.2;
+				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = -200;
@@ -106,30 +124,22 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'catmull-rom rom spline comparisions';
-				options = document.createElement( 'div' );
-				options.style.position = 'absolute';
-				options.style.top = '30px';
-				options.style.width = '100%';
-				options.style.textAlign = 'center';
-
-				options.innerHTML = 'Points: <input type="button" onclick="addPoint();" value="+" />\
-					<input type="button" onclick="removePoint();" value="-" />\
-					<input type="button" onclick="exportSpline();" value="Export" /><br />\
-					<input type="checkbox" id="uniform" checked /> <label for="uniform">Uniform Catmull-rom</label>  <input type="range" id="tension" onchange="splines.uniform.tension = tension.value;updateSplineOutline();" min=0 max=1 step=0.01 value=0.5 /> <span id="tension_value" /></span> <br />\
-					<input type="checkbox" id="centripetal" checked /> Centripetal Catmull-rom<br />\
-					<input type="checkbox" id="chordal" checked /> Chordal Catmull-rom<br />';
-
-				container.appendChild( info );
-				container.appendChild( options );
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				var gui = new dat.GUI();
+
+				gui.add( params, 'uniform' );
+				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function( value ) {
+					splines.uniform.tension = value;
+					updateSplineOutline();
+				});
+				gui.add( params, 'centripetal' );
+				gui.add( params, 'chordal' );
+				gui.add( params, 'addPoint' );
+				gui.add( params, 'removePoint' );
+				gui.add( params, 'exportSpline' );
+				gui.open();
 
 				// Controls
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -377,13 +387,14 @@
 					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) )
 
 				}
+
 				console.log( strplace.join( ',\n' ) );
 				var code = '[' + ( strplace.join( ',\n\t' ) ) + ']';
 				prompt( 'copy and paste code', code );
 
-				}
+			}
 
-				function load( new_positions ) {
+			function load( new_positions ) {
 
 				while ( new_positions.length > positions.length ) {
 
@@ -412,16 +423,15 @@
 				requestAnimationFrame( animate );
 				render();
 				stats.update();
-				controls.update();
 				transformControl.update();
 
 			}
 
 			function render() {
 
-				splines.uniform.mesh.visible = uniform.checked;
-				splines.centripetal.mesh.visible = centripetal.checked;
-				splines.chordal.mesh.visible = chordal.checked;
+				splines.uniform.mesh.visible = params.uniform;
+				splines.centripetal.mesh.visible = params.centripetal;
+				splines.chordal.mesh.visible = params.chordal;
 				renderer.render( scene, camera );
 
 			}

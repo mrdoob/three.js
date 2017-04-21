@@ -50,8 +50,8 @@
 
 				var material = new THREE.MeshNormalMaterial();
 
-				var loader = new THREE.JSONLoader();
-				loader.load( 'obj/Suzanne.js', function ( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 

@@ -254,23 +254,6 @@
 
 			//
 
-			function createScene( geometry, materials, x, y, z, s ) {
-
-				geometry.center();
-
-				hackMaterials( materials );
-
-				var material = new THREE.MultiMaterial( materials );
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( x, y, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-			}
-
-			//
-
 			function onWindowResize( event ) {
 
 				SCREEN_WIDTH = window.innerWidth;

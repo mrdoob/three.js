@@ -49,7 +49,7 @@
 		<div>
 			Used to check whether this or derived classes are Object3Ds. Default is *true*.<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+			You should not change this, as it is used internally for optimisation.
 		</div>
 
 		<h3>[property:Layers layers]</h3>
@@ -69,7 +69,7 @@
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
 		<div>
-		The global transform of the object. If the Object3d has no parent, then it's identical to
+		The global transform of the object. If the Object3D has no parent, then it's identical to
 		the local transform [page:.matrix].
 		</div>
 
@@ -86,7 +86,13 @@
 		<div>Optional name of the object (doesn't need to be unique). Default is an empty string.</div>
 
 		<h3>[property:Matrix3 normalMatrix]</h3>
-		<div>This is passed to the shader and used to calculate lighting for the object.</div>
+		<div>
+		This is passed to the shader and used to calculate lighting for the object. It is the transpose of the inverse of the upper left 3x3 sub-matrix of this object's modelViewMatrix.<br /><br />
+
+		The reason for this special matrix is that simply using the modelViewMatrix could result in a non-unit length of normals (on scaling) or in a non-perpendicular direction (on non-uniform scaling).<br /><br />
+
+		On the other hand the translation part of the modelViewMatrix is not relevant for the calculation of normals. Thus a Matrix3 is sufficient.
+		</div>
 
 		<h3>[property:function onAfterRender]</h3>
 		<div>
@@ -139,7 +145,7 @@
 
 		<h3>[property:object userData]</h3>
 		<div>
-		An object that can be used to store custom data about the Object3d. It should not hold
+		An object that can be used to store custom data about the Object3D. It should not hold
 		references to functions as these will not be cloned.
 		</div>
 
@@ -168,12 +174,12 @@
 		<div>
 			The default [page:.up up] direction for objects, also used as the default position for [page:DirectionalLight],
 			[page:HemisphereLight] and [page:Spotlight] (which creates lights shining from the top down).<br />
-			Set to (0, 1, 0) by default.
+			Set to ( 0, 1, 0 ) by default.
 		</div>
 
 		<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
 		<div>
-			The default setting for [page.matrixAutoUpdate matrixAutoUpdate] for newly created Object3Ds.<br />
+			The default setting for [page:.matrixAutoUpdate matrixAutoUpdate] for newly created Object3Ds.<br />
 
 		</div>
 
@@ -196,7 +202,7 @@
 		<div>
 		recursive -- if true, descendants of the object are also cloned. Default is true.<br /><br />
 
-		Returns a clone of this object and optionaly all descendants.
+		Returns a clone of this object and optionally all descendants.
 		</div>
 
 		<h3>[method:Object3D copy]( [page:Object3D object], [page:Boolean recursive] )</h3>
@@ -216,7 +222,7 @@
 
 		<h3>[method:Object3D getObjectByName]( [page:String name] )</h3>
 		<div>
-		name -- String to match to the children's Object3d.name property. <br /><br />
+		name -- String to match to the children's Object3D.name property. <br /><br />
 
 		Searches through the object's children and returns the first with a matching name.<br />
 		Note that for most objects the [property:name] is an empty string by default. You will
@@ -228,7 +234,7 @@
 		name -- the property name to search for. <br />
 		value -- value of the given property. <br /><br />
 
-		Searches through the object's children and returns the first with a property that matches the aclue given.
+		Searches through the object's children and returns the first with a property that matches the value given.
 		</div>
 
 		<h3>[method:Vector3 getWorldPosition]( [page:Vector3 optionalTarget] )</h3>
@@ -273,7 +279,7 @@
 
 		<h3>[method:Vector3 localToWorld]( [page:Vector3 vector] )</h3>
 		<div>
-		vector - A vector representing a position in local (object) spave.<br /><br />
+		vector - A vector representing a position in local (object) space.<br /><br />
 
 		Converts the vector from local space to world space.
 		</div>

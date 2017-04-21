@@ -78,7 +78,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
-	this.setClearColor = function ( color, alpha ) {
+	this.setClearColor = function ( color ) {
 
 		clearColor.set( color );
 		clearColorBuffer( clearColor );
@@ -179,7 +179,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			var material = element.material;
 			var shader = getMaterialShader( material );
 
-			if ( !shader ) continue;
+			if ( ! shader ) continue;
 
 			if ( element instanceof THREE.RenderableFace ) {
 
@@ -286,8 +286,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				drawLine(
 					element.v1.positionScreen,
 					element.v2.positionScreen,
-					element.vertexColors[0],
-					element.vertexColors[1],
+					element.vertexColors[ 0 ],
+					element.vertexColors[ 1 ],
 					shader,
 					material
 				);
@@ -479,6 +479,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 			if ( buffer[ colorOffset + 3 ] == 255 )	// Only opaue pixls write to the depth buffer
 				depthBuf[ offset ] = depth;
+
 		}
 
 	}
@@ -528,16 +529,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
 
-	function onMaterialUpdate ( event ) {
-
-		var material = event.target;
-
-		material.removeEventListener( 'update', onMaterialUpdate );
-
-		delete shaders[ material.id ];
-
-	}
-
 	function getMaterialShader( material ) {
 
 		var id = material.id;
@@ -545,9 +536,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		if ( shader && material.map && !textures[ material.map.id ] ) delete shaders[ id ];
 
-		if ( shaders[ id ] === undefined ) {
-
-			material.addEventListener( 'update', onMaterialUpdate );
+		if ( shaders[ id ] === undefined || material.needsUpdate === true ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				material instanceof THREE.MeshLambertMaterial ||
@@ -581,7 +570,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var texture = new THREE.SoftwareRenderer.Texture();
 					texture.fromImage( material.map.image );
 
-					if ( !texture.data ) return;
+					if ( ! texture.data ) return;
 
 					textures[ material.map.id ] = texture;
 
@@ -636,7 +625,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					'buffer[ colorOffset + 2 ] = material.color.b * (color1.b+color2.b) * 0.5 * 255;',
 					'buffer[ colorOffset + 3 ] = 255;',
 					'depthBuf[ offset ] = depth;'
-				].join('\n');
+				].join( '\n' );
 
 				shader = new Function( 'buffer, depthBuf, offset, depth, color1, color2, material', string );
 
@@ -657,12 +646,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 			shaders[ id ] = shader;
 
+			material.needsUpdate = false;
+
 		}
 
 		return shader;
 
 	}
 
+	/*
 	function clearRectangle( x1, y1, x2, y2 ) {
 
 		var xmin = Math.max( Math.min( x1, x2 ), 0 );
@@ -686,6 +678,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		}
 
 	}
+	*/
 
 	function drawTriangle( v1, v2, v3, uv1, uv2, uv3, shader, face, material ) {
 
@@ -712,13 +705,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var bHasUV = uv1 && uv2 && uv3;
 
 		var longestSide = Math.max(
-			Math.sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) ),
-			Math.sqrt( (x2 - x3)*(x2 - x3) + (y2 - y3)*(y2 - y3) ),
-			Math.sqrt( (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1) )
+			Math.sqrt( ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 ) ),
+			Math.sqrt( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) ),
+			Math.sqrt( ( x3 - x1 ) * ( x3 - x1 ) + ( y3 - y1 ) * ( y3 - y1 ) )
 		);
 
-		if( !(face instanceof THREE.RenderableSprite)
-			&& (longestSide > 100 * fixscale) ) {
+		if ( ! ( face instanceof THREE.RenderableSprite ) && ( longestSide > 100 * fixscale ) ) {
 
 			// 1
 			// |\
@@ -728,11 +720,13 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			// |b\|d\
 			// |__\__\
 			// 2      3
-			var tempFace = { vertexNormalsModel : [],
-						color : face.color };
+			var tempFace = { vertexNormalsModel: [], color: face.color };
 			var mpUV12, mpUV23, mpUV31;
+
 			if ( bHasUV ) {
+
 				if ( mpUVPoolCount === mpUVPool.length ) {
+
 					mpUV12 = new THREE.Vector2();
 					mpUVPool.push( mpUV12 );
 					++mpUVPoolCount;
@@ -744,27 +738,37 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					mpUV31 = new THREE.Vector2();
 					mpUVPool.push( mpUV31 );
 					++mpUVPoolCount;
+
 				} else {
+
 					mpUV12 = mpUVPool[ mpUVPoolCount ];
 					++mpUVPoolCount;
+
 					mpUV23 = mpUVPool[ mpUVPoolCount ];
 					++mpUVPoolCount;
+
 					mpUV31 = mpUVPool[ mpUVPoolCount ];
 					++mpUVPoolCount;
+
 				}
 
 				var weight;
 
-				weight = (1 + v2.z) * (v2.w / v1.w) / (1 + v1.z);
-				mpUV12.copy( uv1 ).multiplyScalar( weight ).add( uv2 ).multiplyScalar( 1 / (weight + 1) );
-				weight = (1 + v3.z) * (v3.w / v2.w) / (1 + v2.z);
-				mpUV23.copy( uv2 ).multiplyScalar( weight ).add( uv3 ).multiplyScalar( 1 / (weight + 1) );
-				weight = (1 + v1.z) * (v1.w / v3.w) / (1 + v3.z);
-				mpUV31.copy( uv3 ).multiplyScalar( weight ).add( uv1 ).multiplyScalar( 1 / (weight + 1) );
+				weight = ( 1 + v2.z ) * ( v2.w / v1.w ) / ( 1 + v1.z );
+				mpUV12.copy( uv1 ).multiplyScalar( weight ).add( uv2 ).multiplyScalar( 1 / ( weight + 1 ) );
+
+				weight = ( 1 + v3.z ) * ( v3.w / v2.w ) / ( 1 + v2.z );
+				mpUV23.copy( uv2 ).multiplyScalar( weight ).add( uv3 ).multiplyScalar( 1 / ( weight + 1 ) );
+
+				weight = ( 1 + v1.z ) * ( v1.w / v3.w ) / ( 1 + v3.z );
+				mpUV31.copy( uv3 ).multiplyScalar( weight ).add( uv1 ).multiplyScalar( 1 / ( weight + 1 ) );
+
 			}
 
 			var mpV12, mpV23, mpV31;
+
 			if ( mpVPoolCount === mpVPool.length ) {
+
 				mpV12 = new THREE.Vector4();
 				mpVPool.push( mpV12 );
 				++mpVPoolCount;
@@ -776,13 +780,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				mpV31 = new THREE.Vector4();
 				mpVPool.push( mpV31 );
 				++mpVPoolCount;
+
 			} else {
+
 				mpV12 = mpVPool[ mpVPoolCount ];
 				++mpVPoolCount;
+
 				mpV23 = mpVPool[ mpVPoolCount ];
 				++mpVPoolCount;
+
 				mpV31 = mpVPool[ mpVPoolCount ];
 				++mpVPoolCount;
+
 			}
 
 			mpV12.copy( v1 ).add( v2 ).multiplyScalar( 0.5 );
@@ -790,8 +799,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			mpV31.copy( v3 ).add( v1 ).multiplyScalar( 0.5 );
 
 			var mpN12, mpN23, mpN31;
-			if( bHasNormal ) {
+
+			if ( bHasNormal ) {
+
 				if ( mpNPoolCount === mpNPool.length ) {
+
 					mpN12 = new THREE.Vector3();
 					mpNPool.push( mpN12 );
 					++mpNPoolCount;
@@ -803,53 +815,72 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					mpN31 = new THREE.Vector3();
 					mpNPool.push( mpN31 );
 					++mpNPoolCount;
+
 				} else {
+
 					mpN12 = mpNPool[ mpNPoolCount ];
 					++mpNPoolCount;
+
 					mpN23 = mpNPool[ mpNPoolCount ];
 					++mpNPoolCount;
+
 					mpN31 = mpNPool[ mpNPoolCount ];
 					++mpNPoolCount;
+
 				}
 
 				mpN12.copy( face.vertexNormalsModel[ 0 ] ).add( face.vertexNormalsModel[ 1 ] ).normalize();
 				mpN23.copy( face.vertexNormalsModel[ 1 ] ).add( face.vertexNormalsModel[ 2 ] ).normalize();
 				mpN31.copy( face.vertexNormalsModel[ 2 ] ).add( face.vertexNormalsModel[ 0 ] ).normalize();
+
 			}
 
 			// a
-			if( bHasNormal ) {
+			if ( bHasNormal ) {
+
 				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 0 ];
 				tempFace.vertexNormalsModel[ 1 ] = mpN12;
 				tempFace.vertexNormalsModel[ 2 ] = mpN31;
+
 			}
+
 			drawTriangle( v1, mpV12, mpV31, uv1, mpUV12, mpUV31, shader, tempFace, material );
 
 			// b
-			if( bHasNormal ) {
+			if ( bHasNormal ) {
+
 				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 1 ];
 				tempFace.vertexNormalsModel[ 1 ] = mpN23;
 				tempFace.vertexNormalsModel[ 2 ] = mpN12;
+
 			}
+
 			drawTriangle( v2, mpV23, mpV12, uv2, mpUV23, mpUV12, shader, tempFace, material );
 
 			// c
-			if( bHasNormal ) {
+			if ( bHasNormal ) {
+
 				tempFace.vertexNormalsModel[ 0 ] = mpN12;
 				tempFace.vertexNormalsModel[ 1 ] = mpN23;
 				tempFace.vertexNormalsModel[ 2 ] = mpN31;
+
 			}
+
 			drawTriangle( mpV12, mpV23, mpV31, mpUV12, mpUV23, mpUV31, shader, tempFace, material );
 
 			// d
-			if( bHasNormal ) {
+			if ( bHasNormal ) {
+
 				tempFace.vertexNormalsModel[ 0 ] = face.vertexNormalsModel[ 2 ];
 				tempFace.vertexNormalsModel[ 1 ] = mpN31;
 				tempFace.vertexNormalsModel[ 2 ] = mpN23;
+
 			}
+
 			drawTriangle( v3, mpV31, mpV23, uv3, mpUV31, mpUV23, shader, tempFace, material );
 
 			return;
+
 		}
 
 		// Z values (.28 fixed-point)
@@ -976,7 +1007,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		}
 
-		var dnxdx, dnzdy, cbnz;
+		var dnzdy, cbnz;
+
 		if ( bHasNormal ) {
 
 			 // Normal interpolation setup
@@ -1369,16 +1401,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	function drawLine( v1, v2, color1, color2, shader, material ) {
 
 		// While the line mode is enable, blockSize has to be changed to 0.
-		if ( !lineMode ) {
+		if ( ! lineMode ) {
+
 			lineMode = true;
 			blockShift = 0;
 			blockSize = 1 << blockShift;
 
 			setSize( canvas.width, canvas.height );
+
 		}
 
 		// TODO: Implement per-pixel z-clipping
-		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
+		if ( v1.z < - 1 || v1.z > 1 || v2.z < - 1 || v2.z > 1 ) return;
 
 		var halfLineWidth = Math.floor( ( material.linewidth - 1 ) * 0.5 );
 
@@ -1422,7 +1456,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		crossVector.cross( lookVector );
 		crossVector.normalize();
 
-		while (length > 0) {
+		while ( length > 0 ) {
 
 			// Get this pixel.
 			pixelX = x2 + length * unitX;
@@ -1434,7 +1468,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			pZ = ( pixelZ + subpixelBias ) >> subpixelBits;
 
 			// Draw line with line width
-			for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
+			for ( var i = - halfLineWidth; i <= halfLineWidth; ++ i ) {
 
 				// Compute the line pixels.
 				// Get the pixels on the vector that crosses to the line vector
@@ -1442,9 +1476,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				pY = Math.floor( ( pixelY + crossVector.y * i ) );
 
 				// if pixel is over the rect. Continue
-				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY
-					|| recty2 <= pY )
-				continue;
+				if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY || recty2 <= pY )
+					continue;
 
 				// Find this pixel at which block
 				var blockX = pX >> blockShift;
@@ -1464,11 +1497,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				var offset = pX + pY * canvasWidth;
 
 				if ( pZ < zbuffer[ offset ] ) {
+
 					shader( data, zbuffer, offset, pZ, color1, color2, material );
+
 				}
+
 			}
 
 			--length;
+
 		}
 
 	}
@@ -1526,11 +1563,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 };
 
-THREE.SoftwareRenderer.Texture = function() {
+THREE.SoftwareRenderer.Texture = function () {
 
 	var canvas;
 
-	this.fromImage = function( image ) {
+	this.fromImage = function ( image ) {
 
 		if ( ! image || image.width <= 0 || image.height <= 0 )
 			return;

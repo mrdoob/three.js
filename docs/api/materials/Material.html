@@ -17,8 +17,8 @@
 		They are defined in a (mostly) renderer-independent way, so you don't have to
 		rewrite materials if you decide to use a different renderer.<br /><br />
 
-		With the exception of [page:MultiMaterial MultiMaterial], the following properties
-		and methods are inherited by all other material types (although they may have different defaults).
+		The following properties and methods are inherited by all other material types
+		(although they may have different defaults).
 		</div>
 
 		<h2>Constructor</h2>
@@ -100,6 +100,21 @@
 		This can be used in conjunction with a mesh's [property:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
 		</div>
 
+		<h3>[property:Material customDepthMaterial]</h3>
+		<div>
+		Custom depth material to be used by this material in depth based computation. If a material uses any custom logic to position the vertices (animation, displacement other than the default texture based, instancing...) the depth material should also include that logic in order to make effects like shadows and SSAO work. Defining this property allows the WebGLRenderer to use this instance of the material instead of the internal cache. Default is *undefined*.
+		</div>
+		
+		<h3>[property:Material customDistanceMaterial]</h3>
+		<div>
+		Same as customDepthMaterial but used for specific computation (point lights for example). Default is *undefined*
+		</div>
+		
+		<h3>[property:Object defines]</h3>
+		<div>
+		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
+		</div>
+		
 		<h3>[property:Integer depthFunc]</h3>
 		<div>
 		Which depth function to use. Default is [page:Materials LessEqualDepth]. See the depth mode [page:Materials constants] for all possible values.
@@ -183,6 +198,12 @@
 		Default is *false*.
 		</div>
 
+		<h3>[property:Boolean dithering]</h3>
+		<div>
+		Whether to apply dithering to the color to remove the appearance of banding.
+		Default is *false*.
+		</div>
+
 		<h3>[property:Integer shading]</h3>
 		<div>
 		Defines how the material is shaded.
@@ -236,7 +257,7 @@
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
 		<h3>[method:Material clone]( )</h3>
-		<div>Return a new materials with the same parameters as this material.</div>
+		<div>Return a new material with the same parameters as this material.</div>
 
 		<h3>[method:Material copy]( [page:material material] )</h3>
 		<div>Copy the parameters from the passed material into this material.</div>

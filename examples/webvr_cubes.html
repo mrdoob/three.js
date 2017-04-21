@@ -4,6 +4,8 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-05-25 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-05-25" content="Atlrg03BdkeS00YJBz6xcPTMf/Kvm+vc4Mhb0JUzhgCXXe64/YztVsRiOc5dA3OXXPCCaTmY3yVplbeQyGTtmQsAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NTczNjMwN30=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -130,20 +132,11 @@
 				controls = new THREE.VRControls( camera );
 				effect = new THREE.VREffect( renderer );
 
-				if ( navigator.getVRDisplays ) {
+				WEBVR.getVRDisplay( function ( display ) {
 
-					navigator.getVRDisplays()
-						.then( function ( displays ) {
-							effect.setVRDisplay( displays[ 0 ] );
-							controls.setVRDisplay( displays[ 0 ] );
-						} )
-						.catch( function () {
-							// no displays
-						} );
+					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
 
-					document.body.appendChild( WEBVR.getButton( effect ) );
-
-				}
+				} );
 
 				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );

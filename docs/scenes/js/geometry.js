@@ -91,7 +91,9 @@ function updateGroupGeometry( mesh, geometry ) {
 
 }
 
-function CustomSinCurve( scale ){
+function CustomSinCurve( scale ) {
+
+	THREE.Curve.call( this );
 
 	this.scale = ( scale === undefined ) ? 1 : scale;
 
@@ -744,7 +746,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingBufferGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -778,7 +780,7 @@ var guis = {
 
 		var folder = gui.addFolder( 'THREE.RingGeometry' );
 
-		folder.add( data, 'innerRadius', 0, 30 ).onChange( generateGeometry );
+		folder.add( data, 'innerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'outerRadius', 1, 30 ).onChange( generateGeometry );
 		folder.add( data, 'thetaSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'phiSegments', 1, 30 ).step( 1 ).onChange( generateGeometry );
@@ -1291,6 +1293,46 @@ var guis = {
 		}
 
 		var folder = gui.addFolder( 'THREE.ExtrudeGeometry' );
+
+		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelThickness', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSize', 1, 5 ).step( 1 ).onChange( generateGeometry );
+		folder.add( data, 'bevelSegments', 1, 5 ).step( 1 ).onChange( generateGeometry );
+
+		generateGeometry();
+
+	},
+
+	ExtrudeBufferGeometry: function( mesh ) {
+
+		var data = {
+			steps: 2,
+			amount: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		function generateGeometry() {
+
+			updateGroupGeometry( mesh,
+				new THREE.ExtrudeBufferGeometry( shape, data )
+			);
+
+		}
+
+		var folder = gui.addFolder( 'THREE.ExtrudeBufferGeometry' );
 
 		folder.add( data, 'steps', 1, 10 ).step( 1 ).onChange( generateGeometry );
 		folder.add( data, 'amount', 1, 20 ).step( 1 ).onChange( generateGeometry );

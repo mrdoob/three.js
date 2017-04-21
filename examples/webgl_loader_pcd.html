@@ -115,7 +115,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener('keydown', keyboard);
+				window.addEventListener('keypress', keyboard);
 
 			}
 
@@ -132,7 +132,7 @@
 
 				var ZaghettoMesh = scene.getObjectByName( "Zaghetto.pcd" );
 
-				switch ( ev.key ) {
+				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 
 					case '+':
 						ZaghettoMesh.material.size*=1.2;

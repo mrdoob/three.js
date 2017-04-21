@@ -1,6 +1,12 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Alex Pletzer
+ * 
+ * Updated on 22.03.2017
+ * VTK header is now parsed and used to extract all the compressed data
+ * @author Andrii Iudin https://github.com/andreyyudin
+ * @author Paul Kibet Korir https://github.com/polarise
+ * @author Sriram Somasundharam https://github.com/raamssundar
  */
 
 THREE.VTKLoader = function( manager ) {
@@ -526,6 +532,26 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
+		function Float32Concat(first, second) {
+		    var firstLength = first.length,
+		        result = new Float32Array(firstLength + second.length);
+
+		    result.set(first);
+		    result.set(second, firstLength);
+
+		    return result;
+		}
+
+		function Int32Concat(first, second) {
+		    var firstLength = first.length,
+		        result = new Int32Array(firstLength + second.length);
+
+		    result.set(first);
+		    result.set(second, firstLength);
+
+		    return result;
+		}
+
 		function parseXML( stringFile ) {
 
 			// Changes XML to JSON, based on https://davidwalsh.name/convert-xml-json
@@ -666,132 +692,144 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			}
 
 			function parseDataArray( ele, compressed ) {
+				var numBytes = 0;
+				if ( json.attributes.header_type == 'UInt64' )
+					numBytes = 8;
+				else if( json.attributes.header_type == 'UInt32' )
+					numBytes = 4;
 
 				// Check the format
+				if ( ele.attributes.format == 'binary' && compressed ) {
+						var rawData, content, byteData, blocks, cSizeStart, headerSize, padding, dataOffsets, currentOffset;
 
-				if ( ele.attributes.format == 'binary' ) {
-
-					if ( compressed ) {
-
-						// Split the blob_header and compressed Data
-						if ( ele[ '#text' ].indexOf( '==' ) != - 1 ) {
-
-							var data = ele[ '#text' ].split( '==' );
-
-							// console.log( data );
-
-							if ( data.length == 2 ) {
-
-								var blob = data.shift();
-								var content = data.shift();
-
-								if ( content === '' ) {
-
-									content = blob + '==';
-
-								}
-
-							} else if ( data.length > 2 ) {
-
-								var blob = data.shift();
-								var content = data.shift();
-								content = content + '==';
-
-							} else if ( data.length < 2 ) {
-
-								var content = data.shift();
-								content = content + '==';
-
-							}
-
-							// Convert to bytearray
-							var arr = Base64toByteArray( content );
-
-							// decompress
-							var inflate = new Zlib.Inflate( arr, { resize: true, verify: true } );
-							var content = inflate.decompress();
-
-						} else {
-
-							var content = Base64toByteArray( ele[ '#text' ] );
-
+						if ( ele.attributes.type == 'Float32' ) {
+							var txt = new Float32Array( );
+						} else if ( ele.attributes.type === 'Int64' ) {
+							var txt = new Int32Array( );
 						}
 
-					} else {
+						// VTP data with the header has the following structure:
+						// [#blocks][#u-size][#p-size][#c-size-1][#c-size-2]...[#c-size-#blocks][DATA]
+						//
+						// Each token is an integer value whose type is specified by "header_type" at the top of the file (UInt32 if no type specified). The token meanings are:
+						// [#blocks] = Number of blocks
+						// [#u-size] = Block size before compression
+						// [#p-size] = Size of last partial block (zero if it not needed)
+						// [#c-size-i] = Size in bytes of block i after compression
+						//
+						// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is 
+						// computed by summing the compressed block sizes from preceding blocks according to the header. 
+
+						rawData = ele[ '#text' ];
+
+						byteData = Base64toByteArray( rawData );
+
+						blocks = byteData[0]
+						for ( var i = 1; i<numBytes-1; i++ ) {
+							blocks = blocks | ( byteData[i] << (i*numBytes) );
+						}
+
+						headerSize = (blocks + 3) * numBytes;
+						padding = ( (headerSize % 3) > 0 ) ? 3 - (headerSize % 3) : 0;
+						headerSize = headerSize + padding;
+						
+						dataOffsets = [];
+						currentOffset = headerSize;
+						dataOffsets.push( currentOffset );
+
+						// Get the blocks sizes after the compression.
+						// There are three blocks before c-size-i, so we skip 3*numBytes
+						cSizeStart = 3*numBytes;
+						for ( var i = 0; i<blocks; i++ ) {
+							var currentBlockSize = byteData[i*numBytes + cSizeStart];
+							for ( var j = 1; j<numBytes-1; j++ ) {
+								currentBlockSize = currentBlockSize | ( byteData[i*numBytes + cSizeStart + j] << (j*numBytes) );
+							}
+							
+							currentOffset = currentOffset + currentBlockSize;
+							dataOffsets.push( currentOffset );
+						}
+
+						for ( var i=0; i<dataOffsets.length-1; i++ ) {
+							var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[i], dataOffsets[i+1] ), { resize: true, verify: true } );
+							content = inflate.decompress();
+							content = content.buffer;
+
+							if ( ele.attributes.type == 'Float32' ) {
+								content = new Float32Array( content );
+								txt = Float32Concat(txt, content);
+							} else if ( ele.attributes.type === 'Int64' ) {
+								content = new Int32Array( content );
+								txt = Int32Concat(txt, content);
+							}
+						}
+
+						delete ele[ '#text' ];
+
+						// Get the content and optimize it
+						if ( ele.attributes.type == 'Float32' ) {
+							if ( ele.attributes.format == 'binary' ) {
+								if ( ! compressed ) {
+									txt = txt.filter( function( el, idx, arr ) {
+										if ( idx !== 0 ) return true;
+									} );
+								}
+							}
+
+						} else if ( ele.attributes.type === 'Int64' ) {
+							if ( ele.attributes.format == 'binary' ) {
+								if ( ! compressed ) {
+									txt = txt.filter( function ( el, idx, arr ) {
+										if ( idx !== 0 ) return true;
+									} );
+								}
+
+								txt = txt.filter( function ( el, idx, arr ) {
+									if ( idx % 2 !== 1 ) return true;
+								} );
+							}
+						}
+
+				} else {
+					if ( ele.attributes.format == 'binary' && ! compressed ) {
 
 						var content = Base64toByteArray( ele[ '#text' ] );
 
-					}
-
-					var content = content.buffer;
-
-				} else {
-
-					if ( ele[ '#text' ] ) {
-
-						var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el, idx, arr ) {
-
-							if ( el !== '' ) return el;
-
-						} );
+						//  VTP data for the uncompressed case has the following structure:
+						// [#bytes][DATA]
+						// where "[#bytes]" is an integer value specifying the number of bytes in the block of data following it.
+						content = content.slice(numBytes).buffer;
 
 					} else {
 
-						var content = new Int32Array( 0 ).buffer;
-
-					}
-
-				}
-
-				delete ele[ '#text' ];
-
-				// Get the content and optimize it
-
-				if ( ele.attributes.type == 'Float32' ) {
-
-					var txt = new Float32Array( content );
-
-					if ( ele.attributes.format == 'binary' ) {
-
-						if ( ! compressed ) {
-
-							txt = txt.filter( function( el, idx, arr ) {
-
-								if ( idx !== 0 ) return true;
-
+						if ( ele[ '#text' ] ) {
+							var content = ele[ '#text' ].replace( /\n/g, ' ' ).split( ' ' ).filter( function ( el, idx, arr ) {
+								if ( el !== '' ) return el;
 							} );
-
+						} else {
+							var content = new Int32Array( 0 ).buffer;
 						}
 
 					}
 
-				} else if ( ele.attributes.type === 'Int64' ) {
+					delete ele[ '#text' ];
 
-					var txt = new Int32Array( content );
+					// Get the content and optimize it
+					if ( ele.attributes.type == 'Float32' ) {
 
-					if ( ele.attributes.format == 'binary' ) {
+						var txt = new Float32Array( content );
 
-						if ( ! compressed ) {
+					} else if ( ele.attributes.type === 'Int64' ) {
+						var txt = new Int32Array( content );
 
+						if ( ele.attributes.format == 'binary' ) {
 							txt = txt.filter( function ( el, idx, arr ) {
-
-								if ( idx !== 0 ) return true;
-
+								if ( idx % 2 !== 1 ) return true;
 							} );
-
 						}
-
-						txt = txt.filter( function ( el, idx, arr ) {
-
-							if ( idx % 2 !== 1 ) return true;
-
-						} );
-
 					}
 
-				}
-
-				// console.log( txt );
+				} // endif ( ele.attributes.format == 'binary' && compressed )
 
 				return txt;
 
@@ -881,8 +919,10 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 						while ( dataArrayIndex < numberOfDataArrays ) {
 
 							// Parse the DataArray
-							arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
-							dataArrayIndex ++;
+							if ( ('#text' in arr[ dataArrayIndex ]) && (arr[ dataArrayIndex ][ '#text' ].length > 0) ) {
+								arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
+							}
+								dataArrayIndex ++;
 
 						}
 
@@ -910,8 +950,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 								}
 
-								// console.log('Normals', normals);
-
 								break;
 
 							// if it is points
@@ -926,8 +964,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 									points.set( section.DataArray.text, 0 );
 
 								}
-
-								// console.log('Points', points);
 
 								break;
 
@@ -984,8 +1020,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 
 								}
 
-								//console.log('Strips', indices);
-
 								break;
 
 							// if it is polys
@@ -1034,7 +1068,7 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 									}
 
 								}
-								//console.log('Polys', indices);
+
 								break;
 
 							default:
@@ -1057,8 +1091,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 				}
-
-				// console.log( json );
 
 				return geometry;
 
