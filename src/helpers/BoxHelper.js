@@ -45,7 +45,11 @@ BoxHelper.prototype.update = ( function () {
 
 		}
 
-		if ( this.object !== undefined ) {
+		if ( this.object instanceof Box3 ) {
+
+			box.copy( this.object );
+
+		} else if ( this.object !== undefined ) {
 
 			box.setFromObject( this.object );
 
