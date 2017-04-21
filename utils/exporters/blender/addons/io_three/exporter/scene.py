@@ -150,8 +150,7 @@ class Scene(base_classes.BaseScene):
                     if geo_type == constants.GEOMETRY.lower():
                         geom_data.pop(constants.DATA)
                     elif geo_type == constants.BUFFER_GEOMETRY.lower():
-                        geom_data.pop(constants.ATTRIBUTES)
-                        geom_data.pop(constants.METADATA)
+                        geom_data.pop(constants.DATA)
 
                     url = 'geometry.%s%s' % (geom.node, extension)
                     geometry_file = os.path.join(export_dir, url)
