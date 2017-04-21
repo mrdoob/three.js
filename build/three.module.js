@@ -188,7 +188,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '85dev';
+var REVISION = '85';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 var CullFaceNone = 0;
 var CullFaceBack = 1;
@@ -16261,7 +16261,7 @@ function WebGLRenderLists() {
 
 		if ( list === undefined ) {
 
-			console.log( 'THREE.WebGLRenderLists:', hash );
+			// console.log( 'THREE.WebGLRenderLists:', hash );
 
 			list = new WebGLRenderList();
 			lists[ hash ] = list;
@@ -20512,6 +20512,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	function absNumericalSort( a, b ) {
+
+		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+
+	}
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -20850,13 +20856,47 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	// Sorting
+	// Compile
 
-	function absNumericalSort( a, b ) {
+	this.compile = function ( scene, camera ) {
 
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+		lights = [];
 
-	}
+		scene.traverse( function ( object ) {
+
+			if ( object.isLight ) {
+
+				lights.push( object );
+
+			}
+
+		} );
+
+		setupLights( lights, camera );
+
+		scene.traverse( function ( object ) {
+
+			if ( object.material ) {
+
+				if ( Array.isArray( object.material ) ) {
+
+					for ( var i = 0; i < object.material.length; i ++ ) {
+
+						initMaterial( object.material[ i ], scene.fog, object );
+
+					}
+
+				} else {
+
+					initMaterial( object.material, scene.fog, object );
+
+				}
+
+			}
+
+		} );
+
+	};
 
 	// Rendering
 
