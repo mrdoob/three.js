@@ -152,7 +152,7 @@ function replaceLightNums( string, parameters ) {
 
 function parseIncludes( string ) {
 
-	var pattern = /^\s*#include +<([\w\d.]+)>/gm;
+	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
 
 	function replace( match, include ) {
 
@@ -478,7 +478,6 @@ function WebGLProgram( renderer, code, material, parameters ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( "toneMapping", parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.dithering ? ShaderChunk[ 'dithering_pars_fragment' ] : '',
 
 			( parameters.outputEncoding || parameters.mapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ? ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 			parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',

@@ -45,6 +45,7 @@ class Material(base_classes.BaseNode):
 
         if api.material.transparent(self.node):
             self[constants.TRANSPARENT] = True
+            self[constants.OPACITY] = api.material.opacity(self.node)
 
         if api.material.double_sided(self.node):
             self[constants.SIDE] = constants.SIDE_DOUBLE

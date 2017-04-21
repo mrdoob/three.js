@@ -4,7 +4,7 @@ var list = {
 
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
-			"Detecting WebGL and browser compatibility": "manual/introduction/Detecting-WebGL-and-browser-compatibility",
+			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
 			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",

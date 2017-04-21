@@ -69,6 +69,11 @@
 			The first parameter can be either an [page:AnimationClip] object or the name of an AnimationClip.
 		</div>
 
+		<h3>[method:Object3D getRoot]()</h3>
+		<div>
+			Returns this mixer's root object.
+		</div>
+
 		<h3>[method:AnimationMixer stopAllAction]()</h3>
 		<div>
 			Deactivates all previously scheduled actions on this mixer.
@@ -79,11 +84,6 @@
 			Advances the global mixer time and updates the animation.<br /><br />
 
 			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
-		</div>
-
-		<h3>[method:Object3D getRoot]()</h3>
-		<div>
-			Returns this mixer's root object.
 		</div>
 
 		<h3>[method:null uncacheClip]([page:AnimationClip clip])</h3>

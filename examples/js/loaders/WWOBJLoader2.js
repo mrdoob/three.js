@@ -208,7 +208,7 @@ THREE.OBJLoader2.WWOBJLoader2 = (function () {
 		if ( this.dataAvailable ) {
 
 			// fast-fail on bad type
-			if ( ! params.objAsArrayBuffer instanceof Uint8Array ) {
+			if ( ! ( params.objAsArrayBuffer instanceof Uint8Array ) ) {
 				throw 'Provided input is not of type arraybuffer! Aborting...';
 			}
 

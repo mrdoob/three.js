@@ -688,6 +688,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	function absNumericalSort( a, b ) {
+
+		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+
+	}
+
 	this.renderBufferDirect = function ( camera, fog, geometry, material, object, group ) {
 
 		state.setMaterial( material );
@@ -1026,13 +1032,47 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	// Sorting
+	// Compile
 
-	function absNumericalSort( a, b ) {
+	this.compile = function ( scene, camera ) {
 
-		return Math.abs( b[ 0 ] ) - Math.abs( a[ 0 ] );
+		lights = [];
 
-	}
+		scene.traverse( function ( object ) {
+
+			if ( object.isLight ) {
+
+				lights.push( object );
+
+			}
+
+		} );
+
+		setupLights( lights, camera );
+
+		scene.traverse( function ( object ) {
+
+			if ( object.material ) {
+
+				if ( Array.isArray( object.material ) ) {
+
+					for ( var i = 0; i < object.material.length; i ++ ) {
+
+						initMaterial( object.material[ i ], scene.fog, object );
+
+					}
+
+				} else {
+
+					initMaterial( object.material, scene.fog, object );
+
+				}
+
+			}
+
+		} );
+
+	};
 
 	// Rendering
 
@@ -1304,42 +1344,27 @@ function WebGLRenderer( parameters ) {
 
 		if ( ! object.visible ) return;
 
-		if ( object.isLight ) {
+		var visible = object.layers.test( camera.layers );
 
-			lights.push( object );
+		if ( visible ) {
 
-		} else if ( object.isSprite ) {
+			if ( object.isLight ) {
 
-			if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+				lights.push( object );
 
-				sprites.push( object );
+			} else if ( object.isSprite ) {
 
-			}
+				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
-		} else if ( object.isLensFlare ) {
+					sprites.push( object );
 
-			lensFlares.push( object );
+				}
 
-		} else if ( object.isImmediateRenderObject ) {
+			} else if ( object.isLensFlare ) {
 
-			if ( sortObjects ) {
+				lensFlares.push( object );
 
-				_vector3.setFromMatrixPosition( object.matrixWorld )
-					.applyMatrix4( _projScreenMatrix );
-
-			}
-
-			currentRenderList.push( object, null, object.material, _vector3.z, null );
-
-		} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-			if ( object.isSkinnedMesh ) {
-
-				object.skeleton.update();
-
-			}
-
-			if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+			} else if ( object.isImmediateRenderObject ) {
 
 				if ( sortObjects ) {
 
@@ -1348,29 +1373,50 @@ function WebGLRenderer( parameters ) {
 
 				}
 
-				var geometry = objects.update( object );
-				var material = object.material;
+				currentRenderList.push( object, null, object.material, _vector3.z, null );
 
-				if ( Array.isArray( material ) ) {
+			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-					var groups = geometry.groups;
+				if ( object.isSkinnedMesh ) {
 
-					for ( var i = 0, l = groups.length; i < l; i ++ ) {
+					object.skeleton.update();
 
-						var group = groups[ i ];
-						var groupMaterial = material[ group.materialIndex ];
+				}
 
-						if ( groupMaterial && groupMaterial.visible ) {
+				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-							currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+					if ( sortObjects ) {
 
-						}
+						_vector3.setFromMatrixPosition( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
 
 					}
 
-				} else if ( material.visible ) {
+					var geometry = objects.update( object );
+					var material = object.material;
 
-					currentRenderList.push( object, geometry, material, _vector3.z, null );
+					if ( Array.isArray( material ) ) {
+
+						var groups = geometry.groups;
+
+						for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+							var group = groups[ i ];
+							var groupMaterial = material[ group.materialIndex ];
+
+							if ( groupMaterial && groupMaterial.visible ) {
+
+								currentRenderList.push( object, geometry, groupMaterial, _vector3.z, group );
+
+							}
+
+						}
+
+					} else if ( material.visible ) {
+
+						currentRenderList.push( object, geometry, material, _vector3.z, null );
+
+					}
 
 				}
 
@@ -1437,8 +1483,6 @@ function WebGLRenderer( parameters ) {
 	}
 
 	function renderObject( object, scene, camera, geometry, material, group ) {
-
-		if ( object.layers.test( camera.layers ) === false ) return;
 
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
@@ -2416,18 +2460,7 @@ function WebGLRenderer( parameters ) {
 				}
 
 				_lights.pointShadowMap[ pointLength ] = shadowMap;
-
-				if ( _lights.pointShadowMatrix[ pointLength ] === undefined ) {
-
-					_lights.pointShadowMatrix[ pointLength ] = new Matrix4();
-
-				}
-
-				// for point lights we set the shadow matrix to be a translation-only matrix
-				// equal to inverse of the light's position
-				_vector3.setFromMatrixPosition( light.matrixWorld ).negate();
-				_lights.pointShadowMatrix[ pointLength ].identity().setPosition( _vector3 );
-
+				_lights.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 				_lights.point[ pointLength ] = uniforms;
 
 				pointLength ++;

@@ -35,9 +35,9 @@ struct BlinnPhongMaterial {
 				geometry,
 				rectAreaLight.position, rectAreaLight.halfWidth, rectAreaLight.halfHeight );
 
-		// TODO (abelnation): note why division by 2PI is necessary
-		reflectedLight.directSpecular += lightColor * matSpecColor * spec / PI2;
-		reflectedLight.directDiffuse  += lightColor * matDiffColor * diff / PI2;
+		// division by 2 * PI is moved inside the above calls. This is essential as Eq (11) is having this normalization.
+		reflectedLight.directSpecular += lightColor * matSpecColor * spec;
+		reflectedLight.directDiffuse  += lightColor * matDiffColor * diff;
 
 	}
 #endif

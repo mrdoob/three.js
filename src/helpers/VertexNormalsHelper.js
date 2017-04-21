@@ -145,8 +145,6 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 		position.needsUpdate = true;
 
-		return this;
-
 	};
 
 }() );
