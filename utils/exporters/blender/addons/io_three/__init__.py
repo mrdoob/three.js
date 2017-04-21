@@ -551,7 +551,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_faces = BoolProperty(
         name="Faces",
-        description="Export faces",
+        description="Export faces (Geometry only)",
         default=constants.EXPORT_OPTIONS[constants.FACES])
 
     option_normals = BoolProperty(
@@ -581,7 +581,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     option_face_materials = BoolProperty(
         name="Face Materials",
-        description="Face mapping materials",
+        description="Face mapping materials (Geometry only)",
         default=constants.EXPORT_OPTIONS[constants.FACE_MATERIALS])
 
     option_maps = BoolProperty(
@@ -821,6 +821,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         :param context:
 
         """
+
+        using_geometry = self.option_geometry_type == constants.GEOMETRY
+
         layout = self.layout
 
         ## Geometry {
@@ -829,7 +832,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_vertices')
-        row.prop(self.properties, 'option_faces')
+        col = row.column()
+        col.prop(self.properties, 'option_faces')
+        col.enabled = using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_normals')
@@ -841,6 +846,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_extra_vgroups')
+        row.enabled = not using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_apply_modifiers')
@@ -861,6 +867,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_face_materials')
+        row.enabled = using_geometry
 
         row = layout.row()
         row.prop(self.properties, 'option_colors')

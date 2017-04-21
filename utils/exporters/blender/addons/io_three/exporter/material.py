@@ -16,6 +16,9 @@ class Material(base_classes.BaseNode):
         textures = self.parent.options.get(constants.MAPS)
         if textures:
             self._update_maps()
+        skinning = self.parent.options.get(constants.SKINNING)
+        if skinning:
+            self[constants.SKINNING] = True
 
     def _common_attributes(self):
         """Parse the common material attributes"""
