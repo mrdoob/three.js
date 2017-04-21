@@ -143,7 +143,10 @@ def buffer_color(mesh, options):
     """
     colors_ = []
 
-    vertex_colors_ = mesh.vertex_colors[0]  # only supports one set
+    try:
+        vertex_colors_ = mesh.vertex_colors[0]  # only supports one set
+    except IndexError:
+        return []  # no colors found
     for color_data in vertex_colors_.data:
         colors_.extend(tuple(color_data.color))
 
