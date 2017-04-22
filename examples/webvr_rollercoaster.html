@@ -55,7 +55,6 @@
 			scene.add( train );
 
 			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 500 );
-			camera.rotation.y = Math.PI;
 			train.add( camera );
 
 			// environment
@@ -230,6 +229,8 @@
 					funfairs[ i ].rotation.y = time * 0.0004;
 
 				}
+
+				if ( effect.isPresenting === false ) camera.rotation.y = Math.PI;
 
 				//
 
