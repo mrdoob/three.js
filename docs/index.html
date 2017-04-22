@@ -22,6 +22,7 @@
 				<input type="text" id="filterInput" placeholder="Type to filter">
 				<a href="#" id="clearFilterButton">x</a>
 			</div>
+			<div id="content"></div>
 
 		</div>
 
@@ -32,6 +33,7 @@
 		<script>
 
 			var panel = document.getElementById( 'panel' );
+			var content = document.getElementById( 'content' );
 			var clearFilterButton = document.getElementById( 'clearFilterButton' );
 			var expandButton = document.getElementById( 'expandButton' );
 			var filterInput = document.getElementById( 'filterInput' );
@@ -98,7 +100,7 @@
 
 				// Create the navigation panel using data from list.js
 
-				var navigation = createAndAppendDOMElement( { type: 'div', parent: panel } );
+				var navigation = createAndAppendDOMElement( { type: 'div', parent: content } );
 
 				for ( var section in list ) {
 

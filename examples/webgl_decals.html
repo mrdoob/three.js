@@ -37,13 +37,14 @@
 		<script src="../build/three.js"></script>
 		<script src="js/geometries/DecalGeometry.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
 		var container = document.getElementById( 'container' );
 
-		var renderer, scene, camera, fov = 45;
+		var renderer, scene, camera, stats;
 		var mesh, decal;
 		var raycaster;
 		var line;
@@ -101,9 +102,12 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.position.z = 120;
 			camera.target = new THREE.Vector3();
 
@@ -298,6 +302,8 @@
 			requestAnimationFrame( animate );
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 
