@@ -55,7 +55,6 @@
 			scene.add( train );
 
 			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 500 );
-			camera.rotation.y = Math.PI;
 			train.add( camera );
 
 			// environment
@@ -246,7 +245,7 @@
 				velocity -= tangent.y * 0.0000001 * delta;
 				velocity = Math.max( 0.00004, Math.min( 0.0002, velocity ) );
 
-				train.lookAt( lookAt.copy( position ).add( tangent ) );
+				train.lookAt( lookAt.copy( position ).sub( tangent ) );
 
 				//
 
