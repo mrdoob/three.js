@@ -6,7 +6,6 @@
 'use strict';
 
 if ( THREE.OBJLoader2 === undefined ) { THREE.OBJLoader2 = {} }
-THREE.OBJLoader2.version = '1.2.1';
 
 /**
  * Use this class to load OBJ data from files or to parse OBJ data from arraybuffer or text
@@ -16,8 +15,11 @@ THREE.OBJLoader2.version = '1.2.1';
  */
 THREE.OBJLoader2 = (function () {
 
+	var OBJLOADER2_VERSION = '1.2.1';
+
 	function OBJLoader2( manager ) {
-		this.manager = ! Boolean( manager ) ? THREE.DefaultLoadingManager : manager;
+		console.log( "Using THREE.OBJLoader2 version: " + OBJLOADER2_VERSION );
+		this.manager = Validator.verifyInput( manager, THREE.DefaultLoadingManager );
 
 		this.path = '';
 		this.fileLoader = new THREE.FileLoader( this.manager );
@@ -35,7 +37,7 @@ THREE.OBJLoader2 = (function () {
 	 * @param {string} path The basepath
 	 */
 	OBJLoader2.prototype.setPath = function ( path ) {
-		this.path = Boolean( path ) ? path : this.path;
+		this.path = Validator.verifyInput( path, this.path );
 	};
 
 	/**
@@ -83,13 +85,13 @@ THREE.OBJLoader2 = (function () {
 	OBJLoader2.prototype.load = function ( url, onLoad, onProgress, onError, useArrayBuffer ) {
 		this._validate();
 		this.fileLoader.setPath( this.path );
-		this.fileLoader.setResponseType( ( useArrayBuffer || useArrayBuffer === null || useArrayBuffer === undefined ) ? 'arraybuffer' : 'text' );
+		this.fileLoader.setResponseType( useArrayBuffer !== false ? 'arraybuffer' : 'text' );
 
 		var scope = this;
 		scope.fileLoader.load( url, function ( content ) {
 
 			// only use parseText if useArrayBuffer is explicitly set to false
-			onLoad( ( useArrayBuffer || useArrayBuffer === null || useArrayBuffer === undefined ) ? scope.parse( content ) : scope.parseText( content ) );
+			onLoad( useArrayBuffer !== false ? scope.parse( content ) : scope.parseText( content ) );
 
 		}, onProgress, onError );
 	};
@@ -147,7 +149,7 @@ THREE.OBJLoader2 = (function () {
 	OBJLoader2.prototype._validate = function () {
 		if ( this.validated ) return;
 
-		this.fileLoader = Boolean( this.fileLoader ) ? this.fileLoader : new THREE.FileLoader( this.manager );
+		this.fileLoader = Validator.verifyInput( this.fileLoader, new THREE.FileLoader( this.manager ) );
 		this.parser.validate();
 		this.meshCreator.validate();
 
@@ -206,6 +208,32 @@ THREE.OBJLoader2 = (function () {
 		QUAD_INDICES_3: [ 1, 4, 7, 7, 10, 1 ]
 	};
 
+	var Validator = {
+		/**
+		 * If given input is null or undefined, false is returned otherwise true.
+		 *
+		 * @param input Anything
+		 * @returns {boolean}
+		 */
+		isValid: function( input ) {
+			return ( input !== null && input !== undefined );
+		},
+		/**
+		 * If given input is null or undefined, the defaultValue is returned otherwise the given input.
+		 *
+		 * @param input Anything
+		 * @param defaultValue Anything
+		 * @returns {*}
+		 */
+		verifyInput: function( input, defaultValue ) {
+			return ( input === null || input === undefined ) ? defaultValue : input;
+		}
+	};
+
+	OBJLoader2.prototype._getValidator = function () {
+		return Validator;
+	};
+
 	/**
 	 * Parse OBJ data either from ArrayBuffer or string
 	 * @class
@@ -220,7 +248,7 @@ THREE.OBJLoader2 = (function () {
 		}
 
 		Parser.prototype.setDebug = function ( debug ) {
-			this.debug = Boolean( debug ) ? debug : this.debug;
+			if ( debug === true || debug === false ) this.debug = debug;
 		};
 
 		Parser.prototype.validate = function () {
@@ -486,9 +514,9 @@ THREE.OBJLoader2 = (function () {
 			this.uvs = [];
 
 			// faces are stored according combined index of group, material and smoothingGroup (0 or not)
-			this.mtllibName = Boolean( mtllibName ) ? mtllibName : 'none';
-			this.objectName = Boolean( objectName ) ? objectName : 'none';
-			this.groupName = Boolean( groupName ) ? groupName : 'none';
+			this.mtllibName = Validator.verifyInput( mtllibName, 'none' );
+			this.objectName = Validator.verifyInput( objectName, 'none' );
+			this.groupName = Validator.verifyInput( groupName, 'none' );
 			this.activeMtlName = 'none';
 			this.activeSmoothingGroup = 1;
 
@@ -562,7 +590,7 @@ THREE.OBJLoader2 = (function () {
 		};
 
 		RawObject.prototype.pushUsemtl = function ( mtlName ) {
-			if ( this.activeMtlName === mtlName || mtlName === null || mtlName === undefined ) return;
+			if ( this.activeMtlName === mtlName || ! Validator.isValid( mtlName ) ) return;
 			this.activeMtlName = mtlName;
 			this.mtlCount++;
 
@@ -581,7 +609,7 @@ THREE.OBJLoader2 = (function () {
 		RawObject.prototype.verifyIndex = function () {
 			var index = this.buildIndex( this.activeMtlName, ( this.activeSmoothingGroup === 0 ) ? 0 : 1 );
 			this.rawObjectDescriptionInUse = this.rawObjectDescriptions[ index ];
-			if ( ! Boolean( this.rawObjectDescriptionInUse ) ) {
+			if ( ! Validator.isValid( this.rawObjectDescriptionInUse ) ) {
 
 				this.rawObjectDescriptionInUse = new RawObjectDescription( this.objectName, this.groupName, this.activeMtlName, this.activeSmoothingGroup );
 				this.rawObjectDescriptions[ index ] = this.rawObjectDescriptionInUse;
@@ -809,15 +837,17 @@ THREE.OBJLoader2 = (function () {
 		}
 
 		MeshCreator.prototype.setSceneGraphBaseNode = function ( sceneGraphBaseNode ) {
-			this.sceneGraphBaseNode = Boolean( sceneGraphBaseNode ) ? sceneGraphBaseNode : ( Boolean( this.sceneGraphBaseNode ) ? this.sceneGraphBaseNode : new THREE.Group() );
+			this.sceneGraphBaseNode = Validator.verifyInput( sceneGraphBaseNode, this.sceneGraphBaseNode );
+			this.sceneGraphBaseNode = Validator.verifyInput( this.sceneGraphBaseNode, new THREE.Group() );
 		};
 
 		MeshCreator.prototype.setMaterials = function ( materials ) {
-			this.materials = Boolean( materials ) ? materials : ( Boolean( this.materials ) ? this.materials : { materials: [] } );
+			this.materials = Validator.verifyInput( materials, this.materials );
+			this.materials = Validator.verifyInput( this.materials, { materials: [] } );
 		};
 
 		MeshCreator.prototype.setDebug = function ( debug ) {
-			this.debug = Boolean( debug ) ? debug : this.debug;
+			if ( debug === true || debug === false ) this.debug = debug;
 		};
 
 		MeshCreator.prototype.validate = function () {
@@ -986,6 +1016,7 @@ THREE.OBJLoader2 = (function () {
 	OBJLoader2.prototype._buildWebWorkerCode = function ( funcBuildObject, funcBuildSingelton ) {
 		var workerCode = '';
 		workerCode += funcBuildObject( 'Consts', Consts );
+		workerCode += funcBuildObject( 'Validator', Validator );
 		workerCode += funcBuildSingelton( 'Parser', 'Parser', Parser );
 		workerCode += funcBuildSingelton( 'RawObject', 'RawObject', RawObject );
 		workerCode += funcBuildSingelton( 'RawObjectDescription', 'RawObjectDescription', RawObjectDescription );

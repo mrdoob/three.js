@@ -92,6 +92,8 @@
 
 			var WWParallels = (function () {
 
+				var Validator = THREE.OBJLoader2.prototype._getValidator();
+
 				function WWParallels( elementToBindTo ) {
 					this.renderer = null;
 					this.canvas = elementToBindTo;
@@ -117,6 +119,8 @@
 
 					this.allAssets = [];
 					this.feedbackArray = null;
+
+					this.running = false;
 				}
 
 				WWParallels.prototype.initGL = function () {
@@ -192,6 +196,15 @@
 				};
 
 				WWParallels.prototype.enqueueAllAssests = function ( maxQueueSize, maxWebWorkers, streamMeshes ) {
+					if ( this.running ) {
+
+						return;
+
+					} else {
+
+						this.running = true;
+
+					}
 					var scope = this;
 					scope.wwDirector.objectsCompleted = 0;
 					scope.feedbackArray = new Array( maxWebWorkers );
@@ -209,12 +222,14 @@
 						console.log( msg );
 						scope.feedbackArray[ instanceNo ] = msg;
 						scope.reportProgress( scope.feedbackArray.join( '\<br\>' ) );
+
+						if ( scope.wwDirector.objectsCompleted + 1 === maxQueueSize ) scope.running = false;
 					};
 
 					var callbackMeshLoaded = function ( name, bufferGeometry, material ) {
 						var materialOverride;
 
-						if ( Boolean( material ) && material.name === 'defaultMaterial' || name === 'Mesh_Mesh_head_geo.001' ) {
+						if ( Validator.isValid( material ) && material.name === 'defaultMaterial' || name === 'Mesh_Mesh_head_geo.001' ) {
 
 							materialOverride = material;
 							materialOverride.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
@@ -294,7 +309,7 @@
 							distributionBase + distributionMax * Math.random(),
 							distributionBase + distributionMax * Math.random()
 						);
-						if ( Boolean( model.scale ) ) pivot.scale.set( model.scale, model.scale, model.scale );
+						if ( Validator.isValid( model.scale ) ) pivot.scale.set( model.scale, model.scale, model.scale );
 
 						this.scene.add( pivot );
 
