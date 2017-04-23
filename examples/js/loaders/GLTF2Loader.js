@@ -1782,40 +1782,29 @@ THREE.GLTF2Loader = ( function () {
 
 					// set uniforms and defines for Specular-Glossiness
 
-					var uniforms = materialParams.uniforms;
-					var defines = materialParams.defines;
-
-					if ( materialParams.color !== undefined ) uniforms.diffuse.value.copy( materialParams.color );
-					if ( materialParams.emissive !== undefined ) uniforms.emissive.value.copy( materialParams.emissive );
-					if ( materialParams.specular !== undefined ) uniforms.specular.value.copy( materialParams.specular );
-					if ( materialParams.glossiness !== undefined ) uniforms.glossiness.value = materialParams.glossiness;
-
-					if ( materialParams.map !== undefined ) uniforms.map.value = materialParams.map;
-					if ( materialParams.aoMap !== undefined ) uniforms.aoMap.value = materialParams.aoMap;
-					if ( materialParams.emissiveMap !== undefined ) uniforms.emissiveMap.value = materialParams.emissiveMap;
-					if ( materialParams.normalMap !== undefined ) uniforms.normalMap.value = materialParams.normalMap;
-					if ( materialParams.specularMap !== undefined ) uniforms.specularMap.value = materialParams.specularMap;
-					if ( materialParams.glossinessMap !== undefined ) uniforms.glossinessMap.value = materialParams.glossinessMap;
-
-					if ( uniforms.map.value !== null ) defines.USE_MAP = '';
-					if ( uniforms.aoMap.value !== null ) defines.USE_AOMAP = '';
-					if ( uniforms.emissiveMap.value !== null ) defines.USE_EMISSIVEMAP = '';
-					if ( uniforms.normalMap.value !== null ) defines.USE_NORMALMAP = '';
-					if ( uniforms.specularMap.value !== null ) defines.USE_SPECULARMAP = '';
-					if ( uniforms.glossinessMap.value !== null ) defines.USE_GLOSSINESSMAP = '';
-
-					// set defines.USE_GLOSSINESSMAP to enable vUv in the shader
-					if ( defines.USE_GLOSSINESSMAP !== undefined ) defines.USE_ROUGHNESSMAP = '';
-
 					_material = new materialType( {
-						defines: defines,
+						defines: materialParams.defines,
 						vertexShader: materialParams.vertexShader,
 						fragmentShader: materialParams.fragmentShader,
-						uniforms: uniforms,
+						uniforms: materialParams.uniforms,
 						lights: materialParams.lights,
 						opacity: materialParams.opacity,
 						transparent: materialParams.transparent
 					} );
+
+					_material.color = materialParams.color;
+					_material.emissive = materialParams.emissive;
+					_material.specular = materialParams.specular;
+					_material.glossiness = materialParams.glossiness;
+
+					_material.map = materialParams.map === undefined ? null : materialParams.map;
+					_material.aoMap = materialParams.aoMap === undefined ? null : materialParams.aoMap;
+					_material.bumpMap = materialParams.bumpMap === undefined ? null : materialParams.bumpMap;
+					_material.emissiveMap = materialParams.emissiveMap === undefined ? null : materialParams.emissiveMap;
+					_material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap;
+					_material.normalMap = materialParams.normalMap === undefined ? null : materialParams.normalMap;
+					_material.specularMap = materialParams.specularMap === undefined ? null : materialParams.specularMap;
+					_material.glossinessMap = materialParams.glossinessMap === undefined ? null : materialParams.glossinessMap;
 
 					_material.extensions.derivatives = true;
 
@@ -2471,6 +2460,47 @@ THREE.GLTF2Loader = ( function () {
 						child.gltfShader = new GLTFShader( child, dependencies.nodes );
 						child.onBeforeRender = function(renderer, scene, camera){
 							this.gltfShader.update(scene, camera);
+						};
+
+					}
+
+					// for Specular-Glossiness
+					if ( child.material && child.material.type === 'ShaderMaterial' ) {
+
+						child.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
+
+							var uniforms = material.uniforms;
+							var defines = material.defines;
+
+							uniforms.diffuse.value.copy( material.color );
+							uniforms.emissive.value.copy( material.emissive );
+							uniforms.specular.value.copy( material.specular );
+							uniforms.glossiness.value = material.glossiness;
+
+							uniforms.map.value = material.map;
+							uniforms.aoMap.value = material.aoMap;
+							uniforms.bumpMap.value = material.bumpMap;
+							uniforms.emissiveMap.value = material.emissiveMap;
+							uniforms.envMap.value = material.envMap;
+							uniforms.normalMap.value = material.normalMap;
+							uniforms.specularMap.value = material.specularMap;
+							uniforms.glossinessMap.value = material.glossinessMap;
+
+							if ( uniforms.glossinessMap.value !== null && defines.USE_GLOSSINESSMAP === undefined ) {
+
+								defines.USE_GLOSSINESSMAP = '';
+								// set USE_ROUGHNESSMAP to enable vUv
+								defines.USE_ROUGHNESSMAP = ''
+
+							}
+
+							if ( uniforms.glossinessMap.value === null && defines.USE_GLOSSINESSMAP !== undefined ) {
+
+								delete defines.USE_GLOSSINESSMAP;
+								delete defines.USE_ROUGHNESSMAP;
+
+							}
+
 						};
 
 					}

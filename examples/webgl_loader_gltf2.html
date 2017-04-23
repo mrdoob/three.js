@@ -260,19 +260,10 @@
 
 						object.traverse( function( node ) {
 
-							if ( node.material && node.material.isMeshStandardMaterial ) {
+							if ( node.material && ( node.material.isMeshStandardMaterial ||
+								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
 
 								node.material.envMap = envMap;
-								node.material.needsUpdate = true;
-
-							}
-
-							if ( node.material && node.material.isShaderMaterial && node.material.uniforms.envMap ) {
-
-								node.material.uniforms.envMap.value = envMap;
-								node.material.defines.USE_ENVMAP = '';
-								node.material.defines.ENVMAP_TYPE_CUBE = '';
-								node.material.defines.ENVMAP_MODE_REFLECTION = '';
 								node.material.needsUpdate = true;
 
 							}
