@@ -2,8 +2,6 @@
  * @author oosmoxiecode
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
- *
- * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
 import { Geometry } from '../core/Geometry';
