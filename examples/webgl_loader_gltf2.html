@@ -88,6 +88,7 @@
 			<select id="extensions_list" onchange="selectExtension();">
 				<option value="glTF">None</option>
 				<option value="glTF-MaterialsCommon">Built-in shaders</option>
+				<option value="glTF-pbrSpecularGlossiness">Specular-Glossiness</option>
 				<option value="glTF-Binary">Binary</option>
 			</select>
 		</div>
@@ -266,6 +267,16 @@
 
 							}
 
+							if ( node.material && node.material.isShaderMaterial && node.material.uniforms.envMap ) {
+
+								node.material.uniforms.envMap.value = envMap;
+								node.material.defines.USE_ENVMAP = '';
+								node.material.defines.ENVMAP_TYPE_CUBE = '';
+								node.material.defines.ENVMAP_MODE_REFLECTION = '';
+								node.material.needsUpdate = true;
+
+							}
+
 						} );
 
 						scene.background = envMap;
@@ -416,7 +427,7 @@
 					cameraPos: new THREE.Vector3(2, 1, 3),
 					objectRotation: new THREE.Euler(0, Math.PI, 0),
 					addLights:true,
-					extensions: ["glTF", "glTF-Binary"],
+					extensions: ["glTF", "glTF-pbrSpecularGlossiness", "glTF-Binary"],
 					addEnvMap: true
 				}
 			];
