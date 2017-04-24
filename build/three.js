@@ -2317,8 +2317,6 @@
 
 		setFromUnitVectors: function () {
 
-			// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
-
 			// assumes direction vectors vFrom and vTo are normalized
 
 			var v1 = new Vector3();
@@ -15253,8 +15251,6 @@
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
 	 */
 
 	// BoxGeometry
@@ -15447,8 +15443,6 @@
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
 	 */
 
 	// PlaneGeometry
@@ -25485,8 +25479,6 @@
 	 * @author oosmoxiecode
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
 	 */
 
 	// TorusGeometry
@@ -32335,18 +32327,6 @@
 
 			if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
-			// MultiMaterial
-
-			if ( json.materials !== undefined ) {
-
-				for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
-
-					material.materials.push( this.parse( json.materials[ i ] ) );
-
-				}
-
-			}
-
 			return material;
 
 		}
@@ -33655,8 +33635,27 @@
 
 				for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-					var material = loader.parse( json[ i ] );
-					materials[ material.uuid ] = material;
+					var data = json[ i ];
+
+					if ( data.type === 'MultiMaterial' ) {
+
+						// Deprecated
+
+						var array = [];
+
+						for ( var j = 0; j < data.materials.length; j ++ ) {
+
+							array.push( loader.parse( data.materials[ j ] ) );
+
+						}
+
+						materials[ data.uuid ] = array;
+
+					} else {
+
+						materials[ data.uuid ] = loader.parse( data );
+
+					}
 
 				}
 
@@ -40448,7 +40447,7 @@
 
 			this.cone.lookAt( vector2.sub( vector ) );
 
-			this.cone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+			this.cone.material.color.copy( this.light.color );
 
 		};
 
@@ -40581,7 +40580,7 @@
 
 		var geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
 		var material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-		material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		material.color.copy( this.light.color );
 
 		Mesh.call( this, geometry, material );
 
@@ -40624,7 +40623,7 @@
 
 	PointLightHelper.prototype.update = function () {
 
-		this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.material.color.copy( this.light.color );
 
 		/*
 		var d = this.light.distance;
@@ -40646,6 +40645,7 @@
 	/**
 	 * @author abelnation / http://github.com/abelnation
 	 * @author Mugen87 / http://github.com/Mugen87
+	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
 	function RectAreaLightHelper( light ) {
@@ -40655,28 +40655,16 @@
 		this.light = light;
 		this.light.updateMatrixWorld();
 
-		var materialFront = new MeshBasicMaterial( {
-			color: light.color,
-			fog: false
-		} );
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
 
-		var materialBack = new MeshBasicMaterial( {
-			color: light.color,
-			fog: false,
-			wireframe: true
-		} );
+		var material = new LineBasicMaterial( { color: light.color } );
 
 		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 6 * 3 ), 3 ) );
+		geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 5 * 3 ), 3 ) );
 
-		// shows the "front" of the light, e.g. where light comes from
-
-		this.add( new Mesh( geometry, materialFront ) );
-
-		// shows the "back" of the light, which does not emit light
-
-		this.add( new Mesh( geometry, materialBack ) );
+		this.add( new Line( geometry, material ) );
 
 		this.update();
 
@@ -40689,8 +40677,6 @@
 
 		this.children[ 0 ].geometry.dispose();
 		this.children[ 0 ].material.dispose();
-		this.children[ 1 ].geometry.dispose();
-		this.children[ 1 ].material.dispose();
 
 	};
 
@@ -40701,46 +40687,27 @@
 
 		return function update() {
 
-			var mesh1 = this.children[ 0 ];
-			var mesh2 = this.children[ 1 ];
+			var line = this.children[ 0 ];
 
-			if ( this.light.target ) {
+			// update material
 
-				vector1.setFromMatrixPosition( this.light.matrixWorld );
-				vector2.setFromMatrixPosition( this.light.target.matrixWorld );
-
-				var lookVec = vector2.clone().sub( vector1 );
-				mesh1.lookAt( lookVec );
-				mesh2.lookAt( lookVec );
-
-			}
-
-			// update materials
-
-			mesh1.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-			mesh2.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+			line.material.color.copy( this.light.color );
 
 			// calculate new dimensions of the helper
 
 			var hx = this.light.width * 0.5;
 			var hy = this.light.height * 0.5;
 
-			// because the buffer attribute is shared over both geometries, we only have to update once
-
-			var position = mesh1.geometry.getAttribute( 'position' );
+			var position = line.geometry.attributes.position;
 			var array = position.array;
 
-			// first face
+			// update vertices
 
 			array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
 			array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
 			array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
-
-			// second face
-
-			array[  9 ] = - hx; array[ 10 ] =   hy; array[ 11 ] = 0;
-			array[ 12 ] = - hx; array[ 13 ] = - hy; array[ 14 ] = 0;
-			array[ 15 ] =   hx; array[ 16 ] = - hy; array[ 17 ] = 0;
+			array[  9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
+			array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
 
 			position.needsUpdate = true;
 
@@ -40803,8 +40770,8 @@
 
 			var colors = mesh.geometry.getAttribute( 'color' );
 
-			color1.copy( this.light.color ).multiplyScalar( this.light.intensity );
-			color2.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+			color1.copy( this.light.color );
+			color2.copy( this.light.groundColor );
 
 			for ( var i = 0, l = colors.count; i < l; i ++ ) {
 
@@ -41133,7 +41100,7 @@
 			var targetLine = this.children[ 1 ];
 
 			lightPlane.lookAt( v3 );
-			lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+			lightPlane.material.color.copy( this.light.color );
 
 			targetLine.lookAt( v3 );
 			targetLine.scale.z = v3.length();

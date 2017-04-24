@@ -3831,10 +3831,6 @@
           "!type": "fn(a: +THREE.Matrix4, b: +THREE.Matrix4) -> +THREE.Matrix4",
           "!doc": "Sets this matrix to *a x b*."
         },
-        "multiplyToArray": {
-          "!type": "fn(a: +THREE.Matrix4, b: +THREE.Matrix4, r: []) -> +THREE.Matrix4",
-          "!doc": "Sets this matrix to *a x b* and stores the result into the flat array *r*.<br>\n\t\t*r* can be either a regular Array or a TypedArray."
-        },
         "multiplyScalar": {
           "!type": "fn(s: number) -> +THREE.Matrix4",
           "!doc": "Multiplies this matrix by *s*."
