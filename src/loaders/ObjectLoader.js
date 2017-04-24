@@ -363,8 +363,27 @@ Object.assign( ObjectLoader.prototype, {
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var material = loader.parse( json[ i ] );
-				materials[ material.uuid ] = material;
+				var data = json[ i ];
+
+				if ( data.type === 'MultiMaterial' ) {
+
+					// Deprecated
+
+					var array = [];
+
+					for ( var j = 0; j < data.materials.length; j ++ ) {
+
+						array.push( loader.parse( data.materials[ j ] ) );
+
+					}
+
+					materials[ data.uuid ] = array;
+
+				} else {
+
+					materials[ data.uuid ] = loader.parse( data );
+
+				}
 
 			}
 
