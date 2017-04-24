@@ -48,7 +48,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="../build/three.js"></script>
 	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
@@ -152,9 +151,6 @@
 			var instanceQuaternions = [];
 			var instanceScales = [];
 
-			// var position = new THREE.Vector3();
-			// var quaternion = new THREE.Quaternion();
-
 			for ( var i = 0; i < INSTANCE_COUNT; i ++ ) {
 
 				var mesh = new THREE.Mesh( geometry, material );
@@ -197,94 +193,6 @@
 			var mesh2 = new THREE.Mesh( geometry2, material );
 			mesh2.position.x = 0.1;
 			scene.add( mesh2 );
-
-
-			/*
-			// geometry
-
-			var triangles = 1;
-			var instances = 65000;
-
-			var geometry = new THREE.InstancedBufferGeometry();
-
-			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
-			var gui = new dat.GUI();
-			gui.add( geometry, "maxInstancedCount", 0, instances );
-
-			var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
-
-			vertices.setXYZ( 0, 0.025, -0.025, 0 );
-			vertices.setXYZ( 1, -0.025, 0.025, 0 );
-			vertices.setXYZ( 2, 0, 0, 0.025 );
-
-			geometry.addAttribute( 'position', vertices );
-
-			var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
-
-			for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
-
-				offsets.setXYZ( i, Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-
-			}
-
-			geometry.addAttribute( 'offset', offsets );
-
-			var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-
-			for ( var i = 0, ul = colors.count; i < ul; i++ ) {
-
-				colors.setXYZW( i, Math.random(), Math.random(), Math.random(), Math.random() );
-
-			}
-
-			geometry.addAttribute( 'color', colors );
-
-			var vector = new THREE.Vector4();
-
-			var orientationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-
-			for ( var i = 0, ul = orientationsStart.count; i < ul; i++ ) {
-
-				vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-				vector.normalize();
-
-				orientationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
-
-			}
-
-			geometry.addAttribute( 'orientationStart', orientationsStart );
-
-			var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-
-			for ( var i = 0, ul = orientationsEnd.count; i < ul; i++ ) {
-
-				vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-				vector.normalize();
-
-				orientationsEnd.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
-
-			}
-
-			geometry.addAttribute( 'orientationEnd', orientationsEnd );
-
-			// material
-
-			var material = new THREE.RawShaderMaterial( {
-
-				uniforms: {
-					time: { value: 1.0 },
-					sineTime: { value: 1.0 }
-				},
-				vertexShader: document.getElementById( 'vertexShader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-				side: THREE.DoubleSide,
-				transparent: true
-
-			} );
-
-			var mesh = new THREE.Mesh( geometry, material );
-			scene.add( mesh );
-			*/
 
 			renderer = new THREE.WebGLRenderer();
 
