@@ -41,6 +41,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters, onFa
 					if ( onFailureCallback ) {
 						onFailureCallback();
 					}
+					throw e;
 				}
 
 				var materials = [], geometries = [], counter = 0;
