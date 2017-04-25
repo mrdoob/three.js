@@ -45,37 +45,30 @@ RectAreaLightHelper.prototype.dispose = function () {
 
 RectAreaLightHelper.prototype.update = function () {
 
-	var vector1 = new Vector3();
-	var vector2 = new Vector3();
+	var line = this.children[ 0 ];
 
-	return function update() {
+	// update material
 
-		var line = this.children[ 0 ];
+	line.material.color.copy( this.light.color );
 
-		// update material
+	// calculate new dimensions of the helper
 
-		line.material.color.copy( this.light.color );
+	var hx = this.light.width * 0.5;
+	var hy = this.light.height * 0.5;
 
-		// calculate new dimensions of the helper
+	var position = line.geometry.attributes.position;
+	var array = position.array;
 
-		var hx = this.light.width * 0.5;
-		var hy = this.light.height * 0.5;
+	// update vertices
 
-		var position = line.geometry.attributes.position;
-		var array = position.array;
+	array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
+	array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
+	array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
+	array[  9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
+	array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
 
-		// update vertices
+	position.needsUpdate = true;
 
-		array[  0 ] =   hx; array[  1 ] = - hy; array[  2 ] = 0;
-		array[  3 ] =   hx; array[  4 ] =   hy; array[  5 ] = 0;
-		array[  6 ] = - hx; array[  7 ] =   hy; array[  8 ] = 0;
-		array[  9 ] = - hx; array[ 10 ] = - hy; array[ 11 ] = 0;
-		array[ 12 ] =   hx; array[ 13 ] = - hy; array[ 14 ] = 0;
-
-		position.needsUpdate = true;
-
-	};
-
-}();
+};
 
 export { RectAreaLightHelper };
