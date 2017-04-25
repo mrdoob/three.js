@@ -351,8 +351,7 @@ Object.assign( Quaternion.prototype, {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1 = new Vector3();
-		var r;
+		var v1, r;
 
 		var EPS = 0.000001;
 
