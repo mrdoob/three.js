@@ -43,6 +43,7 @@ import { Color } from '../math/Color';
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  * @author tschw
+ * @author jcowles / http://visualcore.com/
  */
 
 function WebGLRenderer( parameters ) {
@@ -1955,6 +1956,16 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+
+		// optional inverse matrices
+
+		if (object.material.needsInverseMatrices) {
+			var mvi = new Matrix4( );
+			mvi.getInverse( object.modelViewMatrix );
+			p_uniforms.setValue( _gl, 'modelInverseMatrix', object.matrixWorldInverse );
+			p_uniforms.setValue( _gl, 'modelViewInverseMatrix', mvi );
+		}
 
 		return program;
 
