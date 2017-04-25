@@ -1300,8 +1300,6 @@ THREE.GLTF2Loader = ( function () {
 						materialParams.uniforms = uniforms;
 						materialParams.defines = { 'STANDARD': '' };
 
-						materialParams.lights = true;
-
 						materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
 						materialParams.opacity = 1.0;
 
@@ -1780,31 +1778,55 @@ THREE.GLTF2Loader = ( function () {
 
 				if ( materialType === THREE.ShaderMaterial ) {
 
-					// set uniforms and defines for Specular-Glossiness
+					// setup material properties based on MeshStandardMaterial for Specular-Glossiness
 
 					_material = new materialType( {
 						defines: materialParams.defines,
 						vertexShader: materialParams.vertexShader,
 						fragmentShader: materialParams.fragmentShader,
 						uniforms: materialParams.uniforms,
-						lights: materialParams.lights,
+						fog: true,
+						lights: true,
 						opacity: materialParams.opacity,
 						transparent: materialParams.transparent
 					} );
 
 					_material.color = materialParams.color;
-					_material.emissive = materialParams.emissive;
-					_material.specular = materialParams.specular;
-					_material.glossiness = materialParams.glossiness;
 
 					_material.map = materialParams.map === undefined ? null : materialParams.map;
+
+					_material.lightMap = null;
+					_material.lightMapIntensity = 1.0;
+
 					_material.aoMap = materialParams.aoMap === undefined ? null : materialParams.aoMap;
-					_material.bumpMap = materialParams.bumpMap === undefined ? null : materialParams.bumpMap;
+					_material.aoMapIntensity = 1.0;
+
+					_material.emissive = materialParams.emissive;
+					_material.emissiveIntensity = 1.0;
 					_material.emissiveMap = materialParams.emissiveMap === undefined ? null : materialParams.emissiveMap;
-					_material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap;
+
+					_material.bumpMap = materialParams.bumpMap === undefined ? null : materialParams.bumpMap;
+					_material.bumpScale = 1;
+
 					_material.normalMap = materialParams.normalMap === undefined ? null : materialParams.normalMap;
+					_material.normalScale = new THREE.Vector2( 1, 1 );
+
+					_material.displacementMap = null;
+					_material.displacementScale = 1;
+					_material.displacementBias = 0;
+
 					_material.specularMap = materialParams.specularMap === undefined ? null : materialParams.specularMap;
+					_material.specular = materialParams.specular;
+
 					_material.glossinessMap = materialParams.glossinessMap === undefined ? null : materialParams.glossinessMap;
+					_material.glossiness = materialParams.glossiness;
+
+					_material.alphaMap = null;
+
+					_material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap;
+					_material.envMapIntensity = 1.0;
+
+					_material.refractionRatio = 0.98;
 
 					_material.extensions.derivatives = true;
 
@@ -2464,7 +2486,8 @@ THREE.GLTF2Loader = ( function () {
 
 					}
 
-					// for Specular-Glossiness
+					// Refresh uniforms and defines for Specular-Glossiness.
+					// Here's based on refreshUniformsCommon() and refreshUniformsStandard() in WebGLRenderer.
 					if ( child.material && child.material.type === 'ShaderMaterial' ) {
 
 						child.onBeforeRender = function ( renderer, scene, camera, geometry, material, group ) {
@@ -2472,19 +2495,99 @@ THREE.GLTF2Loader = ( function () {
 							var uniforms = material.uniforms;
 							var defines = material.defines;
 
+							uniforms.opacity.value = material.opacity;
+
 							uniforms.diffuse.value.copy( material.color );
-							uniforms.emissive.value.copy( material.emissive );
+							uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+
+							uniforms.map.value = material.map;
+							uniforms.specularMap.value = material.specularMap;
+							uniforms.alphaMap.value = material.alphaMap;
+
+							uniforms.lightMap.value = material.lightMap;
+							uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
+							uniforms.aoMap.value = material.aoMap;
+							uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
+							// uv repeat and offset setting priorities
+							// 1. color map
+							// 2. specular map
+							// 3. normal map
+							// 4. bump map
+							// 5. alpha map
+							// 6. emissive map
+
+							var uvScaleMap;
+
+							if ( material.map ) {
+
+								uvScaleMap = material.map;
+
+							} else if ( material.specularMap ) {
+
+								uvScaleMap = material.specularMap;
+
+							} else if ( material.displacementMap ) {
+
+								uvScaleMap = material.displacementMap;
+
+							} else if ( material.normalMap ) {
+
+								uvScaleMap = material.normalMap;
+
+							} else if ( material.bumpMap ) {
+
+								uvScaleMap = material.bumpMap;
+
+							} else if ( material.glossinessMap ) {
+
+								uvScaleMap = material.glossinessMap;
+
+							} else if ( material.alphaMap ) {
+
+								uvScaleMap = material.alphaMap;
+
+							} else if ( material.emissiveMap ) {
+
+								uvScaleMap = material.emissiveMap;
+
+							}
+
+							if ( uvScaleMap !== undefined ) {
+
+								// backwards compatibility
+								if ( uvScaleMap.isWebGLRenderTarget ) {
+
+									uvScaleMap = uvScaleMap.texture;
+
+								}
+
+								var offset = uvScaleMap.offset;
+								var repeat = uvScaleMap.repeat;
+
+								uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+							}
+
+							uniforms.envMap.value = material.envMap;
+							uniforms.envMapIntensity.value = material.envMapIntensity;
+							uniforms.flipEnvMap.value = ( material.envMap && material.envMap.isCubeTexture ) ? -1 : 1;
+
+							uniforms.refractionRatio.value = material.refractionRatio;
+
 							uniforms.specular.value.copy( material.specular );
 							uniforms.glossiness.value = material.glossiness;
 
-							uniforms.map.value = material.map;
-							uniforms.aoMap.value = material.aoMap;
-							uniforms.bumpMap.value = material.bumpMap;
-							uniforms.emissiveMap.value = material.emissiveMap;
-							uniforms.envMap.value = material.envMap;
-							uniforms.normalMap.value = material.normalMap;
-							uniforms.specularMap.value = material.specularMap;
 							uniforms.glossinessMap.value = material.glossinessMap;
+
+							uniforms.emissiveMap.value = material.emissiveMap;
+							uniforms.bumpMap.value = material.bumpMap;
+							uniforms.normalMap.value = material.normalMap;
+
+							uniforms.displacementMap.value = material.displacementMap;
+							uniforms.displacementScale.value = material.displacementScale;
+							uniforms.displacementBias.value = material.displacementBias;
 
 							if ( uniforms.glossinessMap.value !== null && defines.USE_GLOSSINESSMAP === undefined ) {
 
