@@ -15,6 +15,8 @@ function SpotLightHelper( light ) {
 
 	Object3D.call( this );
 
+	this.type = 'SpotLightHelper';
+
 	this.light = light;
 	this.light.updateMatrixWorld();
 

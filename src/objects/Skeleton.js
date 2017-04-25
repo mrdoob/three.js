@@ -9,6 +9,8 @@ import { Matrix4 } from '../math/Matrix4';
 
 function Skeleton( bones, boneInverses ) {
 
+	this.type = 'Skeleton';
+
 	// copy the bone array
 
 	bones = bones || [];

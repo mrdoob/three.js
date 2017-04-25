@@ -15,6 +15,8 @@ function DirectionalLightHelper( light, size ) {
 
 	Object3D.call( this );
 
+	this.type = 'DirectionalLightHelper';
+
 	this.light = light;
 	this.light.updateMatrixWorld();
 

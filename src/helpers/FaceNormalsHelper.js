@@ -48,7 +48,7 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 
-	//
+	this.type = 'FaceNormalsHelper';
 
 	this.matrixAutoUpdate = false;
 	this.update();

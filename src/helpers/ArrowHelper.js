@@ -32,6 +32,8 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	Object3D.call( this );
 
+	this.type = 'ArrowHelper';
+
 	if ( color === undefined ) color = 0xffff00;
 	if ( length === undefined ) length = 1;
 	if ( headLength === undefined ) headLength = 0.2 * length;
