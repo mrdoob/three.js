@@ -19,7 +19,7 @@ THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 
 // Load multiple CTM parts defined in JSON
 
-THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
+THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters, onFailureCallback ) {
 
 	parameters = parameters || {};
 
@@ -35,7 +35,14 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var jsonObject = JSON.parse( xhr.responseText );
+				try {
+					var jsonObject = JSON.parse( xhr.responseText );
+				} catch ( e ) {
+					if ( onFailureCallback ) {
+						onFailureCallback();
+					}
+					throw e;
+				}
 
 				var materials = [], geometries = [], counter = 0;
 
