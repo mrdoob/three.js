@@ -19,6 +19,7 @@ THREE.DRACOLoader = function(manager) {
         THREE.DefaultLoadingManager;
     this.materials = null;
     this.verbosity = 0;
+    this.dracoDecoderType = {};
 };
 
 
@@ -32,7 +33,7 @@ THREE.DRACOLoader.prototype = {
         loader.setPath(this.path);
         loader.setResponseType('arraybuffer');
         loader.load(url, function(blob) {
-            onLoad(scope.decodeDracoFile(blob));
+            scope.decodeDracoFile(blob, onLoad);
         }, onProgress, onError);
     },
 
@@ -44,8 +45,19 @@ THREE.DRACOLoader.prototype = {
         this.verbosity = level;
     },
 
-    decodeDracoFile: function(rawBuffer) {
-      const dracoDecoder = THREE.DRACOLoader.getDecoder();
+    setDracoDecoderType: function(dracoDecoderType) {
+        this.dracoDecoderType = dracoDecoderType;
+    },
+
+    decodeDracoFile: function(rawBuffer, callback) {
+      const scope = this;
+      THREE.DRACOLoader.getDecoder(this.dracoDecoderType,
+          function(dracoDecoder) {
+            scope.decodeDracoFileInternal(rawBuffer, dracoDecoder, callback);
+      });
+    },
+
+    decodeDracoFileInternal : function(rawBuffer, dracoDecoder, callback) {
       /*
        * Here is how to use Draco Javascript decoder and get the geometry.
        */
@@ -70,11 +82,12 @@ THREE.DRACOLoader.prototype = {
         console.error(errorMsg);
         throw new Error(errorMsg);
       }
-      return this.convertDracoGeometryTo3JS(wrapper, geometryType, buffer);
+      callback(this.convertDracoGeometryTo3JS(dracoDecoder, wrapper,
+          geometryType, buffer));
     },
 
-    convertDracoGeometryTo3JS: function(wrapper, geometryType, buffer) {
-        const dracoDecoder = THREE.DRACOLoader.getDecoder();
+    convertDracoGeometryTo3JS: function(dracoDecoder, wrapper, geometryType,
+                                        buffer) {
         let dracoGeometry;
         const start_time = performance.now();
         if (geometryType == dracoDecoder.TRIANGULAR_MESH) {
@@ -263,26 +276,38 @@ THREE.DRACOLoader.prototype = {
         return geometry;
     },
 
-    isVersionSupported: function(version) {
-        return THREE.DRACOLoader.getDecoder().isVersionSupported(version);
+    isVersionSupported: function(version, callback) {
+        return THREE.DRACOLoader.getDecoder(this.dracoDecoderType,
+            function(decoder) { return decoder.isVersionSupported(version); });
     }
 };
 
 /**
- * Returns a singleton instance of the DracoModule decoder. Creating multiple
- * copies of the decoder is expensive.
+ * Creates and returns a singleton instance of the DracoModule decoder.
+ * The module loading is done asynchronously for WebAssembly. Initialized module
+ * can be accessed through the callback function |onDracoModuleLoadedCallback|.
  */
 THREE.DRACOLoader.getDecoder = (function() {
     let decoder;
 
-    return function() {
+    return function(dracoDecoderType, onDracoModuleLoadedCallback) {
         if (typeof DracoModule === 'undefined') {
           throw new Error('THREE.DRACOLoader: DracoModule not found.');
         }
-
-        decoder = decoder || DracoModule();
-
-        return decoder;
+        if (typeof decoder !== 'undefined') {
+          // Module already initialized.
+          if (typeof onDracoModuleLoadedCallback !== 'undefined') {
+            onDracoModuleLoadedCallback(decoder);
+          }
+        } else {
+          dracoDecoderType['onModuleLoaded'] = function(module) {
+            if (typeof onDracoModuleLoadedCallback === 'function') {
+              decoder = module;
+              onDracoModuleLoadedCallback(module);
+            }
+          };
+          DracoModule(dracoDecoderType);
+        }
     };
 
 })();
